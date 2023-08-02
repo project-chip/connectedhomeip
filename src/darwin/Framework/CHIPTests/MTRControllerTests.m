@@ -1524,6 +1524,8 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 
+    fprintf(stderr, "DOING TOO LONG TEST\n");
+
     //
     // Trying to bring up the same fabric with too-long CATs should fail, if we
     // are taking the provided CATs into account.
@@ -1534,6 +1536,8 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
     controller = [factory createControllerOnExistingFabric:params error:nil];
     XCTAssertNil(controller);
 
+    fprintf(stderr, "DOING INVALID TEST\n");
+
     //
     // Trying to bring up the same fabric with invalid CATs should fail, if we
     // are taking the provided CATs into account.
@@ -1541,9 +1545,12 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
     params.nodeID = @(17);
     params.operationalKeypair = operationalKeys;
     params.caseAuthenticatedTags = invalidCATs;
+    fprintf(stderr, "BRINGING UP CONTROLLER\n");
     controller = [factory createControllerOnExistingFabric:params error:nil];
+    fprintf(stderr, "CONTROLLER SHOULD BE NIL\n");
     XCTAssertNil(controller);
 
+    fprintf(stderr, "STOPPING FACTORY\n");
     [factory stopControllerFactory];
     XCTAssertFalse([factory isRunning]);
 }

@@ -61,7 +61,6 @@ static_library("chip-tool-utils") {
     "commands/common/Commands.cpp",
     "commands/common/Commands.h",
     "commands/common/CredentialIssuerCommands.h",
-    "commands/common/DeviceScanner.cpp",
     "commands/common/HexConversion.h",
     "commands/common/RemoteDataModelLogger.cpp",
     "commands/common/RemoteDataModelLogger.h",
@@ -97,7 +96,12 @@ static_library("chip-tool-utils") {
     sources += [ "commands/tests/TestCommand.cpp" ]
   }
 
+  if (chip_device_platform == "darwin") {
+    sources += [ "commands/common/DeviceScanner.cpp" ]
+  }
+
   public_deps = [
+    "${chip_root}/examples/common/tracing:commandline",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/tests/suites/commands/commissioner",
     "${chip_root}/src/app/tests/suites/commands/delay",

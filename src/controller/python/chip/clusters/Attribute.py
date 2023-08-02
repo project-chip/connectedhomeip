@@ -29,6 +29,7 @@ from dataclasses import dataclass, field
 from enum import Enum, unique
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
+import chip
 import chip.exceptions
 import chip.interaction_model
 import chip.tlv
@@ -149,11 +150,11 @@ class TypedAttributePath:
                 raise KeyError(f"No Schema found for Attribute {Path}")
 
         # Next, let's figure out the label.
-        for field in self.ClusterType.descriptor.Fields:
-            if (field.Tag != self.AttributeType.attribute_id):
+        for c_field in self.ClusterType.descriptor.Fields:
+            if (c_field.Tag != self.AttributeType.attribute_id):
                 continue
 
-            self.AttributeName = field.Label
+            self.AttributeName = c_field.Label
 
         if (self.AttributeName is None):
             raise KeyError(f"Unable to resolve name for Attribute {Path}")
@@ -212,7 +213,8 @@ class EventHeader:
     Timestamp: int = None
     TimestampType: EventTimestampType = None
 
-    def __init__(self, EndpointId: int = None, ClusterId: int = None, EventId: int = None, EventNumber=None, Priority=None, Timestamp=None, TimestampType=None):
+    def __init__(self, EndpointId: int = None, ClusterId: int = None,
+                 EventId: int = None, EventNumber=None, Priority=None, Timestamp=None, TimestampType=None):
         self.EndpointId = EndpointId
         self.ClusterId = ClusterId
         self.EventId = EventId
@@ -222,7 +224,8 @@ class EventHeader:
         self.TimestampType = TimestampType
 
     def __str__(self) -> str:
-        return f"{self.EndpointId}/{self.ClusterId}/{self.EventId}/{self.EventNumber}/{self.Priority}/{self.Timestamp}/{self.TimestampType}"
+        return (f"{self.EndpointId}/{self.ClusterId}/{self.EventId}/"
+                f"{self.EventNumber}/{self.Priority}/{self.Timestamp}/{self.TimestampType}")
 
 
 @dataclass
@@ -266,6 +269,7 @@ EventReadRequest = EventDescriptorWithEndpoint
 @dataclass
 class AttributeReadResult(AttributeStatus):
     Data: Any = None
+    DataVersion: int = 0
 
 
 @dataclass
@@ -290,8 +294,9 @@ _ClusterIndex = {}
 
 def _BuildAttributeIndex():
     ''' Build internal attribute index for locating the corresponding cluster object by path in the future.
-    We do this because this operation will take a long time when there are lots of attributes, it takes about 300ms for a single query.
-    This is acceptable during init, but unacceptable when the server returns lots of attributes at the same time.
+        We do this because this operation will take a long time when there are lots of attributes,
+        it takes about 300ms for a single query.
+        This is acceptable during init, but unacceptable when the server returns lots of attributes at the same time.
     '''
     for clusterName, obj in inspect.getmembers(sys.modules['chip.clusters.Objects']):
         if ('chip.clusters.Objects' in str(obj)) and inspect.isclass(obj):
@@ -374,7 +379,8 @@ class AttributeCache:
         if (path.ClusterId not in endpointCache):
             endpointCache[path.ClusterId] = {}
 
-        # All attributes from the same cluster instance should have the same dataVersion, so we can set the dataVersion of the cluster to the dataVersion with a random attribute.
+        # All attributes from the same cluster instance should have the same dataVersion,
+        # so we can set the dataVersion of the cluster to the dataVersion with a random attribute.
         endpointVersion[path.ClusterId] = dataVersion
 
         clusterCache = endpointCache[path.ClusterId]
@@ -383,86 +389,94 @@ class AttributeCache:
 
         clusterCache[path.AttributeId] = data
 
-    def UpdateCachedData(self):
+    def UpdateCachedData(self, changedPathSet: set[AttributePath]):
         ''' This converts the raw TLV data into a cluster object format.
 
             Two formats are available:
-                1. Attribute-View (returnClusterObject=False): Dict[EndpointId, Dict[ClusterObjectType, Dict[AttributeObjectType, Dict[AttributeValue, DataVersion]]]]
+                1. Attribute-View (returnClusterObject=False): Dict[EndpointId,
+                                                                    Dict[ClusterObjectType,
+                                                                    Dict[AttributeObjectType, Dict[AttributeValue, DataVersion]]]]
                 2. Cluster-View (returnClusterObject=True): Dict[EndpointId, Dict[ClusterObjectType, ClusterValue]]
 
-            In the attribute-view, only attributes that match the original path criteria are present in the dictionary. The attribute values can
-            either be the actual data for the attribute, or a ValueDecodeFailure in the case of non-success IM status codes, or other errors encountered during decode.
+            In the attribute-view, only attributes that match the original path criteria are present in the dictionary.
+            The attribute values can either be the actual data for the attribute, or a ValueDecodeFailure in the case of
+            non-success IM status codes, or other errors encountered during decode.
 
             In the cluster-view, a cluster object that corresponds to all attributes on a given cluster instance is returned,
-            regardless of the subset of attributes read. For attributes not returned in the report, defaults are used. If a cluster cannot be decoded,
+            regardless of the subset of attributes read. For attributes not returned in the report,
+            defaults are used. If a cluster cannot be decoded,
             instead of a cluster object value, a ValueDecodeFailure shall be present.
         '''
 
         tlvCache = self.attributeTLVCache
         attributeCache = self.attributeCache
 
-        for endpoint in tlvCache:
-            if (endpoint not in attributeCache):
-                attributeCache[endpoint] = {}
+        for attributePath in changedPathSet:
+            endpointId = attributePath.EndpointId
 
-            endpointCache = attributeCache[endpoint]
+            if endpointId not in attributeCache:
+                attributeCache[endpointId] = {}
 
-            for cluster in tlvCache[endpoint]:
-                if cluster not in _ClusterIndex:
+            endpointCache = attributeCache[endpointId]
+
+            clusterId = attributePath.ClusterId
+
+            if clusterId not in _ClusterIndex:
+                #
+                # #22599 tracks dealing with unknown clusters more
+                # gracefully so that clients can still access this data.
+                #
+                continue
+
+            clusterType = _ClusterIndex[clusterId]
+
+            if clusterType not in endpointCache:
+                endpointCache[clusterType] = {}
+
+            clusterCache = endpointCache[clusterType]
+            clusterDataVersion = self.versionList.get(
+                endpointId, {}).get(clusterId, None)
+
+            if self.returnClusterObject:
+                try:
+                    # Since the TLV data is already organized by attribute tags, we can trivially convert to a cluster object representation.
+                    endpointCache[clusterType] = clusterType.FromDict(
+                        data=clusterType.descriptor.TagDictToLabelDict([], tlvCache[endpointId][clusterId]))
+                    endpointCache[clusterType].SetDataVersion(
+                        clusterDataVersion)
+                except Exception as ex:
+                    decodedValue = ValueDecodeFailure(
+                        tlvCache[endpointId][clusterId], ex)
+                    endpointCache[clusterType] = decodedValue
+            else:
+                clusterCache[DataVersion] = clusterDataVersion
+
+                attributeId = attributePath.AttributeId
+
+                value = tlvCache[endpointId][clusterId][attributeId]
+
+                if (clusterId, attributeId) not in _AttributeIndex:
                     #
                     # #22599 tracks dealing with unknown clusters more
                     # gracefully so that clients can still access this data.
                     #
                     continue
 
-                clusterType = _ClusterIndex[cluster]
+                attributeType = _AttributeIndex[(clusterId, attributeId)][0]
 
-                if (clusterType not in endpointCache):
-                    endpointCache[clusterType] = {}
+                if attributeType not in clusterCache:
+                    clusterCache[attributeType] = {}
 
-                clusterCache = endpointCache[clusterType]
-                clusterDataVersion = self.versionList.get(
-                    endpoint, {}).get(cluster, None)
-
-                if (self.returnClusterObject):
-                    try:
-                        # Since the TLV data is already organized by attribute tags, we can trivially convert to a cluster object representation.
-                        endpointCache[clusterType] = clusterType.FromDict(
-                            data=clusterType.descriptor.TagDictToLabelDict([], tlvCache[endpoint][cluster]))
-                        endpointCache[clusterType].SetDataVersion(
-                            clusterDataVersion)
-                    except Exception as ex:
-                        decodedValue = ValueDecodeFailure(
-                            tlvCache[endpoint][cluster], ex)
-                        endpointCache[clusterType] = decodedValue
+                if isinstance(value, ValueDecodeFailure):
+                    clusterCache[attributeType] = value
                 else:
-                    clusterCache[DataVersion] = clusterDataVersion
-                    for attribute in tlvCache[endpoint][cluster]:
-                        value = tlvCache[endpoint][cluster][attribute]
+                    try:
+                        decodedValue = attributeType.FromTagDictOrRawValue(
+                            tlvCache[endpointId][clusterId][attributeId])
+                    except Exception as ex:
+                        decodedValue = ValueDecodeFailure(value, ex)
 
-                        if (cluster, attribute) not in _AttributeIndex:
-                            #
-                            # #22599 tracks dealing with unknown clusters more
-                            # gracefully so that clients can still access this data.
-                            #
-                            continue
-
-                        attributeType = _AttributeIndex[(
-                            cluster, attribute)][0]
-
-                        if (attributeType not in clusterCache):
-                            clusterCache[attributeType] = {}
-
-                        if (type(value) is ValueDecodeFailure):
-                            clusterCache[attributeType] = value
-                        else:
-                            try:
-                                decodedValue = attributeType.FromTagDictOrRawValue(
-                                    tlvCache[endpoint][cluster][attribute])
-                            except Exception as ex:
-                                decodedValue = ValueDecodeFailure(value, ex)
-
-                            clusterCache[attributeType] = decodedValue
+                    clusterCache[attributeType] = decodedValue
 
 
 class SubscriptionTransaction:
@@ -505,7 +519,7 @@ class SubscriptionTransaction:
 
     def GetReportingIntervalsSeconds(self) -> Tuple[int, int]:
         '''
-        Retrieve the reporting intervals associated with an active subscription. 
+        Retrieve the reporting intervals associated with an active subscription.
         This should only be called if we're of subscription interaction type and after a subscription has been established.
         '''
         handle = chip.native.GetLibraryHandle()
@@ -549,7 +563,8 @@ class SubscriptionTransaction:
 
     def SetAttributeUpdateCallback(self, callback: Callable[[TypedAttributePath, SubscriptionTransaction], None]):
         '''
-        Sets the callback function for the attribute value change event, accepts a Callable accepts an attribute path and the cached data.
+        Sets the callback function for the attribute value change event,
+        accepts a Callable accepts an attribute path and the cached data.
         '''
         if callback is not None:
             self._onAttributeChangeCb = callback
@@ -560,7 +575,8 @@ class SubscriptionTransaction:
 
     def SetErrorCallback(self, callback: Callable[[int, SubscriptionTransaction], None]):
         '''
-        Sets the callback function in case a subscription error occured, accepts a Callable accepts an error code and the cached data.
+        Sets the callback function in case a subscription error occured,
+        accepts a Callable accepts an error code and the cached data.
         '''
         if callback is not None:
             self._onErrorCb = callback
@@ -599,7 +615,8 @@ class SubscriptionTransaction:
         return f'<Subscription (Id={self._subscriptionId})>'
 
 
-async def DefaultResubscriptionAttemptedCallback(transaction: SubscriptionTransaction, terminationError, nextResubscribeIntervalMsec):
+def DefaultResubscriptionAttemptedCallback(transaction: SubscriptionTransaction,
+                                           terminationError, nextResubscribeIntervalMsec):
     print(f"Previous subscription failed with Error: {terminationError} - re-subscribing in {nextResubscribeIntervalMsec}ms...")
 
 
@@ -621,7 +638,7 @@ def DefaultEventChangeCallback(data: EventReadResult, transaction: SubscriptionT
 
 
 def DefaultErrorCallback(chipError: int, transaction: SubscriptionTransaction):
-    print("Error during Subscription: Chip Stack Error %d".format(chipError))
+    print(f"Error during Subscription: Chip Stack Error {chipError}")
 
 
 def _BuildEventIndex():
@@ -650,8 +667,9 @@ def _BuildEventIndex():
 class AsyncReadTransaction:
     @dataclass
     class ReadResponse:
-        attributes: AttributeCache = None
-        events: List[ClusterEvent] = None
+        attributes: dict[Any, Any]
+        events: list[ClusterEvent]
+        tlvAttributes: dict[int, Any]
 
     def __init__(self, future: Future, eventLoop, devCtrl, returnClusterObject: bool):
         self._event_loop = eventLoop
@@ -677,7 +695,7 @@ class AsyncReadTransaction:
             imStatus = status
             try:
                 imStatus = chip.interaction_model.Status(status)
-            except:
+            except chip.exceptions.ChipStackException:
                 pass
 
             if (imStatus != chip.interaction_model.Status.Success):
@@ -710,7 +728,8 @@ class AsyncReadTransaction:
                         eventValue = eventType.FromTLV(data)
                     except Exception as ex:
                         logging.error(
-                            f"Error convering TLV to Cluster Object for path: Endpoint = {path.EndpointId}/Cluster = {path.ClusterId}/Event = {path.EventId}")
+                            f"Error convering TLV to Cluster Object for path: Endpoint = {path.EndpointId}/"
+                            f"Cluster = {path.ClusterId}/Event = {path.EventId}")
                         logging.error(
                             f"Failed Cluster Object: {str(eventType)}")
                         logging.error(ex)
@@ -754,18 +773,21 @@ class AsyncReadTransaction:
             self._handleSubscriptionEstablished, subscriptionId)
 
     def handleResubscriptionAttempted(self, terminationCause: PyChipError, nextResubscribeIntervalMsec: int):
+        if not self._subscription_handler:
+            return
         if (self._subscription_handler._onResubscriptionAttemptedCb_isAsync):
             self._event_loop.create_task(self._subscription_handler._onResubscriptionAttemptedCb(
                 self._subscription_handler, terminationCause.code, nextResubscribeIntervalMsec))
         else:
             self._event_loop.call_soon_threadsafe(
-                self._subscription_handler._onResubscriptionAttemptedCb, self._subscription_handler, terminationCause.code, nextResubscribeIntervalMsec)
+                self._subscription_handler._onResubscriptionAttemptedCb,
+                self._subscription_handler, terminationCause.code, nextResubscribeIntervalMsec)
 
     def _handleReportBegin(self):
         pass
 
     def _handleReportEnd(self):
-        self._cache.UpdateCachedData()
+        self._cache.UpdateCachedData(self._changedPathSet)
 
         if (self._subscription_handler is not None):
             for change in self._changedPathSet:
@@ -796,7 +818,7 @@ class AsyncReadTransaction:
                     self._future.set_exception(chip.exceptions.ChipStackError(self._resultError))
             else:
                 self._future.set_result(AsyncReadTransaction.ReadResponse(
-                    attributes=self._cache.attributeCache, events=self._events))
+                    attributes=self._cache.attributeCache, events=self._events, tlvAttributes=self._cache.attributeTLVCache))
 
         #
         # Decrement the ref on ourselves to match the increment that happened at allocation.
@@ -827,7 +849,7 @@ class AsyncWriteTransaction:
         try:
             imStatus = chip.interaction_model.Status(status)
             self._resultData.append(AttributeWriteResult(Path=path, Status=imStatus))
-        except:
+        except chip.exceptions.ChipStackException:
             self._resultData.append(AttributeWriteResult(Path=path, Status=status))
 
     def handleError(self, chipError: PyChipError):
@@ -883,7 +905,8 @@ def _OnReadAttributeDataCallback(closure, dataVersion: int, endpoint: int, clust
 
 
 @_OnReadEventDataCallbackFunct
-def _OnReadEventDataCallback(closure, endpoint: int, cluster: int, event: c_uint64, number: int, priority: int, timestamp: int, timestampType: int, data, len, status):
+def _OnReadEventDataCallback(closure, endpoint: int, cluster: int, event: c_uint64,
+                             number: int, priority: int, timestamp: int, timestampType: int, data, len, status):
     dataBytes = ctypes.string_at(data, len)
     path = EventPath(ClusterId=cluster, EventId=event)
 
@@ -949,7 +972,9 @@ def _OnWriteDoneCallback(closure):
     closure.handleDone()
 
 
-def WriteAttributes(future: Future, eventLoop, device, attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: Union[None, int] = None, interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None) -> PyChipError:
+def WriteAttributes(future: Future, eventLoop, device,
+                    attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: Union[None, int] = None,
+                    interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None) -> PyChipError:
     handle = chip.native.GetLibraryHandle()
 
     writeargs = []
@@ -1017,10 +1042,15 @@ _ReadParams = construct.Struct(
     "IsSubscription" / construct.Flag,
     "IsFabricFiltered" / construct.Flag,
     "KeepSubscriptions" / construct.Flag,
+    "AutoResubscribe" / construct.Flag,
 )
 
 
-def Read(future: Future, eventLoop, device, devCtrl, attributes: List[AttributePath] = None, dataVersionFilters: List[DataVersionFilter] = None, events: List[EventPath] = None, eventNumberFilter: Optional[int] = None, returnClusterObject: bool = True, subscriptionParameters: SubscriptionParameters = None, fabricFiltered: bool = True, keepSubscriptions: bool = False) -> PyChipError:
+def Read(future: Future, eventLoop, device, devCtrl,
+         attributes: List[AttributePath] = None, dataVersionFilters: List[DataVersionFilter] = None,
+         events: List[EventPath] = None, eventNumberFilter: Optional[int] = None, returnClusterObject: bool = True,
+         subscriptionParameters: SubscriptionParameters = None,
+         fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True) -> PyChipError:
     if (not attributes) and dataVersionFilters:
         raise ValueError(
             "Must provide valid attribute list when data version filters is not null")
@@ -1052,17 +1082,17 @@ def Read(future: Future, eventLoop, device, devCtrl, attributes: List[AttributeP
                 filter.EndpointId = f.EndpointId
             else:
                 raise ValueError(
-                    f"DataVersionFilter must provide EndpointId.")
+                    "DataVersionFilter must provide EndpointId.")
             if f.ClusterId is not None:
                 filter.ClusterId = f.ClusterId
             else:
                 raise ValueError(
-                    f"DataVersionFilter must provide ClusterId.")
+                    "DataVersionFilter must provide ClusterId.")
             if f.DataVersion is not None:
                 filter.DataVersion = f.DataVersion
             else:
                 raise ValueError(
-                    f"DataVersionFilter must provide DataVersion.")
+                    "DataVersionFilter must provide DataVersion.")
             filter = chip.interaction_model.DataVersionFilterIBstruct.build(
                 filter)
             readargs.append(ctypes.c_char_p(filter))
@@ -1092,6 +1122,7 @@ def Read(future: Future, eventLoop, device, devCtrl, attributes: List[AttributeP
     if subscriptionParameters is not None:
         params.MinInterval = subscriptionParameters.MinReportIntervalFloorSeconds
         params.MaxInterval = subscriptionParameters.MaxReportIntervalCeilingSeconds
+        params.AutoResubscribe = autoResubscribe
         params.IsSubscription = True
         params.KeepSubscriptions = keepSubscriptions
     params.IsFabricFiltered = fabricFiltered
@@ -1121,12 +1152,23 @@ def Read(future: Future, eventLoop, device, devCtrl, attributes: List[AttributeP
     return res
 
 
-def ReadAttributes(future: Future, eventLoop, device, devCtrl, attributes: List[AttributePath], dataVersionFilters: List[DataVersionFilter] = None, returnClusterObject: bool = True, subscriptionParameters: SubscriptionParameters = None, fabricFiltered: bool = True) -> int:
-    return Read(future=future, eventLoop=eventLoop, device=device, devCtrl=devCtrl, attributes=attributes, dataVersionFilters=dataVersionFilters, events=None, returnClusterObject=returnClusterObject, subscriptionParameters=subscriptionParameters, fabricFiltered=fabricFiltered)
+def ReadAttributes(future: Future, eventLoop, device, devCtrl,
+                   attributes: List[AttributePath], dataVersionFilters: List[DataVersionFilter] = None,
+                   returnClusterObject: bool = True,
+                   subscriptionParameters: SubscriptionParameters = None, fabricFiltered: bool = True) -> int:
+    return Read(future=future, eventLoop=eventLoop, device=device,
+                devCtrl=devCtrl, attributes=attributes, dataVersionFilters=dataVersionFilters,
+                events=None, returnClusterObject=returnClusterObject,
+                subscriptionParameters=subscriptionParameters, fabricFiltered=fabricFiltered)
 
 
-def ReadEvents(future: Future, eventLoop, device, devCtrl, events: List[EventPath], eventNumberFilter=None, returnClusterObject: bool = True, subscriptionParameters: SubscriptionParameters = None, fabricFiltered: bool = True) -> int:
-    return Read(future=future, eventLoop=eventLoop, device=device, devCtrl=devCtrl, attributes=None, dataVersionFilters=None, events=events, eventNumberFilter=eventNumberFilter, returnClusterObject=returnClusterObject, subscriptionParameters=subscriptionParameters, fabricFiltered=fabricFiltered)
+def ReadEvents(future: Future, eventLoop, device, devCtrl,
+               events: List[EventPath], eventNumberFilter=None, returnClusterObject: bool = True,
+               subscriptionParameters: SubscriptionParameters = None, fabricFiltered: bool = True) -> int:
+    return Read(future=future, eventLoop=eventLoop, device=device, devCtrl=devCtrl, attributes=None,
+                dataVersionFilters=None, events=events, eventNumberFilter=eventNumberFilter,
+                returnClusterObject=returnClusterObject,
+                subscriptionParameters=subscriptionParameters, fabricFiltered=fabricFiltered)
 
 
 def Init():
@@ -1155,13 +1197,16 @@ def Init():
                    _OnWriteResponseCallbackFunct, _OnWriteErrorCallbackFunct, _OnWriteDoneCallbackFunct])
         handle.pychip_ReadClient_Read.restype = PyChipError
         setter.Set('pychip_ReadClient_InitCallbacks', None, [
-                   _OnReadAttributeDataCallbackFunct, _OnReadEventDataCallbackFunct, _OnSubscriptionEstablishedCallbackFunct, _OnResubscriptionAttemptedCallbackFunct, _OnReadErrorCallbackFunct, _OnReadDoneCallbackFunct,
+                   _OnReadAttributeDataCallbackFunct, _OnReadEventDataCallbackFunct,
+                   _OnSubscriptionEstablishedCallbackFunct, _OnResubscriptionAttemptedCallbackFunct,
+                   _OnReadErrorCallbackFunct, _OnReadDoneCallbackFunct,
                    _OnReportBeginCallbackFunct, _OnReportEndCallbackFunct])
 
     handle.pychip_WriteClient_InitCallbacks(
         _OnWriteResponseCallback, _OnWriteErrorCallback, _OnWriteDoneCallback)
     handle.pychip_ReadClient_InitCallbacks(
-        _OnReadAttributeDataCallback, _OnReadEventDataCallback, _OnSubscriptionEstablishedCallback, _OnResubscriptionAttemptedCallback, _OnReadErrorCallback, _OnReadDoneCallback,
+        _OnReadAttributeDataCallback, _OnReadEventDataCallback,
+        _OnSubscriptionEstablishedCallback, _OnResubscriptionAttemptedCallback, _OnReadErrorCallback, _OnReadDoneCallback,
         _OnReportBeginCallback, _OnReportEndCallback)
 
     _BuildAttributeIndex()

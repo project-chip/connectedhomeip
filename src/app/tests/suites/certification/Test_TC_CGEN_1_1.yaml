@@ -23,7 +23,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read the global attribute: ClusterRevision"
+    - label: "Step 2: Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -39,7 +39,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Read the global attribute: FeatureMap"
+    - label: "Step 3: Read the global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -47,7 +47,8 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Read the global attribute: AttributeList"
+    - label: "Step 4: Read the global attribute: AttributeList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -56,7 +57,17 @@ tests:
               contains:
                   [0, 1, 2, 3, 4, 65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label: "Read the global attribute: EventList"
+    - label: "Step 4: Read the global attribute: AttributeList"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 3, 4, 65528, 65529, 65531, 65532, 65533]
+
+    - label: "Step 5: Read the global attribute: EventList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -64,7 +75,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Read the global attribute: AcceptedCommandList"
+    - label: "Step 6: Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -72,7 +83,7 @@ tests:
               type: list
               contains: [0, 2, 4]
 
-    - label: "Read the global attribute: GeneratedCommandList"
+    - label: "Step 7: Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

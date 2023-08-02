@@ -417,10 +417,10 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegateAccessory;
     CASESession pairingAccessory;
-    ReliableMessageProtocolConfig verySleepyAccessoryRmpConfig(System::Clock::Milliseconds32(360000),
-                                                               System::Clock::Milliseconds32(100000));
-    ReliableMessageProtocolConfig nonSleepyCommissionerRmpConfig(System::Clock::Milliseconds32(5000),
-                                                                 System::Clock::Milliseconds32(300));
+    ReliableMessageProtocolConfig verySleepyAccessoryRmpConfig(
+        System::Clock::Milliseconds32(360000), System::Clock::Milliseconds32(100000), System::Clock::Milliseconds16(300));
+    ReliableMessageProtocolConfig nonSleepyCommissionerRmpConfig(
+        System::Clock::Milliseconds32(5000), System::Clock::Milliseconds32(300), System::Clock::Milliseconds16(4000));
 
     auto & loopback            = ctx.GetLoopback();
     loopback.mSentMessageCount = 0;
@@ -450,9 +450,11 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingErrors == 0);
     NL_TEST_ASSERT(inSuite, pairingAccessory.GetRemoteMRPConfig().mIdleRetransTimeout == System::Clock::Milliseconds32(5000));
     NL_TEST_ASSERT(inSuite, pairingAccessory.GetRemoteMRPConfig().mActiveRetransTimeout == System::Clock::Milliseconds32(300));
+    NL_TEST_ASSERT(inSuite, pairingAccessory.GetRemoteMRPConfig().mActiveThresholdTime == System::Clock::Milliseconds16(4000));
     NL_TEST_ASSERT(inSuite, pairingCommissioner.GetRemoteMRPConfig().mIdleRetransTimeout == System::Clock::Milliseconds32(360000));
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner.GetRemoteMRPConfig().mActiveRetransTimeout == System::Clock::Milliseconds32(100000));
+    NL_TEST_ASSERT(inSuite, pairingCommissioner.GetRemoteMRPConfig().mActiveThresholdTime == System::Clock::Milliseconds16(300));
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // Confirming that FabricTable sending a notification that fabric was updated doesn't affect
     // already established connections.

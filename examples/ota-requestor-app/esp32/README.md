@@ -28,7 +28,7 @@ After commissioning is successful, announce OTA provider's presence using
 chip-tool. On receiving this command OTA requestor will query for OTA image.
 
 ```
-./out/debug/chip-tool otasoftwareupdaterequestor announce-ota-provider <PROVIDER NODE ID> 0 0 0 <REQUESTOR NODE ID> 0
+./out/debug/chip-tool otasoftwareupdaterequestor announce-otaprovider <PROVIDER NODE ID> 0 0 0 <REQUESTOR NODE ID> 0
 ```
 
 Once the transfer is complete, OTA requestor sends ApplyUpdateRequest command to

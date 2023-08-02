@@ -33,7 +33,6 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/internal/BLEManager.h>
-#include <trace/trace.h>
 
 #include "AndroidChipPlatform-JNI.h"
 #include "BLEManagerImpl.h"
@@ -41,6 +40,7 @@
 #include "CommissionableDataProviderImpl.h"
 #include "DiagnosticDataProviderImpl.h"
 #include "DnssdImpl.h"
+#include "tracing.h"
 
 using namespace chip;
 
@@ -88,8 +88,7 @@ CHIP_ERROR AndroidChipPlatformJNI_OnLoad(JavaVM * jvm, void * reserved)
     err = BleConnectCallbackJNI_OnLoad(jvm, reserved);
     SuccessOrExit(err);
 
-    chip::InitializeTracing();
-
+    chip::Android::InitializeTracing();
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -102,6 +101,8 @@ exit:
 
 void AndroidChipPlatformJNI_OnUnload(JavaVM * jvm, void * reserved)
 {
+    chip::Android::ShutdownTracing();
+
     ChipLogProgress(DeviceLayer, "AndroidChipPlatform JNI_OnUnload() called");
     BleConnectCallbackJNI_OnUnload(jvm, reserved);
     chip::Platform::MemoryShutdown();

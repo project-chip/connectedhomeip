@@ -336,13 +336,13 @@ class TC_ACE_1_4(MatterBaseTest):
         self.check_read_success(appcluster_wildcard, self.endpoint, self.cluster, self.attribute)
 
         self.print_step(48, "TH1 resets ACL")
-        descriptor_appendpoint_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+        full_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[self.matter_test_config.controller_node_id],
             targets=[])
 
-        acl = [admin_acl, descriptor_appendpoint_view]
+        acl = [full_acl]
         await self.write_acl(acl)
 
 

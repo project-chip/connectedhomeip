@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 
 #import <Matter/MTRAsyncCallbackWorkQueue.h>
+#import <Matter/MTRBackwardsCompatShims.h>
 #import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRCSRInfo.h>
@@ -28,6 +29,8 @@
 #import <Matter/MTRClusterStateCacheContainer.h>
 #import <Matter/MTRClusters.h>
 #import <Matter/MTRCommandPayloadsObjc.h>
+#import <Matter/MTRCommissionableBrowserDelegate.h>
+#import <Matter/MTRCommissionableBrowserResult.h>
 #import <Matter/MTRCommissioningParameters.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDevice.h>

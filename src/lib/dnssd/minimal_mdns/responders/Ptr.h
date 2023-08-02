@@ -31,9 +31,15 @@ public:
     void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
                          const ResponseConfiguration & configuration) override
     {
+        if (!delegate->ShouldSend(*this))
+        {
+            return;
+        }
+
         PtrResourceRecord record(GetQName(), mTarget);
         configuration.Adjust(record);
         delegate->AddResponse(record);
+        delegate->ResponsesAdded(*this);
     }
 
 private:

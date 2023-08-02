@@ -22,6 +22,8 @@
 #include <controller/CHIPCluster.h>
 #include <functional>
 
+#include <app-common/zap-generated/cluster-objects.h>
+
 // COMMAND CLASSES
 class LaunchAppCommand
     : public MediaCommandBase<chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type,

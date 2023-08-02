@@ -10,6 +10,7 @@ println 'matterUTestLib='+matterUTestLib
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
+    ndkPath System.getenv("ANDROID_NDK_HOME")
 
     defaultConfig {
         applicationId "com.tcl.chip.chiptest"

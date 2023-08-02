@@ -31,7 +31,6 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -226,6 +225,8 @@ public:
      */
     CHIP_ERROR RequestSEDActiveMode(bool onOff, bool delayIdle = false);
 #endif
+
+    CHIP_ERROR SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 
     // CHIPoBLE service methods
     Ble::BleLayer * GetBleLayer();
@@ -485,6 +486,15 @@ inline CHIP_ERROR ConnectivityManager::RequestSEDActiveMode(bool onOff, bool del
     return static_cast<ImplClass *>(this)->_RequestSEDActiveMode(onOff, delayIdle);
 }
 #endif
+
+inline CHIP_ERROR ConnectivityManager::SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
+{
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    return static_cast<ImplClass *>(this)->_SetPollingInterval(pollingInterval);
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
+}
 
 inline bool ConnectivityManager::IsThreadAttached()
 {

@@ -25,7 +25,6 @@
 
 import json
 import os
-import string
 import sys
 
 FILE_NAME = "ota-image-list.json"

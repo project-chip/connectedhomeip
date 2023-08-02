@@ -49,7 +49,8 @@ class TC_TIMESYNC_2_7(MatterBaseTest):
     @async_test_body
     async def test_TC_TIMESYNC_2_7(self):
 
-        self.endpoint = self.user_params.get("endpoint", 0)
+        # Time sync is required to be on endpoint 0 if it is present
+        self.endpoint = 0
 
         self.print_step(0, "Commissioning, already done")
         time_cluster = Clusters.Objects.TimeSynchronization
@@ -84,7 +85,7 @@ class TC_TIMESYNC_2_7(MatterBaseTest):
         local = await self.read_ts_attribute_expect_success(local_attr)
         compare_time(received=local, offset=timedelta(), tolerance=timedelta(seconds=5))
 
-        self.print_step(6, "Send SetTimeZone command with 0 offset")
+        self.print_step(6, "Send SetTimeZone command with 3600 offset")
         tz = [tz_struct(offset=3600, validAt=0)]
         ret = await self.send_set_time_zone_cmd(tz)
         asserts.assert_true(ret.DSTOffsetRequired, "DSTOffsetRequired not set to true")
@@ -101,68 +102,51 @@ class TC_TIMESYNC_2_7(MatterBaseTest):
         local = await self.read_ts_attribute_expect_success(local_attr)
         compare_time(received=local, offset=timedelta(seconds=3600), tolerance=timedelta(seconds=5))
 
-        self.print_step(10, "Send SetTimeZone")
-        th_utc = utc_time_in_matter_epoch()
-        tz = [tz_struct(offset=7200, validAt=th_utc+1e+7)]
-        ret = await self.send_set_time_zone_cmd(tz)
-        asserts.assert_true(ret.DSTOffsetRequired, "DSTOffsetRequired not set to true")
-
-        self.print_step(11, "Send SetDSTOffset command")
-        dst = [dst_struct(offset=0, validStarting=0, validUntil=NullValue)]
-        await self.send_set_dst_cmd(dst)
-
-        self.print_step(12, "Read LocalTime")
-        local = await self.read_ts_attribute_expect_success(local_attr)
-        compare_time(received=local, offset=timedelta(), tolerance=timedelta(seconds=5))
-
-        self.print_step(13, "Wait 15s then Read LocalTime")
-        time.sleep(15)
-        local = await self.read_ts_attribute_expect_success(local_attr)
-        compare_time(received=local, offset=timedelta(seconds=7200), tolerance=timedelta(seconds=5))
-
-        self.print_step(14, "Read TZ list size")
+        self.print_step(10, "Read TZ list size")
         tz_list_size = await self.read_ts_attribute_expect_success(attributes.TimeZoneListMaxSize)
 
-        self.print_step(15, "Set time zone with two items")
+        self.print_step(11, "Set time zone with two items")
         if tz_list_size > 1:
             th_utc = utc_time_in_matter_epoch()
             tz = [tz_struct(offset=3600, validAt=0), tz_struct(offset=7200, validAt=th_utc+1e+7)]
+            ret = await self.send_set_time_zone_cmd(tz)
+            asserts.assert_true(ret.DSTOffsetRequired, "DSTOffsetRequired not set to true")
 
-        self.print_step(16, "Send SetDSTOffset command")
+        self.print_step(12, "Send SetDSTOffset command")
         if tz_list_size > 1:
             dst = [dst_struct(offset=0, validStarting=0, validUntil=NullValue)]
             await self.send_set_dst_cmd(dst)
 
-        self.print_step(17, "Read LocalTime")
+        self.print_step(13, "Read LocalTime")
         if tz_list_size > 1:
             local = await self.read_ts_attribute_expect_success(local_attr)
             compare_time(received=local, offset=timedelta(seconds=3600), tolerance=timedelta(seconds=5))
 
-        self.print_step(18, "Wait 15s and read LocalTime")
+        self.print_step(14, "Wait 15s and read LocalTime")
         if tz_list_size > 1:
             time.sleep(15)
             local = await self.read_ts_attribute_expect_success(local_attr)
             compare_time(received=local, offset=timedelta(seconds=7200), tolerance=timedelta(seconds=5))
 
-        self.print_step(19, "Send SetTimeZone with negative offset")
+        self.print_step(15, "Send SetTimeZone with negative offset")
         tz = [tz_struct(offset=-3600, validAt=0)]
         ret = await self.send_set_time_zone_cmd(tz)
         asserts.assert_true(ret.DSTOffsetRequired, "DSTOffsetRequired not set to true")
 
-        self.print_step(20, "Send SetDSTOffset command")
+        self.print_step(16, "Send SetDSTOffset command")
         dst = [dst_struct(offset=0, validStarting=0, validUntil=NullValue)]
         await self.send_set_dst_cmd(dst)
 
-        self.print_step(21, "Read LocalTime")
+        self.print_step(17, "Read LocalTime")
         local = await self.read_ts_attribute_expect_success(local_attr)
         compare_time(received=local, offset=timedelta(seconds=-3600), tolerance=timedelta(seconds=5))
 
-        self.print_step(22, "Send SetTimeZone with 0 offset")
+        self.print_step(18, "Send SetTimeZone with 0 offset")
         tz = [tz_struct(offset=0, validAt=0)]
         ret = await self.send_set_time_zone_cmd(tz)
         asserts.assert_true(ret.DSTOffsetRequired, "DSTOffsetRequired not set to true")
 
-        self.print_step(23, "Send SetDSTOffset command")
+        self.print_step(19, "Send SetDSTOffset command")
         dst = [dst_struct(offset=0, validStarting=0, validUntil=NullValue)]
         await self.send_set_dst_cmd(dst)
 

@@ -19,7 +19,7 @@ limitations under the License.
 
   <bitmap name="Feature" type="BITMAP32">
     <cluster code="0x0202" />
-    <field name="Multi-Speed" mask="0x01" />
+    <field name="MultiSpeed" mask="0x01" />
     <field name="Auto" mask="0x02" />
     <field name="Rocking" mask="0x04" />
     <field name="Wind" mask="0x08" />
@@ -27,7 +27,7 @@ limitations under the License.
     <field name="Airflow Direction" mask="0x20" />
   </bitmap>
 
-  <enum name="FanModeType" type="ENUM8">
+  <enum name="FanModeEnum" type="ENUM8">
     <cluster code="0x0202"/>
     <item name="Off" value="0x00"/>
     <item name="Low" value="0x01"/>
@@ -38,7 +38,7 @@ limitations under the License.
     <item name="Smart" value="0x06"/>
   </enum>
 
-  <enum name="FanModeSequenceType" type="ENUM8">
+  <enum name="FanModeSequenceEnum" type="ENUM8">
     <cluster code="0x0202"/>
     <item name="Off/Low/Med/High" value="0x00"/>
     <item name="Off/Low/High" value="0x01"/>
@@ -48,26 +48,20 @@ limitations under the License.
     <item name="Off/On" value="0x05"/>
   </enum>
 
-  <bitmap name="RockSupportMask" type="BITMAP8">
+  <bitmap name="RockBitmap" type="BITMAP8">
     <cluster code="0x0202" />
     <field name="RockLeftRight" mask="0x01" />
     <field name="RockUpDown" mask="0x02" />
     <field name="RockRound" mask="0x04" />
   </bitmap>
 
-  <bitmap name="WindSupportMask" type="BITMAP8">
+  <bitmap name="WindBitmap" type="BITMAP8">
     <cluster code="0x0202" />
     <field name="Sleep Wind" mask="0x01" />
     <field name="Natural Wind" mask="0x02" />
   </bitmap>
 
-  <bitmap name="WindSettingMask" type="BITMAP8">
-    <cluster code="0x0202" />
-    <field name="Sleep Wind" mask="0x01" />
-    <field name="Natural Wind" mask="0x02" />
-  </bitmap>
-
-  <enum name="DirectionEnum" type="ENUM8">
+  <enum name="StepDirectionEnum" type="ENUM8">
     <cluster code="0x0202"/>
     <item name="Increase" value="0x00"/>
     <item name="Decrease" value="0x01"/>
@@ -89,22 +83,22 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="FAN_MODE" type="FanModeType" min="0" max="6" writable="true" default="0" optional="false">FanMode</attribute>
-    <attribute side="server" code="0x0001" define="FAN_MODE_SEQUENCE" type="FanModeSequenceType" min="0" max="5" writable="true" default="2" optional="false">FanModeSequence</attribute>
-    <attribute side="server" code="0x0002" define="PERCENT_SETTING" type="INT8U" min="0" max="100" writable="true" default="0" isNullable="true" optional="false">PercentSetting</attribute>
-    <attribute side="server" code="0x0003" define="PERCENT_CURRENT" type="INT8U" min="0" max="100" writable="false" default="0" optional="false">PercentCurrent</attribute>
+    <attribute side="server" code="0x0000" define="FAN_MODE" type="FanModeEnum" min="0" max="6" writable="true" default="0" optional="false">FanMode</attribute>
+    <attribute side="server" code="0x0001" define="FAN_MODE_SEQUENCE" type="FanModeSequenceEnum" min="0" max="5" writable="true" default="2" optional="false">FanModeSequence</attribute>
+    <attribute side="server" code="0x0002" define="PERCENT_SETTING" type="Percent" min="0" max="100" writable="true" default="0" isNullable="true" optional="false">PercentSetting</attribute>
+    <attribute side="server" code="0x0003" define="PERCENT_CURRENT" type="Percent" min="0" max="100" writable="false" default="0" optional="false">PercentCurrent</attribute>
     <attribute side="server" code="0x0004" define="SPEED_MAX" type="INT8U" min="1" max="100" writable="false" default="1" optional="true">SpeedMax</attribute>
     <attribute side="server" code="0x0005" define="SPEED_SETTING" type="INT8U" min="0" max="100" writable="true" default="0" isNullable="true" optional="true">SpeedSetting</attribute>
     <attribute side="server" code="0x0006" define="SPEED_CURRENT" type="INT8U" min="0" max="100" writable="false" default="0" optional="true">SpeedCurrent</attribute>
-    <attribute side="server" code="0x0007" define="ROCK_SUPPORT" type="BITMAP8" writable="false" default="0x00" optional="true">RockSupport</attribute>
-    <attribute side="server" code="0x0008" define="ROCK_SETTING" type="BITMAP8" writable="true" default="0x00" optional="true">RockSetting</attribute>
-    <attribute side="server" code="0x0009" define="WIND_SUPPORT" type="BITMAP8" writable="false" default="0x00" optional="true">WindSupport</attribute>
-    <attribute side="server" code="0x000A" define="WIND_SETTING" type="BITMAP8" writable="true" default="0x00" optional="true">WindSetting</attribute>
+    <attribute side="server" code="0x0007" define="ROCK_SUPPORT" type="RockBitmap" writable="false" default="0x00" optional="true">RockSupport</attribute>
+    <attribute side="server" code="0x0008" define="ROCK_SETTING" type="RockBitmap" writable="true" default="0x00" optional="true">RockSetting</attribute>
+    <attribute side="server" code="0x0009" define="WIND_SUPPORT" type="WindBitmap" writable="false" default="0x00" optional="true">WindSupport</attribute>
+    <attribute side="server" code="0x000A" define="WIND_SETTING" type="WindBitmap" writable="true" default="0x00" optional="true">WindSetting</attribute>
     <attribute side="server" code="0x000B" define="AIRFLOW_DIRECTION" type="AirflowDirectionEnum" writable="true" default="0" optional="true">AirflowDirection</attribute>
-  
+
     <command source="client" code="0x00" name="Step" optional="true">
       <description>The Step command speeds up or slows down the fan, in steps.</description>
-      <arg name="Direction" type="DirectionEnum"/>
+      <arg name="Direction" type="StepDirectionEnum"/>
       <arg name="Wrap" type="boolean" optional="true"/>
       <arg name="LowestOff" type="boolean" optional="true"/>
     </command>

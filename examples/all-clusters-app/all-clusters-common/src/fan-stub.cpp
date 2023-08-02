@@ -20,46 +20,44 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/clusters/fan-control-server/fan-control-server.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/error-mapping.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::FanControl;
 using namespace chip::app::Clusters::FanControl::Attributes;
+using Protocols::InteractionModel::Status;
 
 namespace {
-
-/*
- * TODO: This is a stop-gap solution to allow the existing fan control cluster tests to run after changes to
- * the cluster objects for TE1. This should be removed once #6496 is resolved as it will likely result in a
- * FanControl delegate added to the SDK.
- *
- * FYI... The previous implementation of the FanControl cluster set the speedCurrent/percentCurrent when it received
- * speedSetting/percentSetting. The new implementation of the FanControl cluster does not do this as this should
- * really be done by the application.
- */
-
-class FanAttrAccess : public AttributeAccessInterface
+class FanControlManager : public AttributeAccessInterface, public Delegate
 {
 public:
     // Register for the FanControl cluster on all endpoints.
-    FanAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), FanControl::Id) {}
+    FanControlManager(EndpointId aEndpointId) :
+        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), FanControl::Id), Delegate(aEndpointId)
+    {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
 
 private:
-    CHIP_ERROR ReadPercentCurrent(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadSpeedCurrent(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadPercentCurrent(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadSpeedCurrent(AttributeValueEncoder & aEncoder);
 };
 
-CHIP_ERROR FanAttrAccess::ReadPercentCurrent(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+static FanControlManager * mFanControlManager = nullptr;
+
+CHIP_ERROR FanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEncoder)
 {
     // Return PercentSetting attribute value for now
-    DataModel::Nullable<uint8_t> percentSetting;
-    PercentSetting::Get(endpoint, percentSetting);
-    uint8_t ret = 0;
+    DataModel::Nullable<Percent> percentSetting;
+    PercentSetting::Get(mEndpoint, percentSetting);
+    Percent ret = 0;
     if (!percentSetting.IsNull())
     {
         ret = percentSetting.Value();
@@ -68,11 +66,11 @@ CHIP_ERROR FanAttrAccess::ReadPercentCurrent(EndpointId endpoint, AttributeValue
     return aEncoder.Encode(ret);
 }
 
-CHIP_ERROR FanAttrAccess::ReadSpeedCurrent(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+CHIP_ERROR FanControlManager::ReadSpeedCurrent(AttributeValueEncoder & aEncoder)
 {
     // Return SpeedCurrent attribute value for now
     DataModel::Nullable<uint8_t> speedSetting;
-    SpeedSetting::Get(endpoint, speedSetting);
+    SpeedSetting::Get(mEndpoint, speedSetting);
     uint8_t ret = 0;
     if (!speedSetting.IsNull())
     {
@@ -82,34 +80,99 @@ CHIP_ERROR FanAttrAccess::ReadSpeedCurrent(EndpointId endpoint, AttributeValueEn
     return aEncoder.Encode(ret);
 }
 
-FanAttrAccess gAttrAccess;
+Status FanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff)
+{
+    ChipLogProgress(NotSpecified, "FanControlManager::HandleStep aDirection %d, aWrap %d, aLowestOff %d", to_underlying(aDirection),
+                    aWrap, aLowestOff);
 
-CHIP_ERROR FanAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+    VerifyOrReturnError(aDirection != StepDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
+
+    uint8_t speedMax;
+    SpeedMax::Get(mEndpoint, &speedMax);
+
+    DataModel::Nullable<uint8_t> speedSetting;
+    SpeedSetting::Get(mEndpoint, speedSetting);
+
+    uint8_t newSpeedSetting = speedSetting.IsNull() ? 0 : speedSetting.Value();
+
+    if (aDirection == StepDirectionEnum::kIncrease)
+    {
+        if (speedSetting.IsNull())
+        {
+            newSpeedSetting = 1;
+        }
+        else if (speedSetting.Value() < speedMax)
+        {
+            newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() + 1);
+        }
+        else if (speedSetting.Value() == speedMax)
+        {
+            if (aWrap)
+            {
+                newSpeedSetting = aLowestOff ? 0 : 1;
+            }
+        }
+    }
+    else if (aDirection == StepDirectionEnum::kDecrease)
+    {
+        if (speedSetting.IsNull())
+        {
+            newSpeedSetting = aLowestOff ? 0 : 1;
+        }
+        else if ((speedSetting.Value() > 1) && (speedSetting.Value() <= speedMax))
+        {
+            newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() - 1);
+        }
+        else if (speedSetting.Value() == 1)
+        {
+            if (aLowestOff)
+            {
+                newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() - 1);
+            }
+            else if (aWrap)
+            {
+                newSpeedSetting = speedMax;
+            }
+        }
+        else if (speedSetting.Value() == 0)
+        {
+            if (aWrap)
+            {
+                newSpeedSetting = speedMax;
+            }
+            else if (!aLowestOff)
+            {
+                newSpeedSetting = 1;
+            }
+        }
+    }
+
+    return ToInteractionModelStatus(SpeedSetting::Set(mEndpoint, newSpeedSetting));
+}
+
+CHIP_ERROR FanControlManager::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == FanControl::Id);
+    VerifyOrDie(aPath.mEndpointId == mEndpoint);
 
     switch (aPath.mAttributeId)
     {
     case SpeedCurrent::Id:
-        return ReadSpeedCurrent(aPath.mEndpointId, aEncoder);
+        return ReadSpeedCurrent(aEncoder);
     case PercentCurrent::Id:
-        return ReadPercentCurrent(aPath.mEndpointId, aEncoder);
+        return ReadPercentCurrent(aEncoder);
     default:
         break;
     }
     return CHIP_NO_ERROR;
 }
+
 } // anonymous namespace
 
 void emberAfFanControlClusterInitCallback(EndpointId endpoint)
 {
-    uint32_t featureMap = 0;
-
-    featureMap |= to_underlying(FanControl::Feature::kMultiSpeed);
-    featureMap |= to_underlying(FanControl::Feature::kMultiSpeed);
-    featureMap |= to_underlying(FanControl::Feature::kAuto);
-
-    FeatureMap::Set(endpoint, featureMap);
-
-    registerAttributeAccessOverride(&gAttrAccess);
+    VerifyOrDie(mFanControlManager == nullptr);
+    mFanControlManager = new FanControlManager(endpoint);
+    registerAttributeAccessOverride(mFanControlManager);
+    FanControl::SetDefaultDelegate(endpoint, mFanControlManager);
 }

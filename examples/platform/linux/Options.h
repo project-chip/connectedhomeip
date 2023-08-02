@@ -65,6 +65,7 @@ struct LinuxDeviceOptions
     chip::CSRResponseOptions mCSRResponseOptions;
     uint8_t testEventTriggerEnableKey[16] = { 0 };
     chip::FabricId commissionerFabricId   = chip::kUndefinedFabricId;
+    std::vector<std::string> traceTo;
 
     static LinuxDeviceOptions & GetInstance();
 };

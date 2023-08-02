@@ -16,18 +16,21 @@ java-jni:
         jni/MyClusterClient-InvokeSubscribeImpl.cpp: outputs/simple_attribute/jni/MyClusterClient-InvokeSubscribeImpl.cpp
         jni/CHIPCallbackTypes.h: outputs/simple_attribute/jni/CHIPCallbackTypes.h
         jni/CHIPReadCallbacks.h: outputs/simple_attribute/jni/CHIPReadReadCallbacks.h
+        jni/CHIPGlobalCallbacks.cpp: outputs/shared/jni/CHIPGlobalCallbacks.cpp
 
     inputs/global_struct_attribute.matter:
         jni/DemoClusterClient-ReadImpl.cpp: outputs/global_struct_attribute/jni/DemoClusterClient-ReadImpl.cpp
         jni/DemoClusterClient-InvokeSubscribeImpl.cpp: outputs/global_struct_attribute/jni/DemoClusterClient-InvokeSubscribeImpl.cpp
         jni/CHIPCallbackTypes.h: outputs/global_struct_attribute/jni/CHIPCallbackTypes.h
         jni/CHIPReadCallbacks.h: outputs/global_struct_attribute/jni/CHIPReadReadCallbacks.h
+        jni/CHIPGlobalCallbacks.cpp: outputs/shared/jni/CHIPGlobalCallbacks.cpp
 
     inputs/cluster_struct_attribute.matter:
         jni/DemoClusterClient-ReadImpl.cpp: outputs/cluster_struct_attribute/jni/DemoClusterClient-ReadImpl.cpp
         jni/DemoClusterClient-InvokeSubscribeImpl.cpp: outputs/cluster_struct_attribute/jni/DemoClusterClient-InvokeSubscribeImpl.cpp
         jni/CHIPCallbackTypes.h: outputs/cluster_struct_attribute/jni/CHIPCallbackTypes.h
         jni/CHIPReadCallbacks.h: outputs/cluster_struct_attribute/jni/CHIPReadReadCallbacks.h
+        jni/CHIPGlobalCallbacks.cpp: outputs/shared/jni/CHIPGlobalCallbacks.cpp
 
     inputs/several_clusters.matter:
         jni/FirstClient-ReadImpl.cpp: outputs/several_clusters/jni/FirstClient-ReadImpl.cpp
@@ -38,12 +41,14 @@ java-jni:
         jni/ThirdClient-InvokeSubscribeImpl.cpp: outputs/several_clusters/jni/ThirdClient-InvokeSubscribeImpl.cpp
         jni/CHIPCallbackTypes.h: outputs/several_clusters/jni/CHIPCallbackTypes.h
         jni/CHIPReadCallbacks.h: outputs/several_clusters/jni/CHIPReadReadCallbacks.h
+        jni/CHIPGlobalCallbacks.cpp: outputs/shared/jni/CHIPGlobalCallbacks.cpp
 
     inputs/optional_argument.matter:
         jni/MyClusterClient-ReadImpl.cpp: outputs/optional_argument/jni/MyClusterClient-ReadImpl.cpp
         jni/MyClusterClient-InvokeSubscribeImpl.cpp: outputs/optional_argument/jni/MyClusterClient-InvokeSubscribeImpl.cpp
         jni/CHIPCallbackTypes.h: outputs/optional_argument/jni/CHIPCallbackTypes.h
         jni/CHIPReadCallbacks.h: outputs/optional_argument/jni/CHIPReadReadCallbacks.h
+        jni/CHIPGlobalCallbacks.cpp: outputs/shared/jni/CHIPGlobalCallbacks.cpp
 
 java-class:
     inputs/several_clusters.matter:
@@ -63,6 +68,14 @@ cpp-app:
     inputs/large_lighting_app.matter:
         app/PluginApplicationCallbacks.h: outputs/large_lighting_app/cpp-app/PluginApplicationCallbacks.h
         app/callback-stub.cpp: outputs/large_lighting_app/cpp-app/callback-stub.cpp
+
+cpp-tlvmeta:
+    inputs/cluster_with_commands.matter:
+        tlv/meta/clusters_meta.cpp: outputs/cluster_with_commands/cpp-tlvmeta/clusters_meta.cpp
+        tlv/meta/clusters_meta.h: outputs/cluster_with_commands/cpp-tlvmeta/clusters_meta.h
+    inputs/cluster_struct_attribute.matter:
+        tlv/meta/clusters_meta.cpp: outputs/cluster_struct_attribute/cpp-tlvmeta/clusters_meta.cpp
+        tlv/meta/clusters_meta.h: outputs/cluster_struct_attribute/cpp-tlvmeta/clusters_meta.h
 
 custom-example-proto:
     inputs/several_clusters.matter:

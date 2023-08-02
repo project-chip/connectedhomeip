@@ -22,9 +22,7 @@ get_filename_component(OPEN_IOT_SDK_EXAMPLE_COMMON ${CHIP_ROOT}/examples/platfor
 
 list(APPEND CMAKE_MODULE_PATH ${OPEN_IOT_SDK_CONFIG}/cmake)
 
-set(TFM_SUPPORT YES)
-
-# Application CHIP build configuration 
+# Application CHIP build configuration
 set(CONFIG_CHIP_LIB_TESTS YES)
 set(CONFIG_CHIP_DETAIL_LOGGING NO)
 set(CONFIG_CHIP_PROGRESS_LOGGING NO)

@@ -18,6 +18,7 @@ import("//build_overrides/jlink.gni")
 import("//build_overrides/mbedtls.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
+import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("silabs_board.gni")
 
@@ -153,14 +154,11 @@ template("siwx917_sdk") {
       defines += [ "ENABLE_WSTK_LEDS" ]
     }
 
-    if (defined(invoker.enable_sleepy_device)) {
-      if (invoker.enable_sleepy_device) {
-        defines += [
-          "CHIP_DEVICE_CONFIG_ENABLE_SED=1",
-          "SL_CATALOG_POWER_MANAGER_PRESENT",
-          "SL_CATALOG_SLEEPTIMER_PRESENT",
-        ]
-      }
+    if (chip_enable_icd_server) {
+      defines += [
+        "SL_CATALOG_POWER_MANAGER_PRESENT",
+        "SL_CATALOG_SLEEPTIMER_PRESENT",
+      ]
     }
 
     if (chip_build_libshell) {  # matter shell

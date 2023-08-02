@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -33,7 +33,8 @@ tests:
 
     ### MANDATORY GLOBAL Attributes
     ### Attribute[0xFFFD]: ClusterRevision =======================================
-    - label: "TH reads from the DUT the (0xFFFD) ClusterRevision attribute"
+    - label:
+          "Step 2: TH reads from the DUT the (0xFFFD) ClusterRevision attribute"
       PICS: WNCV.S.Afffd
       command: "readAttribute"
       attribute: "ClusterRevision"
@@ -44,7 +45,7 @@ tests:
               minValue: 5
               maxValue: 200
 
-    - label: "TH reads from the DUT the (0xFFFC) FeatureMap attribute"
+    - label: "Step 3a: TH reads from the DUT the (0xFFFC) FeatureMap attribute"
       PICS:
           " WNCV.S.Afffc && !WNCV.S.F00 && !WNCV.S.F01 && !WNCV.S.F02 &&
           !WNCV.S.F03 && !WNCV.S.F04 "
@@ -55,7 +56,9 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Given WNCV.S.F00(LF) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3b: Given WNCV.S.F00(LF) ensure featuremap has the correct bit
+          set"
       PICS: WNCV.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -64,7 +67,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x1]
 
-    - label: "Given  WNCV.S.F01(TL) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3c: Given  WNCV.S.F01(TL) ensure featuremap has the correct bit
+          set"
       PICS: WNCV.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -73,7 +78,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x2]
 
-    - label: "Given WNCV.S.F02(PA_LF) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3d: Given WNCV.S.F02(PA_LF) ensure featuremap has the correct
+          bit set"
       PICS: WNCV.S.F02
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -82,7 +89,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x4]
 
-    - label: "Given WNCV.S.F03(ABS) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3e: Given WNCV.S.F03(ABS) ensure featuremap has the correct bit
+          set"
       PICS: WNCV.S.F03
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -91,7 +100,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x8]
 
-    - label: "Given WNCV.S.F04(PA_TL) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3f: Given WNCV.S.F04(PA_TL) ensure featuremap has the correct
+          bit set"
       PICS: WNCV.S.F04
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -100,8 +111,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x10]
 
-    - label: "TH reads from the DUT the (0xFFFB) AttributeList attribute"
-      PICS: WNCV.S.Afffb
+    - label:
+          "Step 4a: TH reads from the DUT the (0xFFFB) AttributeList attribute"
+      PICS: PICS_EVENT_LIST_ENABLED && WNCV.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -110,7 +122,18 @@ tests:
               contains:
                   [0, 7, 10, 13, 23, 65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label: "TH reads optional attribute(SafetyStatus) in AttributeList"
+    - label:
+          "Step 4a: TH reads from the DUT the (0xFFFB) AttributeList attribute"
+      PICS: "!PICS_EVENT_LIST_ENABLED && WNCV.S.Afffb"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 7, 10, 13, 23, 65528, 65529, 65531, 65532, 65533]
+
+    - label:
+          "Step 4b: TH reads optional attribute(SafetyStatus) in AttributeList"
       PICS: WNCV.S.Afffb && WNCV.S.A001a
       command: "readAttribute"
       attribute: "AttributeList"
@@ -120,8 +143,8 @@ tests:
               contains: [26]
 
     - label:
-          "Read the Feature dependent(WNCV.S.F00 & WNCV.S.F02 & WNCV.S.F03)
-          attribute in AttributeList"
+          "Step 4c: Read the Feature dependent(WNCV.S.F00 & WNCV.S.F02 &
+          WNCV.S.F03) attribute in AttributeList"
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.F03 && WNCV.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
@@ -131,8 +154,8 @@ tests:
               contains: [16, 17]
 
     - label:
-          "Read the Feature dependent(WNCV.S.F00 & WNCV.S.F02 ) attribute in
-          AttributeList"
+          "Step 4d: Read the Feature dependent(WNCV.S.F00 & WNCV.S.F02 )
+          attribute in AttributeList"
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
@@ -142,8 +165,8 @@ tests:
               contains: [11, 14]
 
     - label:
-          "Read the Feature dependent(WNCV.S.F01 & WNCV.S.F04 & WNCV.S.F03)
-          attribute in AttributeList"
+          "Step 4e: Read the Feature dependent(WNCV.S.F01 & WNCV.S.F04 &
+          WNCV.S.F03) attribute in AttributeList"
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.F03 && WNCV.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
@@ -153,8 +176,8 @@ tests:
               contains: [18, 19]
 
     - label:
-          "Read the Feature dependent(WNCV.S.F01 & WNCV.S.F04 ) attribute in
-          AttributeList"
+          "Step 4f: Read the Feature dependent(WNCV.S.F01 & WNCV.S.F04 )
+          attribute in AttributeList"
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
@@ -163,7 +186,8 @@ tests:
               type: list
               contains: [12, 15]
 
-    - label: "Read the global attribute: EventList"
+    - label: "Step 5: Read the global attribute: EventList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -171,7 +195,9 @@ tests:
           constraints:
               type: list
 
-    - label: "TH reads from the DUT the (0xFFF9) AcceptedCommandList attribute"
+    - label:
+          "Step 6a: TH reads from the DUT the (0xFFF9) AcceptedCommandList
+          attribute"
       PICS: WNCV.S.Afff9
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -181,8 +207,8 @@ tests:
               contains: [0, 1, 2]
 
     - label:
-          "TH reads Feature dependent(WNCV.S.F00 & WNCV.S.F02) command in
-          AcceptedCommandList"
+          "Step 6b: TH reads Feature dependent(WNCV.S.F00 & WNCV.S.F02) command
+          in AcceptedCommandList"
       PICS: WNCV.S.Afff9 && WNCV.S.F00 && WNCV.S.F02
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -192,8 +218,8 @@ tests:
               contains: [5]
 
     - label:
-          "TH reads Feature dependent(WNCV.S.F01 & WNCV.S.F03) command in
-          AcceptedCommandList"
+          "Step 6c: TH reads Feature dependent(WNCV.S.F01 & WNCV.S.F03) command
+          in AcceptedCommandList"
       PICS: WNCV.S.Afff9 && WNCV.S.F01 && WNCV.S.F03
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -203,8 +229,8 @@ tests:
               contains: [7]
 
     - label:
-          "TH reads Feature dependent(WNCV.S.F01 & WNCV.S.F04) command in
-          AcceptedCommandList"
+          "Step 6d: TH reads Feature dependent(WNCV.S.F01 & WNCV.S.F04) command
+          in AcceptedCommandList"
       PICS: WNCV.S.Afff9 && WNCV.S.F01 && WNCV.S.F04
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -213,7 +239,9 @@ tests:
               type: list
               contains: [8]
 
-    - label: "TH reads from the DUT the (0xFFF8) GeneratedCommandList attribute"
+    - label:
+          "Step 7: TH reads from the DUT the (0xFFF8) GeneratedCommandList
+          attribute"
       PICS: WNCV.S.Afff8
       command: "readAttribute"
       attribute: "GeneratedCommandList"

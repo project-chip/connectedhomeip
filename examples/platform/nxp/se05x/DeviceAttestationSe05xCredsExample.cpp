@@ -16,19 +16,12 @@
  */
 #include "DeviceAttestationSe05xCredsExample.h"
 
+#include <CHIPCryptoPAL_se05x.h>
 #include <credentials/examples/ExampleDACs.h>
 #include <credentials/examples/ExamplePAI.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
-
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
-
-#ifdef ENABLE_HSM_DEVICE_ATTESTATION
-
-#include <crypto/hsm/nxp/CHIPCryptoPALHsm_SE05X_utils.h>
 
 /* Device attestation key ids */
 #define DEV_ATTESTATION_KEY_SE05X_ID 0x7D300000
@@ -135,7 +128,9 @@ CHIP_ERROR ExampleSe05xDACProvider::SignWithDeviceAttestationKey(const ByteSpan 
                                                                  MutableByteSpan & out_signature_buffer)
 {
     Crypto::P256ECDSASignature signature;
-    Crypto::P256KeypairHSM keypair;
+    Crypto::P256Keypair keypair;
+    Crypto::P256SerializedKeypair serialized_keypair;
+    uint8_t magic_bytes[] = NXP_CRYPTO_KEY_MAGIC;
 
     ChipLogDetail(Crypto, "Sign using DA key from se05x");
 
@@ -143,9 +138,22 @@ CHIP_ERROR ExampleSe05xDACProvider::SignWithDeviceAttestationKey(const ByteSpan 
     VerifyOrReturnError(IsSpanUsable(message_to_sign), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_signature_buffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    keypair.SetKeyId(DEV_ATTESTATION_KEY_SE05X_ID);
-    keypair.provisioned_key = true;
-    keypair.Initialize(Crypto::ECPKeyTarget::ECDSA);
+    // Add public key + reference private key (ref to key inside SE)
+
+    serialized_keypair.SetLength(Crypto::kP256_PublicKey_Length + Crypto::kP256_PrivateKey_Length);
+
+    memset(serialized_keypair.Bytes(), 0, Crypto::kP256_PublicKey_Length);
+    memcpy(serialized_keypair.Bytes() + Crypto::kP256_PublicKey_Length, magic_bytes, sizeof(magic_bytes));
+    *(serialized_keypair.Bytes() + Crypto::kP256_PublicKey_Length + sizeof(magic_bytes) + 0) =
+        (DEV_ATTESTATION_KEY_SE05X_ID & 0xFF000000) >> (8 * 3);
+    *(serialized_keypair.Bytes() + Crypto::kP256_PublicKey_Length + sizeof(magic_bytes) + 1) =
+        (DEV_ATTESTATION_KEY_SE05X_ID & 0x00FF0000) >> (8 * 2);
+    *(serialized_keypair.Bytes() + Crypto::kP256_PublicKey_Length + sizeof(magic_bytes) + 2) =
+        (DEV_ATTESTATION_KEY_SE05X_ID & 0x0000FF00) >> (8 * 1);
+    *(serialized_keypair.Bytes() + Crypto::kP256_PublicKey_Length + sizeof(magic_bytes) + 3) =
+        (DEV_ATTESTATION_KEY_SE05X_ID & 0x000000FF) >> (8 * 0);
+
+    ReturnErrorOnFailure(keypair.Deserialize(serialized_keypair));
 
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(message_to_sign.data(), message_to_sign.size(), signature));
 
@@ -164,5 +172,3 @@ DeviceAttestationCredentialsProvider * GetExampleSe05xDACProvider()
 } // namespace Examples
 } // namespace Credentials
 } // namespace chip
-
-#endif //#ifdef ENABLE_HSM_DEVICE_ATTESTATION

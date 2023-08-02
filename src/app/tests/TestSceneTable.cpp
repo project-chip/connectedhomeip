@@ -159,7 +159,7 @@ public:
                 clusterBuffer.reduce_size(2);
             }
         }
-        else if (endpoint == kTestEndpoint1)
+        else if (endpoint == kTestEndpoint2)
         {
             if (clusterBuffer.size() >= 2)
             {
@@ -168,7 +168,7 @@ public:
                 clusterBuffer.reduce_size(2);
             }
         }
-        else if (endpoint == kTestEndpoint1)
+        else if (endpoint == kTestEndpoint3)
         {
             if (clusterBuffer.size() >= 3)
             {
@@ -177,6 +177,10 @@ public:
                 buffer[2] = kColorControlClusterId;
                 clusterBuffer.reduce_size(3);
             }
+        }
+        else
+        {
+            clusterBuffer.reduce_size(0);
         }
     }
 
@@ -405,6 +409,8 @@ protected:
 
         return 0;
     }
+
+    uint8_t GetClusterCountFromEndpoint() override { return 3; }
 };
 
 // Storage
@@ -430,6 +436,18 @@ void TestHandlerRegistration(nlTestSuite * aSuite, void * aContext)
     {
         sceneTable->RegisterHandler(&tmpHandler[i]);
     }
+
+    // Emptying Handler array
+    sceneTable->UnregisterAllHandlers();
+
+    // Verify the handler num has been updated properly
+    NL_TEST_ASSERT(aSuite, sceneTable->HandlerListEmpty());
+
+    for (uint8_t i = 0; i < scenes::kMaxClustersPerScene; i++)
+    {
+        sceneTable->RegisterHandler(&tmpHandler[i]);
+    }
+
     // Hanlder order in table : [H0, H1, H2]
 
     NL_TEST_ASSERT(aSuite, !sceneTable->HandlerListEmpty());
@@ -471,36 +489,34 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
 
     TLV::TLVReader reader;
     TLV::TLVWriter writer;
-    TLV::TLVType outer;
-    TLV::TLVType outerRead;
 
     static const uint8_t OO_av_payload     = 0x01;
     static const uint16_t LC_av_payload[2] = { 0x64, 0x01F0 };
     static const uint16_t CC_av_payload[8] = { 0 };
 
-    OOPairs[0].attributeID.SetValue(kOnOffAttId);
+    OOPairs[0].attributeID    = kOnOffAttId;
     OOPairs[0].attributeValue = OO_av_payload;
 
-    LCPairs[0].attributeID.SetValue(kCurrentLevelId);
+    LCPairs[0].attributeID    = kCurrentLevelId;
     LCPairs[0].attributeValue = LC_av_payload[0];
-    LCPairs[1].attributeID.SetValue(kCurrentFrequencyId);
+    LCPairs[1].attributeID    = kCurrentFrequencyId;
     LCPairs[1].attributeValue = LC_av_payload[1];
 
-    CCPairs[0].attributeID.SetValue(kCurrentSaturationId);
+    CCPairs[0].attributeID    = kCurrentSaturationId;
     CCPairs[0].attributeValue = CC_av_payload[0];
-    CCPairs[1].attributeID.SetValue(kCurrentXId);
+    CCPairs[1].attributeID    = kCurrentXId;
     CCPairs[1].attributeValue = CC_av_payload[1];
-    CCPairs[2].attributeID.SetValue(kCurrentYId);
+    CCPairs[2].attributeID    = kCurrentYId;
     CCPairs[2].attributeValue = CC_av_payload[2];
-    CCPairs[3].attributeID.SetValue(kColorTemperatureMiredsId);
+    CCPairs[3].attributeID    = kColorTemperatureMiredsId;
     CCPairs[3].attributeValue = CC_av_payload[3];
-    CCPairs[4].attributeID.SetValue(kEnhancedCurrentHueId);
+    CCPairs[4].attributeID    = kEnhancedCurrentHueId;
     CCPairs[4].attributeValue = CC_av_payload[4];
-    CCPairs[5].attributeID.SetValue(kColorLoopActiveId);
+    CCPairs[5].attributeID    = kColorLoopActiveId;
     CCPairs[5].attributeValue = CC_av_payload[5];
-    CCPairs[6].attributeID.SetValue(kColorLoopDirectionId);
+    CCPairs[6].attributeID    = kColorLoopDirectionId;
     CCPairs[6].attributeValue = CC_av_payload[6];
-    CCPairs[7].attributeID.SetValue(kColorLoopTimeId);
+    CCPairs[7].attributeID    = kColorLoopTimeId;
     CCPairs[7].attributeValue = CC_av_payload[7];
 
     // Initialize Extension Field sets as if they were received by add commands
@@ -520,36 +536,18 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
 
     // Serialize Extension Field sets as if they were recovered from memory
     writer.Init(OO_buffer);
-    writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer);
     NL_TEST_ASSERT(aSuite,
-                   CHIP_NO_ERROR ==
-                       app::DataModel::Encode(writer,
-                                              TLV::ContextTag(to_underlying(
-                                                  app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)),
-                                              OOextensionFieldSet.attributeValueList));
-    writer.EndContainer(outer);
+                   CHIP_NO_ERROR == app::DataModel::Encode(writer, TLV::AnonymousTag(), OOextensionFieldSet.attributeValueList));
     OO_buffer_serialized_length = writer.GetLengthWritten();
 
     writer.Init(LC_buffer);
-    writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer);
     NL_TEST_ASSERT(aSuite,
-                   CHIP_NO_ERROR ==
-                       app::DataModel::Encode(writer,
-                                              TLV::ContextTag(to_underlying(
-                                                  app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)),
-                                              LCextensionFieldSet.attributeValueList));
-    writer.EndContainer(outer);
+                   CHIP_NO_ERROR == app::DataModel::Encode(writer, TLV::AnonymousTag(), LCextensionFieldSet.attributeValueList));
     LC_buffer_serialized_length = writer.GetLengthWritten();
 
     writer.Init(CC_buffer);
-    writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer);
     NL_TEST_ASSERT(aSuite,
-                   CHIP_NO_ERROR ==
-                       app::DataModel::Encode(writer,
-                                              TLV::ContextTag(to_underlying(
-                                                  app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)),
-                                              CCextensionFieldSet.attributeValueList));
-    writer.EndContainer(outer);
+                   CHIP_NO_ERROR == app::DataModel::Encode(writer, TLV::AnonymousTag(), CCextensionFieldSet.attributeValueList));
     CC_buffer_serialized_length = writer.GetLengthWritten();
 
     // Test Registering SceneHandler
@@ -560,10 +558,7 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     reader.Init(OO_list);
     extensionFieldSetIn.clusterID = kOnOffClusterId;
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.EnterContainer(outerRead));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == extensionFieldSetIn.attributeValueList.Decode(reader));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.ExitContainer(outerRead));
 
     NL_TEST_ASSERT(aSuite, sHandler.SupportsCluster(kTestEndpoint1, extensionFieldSetIn.clusterID));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.SerializeAdd(kTestEndpoint1, extensionFieldSetIn, buff_span));
@@ -571,15 +566,13 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     // Verify the handler extracted buffer matches the initial field sets
     NL_TEST_ASSERT(aSuite, 0 == memcmp(OO_list.data(), buff_span.data(), buff_span.size()));
     memset(buffer, 0, buff_span.size());
+    buff_span = MutableByteSpan(buffer);
 
     // Setup the Level Control Extension field set in the expected state from a command
     reader.Init(LC_list);
     extensionFieldSetIn.clusterID = kLevelControlClusterId;
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.EnterContainer(outerRead));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == extensionFieldSetIn.attributeValueList.Decode(reader));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.ExitContainer(outerRead));
 
     NL_TEST_ASSERT(aSuite, sHandler.SupportsCluster(kTestEndpoint1, extensionFieldSetIn.clusterID));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.SerializeAdd(kTestEndpoint1, extensionFieldSetIn, buff_span));
@@ -587,15 +580,13 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     // Verify the handler extracted buffer matches the initial field sets
     NL_TEST_ASSERT(aSuite, 0 == memcmp(LC_list.data(), buff_span.data(), buff_span.size()));
     memset(buffer, 0, buff_span.size());
+    buff_span = MutableByteSpan(buffer);
 
     // Setup the Color control Extension field set in the expected state from a command
     reader.Init(CC_list);
     extensionFieldSetIn.clusterID = kColorControlClusterId;
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.EnterContainer(outerRead));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == extensionFieldSetIn.attributeValueList.Decode(reader));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.ExitContainer(outerRead));
 
     NL_TEST_ASSERT(aSuite, sHandler.SupportsCluster(kTestEndpoint1, extensionFieldSetIn.clusterID));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.SerializeAdd(kTestEndpoint1, extensionFieldSetIn, buff_span));
@@ -603,6 +594,7 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     // Verify the handler extracted buffer matches the initial field sets
     NL_TEST_ASSERT(aSuite, 0 == memcmp(CC_list.data(), buff_span.data(), buff_span.size()));
     memset(buffer, 0, buff_span.size());
+    buff_span = MutableByteSpan(buffer);
 
     // Verify Deserializing is properly filling out output extension field set for on off
     NL_TEST_ASSERT(aSuite, sHandler.SupportsCluster(kTestEndpoint1, kOnOffClusterId));
@@ -610,14 +602,8 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
 
     // Verify Encoding the Extension field set returns the same data as the one serialized for on off previously
     writer.Init(buff_span);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer));
     NL_TEST_ASSERT(aSuite,
-                   CHIP_NO_ERROR ==
-                       app::DataModel::Encode(writer,
-                                              TLV::ContextTag(to_underlying(
-                                                  app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)),
-                                              extensionFieldSetOut.attributeValueList));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == writer.EndContainer(outer));
+                   CHIP_NO_ERROR == app::DataModel::Encode(writer, TLV::AnonymousTag(), extensionFieldSetOut.attributeValueList));
     NL_TEST_ASSERT(aSuite, 0 == memcmp(OO_list.data(), buff_span.data(), buff_span.size()));
     memset(buffer, 0, buff_span.size());
 
@@ -628,14 +614,8 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
 
     // Verify Encoding the Extension field set returns the same data as the one serialized for level control previously
     writer.Init(buff_span);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer));
     NL_TEST_ASSERT(aSuite,
-                   CHIP_NO_ERROR ==
-                       app::DataModel::Encode(writer,
-                                              TLV::ContextTag(to_underlying(
-                                                  app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)),
-                                              extensionFieldSetOut.attributeValueList));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == writer.EndContainer(outer));
+                   CHIP_NO_ERROR == app::DataModel::Encode(writer, TLV::AnonymousTag(), extensionFieldSetOut.attributeValueList));
     NL_TEST_ASSERT(aSuite, 0 == memcmp(LC_list.data(), buff_span.data(), buff_span.size()));
     memset(buffer, 0, buff_span.size());
 
@@ -646,14 +626,8 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
 
     // Verify Encoding the Extension field set returns the same data as the one serialized for color control previously
     writer.Init(buff_span);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer));
     NL_TEST_ASSERT(aSuite,
-                   CHIP_NO_ERROR ==
-                       app::DataModel::Encode(writer,
-                                              TLV::ContextTag(to_underlying(
-                                                  app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)),
-                                              extensionFieldSetOut.attributeValueList));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == writer.EndContainer(outer));
+                   CHIP_NO_ERROR == app::DataModel::Encode(writer, TLV::AnonymousTag(), extensionFieldSetOut.attributeValueList));
     NL_TEST_ASSERT(aSuite, 0 == memcmp(CC_list.data(), buff_span.data(), buff_span.size()));
     memset(buffer, 0, buff_span.size());
 
@@ -662,11 +636,7 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType extensionFieldFailTestIn;
     app::Clusters::Scenes::Structs::AttributeValuePair::Type TooManyPairs[16];
 
-    TLV::TLVType failWrite;
-    TLV::TLVType failRead;
-
     uint8_t payloadOk = 0;
-
     for (uint8_t i = 0; i < 16; i++)
     {
         TooManyPairs[i].attributeValue = payloadOk;
@@ -675,28 +645,20 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     extensionFieldFailTestOut.clusterID          = kColorControlClusterId;
     extensionFieldFailTestOut.attributeValueList = TooManyPairs;
 
-    uint8_t failBuffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
+    // Give a bigger buffer given we are using too many pairs on purpose
+    uint8_t failBuffer[2 * scenes::kMaxFieldBytesPerCluster] = { 0 };
     ByteSpan fail_list(failBuffer);
 
     // Serialize Extension Field sets as if they were recovered from memory
     writer.Init(failBuffer);
-    writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, failWrite);
-    NL_TEST_ASSERT(aSuite,
-                   CHIP_NO_ERROR ==
-                       app::DataModel::Encode(writer,
-                                              TLV::ContextTag(to_underlying(
-                                                  app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)),
-                                              extensionFieldFailTestOut.attributeValueList));
-    writer.EndContainer(failWrite);
+    NL_TEST_ASSERT(
+        aSuite, CHIP_NO_ERROR == app::DataModel::Encode(writer, TLV::AnonymousTag(), extensionFieldFailTestOut.attributeValueList));
 
     // Setup the On Off Extension field set in the expected state from a command
     reader.Init(fail_list);
     extensionFieldFailTestIn.clusterID = kColorControlClusterId;
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.EnterContainer(failRead));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == extensionFieldFailTestIn.attributeValueList.Decode(reader));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.ExitContainer(failRead));
 
     // Verify failure on both serialize and deserialize
     NL_TEST_ASSERT(aSuite,

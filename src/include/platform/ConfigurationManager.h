@@ -31,7 +31,7 @@
 #include <setup_payload/CHIPAdditionalDataPayloadBuildConfig.h>
 #endif
 
-#include <app-common/zap-generated/cluster-objects.h>
+#include <lib/core/ClusterEnums.h>
 #include <lib/support/Span.h>
 #include <platform/PersistedStorage.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>

@@ -4,7 +4,6 @@
 struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
-    optional char_string<64> tagName = 2;
 }
 
 struct ModeOptionStruct {
@@ -18,9 +17,68 @@ struct ApplicationStruct {
     char_string applicationID = 1;
 }
 
+struct ErrorStateStruct {
+    enum8 errorStateID = 0;
+    optional char_string<64> errorStateLabel = 1;
+    optional char_string<64> errorStateDetails = 2;
+}
+
 struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
+}
+
+struct OperationalStateStruct {
+    enum8 operationalStateID = 0;
+    optional char_string<64> operationalStateLabel = 1;
+}
+
+/** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
+client cluster Identify = 3 {
+  enum EffectIdentifierEnum : ENUM8 {
+    kBlink = 0;
+    kBreathe = 1;
+    kOkay = 2;
+    kChannelChange = 11;
+    kFinishEffect = 254;
+    kStopEffect = 255;
+  }
+
+  enum EffectVariantEnum : ENUM8 {
+    kDefault = 0;
+  }
+
+  enum IdentifyTypeEnum : ENUM8 {
+    kNone = 0;
+    kLightOutput = 1;
+    kVisibleIndicator = 2;
+    kAudibleBeep = 3;
+    kDisplay = 4;
+    kActuator = 5;
+  }
+
+  attribute int16u identifyTime = 0;
+  readonly attribute IdentifyTypeEnum identifyType = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct IdentifyRequest {
+    INT16U identifyTime = 0;
+  }
+
+  request struct TriggerEffectRequest {
+    EffectIdentifierEnum effectIdentifier = 0;
+    EffectVariantEnum effectVariant = 1;
+  }
+
+  /** Command description for Identify */
+  command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
+  /** Command description for TriggerEffect */
+  command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
@@ -149,7 +207,7 @@ server cluster Scenes = 5 {
   }
 
   struct AttributeValuePair {
-    optional attrib_id attributeID = 0;
+    attrib_id attributeID = 0;
     int32u attributeValue = 1;
   }
 
@@ -280,6 +338,7 @@ client cluster OnOff = 6 {
 
   bitmap Feature : BITMAP32 {
     kLighting = 0x1;
+    kDeadFront = 0x2;
   }
 
   bitmap OnOffControl : BITMAP8 {
@@ -348,6 +407,7 @@ server cluster OnOff = 6 {
 
   bitmap Feature : BITMAP32 {
     kLighting = 0x1;
+    kDeadFront = 0x2;
   }
 
   bitmap OnOffControl : BITMAP8 {
@@ -623,6 +683,13 @@ server cluster Descriptor = 29 {
     int16u revision = 1;
   }
 
+  struct SemanticTagStruct {
+    nullable vendor_id mfgCode = 0;
+    enum8 namespaceID = 1;
+    enum8 tag = 2;
+    optional nullable char_string label = 3;
+  }
+
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
   readonly attribute CLUSTER_ID serverList[] = 1;
   readonly attribute CLUSTER_ID clientList[] = 2;
@@ -641,8 +708,8 @@ server cluster Descriptor = 29 {
       cluster instances. */
 server cluster AccessControl = 31 {
   enum AccessControlEntryAuthModeEnum : ENUM8 {
-    kPase = 1;
-    kCase = 2;
+    kPASE = 1;
+    kCASE = 2;
     kGroup = 3;
   }
 
@@ -996,17 +1063,6 @@ server cluster UnitLocalization = 45 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** This cluster is used to describe the configuration and capabilities of a Device's power system. */
-server cluster PowerSourceConfiguration = 46 {
-  readonly attribute INT8U sources[] = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 server cluster PowerSource = 47 {
   enum BatApprovedChemistryEnum : ENUM16 {
@@ -1060,7 +1116,7 @@ server cluster PowerSource = 47 {
   }
 
   enum BatChargeLevelEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
@@ -1074,15 +1130,15 @@ server cluster PowerSource = 47 {
 
   enum BatCommonDesignationEnum : ENUM16 {
     kUnspecified = 0;
-    kAaa = 1;
-    kAa = 2;
+    kAAA = 1;
+    kAA = 2;
     kC = 3;
     kD = 4;
     k4v5 = 5;
     k6v0 = 6;
     k9v0 = 7;
-    k12aa = 8;
-    kAaaa = 9;
+    k12AA = 8;
+    kAAAA = 9;
     kA = 10;
     kB = 11;
     kF = 12;
@@ -1091,9 +1147,9 @@ server cluster PowerSource = 47 {
     kSubC = 15;
     kA23 = 16;
     kA27 = 17;
-    kBa5800 = 18;
+    kBA5800 = 18;
     kDuplex = 19;
-    k4sr44 = 20;
+    k4SR44 = 20;
     k523 = 21;
     k531 = 22;
     k15v0 = 23;
@@ -1102,39 +1158,39 @@ server cluster PowerSource = 47 {
     k45v0 = 26;
     k67v5 = 27;
     kJ = 28;
-    kCr123a = 29;
-    kCr2 = 30;
-    k2cr5 = 31;
-    kCrP2 = 32;
-    kCrV3 = 33;
-    kSr41 = 34;
-    kSr43 = 35;
-    kSr44 = 36;
-    kSr45 = 37;
-    kSr48 = 38;
-    kSr54 = 39;
-    kSr55 = 40;
-    kSr57 = 41;
-    kSr58 = 42;
-    kSr59 = 43;
-    kSr60 = 44;
-    kSr63 = 45;
-    kSr64 = 46;
-    kSr65 = 47;
-    kSr66 = 48;
-    kSr67 = 49;
-    kSr68 = 50;
-    kSr69 = 51;
-    kSr516 = 52;
-    kSr731 = 53;
-    kSr712 = 54;
-    kLr932 = 55;
+    kCR123A = 29;
+    kCR2 = 30;
+    k2CR5 = 31;
+    kCRP2 = 32;
+    kCRV3 = 33;
+    kSR41 = 34;
+    kSR43 = 35;
+    kSR44 = 36;
+    kSR45 = 37;
+    kSR48 = 38;
+    kSR54 = 39;
+    kSR55 = 40;
+    kSR57 = 41;
+    kSR58 = 42;
+    kSR59 = 43;
+    kSR60 = 44;
+    kSR63 = 45;
+    kSR64 = 46;
+    kSR65 = 47;
+    kSR66 = 48;
+    kSR67 = 49;
+    kSR68 = 50;
+    kSR69 = 51;
+    kSR516 = 52;
+    kSR731 = 53;
+    kSR712 = 54;
+    kLR932 = 55;
     kA5 = 56;
     kA10 = 57;
     kA13 = 58;
     kA312 = 59;
     kA675 = 60;
-    kAc41e = 61;
+    kAC41E = 61;
     k10180 = 62;
     k10280 = 63;
     k10440 = 64;
@@ -1144,7 +1200,7 @@ server cluster PowerSource = 47 {
     k14650 = 68;
     k15270 = 69;
     k16340 = 70;
-    kRcr123a = 71;
+    kRCR123A = 71;
     k17500 = 72;
     k17670 = 73;
     k18350 = 74;
@@ -1177,8 +1233,8 @@ server cluster PowerSource = 47 {
   }
 
   enum WiredCurrentTypeEnum : ENUM8 {
-    kAc = 0;
-    kDc = 1;
+    kAC = 0;
+    kDC = 1;
   }
 
   enum WiredFaultEnum : ENUM8 {
@@ -1255,6 +1311,7 @@ server cluster PowerSource = 47 {
   readonly attribute boolean batFunctionalWhileCharging = 28;
   readonly attribute nullable int32u batChargingCurrent = 29;
   readonly attribute BatChargeFaultEnum activeBatChargeFaults[] = 30;
+  readonly attribute endpoint_no endpointList[] = 31;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1266,7 +1323,7 @@ server cluster PowerSource = 47 {
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 client cluster GeneralCommissioning = 48 {
   enum CommissioningErrorEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
     kNoFailSafe = 3;
@@ -1333,7 +1390,7 @@ client cluster GeneralCommissioning = 48 {
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 server cluster GeneralCommissioning = 48 {
   enum CommissioningErrorEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
     kNoFailSafe = 3;
@@ -1413,12 +1470,12 @@ server cluster NetworkCommissioning = 49 {
   }
 
   enum WiFiBandEnum : ENUM8 {
-    k2g4 = 0;
-    k3g65 = 1;
-    k5g = 2;
-    k6g = 3;
-    k60g = 4;
-    k1g = 5;
+    k2G4 = 0;
+    k3G65 = 1;
+    k5G = 2;
+    k6G = 3;
+    k60G = 4;
+    k1G = 5;
   }
 
   bitmap Feature : BITMAP32 {
@@ -1429,10 +1486,10 @@ server cluster NetworkCommissioning = 49 {
 
   bitmap WiFiSecurityBitmap : BITMAP8 {
     kUnencrypted = 0x1;
-    kWep = 0x2;
-    kWpaPersonal = 0x4;
-    kWpa2Personal = 0x8;
-    kWpa3Personal = 0x10;
+    kWEP = 0x2;
+    kWPAPersonal = 0x4;
+    kWPA2Personal = 0x8;
+    kWPA3Personal = 0x10;
   }
 
   struct NetworkInfoStruct {
@@ -1692,7 +1749,7 @@ client cluster ThreadNetworkDiagnostics = 53 {
     kUnassigned = 1;
     kSleepyEndDevice = 2;
     kEndDevice = 3;
-    kReed = 4;
+    kREED = 4;
     kRouter = 5;
     kLeader = 6;
   }
@@ -1856,7 +1913,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
     kUnassigned = 1;
     kSleepyEndDevice = 2;
     kEndDevice = 3;
-    kReed = 4;
+    kREED = 4;
     kRouter = 5;
     kLeader = 6;
   }
@@ -2017,10 +2074,10 @@ server cluster WiFiNetworkDiagnostics = 54 {
   enum SecurityTypeEnum : ENUM8 {
     kUnspecified = 0;
     kNone = 1;
-    kWep = 2;
-    kWpa = 3;
-    kWpa2 = 4;
-    kWpa3 = 5;
+    kWEP = 2;
+    kWPA = 3;
+    kWPA2 = 4;
+    kWPA3 = 5;
   }
 
   enum WiFiVersionEnum : ENUM8 {
@@ -2080,7 +2137,7 @@ server cluster EthernetNetworkDiagnostics = 55 {
     kRate10M = 0;
     kRate100M = 1;
     kRate1G = 2;
-    kRate25g = 3;
+    kRate25G = 3;
     kRate5G = 4;
     kRate10G = 5;
     kRate40G = 6;
@@ -2183,6 +2240,7 @@ server cluster BridgedDeviceBasicInformation = 57 {
   readonly attribute long_char_string<256> productURL = 13;
   readonly attribute char_string<64> productLabel = 14;
   readonly attribute char_string<32> serialNumber = 15;
+  readonly attribute boolean reachable = 17;
   readonly attribute char_string<32> uniqueID = 18;
   readonly attribute ProductAppearanceStruct productAppearance = 20;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -2348,7 +2406,7 @@ client cluster OperationalCredentials = 62 {
   }
 
   enum NodeOperationalCertStatusEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
     kInvalidNOC = 3;
@@ -2472,7 +2530,7 @@ server cluster OperationalCredentials = 62 {
   }
 
   enum NodeOperationalCertStatusEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
     kInvalidNOC = 3;
@@ -2646,44 +2704,23 @@ server cluster BooleanState = 69 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 client cluster ModeSelect = 80 {
-  enum ModeTag : ENUM16 {
-    kAuto = 0;
-    kQuick = 1;
-    kQuiet = 2;
-    kLowNoise = 3;
-    kLowEnergy = 4;
-    kVacation = 5;
-    kMin = 6;
-    kMax = 7;
-    kNight = 8;
-    kDay = 9;
-  }
-
-  enum StatusCode : ENUM8 {
-    kSuccess = 0;
-    kUnsupportedMode = 1;
-    kGenericFailure = 2;
-  }
-
   bitmap Feature : BITMAP32 {
     kOnOff = 0x1;
-    kExtendedStatus = 0x2;
   }
 
-  struct ModeTagStruct {
-    optional vendor_id mfgCode = 0;
+  struct SemanticTagStruct {
+    vendor_id mfgCode = 0;
     enum16 value = 1;
-    optional char_string<64> tagName = 2;
   }
 
   struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
-    ModeTagStruct modeTags[] = 2;
+    SemanticTagStruct semanticTags[] = 2;
   }
 
   readonly attribute char_string<64> description = 0;
-  readonly attribute optional nullable enum16 standardNamespace = 1;
+  readonly attribute nullable enum16 standardNamespace = 1;
   readonly attribute ModeOptionStruct supportedModes[] = 2;
   readonly attribute int8u currentMode = 3;
   attribute optional nullable int8u startUpMode = 4;
@@ -2699,60 +2736,25 @@ client cluster ModeSelect = 80 {
     INT8U newMode = 0;
   }
 
-  request struct ChangeToModeWithStatusRequest {
-    INT8U newMode = 0;
-  }
-
-  response struct ChangeToModeResponse = 2 {
-    ENUM8 status = 0;
-    optional CHAR_STRING statusText = 1;
-  }
-
-  /** If the NewMode field doesn't match the Mode field in an entry of the SupportedModes list the server SHALL respond with an INVALID_COMMAND status response.
-        If the NewMode field matches the Mode field in an entry of the SupportedModes list but the device is unable to transition as requested, the server SHALL respond with a FAILURE status response.
-        If the NewMode field matches the Mode field in an entry of the SupportedModes list and the device is able to transition as requested the server SHALL set the CurrentMode attribute to the NewMode value and SHALL respond with a SUCCESS status response. */
+  /** On receipt of this command, if the NewMode field matches the Mode field in an entry of the SupportedModes list, the server SHALL set the CurrentMode attribute to the NewMode value, otherwise, the server SHALL respond with an INVALID_COMMAND status response. */
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
-  /** This command is used to change device modes using the same mechanism and semantics as ChangeToMode, and additionally obtaining a response with an ability for clients to determine causes of failures with fine-grained details. For status response depending on NewMode field, see ChangeToMode command.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
-  command ChangeToModeWithStatus(ChangeToModeWithStatusRequest): ChangeToModeResponse = 1;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 server cluster ModeSelect = 80 {
-  enum ModeTag : ENUM16 {
-    kAuto = 0;
-    kQuick = 1;
-    kQuiet = 2;
-    kLowNoise = 3;
-    kLowEnergy = 4;
-    kVacation = 5;
-    kMin = 6;
-    kMax = 7;
-    kNight = 8;
-    kDay = 9;
-  }
-
-  enum StatusCode : ENUM8 {
-    kSuccess = 0;
-    kUnsupportedMode = 1;
-    kGenericFailure = 2;
-  }
-
   bitmap Feature : BITMAP32 {
     kOnOff = 0x1;
-    kExtendedStatus = 0x2;
   }
 
-  struct ModeTagStruct {
-    optional vendor_id mfgCode = 0;
+  struct SemanticTagStruct {
+    vendor_id mfgCode = 0;
     enum16 value = 1;
-    optional char_string<64> tagName = 2;
   }
 
   struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
-    ModeTagStruct modeTags[] = 2;
+    SemanticTagStruct semanticTags[] = 2;
   }
 
   readonly attribute char_string<64> description = 0;
@@ -2795,8 +2797,8 @@ client cluster DoorLock = 257 {
 
   enum CredentialTypeEnum : ENUM8 {
     kProgrammingPIN = 0;
-    kPin = 1;
-    kRfid = 2;
+    kPIN = 1;
+    kRFID = 2;
     kFingerprint = 3;
     kFingerVein = 4;
     kFace = 5;
@@ -2907,8 +2909,8 @@ client cluster DoorLock = 257 {
     kWeekDaySchedule = 3;
     kYearDaySchedule = 4;
     kHolidaySchedule = 5;
-    kPin = 6;
-    kRfid = 7;
+    kPIN = 6;
+    kRFID = 7;
     kFingerprint = 8;
     kFingerVein = 9;
     kFace = 10;
@@ -2947,7 +2949,7 @@ client cluster DoorLock = 257 {
     kButton = 5;
     kSchedule = 6;
     kRemote = 7;
-    kRfid = 8;
+    kRFID = 8;
     kBiometric = 9;
   }
 
@@ -3096,8 +3098,8 @@ client cluster DoorLock = 257 {
   }
 
   bitmap Feature : BITMAP32 {
-    kPinCredential = 0x1;
-    kRfidCredential = 0x2;
+    kPINCredential = 0x1;
+    kRFIDCredential = 0x2;
     kFingerCredentials = 0x4;
     kLogging = 0x8;
     kWeekDayAccessSchedules = 0x10;
@@ -3415,8 +3417,8 @@ server cluster DoorLock = 257 {
 
   enum CredentialTypeEnum : ENUM8 {
     kProgrammingPIN = 0;
-    kPin = 1;
-    kRfid = 2;
+    kPIN = 1;
+    kRFID = 2;
     kFingerprint = 3;
     kFingerVein = 4;
     kFace = 5;
@@ -3527,8 +3529,8 @@ server cluster DoorLock = 257 {
     kWeekDaySchedule = 3;
     kYearDaySchedule = 4;
     kHolidaySchedule = 5;
-    kPin = 6;
-    kRfid = 7;
+    kPIN = 6;
+    kRFID = 7;
     kFingerprint = 8;
     kFingerVein = 9;
     kFace = 10;
@@ -3567,7 +3569,7 @@ server cluster DoorLock = 257 {
     kButton = 5;
     kSchedule = 6;
     kRemote = 7;
-    kRfid = 8;
+    kRFID = 8;
     kBiometric = 9;
   }
 
@@ -3716,8 +3718,8 @@ server cluster DoorLock = 257 {
   }
 
   bitmap Feature : BITMAP32 {
-    kPinCredential = 0x1;
-    kRfidCredential = 0x2;
+    kPINCredential = 0x1;
+    kRFIDCredential = 0x2;
     kFingerCredentials = 0x4;
     kLogging = 0x8;
     kWeekDayAccessSchedules = 0x10;
@@ -3829,9 +3831,69 @@ server cluster DoorLock = 257 {
     optional OCTET_STRING PINCode = 1;
   }
 
+  request struct SetWeekDayScheduleRequest {
+    INT8U weekDayIndex = 0;
+    INT16U userIndex = 1;
+    DaysMaskMap daysMask = 2;
+    INT8U startHour = 3;
+    INT8U startMinute = 4;
+    INT8U endHour = 5;
+    INT8U endMinute = 6;
+  }
+
+  request struct ClearWeekDayScheduleRequest {
+    INT8U weekDayIndex = 0;
+    INT16U userIndex = 1;
+  }
+
+  request struct SetYearDayScheduleRequest {
+    INT8U yearDayIndex = 0;
+    INT16U userIndex = 1;
+    epoch_s localStartTime = 2;
+    epoch_s localEndTime = 3;
+  }
+
+  request struct ClearYearDayScheduleRequest {
+    INT8U yearDayIndex = 0;
+    INT16U userIndex = 1;
+  }
+
+  request struct SetHolidayScheduleRequest {
+    INT8U holidayIndex = 0;
+    epoch_s localStartTime = 1;
+    epoch_s localEndTime = 2;
+    OperatingModeEnum operatingMode = 3;
+  }
+
+  request struct ClearHolidayScheduleRequest {
+    INT8U holidayIndex = 0;
+  }
+
+  request struct SetUserRequest {
+    DataOperationTypeEnum operationType = 0;
+    INT16U userIndex = 1;
+    nullable CHAR_STRING userName = 2;
+    nullable INT32U userUniqueID = 3;
+    nullable UserStatusEnum userStatus = 4;
+    nullable UserTypeEnum userType = 5;
+    nullable CredentialRuleEnum credentialRule = 6;
+  }
+
+  request struct ClearCredentialRequest {
+    nullable CredentialStruct credential = 0;
+  }
+
   timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
   timed command UnlockDoor(UnlockDoorRequest): DefaultSuccess = 1;
   timed command UnlockWithTimeout(UnlockWithTimeoutRequest): DefaultSuccess = 3;
+  command access(invoke: administer) SetWeekDaySchedule(SetWeekDayScheduleRequest): DefaultSuccess = 11;
+  command access(invoke: administer) ClearWeekDaySchedule(ClearWeekDayScheduleRequest): DefaultSuccess = 13;
+  command access(invoke: administer) SetYearDaySchedule(SetYearDayScheduleRequest): DefaultSuccess = 14;
+  command access(invoke: administer) ClearYearDaySchedule(ClearYearDayScheduleRequest): DefaultSuccess = 16;
+  command access(invoke: administer) SetHolidaySchedule(SetHolidayScheduleRequest): DefaultSuccess = 17;
+  command access(invoke: administer) ClearHolidaySchedule(ClearHolidayScheduleRequest): DefaultSuccess = 19;
+  timed command access(invoke: administer) SetUser(SetUserRequest): DefaultSuccess = 26;
+  timed command access(invoke: administer) ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
 }
 
 /** Provides an interface for controlling and adjusting automatic window coverings. */
@@ -4469,7 +4531,7 @@ client cluster ColorControl = 768 {
     kHueAndSaturation = 0x1;
     kEnhancedHue = 0x2;
     kColorLoop = 0x4;
-    kXy = 0x8;
+    kXY = 0x8;
     kColorTemperature = 0x10;
   }
 
@@ -4787,7 +4849,7 @@ server cluster ColorControl = 768 {
     kHueAndSaturation = 0x1;
     kEnhancedHue = 0x2;
     kColorLoop = 0x4;
-    kXy = 0x8;
+    kXY = 0x8;
     kColorTemperature = 0x10;
   }
 
@@ -5023,7 +5085,7 @@ server cluster ColorControl = 768 {
 server cluster IlluminanceMeasurement = 1024 {
   enum LightSensorTypeEnum : ENUM8 {
     kPhotodiode = 0;
-    kCmos = 1;
+    kCMOS = 1;
   }
 
   readonly attribute nullable int16u measuredValue = 0;
@@ -5135,7 +5197,7 @@ server cluster RelativeHumidityMeasurement = 1029 {
 /** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
 server cluster OccupancySensing = 1030 {
   enum OccupancySensorTypeEnum : ENUM8 {
-    kPir = 0;
+    kPIR = 0;
     kUltrasonic = 1;
     kPIRAndUltrasonic = 2;
     kPhysicalContact = 3;
@@ -5146,7 +5208,7 @@ server cluster OccupancySensing = 1030 {
   }
 
   bitmap OccupancySensorTypeBitmap : BITMAP8 {
-    kPir = 0x1;
+    kPIR = 0x1;
     kUltrasonic = 0x2;
     kPhysicalContact = 0x4;
   }
@@ -5180,7 +5242,7 @@ client cluster Channel = 1284 {
   }
 
   enum LineupInfoTypeEnum : ENUM8 {
-    kMso = 0;
+    kMSO = 0;
   }
 
   bitmap Feature : BITMAP32 {
@@ -5248,7 +5310,7 @@ server cluster Channel = 1284 {
   }
 
   enum LineupInfoTypeEnum : ENUM8 {
-    kMso = 0;
+    kMSO = 0;
   }
 
   bitmap Feature : BITMAP32 {
@@ -5520,13 +5582,13 @@ client cluster MediaInput = 1287 {
     kAux = 1;
     kCoax = 2;
     kComposite = 3;
-    kHdmi = 4;
+    kHDMI = 4;
     kInput = 5;
     kLine = 6;
     kOptical = 7;
     kVideo = 8;
-    kScart = 9;
-    kUsb = 10;
+    kSCART = 9;
+    kUSB = 10;
     kOther = 11;
   }
 
@@ -5576,13 +5638,13 @@ server cluster MediaInput = 1287 {
     kAux = 1;
     kCoax = 2;
     kComposite = 3;
-    kHdmi = 4;
+    kHDMI = 4;
     kInput = 5;
     kLine = 6;
     kOptical = 7;
     kVideo = 8;
-    kScart = 9;
-    kUsb = 10;
+    kSCART = 9;
+    kUSB = 10;
     kOther = 11;
   }
 
@@ -5903,8 +5965,8 @@ client cluster ContentLauncher = 1290 {
   }
 
   bitmap SupportedStreamingProtocol : BITMAP32 {
-    kDash = 0x1;
-    kHls = 0x2;
+    kDASH = 0x1;
+    kHLS = 0x2;
   }
 
   struct DimensionStruct {
@@ -6011,8 +6073,8 @@ server cluster ContentLauncher = 1290 {
   }
 
   bitmap SupportedStreamingProtocol : BITMAP32 {
-    kDash = 0x1;
-    kHls = 0x2;
+    kDASH = 0x1;
+    kHLS = 0x2;
   }
 
   struct DimensionStruct {
@@ -6084,8 +6146,8 @@ server cluster ContentLauncher = 1290 {
 /** This cluster provides an interface for controlling the Output on a media device such as a TV. */
 client cluster AudioOutput = 1291 {
   enum OutputTypeEnum : ENUM8 {
-    kHdmi = 0;
-    kBt = 1;
+    kHDMI = 0;
+    kBT = 1;
     kOptical = 2;
     kHeadphone = 3;
     kInternal = 4;
@@ -6129,8 +6191,8 @@ client cluster AudioOutput = 1291 {
 /** This cluster provides an interface for controlling the Output on a media device such as a TV. */
 server cluster AudioOutput = 1291 {
   enum OutputTypeEnum : ENUM8 {
-    kHdmi = 0;
-    kBt = 1;
+    kHDMI = 0;
+    kBT = 1;
     kOptical = 2;
     kHeadphone = 3;
     kInternal = 4;
@@ -6376,7 +6438,7 @@ server cluster AccountLogin = 1294 {
 }
 
 endpoint 0 {
-  device type anonymousEndpointType = 65280, version 1;
+  device type rootdevice = 22, version 1;
   binding cluster GeneralCommissioning;
   binding cluster ThreadNetworkDiagnostics;
   binding cluster Switch;
@@ -6416,7 +6478,6 @@ endpoint 0 {
     callback attribute accessControlEntriesPerFabric;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -6465,12 +6526,6 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster PowerSourceConfiguration {
-    callback attribute sources;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
   server cluster PowerSource {
     ram      attribute status;
     ram      attribute order;
@@ -6503,8 +6558,9 @@ endpoint 0 {
     ram      attribute batFunctionalWhileCharging;
     ram      attribute batChargingCurrent;
     callback attribute activeBatChargeFaults;
+    callback attribute endpointList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster GeneralCommissioning {
@@ -6663,20 +6719,21 @@ endpoint 0 {
     emits event StartUp;
     emits event ShutDown;
     emits event Leave;
-    callback attribute vendorName;
-    callback attribute vendorID;
-    callback attribute productName;
+    ram      attribute vendorName;
+    ram      attribute vendorID;
+    ram      attribute productName;
     persist  attribute nodeLabel;
-    callback attribute hardwareVersion;
-    callback attribute hardwareVersionString;
-    callback attribute softwareVersion;
-    callback attribute softwareVersionString;
-    callback attribute manufacturingDate;
-    callback attribute partNumber;
-    callback attribute productURL;
-    callback attribute productLabel;
-    callback attribute serialNumber;
-    callback attribute uniqueID;
+    ram      attribute hardwareVersion default = 0;
+    ram      attribute hardwareVersionString;
+    ram      attribute softwareVersion default = 0;
+    ram      attribute softwareVersionString;
+    ram      attribute manufacturingDate default = "20210614123456ZZ";
+    ram      attribute partNumber;
+    ram      attribute productURL;
+    ram      attribute productLabel;
+    ram      attribute serialNumber;
+    ram      attribute reachable default = 1;
+    ram      attribute uniqueID;
     callback attribute productAppearance;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
@@ -6731,42 +6788,42 @@ endpoint 0 {
   }
 
   server cluster DoorLock {
-    callback attribute lockState;
-    callback attribute lockType;
+    ram      attribute lockState;
+    ram      attribute lockType;
     ram      attribute actuatorEnabled;
-    callback attribute doorState;
-    callback attribute doorOpenEvents;
-    callback attribute doorClosedEvents;
-    callback attribute openPeriod;
-    callback attribute numberOfTotalUsersSupported default = 0;
-    callback attribute numberOfPINUsersSupported default = 0;
-    callback attribute numberOfRFIDUsersSupported default = 0;
-    callback attribute numberOfWeekDaySchedulesSupportedPerUser default = 0;
-    callback attribute numberOfYearDaySchedulesSupportedPerUser default = 0;
-    callback attribute numberOfHolidaySchedulesSupported default = 0;
-    callback attribute maxPINCodeLength;
-    callback attribute minPINCodeLength;
-    callback attribute maxRFIDCodeLength;
-    callback attribute minRFIDCodeLength;
-    callback attribute credentialRulesSupport default = 1;
-    callback attribute numberOfCredentialsSupportedPerUser default = 0;
-    callback attribute language;
-    callback attribute LEDSettings default = 0;
-    callback attribute autoRelockTime;
-    callback attribute soundVolume default = 0;
-    callback attribute operatingMode default = 0;
-    callback attribute supportedOperatingModes default = 65526;
-    callback attribute defaultConfigurationRegister default = 0;
-    callback attribute enableLocalProgramming default = 1;
-    callback attribute enableOneTouchLocking default = 0;
-    callback attribute enableInsideStatusLED default = 0;
-    callback attribute enablePrivacyModeButton default = 0;
-    callback attribute localProgrammingFeatures default = 0;
-    callback attribute wrongCodeEntryLimit;
-    callback attribute userCodeTemporaryDisableTime;
-    callback attribute sendPINOverTheAir default = 0;
-    callback attribute requirePINforRemoteOperation default = 0;
-    callback attribute expiringUserTimeout;
+    ram      attribute doorState;
+    ram      attribute doorOpenEvents;
+    ram      attribute doorClosedEvents;
+    ram      attribute openPeriod;
+    ram      attribute numberOfTotalUsersSupported default = 0;
+    ram      attribute numberOfPINUsersSupported default = 0;
+    ram      attribute numberOfRFIDUsersSupported default = 0;
+    ram      attribute numberOfWeekDaySchedulesSupportedPerUser default = 0;
+    ram      attribute numberOfYearDaySchedulesSupportedPerUser default = 0;
+    ram      attribute numberOfHolidaySchedulesSupported default = 0;
+    ram      attribute maxPINCodeLength;
+    ram      attribute minPINCodeLength;
+    ram      attribute maxRFIDCodeLength;
+    ram      attribute minRFIDCodeLength;
+    ram      attribute credentialRulesSupport default = 1;
+    ram      attribute numberOfCredentialsSupportedPerUser default = 0;
+    ram      attribute language;
+    ram      attribute LEDSettings default = 0;
+    ram      attribute autoRelockTime;
+    ram      attribute soundVolume default = 0;
+    ram      attribute operatingMode default = 0;
+    ram      attribute supportedOperatingModes default = 65526;
+    ram      attribute defaultConfigurationRegister default = 0;
+    ram      attribute enableLocalProgramming default = 1;
+    ram      attribute enableOneTouchLocking default = 0;
+    ram      attribute enableInsideStatusLED default = 0;
+    ram      attribute enablePrivacyModeButton default = 0;
+    ram      attribute localProgrammingFeatures default = 0;
+    ram      attribute wrongCodeEntryLimit;
+    ram      attribute userCodeTemporaryDisableTime;
+    ram      attribute sendPINOverTheAir default = 0;
+    ram      attribute requirePINforRemoteOperation default = 0;
+    ram      attribute expiringUserTimeout;
     ram      attribute clusterRevision default = 6;
   }
 
@@ -7029,6 +7086,7 @@ endpoint 0 {
 }
 endpoint 1 {
   device type anonymousEndpointType = 257, version 1;
+  binding cluster Identify;
   binding cluster OnOff;
   binding cluster LevelControl;
   binding cluster LocalizationConfiguration;
@@ -7041,7 +7099,6 @@ endpoint 1 {
     ram      attribute identifyType default = 0x0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
@@ -7051,7 +7108,6 @@ endpoint 1 {
     ram      attribute nameSupport;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
@@ -7065,10 +7121,9 @@ endpoint 1 {
     ram      attribute nameSupport;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster OnOff {
@@ -7079,10 +7134,9 @@ endpoint 1 {
     ram      attribute startUpOnOff default = 0xFF;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0001;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster LevelControl {
@@ -7102,7 +7156,6 @@ endpoint 1 {
     ram      attribute startUpCurrentLevel;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 5;
@@ -7115,7 +7168,6 @@ endpoint 1 {
     callback attribute partsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -7173,54 +7225,54 @@ endpoint 1 {
   server cluster ColorControl {
     ram      attribute currentHue default = 0x00;
     ram      attribute currentSaturation default = 0x00;
-    callback attribute remainingTime default = 0x00;
+    ram      attribute remainingTime default = 0x00;
     ram      attribute currentX default = 0x616B;
     ram      attribute currentY default = 0x607D;
-    callback attribute driftCompensation;
-    callback attribute compensationText;
+    ram      attribute driftCompensation;
+    ram      attribute compensationText;
     ram      attribute colorTemperatureMireds default = 0x00FA;
-    callback attribute colorMode default = 1;
+    ram      attribute colorMode default = 1;
     ram      attribute options default = 0x00;
-    callback attribute numberOfPrimaries;
-    callback attribute primary1X;
-    callback attribute primary1Y;
-    callback attribute primary1Intensity;
-    callback attribute primary2X;
-    callback attribute primary2Y;
-    callback attribute primary2Intensity;
-    callback attribute primary3X;
-    callback attribute primary3Y;
-    callback attribute primary3Intensity;
-    callback attribute primary4X;
-    callback attribute primary4Y;
-    callback attribute primary4Intensity;
-    callback attribute primary5X;
-    callback attribute primary5Y;
-    callback attribute primary5Intensity;
-    callback attribute primary6X;
-    callback attribute primary6Y;
-    callback attribute primary6Intensity;
-    callback attribute whitePointX;
-    callback attribute whitePointY;
-    callback attribute colorPointRX;
-    callback attribute colorPointRY;
-    callback attribute colorPointRIntensity;
-    callback attribute colorPointGX;
-    callback attribute colorPointGY;
-    callback attribute colorPointGIntensity;
-    callback attribute colorPointBX;
-    callback attribute colorPointBY;
-    callback attribute colorPointBIntensity;
+    ram      attribute numberOfPrimaries;
+    ram      attribute primary1X;
+    ram      attribute primary1Y;
+    ram      attribute primary1Intensity;
+    ram      attribute primary2X;
+    ram      attribute primary2Y;
+    ram      attribute primary2Intensity;
+    ram      attribute primary3X;
+    ram      attribute primary3Y;
+    ram      attribute primary3Intensity;
+    ram      attribute primary4X;
+    ram      attribute primary4Y;
+    ram      attribute primary4Intensity;
+    ram      attribute primary5X;
+    ram      attribute primary5Y;
+    ram      attribute primary5Intensity;
+    ram      attribute primary6X;
+    ram      attribute primary6Y;
+    ram      attribute primary6Intensity;
+    ram      attribute whitePointX;
+    ram      attribute whitePointY;
+    ram      attribute colorPointRX;
+    ram      attribute colorPointRY;
+    ram      attribute colorPointRIntensity;
+    ram      attribute colorPointGX;
+    ram      attribute colorPointGY;
+    ram      attribute colorPointGIntensity;
+    ram      attribute colorPointBX;
+    ram      attribute colorPointBY;
+    ram      attribute colorPointBIntensity;
     ram      attribute enhancedCurrentHue default = 0x00;
-    callback attribute enhancedColorMode default = 0x01;
+    ram      attribute enhancedColorMode default = 0x01;
     ram      attribute colorLoopActive default = 0x00;
     ram      attribute colorLoopDirection default = 0x00;
     ram      attribute colorLoopTime default = 0x0019;
     ram      attribute colorLoopStartEnhancedHue default = 0x2300;
     ram      attribute colorLoopStoredEnhancedHue default = 0x00;
-    callback attribute colorCapabilities default = 0x00;
-    callback attribute colorTempPhysicalMinMireds default = 0x00;
-    callback attribute colorTempPhysicalMaxMireds default = 0xfeff;
+    ram      attribute colorCapabilities default = 0x00;
+    ram      attribute colorTempPhysicalMinMireds default = 0x00;
+    ram      attribute colorTempPhysicalMaxMireds default = 0xfeff;
     ram      attribute coupleColorTempToLevelMinMireds;
     ram      attribute startUpColorTemperatureMireds;
     ram      attribute featureMap default = 0;

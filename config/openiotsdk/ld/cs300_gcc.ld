@@ -17,11 +17,8 @@
 
 MEMORY
 {
-  ITCM (rx)       : ORIGIN = 0x00000000, LENGTH = 32K
-  /* Vector table is copied to RAM, so RAM address needs to be adjusted */
-  DTCM (rwx)      : ORIGIN = 0x20000000, LENGTH = 32K
-  DATA_SRAM (rwx) : ORIGIN = 0x21000000, LENGTH = 2M
-  QSPI_RAM (rx)   : ORIGIN = 0x28000000, LENGTH = 8M
+  FLASH (rx)  : ORIGIN = ((0x28000000) + (0x60000) + (0x400)), LENGTH = ((0x200000) - (0x400) - (0x800))
+  RAM (rwx)   : ORIGIN = 0x21000000, LENGTH = 0x200000
 }
 
 __stack_size__ = 0x1000;
@@ -31,15 +28,18 @@ GROUP(libgcc.a libc.a libm.a libnosys.a)
 
 SECTIONS
 {
-    .vectors :
+    .text :
     {
         KEEP(*(.vectors))
         __Vectors_End = .;
         __Vectors_Size = __Vectors_End - __Vectors;
         __end__ = .;
 
+        *(.text*)
+
         KEEP(*(.init))
         KEEP(*(.fini))
+
 
         /* .ctors */
         *crtbegin.o(.ctors)
@@ -47,12 +47,7 @@ SECTIONS
         *(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
         *(SORT(.ctors.*))
         *(.ctors)
-    } > ITCM
 
-    .text :
-    {
-        *(.text*)
-        
         /* .dtors */
          *crtbegin.o(.dtors)
          *crtbegin?.o(.dtors)
@@ -63,19 +58,19 @@ SECTIONS
         *(.rodata*)
 
         KEEP(*(.eh_frame*))
-    } > QSPI_RAM
+    } > FLASH
 
     .ARM.extab :
     {
         *(.ARM.extab* .gnu.linkonce.armextab.*)
-    } > QSPI_RAM
+    } > FLASH
 
     __exidx_start = .;
 
     .ARM.exidx :
     {
         *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-    } > QSPI_RAM
+    } > FLASH
 
     __exidx_end = .;
 
@@ -92,7 +87,7 @@ SECTIONS
         LONG (DEFINED(__data2_start__) ? __data2_start__ : 0)
         LONG (DEFINED(__data2_start__) ? __data2_end__ - __data2_start__ : 0)
         __copy_table_end__ = .;
-    } > QSPI_RAM
+    } > FLASH
 
     .zero.table :
     {
@@ -103,7 +98,7 @@ SECTIONS
         LONG (DEFINED(__bss2_start__) ? __bss2_start__ : 0)
         LONG (DEFINED(__bss2_start__) ? __bss2_end__ - __bss2_start__ : 0)
         __zero_table_end__ = .;
-    } > QSPI_RAM
+    } > FLASH
 
     __etext = .;
 
@@ -137,7 +132,7 @@ SECTIONS
         . = ALIGN(4);
         /* All data end */
         __data_end__ = .;
-    } > DATA_SRAM
+    } > RAM
 
     .bss :
     {
@@ -147,7 +142,7 @@ SECTIONS
         *(COMMON)
         . = ALIGN(4);
         __bss_end__ = .;
-    } > DATA_SRAM
+    } > RAM
 
     bss_size = __bss_end__ - __bss_start__;
 
@@ -158,7 +153,7 @@ SECTIONS
         KEEP(*(.stack*))
         . += __stack_size__;
         __StackTop = .;
-    } > DTCM
+    } > RAM
     PROVIDE(__stack = __StackTop);
 
     .heap (COPY):
@@ -168,10 +163,10 @@ SECTIONS
         __end__ = .;
         end = __end__;
         KEEP(*(.heap*))
-        . += (ORIGIN(DATA_SRAM) + LENGTH(DATA_SRAM) - .);
+        . += (ORIGIN(RAM) + LENGTH(RAM) - .);
         __HeapLimit = .;
         __heap_limit = .;
-    } > DATA_SRAM
+    } > RAM
 
-    ASSERT(__StackTop <= (ORIGIN(DTCM) + LENGTH(DTCM)), "RAM region overflowed")
+    ASSERT(__HeapLimit <= (ORIGIN(RAM) + LENGTH(RAM)), "RAM region overflowed")
 }

@@ -1,0 +1,8 @@
+name: Bootstrap
+description: Bootstrap
+runs:
+  using: "composite"
+  steps:
+    - name: Bootstrap
+      shell: bash
+      run: bash scripts/bootstrap.sh

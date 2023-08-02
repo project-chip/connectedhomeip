@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -1284,7 +1284,7 @@ exit:
 
 bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subjectVID, uint16_t subjectPID,
                  bool encodeVIDandPIDasCN, X509 * caCert, EVP_PKEY * caKey, const struct tm & validFrom, uint32_t validDays,
-                 X509 * newCert, EVP_PKEY * newKey, CertStructConfig & certConfig)
+                 X509 * newCert, EVP_PKEY * newKey, CertStructConfig & certConfig, X509_EXTENSION * cdpExt)
 {
     bool res     = true;
     uint16_t vid = certConfig.IsSubjectVIDMismatch() ? static_cast<uint16_t>(subjectVID + 1) : subjectVID;
@@ -1465,6 +1465,19 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
     {
         // Add optional Subject Alternative Name extentsion.
         res = AddExtension(newCert, NID_subject_alt_name, "DNS:test.com");
+        VerifyTrueOrExit(res);
+    }
+
+    if (cdpExt != nullptr)
+    {
+        int result = X509_add_ext(newCert, cdpExt, -1);
+        VerifyTrueOrExit(result == 1);
+    }
+
+    if (certConfig.IsExtensionCDPPresent())
+    {
+        // Add second CDP extension.
+        res = AddExtension(newCert, NID_crl_distribution_points, "URI:http://example.com/test_crl.pem");
         VerifyTrueOrExit(res);
     }
 

@@ -29,14 +29,8 @@ jobs:
         name: Check Spelling - reviewdog
         runs-on: ubuntu-latest
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              name: Checkout
-              with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
+            - name: Checkout
+              uses: actions/checkout@v3
             - uses: reviewdog/action-misspell@v1
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -44,12 +38,6 @@ jobs:
         name: Check Spelling - pyspelling
         runs-on: ubuntu-latest
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              name: Checkout
-              with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
+            - name: Checkout
+              uses: actions/checkout@v3
             - uses: igsekor/pyspelling-any@v1.0.4

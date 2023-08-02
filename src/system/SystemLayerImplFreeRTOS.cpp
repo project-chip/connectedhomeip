@@ -76,6 +76,26 @@ CHIP_ERROR LayerImplFreeRTOS::StartTimer(Clock::Timeout delay, TimerCompleteCall
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR LayerImplFreeRTOS::ExtendTimerTo(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
+{
+    VerifyOrReturnError(delay.count() > 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    assertChipStackLockedByCurrentThread();
+
+    Clock::Timeout remainingTime = mTimerList.GetRemainingTime(onComplete, appState);
+    if (remainingTime.count() < delay.count())
+    {
+        return StartTimer(delay, onComplete, appState);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+bool LayerImplFreeRTOS::IsTimerActive(TimerCompleteCallback onComplete, void * appState)
+{
+    return (mTimerList.GetRemainingTime(onComplete, appState) > Clock::kZero);
+}
+
 void LayerImplFreeRTOS::CancelTimer(TimerCompleteCallback onComplete, void * appState)
 {
     assertChipStackLockedByCurrentThread();

@@ -16,7 +16,106 @@ import base64
 import json
 import re
 
+_ANY_COMMANDS_LIST = [
+    'ReadById',
+    'WriteById',
+    'SubscribeById',
+    'ReadEventById',
+    'SubscribeEventById',
+    'ReadNone',
+    'ReadAll',
+    'SubscribeNone',
+    'SubscribeAll',
+]
+
+_ANY_COMMANDS_LIST_ARGUMENTS_WITH_WILDCARDS = [
+    'ClusterId',
+    'AttributeId',
+    'EventId',
+]
+
+
 _ALIASES = {
+    '*': {
+        'commands': {
+            'CommandById': {
+                'alias': 'command-by-id',
+                'arguments': {
+                    'ClusterId': 'cluster-id',
+                    'CommandId': 'command-id',
+                },
+            },
+            'ReadById': {
+                'alias': 'read-by-id',
+                'arguments': {
+                    'ClusterId': 'cluster-ids',
+                    'AttributeId': 'attribute-ids',
+                },
+            },
+            'WriteById': {
+                'alias': 'write-by-id',
+                'arguments': {
+                    'ClusterId': 'cluster-ids',
+                    'AttributeId': 'attribute-ids',
+                    'Value': 'attribute-values'
+                },
+            },
+            'SubscribeById': {
+                'alias': 'subscribe-by-id',
+                'arguments': {
+                    'ClusterId': 'cluster-ids',
+                    'AttributeId': 'attribute-ids',
+                },
+            },
+            'ReadEventById': {
+                'alias': 'read-event-by-id',
+                'arguments': {
+                    'ClusterId': 'cluster-id',
+                    'EventId': 'event-id',
+                },
+            },
+            'SubscribeEventById': {
+                'alias': 'subscribe-event-by-id',
+                'arguments': {
+                    'ClusterId': 'cluster-id',
+                    'EventId': 'event-id',
+                },
+            },
+            'ReadNone': {
+                'alias': 'read-none',
+            },
+            'ReadAll': {
+                'alias': 'read-all',
+                'arguments': {
+                    'ClusterId': 'cluster-ids',
+                    'AttributeId': 'attribute-ids',
+                    'EventId': 'event-ids',
+                },
+            },
+            'SubscribeNone': {
+                'alias': 'subscribe-none',
+            },
+            'SubscribeAll': {
+                'alias': 'subscribe-all',
+                'arguments': {
+                    'ClusterId': 'cluster-ids',
+                    'AttributeId': 'attribute-ids',
+                    'EventId': 'event-ids',
+                },
+            },
+        }
+    },
+    'AnyCommands': {
+        'alias': 'any',
+        'commands': {
+            'ReadNone': {
+                'has_endpoint': False,
+            },
+            'SubscribeNone': {
+                'has_endpoint': False,
+            }
+        }
+    },
     'CommissionerCommands': {
         'alias': 'pairing',
         'commands': {
@@ -114,7 +213,7 @@ class Encoder:
         command, command_specifier = self.__get_command_name(request)
 
         if command == 'wait-for-report':
-            return ''
+            return str(request.timeout) if request.timeout is not None else ''
 
         arguments = self.__get_arguments(request)
         base64_arguments = base64.b64encode(
@@ -151,16 +250,44 @@ class Encoder:
         return command_name, command_specifier
 
     def __get_arguments(self, request):
+        # chip-tool expects a json encoded string that contains both mandatory and optional arguments for the target command.
+        #
+        # Those arguments are either top level properties of the request object or under the 'arguments' property.
+        #
+        # Usually if an argument is used by multiple commands (e.g: 'endpoint', 'min-interval', 'commissioner-name') it is represented as
+        # a top level property of the request.
+        # Otherwise if the argument is a command specific argument, it can be retrieved as a member of the 'arguments' property.
+        #
+        # As an example, the following test step:
+        #
+        # - label: "Send Test Add Arguments Command"
+        #   nodeId: 0x12344321
+        #   endpoint: 1
+        #   cluster: Unit Testing
+        #   command: TestAddArguments
+        #   identity: beta
+        #   arguments:
+        #       values:
+        #           - name: arg1
+        #             value: 3
+        #           - name: arg2
+        #             value: 4
+        #
+        # Will be translated to:
+        #   destination-id": "0x12344321", "endpoint-id-ignored-for-group-commands": "1", "arg1":"3", "arg2":"17", "commissioner-name": "beta"
         arguments = ''
         arguments = self.__maybe_add_destination(arguments, request)
         arguments = self.__maybe_add_endpoint(arguments, request)
         arguments = self.__maybe_add_command_arguments(arguments, request)
+        arguments = self.__maybe_add_data_version(arguments, request)
         arguments = self.__maybe_add(
             arguments, request.min_interval, "min-interval")
         arguments = self.__maybe_add(
             arguments, request.max_interval, "max-interval")
         arguments = self.__maybe_add(arguments, request.timed_interaction_timeout_ms,
                                      "timedInteractionTimeoutMs")
+        arguments = self.__maybe_add(
+            arguments, request.timeout, "timeout")
         arguments = self.__maybe_add(
             arguments, request.event_number, "event-min")
         arguments = self.__maybe_add(
@@ -198,8 +325,10 @@ class Encoder:
 
         endpoint_argument_name = 'endpoint-id-ignored-for-group-commands'
         endpoint_argument_value = request.endpoint
+        if endpoint_argument_value == '*':
+            endpoint_argument_value = 0xFFFF
 
-        if (request.is_attribute and not request.command == "writeAttribute") or request.is_event:
+        if (request.is_attribute and not request.command == "writeAttribute") or request.is_event or (request.command in _ANY_COMMANDS_LIST and not request.command == "WriteById"):
             endpoint_argument_name = 'endpoint-ids'
 
         if rv:
@@ -213,10 +342,30 @@ class Encoder:
 
         for entry in request.arguments['values']:
             name = self.__get_argument_name(request, entry)
-            value = self.__encode_value(entry['value'])
+            value = self.__encode_value(
+                request.command, entry.get('name'), entry['value'])
             if rv:
                 rv += ', '
             rv += f'"{name}":{value}'
+
+        return rv
+
+    def __maybe_add_data_version(self, rv, request):
+        if request.data_version is None:
+            return rv
+
+        value = ''
+        if type(request.data_version) is list:
+            for index, version in enumerate(request.data_version):
+                value += str(version)
+                if index != len(request.data_version) - 1:
+                    value += ','
+        else:
+            value = request.data_version
+
+        if rv:
+            rv += ', '
+        rv += f'"data-version":"{value}"'
 
         return rv
 
@@ -231,7 +380,7 @@ class Encoder:
             else:
                 argument_name = 'value'
 
-        return self.__get_alias(cluster_name, command_name, argument_name) or argument_name
+        return self.__get_alias('*', command_name, argument_name) or self.__get_alias(cluster_name, command_name, argument_name) or argument_name
 
     def __maybe_add(self, rv, value, name):
         if value is None:
@@ -242,10 +391,23 @@ class Encoder:
         rv += f'"{name}":"{value}"'
         return rv
 
-    def __encode_value(self, value):
+    def __encode_value(self, command_name, argument_name, value):
+        value = self.__encode_wildcards(command_name, argument_name, value)
         value = self.__encode_octet_strings(value)
         value = self.__lower_camel_case_member_fields(value)
         return self.__convert_to_json_string(value)
+
+    def __encode_wildcards(self, command_name, argument_name, value):
+        if value != '*':
+            return value
+
+        # maybe a wildcard
+        if command_name in _ANY_COMMANDS_LIST and argument_name in _ANY_COMMANDS_LIST_ARGUMENTS_WITH_WILDCARDS:
+            # translate * to wildcard constant
+            return 0xFFFFFFFF
+
+        # return actual '*' as  value ... not a wildcard-compatible argument
+        return value
 
     def __encode_octet_strings(self, value):
         if isinstance(value, list):
@@ -279,7 +441,7 @@ class Encoder:
         return name[:1].lower() + name[1:]
 
     def __format_cluster_name(self, name):
-        return name.lower().replace(' ', '').replace('/', '').lower()
+        return name.lower().replace(' ', '').replace('/', '').replace('.', '').lower()
 
     def __format_command_name(self, name):
         if name is None:

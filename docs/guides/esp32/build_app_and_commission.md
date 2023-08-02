@@ -11,7 +11,7 @@ the esp32 application.
 -   [Build, flash and monitor an example](#build-flash-and-monitor-an-example)
 -   [Commissioning](#commissioning)
     -   [Building Standalone chip-tool](#building-standalone-chip-tool)
-    -   [Commissioning the WiFi devices](#commissioning-the-wifi-devices-esp32-esp32c3-esp32s3)
+    -   [Commissioning the WiFi devices](#commissioning-the-wifi-devices-esp32-esp32c3-esp32s3-esp32c6)
     -   [Commissioning the Thread device](#commissioning-the-thread-device-esp32h2)
     -   [Commissioning Parameters](#commissioning-parameters)
 -   [Flashing app using script](#flashing-app-using-script)
@@ -31,7 +31,8 @@ and the ESP32S3.
 
 All the applications support variants of ESP32, ESP32C3, ESP32S3 chips.
 
-ESP32H2 is only supported and tested with lighting-app.
+ESP32H2 and ESP32C6 are only supported and tested with lighting-app and
+all-clusters-app.
 
 Note: M5Stack Core 2 display is not supported in the tft component, while other
 functionality can still work fine.
@@ -86,17 +87,19 @@ functionality can still work fine.
 
     All the example applications supports target chips: esp32, esp32s3, esp32c3
 
-    ESP32H2 is only supported in lighting-app, to set it as target
+    ESP32H2 and ESP32C6 are only supported in lighting-app, to set it as target
 
     ```
-    idf.py --preview set-target esp32h2
+    $ idf.py --preview set-target esp32h2
+    $ idf.py --preview set-target esp32c6
     ```
 
 -   Configuration Options
 
     To build the default configuration (`sdkconfig.defaults`) skip this step.
 
-    To build a specific configuration (example `m5stack`):
+    To build a specific configuration (example `m5stack` or `esp32h2` or
+    `esp32c6`):
 
     ```
     $ rm sdkconfig
@@ -117,7 +120,7 @@ functionality can still work fine.
 -   Build the application
 
     ```
-    idf.py build
+    $ idf.py build
     ```
 
 -   Flash the application
@@ -158,14 +161,14 @@ Below apps can be used for commissioning the application running on ESP32:
 ### Building Standalone chip-tool
 
 ```
-cd path/to/connectedhomeip
-scripts/examples/gn_build_example.sh examples/chip-tool out/debug
+$ cd path/to/connectedhomeip
+$ scripts/examples/gn_build_example.sh examples/chip-tool out/debug
 ```
 
 Run the built executable and pass it the discriminator and pairing code of the
 remote device, as well as the network credentials to use.
 
-#### Commissioning the WiFi devices (ESP32, ESP32C3, ESP32S3)
+#### Commissioning the WiFi devices (ESP32, ESP32C3, ESP32S3, ESP32C6)
 
 ```
 $ out/debug/chip-tool pairing ble-wifi 12345 MY_SSID MY_PASSWORD 20202021 3840
@@ -187,7 +190,7 @@ $ out/debug/chip-tool pairing ble-wifi 12345 MY_SSID MY_PASSWORD 20202021 3840
 -   Commissioning the Thread device
 
     ```
-     $ ./out/debug/chip-tool pairing ble-thread 12345 hex:<operational-dataset> 20202021 3840
+    $ ./out/debug/chip-tool pairing ble-thread 12345 hex:<operational-dataset> 20202021 3840
     ```
 
 #### Commissioning the Ethernet device (ESP32-Ethernet-Kit)
@@ -222,6 +225,7 @@ follow [Using ESP32 Factory Data Provider guide](factory_data.md)
         ```
         $ idf.py set-target esp32
         $ idf.py set-target esp32c3
+        $ idf.py set-target esp32c6
         ```
 
     -   Execute below sequence of commands

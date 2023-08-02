@@ -16,9 +16,11 @@
 #pragma once
 
 #import <Foundation/Foundation.h>
+#import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
+MTR_HIDDEN
 @interface MTRControllerAccessControl : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;

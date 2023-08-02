@@ -335,6 +335,33 @@ static BOOL AttributeIsSpecifiedInBinaryInputBasicCluster(AttributeId aAttribute
     }
     }
 }
+static BOOL AttributeIsSpecifiedInPulseWidthModulationCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::PulseWidthModulation;
+    switch (aAttributeId) {
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInDescriptorCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Descriptor;
@@ -349,6 +376,9 @@ static BOOL AttributeIsSpecifiedInDescriptorCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::PartsList::Id: {
+        return YES;
+    }
+    case Attributes::TagList::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -862,6 +892,9 @@ static BOOL AttributeIsSpecifiedInPowerSourceCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::ActiveBatChargeFaults::Id: {
+        return YES;
+    }
+    case Attributes::EndpointList::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -1436,6 +1469,72 @@ static BOOL AttributeIsSpecifiedInEthernetNetworkDiagnosticsCluster(AttributeId 
     }
     }
 }
+static BOOL AttributeIsSpecifiedInTimeSynchronizationCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::TimeSynchronization;
+    switch (aAttributeId) {
+    case Attributes::UTCTime::Id: {
+        return YES;
+    }
+    case Attributes::Granularity::Id: {
+        return YES;
+    }
+    case Attributes::TimeSource::Id: {
+        return YES;
+    }
+    case Attributes::TrustedTimeSource::Id: {
+        return YES;
+    }
+    case Attributes::DefaultNTP::Id: {
+        return YES;
+    }
+    case Attributes::TimeZone::Id: {
+        return YES;
+    }
+    case Attributes::DSTOffset::Id: {
+        return YES;
+    }
+    case Attributes::LocalTime::Id: {
+        return YES;
+    }
+    case Attributes::TimeZoneDatabase::Id: {
+        return YES;
+    }
+    case Attributes::NTPServerAvailable::Id: {
+        return YES;
+    }
+    case Attributes::TimeZoneListMaxSize::Id: {
+        return YES;
+    }
+    case Attributes::DSTOffsetListMaxSize::Id: {
+        return YES;
+    }
+    case Attributes::SupportsDNSResolve::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInBridgedDeviceBasicInformationCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::BridgedDeviceBasicInformation;
@@ -1757,6 +1856,51 @@ static BOOL AttributeIsSpecifiedInBooleanStateCluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL AttributeIsSpecifiedInICDManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::IcdManagement;
+    switch (aAttributeId) {
+    case Attributes::IdleModeInterval::Id: {
+        return YES;
+    }
+    case Attributes::ActiveModeInterval::Id: {
+        return YES;
+    }
+    case Attributes::ActiveModeThreshold::Id: {
+        return YES;
+    }
+    case Attributes::RegisteredClients::Id: {
+        return YES;
+    }
+    case Attributes::ICDCounter::Id: {
+        return YES;
+    }
+    case Attributes::ClientsSupportedPerFabric::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInModeSelectCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ModeSelect;
@@ -1802,13 +1946,10 @@ static BOOL AttributeIsSpecifiedInModeSelectCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL AttributeIsSpecifiedInLaundryWasherModeSelectCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInLaundryWasherModeCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::LaundryWasherModeSelect;
+    using namespace Clusters::LaundryWasherMode;
     switch (aAttributeId) {
-    case Attributes::Description::Id: {
-        return YES;
-    }
     case Attributes::SupportedModes::Id: {
         return YES;
     }
@@ -1844,13 +1985,10 @@ static BOOL AttributeIsSpecifiedInLaundryWasherModeSelectCluster(AttributeId aAt
     }
     }
 }
-static BOOL AttributeIsSpecifiedInRefrigeratorAndTemperatureControlledCabinetModeSelectCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInRefrigeratorAndTemperatureControlledCabinetModeCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect;
+    using namespace Clusters::RefrigeratorAndTemperatureControlledCabinetMode;
     switch (aAttributeId) {
-    case Attributes::Description::Id: {
-        return YES;
-    }
     case Attributes::SupportedModes::Id: {
         return YES;
     }
@@ -1886,13 +2024,49 @@ static BOOL AttributeIsSpecifiedInRefrigeratorAndTemperatureControlledCabinetMod
     }
     }
 }
-static BOOL AttributeIsSpecifiedInRVCRunModeSelectCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInLaundryWasherControlsCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::RvcRunModeSelect;
+    using namespace Clusters::LaundryWasherControls;
     switch (aAttributeId) {
-    case Attributes::Description::Id: {
+    case Attributes::SpinSpeeds::Id: {
         return YES;
     }
+    case Attributes::SpinSpeedCurrent::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfRinses::Id: {
+        return YES;
+    }
+    case Attributes::SupportedRinses::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInRVCRunModeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::RvcRunMode;
+    switch (aAttributeId) {
     case Attributes::SupportedModes::Id: {
         return YES;
     }
@@ -1928,13 +2102,10 @@ static BOOL AttributeIsSpecifiedInRVCRunModeSelectCluster(AttributeId aAttribute
     }
     }
 }
-static BOOL AttributeIsSpecifiedInRVCCleanModeSelectCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInRVCCleanModeCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::RvcCleanModeSelect;
+    using namespace Clusters::RvcCleanMode;
     switch (aAttributeId) {
-    case Attributes::Description::Id: {
-        return YES;
-    }
     case Attributes::SupportedModes::Id: {
         return YES;
     }
@@ -1986,7 +2157,7 @@ static BOOL AttributeIsSpecifiedInTemperatureControlCluster(AttributeId aAttribu
     case Attributes::Step::Id: {
         return YES;
     }
-    case Attributes::CurrentTemperatureLevelIndex::Id: {
+    case Attributes::SelectedTemperatureLevel::Id: {
         return YES;
     }
     case Attributes::SupportedTemperatureLevels::Id: {
@@ -2022,10 +2193,10 @@ static BOOL AttributeIsSpecifiedInRefrigeratorAlarmCluster(AttributeId aAttribut
     case Attributes::Mask::Id: {
         return YES;
     }
-    case Attributes::Latch::Id: {
+    case Attributes::State::Id: {
         return YES;
     }
-    case Attributes::State::Id: {
+    case Attributes::Supported::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -2051,13 +2222,10 @@ static BOOL AttributeIsSpecifiedInRefrigeratorAlarmCluster(AttributeId aAttribut
     }
     }
 }
-static BOOL AttributeIsSpecifiedInDishwasherModeSelectCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInDishwasherModeCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::DishwasherModeSelect;
+    using namespace Clusters::DishwasherMode;
     switch (aAttributeId) {
-    case Attributes::Description::Id: {
-        return YES;
-    }
     case Attributes::SupportedModes::Id: {
         return YES;
     }
@@ -2160,7 +2328,49 @@ static BOOL AttributeIsSpecifiedInSmokeCOAlarmCluster(AttributeId aAttributeId)
     case Attributes::ContaminationState::Id: {
         return YES;
     }
-    case Attributes::SensitivityLevel::Id: {
+    case Attributes::SmokeSensitivityLevel::Id: {
+        return YES;
+    }
+    case Attributes::ExpiryDate::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInDishwasherAlarmCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::DishwasherAlarm;
+    switch (aAttributeId) {
+    case Attributes::Mask::Id: {
+        return YES;
+    }
+    case Attributes::Latch::Id: {
+        return YES;
+    }
+    case Attributes::State::Id: {
+        return YES;
+    }
+    case Attributes::Supported::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -2231,6 +2441,51 @@ static BOOL AttributeIsSpecifiedInOperationalStateCluster(AttributeId aAttribute
     }
     }
 }
+static BOOL AttributeIsSpecifiedInRVCOperationalStateCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::RvcOperationalState;
+    switch (aAttributeId) {
+    case Attributes::PhaseList::Id: {
+        return YES;
+    }
+    case Attributes::CurrentPhase::Id: {
+        return YES;
+    }
+    case Attributes::CountdownTime::Id: {
+        return YES;
+    }
+    case Attributes::OperationalStateList::Id: {
+        return YES;
+    }
+    case Attributes::OperationalState::Id: {
+        return YES;
+    }
+    case Attributes::OperationalError::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInHEPAFilterMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::HepaFilterMonitoring;
@@ -2245,6 +2500,12 @@ static BOOL AttributeIsSpecifiedInHEPAFilterMonitoringCluster(AttributeId aAttri
         return YES;
     }
     case Attributes::InPlaceIndicator::Id: {
+        return YES;
+    }
+    case Attributes::LastChangedTime::Id: {
+        return YES;
+    }
+    case Attributes::ReplacementProductList::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -2286,394 +2547,10 @@ static BOOL AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(Attribu
     case Attributes::InPlaceIndicator::Id: {
         return YES;
     }
-    case Attributes::GeneratedCommandList::Id: {
+    case Attributes::LastChangedTime::Id: {
         return YES;
     }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInCeramicFilterMonitoringCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::CeramicFilterMonitoring;
-    switch (aAttributeId) {
-    case Attributes::Condition::Id: {
-        return YES;
-    }
-    case Attributes::DegradationDirection::Id: {
-        return YES;
-    }
-    case Attributes::ChangeIndication::Id: {
-        return YES;
-    }
-    case Attributes::InPlaceIndicator::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInElectrostaticFilterMonitoringCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::ElectrostaticFilterMonitoring;
-    switch (aAttributeId) {
-    case Attributes::Condition::Id: {
-        return YES;
-    }
-    case Attributes::DegradationDirection::Id: {
-        return YES;
-    }
-    case Attributes::ChangeIndication::Id: {
-        return YES;
-    }
-    case Attributes::InPlaceIndicator::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInUVFilterMonitoringCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::UvFilterMonitoring;
-    switch (aAttributeId) {
-    case Attributes::Condition::Id: {
-        return YES;
-    }
-    case Attributes::DegradationDirection::Id: {
-        return YES;
-    }
-    case Attributes::ChangeIndication::Id: {
-        return YES;
-    }
-    case Attributes::InPlaceIndicator::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInIonizingFilterMonitoringCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::IonizingFilterMonitoring;
-    switch (aAttributeId) {
-    case Attributes::Condition::Id: {
-        return YES;
-    }
-    case Attributes::DegradationDirection::Id: {
-        return YES;
-    }
-    case Attributes::ChangeIndication::Id: {
-        return YES;
-    }
-    case Attributes::InPlaceIndicator::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInZeoliteFilterMonitoringCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::ZeoliteFilterMonitoring;
-    switch (aAttributeId) {
-    case Attributes::Condition::Id: {
-        return YES;
-    }
-    case Attributes::DegradationDirection::Id: {
-        return YES;
-    }
-    case Attributes::ChangeIndication::Id: {
-        return YES;
-    }
-    case Attributes::InPlaceIndicator::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInOzoneFilterMonitoringCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::OzoneFilterMonitoring;
-    switch (aAttributeId) {
-    case Attributes::Condition::Id: {
-        return YES;
-    }
-    case Attributes::DegradationDirection::Id: {
-        return YES;
-    }
-    case Attributes::ChangeIndication::Id: {
-        return YES;
-    }
-    case Attributes::InPlaceIndicator::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInWaterTankMonitoringCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::WaterTankMonitoring;
-    switch (aAttributeId) {
-    case Attributes::Condition::Id: {
-        return YES;
-    }
-    case Attributes::DegradationDirection::Id: {
-        return YES;
-    }
-    case Attributes::ChangeIndication::Id: {
-        return YES;
-    }
-    case Attributes::InPlaceIndicator::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInFuelTankMonitoringCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::FuelTankMonitoring;
-    switch (aAttributeId) {
-    case Attributes::Condition::Id: {
-        return YES;
-    }
-    case Attributes::DegradationDirection::Id: {
-        return YES;
-    }
-    case Attributes::ChangeIndication::Id: {
-        return YES;
-    }
-    case Attributes::InPlaceIndicator::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInInkCartridgeMonitoringCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::InkCartridgeMonitoring;
-    switch (aAttributeId) {
-    case Attributes::Condition::Id: {
-        return YES;
-    }
-    case Attributes::DegradationDirection::Id: {
-        return YES;
-    }
-    case Attributes::ChangeIndication::Id: {
-        return YES;
-    }
-    case Attributes::InPlaceIndicator::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInTonerCartridgeMonitoringCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::TonerCartridgeMonitoring;
-    switch (aAttributeId) {
-    case Attributes::Condition::Id: {
-        return YES;
-    }
-    case Attributes::DegradationDirection::Id: {
-        return YES;
-    }
-    case Attributes::ChangeIndication::Id: {
-        return YES;
-    }
-    case Attributes::InPlaceIndicator::Id: {
+    case Attributes::ReplacementProductList::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -4001,306 +3878,6 @@ static BOOL AttributeIsSpecifiedInCarbonDioxideConcentrationMeasurementCluster(A
     }
     }
 }
-static BOOL AttributeIsSpecifiedInEthyleneConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::EthyleneConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInEthyleneOxideConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::EthyleneOxideConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInHydrogenConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::HydrogenConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInHydrogenSulfideConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::HydrogenSulfideConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInNitricOxideConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::NitricOxideConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL AttributeIsSpecifiedInNitrogenDioxideConcentrationMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::NitrogenDioxideConcentrationMeasurement;
@@ -4361,1269 +3938,9 @@ static BOOL AttributeIsSpecifiedInNitrogenDioxideConcentrationMeasurementCluster
     }
     }
 }
-static BOOL AttributeIsSpecifiedInOxygenConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::OxygenConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL AttributeIsSpecifiedInOzoneConcentrationMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::OzoneConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInSulfurDioxideConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::SulfurDioxideConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInDissolvedOxygenConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::DissolvedOxygenConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInBromateConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::BromateConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInChloraminesConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::ChloraminesConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInChlorineConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::ChlorineConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInFecalColiformEColiConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::FecalColiformEColiConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInFluorideConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::FluorideConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInHaloaceticAcidsConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::HaloaceticAcidsConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInTotalTrihalomethanesConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::TotalTrihalomethanesConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInTotalColiformBacteriaConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::TotalColiformBacteriaConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInTurbidityConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::TurbidityConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInCopperConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::CopperConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInLeadConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::LeadConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInManganeseConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::ManganeseConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInSulfateConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::SulfateConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInBromodichloromethaneConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::BromodichloromethaneConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInBromoformConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::BromoformConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInChlorodibromomethaneConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::ChlorodibromomethaneConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInChloroformConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::ChloroformConcentrationMeasurement;
-    switch (aAttributeId) {
-    case Attributes::MeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MinMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::MaxMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::PeakMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValue::Id: {
-        return YES;
-    }
-    case Attributes::AverageMeasuredValueWindow::Id: {
-        return YES;
-    }
-    case Attributes::Uncertainty::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementUnit::Id: {
-        return YES;
-    }
-    case Attributes::MeasurementMedium::Id: {
-        return YES;
-    }
-    case Attributes::LevelValue::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInSodiumConcentrationMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::SodiumConcentrationMeasurement;
     switch (aAttributeId) {
     case Attributes::MeasuredValue::Id: {
         return YES;
@@ -7161,6 +5478,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::BinaryInputBasic::Id: {
         return AttributeIsSpecifiedInBinaryInputBasicCluster(aAttributeId);
     }
+    case Clusters::PulseWidthModulation::Id: {
+        return AttributeIsSpecifiedInPulseWidthModulationCluster(aAttributeId);
+    }
     case Clusters::Descriptor::Id: {
         return AttributeIsSpecifiedInDescriptorCluster(aAttributeId);
     }
@@ -7221,6 +5541,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::EthernetNetworkDiagnostics::Id: {
         return AttributeIsSpecifiedInEthernetNetworkDiagnosticsCluster(aAttributeId);
     }
+    case Clusters::TimeSynchronization::Id: {
+        return AttributeIsSpecifiedInTimeSynchronizationCluster(aAttributeId);
+    }
     case Clusters::BridgedDeviceBasicInformation::Id: {
         return AttributeIsSpecifiedInBridgedDeviceBasicInformationCluster(aAttributeId);
     }
@@ -7245,20 +5568,26 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::BooleanState::Id: {
         return AttributeIsSpecifiedInBooleanStateCluster(aAttributeId);
     }
+    case Clusters::IcdManagement::Id: {
+        return AttributeIsSpecifiedInICDManagementCluster(aAttributeId);
+    }
     case Clusters::ModeSelect::Id: {
         return AttributeIsSpecifiedInModeSelectCluster(aAttributeId);
     }
-    case Clusters::LaundryWasherModeSelect::Id: {
-        return AttributeIsSpecifiedInLaundryWasherModeSelectCluster(aAttributeId);
+    case Clusters::LaundryWasherMode::Id: {
+        return AttributeIsSpecifiedInLaundryWasherModeCluster(aAttributeId);
     }
-    case Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id: {
-        return AttributeIsSpecifiedInRefrigeratorAndTemperatureControlledCabinetModeSelectCluster(aAttributeId);
+    case Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id: {
+        return AttributeIsSpecifiedInRefrigeratorAndTemperatureControlledCabinetModeCluster(aAttributeId);
     }
-    case Clusters::RvcRunModeSelect::Id: {
-        return AttributeIsSpecifiedInRVCRunModeSelectCluster(aAttributeId);
+    case Clusters::LaundryWasherControls::Id: {
+        return AttributeIsSpecifiedInLaundryWasherControlsCluster(aAttributeId);
     }
-    case Clusters::RvcCleanModeSelect::Id: {
-        return AttributeIsSpecifiedInRVCCleanModeSelectCluster(aAttributeId);
+    case Clusters::RvcRunMode::Id: {
+        return AttributeIsSpecifiedInRVCRunModeCluster(aAttributeId);
+    }
+    case Clusters::RvcCleanMode::Id: {
+        return AttributeIsSpecifiedInRVCCleanModeCluster(aAttributeId);
     }
     case Clusters::TemperatureControl::Id: {
         return AttributeIsSpecifiedInTemperatureControlCluster(aAttributeId);
@@ -7266,8 +5595,8 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::RefrigeratorAlarm::Id: {
         return AttributeIsSpecifiedInRefrigeratorAlarmCluster(aAttributeId);
     }
-    case Clusters::DishwasherModeSelect::Id: {
-        return AttributeIsSpecifiedInDishwasherModeSelectCluster(aAttributeId);
+    case Clusters::DishwasherMode::Id: {
+        return AttributeIsSpecifiedInDishwasherModeCluster(aAttributeId);
     }
     case Clusters::AirQuality::Id: {
         return AttributeIsSpecifiedInAirQualityCluster(aAttributeId);
@@ -7275,44 +5604,20 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::SmokeCoAlarm::Id: {
         return AttributeIsSpecifiedInSmokeCOAlarmCluster(aAttributeId);
     }
+    case Clusters::DishwasherAlarm::Id: {
+        return AttributeIsSpecifiedInDishwasherAlarmCluster(aAttributeId);
+    }
     case Clusters::OperationalState::Id: {
         return AttributeIsSpecifiedInOperationalStateCluster(aAttributeId);
+    }
+    case Clusters::RvcOperationalState::Id: {
+        return AttributeIsSpecifiedInRVCOperationalStateCluster(aAttributeId);
     }
     case Clusters::HepaFilterMonitoring::Id: {
         return AttributeIsSpecifiedInHEPAFilterMonitoringCluster(aAttributeId);
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(aAttributeId);
-    }
-    case Clusters::CeramicFilterMonitoring::Id: {
-        return AttributeIsSpecifiedInCeramicFilterMonitoringCluster(aAttributeId);
-    }
-    case Clusters::ElectrostaticFilterMonitoring::Id: {
-        return AttributeIsSpecifiedInElectrostaticFilterMonitoringCluster(aAttributeId);
-    }
-    case Clusters::UvFilterMonitoring::Id: {
-        return AttributeIsSpecifiedInUVFilterMonitoringCluster(aAttributeId);
-    }
-    case Clusters::IonizingFilterMonitoring::Id: {
-        return AttributeIsSpecifiedInIonizingFilterMonitoringCluster(aAttributeId);
-    }
-    case Clusters::ZeoliteFilterMonitoring::Id: {
-        return AttributeIsSpecifiedInZeoliteFilterMonitoringCluster(aAttributeId);
-    }
-    case Clusters::OzoneFilterMonitoring::Id: {
-        return AttributeIsSpecifiedInOzoneFilterMonitoringCluster(aAttributeId);
-    }
-    case Clusters::WaterTankMonitoring::Id: {
-        return AttributeIsSpecifiedInWaterTankMonitoringCluster(aAttributeId);
-    }
-    case Clusters::FuelTankMonitoring::Id: {
-        return AttributeIsSpecifiedInFuelTankMonitoringCluster(aAttributeId);
-    }
-    case Clusters::InkCartridgeMonitoring::Id: {
-        return AttributeIsSpecifiedInInkCartridgeMonitoringCluster(aAttributeId);
-    }
-    case Clusters::TonerCartridgeMonitoring::Id: {
-        return AttributeIsSpecifiedInTonerCartridgeMonitoringCluster(aAttributeId);
     }
     case Clusters::DoorLock::Id: {
         return AttributeIsSpecifiedInDoorLockCluster(aAttributeId);
@@ -7365,89 +5670,11 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::CarbonDioxideConcentrationMeasurement::Id: {
         return AttributeIsSpecifiedInCarbonDioxideConcentrationMeasurementCluster(aAttributeId);
     }
-    case Clusters::EthyleneConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInEthyleneConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::EthyleneOxideConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInEthyleneOxideConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::HydrogenConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInHydrogenConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::HydrogenSulfideConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInHydrogenSulfideConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::NitricOxideConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInNitricOxideConcentrationMeasurementCluster(aAttributeId);
-    }
     case Clusters::NitrogenDioxideConcentrationMeasurement::Id: {
         return AttributeIsSpecifiedInNitrogenDioxideConcentrationMeasurementCluster(aAttributeId);
     }
-    case Clusters::OxygenConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInOxygenConcentrationMeasurementCluster(aAttributeId);
-    }
     case Clusters::OzoneConcentrationMeasurement::Id: {
         return AttributeIsSpecifiedInOzoneConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::SulfurDioxideConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInSulfurDioxideConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::DissolvedOxygenConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInDissolvedOxygenConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::BromateConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInBromateConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::ChloraminesConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInChloraminesConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::ChlorineConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInChlorineConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::FecalColiformEColiConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInFecalColiformEColiConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::FluorideConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInFluorideConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::HaloaceticAcidsConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInHaloaceticAcidsConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::TotalTrihalomethanesConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInTotalTrihalomethanesConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::TotalColiformBacteriaConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInTotalColiformBacteriaConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::TurbidityConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInTurbidityConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::CopperConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInCopperConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::LeadConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInLeadConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::ManganeseConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInManganeseConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::SulfateConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInSulfateConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::BromodichloromethaneConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInBromodichloromethaneConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::BromoformConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInBromoformConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::ChlorodibromomethaneConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInChlorodibromomethaneConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::ChloroformConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInChloroformConcentrationMeasurementCluster(aAttributeId);
-    }
-    case Clusters::SodiumConcentrationMeasurement::Id: {
-        return AttributeIsSpecifiedInSodiumConcentrationMeasurementCluster(aAttributeId);
     }
     case Clusters::Pm25ConcentrationMeasurement::Id: {
         return AttributeIsSpecifiedInPM25ConcentrationMeasurementCluster(aAttributeId);

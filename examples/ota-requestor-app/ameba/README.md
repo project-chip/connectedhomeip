@@ -6,11 +6,11 @@ A prototype application that demonstrates OTA Requestor capabilities.
 
 -   Pull docker image:
 
-          $ docker pull connectedhomeip/chip-build-ameba:latest
+          $ docker pull ghcr.io/project-chip/chip-build-ameba:1
 
 -   Run docker container:
 
-          $ docker run -it -v ${CHIP_DIR}:/root/chip connectedhomeip/chip-build-ameba:latest
+          $ docker run -it -v ${CHIP_DIR}:/root/chip ghcr.io/project-chip/chip-build-ameba:1
 
 -   Setup build environment:
 
@@ -53,7 +53,7 @@ A prototype application that demonstrates OTA Requestor capabilities.
 
 4.  Write the Default OTA providers into Ameba
 
-          $ ./chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 2, "endpoint": 0}]' 1 0
+          $ ./chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"fabricIndex": 1, "providerNodeID": 2, "endpoint": 0}]' 1 0
 
 5.  Configure the ACL of the ota-provider-app to allow access for Ameba
 
@@ -61,7 +61,7 @@ A prototype application that demonstrates OTA Requestor capabilities.
 
 6.  Use the chip-tool to announce the ota-provider-app to start the OTA process
 
-          $ ./chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+          $ ./chip-tool otasoftwareupdaterequestor announce-otaprovider 1 0 0 0 2 0
 
 7.  The OTA process should include downloading the image, verification of image
     header, erasing upgraded flash partition, writing to flash and checksum

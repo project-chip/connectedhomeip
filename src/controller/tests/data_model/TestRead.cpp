@@ -20,6 +20,8 @@
 #include "transport/SecureSession.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/ClusterStateCache.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteEventPath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/mock/Constants.h>
@@ -239,6 +241,11 @@ bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
     return true;
 }
 
+Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
+{
+    return Protocols::InteractionModel::Status::Success;
+}
+
 } // namespace app
 } // namespace chip
 
@@ -295,7 +302,7 @@ private:
 
         if (mAlterSubscriptionIntervals)
         {
-            ReturnErrorOnFailure(aReadHandler.SetReportingIntervals(mMaxInterval));
+            ReturnErrorOnFailure(aReadHandler.SetMaxReportingInterval(mMaxInterval));
         }
         return CHIP_NO_ERROR;
     }
@@ -4638,14 +4645,15 @@ void TestReadInteraction::TestReadHandler_KeepSubscriptionTest(nlTestSuite * apS
 
 System::Clock::Timeout TestReadInteraction::ComputeSubscriptionTimeout(System::Clock::Seconds16 aMaxInterval)
 {
-    // Add 50ms of slack to our max interval to make sure we hit the
-    // subscription liveness timer.
+    // Add 1000ms of slack to our max interval to make sure we hit the
+    // subscription liveness timer.  100ms was tried in the past and is not
+    // sufficient: our process can easily lose the timeslice for 100ms.
     const auto & ourMrpConfig = GetDefaultMRPConfig();
     auto publisherTransmissionTimeout =
         GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
-                                 System::SystemClock().GetMonotonicTimestamp(), Transport::kMinActiveTime);
+                                 System::SystemClock().GetMonotonicTimestamp(), ourMrpConfig.mActiveThresholdTime);
 
-    return publisherTransmissionTimeout + aMaxInterval + System::Clock::Milliseconds32(50);
+    return publisherTransmissionTimeout + aMaxInterval + System::Clock::Milliseconds32(1000);
 }
 
 // clang-format off

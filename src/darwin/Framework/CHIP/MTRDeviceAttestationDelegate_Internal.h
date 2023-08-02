@@ -23,7 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithDACCertificate:(MTRCertificateDERBytes)dacCertificate
                      dacPAICertificate:(MTRCertificateDERBytes)dacPAICertificate
-                certificateDeclaration:(NSData *)certificateDeclaration;
+                certificateDeclaration:(NSData *)certificateDeclaration
+              basicInformationVendorID:(NSNumber *)basicInformationVendorID
+             basicInformationProductID:(NSNumber *)basicInformationProductID;
 
 @end
 

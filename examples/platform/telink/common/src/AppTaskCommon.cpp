@@ -138,6 +138,7 @@ class AppCallbacks : public AppDelegate
     bool isComissioningStarted;
 
 public:
+    void OnCommissioningSessionEstablishmentStarted() {}
     void OnCommissioningSessionStarted() override { isComissioningStarted = true; }
     void OnCommissioningSessionStopped() override { isComissioningStarted = false; }
     void OnCommissioningWindowClosed() override
@@ -341,6 +342,32 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 
     return CHIP_NO_ERROR;
 }
+
+#ifdef CONFIG_CHIP_PW_RPC
+void AppTaskCommon::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
+{
+    if (!btnPressed)
+    {
+        return;
+    }
+
+    switch (btnId)
+    {
+    case kButtonId_ExampleAction:
+        ExampleActionButtonEventHandler();
+        break;
+    case kButtonId_FactoryReset:
+        FactoryResetButtonEventHandler();
+        break;
+    case kButtonId_StartThread:
+        StartThreadButtonEventHandler();
+        break;
+    case kButtonId_StartBleAdv:
+        StartBleAdvButtonEventHandler();
+        break;
+    }
+}
+#endif
 
 void AppTaskCommon::InitButtons(void)
 {

@@ -36,7 +36,7 @@ tests:
           3. Operations happen within the Fail-Safe Context
       disabled: true
 
-    - label: "DUT completes the attestation procedure"
+    - label: "Step 1: DUT completes the attestation procedure"
       verification: |
           Veriy attestation request is sent on TH(all-clusters-app)
 
@@ -279,8 +279,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT generates 32-byte CSRNonce and is sent to TH1 through CSRRequest
-          Command"
+          "Step 2: DUT generates 32-byte CSRNonce and is sent to TH1 through
+          CSRRequest Command"
       verification: |
           Send the below command 2 times to create CSR NONCE value  in TH
 
@@ -310,13 +310,13 @@ tests:
       disabled: true
 
     - label:
-          "TH1 generates Invalid NOCSR Information and sends the CSRResponse
-          Command. Refer Steps 6.1 to 6.8"
+          "Step 3: TH1 generates Invalid NOCSR Information and sends the
+          CSRResponse Command. Refer Steps 6.1 to 6.8"
       verification: |
 
       disabled: true
 
-    - label: "Factory Reset DUT so that it is commissionable again"
+    - label: "Step 5: Factory Reset DUT so that it is commissionable again"
       verification: |
           sudo rm -rf /tmp/chip_*
 
@@ -329,25 +329,25 @@ tests:
       disabled: true
 
     - label:
-          "Repeat Step1 to Step 4 multiple times. For each time in Step 3 TH1
-          generates the following error:"
+          "Step 6: Repeat Step1 to Step 4 multiple times. For each time in Step
+          3 TH1 generates the following error:"
       verification: |
 
       disabled: true
 
-    - label: "CSRNonce is OCTET string of length > 32"
+    - label: "Step 6.1: CSRNonce is OCTET string of length > 32"
       verification: |
 
       disabled: true
 
     - label:
-          "CSRNonce value does not match the value CSR Nonce field in the
-          corresponding CSRRequest Command"
+          "Step 6.2: CSRNonce value does not match the value CSR Nonce field in
+          the corresponding CSRRequest Command"
       verification: |
 
       disabled: true
 
-    - label: "NOCSRElement size is greater than RESP_MAX"
+    - label: "Step 6.3: NOCSRElement size is greater than RESP_MAX"
       verification: |
 
       disabled: true

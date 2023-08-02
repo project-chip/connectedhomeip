@@ -109,8 +109,8 @@ class TestBuilder(unittest.TestCase):
             'android-arm64-chip-tool',
             'nrf-nrf52840dk-pump',
             'efr32-brd4161a-light-rpc-no-version',
-            'openiotsdk-lock',
-            'openiotsdk-shell'
+            'openiotsdk-lock-mbedtls',
+            'openiotsdk-shell-mbedtls'
         ]
 
         for target in TARGETS:

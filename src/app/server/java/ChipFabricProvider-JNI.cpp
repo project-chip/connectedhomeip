@@ -32,7 +32,6 @@
 #include <lib/support/JniTypeWrappers.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <thread>
-#include <trace/trace.h>
 
 using namespace chip;
 
@@ -58,8 +57,6 @@ CHIP_ERROR AndroidChipFabricProviderJNI_OnLoad(JavaVM * jvm, void * reserved)
     // check if the JNI environment is correct
     env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
-
-    chip::InitializeTracing();
 
 exit:
     if (err != CHIP_NO_ERROR)

@@ -21,6 +21,8 @@
 
 #define MTR_EXPORT __attribute__((visibility("default")))
 
+#define MTR_HIDDEN __attribute__((visibility("hidden")))
+
 #ifdef __cplusplus
 #define MTR_EXTERN extern "C" MTR_EXPORT
 #else
@@ -49,6 +51,12 @@
 
 #ifndef MTR_NEWLY_AVAILABLE
 #define MTR_NEWLY_AVAILABLE
+#endif
+
+#if defined(MTR_ENABLE_PROVISIONAL) && MTR_ENABLE_PROVISIONAL
+#define MTR_PROVISIONALLY_AVAILABLE MTR_NEWLY_AVAILABLE
+#else
+#define MTR_PROVISIONALLY_AVAILABLE NS_UNAVAILABLE MTR_HIDDEN
 #endif
 
 #pragma mark - Types

@@ -24,6 +24,7 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 
 #include <thread.h>
 
@@ -31,6 +32,7 @@
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/dnssd/platform/Dnssd.h>
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -127,6 +129,19 @@ public:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
 private:
+    static constexpr size_t kSrpServiceInstanceNameSize = Dnssd::Common::kInstanceNameMaxLength + 1; // add null-terminator
+    static constexpr size_t kSrpServiceNameSize         = Dnssd::Common::kSubTypeTotalLength + 1;    // add null-terminator
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    struct SrpClientService
+    {
+        char mInstanceName[kSrpServiceInstanceNameSize];
+        char mName[kSrpServiceNameSize];
+        uint16_t mPort;
+        bool mValid = true;
+    };
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
     static constexpr char kOpenthreadDeviceRoleDisabled[] = "disabled";
     static constexpr char kOpenthreadDeviceRoleDetached[] = "detached";
     static constexpr char kOpenthreadDeviceRoleChild[]    = "child";
@@ -153,6 +168,9 @@ private:
     bool mIsAttached;
     bool mIsInitialized;
     thread_instance_h mThreadInstance;
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    std::vector<SrpClientService> mSrpClientServices;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 };
 
 } // namespace DeviceLayer

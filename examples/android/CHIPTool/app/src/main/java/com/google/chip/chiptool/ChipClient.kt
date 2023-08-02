@@ -47,11 +47,14 @@ object ChipClient {
     getAndroidChipPlatform(context)
 
     if (!this::chipDeviceController.isInitialized) {
-      chipDeviceController = ChipDeviceController(ControllerParams.newBuilder().setControllerVendorId(VENDOR_ID).build())
+      chipDeviceController =
+        ChipDeviceController(ControllerParams.newBuilder().setControllerVendorId(VENDOR_ID).build())
 
       // Set delegate for attestation trust store for device attestation verifier.
       // It will replace the default attestation trust store.
-      chipDeviceController.setAttestationTrustStoreDelegate(ExampleAttestationTrustStoreDelegate(chipDeviceController))
+      chipDeviceController.setAttestationTrustStoreDelegate(
+        ExampleAttestationTrustStoreDelegate(chipDeviceController)
+      )
     }
 
     return chipDeviceController
@@ -59,9 +62,18 @@ object ChipClient {
 
   fun getAndroidChipPlatform(context: Context?): AndroidChipPlatform {
     if (!this::androidPlatform.isInitialized && context != null) {
-      //force ChipDeviceController load jni
+      // force ChipDeviceController load jni
       ChipDeviceController.loadJni()
-      androidPlatform = AndroidChipPlatform(AndroidBleManager(context), PreferencesKeyValueStoreManager(context), PreferencesConfigurationManager(context), NsdManagerServiceResolver(context), NsdManagerServiceBrowser(context), ChipMdnsCallbackImpl(), DiagnosticDataProviderImpl(context))
+      androidPlatform =
+        AndroidChipPlatform(
+          AndroidBleManager(context),
+          PreferencesKeyValueStoreManager(context),
+          PreferencesConfigurationManager(context),
+          NsdManagerServiceResolver(context),
+          NsdManagerServiceBrowser(context),
+          ChipMdnsCallbackImpl(),
+          DiagnosticDataProviderImpl(context)
+        )
     }
 
     return androidPlatform
@@ -71,25 +83,30 @@ object ChipClient {
    * Wrapper around [ChipDeviceController.getConnectedDevicePointer] to return the value directly.
    */
   suspend fun getConnectedDevicePointer(context: Context, nodeId: Long): Long {
-    // TODO (#21539) This is a memory leak because we currently never call releaseConnectedDevicePointer
-    // once we are done with the returned device pointer. Memory leak was introduced since the refactor
-    // that introduced it was very large in order to fix a use after free, which was considered to be
+    // TODO (#21539) This is a memory leak because we currently never call
+    // releaseConnectedDevicePointer
+    // once we are done with the returned device pointer. Memory leak was introduced since the
+    // refactor
+    // that introduced it was very large in order to fix a use after free, which was considered
+    // to be
     // worse than the memory leak that was introduced.
     return suspendCancellableCoroutine { continuation ->
-      getDeviceController(context).getConnectedDevicePointer(
-        nodeId,
-        object : GetConnectedDeviceCallback {
-          override fun onDeviceConnected(devicePointer: Long) {
-            Log.d(TAG, "Got connected device pointer")
-            continuation.resume(devicePointer)
-          }
+      getDeviceController(context)
+        .getConnectedDevicePointer(
+          nodeId,
+          object : GetConnectedDeviceCallback {
+            override fun onDeviceConnected(devicePointer: Long) {
+              Log.d(TAG, "Got connected device pointer")
+              continuation.resume(devicePointer)
+            }
 
-          override fun onConnectionFailure(nodeId: Long, error: Exception) {
-            val errorMessage = "Unable to get connected device with nodeId $nodeId"
-            Log.e(TAG, errorMessage, error)
-            continuation.resumeWithException(IllegalStateException(errorMessage))
+            override fun onConnectionFailure(nodeId: Long, error: Exception) {
+              val errorMessage = "Unable to get connected device with nodeId $nodeId"
+              Log.e(TAG, errorMessage, error)
+              continuation.resumeWithException(IllegalStateException(errorMessage))
+            }
           }
-        })
+        )
     }
   }
 }

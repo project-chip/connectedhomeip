@@ -28,12 +28,15 @@ static_library("address_resolve") {
     "${chip_root}/src/lib/dnssd",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
+    "${chip_root}/src/tracing",
+    "${chip_root}/src/tracing:macros",
     "${chip_root}/src/transport/raw",
   ]
 
   sources = [
     "AddressResolve.cpp",
     "AddressResolve.h",
+    "TracingStructs.h",
   ]
 
   if (chip_address_resolve_strategy == "default") {
@@ -61,6 +64,7 @@ executable("address-resolve-tool") {
 
   public_deps = [
     ":address_resolve",
+    "${chip_root}/examples/common/tracing:commandline",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform/logging:stdio",
   ]

@@ -27,6 +27,10 @@
 #include "esp_system.h"
 #include "lib/core/CHIPError.h"
 
+#if CONFIG_ENABLE_ENCRYPTED_OTA
+#include <esp_encrypted_img.h>
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
+
 #define TAG "OTAImageProcessor"
 using namespace chip::System;
 using namespace ::chip::DeviceLayer::Internal;
@@ -53,6 +57,20 @@ void PostOTAStateChangeEvent(DeviceLayer::OtaState newState)
 }
 
 } // namespace
+
+#if CONFIG_ENABLE_ENCRYPTED_OTA
+void OTAImageProcessorImpl::EndDecryption()
+{
+    VerifyOrReturn(mEncryptedOTAEnabled);
+
+    esp_err_t err = esp_encrypted_img_decrypt_end(mOTADecryptionHandle);
+    if (err != ESP_OK)
+    {
+        ChipLogError(SoftwareUpdate, "Failed to end pre encrypted OTA esp_err:%d", err);
+    }
+    mOTADecryptionHandle = nullptr;
+}
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
 bool OTAImageProcessorImpl::IsFirstImageRun()
 {
@@ -145,6 +163,32 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         imageProcessor->mDownloader->OnPreparedForDownload(ESP32Utils::MapError(err));
         return;
     }
+
+#if CONFIG_ENABLE_ENCRYPTED_OTA
+    if (imageProcessor->mEncryptedOTAEnabled == false)
+    {
+        ChipLogError(SoftwareUpdate, "Encrypted OTA is not initialized");
+        imageProcessor->mDownloader->OnPreparedForDownload(ESP32Utils::MapError(err));
+        return;
+    }
+
+    // This struct takes in private key but arguments are named as pub_key
+    // This is the issue in the esp_encrypted_img component
+    // https://github.com/espressif/idf-extra-components/blob/791d506/esp_encrypted_img/include/esp_encrypted_img.h#L47
+    const esp_decrypt_cfg_t decryptionConfig = {
+        .rsa_pub_key     = imageProcessor->mKey.data(),
+        .rsa_pub_key_len = imageProcessor->mKey.size(),
+    };
+
+    imageProcessor->mOTADecryptionHandle = esp_encrypted_img_decrypt_start(&decryptionConfig);
+    if (imageProcessor->mOTADecryptionHandle == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "Failed to initialize encrypted OTA");
+        imageProcessor->mDownloader->OnPreparedForDownload(ESP32Utils::MapError(ESP_FAIL));
+        return;
+    }
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
+
     imageProcessor->mHeaderParser.Init();
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
     PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadInProgress);
@@ -158,6 +202,11 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
         return;
     }
+
+#if CONFIG_ENABLE_ENCRYPTED_OTA
+    imageProcessor->EndDecryption();
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
+
     esp_err_t err = esp_ota_end(imageProcessor->mOTAUpdateHandle);
     if (err != ESP_OK)
     {
@@ -185,6 +234,11 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
         return;
     }
+
+#if CONFIG_ENABLE_ENCRYPTED_OTA
+    imageProcessor->EndDecryption();
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
+
     if (esp_ota_abort(imageProcessor->mOTAUpdateHandle) != ESP_OK)
     {
         ESP_LOGE(TAG, "ESP OTA abort failed");
@@ -218,7 +272,59 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         return;
     }
 
-    esp_err_t err = esp_ota_write(imageProcessor->mOTAUpdateHandle, block.data(), block.size());
+    esp_err_t err;
+    ByteSpan blockToWrite = block;
+
+#if CONFIG_ENABLE_ENCRYPTED_OTA
+    if (imageProcessor->mEncryptedOTAEnabled == false)
+    {
+        ChipLogError(SoftwareUpdate, "Encrypted OTA is not initialized");
+        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_INCORRECT_STATE);
+        PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
+        return;
+    }
+
+    if (imageProcessor->mOTADecryptionHandle == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "OTA decryption handle is nullptr");
+        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_INCORRECT_STATE);
+        PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
+        return;
+    }
+
+    pre_enc_decrypt_arg_t preEncOtaDecryptArgs = {
+        .data_in      = reinterpret_cast<const char *>(block.data()),
+        .data_in_len  = block.size(),
+        .data_out     = nullptr,
+        .data_out_len = 0,
+    };
+
+    err = esp_encrypted_img_decrypt_data(imageProcessor->mOTADecryptionHandle, &preEncOtaDecryptArgs);
+    if (err != ESP_OK && err != ESP_ERR_NOT_FINISHED)
+    {
+        ChipLogError(SoftwareUpdate, "esp_encrypted_img_decrypt_data failed err:%d", err);
+        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+        PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
+        return;
+    }
+
+    ChipLogDetail(SoftwareUpdate, "data_in_len:%u, data_out_len:%u", preEncOtaDecryptArgs.data_in_len,
+                  preEncOtaDecryptArgs.data_out_len);
+
+    if (preEncOtaDecryptArgs.data_out == nullptr || preEncOtaDecryptArgs.data_out_len <= 0)
+    {
+        ChipLogProgress(SoftwareUpdate, "Decrypted data is null or out len is zero");
+    }
+
+    blockToWrite = ByteSpan(reinterpret_cast<const uint8_t *>(preEncOtaDecryptArgs.data_out), preEncOtaDecryptArgs.data_out_len);
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
+
+    err = esp_ota_write(imageProcessor->mOTAUpdateHandle, blockToWrite.data(), blockToWrite.size());
+
+#if CONFIG_ENABLE_ENCRYPTED_OTA
+    free(preEncOtaDecryptArgs.data_out);
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
+
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "esp_ota_write failed (%s)", esp_err_to_name(err));
@@ -226,7 +332,8 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
         return;
     }
-    imageProcessor->mParams.downloadedBytes += block.size();
+
+    imageProcessor->mParams.downloadedBytes += blockToWrite.size();
     imageProcessor->mDownloader->FetchNextData();
 }
 
@@ -309,5 +416,17 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
 
     return CHIP_NO_ERROR;
 }
+
+#if CONFIG_ENABLE_ENCRYPTED_OTA
+CHIP_ERROR OTAImageProcessorImpl::InitEncryptedOTA(const CharSpan & key)
+{
+    VerifyOrReturnError(mEncryptedOTAEnabled == false, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsSpanUsable(key), CHIP_ERROR_INVALID_ARGUMENT);
+
+    mKey                 = key;
+    mEncryptedOTAEnabled = true;
+    return CHIP_NO_ERROR;
+}
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
 } // namespace chip

@@ -21,7 +21,7 @@ if CHIP
 
 config CHIP_WIFI
 	bool "Enable nrfconnect Wi-Fi support"
-	default y if SHIELD_NRF7002_EK || BOARD_NRF7002DK_NRF5340_CPUAPP
+	default y if SHIELD_NRF7002EK || BOARD_NRF7002DK_NRF5340_CPUAPP
 	select WIFI_NRF700X
 	select WIFI
 	select WPA_SUPP
@@ -73,18 +73,77 @@ config SPI_NOR_FLASH_LAYOUT_PAGE_SIZE
 
 endif # CHIP_SPI_NOR
 
+config CHIP_NUS
+	bool "Enable Nordic UART service for Matter purposes"
+	select BT_NUS
+	select BT_SMP
+	select BT_NUS_AUTHEN
+	help
+	  Enables Nordic UART service (NUS) for Matter samples.
+	  Using NUS service you can control a Matter sample using pre-defined BLE commands 
+	  and do defined operations. The CHIP NUS service can be useful to keep communication
+	  with a smart home device when a connection within Matter network is lost.
+
+if CHIP_NUS
+
+# Requires providing a PIN for each pair request
+config BT_BONDABLE
+	default n
+
+config BT_RX_STACK_SIZE
+	default 1536
+
+config SYSTEM_WORKQUEUE_STACK_SIZE
+	default 2048
+
+config BT_DEVICE_APPEARANCE
+	default 833
+
+if !LOG
+
+config BT_FIXED_PASSKEY
+	default y
+
+endif
+
+config CHIP_NUS_MAX_COMMAND_LEN
+	int "Maximum length of single command in Bytes"
+	default 10
+	help
+	  Maximum length of single command. This command will be send via Bluetooth LE to
+	  a paired smart home device.
+
+config CHIP_NUS_FIXED_PASSKEY
+	int "Define the default passkey for NUS"
+	depends on BT_FIXED_PASSKEY
+	default 123456
+	help
+	  Define the default password for pairing with the Bluetooth LE device.
+
+config CHIP_NUS_MAX_COMMANDS
+	int "Define maximum NUS commands amount"
+	default 2
+	help
+	  Define the maximum number of NUS commands to declare by user.
+
+endif
+
+
 config CHIP_DFU_OVER_BT_SMP
 	bool "Enable DFU over Bluetooth LE SMP feature set"
 	imply CHIP_QSPI_NOR if BOARD_NRF5340DK_NRF5340_CPUAPP || BOARD_NRF52840DK_NRF52840
 	imply CHIP_SPI_NOR if BOARD_NRF7002DK_NRF5340_CPUAPP
 	imply BOOTLOADER_MCUBOOT
 	select MCUMGR
-	select MCUMGR_SMP_BT
-	select MCUMGR_CMD_IMG_MGMT
-	select MCUMGR_CMD_OS_MGMT
+	select MCUMGR_TRANSPORT_BT
+	select IMG_MANAGER
+	select STREAM_FLASH
+	select ZCBOR
+	select MCUMGR_GRP_IMG
+	select MCUMGR_GRP_OS
 	# Enable custom SMP request to erase settings partition.
-	select MCUMGR_GRP_ZEPHYR_BASIC
-	select MCUMGR_GRP_BASIC_CMD_STORAGE_ERASE
+	select MCUMGR_GRP_ZBASIC
+	select MCUMGR_GRP_ZBASIC_STORAGE_ERASE
 	help
 	  Enables Device Firmware Upgrade over Bluetooth LE with SMP and configures
 	  the set of options related to that feature.
@@ -92,10 +151,10 @@ config CHIP_DFU_OVER_BT_SMP
 if CHIP_DFU_OVER_BT_SMP
 
 # MCU Manager and SMP configuration
-config MCUMGR_SMP_BT_AUTHEN
+config MCUMGR_TRANSPORT_BT_AUTHEN
 	default n
 
-config MCUMGR_BUF_COUNT
+config MCUMGR_TRANSPORT_NETBUF_COUNT
 	default 6
 
 config MCUMGR_MGMT_NOTIFICATION_HOOKS
@@ -117,8 +176,8 @@ config BT_L2CAP_TX_MTU
 config BT_BUF_ACL_RX_SIZE
 	default 502
 
-# Increase MCUMGR_BUF_SIZE, as it must be big enough to fit MAX MTU + overhead and for single-image DFU default is 384 B
-config MCUMGR_BUF_SIZE
+# Increase MCUMGR_TRANSPORT_NETBUF_SIZE, as it must be big enough to fit MAX MTU + overhead and for single-image DFU default is 384 B
+config MCUMGR_TRANSPORT_NETBUF_SIZE
 	default 1024
 
 # Increase system workqueue size, as SMP is processed within it
@@ -128,10 +187,10 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
 if SOC_SERIES_NRF53X
 
 # Enable custom SMP request to erase settings partition.
-config MCUMGR_GRP_ZEPHYR_BASIC
+config MCUMGR_GRP_ZBASIC
 	default y
 
-config MCUMGR_GRP_BASIC_CMD_STORAGE_ERASE
+config MCUMGR_GRP_ZBASIC_STORAGE_ERASE
 	default y
 
 endif # SOC_SERIES_NRF53X

@@ -22,6 +22,8 @@
 #include <controller/CHIPCluster.h>
 #include <functional>
 
+#include <app-common/zap-generated/cluster-objects.h>
+
 // COMMAND CLASSES
 class StepCommand
     : public MediaCommandBase<chip::app::Clusters::LevelControl::Commands::Step::Type, chip::app::DataModel::NullObjectType>

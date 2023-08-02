@@ -22,6 +22,7 @@ import chip.native
 import pytest
 from chip import exceptions
 from chip.setup_payload import SetupPayload
+from common.utils import get_shell_commands_from_help_response
 from packaging import version
 
 log = logging.getLogger(__name__)
@@ -38,10 +39,6 @@ def binaryPath(request, rootDir):
 SHELL_COMMAND_NAME = ["base64", "exit", "help", "version",
                       "config", "device", "onboardingcodes", "dns",
                       "echo", "log", "rand"]
-
-
-def get_shell_command(response):
-    return [line.split()[0].strip() for line in response]
 
 
 def parse_config_response(response):
@@ -100,7 +97,7 @@ def test_command_check(device):
     # Help
     ret = device.send(command="help", expected_output="Done")
     assert ret is not None and len(ret) > 1
-    shell_commands = get_shell_command(ret[1:-1])
+    shell_commands = get_shell_commands_from_help_response(ret[1:-1])
     assert set(SHELL_COMMAND_NAME) == set(shell_commands)
 
     # Echo

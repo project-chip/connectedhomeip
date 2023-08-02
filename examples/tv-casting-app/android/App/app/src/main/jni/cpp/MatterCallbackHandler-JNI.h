@@ -28,6 +28,8 @@
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 
+#include <app-common/zap-generated/cluster-objects.h>
+
 class CallbackBaseJNI
 {
 public:

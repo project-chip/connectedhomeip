@@ -55,213 +55,212 @@ import kotlin.math.min
 
 /** Launches the camera to scan for QR code. */
 class BarcodeFragment : Fragment() {
-    private var _binding: BarcodeFragmentBinding? = null
-    private val binding get() = _binding!!
+  private var _binding: BarcodeFragmentBinding? = null
+  private val binding
+    get() = _binding!!
 
-    private fun aspectRatio(width: Int, height: Int): Int {
-        val previewRatio = max(width, height).toDouble() / min(width, height)
-        if (abs(previewRatio - RATIO_4_3_VALUE) <= abs(previewRatio - RATIO_16_9_VALUE)) {
-            return AspectRatio.RATIO_4_3
+  private fun aspectRatio(width: Int, height: Int): Int {
+    val previewRatio = max(width, height).toDouble() / min(width, height)
+    if (abs(previewRatio - RATIO_4_3_VALUE) <= abs(previewRatio - RATIO_16_9_VALUE)) {
+      return AspectRatio.RATIO_4_3
+    }
+    return AspectRatio.RATIO_16_9
+  }
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    if (!hasCameraPermission()) {
+      requestCameraPermission()
+    }
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    _binding = BarcodeFragmentBinding.inflate(inflater, container, false)
+
+    startCamera()
+    binding.inputAddressBtn.setOnClickListener {
+      FragmentUtil.getHost(this@BarcodeFragment, SelectActionFragment.Callback::class.java)
+        ?.onShowDeviceAddressInput()
+    }
+
+    return binding.root
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
+
+  @SuppressLint("UnsafeOptInUsageError")
+  private fun startCamera() {
+    val cameraProviderFuture = ProcessCameraProvider.getInstance(requireActivity())
+    cameraProviderFuture.addListener(
+      {
+        val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+        val metrics = DisplayMetrics().also { binding.cameraView.display?.getRealMetrics(it) }
+        val screenAspectRatio = aspectRatio(metrics.widthPixels, metrics.heightPixels)
+        // Preview
+        val preview: Preview =
+          Preview.Builder()
+            .setTargetAspectRatio(screenAspectRatio)
+            .setTargetRotation(binding.cameraView.display.rotation)
+            .build()
+        preview.setSurfaceProvider(binding.cameraView.surfaceProvider)
+
+        // Setup barcode scanner
+        val imageAnalysis =
+          ImageAnalysis.Builder()
+            .setTargetAspectRatio(screenAspectRatio)
+            .setTargetRotation(binding.cameraView.display.rotation)
+            .build()
+        val cameraExecutor = Executors.newSingleThreadExecutor()
+        val barcodeScanner: BarcodeScanner = BarcodeScanning.getClient()
+        imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
+          processImageProxy(barcodeScanner, imageProxy)
         }
-        return AspectRatio.RATIO_16_9
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if (!hasCameraPermission()) {
-            requestCameraPermission()
-        }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = BarcodeFragmentBinding.inflate(inflater, container, false)
-
-        startCamera()
-        binding.inputAddressBtn.setOnClickListener {
-            FragmentUtil.getHost(
-                this@BarcodeFragment,
-                SelectActionFragment.Callback::class.java
-            )?.onShowDeviceAddressInput()
-        }
-
-        return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
-    @SuppressLint("UnsafeOptInUsageError")
-    private fun startCamera() {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireActivity())
-        cameraProviderFuture.addListener({
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-            val metrics = DisplayMetrics().also { binding.cameraView.display?.getRealMetrics(it) }
-            val screenAspectRatio = aspectRatio(metrics.widthPixels, metrics.heightPixels)
-            // Preview
-            val preview: Preview = Preview.Builder()
-                .setTargetAspectRatio(screenAspectRatio)
-                .setTargetRotation(binding.cameraView.display.rotation)
-                .build()
-            preview.setSurfaceProvider(binding.cameraView.surfaceProvider)
-
-            // Setup barcode scanner
-            val imageAnalysis = ImageAnalysis.Builder()
-                .setTargetAspectRatio(screenAspectRatio)
-                .setTargetRotation(binding.cameraView.display.rotation)
-                .build()
-            val cameraExecutor = Executors.newSingleThreadExecutor()
-            val barcodeScanner: BarcodeScanner = BarcodeScanning.getClient()
-            imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
-                processImageProxy(barcodeScanner, imageProxy)
-            }
-            // Select back camera as a default
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-            try {
-                // Unbind use cases before rebinding
-                cameraProvider.unbindAll()
-
-                // Bind use cases to camera
-                cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis)
-
-            } catch (exc: Exception) {
-                Log.e(TAG, "Use case binding failed", exc)
-            }
-        }, ContextCompat.getMainExecutor(requireActivity()))
-
-        //workaround: can not use gms to scan the code in China, added a EditText to debug
-        binding.manualCodeBtn.setOnClickListener {
-            val qrCode = binding.manualCodeEditText.text.toString()
-            Log.d(TAG, "Submit Code:$qrCode")
-            handleInputQrCode(qrCode)
-        }
-    }
-
-    @ExperimentalGetImage
-    private fun processImageProxy(
-        barcodeScanner: BarcodeScanner,
-        imageProxy: ImageProxy
-    ) {
-        val inputImage =
-            InputImage.fromMediaImage(imageProxy.image!!, imageProxy.imageInfo.rotationDegrees)
-
-        barcodeScanner.process(inputImage)
-            .addOnSuccessListener { barcodes ->
-                barcodes.forEach {
-                    handleScannedQrCode(it)
-                }
-            }
-            .addOnFailureListener {
-                Log.e(TAG, it.message ?: it.toString())
-            }.addOnCompleteListener {
-                // When the image is from CameraX analysis use case, must call image.close() on received
-                // images when finished using them. Otherwise, new images may not be received or the camera
-                // may stall.
-                imageProxy.close()
-            }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        if (requestCode == REQUEST_CODE_CAMERA_PERMISSION) {
-            if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                showCameraPermissionAlert()
-            }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        }
-    }
-
-    private fun handleInputQrCode(qrCode: String) {
-        lateinit var payload: OnboardingPayload
+        // Select back camera as a default
+        val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
         try {
-            payload = OnboardingPayloadParser().parseQrCode(qrCode)
-        } catch (ex: OnboardingPayloadException) {
-            try {
-                payload = OnboardingPayloadParser().parseManualPairingCode(qrCode)
-            } catch (ex: Exception) {
-                Log.e(TAG, "Unrecognized Manual Pairing Code", ex)
-                Toast.makeText(requireContext(), "Unrecognized Manual Pairing Code", Toast.LENGTH_SHORT).show()
-            }
-        } catch (ex: UnrecognizedQrCodeException) {
-            Log.e(TAG, "Unrecognized QR Code", ex)
-            Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
+          // Unbind use cases before rebinding
+          cameraProvider.unbindAll()
+
+          // Bind use cases to camera
+          cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis)
+        } catch (exc: Exception) {
+          Log.e(TAG, "Use case binding failed", exc)
         }
-        FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
-            ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
+      },
+      ContextCompat.getMainExecutor(requireActivity())
+    )
+
+    // workaround: can not use gms to scan the code in China, added a EditText to debug
+    binding.manualCodeBtn.setOnClickListener {
+      val qrCode = binding.manualCodeEditText.text.toString()
+      Log.d(TAG, "Submit Code:$qrCode")
+      handleInputQrCode(qrCode)
     }
+  }
 
-    private fun handleScannedQrCode(barcode: Barcode) {
-        Handler(Looper.getMainLooper()).post {
-            lateinit var payload: OnboardingPayload
-            try {
-                payload = barcode.displayValue?.let { OnboardingPayloadParser().parseQrCode(it) } ?: return@post
-            } catch (ex: UnrecognizedQrCodeException) {
-                Log.e(TAG, "Unrecognized QR Code", ex)
-                Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
-                return@post
-            }
-            FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
-                ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
-        }
+  @ExperimentalGetImage
+  private fun processImageProxy(barcodeScanner: BarcodeScanner, imageProxy: ImageProxy) {
+    val inputImage =
+      InputImage.fromMediaImage(imageProxy.image!!, imageProxy.imageInfo.rotationDegrees)
+
+    barcodeScanner
+      .process(inputImage)
+      .addOnSuccessListener { barcodes -> barcodes.forEach { handleScannedQrCode(it) } }
+      .addOnFailureListener { Log.e(TAG, it.message ?: it.toString()) }
+      .addOnCompleteListener {
+        // When the image is from CameraX analysis use case, must call image.close() on
+        // received
+        // images when finished using them. Otherwise, new images may not be received or the
+        // camera
+        // may stall.
+        imageProxy.close()
+      }
+  }
+
+  override fun onRequestPermissionsResult(
+    requestCode: Int,
+    permissions: Array<String>,
+    grantResults: IntArray
+  ) {
+    if (requestCode == REQUEST_CODE_CAMERA_PERMISSION) {
+      if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
+        showCameraPermissionAlert()
+      }
+    } else {
+      super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
+  }
 
-    private fun showCameraPermissionAlert() {
-        AlertDialog.Builder(requireContext())
-            .setTitle(R.string.camera_permission_missing_alert_title)
-            .setMessage(R.string.camera_permission_missing_alert_subtitle)
-            .setPositiveButton(R.string.camera_permission_missing_alert_try_again) { _, _ ->
-                requestCameraPermission()
-            }
-            .setCancelable(false)
-            .create()
-            .show()
+  private fun handleInputQrCode(qrCode: String) {
+    lateinit var payload: OnboardingPayload
+    try {
+      payload = OnboardingPayloadParser().parseQrCode(qrCode)
+    } catch (ex: OnboardingPayloadException) {
+      try {
+        payload = OnboardingPayloadParser().parseManualPairingCode(qrCode)
+      } catch (ex: Exception) {
+        Log.e(TAG, "Unrecognized Manual Pairing Code", ex)
+        Toast.makeText(requireContext(), "Unrecognized Manual Pairing Code", Toast.LENGTH_SHORT)
+          .show()
+      }
+    } catch (ex: UnrecognizedQrCodeException) {
+      Log.e(TAG, "Unrecognized QR Code", ex)
+      Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
     }
+    FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
+      ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
+  }
 
-    private fun showCameraUnavailableAlert() {
-        AlertDialog.Builder(requireContext())
-            .setTitle(R.string.camera_unavailable_alert_title)
-            .setMessage(R.string.camera_unavailable_alert_subtitle)
-            .setPositiveButton(R.string.camera_unavailable_alert_exit) { _, _ ->
-                requireActivity().finish()
-            }
-            .setCancelable(false)
-            .create()
-            .show()
+  private fun handleScannedQrCode(barcode: Barcode) {
+    Handler(Looper.getMainLooper()).post {
+      lateinit var payload: OnboardingPayload
+      try {
+        payload =
+          barcode.displayValue?.let { OnboardingPayloadParser().parseQrCode(it) } ?: return@post
+      } catch (ex: UnrecognizedQrCodeException) {
+        Log.e(TAG, "Unrecognized QR Code", ex)
+        Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
+        return@post
+      }
+      FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
+        ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
     }
+  }
 
-    private fun hasCameraPermission(): Boolean {
-        return (PackageManager.PERMISSION_GRANTED
-                == checkSelfPermission(requireContext(), Manifest.permission.CAMERA))
-    }
+  private fun showCameraPermissionAlert() {
+    AlertDialog.Builder(requireContext())
+      .setTitle(R.string.camera_permission_missing_alert_title)
+      .setMessage(R.string.camera_permission_missing_alert_subtitle)
+      .setPositiveButton(R.string.camera_permission_missing_alert_try_again) { _, _ ->
+        requestCameraPermission()
+      }
+      .setCancelable(false)
+      .create()
+      .show()
+  }
 
-    private fun requestCameraPermission() {
-        val permissions = arrayOf(Manifest.permission.CAMERA)
-        requestPermissions(permissions, REQUEST_CODE_CAMERA_PERMISSION)
-    }
+  private fun showCameraUnavailableAlert() {
+    AlertDialog.Builder(requireContext())
+      .setTitle(R.string.camera_unavailable_alert_title)
+      .setMessage(R.string.camera_unavailable_alert_subtitle)
+      .setPositiveButton(R.string.camera_unavailable_alert_exit) { _, _ ->
+        requireActivity().finish()
+      }
+      .setCancelable(false)
+      .create()
+      .show()
+  }
 
-    /** Interface for notifying the host. */
-    interface Callback {
-        /** Notifies host of the [CHIPDeviceInfo] from the scanned QR code. */
-        fun onCHIPDeviceInfoReceived(deviceInfo: CHIPDeviceInfo)
-    }
+  private fun hasCameraPermission(): Boolean {
+    return (PackageManager.PERMISSION_GRANTED ==
+      checkSelfPermission(requireContext(), Manifest.permission.CAMERA))
+  }
 
-    companion object {
-        private const val TAG = "BarcodeFragment"
-        private const val REQUEST_CODE_CAMERA_PERMISSION = 100;
+  private fun requestCameraPermission() {
+    val permissions = arrayOf(Manifest.permission.CAMERA)
+    requestPermissions(permissions, REQUEST_CODE_CAMERA_PERMISSION)
+  }
 
-        @JvmStatic
-        fun newInstance() = BarcodeFragment()
+  /** Interface for notifying the host. */
+  interface Callback {
+    /** Notifies host of the [CHIPDeviceInfo] from the scanned QR code. */
+    fun onCHIPDeviceInfoReceived(deviceInfo: CHIPDeviceInfo)
+  }
 
-        private const val RATIO_4_3_VALUE = 4.0 / 3.0
-        private const val RATIO_16_9_VALUE = 16.0 / 9.0
-    }
+  companion object {
+    private const val TAG = "BarcodeFragment"
+    private const val REQUEST_CODE_CAMERA_PERMISSION = 100
+
+    @JvmStatic fun newInstance() = BarcodeFragment()
+
+    private const val RATIO_4_3_VALUE = 4.0 / 3.0
+    private const val RATIO_16_9_VALUE = 16.0 / 9.0
+  }
 }

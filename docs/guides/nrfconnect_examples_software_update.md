@@ -81,7 +81,7 @@ To test the DFU over Matter, you need to complete the following steps:
     Requestor Endpoint ID, respectively):
 
     ```
-    ./out/chiptool/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 1, "endpoint": 0}]' 2 0
+    ./out/chiptool/chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"fabricIndex": 1, "providerNodeID": 1, "endpoint": 0}]' 2 0
     ```
 
 9.  Configure the OTA Provider with the access control list (ACL) that grants
@@ -109,7 +109,7 @@ To test the DFU over Matter, you need to complete the following steps:
         Requestor Endpoint ID, respectively):
 
         ```
-        ./out/chiptool/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+        ./out/chiptool/chip-tool otasoftwareupdaterequestor announce-otaprovider 1 0 0 0 2 0
         ```
 
         Once the device is made aware of the OTA Provider node, it automatically

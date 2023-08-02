@@ -69,6 +69,7 @@ void ChipDnssdShutdown() {}
 
 CHIP_ERROR ChipDnssdRemoveServices()
 {
+
     VerifyOrReturnError(sResolverObject != nullptr && sRemoveServicesMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 

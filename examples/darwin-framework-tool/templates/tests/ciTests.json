@@ -1,8 +1,7 @@
 {
     "include": "../../../../src/app/tests/suites/ciTests.json",
     "disable": [
-        "TestClientMonitoringCluster",
-        "Test_TC_SC_4_2",
+        "Test_TC_SC_4_1",
         "Test_TC_SC_5_2",
         "TestClusterComplexTypes",
         "TestEvents",
@@ -32,6 +31,17 @@
         "Test_TC_ACL_2_9",
         "Test_TC_ACL_2_10",
         "DL_LockUnlock",
-        "Test_TC_TIMESYNC_1_1"
+        "Disabled due to Events verification not supported",
+        "Test_TC_BINFO_2_2",
+        "Test_TC_ACL_2_5",
+        "Test_TC_ACL_2_6",
+        "Test_TC_SMOKECO_2_2",
+        "Test_TC_SMOKECO_2_3",
+        "Test_TC_SMOKECO_2_4",
+        "Test_TC_SMOKECO_2_5",
+        "Disabled because the power source configuration cluster is now deprecated and not present in all-clusters",
+        "Test_TC_PSCFG_1_1",
+        "Test_TC_PSCFG_2_1",
+        "Test_TC_PSCFG_2_2"
     ]
 }

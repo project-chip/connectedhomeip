@@ -41,10 +41,12 @@ TELNET_CONNECTION_PORT=""
 FAILED_TESTS=0
 IS_UNIT_TEST=0
 FVP_NETWORK="user"
-KVS_STORAGE_TYPE="tdb"
 KVS_STORAGE_FILE=""
+NO_ACTIVATE=""
+CRYPTO_BACKEND="mbedtls"
+APP_VERSION="1"
+APP_VERSION_STR="0.0.1"
 
-declare -A tdb_storage_param=([instance]=sram [memspace]=0 [address]=0x0 [size]=0x100000)
 declare -A ps_storage_param=([instance]=qspi_sram [memspace]=0 [address]=0x660000 [size]=0x12000)
 
 readarray -t SUPPORTED_APP_NAMES <"$CHIP_ROOT"/examples/platform/openiotsdk/supported_examples.txt
@@ -65,11 +67,13 @@ Options:
     -C,--command    <command>           Action to execute <build-run | run | test | build - default>
     -d,--debug      <debug_enable>      Build in debug mode <true | false - default>
     -l,--lwipdebug  <lwip_debug_enable> Build with LwIP debug logs support <true | false - default>
-    -k,--kvsstore   <kvs_storage_type>  Select KVS storage type <ps | tdb - default>
+    -b,--backend    <crypto_backend)    Select crypto backend <psa | mbedtls - default>
     -p,--path       <build_path>        Build path <build_path - default is example_dir/build>
     -K,--kvsfile    <kvs_storage_file>  Path to KVS storage file which will be used to ensure persistence <kvs_storage_file - default is empty which means disable persistence>
     -n,--network    <network_name>      FVP network interface name <network_name - default is "user" which means user network mode>
-
+    -v,--version    <version_number>    Application version number <version_number - default is 1>
+    -V,--versionStr <version_str>       Application version string <version_strr - default is "0.0.1">
+    --no-activate                       Do not activate the chip build environment
 Examples:
 EOF
 
@@ -119,6 +123,8 @@ function build_with_cmake() {
     fi
 
     BUILD_OPTIONS=(-DCMAKE_SYSTEM_PROCESSOR=cortex-m55)
+    BUILD_OPTIONS+=(-DCONFIG_CHIP_OPEN_IOT_SDK_SOFTWARE_VERSION="$APP_VERSION")
+    BUILD_OPTIONS+=(-DTFM_NS_APP_VERSION="$APP_VERSION_STR")
 
     if "$DEBUG"; then
         BUILD_OPTIONS+=(-DCMAKE_BUILD_TYPE=Debug)
@@ -130,9 +136,7 @@ function build_with_cmake() {
         BUILD_OPTIONS+=(-DCONFIG_CHIP_OPEN_IOT_SDK_LWIP_DEBUG=YES)
     fi
 
-    if [[ $KVS_STORAGE_TYPE == "ps" ]]; then
-        BUILD_OPTIONS+=(-DCONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS=YES)
-    fi
+    BUILD_OPTIONS+=(-DCONFIG_CHIP_CRYPTO="$CRYPTO_BACKEND")
 
     cmake -G Ninja -S "$EXAMPLE_PATH" -B "$BUILD_PATH" --toolchain="$TOOLCHAIN_PATH" "${BUILD_OPTIONS[@]}"
     cmake --build "$BUILD_PATH"
@@ -174,11 +178,7 @@ function run_fvp() {
     fi
 
     if [ -n "$KVS_STORAGE_FILE" ]; then
-        if [[ $KVS_STORAGE_TYPE == "ps" ]]; then
-            declare -n storage_param=ps_storage_param
-        else
-            declare -n storage_param=tdb_storage_param
-        fi
+        declare -n storage_param=ps_storage_param
         if [ -f "$KVS_STORAGE_FILE" ]; then
             RUN_OPTIONS+=(--data "mps3_board.${storage_param[instance]}=$KVS_STORAGE_FILE@${storage_param[memspace]}:${storage_param[address]}")
         fi
@@ -251,6 +251,18 @@ function run_test() {
         TEST_OPTIONS+=(--networkInterface="$FVP_NETWORK")
     fi
 
+    if [[ "$EXAMPLE" == "ota-requestor-app" ]]; then
+        TEST_OPTIONS+=(--updateBinaryPath="${EXAMPLE_EXE_PATH/elf/"ota"}")
+        # Check if OTA provider exists, if so get the path to it
+        OTA_PROVIDER_APP=$(find . -type f -name "chip-ota-provider-app")
+        if [ -z "$OTA_PROVIDER_APP" ]; then
+            echo "Error: OTA provider application does not exist." >&2
+            exit 1
+        fi
+        TEST_OPTIONS+=(--otaProvider="$OTA_PROVIDER_APP")
+        TEST_OPTIONS+=(--softwareVersion="$APP_VERSION:$APP_VERSION_STR")
+    fi
+
     if [[ -f $EXAMPLE_TEST_PATH/test_report_$EXAMPLE.json ]]; then
         rm -rf "$EXAMPLE_TEST_PATH/test_report_$EXAMPLE".json
     fi
@@ -268,8 +280,8 @@ function run_test() {
     fi
 }
 
-SHORT=C:,p:,d:,l:,n:,k:,K:,c,s,h
-LONG=command:,path:,debug:,lwipdebug:,network:,kvsstore:,kvsfile:,clean,scratch,help
+SHORT=C:,p:,d:,l:,b:,n:,k:,K:,v:,V:,c,s,h
+LONG=command:,path:,debug:,lwipdebug:,backend:,network:,kvsstore:,kvsfile:,version:,versionStr:,clean,scratch,help,no-activate
 OPTS=$(getopt -n build --options "$SHORT" --longoptions "$LONG" -- "$@")
 
 eval set -- "$OPTS"
@@ -300,12 +312,12 @@ while :; do
             LWIP_DEBUG=$2
             shift 2
             ;;
-        -k | --kvsstore)
-            KVS_STORAGE_TYPE=$2
-            shift 2
-            ;;
         -K | --kvsfile)
             KVS_STORAGE_FILE=$2
+            shift 2
+            ;;
+        -b | --backend)
+            CRYPTO_BACKEND=$2
             shift 2
             ;;
         -p | --path)
@@ -314,6 +326,18 @@ while :; do
             ;;
         -n | --network)
             FVP_NETWORK=$2
+            shift 2
+            ;;
+        --no-activate)
+            NO_ACTIVATE='YES'
+            shift
+            ;;
+        -v | --version)
+            APP_VERSION=$2
+            shift 2
+            ;;
+        -V | --versionStr)
+            APP_VERSION_STR=$2
             shift 2
             ;;
         -* | --*)
@@ -371,10 +395,10 @@ else
     EXAMPLE_PATH="$CHIP_ROOT/examples/$EXAMPLE/openiotsdk"
 fi
 
-case "$KVS_STORAGE_TYPE" in
-    ps | tdb) ;;
+case "$CRYPTO_BACKEND" in
+    psa | mbedtls) ;;
     *)
-        echo "Wrong KVS storage type definition"
+        echo "Wrong crypto type definition"
         show_usage
         exit 2
         ;;
@@ -386,8 +410,10 @@ if [ -z "$BUILD_PATH" ]; then
     BUILD_PATH="$EXAMPLE_PATH/build"
 fi
 
-# Activate Matter environment
-source "$CHIP_ROOT"/scripts/activate.sh
+if [ -z "$NO_ACTIVATE" ]; then
+    # Activate Matter environment
+    source "$CHIP_ROOT"/scripts/activate.sh
+fi
 
 if [[ $IS_UNIT_TEST -eq 0 ]]; then
     EXAMPLE_EXE_PATH="$BUILD_PATH/chip-openiotsdk-$EXAMPLE-example.elf"

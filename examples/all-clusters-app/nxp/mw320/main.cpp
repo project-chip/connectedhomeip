@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-//#include "FreeRTOS.h"
-//#include "task.h"
+// #include "FreeRTOS.h"
+// #include "task.h"
 
 #include <lib/shell/Engine.h>
 
@@ -28,7 +28,7 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 
-//#include <lib/support/RandUtils.h>   //==> rm from TE7.5
+// #include <lib/support/RandUtils.h>   //==> rm from TE7.5
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -41,6 +41,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <static-supported-temperature-levels.h>
 
 #include <app/InteractionModelEngine.h>
 
@@ -59,9 +60,9 @@
 #include "app/clusters/ota-requestor/DefaultOTARequestor.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorDriver.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
-//#include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
+// #include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
 #include "platform/nxp/mw320/OTAImageProcessorImpl.h"
-//#include "app/clusters/ota-requestor/OTARequestorDriver.h"
+// #include "app/clusters/ota-requestor/OTARequestorDriver.h"
 
 // for ota module test
 #include "mw320_ota.h"
@@ -118,6 +119,8 @@ static const char * TAG = "mw320";
 static SemaphoreHandle_t aesLock;
 static struct wlan_network sta_network;
 static struct wlan_network uap_network;
+
+chip::app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 
 const int TASK_MAIN_PRIO         = OS_PRIO_3;
 const int TASK_MAIN_STACK_SIZE   = 800;
@@ -1079,6 +1082,8 @@ static void run_chip_srv(System::Layer * aSystemLayer, void * aAppState)
     InitBindingHandlers();
     // binding --
 
+    chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+
     return;
 }
 
@@ -1528,7 +1533,7 @@ static void OnSwitchAttributeChangeCallback(EndpointId endpointId, AttributeId a
                 ReadHandler * phandler = pimEngine->ActiveHandlerAt(i);
                 if (phandler->IsType(chip::app::ReadHandler::InteractionType::Subscribe) &&
                         (phandler->IsGeneratingReports() || phandler->IsAwaitingReportResponse())) {
-                        phandler->UnblockUrgentEventDelivery();
+                        phandler->ForceDirtyState();
                         do_sendrpt = true;
                         break;
                 }

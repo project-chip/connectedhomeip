@@ -81,6 +81,12 @@ public:
         bool exhausted = false;
     };
 
+    GenericThreadDriver(uint8_t scanTimeoutSec = 10, uint8_t connectTimeoutSec = 20)
+    {
+        scanNetworkTimeoutSeconds = scanTimeoutSec;
+        connectNetworkTimeout     = connectTimeoutSec;
+    }
+
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new ThreadNetworkIterator(this); }
     CHIP_ERROR Init(Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback) override;
@@ -88,8 +94,11 @@ public:
 
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return 1; }
-    uint8_t GetScanNetworkTimeoutSeconds() override { return 10; }
-    uint8_t GetConnectNetworkTimeoutSeconds() override { return 20; }
+    uint8_t GetScanNetworkTimeoutSeconds() override { return scanNetworkTimeoutSeconds; }
+    uint8_t GetConnectNetworkTimeoutSeconds() override { return connectNetworkTimeout; }
+
+    void SetScanNetworkTimeoutSeconds(uint8_t scanTimeoutSec) { scanNetworkTimeoutSeconds = scanTimeoutSec; }
+    void SetConnectNetworkTimeoutSeconds(uint8_t connectTimeoutSec) { connectNetworkTimeout = connectTimeoutSec; }
 
     CHIP_ERROR CommitConfiguration() override;
     CHIP_ERROR RevertConfiguration() override;
@@ -103,6 +112,8 @@ public:
     void ScanNetworks(ThreadDriver::ScanCallback * callback) override;
 
 private:
+    uint8_t scanNetworkTimeoutSeconds;
+    uint8_t connectNetworkTimeout;
     Status MatchesNetworkId(const Thread::OperationalDataset & dataset, const ByteSpan & networkId) const;
     CHIP_ERROR BackupConfiguration();
 

@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTR{{cluster}}Cluster{{command}}Params : NSObject <NSCopying>
 {{#zcl_command_arguments}}
 
-{{> struct_field_decl cluster=parent.parent.name type=type label=label}} {{availability ../cluster command=../command commandField=(asStructPropertyName label)}};
+{{> struct_field_decl cluster=parent.parent.name type=type label=label}} {{availability ../cluster command=../command commandField=(asStructPropertyName label) deprecationMessage=(concat "The " (asStructPropertyName label) " field will be removed")}};
 {{#*inline "oldNameFieldDecl"}}
 
 {{> struct_field_decl cluster=parent.parent.name type=type label=commandField}} {{availability ../cluster command=../command commandField=commandField deprecationMessage=(concat "Please use " (asStructPropertyName label))}};
@@ -81,7 +81,7 @@ NS_ASSUME_NONNULL_BEGIN
  * schema for this command.
  */
 - (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+                                         error:(NSError * __autoreleasing *)error {{availability cluster command=command deprecationMessage="This command has been removed" minimalRelease="Fall 2023"}};
 {{/if}}
 @end
 {{/if}}

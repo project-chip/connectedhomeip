@@ -14,8 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #include "DeviceAttestationSe05xCredsExample.h"
 
+#include <CHIPCryptoPAL_se05x.h>
 #include <credentials/examples/ExampleDACs.h>
 #include <credentials/examples/ExamplePAI.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -23,16 +25,8 @@
 #include <lib/core/TLV.h>
 #include <lib/core/TLVTags.h>
 #include <lib/core/TLVTypes.h>
-#include <lib/core/TLVUtilities.hpp>
+#include <lib/core/TLVUtilities.h>
 #include <lib/support/Span.h>
-
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
-
-#ifdef ENABLE_HSM_DEVICE_ATTESTATION
-
-#include <crypto/hsm/nxp/CHIPCryptoPALHsm_SE05X_utils.h>
 
 /* Device attestation key ids */
 #define DEV_ATTESTATION_KEY_SE05X_ID 0x7D300000
@@ -279,5 +273,3 @@ DeviceAttestationCredentialsProvider * GetExampleSe05xDACProviderv2()
 } // namespace Examples
 } // namespace Credentials
 } // namespace chip
-
-#endif // #ifdef ENABLE_HSM_DEVICE_ATTESTATION

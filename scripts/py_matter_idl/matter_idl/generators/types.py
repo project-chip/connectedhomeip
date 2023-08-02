@@ -412,3 +412,29 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
             "Data type %s is NOT known, but treating it as a generic IDL type." % data_type)
 
     return result
+
+
+def IsSignedDataType(data_type: DataType) -> bool:
+    """
+    Returns if the data type is a signed type.
+    Returns if the data type is a signed data type of False if the data type can not be found.
+    """
+    lowercase_name = data_type.name.lower()
+    sized_type = __CHIP_SIZED_TYPES__.get(lowercase_name, None)
+    if sized_type is None:
+        return False
+
+    return sized_type.is_signed
+
+
+def GetDataTypeSizeInBits(data_type: DataType) -> Optional[int]:
+    """
+    Returns the size in bits for a given data type or None if the data type can not be found.
+    """
+
+    lowercase_name = data_type.name.lower()
+    sized_type = __CHIP_SIZED_TYPES__.get(lowercase_name, None)
+    if sized_type is None:
+        return None
+
+    return sized_type.power_of_two_bits

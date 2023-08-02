@@ -26,7 +26,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -34,7 +34,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the ClusterRevision from DUT"
+    - label: "Step 2: TH reads the ClusterRevision from DUT"
       PICS: OPCREDS.S.Afffd
       command: "readAttribute"
       attribute: "ClusterRevision"
@@ -43,7 +43,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "TH reads the FeatureMap from DUT"
+    - label: "Step 3: TH reads the FeatureMap from DUT"
       PICS: OPCREDS.S.Afffc
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -52,8 +52,8 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "TH reads AttributeList from DUT"
-      PICS: OPCREDS.S.Afffb
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED && OPCREDS.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -76,9 +76,33 @@ tests:
                   ]
 
     #List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED && OPCREDS.S.Afffb"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [
+                      0xFFFD,
+                      0xFFFC,
+                      0xFFFB,
+
+                      0xFFF9,
+                      0xFFF8,
+                      0x00,
+                      0x01,
+                      0x02,
+                      0x03,
+                      0x04,
+                      0x05,
+                  ]
+
+    #List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
     - label:
-          "TH reads AttributeList attribute from DUT. 1.The list SHALL NOT
-          contain any additional values in the standard or scoped range:
+          "Step 4b: TH reads AttributeList attribute from DUT. 1.The list SHALL
+          NOT contain any additional values in the standard or scoped range:
           (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE) 2.The list
           MAY contain values in the Manufacturer Extensible Identifier (MEI)
           range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed MEI
@@ -119,13 +143,13 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads EventList attribute from DUT. 1.The list MAY contain values
-          in the Manufacturer Extensible Identifier (MEI) range: (0xXXXX_0000 -
-          0xXXXX_00FF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1),
-          these values SHALL be ignored. 2.The list SHALL NOT contain any values
-          in the Test Vendor or invalid range: (0x0000_0100 - 0x0000_FFFF),
-          (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where
-          XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
+          "Step 5: TH reads EventList attribute from DUT. 1.The list MAY contain
+          values in the Manufacturer Extensible Identifier (MEI) range:
+          (0xXXXX_0000 - 0xXXXX_00FF), where XXXX is the allowed MEI range
+          (0x0001 - 0xFFF1), these values SHALL be ignored. 2.The list SHALL NOT
+          contain any values in the Test Vendor or invalid range: (0x0000_0100 -
+          0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 -
+          0xFFFF_FFFF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
       verification: |
           ./chip-tool operationalcredentials read event-list 1 0
 
@@ -147,7 +171,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads AcceptedCommandList from DUT"
+    - label: "Step 6a: TH reads AcceptedCommandList from DUT"
       PICS: OPCREDS.S.Afff9
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -157,10 +181,10 @@ tests:
               contains: [0x00, 0x02, 0x04, 0x06, 0x07, 0x09, 0x0a, 0x0b]
 
     - label:
-          "TH reads AcceptedCommandList attribute from DUT. 1.The list SHALL NOT
-          contain any additional values in the standard or scoped range:
-          (0x0000_0000 - 0x0000_00FF). 2.The list MAY contain values in the
-          Manufacturer Extensible Identifier (MEI) range: (0xXXXX_0000 -
+          "Step 6b: TH reads AcceptedCommandList attribute from DUT. 1.The list
+          SHALL NOT contain any additional values in the standard or scoped
+          range: (0x0000_0000 - 0x0000_00FF). 2.The list MAY contain values in
+          the Manufacturer Extensible Identifier (MEI) range: (0xXXXX_0000 -
           0xXXXX_00FF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1),
           these values SHALL be ignored.3.The list SHALL NOT contain any values
           in the Test Vendor or invalid range: (0x0000_0100 - 0x0000_FFFF),
@@ -193,7 +217,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads GeneratedCommandList from DUT"
+    - label: "Step 7a: TH reads GeneratedCommandList from DUT"
       PICS: OPCREDS.S.Afff8
       command: "readAttribute"
       attribute: "GeneratedCommandList"
@@ -203,13 +227,14 @@ tests:
               contains: [0x01, 0x03, 0x05, 0x08]
 
     - label:
-          "TH reads GeneratedCommandList attribute from DUT. 1.The list MAY
-          contain values in the Manufacturer Extensible Identifier (MEI) range:
-          (0xXXXX_0000 - 0xXXXX_00FF), where XXXX is the allowed MEI range
-          (0x0001 - 0xFFF1), these values SHALL be ignored. 2.The list SHALL NOT
-          contain any values in the Test Vendor or invalid range: (0x0000_0100 -
-          0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 -
-          0xFFFF_FFFF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
+          "Step 7b: TH reads GeneratedCommandList attribute from DUT. 1.The list
+          MAY contain values in the Manufacturer Extensible Identifier (MEI)
+          range: (0xXXXX_0000 - 0xXXXX_00FF), where XXXX is the allowed MEI
+          range (0x0001 - 0xFFF1), these values SHALL be ignored. 2.The list
+          SHALL NOT contain any values in the Test Vendor or invalid range:
+          (0x0000_0100 - 0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and
+          (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the allowed MEI range
+          (0x0001 - 0xFFF1)"
       verification: |
           ./chip-tool operationalcredentials read generated-command-list 1 0
 

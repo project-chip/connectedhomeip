@@ -21,7 +21,7 @@ import inspect
 import logging
 import sys
 from asyncio.futures import Future
-from ctypes import CFUNCTYPE, c_char_p, c_size_t, c_uint8, c_uint16, c_uint32, c_void_p, py_object
+from ctypes import CFUNCTYPE, c_bool, c_char_p, c_size_t, c_uint8, c_uint16, c_uint32, c_void_p, py_object
 from dataclasses import dataclass
 from typing import Type, Union
 
@@ -64,7 +64,8 @@ def FindCommandClusterObject(isClientSideCommand: bool, path: CommandPath):
                         if inspect.isclass(command):
                             for name, field in inspect.getmembers(command):
                                 if ('__dataclass_fields__' in name):
-                                    if (field['cluster_id'].default == path.ClusterId) and (field['command_id'].default == path.CommandId) and (field['is_client'].default == isClientSideCommand):
+                                    if (field['cluster_id'].default == path.ClusterId) and (field['command_id'].default ==
+                                                                                            path.CommandId) and (field['is_client'].default == isClientSideCommand):
                                         return eval('chip.clusters.Objects.' + clusterName + '.Commands.' + commandName)
     return None
 
@@ -105,11 +106,11 @@ class AsyncCommandTransaction:
         else:
             try:
                 self._future.set_exception(
-                    chip.interaction_model.InteractionModelError(chip.interaction_model.Status(imError.IMStatus)))
-            except Exception as e2:
+                    chip.interaction_model.InteractionModelError(chip.interaction_model.Status(imError.IMStatus), imError.ClusterStatus))
+            except Exception:
                 logger.exception("Failed to map interaction model status received: %s. Remapping to Failure." % imError)
                 self._future.set_exception(chip.interaction_model.InteractionModelError(
-                    chip.interaction_model.Status.Failure))
+                    chip.interaction_model.Status.Failure, imError.ClusterStatus))
 
     def handleError(self, status: Status, chipError: PyChipError):
         self._event_loop.call_soon_threadsafe(
@@ -126,7 +127,8 @@ _OnCommandSenderDoneCallbackFunct = CFUNCTYPE(
 
 
 @_OnCommandSenderResponseCallbackFunct
-def _OnCommandSenderResponseCallback(closure, endpoint: int, cluster: int, command: int, imStatus: int, clusterStatus: int, payload, size):
+def _OnCommandSenderResponseCallback(closure, endpoint: int, cluster: int, command: int,
+                                     imStatus: int, clusterStatus: int, payload, size):
     data = ctypes.string_at(payload, size)
     closure.handleResponse(CommandPath(endpoint, cluster, command), Status(
         imStatus, clusterStatus), data[:])
@@ -142,7 +144,30 @@ def _OnCommandSenderDoneCallback(closure):
     ctypes.pythonapi.Py_DecRef(ctypes.py_object(closure))
 
 
-def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPath: CommandPath, payload: ClusterCommand, timedRequestTimeoutMs: Union[None, int] = None, interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None) -> PyChipError:
+def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(future: Future, eventLoop, responseType, device, commandPath, payload):
+    ''' ONLY TO BE USED FOR TEST: Sends the payload with a TimedRequest flag but no TimedInvoke transaction
+    '''
+    if (responseType is not None) and (not issubclass(responseType, ClusterCommand)):
+        raise ValueError("responseType must be a ClusterCommand or None")
+
+    handle = chip.native.GetLibraryHandle()
+    transaction = AsyncCommandTransaction(future, eventLoop, responseType)
+
+    payloadTLV = payload.ToTLV()
+    ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
+    return builtins.chipStack.Call(
+        lambda: handle.pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke(
+            ctypes.py_object(transaction), device,
+            commandPath.EndpointId, commandPath.ClusterId, commandPath.CommandId, payloadTLV, len(payloadTLV),
+            ctypes.c_uint16(0),  # interactionTimeoutMs
+            ctypes.c_uint16(0),  # busyWaitMs
+            ctypes.c_bool(False)  # suppressResponse
+        ))
+
+
+def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPath: CommandPath, payload: ClusterCommand,
+                timedRequestTimeoutMs: Union[None, int] = None, interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None,
+                suppressResponse: Union[None, bool] = None) -> PyChipError:
     ''' Send a cluster-object encapsulated command to a device and does the following:
             - On receipt of a successful data response, returns the cluster-object equivalent through the provided future.
             - None (on a successful response containing no data)
@@ -172,6 +197,7 @@ def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPa
             commandPath.ClusterId, commandPath.CommandId, payloadTLV, len(payloadTLV),
             ctypes.c_uint16(0 if interactionTimeoutMs is None else interactionTimeoutMs),
             ctypes.c_uint16(0 if busyWaitMs is None else busyWaitMs),
+            ctypes.c_bool(False if suppressResponse is None else suppressResponse)
         ))
 
 
@@ -200,7 +226,9 @@ def Init():
         setter = chip.native.NativeLibraryHandleMethodArguments(handle)
 
         setter.Set('pychip_CommandSender_SendCommand',
-                   PyChipError, [py_object, c_void_p, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16])
+                   PyChipError, [py_object, c_void_p, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16, c_bool])
+        setter.Set('pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke',
+                   PyChipError, [py_object, c_void_p, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16, c_bool])
         setter.Set('pychip_CommandSender_SendGroupCommand',
                    PyChipError, [c_uint16, c_void_p, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16])
         setter.Set('pychip_CommandSender_InitCallbacks', None, [

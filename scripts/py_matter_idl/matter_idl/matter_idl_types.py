@@ -99,7 +99,12 @@ class DataType:
     name: str
 
     # Applies for strings (char or binary)
+    min_length: Optional[int] = None
     max_length: Optional[int] = None
+
+    # Applies for numbers
+    min_value: Optional[int] = None
+    max_value: Optional[int] = None
 
 
 @dataclass

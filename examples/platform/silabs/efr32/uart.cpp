@@ -28,7 +28,9 @@ extern "C" {
 #include "assert.h"
 #include "em_core.h"
 #include "em_usart.h"
+#ifdef SL_BOARD_NAME
 #include "sl_board_control.h"
+#endif
 #include "sl_uartdrv_instances.h"
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
 #include "sl_uartdrv_eusart_vcom_config.h"
@@ -252,7 +254,9 @@ void uartConsoleInit(void)
         return;
     }
 
+#ifdef SL_BOARD_NAME
     sl_board_enable_vcom();
+#endif
     // Init a fifo for the data received on the uart
     InitFifo(&sReceiveFifo, sRxFifoBuffer, MAX_BUFFER_SIZE);
 
@@ -474,9 +478,9 @@ void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes)
 #if (defined(EFR32MG24) && defined(WF200_WIFI))
     // Blocking transmit for the MG24 + WF200 since UART TX is multiplexed with
     // WF200 SPI IRQ
-    pre_uart_transfer();
+    sl_wfx_host_pre_uart_transfer();
     UARTDRV_ForceTransmit(vcom_handle, (uint8_t *) buffer, nbOfBytes);
-    post_uart_transfer();
+    sl_wfx_host_post_uart_transfer();
 #else
     // Non Blocking Transmit
     UARTDRV_Transmit(vcom_handle, (uint8_t *) buffer, nbOfBytes, UART_tx_callback);

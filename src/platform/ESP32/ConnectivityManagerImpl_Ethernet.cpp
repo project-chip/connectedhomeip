@@ -30,6 +30,7 @@
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 #include <platform/internal/BLEManager.h>
 
+#include "esp_eth_com.h"
 #include "esp_event.h"
 #include "esp_netif.h"
 #include "esp_wifi.h"

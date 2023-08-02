@@ -175,6 +175,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRTimeSynchronizationClusterSetTimeZoneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::TimeSynchronization::Commands::SetTimeZoneResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTROperationalCredentialsClusterAttestationResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
@@ -217,45 +224,46 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRModeSelectClusterChangeToModeResponseParams (InternalMethods)
+@interface MTRICDManagementClusterRegisterClientResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::ModeSelect::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
+    (const chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType &)decodableStruct;
 
 @end
 
-@interface MTRLaundryWasherModeSelectClusterChangeToModeResponseParams (InternalMethods)
+@interface MTRLaundryWasherModeClusterChangeToModeResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::LaundryWasherModeSelect::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
+    (const chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
 
 @end
 
-@interface MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseParams (InternalMethods)
+@interface MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::
-                                                    Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::DecodableType &)
+        decodableStruct;
 
 @end
 
-@interface MTRRVCRunModeSelectClusterChangeToModeResponseParams (InternalMethods)
+@interface MTRRVCRunModeClusterChangeToModeResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::RvcRunModeSelect::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
+    (const chip::app::Clusters::RvcRunMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
 
 @end
 
-@interface MTRRVCCleanModeSelectClusterChangeToModeResponseParams (InternalMethods)
+@interface MTRRVCCleanModeClusterChangeToModeResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::RvcCleanModeSelect::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
+    (const chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
 
 @end
 
-@interface MTRDishwasherModeSelectClusterChangeToModeResponseParams (InternalMethods)
+@interface MTRDishwasherModeClusterChangeToModeResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::DishwasherModeSelect::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
+    (const chip::app::Clusters::DishwasherMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
 
 @end
 
@@ -263,6 +271,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
     (const chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRRVCOperationalStateClusterOperationalCommandResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct;
 
 @end
 

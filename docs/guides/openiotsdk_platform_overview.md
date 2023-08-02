@@ -66,14 +66,12 @@ Configuration of Mbed TLS is in
 
 ## Storage
 
-Storage in Open IoT SDK is provided by
-[TDBStore](https://gitlab.arm.com/iot/open-iot-sdk/storage) which is a simple
-key-value storage over a block device.
-
-If the application uses
-[Trusted Firmware-M](https://tf-m-user-guide.trustedfirmware.org) then
+The application uses
+[Trusted Firmware-M](https://tf-m-user-guide.trustedfirmware.org) and
 [TF-M Protected Storage Service](https://tf-m-user-guide.trustedfirmware.org/integration_guide/services/tfm_ps_integration_guide.html)
-can be used as an alternative for persistence in secure memory.
+is used for persistence in secure memory. The `key-value` objects are stored in
+a secure part of flash memory and the Protected Storage Service takes care of
+their encryption and authentication.
 
 ---
 

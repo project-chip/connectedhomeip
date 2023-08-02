@@ -31,7 +31,7 @@
 #include <platform/DeviceControlServer.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-#include <trace/trace.h>
+#include <tracing/macros.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -243,7 +243,7 @@ void Instance::OnNetworkingStatusChange(NetworkCommissioning::Status aCommission
 
 void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetworks::DecodableType & req)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandleScanNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE("HandleScanNetwork", "NetworkCommissioning");
     if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
     {
         ByteSpan ssid;
@@ -315,7 +315,7 @@ bool CheckFailSafeArmed(CommandHandlerInterface::HandlerContext & ctx)
 
 void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands::AddOrUpdateWiFiNetwork::DecodableType & req)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandleAddOrUpdateWiFiNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE("HandleAddOrUpdateWiFiNetwork", "NetworkCommissioning");
 
     VerifyOrReturn(CheckFailSafeArmed(ctx));
 
@@ -373,7 +373,7 @@ void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands
 
 void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Commands::AddOrUpdateThreadNetwork::DecodableType & req)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandleAddOrUpdateThreadNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE("HandleAddOrUpdateThreadNetwork", "NetworkCommissioning");
 
     VerifyOrReturn(CheckFailSafeArmed(ctx));
 
@@ -410,7 +410,7 @@ void Instance::CommitSavedBreadcrumb()
 
 void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveNetwork::DecodableType & req)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandleRemoveNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE("HandleRemoveNetwork", "NetworkCommissioning");
 
     VerifyOrReturn(CheckFailSafeArmed(ctx));
 
@@ -432,7 +432,7 @@ void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveN
 
 void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::ConnectNetwork::DecodableType & req)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandleConnectNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE("HandleConnectNetwork", "NetworkCommissioning");
     if (req.networkID.size() > DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidValue);
@@ -450,7 +450,7 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
 
 void Instance::HandleReorderNetwork(HandlerContext & ctx, const Commands::ReorderNetwork::DecodableType & req)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandleReorderNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE("HandleReorderNetwork", "NetworkCommissioning");
     Commands::NetworkConfigResponse::Type response;
     MutableCharSpan debugText;
 #if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
@@ -542,62 +542,67 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
     SuccessOrExit(err = writer->StartContainer(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kThreadScanResults),
                                                TLV::TLVType::kTLVType_Array, listContainerType));
 
-    VerifyOrExit(scanResponseArray.Alloc(chip::min(networks->Count(), kMaxNetworksInScanResponse)), err = CHIP_ERROR_NO_MEMORY);
-    for (; networks != nullptr && networks->Next(scanResponse);)
+    // If no network was found, we encode an empty list, don't call a zero-sized alloc.
+    if (networks->Count() > 0)
     {
-        if ((scanResponseArrayLength == kMaxNetworksInScanResponse) &&
-            (scanResponseArray[scanResponseArrayLength - 1].rssi > scanResponse.rssi))
+        VerifyOrExit(scanResponseArray.Alloc(chip::min(networks->Count(), kMaxNetworksInScanResponse)), err = CHIP_ERROR_NO_MEMORY);
+        for (; networks != nullptr && networks->Next(scanResponse);)
         {
-            continue;
-        }
+            if ((scanResponseArrayLength == kMaxNetworksInScanResponse) &&
+                (scanResponseArray[scanResponseArrayLength - 1].rssi > scanResponse.rssi))
+            {
+                continue;
+            }
 
-        bool isDuplicated = false;
+            bool isDuplicated = false;
+
+            for (size_t i = 0; i < scanResponseArrayLength; i++)
+            {
+                if ((scanResponseArray[i].panId == scanResponse.panId) &&
+                    (scanResponseArray[i].extendedPanId == scanResponse.extendedPanId))
+                {
+                    if (scanResponseArray[i].rssi < scanResponse.rssi)
+                    {
+                        scanResponseArray[i] = scanResponseArray[--scanResponseArrayLength];
+                    }
+                    else
+                    {
+                        isDuplicated = true;
+                    }
+                    break;
+                }
+            }
+
+            if (isDuplicated)
+            {
+                continue;
+            }
+
+            if (scanResponseArrayLength < kMaxNetworksInScanResponse)
+            {
+                scanResponseArrayLength++;
+            }
+            scanResponseArray[scanResponseArrayLength - 1] = scanResponse;
+            Sorting::InsertionSort(
+                scanResponseArray.Get(), scanResponseArrayLength,
+                [](const ThreadScanResponse & a, const ThreadScanResponse & b) -> bool { return a.rssi > b.rssi; });
+        }
 
         for (size_t i = 0; i < scanResponseArrayLength; i++)
         {
-            if ((scanResponseArray[i].panId == scanResponse.panId) &&
-                (scanResponseArray[i].extendedPanId == scanResponse.extendedPanId))
-            {
-                if (scanResponseArray[i].rssi < scanResponse.rssi)
-                {
-                    scanResponseArray[i] = scanResponseArray[--scanResponseArrayLength];
-                }
-                else
-                {
-                    isDuplicated = true;
-                }
-                break;
-            }
+            Structs::ThreadInterfaceScanResultStruct::Type result;
+            Encoding::BigEndian::Put64(extendedAddressBuffer, scanResponseArray[i].extendedAddress);
+            result.panId           = scanResponseArray[i].panId;
+            result.extendedPanId   = scanResponseArray[i].extendedPanId;
+            result.networkName     = CharSpan(scanResponseArray[i].networkName, scanResponseArray[i].networkNameLen);
+            result.channel         = scanResponseArray[i].channel;
+            result.version         = scanResponseArray[i].version;
+            result.extendedAddress = ByteSpan(extendedAddressBuffer);
+            result.rssi            = scanResponseArray[i].rssi;
+            result.lqi             = scanResponseArray[i].lqi;
+
+            SuccessOrExit(err = DataModel::Encode(*writer, TLV::AnonymousTag(), result));
         }
-
-        if (isDuplicated)
-        {
-            continue;
-        }
-
-        if (scanResponseArrayLength < kMaxNetworksInScanResponse)
-        {
-            scanResponseArrayLength++;
-        }
-        scanResponseArray[scanResponseArrayLength - 1] = scanResponse;
-        Sorting::InsertionSort(scanResponseArray.Get(), scanResponseArrayLength,
-                               [](const ThreadScanResponse & a, const ThreadScanResponse & b) -> bool { return a.rssi > b.rssi; });
-    }
-
-    for (size_t i = 0; i < scanResponseArrayLength; i++)
-    {
-        Structs::ThreadInterfaceScanResultStruct::Type result;
-        Encoding::BigEndian::Put64(extendedAddressBuffer, scanResponseArray[i].extendedAddress);
-        result.panId           = scanResponseArray[i].panId;
-        result.extendedPanId   = scanResponseArray[i].extendedPanId;
-        result.networkName     = CharSpan(scanResponseArray[i].networkName, scanResponseArray[i].networkNameLen);
-        result.channel         = scanResponseArray[i].channel;
-        result.version         = scanResponseArray[i].version;
-        result.extendedAddress = ByteSpan(extendedAddressBuffer);
-        result.rssi            = scanResponseArray[i].rssi;
-        result.lqi             = scanResponseArray[i].lqi;
-
-        SuccessOrExit(err = DataModel::Encode(*writer, TLV::AnonymousTag(), result));
     }
 
     SuccessOrExit(err = writer->EndContainer(listContainerType));

@@ -37,7 +37,7 @@ _CHEF_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 _REPO_BASE_PATH = os.path.join(_CHEF_SCRIPT_PATH, "../../")
 _DEVICE_FOLDER = os.path.join(_CHEF_SCRIPT_PATH, "devices")
 _DEVICE_LIST = [file[:-4]
-                for file in os.listdir(_DEVICE_FOLDER) if file.endswith(".zap")]
+                for file in os.listdir(_DEVICE_FOLDER) if file.endswith(".zap") and file != 'template.zap']
 _CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_config.json")
 _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
 
@@ -75,6 +75,8 @@ def load_config() -> None:
                     "for the vendor's SDK")
         configStream = open(configFile, 'w')
         config["nrfconnect"]["ZEPHYR_BASE"] = os.environ.get('ZEPHYR_BASE')
+        config["nrfconnect"]["ZEPHYR_SDK_INSTALL_DIR"] = os.environ.get(
+            'ZEPHYR_SDK_INSTALL_DIR')
         config["nrfconnect"]["TTY"] = None
         config["esp32"]["IDF_PATH"] = os.environ.get('IDF_PATH')
         config["esp32"]["TTY"] = None
@@ -262,7 +264,7 @@ def main() -> int:
     # Arguments parser
     #
 
-    deviceTypes = "\n  ".join(_DEVICE_LIST)
+    deviceTypes = "\n            ".join(_DEVICE_LIST)
 
     usage = textwrap.dedent(f"""\
         usage: chef.py [options]
@@ -308,11 +310,11 @@ def main() -> int:
     parser.add_option("-t", "--target", type='choice',
                       action='store',
                       dest="build_target",
-                      help="specifies target platform. Default is esp32. See info below for currently supported target platforms",
+                      help="specifies target platform. See info below for currently supported target platforms",
                       choices=['nrfconnect', 'esp32',
                                'linux', 'silabs-thread', 'ameba'],
                       metavar="TARGET",
-                      default="esp32")
+                      default="linux")
     parser.add_option("-r", "--rpc",
                       help=("enables Pigweed RPC interface. Enabling RPC disables the shell interface. "
                             "Your sdkconfig configurations will be reverted to default. Default is PW RPC off. "
@@ -374,9 +376,6 @@ def main() -> int:
                 flush_print(
                     f"{device_name} in CICD config but not {_DEVICE_FOLDER}!")
                 exit(1)
-            if options.build_target == "nrfconnect":
-                shell.run_cmd(
-                    "export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
             command = f"./chef.py -cbr -d {device_name} -t {options.build_target}"
             flush_print(f"Building {command}", with_border=True)
@@ -412,8 +411,6 @@ def main() -> int:
                     command += " ".join(args)
                     flush_print(f"Building {command}", with_border=True)
                     shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
-                    shell.run_cmd(
-                        "export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
                     try:
                         shell.run_cmd(command)
                     except RuntimeError as build_fail_error:
@@ -469,11 +466,33 @@ def main() -> int:
     elif options.build_target == "nrfconnect":
         if config['nrfconnect']['ZEPHYR_BASE'] is None:
             flush_print(
-                'Path for nrfconnect SDK was not found. Make sure nrfconnect.ZEPHYR_BASE is set on your config.yaml file')
+                'The path for nrfconnect SDK was not found. Make sure nrfconnect.ZEPHYR_BASE is set on your config.yaml file. This is typically <NCS INSTALL PATH>/ncs/vX.X.X/zephyr')
             exit(1)
+        if config['nrfconnect']['ZEPHYR_SDK_INSTALL_DIR'] is None:
+            flush_print(
+                'The path for nrfconnect toolchain was not found. Make sure nrfconnect.ZEPHYR_SDK_INSTALL_DIR is set on your config.yaml file. This is typically <NCS INSTALL PATH>/ncs/toolchains/vX.X.X/opt/zephyr-sdk')
+            exit(1)
+        zephyr_sdk_dir = config['nrfconnect']['ZEPHYR_SDK_INSTALL_DIR']
+        shell.run_cmd("export ZEPHYR_TOOLCHAIN_VARIANT=zephyr")
+        shell.run_cmd(f"export ZEPHYR_SDK_INSTALL_DIR={zephyr_sdk_dir}")
+        shell.run_cmd(
+            f"export ZEPHYR_BASE={config['nrfconnect']['ZEPHYR_BASE']}")
         shell.run_cmd(
             f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/zephyr-env.sh')
-        shell.run_cmd("export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb")
+        # QUIRK:
+        # When the Zephyr SDK is installed as a part of the NCS toolchain, the build system will use
+        # build tools from the NCS toolchain, but it will not update the PATH and LD_LIBRARY_PATH
+        # and hence the build will fail. This ideally, should be handled automatically by the NCS
+        # build system but until it is fixed, set the variables manually.
+        ncs_toolchain_dir = os.path.abspath(f"{zephyr_sdk_dir}/../..")
+        if os.path.exists(os.path.join(ncs_toolchain_dir, 'manifest.json')):
+            shell.run_cmd(f"export PATH=$PATH:{ncs_toolchain_dir}/usr/bin")
+            shell.run_cmd(
+                f"export PATH=$PATH:{ncs_toolchain_dir}/usr/local/bin")
+            shell.run_cmd(
+                f"export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{ncs_toolchain_dir}/usr/lib")
+            shell.run_cmd(
+                f"export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{ncs_toolchain_dir}/usr/local/lib")
     elif options.build_target == "linux":
         pass
     elif options.build_target == "silabs-thread":
@@ -545,8 +564,6 @@ def main() -> int:
         shell.run_cmd(
             f"{_REPO_BASE_PATH}/scripts/tools/zap/generate.py "
             f"{_CHEF_SCRIPT_PATH}/devices/{options.sample_device_type_name}.zap -o {gen_dir}")
-        # af-gen-event.h is not generated
-        shell.run_cmd(f"touch {gen_dir}/af-gen-event.h")
 
     #
     # Setup environment

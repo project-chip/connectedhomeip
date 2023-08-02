@@ -46,8 +46,8 @@ public:
     /// any broadcast filtering. Intent is for paths such as:
     ///   - boot time advertisement: advertise all services available
     ///   - stop-time advertisement: advertise a TTL of 0 as services are removed
-    bool IsInternalBroadcast() const { return mIsInternalBroadcast; }
-    void SetIsInternalBroadcast(bool isInternalBroadcast) { mIsInternalBroadcast = isInternalBroadcast; }
+    bool IsAnnounceBroadcast() const { return mIsAnnounceBroadcast; }
+    void SetIsAnnounceBroadcast(bool isAnnounceBroadcast) { mIsAnnounceBroadcast = isAnnounceBroadcast; }
 
     SerializedQNameIterator GetName() const { return mNameIterator; }
 
@@ -69,7 +69,7 @@ private:
 
     /// Flag as an internal broadcast, controls reply construction (e.g. no
     /// filtering applied)
-    bool mIsInternalBroadcast = false;
+    bool mIsAnnounceBroadcast = false;
 };
 
 class ResourceData

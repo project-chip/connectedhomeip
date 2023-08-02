@@ -37,9 +37,6 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/DefaultSessionKeystore.h>
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
@@ -62,8 +59,6 @@
 #include <credentials/tests/CHIPAttCert_test_vectors.h>
 #include <credentials/tests/CHIPCert_test_vectors.h>
 
-#define HSM_ECC_KEYID 0x11223344
-
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
 #include <lib/core/TLV.h>
@@ -84,40 +79,11 @@ using namespace chip::TLV;
 
 namespace {
 
-#ifdef ENABLE_HSM_EC_KEY
-class Test_P256Keypair : public P256KeypairHSM
-{
-public:
-    Test_P256Keypair() { SetKeyId(HSM_ECC_KEYID); }
-    Test_P256Keypair(uint32_t keyId) { SetKeyId(keyId); }
-};
-#else
 using Test_P256Keypair                  = P256Keypair;
-#endif
-
-#ifdef ENABLE_HSM_SPAKE
-using TestSpake2p_P256_SHA256_HKDF_HMAC = Spake2pHSM_P256_SHA256_HKDF_HMAC;
-#else
 using TestSpake2p_P256_SHA256_HKDF_HMAC = Spake2p_P256_SHA256_HKDF_HMAC;
-#endif
-
-#ifdef ENABLE_HSM_PBKDF2
-using TestPBKDF2_sha256 = PBKDF2_sha256HSM;
-#else
 using TestPBKDF2_sha256                 = PBKDF2_sha256;
-#endif
-
-#ifdef ENABLE_HSM_HKDF
-using TestHKDF_sha = HKDF_shaHSM;
-#else
 using TestHKDF_sha                      = HKDF_sha;
-#endif
-
-#ifdef ENABLE_HSM_HMAC
-using TestHMAC_sha = HMAC_shaHSM;
-#else
 using TestHMAC_sha                      = HMAC_sha;
-#endif
 
 // Helper class to verify that all mbedTLS heap objects are released at the end of a test.
 #if CHIP_CRYPTO_MBEDTLS && defined(MBEDTLS_MEMORY_DEBUG)
@@ -155,6 +121,8 @@ public:
     explicit HeapChecker(nlTestSuite *) {}
 };
 #endif
+
+#include "DacValidationExplicitVectors.h"
 
 } // namespace
 
@@ -1043,11 +1011,7 @@ static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
     Test_P256Keypair keypair1;
     NL_TEST_ASSERT(inSuite, keypair1.Initialize(ECPKeyTarget::ECDH) == CHIP_NO_ERROR);
 
-#ifdef ENABLE_HSM_EC_KEY
-    Test_P256Keypair keypair2(HSM_ECC_KEYID + 1);
-#else
     Test_P256Keypair keypair2;
-#endif
     NL_TEST_ASSERT(inSuite, keypair2.Initialize(ECPKeyTarget::ECDH) == CHIP_NO_ERROR);
 
     P256ECDHDerivedSecret out_secret1;
@@ -1662,12 +1626,7 @@ static void TestSPAKE2P_spake2p_PointIsValid(nlTestSuite * inSuite, void * inCon
 
 // We need to "generate" specific field elements
 // to do so we need to override the specific method
-class Test_Spake2p_P256_SHA256_HKDF_HMAC :
-#ifdef ENABLE_HSM_SPAKE
-    public Spake2pHSM_P256_SHA256_HKDF_HMAC
-#else
-    public Spake2p_P256_SHA256_HKDF_HMAC
-#endif
+class Test_Spake2p_P256_SHA256_HKDF_HMAC : public Spake2p_P256_SHA256_HKDF_HMAC
 {
 public:
     CHIP_ERROR TestSetFE(const uint8_t * fe_in, size_t fe_in_len)
@@ -1956,14 +1915,26 @@ static void TestX509_VerifyAttestationCertificateFormat(nlTestSuite * inSuite, v
         {  ByteSpan(),                                    Crypto::AttestationCertType::kDAC, CHIP_ERROR_INVALID_ARGUMENT },
         {  sTestCert_PAI_FFF2_NoPID_FB_Cert,              Crypto::AttestationCertType::kDAC, CHIP_ERROR_INTERNAL         },
         {  sTestCert_DAC_FFF2_8006_0025_ValInFuture_Cert, Crypto::AttestationCertType::kPAA, CHIP_ERROR_INTERNAL         },
+        {  ByteSpan{kPaaWithNoPathlen},                   Crypto::AttestationCertType::kPAA, CHIP_NO_ERROR               },
+        {  ByteSpan{kPaiPathLenMissing},                  Crypto::AttestationCertType::kPAI, CHIP_ERROR_INTERNAL         },
+        {  ByteSpan{kPaiPathLen1},                        Crypto::AttestationCertType::kPAI, CHIP_ERROR_INTERNAL         },
+        {  ByteSpan{kPaaPathLen2},                        Crypto::AttestationCertType::kPAA, CHIP_ERROR_INTERNAL         },
+        {  ByteSpan{kWrongPathLenFormat},                 Crypto::AttestationCertType::kPAI, CHIP_ERROR_INTERNAL         },
     };
     // clang-format on
 
+    int case_idx = 0;
     for (auto & testCase : sValidationTestCases)
     {
         ByteSpan cert  = testCase.cert;
         CHIP_ERROR err = VerifyAttestationCertificateFormat(cert, testCase.type);
+        if (err != testCase.expectedError)
+        {
+            ChipLogError(Crypto, "Failed TestX509_VerifyAttestationCertificateFormat sub-case %d, err: %" CHIP_ERROR_FORMAT,
+                         case_idx, err.Format());
+        }
         NL_TEST_ASSERT(inSuite, err == testCase.expectedError);
+        ++case_idx;
     }
 }
 
@@ -2132,6 +2103,124 @@ static void TestAKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
         err = ExtractAKIDFromX509Cert(cert, akidOut);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, akidSpan.data_equal(akidOut));
+    }
+}
+
+static void TestCDPExtension_x509Extraction(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace TestCerts;
+
+    HeapChecker heapChecker(inSuite);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    struct CDPTestCase
+    {
+        ByteSpan Cert;
+        CHIP_ERROR mExpectedError;
+        CharSpan mExpectedResult;
+    };
+
+    constexpr const char * exampleHttpURI  = "http://example.com/crl.pem";
+    constexpr const char * exampleHttpsURI = "https://example.com/crl.pem";
+    CharSpan httpSpan                      = CharSpan::fromCharString(exampleHttpURI);
+    CharSpan httpsSpan                     = CharSpan::fromCharString(exampleHttpsURI);
+
+    // clang-format off
+    static CDPTestCase sCDPTestCases[] = {
+        // Cert                                                             Expected Error               Expected Output
+        // ==============================================================================================================
+        {  ByteSpan(),                                                      CHIP_ERROR_INVALID_ARGUMENT, CharSpan() },
+        {  sTestCert_PAA_FFF1_Cert,                                         CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_PAI_FFF2_8001_Cert,                                    CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF2_8003_0019_FB_Cert,                            CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Cert,                           CHIP_NO_ERROR,               httpSpan   },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_Cert,                     CHIP_NO_ERROR,               httpsSpan  },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_Cert,                     CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_Cert,                      CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert,                         CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_Cert,              CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Long_Cert,                      CHIP_ERROR_BUFFER_TOO_SMALL, CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_Cert,         CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_Cert,    CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_Cert,  CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_Cert,      CHIP_NO_ERROR,               httpsSpan  },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_Cert,           CHIP_NO_ERROR,               httpsSpan  },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_Cert,          CHIP_NO_ERROR,               httpsSpan  },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Cert,      CHIP_NO_ERROR,               httpsSpan  },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_Cert, CHIP_ERROR_BUFFER_TOO_SMALL, CharSpan() },
+    };
+    // clang-format on
+
+    for (auto & testCase : sCDPTestCases)
+    {
+        char cdpBuf[kMaxCRLDistributionPointURLLength] = { '\0' };
+        MutableCharSpan cdp(cdpBuf);
+        err = ExtractCRLDistributionPointURIFromX509Cert(testCase.Cert, cdp);
+        NL_TEST_ASSERT(inSuite, err == testCase.mExpectedError);
+        if (testCase.mExpectedError == CHIP_NO_ERROR)
+        {
+            NL_TEST_ASSERT(inSuite, cdp.size() == testCase.mExpectedResult.size());
+            NL_TEST_ASSERT(inSuite, cdp.data_equal(testCase.mExpectedResult));
+        }
+    }
+}
+
+static void TestCDPCRLIssuerExtension_x509Extraction(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace TestCerts;
+
+    HeapChecker heapChecker(inSuite);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    struct CDPTestCase
+    {
+        ByteSpan Cert;
+        CHIP_ERROR mExpectedError;
+        ByteSpan mCRLIssuerCert;
+    };
+
+    // clang-format off
+    static CDPTestCase sCDPTestCases[] = {
+        // Cert                                                             Expected Error               Expected CRL Issuer Cert
+        // =======================================================================================================================
+        {  ByteSpan(),                                                      CHIP_ERROR_INVALID_ARGUMENT, ByteSpan() },
+        {  sTestCert_PAA_FFF1_Cert,                                         CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_PAI_FFF2_8001_Cert,                                    CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF2_8003_0019_FB_Cert,                            CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Cert,                           CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_Cert,                     CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_Cert,                     CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_Cert,                      CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert,                         CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_Cert,              CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Long_Cert,                      CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_Cert,         CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_Cert,    CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_Cert,  CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_Cert,      CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_Cert,           CHIP_NO_ERROR,               sTestCert_PAA_FFF1_Cert },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_Cert,          CHIP_NO_ERROR,               sTestCert_PAA_NoVID_Cert },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Cert,      CHIP_NO_ERROR,               sTestCert_PAI_FFF2_8004_FB_Cert },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_Cert, CHIP_NO_ERROR,               sTestCert_PAI_FFF2_8004_FB_Cert },
+    };
+    // clang-format on
+
+    for (auto & testCase : sCDPTestCases)
+    {
+        uint8_t crlIssuerBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
+        MutableByteSpan crlIssuer(crlIssuerBuf);
+        err = ExtractCDPExtensionCRLIssuerFromX509Cert(testCase.Cert, crlIssuer);
+        NL_TEST_ASSERT(inSuite, err == testCase.mExpectedError);
+        if (testCase.mExpectedError == CHIP_NO_ERROR)
+        {
+            uint8_t crlIssuerSubjectBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
+            MutableByteSpan crlIssuerSubject(crlIssuerSubjectBuf);
+
+            err = ExtractSubjectFromX509Cert(testCase.mCRLIssuerCert, crlIssuerSubject);
+            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+            NL_TEST_ASSERT(inSuite, crlIssuer.data_equal(crlIssuerSubject));
+        }
     }
 }
 
@@ -2732,6 +2821,8 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test x509 Certificate Timestamp Validation", TestX509_IssuingTimestampValidation),
     NL_TEST_DEF("Test Subject Key Id Extraction from x509 Certificate", TestSKID_x509Extraction),
     NL_TEST_DEF("Test Authority Key Id Extraction from x509 Certificate", TestAKID_x509Extraction),
+    NL_TEST_DEF("Test CRL Distribution Point Extension Extraction from x509 Certificate", TestCDPExtension_x509Extraction),
+    NL_TEST_DEF("Test CDP Extension CRL Issuer Extraction from x509 Certificate", TestCDPCRLIssuerExtension_x509Extraction),
     NL_TEST_DEF("Test Serial Number Extraction from x509 Certificate", TestSerialNumber_x509Extraction),
     NL_TEST_DEF("Test Subject Extraction from x509 Certificate", TestSubject_x509Extraction),
     NL_TEST_DEF("Test Issuer Extraction from x509 Certificate", TestIssuer_x509Extraction),

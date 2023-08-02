@@ -492,9 +492,11 @@ private:
     uint64_t mTransferGeneration = 0;
 };
 
+namespace {
 BdxOTASender gOtaSender;
 
-static NSInteger const kOtaProviderEndpoint = 0;
+NSInteger const kOtaProviderEndpoint = 0;
+} // anonymous namespace
 
 MTROTAProviderDelegateBridge::MTROTAProviderDelegateBridge(id<MTROTAProviderDelegate> delegate)
     : mDelegate(delegate)

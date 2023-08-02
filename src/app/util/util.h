@@ -20,6 +20,7 @@
 #include <inttypes.h>
 
 #include <app/util/af-types.h>
+#include <app/util/endpoint-config-api.h>
 
 // Cluster name structure
 typedef struct
@@ -41,8 +42,6 @@ uint16_t emberAfFindClusterNameIndex(chip::ClusterId cluster);
  * up to 4 bytes.
  */
 EmberAfDifferenceType emberAfGetDifference(uint8_t * pData, EmberAfDifferenceType value, uint8_t dataSize);
-
-bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
 /* @brief returns true if the attribute is known to be volatile (i.e. RAM
  * storage).

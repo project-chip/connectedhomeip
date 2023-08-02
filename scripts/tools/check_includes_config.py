@@ -153,5 +153,9 @@ ALLOW: Dict[str, Set[str]] = {
     # of a list of discovered things.
     'src/controller/SetUpCodePairer.h': {'deque'},
 
-    'src/controller/ExamplePersistentStorage.cpp': {'fstream'}
+    'src/controller/ExamplePersistentStorage.cpp': {'fstream'},
+
+    # Library meant for non-embedded
+    'src/tracing/json/json_tracing.cpp': {'string', 'sstream'},
+    'src/tracing/json/json_tracing.h': {'fstream'},
 }

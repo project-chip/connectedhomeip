@@ -48,6 +48,7 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
 
 typedef uint8_t EmberAfClusterMask;
@@ -65,6 +66,8 @@ ClusterId clusters[]      = { MockClusterId(1), MockClusterId(2), MockClusterId(
                          MockClusterId(1), MockClusterId(2), MockClusterId(3), MockClusterId(4) };
 uint16_t attributeIndex[] = { 0, 2, 5, 7, 11, 16, 19, 25, 27 };
 uint16_t attributeCount[] = { 2, 3, 2, 4, 5, 3, 6, 2, 2 };
+uint16_t eventIndex[]     = { 0, 2, 2, 2, 2, 2, 2, 2, 2 };
+uint16_t eventCount[]     = { 2, 0, 0, 0, 0, 0, 0, 0, 0 };
 AttributeId attributes[]  = {
     // clang-format off
     Clusters::Globals::Attributes::ClusterRevision::Id, Clusters::Globals::Attributes::FeatureMap::Id,
@@ -77,6 +80,10 @@ AttributeId attributes[]  = {
     Clusters::Globals::Attributes::ClusterRevision::Id, Clusters::Globals::Attributes::FeatureMap::Id,
     Clusters::Globals::Attributes::ClusterRevision::Id, Clusters::Globals::Attributes::FeatureMap::Id
     // clang-format on
+};
+EventId events[] = {
+    MockEventId(1),
+    MockEventId(2),
 };
 
 uint16_t mockClusterRevision = 1;
@@ -93,6 +100,32 @@ uint8_t mockAttribute4[256]  = {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+};
+
+#define MOCK_CLUSTER_DECL(idx)                                                                                                     \
+    {                                                                                                                              \
+        .clusterId = clusters[idx], .attributes = nullptr,                                     /* Not used for now. */             \
+            .attributeCount = attributeCount[idx], .clusterSize = 0,                           /* Not used for now. */             \
+            .mask = CLUSTER_MASK_SERVER, .functions = nullptr, .acceptedCommandList = nullptr, /* Not used for now */              \
+            .generatedCommandList = nullptr,                                                   /* Not used for now */              \
+            .eventList = &events[eventIndex[idx]], .eventCount = eventCount[idx],                                                  \
+    }
+
+EmberAfCluster clusterStructs[] = {
+    MOCK_CLUSTER_DECL(0), MOCK_CLUSTER_DECL(1), MOCK_CLUSTER_DECL(2), MOCK_CLUSTER_DECL(3), MOCK_CLUSTER_DECL(4),
+    MOCK_CLUSTER_DECL(5), MOCK_CLUSTER_DECL(6), MOCK_CLUSTER_DECL(7), MOCK_CLUSTER_DECL(8),
+};
+
+#define MOCK_ENDPOINT_DECL(idx)                                                                                                    \
+    {                                                                                                                              \
+        .cluster = &clusterStructs[clusterIndex[idx]], .clusterCount = clusterCount[idx],                                          \
+        .endpointSize = 0, /* Not used for now */                                                                                  \
+    }
+
+EmberAfEndpointType endpointStructs[] = {
+    MOCK_ENDPOINT_DECL(0),
+    MOCK_ENDPOINT_DECL(1),
+    MOCK_ENDPOINT_DECL(2),
 };
 
 } // namespace
@@ -116,7 +149,7 @@ uint16_t emberAfIndexFromEndpoint(chip::EndpointId endpoint)
     return UINT16_MAX;
 }
 
-uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
+uint8_t emberAfGetClusterCountForEndpoint(chip::EndpointId endpoint)
 {
     for (size_t i = 0; i < ArraySize(endpoints); i++)
     {
@@ -126,6 +159,11 @@ uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
         }
     }
     return 0;
+}
+
+uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
+{
+    return emberAfGetClusterCountForEndpoint(endpoint);
 }
 
 uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpoint, chip::ClusterId cluster)
@@ -279,7 +317,37 @@ bool emberAfContainsServerFromIndex(uint16_t index, ClusterId clusterId)
         return false;
     }
 
-    return clusterId; // Mock version return true as long as the endpoint is valid
+    return clusterId; // Mock version return true as long as the endpoint is
+                      // valid
+}
+
+const EmberAfEndpointType * emberAfFindEndpointType(EndpointId endpointId)
+{
+    uint16_t ep = emberAfIndexFromEndpoint(endpointId);
+    if (ep == UINT16_MAX)
+    {
+        return nullptr;
+    }
+    return &endpointStructs[ep];
+}
+
+const EmberAfCluster * emberAfFindServerCluster(EndpointId endpoint, ClusterId clusterId)
+{
+    auto * endpointType = emberAfFindEndpointType(endpoint);
+    if (endpointType == nullptr)
+    {
+        return nullptr;
+    }
+
+    for (decltype(endpointType->clusterCount) idx = 0; idx < endpointType->clusterCount; ++idx)
+    {
+        auto * cluster = &endpointType->cluster[idx];
+        if (cluster->clusterId == clusterId && (cluster->mask & CLUSTER_MASK_SERVER))
+        {
+            return cluster;
+        }
+    }
+    return nullptr;
 }
 
 namespace chip {

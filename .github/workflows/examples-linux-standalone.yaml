@@ -25,76 +25,46 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    # XXX: Workaround for https://github.com/actions/cache/issues/1141
-    SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
-
+    
 jobs:
     linux_standalone:
         name: Linux Standalone
-        timeout-minutes: 90
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.7.3
+            image: ghcr.io/project-chip/chip-build:1
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
+                platform: linux
 
             - name: Set up environment for size reports
+              uses: ./.github/actions/setup-size-reports
               if: ${{ !env.ACT }}
-              env:
-                  GH_CONTEXT: ${{ toJson(github) }}
-              run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
-
-            - name: Bootstrap cache
-              uses: actions/cache@v3
-              timeout-minutes: 10
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: bash scripts/bootstrap.sh
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v3
-              if: ${{ always() && !env.ACT }}
-              with:
-                  name: bootstrap-logs
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
+                gh-context: ${{ toJson(github) }}
 
             - name: Build Standalone cert tool
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-cert \
                         build"
             - name: Build minmdns example with platform dns
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-address-resolve-tool-platform-mdns-ipv6only \
                         build"
-            - name: Build example Standalone Echo Client
-              timeout-minutes: 10
+            - name: Build example Standalone chip tool
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -105,7 +75,6 @@ jobs:
                     out/linux-x64-chip-tool/chip-tool \
                     /tmp/bloat_reports/
             - name: Build example Standalone Shell
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -116,7 +85,6 @@ jobs:
                     out/linux-x64-shell/chip-shell \
                     /tmp/bloat_reports/
             - name: Build example Standalone All Clusters Server
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -126,8 +94,9 @@ jobs:
                     linux debug all-clusters-app \
                     out/linux-x64-all-clusters/chip-all-clusters-app \
                     /tmp/bloat_reports/
+            - name: Clean out build output
+              run: rm -rf ./out
             - name: Build example Standalone All Clusters Minimal Server
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -138,7 +107,6 @@ jobs:
                     out/linux-x64-all-clusters-minimal/chip-all-clusters-minimal-app \
                     /tmp/bloat_reports/
             - name: Build example TV app
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -149,7 +117,6 @@ jobs:
                     out/linux-x64-tv-app/chip-tv-app \
                     /tmp/bloat_reports/
             - name: Build example Standalone TV Casting App
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -160,7 +127,6 @@ jobs:
                     out/linux-x64-tv-casting-app/chip-tv-casting-app \
                     /tmp/bloat_reports/
             - name: Build example lighting app with RPCs and UI
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -170,8 +136,9 @@ jobs:
                     linux debug+rpc+ui lighting-app \
                     out/linux-x64-light-rpc-with-ui/chip-lighting-app \
                     /tmp/bloat_reports/
+            - name: Clean out build output
+              run: rm -rf ./out
             - name: Build example Standalone Bridge
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -182,7 +149,6 @@ jobs:
                     out/linux-x64-bridge/chip-bridge-app \
                     /tmp/bloat_reports/
             - name: Build example OTA Provider
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -193,7 +159,6 @@ jobs:
                     out/linux-x64-ota-provider/chip-ota-provider-app \
                     /tmp/bloat_reports/
             - name: Build example OTA Requestor
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -203,8 +168,9 @@ jobs:
                     linux debug ota-requestor-app \
                     out/linux-x64-ota-requestor/chip-ota-requestor-app \
                     /tmp/bloat_reports/
+            - name: Clean out build output
+              run: rm -rf ./out
             - name: Build example Standalone Lock App
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -221,9 +187,7 @@ jobs:
                         --target linux-x64-contact-sensor-no-ble-with-ui \
                         build"
             - name: Uploading Size Reports
-              uses: actions/upload-artifact@v3
+              uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}
               with:
-                  name: Size,Linux-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
-                  path: |
-                      /tmp/bloat_reports/
+                platform-name: Linux-Standalone

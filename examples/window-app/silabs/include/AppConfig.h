@@ -24,6 +24,8 @@
 // ---- Window Example App Config ----
 #define APP_TASK_NAME "APP"
 
+#define BLE_DEV_NAME "SiLabs-Window"
+
 #define LCD_SIZE 128
 #define LCD_MARGIN_SIZE 1
 #define LCD_BORDER_SIZE 2

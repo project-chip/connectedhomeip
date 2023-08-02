@@ -173,7 +173,7 @@ CHIP_ERROR EventManagement::EnsureSpaceInCircularBuffer(size_t aRequiredSpace, P
 
     // Check that we have this much space in all our event buffers that might
     // hold the event. If we do not, that will prevent the event from being
-    // properly evicted into higher-priority bufers.  We want to discover
+    // properly evicted into higher-priority buffers. We want to discover
     // this early, so that testing surfaces the need to make those buffers
     // larger.
     for (auto * currentBuffer = mpEventBuffer; currentBuffer; currentBuffer = currentBuffer->GetNextCircularEventBuffer())

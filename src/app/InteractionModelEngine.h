@@ -46,6 +46,7 @@
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/ConcreteEventPath.h>
 #include <app/DataVersionFilter.h>
 #include <app/EventPathParams.h>
 #include <app/ObjectList.h>
@@ -56,6 +57,7 @@
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
+#include <app/reporting/ReportScheduler.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/basic-types.h>
 
@@ -114,7 +116,7 @@ public:
      *
      */
     CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
-                    CASESessionManager * apCASESessionMgr                         = nullptr,
+                    reporting::ReportScheduler * reportScheduler, CASESessionManager * apCASESessionMgr = nullptr,
                     SubscriptionResumptionStorage * subscriptionResumptionStorage = nullptr);
 
     void Shutdown();
@@ -176,6 +178,8 @@ public:
     uint32_t GetMagicNumber() const { return mMagic; }
 
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
+
+    reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
 
     void ReleaseAttributePathList(ObjectList<AttributePathParams> *& aAttributePathList);
 
@@ -365,6 +369,7 @@ public:
 private:
     friend class reporting::Engine;
     friend class TestCommandInteraction;
+    friend class TestInteractionModelEngine;
     using Status = Protocols::InteractionModel::Status;
 
     void OnDone(CommandHandler & apCommandObj) override;
@@ -397,6 +402,19 @@ private:
     static CHIP_ERROR ParseAttributePaths(const Access::SubjectDescriptor & aSubjectDescriptor,
                                           AttributePathIBs::Parser & aAttributePathListParser, bool & aHasValidAttributePath,
                                           size_t & aRequestedAttributePathCount);
+
+    /**
+     * This parses the event path list to ensure it is well formed. If so, for each path in the list, it will expand to a list
+     * of concrete paths and walk each path to check if it has privileges to read that event.
+     *
+     * If there is AT LEAST one "existent path" (as the spec calls it) that has sufficient privilege, aHasValidEventPath
+     * will be set to true. Otherwise, it will be set to false.
+     *
+     * aRequestedEventPathCount will be updated to reflect the number of event paths in the request.
+     */
+    static CHIP_ERROR ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor,
+                                      EventPathIBs::Parser & aEventPathListParser, bool & aHasValidEventPath,
+                                      size_t & aRequestedEventPathCount);
 
     /**
      * Called when Interaction Model receives a Read Request message.  Errors processing
@@ -551,6 +569,7 @@ private:
     ObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER> mTimedHandlers;
     WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
+    reporting::ReportScheduler * mReportScheduler = nullptr;
 
     static constexpr size_t kReservedHandlersForReads = kMinSupportedReadRequestsPerFabric * (CHIP_CONFIG_MAX_FABRICS);
     static constexpr size_t kReservedPathsForReads    = kMinSupportedPathsPerReadRequest * kReservedHandlersForReads;
@@ -597,6 +616,13 @@ private:
     // enforce such check based on the configured size. This flag is used for unit tests only, there is another compare time flag
     // CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK for stress tests.
     bool mForceHandlerQuota = false;
+#endif
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    bool HasSubscriptionsToResume();
+    uint32_t ComputeTimeSecondsTillNextSubscriptionResumption();
+    uint32_t mNumSubscriptionResumptionRetries = 0;
+    bool mSubscriptionResumptionScheduled      = false;
 #endif
 
     FabricTable * mpFabricTable;
@@ -677,7 +703,12 @@ bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint);
  *
  * @retval The metadata of the attribute, will return null if the given attribute does not exists.
  */
-const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath);
+const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aPath);
+
+/**
+ * Returns the event support status for the given event, as an interaction model status.
+ */
+Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath);
 
 } // namespace app
 } // namespace chip

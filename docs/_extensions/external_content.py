@@ -35,11 +35,11 @@ Configuration options
 
 import filecmp
 import os
-from pathlib import Path
 import re
 import shutil
 import tempfile
-from typing import Dict, Any, List, Optional
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 from sphinx.application import Sphinx
 
@@ -81,7 +81,7 @@ def adjust_includes(
 
     def _adjust_path(path):
         # ignore absolute paths, section links, hyperlinks and same folder
-        if path.startswith(("/", "#", "http", "www")) or not "/" in path:
+        if path.startswith(("/", "#", "http", "www")) or "/" not in path:
             return path
 
         # for files that are being copied modify reference to and out of /docs
@@ -161,7 +161,7 @@ def adjust_includes(
 
 
 def sync_contents(app: Sphinx) -> None:
-    """Synhronize external contents.
+    """Synchronize external contents.
 
     Args:
         app: Sphinx application instance.

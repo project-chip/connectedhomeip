@@ -34,6 +34,9 @@
 #include <lib/core/CHIPError.h>
 #include <string>
 #include <vector>
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include "init_OTARequestor.h"
+#endif
 
 using namespace ::chip;
 using namespace ::chip::Credentials;

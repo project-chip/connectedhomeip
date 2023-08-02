@@ -655,7 +655,7 @@ user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing ble-th
 Start the OTA process:
 
 ```
-user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupdaterequestor announce-otaprovider 1 0 0 0 2 0
 ```
 
 ## Known issues ota

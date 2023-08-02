@@ -55,14 +55,6 @@ buildconfig_header("crypto_buildconfig") {
     "CHIP_CRYPTO_BORINGSSL=${chip_crypto_boringssl}",
     "CHIP_CRYPTO_PLATFORM=${chip_crypto_platform}",
   ]
-
-  if (chip_with_se05x == 1) {
-    defines += [ "CHIP_CRYPTO_HSM=1" ]
-    defines += [ "CHIP_CRYPTO_HSM_NXP=1" ]
-  } else {
-    defines += [ "CHIP_CRYPTO_HSM=0" ]
-    defines += [ "CHIP_CRYPTO_HSM_NXP=0" ]
-  }
 }
 
 source_set("public_headers") {
@@ -176,20 +168,5 @@ static_library("crypto") {
     # own implementation and dependencies
   } else {
     assert(false, "Invalid CHIP crypto")
-  }
-
-  if (chip_with_se05x == 1) {
-    sources += [
-      "hsm/nxp/CHIPCryptoPALHsm_SE05X_HKDF.cpp",
-      "hsm/nxp/CHIPCryptoPALHsm_SE05X_HMAC.cpp",
-      "hsm/nxp/CHIPCryptoPALHsm_SE05X_P256.cpp",
-      "hsm/nxp/CHIPCryptoPALHsm_SE05X_PBKDF.cpp",
-      "hsm/nxp/CHIPCryptoPALHsm_SE05X_Spake2p.cpp",
-      "hsm/nxp/CHIPCryptoPALHsm_SE05X_utils.cpp",
-      "hsm/nxp/PersistentStorageOperationalKeystoreHSM.cpp",
-      "hsm/nxp/PersistentStorageOperationalKeystoreHSM.h",
-    ]
-    public_deps += [ "${chip_root}/third_party/simw-top-mini:se05x" ]
-    public_configs += [ "${chip_root}/third_party/simw-top-mini:se05x_config" ]
   }
 }

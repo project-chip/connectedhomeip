@@ -17,53 +17,27 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
-#include <platform/internal/BLEManager.h>
 
-#include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
+#include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-#include <platform/internal/GenericConnectivityManagerImpl_TCP.ipp>
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
+#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <eth_bd.h>
+#include <platform/bouffalolab/BL702/EthernetInterface.h>
 #endif
 
 using namespace ::chip;
-using namespace ::chip::Inet;
-using namespace ::chip::System;
-using namespace ::chip::TLV;
-using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
 namespace DeviceLayer {
 
-ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
-
-CHIP_ERROR ConnectivityManagerImpl::_Init()
+#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_ENABLE_WIFI
+extern "C" void ethernetInterface_eventGotIP(struct netif * interface)
 {
-    // Initialize the generic base classes that require it.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
-#endif
-
-    return CHIP_NO_ERROR;
+    ChipLogProgress(DeviceLayer, "ethernetInterface_eventGotIP");
+    ConnectivityMgrImpl().OnConnectivityChanged(interface);
 }
-
-void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
-{
-    // Forward the event to the generic base classes as needed.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_OnPlatformEvent(event);
 #endif
-}
 
 } // namespace DeviceLayer
 } // namespace chip

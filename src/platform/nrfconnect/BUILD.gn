@@ -97,6 +97,7 @@ static_library("nrfconnect") {
     sources += [
       "../Zephyr/InetUtils.cpp",
       "../Zephyr/InetUtils.h",
+      "OTAImageProcessorImplWiFi.h",
       "wifi/ConnectivityManagerImplWiFi.cpp",
       "wifi/ConnectivityManagerImplWiFi.h",
       "wifi/NrfWiFiDriver.cpp",

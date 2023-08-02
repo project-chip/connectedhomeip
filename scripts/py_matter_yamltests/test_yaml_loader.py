@@ -15,7 +15,6 @@
 #    limitations under the License.
 #
 
-import io
 import unittest
 from unittest.mock import mock_open, patch
 
@@ -268,7 +267,8 @@ class TestYamlLoader(unittest.TestCase):
         load = YamlLoader().load
 
         content = ('tests:\n'
-                   '  - {key}: {value}')
+                   '  - command: writeAttribute\n'
+                   '    {key}: {value}')
         keys = [
             'arguments',
         ]
@@ -279,7 +279,8 @@ class TestYamlLoader(unittest.TestCase):
         for key in keys:
             _, _, _, _, tests = load(
                 content.format(key=key, value=valid_value))
-            self.assertEqual(tests, [{key: {'value': True}}])
+            self.assertEqual(
+                tests, [{'command': 'writeAttribute', key: {'value': True}}])
 
             for value in wrong_values:
                 x = content.format(key=key, value=value)
@@ -301,7 +302,7 @@ class TestYamlLoader(unittest.TestCase):
         _, _, _, _, tests = load(content.format(value=value))
         self.assertEqual(tests, [{'response': [{'value': True}]}])
 
-        wrong_values = self._get_wrong_values([dict, list], spaces=6)
+        wrong_values = self._get_wrong_values([dict, list, str], spaces=6)
         for value in wrong_values:
             x = content.format(value=value)
             self.assertRaises(TestStepInvalidTypeError, load, x)

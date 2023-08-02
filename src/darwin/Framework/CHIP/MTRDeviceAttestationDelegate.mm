@@ -28,11 +28,15 @@ using namespace chip::Crypto;
 - (instancetype)initWithDACCertificate:(MTRCertificateDERBytes)dacCertificate
                      dacPAICertificate:(MTRCertificateDERBytes)dacPAICertificate
                 certificateDeclaration:(NSData *)certificateDeclaration
+              basicInformationVendorID:(NSNumber *)basicInformationVendorID
+             basicInformationProductID:(NSNumber *)basicInformationProductID
 {
     if (self = [super init]) {
         _dacCertificate = [dacCertificate copy];
         _dacPAICertificate = [dacPAICertificate copy];
         _certificateDeclaration = [certificateDeclaration copy];
+        _basicInformationVendorID = [basicInformationVendorID copy];
+        _basicInformationProductID = [basicInformationProductID copy];
 
         struct AttestationCertVidPid dacVidPid;
         if (ExtractVIDPIDFromX509Cert(AsByteSpan(_dacCertificate), dacVidPid) == CHIP_NO_ERROR) {

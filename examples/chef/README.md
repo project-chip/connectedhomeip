@@ -51,12 +51,7 @@ All device types available (.zap files) are found inside the `devices` folder.
 
 ## Creating a new device type in your device library
 
-1. Run `$ chef.py -g -d <device>` to open in the ZAP GUI a device to be used as
-   a starting point.
-2. Edit your cluster configurations
-3. Click on `Save As` and save the file with the name of your new device type
-   into the `devices` folder. This device is now available for the script. See
-   `chef.py -h` for a list of devices available.
+Follow guide in [NEW_CHEF_DEVICES.md](NEW_CHEF_DEVICES.md).
 
 ## Folder Structure and Guidelines
 
@@ -106,7 +101,7 @@ relevant platform image. You can simulate the workflow locally by mounting your
 CHIP repo into a container and executing the CI command:
 
 ```shell
-docker run -it --mount source=$(pwd),target=/workspace,type=bind connectedhomeip/chip-build-$PLATFORM:$VERSION
+docker run -it --mount source=$(pwd),target=/workspace,type=bind ghcr.io/project-chip/chip-build-$PLATFORM:1$VERSION
 ```
 
 In the container:
@@ -133,24 +128,16 @@ chef_$PLATFORM:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-        image: connectedhomeip/chip-build-$PLATFORM:$VERSION
+        image: ghcr.io/project-chip/chip-build-$PLATFORM:1$VERSION
         options: --user root
 
     steps:
-        - uses: Wandalen/wretry.action@v1.0.36
-          name: Checkout
+        - name: Checkout
+          uses: actions/checkout@v3
+        - name: Checkout submodules & Bootstrap
+          uses: ./.github/actions/checkout-submodules-and-bootstrap
           with:
-              action: actions/checkout@v3
-              with: |
-                  token: ${{ github.token }}
-              attempt_limit: 3
-              attempt_delay: 2000
-        - name: Checkout submodules
-          run: |
-              scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform $PLATFORM
-        - name: Bootstrap
-          timeout-minutes: 25
-          run: bash scripts/bootstrap.sh
+              platform: $PLATFORM
         - name: CI Examples $PLATFORM
           shell: bash
           run: |
@@ -196,7 +183,7 @@ command for these targets.
 To test your configuration locally, you may employ a similar strategy as in CI:
 
 ```shell
-docker run -it --mount source=$(pwd),target=/workspace,type=bind connectedhomeip/chip-build-vscode:$VERSION
+docker run -it --mount source=$(pwd),target=/workspace,type=bind ghcr.io/project-chip/chip-build-vscode:1$VERSION
 ```
 
 In the container:

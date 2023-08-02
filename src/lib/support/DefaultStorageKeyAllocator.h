@@ -170,16 +170,24 @@ public:
         return StorageKeyName::Formatted("g/a/%x/%" PRIx32 "/%" PRIx32, endpointId, clusterId, attributeId);
     }
 
+    // Returns the key for Safely stored attributes.
+    static StorageKeyName SafeAttributeValue(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId)
+    {
+        // Needs at most 26 chars: 6 for "s/a///", 4 for the endpoint id, 8 each
+        // for the cluster and attribute ids.
+        return StorageKeyName::Formatted("g/sa/%x/%" PRIx32 "/%" PRIx32, endpointId, clusterId, attributeId);
+    }
+
     // TODO: Should store fabric-specific parts of the binding list under keys
     // starting with "f/%x/".
     static StorageKeyName BindingTable() { return StorageKeyName::FromConst("g/bt"); }
     static StorageKeyName BindingTableEntry(uint8_t index) { return StorageKeyName::Formatted("g/bt/%x", index); }
 
-    // Client Monitoring
+    // ICD Management
 
-    static StorageKeyName ClientMonitoringTableEntry(chip::FabricIndex fabric)
+    static StorageKeyName IcdManagementTableEntry(chip::FabricIndex fabric, uint16_t index)
     {
-        return StorageKeyName::Formatted("f/%x/cm", fabric);
+        return StorageKeyName::Formatted("f/%x/icd/%x", fabric, index);
     }
 
     static StorageKeyName OTADefaultProviders() { return StorageKeyName::FromConst("g/o/dp"); }
@@ -215,6 +223,12 @@ public:
     {
         return StorageKeyName::Formatted("f/%x/e/%x/sc/%x", fabric, endpoint, idx);
     }
+
+    // Time synchronization cluster
+    static StorageKeyName TSTrustedTimeSource() { return StorageKeyName::FromConst("g/ts/tts"); }
+    static StorageKeyName TSDefaultNTP() { return StorageKeyName::FromConst("g/ts/dntp"); }
+    static StorageKeyName TSTimeZone() { return StorageKeyName::FromConst("g/ts/tz"); }
+    static StorageKeyName TSDSTOffset() { return StorageKeyName::FromConst("g/ts/dsto"); }
 };
 
 } // namespace chip

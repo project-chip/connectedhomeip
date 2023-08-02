@@ -26,16 +26,21 @@ include(${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/cm
 
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/components"
-    "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/QRCode"
+    "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common"
 )
 
 if(${IDF_TARGET} STREQUAL "esp32")
-    list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/m5stack-tft/repo/components/tft"
-                                     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/m5stack-tft/repo/components/spidriver"
-                                     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/screen-framework")
+    list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/m5stack-tft/repo/components")
 endif()
 
+
 project(chip-lighting-app)
+
+# WARNING: This is just an example for using key for decrypting the encrypted OTA image
+# Please do not use it as is.
+if(CONFIG_ENABLE_ENCRYPTED_OTA)
+    target_add_binary_data(chip-lighting-app.elf "esp_image_encryption_key.pem" TEXT)
+endif()
 
 # C++17 is required for RPC build.
 idf_build_set_property(CXX_COMPILE_OPTIONS "-std=gnu++17;-Os;-DCHIP_HAVE_CONFIG_H" APPEND)

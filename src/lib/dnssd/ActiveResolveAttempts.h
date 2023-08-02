@@ -140,7 +140,7 @@ public:
         {
             return resolveData.Is<Resolve>() && (resolveData.Get<Resolve>().peerId == peer);
         }
-        bool Matches(const chip::Dnssd::DiscoveredNodeData & data) const
+        bool Matches(const chip::Dnssd::DiscoveredNodeData & data, chip::Dnssd::DiscoveryType type) const
         {
             if (!resolveData.Is<Browse>())
             {
@@ -149,13 +149,11 @@ public:
 
             auto & browse = resolveData.Get<Browse>();
 
-            // TODO: we should mark returned node data based on the query
-            if (browse.type != chip::Dnssd::DiscoveryType::kCommissionableNode)
+            if (browse.type != type)
             {
-                // We don't currently have markers in the returned DiscoveredNodeData to differentiate these, so assume all returned
-                // packets match
-                return true;
+                return false;
             }
+
             switch (browse.filter.type)
             {
             case chip::Dnssd::DiscoveryFilterType::kNone:
@@ -251,7 +249,8 @@ public:
 
     /// Mark a resolution as a success, removing it from the internal list
     void Complete(const chip::PeerId & peerId);
-    void Complete(const chip::Dnssd::DiscoveredNodeData & data);
+    void CompleteCommissioner(const chip::Dnssd::DiscoveredNodeData & data);
+    void CompleteCommissionable(const chip::Dnssd::DiscoveredNodeData & data);
     void CompleteIpResolution(SerializedQNameIterator targetHostName);
 
     /// Mark all browse-type scheduled attemptes as a success, removing them
@@ -288,6 +287,9 @@ public:
     /// Check if any of the pending queries are for the given host name for
     /// IP resolution.
     bool IsWaitingForIpResolutionFor(SerializedQNameIterator hostName) const;
+
+    /// Check if a browse operation is active for the given discovery type
+    bool HasBrowseFor(chip::Dnssd::DiscoveryType type) const;
 
 private:
     struct RetryEntry

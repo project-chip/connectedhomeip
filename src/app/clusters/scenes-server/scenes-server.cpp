@@ -143,8 +143,6 @@ void ScenesServer::Shutdown()
 {
     chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
 
-    SceneTable * sceneTable = scenes::GetSceneTableImpl();
-    sceneTable->Finish();
     mGroupProvider = nullptr;
     mIsInitialized = false;
 }
@@ -544,6 +542,32 @@ void ScenesServer::RecallScene(FabricIndex aFabricIx, EndpointId aEndpointId, Gr
     if (CHIP_NO_ERROR == RecallSceneParse(aFabricIx, aEndpointId, aGroupId, aSceneId, transitionTime, mGroupProvider))
     {
         Attributes::SceneValid::Set(aEndpointId, true);
+    }
+}
+
+bool ScenesServer::IsHandlerRegistered(scenes::SceneHandler * handler)
+{
+    SceneTable * sceneTable = scenes::GetSceneTableImpl();
+    return sceneTable->mHandlerList.Contains(handler);
+}
+
+void ScenesServer::RegisterSceneHandler(scenes::SceneHandler * handler)
+{
+    SceneTable * sceneTable = scenes::GetSceneTableImpl();
+
+    if (!IsHandlerRegistered(handler))
+    {
+        sceneTable->RegisterHandler(handler);
+    }
+}
+
+void ScenesServer::UnregisterSceneHandler(scenes::SceneHandler * handler)
+{
+    SceneTable * sceneTable = scenes::GetSceneTableImpl();
+
+    if (IsHandlerRegistered(handler))
+    {
+        sceneTable->UnregisterHandler(handler);
     }
 }
 

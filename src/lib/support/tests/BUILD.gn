@@ -47,6 +47,7 @@ chip_test_suite("tests") {
     "TestSpan.cpp",
     "TestStateMachine.cpp",
     "TestStringBuilder.cpp",
+    "TestStringSplitter.cpp",
     "TestTestPersistentStorageDelegate.cpp",
     "TestThreadOperationalDataset.cpp",
     "TestTimeUtils.cpp",
@@ -65,6 +66,9 @@ chip_test_suite("tests") {
 
     # TODO(#21255): work-around for SimpleStateMachine constructor issue.
     "-Wno-uninitialized",
+
+    # TestStringSplitter intentionally validates string overflows.
+    "-Wno-stringop-truncation",
   ]
 
   public_deps = [

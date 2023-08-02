@@ -37,6 +37,10 @@
 #include <messaging/ReliableMessageContext.h>
 #include <platform/ConnectivityManager.h>
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/ICDManager.h> // nogncheck
+#endif
+
 using namespace chip::System::Clock::Literals;
 
 namespace chip {
@@ -77,10 +81,10 @@ void ReliableMessageMgr::Shutdown()
     mSystemLayer = nullptr;
 }
 
-#if defined(RMP_TICKLESS_DEBUG)
 void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
 {
-    ChipLogDetail(ExchangeManager, log);
+#if defined(RMP_TICKLESS_DEBUG)
+    ChipLogDetail(ExchangeManager, "%s", log);
 
     mRetransTable.ForEachActiveObject([&](auto * entry) {
         ChipLogDetail(ExchangeManager,
@@ -89,17 +93,15 @@ void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
                       entry->nextRetransTime.count());
         return Loop::Continue;
     });
+#endif
 }
-#else
-void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log) {}
-#endif // RMP_TICKLESS_DEBUG
 
 void ReliableMessageMgr::ExecuteActions()
 {
     System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
 
 #if defined(RMP_TICKLESS_DEBUG)
-    ChipLogDetail(ExchangeManager, "ReliableMessageMgr::ExecuteActions at % " PRIu64 "ms", now.count());
+    ChipLogDetail(ExchangeManager, "ReliableMessageMgr::ExecuteActions at %" PRIu64 "ms", now.count());
 #endif
 
     ExecuteForAllContext([&](ReliableMessageContext * rc) {
@@ -180,7 +182,7 @@ void ReliableMessageMgr::Timeout(System::Layer * aSystemLayer, void * aAppState)
     VerifyOrDie((aSystemLayer != nullptr) && (manager != nullptr));
 
 #if defined(RMP_TICKLESS_DEBUG)
-    ChipLogDetail(ExchangeManager, "ReliableMessageMgr::Timeout\n");
+    ChipLogDetail(ExchangeManager, "ReliableMessageMgr::Timeout");
 #endif
 
     // Execute any actions that are due this tick
@@ -251,10 +253,12 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
     uint32_t jitter = MRP_BACKOFF_JITTER_BASE + (computeMaxPossible ? UINT8_MAX : Crypto::GetRandU8());
     mrpBackoffTime  = mrpBackoffTime * jitter / MRP_BACKOFF_JITTER_BASE;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Implement:
-    //   "A sleepy sender SHOULD increase t to also account for its own sleepy interval
+    //   "An ICD sender SHOULD increase t to also account for its own sleepy interval
     //   required to receive the acknowledgment"
+    mrpBackoffTime += app::ICDManager::GetFastPollingInterval();
+#elif CHIP_DEVICE_CONFIG_ENABLE_SED
     DeviceLayer::ConnectivityManager::SEDIntervalsConfig sedIntervals;
 
     if (DeviceLayer::ConnectivityMgr().GetSEDIntervalsConfig(sedIntervals) == CHIP_NO_ERROR)
@@ -263,9 +267,7 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
     }
 #endif
 
-#ifdef CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST
     mrpBackoffTime += CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
-#endif
 
     return mrpBackoffTime;
 }
@@ -321,6 +323,19 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
 
     if (err == CHIP_NO_ERROR)
     {
+#if CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
+        DeviceLayer::ChipDeviceEvent event;
+        // Here always set ExpectResponse to false.
+        // The Initial message sent from the Exchange Context will have set ExpectResponse to the correct value.
+        // If we are expecting a Response, the ICD will already be in a state waiting for the response (or timeout).
+        event.Type                       = DeviceLayer::DeviceEventType::kChipMsgSentEvent;
+        event.MessageSent.ExpectResponse = false;
+        CHIP_ERROR status                = DeviceLayer::PlatformMgr().PostEvent(&event);
+        if (status != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to post retransmit message sent event %" CHIP_ERROR_FORMAT, status.Format());
+        }
+#endif // CONFIG_DEVICE_LAYER
 #if CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
         const ExchangeManager * exchangeMgr = entry->ec->GetExchangeMgr();
         // TODO: investigate why in ReliableMessageMgr::CheckResendApplicationMessageWithPeerExchange unit test released exchange
@@ -392,16 +407,17 @@ void ReliableMessageMgr::StartTimer()
         return Loop::Continue;
     });
 
+    StopTimer();
+
     if (nextWakeTime != System::Clock::Timestamp::max())
     {
-#if defined(RMP_TICKLESS_DEBUG)
-        ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer wake at %" PRIu64 "ms", nextWakeTime);
-#endif
-
-        StopTimer();
-
         const System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
         const auto nextWakeDelay           = (nextWakeTime > now) ? nextWakeTime - now : 0_ms;
+
+#if defined(RMP_TICKLESS_DEBUG)
+        ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer at %" PRIu64 "ms wake at %" PRIu64 "ms (in %" PRIu64 "ms)",
+                      now.count(), nextWakeTime.count(), nextWakeDelay.count());
+#endif
         VerifyOrDie(mSystemLayer->StartTimer(nextWakeDelay, Timeout, this) == CHIP_NO_ERROR);
     }
     else
@@ -409,7 +425,6 @@ void ReliableMessageMgr::StartTimer()
 #if defined(RMP_TICKLESS_DEBUG)
         ChipLogDetail(ExchangeManager, "ReliableMessageMgr skipped timer");
 #endif
-        StopTimer();
     }
 
     TicklessDebugDumpRetransTable("ReliableMessageMgr::StartTimer Dumping mRetransTable entries after setting wakeup times");

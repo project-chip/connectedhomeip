@@ -20,6 +20,7 @@
 
 #include <arpa/inet.h>
 
+#include <TracingCommandLineArgument.h>
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
@@ -40,9 +41,9 @@
 
 #include "PacketReporter.h"
 
-using namespace chip;
-
 namespace {
+
+using namespace chip;
 
 struct Options
 {
@@ -56,6 +57,10 @@ using namespace ArgParser;
 constexpr uint16_t kOptionEnableIpV4   = '4';
 constexpr uint16_t kOptionListenPort   = 'p';
 constexpr uint16_t kOptionInstanceName = 'i';
+constexpr uint16_t kOptionTraceTo      = 't';
+
+// Only used for argument parsing. Tracing setup owned by the main loop.
+chip::CommandLineApp::TracingSetup * tracing_setup_for_argparse = nullptr;
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
@@ -67,6 +72,10 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
     case kOptionInstanceName:
         gOptions.instanceName = aValue;
+        return true;
+
+    case kOptionTraceTo:
+        tracing_setup_for_argparse->EnableTracingFor(aValue);
         return true;
 
     case kOptionListenPort:
@@ -87,6 +96,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "listen-port", kArgumentRequired, kOptionListenPort },
     { "enable-ip-v4", kNoArgument, kOptionEnableIpV4 },
     { "instance-name", kArgumentRequired, kOptionInstanceName },
+    { "trace-to", kArgumentRequired, kOptionTraceTo },
     {},
 };
 
@@ -100,6 +110,9 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  -i <name>\n"
                              "  --instance-name <name>\n"
                              "        instance name to advertise.\n"
+                             "  -t <dest>\n"
+                             "  --trace-to <dest>\n"
+                             "        trace to the given destination (supported: " SUPPORTED_COMMAND_LINE_TRACING_TARGETS ").\n"
                              "\n" };
 
 HelpOptions helpOptions("minimal-mdns-server", "Usage: minimal-mdns-server [options]", "1.0");
@@ -175,7 +188,6 @@ void StopSignalHandler(int signal)
     gMdnsServer.Shutdown();
 
     DeviceLayer::PlatformMgr().StopEventLoopTask();
-    DeviceLayer::PlatformMgr().Shutdown();
 }
 
 } // namespace
@@ -194,10 +206,14 @@ int main(int argc, char ** args)
         return 1;
     }
 
+    chip::CommandLineApp::TracingSetup tracing_setup;
+
+    tracing_setup_for_argparse = &tracing_setup;
     if (!ArgParser::ParseArgs(args[0], argc, args, allOptions))
     {
         return 1;
     }
+    tracing_setup_for_argparse = nullptr;
 
     // This forces the global MDNS instance to be loaded in, effectively setting
     // built in policies for addresses.
@@ -283,6 +299,9 @@ int main(int argc, char ** args)
     signal(SIGINT, StopSignalHandler);
 
     DeviceLayer::PlatformMgr().RunEventLoop();
+
+    tracing_setup.StopTracing();
+    DeviceLayer::PlatformMgr().Shutdown();
 
     printf("Done...\n");
     return 0;

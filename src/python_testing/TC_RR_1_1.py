@@ -434,6 +434,8 @@ class TC_RR_1_1(MatterBaseTest):
                 node_id=self.dut_node_id,
                 endpoint=0,
                 attribute=Clusters.GroupKeyManagement.Attributes.MaxGroupsPerFabric)
+            logging.info(
+                f"MaxGroupsPerFabric value: {indicated_max_groups_per_fabric}, number of endpoints with Groups clusters cluster: {counted_groups_clusters}, which are: {list(groups_cluster_endpoints.keys())}")
             if indicated_max_groups_per_fabric < 4 * counted_groups_clusters:
                 asserts.fail("Failed Step 11: MaxGroupsPerFabric < 4 * counted_groups_clusters")
 

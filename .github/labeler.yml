@@ -44,6 +44,10 @@ integrations:
     - integrations/*
     - integrations/**/*
 
+docker:
+    - integrations/docker/*
+    - integrations/docker/**/*
+
 vscode:
     - .vscode/*
     - .vscode/**/*
@@ -144,6 +148,10 @@ app:
     - src/app/*
     - src/app/**/*
 
+icd:
+    - src/app/icd/*
+    - src/app/icd/**/*
+
 transport:
     - src/transport/*
     - src/transport/**/*
@@ -181,9 +189,9 @@ darwin:
     - examples/darwin-framework-tool/*
     - examples/darwin-framework-tool/**/*
 
-efr32:
-    - src/platform/efr32/*
-    - src/platform/efr32/**/*
+silabs:
+    - src/platform/silabs/*
+    - src/platform/silabs/**/*
 
 esp32:
     - src/platform/ESP32/*

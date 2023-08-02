@@ -40,12 +40,14 @@
 
 #include "gpiointerrupt.h"
 #include "sl_device_init_clocks.h"
+#include "sl_memlcd.h"
 #include "sl_status.h"
 
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "task.h"
 
+#include "btl_interface.h"
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
@@ -58,6 +60,14 @@
 #include "sl_power_manager.h"
 #endif
 
+#define CONCAT(A, B) (A##B)
+#define SPI_CLOCK(N) CONCAT(cmuClock_USART, N)
+
+#if defined(EFR32MG24)
+StaticSemaphore_t spi_sem_peripheral;
+SemaphoreHandle_t spi_sem_sync_hdl;
+#endif /* EFR32MG24 */
+
 StaticSemaphore_t xEfxSpiIntfSemaBuffer;
 static SemaphoreHandle_t spiTransferLock;
 static TaskHandle_t spiInitiatorTaskHandle = NULL;
@@ -65,17 +75,18 @@ static TaskHandle_t spiInitiatorTaskHandle = NULL;
 #if defined(EFR32MG12)
 #include "sl_spidrv_exp_config.h"
 extern SPIDRV_Handle_t sl_spidrv_exp_handle;
-#define SPI_HANDLE sl_spidrv_exp_handle
+#define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
 #elif defined(EFR32MG24)
-#include "sl_spidrv_eusart_exp_config.h"
-extern SPIDRV_Handle_t sl_spidrv_eusart_exp_handle;
-#define SPI_HANDLE sl_spidrv_eusart_exp_handle
+#include "spi_multiplex.h"
 #else
 #error "Unknown platform"
 #endif
 
+// variable to identify spi configured for expansion header
+// EUSART configuration available on the SPIDRV
+static bool spi_enabled = false;
+
 extern void rsi_gpio_irq_cb(uint8_t irqnum);
-//#define RS911X_USE_LDMA
 
 /********************************************************
  * @fn   sl_wfx_host_gpio_init(void)
@@ -89,6 +100,11 @@ void sl_wfx_host_gpio_init(void)
 {
     // Enable GPIO clock.
     CMU_ClockEnable(cmuClock_GPIO, true);
+
+#if defined(EFR32MG24)
+    // Set CS pin to high/inactive
+    GPIO_PinModeSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN, gpioModePushPull, PINOUT_SET);
+#endif
 
     GPIO_PinModeSet(WFX_RESET_PIN.port, WFX_RESET_PIN.pin, gpioModePushPull, PINOUT_SET);
     GPIO_PinModeSet(WFX_SLEEP_CONFIRM_PIN.port, WFX_SLEEP_CONFIRM_PIN.pin, gpioModePushPull, PINOUT_CLEAR);
@@ -105,6 +121,7 @@ void sl_wfx_host_gpio_init(void)
     // Change GPIO interrupt priority (FreeRTOS asserts unless this is done here!)
     NVIC_SetPriority(GPIO_EVEN_IRQn, WFX_SPI_NVIC_PRIORITY);
     NVIC_SetPriority(GPIO_ODD_IRQn, WFX_SPI_NVIC_PRIORITY);
+    spi_enabled = true;
 }
 
 /*****************************************************************
@@ -141,12 +158,147 @@ void rsi_hal_board_init(void)
     spiTransferLock = xSemaphoreCreateBinaryStatic(&xEfxSpiIntfSemaBuffer);
     xSemaphoreGive(spiTransferLock);
 
+#if defined(EFR32MG24)
+    if (spi_sem_sync_hdl == NULL)
+    {
+        spi_sem_sync_hdl = xSemaphoreCreateBinaryStatic(&spi_sem_peripheral);
+    }
+    configASSERT(spi_sem_sync_hdl);
+    xSemaphoreGive(spi_sem_sync_hdl);
+#endif /* EFR32MG24 */
+
     /* GPIO INIT of MG12 & MG24 : Reset, Wakeup, Interrupt */
     sl_wfx_host_gpio_init();
 
     /* Reset of Wifi chip */
     sl_wfx_host_reset_chip();
 }
+
+#if defined(EFR32MG24)
+
+void SPIDRV_SetBaudrate(uint32_t baudrate)
+{
+    if (EUSART_BaudrateGet(MY_USART) == baudrate)
+    {
+        // EUSART synced to baudrate already
+        return;
+    }
+    EUSART_BaudrateSet(MY_USART, 0, baudrate);
+}
+
+sl_status_t sl_wfx_host_spi_cs_assert(void)
+{
+    xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
+
+    if (!spi_enabled) // Reduce sl_spidrv_init_instances
+    {
+        sl_spidrv_init_instances();
+        spi_enabled = true;
+    }
+    GPIO_PinOutClear(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
+    return SL_STATUS_OK;
+}
+
+sl_status_t sl_wfx_host_spi_cs_deassert(void)
+{
+    if (spi_enabled)
+    {
+        if (ECODE_EMDRV_SPIDRV_OK != SPIDRV_DeInit(SL_SPIDRV_HANDLE))
+        {
+            xSemaphoreGive(spi_sem_sync_hdl);
+            return SL_STATUS_FAIL;
+        }
+        spi_enabled = false;
+    }
+    GPIO_PinOutSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
+    GPIO->EUSARTROUTE[SL_SPIDRV_EUSART_EXP_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
+    xSemaphoreGive(spi_sem_sync_hdl);
+    return SL_STATUS_OK;
+}
+
+sl_status_t sl_wfx_host_spiflash_cs_assert(void)
+{
+    GPIO_PinOutClear(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
+    return SL_STATUS_OK;
+}
+
+sl_status_t sl_wfx_host_spiflash_cs_deassert(void)
+{
+    GPIO_PinOutSet(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
+    return SL_STATUS_OK;
+}
+
+sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void)
+{
+    xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
+    if (spi_enabled)
+    {
+        if (ECODE_EMDRV_SPIDRV_OK != SPIDRV_DeInit(SL_SPIDRV_HANDLE))
+        {
+            xSemaphoreGive(spi_sem_sync_hdl);
+            return SL_STATUS_FAIL;
+        }
+        spi_enabled = false;
+    }
+    // bootloader_init takes care of SPIDRV_Init()
+    int32_t status = bootloader_init();
+    if (status != BOOTLOADER_OK)
+    {
+        SILABS_LOG("bootloader_init error: %x", status);
+        xSemaphoreGive(spi_sem_sync_hdl);
+        return SL_STATUS_FAIL;
+    }
+    sl_wfx_host_spiflash_cs_assert();
+    return SL_STATUS_OK;
+}
+
+sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
+{
+    // bootloader_deinit will do USART disable
+    int32_t status = bootloader_deinit();
+    if (status != BOOTLOADER_OK)
+    {
+        SILABS_LOG("bootloader_deinit error: %x", status);
+        xSemaphoreGive(spi_sem_sync_hdl);
+        return SL_STATUS_FAIL;
+    }
+    GPIO->USARTROUTE[SL_MX25_FLASH_SHUTDOWN_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
+    sl_wfx_host_spiflash_cs_deassert();
+    xSemaphoreGive(spi_sem_sync_hdl);
+    return SL_STATUS_OK;
+}
+
+sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
+{
+    xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
+    if (spi_enabled)
+    {
+        if (ECODE_EMDRV_SPIDRV_OK != SPIDRV_DeInit(SL_SPIDRV_HANDLE))
+        {
+            xSemaphoreGive(spi_sem_sync_hdl);
+            return SL_STATUS_FAIL;
+        }
+        spi_enabled = false;
+    }
+    // sl_memlcd_refresh takes care of SPIDRV_Init()
+    if (SL_STATUS_OK != sl_memlcd_refresh(sl_memlcd_get()))
+    {
+        xSemaphoreGive(spi_sem_sync_hdl);
+        return SL_STATUS_FAIL;
+    }
+    return SL_STATUS_OK;
+}
+
+sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
+{
+    USART_Enable(SL_MEMLCD_SPI_PERIPHERAL, usartDisable);
+    CMU_ClockEnable(SPI_CLOCK(SL_MEMLCD_SPI_PERIPHERAL_NO), false);
+    GPIO->USARTROUTE[SL_MEMLCD_SPI_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
+    xSemaphoreGive(spi_sem_sync_hdl);
+    return SL_STATUS_OK;
+}
+
+#endif /* EFR32MG24 */
 
 /*****************************************************************************
  *@brief
@@ -182,7 +334,13 @@ static void spi_dmaTransfertComplete(SPIDRV_HandleData_t * pxHandle, Ecode_t tra
  **************************************************************************/
 int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint8_t mode)
 {
-    if (xlen <= MIN_XLEN || (tx_buf == NULL && rx_buf == NULL)) // at least one buffer needs to be provided
+#if defined(EFR32MG24)
+    sl_wfx_host_spi_cs_assert();
+#endif /* EFR32MG24 */
+    /*
+        TODO: tx_buf and rx_buf needs to be replaced with a dummy buffer of length xlen to align with SDK of WiFi
+    */
+    if (xlen <= MIN_XLEN || (tx_buf == NULL && rx_buf == NULL))
     {
         return RSI_ERROR_INVALID_PARAM;
     }
@@ -190,26 +348,24 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     (void) mode; // currently not used;
     rsi_error_t rsiError = RSI_ERROR_NONE;
 
-    if (xSemaphoreTake(spiTransferLock, portMAX_DELAY) != pdTRUE)
-    {
-        return RSI_ERROR_SPI_BUSY;
-    }
+    xSemaphoreTake(spiTransferLock, portMAX_DELAY);
 
-    configASSERT(spiInitiatorTaskHandle == NULL); // No other task should currently be waiting for the dma completion
+    // No other task should currently be waiting for the dma completion
+    configASSERT(spiInitiatorTaskHandle == NULL);
     spiInitiatorTaskHandle = xTaskGetCurrentTaskHandle();
 
     Ecode_t spiError;
     if (tx_buf == NULL) // Rx operation only
     {
-        spiError = SPIDRV_MReceive(SPI_HANDLE, rx_buf, xlen, spi_dmaTransfertComplete);
+        spiError = SPIDRV_MReceive(SL_SPIDRV_HANDLE, rx_buf, xlen, spi_dmaTransfertComplete);
     }
     else if (rx_buf == NULL) // Tx operation only
     {
-        spiError = SPIDRV_MTransmit(SPI_HANDLE, tx_buf, xlen, spi_dmaTransfertComplete);
+        spiError = SPIDRV_MTransmit(SL_SPIDRV_HANDLE, tx_buf, xlen, spi_dmaTransfertComplete);
     }
     else // Tx and Rx operation
     {
-        spiError = SPIDRV_MTransfer(SPI_HANDLE, tx_buf, rx_buf, xlen, spi_dmaTransfertComplete);
+        spiError = SPIDRV_MTransfer(SL_SPIDRV_HANDLE, tx_buf, rx_buf, xlen, spi_dmaTransfertComplete);
     }
 
     if (spiError == ECODE_EMDRV_SPIDRV_OK)
@@ -221,21 +377,24 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
         {
             int itemsTransferred = 0;
             int itemsRemaining   = 0;
-            SPIDRV_GetTransferStatus(SPI_HANDLE, &itemsTransferred, &itemsRemaining);
-            SILABS_LOG("SPI transfert timed out %d/%d (rx%x rx%x)", itemsTransferred, itemsRemaining, (uint32_t) tx_buf,
+            SPIDRV_GetTransferStatus(SL_SPIDRV_HANDLE, &itemsTransferred, &itemsRemaining);
+            SILABS_LOG("ERR: SPI timed out %d/%d (rx%x rx%x)", itemsTransferred, itemsRemaining, (uint32_t) tx_buf,
                        (uint32_t) rx_buf);
 
-            SPIDRV_AbortTransfer(SPI_HANDLE);
+            SPIDRV_AbortTransfer(SL_SPIDRV_HANDLE);
             rsiError = RSI_ERROR_SPI_TIMEOUT;
         }
     }
     else
     {
-        SILABS_LOG("SPI transfert failed with err:%x (tx%x rx%x)", spiError, (uint32_t) tx_buf, (uint32_t) rx_buf);
+        SILABS_LOG("ERR: SPI failed with error:%x (tx%x rx%x)", spiError, (uint32_t) tx_buf, (uint32_t) rx_buf);
         rsiError               = RSI_ERROR_SPI_FAIL;
         spiInitiatorTaskHandle = NULL; // SPI operation failed. No notification to received.
     }
 
     xSemaphoreGive(spiTransferLock);
+#if defined(EFR32MG24)
+    sl_wfx_host_spi_cs_deassert();
+#endif /* EFR32MG24 */
     return rsiError;
 }

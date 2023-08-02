@@ -18,6 +18,7 @@
 
 #import "MTRDeviceControllerStartupParams.h"
 #import <Foundation/Foundation.h>
+#import <Matter/MTRDefines.h>
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/DataModelTypes.h>
@@ -42,6 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithParams:(MTRDeviceControllerStartupParams *)params;
 @end
 
+MTR_HIDDEN
 @interface MTRDeviceControllerStartupParamsInternal : MTRDeviceControllerStartupParams
 
 // Fabric table we can use to do things like allocate operational keys.

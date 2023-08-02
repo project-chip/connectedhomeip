@@ -25,10 +25,18 @@
 #define duet_flash_kv_get alto_flash_kv_get
 #define duet_flash_kv_del alto_flash_kv_del
 #define duet_flash_erase asr_flash_erase
-#else
+#elif defined CFG_PLF_DUET
 #include "duet_cm4.h"
 #include "duet_flash.h"
 #include "duet_flash_kv.h"
+#else
+#include "lega_cm4.h"
+#include "lega_flash.h"
+#include "lega_flash_kv.h"
+#define duet_flash_kv_set lega_flash_kv_set
+#define duet_flash_kv_get lega_flash_kv_get
+#define duet_flash_kv_del lega_flash_kv_del
+#define duet_flash_erase lega_flash_erase
 #endif
 #include "string.h"
 
@@ -44,7 +52,7 @@ KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 
 CHIP_ERROR KeyValueStoreManagerImpl::Init()
 {
-    // duet_flash_kv_init();
+    // KV has already been initialized at init_asrPlatform(), so return success
     return CHIP_NO_ERROR;
 }
 

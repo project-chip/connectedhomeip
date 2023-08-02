@@ -16,6 +16,7 @@
  */
 
 #import "MTRCommandPayloadsObjc.h"
+#import "MTRBackwardsCompatShims.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCommandPayloads_Internal.h"
 #import "MTRError_Internal.h"
@@ -1120,11 +1121,7 @@ NS_ASSUME_NONNULL_BEGIN
                             auto & entry_3 = iter_3.GetValue();
                             MTRScenesClusterAttributeValuePair * newElement_3;
                             newElement_3 = [MTRScenesClusterAttributeValuePair new];
-                            if (entry_3.attributeID.HasValue()) {
-                                newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID.Value()];
-                            } else {
-                                newElement_3.attributeID = nil;
-                            }
+                            newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID];
                             newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
                             [array_3 addObject:newElement_3];
                         }
@@ -2273,11 +2270,7 @@ NS_ASSUME_NONNULL_BEGIN
                             auto & entry_3 = iter_3.GetValue();
                             MTRScenesClusterAttributeValuePair * newElement_3;
                             newElement_3 = [MTRScenesClusterAttributeValuePair new];
-                            if (entry_3.attributeID.HasValue()) {
-                                newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID.Value()];
-                            } else {
-                                newElement_3.attributeID = nil;
-                            }
+                            newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID];
                             newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
                             [array_3 addObject:newElement_3];
                         }
@@ -5272,7 +5265,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTimeSynchronizationClusterSetUtcTimeParams
+@implementation MTRTimeSynchronizationClusterSetUTCTimeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -5290,7 +5283,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTimeSynchronizationClusterSetUtcTimeParams alloc] init];
+    auto other = [[MTRTimeSynchronizationClusterSetUTCTimeParams alloc] init];
 
     other.utcTime = self.utcTime;
     other.granularity = self.granularity;
@@ -5305,6 +5298,210 @@ NS_ASSUME_NONNULL_BEGIN
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: utcTime:%@; granularity:%@; timeSource:%@; >",
                                              NSStringFromClass([self class]), _utcTime, _granularity, _timeSource];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRTimeSynchronizationClusterSetUtcTimeParams
+@end
+@implementation MTRTimeSynchronizationClusterSetTrustedTimeSourceParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _trustedTimeSource = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRTimeSynchronizationClusterSetTrustedTimeSourceParams alloc] init];
+
+    other.trustedTimeSource = self.trustedTimeSource;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: trustedTimeSource:%@; >", NSStringFromClass([self class]), _trustedTimeSource];
+    return descriptionString;
+}
+
+@end
+@implementation MTRTimeSynchronizationClusterSetTimeZoneParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _timeZone = [NSArray array];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRTimeSynchronizationClusterSetTimeZoneParams alloc] init];
+
+    other.timeZone = self.timeZone;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeZone:%@; >", NSStringFromClass([self class]), _timeZone];
+    return descriptionString;
+}
+
+@end
+@implementation MTRTimeSynchronizationClusterSetTimeZoneResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _dstOffsetRequired = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRTimeSynchronizationClusterSetTimeZoneResponseParams alloc] init];
+
+    other.dstOffsetRequired = self.dstOffsetRequired;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: dstOffsetRequired:%@; >", NSStringFromClass([self class]), _dstOffsetRequired];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::TimeSynchronization::Commands::SetTimeZoneResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRTimeSynchronizationClusterSetTimeZoneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::TimeSynchronization::Commands::SetTimeZoneResponse::DecodableType &)decodableStruct
+{
+    {
+        self.dstOffsetRequired = [NSNumber numberWithBool:decodableStruct.DSTOffsetRequired];
+    }
+    return CHIP_NO_ERROR;
+}
+@end
+@implementation MTRTimeSynchronizationClusterSetDSTOffsetParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _dstOffset = [NSArray array];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRTimeSynchronizationClusterSetDSTOffsetParams alloc] init];
+
+    other.dstOffset = self.dstOffset;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dstOffset:%@; >", NSStringFromClass([self class]), _dstOffset];
+    return descriptionString;
+}
+
+@end
+@implementation MTRTimeSynchronizationClusterSetDefaultNTPParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _defaultNTP = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRTimeSynchronizationClusterSetDefaultNTPParams alloc] init];
+
+    other.defaultNTP = self.defaultNTP;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: defaultNTP:%@; >", NSStringFromClass([self class]), _defaultNTP];
     return descriptionString;
 }
 
@@ -6297,8 +6494,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
-
-        _groupKeySetIDs = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -6309,7 +6504,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRGroupKeyManagementClusterKeySetReadAllIndicesParams alloc] init];
 
-    other.groupKeySetIDs = self.groupKeySetIDs;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -6318,8 +6512,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupKeySetIDs:%@; >", NSStringFromClass([self class]), _groupKeySetIDs];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
     return descriptionString;
 }
 
@@ -6419,6 +6612,189 @@ NS_ASSUME_NONNULL_BEGIN
     return CHIP_NO_ERROR;
 }
 @end
+@implementation MTRICDManagementClusterRegisterClientParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _checkInNodeID = @(0);
+
+        _monitoredSubject = @(0);
+
+        _key = [NSData data];
+
+        _verificationKey = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRICDManagementClusterRegisterClientParams alloc] init];
+
+    other.checkInNodeID = self.checkInNodeID;
+    other.monitoredSubject = self.monitoredSubject;
+    other.key = self.key;
+    other.verificationKey = self.verificationKey;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: checkInNodeID:%@; monitoredSubject:%@; key:%@; verificationKey:%@; >",
+                  NSStringFromClass([self class]), _checkInNodeID, _monitoredSubject, [_key base64EncodedStringWithOptions:0],
+                  [_verificationKey base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+@implementation MTRICDManagementClusterRegisterClientResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _icdCounter = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRICDManagementClusterRegisterClientResponseParams alloc] init];
+
+    other.icdCounter = self.icdCounter;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: icdCounter:%@; >", NSStringFromClass([self class]), _icdCounter];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRICDManagementClusterRegisterClientResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType &)decodableStruct
+{
+    {
+        self.icdCounter = [NSNumber numberWithUnsignedInt:decodableStruct.ICDCounter];
+    }
+    return CHIP_NO_ERROR;
+}
+@end
+@implementation MTRICDManagementClusterUnregisterClientParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _checkInNodeID = @(0);
+
+        _verificationKey = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRICDManagementClusterUnregisterClientParams alloc] init];
+
+    other.checkInNodeID = self.checkInNodeID;
+    other.verificationKey = self.verificationKey;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: checkInNodeID:%@; verificationKey:%@; >", NSStringFromClass([self class]), _checkInNodeID,
+                  [_verificationKey base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+@implementation MTRICDManagementClusterStayActiveRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRICDManagementClusterStayActiveRequestParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
 @implementation MTRModeSelectClusterChangeToModeParams
 - (instancetype)init
 {
@@ -6449,7 +6825,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRModeSelectClusterChangeToModeWithStatusParams
+@implementation MTRLaundryWasherModeClusterChangeToModeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6463,7 +6839,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRModeSelectClusterChangeToModeWithStatusParams alloc] init];
+    auto other = [[MTRLaundryWasherModeClusterChangeToModeParams alloc] init];
 
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -6479,7 +6855,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRModeSelectClusterChangeToModeResponseParams
+@implementation MTRLaundryWasherModeClusterChangeToModeResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6493,7 +6869,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRModeSelectClusterChangeToModeResponseParams alloc] init];
+    auto other = [[MTRLaundryWasherModeClusterChangeToModeResponseParams alloc] init];
 
     other.status = self.status;
     other.statusText = self.statusText;
@@ -6515,7 +6891,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::ModeSelect::Commands::ChangeToModeResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -6550,10 +6926,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRModeSelectClusterChangeToModeResponseParams (InternalMethods)
+@implementation MTRLaundryWasherModeClusterChangeToModeResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::ModeSelect::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+    (const chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -6572,7 +6948,7 @@ NS_ASSUME_NONNULL_BEGIN
     return CHIP_NO_ERROR;
 }
 @end
-@implementation MTRLaundryWasherModeSelectClusterChangeToModeParams
+@implementation MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6586,7 +6962,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRLaundryWasherModeSelectClusterChangeToModeParams alloc] init];
+    auto other = [[MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeParams alloc] init];
 
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -6602,37 +6978,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRLaundryWasherModeSelectClusterChangeToModeWithStatusParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _newMode = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRLaundryWasherModeSelectClusterChangeToModeWithStatusParams alloc] init];
-
-    other.newMode = self.newMode;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newMode:%@; >", NSStringFromClass([self class]), _newMode];
-    return descriptionString;
-}
-
-@end
-@implementation MTRLaundryWasherModeSelectClusterChangeToModeResponseParams
+@implementation MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6646,160 +6992,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRLaundryWasherModeSelectClusterChangeToModeResponseParams alloc] init];
-
-    other.status = self.status;
-    other.statusText = self.statusText;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: status:%@; statusText:%@; >", NSStringFromClass([self class]), _status, _statusText];
-    return descriptionString;
-}
-
-- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    using DecodableType = chip::app::Clusters::LaundryWasherModeSelect::Commands::ChangeToModeResponse::DecodableType;
-    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
-                                                                           clusterID:DecodableType::GetClusterId()
-                                                                           commandID:DecodableType::GetCommandId()
-                                                                               error:error];
-    if (buffer.IsNull()) {
-        return nil;
-    }
-
-    chip::TLV::TLVReader reader;
-    reader.Init(buffer->Start(), buffer->DataLength());
-
-    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
-    if (err == CHIP_NO_ERROR) {
-        DecodableType decodedStruct;
-        err = chip::app::DataModel::Decode(reader, decodedStruct);
-        if (err == CHIP_NO_ERROR) {
-            err = [self _setFieldsFromDecodableStruct:decodedStruct];
-            if (err == CHIP_NO_ERROR) {
-                return self;
-            }
-        }
-    }
-
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
-    return nil;
-}
-
-@end
-
-@implementation MTRLaundryWasherModeSelectClusterChangeToModeResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::LaundryWasherModeSelect::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
-{
-    {
-        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
-    }
-    {
-        if (decodableStruct.statusText.HasValue()) {
-            self.statusText = AsString(decodableStruct.statusText.Value());
-            if (self.statusText == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                return err;
-            }
-        } else {
-            self.statusText = nil;
-        }
-    }
-    return CHIP_NO_ERROR;
-}
-@end
-@implementation MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _newMode = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeParams alloc] init];
-
-    other.newMode = self.newMode;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newMode:%@; >", NSStringFromClass([self class]), _newMode];
-    return descriptionString;
-}
-
-@end
-@implementation MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeWithStatusParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _newMode = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeWithStatusParams alloc] init];
-
-    other.newMode = self.newMode;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newMode:%@; >", NSStringFromClass([self class]), _newMode];
-    return descriptionString;
-}
-
-@end
-@implementation MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-
-        _statusText = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseParams alloc] init];
+    auto other = [[MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseParams alloc] init];
 
     other.status = self.status;
     other.statusText = self.statusText;
@@ -6822,7 +7015,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 
     using DecodableType
-        = chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Commands::ChangeToModeResponse::DecodableType;
+        = chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -6857,10 +7050,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseParams (InternalMethods)
+@implementation MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::
-                                                    Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::DecodableType &)
+        decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -6879,7 +7073,7 @@ NS_ASSUME_NONNULL_BEGIN
     return CHIP_NO_ERROR;
 }
 @end
-@implementation MTRRVCRunModeSelectClusterChangeToModeParams
+@implementation MTRRVCRunModeClusterChangeToModeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6893,7 +7087,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRRVCRunModeSelectClusterChangeToModeParams alloc] init];
+    auto other = [[MTRRVCRunModeClusterChangeToModeParams alloc] init];
 
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -6909,37 +7103,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRRVCRunModeSelectClusterChangeToModeWithStatusParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _newMode = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRRVCRunModeSelectClusterChangeToModeWithStatusParams alloc] init];
-
-    other.newMode = self.newMode;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newMode:%@; >", NSStringFromClass([self class]), _newMode];
-    return descriptionString;
-}
-
-@end
-@implementation MTRRVCRunModeSelectClusterChangeToModeResponseParams
+@implementation MTRRVCRunModeClusterChangeToModeResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6953,7 +7117,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRRVCRunModeSelectClusterChangeToModeResponseParams alloc] init];
+    auto other = [[MTRRVCRunModeClusterChangeToModeResponseParams alloc] init];
 
     other.status = self.status;
     other.statusText = self.statusText;
@@ -6975,7 +7139,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::RvcRunModeSelect::Commands::ChangeToModeResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::RvcRunMode::Commands::ChangeToModeResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -7010,10 +7174,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRRVCRunModeSelectClusterChangeToModeResponseParams (InternalMethods)
+@implementation MTRRVCRunModeClusterChangeToModeResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::RvcRunModeSelect::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+    (const chip::app::Clusters::RvcRunMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -7032,7 +7196,7 @@ NS_ASSUME_NONNULL_BEGIN
     return CHIP_NO_ERROR;
 }
 @end
-@implementation MTRRVCCleanModeSelectClusterChangeToModeParams
+@implementation MTRRVCCleanModeClusterChangeToModeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7046,7 +7210,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRRVCCleanModeSelectClusterChangeToModeParams alloc] init];
+    auto other = [[MTRRVCCleanModeClusterChangeToModeParams alloc] init];
 
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7062,37 +7226,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRRVCCleanModeSelectClusterChangeToModeWithStatusParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _newMode = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRRVCCleanModeSelectClusterChangeToModeWithStatusParams alloc] init];
-
-    other.newMode = self.newMode;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newMode:%@; >", NSStringFromClass([self class]), _newMode];
-    return descriptionString;
-}
-
-@end
-@implementation MTRRVCCleanModeSelectClusterChangeToModeResponseParams
+@implementation MTRRVCCleanModeClusterChangeToModeResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7106,7 +7240,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRRVCCleanModeSelectClusterChangeToModeResponseParams alloc] init];
+    auto other = [[MTRRVCCleanModeClusterChangeToModeResponseParams alloc] init];
 
     other.status = self.status;
     other.statusText = self.statusText;
@@ -7128,7 +7262,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::RvcCleanModeSelect::Commands::ChangeToModeResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -7163,10 +7297,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRRVCCleanModeSelectClusterChangeToModeResponseParams (InternalMethods)
+@implementation MTRRVCCleanModeClusterChangeToModeResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::RvcCleanModeSelect::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+    (const chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -7219,41 +7353,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRRefrigeratorAlarmClusterResetParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _alarms = @(0);
-
-        _mask = nil;
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRRefrigeratorAlarmClusterResetParams alloc] init];
-
-    other.alarms = self.alarms;
-    other.mask = self.mask;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: alarms:%@; mask:%@; >", NSStringFromClass([self class]), _alarms, _mask];
-    return descriptionString;
-}
-
-@end
-@implementation MTRDishwasherModeSelectClusterChangeToModeParams
+@implementation MTRDishwasherModeClusterChangeToModeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7267,7 +7367,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRDishwasherModeSelectClusterChangeToModeParams alloc] init];
+    auto other = [[MTRDishwasherModeClusterChangeToModeParams alloc] init];
 
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7283,37 +7383,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRDishwasherModeSelectClusterChangeToModeWithStatusParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _newMode = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRDishwasherModeSelectClusterChangeToModeWithStatusParams alloc] init];
-
-    other.newMode = self.newMode;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newMode:%@; >", NSStringFromClass([self class]), _newMode];
-    return descriptionString;
-}
-
-@end
-@implementation MTRDishwasherModeSelectClusterChangeToModeResponseParams
+@implementation MTRDishwasherModeClusterChangeToModeResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7327,7 +7397,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRDishwasherModeSelectClusterChangeToModeResponseParams alloc] init];
+    auto other = [[MTRDishwasherModeClusterChangeToModeResponseParams alloc] init];
 
     other.status = self.status;
     other.statusText = self.statusText;
@@ -7349,7 +7419,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::DishwasherModeSelect::Commands::ChangeToModeResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::DishwasherMode::Commands::ChangeToModeResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -7384,10 +7454,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRDishwasherModeSelectClusterChangeToModeResponseParams (InternalMethods)
+@implementation MTRDishwasherModeClusterChangeToModeResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::DishwasherModeSelect::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+    (const chip::app::Clusters::DishwasherMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -7429,6 +7499,66 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation MTRDishwasherAlarmClusterResetParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _alarms = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDishwasherAlarmClusterResetParams alloc] init];
+
+    other.alarms = self.alarms;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: alarms:%@; >", NSStringFromClass([self class]), _alarms];
+    return descriptionString;
+}
+
+@end
+@implementation MTRDishwasherAlarmClusterModifyEnabledAlarmsParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _mask = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDishwasherAlarmClusterModifyEnabledAlarmsParams alloc] init];
+
+    other.mask = self.mask;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mask:%@; >", NSStringFromClass([self class]), _mask];
     return descriptionString;
 }
 
@@ -7617,15 +7747,222 @@ NS_ASSUME_NONNULL_BEGIN
     {
         self.commandResponseState = [MTROperationalStateClusterErrorStateStruct new];
         self.commandResponseState.errorStateID =
-            [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.commandResponseState.errorStateID)];
-        if (decodableStruct.commandResponseState.errorStateLabel.IsNull()) {
-            self.commandResponseState.errorStateLabel = nil;
-        } else {
+            [NSNumber numberWithUnsignedChar:decodableStruct.commandResponseState.errorStateID];
+        if (decodableStruct.commandResponseState.errorStateLabel.HasValue()) {
             self.commandResponseState.errorStateLabel = AsString(decodableStruct.commandResponseState.errorStateLabel.Value());
             if (self.commandResponseState.errorStateLabel == nil) {
                 CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                 return err;
             }
+        } else {
+            self.commandResponseState.errorStateLabel = nil;
+        }
+        if (decodableStruct.commandResponseState.errorStateDetails.HasValue()) {
+            self.commandResponseState.errorStateDetails = AsString(decodableStruct.commandResponseState.errorStateDetails.Value());
+            if (self.commandResponseState.errorStateDetails == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+        } else {
+            self.commandResponseState.errorStateDetails = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+@end
+@implementation MTRRVCOperationalStateClusterPauseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRRVCOperationalStateClusterPauseParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation MTRRVCOperationalStateClusterStopParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRRVCOperationalStateClusterStopParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation MTRRVCOperationalStateClusterStartParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRRVCOperationalStateClusterStartParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation MTRRVCOperationalStateClusterResumeParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRRVCOperationalStateClusterResumeParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation MTRRVCOperationalStateClusterOperationalCommandResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _commandResponseState = [MTRRVCOperationalStateClusterErrorStateStruct new];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRRVCOperationalStateClusterOperationalCommandResponseParams alloc] init];
+
+    other.commandResponseState = self.commandResponseState;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: commandResponseState:%@; >", NSStringFromClass([self class]), _commandResponseState];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRRVCOperationalStateClusterOperationalCommandResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct
+{
+    {
+        self.commandResponseState = [MTRRVCOperationalStateClusterErrorStateStruct new];
+        self.commandResponseState.errorStateID =
+            [NSNumber numberWithUnsignedChar:decodableStruct.commandResponseState.errorStateID];
+        if (decodableStruct.commandResponseState.errorStateLabel.HasValue()) {
+            self.commandResponseState.errorStateLabel = AsString(decodableStruct.commandResponseState.errorStateLabel.Value());
+            if (self.commandResponseState.errorStateLabel == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+        } else {
+            self.commandResponseState.errorStateLabel = nil;
         }
         if (decodableStruct.commandResponseState.errorStateDetails.HasValue()) {
             self.commandResponseState.errorStateDetails = AsString(decodableStruct.commandResponseState.errorStateDetails.Value());
@@ -7680,276 +8017,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRActivatedCarbonFilterMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRCeramicFilterMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRCeramicFilterMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRElectrostaticFilterMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRElectrostaticFilterMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRUVFilterMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRUVFilterMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRIonizingFilterMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRIonizingFilterMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRZeoliteFilterMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRZeoliteFilterMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTROzoneFilterMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTROzoneFilterMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRWaterTankMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRWaterTankMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRFuelTankMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRFuelTankMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRInkCartridgeMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRInkCartridgeMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRTonerCartridgeMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRTonerCartridgeMonitoringClusterResetConditionParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -13208,179 +13275,180 @@ NS_ASSUME_NONNULL_BEGIN
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
     (const chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType &)decodableStruct
 {
-    { { // Scope for our temporary variables
-        auto * array_0 = [NSMutableArray new];
-    auto iter_0 = decodableStruct.arg1.begin();
-    while (iter_0.Next()) {
-        auto & entry_0 = iter_0.GetValue();
-        MTRUnitTestingClusterNestedStructList * newElement_0;
-        newElement_0 = [MTRUnitTestingClusterNestedStructList new];
-        newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
-        newElement_0.b = [NSNumber numberWithBool:entry_0.b];
-        newElement_0.c = [MTRUnitTestingClusterSimpleStruct new];
-        newElement_0.c.a = [NSNumber numberWithUnsignedChar:entry_0.c.a];
-        newElement_0.c.b = [NSNumber numberWithBool:entry_0.c.b];
-        newElement_0.c.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c.c)];
-        newElement_0.c.d = AsData(entry_0.c.d);
-        newElement_0.c.e = AsString(entry_0.c.e);
-        if (newElement_0.c.e == nil) {
-            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-            return err;
-        }
-        newElement_0.c.f = [NSNumber numberWithUnsignedChar:entry_0.c.f.Raw()];
-        newElement_0.c.g = [NSNumber numberWithFloat:entry_0.c.g];
-        newElement_0.c.h = [NSNumber numberWithDouble:entry_0.c.h];
+    {
         { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.d.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                MTRUnitTestingClusterSimpleStruct * newElement_2;
-                newElement_2 = [MTRUnitTestingClusterSimpleStruct new];
-                newElement_2.a = [NSNumber numberWithUnsignedChar:entry_2.a];
-                newElement_2.b = [NSNumber numberWithBool:entry_2.b];
-                newElement_2.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.c)];
-                newElement_2.d = AsData(entry_2.d);
-                newElement_2.e = AsString(entry_2.e);
-                if (newElement_2.e == nil) {
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = decodableStruct.arg1.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRUnitTestingClusterNestedStructList * newElement_0;
+                newElement_0 = [MTRUnitTestingClusterNestedStructList new];
+                newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
+                newElement_0.b = [NSNumber numberWithBool:entry_0.b];
+                newElement_0.c = [MTRUnitTestingClusterSimpleStruct new];
+                newElement_0.c.a = [NSNumber numberWithUnsignedChar:entry_0.c.a];
+                newElement_0.c.b = [NSNumber numberWithBool:entry_0.c.b];
+                newElement_0.c.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c.c)];
+                newElement_0.c.d = AsData(entry_0.c.d);
+                newElement_0.c.e = AsString(entry_0.c.e);
+                if (newElement_0.c.e == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                     return err;
                 }
-                newElement_2.f = [NSNumber numberWithUnsignedChar:entry_2.f.Raw()];
-                newElement_2.g = [NSNumber numberWithFloat:entry_2.g];
-                newElement_2.h = [NSNumber numberWithDouble:entry_2.h];
-                [array_2 addObject:newElement_2];
+                newElement_0.c.f = [NSNumber numberWithUnsignedChar:entry_0.c.f.Raw()];
+                newElement_0.c.g = [NSNumber numberWithFloat:entry_0.c.g];
+                newElement_0.c.h = [NSNumber numberWithDouble:entry_0.c.h];
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.d.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        MTRUnitTestingClusterSimpleStruct * newElement_2;
+                        newElement_2 = [MTRUnitTestingClusterSimpleStruct new];
+                        newElement_2.a = [NSNumber numberWithUnsignedChar:entry_2.a];
+                        newElement_2.b = [NSNumber numberWithBool:entry_2.b];
+                        newElement_2.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.c)];
+                        newElement_2.d = AsData(entry_2.d);
+                        newElement_2.e = AsString(entry_2.e);
+                        if (newElement_2.e == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            return err;
+                        }
+                        newElement_2.f = [NSNumber numberWithUnsignedChar:entry_2.f.Raw()];
+                        newElement_2.g = [NSNumber numberWithFloat:entry_2.g];
+                        newElement_2.h = [NSNumber numberWithDouble:entry_2.h];
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        return err;
+                    }
+                    newElement_0.d = array_2;
+                }
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.e.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        NSNumber * newElement_2;
+                        newElement_2 = [NSNumber numberWithUnsignedInt:entry_2];
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        return err;
+                    }
+                    newElement_0.e = array_2;
+                }
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.f.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        NSData * newElement_2;
+                        newElement_2 = AsData(entry_2);
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        return err;
+                    }
+                    newElement_0.f = array_2;
+                }
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.g.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        NSNumber * newElement_2;
+                        newElement_2 = [NSNumber numberWithUnsignedChar:entry_2];
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        return err;
+                    }
+                    newElement_0.g = array_2;
+                }
+                [array_0 addObject:newElement_0];
             }
-            CHIP_ERROR err = iter_2.GetStatus();
+            CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
                 return err;
             }
-            newElement_0.d = array_2;
+            self.arg1 = array_0;
         }
+    }
+    {
         { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.e.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                NSNumber * newElement_2;
-                newElement_2 = [NSNumber numberWithUnsignedInt:entry_2];
-                [array_2 addObject:newElement_2];
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = decodableStruct.arg2.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRUnitTestingClusterSimpleStruct * newElement_0;
+                newElement_0 = [MTRUnitTestingClusterSimpleStruct new];
+                newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
+                newElement_0.b = [NSNumber numberWithBool:entry_0.b];
+                newElement_0.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c)];
+                newElement_0.d = AsData(entry_0.d);
+                newElement_0.e = AsString(entry_0.e);
+                if (newElement_0.e == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    return err;
+                }
+                newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
+                newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
+                newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
+                [array_0 addObject:newElement_0];
             }
-            CHIP_ERROR err = iter_2.GetStatus();
+            CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
                 return err;
             }
-            newElement_0.e = array_2;
+            self.arg2 = array_0;
         }
+    }
+    {
         { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.f.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                NSData * newElement_2;
-                newElement_2 = AsData(entry_2);
-                [array_2 addObject:newElement_2];
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = decodableStruct.arg3.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                [array_0 addObject:newElement_0];
             }
-            CHIP_ERROR err = iter_2.GetStatus();
+            CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
                 return err;
             }
-            newElement_0.f = array_2;
+            self.arg3 = array_0;
         }
+    }
+    {
         { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.g.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                NSNumber * newElement_2;
-                newElement_2 = [NSNumber numberWithUnsignedChar:entry_2];
-                [array_2 addObject:newElement_2];
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = decodableStruct.arg4.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithBool:entry_0];
+                [array_0 addObject:newElement_0];
             }
-            CHIP_ERROR err = iter_2.GetStatus();
+            CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
                 return err;
             }
-            newElement_0.g = array_2;
+            self.arg4 = array_0;
         }
-        [array_0 addObject:newElement_0];
     }
-    CHIP_ERROR err = iter_0.GetStatus();
-    if (err != CHIP_NO_ERROR) {
-        return err;
+    {
+        self.arg5 = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.arg5)];
     }
-    self.arg1 = array_0;
-}
-}
-{
-    { // Scope for our temporary variables
-        auto * array_0 = [NSMutableArray new];
-        auto iter_0 = decodableStruct.arg2.begin();
-        while (iter_0.Next()) {
-            auto & entry_0 = iter_0.GetValue();
-            MTRUnitTestingClusterSimpleStruct * newElement_0;
-            newElement_0 = [MTRUnitTestingClusterSimpleStruct new];
-            newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
-            newElement_0.b = [NSNumber numberWithBool:entry_0.b];
-            newElement_0.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c)];
-            newElement_0.d = AsData(entry_0.d);
-            newElement_0.e = AsString(entry_0.e);
-            if (newElement_0.e == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                return err;
-            }
-            newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
-            newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
-            newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
-            [array_0 addObject:newElement_0];
-        }
-        CHIP_ERROR err = iter_0.GetStatus();
-        if (err != CHIP_NO_ERROR) {
-            return err;
-        }
-        self.arg2 = array_0;
+    {
+        self.arg6 = [NSNumber numberWithBool:decodableStruct.arg6];
     }
-}
-{
-    { // Scope for our temporary variables
-        auto * array_0 = [NSMutableArray new];
-        auto iter_0 = decodableStruct.arg3.begin();
-        while (iter_0.Next()) {
-            auto & entry_0 = iter_0.GetValue();
-            NSNumber * newElement_0;
-            newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
-            [array_0 addObject:newElement_0];
-        }
-        CHIP_ERROR err = iter_0.GetStatus();
-        if (err != CHIP_NO_ERROR) {
-            return err;
-        }
-        self.arg3 = array_0;
-    }
-}
-{
-    { // Scope for our temporary variables
-        auto * array_0 = [NSMutableArray new];
-        auto iter_0 = decodableStruct.arg4.begin();
-        while (iter_0.Next()) {
-            auto & entry_0 = iter_0.GetValue();
-            NSNumber * newElement_0;
-            newElement_0 = [NSNumber numberWithBool:entry_0];
-            [array_0 addObject:newElement_0];
-        }
-        CHIP_ERROR err = iter_0.GetStatus();
-        if (err != CHIP_NO_ERROR) {
-            return err;
-        }
-        self.arg4 = array_0;
-    }
-}
-{
-    self.arg5 = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.arg5)];
-}
-{
-    self.arg6 = [NSNumber numberWithBool:decodableStruct.arg6];
-}
-return CHIP_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 @end
 
@@ -15114,87 +15182,6 @@ return CHIP_NO_ERROR;
 @end
 
 @implementation MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams
-@end
-@implementation MTRFaultInjectionClusterFailAtFaultParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _type = @(0);
-
-        _id = @(0);
-
-        _numCallsToSkip = @(0);
-
-        _numCallsToFail = @(0);
-
-        _takeMutex = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRFaultInjectionClusterFailAtFaultParams alloc] init];
-
-    other.type = self.type;
-    other.id = self.id;
-    other.numCallsToSkip = self.numCallsToSkip;
-    other.numCallsToFail = self.numCallsToFail;
-    other.takeMutex = self.takeMutex;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: type:%@; id:%@; numCallsToSkip:%@; numCallsToFail:%@; takeMutex:%@; >",
-                  NSStringFromClass([self class]), _type, _id, _numCallsToSkip, _numCallsToFail, _takeMutex];
-    return descriptionString;
-}
-
-@end
-@implementation MTRFaultInjectionClusterFailRandomlyAtFaultParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _type = @(0);
-
-        _id = @(0);
-
-        _percentage = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRFaultInjectionClusterFailRandomlyAtFaultParams alloc] init];
-
-    other.type = self.type;
-    other.id = self.id;
-    other.percentage = self.percentage;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: type:%@; id:%@; percentage:%@; >", NSStringFromClass([self class]), _type, _id, _percentage];
-    return descriptionString;
-}
-
 @end
 
 NS_ASSUME_NONNULL_END

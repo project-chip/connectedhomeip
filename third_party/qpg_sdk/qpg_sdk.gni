@@ -27,6 +27,9 @@ declare_args() {
   # Target IC for QPG SDK
   qpg_target_ic = "qpg6105"
 
+  # Target board for QPG SDK
+  qpg_target_board = "QPG6105DK_B01"
+
   # an option to disable referencing qorvo object archive files (*.a)
   qpg_sdk_include_platform_libs = true
 

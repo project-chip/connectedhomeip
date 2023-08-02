@@ -19,8 +19,6 @@ ninja -C {out}/android-arm64-chip-tool
 # Prepare Native libs android-arm64-chip-tool
 mkdir -p {root}/examples/android/CHIPTool/app/libs/jniLibs/arm64-v8a
 
-cp {out}/android-arm64-chip-tool/lib/jni/arm64-v8a/libOnboardingPayload.so {root}/examples/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libOnboardingPayload.so
-
 cp {out}/android-arm64-chip-tool/lib/jni/arm64-v8a/libCHIPController.so {root}/examples/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libCHIPController.so
 
 cp {out}/android-arm64-chip-tool/lib/jni/arm64-v8a/libc++_shared.so {root}/examples/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libc++_shared.so

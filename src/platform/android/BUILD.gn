@@ -22,6 +22,20 @@ import("${chip_root}/build/chip/java/rules.gni")
 
 assert(chip_device_platform == "android")
 
+source_set("tracing") {
+  sources = [
+    "tracing.cpp",
+    "tracing.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/tracing",
+    "${chip_root}/src/tracing/perfetto:event_storage",
+    "${chip_root}/src/tracing/perfetto:simple_initialization",
+  ]
+}
+
 static_library("android") {
   output_name = "libAndroidPlatform"
 
@@ -58,9 +72,9 @@ static_library("android") {
   ]
 
   deps = [
+    ":tracing",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/setup_payload",
-    "${chip_root}/src/trace",
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]

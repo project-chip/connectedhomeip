@@ -1,5 +1,5 @@
 steps:
-    - name: "connectedhomeip/chip-build-vscode:0.7.3"
+    - name: "ghcr.io/project-chip/chip-build-vscode:1"
       entrypoint: "bash"
       args:
           - "-c"
@@ -7,7 +7,7 @@ steps:
               git config --global --add safe.directory "*"
               git submodule update --init --recursive
       id: Submodules
-    - name: "connectedhomeip/chip-build-vscode:0.7.3"
+    - name: "ghcr.io/project-chip/chip-build-vscode:1"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -22,16 +22,17 @@ steps:
             path: /pwenv
       timeout: 900s
 
-    - name: "connectedhomeip/chip-build-vscode:0.7.3"
+    - name: "ghcr.io/project-chip/chip-build-vscode:1"
       id: ESP32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
+              perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt &&
               ./scripts/build/build_examples.py --enable-flashbundle --target
               esp32-devkitc-light-rpc --target
               esp32-m5stack-all-clusters-ipv6only --target
-              esp32-m5stack-all-clusters-rpc --target
+              esp32-m5stack-all-clusters-rpc-ipv6only --target
               esp32-m5stack-light --target
               esp32-m5stack-light-ipv6only --target
               esp32-m5stack-ota-requestor build --create-archives
@@ -42,7 +43,7 @@ steps:
       volumes:
           - name: pwenv
             path: /pwenv
-    - name: "connectedhomeip/chip-build-vscode:0.7.3"
+    - name: "ghcr.io/project-chip/chip-build-vscode:1"
       id: NRFConnect
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -63,7 +64,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.7.3"
+    - name: "ghcr.io/project-chip/chip-build-vscode:1"
       id: EFR32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -85,7 +86,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.7.3"
+    - name: "ghcr.io/project-chip/chip-build-vscode:1"
       id: Linux
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -108,8 +109,6 @@ steps:
               --target linux-arm64-python-bindings-clang
               --target linux-arm64-shell-ipv6only-clang
               --target linux-arm64-thermostat-ipv6only-clang
-              --target linux-arm64-tv-app-ipv6only-clang
-              --target linux-arm64-tv-casting-app-ipv6only-clang
               --target linux-x64-address-resolve-tool
               --target linux-x64-all-clusters-nodeps
               --target linux-x64-all-clusters-coverage
@@ -124,15 +123,12 @@ steps:
               --target linux-x64-light-rpc-ipv6only-minmdns-verbose
               --target linux-x64-lock-ipv6only
               --target linux-x64-minmdns-ipv6only
-              --target linux-x64-minmdns-ipv6only-minmdns-verbose
               --target linux-x64-ota-provider-ipv6only
               --target linux-x64-ota-requestor-ipv6only
               --target linux-x64-python-bindings
               --target linux-x64-rpc-console
               --target linux-x64-shell-ipv6only
               --target linux-x64-thermostat-ipv6only
-              --target linux-x64-tv-app-ipv6only
-              --target linux-x64-tv-casting-app-ipv6only
               build
               --create-archives /workspace/artifacts/
       waitFor:
@@ -143,7 +139,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.7.3"
+    - name: "ghcr.io/project-chip/chip-build-vscode:1"
       id: Android
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -164,7 +160,7 @@ steps:
 logsBucket: matter-build-automation-build-logs
 
 # Global timeout for all steps
-timeout: 9000s
+timeout: 14400s
 queueTtl: 21600s
 
 artifacts:

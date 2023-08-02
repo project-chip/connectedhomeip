@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 80.3.3. [TC-MOD-3.3] OTA Mode Verification (DUT as Server)
+name: 81.3.3. [TC-MOD-3.3] OTA Mode Verification (DUT as Server)
 
 PICS:
     - MOD.S.A0004
@@ -57,7 +57,7 @@ tests:
           This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
       disabled: true
 
-    - label: "TH reads the StartUpMode attribute from the DUT"
+    - label: "Step 1: TH reads the StartUpMode attribute from the DUT"
       PICS: MOD.S.A0004
       verification: |
           ./chip-tool modeselect read start-up-mode 1 1
@@ -68,7 +68,7 @@ tests:
           [1645778279.693151][4898:4903] CHIP:TOO:   StartUpMode: 0
       disabled: true
 
-    - label: "TH reads the CurrentMode attribute from the DUT"
+    - label: "Step 2a: TH reads the CurrentMode attribute from the DUT"
       PICS: MOD.S.A0003
       verification: |
           ./chip-tool modeselect read current-mode 1 1
@@ -80,15 +80,15 @@ tests:
       disabled: true
 
     - label:
-          "If the StartUpMode and CurrentMode attributes have the same value,
-          proceed to step 2c, Otherwise proceed to step 3a."
+          "Step 2b: If the StartUpMode and CurrentMode attributes have the same
+          value, proceed to step 2c, Otherwise proceed to step 3a."
       PICS: MOD.S.A0003 && MOD.S.A0004
       verification: |
           NOTE:
           If the StartUpMode and CurrentMode attributes have the same value, proceed to step 2c, Otherwise proceed to step 3a.
       disabled: true
 
-    - label: "TH reads the SupportedModes attribute from the DUT"
+    - label: "Step 2c: TH reads the SupportedModes attribute from the DUT"
       PICS: MOD.S.A0002
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
@@ -129,9 +129,9 @@ tests:
       disabled: true
 
     - label:
-          "Select a value from the list in step 2c with a different value than
-          the StartUpMode value read in step 1. TH sends a ChangeToMode command
-          to the DUT with the selected value."
+          "Step 2d: Select a value from the list in step 2c with a different
+          value than the StartUpMode value read in step 1. TH sends a
+          ChangeToMode command to the DUT with the selected value."
       PICS: MOD.S.A0002 && MOD.S.C00.Rsp
       verification: |
           ./chip-tool modeselect change-to-mode 4 1 1
@@ -142,32 +142,39 @@ tests:
       disabled: true
 
     - label:
-          "Perform an OTA update on the device that requires a reboot. Allow for
-          the DUT to update and fully reboot."
+          "Step 3a: Perform an OTA update on the device that requires a reboot.
+          Allow for the DUT to update and fully reboot."
       verification: |
           To perform an OTA update on Thread device follow the cmmds below:
 
-          Step-1 : Where we builded OTA provider app execute this cmmd . (In my case I ran connectedhomeip/out/debug ./chip-otaprovider-app -f  )
+          Step-1 :Run the below command in the path, Where we built the OTA provider app . (In this example , the path is  connectedhomeip/out/debug ./chip-ota-provider-app -f  )
 
-          ./chip-otaprovider-app -f ~/chip_repos/connectedhomeip/examples/all-clusters-app/nrfconnect/build2/zephyr/matter.ota
+          ./chip-ota-provider-app -f ~/chip_repos/connectedhomeip/examples/all-clusters-app/nrfconnect/build2/zephyr/matter.ota
 
-          Ran on chip-tool:
+          Execute the  command using chip-tool and verify the response as below.
 
           Step-2: ./chip-tool pairing onnetwork 2 20202021
 
+          [1659104612.593187][62366:62371] CHIP:CTL: Successfully finished commissioning step 'ReadCommissioningInfo'
+
           Step-3 : ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": [{"cluster": 41, "endpoint": null, "deviceType": null}]}]' 2 0
+
+          [1651101661960] [90832:7598169] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
+
 
           Step-4: ./chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"fabricIndex": 1, "providerNodeID": 2, "endpoint": 0}]' 1 0
 
           Step-5: ./chip-tool otasoftwareupdaterequestor announce-otaprovider 2 0 0 0 1 0
+
+          Make sure the OTA update is succesful. Refer OTA testcases for the command & its output. .
       disabled: true
 
-    - label: "TH reads the CurrentMode attribute from the DUT"
+    - label: "Step 3b: TH reads the CurrentMode attribute from the DUT"
       PICS: MOD.S.A0003
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          on TH(chip-tool) log verify that CurrentMode is same as value recorded in step 2d and below is the sample log provided for the raspi platform:
+          After the OTA-update on TH(chip-tool) log verify that CurrentMode is same as value recorded in step 2d and below is the sample log provided for the raspi platform:
 
           [1645778146.171510][4876:4881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469721
           [1645778146.171602][4876:4881] CHIP:TOO:   CurrentMode: 4

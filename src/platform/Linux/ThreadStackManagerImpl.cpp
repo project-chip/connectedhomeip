@@ -25,6 +25,8 @@
 #include <platform/PlatformManager.h>
 #include <platform/ThreadStackManager.h>
 
+#include <app-common/zap-generated/ids/Attributes.h>
+
 #include <nlbyteorder.hpp>
 #include <nlio-byteorder.hpp>
 #include <nlio.hpp>
@@ -544,6 +546,14 @@ CHIP_ERROR ThreadStackManagerImpl::_RequestSEDActiveMode(bool onOff, bool delayI
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 #endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+CHIP_ERROR ThreadStackManagerImpl::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
+{
+    (void) pollingInterval;
+    ChipLogError(DeviceLayer, "Set ICD Polling on linux");
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 
 bool ThreadStackManagerImpl::_HaveMeshConnectivity()
 {

@@ -30,14 +30,20 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 #if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif // HAVE_SYS_SOCKET_H
-
-#include <cerrno>
 #include <net/if.h>
 #include <netinet/in.h>
 #include <sys/ioctl.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
+
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
+#include <zephyr/net/socket.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
+
+#include <cerrno>
 #include <unistd.h>
 #include <utility>
 
@@ -463,7 +469,14 @@ CHIP_ERROR UDPEndPointImplSockets::GetSocket(IPAddressType addressType)
         {
             return CHIP_ERROR_POSIX(errno);
         }
-        ReturnErrorOnFailure(static_cast<System::LayerSockets *>(&GetSystemLayer())->StartWatchingSocket(mSocket, &mWatch));
+        CHIP_ERROR err = static_cast<System::LayerSockets *>(&GetSystemLayer())->StartWatchingSocket(mSocket, &mWatch);
+        if (err != CHIP_NO_ERROR)
+        {
+            // Our mWatch is not valid; make sure we never use it.
+            close(mSocket);
+            mSocket = kInvalidSocketFd;
+            return err;
+        }
 
         mAddrType = addressType;
 

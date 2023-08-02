@@ -37,7 +37,8 @@ tests:
       command: "readEvent"
       event: "TestEvent"
       endpoint: 0
-      response: []
+      response:
+          error: UNSUPPORTED_CLUSTER
 
     - label: "Generate an event on the accessory"
       command: "TestEmitTestEventRequest"

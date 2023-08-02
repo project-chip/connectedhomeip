@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/clusters/scenes-server/SceneTable.h>
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -28,11 +29,10 @@
  * Defines and Macros
  *********************************************************/
 
-static constexpr chip::System::Clock::Milliseconds32 UPDATE_TIME_MS = chip::System::Clock::Milliseconds32(100);
-static constexpr uint16_t TRANSITION_TIME_1S                        = 10;
+static constexpr chip::System::Clock::Milliseconds32 ON_OFF_UPDATE_TIME_MS = chip::System::Clock::Milliseconds32(100);
 
-static constexpr uint16_t MAX_TIME_VALUE = 0xFFFF;
-static constexpr uint8_t MIN_TIME_VALUE  = 1;
+static constexpr uint16_t MIN_ON_OFF_TIME_VALUE = 1;
+static constexpr uint16_t MAX_ON_OFF_TIME_VALUE = 0xFFFF;
 
 /**
  * @brief
@@ -48,6 +48,8 @@ public:
      *********************************************************/
 
     static OnOffServer & Instance();
+
+    chip::scenes::SceneHandler * GetSceneHandler();
 
     bool offCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
     bool onCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
@@ -76,7 +78,7 @@ private:
 #ifndef IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
     bool areStartUpOnOffServerAttributesNonVolatile(chip::EndpointId endpoint);
 #endif
-    EmberEventControl * getEventControl(chip::EndpointId endpoint);
+    EmberEventControl * getEventControl(chip::EndpointId endpoint, const chip::Span<EmberEventControl> & eventControlArray);
     EmberEventControl * configureEventControl(chip::EndpointId endpoint);
 
     uint32_t calculateNextWaitTimeMS(void);
@@ -92,6 +94,8 @@ private:
 
     static OnOffServer instance;
     chip::System::Clock::Timestamp nextDesiredOnWithTimedOffTimestamp;
+
+    friend class DefaultOnOffSceneHandler;
 };
 
 struct OnOffEffect

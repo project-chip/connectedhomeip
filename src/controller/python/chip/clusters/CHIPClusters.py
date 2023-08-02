@@ -948,6 +948,12 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000004: {
+                "attributeName": "TagList",
+                "attributeId": 0x00000004,
+                "type": "",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -2020,6 +2026,12 @@ class ChipClusters:
             0x0000001E: {
                 "attributeName": "ActiveBatChargeFaults",
                 "attributeId": 0x0000001E,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000001F: {
+                "attributeName": "EndpointList",
+                "attributeId": 0x0000001F,
                 "type": "int",
                 "reportable": True,
             },
@@ -3814,7 +3826,6 @@ class ChipClusters:
                 "commandId": 0x00000004,
                 "commandName": "KeySetReadAllIndices",
                 "args": {
-                    "groupKeySetIDs": "int",
                 },
             },
         },
@@ -4184,7 +4195,7 @@ class ChipClusters:
                 "commandName": "UnregisterClient",
                 "args": {
                     "checkInNodeID": "int",
-                    "key": "bytes",
+                    "verificationKey": "bytes",
                 },
             },
             0x00000003: {
@@ -4280,13 +4291,6 @@ class ChipClusters:
                     "newMode": "int",
                 },
             },
-            0x00000001: {
-                "commandId": 0x00000001,
-                "commandName": "ChangeToModeWithStatus",
-                "args": {
-                    "newMode": "int",
-                },
-            },
         },
         "attributes": {
             0x00000000: {
@@ -4365,8 +4369,8 @@ class ChipClusters:
             },
         },
     }
-    _LAUNDRY_WASHER_MODE_SELECT_CLUSTER_INFO = {
-        "clusterName": "LaundryWasherModeSelect",
+    _LAUNDRY_WASHER_MODE_CLUSTER_INFO = {
+        "clusterName": "LaundryWasherMode",
         "clusterId": 0x00000051,
         "commands": {
             0x00000000: {
@@ -4376,43 +4380,30 @@ class ChipClusters:
                     "newMode": "int",
                 },
             },
-            0x00000001: {
-                "commandId": 0x00000001,
-                "commandName": "ChangeToModeWithStatus",
-                "args": {
-                    "newMode": "int",
-                },
-            },
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "Description",
-                "attributeId": 0x00000000,
-                "type": "str",
-                "reportable": True,
-            },
-            0x00000002: {
                 "attributeName": "SupportedModes",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
             },
-            0x00000003: {
+            0x00000001: {
                 "attributeName": "CurrentMode",
-                "attributeId": 0x00000003,
+                "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
-            0x00000004: {
+            0x00000002: {
                 "attributeName": "StartUpMode",
-                "attributeId": 0x00000004,
+                "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
-            0x00000005: {
+            0x00000003: {
                 "attributeName": "OnMode",
-                "attributeId": 0x00000005,
+                "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
@@ -4455,8 +4446,8 @@ class ChipClusters:
             },
         },
     }
-    _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SELECT_CLUSTER_INFO = {
-        "clusterName": "RefrigeratorAndTemperatureControlledCabinetModeSelect",
+    _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO = {
+        "clusterName": "RefrigeratorAndTemperatureControlledCabinetMode",
         "clusterId": 0x00000052,
         "commands": {
             0x00000000: {
@@ -4466,43 +4457,30 @@ class ChipClusters:
                     "newMode": "int",
                 },
             },
-            0x00000001: {
-                "commandId": 0x00000001,
-                "commandName": "ChangeToModeWithStatus",
-                "args": {
-                    "newMode": "int",
-                },
-            },
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "Description",
-                "attributeId": 0x00000000,
-                "type": "str",
-                "reportable": True,
-            },
-            0x00000002: {
                 "attributeName": "SupportedModes",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
             },
-            0x00000003: {
+            0x00000001: {
                 "attributeName": "CurrentMode",
-                "attributeId": 0x00000003,
+                "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
-            0x00000004: {
+            0x00000002: {
                 "attributeName": "StartUpMode",
-                "attributeId": 0x00000004,
+                "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
-            0x00000005: {
+            0x00000003: {
                 "attributeName": "OnMode",
-                "attributeId": 0x00000005,
+                "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
@@ -4545,8 +4523,78 @@ class ChipClusters:
             },
         },
     }
-    _RVC_RUN_MODE_SELECT_CLUSTER_INFO = {
-        "clusterName": "RvcRunModeSelect",
+    _LAUNDRY_WASHER_CONTROLS_CLUSTER_INFO = {
+        "clusterName": "LaundryWasherControls",
+        "clusterId": 0x00000053,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "SpinSpeeds",
+                "attributeId": 0x00000000,
+                "type": "str",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "SpinSpeedCurrent",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000002: {
+                "attributeName": "NumberOfRinses",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000003: {
+                "attributeName": "SupportedRinses",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _RVC_RUN_MODE_CLUSTER_INFO = {
+        "clusterName": "RvcRunMode",
         "clusterId": 0x00000054,
         "commands": {
             0x00000000: {
@@ -4556,43 +4604,30 @@ class ChipClusters:
                     "newMode": "int",
                 },
             },
-            0x00000001: {
-                "commandId": 0x00000001,
-                "commandName": "ChangeToModeWithStatus",
-                "args": {
-                    "newMode": "int",
-                },
-            },
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "Description",
-                "attributeId": 0x00000000,
-                "type": "str",
-                "reportable": True,
-            },
-            0x00000002: {
                 "attributeName": "SupportedModes",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
             },
-            0x00000003: {
+            0x00000001: {
                 "attributeName": "CurrentMode",
-                "attributeId": 0x00000003,
+                "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
-            0x00000004: {
+            0x00000002: {
                 "attributeName": "StartUpMode",
-                "attributeId": 0x00000004,
+                "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
-            0x00000005: {
+            0x00000003: {
                 "attributeName": "OnMode",
-                "attributeId": 0x00000005,
+                "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
@@ -4635,8 +4670,8 @@ class ChipClusters:
             },
         },
     }
-    _RVC_CLEAN_MODE_SELECT_CLUSTER_INFO = {
-        "clusterName": "RvcCleanModeSelect",
+    _RVC_CLEAN_MODE_CLUSTER_INFO = {
+        "clusterName": "RvcCleanMode",
         "clusterId": 0x00000055,
         "commands": {
             0x00000000: {
@@ -4646,43 +4681,30 @@ class ChipClusters:
                     "newMode": "int",
                 },
             },
-            0x00000001: {
-                "commandId": 0x00000001,
-                "commandName": "ChangeToModeWithStatus",
-                "args": {
-                    "newMode": "int",
-                },
-            },
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "Description",
-                "attributeId": 0x00000000,
-                "type": "str",
-                "reportable": True,
-            },
-            0x00000002: {
                 "attributeName": "SupportedModes",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
             },
-            0x00000003: {
+            0x00000001: {
                 "attributeName": "CurrentMode",
-                "attributeId": 0x00000003,
+                "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
-            0x00000004: {
+            0x00000002: {
                 "attributeName": "StartUpMode",
-                "attributeId": 0x00000004,
+                "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
-            0x00000005: {
+            0x00000003: {
                 "attributeName": "OnMode",
-                "attributeId": 0x00000005,
+                "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
@@ -4764,7 +4786,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000004: {
-                "attributeName": "CurrentTemperatureLevelIndex",
+                "attributeName": "SelectedTemperatureLevel",
                 "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
@@ -4772,7 +4794,7 @@ class ChipClusters:
             0x00000005: {
                 "attributeName": "SupportedTemperatureLevels",
                 "attributeId": 0x00000005,
-                "type": "",
+                "type": "str",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -4817,14 +4839,6 @@ class ChipClusters:
         "clusterName": "RefrigeratorAlarm",
         "clusterId": 0x00000057,
         "commands": {
-            0x00000000: {
-                "commandId": 0x00000000,
-                "commandName": "Reset",
-                "args": {
-                    "alarms": "int",
-                    "mask": "int",
-                },
-            },
         },
         "attributes": {
             0x00000000: {
@@ -4832,17 +4846,16 @@ class ChipClusters:
                 "attributeId": 0x00000000,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
-            },
-            0x00000001: {
-                "attributeName": "Latch",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
             },
             0x00000002: {
                 "attributeName": "State",
                 "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "Supported",
+                "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
             },
@@ -4884,8 +4897,8 @@ class ChipClusters:
             },
         },
     }
-    _DISHWASHER_MODE_SELECT_CLUSTER_INFO = {
-        "clusterName": "DishwasherModeSelect",
+    _DISHWASHER_MODE_CLUSTER_INFO = {
+        "clusterName": "DishwasherMode",
         "clusterId": 0x00000059,
         "commands": {
             0x00000000: {
@@ -4895,43 +4908,30 @@ class ChipClusters:
                     "newMode": "int",
                 },
             },
-            0x00000001: {
-                "commandId": 0x00000001,
-                "commandName": "ChangeToModeWithStatus",
-                "args": {
-                    "newMode": "int",
-                },
-            },
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "Description",
-                "attributeId": 0x00000000,
-                "type": "str",
-                "reportable": True,
-            },
-            0x00000002: {
                 "attributeName": "SupportedModes",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
             },
-            0x00000003: {
+            0x00000001: {
                 "attributeName": "CurrentMode",
-                "attributeId": 0x00000003,
+                "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
-            0x00000004: {
+            0x00000002: {
                 "attributeName": "StartUpMode",
-                "attributeId": 0x00000004,
+                "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
-            0x00000005: {
+            0x00000003: {
                 "attributeName": "OnMode",
-                "attributeId": 0x00000005,
+                "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
@@ -5103,11 +5103,99 @@ class ChipClusters:
                 "reportable": True,
             },
             0x0000000B: {
-                "attributeName": "SensitivityLevel",
+                "attributeName": "SmokeSensitivityLevel",
                 "attributeId": 0x0000000B,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
+            },
+            0x0000000C: {
+                "attributeName": "ExpiryDate",
+                "attributeId": 0x0000000C,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _DISHWASHER_ALARM_CLUSTER_INFO = {
+        "clusterName": "DishwasherAlarm",
+        "clusterId": 0x0000005D,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "Reset",
+                "args": {
+                    "alarms": "int",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "ModifyEnabledAlarms",
+                "args": {
+                    "mask": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "Mask",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "Latch",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "State",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "Supported",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
@@ -5204,7 +5292,111 @@ class ChipClusters:
             0x00000004: {
                 "attributeName": "OperationalState",
                 "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "OperationalError",
+                "attributeId": 0x00000005,
                 "type": "",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _RVC_OPERATIONAL_STATE_CLUSTER_INFO = {
+        "clusterName": "RvcOperationalState",
+        "clusterId": 0x00000061,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "Pause",
+                "args": {
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "Stop",
+                "args": {
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "Start",
+                "args": {
+                },
+            },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "Resume",
+                "args": {
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "PhaseList",
+                "attributeId": 0x00000000,
+                "type": "str",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "CurrentPhase",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "CountdownTime",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "OperationalStateList",
+                "attributeId": 0x00000003,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "OperationalState",
+                "attributeId": 0x00000004,
+                "type": "int",
                 "reportable": True,
             },
             0x00000005: {
@@ -5287,6 +5479,19 @@ class ChipClusters:
                 "type": "bool",
                 "reportable": True,
             },
+            0x00000004: {
+                "attributeName": "LastChangedTime",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000005: {
+                "attributeName": "ReplacementProductList",
+                "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -5361,744 +5566,17 @@ class ChipClusters:
                 "type": "bool",
                 "reportable": True,
             },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
+            0x00000004: {
+                "attributeName": "LastChangedTime",
+                "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
+                "writable": True,
             },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _CERAMIC_FILTER_MONITORING_CLUSTER_INFO = {
-        "clusterName": "CeramicFilterMonitoring",
-        "clusterId": 0x00000073,
-        "commands": {
-            0x00000000: {
-                "commandId": 0x00000000,
-                "commandName": "ResetCondition",
-                "args": {
-                },
-            },
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "Condition",
-                "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "DegradationDirection",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "ChangeIndication",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "InPlaceIndicator",
-                "attributeId": 0x00000003,
-                "type": "bool",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _ELECTROSTATIC_FILTER_MONITORING_CLUSTER_INFO = {
-        "clusterName": "ElectrostaticFilterMonitoring",
-        "clusterId": 0x00000074,
-        "commands": {
-            0x00000000: {
-                "commandId": 0x00000000,
-                "commandName": "ResetCondition",
-                "args": {
-                },
-            },
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "Condition",
-                "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "DegradationDirection",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "ChangeIndication",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "InPlaceIndicator",
-                "attributeId": 0x00000003,
-                "type": "bool",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _UV_FILTER_MONITORING_CLUSTER_INFO = {
-        "clusterName": "UvFilterMonitoring",
-        "clusterId": 0x00000075,
-        "commands": {
-            0x00000000: {
-                "commandId": 0x00000000,
-                "commandName": "ResetCondition",
-                "args": {
-                },
-            },
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "Condition",
-                "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "DegradationDirection",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "ChangeIndication",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "InPlaceIndicator",
-                "attributeId": 0x00000003,
-                "type": "bool",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _IONIZING_FILTER_MONITORING_CLUSTER_INFO = {
-        "clusterName": "IonizingFilterMonitoring",
-        "clusterId": 0x00000076,
-        "commands": {
-            0x00000000: {
-                "commandId": 0x00000000,
-                "commandName": "ResetCondition",
-                "args": {
-                },
-            },
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "Condition",
-                "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "DegradationDirection",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "ChangeIndication",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "InPlaceIndicator",
-                "attributeId": 0x00000003,
-                "type": "bool",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _ZEOLITE_FILTER_MONITORING_CLUSTER_INFO = {
-        "clusterName": "ZeoliteFilterMonitoring",
-        "clusterId": 0x00000077,
-        "commands": {
-            0x00000000: {
-                "commandId": 0x00000000,
-                "commandName": "ResetCondition",
-                "args": {
-                },
-            },
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "Condition",
-                "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "DegradationDirection",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "ChangeIndication",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "InPlaceIndicator",
-                "attributeId": 0x00000003,
-                "type": "bool",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _OZONE_FILTER_MONITORING_CLUSTER_INFO = {
-        "clusterName": "OzoneFilterMonitoring",
-        "clusterId": 0x00000078,
-        "commands": {
-            0x00000000: {
-                "commandId": 0x00000000,
-                "commandName": "ResetCondition",
-                "args": {
-                },
-            },
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "Condition",
-                "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "DegradationDirection",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "ChangeIndication",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "InPlaceIndicator",
-                "attributeId": 0x00000003,
-                "type": "bool",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _WATER_TANK_MONITORING_CLUSTER_INFO = {
-        "clusterName": "WaterTankMonitoring",
-        "clusterId": 0x00000079,
-        "commands": {
-            0x00000000: {
-                "commandId": 0x00000000,
-                "commandName": "ResetCondition",
-                "args": {
-                },
-            },
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "Condition",
-                "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "DegradationDirection",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "ChangeIndication",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "InPlaceIndicator",
-                "attributeId": 0x00000003,
-                "type": "bool",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _FUEL_TANK_MONITORING_CLUSTER_INFO = {
-        "clusterName": "FuelTankMonitoring",
-        "clusterId": 0x0000007A,
-        "commands": {
-            0x00000000: {
-                "commandId": 0x00000000,
-                "commandName": "ResetCondition",
-                "args": {
-                },
-            },
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "Condition",
-                "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "DegradationDirection",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "ChangeIndication",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "InPlaceIndicator",
-                "attributeId": 0x00000003,
-                "type": "bool",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _INK_CARTRIDGE_MONITORING_CLUSTER_INFO = {
-        "clusterName": "InkCartridgeMonitoring",
-        "clusterId": 0x0000007B,
-        "commands": {
-            0x00000000: {
-                "commandId": 0x00000000,
-                "commandName": "ResetCondition",
-                "args": {
-                },
-            },
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "Condition",
-                "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "DegradationDirection",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "ChangeIndication",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "InPlaceIndicator",
-                "attributeId": 0x00000003,
-                "type": "bool",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _TONER_CARTRIDGE_MONITORING_CLUSTER_INFO = {
-        "clusterName": "TonerCartridgeMonitoring",
-        "clusterId": 0x0000007C,
-        "commands": {
-            0x00000000: {
-                "commandId": 0x00000000,
-                "commandName": "ResetCondition",
-                "args": {
-                },
-            },
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "Condition",
-                "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "DegradationDirection",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "ChangeIndication",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "InPlaceIndicator",
-                "attributeId": 0x00000003,
-                "type": "bool",
+            0x00000005: {
+                "attributeName": "ReplacementProductList",
+                "attributeId": 0x00000005,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -9137,556 +8615,6 @@ class ChipClusters:
             },
         },
     }
-    _ETHYLENE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "EthyleneConcentrationMeasurement",
-        "clusterId": 0x0000040E,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "EthyleneOxideConcentrationMeasurement",
-        "clusterId": 0x0000040F,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _HYDROGEN_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "HydrogenConcentrationMeasurement",
-        "clusterId": 0x00000410,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _HYDROGEN_SULFIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "HydrogenSulfideConcentrationMeasurement",
-        "clusterId": 0x00000411,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "NitricOxideConcentrationMeasurement",
-        "clusterId": 0x00000412,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
     _NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
         "clusterName": "NitrogenDioxideConcentrationMeasurement",
         "clusterId": 0x00000413,
@@ -9797,2319 +8725,9 @@ class ChipClusters:
             },
         },
     }
-    _OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "OxygenConcentrationMeasurement",
-        "clusterId": 0x00000414,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
     _OZONE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
         "clusterName": "OzoneConcentrationMeasurement",
         "clusterId": 0x00000415,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "SulfurDioxideConcentrationMeasurement",
-        "clusterId": 0x00000416,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "DissolvedOxygenConcentrationMeasurement",
-        "clusterId": 0x00000417,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _BROMATE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "BromateConcentrationMeasurement",
-        "clusterId": 0x00000418,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _CHLORAMINES_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "ChloraminesConcentrationMeasurement",
-        "clusterId": 0x00000419,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _CHLORINE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "ChlorineConcentrationMeasurement",
-        "clusterId": 0x0000041A,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _FECAL_COLIFORM_E_COLI_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "FecalColiformEColiConcentrationMeasurement",
-        "clusterId": 0x0000041B,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _FLUORIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "FluorideConcentrationMeasurement",
-        "clusterId": 0x0000041C,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "HaloaceticAcidsConcentrationMeasurement",
-        "clusterId": 0x0000041D,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "TotalTrihalomethanesConcentrationMeasurement",
-        "clusterId": 0x0000041E,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "TotalColiformBacteriaConcentrationMeasurement",
-        "clusterId": 0x0000041F,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _TURBIDITY_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "TurbidityConcentrationMeasurement",
-        "clusterId": 0x00000420,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _COPPER_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "CopperConcentrationMeasurement",
-        "clusterId": 0x00000421,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _LEAD_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "LeadConcentrationMeasurement",
-        "clusterId": 0x00000422,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _MANGANESE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "ManganeseConcentrationMeasurement",
-        "clusterId": 0x00000423,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _SULFATE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "SulfateConcentrationMeasurement",
-        "clusterId": 0x00000424,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "BromodichloromethaneConcentrationMeasurement",
-        "clusterId": 0x00000425,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _BROMOFORM_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "BromoformConcentrationMeasurement",
-        "clusterId": 0x00000426,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "ChlorodibromomethaneConcentrationMeasurement",
-        "clusterId": 0x00000427,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _CHLOROFORM_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "ChloroformConcentrationMeasurement",
-        "clusterId": 0x00000428,
-        "commands": {
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "MeasuredValue",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "MinMeasuredValue",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "MaxMeasuredValue",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "PeakMeasuredValue",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "PeakMeasuredValueWindow",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "AverageMeasuredValue",
-                "attributeId": 0x00000005,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "AverageMeasuredValueWindow",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "Uncertainty",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "MeasurementUnit",
-                "attributeId": 0x00000008,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "MeasurementMedium",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "LevelValue",
-                "attributeId": 0x0000000A,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "SodiumConcentrationMeasurement",
-        "clusterId": 0x00000429,
         "commands": {
         },
         "attributes": {
@@ -15526,28 +12144,21 @@ class ChipClusters:
         0x00000045: _BOOLEAN_STATE_CLUSTER_INFO,
         0x00000046: _ICD_MANAGEMENT_CLUSTER_INFO,
         0x00000050: _MODE_SELECT_CLUSTER_INFO,
-        0x00000051: _LAUNDRY_WASHER_MODE_SELECT_CLUSTER_INFO,
-        0x00000052: _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SELECT_CLUSTER_INFO,
-        0x00000054: _RVC_RUN_MODE_SELECT_CLUSTER_INFO,
-        0x00000055: _RVC_CLEAN_MODE_SELECT_CLUSTER_INFO,
+        0x00000051: _LAUNDRY_WASHER_MODE_CLUSTER_INFO,
+        0x00000052: _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO,
+        0x00000053: _LAUNDRY_WASHER_CONTROLS_CLUSTER_INFO,
+        0x00000054: _RVC_RUN_MODE_CLUSTER_INFO,
+        0x00000055: _RVC_CLEAN_MODE_CLUSTER_INFO,
         0x00000056: _TEMPERATURE_CONTROL_CLUSTER_INFO,
         0x00000057: _REFRIGERATOR_ALARM_CLUSTER_INFO,
-        0x00000059: _DISHWASHER_MODE_SELECT_CLUSTER_INFO,
+        0x00000059: _DISHWASHER_MODE_CLUSTER_INFO,
         0x0000005B: _AIR_QUALITY_CLUSTER_INFO,
         0x0000005C: _SMOKE_CO_ALARM_CLUSTER_INFO,
+        0x0000005D: _DISHWASHER_ALARM_CLUSTER_INFO,
         0x00000060: _OPERATIONAL_STATE_CLUSTER_INFO,
+        0x00000061: _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
         0x00000071: _HEPA_FILTER_MONITORING_CLUSTER_INFO,
         0x00000072: _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
-        0x00000073: _CERAMIC_FILTER_MONITORING_CLUSTER_INFO,
-        0x00000074: _ELECTROSTATIC_FILTER_MONITORING_CLUSTER_INFO,
-        0x00000075: _UV_FILTER_MONITORING_CLUSTER_INFO,
-        0x00000076: _IONIZING_FILTER_MONITORING_CLUSTER_INFO,
-        0x00000077: _ZEOLITE_FILTER_MONITORING_CLUSTER_INFO,
-        0x00000078: _OZONE_FILTER_MONITORING_CLUSTER_INFO,
-        0x00000079: _WATER_TANK_MONITORING_CLUSTER_INFO,
-        0x0000007A: _FUEL_TANK_MONITORING_CLUSTER_INFO,
-        0x0000007B: _INK_CARTRIDGE_MONITORING_CLUSTER_INFO,
-        0x0000007C: _TONER_CARTRIDGE_MONITORING_CLUSTER_INFO,
         0x00000101: _DOOR_LOCK_CLUSTER_INFO,
         0x00000102: _WINDOW_COVERING_CLUSTER_INFO,
         0x00000103: _BARRIER_CONTROL_CLUSTER_INFO,
@@ -15565,34 +12176,8 @@ class ChipClusters:
         0x00000406: _OCCUPANCY_SENSING_CLUSTER_INFO,
         0x0000040C: _CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         0x0000040D: _CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x0000040E: _ETHYLENE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x0000040F: _ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x00000410: _HYDROGEN_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x00000411: _HYDROGEN_SULFIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x00000412: _NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         0x00000413: _NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x00000414: _OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         0x00000415: _OZONE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x00000416: _SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x00000417: _DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x00000418: _BROMATE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x00000419: _CHLORAMINES_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x0000041A: _CHLORINE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x0000041B: _FECAL_COLIFORM_E_COLI_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x0000041C: _FLUORIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x0000041D: _HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x0000041E: _TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x0000041F: _TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x00000420: _TURBIDITY_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x00000421: _COPPER_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x00000422: _LEAD_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x00000423: _MANGANESE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x00000424: _SULFATE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x00000425: _BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x00000426: _BROMOFORM_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x00000427: _CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x00000428: _CHLOROFORM_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        0x00000429: _SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         0x0000042A: _PM2__5_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         0x0000042B: _FORMALDEHYDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         0x0000042C: _PM1_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
@@ -15659,28 +12244,21 @@ class ChipClusters:
         "BooleanState": _BOOLEAN_STATE_CLUSTER_INFO,
         "IcdManagement": _ICD_MANAGEMENT_CLUSTER_INFO,
         "ModeSelect": _MODE_SELECT_CLUSTER_INFO,
-        "LaundryWasherModeSelect": _LAUNDRY_WASHER_MODE_SELECT_CLUSTER_INFO,
-        "RefrigeratorAndTemperatureControlledCabinetModeSelect": _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SELECT_CLUSTER_INFO,
-        "RvcRunModeSelect": _RVC_RUN_MODE_SELECT_CLUSTER_INFO,
-        "RvcCleanModeSelect": _RVC_CLEAN_MODE_SELECT_CLUSTER_INFO,
+        "LaundryWasherMode": _LAUNDRY_WASHER_MODE_CLUSTER_INFO,
+        "RefrigeratorAndTemperatureControlledCabinetMode": _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO,
+        "LaundryWasherControls": _LAUNDRY_WASHER_CONTROLS_CLUSTER_INFO,
+        "RvcRunMode": _RVC_RUN_MODE_CLUSTER_INFO,
+        "RvcCleanMode": _RVC_CLEAN_MODE_CLUSTER_INFO,
         "TemperatureControl": _TEMPERATURE_CONTROL_CLUSTER_INFO,
         "RefrigeratorAlarm": _REFRIGERATOR_ALARM_CLUSTER_INFO,
-        "DishwasherModeSelect": _DISHWASHER_MODE_SELECT_CLUSTER_INFO,
+        "DishwasherMode": _DISHWASHER_MODE_CLUSTER_INFO,
         "AirQuality": _AIR_QUALITY_CLUSTER_INFO,
         "SmokeCoAlarm": _SMOKE_CO_ALARM_CLUSTER_INFO,
+        "DishwasherAlarm": _DISHWASHER_ALARM_CLUSTER_INFO,
         "OperationalState": _OPERATIONAL_STATE_CLUSTER_INFO,
+        "RvcOperationalState": _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
         "HepaFilterMonitoring": _HEPA_FILTER_MONITORING_CLUSTER_INFO,
         "ActivatedCarbonFilterMonitoring": _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
-        "CeramicFilterMonitoring": _CERAMIC_FILTER_MONITORING_CLUSTER_INFO,
-        "ElectrostaticFilterMonitoring": _ELECTROSTATIC_FILTER_MONITORING_CLUSTER_INFO,
-        "UvFilterMonitoring": _UV_FILTER_MONITORING_CLUSTER_INFO,
-        "IonizingFilterMonitoring": _IONIZING_FILTER_MONITORING_CLUSTER_INFO,
-        "ZeoliteFilterMonitoring": _ZEOLITE_FILTER_MONITORING_CLUSTER_INFO,
-        "OzoneFilterMonitoring": _OZONE_FILTER_MONITORING_CLUSTER_INFO,
-        "WaterTankMonitoring": _WATER_TANK_MONITORING_CLUSTER_INFO,
-        "FuelTankMonitoring": _FUEL_TANK_MONITORING_CLUSTER_INFO,
-        "InkCartridgeMonitoring": _INK_CARTRIDGE_MONITORING_CLUSTER_INFO,
-        "TonerCartridgeMonitoring": _TONER_CARTRIDGE_MONITORING_CLUSTER_INFO,
         "DoorLock": _DOOR_LOCK_CLUSTER_INFO,
         "WindowCovering": _WINDOW_COVERING_CLUSTER_INFO,
         "BarrierControl": _BARRIER_CONTROL_CLUSTER_INFO,
@@ -15698,34 +12276,8 @@ class ChipClusters:
         "OccupancySensing": _OCCUPANCY_SENSING_CLUSTER_INFO,
         "CarbonMonoxideConcentrationMeasurement": _CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         "CarbonDioxideConcentrationMeasurement": _CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "EthyleneConcentrationMeasurement": _ETHYLENE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "EthyleneOxideConcentrationMeasurement": _ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "HydrogenConcentrationMeasurement": _HYDROGEN_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "HydrogenSulfideConcentrationMeasurement": _HYDROGEN_SULFIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "NitricOxideConcentrationMeasurement": _NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         "NitrogenDioxideConcentrationMeasurement": _NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "OxygenConcentrationMeasurement": _OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         "OzoneConcentrationMeasurement": _OZONE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "SulfurDioxideConcentrationMeasurement": _SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "DissolvedOxygenConcentrationMeasurement": _DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "BromateConcentrationMeasurement": _BROMATE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "ChloraminesConcentrationMeasurement": _CHLORAMINES_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "ChlorineConcentrationMeasurement": _CHLORINE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "FecalColiformEColiConcentrationMeasurement": _FECAL_COLIFORM_E_COLI_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "FluorideConcentrationMeasurement": _FLUORIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "HaloaceticAcidsConcentrationMeasurement": _HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "TotalTrihalomethanesConcentrationMeasurement": _TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "TotalColiformBacteriaConcentrationMeasurement": _TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "TurbidityConcentrationMeasurement": _TURBIDITY_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "CopperConcentrationMeasurement": _COPPER_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "LeadConcentrationMeasurement": _LEAD_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "ManganeseConcentrationMeasurement": _MANGANESE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "SulfateConcentrationMeasurement": _SULFATE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "BromodichloromethaneConcentrationMeasurement": _BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "BromoformConcentrationMeasurement": _BROMOFORM_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "ChlorodibromomethaneConcentrationMeasurement": _CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "ChloroformConcentrationMeasurement": _CHLOROFORM_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
-        "SodiumConcentrationMeasurement": _SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         "Pm25ConcentrationMeasurement": _PM2__5_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         "FormaldehydeConcentrationMeasurement": _FORMALDEHYDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         "Pm1ConcentrationMeasurement": _PM1_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,

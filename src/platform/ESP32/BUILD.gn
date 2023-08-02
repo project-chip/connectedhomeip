@@ -153,7 +153,6 @@ static_library("ESP32") {
       "../OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
       "../OpenThread/GenericNetworkCommissioningThreadDriver.h",
       "../OpenThread/OpenThreadUtils.cpp",
-      "OpenthreadConfig.h",
       "OpenthreadLauncher.c",
       "OpenthreadLauncher.h",
       "ThreadStackManagerImpl.cpp",

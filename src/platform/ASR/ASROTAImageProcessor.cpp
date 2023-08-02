@@ -150,9 +150,8 @@ void ASROTAImageProcessor::HandleApply(intptr_t context)
     ChipLogProgress(SoftwareUpdate, "ASROTAImageProcessor::HandleApply()");
 
     imageProcessor->ota_boot_para.res_type = LEGA_OTA_FINISH;
+    // Set boot mode and then reboot
     lega_ota_set_boot(&imageProcessor->ota_boot_para);
-
-    // reboot();
 }
 
 void ASROTAImageProcessor::HandleAbort(intptr_t context)
@@ -217,7 +216,6 @@ CHIP_ERROR ASROTAImageProcessor::ProcessHeader(ByteSpan & block)
         ReturnErrorCodeIf(error == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
         ReturnErrorOnFailure(error);
 
-        // SL TODO -- store version somewhere
         ChipLogProgress(SoftwareUpdate, "Image Header software version: %ld payload size: %lu", header.mSoftwareVersion,
                         (long unsigned int) header.mPayloadSize);
         mParams.totalFileBytes = header.mPayloadSize;

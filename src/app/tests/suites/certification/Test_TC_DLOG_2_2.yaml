@@ -31,13 +31,13 @@ tests:
           DUT does not support BDX
       disabled: true
 
-    - label: "Commission DUT to TH"
+    - label: "Step 1: Commission DUT to TH"
       verification: |
 
       disabled: true
 
     - label:
-          "TH sends RetrieveLogsRequest Command (Intent =
+          "Step 2: TH sends RetrieveLogsRequest Command (Intent =
           EndUserSupport,TransferFileDesignator = 'test.txt',RequestedProtocol=
           BDX) to DUT"
       verification: |
@@ -76,8 +76,8 @@ tests:
       disabled: true
 
     - label:
-          "Verify that the BDX transfer is not initiated from DUT,Verify that
-          DUT sends RetrieveLogsResponse command,Verify that the LogContent
+          "Step 3: Verify that the BDX transfer is not initiated from DUT,Verify
+          that DUT sends RetrieveLogsResponse command,Verify that the LogContent
           field of RetrieveLogsResponse command has the DUT log entries up to <
           = 1024 octets,Verify that Status field is set to Exhausted"
       verification: |

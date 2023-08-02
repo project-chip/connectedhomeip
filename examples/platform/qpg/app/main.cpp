@@ -81,13 +81,6 @@ constexpr int extDiscTimeoutSecs             = 20;
 
 CHIP_ERROR CHIP_Init(void);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-void InitOTARequestorHandler(void)
-{
-    InitializeOTARequestor();
-}
-#endif
-
 void Application_Init(void)
 {
     CHIP_ERROR error;
@@ -96,12 +89,12 @@ void Application_Init(void)
     GP_CLEARBOX_TESTING_APPLICATION_INIT_HOOK;
 #endif
 
-    /* Initialize IO */
-    qvIO_Init();
-
 #if defined(GP_APP_DIVERSITY_POWERCYCLECOUNTING)
     gpAppFramework_Reset_Init();
 #endif
+
+    /* Initialize IO */
+    qvIO_Init();
 
     /* Initialize CHIP stack */
     error = CHIP_Init();
@@ -137,7 +130,7 @@ void ChipEventHandler(const ChipDeviceEvent * aEvent, intptr_t /* arg */)
     {
     case DeviceEventType::kDnssdInitialized:
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-        InitOTARequestorHandler();
+        InitializeOTARequestor();
 #endif
         break;
     default:
@@ -199,7 +192,7 @@ CHIP_ERROR CHIP_Init(void)
     qvIO_EnableSleep(true);
 #elif CHIP_DEVICE_CONFIG_THREAD_FTD
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
-    qvIO_EnableSleep(false);
+    qvIO_EnableSleep(true);
 #else
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
     qvIO_EnableSleep(false);

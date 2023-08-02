@@ -29,6 +29,8 @@
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
 #endif
 #include <atomic>
+#include <lega_rtos_api.h>
+
 namespace chip {
 namespace DeviceLayer {
 

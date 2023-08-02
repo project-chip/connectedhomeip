@@ -130,14 +130,12 @@ def test_case(func):
 
 
 def configurable_tests():
-    res = [v for v in _configurable_test_sets]
-    res.sort()
+    res = sorted([v for v in _configurable_test_sets])
     return res
 
 
 def configurable_test_cases():
-    res = [v for v in _configurable_tests]
-    res.sort()
+    res = sorted([v for v in _configurable_tests])
     return res
 
 
@@ -190,7 +188,8 @@ class TestResult:
 
 
 class BaseTestHelper:
-    def __init__(self, nodeid: int, paaTrustStorePath: str, testCommissioner: bool = False, keypair: p256keypair.P256Keypair = None):
+    def __init__(self, nodeid: int, paaTrustStorePath: str, testCommissioner: bool = False,
+                 keypair: p256keypair.P256Keypair = None):
         chip.native.Init()
 
         self.chipStack = ChipStack('/tmp/repl_storage.json')
@@ -250,16 +249,16 @@ class BaseTestHelper:
             nodeid, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=180, breadcrumb=0))
 
         await self.devCtrl.SendCommand(
-            nodeid, 0, Clusters.AdministratorCommissioning.Commands.RevokeCommissioning(),  timedRequestTimeoutMs=10000)
+            nodeid, 0, Clusters.AdministratorCommissioning.Commands.RevokeCommissioning(), timedRequestTimeoutMs=10000)
         await self.devCtrl.SendCommand(
             nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180), timedRequestTimeoutMs=10000)
         await self.devCtrl.SendCommand(
-            nodeid, 0, Clusters.AdministratorCommissioning.Commands.RevokeCommissioning(),  timedRequestTimeoutMs=10000)
+            nodeid, 0, Clusters.AdministratorCommissioning.Commands.RevokeCommissioning(), timedRequestTimeoutMs=10000)
         return True
 
     def TestEnhancedCommissioningWindow(self, ip: str, nodeid: int):
-        pin, code = self.devCtrl.OpenCommissioningWindow(nodeid=nodeid, timeout=600, iteration=10000, discriminator=3840, option=1)
-        return self.TestPaseOnly(ip=ip, nodeid=nodeid, setuppin=pin, devCtrl=self.devCtrl2)
+        params = self.devCtrl.OpenCommissioningWindow(nodeid=nodeid, timeout=600, iteration=10000, discriminator=3840, option=1)
+        return self.TestPaseOnly(ip=ip, nodeid=nodeid, setuppin=params.setupPinCode, devCtrl=self.devCtrl2)
 
     def TestPaseOnly(self, ip: str, setuppin: int, nodeid: int, devCtrl=None):
         if devCtrl is None:
@@ -461,9 +460,9 @@ class BaseTestHelper:
 
         # Read out the attribute again - this time, it should succeed.
         res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
-        if (type(res[0][
+        if (not isinstance(res[0][
                 Clusters.AccessControl][
-                Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntryStruct):
+                Clusters.AccessControl.Attributes.Acl][0], Clusters.AccessControl.Structs.AccessControlEntryStruct)):
             self.logger.error(f"2: Received something other than data:{res}")
             return False
 
@@ -505,9 +504,9 @@ class BaseTestHelper:
         # Doing this ensures that we're not somehow aliasing the CASE sessions.
         #
         res = await self.devCtrl.ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
-        if (type(res[0][
+        if (not isinstance(res[0][
                 Clusters.AccessControl][
-                Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntryStruct):
+                Clusters.AccessControl.Attributes.Acl][0], Clusters.AccessControl.Structs.AccessControlEntryStruct)):
             self.logger.error(f"2: Received something other than data:{res}")
             return False
 
@@ -531,9 +530,9 @@ class BaseTestHelper:
             targetNodeId=nodeid
         )
         res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
-        if (type(res[0][
+        if (not isinstance(res[0][
                 Clusters.AccessControl][
-                Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntryStruct):
+                Clusters.AccessControl.Attributes.Acl][0], Clusters.AccessControl.Structs.AccessControlEntryStruct)):
             self.logger.error(f"4: Received something other than data:{res}")
             return False
 
@@ -547,9 +546,9 @@ class BaseTestHelper:
             targetNodeId=nodeid
         )
         res = await newControllers[1].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
-        if (type(res[0][
+        if (not isinstance(res[0][
                 Clusters.AccessControl][
-                Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntryStruct):
+                Clusters.AccessControl.Attributes.Acl][0], Clusters.AccessControl.Structs.AccessControlEntryStruct)):
             self.logger.error(f"5: Received something other than data:{res}")
             return False
 
@@ -571,11 +570,9 @@ class BaseTestHelper:
         #
         res = await newControllers[1].ReadAttribute(nodeid=nodeid,
                                                     attributes=[(0, Clusters.BasicInformation.Attributes.ClusterRevision)])
-        if (type(
-            res[0][
+        if (not isinstance(res[0][
                 Clusters.BasicInformation][
-                Clusters.BasicInformation.Attributes.ClusterRevision]
-        ) != Clusters.BasicInformation.Attributes.ClusterRevision.attribute_type.Type):
+                Clusters.BasicInformation.Attributes.ClusterRevision], Clusters.BasicInformation.Attributes.ClusterRevision.attribute_type.Type)):
             self.logger.error(f"7: Received something other than data:{res}")
             return False
 

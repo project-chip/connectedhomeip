@@ -16,7 +16,8 @@ object AttestationAppLauncher {
     caller: ActivityResultCaller,
     block: (String?) -> Unit
   ): ActivityResultLauncher<Intent> {
-    return caller.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    return caller.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+      result ->
       val data = result.data
       if (result.resultCode == Activity.RESULT_OK && data != null) {
         val chipResult = data.getStringExtra(CHIP_RESULT_KEY)
@@ -30,9 +31,8 @@ object AttestationAppLauncher {
   fun getAttestationIntent(context: Context): Intent? {
     val packageManager = context.packageManager as PackageManager
     val attestationActivityIntent = Intent(CHIP_ACTION)
-    val attestationAppInfo = packageManager
-      .queryIntentActivities(attestationActivityIntent, 0)
-      .firstOrNull()
+    val attestationAppInfo =
+      packageManager.queryIntentActivities(attestationActivityIntent, 0).firstOrNull()
 
     return if (attestationAppInfo != null) {
       attestationActivityIntent.setClassName(

@@ -11,13 +11,13 @@ for creating your own application.
 1. Pull docker image from repository:
 
     ```bash
-    $ docker pull connectedhomeip/chip-build-telink:latest
+    $ docker pull ghcr.io/project-chip/chip-build-telink:1
     ```
 
 1. Run docker container:
 
     ```bash
-    $ docker run -it --rm -v ${CHIP_BASE}:/root/chip -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" connectedhomeip/chip-build-telink:latest
+    $ docker run -it --rm -v ${CHIP_BASE}:/root/chip -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" ghcr.io/project-chip/chip-build-telink:1
     ```
 
     here `${CHIP_BASE}` is directory which contains CHIP repo files **!!!Pay
@@ -146,7 +146,7 @@ Usage of OTA:
 -   Use the chip-tool to announce the ota-provider-app to start the OTA process
 
     ```
-    ./chip-tool otasoftwareupdaterequestor announce-ota-provider ${OTA_PROVIDER_NODE_ID} 0 0 0 ${DEVICE_NODE_ID} 0
+    ./chip-tool otasoftwareupdaterequestor announce-otaprovider ${OTA_PROVIDER_NODE_ID} 0 0 0 ${DEVICE_NODE_ID} 0
     ```
 
     here:

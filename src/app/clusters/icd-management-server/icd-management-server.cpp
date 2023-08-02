@@ -17,13 +17,17 @@
 
 #include "icd-management-server.h"
 
-#include "app/server/Server.h"
+#include <access/AccessControl.h>
+#include <access/Privilege.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/icd/IcdManagementServer.h>
+#include <app/icd/IcdMonitoringTable.h>
+#include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 
@@ -32,8 +36,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IcdManagement;
 using namespace Protocols;
-
-//==============================================================================
+using namespace chip::Access;
 
 namespace {
 
@@ -48,7 +51,12 @@ public:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
+    CHIP_ERROR ReadIdleModeInterval(EndpointId endpoint, AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadActiveModeInterval(EndpointId endpoint, AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadActiveModeThreshold(EndpointId endpoint, AttributeValueEncoder & encoder);
     CHIP_ERROR ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadICDCounter(EndpointId endpoint, AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadClientsSupportedPerFabric(EndpointId endpoint, AttributeValueEncoder & encoder);
 };
 
 CHIP_ERROR IcdManagementAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -57,76 +65,172 @@ CHIP_ERROR IcdManagementAttributeAccess::Read(const ConcreteReadAttributePath & 
 
     switch (aPath.mAttributeId)
     {
+    case IcdManagement::Attributes::IdleModeInterval::Id:
+        return ReadIdleModeInterval(aPath.mEndpointId, aEncoder);
+
+    case IcdManagement::Attributes::ActiveModeInterval::Id:
+        return ReadActiveModeInterval(aPath.mEndpointId, aEncoder);
+
+    case IcdManagement::Attributes::ActiveModeThreshold::Id:
+        return ReadActiveModeThreshold(aPath.mEndpointId, aEncoder);
+
     case IcdManagement::Attributes::RegisteredClients::Id:
         return ReadRegisteredClients(aPath.mEndpointId, aEncoder);
 
-    default:
-        break;
+    case IcdManagement::Attributes::ICDCounter::Id:
+        return ReadICDCounter(aPath.mEndpointId, aEncoder);
+
+    case IcdManagement::Attributes::ClientsSupportedPerFabric::Id:
+        return ReadClientsSupportedPerFabric(aPath.mEndpointId, aEncoder);
     }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR IcdManagementAttributeAccess::ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR IcdManagementAttributeAccess::ReadIdleModeInterval(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
-    return encoder.EncodeEmptyList();
+    return encoder.Encode(IcdManagementServer::GetInstance().GetIdleModeInterval());
 }
 
+CHIP_ERROR IcdManagementAttributeAccess::ReadActiveModeInterval(EndpointId endpoint, AttributeValueEncoder & encoder)
+{
+    return encoder.Encode(IcdManagementServer::GetInstance().GetActiveModeInterval());
+}
+
+CHIP_ERROR IcdManagementAttributeAccess::ReadActiveModeThreshold(EndpointId endpoint, AttributeValueEncoder & encoder)
+{
+    return encoder.Encode(IcdManagementServer::GetInstance().GetActiveModeThreshold());
+}
+
+CHIP_ERROR IcdManagementAttributeAccess::ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder)
+{
+    uint16_t supported_clients = IcdManagementServer::GetInstance().GetClientsSupportedPerFabric();
+
+    return encoder.EncodeList([supported_clients](const auto & subEncoder) -> CHIP_ERROR {
+        IcdMonitoringEntry e;
+
+        const auto & fabricTable = Server::GetInstance().GetFabricTable();
+        for (const auto & fabricInfo : fabricTable)
+        {
+            PersistentStorageDelegate & storage = chip::Server::GetInstance().GetPersistentStorage();
+            IcdMonitoringTable table(storage, fabricInfo.GetFabricIndex(), supported_clients);
+            for (uint16_t i = 0; i < table.Limit(); ++i)
+            {
+                CHIP_ERROR err = table.Get(i, e);
+                if (CHIP_ERROR_NOT_FOUND == err)
+                {
+                    // No more entries in the table
+                    break;
+                }
+                ReturnErrorOnFailure(err);
+
+                Structs::MonitoringRegistrationStruct::Type s{ .checkInNodeID    = e.checkInNodeID,
+                                                               .monitoredSubject = e.monitoredSubject,
+                                                               .key              = e.key,
+                                                               .fabricIndex      = e.fabricIndex };
+                ReturnErrorOnFailure(subEncoder.Encode(s));
+            }
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
+CHIP_ERROR IcdManagementAttributeAccess::ReadICDCounter(EndpointId endpoint, AttributeValueEncoder & encoder)
+{
+    return encoder.Encode(IcdManagementServer::GetInstance().GetICDCounter());
+}
+
+CHIP_ERROR IcdManagementAttributeAccess::ReadClientsSupportedPerFabric(EndpointId endpoint, AttributeValueEncoder & encoder)
+{
+    return encoder.Encode(IcdManagementServer::GetInstance().GetClientsSupportedPerFabric());
+}
+
+CHIP_ERROR CheckAdmin(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, bool & is_admin)
+{
+    RequestPath requestPath{ .cluster = commandPath.mClusterId, .endpoint = commandPath.mEndpointId };
+    CHIP_ERROR err = GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, Privilege::kAdminister);
+    if (CHIP_NO_ERROR == err)
+    {
+        is_admin = true;
+    }
+    else if (CHIP_ERROR_ACCESS_DENIED == err)
+    {
+        is_admin = false;
+        err      = CHIP_NO_ERROR;
+    }
+    return err;
+}
+
+class IcdManagementFabricDelegate : public chip::FabricTable::Delegate
+{
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
+    {
+        uint16_t supported_clients = IcdManagementServer::GetInstance().GetClientsSupportedPerFabric();
+        IcdMonitoringTable table(chip::Server::GetInstance().GetPersistentStorage(), fabricIndex, supported_clients);
+        table.RemoveAll();
+    }
+};
+
+IcdManagementFabricDelegate gFabricDelegate;
 IcdManagementAttributeAccess gAttribute;
 
 } // namespace
 
-//==============================================================================
-
-InteractionModel::Status
-IcdManagementServer::RegisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                    const chip::app::Clusters::IcdManagement::Commands::RegisterClient::DecodableType & commandData)
+void emberAfIcdManagementClusterInitCallback()
 {
-    // TODO: Implementent logic for end device
-    return InteractionModel::Status::UnsupportedCommand;
+    Server::GetInstance().GetFabricTable().AddFabricDelegate(&gFabricDelegate);
 }
-
-InteractionModel::Status IcdManagementServer::UnregisterClient(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData)
-{
-    // TODO: Implementent logic for end device
-    return InteractionModel::Status::UnsupportedCommand;
-}
-
-InteractionModel::Status IcdManagementServer::StayActiveRequest(const chip::app::ConcreteCommandPath & commandPath)
-{
-    // TODO: Implementent logic for end device
-    return InteractionModel::Status::UnsupportedCommand;
-}
-
-//==============================================================================
 
 /**
  * @brief ICD Management Cluster RegisterClient Command callback (from client)
  *
  */
-bool emberAfIcdManagementClusterRegisterClientCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::IcdManagement::Commands::RegisterClient::DecodableType & commandData)
+bool emberAfIcdManagementClusterRegisterClientCallback(chip::app::CommandHandler * commandObj,
+                                                       const chip::app::ConcreteCommandPath & commandPath,
+                                                       const Commands::RegisterClient::DecodableType & commandData)
 {
-    IcdManagementServer server;
-    InteractionModel::Status status = server.RegisterClient(commandObj, commandPath, commandData);
+    InteractionModel::Status status = InteractionModel::Status::Failure;
+    bool is_admin                   = false;
+    if (CHIP_NO_ERROR == CheckAdmin(commandObj, commandPath, is_admin))
+    {
+        PersistentStorageDelegate & storage = chip::Server::GetInstance().GetPersistentStorage();
+        FabricIndex fabric                  = commandObj->GetAccessingFabricIndex();
+        status = IcdManagementServer::GetInstance().RegisterClient(storage, fabric, commandData.checkInNodeID,
+                                                                   commandData.monitoredSubject, commandData.key,
+                                                                   commandData.verificationKey, is_admin);
+    }
 
+    if (InteractionModel::Status::Success == status)
+    {
+        // Response
+        IcdManagement::Commands::RegisterClientResponse::Type response{ .ICDCounter =
+                                                                            IcdManagementServer::GetInstance().GetICDCounter() };
+        commandObj->AddResponse(commandPath, response);
+        return true;
+    }
+
+    // Error
     commandObj->AddStatus(commandPath, status);
     return true;
 }
 
 /**
- * @brief ICD Management Cluster UnregisterClient Command callback (from client)
+ * @brief ICD Management Cluster UregisterClient Command callback (from client)
  *
  */
-bool emberAfIcdManagementClusterUnregisterClientCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData)
+bool emberAfIcdManagementClusterUnregisterClientCallback(chip::app::CommandHandler * commandObj,
+                                                         const chip::app::ConcreteCommandPath & commandPath,
+                                                         const Commands::UnregisterClient::DecodableType & commandData)
 {
-    IcdManagementServer server;
-    InteractionModel::Status status = server.UnregisterClient(commandObj, commandPath, commandData);
+    InteractionModel::Status status = InteractionModel::Status::Failure;
+    bool is_admin                   = false;
+    if (CHIP_NO_ERROR == CheckAdmin(commandObj, commandPath, is_admin))
+    {
+        PersistentStorageDelegate & storage = chip::Server::GetInstance().GetPersistentStorage();
+        FabricIndex fabric                  = commandObj->GetAccessingFabricIndex();
+        status = IcdManagementServer::GetInstance().UnregisterClient(storage, fabric, commandData.checkInNodeID,
+                                                                     commandData.verificationKey, is_admin);
+    }
 
     commandObj->AddStatus(commandPath, status);
     return true;
@@ -135,12 +239,11 @@ bool emberAfIcdManagementClusterUnregisterClientCallback(
 /**
  * @brief ICD Management Cluster StayActiveRequest Command callback (from client)
  */
-bool emberAfIcdManagementClusterStayActiveRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::IcdManagement::Commands::StayActiveRequest::DecodableType & commandData)
+bool emberAfIcdManagementClusterStayActiveRequestCallback(chip::app::CommandHandler * commandObj,
+                                                          const chip::app::ConcreteCommandPath & commandPath,
+                                                          const Commands::StayActiveRequest::DecodableType & commandData)
 {
-    IcdManagementServer server;
-    InteractionModel::Status status = server.StayActiveRequest(commandPath);
+    InteractionModel::Status status = IcdManagementServer::GetInstance().StayActiveRequest(commandObj->GetAccessingFabricIndex());
 
     commandObj->AddStatus(commandPath, status);
     return true;

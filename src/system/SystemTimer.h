@@ -179,6 +179,13 @@ public:
      */
     void Clear() { mEarliestTimer = nullptr; }
 
+    /**
+     * Find the timer with the given properties, if present, and return its remaining time
+     *
+     * @return The remaining time on this partifcular timer or 0 if not found.
+     */
+    Clock::Timeout GetRemainingTime(TimerCompleteCallback aOnComplete, void * aAppState);
+
 private:
     Node * mEarliestTimer;
 };

@@ -29,7 +29,7 @@
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
 static uint64_t sDeviceId = 0x12344321;
-static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
+static NSString * kOnboardingPayload = @"MT:Y.K90SO527JA0648G00";
 static const uint16_t kLocalPort = 5541;
 static const uint16_t kTestVendorId = 0xFFF1u;
 
@@ -64,6 +64,11 @@ static MTRTestKeys * sTestKeys = nil;
                                           error:(NSError * _Nullable)error
 {
     [self.expectation fulfill];
+    // Hard-coded to what our example server app uses for now.
+    XCTAssertEqualObjects(attestationDeviceInfo.vendorID, @(0xFFF2));
+    XCTAssertEqualObjects(attestationDeviceInfo.productID, @(0x8001));
+    XCTAssertEqualObjects(attestationDeviceInfo.basicInformationVendorID, @(0xFFF1));
+    XCTAssertEqualObjects(attestationDeviceInfo.basicInformationProductID, @(0x8000));
     [controller continueCommissioningDevice:opaqueDeviceHandle ignoreAttestationFailure:NO error:nil];
 }
 

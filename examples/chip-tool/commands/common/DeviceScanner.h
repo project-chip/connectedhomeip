@@ -18,21 +18,19 @@
 
 #pragma once
 
-#include <controller/CHIPDeviceController.h>
-#include <lib/dnssd/ResolverProxy.h>
+#include <platform/CHIPDeviceBuildConfig.h>
 
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+
+#include <controller/CHIPDeviceController.h>
+#include <lib/dnssd/platform/Dnssd.h>
+
+#include <unordered_map>
 #include <vector>
 
 #if CONFIG_NETWORK_LAYER_BLE
-#if CHIP_DEVICE_LAYER_TARGET_DARWIN
 #include <platform/Darwin/BleScannerDelegate.h>
-#define CHIP_TOOL_DEVICE_SCANNER_USE_BLE 1
-#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 #endif // CONFIG_NETWORK_LAYER_BLE
-
-#ifndef CHIP_TOOL_DEVICE_SCANNER_USE_BLE
-#define CHIP_TOOL_DEVICE_SCANNER_USE_BLE 0
-#endif // CHIP_TOOL_DEVICE_SCANNER_USE_BLE
 
 struct DeviceScannerResult
 {
@@ -40,32 +38,42 @@ struct DeviceScannerResult
     chip::VendorId mVendorId;
     uint16_t mProductId;
     uint16_t mDiscriminator;
+    chip::Optional<chip::Dnssd::CommonResolutionData> mResolutionData;
 };
 
-class DeviceScanner : public chip::Dnssd::CommissioningResolveDelegate
-#if CHIP_TOOL_DEVICE_SCANNER_USE_BLE
+class DeviceScanner : public chip::Dnssd::CommissioningResolveDelegate,
+                      public chip::Dnssd::DnssdBrowseDelegate
+#if CONFIG_NETWORK_LAYER_BLE
     ,
                       public chip::DeviceLayer::BleScannerDelegate
-#endif // CHIP_TOOL_DEVICE_SCANNER_USE_BLE
+#endif // CONFIG_NETWORK_LAYER_BLE
 {
 public:
     CHIP_ERROR Start();
     CHIP_ERROR Stop();
     CHIP_ERROR Get(uint16_t index, chip::RendezvousParameters & params);
+    CHIP_ERROR Get(uint16_t index, chip::Dnssd::CommonResolutionData & resolutionData);
     void Log() const;
 
     /////////// CommissioningResolveDelegate Interface /////////
     void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
-#if CHIP_TOOL_DEVICE_SCANNER_USE_BLE
+    /////////// DnssdBrowseDelegate Interface /////////
+    void OnBrowseAdd(chip::Dnssd::DnssdService service) override;
+    void OnBrowseRemove(chip::Dnssd::DnssdService service) override;
+    void OnBrowseStop(CHIP_ERROR error) override;
+
+#if CONFIG_NETWORK_LAYER_BLE
     /////////// BleScannerDelegate Interface /////////
     void OnBleScanAdd(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
     void OnBleScanRemove(BLE_CONNECTION_OBJECT connObj) override;
-#endif // CHIP_TOOL_DEVICE_SCANNER_USE_BLE
+#endif // CONFIG_NETWORK_LAYER_BLE
 
 private:
-    std::vector<DeviceScannerResult> mDiscoveredResults;
-    chip::Dnssd::ResolverProxy mDNSResolver;
+    std::unordered_map<std::string, std::map<chip::Inet::InterfaceId::PlatformType, std::vector<DeviceScannerResult>>>
+        mDiscoveredResults;
 };
 
 DeviceScanner & GetDeviceScanner();
+
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN

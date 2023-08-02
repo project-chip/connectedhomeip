@@ -25,6 +25,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/Ameba/AmebaConfig.h>
+#include <platform/Ameba/AmebaUtils.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
@@ -152,13 +153,22 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
+    CHIP_ERROR err;
+    int32_t error;
+
     char temp[32];
     uint32_t mac[ETH_ALEN];
-    int i = 0;
-
-    wifi_get_mac_address(temp);
-
     char * token = strtok(temp, ":");
+    int i        = 0;
+
+    error = matter_wifi_get_mac_address(temp);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to get mac address");
+        goto exit;
+    }
+
     while (token != NULL)
     {
         mac[i] = (uint32_t) strtol(token, NULL, 16);
@@ -169,7 +179,8 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
     for (i = 0; i < ETH_ALEN; i++)
         buf[i] = mac[i] & 0xFF;
 
-    return CHIP_NO_ERROR;
+exit:
+    return err;
 }
 
 bool ConfigurationManagerImpl::CanFactoryReset()
@@ -188,10 +199,6 @@ CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform:
     AmebaConfig::Key configKey{ AmebaConfig::kConfigNamespace_ChipCounters, key };
 
     CHIP_ERROR err = ReadConfigValue(configKey, value);
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-    }
     return err;
 }
 

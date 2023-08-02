@@ -50,19 +50,14 @@ include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn_args.cmake)
 include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn.cmake)
 
 # Prepare compiler flags
-matter_add_flags(-D_DEFAULT_SOURCE)
-
 if (CHIP_CFLAGS)
     matter_add_flags("${CHIP_CFLAGS}")
 endif()
 
+matter_add_flags(-D_POSIX_C_SOURCE=200809)
+
 if (CONFIG_ARM)
     matter_add_cflags(--specs=nosys.specs)
-endif()
-
-if (CONFIG_POSIX_API)
-    matter_add_flags(-D_SYS__PTHREADTYPES_H_)
-    matter_add_flags(-isystem${ZEPHYR_BASE}/include/zephyr/posix)
 endif()
 
 if (CONFIG_NORDIC_SECURITY_BACKEND)
@@ -127,7 +122,7 @@ matter_add_gn_arg_bool  ("chip_logging"                           CONFIG_LOG)
 matter_add_gn_arg_bool  ("chip_enable_openthread"                 CONFIG_NET_L2_OPENTHREAD)
 matter_add_gn_arg_bool  ("chip_openthread_ftd"                    CONFIG_OPENTHREAD_FTD)
 matter_add_gn_arg_bool  ("chip_config_network_layer_ble"          CONFIG_BT)
-matter_add_gn_arg_bool  ("chip_inet_config_enable_ipv4"           CONFIG_NET_IPV4)
+matter_add_gn_arg_bool  ("chip_inet_config_enable_ipv4"           CONFIG_CHIP_IPV4)
 matter_add_gn_arg_bool  ("chip_enable_nfc"                        CONFIG_CHIP_NFC_COMMISSIONING)
 matter_add_gn_arg_bool  ("chip_enable_ota_requestor"              CONFIG_CHIP_OTA_REQUESTOR)
 matter_add_gn_arg_bool  ("chip_persist_subscriptions"             CONFIG_CHIP_PERSISTENT_SUBSCRIPTIONS)
@@ -197,8 +192,12 @@ matter_build(chip
     DEVICE_INFO_EXAMPLE_PROVIDER ${CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER}
     GN_DEPENDENCIES kernel
 )
+
 set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
-target_compile_definitions(chip INTERFACE _DEFAULT_SOURCE)
+# Enable visibility of POSIX.1-2008 functions, such as strnlen
+target_compile_definitions(chip INTERFACE _POSIX_C_SOURCE=200809)
+# Make sure that kernel symbols that are only referenced by the Matter libraries are resolved.
+target_link_libraries(chip INTERFACE $<TARGET_FILE:kernel>)
 
 if (CONFIG_CHIP_MALLOC_SYS_HEAP_OVERRIDE)
     target_link_options(chip INTERFACE

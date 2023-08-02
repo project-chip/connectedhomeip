@@ -31,7 +31,6 @@ chip_system_config_use_lwip = true
 lwip_platform = "external"
 chip_system_config_use_sockets = false
 
-chip_crypto = "mbedtls"
 chip_external_mbedtls = true
 
 custom_toolchain = "${chip_root}/config/openiotsdk/chip-gn/toolchain:openiotsdk"

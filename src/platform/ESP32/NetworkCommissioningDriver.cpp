@@ -38,6 +38,40 @@ constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
 static uint8_t WiFiSSIDStr[DeviceLayer::Internal::kMaxWiFiSSIDLength];
 } // namespace
 
+BitFlags<WiFiSecurityBitmap> ConvertSecurityType(wifi_auth_mode_t authMode)
+{
+    BitFlags<WiFiSecurityBitmap> securityType;
+    switch (authMode)
+    {
+    case WIFI_AUTH_OPEN:
+        securityType.Set(WiFiSecurity::kUnencrypted);
+        break;
+    case WIFI_AUTH_WEP:
+        securityType.Set(WiFiSecurity::kWep);
+        break;
+    case WIFI_AUTH_WPA_PSK:
+        securityType.Set(WiFiSecurity::kWpaPersonal);
+        break;
+    case WIFI_AUTH_WPA2_PSK:
+        securityType.Set(WiFiSecurity::kWpa2Personal);
+        break;
+    case WIFI_AUTH_WPA_WPA2_PSK:
+        securityType.Set(WiFiSecurity::kWpa2Personal);
+        securityType.Set(WiFiSecurity::kWpaPersonal);
+        break;
+    case WIFI_AUTH_WPA3_PSK:
+        securityType.Set(WiFiSecurity::kWpa3Personal);
+        break;
+    case WIFI_AUTH_WPA2_WPA3_PSK:
+        securityType.Set(WiFiSecurity::kWpa3Personal);
+        securityType.Set(WiFiSecurity::kWpa2Personal);
+        break;
+    default:
+        break;
+    }
+    return securityType;
+}
+
 CHIP_ERROR GetConfiguredNetwork(Network & network)
 {
     wifi_ap_record_t ap_info;
@@ -189,6 +223,9 @@ CHIP_ERROR ESPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen,
     memset(&wifiConfig, 0, sizeof(wifiConfig));
     memcpy(wifiConfig.sta.ssid, ssid, std::min(ssidLen, static_cast<uint8_t>(sizeof(wifiConfig.sta.ssid))));
     memcpy(wifiConfig.sta.password, key, std::min(keyLen, static_cast<uint8_t>(sizeof(wifiConfig.sta.password))));
+#if CONFIG_WIFI_POWER_SAVE_MAX
+    wifiConfig.sta..listen_interval = CONFIG_WIFI_PS_LISTEN_INTERVAL;
+#endif
 
     // Configure the ESP WiFi interface.
     esp_err_t err = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
@@ -297,27 +334,26 @@ CHIP_ERROR ESPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 
 void ESPWiFiDriver::OnScanWiFiNetworkDone()
 {
+    if (!mpScanCallback)
+    {
+        ChipLogProgress(DeviceLayer, "No scan callback");
+        return;
+    }
     uint16_t ap_number;
     esp_wifi_scan_get_ap_num(&ap_number);
     if (!ap_number)
     {
         ChipLogProgress(DeviceLayer, "No AP found");
-        if (mpScanCallback != nullptr)
-        {
-            mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), nullptr);
-            mpScanCallback = nullptr;
-        }
+        mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), nullptr);
+        mpScanCallback = nullptr;
         return;
     }
     std::unique_ptr<wifi_ap_record_t[]> ap_buffer_ptr(new wifi_ap_record_t[ap_number]);
     if (ap_buffer_ptr == NULL)
     {
         ChipLogError(DeviceLayer, "can't malloc memory for ap_list_buffer");
-        if (mpScanCallback)
-        {
-            mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
-            mpScanCallback = nullptr;
-        }
+        mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
+        mpScanCallback = nullptr;
         return;
     }
     wifi_ap_record_t * ap_list_buffer = ap_buffer_ptr.get();
@@ -339,15 +375,18 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
         {
             ap_buffer_ptr.release();
         }
+        else
+        {
+            ChipLogError(DeviceLayer, "can't schedule the scan result processing");
+            mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
+            mpScanCallback = nullptr;
+        }
     }
     else
     {
         ChipLogError(DeviceLayer, "can't get ap_records ");
-        if (mpScanCallback)
-        {
-            mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
-            mpScanCallback = nullptr;
-        }
+        mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
+        mpScanCallback = nullptr;
     }
 }
 

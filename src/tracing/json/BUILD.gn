@@ -1,0 +1,61 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip/buildconfig_header.gni")
+
+declare_args() {
+  # Include the hex content of the payload in the json output
+  matter_log_json_payload_hex = false
+
+  # Include the decoded payload in the json outut
+  matter_log_json_payload_decode_full = false
+}
+
+buildconfig_header("log-json-buildconfig") {
+  header = "log_json_build_config.h"
+  header_dir = "log_json"
+
+  defines = [
+    "MATTER_LOG_JSON_DECODE_HEX=${matter_log_json_payload_hex}",
+    "MATTER_LOG_JSON_DECODE_FULL=${matter_log_json_payload_decode_full}",
+  ]
+}
+
+# As this uses std::string, this library is NOT for use
+# for embedded devices.
+static_library("json") {
+  sources = [
+    "json_tracing.cpp",
+    "json_tracing.h",
+  ]
+
+  public_deps = [
+    ":log-json-buildconfig",
+    "${chip_root}/src/lib/address_resolve",
+    "${chip_root}/src/tracing",
+    "${chip_root}/src/transport",
+    "${chip_root}/third_party/jsoncpp",
+  ]
+
+  if (matter_log_json_payload_decode_full) {
+    public_deps += [
+      "${chip_root}/src/controller/data_model:cluster-tlv-metadata",
+      "${chip_root}/src/lib/format:protocol-decoder",
+      "${chip_root}/src/lib/format:protocol-tlv-metadata",
+    ]
+  }
+}

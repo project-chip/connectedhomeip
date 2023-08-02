@@ -43,7 +43,8 @@ class TC_TIMESYNC_2_6(MatterBaseTest):
     @async_test_body
     async def test_TC_TIMESYNC_2_6(self):
 
-        self.endpoint = self.user_params.get("endpoint", 0)
+        # Time sync is required to be on endpoint 0 if it is present
+        self.endpoint = 0
 
         self.print_step(0, "Commissioning, already done")
         attributes = Clusters.TimeSynchronization.Attributes
@@ -101,7 +102,7 @@ class TC_TIMESYNC_2_6(MatterBaseTest):
 
         self.print_step(14, "Set DefaultNTP to good IPv6")
         ntp = "fe80::1"
-        await self.send_set_default_ntp(ntp=ntp)
+        await self.send_set_default_ntp_cmd(ntp=ntp)
 
         self.print_step(15, "Read DefaultNTP")
         attr = await self.read_ts_attribute_expect_success(default_ntp_attr)

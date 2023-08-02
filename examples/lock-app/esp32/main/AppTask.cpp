@@ -422,6 +422,11 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
 
         sLockLED.Set(false);
     }
+    if (sAppTask.mSyncClusterToButtonAction)
+    {
+        chip::DeviceLayer::SystemLayer().ScheduleWork(UpdateClusterState, nullptr);
+        sAppTask.mSyncClusterToButtonAction = false;
+    }
 }
 
 void AppTask::PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction)

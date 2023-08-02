@@ -44,6 +44,7 @@ AdvSendAdvert
 AE
 aef
 AES
+AIDL
 AlarmCode
 algs
 alloc
@@ -87,8 +88,8 @@ ARMmbed
 armv
 ASAN
 asdk
-AssertionError
 ASR
+AssertionError
 AST
 ASYNC
 atomics
@@ -164,6 +165,7 @@ bredr
 BridgedDeviceBasicInformation
 bridgedLightEndpoint
 bringup
+BroadcastReceiver
 BromateConcentrationMeasurement
 BromodichloromethaneConcentrationMeasurement
 BromoformConcentrationMeasurement
@@ -357,6 +359,8 @@ DCONF
 DCONFIG
 debianutils
 debugText
+decrypt
+decrypted
 DEDEDEDE
 deepnote
 DefaultOTAProviders
@@ -476,6 +480,7 @@ EEE
 eef
 ef
 EFR
+efuse
 eg
 EjQ
 elftools
@@ -585,6 +590,7 @@ getManualTests
 getstarted
 getTests
 GH
+ghcr
 ghp
 githubusercontent
 gitignore
@@ -635,6 +641,7 @@ HomePods
 hostapd
 hostname
 href
+HEPA
 HTTPS
 HW
 hwadr
@@ -952,6 +959,7 @@ OnOffClusterTest
 OnOffSwitchConfiguration
 OnPlatformEvent
 OO
+openiotsdk
 openjdk
 OpenOCD
 OpenSSL
@@ -977,6 +985,7 @@ otaissues
 OTAProvider
 OTAProviderIpAddress
 OTAProviderNodeId
+otaproviders
 OTAProviderSerialPort
 OTARequesterImpl
 OTARequestorDriver
@@ -1022,6 +1031,7 @@ peerNodeId
 peerSessionId
 pem
 percentageLiftValue
+perfetto
 periodicQueryTimeout
 pexpect
 pickString
@@ -1067,6 +1077,7 @@ ProxyDiscovery
 ProxyValid
 ProxyView
 PRs
+PSA
 PSCAN
 PSECT
 PSK
@@ -1151,6 +1162,7 @@ RPC
 RPCs
 RPi
 RPis
+RSA
 rsn
 RSSI
 RST
@@ -1243,8 +1255,8 @@ SoftwareVersion
 softwareVersionStr
 SoftwareVersionString
 softwareVersionValid
-sphinxcontrib
 SparkFun
+sphinxcontrib
 SPI
 spiflash
 spinel
@@ -1353,6 +1365,7 @@ tmp
 tngvndl
 TODO
 toJson
+tokenization
 tokenized
 tokenizer
 toolchain

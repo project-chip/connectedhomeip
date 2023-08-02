@@ -1,0 +1,318 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 25.2.2. [TC-CC-2.2] Attributes with client as DUT
+
+PICS:
+    - CC.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Color Control"
+    endpoint: 1
+
+tests:
+    #- label: "Wait for the device to be commissioned"
+    #  cluster: "DelayCommands"
+    #  command: "WaitForCommissioning"
+
+    - label: "DUT reads from the TH the (0x0000) CurrentHue attribute"
+      PICS: CC.C.A0000
+      wait: "readAttribute"
+      attribute: "CurrentHue"
+
+    - label: "DUT reads from the TH the (0x0001) CurrentSaturation attribute"
+      PICS: CC.C.A0001
+      wait: "readAttribute"
+      attribute: "CurrentSaturation"
+
+    - label:
+          "DUT reads from the TH the Optional (0x0002) RemainingTime attribute"
+      PICS: CC.C.A0002
+      wait: "readAttribute"
+      attribute: "RemainingTime"
+
+    - label: "DUT reads from the TH the (0x0003) CurrentX attribute"
+      PICS: CC.C.A0003
+      wait: "readAttribute"
+      attribute: "CurrentX"
+
+    - label: "DUT reads from the TH the (0x0004) CurrentY attribute"
+      PICS: CC.C.A0004
+      wait: "readAttribute"
+      attribute: "CurrentY"
+
+    - label:
+          "DUT reads from the TH the Optional (0x0005) DriftCompensation
+          attribute"
+      PICS: CC.C.A0005
+      wait: "readAttribute"
+      attribute: "DriftCompensation"
+
+    - label:
+          "DUT reads from the TH the Optional (0x0006) CompensationText
+          attribute"
+      PICS: CC.C.A0006
+      wait: "readAttribute"
+      attribute: "CompensationText"
+
+    - label:
+          "DUT reads from the TH the (0x0007) ColorTemperatureMireds attribute"
+      PICS: CC.C.A0007
+      wait: "readAttribute"
+      attribute: "ColorTemperatureMireds"
+
+    - label: "DUT reads from the TH the (0x0008) ColorMode attribute"
+      PICS: CC.C.A0008
+      wait: "readAttribute"
+      attribute: "ColorMode"
+
+    - label: "DUT reads from the TH the (0x000f) Options attribute"
+      PICS: CC.C.A000f
+      wait: "readAttribute"
+      attribute: "Options"
+
+    - label: "DUT reads from the TH the (0x4000) EnhancedCurrentHue attribute"
+      PICS: CC.C.A4000
+      wait: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+
+    - label: "DUT reads from the TH the (0x4001) EnhancedColorMode attribute"
+      PICS: CC.C.A4001
+      wait: "readAttribute"
+      attribute: "EnhancedColorMode"
+
+    - label: "DUT reads from the TH the (0x4002) ColorLoopActive attribute"
+      PICS: CC.C.A4002
+      wait: "readAttribute"
+      attribute: "ColorLoopActive"
+
+    - label: "DUT reads from the TH the (0x4003) ColorLoopDirection attribute"
+      PICS: CC.C.A4003
+      wait: "readAttribute"
+      attribute: "ColorLoopDirection"
+
+    - label: "DUT reads from the TH the (0x4004) ColorLoopTime attribute"
+      PICS: CC.C.A4004
+      wait: "readAttribute"
+      attribute: "ColorLoopTime"
+
+    - label:
+          "DUT reads from the TH the (0x4005) ColorLoopStartEnhancedHue
+          attribute"
+      PICS: CC.C.A4005
+      wait: "readAttribute"
+      attribute: "ColorLoopStartEnhancedHue"
+
+    - label:
+          "DUT reads from the TH the (0x4006) ColorLoopStoredEnhancedHue
+          attribute"
+      PICS: CC.C.A4006
+      wait: "readAttribute"
+      attribute: "ColorLoopStoredEnhancedHue"
+
+    - label: "DUT reads from the TH the (0x400a) ColorCapabilities attribute"
+      PICS: CC.C.A400a
+      wait: "readAttribute"
+      attribute: "ColorCapabilities"
+
+    - label:
+          "DUT reads from the TH the (0x400b) ColorTempPhysicalMinMireds
+          attribute"
+      PICS: CC.C.A400b
+      wait: "readAttribute"
+      attribute: "ColorTempPhysicalMinMireds"
+
+    - label:
+          "DUT reads from the TH the (0x400c) ColorTempPhysicalMaxMireds
+          attribute"
+      PICS: CC.C.A400c
+      wait: "readAttribute"
+      attribute: "ColorTempPhysicalMaxMireds"
+
+    - label:
+          "DUT reads from the TH the (0x400d) CoupleColorTempToLevelMinMireds
+          attribute"
+      PICS: CC.C.A400d
+      wait: "readAttribute"
+      attribute: "CoupleColorTempToLevelMinMireds"
+
+    - label:
+          "DUT reads from the TH the (0x4010) StartUpColorTemperatureMireds
+          attribute"
+      PICS: CC.C.A4010
+      wait: "readAttribute"
+      attribute: "StartUpColorTemperatureMireds"
+
+    - label: "DUT reads from the TH the (0x0010) NumberOfPrimaries attribute"
+      PICS: CC.C.A0010
+      wait: "readAttribute"
+      attribute: "NumberOfPrimaries"
+
+    - label: "DUT reads from the TH the (0x0011) Primary1X attribute"
+      PICS: CC.C.A0011
+      wait: "readAttribute"
+      attribute: "Primary1X"
+
+    - label: "DUT reads from the TH the (0x0012) Primary1Y attribute"
+      PICS: CC.C.A0012
+      wait: "readAttribute"
+      attribute: "Primary1Y"
+
+    - label: "DUT reads from the TH the (0x0013) Primary1Intensity attribute"
+      PICS: CC.C.A0013
+      wait: "readAttribute"
+      attribute: "Primary1Intensity"
+
+    - label: "DUT reads from the TH the (0x0015) Primary2X attribute"
+      PICS: CC.C.A0015
+      wait: "readAttribute"
+      attribute: "Primary2X"
+
+    - label: "DUT reads from the TH the (0x0016) Primary2Y attribute"
+      PICS: CC.C.A0016
+      wait: "readAttribute"
+      attribute: "Primary2Y"
+
+    - label: "DUT reads from the TH the (0x0017) Primary2Intensity attribute"
+      PICS: CC.C.A0017
+      wait: "readAttribute"
+      attribute: "Primary2Intensity"
+
+    - label: "DUT reads from the TH the (0x0019) Primary3X attribute"
+      PICS: CC.C.A0019
+      wait: "readAttribute"
+      attribute: "Primary3X"
+
+    - label: "DUT reads from the TH the (0x001a) Primary3Y attribute"
+      PICS: CC.C.A001a
+      wait: "readAttribute"
+      attribute: "Primary3Y"
+
+    - label: "DUT reads from the TH the (0x001b) Primary3Intensity attribute"
+      PICS: CC.C.A001b
+      wait: "readAttribute"
+      attribute: "Primary3Intensity"
+
+    - label: "DUT reads from the TH the (0x0020) Primary4X attribute"
+      PICS: CC.C.A0020
+      wait: "readAttribute"
+      attribute: "Primary4X"
+
+    - label: "DUT reads from the TH the (0x0021) Primary4Y attribute"
+      PICS: CC.C.A0021
+      wait: "readAttribute"
+      attribute: "Primary4Y"
+
+    - label: "DUT reads from the TH the (0x0022) Primary4Intensity attribute"
+      PICS: CC.C.A0022
+      wait: "readAttribute"
+      attribute: "Primary4Intensity"
+
+    - label: "DUT reads from the TH the (0x0024) Primary5X attribute"
+      PICS: CC.C.A0024
+      wait: "readAttribute"
+      attribute: "Primary5X"
+
+    - label: "DUT reads from the TH the (0x0025) Primary5Y attribute"
+      PICS: CC.C.A0025
+      wait: "readAttribute"
+      attribute: "Primary5Y"
+
+    - label: "DUT reads from the TH the (0x0026) Primary5Intensity attribute"
+      PICS: CC.C.A0026
+      wait: "readAttribute"
+      attribute: "Primary5Intensity"
+
+    - label: "DUT reads from the TH the (0x0028) Primary6X attribute"
+      PICS: CC.C.A0028
+      wait: "readAttribute"
+      attribute: "Primary6X"
+
+    - label: "DUT reads from the TH the (0x0029) Primary6Y attribute"
+      PICS: CC.C.A0029
+      wait: "readAttribute"
+      attribute: "Primary6Y"
+
+    - label: "DUT reads from the TH the (0x002a) Primary6Intensity attribute"
+      PICS: CC.C.A002a
+      wait: "readAttribute"
+      attribute: "Primary6Intensity"
+
+    - label: "DUT reads from the TH the Optional (0x0030) WhitePointX attribute"
+      PICS: CC.C.A0030
+      wait: "readAttribute"
+      attribute: "WhitePointX"
+
+    - label: "DUT reads from the TH the Optional (0x0031) WhitePointY attribute"
+      PICS: CC.C.A0031
+      wait: "readAttribute"
+      attribute: "WhitePointY"
+
+    - label:
+          "DUT reads from the TH the Optional (0x0032) ColorPointRX attribute"
+      PICS: CC.C.A0032
+      wait: "readAttribute"
+      attribute: "ColorPointRX"
+
+    - label:
+          "DUT reads from the TH the Optional (0x0033) ColorPointRY attribute"
+      PICS: CC.C.A0033
+      wait: "readAttribute"
+      attribute: "ColorPointRY"
+
+    - label:
+          "DUT reads from the TH the Optional (0x0034) ColorPointRIntensity
+          attribute"
+      PICS: CC.C.A0034
+      wait: "readAttribute"
+      attribute: "ColorPointRIntensity"
+
+    - label:
+          "DUT reads from the TH the Optional (0x0036) ColorPointGX attribute"
+      PICS: CC.C.A0036
+      wait: "readAttribute"
+      attribute: "ColorPointGX"
+
+    - label:
+          "DUT reads from the TH the Optional (0x0037) ColorPointGY attribute"
+      PICS: CC.C.A0037
+      wait: "readAttribute"
+      attribute: "ColorPointGY"
+
+    - label:
+          "DUT reads from the TH the Optional (0x0038) ColorPointGIntensity
+          attribute"
+      PICS: CC.C.A0038
+      wait: "readAttribute"
+      attribute: "ColorPointGIntensity"
+
+    - label:
+          "DUT reads from the TH the Optional (0x003a) ColorPointBX attribute"
+      PICS: CC.C.A003a
+      wait: "readAttribute"
+      attribute: "ColorPointBX"
+
+    - label:
+          "DUT reads from the TH the Optional (0x003b) ColorPointBY attribute"
+      PICS: CC.C.A003b
+      wait: "readAttribute"
+      attribute: "ColorPointBY"
+
+    - label:
+          "DUT reads from the TH the Optional (0x003c) ColorPointBIntensity
+          attribute"
+      PICS: CC.C.A003c
+      wait: "readAttribute"
+      attribute: "ColorPointBIntensity"

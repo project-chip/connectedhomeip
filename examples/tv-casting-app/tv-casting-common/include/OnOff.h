@@ -22,6 +22,8 @@
 #include <controller/CHIPCluster.h>
 #include <functional>
 
+#include <app-common/zap-generated/cluster-objects.h>
+
 // COMMAND CLASSES
 class OnCommand : public MediaCommandBase<chip::app::Clusters::OnOff::Commands::On::Type, chip::app::DataModel::NullObjectType>
 {

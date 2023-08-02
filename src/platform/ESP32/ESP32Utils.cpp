@@ -117,6 +117,13 @@ CHIP_ERROR ESP32Utils::StartWiFiLayer(void)
             ChipLogError(DeviceLayer, "esp_wifi_start() failed: %s", esp_err_to_name(err));
             return ESP32Utils::MapError(err);
         }
+#if CONFIC_WIFI_POWER_SAVE_MIN
+        esp_wifi_set_ps(WIFI_PS_MIN_MODEM);
+#elif CONFIC_WIFI_POWER_SAVE_MAX
+        esp_wifi_set_ps(WIFI_PS_MAX_MODEM);
+#elif CONFIG_WIFI_POWER_SAVE_NONE
+        esp_wifi_set_ps(WIFI_PS_NONE);
+#endif
     }
 
     return CHIP_NO_ERROR;

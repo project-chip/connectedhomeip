@@ -160,5 +160,23 @@ TimerList TimerList::ExtractEarlier(Clock::Timestamp t)
     return out;
 }
 
+Clock::Timeout TimerList::GetRemainingTime(TimerCompleteCallback aOnComplete, void * aAppState)
+{
+    for (TimerList::Node * timer = mEarliestTimer; timer != nullptr; timer = timer->mNextTimer)
+    {
+        if (timer->GetCallback().GetOnComplete() == aOnComplete && timer->GetCallback().GetAppState() == aAppState)
+        {
+            Clock::Timestamp currentTime = SystemClock().GetMonotonicTimestamp();
+
+            if (currentTime < timer->AwakenTime())
+            {
+                return Clock::Timeout(timer->AwakenTime() - currentTime);
+            }
+            return Clock::kZero;
+        }
+    }
+    return Clock::kZero;
+}
+
 } // namespace System
 } // namespace chip

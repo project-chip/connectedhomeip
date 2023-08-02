@@ -15,7 +15,7 @@ MTRCluster{{compatClusterNameRemapping label}}ID {{availability (compatClusterNa
 {{#zcl_clusters}}
 {{#if (isSupported (asUpperCamelCase label preserveAcronyms=true) isForIds=true)}}
 {{~#*inline "cluster"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
-MTRClusterIDType{{>cluster}}ID {{availability (asUpperCamelCase label preserveAcronyms=true) minimalRelease="First major API revamp" isForIds=true}} = {{asMEI manufacturerCode code}},
+MTRClusterIDType{{>cluster}}ID {{availability (asUpperCamelCase label preserveAcronyms=true) minimalRelease="First major API revamp" isForIds=true deprecationMessage=(concat "The " (asUpperCamelCase label preserveAcronyms=true) " cluster will be removed")}} = {{asMEI manufacturerCode code}},
 {{/if}}
 {{/zcl_clusters}}
 };
@@ -89,7 +89,7 @@ MTRClusterGlobalAttribute{{asUpperCamelCase label}}ID,
 {{#if (and (isSupported (asUpperCamelCase ../clusterName preserveAcronyms=true) attribute=(asUpperCamelCase label preserveAcronyms=true) isForIds=true)
            (or clusterRef
                (isSupported "" globalAttribute=(asUpperCamelCase label preserveAcronyms=true) isForIds=true)))}}
-MTRAttributeIDTypeCluster{{>cluster}}Attribute{{>attribute}}ID {{availability (asUpperCamelCase ../clusterName preserveAcronyms=true) attribute=(asUpperCamelCase label preserveAcronyms=true) minimalRelease="First major API revamp" isForIds=true}} =
+MTRAttributeIDTypeCluster{{>cluster}}Attribute{{>attribute}}ID {{availability (asUpperCamelCase ../clusterName preserveAcronyms=true) attribute=(asUpperCamelCase label preserveAcronyms=true) minimalRelease="First major API revamp" isForIds=true deprecationMessage=(concat "The " (asUpperCamelCase label preserveAcronyms=true) " attribute will be removed")}} =
 {{#if clusterRef}}
 {{asMEI manufacturerCode code}},
 {{else}}
@@ -152,7 +152,7 @@ MTRCluster{{cluster}}Command{{command}}ID
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
 {{#*inline "commandIdDecl"}}
 {{#if (isSupported cluster command=command isForIds=true)}}
-MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID {{availability cluster command=command minimalRelease="First major API revamp" isForIds=true}} = {{asMEI manufacturerCode code}},
+MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID {{availability cluster command=command minimalRelease="First major API revamp" isForIds=true deprecationMessage=(concat "The " command " command will be removed")}} = {{asMEI manufacturerCode code}},
 {{/if}}
 {{/inline}}
 {{> commandIdDecl cluster=(asUpperCamelCase ../clusterName preserveAcronyms=true)

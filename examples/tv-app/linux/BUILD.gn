@@ -20,43 +20,12 @@ import("${chip_root}/src/lib/lib.gni")
 assert(chip_build_tools)
 
 executable("chip-tv-app") {
-  sources = [
-    "${chip_root}/examples/tv-app/tv-common/include/CHIPProjectAppConfig.h",
-    "AppImpl.cpp",
-    "AppImpl.h",
-    "ZclCallbacks.cpp",
-    "include/account-login/AccountLoginManager.cpp",
-    "include/account-login/AccountLoginManager.h",
-    "include/application-basic/ApplicationBasicManager.cpp",
-    "include/application-basic/ApplicationBasicManager.h",
-    "include/application-launcher/ApplicationLauncherManager.cpp",
-    "include/application-launcher/ApplicationLauncherManager.h",
-    "include/audio-output/AudioOutputManager.cpp",
-    "include/audio-output/AudioOutputManager.h",
-    "include/channel/ChannelManager.cpp",
-    "include/channel/ChannelManager.h",
-    "include/cluster-change-attribute.cpp",
-    "include/cluster-init.cpp",
-    "include/content-launcher/ContentLauncherManager.cpp",
-    "include/content-launcher/ContentLauncherManager.h",
-    "include/keypad-input/KeypadInputManager.cpp",
-    "include/keypad-input/KeypadInputManager.h",
-    "include/low-power/LowPowerManager.cpp",
-    "include/low-power/LowPowerManager.h",
-    "include/media-input/MediaInputManager.cpp",
-    "include/media-input/MediaInputManager.h",
-    "include/media-playback/MediaPlaybackManager.cpp",
-    "include/media-playback/MediaPlaybackManager.h",
-    "include/target-navigator/TargetNavigatorManager.cpp",
-    "include/target-navigator/TargetNavigatorManager.h",
-    "include/wake-on-lan/WakeOnLanManager.cpp",
-    "include/wake-on-lan/WakeOnLanManager.h",
-    "main.cpp",
-  ]
+  sources = [ "main.cpp" ]
 
   deps = [
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/examples/tv-app/tv-common",
+    "${chip_root}/examples/tv-app/tv-common:tv-common-sources",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/inipp",
   ]
@@ -71,7 +40,6 @@ executable("chip-tv-app") {
 
   if (chip_build_libshell) {
     defines += [ "ENABLE_CHIP_SHELL" ]
-    sources += [ "AppPlatformShellCommands.cpp" ]
   }
 
   output_dir = root_out_dir

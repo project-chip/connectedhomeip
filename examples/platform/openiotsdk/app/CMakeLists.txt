@@ -24,29 +24,18 @@ add_library(openiotsdk-startup
 
 target_link_libraries(openiotsdk-startup
     PUBLIC
-        # iotsdk-serial-retarget contains the UART but we don't need the retarget part 
+        # iotsdk-serial-retarget contains the UART but we don't need the retarget part
         $<FILTER:$<TARGET_OBJECTS:iotsdk-serial-retarget>,EXCLUDE,.*gcc_retarget.*>
         cmsis-rtos-api
         mcu-driver-hal
+        tfm-ns-interface
 )
 
 target_link_options(openiotsdk-startup
     PUBLIC
         "-Wl,--wrap,__malloc_lock"
-        "-Wl,--wrap,__malloc_unlock" 
+        "-Wl,--wrap,__malloc_unlock"
 )
-
-if(TFM_SUPPORT)
-    target_compile_definitions(openiotsdk-startup
-        PUBLIC
-            TFM_SUPPORT
-    )
-
-    target_link_libraries(openiotsdk-startup
-        PUBLIC
-            tfm-ns-interface
-    )    
-endif()
 
 # Declare Open IoT SDK app interface target
 add_library(openiotsdk-app
@@ -54,20 +43,30 @@ add_library(openiotsdk-app
     ${CHIP_ROOT}/examples/providers/DeviceInfoProviderImpl.cpp
 )
 
-target_include_directories(openiotsdk-app 
+target_include_directories(openiotsdk-app
     PUBLIC
         .
         ${CHIP_ROOT}/examples/providers
 )
 
-target_link_libraries(openiotsdk-app 
+target_link_libraries(openiotsdk-app
     PUBLIC
         chip
 )
 
-if(TFM_SUPPORT)
-    target_compile_definitions(openiotsdk-app 
+if(CONFIG_CHIP_OPEN_IOT_SDK_OTA_ENABLE)
+    target_include_directories(openiotsdk-app
         PUBLIC
-            TFM_SUPPORT
+            dfu
+    )
+
+    target_sources(openiotsdk-app
+        PUBLIC
+            dfu/openiotsdk_dfu_manager.cpp
+    )
+
+    target_compile_definitions(openiotsdk-app
+        PUBLIC
+            CHIP_OPEN_IOT_SDK_OTA_ENABLE
     )
 endif()

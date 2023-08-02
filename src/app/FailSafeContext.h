@@ -66,7 +66,7 @@ public:
 
     bool IsFailSafeArmed(FabricIndex accessingFabricIndex) const
     {
-        return mFailSafeArmed && MatchesFabricIndex(accessingFabricIndex);
+        return IsFailSafeArmed() && MatchesFabricIndex(accessingFabricIndex);
     }
 
     // Returns true if the fail-safe is in a state where commands that require an armed
@@ -82,7 +82,7 @@ public:
 
     bool MatchesFabricIndex(FabricIndex accessingFabricIndex) const
     {
-        VerifyOrDie(mFailSafeArmed);
+        VerifyOrDie(IsFailSafeArmed());
         return (accessingFabricIndex == mFabricIndex);
     }
 
@@ -94,7 +94,7 @@ public:
 
     FabricIndex GetFabricIndex() const
     {
-        VerifyOrDie(mFailSafeArmed);
+        VerifyOrDie(IsFailSafeArmed());
         return mFabricIndex;
     }
 
@@ -131,12 +131,15 @@ private:
      */
     static void HandleDisarmFailSafe(intptr_t arg);
 
+    void SetFailSafeArmed(bool armed);
+
     /**
      * @brief Reset to unarmed basic state
      */
     void ResetState()
     {
-        mFailSafeArmed                    = false;
+        SetFailSafeArmed(false);
+
         mAddNocCommandHasBeenInvoked      = false;
         mUpdateNocCommandHasBeenInvoked   = false;
         mAddTrustedRootCertHasBeenInvoked = false;

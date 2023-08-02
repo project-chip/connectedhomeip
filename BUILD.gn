@@ -54,6 +54,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "${chip_root}/src/credentials/tests:fuzz-chip-cert",
         "${chip_root}/src/lib/core/tests:fuzz-tlv-reader",
         "${chip_root}/src/lib/dnssd/minimal_mdns/tests:fuzz-minmdns-packet-parsing",
+        "${chip_root}/src/lib/format/tests:fuzz-payload-decoder",
       ]
     }
   }

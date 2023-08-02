@@ -73,6 +73,8 @@ qpg_executable("lighting_app") {
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
     "${chip_root}/third_party/qpg_sdk:qpg_light_factorydata_lib",
+    "${chip_root}/third_party/qpg_sdk:qpg_light_factorydata_lib",
+    "${chip_root}/third_party/qpg_sdk:qpg_light_firmwaredata_lib",
   ]
 
   if (chip_openthread_ftd) {

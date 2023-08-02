@@ -24,6 +24,7 @@
  */
 
 #pragma once
+#include <string>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 

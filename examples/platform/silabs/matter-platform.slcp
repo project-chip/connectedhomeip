@@ -48,11 +48,6 @@ component:
 - {id: rail_lib_multiprotocol}
 - {id: bluetooth_feature_system}
 - {id: bluetooth_feature_scanner}
-- instance: [vcom]
-  id: uartdrv_usart
-- instance: [vcom]
-  id: uartdrv_eusart
-
 
 config_file:
   - override:
@@ -83,7 +78,7 @@ requires:
 - condition: [device_series_2]
   name: uartdrv_eusart
 - condition: [device_series_2]
-  name: device_init_dpll  
+  name: device_init_dpll
 
 ui_hints:
   highlight:

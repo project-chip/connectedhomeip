@@ -18,5 +18,7 @@
 package com.matter.controller.commands.pairing
 
 enum class PairingNetworkType {
-  NONE, WIFI, THREAD
+  NONE,
+  WIFI,
+  THREAD
 }

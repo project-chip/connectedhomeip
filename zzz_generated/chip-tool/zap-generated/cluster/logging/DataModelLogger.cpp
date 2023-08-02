@@ -41,14 +41,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
             return err;
         }
     }
-    {
-        CHIP_ERROR err = LogValue("TagName", indent + 1, value.tagName);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TagName'");
-            return err;
-        }
-    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -113,6 +105,39 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::detail::Structs::ErrorStateStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("ErrorStateID", indent + 1, value.errorStateID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ErrorStateID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ErrorStateLabel", indent + 1, value.errorStateLabel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ErrorStateLabel'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ErrorStateDetails", indent + 1, value.errorStateDetails);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ErrorStateDetails'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::detail::Structs::LabelStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -129,6 +154,31 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Value'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::detail::Structs::OperationalStateStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("OperationalStateID", indent + 1, value.operationalStateID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'OperationalStateID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("OperationalStateLabel", indent + 1, value.operationalStateLabel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'OperationalStateLabel'");
             return err;
         }
     }
@@ -204,6 +254,47 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Revision'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("MfgCode", indent + 1, value.mfgCode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MfgCode'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("NamespaceID", indent + 1, value.namespaceID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'NamespaceID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Tag", indent + 1, value.tag);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Tag'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Label", indent + 1, value.label);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Label'");
             return err;
         }
     }
@@ -1719,9 +1810,33 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::ModeSelect::Structs::SemanticTagStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("MfgCode", indent + 1, value.mfgCode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MfgCode'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Value", indent + 1, value.value);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Value'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -1733,43 +1848,18 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("TemperatureLevel", indent + 1, value.temperatureLevel);
+        CHIP_ERROR err = LogValue("Mode", indent + 1, value.mode);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TemperatureLevel'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("ErrorStateID", indent + 1, value.errorStateID);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ErrorStateID'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Mode'");
             return err;
         }
     }
     {
-        CHIP_ERROR err = LogValue("ErrorStateLabel", indent + 1, value.errorStateLabel);
+        CHIP_ERROR err = LogValue("SemanticTags", indent + 1, value.semanticTags);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ErrorStateLabel'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ErrorStateDetails", indent + 1, value.errorStateDetails);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ErrorStateDetails'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SemanticTags'");
             return err;
         }
     }
@@ -1780,22 +1870,48 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::DecodableType & value)
+                          const chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("OperationalStateID", indent + 1, value.operationalStateID);
+        CHIP_ERROR err = LogValue("ProductIdentifierType", indent + 1, value.productIdentifierType);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'OperationalStateID'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierType'");
             return err;
         }
     }
     {
-        CHIP_ERROR err = LogValue("OperationalStateLabel", indent + 1, value.operationalStateLabel);
+        CHIP_ERROR err = LogValue("ProductIdentifierValue", indent + 1, value.productIdentifierValue);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'OperationalStateLabel'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierValue'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierType", indent + 1, value.productIdentifierType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierValue", indent + 1, value.productIdentifierValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierValue'");
             return err;
         }
     }
@@ -3609,6 +3725,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const SmokeCoAlarm::Events::SmokeAlarm::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AlarmSeverityLevel", indent + 1, value.alarmSeverityLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AlarmSeverityLevel'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -3616,6 +3740,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const SmokeCoAlarm::Events::COAlarm::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AlarmSeverityLevel", indent + 1, value.alarmSeverityLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AlarmSeverityLevel'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -3624,6 +3756,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const SmokeCoAlarm::Events::LowBattery::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AlarmSeverityLevel", indent + 1, value.alarmSeverityLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AlarmSeverityLevel'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -3672,6 +3812,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const SmokeCoAlarm::Events::InterconnectSmokeAlarm::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AlarmSeverityLevel", indent + 1, value.alarmSeverityLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AlarmSeverityLevel'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -3680,6 +3828,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const SmokeCoAlarm::Events::InterconnectCOAlarm::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AlarmSeverityLevel", indent + 1, value.alarmSeverityLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AlarmSeverityLevel'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -3687,6 +3843,46 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const SmokeCoAlarm::Events::AllClear::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const DishwasherAlarm::Events::Notify::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Active", indent + 1, value.active);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Active'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Inactive", indent + 1, value.inactive);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Inactive'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("State", indent + 1, value.state);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'State'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Mask", indent + 1, value.mask);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Mask'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -3709,6 +3905,54 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const OperationalState::Events::OperationCompletion::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("CompletionErrorCode", indent + 1, value.completionErrorCode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'CompletionErrorCode'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("TotalOperationalTime", indent + 1, value.totalOperationalTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'TotalOperationalTime'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("PausedTime", indent + 1, value.pausedTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'PausedTime'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const RvcOperationalState::Events::OperationalError::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("ErrorState", indent + 1, value.errorState);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ErrorState'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const RvcOperationalState::Events::OperationCompletion::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -4458,16 +4702,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const ModeSelect::Commands::ChangeToModeResponse::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("statusText", indent + 1, value.statusText));
-    DataModelLogger::LogString(indent, "}");
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const LaundryWasherModeSelect::Commands::ChangeToModeResponse::DecodableType & value)
+                                     const LaundryWasherMode::Commands::ChangeToModeResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -4477,7 +4712,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
-    const RefrigeratorAndTemperatureControlledCabinetModeSelect::Commands::ChangeToModeResponse::DecodableType & value)
+    const RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -4486,7 +4721,7 @@ CHIP_ERROR DataModelLogger::LogValue(
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const RvcRunModeSelect::Commands::ChangeToModeResponse::DecodableType & value)
+                                     const RvcRunMode::Commands::ChangeToModeResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -4495,7 +4730,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const RvcCleanModeSelect::Commands::ChangeToModeResponse::DecodableType & value)
+                                     const RvcCleanMode::Commands::ChangeToModeResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -4504,7 +4739,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const DishwasherModeSelect::Commands::ChangeToModeResponse::DecodableType & value)
+                                     const DishwasherMode::Commands::ChangeToModeResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -4514,6 +4749,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const OperationalState::Commands::OperationalCommandResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("commandResponseState", indent + 1, value.commandResponseState));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const RvcOperationalState::Commands::OperationalCommandResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("commandResponseState", indent + 1, value.commandResponseState));
@@ -5359,6 +5602,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PartsList", 1, value);
         }
+        case Descriptor::Attributes::TagList::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TagList", 1, value);
+        }
         case Descriptor::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -6120,6 +6368,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFaultEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActiveBatChargeFaults", 1, value);
+        }
+        case PowerSource::Attributes::EndpointList::Id: {
+            chip::app::DataModel::DecodableList<chip::EndpointId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EndpointList", 1, value);
         }
         case PowerSource::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -7824,62 +8077,114 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-    case LaundryWasherModeSelect::Id: {
+    case LaundryWasherMode::Id: {
         switch (path.mAttributeId)
         {
-        case LaundryWasherModeSelect::Attributes::Description::Id: {
-            chip::CharSpan value;
+        case LaundryWasherMode::Attributes::SupportedModes::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherMode::Structs::ModeOptionStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Description", 1, value);
+            return DataModelLogger::LogValue("SupportedModes", 1, value);
         }
-        case LaundryWasherModeSelect::Attributes::SupportedModes::Id: {
+        case LaundryWasherMode::Attributes::CurrentMode::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentMode", 1, value);
+        }
+        case LaundryWasherMode::Attributes::StartUpMode::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StartUpMode", 1, value);
+        }
+        case LaundryWasherMode::Attributes::OnMode::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OnMode", 1, value);
+        }
+        case LaundryWasherMode::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case LaundryWasherMode::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case LaundryWasherMode::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case LaundryWasherMode::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case LaundryWasherMode::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case LaundryWasherMode::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
+    case RefrigeratorAndTemperatureControlledCabinetMode::Id: {
+        switch (path.mAttributeId)
+        {
+        case RefrigeratorAndTemperatureControlledCabinetMode::Attributes::SupportedModes::Id: {
             chip::app::DataModel::DecodableList<
-                chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeOptionStruct::DecodableType>
+                chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Structs::ModeOptionStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedModes", 1, value);
         }
-        case LaundryWasherModeSelect::Attributes::CurrentMode::Id: {
+        case RefrigeratorAndTemperatureControlledCabinetMode::Attributes::CurrentMode::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentMode", 1, value);
         }
-        case LaundryWasherModeSelect::Attributes::StartUpMode::Id: {
+        case RefrigeratorAndTemperatureControlledCabinetMode::Attributes::StartUpMode::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StartUpMode", 1, value);
         }
-        case LaundryWasherModeSelect::Attributes::OnMode::Id: {
+        case RefrigeratorAndTemperatureControlledCabinetMode::Attributes::OnMode::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OnMode", 1, value);
         }
-        case LaundryWasherModeSelect::Attributes::GeneratedCommandList::Id: {
+        case RefrigeratorAndTemperatureControlledCabinetMode::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
         }
-        case LaundryWasherModeSelect::Attributes::AcceptedCommandList::Id: {
+        case RefrigeratorAndTemperatureControlledCabinetMode::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
         }
-        case LaundryWasherModeSelect::Attributes::EventList::Id: {
+        case RefrigeratorAndTemperatureControlledCabinetMode::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EventList", 1, value);
         }
-        case LaundryWasherModeSelect::Attributes::AttributeList::Id: {
+        case RefrigeratorAndTemperatureControlledCabinetMode::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
-        case LaundryWasherModeSelect::Attributes::FeatureMap::Id: {
+        case RefrigeratorAndTemperatureControlledCabinetMode::Attributes::FeatureMap::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
-        case LaundryWasherModeSelect::Attributes::ClusterRevision::Id: {
+        case RefrigeratorAndTemperatureControlledCabinetMode::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -7887,62 +8192,55 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-    case RefrigeratorAndTemperatureControlledCabinetModeSelect::Id: {
+    case LaundryWasherControls::Id: {
         switch (path.mAttributeId)
         {
-        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::Description::Id: {
-            chip::CharSpan value;
+        case LaundryWasherControls::Attributes::SpinSpeeds::Id: {
+            chip::app::DataModel::DecodableList<chip::CharSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Description", 1, value);
+            return DataModelLogger::LogValue("SpinSpeeds", 1, value);
         }
-        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::SupportedModes::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::
-                                                    Structs::ModeOptionStruct::DecodableType>
-                value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SupportedModes", 1, value);
-        }
-        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::CurrentMode::Id: {
-            uint8_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("CurrentMode", 1, value);
-        }
-        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::StartUpMode::Id: {
+        case LaundryWasherControls::Attributes::SpinSpeedCurrent::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("StartUpMode", 1, value);
+            return DataModelLogger::LogValue("SpinSpeedCurrent", 1, value);
         }
-        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::OnMode::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
+        case LaundryWasherControls::Attributes::NumberOfRinses::Id: {
+            chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("OnMode", 1, value);
+            return DataModelLogger::LogValue("NumberOfRinses", 1, value);
         }
-        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::GeneratedCommandList::Id: {
+        case LaundryWasherControls::Attributes::SupportedRinses::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedRinses", 1, value);
+        }
+        case LaundryWasherControls::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
         }
-        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::AcceptedCommandList::Id: {
+        case LaundryWasherControls::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
         }
-        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::EventList::Id: {
+        case LaundryWasherControls::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EventList", 1, value);
         }
-        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::AttributeList::Id: {
+        case LaundryWasherControls::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
-        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::FeatureMap::Id: {
+        case LaundryWasherControls::Attributes::FeatureMap::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
-        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::ClusterRevision::Id: {
+        case LaundryWasherControls::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -7950,61 +8248,55 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-    case RvcRunModeSelect::Id: {
+    case RvcRunMode::Id: {
         switch (path.mAttributeId)
         {
-        case RvcRunModeSelect::Attributes::Description::Id: {
-            chip::CharSpan value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Description", 1, value);
-        }
-        case RvcRunModeSelect::Attributes::SupportedModes::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::RvcRunModeSelect::Structs::ModeOptionStruct::DecodableType>
-                value;
+        case RvcRunMode::Attributes::SupportedModes::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::RvcRunMode::Structs::ModeOptionStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedModes", 1, value);
         }
-        case RvcRunModeSelect::Attributes::CurrentMode::Id: {
+        case RvcRunMode::Attributes::CurrentMode::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentMode", 1, value);
         }
-        case RvcRunModeSelect::Attributes::StartUpMode::Id: {
+        case RvcRunMode::Attributes::StartUpMode::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StartUpMode", 1, value);
         }
-        case RvcRunModeSelect::Attributes::OnMode::Id: {
+        case RvcRunMode::Attributes::OnMode::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OnMode", 1, value);
         }
-        case RvcRunModeSelect::Attributes::GeneratedCommandList::Id: {
+        case RvcRunMode::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
         }
-        case RvcRunModeSelect::Attributes::AcceptedCommandList::Id: {
+        case RvcRunMode::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
         }
-        case RvcRunModeSelect::Attributes::EventList::Id: {
+        case RvcRunMode::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EventList", 1, value);
         }
-        case RvcRunModeSelect::Attributes::AttributeList::Id: {
+        case RvcRunMode::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
-        case RvcRunModeSelect::Attributes::FeatureMap::Id: {
+        case RvcRunMode::Attributes::FeatureMap::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
-        case RvcRunModeSelect::Attributes::ClusterRevision::Id: {
+        case RvcRunMode::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -8012,61 +8304,55 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-    case RvcCleanModeSelect::Id: {
+    case RvcCleanMode::Id: {
         switch (path.mAttributeId)
         {
-        case RvcCleanModeSelect::Attributes::Description::Id: {
-            chip::CharSpan value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Description", 1, value);
-        }
-        case RvcCleanModeSelect::Attributes::SupportedModes::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::RvcCleanModeSelect::Structs::ModeOptionStruct::DecodableType>
-                value;
+        case RvcCleanMode::Attributes::SupportedModes::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::RvcCleanMode::Structs::ModeOptionStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedModes", 1, value);
         }
-        case RvcCleanModeSelect::Attributes::CurrentMode::Id: {
+        case RvcCleanMode::Attributes::CurrentMode::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentMode", 1, value);
         }
-        case RvcCleanModeSelect::Attributes::StartUpMode::Id: {
+        case RvcCleanMode::Attributes::StartUpMode::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StartUpMode", 1, value);
         }
-        case RvcCleanModeSelect::Attributes::OnMode::Id: {
+        case RvcCleanMode::Attributes::OnMode::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OnMode", 1, value);
         }
-        case RvcCleanModeSelect::Attributes::GeneratedCommandList::Id: {
+        case RvcCleanMode::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
         }
-        case RvcCleanModeSelect::Attributes::AcceptedCommandList::Id: {
+        case RvcCleanMode::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
         }
-        case RvcCleanModeSelect::Attributes::EventList::Id: {
+        case RvcCleanMode::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EventList", 1, value);
         }
-        case RvcCleanModeSelect::Attributes::AttributeList::Id: {
+        case RvcCleanMode::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
-        case RvcCleanModeSelect::Attributes::FeatureMap::Id: {
+        case RvcCleanMode::Attributes::FeatureMap::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
-        case RvcCleanModeSelect::Attributes::ClusterRevision::Id: {
+        case RvcCleanMode::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -8097,15 +8383,13 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Step", 1, value);
         }
-        case TemperatureControl::Attributes::CurrentTemperatureLevelIndex::Id: {
+        case TemperatureControl::Attributes::SelectedTemperatureLevel::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("CurrentTemperatureLevelIndex", 1, value);
+            return DataModelLogger::LogValue("SelectedTemperatureLevel", 1, value);
         }
         case TemperatureControl::Attributes::SupportedTemperatureLevels::Id: {
-            chip::app::DataModel::DecodableList<
-                chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::DecodableType>
-                value;
+            chip::app::DataModel::DecodableList<chip::CharSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedTemperatureLevels", 1, value);
         }
@@ -8150,15 +8434,15 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Mask", 1, value);
         }
-        case RefrigeratorAlarm::Attributes::Latch::Id: {
-            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Latch", 1, value);
-        }
         case RefrigeratorAlarm::Attributes::State::Id: {
             chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("State", 1, value);
+        }
+        case RefrigeratorAlarm::Attributes::Supported::Id: {
+            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Supported", 1, value);
         }
         case RefrigeratorAlarm::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -8193,61 +8477,56 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-    case DishwasherModeSelect::Id: {
+    case DishwasherMode::Id: {
         switch (path.mAttributeId)
         {
-        case DishwasherModeSelect::Attributes::Description::Id: {
-            chip::CharSpan value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Description", 1, value);
-        }
-        case DishwasherModeSelect::Attributes::SupportedModes::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DishwasherModeSelect::Structs::ModeOptionStruct::DecodableType>
+        case DishwasherMode::Attributes::SupportedModes::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DishwasherMode::Structs::ModeOptionStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedModes", 1, value);
         }
-        case DishwasherModeSelect::Attributes::CurrentMode::Id: {
+        case DishwasherMode::Attributes::CurrentMode::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentMode", 1, value);
         }
-        case DishwasherModeSelect::Attributes::StartUpMode::Id: {
+        case DishwasherMode::Attributes::StartUpMode::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StartUpMode", 1, value);
         }
-        case DishwasherModeSelect::Attributes::OnMode::Id: {
+        case DishwasherMode::Attributes::OnMode::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OnMode", 1, value);
         }
-        case DishwasherModeSelect::Attributes::GeneratedCommandList::Id: {
+        case DishwasherMode::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
         }
-        case DishwasherModeSelect::Attributes::AcceptedCommandList::Id: {
+        case DishwasherMode::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
         }
-        case DishwasherModeSelect::Attributes::EventList::Id: {
+        case DishwasherMode::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EventList", 1, value);
         }
-        case DishwasherModeSelect::Attributes::AttributeList::Id: {
+        case DishwasherMode::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
-        case DishwasherModeSelect::Attributes::FeatureMap::Id: {
+        case DishwasherMode::Attributes::FeatureMap::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
-        case DishwasherModeSelect::Attributes::ClusterRevision::Id: {
+        case DishwasherMode::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -8354,10 +8633,15 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ContaminationState", 1, value);
         }
-        case SmokeCoAlarm::Attributes::SensitivityLevel::Id: {
+        case SmokeCoAlarm::Attributes::SmokeSensitivityLevel::Id: {
             chip::app::Clusters::SmokeCoAlarm::SensitivityEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SensitivityLevel", 1, value);
+            return DataModelLogger::LogValue("SmokeSensitivityLevel", 1, value);
+        }
+        case SmokeCoAlarm::Attributes::ExpiryDate::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ExpiryDate", 1, value);
         }
         case SmokeCoAlarm::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -8392,6 +8676,62 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case DishwasherAlarm::Id: {
+        switch (path.mAttributeId)
+        {
+        case DishwasherAlarm::Attributes::Mask::Id: {
+            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Mask", 1, value);
+        }
+        case DishwasherAlarm::Attributes::Latch::Id: {
+            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Latch", 1, value);
+        }
+        case DishwasherAlarm::Attributes::State::Id: {
+            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("State", 1, value);
+        }
+        case DishwasherAlarm::Attributes::Supported::Id: {
+            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Supported", 1, value);
+        }
+        case DishwasherAlarm::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case DishwasherAlarm::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case DishwasherAlarm::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case DishwasherAlarm::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case DishwasherAlarm::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case DishwasherAlarm::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case OperationalState::Id: {
         switch (path.mAttributeId)
         {
@@ -8418,7 +8758,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("OperationalStateList", 1, value);
         }
         case OperationalState::Attributes::OperationalState::Id: {
-            chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::DecodableType value;
+            chip::app::Clusters::OperationalState::OperationalStateEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalState", 1, value);
         }
@@ -8460,6 +8800,74 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case RvcOperationalState::Id: {
+        switch (path.mAttributeId)
+        {
+        case RvcOperationalState::Attributes::PhaseList::Id: {
+            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<chip::CharSpan>> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PhaseList", 1, value);
+        }
+        case RvcOperationalState::Attributes::CurrentPhase::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentPhase", 1, value);
+        }
+        case RvcOperationalState::Attributes::CountdownTime::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CountdownTime", 1, value);
+        }
+        case RvcOperationalState::Attributes::OperationalStateList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::RvcOperationalState::Structs::OperationalStateStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OperationalStateList", 1, value);
+        }
+        case RvcOperationalState::Attributes::OperationalState::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OperationalState", 1, value);
+        }
+        case RvcOperationalState::Attributes::OperationalError::Id: {
+            chip::app::Clusters::RvcOperationalState::Structs::ErrorStateStruct::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OperationalError", 1, value);
+        }
+        case RvcOperationalState::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case RvcOperationalState::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case RvcOperationalState::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case RvcOperationalState::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case RvcOperationalState::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case RvcOperationalState::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case HepaFilterMonitoring::Id: {
         switch (path.mAttributeId)
         {
@@ -8482,6 +8890,18 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
+        }
+        case HepaFilterMonitoring::Attributes::LastChangedTime::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LastChangedTime", 1, value);
+        }
+        case HepaFilterMonitoring::Attributes::ReplacementProductList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ReplacementProductList", 1, value);
         }
         case HepaFilterMonitoring::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -8539,6 +8959,18 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
         }
+        case ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LastChangedTime", 1, value);
+        }
+        case ActivatedCarbonFilterMonitoring::Attributes::ReplacementProductList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ReplacementProductList", 1, value);
+        }
         case ActivatedCarbonFilterMonitoring::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -8565,566 +8997,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
         case ActivatedCarbonFilterMonitoring::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case CeramicFilterMonitoring::Id: {
-        switch (path.mAttributeId)
-        {
-        case CeramicFilterMonitoring::Attributes::Condition::Id: {
-            chip::Percent value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Condition", 1, value);
-        }
-        case CeramicFilterMonitoring::Attributes::DegradationDirection::Id: {
-            chip::app::Clusters::CeramicFilterMonitoring::DegradationDirectionEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("DegradationDirection", 1, value);
-        }
-        case CeramicFilterMonitoring::Attributes::ChangeIndication::Id: {
-            chip::app::Clusters::CeramicFilterMonitoring::ChangeIndicationEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ChangeIndication", 1, value);
-        }
-        case CeramicFilterMonitoring::Attributes::InPlaceIndicator::Id: {
-            bool value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
-        }
-        case CeramicFilterMonitoring::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case CeramicFilterMonitoring::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case CeramicFilterMonitoring::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case CeramicFilterMonitoring::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case CeramicFilterMonitoring::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case CeramicFilterMonitoring::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case ElectrostaticFilterMonitoring::Id: {
-        switch (path.mAttributeId)
-        {
-        case ElectrostaticFilterMonitoring::Attributes::Condition::Id: {
-            chip::Percent value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Condition", 1, value);
-        }
-        case ElectrostaticFilterMonitoring::Attributes::DegradationDirection::Id: {
-            chip::app::Clusters::ElectrostaticFilterMonitoring::DegradationDirectionEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("DegradationDirection", 1, value);
-        }
-        case ElectrostaticFilterMonitoring::Attributes::ChangeIndication::Id: {
-            chip::app::Clusters::ElectrostaticFilterMonitoring::ChangeIndicationEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ChangeIndication", 1, value);
-        }
-        case ElectrostaticFilterMonitoring::Attributes::InPlaceIndicator::Id: {
-            bool value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
-        }
-        case ElectrostaticFilterMonitoring::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case ElectrostaticFilterMonitoring::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case ElectrostaticFilterMonitoring::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case ElectrostaticFilterMonitoring::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case ElectrostaticFilterMonitoring::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case ElectrostaticFilterMonitoring::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case UvFilterMonitoring::Id: {
-        switch (path.mAttributeId)
-        {
-        case UvFilterMonitoring::Attributes::Condition::Id: {
-            chip::Percent value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Condition", 1, value);
-        }
-        case UvFilterMonitoring::Attributes::DegradationDirection::Id: {
-            chip::app::Clusters::UvFilterMonitoring::DegradationDirectionEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("DegradationDirection", 1, value);
-        }
-        case UvFilterMonitoring::Attributes::ChangeIndication::Id: {
-            chip::app::Clusters::UvFilterMonitoring::ChangeIndicationEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ChangeIndication", 1, value);
-        }
-        case UvFilterMonitoring::Attributes::InPlaceIndicator::Id: {
-            bool value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
-        }
-        case UvFilterMonitoring::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case UvFilterMonitoring::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case UvFilterMonitoring::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case UvFilterMonitoring::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case UvFilterMonitoring::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case UvFilterMonitoring::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case IonizingFilterMonitoring::Id: {
-        switch (path.mAttributeId)
-        {
-        case IonizingFilterMonitoring::Attributes::Condition::Id: {
-            chip::Percent value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Condition", 1, value);
-        }
-        case IonizingFilterMonitoring::Attributes::DegradationDirection::Id: {
-            chip::app::Clusters::IonizingFilterMonitoring::DegradationDirectionEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("DegradationDirection", 1, value);
-        }
-        case IonizingFilterMonitoring::Attributes::ChangeIndication::Id: {
-            chip::app::Clusters::IonizingFilterMonitoring::ChangeIndicationEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ChangeIndication", 1, value);
-        }
-        case IonizingFilterMonitoring::Attributes::InPlaceIndicator::Id: {
-            bool value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
-        }
-        case IonizingFilterMonitoring::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case IonizingFilterMonitoring::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case IonizingFilterMonitoring::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case IonizingFilterMonitoring::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case IonizingFilterMonitoring::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case IonizingFilterMonitoring::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case ZeoliteFilterMonitoring::Id: {
-        switch (path.mAttributeId)
-        {
-        case ZeoliteFilterMonitoring::Attributes::Condition::Id: {
-            chip::Percent value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Condition", 1, value);
-        }
-        case ZeoliteFilterMonitoring::Attributes::DegradationDirection::Id: {
-            chip::app::Clusters::ZeoliteFilterMonitoring::DegradationDirectionEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("DegradationDirection", 1, value);
-        }
-        case ZeoliteFilterMonitoring::Attributes::ChangeIndication::Id: {
-            chip::app::Clusters::ZeoliteFilterMonitoring::ChangeIndicationEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ChangeIndication", 1, value);
-        }
-        case ZeoliteFilterMonitoring::Attributes::InPlaceIndicator::Id: {
-            bool value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
-        }
-        case ZeoliteFilterMonitoring::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case ZeoliteFilterMonitoring::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case ZeoliteFilterMonitoring::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case ZeoliteFilterMonitoring::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case ZeoliteFilterMonitoring::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case ZeoliteFilterMonitoring::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case OzoneFilterMonitoring::Id: {
-        switch (path.mAttributeId)
-        {
-        case OzoneFilterMonitoring::Attributes::Condition::Id: {
-            chip::Percent value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Condition", 1, value);
-        }
-        case OzoneFilterMonitoring::Attributes::DegradationDirection::Id: {
-            chip::app::Clusters::OzoneFilterMonitoring::DegradationDirectionEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("DegradationDirection", 1, value);
-        }
-        case OzoneFilterMonitoring::Attributes::ChangeIndication::Id: {
-            chip::app::Clusters::OzoneFilterMonitoring::ChangeIndicationEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ChangeIndication", 1, value);
-        }
-        case OzoneFilterMonitoring::Attributes::InPlaceIndicator::Id: {
-            bool value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
-        }
-        case OzoneFilterMonitoring::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case OzoneFilterMonitoring::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case OzoneFilterMonitoring::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case OzoneFilterMonitoring::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case OzoneFilterMonitoring::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case OzoneFilterMonitoring::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case WaterTankMonitoring::Id: {
-        switch (path.mAttributeId)
-        {
-        case WaterTankMonitoring::Attributes::Condition::Id: {
-            chip::Percent value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Condition", 1, value);
-        }
-        case WaterTankMonitoring::Attributes::DegradationDirection::Id: {
-            chip::app::Clusters::WaterTankMonitoring::DegradationDirectionEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("DegradationDirection", 1, value);
-        }
-        case WaterTankMonitoring::Attributes::ChangeIndication::Id: {
-            chip::app::Clusters::WaterTankMonitoring::ChangeIndicationEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ChangeIndication", 1, value);
-        }
-        case WaterTankMonitoring::Attributes::InPlaceIndicator::Id: {
-            bool value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
-        }
-        case WaterTankMonitoring::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case WaterTankMonitoring::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case WaterTankMonitoring::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case WaterTankMonitoring::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case WaterTankMonitoring::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case WaterTankMonitoring::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case FuelTankMonitoring::Id: {
-        switch (path.mAttributeId)
-        {
-        case FuelTankMonitoring::Attributes::Condition::Id: {
-            chip::Percent value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Condition", 1, value);
-        }
-        case FuelTankMonitoring::Attributes::DegradationDirection::Id: {
-            chip::app::Clusters::FuelTankMonitoring::DegradationDirectionEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("DegradationDirection", 1, value);
-        }
-        case FuelTankMonitoring::Attributes::ChangeIndication::Id: {
-            chip::app::Clusters::FuelTankMonitoring::ChangeIndicationEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ChangeIndication", 1, value);
-        }
-        case FuelTankMonitoring::Attributes::InPlaceIndicator::Id: {
-            bool value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
-        }
-        case FuelTankMonitoring::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case FuelTankMonitoring::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case FuelTankMonitoring::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case FuelTankMonitoring::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case FuelTankMonitoring::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case FuelTankMonitoring::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case InkCartridgeMonitoring::Id: {
-        switch (path.mAttributeId)
-        {
-        case InkCartridgeMonitoring::Attributes::Condition::Id: {
-            chip::Percent value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Condition", 1, value);
-        }
-        case InkCartridgeMonitoring::Attributes::DegradationDirection::Id: {
-            chip::app::Clusters::InkCartridgeMonitoring::DegradationDirectionEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("DegradationDirection", 1, value);
-        }
-        case InkCartridgeMonitoring::Attributes::ChangeIndication::Id: {
-            chip::app::Clusters::InkCartridgeMonitoring::ChangeIndicationEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ChangeIndication", 1, value);
-        }
-        case InkCartridgeMonitoring::Attributes::InPlaceIndicator::Id: {
-            bool value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
-        }
-        case InkCartridgeMonitoring::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case InkCartridgeMonitoring::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case InkCartridgeMonitoring::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case InkCartridgeMonitoring::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case InkCartridgeMonitoring::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case InkCartridgeMonitoring::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case TonerCartridgeMonitoring::Id: {
-        switch (path.mAttributeId)
-        {
-        case TonerCartridgeMonitoring::Attributes::Condition::Id: {
-            chip::Percent value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Condition", 1, value);
-        }
-        case TonerCartridgeMonitoring::Attributes::DegradationDirection::Id: {
-            chip::app::Clusters::TonerCartridgeMonitoring::DegradationDirectionEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("DegradationDirection", 1, value);
-        }
-        case TonerCartridgeMonitoring::Attributes::ChangeIndication::Id: {
-            chip::app::Clusters::TonerCartridgeMonitoring::ChangeIndicationEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ChangeIndication", 1, value);
-        }
-        case TonerCartridgeMonitoring::Attributes::InPlaceIndicator::Id: {
-            bool value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
-        }
-        case TonerCartridgeMonitoring::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case TonerCartridgeMonitoring::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case TonerCartridgeMonitoring::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case TonerCartridgeMonitoring::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case TonerCartridgeMonitoring::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case TonerCartridgeMonitoring::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -10016,22 +9888,22 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case FanControl::Attributes::FanMode::Id: {
-            chip::app::Clusters::FanControl::FanModeType value;
+            chip::app::Clusters::FanControl::FanModeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FanMode", 1, value);
         }
         case FanControl::Attributes::FanModeSequence::Id: {
-            chip::app::Clusters::FanControl::FanModeSequenceType value;
+            chip::app::Clusters::FanControl::FanModeSequenceEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FanModeSequence", 1, value);
         }
         case FanControl::Attributes::PercentSetting::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
+            chip::app::DataModel::Nullable<chip::Percent> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PercentSetting", 1, value);
         }
         case FanControl::Attributes::PercentCurrent::Id: {
-            uint8_t value;
+            chip::Percent value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PercentCurrent", 1, value);
         }
@@ -10051,22 +9923,22 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("SpeedCurrent", 1, value);
         }
         case FanControl::Attributes::RockSupport::Id: {
-            uint8_t value;
+            chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RockSupport", 1, value);
         }
         case FanControl::Attributes::RockSetting::Id: {
-            uint8_t value;
+            chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RockSetting", 1, value);
         }
         case FanControl::Attributes::WindSupport::Id: {
-            uint8_t value;
+            chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("WindSupport", 1, value);
         }
         case FanControl::Attributes::WindSetting::Id: {
-            uint8_t value;
+            chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("WindSetting", 1, value);
         }
@@ -11149,461 +11021,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-    case EthyleneConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case EthyleneConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case EthyleneConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case EthyleneConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case EthyleneConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case EthyleneConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case EthyleneConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case EthyleneConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case EthyleneConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case EthyleneConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::EthyleneConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case EthyleneConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::EthyleneConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case EthyleneConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::EthyleneConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case EthyleneConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case EthyleneConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case EthyleneConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case EthyleneConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case EthyleneConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case EthyleneConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case EthyleneOxideConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case EthyleneOxideConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case EthyleneOxideConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case EthyleneOxideConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case EthyleneOxideConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case EthyleneOxideConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case EthyleneOxideConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case EthyleneOxideConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case EthyleneOxideConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case EthyleneOxideConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::EthyleneOxideConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case EthyleneOxideConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::EthyleneOxideConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case EthyleneOxideConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::EthyleneOxideConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case EthyleneOxideConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case EthyleneOxideConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case EthyleneOxideConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case EthyleneOxideConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case EthyleneOxideConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case EthyleneOxideConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case HydrogenConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case HydrogenConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case HydrogenConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case HydrogenConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case HydrogenConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case HydrogenConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case HydrogenConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case HydrogenConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case HydrogenConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case HydrogenConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::HydrogenConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case HydrogenConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::HydrogenConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case HydrogenConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::HydrogenConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case HydrogenConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case HydrogenConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case HydrogenConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case HydrogenConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case HydrogenConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case HydrogenConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case HydrogenSulfideConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case HydrogenSulfideConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case HydrogenSulfideConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case HydrogenSulfideConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case HydrogenSulfideConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case HydrogenSulfideConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case HydrogenSulfideConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case HydrogenSulfideConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case HydrogenSulfideConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case HydrogenSulfideConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::HydrogenSulfideConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case HydrogenSulfideConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::HydrogenSulfideConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case HydrogenSulfideConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::HydrogenSulfideConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case HydrogenSulfideConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case HydrogenSulfideConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case HydrogenSulfideConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case HydrogenSulfideConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case HydrogenSulfideConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case HydrogenSulfideConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case NitricOxideConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case NitricOxideConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case NitricOxideConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case NitricOxideConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case NitricOxideConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case NitricOxideConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case NitricOxideConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case NitricOxideConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case NitricOxideConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case NitricOxideConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::NitricOxideConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case NitricOxideConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::NitricOxideConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case NitricOxideConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::NitricOxideConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case NitricOxideConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case NitricOxideConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case NitricOxideConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case NitricOxideConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case NitricOxideConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case NitricOxideConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
     case NitrogenDioxideConcentrationMeasurement::Id: {
         switch (path.mAttributeId)
         {
@@ -11695,97 +11112,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-    case OxygenConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case OxygenConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case OxygenConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case OxygenConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case OxygenConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case OxygenConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case OxygenConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case OxygenConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case OxygenConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case OxygenConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::OxygenConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case OxygenConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::OxygenConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case OxygenConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::OxygenConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case OxygenConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case OxygenConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case OxygenConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case OxygenConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case OxygenConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case OxygenConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
     case OzoneConcentrationMeasurement::Id: {
         switch (path.mAttributeId)
         {
@@ -11870,1826 +11196,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
         case OzoneConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case SulfurDioxideConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case SulfurDioxideConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case SulfurDioxideConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case SulfurDioxideConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case SulfurDioxideConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case SulfurDioxideConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case SulfurDioxideConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case SulfurDioxideConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case SulfurDioxideConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case SulfurDioxideConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::SulfurDioxideConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case SulfurDioxideConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::SulfurDioxideConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case SulfurDioxideConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::SulfurDioxideConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case SulfurDioxideConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case SulfurDioxideConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case SulfurDioxideConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case SulfurDioxideConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case SulfurDioxideConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case SulfurDioxideConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case DissolvedOxygenConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case DissolvedOxygenConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case DissolvedOxygenConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case DissolvedOxygenConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case DissolvedOxygenConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case DissolvedOxygenConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case DissolvedOxygenConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case DissolvedOxygenConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case DissolvedOxygenConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case DissolvedOxygenConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case DissolvedOxygenConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case DissolvedOxygenConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case DissolvedOxygenConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case DissolvedOxygenConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case DissolvedOxygenConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case DissolvedOxygenConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case DissolvedOxygenConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case DissolvedOxygenConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case BromateConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case BromateConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case BromateConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case BromateConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case BromateConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case BromateConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case BromateConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case BromateConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case BromateConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case BromateConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::BromateConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case BromateConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::BromateConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case BromateConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::BromateConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case BromateConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case BromateConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case BromateConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case BromateConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case BromateConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case BromateConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case ChloraminesConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case ChloraminesConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case ChloraminesConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case ChloraminesConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case ChloraminesConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case ChloraminesConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case ChloraminesConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case ChloraminesConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case ChloraminesConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case ChloraminesConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::ChloraminesConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case ChloraminesConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::ChloraminesConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case ChloraminesConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::ChloraminesConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case ChloraminesConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case ChloraminesConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case ChloraminesConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case ChloraminesConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case ChloraminesConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case ChloraminesConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case ChlorineConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case ChlorineConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case ChlorineConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case ChlorineConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case ChlorineConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case ChlorineConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case ChlorineConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case ChlorineConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case ChlorineConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case ChlorineConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::ChlorineConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case ChlorineConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::ChlorineConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case ChlorineConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::ChlorineConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case ChlorineConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case ChlorineConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case ChlorineConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case ChlorineConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case ChlorineConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case ChlorineConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case FecalColiformEColiConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case FecalColiformEColiConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case FecalColiformEColiConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case FecalColiformEColiConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case FecalColiformEColiConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case FecalColiformEColiConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case FecalColiformEColiConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case FecalColiformEColiConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case FecalColiformEColiConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case FecalColiformEColiConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::FecalColiformEColiConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case FecalColiformEColiConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::FecalColiformEColiConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case FecalColiformEColiConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::FecalColiformEColiConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case FecalColiformEColiConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case FecalColiformEColiConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case FecalColiformEColiConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case FecalColiformEColiConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case FecalColiformEColiConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case FecalColiformEColiConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case FluorideConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case FluorideConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case FluorideConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case FluorideConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case FluorideConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case FluorideConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case FluorideConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case FluorideConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case FluorideConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case FluorideConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::FluorideConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case FluorideConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::FluorideConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case FluorideConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::FluorideConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case FluorideConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case FluorideConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case FluorideConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case FluorideConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case FluorideConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case FluorideConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case HaloaceticAcidsConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case HaloaceticAcidsConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case HaloaceticAcidsConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case HaloaceticAcidsConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case HaloaceticAcidsConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case HaloaceticAcidsConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case HaloaceticAcidsConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case HaloaceticAcidsConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case HaloaceticAcidsConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case HaloaceticAcidsConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case HaloaceticAcidsConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case HaloaceticAcidsConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case HaloaceticAcidsConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case HaloaceticAcidsConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case HaloaceticAcidsConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case HaloaceticAcidsConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case HaloaceticAcidsConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case HaloaceticAcidsConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case TotalTrihalomethanesConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case TotalTrihalomethanesConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case TotalTrihalomethanesConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case TotalTrihalomethanesConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case TotalTrihalomethanesConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case TotalTrihalomethanesConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case TotalTrihalomethanesConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case TotalTrihalomethanesConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case TotalTrihalomethanesConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case TotalTrihalomethanesConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case TotalTrihalomethanesConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case TotalTrihalomethanesConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case TotalTrihalomethanesConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case TotalTrihalomethanesConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case TotalTrihalomethanesConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case TotalTrihalomethanesConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case TotalTrihalomethanesConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case TotalTrihalomethanesConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case TotalColiformBacteriaConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case TotalColiformBacteriaConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case TotalColiformBacteriaConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case TotalColiformBacteriaConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case TotalColiformBacteriaConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case TotalColiformBacteriaConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case TotalColiformBacteriaConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case TotalColiformBacteriaConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case TotalColiformBacteriaConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case TotalColiformBacteriaConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case TotalColiformBacteriaConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case TotalColiformBacteriaConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case TotalColiformBacteriaConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case TotalColiformBacteriaConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case TotalColiformBacteriaConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case TotalColiformBacteriaConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case TotalColiformBacteriaConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case TotalColiformBacteriaConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case TurbidityConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case TurbidityConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case TurbidityConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case TurbidityConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case TurbidityConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case TurbidityConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case TurbidityConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case TurbidityConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case TurbidityConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case TurbidityConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::TurbidityConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case TurbidityConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::TurbidityConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case TurbidityConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::TurbidityConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case TurbidityConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case TurbidityConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case TurbidityConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case TurbidityConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case TurbidityConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case TurbidityConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case CopperConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case CopperConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case CopperConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case CopperConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case CopperConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case CopperConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case CopperConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case CopperConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case CopperConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case CopperConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::CopperConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case CopperConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::CopperConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case CopperConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::CopperConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case CopperConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case CopperConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case CopperConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case CopperConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case CopperConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case CopperConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case LeadConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case LeadConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case LeadConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case LeadConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case LeadConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case LeadConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case LeadConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case LeadConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case LeadConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case LeadConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::LeadConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case LeadConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::LeadConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case LeadConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::LeadConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case LeadConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case LeadConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case LeadConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case LeadConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case LeadConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case LeadConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case ManganeseConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case ManganeseConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case ManganeseConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case ManganeseConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case ManganeseConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case ManganeseConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case ManganeseConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case ManganeseConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case ManganeseConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case ManganeseConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::ManganeseConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case ManganeseConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::ManganeseConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case ManganeseConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::ManganeseConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case ManganeseConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case ManganeseConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case ManganeseConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case ManganeseConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case ManganeseConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case ManganeseConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case SulfateConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case SulfateConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case SulfateConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case SulfateConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case SulfateConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case SulfateConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case SulfateConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case SulfateConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case SulfateConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case SulfateConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::SulfateConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case SulfateConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::SulfateConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case SulfateConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::SulfateConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case SulfateConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case SulfateConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case SulfateConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case SulfateConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case SulfateConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case SulfateConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case BromodichloromethaneConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case BromodichloromethaneConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case BromodichloromethaneConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case BromodichloromethaneConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case BromodichloromethaneConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case BromodichloromethaneConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case BromodichloromethaneConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case BromodichloromethaneConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case BromodichloromethaneConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case BromodichloromethaneConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case BromodichloromethaneConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case BromodichloromethaneConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case BromodichloromethaneConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case BromodichloromethaneConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case BromodichloromethaneConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case BromodichloromethaneConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case BromodichloromethaneConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case BromodichloromethaneConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case BromoformConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case BromoformConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case BromoformConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case BromoformConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case BromoformConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case BromoformConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case BromoformConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case BromoformConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case BromoformConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case BromoformConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::BromoformConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case BromoformConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::BromoformConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case BromoformConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::BromoformConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case BromoformConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case BromoformConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case BromoformConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case BromoformConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case BromoformConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case BromoformConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case ChlorodibromomethaneConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case ChlorodibromomethaneConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case ChlorodibromomethaneConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case ChlorodibromomethaneConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case ChlorodibromomethaneConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case ChlorodibromomethaneConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case ChlorodibromomethaneConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case ChlorodibromomethaneConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case ChlorodibromomethaneConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case ChlorodibromomethaneConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case ChlorodibromomethaneConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case ChlorodibromomethaneConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case ChlorodibromomethaneConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case ChlorodibromomethaneConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case ChlorodibromomethaneConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case ChlorodibromomethaneConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case ChlorodibromomethaneConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case ChlorodibromomethaneConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case ChloroformConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case ChloroformConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case ChloroformConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case ChloroformConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case ChloroformConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case ChloroformConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case ChloroformConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case ChloroformConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case ChloroformConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case ChloroformConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::ChloroformConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case ChloroformConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::ChloroformConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case ChloroformConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::ChloroformConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case ChloroformConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case ChloroformConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case ChloroformConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case ChloroformConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case ChloroformConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case ChloroformConcentrationMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case SodiumConcentrationMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case SodiumConcentrationMeasurement::Attributes::MeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasuredValue", 1, value);
-        }
-        case SodiumConcentrationMeasurement::Attributes::MinMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
-        }
-        case SodiumConcentrationMeasurement::Attributes::MaxMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
-        }
-        case SodiumConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValue", 1, value);
-        }
-        case SodiumConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PeakMeasuredValueWindow", 1, value);
-        }
-        case SodiumConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
-            chip::app::DataModel::Nullable<float> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValue", 1, value);
-        }
-        case SodiumConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AverageMeasuredValueWindow", 1, value);
-        }
-        case SodiumConcentrationMeasurement::Attributes::Uncertainty::Id: {
-            float value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Uncertainty", 1, value);
-        }
-        case SodiumConcentrationMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::SodiumConcentrationMeasurement::MeasurementUnitEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementUnit", 1, value);
-        }
-        case SodiumConcentrationMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::SodiumConcentrationMeasurement::MeasurementMediumEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementMedium", 1, value);
-        }
-        case SodiumConcentrationMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::SodiumConcentrationMeasurement::LevelValueEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LevelValue", 1, value);
-        }
-        case SodiumConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case SodiumConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case SodiumConcentrationMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case SodiumConcentrationMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case SodiumConcentrationMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case SodiumConcentrationMeasurement::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -16208,66 +13714,55 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         }
         break;
     }
-    case ModeSelect::Id: {
+    case LaundryWasherMode::Id: {
         switch (path.mCommandId)
         {
-        case ModeSelect::Commands::ChangeToModeResponse::Id: {
-            ModeSelect::Commands::ChangeToModeResponse::DecodableType value;
+        case LaundryWasherMode::Commands::ChangeToModeResponse::Id: {
+            LaundryWasherMode::Commands::ChangeToModeResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ChangeToModeResponse", 1, value);
         }
         }
         break;
     }
-    case LaundryWasherModeSelect::Id: {
+    case RefrigeratorAndTemperatureControlledCabinetMode::Id: {
         switch (path.mCommandId)
         {
-        case LaundryWasherModeSelect::Commands::ChangeToModeResponse::Id: {
-            LaundryWasherModeSelect::Commands::ChangeToModeResponse::DecodableType value;
+        case RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::Id: {
+            RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ChangeToModeResponse", 1, value);
         }
         }
         break;
     }
-    case RefrigeratorAndTemperatureControlledCabinetModeSelect::Id: {
+    case RvcRunMode::Id: {
         switch (path.mCommandId)
         {
-        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Commands::ChangeToModeResponse::Id: {
-            RefrigeratorAndTemperatureControlledCabinetModeSelect::Commands::ChangeToModeResponse::DecodableType value;
+        case RvcRunMode::Commands::ChangeToModeResponse::Id: {
+            RvcRunMode::Commands::ChangeToModeResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ChangeToModeResponse", 1, value);
         }
         }
         break;
     }
-    case RvcRunModeSelect::Id: {
+    case RvcCleanMode::Id: {
         switch (path.mCommandId)
         {
-        case RvcRunModeSelect::Commands::ChangeToModeResponse::Id: {
-            RvcRunModeSelect::Commands::ChangeToModeResponse::DecodableType value;
+        case RvcCleanMode::Commands::ChangeToModeResponse::Id: {
+            RvcCleanMode::Commands::ChangeToModeResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ChangeToModeResponse", 1, value);
         }
         }
         break;
     }
-    case RvcCleanModeSelect::Id: {
+    case DishwasherMode::Id: {
         switch (path.mCommandId)
         {
-        case RvcCleanModeSelect::Commands::ChangeToModeResponse::Id: {
-            RvcCleanModeSelect::Commands::ChangeToModeResponse::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ChangeToModeResponse", 1, value);
-        }
-        }
-        break;
-    }
-    case DishwasherModeSelect::Id: {
-        switch (path.mCommandId)
-        {
-        case DishwasherModeSelect::Commands::ChangeToModeResponse::Id: {
-            DishwasherModeSelect::Commands::ChangeToModeResponse::DecodableType value;
+        case DishwasherMode::Commands::ChangeToModeResponse::Id: {
+            DishwasherMode::Commands::ChangeToModeResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ChangeToModeResponse", 1, value);
         }
@@ -16279,6 +13774,17 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         {
         case OperationalState::Commands::OperationalCommandResponse::Id: {
             OperationalState::Commands::OperationalCommandResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OperationalCommandResponse", 1, value);
+        }
+        }
+        break;
+    }
+    case RvcOperationalState::Id: {
+        switch (path.mCommandId)
+        {
+        case RvcOperationalState::Commands::OperationalCommandResponse::Id: {
+            RvcOperationalState::Commands::OperationalCommandResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalCommandResponse", 1, value);
         }
@@ -16881,6 +14387,17 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         }
         break;
     }
+    case DishwasherAlarm::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case DishwasherAlarm::Events::Notify::Id: {
+            chip::app::Clusters::DishwasherAlarm::Events::Notify::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Notify", 1, value);
+        }
+        }
+        break;
+    }
     case OperationalState::Id: {
         switch (header.mPath.mEventId)
         {
@@ -16891,6 +14408,22 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         }
         case OperationalState::Events::OperationCompletion::Id: {
             chip::app::Clusters::OperationalState::Events::OperationCompletion::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OperationCompletion", 1, value);
+        }
+        }
+        break;
+    }
+    case RvcOperationalState::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case RvcOperationalState::Events::OperationalError::Id: {
+            chip::app::Clusters::RvcOperationalState::Events::OperationalError::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OperationalError", 1, value);
+        }
+        case RvcOperationalState::Events::OperationCompletion::Id: {
+            chip::app::Clusters::RvcOperationalState::Events::OperationCompletion::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationCompletion", 1, value);
         }

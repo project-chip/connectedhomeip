@@ -27,6 +27,10 @@
 #include "iotsdk/ip_network_api.h"
 #include "mbedtls/platform.h"
 
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+#include "psa/crypto.h"
+#endif
+
 #include <DeviceInfoProviderImpl.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -44,11 +48,13 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #endif // USE_CHIP_DATA_MODEL
 
-#ifdef TFM_SUPPORT
+#ifdef CHIP_OPEN_IOT_SDK_OTA_ENABLE
+#include "openiotsdk_dfu_manager.h"
+#endif // CHIP_OPEN_IOT_SDK_OTA_ENABLE
+
 #include "psa/fwu_config.h"
 #include "psa/update.h"
 #include "tfm_ns_interface.h"
-#endif // TFM_SUPPORT
 
 using namespace ::chip;
 using namespace ::chip::Platform;
@@ -67,12 +73,10 @@ static osEventFlagsId_t event_flags_id;
 
 static DeviceLayer::DeviceInfoProviderImpl gDeviceInfoProvider;
 
-#ifdef TFM_SUPPORT
 extern "C" {
 // RTOS-specific initialization that is not declared in any header file
 uint32_t tfm_ns_interface_init(void);
 }
-#endif // TFM_SUPPORT
 
 /** Wait for specific event and check error */
 static int wait_for_event(uint32_t event)
@@ -136,7 +140,6 @@ static void network_state_callback(network_state_callback_event_t event)
     }
 }
 
-#ifdef TFM_SUPPORT
 static int get_psa_images_details()
 {
     psa_status_t status;
@@ -164,7 +167,6 @@ static int get_psa_images_details()
 
     return EXIT_SUCCESS;
 }
-#endif // TFM_SUPPORT
 
 int openiotsdk_platform_init(void)
 {
@@ -179,14 +181,21 @@ int openiotsdk_platform_init(void)
         return EXIT_FAILURE;
     }
 
-#ifdef TFM_SUPPORT
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+    ret = psa_crypto_init();
+    if (ret)
+    {
+        ChipLogError(NotSpecified, "PSA crypto initialization failed: %d", ret);
+        return EXIT_FAILURE;
+    }
+#endif
+
     ret = get_psa_images_details();
     if (ret != 0)
     {
         ChipLogError(NotSpecified, "Get PSA image details failed: %d", ret);
         return EXIT_FAILURE;
     }
-#endif // TFM_SUPPORT
 
     return EXIT_SUCCESS;
 }
@@ -286,6 +295,18 @@ int openiotsdk_chip_run(void)
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 #endif // USE_CHIP_DATA_MODEL
+
+    ChipLogProgress(NotSpecified, "Current software version: [%ld] %s", uint32_t(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION),
+                    CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+
+#ifdef CHIP_OPEN_IOT_SDK_OTA_ENABLE
+    err = GetDFUManager().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "DFU manager initialization failed: %s", err.AsString());
+        return EXIT_FAILURE;
+    }
+#endif
 
     return EXIT_SUCCESS;
 }

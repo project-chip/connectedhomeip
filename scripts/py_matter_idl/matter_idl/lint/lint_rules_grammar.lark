@@ -6,11 +6,13 @@ load_xml: "load" ESCAPED_STRING ";"
 
 all_endpoint_rule: "all" "endpoints" "{" required_global_attribute* "}"
 
-specific_endpoint_rule: "endpoint" integer "{" required_server_cluster* "}"
+specific_endpoint_rule: "endpoint" integer "{" (required_server_cluster|rejected_server_cluster)* "}"
 
 required_global_attribute: "require" "global" "attribute" id "=" integer ";"
 
 required_server_cluster: "require" "server" "cluster" (id|POSITIVE_INTEGER|HEX_INTEGER) ";"
+
+rejected_server_cluster: "reject" "server" "cluster" (id|POSITIVE_INTEGER|HEX_INTEGER) ";"
 
 integer: positive_integer | negative_integer
 

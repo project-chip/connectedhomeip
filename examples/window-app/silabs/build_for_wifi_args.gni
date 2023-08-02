@@ -19,4 +19,3 @@ import("${chip_root}/src/platform/silabs/wifi_args.gni")
 
 chip_enable_ota_requestor = true
 app_data_model = "${chip_root}/examples/window-app/common:window-common"
-use_base_app = false

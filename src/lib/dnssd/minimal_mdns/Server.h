@@ -32,9 +32,7 @@ namespace Minimal {
 namespace BroadcastIpAddresses {
 
 // Get standard mDNS Broadcast addresses
-
-void GetIpv6Into(chip::Inet::IPAddress & dest);
-void GetIpv4Into(chip::Inet::IPAddress & dest);
+chip::Inet::IPAddress Get(chip::Inet::IPAddressType addressType);
 
 } // namespace BroadcastIpAddresses
 
@@ -130,10 +128,9 @@ public:
 
     ServerBase(EndpointInfoPoolType & pool) : mEndpoints(pool)
     {
-        BroadcastIpAddresses::GetIpv6Into(mIpv6BroadcastAddress);
-
+        mIpv6BroadcastAddress = BroadcastIpAddresses::Get(chip::Inet::IPAddressType::kIPv6);
 #if INET_CONFIG_ENABLE_IPV4
-        BroadcastIpAddresses::GetIpv4Into(mIpv4BroadcastAddress);
+        mIpv4BroadcastAddress = BroadcastIpAddresses::Get(chip::Inet::IPAddressType::kIPv4);
 #endif
     }
     virtual ~ServerBase();
@@ -176,13 +173,6 @@ public:
     {
         mDelegate = d;
         return *this;
-    }
-
-    /// Iterator through all Endpoints
-    template <typename Function>
-    chip::Loop ForEachEndPoints(Function && function)
-    {
-        return mEndpoints.ForEachActiveObject(std::forward<Function>(function));
     }
 
     /// A server is considered listening if any UDP endpoint is active.

@@ -24,13 +24,10 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    # XXX: Workaround for https://github.com/actions/cache/issues/1141
-    SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
-
+    
 jobs:
     full_android:
         name: Run
-        timeout-minutes: 120
 
         env:
             JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64/
@@ -39,21 +36,16 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-android:0.7.3
+            image: ghcr.io/project-chip/chip-build-android:1
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              if: ${{ !env.ACT }}
+            - uses: actions/checkout@v3
               name: Checkout
               with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            # To use act like:
+                token: ${{ github.token }}
+              # To use act like:
             #   act -j full_android
             #
             # Note you likely still need to have non submodules setup for the
@@ -62,59 +54,41 @@ jobs:
             - uses: actions/checkout@v3
               if: ${{ env.ACT }}
               name: Checkout (ACT for local build)
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform android
-
-            - name: Bootstrap cache
-              uses: actions/cache@v3
-              timeout-minutes: 10
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: bash scripts/bootstrap.sh
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v3
-              if: ${{ always() && !env.ACT }}
-              with:
-                  name: bootstrap-logs
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
+                platform: android
 
             - name: Build Android arm-chip-tool
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target android-arm-chip-tool build"
             - name: Clean out build output
-              run: rm -rf ./out
+              run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/*
             - name: Build Android arm-tv-casting-app
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target android-arm-tv-casting-app build"
             - name: Clean out build output
-              run: rm -rf ./out
+              run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/*
             - name: Build Android arm-tv-server
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target android-arm-tv-server build"
             - name: Clean out build output
-              run: rm -rf ./out
+              run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/*
             - name: Build Android arm64-tv-casting-app
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target android-arm64-tv-casting-app build"
             - name: Clean out build output
-              run: rm -rf ./out
+              run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/*
             - name: Build Android arm64-tv-server
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target android-arm64-tv-server build"
             - name: Clean out build output
-              run: rm -rf ./out                    
+              run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/*
             - name: Build Android arm64-chip-tool
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -124,7 +98,7 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "ninja -C out/android-arm64-chip-tool build/chip/java/tests:java_build_test"
             - name: Clean out build output
-              run: rm -rf ./out
+              run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/*
             # - name: Build Android Studio build (arm64 only)
             #   run: |
             #     ./scripts/run_in_build_env.sh \

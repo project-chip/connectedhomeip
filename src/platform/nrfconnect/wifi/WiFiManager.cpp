@@ -138,11 +138,12 @@ const Map<wifi_iface_state, WiFiManager::StationStatus, 10>
                               { WIFI_STATE_GROUP_HANDSHAKE, WiFiManager::StationStatus::PROVISIONING },
                               { WIFI_STATE_COMPLETED, WiFiManager::StationStatus::FULLY_PROVISIONED } });
 
-const Map<uint32_t, WiFiManager::NetEventHandler, 4>
+const Map<uint32_t, WiFiManager::NetEventHandler, 5>
     WiFiManager::sEventHandlerMap({ { NET_EVENT_WIFI_SCAN_RESULT, WiFiManager::ScanResultHandler },
                                     { NET_EVENT_WIFI_SCAN_DONE, WiFiManager::ScanDoneHandler },
                                     { NET_EVENT_WIFI_CONNECT_RESULT, WiFiManager::ConnectHandler },
-                                    { NET_EVENT_WIFI_DISCONNECT_RESULT, WiFiManager::DisconnectHandler } });
+                                    { NET_EVENT_WIFI_DISCONNECT_RESULT, WiFiManager::NetworkDrivenDisconnectHandler },
+                                    { NET_EVENT_WIFI_DISCONNECT_COMPLETE, WiFiManager::ApplicationDrivenDisconnectHandler } });
 
 void WiFiManager::WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface)
 {
@@ -205,10 +206,32 @@ CHIP_ERROR WiFiManager::Scan(const ByteSpan & ssid, ScanResultCallback resultCal
     mCachedWiFiState    = mWiFiState;
     mWiFiState          = WIFI_STATE_SCANNING;
     mSsidFound          = false;
+    mRecoveryArmed      = true;
+    // TODO Workaround for recovery mechanism to wait before the next scan request until the WiFi supplicant is not busy.
+    static bool workaroundDone;
 
-    if (net_mgmt(NET_REQUEST_WIFI_SCAN, iface, NULL, 0))
+    int ret = net_mgmt(NET_REQUEST_WIFI_SCAN, iface, NULL, 0);
+
+    if (ret)
     {
-        ChipLogError(DeviceLayer, "Scan request failed");
+        ChipLogError(DeviceLayer, "Scan request failed %d", ret);
+        if (ret == -EBUSY && !workaroundDone)
+        {
+            // TODO Wi-Fi driver returned an error during recovery.
+            // As a workaround schedule the recovery timer one more time in WifiSupplicantWorkaroundTime time.
+            // This allows the device to run the Scan method without
+            // rebooting when the "Device or resource busy" error occurs.
+            DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kWifiSupplicantWorkaroundTime), Recover, nullptr);
+            workaroundDone = true;
+            return CHIP_NO_ERROR;
+        }
+        else
+        {
+            // TODO The workaround has not worked, so reboot the device
+            ChipLogError(DeviceLayer, "WiFi driver does not respond, resetting the device...");
+            workaroundDone = false;
+            PlatformMgr().Shutdown();
+        }
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -250,10 +273,12 @@ CHIP_ERROR WiFiManager::Disconnect()
     net_if * iface = InetUtils::GetInterface();
     VerifyOrReturnError(nullptr != iface, CHIP_ERROR_INTERNAL);
 
-    int status = net_mgmt(NET_REQUEST_WIFI_DISCONNECT, iface, NULL, 0);
+    mApplicationDisconnectRequested = true;
+    int status                      = net_mgmt(NET_REQUEST_WIFI_DISCONNECT, iface, NULL, 0);
 
     if (status)
     {
+        mApplicationDisconnectRequested = false;
         if (status == -EALREADY)
         {
             ChipLogDetail(DeviceLayer, "Already disconnected");
@@ -387,15 +412,21 @@ void WiFiManager::ScanDoneHandler(Platform::UniquePtr<uint8_t> data)
         // Internal scan is supposed to be followed by a connection request if the SSID has been found
         if (Instance().mInternalScan)
         {
-            if (!Instance().mSsidFound && !Instance().mRecoveryTimerAborted)
+            if (Instance().mRecoveryArmed)
             {
-                ChipLogProgress(DeviceLayer, "No requested SSID found");
-                auto currentTimeout = Instance().CalculateNextRecoveryTime();
-                ChipLogProgress(DeviceLayer, "Starting connection recover: re-scanning... (next attempt in %d ms)",
-                                currentTimeout.count());
-                Instance().mRecoveryTimerAborted = false;
-                DeviceLayer::SystemLayer().StartTimer(currentTimeout, Recover, nullptr);
-                return;
+                if (!Instance().mSsidFound)
+                {
+                    ChipLogProgress(DeviceLayer, "No requested SSID found");
+                    auto currentTimeout = Instance().CalculateNextRecoveryTime();
+                    ChipLogProgress(DeviceLayer, "Starting connection recover: re-scanning... (next attempt in %d ms)",
+                                    currentTimeout.count());
+                    DeviceLayer::SystemLayer().StartTimer(currentTimeout, Recover, nullptr);
+                    return;
+                }
+                else
+                {
+                    Instance().AbortConnectionRecovery();
+                }
             }
 
             Instance().mWiFiState = WIFI_STATE_ASSOCIATING;
@@ -412,8 +443,8 @@ void WiFiManager::ScanDoneHandler(Platform::UniquePtr<uint8_t> data)
                 Instance().mWiFiState = WIFI_STATE_DISCONNECTED;
                 return;
             }
-            ChipLogProgress(DeviceLayer, "Connection to %*s requested", Instance().mWiFiParams.mParams.ssid_length,
-                            Instance().mWiFiParams.mParams.ssid);
+            ChipLogProgress(DeviceLayer, "Connection to %*s requested [RSSI=%d]", Instance().mWiFiParams.mParams.ssid_length,
+                            Instance().mWiFiParams.mParams.ssid, Instance().mWiFiParams.mRssi);
             Instance().mInternalScan = false;
         }
     });
@@ -499,15 +530,41 @@ void WiFiManager::ConnectHandler(Platform::UniquePtr<uint8_t> data)
     }
 }
 
-void WiFiManager::DisconnectHandler(Platform::UniquePtr<uint8_t>)
+void WiFiManager::NetworkDrivenDisconnectHandler(Platform::UniquePtr<uint8_t>)
 {
+    // Workaround: schedule the application level connection recovery in kSupplicantReconnectionTimeoutMs to give WPA supplicant
+    // some time to restore it.
+    if (!Instance().mRecoveryArmed)
+    {
+        Instance().mRecoveryArmed = true;
+        DeviceLayer::SystemLayer().StartTimer(
+            System::Clock::Milliseconds32(kSupplicantReconnectionTimeoutMs),
+            [](System::Layer * layer, void * param) { Instance().Disconnect(); }, nullptr);
+    }
+
     SystemLayer().ScheduleLambda([] {
         ChipLogProgress(DeviceLayer, "WiFi station disconnected");
         Instance().mWiFiState = WIFI_STATE_DISCONNECTED;
         Instance().PostConnectivityStatusChange(kConnectivity_Lost);
-        // Ensure fresh recovery for future connection requests.
-        Instance().ResetRecoveryTime();
     });
+}
+
+void WiFiManager::ApplicationDrivenDisconnectHandler(Platform::UniquePtr<uint8_t>)
+{
+    if (!Instance().mRecoveryArmed)
+    {
+        return;
+    }
+
+    if (!Instance().mApplicationDisconnectRequested)
+    {
+        Instance().AbortConnectionRecovery();
+    }
+    else
+    {
+        Instance().mApplicationDisconnectRequested = false;
+        SystemLayer().ScheduleLambda([] { Recover(nullptr, nullptr); });
+    }
 }
 
 WiFiManager::StationStatus WiFiManager::GetStationStatus() const
@@ -542,6 +599,13 @@ System::Clock::Milliseconds32 WiFiManager::CalculateNextRecoveryTime()
 
 void WiFiManager::Recover(System::Layer *, void *)
 {
+    // Prevent scheduling recovery if we are already connected to the network.
+    if (Instance().mWiFiState == WIFI_STATE_COMPLETED)
+    {
+        Instance().AbortConnectionRecovery();
+        return;
+    }
+
     // If kConnectionRecoveryMaxOverallInterval has a non-zero value prevent endless re-scan.
     if (0 != kConnectionRecoveryMaxRetries && (++Instance().mConnectionRecoveryCounter >= kConnectionRecoveryMaxRetries))
     {
@@ -562,7 +626,36 @@ void WiFiManager::AbortConnectionRecovery()
 {
     DeviceLayer::SystemLayer().CancelTimer(Recover, nullptr);
     Instance().ResetRecoveryTime();
-    Instance().mRecoveryTimerAborted = true;
+    Instance().mRecoveryArmed = false;
+}
+
+CHIP_ERROR WiFiManager::SetLowPowerMode(bool onoff)
+{
+    net_if * iface = InetUtils::GetInterface();
+    VerifyOrReturnError(nullptr != iface, CHIP_ERROR_INTERNAL);
+
+    wifi_ps_config currentConfig{};
+    if (net_mgmt(NET_REQUEST_WIFI_PS_CONFIG, iface, &currentConfig, sizeof(currentConfig)))
+    {
+        ChipLogError(DeviceLayer, "Get current low power mode config request failed");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if ((currentConfig.ps_params.enabled == WIFI_PS_ENABLED && onoff == false) ||
+        (currentConfig.ps_params.enabled == WIFI_PS_DISABLED && onoff == true))
+    {
+        wifi_ps_params params{ .enabled = onoff ? WIFI_PS_ENABLED : WIFI_PS_DISABLED };
+        if (net_mgmt(NET_REQUEST_WIFI_PS, iface, &params, sizeof(params)))
+        {
+            ChipLogError(DeviceLayer, "Set low power mode request failed");
+            return CHIP_ERROR_INTERNAL;
+        }
+        ChipLogProgress(DeviceLayer, "Successfully set low power mode [%d]", onoff);
+        return CHIP_NO_ERROR;
+    }
+
+    ChipLogDetail(DeviceLayer, "Low power mode is already in requested state [%d]", onoff);
+    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer

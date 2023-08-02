@@ -175,8 +175,9 @@ class DevicePowerSource : public Device
 public:
     enum Changed_t
     {
-        kChanged_BatLevel    = kChanged_Last << 1,
-        kChanged_Description = kChanged_Last << 2,
+        kChanged_BatLevel     = kChanged_Last << 1,
+        kChanged_Description  = kChanged_Last << 2,
+        kChanged_EndpointList = kChanged_Last << 3,
     } Changed;
 
     DevicePowerSource(const char * szDeviceName, std::string szLocation,
@@ -189,12 +190,14 @@ public:
 
     void SetBatChargeLevel(uint8_t aBatChargeLevel);
     void SetDescription(std::string aDescription);
+    void SetEndpointList(std::vector<chip::EndpointId> mEndpointList);
 
     inline uint32_t GetFeatureMap() { return mFeatureMap.Raw(); };
     inline uint8_t GetBatChargeLevel() { return mBatChargeLevel; };
     inline uint8_t GetOrder() { return mOrder; };
     inline uint8_t GetStatus() { return mStatus; };
     inline std::string GetDescription() { return mDescription; };
+    std::vector<chip::EndpointId> & GetEndpointList() { return mEndpointList; }
 
 private:
     void HandleDeviceChange(Device * device, Device::Changed_t changeMask);
@@ -206,6 +209,8 @@ private:
     std::string mDescription = "Primary Battery";
     chip::BitFlags<chip::app::Clusters::PowerSource::Feature> mFeatureMap;
     DeviceCallback_fn mChanged_CB;
+    // This is linux, vector is not going to kill us here and it's easier. Plus, post c++11, storage is contiguous with .data()
+    std::vector<chip::EndpointId> mEndpointList;
 };
 
 class EndpointListInfo

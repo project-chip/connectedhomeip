@@ -121,50 +121,25 @@ private:
 namespace BroadcastIpAddresses {
 
 // Get standard mDNS Broadcast addresses
-
-void GetIpv6Into(chip::Inet::IPAddress & dest)
+chip::Inet::IPAddress Get(chip::Inet::IPAddressType addressType)
 {
-    if (!chip::Inet::IPAddress::FromString("FF02::FB", dest))
+    chip::Inet::IPAddress address;
+#if INET_CONFIG_ENABLE_IPV4
+    if (addressType == chip::Inet::IPAddressType::kIPv4)
     {
-        ChipLogError(Discovery, "Failed to parse standard IPv6 broadcast address");
+        VerifyOrDie(chip::Inet::IPAddress::FromString("224.0.0.251", address));
     }
-}
-
-void GetIpv4Into(chip::Inet::IPAddress & dest)
-{
-    if (!chip::Inet::IPAddress::FromString("224.0.0.251", dest))
+    else
+#endif
     {
-        ChipLogError(Discovery, "Failed to parse standard IPv4 broadcast address");
+        VerifyOrDie(chip::Inet::IPAddress::FromString("FF02::FB", address));
     }
+    return address;
 }
 
 } // namespace BroadcastIpAddresses
 
 namespace {
-
-CHIP_ERROR JoinMulticastGroup(chip::Inet::InterfaceId interfaceId, chip::Inet::UDPEndPoint * endpoint,
-                              chip::Inet::IPAddressType addressType)
-{
-
-    chip::Inet::IPAddress address;
-
-    if (addressType == chip::Inet::IPAddressType::kIPv6)
-    {
-        BroadcastIpAddresses::GetIpv6Into(address);
-#if INET_CONFIG_ENABLE_IPV4
-    }
-    else if (addressType == chip::Inet::IPAddressType::kIPv4)
-    {
-        BroadcastIpAddresses::GetIpv4Into(address);
-#endif // INET_CONFIG_ENABLE_IPV4
-    }
-    else
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    return endpoint->JoinMulticastGroup(interfaceId, address);
-}
 
 #if CHIP_ERROR_LOGGING
 const char * AddressTypeStr(chip::Inet::IPAddressType addressType)
@@ -240,7 +215,8 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoin
 
         ReturnErrorOnFailure(listenUdp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));
 
-        CHIP_ERROR err = JoinMulticastGroup(interfaceId, listenUdp, addressType);
+        CHIP_ERROR err = listenUdp->JoinMulticastGroup(interfaceId, BroadcastIpAddresses::Get(addressType));
+
         if (err != CHIP_NO_ERROR)
         {
             char interfaceName[chip::Inet::InterfaceId::kMaxIfNameLength];
@@ -467,7 +443,13 @@ void ServerBase::OnUdpPacketReceived(chip::Inet::UDPEndPoint * endPoint, chip::S
 
     if (HeaderRef(const_cast<uint8_t *>(data.Start())).GetFlags().IsQuery())
     {
-        srv->mDelegate->OnQuery(data, info);
+        // Only consider queries that are received on the same interface we are listening on.
+        // Without this, queries show up on all addresses on all interfaces, resulting
+        // in more replies than one would expect.
+        if (endPoint->GetBoundInterface() == info->Interface)
+        {
+            srv->mDelegate->OnQuery(data, info);
+        }
     }
     else
     {

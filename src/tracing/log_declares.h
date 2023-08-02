@@ -23,7 +23,7 @@ namespace Tracing {
 // on actual types. This allows tracing to be used anywhere lib/support could be used.
 
 struct MessageSendInfo;
-struct MessageReceiveInfo;
+struct MessageReceivedInfo;
 struct NodeLookupInfo;
 struct NodeDiscoveredInfo;
 struct NodeDiscoveryFailedInfo;
