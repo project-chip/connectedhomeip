@@ -88,7 +88,7 @@ private:
 class OperationalStateDelegate : public GenericOperationalStateDelegateImpl
 {
 private:
-    const GenericOperationalState rvcOpStateList[7] = {
+    const GenericOperationalState rvcOpStateList[4] = {
         GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
         GenericOperationalState(to_underlying(OperationalStateEnum::kRunning)),
         GenericOperationalState(to_underlying(OperationalStateEnum::kPaused)),
