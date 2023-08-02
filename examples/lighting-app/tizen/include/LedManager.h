@@ -40,8 +40,6 @@ private:
     peripheral_gpio_h gpio[number_of_pins]    = {};
 
     const chip::EndpointId mEndpointId;
-
-    static LedManager sLedMgr;
 };
 
 } // namespace example
