@@ -39563,3 +39563,4 @@ public class ChipClusters {
 , int minInterval, int maxInterval);
   }
 }
+

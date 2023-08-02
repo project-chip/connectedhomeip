@@ -254,3 +254,4 @@ public class ChipClusters {
   {{/not_last}}
   {{/zcl_clusters}}
 }
+

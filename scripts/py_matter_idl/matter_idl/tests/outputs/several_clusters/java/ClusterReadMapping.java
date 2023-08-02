@@ -90,3 +90,4 @@ public class ClusterReadMapping {
             put("third", readThirdInteractionInfo());}};
     }
 }
+
