@@ -133,7 +133,7 @@ Silicon Labs platform.
 
 *   Build the example as Intermittently Connected Device (ICD)
 
-          $ ./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs/efr32/ ./out/light-switch-app_SED BRD4187C --icd
+          $ ./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs/efr32/ ./out/light-switch-app_ICD BRD4187C --icd
 
     or use gn as previously mentioned but adding the following arguments:
 
