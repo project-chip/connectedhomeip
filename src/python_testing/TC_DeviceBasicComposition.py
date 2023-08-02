@@ -171,32 +171,10 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         dump_device_composition_path: Optional[str] = self.user_params.get("dump_device_composition_path", None)
 
         if do_test_over_pase:
-            if self.matter_test_config.qr_code_content is not None:
-                qr_code = self.matter_test_config.qr_code_content
-                try:
-                    setup_payload = SetupPayload().ParseQrCode(qr_code)
-                except ChipStackError:
-                    asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
-
-            elif self.matter_test_config.manual_code is not None:
-                manual_code = self.matter_test_config.manual_code
-                try:
-                    setup_payload = SetupPayload().ParseManualPairingCode(manual_code)
-                except ChipStackError:
-                    asserts.fail(
-                        f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
-            else:
-                asserts.fail("Require either --qr-code or --manual-code to proceed with PASE needed for test.")
-
-            if setup_payload.short_discriminator is not None:
-                filter_type = discovery.FilterType.SHORT_DISCRIMINATOR
-                filter_value = setup_payload.short_discriminator
-            else:
-                filter_type = discovery.FilterType.LONG_DISCRIMINATOR
-                filter_value = setup_payload.long_discriminator
+            info = self.get_setup_payload_info()
 
             commissionable_nodes = dev_ctrl.DiscoverCommissionableNodes(
-                filter_type, filter_value, stopOnFirst=True, timeoutSecond=15)
+                info.filter_type, info.filter_value, stopOnFirst=True, timeoutSecond=15)
             logging.info(f"Commissionable nodes: {commissionable_nodes}")
             # TODO: Support BLE
             if commissionable_nodes is not None and len(commissionable_nodes) > 0:
@@ -208,7 +186,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                 logging.info(f"Found instance {instance_name}, VID={vid}, PID={pid}, Address={address}")
 
                 node_id = 1
-                dev_ctrl.EstablishPASESessionIP(address, setup_payload.setup_passcode, node_id)
+                dev_ctrl.EstablishPASESessionIP(address, info.passcode, node_id)
             else:
                 asserts.fail("Failed to find the DUT according to command line arguments.")
         else:
