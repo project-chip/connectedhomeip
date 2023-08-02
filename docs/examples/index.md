@@ -3,6 +3,16 @@
 The Matter SDK provides examples of Matter devices for different development
 platforms.
 
+## Air Qaulity Sensor example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+air-quality-sensor-app/**/README
+air-quality-sensor-app/**/Readme
+```
+
 ## All clusters example
 
 ```{toctree}
