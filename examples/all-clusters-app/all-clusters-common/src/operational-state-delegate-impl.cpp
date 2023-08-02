@@ -17,58 +17,13 @@
  */
 #include <operational-state-delegate-impl.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace OperationalState {
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::OperationalState;
+using namespace chip::app::Clusters::RvcOperationalState;
 
-using chip::Protocols::InteractionModel::Status;
-
-CHIP_ERROR OperationalStateDelegate::SetOperationalState(uint8_t opState)
-{
-    mOperationalState = opState;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR OperationalStateDelegate::SetPhase(const app::DataModel::Nullable<uint8_t> & phase)
-{
-    mOperationalPhase = phase;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR OperationalStateDelegate::SetCountdownTime(const app::DataModel::Nullable<uint32_t> & time)
-{
-    mCountdownTime = time;
-    return CHIP_NO_ERROR;
-}
-
-uint8_t OperationalStateDelegate::GetCurrentOperationalState()
-{
-    return mOperationalState;
-}
-
-CHIP_ERROR OperationalStateDelegate::SetOperationalError(const GenericOperationalError & opErrState)
-{
-    mOperationalError = opErrState;
-    return CHIP_NO_ERROR;
-}
-
-void OperationalStateDelegate::GetCurrentOperationalError(GenericOperationalError & error)
-{
-    error = mOperationalError;
-}
-
-void OperationalStateDelegate::GetCurrentPhase(app::DataModel::Nullable<uint8_t> & phase)
-{
-    phase = mOperationalPhase;
-}
-
-void OperationalStateDelegate::GetCountdownTime(app::DataModel::Nullable<uint32_t> & time)
-{
-    time = mCountdownTime;
-}
-
-CHIP_ERROR OperationalStateDelegate::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
+CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
 {
     if (index > mOperationalStateList.size() - 1)
     {
@@ -78,7 +33,7 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalStateAtIndex(size_t index, Ge
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase)
+CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase)
 {
     if (index > mOperationalPhaseList.size() - 1)
     {
@@ -88,35 +43,121 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, Ge
     return CHIP_NO_ERROR;
 }
 
-void OperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
+void GenericOperationalStateDelegateImpl::HandlePauseStateCallback(GenericOperationalError & err)
 {
     // placeholder implementation
-    mOperationalState = to_underlying(OperationalStateEnum::kPaused);
-    err.Set(to_underlying(ErrorStateEnum::kNoError));
+    auto error = mServer->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
+    if (error == CHIP_NO_ERROR)
+    {
+        err.Set(to_underlying(ErrorStateEnum::kNoError));
+    }
+    else
+    {
+        err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
+    }
 }
 
-void OperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError & err)
+void GenericOperationalStateDelegateImpl::HandleResumeStateCallback(GenericOperationalError & err)
 {
     // placeholder implementation
-    mOperationalState = to_underlying(OperationalStateEnum::kRunning);
-    err.Set(to_underlying(ErrorStateEnum::kNoError));
+    auto error = mServer->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
+    if (error == CHIP_NO_ERROR)
+    {
+        err.Set(to_underlying(ErrorStateEnum::kNoError));
+    }
+    else
+    {
+        err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
+    }
 }
 
-void OperationalStateDelegate::HandleStartStateCallback(GenericOperationalError & err)
+void GenericOperationalStateDelegateImpl::HandleStartStateCallback(GenericOperationalError & err)
 {
     // placeholder implementation
-    mOperationalState = to_underlying(OperationalStateEnum::kRunning);
-    err.Set(to_underlying(ErrorStateEnum::kNoError));
+    auto error = mServer->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
+    if (error == CHIP_NO_ERROR)
+    {
+        err.Set(to_underlying(ErrorStateEnum::kNoError));
+    }
+    else
+    {
+        err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
+    }
 }
 
-void OperationalStateDelegate::HandleStopStateCallback(GenericOperationalError & err)
+void GenericOperationalStateDelegateImpl::HandleStopStateCallback(GenericOperationalError & err)
 {
     // placeholder implementation
-    mOperationalState = to_underlying(OperationalStateEnum::kStopped);
-    err.Set(to_underlying(ErrorStateEnum::kNoError));
+    auto error = mServer->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
+    if (error == CHIP_NO_ERROR)
+    {
+        err.Set(to_underlying(ErrorStateEnum::kNoError));
+    }
+    else
+    {
+        err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
+    }
 }
 
-} // namespace OperationalState
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+// Init Operational State cluster
+
+static OperationalState::OperationalStateServer * gOperationalStateServer = nullptr;
+static OperationalStateDelegate * gOperationalStateDelegate = nullptr;
+
+void OperationalState::Shutdown()
+{
+    if (gOperationalStateServer != nullptr)
+    {
+        delete gOperationalStateServer;
+        gOperationalStateServer = nullptr;
+    }
+    if (gOperationalStateDelegate != nullptr)
+    {
+        delete gOperationalStateDelegate;
+        gOperationalStateDelegate = nullptr;
+    }
+}
+
+void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
+{
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    VerifyOrDie(gOperationalStateServer == nullptr && gOperationalStateDelegate == nullptr);
+    gOperationalStateDelegate = new OperationalStateDelegate;
+    gOperationalStateServer = new OperationalStateServer(gOperationalStateDelegate, 0x01,
+                                                              Clusters::OperationalState::Id);
+    gOperationalStateServer->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+    gOperationalStateServer->SetOperationalError(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    gOperationalStateServer->Init();
+}
+
+// Init RVC Operational State cluster
+
+static OperationalState::OperationalStateServer * gRvcOperationalStateServer = nullptr;
+static RvcOperationalStateDelegate * gRvcOperationalStateDelegate = nullptr;
+
+void RvcOperationalState::Shutdown()
+{
+    if (gRvcOperationalStateServer != nullptr)
+    {
+        delete gRvcOperationalStateServer;
+        gRvcOperationalStateServer = nullptr;
+    }
+    if (gRvcOperationalStateDelegate != nullptr)
+    {
+        delete gRvcOperationalStateDelegate;
+        gRvcOperationalStateDelegate = nullptr;
+    }
+}
+
+
+void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
+{
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    VerifyOrDie(gRvcOperationalStateServer == nullptr && gRvcOperationalStateDelegate == nullptr);
+    gRvcOperationalStateDelegate = new RvcOperationalStateDelegate;
+    gRvcOperationalStateServer = new OperationalStateServer(gRvcOperationalStateDelegate, 0x01,
+                                                              Clusters::RvcOperationalState::Id);
+    gRvcOperationalStateServer->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+    gRvcOperationalStateServer->SetOperationalError(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    gRvcOperationalStateServer->Init();
+}

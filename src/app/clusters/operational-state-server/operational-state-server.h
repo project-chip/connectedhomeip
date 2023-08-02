@@ -32,7 +32,7 @@ class Uncopyable
 {
 protected:
     Uncopyable() {}
-    ~Uncopyable() {}
+    ~Uncopyable() = default;
 
 private:
     Uncopyable(const Uncopyable &) = delete;
@@ -40,6 +40,7 @@ private:
 };
 
 class Delegate;
+
 /**
  * OperationalStateServer is a class that represents an instance of a derivation of the operational state cluster.
  * It implements CommandHandlerInterface so it can generically handle commands for any derivation cluster id.

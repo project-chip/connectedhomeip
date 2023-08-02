@@ -128,6 +128,7 @@ DataModel::Nullable<uint32_t> OperationalStateServer::GetCountdownTime()
 
 uint8_t OperationalStateServer::GetCurrentOperationalState() const
 {
+    ChipLogError(Zcl, "OperationalState: H2");
     return mOperationalState;
 }
 
@@ -316,6 +317,7 @@ void OperationalStateServer::HandleCommand(HandlerContext & handlerContext, Func
 
 CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
+    ChipLogError(Zcl, "OperationalState: Reading");
     switch (aPath.mAttributeId)
     {
     case OperationalState::Attributes::OperationalStateList::Id: {
@@ -338,6 +340,7 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     break;
 
     case OperationalState::Attributes::OperationalState::Id: {
+        ChipLogError(Zcl, "OperationalState: H1");
         ReturnErrorOnFailure(aEncoder.Encode(GetCurrentOperationalState()));
     }
     break;
