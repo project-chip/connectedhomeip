@@ -470,6 +470,21 @@ CHIP_ERROR CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, c
     return AddStatusInternal(aCommandPath, StatusIB(aStatus));
 }
 
+CHIP_ERROR CommandHandler::AddStatusAndLogIfFailure(const ConcreteCommandPath & aCommandPath, const Status aStatus,
+                                                    const char * aMessage)
+{
+    if (aStatus != Status::Success)
+    {
+        ChipLogError(DataManagement,
+                     "Failed to handle on Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI
+                     " with " ChipLogFormatIMStatus ": %s",
+                     aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId),
+                     ChipLogValueIMStatus(aStatus), aMessage);
+    }
+
+    return AddStatus(aCommandPath, aStatus);
+}
+
 CHIP_ERROR CommandHandler::AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus)
 {
     return AddStatusInternal(aCommandPath, StatusIB(Status::Success, aClusterStatus));

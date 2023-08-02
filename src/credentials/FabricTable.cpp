@@ -2080,4 +2080,19 @@ CHIP_ERROR FabricTable::GetFabricLabel(FabricIndex fabricIndex, CharSpan & outFa
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR FabricTable::PeekFabricIndexForNextAddition(FabricIndex & outIndex)
+{
+    EnsureNextAvailableFabricIndexUpdated();
+    if (!mNextAvailableFabricIndex.HasValue())
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    FabricIndex index = mNextAvailableFabricIndex.Value();
+    VerifyOrReturnError(IsValidFabricIndex(index), CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+    outIndex = index;
+    return CHIP_NO_ERROR;
+}
+
 } // namespace chip
