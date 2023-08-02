@@ -92,10 +92,20 @@ jobs:
                      find out -name "CHIPClusters.h"
                      exit 1
                   fi
+
+            - name: Build example Lock App using idf.py -DCHIP_CODEGEN_PREGEN_DIR=./zzz_pregenerated build
+              run: |
+                  . "$IDF_PATH/export.sh"
+                  . "scripts/activate.sh"
+                  cd examples/lock-app/esp32
+                  idf.py -DCHIP_CODEGEN_PREGEN_DIR=./zzz_pregenerated build
+                  cd -
+
             - name: Undo code pregeneration changes
               run: |
                   rm -rf ./zzz_pregenerated
                   mv scripts/codegen.py.renamed scripts/codegen.py
+
             - name: Build example All Clusters App C3
               run: scripts/examples/esp_example.sh all-clusters-app sdkconfig_c3devkit.defaults
             - name: Copy aside build products
@@ -107,12 +117,14 @@ jobs:
                      esp32 c3devkit all-clusters-app \
                      example_binaries/esp32-build/chip-all-clusters-app.elf \
                      /tmp/bloat_reports/
-            - name: Build example Pigweed App
-              run: scripts/examples/esp_example.sh pigweed-app sdkconfig.defaults
-            - name: Build example Lighting App
-              run: scripts/examples/esp_example.sh lighting-app sdkconfig.defaults
-            - name: Build example Lock App
-              run: scripts/examples/esp_example.sh lock-app sdkconfig.defaults
+
+            - name: Build example Lighting App using idf.py build
+              run: |
+                  . "$IDF_PATH/export.sh"
+                  . "scripts/activate.sh"
+                  cd examples/lighting-app/esp32
+                  idf.py build
+                  cd -
 
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
@@ -138,6 +150,9 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: esp32
+
+            - name: Build example Pigweed App
+              run: scripts/examples/esp_example.sh pigweed-app sdkconfig.defaults
 
             - name: Build example Bridge App
               run: scripts/examples/esp_example.sh bridge-app
