@@ -641,9 +641,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
                          return nil;
                      }
 
-                     os_unfair_lock_lock(&self->_controllersLock);
-                     NSArray<MTRDeviceController *> * controllersCopy = [self->_controllers copy];
-                     os_unfair_lock_unlock(&self->_controllersLock);
+                     auto * controllersCopy = [self getRunningControllers];
 
                      for (MTRDeviceController * existing in controllersCopy) {
                          BOOL isRunning = YES; // assume the worst
@@ -880,13 +878,19 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     [controller deinitFromFactory];
 }
 
+- (NSArray<MTRDeviceController *> *)getRunningControllers
+{
+    os_unfair_lock_lock(&_controllersLock);
+    NSArray<MTRDeviceController *> * controllersCopy = [_controllers copy];
+    os_unfair_lock_unlock(&_controllersLock);
+    return controllersCopy;
+}
+
 - (nullable MTRDeviceController *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex
 {
     assertChipStackLockedByCurrentThread();
 
-    os_unfair_lock_lock(&_controllersLock);
-    NSArray<MTRDeviceController *> * controllersCopy = [_controllers copy];
-    os_unfair_lock_unlock(&_controllersLock);
+    auto * controllersCopy = [self getRunningControllers];
 
     for (MTRDeviceController * existing in controllersCopy) {
         if ([existing fabricIndex] == fabricIndex) {
@@ -901,9 +905,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 {
     assertChipStackLockedByCurrentThread();
 
-    os_unfair_lock_lock(&_controllersLock);
-    NSArray<MTRDeviceController *> * controllersCopy = [_controllers copy];
-    os_unfair_lock_unlock(&_controllersLock);
+    auto * controllersCopy = [self getRunningControllers];
 
     for (MTRDeviceController * controller in controllersCopy) {
         auto * compressedFabricId = controller.compressedFabricID;
