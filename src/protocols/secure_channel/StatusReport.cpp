@@ -101,13 +101,15 @@ System::PacketBufferHandle StatusReport::MakeBusyStatusReportMessage(uint16_t mi
     constexpr uint8_t kBusyStatusReportProtocolDataSize = sizeof(minimumWaitTime); // 16-bits
 
     auto handle = System::PacketBufferHandle::New(kBusyStatusReportProtocolDataSize, 0);
-    VerifyOrReturnValue(!handle.IsNull(), handle, ChipLogError(SecureChannel, "Failed to allocate protocol data for busy status report"));
+    VerifyOrReturnValue(!handle.IsNull(), handle,
+                        ChipLogError(SecureChannel, "Failed to allocate protocol data for busy status report"));
 
     // Build the protocol data with minimum wait time
     Encoding::LittleEndian::PacketBufferWriter protocolDataBufferWriter(std::move(handle));
     protocolDataBufferWriter.Put16(minimumWaitTime);
     handle = protocolDataBufferWriter.Finalize();
-    VerifyOrReturnValue(!handle.IsNull(), handle, ChipLogError(SecureChannel, "Failed to finalize protocol data for busy status report"));
+    VerifyOrReturnValue(!handle.IsNull(), handle,
+                        ChipLogError(SecureChannel, "Failed to finalize protocol data for busy status report"));
 
     // Build a busy status report
     StatusReport statusReport(GeneralStatusCode::kBusy, Id, kProtocolCodeBusy, std::move(handle));

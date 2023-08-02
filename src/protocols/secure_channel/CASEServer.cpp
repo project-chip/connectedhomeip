@@ -195,7 +195,8 @@ CHIP_ERROR CASEServer::SendBusyStatusReport(Messaging::ExchangeContext * ec, uin
     VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Inet, "Exchange context cannot be NULL"));
 
     System::PacketBufferHandle handle = Protocols::SecureChannel::StatusReport::MakeBusyStatusReportMessage(minimumWaitTime);
-    VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY, ChipLogError(SecureChannel, "Failed to build a busy status report"));
+    VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(SecureChannel, "Failed to build a busy status report"));
 
     ChipLogProgress(Inet, "Sending status report, exchange " ChipLogFormatExchange, ChipLogValueExchange(ec));
     return ec->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(handle));
