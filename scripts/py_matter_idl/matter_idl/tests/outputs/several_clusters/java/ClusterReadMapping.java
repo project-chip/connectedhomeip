@@ -41,7 +41,29 @@ public class ClusterReadMapping {
        return result;
     }
     private static Map<String, InteractionInfo> readSecondInteractionInfo() {
-       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readSecondSomeBytesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readSecondFabricsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSecondFabricsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SecondCluster) cluster).readFabricsAttribute(
+              (ChipClusters.SecondCluster.FabricsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedSecondClusterFabricsAttributeCallback(),
+          readSecondFabricsCommandParams
+        );
+        result.put("readFabricsAttribute", readSecondFabricsAttributeInteractionInfo);
+        InteractionInfo readSecondFabricsAttributeWithFabricFilterInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SecondCluster) cluster).readFabricsAttributeWithFabricFilter(
+              (ChipClusters.SecondCluster.FabricsAttributeCallback) callback,
+              (Boolean) commandArguments.get("isFabricFiltered")
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedSecondClusterFabricsAttributeCallback(),
+          readSecondFabricsCommandParams
+        );
+        result.put("readFabricsAttributeWithFabricFilter", readSecondFabricsAttributeWithFabricFilterInteractionInfo);
+     Map<String, CommandParameterInfo> readSecondSomeBytesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readSecondSomeBytesAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.SecondCluster) cluster).readSomeBytesAttribute(
