@@ -57,11 +57,7 @@ int main(int argc, char * argv[])
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
     example::Ui::ImguiUi ui;
-
     ui.AddWindow(std::make_unique<example::Ui::Windows::QRCode>());
-    ui.AddWindow(std::make_unique<example::Ui::Windows::BooleanState>(chip::EndpointId(1), "Contact Sensor"));
-    ui.AddWindow(std::make_unique<example::Ui::Windows::OccupancySensing>(chip::EndpointId(1), "Occupancy"));
-
     ChipLinuxAppMainLoop(&ui);
 #else
     ChipLinuxAppMainLoop();
