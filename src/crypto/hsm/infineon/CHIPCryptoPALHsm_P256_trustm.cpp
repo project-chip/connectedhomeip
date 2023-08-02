@@ -59,9 +59,9 @@ CHIP_ERROR P256KeypairHSM::Initialize(ECPKeyTarget key_target)
     {
         // Trust M ECC 256 Key Gen
         ChipLogDetail(Crypto, "Generating NIST256 key in Trust M !");
-        uint8_t key_usgae =
-            (optiga_key_usage_t)(OPTIGA_KEY_USAGE_KEY_AGREEMENT | OPTIGA_KEY_USAGE_SIGN | OPTIGA_KEY_USAGE_AUTHENTICATION);
-        return_status = trustm_ecc_keygen(OPTIGA_KEY_ID_E0F2, key_usgae, OPTIGA_ECC_CURVE_NIST_P_256, pubkey, pubKeyLen);
+        uint8_t key_usage =
+            (optiga_key_usage_t)(OPTIGA_KEY_USAGE_SIGN | OPTIGA_KEY_USAGE_AUTHENTICATION);
+        return_status = trustm_ecc_keygen(OPTIGA_KEY_ID_E0F2, key_usage, OPTIGA_ECC_CURVE_NIST_P_256, pubkey, pubKeyLen);
         VerifyOrExit(return_status == OPTIGA_LIB_SUCCESS, error = CHIP_ERROR_INTERNAL);
     }
     else

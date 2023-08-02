@@ -51,7 +51,8 @@ _Step1: Extract the public key from the Infineon pre-provisioned
 Certificate(0xe0e0) using openssl command._
 
 _Step2: Generate DAC test certificate using the extracted public key, Signed by
-[Matter test PAI](https://github.com/project-chip/connectedhomeip/blob/v1.1-branch/credentials/development/attestation/Matter-Development-PAI-FFF1-noPID-Cert.pem)_
+[Matter test PAI](https://github.com/project-chip/connectedhomeip/blob/v1.1-branch/credentials/development/attestation/Matter-Development-PAI-FFF1-noPID-Cert.pem)_.
+Please note that production devices cannot re-use these test keys/certificates.
 
 _Step3: Write DAC test certificate into OPTIGA&trade; Trust M certificate slot
 0xe0e3_

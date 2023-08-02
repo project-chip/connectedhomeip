@@ -145,12 +145,9 @@ Infineon Hardware Security Module-OPTIGA™ Trust M is a high-end security
 solution that provides an anchor of trust for connecting IoT devices to the
 cloud, giving every IoT device its own unique identity.
 
-OPTIGA™ Trust M offers a wide range of security features, making it ideal for
-industrial and building automation applications, smart homes and connected
-consumer devices.
+For different security use cases, please set the flags in CHIPCryptoPALHsm_config.h which is located at _/src/crypto/hsm/_
 
-For different security use cases, please set the flags in
-CHIPCryptoPALHsm_config.h which is located at _/src/crypto/hsm/_:
+For device attestation please enable the flag ENABLE_HSM_DEVICE_ATTESTATION in CHIPCryptoPALHsm_config.h which is located at _/src/crypto/hsm/_
 
 -   Supported hardware setup:
     [CY8CKIT-062S2-43012](https://www.cypress.com/CY8CKIT-062S2-43012)
