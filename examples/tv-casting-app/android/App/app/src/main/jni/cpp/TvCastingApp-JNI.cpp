@@ -113,15 +113,82 @@ JNI_METHOD(void, setDACProvider)(JNIEnv *, jobject, jobject provider)
 }
 
 JNI_METHOD(jboolean, openBasicCommissioningWindow)
-(JNIEnv * env, jobject, jint duration, jobject jCommissioningCompleteHandler, jobject jOnConnectionSuccessHandler,
+(JNIEnv * env, jobject, jint duration, jobject jCommissioningCallbacks, jobject jOnConnectionSuccessHandler,
  jobject jOnConnectionFailureHandler, jobject jOnNewOrUpdatedEndpointHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD openBasicCommissioningWindow called with duration %d", duration);
-    CHIP_ERROR err = TvCastingAppJNIMgr().getCommissioningCompleteHandler().SetUp(env, jCommissioningCompleteHandler);
-    VerifyOrExit(CHIP_NO_ERROR == err,
-                 ChipLogError(AppServer, "MatterCallbackHandlerJNI::SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    CommissioningCallbacks commissioningCallbacks;
+    jclass jCommissioningCallbacksClass;
+    chip::JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/CommissioningCallbacks", jCommissioningCallbacksClass);
+
+    jfieldID jCommissioningCompleteField =
+        env->GetFieldID(jCommissioningCallbacksClass, "commissioningComplete", "Ljava/lang/Object;");
+    jobject jCommissioningComplete = env->GetObjectField(jCommissioningCallbacks, jCommissioningCompleteField);
+    if (jCommissioningComplete != nullptr)
+    {
+        err = TvCastingAppJNIMgr().getCommissioningCompleteHandler().SetUp(env, jCommissioningComplete);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, false,
+                            ChipLogError(AppServer, "MatterCallbackHandlerJNI::SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
+        commissioningCallbacks.commissioningComplete = [](CHIP_ERROR err) {
+            TvCastingAppJNIMgr().getCommissioningCompleteHandler().Handle(err);
+        };
+    }
+
+    jfieldID jSessionEstablishmentStartedField =
+        env->GetFieldID(jCommissioningCallbacksClass, "sessionEstablishmentStarted", "Lcom/chip/casting/SuccessCallback;");
+    jobject jSessionEstablishmentStarted = env->GetObjectField(jCommissioningCallbacks, jSessionEstablishmentStartedField);
+    if (jSessionEstablishmentStarted != nullptr)
+    {
+        err = TvCastingAppJNIMgr().getSessionEstablishmentStartedHandler().SetUp(env, jSessionEstablishmentStarted);
+        VerifyOrReturnValue(
+            err == CHIP_NO_ERROR, false,
+            ChipLogError(AppServer, "SessionEstablishmentStartedHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
+        commissioningCallbacks.sessionEstablishmentStarted = []() {
+            TvCastingAppJNIMgr().getSessionEstablishmentStartedHandler().Handle(nullptr);
+        };
+    }
+
+    jfieldID jSessionEstablishedField =
+        env->GetFieldID(jCommissioningCallbacksClass, "sessionEstablished", "Lcom/chip/casting/SuccessCallback;");
+    jobject jSessionEstablished = env->GetObjectField(jCommissioningCallbacks, jSessionEstablishedField);
+    if (jSessionEstablished != nullptr)
+    {
+        err = TvCastingAppJNIMgr().getSessionEstablishedHandler().SetUp(env, jSessionEstablished);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, false,
+                            ChipLogError(AppServer, "SessionEstablishedHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
+        commissioningCallbacks.sessionEstablished = []() { TvCastingAppJNIMgr().getSessionEstablishedHandler().Handle(nullptr); };
+    }
+
+    jfieldID jSessionEstablishmentErrorField =
+        env->GetFieldID(jCommissioningCallbacksClass, "sessionEstablishmentError", "Lcom/chip/casting/FailureCallback;");
+    jobject jSessionEstablishmentError = env->GetObjectField(jCommissioningCallbacks, jSessionEstablishmentErrorField);
+    if (jSessionEstablishmentError != nullptr)
+    {
+        err = TvCastingAppJNIMgr().getSessionEstablishmentErrorHandler().SetUp(env, jSessionEstablishmentError);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, false);
+        commissioningCallbacks.sessionEstablishmentError = [](CHIP_ERROR err) {
+            TvCastingAppJNIMgr().getSessionEstablishmentErrorHandler().Handle(err);
+        };
+    }
+
+    jfieldID jSessionEstablishmentStoppedField =
+        env->GetFieldID(jCommissioningCallbacksClass, "sessionEstablishmentStopped", "Lcom/chip/casting/FailureCallback;");
+    jobject jSessionEstablishmentStopped = env->GetObjectField(jCommissioningCallbacks, jSessionEstablishmentStoppedField);
+    if (jSessionEstablishmentStopped != nullptr)
+    {
+        err = TvCastingAppJNIMgr().getSessionEstablishmentStoppedHandler().SetUp(env, jSessionEstablishmentStopped);
+        VerifyOrReturnValue(
+            err == CHIP_NO_ERROR, false,
+            ChipLogError(AppServer, "SessionEstablishmentStoppedHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
+        commissioningCallbacks.sessionEstablishmentStopped = []() {
+            TvCastingAppJNIMgr().getSessionEstablishmentStoppedHandler().Handle(CHIP_NO_ERROR);
+        };
+    }
 
     err = TvCastingAppJNIMgr().getOnConnectionSuccessHandler(false).SetUp(env, jOnConnectionSuccessHandler);
     VerifyOrExit(CHIP_NO_ERROR == err,
@@ -136,7 +203,7 @@ JNI_METHOD(jboolean, openBasicCommissioningWindow)
                  ChipLogError(AppServer, "OnNewOrUpdatedEndpointHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->OpenBasicCommissioningWindow(
-        [](CHIP_ERROR err) { TvCastingAppJNIMgr().getCommissioningCompleteHandler().Handle(err); },
+        commissioningCallbacks,
         [](TargetVideoPlayerInfo * videoPlayer) { TvCastingAppJNIMgr().getOnConnectionSuccessHandler(false).Handle(videoPlayer); },
         [](CHIP_ERROR err) { TvCastingAppJNIMgr().getOnConnectionFailureHandler(false).Handle(err); },
         [](TargetEndpointInfo * endpoint) { TvCastingAppJNIMgr().getOnNewOrUpdatedEndpointHandler(false).Handle(endpoint); });
