@@ -34,7 +34,7 @@ config("controller_wno_deprecate") {
 declare_args() {
   chip_python_version = "0.0"
   chip_python_package_prefix = "chip"
-  chip_python_supports_stack_locking = (chip_system_config_locking != "none")
+  chip_python_supports_stack_locking = chip_system_config_locking != "none"
 }
 
 shared_library("ChipDeviceCtrl") {
