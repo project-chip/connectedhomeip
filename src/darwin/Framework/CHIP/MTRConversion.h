@@ -43,7 +43,7 @@ inline NSDate * ChipEpochSecondsAsDate(uint32_t chipEpochSeconds)
 /**
  * Utilities for converting between NSSet<NSNumber *> and chip::CATValues.
  */
-CHIP_ERROR ToCATValues(NSSet<NSNumber *> * catSet, chip::CATValues & values);
-NSSet<NSNumber *> * FromCATValues(const chip::CATValues & values);
+CHIP_ERROR SetToCATValues(NSSet<NSNumber *> * catSet, chip::CATValues & values);
+NSSet<NSNumber *> * CATValuesToSet(const chip::CATValues & values);
 
 NS_ASSUME_NONNULL_END

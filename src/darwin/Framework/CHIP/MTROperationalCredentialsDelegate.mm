@@ -470,7 +470,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::GenerateOperationalCertificate(id<
 
     CATValues cats;
     if (caseAuthenticatedTags != nil) {
-        ReturnErrorOnFailure(ToCATValues(caseAuthenticatedTags, cats));
+        ReturnErrorOnFailure(SetToCATValues(caseAuthenticatedTags, cats));
     }
 
     uint8_t nocBuffer[Controller::kMaxCHIPDERCertLength];

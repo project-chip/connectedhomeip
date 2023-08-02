@@ -303,7 +303,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
         auto tagCount = cats.GetNumTagsPresent();
         if (tagCount > 0) {
-            self.caseAuthenticatedTags = FromCATValues(cats);
+            self.caseAuthenticatedTags = CATValuesToSet(cats);
         } else {
             self.caseAuthenticatedTags = nil;
         }

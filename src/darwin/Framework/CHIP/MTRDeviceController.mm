@@ -313,9 +313,9 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
             chip::CATValues cats = chip::kUndefinedCATs;
             if (startupParams.caseAuthenticatedTags != nil) {
-                errorCode = ToCATValues(startupParams.caseAuthenticatedTags, cats);
+                errorCode = SetToCATValues(startupParams.caseAuthenticatedTags, cats);
                 if (errorCode != CHIP_NO_ERROR) {
-                    // ToCATValues already handles logging.
+                    // SetToCATValues already handles logging.
                     return;
                 }
             }

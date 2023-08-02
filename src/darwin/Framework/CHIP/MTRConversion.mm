@@ -19,7 +19,7 @@
 
 #include <lib/support/SafeInt.h>
 
-CHIP_ERROR ToCATValues(NSSet<NSNumber *> * catSet, chip::CATValues & values)
+CHIP_ERROR SetToCATValues(NSSet<NSNumber *> * catSet, chip::CATValues & values)
 {
     values = chip::kUndefinedCATs;
 
@@ -49,7 +49,7 @@ CHIP_ERROR ToCATValues(NSSet<NSNumber *> * catSet, chip::CATValues & values)
     return CHIP_NO_ERROR;
 }
 
-NSSet<NSNumber *> * FromCATValues(const chip::CATValues & values)
+NSSet<NSNumber *> * CATValuesToSet(const chip::CATValues & values)
 {
     auto * catSet = [[NSMutableSet alloc] initWithCapacity:values.GetNumTagsPresent()];
     for (auto & value : values.values) {
