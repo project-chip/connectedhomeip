@@ -1012,6 +1012,16 @@ exit:
     return err;
 }
 
+void BLEManagerImpl::ConfigureScanResponseData(ByteSpan data)
+{
+    if (data.size() > MAX_ADV_DATA_LEN)
+    {
+        ChipLogError(DeviceLayer, "scan response data is out of length");
+        return;
+    }
+    scanResponse = chip::Optional(data);
+}
+
 void BLEManagerImpl::HandleRXCharWrite(struct ble_gatt_char_context * param)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
@@ -1584,6 +1594,15 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
             }
         }
 #endif
+        if (scanResponse.HasValue())
+        {
+            err = MapBLEError(ble_gap_adv_rsp_set_data(scanResponse.Value().data(), scanResponse.Value().size()));
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "ble_gap_adv_rsp_set_data failed: %s", ErrorStr(err));
+                return err;
+            }
+        }
         err = MapBLEError(ble_gap_adv_start(own_addr_type, NULL, BLE_HS_FOREVER, &adv_params, ble_svr_gap_event, NULL));
         if (err == CHIP_NO_ERROR)
         {

@@ -140,7 +140,11 @@ public:
 #endif
 #endif
 
+    void ConfigureScanResponseData(ByteSpan data);
+
 private:
+    chip::Optional<chip::ByteSpan> scanResponse;
+
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend BLEManager;
