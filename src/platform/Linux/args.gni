@@ -13,3 +13,4 @@
 # limitations under the License.
 
 chip_device_platform = "linux"
+chip_enable_smoke_co_alarm = true 

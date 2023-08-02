@@ -29,6 +29,13 @@ source_set("ota-test-event-trigger") {
   ]
 }
 
+source_set("sco-test-event-trigger") {
+  sources = [
+    "${chip_root}/src/app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerDelegate.h",
+  ]
+}
+
+
 source_set("app-main") {
   defines = [ "ENABLE_TRACING=${matter_enable_tracing_support}" ]
   sources = [
@@ -56,6 +63,7 @@ source_set("app-main") {
   ]
   deps = [
     ":ota-test-event-trigger",
+    ":sco-test-event-trigger",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/app/server",
   ]

@@ -137,6 +137,10 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR=1" ]
     }
 
+#    if (chip_enable_smoke_co_alarm) {
+#      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_ALARM=1" ]
+#    }
+
     if (chip_device_project_config_include != "") {
       defines += [ "CHIP_DEVICE_PROJECT_CONFIG_INCLUDE=${chip_device_project_config_include}" ]
     }
