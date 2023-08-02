@@ -47,13 +47,13 @@ declare_args() {
   use_system_view = false
 
   # ICD Openthread Configuration flags
-  sl_ot_idle_interval_ms = 30000  # 30s Idle Intervals
+  sl_ot_idle_interval_ms = 15000  # 15s Idle Intervals
   sl_ot_active_interval_ms = 200  # 200ms Active Intervals
 
   # ICD Matter Configuration flags
-  sl_idle_mode_interval_ms = 60000  # 10min Idle Mode Interval
+  sl_idle_mode_interval_ms = 600000  # 10min Idle Mode Interval
   sl_active_mode_interval_ms = 1000  # 1s Active Mode Interval
-  sl_active_mode_threshold_ms = 500  # 1s Active Mode Threshold
+  sl_active_mode_threshold_ms = 500  # 500ms Active Mode Threshold
   sl_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
   sl_use_subscription_synching = false
 
