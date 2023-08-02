@@ -46,10 +46,16 @@ declare_args() {
   # Enable Segger System View
   use_system_view = false
 
-  # ICD Configuration flags
+  # ICD Openthread Configuration flags
   sl_ot_idle_interval_ms = 30000  # 30s Idle Intervals
-  sl_ot_active_interval_ms = 200  # 500ms Active Intervals
-  sl_active_mode_threshold = 1000  # 1s Active mode threshold
+  sl_ot_active_interval_ms = 200  # 200ms Active Intervals
+
+  # ICD Matter Configuration flags
+  sl_idle_mode_interval_ms = 60000  # 10min Idle Mode Interval
+  sl_active_mode_interval_ms = 1000  # 1s Active Mode Interval
+  sl_active_mode_threshold_ms = 500  # 1s Active Mode Threshold
+  sl_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
+  sl_use_subscription_synching = false
 
   silabs_log_enabled = true
 
@@ -329,10 +335,20 @@ template("efr32_sdk") {
 
     if (chip_enable_icd_server) {
       defines += [
-        "SL_OT_IDLE_INTERVAL=${sl_ot_idle_interval_ms}",
-        "SL_OT_ACTIVE_INTERVAL=${sl_ot_active_interval_ms}",
-        "SL_ACTIVE_MODE_THRESHOLD=${sl_active_mode_threshold}",
+        "SL_ICD_ENABLED=1",
+        "SL_ACTIVE_MODE_THRESHOLD=${sl_active_mode_threshold_ms}",
+        "SL_ACTIVE_MODE_INTERVAL=${sl_active_mode_interval_ms}",
+        "SL_IDLE_MODE_INTERVAL=${sl_idle_mode_interval_ms}",
+        "SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${sl_icd_supported_clients_per_fabric}",
       ]
+
+      if (defined(invoker.chip_enable_openthread) &&
+          invoker.chip_enable_openthread) {
+        defines += [
+          "SL_OT_IDLE_INTERVAL=${sl_ot_idle_interval_ms}",
+          "SL_OT_ACTIVE_INTERVAL=${sl_ot_active_interval_ms}",
+        ]
+      }
 
       if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
         defines += [
@@ -374,9 +390,15 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/hardware/driver/memlcd/inc/memlcd_usart",
       ]
     }
+
     if (invoker.enable_dic) {
       _include_dirs += [ "${chip_root}/third_party/silabs/mqtt/stack" ]
     }
+
+    if (sl_use_subscription_synching) {
+      defines += [ "CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED=1" ]
+    }
+
     if (silabs_family == "efr32mg12") {
       _include_dirs += [
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG12P/Include",
