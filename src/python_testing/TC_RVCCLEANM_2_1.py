@@ -23,7 +23,7 @@ from mobly import asserts
 
 # This test requires several additional command line arguments
 # run with
-# --int-arg PIXIT_ENDPOINT:<endpoint> PIXIT_MODEOK:<mode id> PIXIT_MODEFAIL:<mode id>
+# --int-arg PIXIT_ENDPOINT:<endpoint> PIXIT_RVCCLEANM_MODEOK:<mode id> PIXIT_RVCCLEANM_MODEFAIL:<mode id>
 
 
 class TC_RVCCLEANM_2_1(MatterBaseTest):
@@ -44,16 +44,16 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
                             "PIXIT_ENDPOINT must be included on the command line in "
                             "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
-        asserts.assert_true('PIXIT_MODEOK' in self.matter_test_config.global_test_params,
-                            "PIXIT_MODEOK must be included on the command line in "
-                            "the --int-arg flag as PIXIT_MODEOK:<mode id>")
-        asserts.assert_true('PIXIT_MODEFAIL' in self.matter_test_config.global_test_params,
-                            "PIXIT_MODEFAIL must be included on the command line in "
-                            "the --int-arg flag as PIXIT_MODEFAIL:<mode id>")
+        asserts.assert_true('PIXIT_RVCCLEANM_MODEOK' in self.matter_test_config.global_test_params,
+                            "PIXIT_RVCCLEANM_MODEOK must be included on the command line in "
+                            "the --int-arg flag as PIXIT_RVCCLEANM_MODEOK:<mode id>")
+        asserts.assert_true('PIXIT_RVCCLEANM_MODEFAIL' in self.matter_test_config.global_test_params,
+                            "PIXIT_RVCCLEANM_MODEFAIL must be included on the command line in "
+                            "the --int-arg flag as PIXIT_RVCCLEANM_MODEFAIL:<mode id>")
 
         self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
-        self.modeok = self.matter_test_config.global_test_params['PIXIT_MODEOK']
-        self.modefail = self.matter_test_config.global_test_params['PIXIT_MODEFAIL']
+        self.modeok = self.matter_test_config.global_test_params['PIXIT_RVCCLEANM_MODEOK']
+        self.modefail = self.matter_test_config.global_test_params['PIXIT_RVCCLEANM_MODEFAIL']
 
         asserts.assert_true(self.check_pics("RVCCLEANM.S.A0000"), "RVCCLEANM.S.A0000 must be supported")
         asserts.assert_true(self.check_pics("RVCCLEANM.S.A0001"), "RVCCLEANM.S.A0001 must be supported")
