@@ -23,6 +23,9 @@
 #endif // CONFIG_OPENTHREAD_ENABLED
 
 #include <esp_log.h>
+#if CONFIG_PM_ENABLE
+#include "esp_pm.h"
+#endif
 
 using namespace ::chip::DeviceLayer;
 
