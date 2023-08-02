@@ -67,11 +67,17 @@ chip::EndpointId kInvalidTestEndpointId = 3;
 chip::DataVersion kTestDataVersion1     = 3;
 chip::DataVersion kTestDataVersion2     = 5;
 
+static chip::System::Clock::Internal::MockClock mockClock;
+static chip::System::Clock::ClockBase * realClock;
+
 class TestContext : public chip::Test::AppContext
 {
 public:
     static int Initialize(void * context)
     {
+        realClock = &chip::System::SystemClock();
+        chip::System::Clock::Internal::SetSystemClockForTesting(&mockClock);
+
         if (AppContext::Initialize(context) != SUCCESS)
             return FAILURE;
 
@@ -97,6 +103,7 @@ public:
     static int Finalize(void * context)
     {
         chip::app::EventManagement::DestroyEventManagement();
+        chip::System::Clock::Internal::SetSystemClockForTesting(realClock);
 
         if (AppContext::Finalize(context) != SUCCESS)
             return FAILURE;
@@ -1598,17 +1605,9 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
 
         // Test report with 2 different path
 
-        // Wait for min interval to elapse
-        System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicTimestamp();
-        while (true)
-        {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >=
-                System::Clock::Seconds16(readPrepareParams.mMinIntervalFloorSeconds))
-            {
-                break;
-            }
-            ctx.GetIOContext().DriveIO();
-        }
+        // Advance monotonic timestamp for min interval to elapse
+        mockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMinIntervalFloorSeconds));
+        ctx.GetIOContext().DriveIO();
 
         delegate.mGotReport            = false;
         delegate.mGotEventResponse     = false;
@@ -1626,17 +1625,10 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test report with 2 different path, and 1 same path
-        // Wait for min interval to elapse
-        startTime = System::SystemClock().GetMonotonicTimestamp();
-        while (true)
-        {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >=
-                System::Clock::Seconds16(readPrepareParams.mMinIntervalFloorSeconds))
-            {
-                break;
-            }
-            ctx.GetIOContext().DriveIO();
-        }
+        // Advance monotonic timestamp for min interval to elapse
+        mockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMinIntervalFloorSeconds));
+        ctx.GetIOContext().DriveIO();
+
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         err                            = engine->GetReportingEngine().SetDirty(dirtyPath1);
@@ -1652,17 +1644,10 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test report with 3 different path, and one path is overlapped with another
-        // Wait for min interval to elapse
-        startTime = System::SystemClock().GetMonotonicTimestamp();
-        while (true)
-        {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >=
-                System::Clock::Seconds16(readPrepareParams.mMinIntervalFloorSeconds))
-            {
-                break;
-            }
-            ctx.GetIOContext().DriveIO();
-        }
+        // Advance monotonic timestamp for min interval to elapse
+        mockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMinIntervalFloorSeconds));
+        ctx.GetIOContext().DriveIO();
+
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         err                            = engine->GetReportingEngine().SetDirty(dirtyPath1);
@@ -1678,17 +1663,10 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test report with 3 different path, all are not overlapped, one path is not interested for current subscription
-        // Wait for min interval to elapse
-        startTime = System::SystemClock().GetMonotonicTimestamp();
-        while (true)
-        {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >=
-                System::Clock::Seconds16(readPrepareParams.mMinIntervalFloorSeconds))
-            {
-                break;
-            }
-            ctx.GetIOContext().DriveIO();
-        }
+        // Advance monotonic timestamp for min interval to elapse
+        mockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMinIntervalFloorSeconds));
+        ctx.GetIOContext().DriveIO();
+
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         err                            = engine->GetReportingEngine().SetDirty(dirtyPath1);
@@ -1704,16 +1682,8 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test empty report
-        // Wait for max interval to elapse
-        startTime = System::SystemClock().GetMonotonicTimestamp();
-        while (true)
-        {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >=
-                System::Clock::Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds))
-            {
-                break;
-            }
-        }
+        // Advance monotonic timestamp for min interval to elapse
+        mockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds));
         ctx.GetIOContext().DriveIO();
 
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().IsRunScheduled());
@@ -1788,8 +1758,7 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         ctx.DrainAndServiceIO();
-
-        System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicTimestamp();
+        System::Clock::Timestamp startTime = mockClock.GetMonotonicTimestamp();
 
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 2);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
@@ -1813,40 +1782,47 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
         nonUrgentDelegate.mGotEventResponse = false;
         nonUrgentDelegate.mGotReport        = false;
 
-        // wait for min interval 2 seconds (in test, we use 1.6 seconds considering the time variation), expect no event is
+        // wait for min interval 1 seconds (in test, we use 0.6 seconds considering the time variation), expect no event is
         // received, then wait for 0.8 seconds, then the urgent event would be sent out
         //  currently DriveIOUntil will call `DriveIO` at least once, which means that if there is any CPU scheduling issues,
         // there's a chance 1.9s will already have elapsed by the time we get there, which will result in DriveIO being called when
         // it shouldn't. Better fix could happen inside DriveIOUntil, not sure the sideeffect there.
+
+        // Advance monotonic looping to allow events to trigger
         while (true)
         {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(600))
+            ctx.GetIOContext().DriveIO();
+            if ((mockClock.GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(600))
             {
                 break;
             }
-            ctx.GetIOContext().DriveIO(); // at least one IO loop is guaranteed
+            mockClock.AdvanceMonotonic(System::Clock::Milliseconds32(10));
         }
+        ctx.GetIOContext().DriveIO();
 
         NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mGotEventResponse);
 
-        startTime = System::SystemClock().GetMonotonicTimestamp();
+        // Advance monotonic timestamp for min interval to elapse
+        startTime = mockClock.GetMonotonicTimestamp();
         while (true)
         {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(800))
+            ctx.GetIOContext().DriveIO();
+            if ((mockClock.GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(800))
             {
                 break;
             }
-            ctx.GetIOContext().DriveIO(); // at least one IO loop is guaranteed
+            mockClock.AdvanceMonotonic(System::Clock::Milliseconds32(10));
         }
+        ctx.GetIOContext().DriveIO();
+
         NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mGotEventResponse);
 
         // Since we just sent a report for our urgent subscription, the min interval of the urgent subcription should have been
         // updated
         NL_TEST_ASSERT(apSuite,
-                       reportScheduler->GetMinTimestampForHandler(delegate.mpReadHandler) >
-                           System::SystemClock().GetMonotonicTimestamp());
+                       reportScheduler->GetMinTimestampForHandler(delegate.mpReadHandler) > mockClock.GetMonotonicTimestamp());
         NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsDirty());
         delegate.mGotEventResponse = false;
 
@@ -1854,19 +1830,12 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
         // should be in the past
         NL_TEST_ASSERT(apSuite,
                        reportScheduler->GetMinTimestampForHandler(nonUrgentDelegate.mpReadHandler) <
-                           System::SystemClock().GetMonotonicTimestamp());
+                           mockClock.GetMonotonicTimestamp());
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
 
-        // Wait for the min interval timer to fire.
-        startTime = System::SystemClock().GetMonotonicTimestamp();
-        while (true)
-        {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(2100))
-            {
-                break;
-            }
-            ctx.GetIOContext().DriveIO(); // at least one IO loop is guaranteed
-        }
+        // Advance monotonic timestamp for min interval to elapse
+        mockClock.AdvanceMonotonic(System::Clock::Milliseconds32(2100));
+        ctx.GetIOContext().DriveIO();
 
         // No reporting should have happened.
         NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
@@ -2338,16 +2307,8 @@ void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);
 
-        // Wait for max interval to elapse
-        System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicTimestamp();
-        while (true)
-        {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >=
-                System::Clock::Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds))
-            {
-                break;
-            }
-        }
+        // Advance monotonic timestamp for min interval to elapse
+        mockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds));
         ctx.GetIOContext().DriveIO();
 
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().IsRunScheduled());
@@ -2540,15 +2501,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Wait for max interval to elapse
-        System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicTimestamp();
-        while (true)
-        {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >=
-                System::Clock::Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds))
-            {
-                break;
-            }
-        }
+        mockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds));
         ctx.GetIOContext().DriveIO();
 
         delegate.mGotReport            = false;
@@ -2898,15 +2851,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout(nlT
         dirtyPath1.mEndpointId  = Test::kMockEndpoint3;
         dirtyPath1.mAttributeId = Test::MockAttributeId(4);
 
-        System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicTimestamp();
-        while (true)
-        {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >=
-                System::Clock::Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds))
-            {
-                break;
-            }
-        }
+        mockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds));
         ctx.GetIOContext().DriveIO();
 
         err = engine->GetReportingEngine().SetDirty(dirtyPath1);
@@ -3010,15 +2955,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout(nlTestSui
         dirtyPath1.mEndpointId  = Test::kMockEndpoint3;
         dirtyPath1.mAttributeId = Test::MockAttributeId(4);
 
-        System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicTimestamp();
-        while (true)
-        {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >=
-                System::Clock::Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds))
-            {
-                break;
-            }
-        }
+        mockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds));
         ctx.GetIOContext().DriveIO();
 
         err = engine->GetReportingEngine().SetDirty(dirtyPath1);
@@ -3127,26 +3064,27 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReport(nlTestSuite * ap
 
         // wait for min interval 1 seconds(in test, we use 0.9second considering the time variation), expect no event is received,
         // then wait for 0.5 seconds, then all chunked dirty reports are sent out, which would not honor minInterval
-        System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicTimestamp();
+        System::Clock::Timestamp startTime = mockClock.GetMonotonicTimestamp();
         while (true)
         {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(900))
+            ctx.GetIOContext().DriveIO();
+            if ((mockClock.GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(900))
             {
                 break;
             }
-            ctx.GetIOContext().DriveIO();
+            mockClock.AdvanceMonotonic(System::Clock::Milliseconds32(10));
         }
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
-        startTime = System::SystemClock().GetMonotonicTimestamp();
+        startTime = mockClock.GetMonotonicTimestamp();
         while (true)
         {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(500))
+            ctx.GetIOContext().DriveIO();
+            if ((mockClock.GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(500))
             {
                 break;
             }
-            ctx.GetIOContext().DriveIO();
+            mockClock.AdvanceMonotonic(System::Clock::Milliseconds32(10));
         }
-        ctx.DrainAndServiceIO();
     }
     // Two chunked reports carry 4 attributeDataIB: 1 with a list of 3 items,
     // and then one per remaining item.
