@@ -389,10 +389,8 @@ public class ChipDeviceController {
   public void onScanNetworksSuccess(
       Integer networkingStatus,
       Optional<String> debugText,
-      Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResultStruct>>
-          wiFiScanResults,
-      Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResultStruct>>
-          threadScanResults) {
+      Optional<ArrayList<WiFiScanResult>> wiFiScanResults,
+      Optional<ArrayList<ThreadScanResult>> threadScanResults) {
     if (scanNetworksListener != null) {
       scanNetworksListener.onScanNetworksSuccess(
           networkingStatus, debugText, wiFiScanResults, threadScanResults);
@@ -1268,10 +1266,8 @@ public class ChipDeviceController {
     void onScanNetworksSuccess(
         Integer networkingStatus,
         Optional<String> debugText,
-        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResultStruct>>
-            wiFiScanResults,
-        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResultStruct>>
-            threadScanResults);
+        Optional<ArrayList<WiFiScanResult>> wiFiScanResults,
+        Optional<ArrayList<ThreadScanResult>> threadScanResults);
   }
 
   /** Interface to listen for callbacks from CHIPDeviceController. */

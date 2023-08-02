@@ -32,7 +32,7 @@ tests:
       command: "readAttribute"
       attribute: "IdleModeInterval"
       response:
-          value: 500
+          value: 2000
 
     - label: "Read ActiveModeInterval"
       command: "readAttribute"
