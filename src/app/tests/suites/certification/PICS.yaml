@@ -27,6 +27,11 @@ PICS:
     - label: "Run steps in SDK and CI only"
       id: PICS_SDK_CI_ONLY
 
+    - label:
+          "EventList attribute enabled (default to false while EventList is
+          provisional)"
+      id: PICS_EVENT_LIST_ENABLED
+
     #
     # Base Details
     #
@@ -9375,107 +9380,107 @@ PICS:
       id: OPSTATE.S.C04.Tx
 
     # Smoke CO Alarm Cluster Test Plan
-    - label: "Does the device implement the SMCO cluster as a server?"
-      id: SMCO.S
+    - label: "Does the device implement the SMOKECO cluster as a server?"
+      id: SMOKECO.S
 
-    - label: "Does the device implement the SMCO cluster as a client?"
-      id: SMCO.C
+    - label: "Does the device implement the SMOKECO cluster as a client?"
+      id: SMOKECO.C
 
     #
     # server / features
     #
     - label: "Does the device support this specific cluster feature?"
-      id: SMCO.S.F00
+      id: SMOKECO.S.F00
 
     - label: "Does the device support this specific cluster feature?"
-      id: SMCO.S.F01
+      id: SMOKECO.S.F01
 
     #
     # server / attributes
     #
     - label: "Does the device implement the ExpressedState attribute?"
-      id: SMCO.S.A0000
+      id: SMOKECO.S.A0000
 
     - label: "Does the device implement the SmokeState attribute?"
-      id: SMCO.S.A0001
+      id: SMOKECO.S.A0001
 
     - label: "Does the device implement the COState attribute?"
-      id: SMCO.S.A0002
+      id: SMOKECO.S.A0002
 
     - label: "Does the device implement the BatteryAlert attribute?"
-      id: SMCO.S.A0003
+      id: SMOKECO.S.A0003
 
     - label: "Does the device implement the DeviceMuted attribute?"
-      id: SMCO.S.A0004
+      id: SMOKECO.S.A0004
 
     - label: "Does the device implement the TestInProgress attribute?"
-      id: SMCO.S.A0005
+      id: SMOKECO.S.A0005
 
     - label: "Does the device implement the HardwareFaultAlert attribute?"
-      id: SMCO.S.A0006
+      id: SMOKECO.S.A0006
 
     - label: "Does the device implement the EndOfServiceAlert attribute?"
-      id: SMCO.S.A0007
+      id: SMOKECO.S.A0007
 
     - label: "Does the device implement the InterconnectSmokeAlarm attribute?"
-      id: SMCO.S.A0008
+      id: SMOKECO.S.A0008
 
     - label: "Does the device implement the InterconnectCOAlarm attribute?"
-      id: SMCO.S.A0009
+      id: SMOKECO.S.A0009
 
     - label: "Does the device implement the ContaminationState attribute?"
-      id: SMCO.S.A0010
+      id: SMOKECO.S.A0010
 
     - label: "Does the device implement the SensitivityLevel attribute?"
-      id: SMCO.S.A0011
+      id: SMOKECO.S.A0011
 
     - label: "Does the device implement the ExpiryDate attribute?"
-      id: SMCO.S.A0012
+      id: SMOKECO.S.A0012
 
     - label: "Does the device implement the ContaminationState attribute?"
-      id: SMCO.S.A000a
+      id: SMOKECO.S.A000a
 
     - label: "Does the device implement the SensitivityLevel attribute?"
-      id: SMCO.S.A000b
+      id: SMOKECO.S.A000b
 
     - label: "Does the device implement the ExpiryDate attribute?"
-      id: SMCO.S.A000c
+      id: SMOKECO.S.A000c
 
     #
     # server / Events
     #
     - label: "Does the device implement the SmokeAlarm event?"
-      id: SMCO.S.E00
+      id: SMOKECO.S.E00
 
     - label: "Does the device implement the COAlarm event?"
-      id: SMCO.S.E01
+      id: SMOKECO.S.E01
 
     - label: "Does the device implement the LowBattery event?"
-      id: SMCO.S.E02
+      id: SMOKECO.S.E02
 
     - label: "Does the device implement the HardwareFault event?"
-      id: SMCO.S.E03
+      id: SMOKECO.S.E03
 
     - label: "Does the device implement the EndOfService event?"
-      id: SMCO.S.E04
+      id: SMOKECO.S.E04
 
     - label: "Does the device implement the SelfTestComplete event?"
-      id: SMCO.S.E05
+      id: SMOKECO.S.E05
 
     - label: "Does the device implement the AlarmMuted event?"
-      id: SMCO.S.E06
+      id: SMOKECO.S.E06
 
     - label: "Does the device implement the MuteEnded event?"
-      id: SMCO.S.E07
+      id: SMOKECO.S.E07
 
     - label: "Does the device implement the InterconnectSmokeAlarm event?"
-      id: SMCO.S.E08
+      id: SMOKECO.S.E08
 
     - label: "Does the device implement the InterconnectCOAlarm event?"
-      id: SMCO.S.E09
+      id: SMOKECO.S.E09
 
     - label: "Does the device implement the AllClear event?"
-      id: SMCO.S.E10
+      id: SMOKECO.S.E10
 
     #
     # server / manually
@@ -9483,18 +9488,18 @@ PICS:
     - label:
           "Can the TestInProgress attribute be changed by physical control at
           the device?"
-      id: SMCO.M.ManuallyControlledTest
+      id: SMOKECO.M.ManuallyControlledTest
 
     - label:
           "Can the DeviceMuted attribute be changed by physical control at the
           device?"
-      id: SMCO.M.ManuallyControlledMute
+      id: SMOKECO.M.ManuallyControlledMute
 
     #
     # server / commandsReceived
     #
     - label: "Does the device implement receiving the SelfTestRequest command?"
-      id: SMCO.S.C00.Rsp
+      id: SMOKECO.S.C00.Rsp
 
     #  Laundry Washer Mode Cluster
 

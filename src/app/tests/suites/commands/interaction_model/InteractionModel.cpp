@@ -503,6 +503,40 @@ void InteractionModelReports::CleanupReadClient(ReadClient * aReadClient)
         mReadClients.end());
 }
 
+CHIP_ERROR InteractionModelReports::ReportNone(chip::DeviceProxy * device, chip::app::ReadClient::InteractionType interactionType)
+{
+    AttributePathParams attributePathParams[kMaxAllowedPaths];
+    EventPathParams eventPathParams[kMaxAllowedPaths];
+
+    ReadPrepareParams params(device->GetSecureSession().Value());
+    params.mpEventPathParamsList        = eventPathParams;
+    params.mEventPathParamsListSize     = 0;
+    params.mEventNumber                 = mEventNumber;
+    params.mpAttributePathParamsList    = attributePathParams;
+    params.mAttributePathParamsListSize = 0;
+
+    if (mFabricFiltered.HasValue())
+    {
+        params.mIsFabricFiltered = mFabricFiltered.Value();
+    }
+
+    if (interactionType == ReadClient::InteractionType::Subscribe)
+    {
+        params.mMinIntervalFloorSeconds   = mMinInterval;
+        params.mMaxIntervalCeilingSeconds = mMaxInterval;
+        if (mKeepSubscriptions.HasValue())
+        {
+            params.mKeepSubscriptions = mKeepSubscriptions.Value();
+        }
+    }
+
+    auto client = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
+                                               mBufferedReadAdapter, interactionType);
+    ReturnErrorOnFailure(client->SendRequest(params));
+    mReadClients.push_back(std::move(client));
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR InteractionModelReports::ReportAll(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                                               std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
                                               std::vector<chip::EventId> eventIds,

@@ -971,6 +971,14 @@ public:
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
     }
 
+    /**
+     * Get the fabric index that will be used for the next fabric that will be
+     * added.  Returns error if no more fabrics can be added, otherwise writes
+     * the fabric index that will be used for the next addition into the
+     * outparam.
+     */
+    CHIP_ERROR PeekFabricIndexForNextAddition(FabricIndex & outIndex);
+
 private:
     enum class StateFlags : uint16_t
     {

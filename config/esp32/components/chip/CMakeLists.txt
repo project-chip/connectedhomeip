@@ -462,26 +462,11 @@ foreach(phy_blob ${phy_blobs})
     list(APPEND chip_libraries "${esp_phy_dir}/lib/${target_name}/lib${phy_blob}.a")
 endforeach()
 
-idf_component_get_property(esp_event_lib esp_event COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${esp_event_lib}>)
-
-idf_component_get_property(hal_lib hal COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${hal_lib}>)
-
-idf_component_get_property(esp_system_lib esp_system COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${esp_system_lib}>)
-
-idf_component_get_property(soc_lib soc COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${soc_lib}>)
-
-idf_component_get_property(efuse_lib efuse COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${efuse_lib}>)
-
-idf_component_get_property(vfs_lib vfs COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${vfs_lib}>)
-
-idf_component_get_property(driver_lib driver COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${driver_lib}>)
+set(components_to_link esp_event hal esp_system soc efuse vfs driver esp_coex freertos)
+foreach(component ${components_to_link})
+    idf_component_get_property(lib_name ${component} COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${lib_name}>)
+endforeach()
 
 target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
                                                 ${chip_libraries}
