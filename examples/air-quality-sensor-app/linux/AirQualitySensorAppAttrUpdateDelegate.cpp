@@ -40,7 +40,7 @@ struct MinMaxValues
     float maxValue;
 };
 
-struct ConcentratorFuncPointers
+struct ConcentrationFuncPointers
 {
     EmberAfStatus (*setMeasuredValue)(chip::EndpointId, float);
     EmberAfStatus (*getMinValue)(chip::EndpointId endpoint, DataModel::Nullable<float> & value);
@@ -50,7 +50,7 @@ struct ConcentratorFuncPointers
 };
 
 // Define a map of string keys to function pointers
-std::map<std::string, ConcentratorFuncPointers> concentratorFuncMap = {
+std::map<std::string, ConcentrationFuncPointers> ConcentrationFuncMap = {
     { "CarbonMonoxideConcentrationMeasurement",
       { &CarbonMonoxideConcentrationMeasurement::Attributes::MeasuredValue::Set,
         &CarbonMonoxideConcentrationMeasurement::Attributes::MinMeasuredValue::Get,
@@ -257,17 +257,17 @@ void AirQualitySensorAttrUpdateHandler::OnHumidityChangeHandler(uint16_t newValu
     }
 }
 
-void AirQualitySensorAttrUpdateHandler::OnConcetratorChangeHandler(std::string concentratorName, float newValue)
+void AirQualitySensorAttrUpdateHandler::OnConcetratorChangeHandler(std::string ConcentrationName, float newValue)
 {
-    auto [setMeasuredValue, getMinValue, setMinValue, getMaxValue, setMaxValue] = concentratorFuncMap[concentratorName];
+    auto [setMeasuredValue, getMinValue, setMinValue, getMaxValue, setMaxValue] = ConcentrationFuncMap[ConcentrationName];
 
-    VerifyOrReturn(setMeasuredValue != NULL, ChipLogError(NotSpecified, "Invalid concentrator %s", concentratorName.c_str()));
+    VerifyOrReturn(setMeasuredValue != NULL, ChipLogError(NotSpecified, "Invalid Concentration %s", ConcentrationName.c_str()));
 
     EndpointId endpoint = 1;
     EmberAfStatus status = setMeasuredValue(endpoint, newValue);
     VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                   ChipLogError(NotSpecified, "Failed to %s set MeasuredValue attribute", concentratorName.c_str()));
-    ChipLogDetail(NotSpecified, "The new %s value: %f", concentratorName.c_str(), newValue);
+                   ChipLogError(NotSpecified, "Failed to %s set MeasuredValue attribute", ConcentrationName.c_str()));
+    ChipLogDetail(NotSpecified, "The new %s value: %f", ConcentrationName.c_str(), newValue);
 
     DataModel::Nullable<float> minVal;
     getMinValue(endpoint, minVal);
@@ -281,7 +281,7 @@ void AirQualitySensorAttrUpdateHandler::OnConcetratorChangeHandler(std::string c
         ChipLogDetail(NotSpecified, "newValue < minVal");
         status = setMinValue(endpoint, newValue);
         VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                       ChipLogError(NotSpecified, "Failed to %s MinMeasuredValue attribute", concentratorName.c_str()));
+                       ChipLogError(NotSpecified, "Failed to %s MinMeasuredValue attribute", ConcentrationName.c_str()));
     }
 
     DataModel::Nullable<float> maxVal;
@@ -296,7 +296,7 @@ void AirQualitySensorAttrUpdateHandler::OnConcetratorChangeHandler(std::string c
         ChipLogDetail(NotSpecified, "newValue > maxVal");
         status = setMaxValue(endpoint, newValue);
         VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                       ChipLogError(NotSpecified, "Failed to %s MinMeasuredValue attribute", concentratorName.c_str()));
+                       ChipLogError(NotSpecified, "Failed to %s MinMeasuredValue attribute", ConcentrationName.c_str()));
     }
 }
 

@@ -51,9 +51,9 @@ private:
     void OnHumidityChangeHandler(uint16_t newValue);
 
     /**
-     * Should be called to set new value for a concentrator.
+     * Should be called to set new value for a Concentration.
      */
-    void OnConcetratorChangeHandler(std::string concentratorName, float newValue);
+    void OnConcetratorChangeHandler(std::string ConcentrationName, float newValue);
 };
 
 class AirQualitySensorAppAttrUpdateDelegate : public NamedPipeCommandDelegate
