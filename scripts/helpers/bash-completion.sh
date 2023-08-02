@@ -19,7 +19,7 @@
 # Get the list of commands from the output of the chip-tool,
 # where each command is prefixed with the ' | * ' string.
 _chip_tool_get_commands() {
-    "$@" 2>&1 | awk '/ [|] [*] /{ print $3 }'
+    "$@" --help 2>&1 | awk '/ [|] [*] /{ print $3 }'
 }
 
 # Get the list of options from the output of the chip-tool,
