@@ -172,7 +172,8 @@ void AirQualitySensorAttrUpdateHandler::HandleCommand(intptr_t context)
         ChipLogError(NotSpecified, "Invalid cluster name %s", clusterName.c_str());
     }
 
-    ChipLogError(NotSpecified, "done");
+    // Delete AirQualitySensorAttrUpdateHandler
+    Platform::Delete(self);
 }
 
 void AirQualitySensorAttrUpdateHandler::OnAirQualityChangeHandler(uint8_t newValue)
@@ -221,15 +222,13 @@ void AirQualitySensorAttrUpdateHandler::OnTemperatureChangeHandler(int16_t newVa
 
 void AirQualitySensorAttrUpdateHandler::OnHumidityChangeHandler(uint16_t newValue)
 {
-    DataModel::Nullable<uint16_t> minVal;
-    DataModel::Nullable<uint16_t> maxVal;
     EndpointId endpoint = 1;
-
     EmberAfStatus status = RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(endpoint, newValue);
     VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
                    ChipLogError(NotSpecified, "Failed to RelativeHumidityMeasurement MeasuredValue attribute"));
     ChipLogDetail(NotSpecified, "The new RelativeHumidityMeasurement value: %d", newValue);
 
+    DataModel::Nullable<uint16_t> minVal;
     RelativeHumidityMeasurement::Attributes::MeasuredValue::Get(endpoint, minVal);
     if (minVal.IsNull())
     {
@@ -244,6 +243,7 @@ void AirQualitySensorAttrUpdateHandler::OnHumidityChangeHandler(uint16_t newValu
                        ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement MinMeasuredValue attribute"));
     }
 
+    DataModel::Nullable<uint16_t> maxVal;
     RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::Get(endpoint, maxVal);
     if (maxVal.IsNull())
     {
@@ -259,18 +259,17 @@ void AirQualitySensorAttrUpdateHandler::OnHumidityChangeHandler(uint16_t newValu
 
 void AirQualitySensorAttrUpdateHandler::OnConcetratorChangeHandler(std::string concentratorName, float newValue)
 {
-    EndpointId endpoint = 1;
-    DataModel::Nullable<float> minVal;
-    DataModel::Nullable<float> maxVal;
     auto [setMeasuredValue, getMinValue, setMinValue, getMaxValue, setMaxValue] = concentratorFuncMap[concentratorName];
 
     VerifyOrReturn(setMeasuredValue != NULL, ChipLogError(NotSpecified, "Invalid concentrator %s", concentratorName.c_str()));
 
+    EndpointId endpoint = 1;
     EmberAfStatus status = setMeasuredValue(endpoint, newValue);
     VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
                    ChipLogError(NotSpecified, "Failed to %s set MeasuredValue attribute", concentratorName.c_str()));
     ChipLogDetail(NotSpecified, "The new %s value: %f", concentratorName.c_str(), newValue);
 
+    DataModel::Nullable<float> minVal;
     getMinValue(endpoint, minVal);
     if (minVal.IsNull())
     {
@@ -285,6 +284,7 @@ void AirQualitySensorAttrUpdateHandler::OnConcetratorChangeHandler(std::string c
                        ChipLogError(NotSpecified, "Failed to %s MinMeasuredValue attribute", concentratorName.c_str()));
     }
 
+    DataModel::Nullable<float> maxVal;
     getMaxValue(endpoint, maxVal);
     if (maxVal.IsNull())
     {
