@@ -101,15 +101,15 @@ void GenericOperationalStateDelegateImpl::HandleStopStateCallback(GenericOperati
 
 // Init Operational State cluster
 
-static OperationalState::OperationalStateServer * gOperationalStateServer = nullptr;
+static OperationalState::Instance * gOperationalStateInstance = nullptr;
 static OperationalStateDelegate * gOperationalStateDelegate = nullptr;
 
 void OperationalState::Shutdown()
 {
-    if (gOperationalStateServer != nullptr)
+    if (gOperationalStateInstance != nullptr)
     {
-        delete gOperationalStateServer;
-        gOperationalStateServer = nullptr;
+        delete gOperationalStateInstance;
+        gOperationalStateInstance = nullptr;
     }
     if (gOperationalStateDelegate != nullptr)
     {
@@ -121,26 +121,28 @@ void OperationalState::Shutdown()
 void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gOperationalStateServer == nullptr && gOperationalStateDelegate == nullptr);
+    VerifyOrDie(gOperationalStateInstance == nullptr && gOperationalStateDelegate == nullptr);
+
     gOperationalStateDelegate = new OperationalStateDelegate;
-    gOperationalStateServer = new OperationalStateServer(gOperationalStateDelegate, 0x01,
-                                                              Clusters::OperationalState::Id);
-    gOperationalStateServer->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
-    gOperationalStateServer->SetOperationalError(to_underlying(OperationalState::ErrorStateEnum::kNoError));
-    gOperationalStateServer->Init();
+    gOperationalStateInstance = new Instance(gOperationalStateDelegate, 0x01, Clusters::OperationalState::Id);
+
+    gOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+    gOperationalStateInstance->SetOperationalError(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+
+    gOperationalStateInstance->Init();
 }
 
 // Init RVC Operational State cluster
 
-static OperationalState::OperationalStateServer * gRvcOperationalStateServer = nullptr;
+static OperationalState::Instance * gRvcOperationalStateInstance  = nullptr;
 static RvcOperationalStateDelegate * gRvcOperationalStateDelegate = nullptr;
 
 void RvcOperationalState::Shutdown()
 {
-    if (gRvcOperationalStateServer != nullptr)
+    if (gRvcOperationalStateInstance != nullptr)
     {
-        delete gRvcOperationalStateServer;
-        gRvcOperationalStateServer = nullptr;
+        delete gRvcOperationalStateInstance;
+        gRvcOperationalStateInstance = nullptr;
     }
     if (gRvcOperationalStateDelegate != nullptr)
     {
@@ -153,11 +155,13 @@ void RvcOperationalState::Shutdown()
 void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gRvcOperationalStateServer == nullptr && gRvcOperationalStateDelegate == nullptr);
+    VerifyOrDie(gRvcOperationalStateInstance == nullptr && gRvcOperationalStateDelegate == nullptr);
+
     gRvcOperationalStateDelegate = new RvcOperationalStateDelegate;
-    gRvcOperationalStateServer = new OperationalStateServer(gRvcOperationalStateDelegate, 0x01,
-                                                              Clusters::RvcOperationalState::Id);
-    gRvcOperationalStateServer->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
-    gRvcOperationalStateServer->SetOperationalError(to_underlying(OperationalState::ErrorStateEnum::kNoError));
-    gRvcOperationalStateServer->Init();
+    gRvcOperationalStateInstance = new Instance(gRvcOperationalStateDelegate, 0x01,Clusters::RvcOperationalState::Id);
+
+    gRvcOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+    gRvcOperationalStateInstance->SetOperationalError(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+
+    gRvcOperationalStateInstance->Init();
 }

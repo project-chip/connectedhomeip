@@ -34,7 +34,7 @@ using namespace chip::app::Clusters::OperationalState::Attributes;
 
 using Status = Protocols::InteractionModel::Status;
 
-OperationalStateServer::OperationalStateServer(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId) :
+Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId) :
     CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId),
     AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId),
     mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId),
@@ -44,13 +44,13 @@ OperationalStateServer::OperationalStateServer(Delegate * aDelegate, EndpointId 
     mDelegate->SetServer(this);
 }
 
-OperationalStateServer::~OperationalStateServer()
+Instance::~Instance()
 {
     InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
     unregisterAttributeAccessOverride(this);
 }
 
-CHIP_ERROR OperationalStateServer::Init()
+CHIP_ERROR Instance::Init()
 {
     // Check if the cluster has been selected in zap
     if (!emberAfContainsServer(mEndpointId, mClusterId))
@@ -68,7 +68,7 @@ CHIP_ERROR OperationalStateServer::Init()
 
 // todo change CHIP_ERROR -> Status?
 
-CHIP_ERROR OperationalStateServer::SetCurrentPhase(const DataModel::Nullable<uint8_t> & aPhase)
+CHIP_ERROR Instance::SetCurrentPhase(const DataModel::Nullable<uint8_t> & aPhase)
 {
     // todo check it the value is valid else return Protocols::InteractionModel::Status::ConstraintError;
 
@@ -82,14 +82,14 @@ CHIP_ERROR OperationalStateServer::SetCurrentPhase(const DataModel::Nullable<uin
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OperationalStateServer::SetCountdownTime(const DataModel::Nullable<uint32_t> & time)
+CHIP_ERROR Instance::SetCountdownTime(const DataModel::Nullable<uint32_t> & time)
 {
     mCountdownTime = time;
     // We should not report this change.
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OperationalStateServer::SetOperationalState(uint8_t opState)
+CHIP_ERROR Instance::SetOperationalState(uint8_t opState)
 {
     // todo check it the value is valid else return Protocols::InteractionModel::Status::ConstraintError;
 
@@ -103,7 +103,7 @@ CHIP_ERROR OperationalStateServer::SetOperationalState(uint8_t opState)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OperationalStateServer::SetOperationalError(const GenericOperationalError & opErrState)
+CHIP_ERROR Instance::SetOperationalError(const GenericOperationalError & opErrState)
 {
     GenericOperationalError oldError = mOperationalError;
     mOperationalError = opErrState;
@@ -116,29 +116,29 @@ CHIP_ERROR OperationalStateServer::SetOperationalError(const GenericOperationalE
     return CHIP_NO_ERROR;
 }
 
-DataModel::Nullable<uint8_t> OperationalStateServer::GetCurrentPhase()
+DataModel::Nullable<uint8_t> Instance::GetCurrentPhase()
 {
     return mCurrentPhase;
 }
 
-DataModel::Nullable<uint32_t> OperationalStateServer::GetCountdownTime()
+DataModel::Nullable<uint32_t> Instance::GetCountdownTime()
 {
     return mCountdownTime;
 }
 
-uint8_t OperationalStateServer::GetCurrentOperationalState() const
+uint8_t Instance::GetCurrentOperationalState() const
 {
     ChipLogError(Zcl, "OperationalState: H2");
     return mOperationalState;
 }
 
 // todo can we return GenericOperationalError?
-void OperationalStateServer::GetCurrentOperationalError(GenericOperationalError & error)
+void Instance::GetCurrentOperationalError(GenericOperationalError & error)
 {
     error = mOperationalError;
 }
 
-void OperationalStateServer::OnOperationalErrorDetected(const Structs::ErrorStateStruct::Type & aError)
+void Instance::OnOperationalErrorDetected(const Structs::ErrorStateStruct::Type & aError)
 {
     ChipLogDetail(Zcl, "OperationalStateServer: OnOperationalErrorDetected");
     SetOperationalState(to_underlying(OperationalStateEnum::kError));
@@ -154,7 +154,7 @@ void OperationalStateServer::OnOperationalErrorDetected(const Structs::ErrorStat
     }
 }
 
-void OperationalStateServer::OnOperationCompletionDetected(uint8_t aCompletionErrorCode,
+void Instance::OnOperationCompletionDetected(uint8_t aCompletionErrorCode,
                                                            const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime,
                                                            const Optional<DataModel::Nullable<uint32_t>> & aPausedTime) const
 {
@@ -174,7 +174,7 @@ void OperationalStateServer::OnOperationCompletionDetected(uint8_t aCompletionEr
 // private
 
 // This function is called by the interaction model engine when a command destined for this instance is received.
-void OperationalStateServer::InvokeCommand(HandlerContext & handlerContext)
+void Instance::InvokeCommand(HandlerContext & handlerContext)
 {
     ChipLogDetail(Zcl, "OperationalState: InvokeCommand");
     switch (handlerContext.mRequestPath.mCommandId)
@@ -209,7 +209,7 @@ void OperationalStateServer::InvokeCommand(HandlerContext & handlerContext)
     }
 }
 
-void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Commands::Pause::DecodableType & req)
+void Instance::HandlePauseState(HandlerContext & ctx, const Commands::Pause::DecodableType & req)
 {
     ChipLogDetail(Zcl, "OperationalState: HandlePauseState");
 
@@ -231,7 +231,7 @@ void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Comman
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Commands::Resume::DecodableType & req)
+void Instance::HandleResumeState(HandlerContext & ctx, const Commands::Resume::DecodableType & req)
 {
     ChipLogDetail(Zcl, "OperationalState: HandleResumeState");
 
@@ -253,7 +253,7 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-void OperationalStateServer::HandleStartState(HandlerContext & ctx, const Commands::Start::DecodableType & req)
+void Instance::HandleStartState(HandlerContext & ctx, const Commands::Start::DecodableType & req)
 {
     ChipLogDetail(Zcl, "OperationalState: HandleStartState");
 
@@ -271,7 +271,7 @@ void OperationalStateServer::HandleStartState(HandlerContext & ctx, const Comman
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-void OperationalStateServer::HandleStopState(HandlerContext & ctx, const Commands::Stop::DecodableType & req)
+void Instance::HandleStopState(HandlerContext & ctx, const Commands::Stop::DecodableType & req)
 {
     ChipLogDetail(Zcl, "OperationalState: HandleStopState");
 
@@ -290,7 +290,7 @@ void OperationalStateServer::HandleStopState(HandlerContext & ctx, const Command
 }
 
 template <typename RequestT, typename FuncT>
-void OperationalStateServer::HandleCommand(HandlerContext & handlerContext, FuncT func)
+void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
 {
     if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mCommandId == RequestT::GetCommandId()))
     {
@@ -315,7 +315,7 @@ void OperationalStateServer::HandleCommand(HandlerContext & handlerContext, Func
     }
 }
 
-CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     ChipLogError(Zcl, "OperationalState: Reading");
     switch (aPath.mAttributeId)

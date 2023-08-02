@@ -46,7 +46,7 @@ class Delegate;
  * It implements CommandHandlerInterface so it can generically handle commands for any derivation cluster id.
  * todo OperationalState in OperationalStateServer is redundant given that we are in the OperationalState namespace, remove.
  */
-class OperationalStateServer : public CommandHandlerInterface, public AttributeAccessInterface, public Uncopyable
+class Instance : public CommandHandlerInterface, public AttributeAccessInterface, public Uncopyable
 {
 public:
     /**
@@ -57,9 +57,9 @@ public:
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aClusterId The ID of the operational state aliased cluster to be instantiated.
      */
-    OperationalStateServer(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId);
+    Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId);
 
-    ~OperationalStateServer() override;
+    ~Instance() override;
 
     /**
      * Init the operational state server.
@@ -190,7 +190,7 @@ private:
 class Delegate
 {
 protected:
-    OperationalStateServer * mServer = nullptr;
+    Instance * mServer = nullptr;
 
 public:
     Delegate() = default;
@@ -201,7 +201,7 @@ public:
      * This method is used by the SDK to set the instance pointer. This is done during the instantiation of a Server object.
      * @param aServer A pointer to the Server object related to this delegate object.
      */
-    void SetServer(OperationalStateServer * aServer) { mServer = aServer; }
+    void SetServer(Instance * aServer) { mServer = aServer; }
 
     /**
      * Get the list of supported operational states.
