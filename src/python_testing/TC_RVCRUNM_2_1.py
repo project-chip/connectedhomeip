@@ -23,7 +23,7 @@ from mobly import asserts
 
 # This test requires several additional command line arguments
 # run with
-# --int-arg PIXIT_ENDPOINT:<endpoint> PIXIT_RVCRUNM_MODEOK:<mode id> PIXIT_RVCRUNM_MODEFAIL:<mode id>
+# --int-arg PIXIT_ENDPOINT:<endpoint> PIXIT.RVCRUNM.MODE_CHANGE_OK:<mode id> PIXIT.RVCRUNM.MODE_CHANGE_FAIL:<mode id>
 
 
 class TC_RVCRUNM_2_1(MatterBaseTest):
@@ -44,16 +44,16 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
         asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
                             "PIXIT_ENDPOINT must be included on the command line in "
                             "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
-        asserts.assert_true('PIXIT_RVCRUNM_MODEOK' in self.matter_test_config.global_test_params,
-                            "PIXIT_RVCRUNM_MODEOK must be included on the command line in "
-                            "the --int-arg flag as PIXIT_RVCRUNM_MODEOK:<mode id>")
-        asserts.assert_true('PIXIT_RVCRUNM_MODEFAIL' in self.matter_test_config.global_test_params,
-                            "PIXIT_RVCRUNM_MODEFAIL must be included on the command line in "
-                            "the --int-arg flag as PIXIT_RVCRUNM_MODEFAIL:<mode id>")
+        asserts.assert_true('PIXIT.RVCRUNM.MODE_CHANGE_OK' in self.matter_test_config.global_test_params,
+                            "PIXIT.RVCRUNM.MODE_CHANGE_OK must be included on the command line in "
+                            "the --int-arg flag as PIXIT.RVCRUNM.MODE_CHANGE_OK:<mode id>")
+        asserts.assert_true('PIXIT.RVCRUNM.MODE_CHANGE_FAIL' in self.matter_test_config.global_test_params,
+                            "PIXIT.RVCRUNM.MODE_CHANGE_FAIL must be included on the command line in "
+                            "the --int-arg flag as PIXIT.RVCRUNM.MODE_CHANGE_FAIL:<mode id>")
 
         self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
-        self.modeok = self.matter_test_config.global_test_params['PIXIT_RVCRUNM_MODEOK']
-        self.modefail = self.matter_test_config.global_test_params['PIXIT_RVCRUNM_MODEFAIL']
+        self.modeok = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_CHANGE_OK']
+        self.modefail = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_CHANGE_FAIL']
 
         asserts.assert_true(self.check_pics("RVCRUNM.S.A0000"), "RVCRUNM.S.A0000 must be supported")
         asserts.assert_true(self.check_pics("RVCRUNM.S.A0001"), "RVCRUNM.S.A0001 must be supported")
