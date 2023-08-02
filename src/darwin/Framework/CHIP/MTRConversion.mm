@@ -14,23 +14,12 @@
  *    limitations under the License.
  */
 
-#pragma once
-
-#import <Foundation/Foundation.h>
-
+#import "MTRConversion.h"
 #import "MTRLogging_Internal.h"
 
-#include <lib/core/CASEAuthTag.h>
-#include <lib/core/CHIPError.h>
 #include <lib/support/SafeInt.h>
 
-NS_ASSUME_NONNULL_BEGIN
-
-/**
- * Utilities for converting between NSSet<NSNumber *> and chip::CATValues.
- */
-
-inline CHIP_ERROR ToCATValues(NSSet<NSNumber *> * catSet, chip::CATValues & values)
+CHIP_ERROR ToCATValues(NSSet<NSNumber *> * catSet, chip::CATValues & values)
 {
     values = chip::kUndefinedCATs;
 
@@ -60,7 +49,7 @@ inline CHIP_ERROR ToCATValues(NSSet<NSNumber *> * catSet, chip::CATValues & valu
     return CHIP_NO_ERROR;
 }
 
-inline NSSet<NSNumber *> * FromCATValues(const chip::CATValues & values)
+NSSet<NSNumber *> * FromCATValues(const chip::CATValues & values)
 {
     auto * catSet = [[NSMutableSet alloc] initWithCapacity:values.GetNumTagsPresent()];
     for (auto & value : values.values) {
@@ -70,5 +59,3 @@ inline NSSet<NSNumber *> * FromCATValues(const chip::CATValues & values)
     }
     return [NSSet setWithSet:catSet];
 }
-
-NS_ASSUME_NONNULL_END

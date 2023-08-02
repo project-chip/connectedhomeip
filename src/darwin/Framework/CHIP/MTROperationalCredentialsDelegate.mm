@@ -22,10 +22,10 @@
 #import <Security/Security.h>
 
 #import "MTRCertificates.h"
+#import "MTRConversion.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "NSDataSpanConversion.h"
-#import "NSSetCATConversion.h"
 
 #include <controller/CommissioningDelegate.h>
 #include <credentials/CHIPCert.h>
