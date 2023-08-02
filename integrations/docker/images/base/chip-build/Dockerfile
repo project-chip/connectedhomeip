@@ -41,7 +41,7 @@ RUN set -x \
     clang-tidy \
     curl \
     flex \
-    g++ \
+    g++-10 \
     git \
     git-lfs \
     gperf \
@@ -96,6 +96,16 @@ RUN set -x \
     zlib1g-dev \
     && rm -rf /var/lib/apt/lists/ \
     && git lfs install \
+    && : # last line
+
+# Set gcc 10 as a default compiler to work with TSAN
+RUN set -x \
+    && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 10 \
+    && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 10 \
+    && update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 30 \
+    && update-alternatives --set cc /usr/bin/gcc \
+    && update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 30 \
+    && update-alternatives --set c++ /usr/bin/g++ \
     && : # last line
 
 # Cmake v3.23.1
