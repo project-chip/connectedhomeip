@@ -22,7 +22,6 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 
-
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
@@ -68,7 +67,7 @@ CHIP_ERROR ExampleTrustMDACProvider::GetProductAttestationIntermediateCert(Mutab
     ChipLogDetail(Crypto, "Get PAI certificate from trustm");
     ReturnErrorOnFailure(trustmGetCertificate(PAI_CERT_ID, out_pai_buffer.data(), &buflen));
     out_pai_buffer.reduce_size(buflen);
-    return CHIP_NO_ERROR; 
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ExampleTrustMDACProvider::GetCertificationDeclaration(MutableByteSpan & out_cd_buffer)
@@ -92,7 +91,7 @@ CHIP_ERROR ExampleTrustMDACProvider::GetCertificationDeclaration(MutableByteSpan
     //-> dac_origin_product_id is not present
     size_t buflen = out_cd_buffer.size();
     ChipLogDetail(Crypto, "Get certificate declaration from trustm");
-    ReturnErrorOnFailure(trustmGetCertificate(CERT_DECLARATION_ID, out_cd_buffer.data(), (uint16_t *)&buflen));
+    ReturnErrorOnFailure(trustmGetCertificate(CERT_DECLARATION_ID, out_cd_buffer.data(), (uint16_t *) &buflen));
     out_cd_buffer.reduce_size(buflen);
     return CHIP_NO_ERROR;
 }
@@ -106,7 +105,7 @@ CHIP_ERROR ExampleTrustMDACProvider::GetFirmwareInformation(MutableByteSpan & ou
 }
 
 CHIP_ERROR ExampleTrustMDACProvider::SignWithDeviceAttestationKey(const ByteSpan & message_to_sign,
-                                                                 MutableByteSpan & out_signature_buffer)
+                                                                  MutableByteSpan & out_signature_buffer)
 {
     Crypto::P256ECDSASignature signature;
     Crypto::P256KeypairHSM keypair;

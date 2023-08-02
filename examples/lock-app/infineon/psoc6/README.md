@@ -57,7 +57,9 @@ will then join the network.
           $ cd ~/connectedhomeip
           $ rm -rf out/
 
-*To build with Infineon Hardware Security Module-OPTIGA™ Trust M for Device attestation and other security use cases, please refer to the [Building with OPTIGA™ Trust M as HSM](#build-trustm-hsm) for more instructions*
+_To build with Infineon Hardware Security Module-OPTIGA™ Trust M for Device
+attestation and other security use cases, please refer to the
+[Building with OPTIGA™ Trust M as HSM](#build-trustm-hsm) for more instructions_
 
 ## Flashing the Application
 
@@ -139,63 +141,64 @@ commands. These power cycle the BlueTooth hardware and disable BR/EDR mode.
 
 ## Building with OPTIGA™ Trust M as HSM
 
-Infineon Hardware Security Module-OPTIGA™ Trust M is a high-end security solution that provides an anchor of trust for connecting IoT devices to the cloud, giving every IoT device its own unique identity. 
+Infineon Hardware Security Module-OPTIGA™ Trust M is a high-end security
+solution that provides an anchor of trust for connecting IoT devices to the
+cloud, giving every IoT device its own unique identity.
 
-OPTIGA™ Trust M offers a wide range of security features, making it ideal for industrial and building automation applications, smart homes and connected consumer devices.
+OPTIGA™ Trust M offers a wide range of security features, making it ideal for
+industrial and building automation applications, smart homes and connected
+consumer devices.
 
-For different security use cases, please set the flags in CHIPCryptoPALHsm_config.h which is located at */src/crypto/hsm/*:  
+For different security use cases, please set the flags in
+CHIPCryptoPALHsm_config.h which is located at _/src/crypto/hsm/_:
 
-- Supported hardware setup:
-  [CY8CKIT-062S2-43012](https://www.cypress.com/CY8CKIT-062S2-43012)
+-   Supported hardware setup:
+    [CY8CKIT-062S2-43012](https://www.cypress.com/CY8CKIT-062S2-43012)
 
-  [OPTIGA™ Trust M S2GO](https://www.infineon.com/cms/en/product/evaluation-boards/s2go-security-optiga-m/)
+    [OPTIGA™ Trust M S2GO](https://www.infineon.com/cms/en/product/evaluation-boards/s2go-security-optiga-m/)
 
-  [MY IOT ADAPTER](https://www.infineon.com/cms/en/product/evaluation-boards/my-iot-adapter/)
+    [MY IOT ADAPTER](https://www.infineon.com/cms/en/product/evaluation-boards/my-iot-adapter/)
 
-* Applying the patch for OPTIGA™ Trust M host Library:
+-   Building
 
-  The example uses the optiga-trust-m host lib which is located at */third_party/infineon/trustm/* as a submodule.
+    Follow the steps to build:
 
-  Apply the patch which is located at */third_party/infineon/trustm* by running the shell script
-  *apply_patch.sh*:
-
-        $ cd third_party/infineon/trustm
-        $ ./apply_patch.sh
-
-- Building
-
-  Follow the steps to build: 
-
-  ```
-    $ cd examples/lock-app/infineon/psoc6
-    $ source third_party/conenctedhomeip/scripts/activate.sh
-    $ export PSOC6_BOARD=CY8CKIT-062S2-43012
-  ```
-
-  Note: export PSOC6_BOARD=CY8CKIT-062S2-43012 is used to set up the development platform and environment to use CY8CKIT-062S2-43012 board for code compilation.
-
-  To enable OPTIGA™ Trust M for device attestation use case:
-
-  ```
-    $ gn gen out/debug --args="chip_enable_infineon_trustm=true chip_enable_infineon_trustm_da=true"
-    $ ninja -C out/debug
-  ```
-
-- To delete generated executable, libraries and object files use:
-
+    ```
       $ cd examples/lock-app/infineon/psoc6
-      $ rm -rf out/
+      $ source third_party/conenctedhomeip/scripts/activate.sh
+      $ export PSOC6_BOARD=CY8CKIT-062S2-43012
+    ```
 
-- Proceed to OPTIGA™ Trust M Provisioning section to complete the credential storage into HSM.
+    Note: export PSOC6_BOARD=CY8CKIT-062S2-43012 is used to set up the
+    development platform and environment to use CY8CKIT-062S2-43012 board for
+    code compilation.
+
+    To enable OPTIGA™ Trust M for device attestation use case:
+
+    ```
+      $ gn gen out/debug --args="chip_enable_infineon_trustm=true chip_enable_infineon_trustm_da=true"
+      $ ninja -C out/debug
+    ```
+
+-   To delete generated executable, libraries and object files use:
+
+        $ cd examples/lock-app/infineon/psoc6
+        $ rm -rf out/
+
+-   Proceed to OPTIGA™ Trust M Provisioning section to complete the credential
+    storage into HSM.
 
 ### <a name="provisioning-trustm"></a>
 
 ### OPTIGA™ Trust M Provisioning
 
-For the description of OPTIGA™ Trust M Provisioning with test DAC generation and PAI and CD storage, please refer to 
-[Infineon OPTIGA™ Trust M Provisioning](../../../../docs/guides/infineon_trustm_provisioning.md) 
+For the description of OPTIGA™ Trust M Provisioning with test DAC generation and
+PAI and CD storage, please refer to
+[Infineon OPTIGA™ Trust M Provisioning](../../../../docs/guides/infineon_trustm_provisioning.md)
 
-After completing OPTIGA™ Trust M Provisioning, proceed to [Flashing the Application](#flashing-the-application) section to continue with subsequent steps.
+After completing OPTIGA™ Trust M Provisioning, proceed to
+[Flashing the Application](#flashing-the-application) section to continue with
+subsequent steps.
 
 ## OTA Software Update
 

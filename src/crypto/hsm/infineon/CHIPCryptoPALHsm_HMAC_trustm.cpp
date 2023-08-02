@@ -23,34 +23,39 @@
  */
 
 #include "CHIPCryptoPALHsm_utils_trustm.h"
-#include <lib/core/CHIPEncoding.h>
-#include "optiga_crypt.h"
 #include "optiga/optiga_util.h"
+#include "optiga_crypt.h"
 #include "optiga_lib_types.h"
+#include <lib/core/CHIPEncoding.h>
 
-static const uint8_t metadata_hmac [] = {
-//Metadata tag in the data object
-0x20, 0x06,
-//Data object type set to PRESSEC
-0xE8, 0x01, 0x21,
-0xD3, 0x01, 0x00,
+static const uint8_t metadata_hmac[] = {
+    // Metadata tag in the data object
+    0x20,
+    0x06,
+    // Data object type set to PRESSEC
+    0xE8,
+    0x01,
+    0x21,
+    0xD3,
+    0x01,
+    0x00,
 };
 
 #if ENABLE_HSM_HMAC_SHA256
 
 namespace chip {
-namespace Crypto{
+namespace Crypto {
 
-CHIP_ERROR HMAC_shaHSM::HMAC_SHA256(const uint8_t * key, size_t key_length,
-                                    const uint8_t * message, size_t message_length, uint8_t * out_buffer, size_t out_length)
+CHIP_ERROR HMAC_shaHSM::HMAC_SHA256(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
+                                    uint8_t * out_buffer, size_t out_length)
 
 {
-    CHIP_ERROR error       = CHIP_ERROR_INTERNAL;
+    CHIP_ERROR error                  = CHIP_ERROR_INTERNAL;
     optiga_lib_status_t return_status = OPTIGA_LIB_BUSY;
 
-    uint16_t key_length_u16 = static_cast<uint16_t>(key_length) ;
+    uint16_t key_length_u16     = static_cast<uint16_t>(key_length);
     uint32_t message_length_u32 = static_cast<uint32_t>(message_length);
-    uint32_t out_length_u32 = static_cast<uint32_t>(out_length);
+    uint32_t out_length_u32     = static_cast<uint32_t>(out_length);
 
     if (key_length > 64)
     {
@@ -62,7 +67,6 @@ CHIP_ERROR HMAC_shaHSM::HMAC_SHA256(const uint8_t * key, size_t key_length,
     VerifyOrReturnError(out_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    
 
     // Trust M init
     trustm_Open();
@@ -83,7 +87,7 @@ CHIP_ERROR HMAC_shaHSM::HMAC_SHA256(const uint8_t * key, size_t key_length,
     exit:
         if (error != CHIP_NO_ERROR)
         {
-            trustm_close();
+        trustm_close();
         }
         return error;
 }
