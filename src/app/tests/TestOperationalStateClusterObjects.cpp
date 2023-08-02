@@ -579,13 +579,13 @@ int TestTearDown(void * inContext)
 
 } // namespace
 
-int TestOperationalStateDelegate()
+int TestOperationalStateClusterObjects()
 {
-    nlTestSuite theSuite = { "Test Operational State delegate tests", &sTests[0], TestSetup, TestTearDown };
+    nlTestSuite theSuite = { "Test Operational State Cluster Objects tests", &sTests[0], TestSetup, TestTearDown };
 
     // Run test suit againt one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
 
-CHIP_REGISTER_TEST_SUITE(TestOperationalStateDelegate)
+CHIP_REGISTER_TEST_SUITE(TestOperationalStateClusterObjects)

@@ -22,6 +22,8 @@
 #include <app/util/af-enums.h>
 #include <lib/support/CommonIterator.h>
 
+#include <utility>
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -39,7 +41,7 @@ struct GenericOperationalState : public app::Clusters::detail::Structs::Operatio
 {
     GenericOperationalState(uint8_t state = to_underlying(OperationalStateEnum::kStopped), Optional<CharSpan> label = NullOptional)
     {
-        Set(state, label);
+        Set(state, std::move(label));
     }
 
     GenericOperationalState(const GenericOperationalState & op) { *this = op; }
@@ -85,7 +87,7 @@ struct GenericOperationalError : public app::Clusters::detail::Structs::ErrorSta
     GenericOperationalError(uint8_t state, Optional<chip::CharSpan> label = NullOptional,
                             Optional<chip::CharSpan> details = NullOptional)
     {
-        Set(state, label, details);
+        Set(state, std::move(label), std::move(details));
     }
 
     GenericOperationalError(const GenericOperationalError & error) { *this = error; }
@@ -148,7 +150,7 @@ private:
  */
 struct GenericOperationalPhase
 {
-    GenericOperationalPhase(app::DataModel::Nullable<CharSpan> name) { Set(name); }
+    GenericOperationalPhase(app::DataModel::Nullable<CharSpan> name) { Set(std::move(name)); }
 
     GenericOperationalPhase(const GenericOperationalPhase & ph) { *this = ph; }
 
