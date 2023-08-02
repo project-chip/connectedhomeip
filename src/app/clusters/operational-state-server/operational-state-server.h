@@ -42,34 +42,33 @@ private:
 class Delegate;
 
 /**
- * OperationalStateServer is a class that represents an instance of a derivation of the operational state cluster.
+ * Instance is a class that represents an instance of a derivation of the operational state cluster.
  * It implements CommandHandlerInterface so it can generically handle commands for any derivation cluster id.
- * todo OperationalState in OperationalStateServer is redundant given that we are in the OperationalState namespace, remove.
  */
 class Instance : public CommandHandlerInterface, public AttributeAccessInterface, public Uncopyable
 {
 public:
     /**
-     * Creates an operational state cluster instance. The Init() function needs to be called for this instance to be registered and
-     * called by the interaction model at the appropriate times.
+     * Creates an operational state cluster instance. The Init() function needs to be called for this instance
+     * to be registered and called by the interaction model at the appropriate times.
      * @param aDelegate A pointer to the delegate to be used by this server.
-     * Note: the caller must ensure that the delegate lives throughout the server's lifetime.
+     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aClusterId The ID of the operational state aliased cluster to be instantiated.
+     * @param aClusterId The ID of the operational state derived cluster to be instantiated.
      */
     Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId);
 
     ~Instance() override;
 
     /**
-     * Init the operational state server.
-     * This function must be called after defining a OperationalStateServer class object.
-     * @param void
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     * Initialise the operational state server instance.
+     * This function must be called after defining an Instance class object.
+     * @return Returns an error if the given endpoint and cluster ID have not been enabled in zap or if the
+     * CommandHandler or AttributeHandler registration fails, else returns CHIP_NO_ERROR.
      */
     CHIP_ERROR Init();
 
-    // Attribute accessors
+    // Attribute setters
     /**
      * Set operational phase.
      * @param phase The operational phase that should now be the current one.
@@ -94,21 +93,22 @@ public:
      */
     CHIP_ERROR SetOperationalError(const GenericOperationalError & opErrState);
 
+    // Attribute getters
     /**
-     * Get current phase
-     * @param phase The app::DataModel::Nullable<uint8_t> to fill with the current phase value
+     * Get current phase.
+     * @return The current phase.
      */
     app::DataModel::Nullable<uint8_t> GetCurrentPhase();
 
     /**
-     * Get countdown time
-     * @param time The app::DataModel::Nullable<uint32_t> to fill with the coutdown time value
+     * Get countdown time.
+     * @return The current countdown time.
      */
     app::DataModel::Nullable<uint32_t> GetCountdownTime();
 
     /**
      * Get the current operational state.
-     * @return The current operational state value
+     * @return The current operational state value.
      */
     uint8_t GetCurrentOperationalState() const;
 
@@ -120,8 +120,8 @@ public:
 
     // Event triggers
     /**
-     * @brief Called when the Node detects a OperationalError has been raised. Note: This function
-     * also sets the OperationalState attribute to Error.
+     * @brief Called when the Node detects a OperationalError has been raised.
+     * Note: This function also sets the OperationalState attribute to Error.
      * @param aError OperationalError which detects
      */
     void OnOperationalErrorDetected(const Structs::ErrorStateStruct::Type & aError);
@@ -155,9 +155,10 @@ private:
     // Inherited from CommandHandlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
 
-    /// IM-level implementation of read
-    ///
-    /// Returns appropriately mapped CHIP_ERROR if applicable (may return CHIP_IM_GLOBAL_STATUS errors)
+    /**
+     * IM-level implementation of read
+     * @return appropriately mapped CHIP_ERROR if applicable (may return CHIP_IM_GLOBAL_STATUS errors)
+     */
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
     /**
@@ -166,9 +167,9 @@ private:
     void HandlePauseState(HandlerContext & ctx, const Commands::Pause::DecodableType & req);
 
     /**
-     * Handle Command: Resume.
+     * Handle Command: Stop.
      */
-    void HandleResumeState(HandlerContext & ctx, const Commands::Resume::DecodableType & req);
+    void HandleStopState(HandlerContext & ctx, const Commands::Stop::DecodableType & req);
 
     /**
      * Handle Command: Start.
@@ -176,9 +177,9 @@ private:
     void HandleStartState(HandlerContext & ctx, const Commands::Start::DecodableType & req);
 
     /**
-     * Handle Command: Stop.
+     * Handle Command: Resume.
      */
-    void HandleStopState(HandlerContext & ctx, const Commands::Stop::DecodableType & req);
+    void HandleResumeState(HandlerContext & ctx, const Commands::Resume::DecodableType & req);
 };
 
 /**
@@ -204,7 +205,6 @@ public:
     void SetServer(Instance * aServer) { mServer = aServer; }
 
     /**
-     * Get the list of supported operational states.
      * Fills in the provided GenericOperationalState with the state at index `index` if there is one,
      * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of states.
      * @param index The index of the state, with 0 representing the first state.
@@ -213,7 +213,6 @@ public:
     virtual CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) = 0;
 
     /**
-     * Get the list of supported operational phases.
      * Fills in the provided GenericOperationalPhase with the phase at index `index` if there is one,
      * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of phases.
      * @param index The index of the phase, with 0 representing the first phase.
@@ -224,25 +223,25 @@ public:
     // command callback
     /**
      * Handle Command Callback in application: Pause
-     * @param[out] get operational error after callback.
+     * @param[out] err operational error after callback.
      */
     virtual void HandlePauseStateCallback(GenericOperationalError & err) = 0;
 
     /**
      * Handle Command Callback in application: Resume
-     * @param[out] get operational error after callback.
+     * @param[out] err operational error after callback.
      */
     virtual void HandleResumeStateCallback(GenericOperationalError & err) = 0;
 
     /**
      * Handle Command Callback in application: Start
-     * @param[out] get operational error after callback.
+     * @param[out] err operational error after callback.
      */
     virtual void HandleStartStateCallback(GenericOperationalError & err) = 0;
 
     /**
      * Handle Command Callback in application: Stop
-     * @param[out] get operational error after callback.
+     * @param[out] err operational error after callback.
      */
     virtual void HandleStopStateCallback(GenericOperationalError & err) = 0;
 

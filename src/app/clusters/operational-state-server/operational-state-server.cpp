@@ -132,7 +132,6 @@ uint8_t Instance::GetCurrentOperationalState() const
     return mOperationalState;
 }
 
-// todo can we return GenericOperationalError?
 void Instance::GetCurrentOperationalError(GenericOperationalError & error)
 {
     error = mOperationalError;
@@ -173,6 +172,32 @@ void Instance::OnOperationCompletionDetected(uint8_t aCompletionErrorCode,
 
 // private
 
+template <typename RequestT, typename FuncT>
+void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
+{
+    if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mCommandId == RequestT::GetCommandId()))
+    {
+        RequestT requestPayload;
+
+        //
+        // If the command matches what the caller is looking for, let's mark this as being handled
+        // even if errors happen after this. This ensures that we don't execute any fall-back strategies
+        // to handle this command since at this point, the caller is taking responsibility for handling
+        // the command in its entirety, warts and all.
+        //
+        handlerContext.SetCommandHandled();
+
+        if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)
+        {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
+                                                     Protocols::InteractionModel::Status::InvalidCommand);
+            return;
+        }
+
+        func(handlerContext, requestPayload);
+    }
+}
+
 // This function is called by the interaction model engine when a command destined for this instance is received.
 void Instance::InvokeCommand(HandlerContext & handlerContext)
 {
@@ -206,112 +231,6 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         HandleCommand<Commands::Stop::DecodableType>(handlerContext,
                                                      [this](HandlerContext & ctx, const auto & req) { HandleStopState(ctx, req); });
         break;
-    }
-}
-
-void Instance::HandlePauseState(HandlerContext & ctx, const Commands::Pause::DecodableType & req)
-{
-    ChipLogDetail(Zcl, "OperationalState: HandlePauseState");
-
-    GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
-    uint8_t opState = GetCurrentOperationalState();
-
-    if (opState != to_underlying(OperationalStateEnum::kPaused) && opState != to_underlying(OperationalStateEnum::kRunning))
-    {
-        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
-    }
-    else if (opState == to_underlying(OperationalStateEnum::kRunning))
-    {
-        mDelegate->HandlePauseStateCallback(err);
-    }
-
-    Commands::OperationalCommandResponse::Type response;
-    response.commandResponseState = err;
-
-    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-}
-
-void Instance::HandleResumeState(HandlerContext & ctx, const Commands::Resume::DecodableType & req)
-{
-    ChipLogDetail(Zcl, "OperationalState: HandleResumeState");
-
-    GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
-    uint8_t opState = GetCurrentOperationalState();
-
-    if (opState != to_underlying(OperationalStateEnum::kPaused) && opState != to_underlying(OperationalStateEnum::kRunning))
-    {
-        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
-    }
-    else if (opState == to_underlying(OperationalStateEnum::kPaused))
-    {
-        mDelegate->HandleResumeStateCallback(err);
-    }
-
-    Commands::OperationalCommandResponse::Type response;
-    response.commandResponseState = err;
-
-    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-}
-
-void Instance::HandleStartState(HandlerContext & ctx, const Commands::Start::DecodableType & req)
-{
-    ChipLogDetail(Zcl, "OperationalState: HandleStartState");
-
-    GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
-    uint8_t opState = GetCurrentOperationalState();
-
-    if (opState != to_underlying(OperationalStateEnum::kRunning))
-    {
-        mDelegate->HandleStartStateCallback(err);
-    }
-
-    Commands::OperationalCommandResponse::Type response;
-    response.commandResponseState = err;
-
-    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-}
-
-void Instance::HandleStopState(HandlerContext & ctx, const Commands::Stop::DecodableType & req)
-{
-    ChipLogDetail(Zcl, "OperationalState: HandleStopState");
-
-    GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
-    uint8_t opState = GetCurrentOperationalState();
-
-    if (opState != to_underlying(OperationalStateEnum::kStopped))
-    {
-        mDelegate->HandleStopStateCallback(err);
-    }
-
-    Commands::OperationalCommandResponse::Type response;
-    response.commandResponseState = err;
-
-    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-}
-
-template <typename RequestT, typename FuncT>
-void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
-{
-    if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mCommandId == RequestT::GetCommandId()))
-    {
-        RequestT requestPayload;
-
-        //
-        // If the command matches what the caller is looking for, let's mark this as being handled
-        // even if errors happen after this. This ensures that we don't execute any fall-back strategies
-        // to handle this command since at this point, the caller is taking responsibility for handling
-        // the command in its entirety, warts and all.
-        //
-        handlerContext.SetCommandHandled();
-
-        if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
-                                                     Protocols::InteractionModel::Status::InvalidCommand);
-            return;
-        }
-
-        func(handlerContext, requestPayload);
     }
 }
 
@@ -382,4 +301,84 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     break;
     }
     return CHIP_NO_ERROR;
+}
+
+void Instance::HandlePauseState(HandlerContext & ctx, const Commands::Pause::DecodableType & req)
+{
+    ChipLogDetail(Zcl, "OperationalState: HandlePauseState");
+
+    GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
+    uint8_t opState = GetCurrentOperationalState();
+
+    if (opState != to_underlying(OperationalStateEnum::kPaused) && opState != to_underlying(OperationalStateEnum::kRunning))
+    {
+        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
+    }
+    else if (opState == to_underlying(OperationalStateEnum::kRunning))
+    {
+        mDelegate->HandlePauseStateCallback(err);
+    }
+
+    Commands::OperationalCommandResponse::Type response;
+    response.commandResponseState = err;
+
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+}
+
+void Instance::HandleStopState(HandlerContext & ctx, const Commands::Stop::DecodableType & req)
+{
+    ChipLogDetail(Zcl, "OperationalState: HandleStopState");
+
+    GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
+    uint8_t opState = GetCurrentOperationalState();
+
+    if (opState != to_underlying(OperationalStateEnum::kStopped))
+    {
+        mDelegate->HandleStopStateCallback(err);
+    }
+
+    Commands::OperationalCommandResponse::Type response;
+    response.commandResponseState = err;
+
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+}
+
+void Instance::HandleStartState(HandlerContext & ctx, const Commands::Start::DecodableType & req)
+{
+    ChipLogDetail(Zcl, "OperationalState: HandleStartState");
+
+    GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
+    uint8_t opState = GetCurrentOperationalState();
+
+    if (opState != to_underlying(OperationalStateEnum::kRunning))
+    {
+        mDelegate->HandleStartStateCallback(err);
+    }
+
+    Commands::OperationalCommandResponse::Type response;
+    response.commandResponseState = err;
+
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+}
+
+void Instance::HandleResumeState(HandlerContext & ctx, const Commands::Resume::DecodableType & req)
+{
+    ChipLogDetail(Zcl, "OperationalState: HandleResumeState");
+
+    GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
+    uint8_t opState = GetCurrentOperationalState();
+
+    if (opState != to_underlying(OperationalStateEnum::kPaused) && opState != to_underlying(OperationalStateEnum::kRunning))
+    {
+        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
+    }
+    else if (opState == to_underlying(OperationalStateEnum::kPaused))
+    {
+        mDelegate->HandleResumeStateCallback(err);
+    }
+
+    Commands::OperationalCommandResponse::Type response;
+    response.commandResponseState = err;
+
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
