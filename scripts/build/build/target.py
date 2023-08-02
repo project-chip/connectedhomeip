@@ -389,7 +389,7 @@ class BuildTarget:
         return _StringIntoParts(value, suffix, self.fixed_targets, self.modifiers)
 
     def Create(self, name: str, runner, repository_path: str, output_prefix: str,
-               builder_options: BuilderOptions):
+               builder_options: BuilderOptions, args: str):
 
         parts = self.StringIntoTargetParts(name)
 
@@ -408,5 +408,6 @@ class BuildTarget:
         builder.output_dir = os.path.join(output_prefix, name)
         builder.chip_dir = repository_path
         builder.options = builder_options
+        builder.args = args
 
         return builder

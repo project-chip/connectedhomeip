@@ -340,6 +340,18 @@ class AndroidBuilder(Builder):
                 self.validate_build_environment()
 
             gn_args = {}
+
+            if self.args:
+                external_args = self.args.split(" ")
+                for arg in external_args:
+                    pair = arg.split("=")
+                    if pair[1] == 'true':
+                        gn_args[pair[0]] = True
+                    elif pair[1] == 'false':
+                        gn_args[pair[0]] = False
+                    else:
+                        gn_args[pair[0]] = pair[1]
+
             gn_args["target_os"] = "android"
             gn_args["target_cpu"] = self.board.TargetCpuName()
             gn_args["android_ndk_root"] = os.environ["ANDROID_NDK_HOME"]

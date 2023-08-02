@@ -131,10 +131,14 @@ def ValidateTargetNames(context, parameter, values):
     help=(
         'Set pigweed command launcher. E.g.: "--pw-command-launcher=ccache" '
         'for using ccache when building examples.'))
+@click.option(
+    '--args',
+    default="",
+    help='Additional build argument')
 @click.pass_context
 def main(context, log_level, target, repo,
          out_prefix, pregen_dir, clean, dry_run, dry_run_output, enable_flashbundle,
-         no_log_timestamps, pw_command_launcher):
+         no_log_timestamps, pw_command_launcher, args):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -158,7 +162,7 @@ before running this script.
     logging.info('Building targets: %s', CommaSeparate(requested_targets))
 
     context.obj = build.Context(
-        repository_path=repo, output_prefix=out_prefix, runner=runner)
+        repository_path=repo, output_prefix=out_prefix, runner=runner, args=args)
     context.obj.SetupBuilders(targets=requested_targets, options=BuilderOptions(
         enable_flashbundle=enable_flashbundle,
         pw_command_launcher=pw_command_launcher,
