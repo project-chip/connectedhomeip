@@ -33,7 +33,33 @@
   ],
   "endpointTypes": [
     {
+      "id": 1,
       "name": "MA-rootdevice",
+      "deviceTypeRef": {
+        "id": 2,
+        "code": 22,
+        "profileId": 259,
+        "label": "MA-rootdevice",
+        "name": "MA-rootdevice"
+      },
+      "deviceTypes": [
+        {
+          "id": 2,
+          "code": 22,
+          "profileId": 259,
+          "label": "MA-rootdevice",
+          "name": "MA-rootdevice"
+        }
+      ],
+      "deviceTypeRefs": [
+        2
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        22
+      ],
       "deviceTypeName": "MA-rootdevice",
       "deviceTypeCode": 22,
       "deviceTypeProfileId": 259,
@@ -7060,7 +7086,33 @@
       ]
     },
     {
+      "id": 2,
       "name": "MA-videoplayer",
+      "deviceTypeRef": {
+        "id": 38,
+        "code": 41,
+        "profileId": 259,
+        "label": "MA-casting-videoclient",
+        "name": "MA-casting-videoclient"
+      },
+      "deviceTypes": [
+        {
+          "id": 38,
+          "code": 41,
+          "profileId": 259,
+          "label": "MA-casting-videoclient",
+          "name": "MA-casting-videoclient"
+        }
+      ],
+      "deviceTypeRefs": [
+        38
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        41
+      ],
       "deviceTypeName": "MA-casting-videoclient",
       "deviceTypeCode": 41,
       "deviceTypeProfileId": 259,
@@ -15416,18 +15468,14 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 22
+      "networkId": 0
     },
     {
       "endpointTypeName": "MA-videoplayer",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 41
+      "networkId": 0
     }
   ],
   "log": []

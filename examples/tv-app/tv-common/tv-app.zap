@@ -33,7 +33,33 @@
   ],
   "endpointTypes": [
     {
+      "id": 1,
       "name": "MA-rootdevice",
+      "deviceTypeRef": {
+        "id": 2,
+        "code": 22,
+        "profileId": 259,
+        "label": "MA-rootdevice",
+        "name": "MA-rootdevice"
+      },
+      "deviceTypes": [
+        {
+          "id": 2,
+          "code": 22,
+          "profileId": 259,
+          "label": "MA-rootdevice",
+          "name": "MA-rootdevice"
+        }
+      ],
+      "deviceTypeRefs": [
+        2
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        22
+      ],
       "deviceTypeName": "MA-rootdevice",
       "deviceTypeCode": 22,
       "deviceTypeProfileId": 259,
@@ -7411,7 +7437,33 @@
       ]
     },
     {
+      "id": 2,
       "name": "MA-videoplayer",
+      "deviceTypeRef": {
+        "id": 36,
+        "code": 35,
+        "profileId": 259,
+        "label": "MA-casting-videoplayer",
+        "name": "MA-casting-videoplayer"
+      },
+      "deviceTypes": [
+        {
+          "id": 36,
+          "code": 35,
+          "profileId": 259,
+          "label": "MA-casting-videoplayer",
+          "name": "MA-casting-videoplayer"
+        }
+      ],
+      "deviceTypeRefs": [
+        36
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        35
+      ],
       "deviceTypeName": "MA-casting-videoplayer",
       "deviceTypeCode": 35,
       "deviceTypeProfileId": 259,
@@ -9741,7 +9793,33 @@
       ]
     },
     {
+      "id": 3,
       "name": "MA-speaker",
+      "deviceTypeRef": {
+        "id": 40,
+        "code": 34,
+        "profileId": 259,
+        "label": "MA-speaker",
+        "name": "MA-speaker"
+      },
+      "deviceTypes": [
+        {
+          "id": 40,
+          "code": 34,
+          "profileId": 259,
+          "label": "MA-speaker",
+          "name": "MA-speaker"
+        }
+      ],
+      "deviceTypeRefs": [
+        40
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        34
+      ],
       "deviceTypeName": "MA-speaker",
       "deviceTypeCode": 34,
       "deviceTypeProfileId": 259,
@@ -10515,7 +10593,33 @@
       ]
     },
     {
+      "id": 4,
       "name": "MA-contentapplication",
+      "deviceTypeRef": {
+        "id": 41,
+        "code": 36,
+        "profileId": 259,
+        "label": "MA-contentapp",
+        "name": "MA-contentapp"
+      },
+      "deviceTypes": [
+        {
+          "id": 41,
+          "code": 36,
+          "profileId": 259,
+          "label": "MA-contentapp",
+          "name": "MA-contentapp"
+        }
+      ],
+      "deviceTypeRefs": [
+        41
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        36
+      ],
       "deviceTypeName": "MA-contentapp",
       "deviceTypeCode": 36,
       "deviceTypeProfileId": 259,
@@ -12429,36 +12533,28 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 22
+      "networkId": 0
     },
     {
       "endpointTypeName": "MA-videoplayer",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 35
+      "networkId": 0
     },
     {
       "endpointTypeName": "MA-speaker",
       "endpointTypeIndex": 2,
       "profileId": 259,
       "endpointId": 2,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 34
+      "networkId": 0
     },
     {
       "endpointTypeName": "MA-contentapplication",
       "endpointTypeIndex": 3,
       "profileId": 259,
       "endpointId": 3,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 36
+      "networkId": 0
     }
   ],
   "log": []

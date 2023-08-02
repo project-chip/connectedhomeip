@@ -33,7 +33,33 @@
   ],
   "endpointTypes": [
     {
+      "id": 1,
       "name": "MA-rootdevice",
+      "deviceTypeRef": {
+        "id": 2,
+        "code": 22,
+        "profileId": 259,
+        "label": "MA-rootdevice",
+        "name": "MA-rootdevice"
+      },
+      "deviceTypes": [
+        {
+          "id": 2,
+          "code": 22,
+          "profileId": 259,
+          "label": "MA-rootdevice",
+          "name": "MA-rootdevice"
+        }
+      ],
+      "deviceTypeRefs": [
+        2
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        22
+      ],
       "deviceTypeName": "MA-rootdevice",
       "deviceTypeCode": 22,
       "deviceTypeProfileId": 259,
@@ -9480,7 +9506,33 @@
       ]
     },
     {
+      "id": 2,
       "name": "MA-onofflight",
+      "deviceTypeRef": {
+        "id": 8,
+        "code": 256,
+        "profileId": 259,
+        "label": "MA-onofflight",
+        "name": "MA-onofflight"
+      },
+      "deviceTypes": [
+        {
+          "id": 8,
+          "code": 256,
+          "profileId": 259,
+          "label": "MA-onofflight",
+          "name": "MA-onofflight"
+        }
+      ],
+      "deviceTypeRefs": [
+        8
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        256
+      ],
       "deviceTypeName": "MA-onofflight",
       "deviceTypeCode": 256,
       "deviceTypeProfileId": 259,
@@ -28933,7 +28985,33 @@
       ]
     },
     {
+      "id": 3,
       "name": "MA-onofflight",
+      "deviceTypeRef": {
+        "id": 8,
+        "code": 256,
+        "profileId": 259,
+        "label": "MA-onofflight",
+        "name": "MA-onofflight"
+      },
+      "deviceTypes": [
+        {
+          "id": 8,
+          "code": 256,
+          "profileId": 259,
+          "label": "MA-onofflight",
+          "name": "MA-onofflight"
+        }
+      ],
+      "deviceTypeRefs": [
+        8
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        256
+      ],
       "deviceTypeName": "MA-onofflight",
       "deviceTypeCode": 256,
       "deviceTypeProfileId": 259,
@@ -32539,7 +32617,33 @@
       ]
     },
     {
+      "id": 4,
       "name": "Anonymous Endpoint Type",
+      "deviceTypeRef": {
+        "id": 53,
+        "code": 61442,
+        "profileId": 259,
+        "label": "MA-secondary-network-commissioning",
+        "name": "MA-secondary-network-commissioning"
+      },
+      "deviceTypes": [
+        {
+          "id": 53,
+          "code": 61442,
+          "profileId": 259,
+          "label": "MA-secondary-network-commissioning",
+          "name": "MA-secondary-network-commissioning"
+        }
+      ],
+      "deviceTypeRefs": [
+        53
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        61442
+      ],
       "deviceTypeName": "MA-secondary-network-commissioning",
       "deviceTypeCode": 61442,
       "deviceTypeProfileId": 259,
@@ -33021,36 +33125,28 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 22
+      "networkId": 0
     },
     {
       "endpointTypeName": "MA-onofflight",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 256
+      "networkId": 0
     },
     {
       "endpointTypeName": "MA-onofflight",
       "endpointTypeIndex": 2,
       "profileId": 259,
       "endpointId": 2,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 256
+      "networkId": 0
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 3,
       "profileId": 259,
       "endpointId": 65534,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 61442
+      "networkId": 0
     }
   ],
   "log": []

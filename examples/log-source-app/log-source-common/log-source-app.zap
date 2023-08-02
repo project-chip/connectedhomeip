@@ -33,7 +33,33 @@
   ],
   "endpointTypes": [
     {
+      "id": 1,
       "name": "Anonymous Endpoint Type",
+      "deviceTypeRef": {
+        "id": 52,
+        "code": 0,
+        "profileId": 259,
+        "label": "MA-all-clusters-app",
+        "name": "MA-all-clusters-app"
+      },
+      "deviceTypes": [
+        {
+          "id": 52,
+          "code": 0,
+          "profileId": 259,
+          "label": "MA-all-clusters-app",
+          "name": "MA-all-clusters-app"
+        }
+      ],
+      "deviceTypeRefs": [
+        52
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        0
+      ],
       "deviceTypeName": "MA-all-clusters-app",
       "deviceTypeCode": 0,
       "deviceTypeProfileId": 259,
@@ -3523,9 +3549,7 @@
       "endpointTypeIndex": 0,
       "profileId": 598,
       "endpointId": 0,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": null
+      "networkId": 0
     }
   ],
   "log": []

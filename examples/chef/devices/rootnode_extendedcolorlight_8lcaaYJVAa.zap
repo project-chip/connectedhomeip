@@ -33,7 +33,33 @@
   ],
   "endpointTypes": [
     {
+      "id": 1,
       "name": "MA-rootdevice",
+      "deviceTypeRef": {
+        "id": 2,
+        "code": 22,
+        "profileId": 259,
+        "label": "MA-rootdevice",
+        "name": "MA-rootdevice"
+      },
+      "deviceTypes": [
+        {
+          "id": 2,
+          "code": 22,
+          "profileId": 259,
+          "label": "MA-rootdevice",
+          "name": "MA-rootdevice"
+        }
+      ],
+      "deviceTypeRefs": [
+        2
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        22
+      ],
       "deviceTypeName": "MA-rootdevice",
       "deviceTypeCode": 22,
       "deviceTypeProfileId": 259,
@@ -5394,7 +5420,33 @@
       ]
     },
     {
+      "id": 2,
       "name": "Anonymous Endpoint Type",
+      "deviceTypeRef": {
+        "id": 11,
+        "code": 269,
+        "profileId": 259,
+        "label": "MA-extendedcolorlight",
+        "name": "MA-extendedcolorlight"
+      },
+      "deviceTypes": [
+        {
+          "id": 11,
+          "code": 269,
+          "profileId": 259,
+          "label": "MA-extendedcolorlight",
+          "name": "MA-extendedcolorlight"
+        }
+      ],
+      "deviceTypeRefs": [
+        11
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        269
+      ],
       "deviceTypeName": "MA-extendedcolorlight",
       "deviceTypeCode": 269,
       "deviceTypeProfileId": 259,
@@ -8596,18 +8648,14 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 22
+      "networkId": 0
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 1,
       "profileId": 260,
       "endpointId": 1,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 269
+      "networkId": 0
     }
   ],
   "log": []
