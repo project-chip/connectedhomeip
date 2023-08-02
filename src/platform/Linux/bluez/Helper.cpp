@@ -186,13 +186,14 @@ exit:
 static void BluezAdvStartDone(GObject * aObject, GAsyncResult * aResult, gpointer apClosure)
 {
     BluezLEAdvertisingManager1 * advMgr = BLUEZ_LEADVERTISING_MANAGER1(aObject);
-    GError * error                      = nullptr;
-    BluezEndpoint * endpoint            = static_cast<BluezEndpoint *>(apClosure);
-    gboolean success                    = FALSE;
+    GAutoPtr<GError> error;
+    BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apClosure);
+    gboolean success         = FALSE;
 
     VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
 
-    success = bluez_leadvertising_manager1_call_register_advertisement_finish(advMgr, aResult, &error);
+    success =
+        bluez_leadvertising_manager1_call_register_advertisement_finish(advMgr, aResult, &MakeUniquePointerReceiver(error).Get());
     if (success == FALSE)
     {
         g_dbus_object_manager_server_unexport(endpoint->mpRoot, endpoint->mpAdvPath);
@@ -205,20 +206,19 @@ static void BluezAdvStartDone(GObject * aObject, GAsyncResult * aResult, gpointe
 
 exit:
     BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(success == TRUE, nullptr);
-    if (error != nullptr)
-        g_error_free(error);
 }
 
 static void BluezAdvStopDone(GObject * aObject, GAsyncResult * aResult, gpointer apClosure)
 {
     BluezLEAdvertisingManager1 * advMgr = BLUEZ_LEADVERTISING_MANAGER1(aObject);
     BluezEndpoint * endpoint            = static_cast<BluezEndpoint *>(apClosure);
-    GError * error                      = nullptr;
-    gboolean success                    = FALSE;
+    GAutoPtr<GError> error;
+    gboolean success = FALSE;
 
     VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
 
-    success = bluez_leadvertising_manager1_call_unregister_advertisement_finish(advMgr, aResult, &error);
+    success =
+        bluez_leadvertising_manager1_call_unregister_advertisement_finish(advMgr, aResult, &MakeUniquePointerReceiver(error).Get());
 
     if (success == FALSE)
     {
@@ -235,8 +235,6 @@ static void BluezAdvStopDone(GObject * aObject, GAsyncResult * aResult, gpointer
 
 exit:
     BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(success == TRUE, nullptr);
-    if (error != nullptr)
-        g_error_free(error);
 }
 
 static CHIP_ERROR BluezAdvSetup(BluezEndpoint * endpoint)
@@ -787,22 +785,19 @@ static BluezGattCharacteristic1 * BluezCharacteristicCreate(BluezGattService1 * 
 
 static void BluezPeripheralRegisterAppDone(GObject * aObject, GAsyncResult * aResult, gpointer apClosure)
 {
-    GError * error              = nullptr;
+    GAutoPtr<GError> error;
     BluezGattManager1 * gattMgr = BLUEZ_GATT_MANAGER1(aObject);
 
-    gboolean success = bluez_gatt_manager1_call_register_application_finish(gattMgr, aResult, &error);
+    gboolean success =
+        bluez_gatt_manager1_call_register_application_finish(gattMgr, aResult, &MakeUniquePointerReceiver(error).Get());
 
-    VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: RegisterApplication : %s", error->message));
+    VerifyOrReturn(success == TRUE, {
+        ChipLogError(DeviceLayer, "FAIL: RegisterApplication : %s", error->message);
+        BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(false, nullptr);
+    });
 
     BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(true, nullptr);
     ChipLogDetail(DeviceLayer, "BluezPeripheralRegisterAppDone done");
-
-exit:
-    if (error != nullptr)
-    {
-        BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(false, nullptr);
-        g_error_free(error);
-    }
 }
 
 static CHIP_ERROR BluezPeripheralRegisterApp(BluezEndpoint * endpoint)
@@ -1249,7 +1244,7 @@ static CHIP_ERROR StartupEndpointBindings(BluezEndpoint * endpoint)
 static CHIP_ERROR BluezC2Indicate(ConnectionDataBundle * closure)
 {
     BluezConnection * conn = nullptr;
-    GError * error         = nullptr;
+    GAutoPtr<GError> error;
     GIOStatus status;
     const char * buf;
     size_t len, written;
@@ -1265,7 +1260,8 @@ static CHIP_ERROR BluezC2Indicate(ConnectionDataBundle * closure)
         buf = (char *) g_variant_get_fixed_array(closure->mpVal, &len, sizeof(uint8_t));
         VerifyOrExit(len <= static_cast<size_t>(std::numeric_limits<gssize>::max()),
                      ChipLogError(DeviceLayer, "FAIL: buffer too large in %s", __func__));
-        status = g_io_channel_write_chars(conn->mC2Channel.mpChannel, buf, static_cast<gssize>(len), &written, &error);
+        status = g_io_channel_write_chars(conn->mC2Channel.mpChannel, buf, static_cast<gssize>(len), &written,
+                                          &MakeUniquePointerReceiver(error).Get());
         g_variant_unref(closure->mpVal);
         closure->mpVal = nullptr;
 
@@ -1287,9 +1283,6 @@ exit:
         g_free(closure);
     }
 
-    if (error != nullptr)
-        g_error_free(error);
-
     return CHIP_NO_ERROR;
 }
 
@@ -1310,7 +1303,7 @@ CHIP_ERROR SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::Packe
 
 static CHIP_ERROR BluezDisconnect(BluezConnection * conn)
 {
-    GError * error = nullptr;
+    GAutoPtr<GError> error;
     gboolean success;
 
     VerifyOrExit(conn != nullptr, ChipLogError(DeviceLayer, "conn is NULL in %s", __func__));
@@ -1318,12 +1311,10 @@ static CHIP_ERROR BluezDisconnect(BluezConnection * conn)
 
     ChipLogDetail(DeviceLayer, "%s peer=%s", __func__, bluez_device1_get_address(conn->mpDevice));
 
-    success = bluez_device1_call_disconnect_sync(conn->mpDevice, nullptr, &error);
+    success = bluez_device1_call_disconnect_sync(conn->mpDevice, nullptr, &MakeUniquePointerReceiver(error).Get());
     VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: Disconnect: %s", error->message));
 
 exit:
-    if (error != nullptr)
-        g_error_free(error);
     return CHIP_NO_ERROR;
 }
 
@@ -1447,15 +1438,11 @@ CHIP_ERROR ShutdownBluezBleLayer(BluezEndpoint * apEndpoint)
 static void SendWriteRequestDone(GObject * aObject, GAsyncResult * aResult, gpointer apConnection)
 {
     BluezGattCharacteristic1 * c1 = BLUEZ_GATT_CHARACTERISTIC1(aObject);
-    GError * error                = nullptr;
-    gboolean success              = bluez_gatt_characteristic1_call_write_value_finish(c1, aResult, &error);
+    GAutoPtr<GError> error;
+    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c1, aResult, &MakeUniquePointerReceiver(error).Get());
 
-    VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: BluezSendWriteRequest : %s", error->message));
+    VerifyOrReturn(success == TRUE, ChipLogError(DeviceLayer, "FAIL: BluezSendWriteRequest : %s", error->message));
     BLEManagerImpl::HandleWriteComplete(static_cast<BLE_CONNECTION_OBJECT>(apConnection));
-
-exit:
-    if (error != nullptr)
-        g_error_free(error);
 }
 
 static CHIP_ERROR SendWriteRequestImpl(ConnectionDataBundle * data)
@@ -1504,16 +1491,12 @@ static void OnCharacteristicChanged(GDBusProxy * aInterface, GVariant * aChanged
 static void SubscribeCharacteristicDone(GObject * aObject, GAsyncResult * aResult, gpointer apConnection)
 {
     BluezGattCharacteristic1 * c2 = BLUEZ_GATT_CHARACTERISTIC1(aObject);
-    GError * error                = nullptr;
-    gboolean success              = bluez_gatt_characteristic1_call_write_value_finish(c2, aResult, &error);
+    GAutoPtr<GError> error;
+    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c2, aResult, &MakeUniquePointerReceiver(error).Get());
 
-    VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: BluezSubscribeCharacteristic : %s", error->message));
+    VerifyOrReturn(success == TRUE, ChipLogError(DeviceLayer, "FAIL: BluezSubscribeCharacteristic : %s", error->message));
 
     BLEManagerImpl::HandleSubscribeOpComplete(static_cast<BLE_CONNECTION_OBJECT>(apConnection), true);
-
-exit:
-    if (error != nullptr)
-        g_error_free(error);
 }
 
 static CHIP_ERROR SubscribeCharacteristicImpl(BluezConnection * connection)
@@ -1541,18 +1524,14 @@ CHIP_ERROR BluezSubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn)
 static void UnsubscribeCharacteristicDone(GObject * aObject, GAsyncResult * aResult, gpointer apConnection)
 {
     BluezGattCharacteristic1 * c2 = BLUEZ_GATT_CHARACTERISTIC1(aObject);
-    GError * error                = nullptr;
-    gboolean success              = bluez_gatt_characteristic1_call_write_value_finish(c2, aResult, &error);
+    GAutoPtr<GError> error;
+    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c2, aResult, &MakeUniquePointerReceiver(error).Get());
 
-    VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: BluezUnsubscribeCharacteristic : %s", error->message));
+    VerifyOrReturn(success == TRUE, ChipLogError(DeviceLayer, "FAIL: BluezUnsubscribeCharacteristic : %s", error->message));
 
     // Stop listening to the TX characteristic changes
     g_signal_handlers_disconnect_by_data(c2, apConnection);
     BLEManagerImpl::HandleSubscribeOpComplete(static_cast<BLE_CONNECTION_OBJECT>(apConnection), false);
-
-exit:
-    if (error != nullptr)
-        g_error_free(error);
 }
 
 static CHIP_ERROR UnsubscribeCharacteristicImpl(BluezConnection * connection)
@@ -1586,9 +1565,9 @@ struct ConnectParams
 
 static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer apParams)
 {
-    BluezDevice1 * device  = BLUEZ_DEVICE1(aObject);
-    GError * error         = nullptr;
-    gboolean success       = bluez_device1_call_connect_finish(device, aResult, &error);
+    BluezDevice1 * device = BLUEZ_DEVICE1(aObject);
+    GAutoPtr<GError> error;
+    gboolean success       = bluez_device1_call_connect_finish(device, aResult, &MakeUniquePointerReceiver(error).Get());
     ConnectParams * params = static_cast<ConnectParams *>(apParams);
 
     assert(params != nullptr);
@@ -1602,14 +1581,14 @@ static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointe
         // BlueZ returns "Software caused connection abort error", and we should make a connection retry.
         // It's important to make sure that the connection is correctly ceased, by calling `Disconnect()`
         // D-Bus method, or else `Connect()` returns immediately without any effect.
-        if (g_error_matches(error, G_IO_ERROR, G_IO_ERROR_DBUS_ERROR) && params->mNumRetries++ < kMaxConnectRetries)
+        if (g_error_matches(error.get(), G_IO_ERROR, G_IO_ERROR_DBUS_ERROR) && params->mNumRetries++ < kMaxConnectRetries)
         {
             // Clear the error before usage in subsequent call.
-            g_clear_error(&error);
+            g_clear_error(&MakeUniquePointerReceiver(error).Get());
 
-            bluez_device1_call_disconnect_sync(device, nullptr, &error);
+            bluez_device1_call_disconnect_sync(device, nullptr, &MakeUniquePointerReceiver(error).Get());
             bluez_device1_call_connect(device, params->mEndpoint->mpConnectCancellable, ConnectDeviceDone, params);
-            ExitNow();
+            return;
         }
 
         BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_INTERNAL);
@@ -1620,10 +1599,6 @@ static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointe
     }
 
     chip::Platform::Delete(params);
-
-exit:
-    if (error != nullptr)
-        g_error_free(error);
 }
 
 static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams)
