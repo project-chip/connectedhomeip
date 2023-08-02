@@ -222,7 +222,7 @@ void AirQualitySensorAttrUpdateHandler::OnTemperatureChangeHandler(int16_t newVa
 
 void AirQualitySensorAttrUpdateHandler::OnHumidityChangeHandler(uint16_t newValue)
 {
-    EndpointId endpoint = 1;
+    EndpointId endpoint  = 1;
     EmberAfStatus status = RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(endpoint, newValue);
     VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
                    ChipLogError(NotSpecified, "Failed to RelativeHumidityMeasurement MeasuredValue attribute"));
@@ -263,7 +263,7 @@ void AirQualitySensorAttrUpdateHandler::OnConcetratorChangeHandler(std::string C
 
     VerifyOrReturn(setMeasuredValue != NULL, ChipLogError(NotSpecified, "Invalid Concentration %s", ConcentrationName.c_str()));
 
-    EndpointId endpoint = 1;
+    EndpointId endpoint  = 1;
     EmberAfStatus status = setMeasuredValue(endpoint, newValue);
     VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
                    ChipLogError(NotSpecified, "Failed to %s set MeasuredValue attribute", ConcentrationName.c_str()));

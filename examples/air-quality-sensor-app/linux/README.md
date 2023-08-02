@@ -120,7 +120,7 @@ air-quality-sensor-app event named pipe /tmp/chip_air_quality_fifo-<PID>.
 
 ### Trigger air quality change event
 
-Generate event `AirQuality`, to change the AirQuality value.
+Generate event `AirQuality`, to change the air quality value.
 
 ```
 $ echo '{"Name":"AirQuality","NewValue":3}' > /tmp/chip_air_quality_fifo-<PID>
