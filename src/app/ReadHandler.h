@@ -418,8 +418,8 @@ private:
     friend class chip::app::reporting::Engine;
     friend class chip::app::InteractionModelEngine;
 
-    // The report scheduler needs to be able to access StateFlag private functions IsReportable(), IsGeneratingReports() and
-    // IsDirty() to know when to schedule a run so it is declared as a friend class.
+    // The report scheduler needs to be able to access StateFlag private functions IsReportable(), IsGeneratingReports(),
+    // ForceDirtyState() and IsDirty() to know when to schedule a run so it is declared as a friend class.
     friend class chip::app::reporting::ReportScheduler;
 
     enum class HandlerState : uint8_t

@@ -1444,6 +1444,12 @@ enum class GroupKeySecurityPolicyEnum : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kCacheAndSync = 0x1,
+};
 } // namespace GroupKeyManagement
 
 namespace FixedLabel {} // namespace FixedLabel

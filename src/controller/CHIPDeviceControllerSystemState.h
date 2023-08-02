@@ -85,10 +85,18 @@ struct DeviceControllerSystemStateParams
     Credentials::GroupDataProvider * groupDataProvider = nullptr;
     Crypto::SessionKeystore * sessionKeystore          = nullptr;
 
+    // NOTE: Exactly one of externalSessionResumptionStorage (externally provided,
+    // externally owned) or ownedSessionResumptionStorage (managed by the system
+    // state) must be non-null.
+    SessionResumptionStorage * externalSessionResumptionStorage = nullptr;
+
     // Params that will be deallocated via Platform::Delete in
     // DeviceControllerSystemState::Shutdown.
     DeviceTransportMgr * transportMgr = nullptr;
-    Platform::UniquePtr<SimpleSessionResumptionStorage> sessionResumptionStorage;
+    // NOTE: Exactly one of externalSessionResumptionStorage (externally provided,
+    // externally owned) or ownedSessionResumptionStorage (managed by the system
+    // state) must be non-null.
+    Platform::UniquePtr<SimpleSessionResumptionStorage> ownedSessionResumptionStorage;
     Credentials::CertificateValidityPolicy * certificateValidityPolicy            = nullptr;
     SessionManager * sessionMgr                                                   = nullptr;
     Protocols::SecureChannel::UnsolicitedStatusHandler * unsolicitedStatusHandler = nullptr;
@@ -132,8 +140,18 @@ public:
         mCASESessionManager(params.caseSessionManager), mSessionSetupPool(params.sessionSetupPool),
         mCASEClientPool(params.caseClientPool), mGroupDataProvider(params.groupDataProvider), mTimerDelegate(params.timerDelegate),
         mReportScheduler(params.reportScheduler), mSessionKeystore(params.sessionKeystore),
-        mFabricTableDelegate(params.fabricTableDelegate), mSessionResumptionStorage(std::move(params.sessionResumptionStorage))
+        mFabricTableDelegate(params.fabricTableDelegate),
+        mOwnedSessionResumptionStorage(std::move(params.ownedSessionResumptionStorage))
     {
+        if (mOwnedSessionResumptionStorage)
+        {
+            mSessionResumptionStorage = mOwnedSessionResumptionStorage.get();
+        }
+        else
+        {
+            mSessionResumptionStorage = params.externalSessionResumptionStorage;
+        }
+
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -172,7 +190,7 @@ public:
             mUnsolicitedStatusHandler != nullptr && mExchangeMgr != nullptr && mMessageCounterManager != nullptr &&
             mFabrics != nullptr && mCASESessionManager != nullptr && mSessionSetupPool != nullptr && mCASEClientPool != nullptr &&
             mGroupDataProvider != nullptr && mReportScheduler != nullptr && mTimerDelegate != nullptr &&
-            mSessionKeystore != nullptr;
+            mSessionKeystore != nullptr && mSessionResumptionStorage != nullptr;
     };
 
     System::Layer * SystemLayer() const { return mSystemLayer; };
@@ -221,7 +239,8 @@ private:
     app::reporting::ReportScheduler * mReportScheduler                             = nullptr;
     Crypto::SessionKeystore * mSessionKeystore                                     = nullptr;
     FabricTable::Delegate * mFabricTableDelegate                                   = nullptr;
-    Platform::UniquePtr<SimpleSessionResumptionStorage> mSessionResumptionStorage;
+    SessionResumptionStorage * mSessionResumptionStorage                           = nullptr;
+    Platform::UniquePtr<SimpleSessionResumptionStorage> mOwnedSessionResumptionStorage;
 
     // If mTempFabricTable is not null, it was created during
     // DeviceControllerFactory::InitSystemState and needs to be
