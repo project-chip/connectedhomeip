@@ -39,14 +39,14 @@ struct PowerSourceClusterInfo
 {
     PowerSourceClusterInfo() : mClusterEndpoint(kInvalidEndpointId) {}
     explicit PowerSourceClusterInfo(EndpointId powerClusterEndpointId) : mClusterEndpoint(powerClusterEndpointId) {}
-    void Shutdown()
+    void Clear()
     {
         mBuf.Free();
         mEndpointList = Span<EndpointId>();
     }
     CHIP_ERROR SetEndpointList(Span<EndpointId> endpointList)
     {
-        Shutdown();
+        Clear();
         if (endpointList.size() == 0)
         {
             mEndpointList = Span<EndpointId>();
@@ -151,7 +151,7 @@ CHIP_ERROR PowerSourceServer::SetEndpointList(EndpointId powerSourceClusterEndpo
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    sPowerSourceClusterInfo[idx].Shutdown();
+    sPowerSourceClusterInfo[idx].Clear();
     if (endpointList.size() == 0)
     {
         sPowerSourceClusterInfo[idx] = PowerSourceClusterInfo();
@@ -177,7 +177,7 @@ void PowerSourceServer::Shutdown()
 {
     for (size_t i = 0; i < kNumSupportedEndpoints; ++i)
     {
-        sPowerSourceClusterInfo[i].Shutdown();
+        sPowerSourceClusterInfo[i].Clear();
     }
 }
 
