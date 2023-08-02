@@ -20,6 +20,7 @@ import("$dir_pw_build/python.gni")
 
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/platform/python.gni")
+import("${chip_root}/src/system/system.gni")
 import("${dir_pw_unit_test}/test.gni")
 
 if (current_os == "mac") {
@@ -33,8 +34,7 @@ config("controller_wno_deprecate") {
 declare_args() {
   chip_python_version = "0.0"
   chip_python_package_prefix = "chip"
-  chip_python_supports_stack_locking =
-      current_os != "mac" && current_os != "ios"
+  chip_python_supports_stack_locking = (chip_system_config_locking != "none")
 }
 
 shared_library("ChipDeviceCtrl") {
