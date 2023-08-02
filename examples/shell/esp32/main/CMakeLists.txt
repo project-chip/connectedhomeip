@@ -23,4 +23,4 @@ idf_component_register(SRCS main.cpp
                       "${CHIP_SHELL_DIR}/shell_common/globals.cpp"
                       PRIV_INCLUDE_DIRS
                       "${CHIP_SHELL_DIR}/shell_common/include"
-                      PRIV_REQUIRES chip nvs_flash bt console)
+                      PRIV_REQUIRES chip nvs_flash bt)

@@ -138,7 +138,7 @@ extern "C" void __wrap_esp_log_writev(esp_log_level_t level, const char * tag, c
         PigweedLogger::putString(logColor, strlen(logColor));
 
         char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
-        size_t len = snprintf(formattedMsg, sizeof formattedMsg, " (%u) %s: ", esp_log_timestamp(), tag);
+        size_t len = snprintf(formattedMsg, sizeof formattedMsg, " (%" PRIu32 ") %s: ", esp_log_timestamp(), tag);
         PigweedLogger::putString(formattedMsg, len);
 
         memset(formattedMsg, 0, sizeof formattedMsg);
