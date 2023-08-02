@@ -2,7 +2,7 @@
 
 ## Introduction
 
-CHIPCryptoPALHsm*trustm.cpp file provides the integration of secure element
+CHIPCryptoPALHsm*trustm*\*.cpp file provides the integration of secure element
 (trustm) in crypto layer of CHIP stack. By enabling the required directives in
 CHIPCryptoPALHsm_config.h header file, required crypto operations can be
 performed using trustm. By default, the secure element is enabled for HKDF, HMAC
