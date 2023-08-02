@@ -52,6 +52,7 @@ using namespace ::chip::DeviceLayer;
 #include <platform/silabs/efr32/Efr32PsaOperationalKeystore.h>
 static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeystore;
 #endif
+#endif
 
 #include "SilabsDeviceDataProvider.h"
 #include "SilabsTestEventTriggerDelegate.h"
@@ -172,7 +173,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
 // WiFi needs to be initialized after Memory Init for some reason
 #ifdef SL_WIFI
-    InitWiFi();
+    ReturnErrorOnFailure(InitWiFi());
 #endif
 
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
@@ -220,6 +221,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     // instead of the default (insecure) one.
     gOperationalKeystore.Init();
     initParams.operationalKeystore = &gOperationalKeystore;
+#endif
 #endif
 
     // Initialize the remaining (not overridden) providers to the SDK example defaults
