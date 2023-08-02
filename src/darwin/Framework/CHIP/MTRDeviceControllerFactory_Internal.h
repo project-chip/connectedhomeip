@@ -23,10 +23,9 @@
 
 #import "MTRDeviceControllerFactory.h"
 
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/PeerId.h>
-
-class MTRPersistentStorageDelegateBridge;
 
 namespace chip {
 namespace Credentials {
@@ -44,6 +43,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)controllerShuttingDown:(MTRDeviceController *)controller;
 
 /**
+ * Get the list of running controllers.  This will include controllers that are
+ * in the middle of starting up or shutting down.
+ */
+- (NSArray<MTRDeviceController *> *)getRunningControllers;
+
+/**
  * Find a running controller, if any, for the given fabric index.
  */
 - (nullable MTRDeviceController *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex;
@@ -54,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)operationalInstanceAdded:(chip::PeerId &)operationalID;
 
-@property (readonly) MTRPersistentStorageDelegateBridge * storageDelegateBridge;
+@property (readonly) chip::PersistentStorageDelegate * storageDelegate;
 @property (readonly) chip::Credentials::GroupDataProvider * groupData;
 @property (readonly) chip::Credentials::DeviceAttestationVerifier * deviceAttestationVerifier;
 @end

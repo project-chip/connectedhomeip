@@ -2678,7 +2678,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             return;
         }
         TimeSynchronization::Commands::SetTrustedTimeSource::Type request;
-        request.trustedTimeSource.SetNull();
+        request.trustedTimeSource = params.GetTrustedTimeSource().Value();
         SendCommand(proxy, request, OnBasicSuccess, OnBasicFailure, endpoint, timeout);
         break;
     }

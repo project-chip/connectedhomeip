@@ -71,6 +71,7 @@ tests:
               hasMasksSet: [0x2]
 
     - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -78,6 +79,15 @@ tests:
               type: list
               contains:
                   [0, 1, 2, 3, 4, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 3, 4, 65528, 65529, 65531, 65532, 65533]
 
     - label:
           "Step 4b: TH reads Feature dependent(DGWIFI.S.F00) attributes in
@@ -141,7 +151,9 @@ tests:
               type: list
 
     - label: "Step 7a: TH reads EventList from DUT"
-      PICS: " !DGWIFI.S.E00 && !DGWIFI.S.E01 && !DGWIFI.S.E02 "
+      PICS:
+          "PICS_EVENT_LIST_ENABLED &&  !DGWIFI.S.E00 && !DGWIFI.S.E01 &&
+          !DGWIFI.S.E02 "
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -152,7 +164,7 @@ tests:
     - label:
           "Step 7b: TH reads optional attribute (Disconnection) in EventList
           from DUT"
-      PICS: DGWIFI.S.E00
+      PICS: PICS_EVENT_LIST_ENABLED && DGWIFI.S.E00
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -163,7 +175,7 @@ tests:
     - label:
           "Step 7c: TH reads optional attribute (AssociationFailure) in
           EventList from DUT"
-      PICS: DGWIFI.S.E01
+      PICS: PICS_EVENT_LIST_ENABLED && DGWIFI.S.E01
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -174,7 +186,7 @@ tests:
     - label:
           "Step 7d: TH reads optional attribute (ConnectionStatus) in EventList
           from DUT"
-      PICS: DGWIFI.S.E02
+      PICS: PICS_EVENT_LIST_ENABLED && DGWIFI.S.E02
       command: "readAttribute"
       attribute: "EventList"
       response:

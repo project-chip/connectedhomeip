@@ -132,7 +132,9 @@ void registerClusterAny(Commands & commands, CredentialIssuerCommands * credsIss
         make_unique<SubscribeAttribute>(credsIssuerConfig), //
         make_unique<ReadEvent>(credsIssuerConfig),       //
         make_unique<SubscribeEvent>(credsIssuerConfig),     //
+        make_unique<ReadNone>(credsIssuerConfig),         //
         make_unique<ReadAll>(credsIssuerConfig),         //
+        make_unique<SubscribeNone>(credsIssuerConfig),         //
         make_unique<SubscribeAll>(credsIssuerConfig),         //
     };
 

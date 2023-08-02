@@ -97,30 +97,32 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         ret = await self.send_change_to_mode_cmd(newMode=old_current_mode)
         asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode to the current mode should be a no-op")
 
-        self.print_step(5, "Manually put the device in a state from which it will FAIL to transition to mode %d" % (self.modefail))
-        input("Press Enter when done.\n")
+        if self.check_pics("RVCCLEANM.S.M.CAN_TEST_MODE_FAILURE"):
+            self.print_step(5, "Manually put the device in a state from which it will FAIL to transition to mode %d" % (self.modefail))
+            input("Press Enter when done.\n")
 
-        self.print_step(6, "Read CurrentMode attribute")
-        old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+            self.print_step(6, "Read CurrentMode attribute")
+            old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        logging.info("CurrentMode: %s" % (old_current_mode))
+            logging.info("CurrentMode: %s" % (old_current_mode))
 
-        self.print_step(7, "Send ChangeToMode command with NewMode set to %d" % (self.modefail))
+            self.print_step(7, "Send ChangeToMode command with NewMode set to %d" % (self.modefail))
 
-        ret = await self.send_change_to_mode_cmd(newMode=self.modefail)
-        st = ret.status
-        is_mfg_code = st in range(0x80, 0xC0)
-        is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st in rvcCleanCodes) or is_mfg_code
-        asserts.assert_true(is_err_code, "Changing to mode %d must fail due to the current state of the device" % (self.modefail))
-        st_text_len = len(ret.statusText)
-        asserts.assert_true(st_text_len in range(1, 65), "StatusText length (%d) must be between 1 and 64" % (st_text_len))
+            ret = await self.send_change_to_mode_cmd(newMode=self.modefail)
+            st = ret.status
+            is_mfg_code = st in range(0x80, 0xC0)
+            is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st in rvcCleanCodes) or is_mfg_code
+            asserts.assert_true(
+                is_err_code, "Changing to mode %d must fail due to the current state of the device" % (self.modefail))
+            st_text_len = len(ret.statusText)
+            asserts.assert_true(st_text_len in range(1, 65), "StatusText length (%d) must be between 1 and 64" % (st_text_len))
 
-        self.print_step(8, "Read CurrentMode attribute")
-        current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+            self.print_step(8, "Read CurrentMode attribute")
+            current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        logging.info("CurrentMode: %s" % (current_mode))
+            logging.info("CurrentMode: %s" % (current_mode))
 
-        asserts.assert_true(current_mode == old_current_mode, "CurrentMode changed after failed ChangeToMode command!")
+            asserts.assert_true(current_mode == old_current_mode, "CurrentMode changed after failed ChangeToMode command!")
 
         self.print_step(9, "Manually put the device in a state from which it will SUCCESSFULLY transition to mode %d" % (self.modeok))
         input("Press Enter when done.\n")

@@ -262,7 +262,7 @@ client cluster IMProtocol = 0xFFFF0001 {
     int64u delta_system_timestamp = 6;
     //  }
 
-    cluster_event_payload data = 2;
+    cluster_event_payload data = 7;
   }
 
   struct EventReportIB {

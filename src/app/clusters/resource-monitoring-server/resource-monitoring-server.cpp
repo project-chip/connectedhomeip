@@ -17,11 +17,11 @@
  */
 
 #include <app/AttributeAccessInterface.h>
-#include <app/AttributePersistenceProvider.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/InteractionModelEngine.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
 #include <app/data-model/Nullable.h>
@@ -116,7 +116,7 @@ chip::Protocols::InteractionModel::Status Instance::UpdateLastChangedTime(DataMo
     mLastChangedTime        = aNewLastChangedTime;
     if (mLastChangedTime != oldLastchangedTime)
     {
-        chip::app::GetAttributePersistenceProvider()->WriteScalarValue(
+        chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
             ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id), mLastChangedTime);
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::LastChangedTime::Id);
     }
@@ -351,7 +351,7 @@ void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
 
 void Instance::LoadPersistentAttributes()
 {
-    CHIP_ERROR err = chip::app::GetAttributePersistenceProvider()->ReadScalarValue(
+    CHIP_ERROR err = chip::app::GetSafeAttributePersistenceProvider()->ReadScalarValue(
         ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id), mLastChangedTime);
     if (err == CHIP_NO_ERROR)
     {

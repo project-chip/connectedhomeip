@@ -2295,6 +2295,10 @@ server cluster GroupKeyManagement = 63 {
     kCacheAndSync = 1;
   }
 
+  bitmap Feature : BITMAP32 {
+    kCacheAndSync = 0x1;
+  }
+
   fabric_scoped struct GroupInfoMapStruct {
     group_id groupId = 1;
     endpoint_no endpoints[] = 2;
@@ -6360,7 +6364,6 @@ endpoint 0 {
     ram      attribute supportsDNSResolve default = false;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0B;
     ram      attribute clusterRevision default = 2;
@@ -6415,7 +6418,6 @@ endpoint 0 {
     callback attribute clientsSupportedPerFabric default = 2;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
@@ -6596,7 +6598,6 @@ endpoint 1 {
     callback attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -6609,7 +6610,6 @@ endpoint 1 {
     callback attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -6622,7 +6622,6 @@ endpoint 1 {
     callback attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -6635,7 +6634,6 @@ endpoint 1 {
     callback attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -6646,7 +6644,6 @@ endpoint 1 {
     callback attribute supportedTemperatureLevels;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
@@ -6659,7 +6656,6 @@ endpoint 1 {
     ram      attribute supported default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -6672,7 +6668,6 @@ endpoint 1 {
     callback attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -6682,7 +6677,6 @@ endpoint 1 {
     ram      attribute airQuality default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 15;
     ram      attribute clusterRevision default = 1;
@@ -6725,7 +6719,6 @@ endpoint 1 {
     ram      attribute supported default = 15;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
@@ -6742,7 +6735,6 @@ endpoint 1 {
     callback attribute operationalError;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -6759,7 +6751,6 @@ endpoint 1 {
     callback attribute operationalError default = 0;
     callback attribute generatedCommandList default = 0;
     callback attribute acceptedCommandList default = 0;
-    callback attribute eventList default = 0;
     callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -6774,7 +6765,6 @@ endpoint 1 {
     callback attribute replacementProductList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
@@ -6789,7 +6779,6 @@ endpoint 1 {
     callback attribute replacementProductList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
@@ -7095,7 +7084,6 @@ endpoint 1 {
     ram      attribute levelValue default = 3;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
     ram      attribute clusterRevision default = 3;
@@ -7115,7 +7103,6 @@ endpoint 1 {
     ram      attribute levelValue default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
     ram      attribute clusterRevision default = 3;
@@ -7135,7 +7122,6 @@ endpoint 1 {
     ram      attribute levelValue default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
     ram      attribute clusterRevision default = 3;
@@ -7155,7 +7141,6 @@ endpoint 1 {
     ram      attribute levelValue default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
     ram      attribute clusterRevision default = 3;
@@ -7175,7 +7160,6 @@ endpoint 1 {
     ram      attribute levelValue default = 2;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
     ram      attribute clusterRevision default = 3;
@@ -7195,7 +7179,6 @@ endpoint 1 {
     ram      attribute levelValue default = 2;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
     ram      attribute clusterRevision default = 3;
@@ -7215,7 +7198,6 @@ endpoint 1 {
     ram      attribute levelValue default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
     ram      attribute clusterRevision default = 3;
@@ -7235,7 +7217,6 @@ endpoint 1 {
     ram      attribute levelValue default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
     ram      attribute clusterRevision default = 3;
@@ -7255,7 +7236,6 @@ endpoint 1 {
     ram      attribute levelValue default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
     ram      attribute clusterRevision default = 3;
@@ -7275,7 +7255,6 @@ endpoint 1 {
     ram      attribute levelValue default = 3;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
     ram      attribute clusterRevision default = 3;
