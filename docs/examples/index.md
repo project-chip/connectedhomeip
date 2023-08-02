@@ -10,7 +10,6 @@ platforms.
 :maxdepth: 1
 
 air-quality-sensor-app/**/README
-air-quality-sensor-app/**/Readme
 ```
 
 ## All clusters example
@@ -20,6 +19,7 @@ air-quality-sensor-app/**/Readme
 :maxdepth: 1
 
 all-clusters-app/**/README
+all-clusters-app/**/Readme
 ```
 
 ## All clusters minimal example
