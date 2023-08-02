@@ -22,6 +22,24 @@
 #include <lib/support/jsontlv/TlvJson.h>
 
 namespace {
+
+constexpr uint32_t kTemporaryImplicitProfileId = 0x1122;
+
+/// RAII to switch the implicit profie id for a reader
+class ImplicitProfileIdChange
+{
+  public:
+    ImplicitProfileIdChange(chip::TLV::TLVReader & reader, uint32_t id) : mReader(reader), mOldImplicitProfileId(reader.ImplicitProfileId)
+    {
+        reader.ImplicitProfileId = id;
+    }
+    ~ImplicitProfileIdChange() { mReader.ImplicitProfileId = mOldImplicitProfileId; }
+
+  private:
+    chip::TLV::TLVReader & mReader;
+    uint32_t mOldImplicitProfileId;
+};
+
 /*
  * Encapsulates the different types of keys permissible.
  *
@@ -116,6 +134,8 @@ std::string JsonToString(Json::Value & json)
 
 CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & parent)
 {
+    ImplicitProfileIdChange implicitProfileIdChange(reader, kTemporaryImplicitProfileId);
+
     switch (reader.GetType())
     {
     case TLV::kTLVType_UnsignedInteger: {

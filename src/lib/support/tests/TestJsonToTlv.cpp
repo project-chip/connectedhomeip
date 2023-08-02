@@ -18,6 +18,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
+#include <lib/core/TLVReader.h>
+#include <lib/core/TLVDebug.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/jsontlv/JsonToTlv.h>
 #include <lib/support/jsontlv/TlvToJson.h>
@@ -29,6 +31,8 @@ using namespace chip::Encoding;
 using namespace chip;
 using namespace chip::app;
 
+constexpr uint32_t kImplicitProfileId = 0x1234;
+
 uint8_t gBuf1[1024];
 uint8_t gBuf2[1024];
 TLV::TLVWriter gWriter1;
@@ -38,7 +42,10 @@ nlTestSuite * gSuite;
 void SetupWriters()
 {
     gWriter1.Init(gBuf1);
+    gWriter1.ImplicitProfileId = kImplicitProfileId;
+
     gWriter2.Init(gBuf2);
+    gWriter2.ImplicitProfileId = kImplicitProfileId;
 }
 
 void PrintBytes(const uint8_t * buf, uint32_t len)
@@ -223,6 +230,90 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
     ConvertJsonToTlvAndValidate(structList, jsonString);
 }
 
+void Test32BitConvert(nlTestSuite * inSuite, void * inContext)
+{
+    // JSON TLV format explicitly wants to support 32-bit integer preservation.
+    //
+    // This is to support encode/decode of a format like:
+    // { "123456:BOOL" : true } to be a compact way of encoding
+    // "attribute id 123456 has value true"
+    //
+    // Such an encoding is NOT part of the matter spec, so best-effort is done here:
+    // - low ids are encoded as context tags (this is in the spec for any structure encoding)
+    // - large ids are encoded as implicit tags (NOT used in spec as spec never has such high ids)
+    TLV::TLVReader reader;
+    TLV::TLVType tlvType;
+    int value = 0;
+
+    // convert a simple single value
+    {
+      SetupWriters();
+      JsonToTlv("{\"1:INT\": 321}", gWriter1);
+      NL_TEST_ASSERT(inSuite, gWriter1.Finalize() == CHIP_NO_ERROR);
+
+
+      reader.Init(gBuf1, gWriter1.GetLengthWritten());
+      reader.ImplicitProfileId = kImplicitProfileId;
+
+      NL_TEST_ASSERT(inSuite, reader.Next(TLV::AnonymousTag()) == CHIP_NO_ERROR);
+      NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_Structure);
+      NL_TEST_ASSERT(inSuite, reader.EnterContainer(tlvType) == CHIP_NO_ERROR);
+      NL_TEST_ASSERT(inSuite, reader.Next(TLV::ContextTag(1)) == CHIP_NO_ERROR);
+      NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_SignedInteger);
+      NL_TEST_ASSERT(inSuite, reader.Get(value) == CHIP_NO_ERROR);
+      NL_TEST_ASSERT(inSuite, value == 321);
+      NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
+      NL_TEST_ASSERT(inSuite, reader.ExitContainer(tlvType) == CHIP_NO_ERROR);
+      NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
+    }
+
+    // convert a single value that is larger than 8 bit
+    {
+        SetupWriters();
+        JsonToTlv("{\"1234:INT\": 321}", gWriter1);
+        NL_TEST_ASSERT(inSuite, gWriter1.Finalize() == CHIP_NO_ERROR);
+
+        reader.Init(gBuf1, gWriter1.GetLengthWritten());
+        reader.ImplicitProfileId = kImplicitProfileId;
+
+        NL_TEST_ASSERT(inSuite, reader.Next(TLV::AnonymousTag()) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_Structure);
+        NL_TEST_ASSERT(inSuite, reader.EnterContainer(tlvType) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.Next(TLV::ProfileTag(kImplicitProfileId, 1234)) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_SignedInteger);
+        NL_TEST_ASSERT(inSuite, reader.Get(value) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, value == 321);
+        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
+        NL_TEST_ASSERT(inSuite, reader.ExitContainer(tlvType) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
+    }
+
+    // Convert to a full 32-bit value, unsigned
+    {
+        SetupWriters();
+        JsonToTlv("{\"4275878552:INT\": 321}", gWriter1);
+        NL_TEST_ASSERT(inSuite, gWriter1.Finalize() == CHIP_NO_ERROR);
+
+        reader.Init(gBuf1, gWriter1.GetLengthWritten());
+        reader.ImplicitProfileId = kImplicitProfileId;
+
+        NL_TEST_ASSERT(inSuite, reader.Next(TLV::AnonymousTag()) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_Structure);
+        NL_TEST_ASSERT(inSuite, reader.EnterContainer(tlvType) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.Next(TLV::ProfileTag(kImplicitProfileId, 0xFEDCBA98u)) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_SignedInteger);
+        NL_TEST_ASSERT(inSuite, reader.Get(value) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, value == 321);
+        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
+        NL_TEST_ASSERT(inSuite, reader.ExitContainer(tlvType) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
+    }
+
+
+    // FIXME: implement
+    
+}
+
 int Initialize(void * apSuite)
 {
     VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
@@ -235,7 +326,14 @@ int Finalize(void * aContext)
     return SUCCESS;
 }
 
-const nlTest sTests[] = { NL_TEST_DEF("TestConverter", TestConverter), NL_TEST_SENTINEL() };
+// clang-format off
+const nlTest sTests[] =
+{
+    NL_TEST_DEF("TestConverter", TestConverter),
+    NL_TEST_DEF("Test32BitConvert", Test32BitConvert),
+    NL_TEST_SENTINEL()
+};
+// clang-format on
 
 } // namespace
 

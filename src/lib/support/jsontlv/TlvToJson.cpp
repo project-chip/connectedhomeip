@@ -28,6 +28,23 @@ namespace chip {
 
 namespace {
 
+constexpr uint32_t kTemporaryImplicitProfileId = 0x1122;
+
+/// RAII to switch the implicit profie id for a reader
+class ImplicitProfileIdChange
+{
+public:
+    ImplicitProfileIdChange(TLV::TLVReader & reader, uint32_t id) : mReader(reader), mOldImplicitProfileId(reader.ImplicitProfileId)
+    {
+        reader.ImplicitProfileId = id;
+    }
+    ~ImplicitProfileIdChange() { mReader.ImplicitProfileId = mOldImplicitProfileId; }
+
+private:
+    TLV::TLVReader & mReader;
+    uint32_t mOldImplicitProfileId;
+};
+
 const char * GetJsonElementStrFromType(const ElementTypeContext & ctx)
 {
     switch (ctx.tlvType)
@@ -129,9 +146,12 @@ CHIP_ERROR TlvStructToJson(TLV::TLVReader & reader, Json::Value & jsonObj)
     {
         TLV::Tag tag = reader.GetTag();
         VerifyOrReturnError(TLV::IsContextTag(tag) || TLV::IsProfileTag(tag), CHIP_ERROR_INVALID_TLV_TAG);
+
+        // Profile tags are expected to be implicit profile tags and they are
+        // used to encode > 8bit values from json
         if (TLV::IsProfileTag(tag))
         {
-            VerifyOrReturnError(TLV::ProfileIdFromTag(tag) == TLV::kCommonProfileId, CHIP_ERROR_INVALID_TLV_TAG);
+            VerifyOrReturnError(TLV::ProfileIdFromTag(tag) == reader.ImplicitProfileId, CHIP_ERROR_INVALID_TLV_TAG);
             VerifyOrReturnError(TLV::TagNumFromTag(tag) > UINT8_MAX, CHIP_ERROR_INVALID_TLV_TAG);
         }
 
@@ -294,6 +314,8 @@ CHIP_ERROR TlvToJson(const ByteSpan & tlv, std::string & jsonString)
 {
     TLV::TLVReader reader;
     reader.Init(tlv);
+    reader.ImplicitProfileId = kTemporaryImplicitProfileId;
+
     ReturnErrorOnFailure(reader.Next());
     return TlvToJson(reader, jsonString);
 }
@@ -303,6 +325,9 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, std::string & jsonString)
     // The top level element must be a TLV Structure of Anonymous type.
     VerifyOrReturnError(reader.GetType() == TLV::kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
     VerifyOrReturnError(reader.GetTag() == TLV::AnonymousTag(), CHIP_ERROR_INVALID_TLV_TAG);
+
+    // During json conversion, a implicit profile ID is required
+    ImplicitProfileIdChange implicitProfileIdChange(reader, kTemporaryImplicitProfileId);
 
     Json::Value jsonObject(Json::objectValue);
     ReturnErrorOnFailure(TlvStructToJson(reader, jsonObject));

@@ -29,6 +29,8 @@ using namespace chip::Encoding;
 using namespace chip;
 using namespace chip::app;
 
+constexpr uint32_t kImplicitProfileId = 0x1122;
+
 nlTestSuite * gSuite;
 
 void PrintSpan(const char * prefix, const ByteSpan & span)
@@ -654,19 +656,21 @@ void TestConverter_Array_Empty(nlTestSuite * inSuite, void * inContext)
     CheckValidConversion(jsonString, tlvSpan, jsonString);
 }
 
-// Empty Array with Common Profile Tag 2
-void TestConverter_Array_Empty_CommonProfileTag2(nlTestSuite * inSuite, void * inContext)
+void TestConverter_Array_Empty_ImplicitProfileTag2(nlTestSuite * inSuite, void * inContext)
 {
     gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
+
     TLV::TLVType containerType;
     TLV::TLVType containerType2;
 
     writer.Init(buf);
+    writer.ImplicitProfileId = kImplicitProfileId;
+
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::CommonTag(10000), TLV::kTLVType_Array, containerType2));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ProfileTag(kImplicitProfileId, 10000), TLV::kTLVType_Array, containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
@@ -682,19 +686,21 @@ void TestConverter_Array_Empty_CommonProfileTag2(nlTestSuite * inSuite, void * i
     CheckValidConversion(jsonString, tlvSpan, jsonExpected);
 }
 
-// Empty Array with Common Profile Tag 4
-void TestConverter_Array_Empty_CommonProfileTag4(nlTestSuite * inSuite, void * inContext)
+void TestConverter_Array_Empty_ImplicitProfileTag4(nlTestSuite * inSuite, void * inContext)
 {
     gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
+
     TLV::TLVType containerType;
     TLV::TLVType containerType2;
 
     writer.Init(buf);
+    writer.ImplicitProfileId = kImplicitProfileId;
+
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::CommonTag(1000000), TLV::kTLVType_Array, containerType2));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ProfileTag(kImplicitProfileId, 1000000), TLV::kTLVType_Array, containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
@@ -1011,8 +1017,10 @@ void TestConverter_Array_Floats(nlTestSuite * inSuite, void * inContext)
     TLV::TLVType containerType2;
 
     writer.Init(buf);
+    writer.ImplicitProfileId = kImplicitProfileId;
+
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::CommonTag(1000), TLV::kTLVType_Array, containerType2));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ProfileTag(kImplicitProfileId, 1000), TLV::kTLVType_Array, containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<float>(1.1)));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<float>(134.2763)));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<float>(-12345.87)));
@@ -1050,8 +1058,10 @@ void TestConverter_Array_Strings(nlTestSuite * inSuite, void * inContext)
     TLV::TLVType containerType2;
 
     writer.Init(buf);
+    writer.ImplicitProfileId = kImplicitProfileId;
+
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::CommonTag(100000), TLV::kTLVType_Array, containerType2));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ProfileTag(kImplicitProfileId, 100000), TLV::kTLVType_Array, containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::AnonymousTag(), "ABC"));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::AnonymousTag(), "Options"));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::AnonymousTag(), "more"));
@@ -1178,13 +1188,15 @@ void TestConverter_Struct_MixedTags(nlTestSuite * inSuite, void * inContext)
     TLV::TLVType containerType2;
 
     writer.Init(buf);
+    writer.ImplicitProfileId = kImplicitProfileId;
+
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Structure, containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(255), static_cast<uint64_t>(42)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::CommonTag(256), static_cast<uint64_t>(17000)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::CommonTag(65535), static_cast<uint64_t>(1)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::CommonTag(65536), static_cast<uint64_t>(345678)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::CommonTag(4294967295), static_cast<uint64_t>(500000000000)));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ProfileTag(kImplicitProfileId, 256), static_cast<uint64_t>(17000)));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ProfileTag(kImplicitProfileId, 65535), static_cast<uint64_t>(1)));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ProfileTag(kImplicitProfileId, 65536), static_cast<uint64_t>(345678)));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ProfileTag(kImplicitProfileId, 4294967295), static_cast<uint64_t>(500000000000)));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
@@ -1275,8 +1287,10 @@ void TestConverter_Array_Structures(nlTestSuite * inSuite, void * inContext)
     char bytes2[] = "Test ByteString Value 2";
 
     writer.Init(buf);
+    writer.ImplicitProfileId = kImplicitProfileId;
+
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::CommonTag(1000), TLV::kTLVType_Array, containerType2));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ProfileTag(kImplicitProfileId, 1000), TLV::kTLVType_Array, containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType3));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(0), static_cast<int64_t>(20)));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(1), true));
@@ -1849,10 +1863,10 @@ const nlTest sTests[] = {
     NL_TEST_DEF("Test Json Tlv Converter - Structure Top-Level Empty", TestConverter_Structure_TopLevelEmpty),
     NL_TEST_DEF("Test Json Tlv Converter - Structure Nested Empty", TestConverter_Structure_NestedEmpty),
     NL_TEST_DEF("Test Json Tlv Converter - Array Empty", TestConverter_Array_Empty),
-    NL_TEST_DEF("Test Json Tlv Converter - Array Empty with Common Profile Tag (length 2)",
-                TestConverter_Array_Empty_CommonProfileTag2),
-    NL_TEST_DEF("Test Json Tlv Converter - Array Empty with Common Profile Tag (length 4)",
-                TestConverter_Array_Empty_CommonProfileTag4),
+    NL_TEST_DEF("Test Json Tlv Converter - Array Empty with Implicit Profile Tag (length 2)",
+                TestConverter_Array_Empty_ImplicitProfileTag2),
+    NL_TEST_DEF("Test Json Tlv Converter - Array Empty with Implicit Profile Tag (length 4)",
+                TestConverter_Array_Empty_ImplicitProfileTag4),
     NL_TEST_DEF("Test Json Tlv Converter - Two Signed Integers", TestConverter_IntsWithContextTags),
     NL_TEST_DEF("Test Json Tlv Converter - Structure With Two Signed Integers", TestConverter_Struct_IntsWithContextTags),
     NL_TEST_DEF("Test Json Tlv Converter - Array Of Signed Integers", TestConverter_Array_Ints),

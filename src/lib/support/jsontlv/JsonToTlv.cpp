@@ -26,6 +26,10 @@ namespace chip {
 
 namespace {
 
+// Not directly used: TLV encoding will not encode
+// This profile, but will be used for deciding what binary values to encode.
+constexpr uint32_t kTemporaryImplicitProfileId = 0xFF01;
+
 std::vector<std::string> SplitIntoFieldsBySeparator(const std::string & input, char separator)
 {
     std::vector<std::string> substrings;
@@ -174,7 +178,7 @@ bool CompareByTag(const ElementContext & a, const ElementContext & b)
     return IsContextTag(a.tag);
 }
 
-CHIP_ERROR ParseJsonName(const std::string name, ElementContext & elementCtx)
+CHIP_ERROR ParseJsonName(const std::string name, ElementContext & elementCtx, uint32_t implicitProfileId)
 {
     uint64_t tagNumber                  = 0;
     const char * elementType            = nullptr;
@@ -206,7 +210,7 @@ CHIP_ERROR ParseJsonName(const std::string name, ElementContext & elementCtx)
     }
     else if (tagNumber <= UINT32_MAX)
     {
-        tag = TLV::CommonTag(static_cast<uint32_t>(tagNumber));
+        tag = TLV::ProfileTag(implicitProfileId, static_cast<uint32_t>(tagNumber));
     }
     else
     {
@@ -378,7 +382,7 @@ CHIP_ERROR EncodeTlvElement(const Json::Value & val, TLV::TLVWriter & writer, co
         for (size_t i = 0; i < jsonNames.size(); i++)
         {
             ElementContext ctx;
-            ReturnErrorOnFailure(ParseJsonName(jsonNames[i], ctx));
+            ReturnErrorOnFailure(ParseJsonName(jsonNames[i], ctx, writer.ImplicitProfileId));
             nestedElementsCtx.push_back(ctx);
         }
 
@@ -433,6 +437,7 @@ CHIP_ERROR JsonToTlv(const std::string & jsonString, MutableByteSpan & tlv)
 {
     TLV::TLVWriter writer;
     writer.Init(tlv);
+    writer.ImplicitProfileId = kTemporaryImplicitProfileId;
     ReturnErrorOnFailure(JsonToTlv(jsonString, writer));
     ReturnErrorOnFailure(writer.Finalize());
     tlv.reduce_size(writer.GetLengthWritten());
