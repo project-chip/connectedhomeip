@@ -41,18 +41,7 @@ public class ClusterReadMapping {
           read{{cluster.name}}{{attribute.definition.name | upfirst}}CommandParams
         );
         result.put("read{{attribute.definition.name | upfirst}}Attribute", read{{cluster.name}}{{attribute.definition.name | upfirst}}AttributeInteractionInfo);
-{% if attribute | isFabricScopedList(typeLookup) %}        InteractionInfo read{{cluster.name}}{{attribute.definition.name | upfirst}}AttributeWithFabricFilterInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.{{cluster.name}}Cluster) cluster).read{{attribute.definition.name | upfirst}}AttributeWithFabricFilter(
-              ({{ attribute | chipClustersCallbackName(typeLookup) }}) callback,
-              (Boolean) commandArguments.get("isFabricFiltered")
-            );
-          },
-          () -> new ClusterInfoMapping.{{ attribute | delegatedCallbackName(typeLookup)}}(),
-          read{{cluster.name}}{{attribute.definition.name | upfirst}}CommandParams
-        );
-        result.put("read{{attribute.definition.name | upfirst}}AttributeWithFabricFilter", read{{cluster.name}}{{attribute.definition.name | upfirst}}AttributeWithFabricFilterInteractionInfo);
-{% endif %}     {% endfor %}
+     {% endfor %}
        return result;
     }
 

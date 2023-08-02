@@ -1173,17 +1173,6 @@ public class ClusterReadMapping {
           readBindingBindingCommandParams
         );
         result.put("readBindingAttribute", readBindingBindingAttributeInteractionInfo);
-        InteractionInfo readBindingBindingAttributeWithFabricFilterInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.BindingCluster) cluster).readBindingAttributeWithFabricFilter(
-              (ChipClusters.BindingCluster.BindingAttributeCallback) callback,
-              (Boolean) commandArguments.get("isFabricFiltered")
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedBindingClusterBindingAttributeCallback(),
-          readBindingBindingCommandParams
-        );
-        result.put("readBindingAttributeWithFabricFilter", readBindingBindingAttributeWithFabricFilterInteractionInfo);
      Map<String, CommandParameterInfo> readBindingGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readBindingGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -1265,17 +1254,6 @@ public class ClusterReadMapping {
           readAccessControlAclCommandParams
         );
         result.put("readAclAttribute", readAccessControlAclAttributeInteractionInfo);
-        InteractionInfo readAccessControlAclAttributeWithFabricFilterInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.AccessControlCluster) cluster).readAclAttributeWithFabricFilter(
-              (ChipClusters.AccessControlCluster.AclAttributeCallback) callback,
-              (Boolean) commandArguments.get("isFabricFiltered")
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedAccessControlClusterAclAttributeCallback(),
-          readAccessControlAclCommandParams
-        );
-        result.put("readAclAttributeWithFabricFilter", readAccessControlAclAttributeWithFabricFilterInteractionInfo);
      Map<String, CommandParameterInfo> readAccessControlExtensionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readAccessControlExtensionAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -1287,17 +1265,6 @@ public class ClusterReadMapping {
           readAccessControlExtensionCommandParams
         );
         result.put("readExtensionAttribute", readAccessControlExtensionAttributeInteractionInfo);
-        InteractionInfo readAccessControlExtensionAttributeWithFabricFilterInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.AccessControlCluster) cluster).readExtensionAttributeWithFabricFilter(
-              (ChipClusters.AccessControlCluster.ExtensionAttributeCallback) callback,
-              (Boolean) commandArguments.get("isFabricFiltered")
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedAccessControlClusterExtensionAttributeCallback(),
-          readAccessControlExtensionCommandParams
-        );
-        result.put("readExtensionAttributeWithFabricFilter", readAccessControlExtensionAttributeWithFabricFilterInteractionInfo);
      Map<String, CommandParameterInfo> readAccessControlSubjectsPerAccessControlEntryCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readAccessControlSubjectsPerAccessControlEntryAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -1864,17 +1831,6 @@ public class ClusterReadMapping {
           readOtaSoftwareUpdateRequestorDefaultOTAProvidersCommandParams
         );
         result.put("readDefaultOTAProvidersAttribute", readOtaSoftwareUpdateRequestorDefaultOTAProvidersAttributeInteractionInfo);
-        InteractionInfo readOtaSoftwareUpdateRequestorDefaultOTAProvidersAttributeWithFabricFilterInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.OtaSoftwareUpdateRequestorCluster) cluster).readDefaultOTAProvidersAttributeWithFabricFilter(
-              (ChipClusters.OtaSoftwareUpdateRequestorCluster.DefaultOTAProvidersAttributeCallback) callback,
-              (Boolean) commandArguments.get("isFabricFiltered")
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedOtaSoftwareUpdateRequestorClusterDefaultOTAProvidersAttributeCallback(),
-          readOtaSoftwareUpdateRequestorDefaultOTAProvidersCommandParams
-        );
-        result.put("readDefaultOTAProvidersAttributeWithFabricFilter", readOtaSoftwareUpdateRequestorDefaultOTAProvidersAttributeWithFabricFilterInteractionInfo);
      Map<String, CommandParameterInfo> readOtaSoftwareUpdateRequestorUpdatePossibleCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readOtaSoftwareUpdateRequestorUpdatePossibleAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -5159,17 +5115,6 @@ public class ClusterReadMapping {
           readOperationalCredentialsNOCsCommandParams
         );
         result.put("readNOCsAttribute", readOperationalCredentialsNOCsAttributeInteractionInfo);
-        InteractionInfo readOperationalCredentialsNOCsAttributeWithFabricFilterInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.OperationalCredentialsCluster) cluster).readNOCsAttributeWithFabricFilter(
-              (ChipClusters.OperationalCredentialsCluster.NOCsAttributeCallback) callback,
-              (Boolean) commandArguments.get("isFabricFiltered")
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedOperationalCredentialsClusterNOCsAttributeCallback(),
-          readOperationalCredentialsNOCsCommandParams
-        );
-        result.put("readNOCsAttributeWithFabricFilter", readOperationalCredentialsNOCsAttributeWithFabricFilterInteractionInfo);
      Map<String, CommandParameterInfo> readOperationalCredentialsFabricsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readOperationalCredentialsFabricsAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -5181,17 +5126,6 @@ public class ClusterReadMapping {
           readOperationalCredentialsFabricsCommandParams
         );
         result.put("readFabricsAttribute", readOperationalCredentialsFabricsAttributeInteractionInfo);
-        InteractionInfo readOperationalCredentialsFabricsAttributeWithFabricFilterInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.OperationalCredentialsCluster) cluster).readFabricsAttributeWithFabricFilter(
-              (ChipClusters.OperationalCredentialsCluster.FabricsAttributeCallback) callback,
-              (Boolean) commandArguments.get("isFabricFiltered")
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedOperationalCredentialsClusterFabricsAttributeCallback(),
-          readOperationalCredentialsFabricsCommandParams
-        );
-        result.put("readFabricsAttributeWithFabricFilter", readOperationalCredentialsFabricsAttributeWithFabricFilterInteractionInfo);
      Map<String, CommandParameterInfo> readOperationalCredentialsSupportedFabricsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readOperationalCredentialsSupportedFabricsAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -5317,17 +5251,6 @@ public class ClusterReadMapping {
           readGroupKeyManagementGroupKeyMapCommandParams
         );
         result.put("readGroupKeyMapAttribute", readGroupKeyManagementGroupKeyMapAttributeInteractionInfo);
-        InteractionInfo readGroupKeyManagementGroupKeyMapAttributeWithFabricFilterInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.GroupKeyManagementCluster) cluster).readGroupKeyMapAttributeWithFabricFilter(
-              (ChipClusters.GroupKeyManagementCluster.GroupKeyMapAttributeCallback) callback,
-              (Boolean) commandArguments.get("isFabricFiltered")
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedGroupKeyManagementClusterGroupKeyMapAttributeCallback(),
-          readGroupKeyManagementGroupKeyMapCommandParams
-        );
-        result.put("readGroupKeyMapAttributeWithFabricFilter", readGroupKeyManagementGroupKeyMapAttributeWithFabricFilterInteractionInfo);
      Map<String, CommandParameterInfo> readGroupKeyManagementGroupTableCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readGroupKeyManagementGroupTableAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -5339,17 +5262,6 @@ public class ClusterReadMapping {
           readGroupKeyManagementGroupTableCommandParams
         );
         result.put("readGroupTableAttribute", readGroupKeyManagementGroupTableAttributeInteractionInfo);
-        InteractionInfo readGroupKeyManagementGroupTableAttributeWithFabricFilterInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.GroupKeyManagementCluster) cluster).readGroupTableAttributeWithFabricFilter(
-              (ChipClusters.GroupKeyManagementCluster.GroupTableAttributeCallback) callback,
-              (Boolean) commandArguments.get("isFabricFiltered")
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedGroupKeyManagementClusterGroupTableAttributeCallback(),
-          readGroupKeyManagementGroupTableCommandParams
-        );
-        result.put("readGroupTableAttributeWithFabricFilter", readGroupKeyManagementGroupTableAttributeWithFabricFilterInteractionInfo);
      Map<String, CommandParameterInfo> readGroupKeyManagementMaxGroupsPerFabricCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readGroupKeyManagementMaxGroupsPerFabricAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -5939,17 +5851,6 @@ public class ClusterReadMapping {
           readIcdManagementRegisteredClientsCommandParams
         );
         result.put("readRegisteredClientsAttribute", readIcdManagementRegisteredClientsAttributeInteractionInfo);
-        InteractionInfo readIcdManagementRegisteredClientsAttributeWithFabricFilterInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.IcdManagementCluster) cluster).readRegisteredClientsAttributeWithFabricFilter(
-              (ChipClusters.IcdManagementCluster.RegisteredClientsAttributeCallback) callback,
-              (Boolean) commandArguments.get("isFabricFiltered")
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIcdManagementClusterRegisteredClientsAttributeCallback(),
-          readIcdManagementRegisteredClientsCommandParams
-        );
-        result.put("readRegisteredClientsAttributeWithFabricFilter", readIcdManagementRegisteredClientsAttributeWithFabricFilterInteractionInfo);
      Map<String, CommandParameterInfo> readIcdManagementICDCounterCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readIcdManagementICDCounterAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -16895,17 +16796,6 @@ public class ClusterReadMapping {
           readUnitTestingListFabricScopedCommandParams
         );
         result.put("readListFabricScopedAttribute", readUnitTestingListFabricScopedAttributeInteractionInfo);
-        InteractionInfo readUnitTestingListFabricScopedAttributeWithFabricFilterInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.UnitTestingCluster) cluster).readListFabricScopedAttributeWithFabricFilter(
-              (ChipClusters.UnitTestingCluster.ListFabricScopedAttributeCallback) callback,
-              (Boolean) commandArguments.get("isFabricFiltered")
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedUnitTestingClusterListFabricScopedAttributeCallback(),
-          readUnitTestingListFabricScopedCommandParams
-        );
-        result.put("readListFabricScopedAttributeWithFabricFilter", readUnitTestingListFabricScopedAttributeWithFabricFilterInteractionInfo);
      Map<String, CommandParameterInfo> readUnitTestingTimedWriteBooleanCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readUnitTestingTimedWriteBooleanAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

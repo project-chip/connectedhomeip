@@ -52,17 +52,6 @@ public class ClusterReadMapping {
           readSecondFabricsCommandParams
         );
         result.put("readFabricsAttribute", readSecondFabricsAttributeInteractionInfo);
-        InteractionInfo readSecondFabricsAttributeWithFabricFilterInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.SecondCluster) cluster).readFabricsAttributeWithFabricFilter(
-              (ChipClusters.SecondCluster.FabricsAttributeCallback) callback,
-              (Boolean) commandArguments.get("isFabricFiltered")
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedSecondClusterFabricsAttributeCallback(),
-          readSecondFabricsCommandParams
-        );
-        result.put("readFabricsAttributeWithFabricFilter", readSecondFabricsAttributeWithFabricFilterInteractionInfo);
      Map<String, CommandParameterInfo> readSecondSomeBytesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readSecondSomeBytesAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
