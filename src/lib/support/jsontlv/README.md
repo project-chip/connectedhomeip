@@ -4,6 +4,20 @@
 
 Helper functions for converting TLV-encoded data to Json format and vice versa.
 
+### Supported payloads
+
+The library supports
+
+- full bi-directional conversion for matter data model payloads
+- Additional support for generic 32-bit unsigned integer ids using "implicit profile tags":
+  - 8-bit IDs are encoded as `ContextTags`, which matches matter specification for
+    encoding field identifiers
+  - For IDs that are larger, they will be encoded as `Implicit Profile Tags`. The reason
+    for allowing such IDs is to support json formats where keys contain ids typically
+    found in paths, like `{"1234:INT": 10}` meaning `"Attribute 1234 has value 10"`.
+  
+### Format details
+
 In order for the Json format to represent the TLV format without loss of
 information, the Json name of each element should contain the TLV element tag
 and type information.
@@ -58,12 +72,12 @@ limitations of this format are:
 -   TLV List types are not supported.
 -   TLV Array cannot contain another TLV Array.
 -   The top-level container MUST be an anonymous STRUCT.
--   Elements of the TLV Structure MUST have Context or Common Profile Tags.
--   Common Profile Tag number MUST be larger or equal to 256 and smaller that
-    2^32.
+-   Elements of the TLV Structure MUST have Context or Implicit Profile Tags.
+-   Implicit Profile Tag number MUST be larger or equal to 256 and smaller that
+    2^32 + 1.
 -   TLV Structure element MUST be sorted by tag numbers from low to high, where
     sorted elements with Context Tags MUST appear first followed by sorted
-    elements with Common Profile Tags.
+    elements with Implicit Profile Tags.
 
 ## Format Example
 
