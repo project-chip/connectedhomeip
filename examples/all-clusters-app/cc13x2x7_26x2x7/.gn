@@ -25,4 +25,5 @@ default_args = {
   target_os = "freertos"
 
   import("//args.gni")
+  pw_build_PIP_REQUIREMENTS += [ "${chip_root}/scripts/setup/requirements.ti.txt" ]
 }
