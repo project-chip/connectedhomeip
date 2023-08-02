@@ -670,7 +670,9 @@ void TestConverter_Array_Empty_ImplicitProfileTag2(nlTestSuite * inSuite, void *
     writer.ImplicitProfileId = kImplicitProfileId;
 
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ProfileTag(kImplicitProfileId, 10000), TLV::kTLVType_Array, containerType2));
+    NL_TEST_ASSERT(gSuite,
+                   CHIP_NO_ERROR ==
+                       writer.StartContainer(TLV::ProfileTag(kImplicitProfileId, 10000), TLV::kTLVType_Array, containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
@@ -700,7 +702,9 @@ void TestConverter_Array_Empty_ImplicitProfileTag4(nlTestSuite * inSuite, void *
     writer.ImplicitProfileId = kImplicitProfileId;
 
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ProfileTag(kImplicitProfileId, 1000000), TLV::kTLVType_Array, containerType2));
+    NL_TEST_ASSERT(gSuite,
+                   CHIP_NO_ERROR ==
+                       writer.StartContainer(TLV::ProfileTag(kImplicitProfileId, 1000000), TLV::kTLVType_Array, containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
@@ -1020,7 +1024,9 @@ void TestConverter_Array_Floats(nlTestSuite * inSuite, void * inContext)
     writer.ImplicitProfileId = kImplicitProfileId;
 
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ProfileTag(kImplicitProfileId, 1000), TLV::kTLVType_Array, containerType2));
+    NL_TEST_ASSERT(gSuite,
+                   CHIP_NO_ERROR ==
+                       writer.StartContainer(TLV::ProfileTag(kImplicitProfileId, 1000), TLV::kTLVType_Array, containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<float>(1.1)));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<float>(134.2763)));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<float>(-12345.87)));
@@ -1061,7 +1067,9 @@ void TestConverter_Array_Strings(nlTestSuite * inSuite, void * inContext)
     writer.ImplicitProfileId = kImplicitProfileId;
 
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ProfileTag(kImplicitProfileId, 100000), TLV::kTLVType_Array, containerType2));
+    NL_TEST_ASSERT(gSuite,
+                   CHIP_NO_ERROR ==
+                       writer.StartContainer(TLV::ProfileTag(kImplicitProfileId, 100000), TLV::kTLVType_Array, containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::AnonymousTag(), "ABC"));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::AnonymousTag(), "Options"));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::AnonymousTag(), "more"));
@@ -1196,7 +1204,8 @@ void TestConverter_Struct_MixedTags(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ProfileTag(kImplicitProfileId, 256), static_cast<uint64_t>(17000)));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ProfileTag(kImplicitProfileId, 65535), static_cast<uint64_t>(1)));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ProfileTag(kImplicitProfileId, 65536), static_cast<uint64_t>(345678)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ProfileTag(kImplicitProfileId, 4294967295), static_cast<uint64_t>(500000000000)));
+    NL_TEST_ASSERT(
+        gSuite, CHIP_NO_ERROR == writer.Put(TLV::ProfileTag(kImplicitProfileId, 4294967295), static_cast<uint64_t>(500000000000)));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
@@ -1290,7 +1299,9 @@ void TestConverter_Array_Structures(nlTestSuite * inSuite, void * inContext)
     writer.ImplicitProfileId = kImplicitProfileId;
 
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ProfileTag(kImplicitProfileId, 1000), TLV::kTLVType_Array, containerType2));
+    NL_TEST_ASSERT(gSuite,
+                   CHIP_NO_ERROR ==
+                       writer.StartContainer(TLV::ProfileTag(kImplicitProfileId, 1000), TLV::kTLVType_Array, containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType3));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(0), static_cast<int64_t>(20)));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(1), true));

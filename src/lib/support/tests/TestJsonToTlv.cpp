@@ -18,8 +18,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
-#include <lib/core/TLVReader.h>
 #include <lib/core/TLVDebug.h>
+#include <lib/core/TLVReader.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/jsontlv/JsonToTlv.h>
 #include <lib/support/jsontlv/TlvToJson.h>
@@ -247,24 +247,23 @@ void Test32BitConvert(nlTestSuite * inSuite, void * inContext)
 
     // convert a simple single value
     {
-      SetupWriters();
-      JsonToTlv("{\"1:INT\": 321}", gWriter1);
-      NL_TEST_ASSERT(inSuite, gWriter1.Finalize() == CHIP_NO_ERROR);
+        SetupWriters();
+        JsonToTlv("{\"1:INT\": 321}", gWriter1);
+        NL_TEST_ASSERT(inSuite, gWriter1.Finalize() == CHIP_NO_ERROR);
 
+        reader.Init(gBuf1, gWriter1.GetLengthWritten());
+        reader.ImplicitProfileId = kImplicitProfileId;
 
-      reader.Init(gBuf1, gWriter1.GetLengthWritten());
-      reader.ImplicitProfileId = kImplicitProfileId;
-
-      NL_TEST_ASSERT(inSuite, reader.Next(TLV::AnonymousTag()) == CHIP_NO_ERROR);
-      NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_Structure);
-      NL_TEST_ASSERT(inSuite, reader.EnterContainer(tlvType) == CHIP_NO_ERROR);
-      NL_TEST_ASSERT(inSuite, reader.Next(TLV::ContextTag(1)) == CHIP_NO_ERROR);
-      NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_SignedInteger);
-      NL_TEST_ASSERT(inSuite, reader.Get(value) == CHIP_NO_ERROR);
-      NL_TEST_ASSERT(inSuite, value == 321);
-      NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
-      NL_TEST_ASSERT(inSuite, reader.ExitContainer(tlvType) == CHIP_NO_ERROR);
-      NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
+        NL_TEST_ASSERT(inSuite, reader.Next(TLV::AnonymousTag()) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_Structure);
+        NL_TEST_ASSERT(inSuite, reader.EnterContainer(tlvType) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.Next(TLV::ContextTag(1)) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_SignedInteger);
+        NL_TEST_ASSERT(inSuite, reader.Get(value) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, value == 321);
+        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
+        NL_TEST_ASSERT(inSuite, reader.ExitContainer(tlvType) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
     }
 
     // convert a single value that is larger than 8 bit
@@ -309,9 +308,7 @@ void Test32BitConvert(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
     }
 
-
     // FIXME: implement
-    
 }
 
 int Initialize(void * apSuite)

@@ -8,14 +8,17 @@ Helper functions for converting TLV-encoded data to Json format and vice versa.
 
 The library supports
 
-- full bi-directional conversion for matter data model payloads
-- Additional support for generic 32-bit unsigned integer ids using "implicit profile tags":
-  - 8-bit IDs are encoded as `ContextTags`, which matches matter specification for
-    encoding field identifiers
-  - For IDs that are larger, they will be encoded as `Implicit Profile Tags`. The reason
-    for allowing such IDs is to support json formats where keys contain ids typically
-    found in paths, like `{"1234:INT": 10}` meaning `"Attribute 1234 has value 10"`.
-  
+-   full bi-directional conversion for matter data model payloads
+-   Additional support for generic 32-bit unsigned integer ids using "implicit
+    profile tags":
+
+    -   8-bit IDs are encoded as `ContextTags`, which matches matter
+        specification for encoding field identifiers
+    -   For IDs that are larger, they will be encoded as
+        `Implicit Profile Tags`. The reason for allowing such IDs is to support
+        json formats where keys contain ids typically found in paths, like
+        `{"1234:INT": 10}` meaning `"Attribute 1234 has value 10"`.
+
 ### Format details
 
 In order for the Json format to represent the TLV format without loss of

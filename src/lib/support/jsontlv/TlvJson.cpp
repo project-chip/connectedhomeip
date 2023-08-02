@@ -28,14 +28,15 @@ constexpr uint32_t kTemporaryImplicitProfileId = 0x1122;
 /// RAII to switch the implicit profie id for a reader
 class ImplicitProfileIdChange
 {
-  public:
-    ImplicitProfileIdChange(chip::TLV::TLVReader & reader, uint32_t id) : mReader(reader), mOldImplicitProfileId(reader.ImplicitProfileId)
+public:
+    ImplicitProfileIdChange(chip::TLV::TLVReader & reader, uint32_t id) :
+        mReader(reader), mOldImplicitProfileId(reader.ImplicitProfileId)
     {
         reader.ImplicitProfileId = id;
     }
     ~ImplicitProfileIdChange() { mReader.ImplicitProfileId = mOldImplicitProfileId; }
 
-  private:
+private:
     chip::TLV::TLVReader & mReader;
     uint32_t mOldImplicitProfileId;
 };
