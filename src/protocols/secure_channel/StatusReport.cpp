@@ -95,10 +95,10 @@ size_t StatusReport::Size() const
     return WriteToBuffer(emptyBuf).Needed();
 }
 
-System::PacketBufferHandle StatusReport::MakeBusyStatusReportMessage(uint16_t minimumWaitTime)
+System::PacketBufferHandle StatusReport::MakeBusyStatusReportMessage(System::Clock::Milliseconds16 minimumWaitTime)
 {
     using namespace Protocols::SecureChannel;
-    constexpr uint8_t kBusyStatusReportProtocolDataSize = sizeof(minimumWaitTime); // 16-bits
+    constexpr uint8_t kBusyStatusReportProtocolDataSize = sizeof(minimumWaitTime.count()); // 16-bits
 
     auto handle = System::PacketBufferHandle::New(kBusyStatusReportProtocolDataSize, 0);
     VerifyOrReturnValue(!handle.IsNull(), handle,
@@ -106,7 +106,7 @@ System::PacketBufferHandle StatusReport::MakeBusyStatusReportMessage(uint16_t mi
 
     // Build the protocol data with minimum wait time
     Encoding::LittleEndian::PacketBufferWriter protocolDataBufferWriter(std::move(handle));
-    protocolDataBufferWriter.Put16(minimumWaitTime);
+    protocolDataBufferWriter.Put16(minimumWaitTime.count());
     handle = protocolDataBufferWriter.Finalize();
     VerifyOrReturnValue(!handle.IsNull(), handle,
                         ChipLogError(SecureChannel, "Failed to finalize protocol data for busy status report"));

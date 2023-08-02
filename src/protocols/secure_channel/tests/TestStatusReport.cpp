@@ -107,10 +107,10 @@ void TestBadStatusReport(nlTestSuite * inSuite, void * inContext)
 
 void TestMakeBusyStatusReport(nlTestSuite * inSuite, void * inContext)
 {
-    GeneralStatusCode generalCode = GeneralStatusCode::kBusy;
-    auto protocolId               = SecureChannel::Id;
-    uint16_t protocolCode         = kProtocolCodeBusy;
-    uint16_t minimumWaitTime      = 5 * 1000;
+    GeneralStatusCode generalCode                 = GeneralStatusCode::kBusy;
+    auto protocolId                               = SecureChannel::Id;
+    uint16_t protocolCode                         = kProtocolCodeBusy;
+    System::Clock::Milliseconds16 minimumWaitTime = System::Clock::Milliseconds16(5000);
 
     System::PacketBufferHandle handle = StatusReport::MakeBusyStatusReportMessage(minimumWaitTime);
     NL_TEST_ASSERT(inSuite, !handle.IsNull());
@@ -129,7 +129,7 @@ void TestMakeBusyStatusReport(nlTestSuite * inSuite, void * inContext)
     uint16_t readMinimumWaitTime = 0;
     Encoding::LittleEndian::Reader reader(rcvData->Start(), rcvData->DataLength());
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == reader.Read16(&readMinimumWaitTime).StatusCode());
-    NL_TEST_ASSERT(inSuite, readMinimumWaitTime == minimumWaitTime);
+    NL_TEST_ASSERT(inSuite, System::Clock::Milliseconds16(readMinimumWaitTime) == minimumWaitTime);
 }
 
 // Test Suite

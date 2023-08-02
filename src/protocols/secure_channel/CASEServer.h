@@ -22,6 +22,7 @@
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/CASESession.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 
@@ -113,7 +114,7 @@ private:
     // @param[in] minimumWaitTime Minimum wait time before client resends sigma1
     //
     // @return CHIP_NO_ERROR on success, error code otherwise
-    CHIP_ERROR SendBusyStatusReport(Messaging::ExchangeContext * ec, uint16_t minimumWaitTime);
+    CHIP_ERROR SendBusyStatusReport(Messaging::ExchangeContext * ec, System::Clock::Milliseconds16 minimumWaitTime);
 };
 
 } // namespace chip

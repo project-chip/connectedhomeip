@@ -21,6 +21,7 @@
 #include <lib/support/BufferWriter.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
+#include <system/SystemClock.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -101,7 +102,7 @@ public:
      *
      * @return Packet buffer handle which can be passed to SendMessage.
      */
-    static System::PacketBufferHandle MakeBusyStatusReportMessage(uint16_t minimumWaitTime);
+    static System::PacketBufferHandle MakeBusyStatusReportMessage(System::Clock::Milliseconds16 minimumWaitTime);
 
 private:
     GeneralStatusCode mGeneralCode;

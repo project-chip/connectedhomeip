@@ -89,7 +89,7 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
             // A successful CASE handshake can take several seconds and some may time out (30 seconds or more).
             // TODO: Come up with better estimate: https://github.com/project-chip/connectedhomeip/issues/28288
             // For now, setting minimum wait time to 5000 milliseconds.
-            CHIP_ERROR err = SendBusyStatusReport(ec, 5 * 1000);
+            CHIP_ERROR err = SendBusyStatusReport(ec, System::Clock::Milliseconds16(5000));
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Inet, "Failed to send the busy status report, err:%" CHIP_ERROR_FORMAT, err.Format());
@@ -189,14 +189,12 @@ void CASEServer::OnSessionEstablished(const SessionHandle & session)
     PrepareForSessionEstablishment(session->GetPeer());
 }
 
-CHIP_ERROR CASEServer::SendBusyStatusReport(Messaging::ExchangeContext * ec, uint16_t minimumWaitTime)
+CHIP_ERROR CASEServer::SendBusyStatusReport(Messaging::ExchangeContext * ec, System::Clock::Milliseconds16 minimumWaitTime)
 {
     ChipLogProgress(Inet, "Already in the middle of CASE handshake, sending busy status report");
-    VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Inet, "Exchange context cannot be NULL"));
 
     System::PacketBufferHandle handle = Protocols::SecureChannel::StatusReport::MakeBusyStatusReportMessage(minimumWaitTime);
-    VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY,
-                        ChipLogError(SecureChannel, "Failed to build a busy status report"));
+    VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     ChipLogProgress(Inet, "Sending status report, exchange " ChipLogFormatExchange, ChipLogValueExchange(ec));
     return ec->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(handle));
