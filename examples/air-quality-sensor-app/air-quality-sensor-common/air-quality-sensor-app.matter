@@ -614,43 +614,6 @@ server cluster NetworkCommissioning = 49 {
   command access(invoke: administer) ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
 }
 
-/** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
-server cluster DiagnosticLogs = 50 {
-  enum IntentEnum : ENUM8 {
-    kEndUserSupport = 0;
-    kNetworkDiag = 1;
-    kCrashLogs = 2;
-  }
-
-  enum StatusEnum : ENUM8 {
-    kSuccess = 0;
-    kExhausted = 1;
-    kNoLogs = 2;
-    kBusy = 3;
-    kDenied = 4;
-  }
-
-  enum TransferProtocolEnum : ENUM8 {
-    kResponsePayload = 0;
-    kBDX = 1;
-  }
-
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct RetrieveLogsRequestRequest {
-    IntentEnum intent = 0;
-    TransferProtocolEnum requestedProtocol = 1;
-    optional CHAR_STRING<32> transferFileDesignator = 2;
-  }
-
-  command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
-}
-
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster GeneralDiagnostics = 51 {
   enum BootReasonEnum : ENUM8 {
@@ -1900,11 +1863,6 @@ endpoint 0 {
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
     ram      attribute featureMap default = 2;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster DiagnosticLogs {
-    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
