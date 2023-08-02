@@ -84,7 +84,8 @@ void RefrigeratorAndTemperatureControlledCabinetMode::Shutdown()
     }
     if (gTccModeDelegate != nullptr)
     {
-        gTccModeDelegate->~TccModeDelegate();
+        delete gTccModeDelegate;
+        gTccModeDelegate = nullptr;
     }
 }
 

@@ -82,12 +82,22 @@ tests:
               hasMasksSet: [0x4]
 
     - label: "Step 3a: Read the global attribute: AttributeList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains: [0, 15, 17, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 3a: Read the global attribute: AttributeList"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 15, 17, 65528, 65529, 65531, 65532, 65533]
 
     - label:
           "Step 3b: Read the optional attribute(StartUpCurrentLevel and
@@ -201,6 +211,7 @@ tests:
               type: list
 
     - label: "Step 5: Read the global attribute: EventList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:

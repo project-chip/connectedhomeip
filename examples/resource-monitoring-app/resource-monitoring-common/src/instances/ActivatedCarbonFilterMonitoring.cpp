@@ -32,19 +32,15 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ActivatedCarbonFilterMonitoring;
 using namespace chip::app::Clusters::ResourceMonitoring;
+using namespace chip::app::Clusters::ResourceMonitoring::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
-static ResourceMonitoring::Attributes::ReplacementProductStruct::Type sActivatedCarbonFilterReplacementProductsList[] = {
-    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kUpc,
-      .productIdentifierValue = CharSpan::fromCharString("111112222233") },
-    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8,
-      .productIdentifierValue = CharSpan::fromCharString("gtin8xca") },
-    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kEan,
-      .productIdentifierValue = CharSpan::fromCharString("4444455555666") },
-    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14,
-      .productIdentifierValue = CharSpan::fromCharString("gtin14xcarbonx") },
-    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kOem,
-      .productIdentifierValue = CharSpan::fromCharString("oem20xcarbonxxxxxxxx") },
+static ReplacementProductStruct sActivatedCarbonFilterReplacementProductsList[] = {
+    { ResourceMonitoring::ProductIdentifierTypeEnum::kUpc, CharSpan::fromCharString("111112222233") },
+    { ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8, CharSpan::fromCharString("gtin8xca") },
+    { ResourceMonitoring::ProductIdentifierTypeEnum::kEan, CharSpan::fromCharString("4444455555666") },
+    { ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14, CharSpan::fromCharString("gtin14xcarbonx") },
+    { ResourceMonitoring::ProductIdentifierTypeEnum::kOem, CharSpan::fromCharString("oem20xcarbonxxxxxxxx") },
 };
 StaticReplacementProductListManager
     sActivatedCarbonFilterReplacementProductListManager(&sActivatedCarbonFilterReplacementProductsList[0],
