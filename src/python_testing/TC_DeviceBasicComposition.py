@@ -27,10 +27,7 @@ from typing import Any, Callable, Optional
 
 import chip.clusters as Clusters
 import chip.tlv
-from chip import discovery
 from chip.clusters.Attribute import ValueDecodeFailure
-from chip.exceptions import ChipStackError
-from chip.setup_payload import SetupPayload
 from matter_testing_support import AttributePathLocation, MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
