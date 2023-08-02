@@ -46,7 +46,8 @@ template("siwx917_sdk") {
     _include_dirs = [
       "${chip_root}/examples/platform/silabs/SiWx917/SiWx917",
       "${chip_root}/examples/platform/silabs/SiWx917/SiWx917/hal",
-      "${sdk_support_root}/platform/emdrv/nvm3/inc",
+      "${efr32_sdk_root}/platform/emdrv/nvm3/inc",
+      "${efr32_sdk_root}/platform/emdrv/common/inc",
       "${sdk_support_root}/matter/mbedtls/tinycrypt/inc",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4325B/autogen",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4325B/config",
@@ -229,7 +230,7 @@ template("siwx917_sdk") {
       defines += [ "DIC_ENABLE=1" ]
     }
 
-    libs += [ "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a" ]
+    libs += [ "${efr32_sdk_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a" ]
 
     cflags = []
     foreach(include_dir, _include_dirs) {
