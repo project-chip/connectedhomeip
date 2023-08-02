@@ -243,7 +243,7 @@ void Test32BitConvert(nlTestSuite * inSuite, void * inContext)
     // - large ids are encoded as implicit tags (NOT used in spec as spec never has such high ids)
     TLV::TLVReader reader;
     TLV::TLVType tlvType;
-    int value = 0;
+    int32_t value = 0;
 
     // convert a simple single value
     {
