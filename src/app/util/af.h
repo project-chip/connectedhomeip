@@ -306,17 +306,17 @@ private:
 /**
  * @brief Sets the parent endpoint for a given endpoint
  */
-EmberAfStatus SetParentEndpointForEndpoint(EndpointId childEndpoint, EndpointId parentEndpoint);
+CHIP_ERROR SetParentEndpointForEndpoint(EndpointId childEndpoint, EndpointId parentEndpoint);
 
 /**
  * @brief Sets an Endpoint to use Flat Composition
  */
-EmberAfStatus SetFlatCompositionForEndpoint(EndpointId endpoint);
+CHIP_ERROR SetFlatCompositionForEndpoint(EndpointId endpoint);
 
 /**
  * @brief Sets an Endpoint to use Tree Composition
  */
-EmberAfStatus SetTreeCompositionForEndpoint(EndpointId endpoint);
+CHIP_ERROR SetTreeCompositionForEndpoint(EndpointId endpoint);
 
 /**
  * @brief Returns true is an Endpoint has flat composition

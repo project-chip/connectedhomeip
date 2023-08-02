@@ -373,8 +373,8 @@ EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttribut
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     // Casting and calling a function pointer on the same line results in ignoring the return
     // of the call on gcc-arm-none-eabi-9-2019-q4-major
-    EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback)(
-        emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
+    EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback) (emberAfFindClusterFunction(
+        cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
     if (f != nullptr)
     {
         status = f(attributePath, attributeType, size, value);
@@ -1424,41 +1424,41 @@ app::AttributeAccessInterface * GetAttributeAccessOverride(EndpointId endpointId
     return nullptr;
 }
 
-EmberAfStatus SetParentEndpointForEndpoint(EndpointId childEndpoint, EndpointId parentEndpoint)
+CHIP_ERROR SetParentEndpointForEndpoint(EndpointId childEndpoint, EndpointId parentEndpoint)
 {
     uint16_t childIndex  = emberAfIndexFromEndpoint(childEndpoint);
     uint16_t parentIndex = emberAfIndexFromEndpoint(parentEndpoint);
 
     if (childIndex == kEmberInvalidEndpointIndex || parentIndex == kEmberInvalidEndpointIndex)
     {
-        return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
     emAfEndpoints[childIndex].parentEndpointId = parentEndpoint;
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return CHIP_NO_ERROR;
 }
 
-EmberAfStatus SetFlatCompositionForEndpoint(EndpointId endpoint)
+CHIP_ERROR SetFlatCompositionForEndpoint(EndpointId endpoint)
 {
     uint16_t index = emberAfIndexFromEndpoint(endpoint);
     if (index == kEmberInvalidEndpointIndex)
     {
-        return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
     emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isTreeComposition);
     emAfEndpoints[index].bitmask.Set(EmberAfEndpointOptions::isFlatComposition);
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return CHIP_NO_ERROR;
 }
 
-EmberAfStatus SetTreeCompositionForEndpoint(EndpointId endpoint)
+CHIP_ERROR SetTreeCompositionForEndpoint(EndpointId endpoint)
 {
     uint16_t index = emberAfIndexFromEndpoint(endpoint);
     if (index == kEmberInvalidEndpointIndex)
     {
-        return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
     emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isFlatComposition);
     emAfEndpoints[index].bitmask.Set(EmberAfEndpointOptions::isTreeComposition);
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return CHIP_NO_ERROR;
 }
 
 bool IsFlatCompositionForEndpoint(EndpointId endpoint)
