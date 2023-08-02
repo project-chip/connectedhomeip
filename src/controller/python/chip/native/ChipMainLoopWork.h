@@ -27,12 +27,12 @@ namespace MainLoopWork {
  *
  * Several implementations exist, however generally:
  *
- *   - if already in the chip main loop, `f` gets executed right away
+ *   - if already in the chip main loop (or main loop is not running),
+ *     `f` gets executed right away
  *   - otherwise:
  *     - if chip stack locking is available, `f` is executed within the lock
- *     - if chip stack locking not available:
- *       - if main loop running, this will schedule and WAIT for `f` to execute
- *       - if main loop is stopped, this will execute `f` right away
+ *     - if chip stack locking not available, this will schedule and WAIT
+ *       for `f` to execute
  */
 void ExecuteInMainLoop(std::function<void()> f);
 
