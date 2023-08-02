@@ -111,7 +111,7 @@ CHIP_ERROR convertTargetEndpointInfoToJContentApp(TargetEndpointInfo * targetEnd
             chip::JniReferences::GetInstance().CreateArrayList(jClustersArrayList);
             for (size_t i = 0; i < kMaxNumberOfClustersPerEndpoint && clusters[i] != chip::kInvalidClusterId; i++)
             {
-                jobject jCluster = nullptr;
+                jobject jCluster  = nullptr;
                 jint jniclusterId = static_cast<jint>(clusters[i]);
                 chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniclusterId, jCluster);
                 chip::JniReferences::GetInstance().AddToList(jClustersArrayList, jCluster);

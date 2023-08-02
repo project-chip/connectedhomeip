@@ -597,10 +597,9 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
     jobject NetworkingStatus;
     std::string NetworkingStatusClassName     = "java/lang/Integer";
     std::string NetworkingStatusCtorSignature = "(I)V";
-    jint jniNetworkingStatus = static_cast<jint>(dataResponse.networkingStatus);
+    jint jniNetworkingStatus                  = static_cast<jint>(dataResponse.networkingStatus);
     chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-        NetworkingStatusClassName.c_str(), NetworkingStatusCtorSignature.c_str(),
-        jniNetworkingStatus, NetworkingStatus);
+        NetworkingStatusClassName.c_str(), NetworkingStatusCtorSignature.c_str(), jniNetworkingStatus, NetworkingStatus);
     jobject DebugText;
     if (!dataResponse.debugText.HasValue())
     {
@@ -631,10 +630,10 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
             jobject newElement_security;
             std::string newElement_securityClassName     = "java/lang/Integer";
             std::string newElement_securityCtorSignature = "(I)V";
-            jint jniNewElementSecurity = static_cast<jint>(entry.security.Raw());
+            jint jniNewElementSecurity                   = static_cast<jint>(entry.security.Raw());
             chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_securityClassName.c_str(),
-                                                                          newElement_securityCtorSignature.c_str(),
-                                                                          jniNewElementSecurity, newElement_security);
+                                                                       newElement_securityCtorSignature.c_str(),
+                                                                       jniNewElementSecurity, newElement_security);
             jobject newElement_ssid;
             jbyteArray newElement_ssidByteArray = env->NewByteArray(static_cast<jsize>(entry.ssid.size()));
             env->SetByteArrayRegion(newElement_ssidByteArray, 0, static_cast<jsize>(entry.ssid.size()),
@@ -647,11 +646,11 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
             newElement_bssid = newElement_bssidByteArray;
             jobject newElement_channel;
             jint jniChannel = static_cast<jint>(entry.channel);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniChannel,
-                                                                           newElement_channel);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniChannel, newElement_channel);
             jobject newElement_wiFiBand;
             jint jniWiFiBand = static_cast<jint>(entry.wiFiBand);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniWiFiBand, newElement_wiFiBand);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniWiFiBand,
+                                                                       newElement_wiFiBand);
             jobject newElement_rssi;
             jint jniRssi = static_cast<jint>(entry.rssi);
             chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniRssi, newElement_rssi);
@@ -696,22 +695,19 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
             auto & entry = iter_ThreadScanResultsInsideOptional.GetValue();
             jobject newElement_panId;
             jint jniPanId = static_cast<jint>(entry.panId);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniPanId,
-                                                                           newElement_panId);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniPanId, newElement_panId);
             jobject newElement_extendedPanId;
             jlong jniExtendedPanId = static_cast<jlong>(entry.extendedPanId);
             chip::JniReferences::GetInstance().CreateBoxedObject<jlong>("java/lang/Long", "(J)V", jniExtendedPanId,
-                                                                           newElement_extendedPanId);
+                                                                        newElement_extendedPanId);
             jobject newElement_networkName;
             newElement_networkName = env->NewStringUTF(std::string(entry.networkName.data(), entry.networkName.size()).c_str());
             jobject newElement_channel;
             jint jniChannel = static_cast<jint>(entry.channel);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniChannel,
-                                                                           newElement_channel);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniChannel, newElement_channel);
             jobject newElement_version;
             jint jniVersion = static_cast<jint>(entry.version);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniVersion,
-                                                                          newElement_version);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniVersion, newElement_version);
             jobject newElement_extendedAddress;
             jbyteArray newElement_extendedAddressByteArray = env->NewByteArray(static_cast<jsize>(entry.extendedAddress.size()));
             env->SetByteArrayRegion(newElement_extendedAddressByteArray, 0, static_cast<jsize>(entry.extendedAddress.size()),
