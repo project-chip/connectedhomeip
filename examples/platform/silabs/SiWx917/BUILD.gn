@@ -258,7 +258,6 @@ source_set("siwx917-common") {
     "${wifi_sdk_dir}/ethernetif.cpp",
     "${wifi_sdk_dir}/lwip_netif.cpp",
     "${wifi_sdk_dir}/wfx_notify.cpp",
-    "BaseApplication.cpp",
     "SiWx917/sl_wifi_if.c",
     "SiWx917/wfx_rsi_host.c",
   ]

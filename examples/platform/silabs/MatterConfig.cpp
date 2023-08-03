@@ -172,7 +172,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
 // WiFi needs to be initialized after Memory Init for some reason
 #ifdef SL_WIFI
-    InitWiFi();
+    ReturnErrorOnFailure(InitWiFi());
 #endif
 
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
@@ -263,13 +263,6 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 #ifdef SL_WFX_USE_SECURE_LINK
     wfx_securelink_task_start(); // start securelink key renegotiation task
 #endif                           // SL_WFX_USE_SECURE_LINK
-#elif defined(SIWX_917)
-    SILABS_LOG("Init RSI 917 Platform");
-    if (wfx_rsi_platform() != SL_STATUS_OK)
-    {
-        SILABS_LOG("RSI init failed");
-        return CHIP_ERROR_INTERNAL;
-    }
 #endif /* WF200_WIFI */
     return CHIP_NO_ERROR;
 }
