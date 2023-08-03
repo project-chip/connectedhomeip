@@ -77,7 +77,7 @@ class TC_DISHM_3_2(MatterBaseTest):
 
         logging.info("StartUpMode: %s" % (startup_mode_dut))
         if startup_mode_dut == NullValue:
-            self.print_step(3, "Read SupportedModes attribute")
+            self.print_step(2, "Read SupportedModes attribute")
             supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
             logging.info("SupportedModes: %s" % (supported_modes))
@@ -85,13 +85,11 @@ class TC_DISHM_3_2(MatterBaseTest):
             asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least two entries!")
 
             modes = [m.mode for m in supported_modes]
-            new_startup_mode = random.choice(modes)
+            startup_mode_dut = random.choice(modes)
 
-            self.print_step(4, "Write the value %s to StartUpMode" % (new_startup_mode))
+            self.print_step(2, "Write the value %s to StartUpMode" % (startup_mode_dut))
 
-            await self.write_start_up_mode(newMode=new_startup_mode)
-        else:
-            new_startup_mode = startup_mode_dut
+            await self.write_start_up_mode(newMode=startup_mode_dut)
 
         self.print_step(3, "Read CurrentMode attribute")
 
@@ -99,7 +97,7 @@ class TC_DISHM_3_2(MatterBaseTest):
 
         logging.info("CurrentMode: %s" % (old_current_mode_dut))
 
-        if old_current_mode_dut == new_startup_mode:
+        if old_current_mode_dut == startup_mode_dut:
 
             self.print_step(4, "Read SupportedModes attribute")
             supported_modes_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
@@ -111,7 +109,7 @@ class TC_DISHM_3_2(MatterBaseTest):
             new_mode_th = None
 
             for m in supported_modes_dut:
-                if m.mode != new_startup_mode:
+                if m.mode != startup_mode_dut:
                     new_mode_th = m.mode
                     break
 
