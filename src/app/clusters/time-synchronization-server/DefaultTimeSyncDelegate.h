@@ -33,11 +33,9 @@ public:
     bool HandleUpdateDSTOffset(CharSpan name) override;
     bool IsNTPAddressValid(CharSpan ntp) override;
     bool IsNTPAddressDomain(CharSpan ntp) override;
-    bool UpdateTimeUsingGNSS() override;
-    bool UpdateTimeUsingPTP() override;
-    bool UpdateTimeUsingExternalSource() override;
-    bool UpdateTimeUsingNTP(bool & usedFullNTP, bool & usedNTS, bool & allSourcesFromMatterNetwork) override;
-    bool UpdateTimeUsingNTPFallback(const CharSpan & fallbackNTP) override;
+    CHIP_ERROR UpdateTimeFromPlatformSource(chip::Callback::Callback<OnTimeSyncCompletion> * callback) override;
+    CHIP_ERROR UpdateTimeUsingNTPFallback(const CharSpan & fallbackNTP,
+                                          chip::Callback::Callback<OnFallbackNTPCompletion> * callback) override;
 };
 
 } // namespace TimeSynchronization

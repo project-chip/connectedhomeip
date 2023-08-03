@@ -18,7 +18,6 @@
 #include "DefaultTimeSyncDelegate.h"
 #include "time-synchronization-delegate.h"
 
-// TODO: Set define in build files, check define against flag using static assert on feature map
 #if TIME_SYNC_ENABLE_TSC_FEATURE
 #include <app/InteractionModelEngine.h>
 #endif
@@ -81,12 +80,25 @@ void OnDeviceConnectionFailureWrapper(void * context, const ScopedNodeId & peerI
     server->OnDeviceConnectionFailureFn();
 }
 
+#endif
+
 void OnPlatformEventWrapper(const DeviceLayer::ChipDeviceEvent * event, intptr_t ptr)
 {
     TimeSynchronizationServer * server = reinterpret_cast<TimeSynchronizationServer *>(ptr);
     server->OnPlatformEventFn(*event);
 }
-#endif
+
+void OnTimeSyncCompletionWrapper(void * context, TimeSourceEnum timeSource, GranularityEnum granularity)
+{
+    TimeSynchronizationServer * server = reinterpret_cast<TimeSynchronizationServer *>(context);
+    server->OnTimeSyncCompletionFn(timeSource, granularity);
+}
+
+void OnFallbackNTPCompletionWrapper(void * context, bool timeSyncSuccessful)
+{
+    TimeSynchronizationServer * server = reinterpret_cast<TimeSynchronizationServer *>(context);
+    server->OnFallbackNTPCompletionFn(timeSyncSuccessful);
+}
 
 } // namespace
 
@@ -255,75 +267,13 @@ TimeSynchronizationServer & TimeSynchronizationServer::Instance()
     return sTimeSyncInstance;
 }
 
-TimeSynchronizationServer::TimeSynchronizationServer()
+TimeSynchronizationServer::TimeSynchronizationServer() :
 #if TIME_SYNC_ENABLE_TSC_FEATURE
-    :
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
-    mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this)
+    mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
 #endif
+    mOnTimeSyncCompletion(OnTimeSyncCompletionWrapper, this), mOnFallbackNTPCompletion(OnFallbackNTPCompletionWrapper, this)
 {}
-
-TimeSourceEnum TimeSynchronizationServer::GetTimeFromDelegate()
-{
-    if (GetDelegate()->UpdateTimeUsingGNSS())
-    {
-        return TimeSourceEnum::kGnss;
-    }
-    if (GetDelegate()->UpdateTimeUsingPTP())
-    {
-        return TimeSourceEnum::kPtp;
-    }
-    if (GetDelegate()->UpdateTimeUsingExternalSource())
-    {
-        return TimeSourceEnum::kCloudSource;
-    }
-    bool full_ntp = false;
-    bool nts      = false;
-    bool matter   = false;
-    if (GetDelegate()->UpdateTimeUsingNTP(full_ntp, nts, matter))
-    {
-        if (matter)
-        {
-            if (full_ntp)
-            {
-                if (nts)
-                {
-                    return TimeSourceEnum::kMatterNTPNTS;
-                }
-                return TimeSourceEnum::kMatterNTP;
-            }
-            else
-            {
-                if (nts)
-                {
-                    return TimeSourceEnum::kMatterSNTPNTS;
-                }
-                return TimeSourceEnum::kMatterSNTP;
-            }
-            // non-matter
-        }
-        else
-        {
-            if (full_ntp)
-            {
-                if (nts)
-                {
-                    return TimeSourceEnum::kNonMatterNTPNTS;
-                }
-                return TimeSourceEnum::kNonMatterNTP;
-            }
-            else
-            {
-                if (nts)
-                {
-                    return TimeSourceEnum::kNonMatterSNTPNTS;
-                }
-                return TimeSourceEnum::kNonMatterSNTP;
-            }
-        }
-    }
-    return TimeSourceEnum::kNone;
-}
 
 void TimeSynchronizationServer::AttemptToGetFallbackNTPTimeFromDelegate()
 {
@@ -340,35 +290,44 @@ void TimeSynchronizationServer::AttemptToGetFallbackNTPTimeFromDelegate()
         emitTimeFailureEvent(kRootEndpointId);
         return;
     }
-    if (GetDelegate()->UpdateTimeUsingNTPFallback(span))
-    {
-        // This is SNTP equivalent even if the delegate has a full NTP stack since there's a single source
-        mGranularity = GranularityEnum::kSecondsGranularity;
-        TimeSource::Set(kRootEndpointId, TimeSourceEnum::kNonMatterSNTP);
-    }
-    else
+    if (GetDelegate()->UpdateTimeUsingNTPFallback(span, &mOnFallbackNTPCompletion) != CHIP_NO_ERROR)
     {
         emitTimeFailureEvent(kRootEndpointId);
     }
 }
 
+#if TIME_SYNC_ENABLE_TSC_FEATURE
 void TimeSynchronizationServer::OnDeviceConnectedFn(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     // Connected to our trusted time source, let's read the time.
-    app::AttributePathParams readPaths[1];
+    app::AttributePathParams readPaths[2];
     // Read all the feature maps for all the networking clusters on any endpoint to determine what is supported
-    readPaths[0]                         = app::AttributePathParams(kRootEndpointId, app::Clusters::TimeSynchronization::Id,
-                                                                    app::Clusters::TimeSynchronization::Attributes::UTCTime::Id);
+    readPaths[0] = app::AttributePathParams(kRootEndpointId, app::Clusters::TimeSynchronization::Id,
+                                            app::Clusters::TimeSynchronization::Attributes::UTCTime::Id);
+    readPaths[1] = app::AttributePathParams(kRootEndpointId, app::Clusters::TimeSynchronization::Id,
+                                            app::Clusters::TimeSynchronization::Attributes::Granularity::Id);
+
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
     app::ReadPrepareParams readParams(sessionHandle);
     readParams.mpAttributePathParamsList    = readPaths;
-    readParams.mAttributePathParamsListSize = 1;
+    readParams.mAttributePathParamsListSize = 2;
 
-    // TODO: check nulls.
     auto attributeCache = Platform::MakeUnique<app::ClusterStateCache>(*this);
-    auto readClient     = chip::Platform::MakeUnique<app::ReadClient>(engine, &exchangeMgr, attributeCache->GetBufferedCallback(),
+    if (attributeCache == nullptr)
+    {
+        // This is unlikely to work if we don't have memory, but let's try
+        OnDeviceConnectionFailureFn();
+        return;
+    }
+    auto readClient = chip::Platform::MakeUnique<app::ReadClient>(engine, &exchangeMgr, attributeCache->GetBufferedCallback(),
                                                                   app::ReadClient::InteractionType::Read);
-    CHIP_ERROR err      = readClient->SendRequest(readParams);
+    if (readClient == nullptr)
+    {
+        // This is unlikely to work if we don't have memory, but let's try
+        OnDeviceConnectionFailureFn();
+        return;
+    }
+    CHIP_ERROR err = readClient->SendRequest(readParams);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to read UTC time from trusted source");
@@ -388,77 +347,106 @@ void TimeSynchronizationServer::OnDeviceConnectionFailureFn()
 void TimeSynchronizationServer::OnDone(ReadClient * apReadClient)
 {
     using namespace chip::app::Clusters::TimeSynchronization::Attributes;
+
+    Granularity::TypeInfo::Type granularity = GranularityEnum::kNoTimeGranularity;
+    mAttributeCache->Get<Granularity::TypeInfo>(kRootEndpointId, granularity);
+
     UTCTime::TypeInfo::Type time;
     CHIP_ERROR err = mAttributeCache->Get<UTCTime::TypeInfo>(kRootEndpointId, time);
-    if (err == CHIP_NO_ERROR && !time.IsNull())
+    if (err == CHIP_NO_ERROR && !time.IsNull() && granularity != GranularityEnum::kNoTimeGranularity)
     {
-        // Being conservative with the granularity here
-        // TODO: ask for granularity in the read path and set accordingly.
-        // TODO: if we fail to set the time here, maybe we should try the backup?
-        SetUTCTime(kRootEndpointId, time.Value(), GranularityEnum::kMinutesGranularity, TimeSourceEnum::kNodeTimeCluster);
+        GranularityEnum ourGranularity;
+        // Being conservative with granularity - nothing smaller than seconds because of network delay
+        switch (granularity)
+        {
+        case GranularityEnum::kMinutesGranularity:
+        case GranularityEnum::kSecondsGranularity:
+            ourGranularity = GranularityEnum::kMinutesGranularity;
+            break;
+        default:
+            ourGranularity = GranularityEnum::kSecondsGranularity;
+            break;
+        }
+
+        err = SetUTCTime(kRootEndpointId, time.Value(), ourGranularity, TimeSourceEnum::kNodeTimeCluster);
+        if (err == CHIP_NO_ERROR)
+        {
+            return;
+        }
+    }
+    // We get here if we didn't get a time, or failed to set the time source
+    // If we failed to set the UTC time, it doesn't hurt to try the backup - NTP system might have different permissions on the
+    // system clock
+    AttemptToGetFallbackNTPTimeFromDelegate();
+}
+#endif
+
+void TimeSynchronizationServer::OnTimeSyncCompletionFn(TimeSourceEnum timeSource, GranularityEnum granularity)
+{
+    if (timeSource != TimeSourceEnum::kNone && granularity == GranularityEnum::kNoTimeGranularity)
+    {
+        // Unable to get time from the delegate. Try remaining sources.
+        CHIP_ERROR err = AttemptToGetTimeFromTrustedNode();
+        if (err != CHIP_NO_ERROR)
+        {
+            AttemptToGetFallbackNTPTimeFromDelegate();
+        }
+        return;
+    }
+    mGranularity = granularity;
+    if (EMBER_ZCL_STATUS_SUCCESS != TimeSource::Set(kRootEndpointId, timeSource))
+    {
+        ChipLogError(Zcl, "Writing TimeSource failed.");
+    }
+}
+
+void TimeSynchronizationServer::OnFallbackNTPCompletionFn(bool timeSyncSuccessful)
+{
+    if (timeSyncSuccessful)
+    {
+        mGranularity = GranularityEnum::kMillisecondsGranularity;
+        // Non-matter SNTP because we know it's external and there's only one source
+        if (EMBER_ZCL_STATUS_SUCCESS != TimeSource::Set(kRootEndpointId, TimeSourceEnum::kNonMatterSNTP))
+        {
+            ChipLogError(Zcl, "Writing TimeSource failed.");
+        }
     }
     else
     {
-        AttemptToGetFallbackNTPTimeFromDelegate();
+        emitTimeFailureEvent(kRootEndpointId);
     }
+}
+
+CHIP_ERROR TimeSynchronizationServer::AttemptToGetTimeFromTrustedNode()
+{
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+    if (!mTrustedTimeSource.IsNull())
+    {
+        CASESessionManager * caseSessionManager = Server::GetInstance().GetCASESessionManager();
+        ScopedNodeId nodeId(mTrustedTimeSource.Value().nodeID, mTrustedTimeSource.Value().fabricIndex);
+        caseSessionManager->FindOrEstablishSession(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+#endif
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 void TimeSynchronizationServer::AttemptToGetTime()
 {
     // Let's check the delegate and see if can get us a time. Even if the time is already set, we want to ask the delegate so we can
     // set the time source as appropriate.
-    bool have_internal_time = false;
-    if (!RuntimeOptionsProvider::Instance().GetSimulateNoInternalTime())
+    CHIP_ERROR err = GetDelegate()->UpdateTimeFromPlatformSource(&mOnTimeSyncCompletion);
+    if (err != CHIP_NO_ERROR)
     {
-        TimeSourceEnum source = GetTimeFromDelegate();
-        if (source != TimeSourceEnum::kNone)
-        {
-            // There's not much we can do if we fail to set this, so I guess just ignore the error.
-            TimeSource::Set(kRootEndpointId, source);
-            // Estimate the granularity based on the source
-            // TODO: Maybe get this from the delegate?
-            switch (source)
-            {
-            case TimeSourceEnum::kGnss:
-            case TimeSourceEnum::kPtp:
-                mGranularity = GranularityEnum::kMicrosecondsGranularity;
-                break;
-            case TimeSourceEnum::kCloudSource:
-            case TimeSourceEnum::kMatterNTP:
-            case TimeSourceEnum::kMatterNTPNTS:
-            case TimeSourceEnum::kNonMatterNTP:
-            case TimeSourceEnum::kNonMatterNTPNTS:
-                mGranularity = GranularityEnum::kMillisecondsGranularity;
-                break;
-            case TimeSourceEnum::kMatterSNTP:
-            case TimeSourceEnum::kMatterSNTPNTS:
-            case TimeSourceEnum::kNonMatterSNTP:
-            case TimeSourceEnum::kNonMatterSNTPNTS:
-                // Let's be a bit more conservative with SNTP
-                mGranularity = GranularityEnum::kSecondsGranularity;
-                break;
-            default:
-                mGranularity = GranularityEnum::kMinutesGranularity;
-            }
-            have_internal_time = true;
-        }
+        err = AttemptToGetTimeFromTrustedNode();
     }
-    if (!have_internal_time)
+    if (err != CHIP_NO_ERROR)
     {
-        // Delegate couldn't get us a time, next up is to check the trusted time source, if we have one.
-        // TODO: ifdef this with a client flag, and check the define flag against the feature map using a static config
-#if TIME_SYNC_ENABLE_TSC_FEATURE
-        if (!mTrustedTimeSource.IsNull())
-        {
-            CASESessionManager * caseSessionManager = Server::GetInstance().GetCASESessionManager();
-            ScopedNodeId nodeId(mTrustedTimeSource.Value().nodeID, mTrustedTimeSource.Value().fabricIndex);
-            caseSessionManager->FindOrEstablishSession(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
-        }
-        else
-#endif
-        {
-            AttemptToGetFallbackNTPTimeFromDelegate();
-        }
+        AttemptToGetFallbackNTPTimeFromDelegate();
     }
 }
 

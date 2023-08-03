@@ -18,6 +18,8 @@
 
 #include "DefaultTimeSyncDelegate.h"
 #include "inet/IPAddress.h"
+#include <platform/RuntimeOptionsProvider.h>
+#include <system/SystemClock.h>
 
 using chip::TimeSyncDataProvider;
 using namespace chip::app::Clusters::TimeSynchronization;
@@ -46,24 +48,26 @@ bool DefaultTimeSyncDelegate::IsNTPAddressDomain(chip::CharSpan ntp)
     return false;
 }
 
-bool DefaultTimeSyncDelegate::UpdateTimeUsingGNSS()
+CHIP_ERROR DefaultTimeSyncDelegate::UpdateTimeFromPlatformSource(chip::Callback::Callback<OnTimeSyncCompletion> * callback)
 {
-    return false;
+    System::Clock::Microseconds64 utcTime;
+    if (chip::app::RuntimeOptionsProvider::Instance().GetSimulateNoInternalTime())
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    else if (System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR)
+    {
+        // Default assumes the time came from NTP. Platforms using other sources should overwrite this
+        // with their own delegates
+        // Call the callback right away from within this function
+        callback->mCall(callback->mContext, TimeSourceEnum::kMixedNTP, GranularityEnum::kMillisecondsGranularity);
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
-bool DefaultTimeSyncDelegate::UpdateTimeUsingPTP()
+
+CHIP_ERROR DefaultTimeSyncDelegate::UpdateTimeUsingNTPFallback(const CharSpan & fallbackNTP,
+                                                               chip::Callback::Callback<OnFallbackNTPCompletion> * callback)
 {
-    return false;
-}
-bool DefaultTimeSyncDelegate::UpdateTimeUsingExternalSource()
-{
-    return false;
-}
-bool DefaultTimeSyncDelegate::UpdateTimeUsingNTP(bool & usedFullNTP, bool & usedNTS, bool & allSourcesFromMatterNetwork)
-{
-    // TODO: For some platforms, this is probably already implemented. Ex. Linux. We need an override here.
-    return false;
-}
-bool DefaultTimeSyncDelegate::UpdateTimeUsingNTPFallback(const CharSpan & fallbackNTP)
-{
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }

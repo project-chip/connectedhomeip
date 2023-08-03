@@ -21,12 +21,12 @@
 
 #pragma once
 
-// TODO: Move this into the build file
 #ifndef TIME_SYNC_ENABLE_TSC_FEATURE
 #define TIME_SYNC_ENABLE_TSC_FEATURE 1
 #endif
 
 #include "TimeSyncDataProvider.h"
+#include "time-synchronization-delegate.h"
 
 #if TIME_SYNC_ENABLE_TSC_FEATURE
 #include <app/ClusterStateCache.h>
@@ -117,13 +117,16 @@ public:
     void OnDeviceConnectedFn(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     void OnDeviceConnectionFailureFn();
 
-    // Platform event handler functions
-    void OnPlatformEventFn(const DeviceLayer::ChipDeviceEvent & event);
-
     // AttributeCache::Callback functions
     void OnAttributeChanged(ClusterStateCache * cache, const ConcreteAttributePath & path) override {}
     void OnDone(ReadClient * apReadClient) override;
 #endif
+
+    // Platform event handler functions
+    void OnPlatformEventFn(const DeviceLayer::ChipDeviceEvent & event);
+
+    void OnTimeSyncCompletionFn(TimeSourceEnum timeSource, GranularityEnum granularity);
+    void OnFallbackNTPCompletionFn(bool timeSyncSuccessful);
 
 private:
     static constexpr size_t kMaxDefaultNTPSize = 128;
@@ -144,12 +147,12 @@ private:
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 #endif
+    chip::Callback::Callback<OnTimeSyncCompletion> mOnTimeSyncCompletion;
+    chip::Callback::Callback<OnFallbackNTPCompletion> mOnFallbackNTPCompletion;
 
     // Called when the platform is set up - attempts to get time using the recommended source list in the spec.
     void AttemptToGetTime();
-    // Attempts to set time through the delegate using gnss -> ptp -> cloud -> external ntp. Returns
-    // TimeSourceEnum of the method used to set the time. If it is unable to get a time kNone is returned.
-    TimeSourceEnum GetTimeFromDelegate();
+    CHIP_ERROR AttemptToGetTimeFromTrustedNode();
     // Attempts to get fallback NTP from the delegate (last available source)
     // If successful, the function will set mGranulatiry and the time source
     // If unsuccessful, it will emit a TimeFailure event.
