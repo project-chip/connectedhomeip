@@ -742,6 +742,14 @@ void WindowManager::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     }
 
     AppTask::GetAppTask().PostEvent(&event);
+
+// Since there is no release interrupt for button1 posting release event after press event
+#ifdef SIWX_917
+    if (button) {
+        event = CreateNewEvent(AppEvent::kEventType_DownReleased);
+        AppTask::GetAppTask().PostEvent(&event);
+    }
+#endif
 }
 
 void WindowManager::GeneralEventHandler(AppEvent * aEvent)
