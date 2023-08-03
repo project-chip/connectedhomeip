@@ -36,8 +36,7 @@
 // Enable use of external heap allocator (calloc/free) for OpenThread.
 #define OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE 1
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-
+#ifdef SL_ICD_ENABLED
 #define OPENTHREAD_CONFIG_PARENT_SEARCH_ENABLE 0
 
 // In seconds
@@ -46,7 +45,7 @@
 // Timeout after 2 missed checkin or 4 mins if sleep interval is too short.
 #define OPENTHREAD_CONFIG_MLE_CHILD_TIMEOUT_DEFAULT ((SL_MLE_TIMEOUT_s < 120) ? 240 : ((SL_MLE_TIMEOUT_s * 2) + 1))
 
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+#endif // SL_ICD_ENABLED
 
 /****Uncomment below section for OpenThread Debug logs*/
 // #define OPENTHREAD_CONFIG_LOG_LEVEL OT_LOG_LEVEL_DEBG
