@@ -203,7 +203,12 @@ class OnOffClientFragment : Fragment() {
               ?: return
           // TODO : Need to be implement poj-to-tlv
           val obj = TlvReader(tlv).toObject()
-          val value = if (obj is Boolean) { obj } else { return }
+          val value =
+            if (obj is Boolean) {
+              obj
+            } else {
+              return
+            }
           val formatter = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
           val time = formatter.format(Calendar.getInstance(Locale.getDefault()).time)
           val message = "Subscribed on/off value at $time: ${if (value) "ON" else "OFF"}"

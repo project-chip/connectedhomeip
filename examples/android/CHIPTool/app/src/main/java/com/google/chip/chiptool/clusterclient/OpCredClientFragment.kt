@@ -15,7 +15,6 @@ import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.InvokeElement
 import chip.devicecontroller.model.NodeState
-import chip.objecttlv.fromObject
 import chip.objecttlv.toObject
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
