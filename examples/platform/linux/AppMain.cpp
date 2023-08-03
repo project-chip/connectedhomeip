@@ -75,11 +75,10 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
 #endif
-#include <app/TestEventTriggerDelegate.h>
-
-// #if CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_ALARM
+#if CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER
 #include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerDelegate.h>
-// #endif
+#endif
+#include <app/TestEventTriggerDelegate.h>
 
 #include <signal.h>
 
@@ -107,11 +106,6 @@ using namespace chip::app::Clusters;
 
 // Network comissioning implementation
 namespace {
-
-uint8_t sTestEventTriggerEnableKey[chip::TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
-                                                                                         0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
-                                                                                         0xcc, 0xdd, 0xee, 0xff };
-
 // If secondaryNetworkCommissioningEndpoint has a value and both Thread and WiFi
 // are enabled, we put the WiFi network commissioning cluster on
 // secondaryNetworkCommissioningEndpoint.
@@ -313,7 +307,6 @@ class SampleTestEventTriggerDelegate : public TestEventTriggerDelegate
 public:
     /// NOTE: If you copy this, please use the reserved range FFFF_FFFF_<VID_HEX>_xxxx for your trigger codes.
     static constexpr uint64_t kSampleTestEventTriggerAlwaysSuccess = static_cast<uint64_t>(0xFFFF'FFFF'FFF1'0000ull);
-    static constexpr uint64_t kSampleTestEventsSmokeCO             = static_cast<uint64_t>(0xFFFF'FFFF'0000'fffful);
 
     SampleTestEventTriggerDelegate() { memset(&mEnableKey[0], 0, sizeof(mEnableKey)); }
 
@@ -335,13 +328,6 @@ public:
         return CopySpanToMutableSpan(enableKey, ourEnableKeySpan);
     }
 
-    CHIP_ERROR SetSmokeCODelegate(TestEventTriggerDelegate * scoDelegate)
-    {
-        VerifyOrReturnError(EnableKeyIsSet() == CHIP_NO_ERROR, CHIP_ERROR_INVALID_ARGUMENT);
-        mSmokeCODelegate = scoDelegate;
-        return CHIP_NO_ERROR;
-    }
-
     bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override { return enableKey.data_equal(ByteSpan(mEnableKey)); }
 
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override
@@ -355,29 +341,14 @@ public:
             return CHIP_NO_ERROR;
         }
 
-        if (eventTrigger & kSampleTestEventsSmokeCO)
-        {
-            ChipLogProgress(Support, "Handling Resideo Smoke CO test event");
-            return (mSmokeCODelegate != nullptr) ? mSmokeCODelegate->HandleEventTrigger(eventTrigger) : CHIP_ERROR_INVALID_ARGUMENT;
-        }
-
         return (mOtherDelegate != nullptr) ? mOtherDelegate->HandleEventTrigger(eventTrigger) : CHIP_ERROR_INVALID_ARGUMENT;
     }
 
 private:
     uint8_t mEnableKey[TestEventTriggerDelegate::kEnableKeyLength];
-    TestEventTriggerDelegate * mOtherDelegate   = nullptr;
-    TestEventTriggerDelegate * mSmokeCODelegate = nullptr;
-    CHIP_ERROR EnableKeyIsSet()
-    {
-        for (size_t i = 0; i < TestEventTriggerDelegate::kEnableKeyLength; i++)
-        {
-            if (mEnableKey[i] != '\0')
-                return CHIP_NO_ERROR;
-        }
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    };
+    TestEventTriggerDelegate * mOtherDelegate = nullptr;
 };
+
 int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
                      const Optional<EndpointId> secondaryNetworkCommissioningEndpoint)
 {
@@ -551,21 +522,20 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     TestEventTriggerDelegate * otherDelegate = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     // We want to allow triggering OTA queries if OTA requestor is enabled
-    static OTATestEventTriggerDelegate otaTestEventTriggerDelegate{ chip::ByteSpan(sTestEventTriggerEnableKey) };
+    static OTATestEventTriggerDelegate otaTestEventTriggerDelegate{ ByteSpan(
+        LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey) };
     otherDelegate = &otaTestEventTriggerDelegate;
 #endif
-    TestEventTriggerDelegate * SmokeCODelegate = nullptr;
-#if CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_ALARM
-
-    // We want to allow triggering OTA queries if OTA requestor is enabled
-    static SmokeCOTestEventTriggerDelegate smokeCOTestEventTriggerDelegate{ chip::ByteSpan(sTestEventTriggerEnableKey) };
-    SmokeCODelegate = &smokeCOTestEventTriggerDelegate;
+#if CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER
+    static SmokeCOTestEventTriggerDelegate smokeCOTestEventTriggerDelegate{
+        ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey), otherDelegate, 1
+    };
+    otherDelegate = &smokeCOTestEventTriggerDelegate;
 #endif
-    //  For general testing of TestEventTrigger, we have a common "core" event trigger delegate.
+    // For general testing of TestEventTrigger, we have a common "core" event trigger delegate.
     static SampleTestEventTriggerDelegate testEventTriggerDelegate;
-    VerifyOrDie(testEventTriggerDelegate.Init(chip::ByteSpan(sTestEventTriggerEnableKey), otherDelegate) == CHIP_NO_ERROR);
-
-    testEventTriggerDelegate.SetSmokeCODelegate(SmokeCODelegate);
+    VerifyOrDie(testEventTriggerDelegate.Init(ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey),
+                                              otherDelegate) == CHIP_NO_ERROR);
 
     initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
 

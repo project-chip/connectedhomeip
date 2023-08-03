@@ -81,7 +81,6 @@ declare_args() {
 
   # Enable OTA requestor support
   chip_enable_ota_requestor = false
-  chip_enable_smoke_co_alarm = false
 
   # Select DNS-SD implementation
   if (chip_device_platform == "linux" || chip_device_platform == "esp32" ||

@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,58 +19,83 @@
 
 #include <app/TestEventTriggerDelegate.h>
 
+#include <app-common/zap-generated/cluster-objects.h>
+
 namespace chip {
-namespace trigger {
 
-// force alarm commands
-const uint64_t ForceSmokeWarning           = 0xffffffff00000090;
-const uint64_t ForceSmokeInterconnect      = 0xffffffff00000092;
-const uint64_t ForceCOInterconnect         = 0xffffffff00000094;
-const uint64_t ForceSmokeContaminationHigh = 0xffffffff00000096;
-const uint64_t ForceSmokeContaminationLow  = 0xffffffff00000097;
-const uint64_t ForceSmokeSensitivityHigh   = 0xffffffff00000098;
-const uint64_t ForceSmokeSensitivityLow    = 0xffffffff00000099;
-const uint64_t ForceSmokeCritical          = 0xffffffff0000009c;
+enum class Trigger : uint64_t
+{
+    // Force alarm commands
+    kForceSmokeWarning           = 0xffffffff00000090,
+    kForceCOWarning              = 0xffffffff00000091,
+    kForceSmokeInterconnect      = 0xffffffff00000092,
+    kForceMalfunction            = 0xffffffff00000093,
+    kForceCOInterconnect         = 0xffffffff00000094,
+    kForceLowBatteryWarning      = 0xffffffff00000095,
+    kForceSmokeContaminationHigh = 0xffffffff00000096,
+    kForceSmokeContaminationLow  = 0xffffffff00000097,
+    kForceSmokeSensitivityHigh   = 0xffffffff00000098,
+    kForceSmokeSensitivityLow    = 0xffffffff00000099,
+    kForceEndOfLife              = 0xffffffff0000009a,
+    kForceSilence                = 0xffffffff0000009b,
+    kForceSmokeCritical          = 0xffffffff0000009c,
+    kForceCOCritical             = 0xffffffff0000009d,
+    kForceLowBatteryCritical     = 0xffffffff0000009e,
+    // Clear alarm commands
+    kClearSmoke             = 0xffffffff000000a0,
+    kClearCO                = 0xffffffff000000a1,
+    kClearSmokeInterconnect = 0xffffffff000000a2,
+    kClearMalfunction       = 0xffffffff000000a3,
+    kClearCOInterconnect    = 0xffffffff000000a4,
+    kClearBatteryLevelLow   = 0xffffffff000000a5,
+    kClearContamination     = 0xffffffff000000a6,
+    kClearSensitivity       = 0xffffffff000000a8,
+    kClearEndOfLife         = 0xffffffff000000aa,
+    kClearSilence           = 0xffffffff000000ab
+};
 
-const uint64_t ForceCOWarning  = 0xffffffff00000091;
-const uint64_t ForceCOCritical = 0xffffffff0000009d;
-
-const uint64_t ForceMalfunction = 0xffffffff00000093;
-
-const uint64_t ForceLowBatteryWarning  = 0xffffffff00000095;
-const uint64_t ForceLowBatteryCritical = 0xffffffff0000009e;
-
-const uint64_t ForceCOEndOfLife = 0xffffffff0000009a;
-const uint64_t ForceSilence     = 0xffffffff0000009b;
-
-// clear alarm commands
-const uint64_t ClearSmoke             = 0xffffffff000000a0;
-const uint64_t ClearCO                = 0xffffffff000000a1;
-const uint64_t ClearSmokeInterconnect = 0xffffffff000000a2;
-const uint64_t ClearMalfunction       = 0xffffffff000000a3;
-const uint64_t ClearCOInterconnect    = 0xffffffff000000a4;
-const uint64_t ClearBatteryLevelLow   = 0xffffffff000000a5;
-const uint64_t ClearContamination     = 0xffffffff000000a6;
-const uint64_t ClearSensitivity       = 0xffffffff000000a8;
-
-const uint64_t ClearCOEndOfLife = 0xffffffff000000aa;
-const uint64_t ClearSilence     = 0xffffffff000000ab;
-} // namespace trigger
 class SmokeCOTestEventTriggerDelegate : public TestEventTriggerDelegate
 {
 public:
-     explicit SmokeCOTestEventTriggerDelegate(const ByteSpan & enableKey) : mEnableKey(enableKey) {}
+    explicit SmokeCOTestEventTriggerDelegate(const ByteSpan & enableKey, TestEventTriggerDelegate * otherDelegate,
+                                             EndpointId endpointId) :
+        mEnableKey(enableKey),
+        mOtherDelegate(otherDelegate), mEndpointId(endpointId)
+    {}
 
     bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override;
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
-    CHIP_ERROR SetSmokeCODelegate(TestEventTriggerDelegate * scoDelegate);
-    // Highest level of Expressed state is Manufacturer specific.
-    // This is specifically written in support of certification test TC-2.6
-    void ExampleSetExpressedState (void);
+
+    using ExpressedStateEnum = app::Clusters::SmokeCoAlarm::ExpressedStateEnum;
+    using AlarmStateEnum     = app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using EndOfServiceEnum   = app::Clusters::SmokeCoAlarm::EndOfServiceEnum;
+
+    /**
+     * @brief The priority order for expressed alarms from Highest to lowest.
+     */
+    std::array<ExpressedStateEnum, 8> priorityOrder = { ExpressedStateEnum::kSmokeAlarm,    ExpressedStateEnum::kInterconnectSmoke,
+                                                        ExpressedStateEnum::kCOAlarm,       ExpressedStateEnum::kInterconnectCO,
+                                                        ExpressedStateEnum::kHardwareFault, ExpressedStateEnum::kTesting,
+                                                        ExpressedStateEnum::kEndOfService,  ExpressedStateEnum::kBatteryAlert };
 
 private:
     ByteSpan mEnableKey;
+    TestEventTriggerDelegate * mOtherDelegate;
+    EndpointId mEndpointId;
 
+    AlarmStateEnum mCurrentSmokeAlarm;
+    AlarmStateEnum mCurrentInterconnectSmokeAlarm;
+    AlarmStateEnum mCurrentCoAlarm;
+    AlarmStateEnum mCurrentInterconnectCoAlarm;
+    AlarmStateEnum mCurrentBatteryState;
+    EndOfServiceEnum mCurrentEndOfService;
+    bool mCurrentTestInProgress;
+    bool mCurrentHardwareFault;
+
+    /**
+     * @brief Highest level of Expressed state is Manufacturer specific.
+     */
+    void SetExpressedState(void);
 };
 
 } // namespace chip

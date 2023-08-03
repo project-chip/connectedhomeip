@@ -17,8 +17,8 @@
 
 #include <lib/core/DataModelTypes.h>
 
-#include <../../../src/app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerDelegate.h>
-#include <../../../src/app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
+#include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerDelegate.h>
+#include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
@@ -48,7 +48,7 @@ void TestModeTimeoutThread(int timeout)
 
     SmokeCoAlarmServer::Instance().GetBatteryAlert(1, currentBatteryState);
     SmokeCoAlarmServer::Instance().GetEndOfServiceAlert(1, currentEndOfService);
-    
+
     if (currentBatteryState != SmokeCoAlarm::AlarmStateEnum::kNormal)
         currentExpressedState = SmokeCoAlarm::ExpressedStateEnum::kBatteryAlert;
     if (currentEndOfService != SmokeCoAlarm::EndOfServiceEnum::kNormal)

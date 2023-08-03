@@ -19,6 +19,10 @@ import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
 
+declare_args() {
+  chip_enable_smoke_co_trigger = false
+}
+
 config("app-main-config") {
   include_dirs = [ "." ]
 }
@@ -29,12 +33,9 @@ source_set("ota-test-event-trigger") {
   ]
 }
 
-source_set("sco-test-event-trigger") {
-  sources = [
-    "${chip_root}/src/app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerDelegate.h",
-  ]
+source_set("smco-test-event-trigger") {
+  sources = [ "${chip_root}/src/app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerDelegate.h" ]
 }
-
 
 source_set("app-main") {
   defines = [ "ENABLE_TRACING=${matter_enable_tracing_support}" ]
@@ -63,7 +64,7 @@ source_set("app-main") {
   ]
   deps = [
     ":ota-test-event-trigger",
-    ":sco-test-event-trigger",
+    ":smco-test-event-trigger",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/app/server",
   ]
@@ -91,6 +92,10 @@ source_set("app-main") {
       "${chip_root}/examples/common/tracing:commandline",
       "${chip_root}/src/tracing",
     ]
+  }
+
+  if (chip_enable_smoke_co_trigger) {
+    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER=1" ]
   }
 
   public_configs = [ ":app-main-config" ]
