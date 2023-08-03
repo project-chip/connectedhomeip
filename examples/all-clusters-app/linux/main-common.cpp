@@ -16,14 +16,18 @@
  *    limitations under the License.
  */
 
-#include "main-common.h"
 #include "AllClustersCommandDelegate.h"
 #include "WindowCoveringManager.h"
+#include "dishwasher-mode.h"
 #include "include/tv-callbacks.h"
+#include "laundry-washer-mode.h"
+#include "rvc-modes.h"
+#include "tcc-mode.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/att-storage.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <lib/support/CHIPMem.h>
@@ -55,6 +59,9 @@ app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSup
 
 #ifdef EMBER_AF_PLUGIN_OPERATIONAL_STATE_SERVER
 extern void MatterOperationalStateServerInit();
+#endif
+#ifdef EMBER_AF_PLUGIN_DISHWASHER_ALARM_SERVER
+extern void MatterDishwasherAlarmServerInit();
 #endif
 
 void OnIdentifyStart(::Identify *)
@@ -176,11 +183,22 @@ void ApplicationInit()
 #ifdef EMBER_AF_PLUGIN_OPERATIONAL_STATE_SERVER
     MatterOperationalStateServerInit();
 #endif
+
+#ifdef EMBER_AF_PLUGIN_DISHWASHER_ALARM_SERVER
+    MatterDishwasherAlarmServerInit();
+#endif
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
-void ApplicationExit()
+void ApplicationShutdown()
 {
+    // These may have been initialised via the emberAfXxxClusterInitCallback methods. We need to destroy them before shutdown.
+    Clusters::DishwasherMode::Shutdown();
+    Clusters::LaundryWasherMode::Shutdown();
+    Clusters::RvcCleanMode::Shutdown();
+    Clusters::RvcRunMode::Shutdown();
+    Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Shutdown();
+
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to stop CHIP NamedPipeCommands");

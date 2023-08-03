@@ -285,7 +285,7 @@ Locking locking;
 #endif // defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
 
 #if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
-pw::trace::TraceService trace_service;
+pw::trace::TraceService trace_service(pw::trace::GetTokenizedTracer());
 #endif // defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
 
 #if defined(PW_RPC_WIFI_SERVICE) && PW_RPC_WIFI_SERVICE

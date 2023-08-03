@@ -42,7 +42,7 @@ tests:
     - label: "Step 3a: Read the global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: "!HEPAFREMON.S.F00 && !HEPAFREMON.S.F01"
+      PICS: "!HEPAFREMON.S.F00 && !HEPAFREMON.S.F01 && !HEPAFREMON.S.F02"
       response:
           value: 0
           constraints:
@@ -70,13 +70,34 @@ tests:
               type: bitmap32
               hasMasksSet: [0x2]
 
+    - label:
+          "Step 3d: Given HEPAFREMON.S.F02(ReplacementProductList) ensure
+          featuremap has the correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: HEPAFREMON.S.F02
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x3]
+
     - label: "Step 4: Read the global attribute: AttributeList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains: [2, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4: Read the global attribute: AttributeList"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [2, 65528, 65529, 65531, 65532, 65533]
 
     - label:
           "Step 4a: Read the feature dependent(HEPAFREMON.S.F00) attribute in
@@ -87,7 +108,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [0, 1]
+              contains: [0, 1, 2]
 
     - label:
           "Step 4b: Read the optional attribute InPlaceIndicator
@@ -101,6 +122,7 @@ tests:
               contains: [3]
 
     - label: "Step 5: TH reads EventList attribute from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:

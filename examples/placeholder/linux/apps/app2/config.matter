@@ -681,6 +681,13 @@ server cluster Descriptor = 29 {
     int16u revision = 1;
   }
 
+  struct SemanticTagStruct {
+    nullable vendor_id mfgCode = 0;
+    enum8 namespaceID = 1;
+    enum8 tag = 2;
+    optional nullable char_string label = 3;
+  }
+
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
   readonly attribute CLUSTER_ID serverList[] = 1;
   readonly attribute CLUSTER_ID clientList[] = 2;
@@ -6430,7 +6437,6 @@ endpoint 0 {
     callback attribute accessControlEntriesPerFabric;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -7069,7 +7075,6 @@ endpoint 1 {
     ram      attribute identifyType default = 0x0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
@@ -7079,7 +7084,6 @@ endpoint 1 {
     ram      attribute nameSupport;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
@@ -7093,7 +7097,6 @@ endpoint 1 {
     ram      attribute nameSupport;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 5;
@@ -7107,7 +7110,6 @@ endpoint 1 {
     ram      attribute startUpOnOff default = 0xFF;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0001;
     ram      attribute clusterRevision default = 5;
@@ -7128,7 +7130,6 @@ endpoint 1 {
     ram      attribute startUpCurrentLevel;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 5;
@@ -7141,7 +7142,6 @@ endpoint 1 {
     callback attribute partsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;

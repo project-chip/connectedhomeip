@@ -80,7 +80,7 @@ tests:
                 value: 180
 
     #Check for DNS-SD advertisement CM is not possible in YAML
-    - label: "Step 3a: Verify that the DNS-SD advertisement shows CM=1"
+    - label: "Step 3: Verify that the DNS-SD advertisement shows CM=1"
       verification: |
           On TH_CR1 send the below command
 
@@ -107,7 +107,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 3b: Wait for PIXIT.CADMIN.CwDuration + 10"
+    - label: "Wait for PIXIT.CADMIN.CwDuration + 10"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -129,7 +129,7 @@ tests:
       response:
           error: FAILURE
 
-    - label: "Step 5a: TH_CR1 opens a commissioning window on DUT_CE"
+    - label: "Step 5: TH_CR1 opens a commissioning window on DUT_CE"
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
@@ -139,7 +139,7 @@ tests:
               - name: "CommissioningTimeout"
                 value: 180
 
-    - label: "Step 5b: Waiting after opening commissioning window"
+    - label: "Waiting after opening commissioning window"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -155,6 +155,7 @@ tests:
 
     - label: "Step 7: TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
+      PICS: CADMIN.S
       cluster: "CommissionerCommands"
       command: "PairWithCode"
       arguments:
@@ -193,7 +194,7 @@ tests:
       response:
           value: "chiptest"
 
-    - label: "Step 10a: TH_CR1 opens a commissioning window on DUT_CE"
+    - label: "Step 10: TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
@@ -204,7 +205,7 @@ tests:
               - name: "CommissioningTimeout"
                 value: 180
 
-    - label: "Step 10b: Waiting after opening commissioning window"
+    - label: "Waiting after opening commissioning window"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -226,7 +227,7 @@ tests:
           error: FAILURE
           clusterError: 2
 
-    - label: "Step 12a: TH_CR2 starts a commissioning process on DUT_CE"
+    - label: "Step 12: TH_CR2 starts a commissioning process on DUT_CE"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -237,7 +238,7 @@ tests:
               - name: "payload"
                 value: payload
 
-    - label: "Step 12b: DUT_CE is commissioned by TH_CR2"
+    - label: "DUT_CE is commissioned by TH_CR2"
       identity: "beta"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -248,8 +249,7 @@ tests:
                 value: nodeId2
 
     - label:
-          "Step 12c: TH2 reads CurrentFabricIndex attribute and save it for
-          future use."
+          "TH2 reads CurrentFabricIndex attribute and save it for future use."
       identity: "beta"
       command: "readAttribute"
       cluster: "Operational Credentials"
@@ -282,7 +282,7 @@ tests:
       response:
           error: FAILURE
 
-    - label: "Step 14a: Remove TH2 FabricIndex"
+    - label: "Remove TH2 FabricIndex"
       PICS: OPCREDS.S.C0a.Rsp && CADMIN.S
       identity: "beta"
       cluster: "Operational Credentials"

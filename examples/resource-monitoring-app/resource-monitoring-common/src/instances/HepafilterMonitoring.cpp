@@ -16,26 +16,33 @@
  *    limitations under the License.
  */
 
+#include <ImmutableReplacementProductListManager.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <app/data-model/Nullable.h>
+#include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
 #include <instances/HepaFilterMonitoring.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <system/SystemClock.h>
 
+using namespace chip;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::HepaFilterMonitoring;
 using namespace chip::app::Clusters::ResourceMonitoring;
+using namespace chip::app::Clusters::ResourceMonitoring::Attributes;
 using chip::Protocols::InteractionModel::Status;
+
+static ImmutableReplacementProductListManager sHepaFilterReplacementProductListManager;
 
 //-- Hepa filter Monitoring instance methods
 CHIP_ERROR HepaFilterMonitoringInstance::AppInit()
 {
     ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::Init()");
+
+    SetReplacementProductListManagerInstance(&sHepaFilterReplacementProductListManager);
+
     return CHIP_NO_ERROR;
 }
 

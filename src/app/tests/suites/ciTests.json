@@ -48,6 +48,7 @@
         "Test_TC_OPCREDS_1_2",
         "Test_TC_BINFO_1_1",
         "Test_TC_BINFO_2_1",
+        "Test_TC_BINFO_2_2",
         "Test_TC_CNET_1_3"
     ],
     "Descriptor": ["Test_TC_DESC_1_1"],
@@ -68,7 +69,7 @@
         "Test_TC_FAN_2_5",
         "Test_TC_FAN_3_1",
         "Test_TC_FAN_3_2",
-        "Test_TC_FAN_3_4"
+        "Test_TC_FAN_3_6"
     ],
     "GeneralCommissioning": ["Test_TC_CGEN_1_1", "Test_TC_CGEN_2_1"],
     "GeneralDiagnostics": ["Test_TC_DGGEN_1_1", "Test_TC_DGGEN_2_1"],
@@ -176,6 +177,15 @@
     "PowerSourceConfiguration": ["Test_TC_PSCFG_1_1", "Test_TC_PSCFG_2_1"],
     "RelativeHumidityMeasurement": ["Test_TC_RH_1_1", "Test_TC_RH_2_1"],
     "SecureChannel": [],
+    "SmokeCOAlarm": [
+        "Test_TC_SMOKECO_1_1",
+        "Test_TC_SMOKECO_2_1",
+        "Test_TC_SMOKECO_2_2",
+        "Test_TC_SMOKECO_2_3",
+        "Test_TC_SMOKECO_2_4",
+        "Test_TC_SMOKECO_2_5",
+        "Test_TC_SMOKECO_2_6"
+    ],
     "Switch": ["Test_TC_SWTCH_1_1", "Test_TC_SWTCH_2_1"],
     "TemperatureMeasurement": ["Test_TC_TMP_1_1", "Test_TC_TMP_2_1"],
     "Thermostat": ["Test_TC_TSTAT_1_1", "Test_TC_TSTAT_2_1"],
@@ -259,7 +269,9 @@
         "TestCommissioningWindow",
         "TestCommissionerNodeId",
         "TestTimeSynchronization",
-        "TestOperationalState"
+        "TestOperationalState",
+        "TestRVCOperationalState",
+        "TestDishwasherAlarm"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": ["Test_TC_DGSW_1_1"],
@@ -291,6 +303,8 @@
     ],
     "Scenes": ["Test_TC_S_1_1"],
     "ResourceMonitoring": [
+        "TestActivatedCarbonFilterMonitoring",
+        "TestHepaFilterMonitoring",
         "Test_TC_ACFREMON_1_1",
         "Test_TC_ACFREMON_2_1",
         "Test_TC_HEPAFREMON_1_1",
@@ -358,6 +372,7 @@
         "PowerSourceConfiguration",
         "RelativeHumidityMeasurement",
         "SecureChannel",
+        "SmokeCOAlarm",
         "Switch",
         "TemperatureMeasurement",
         "Thermostat",

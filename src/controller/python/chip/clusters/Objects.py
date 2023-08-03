@@ -2782,6 +2782,7 @@ class Descriptor(Cluster):
                 ClusterObjectFieldDescriptor(Label="serverList", Tag=0x00000001, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="clientList", Tag=0x00000002, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="partsList", Tag=0x00000003, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="tagList", Tag=0x00000004, Type=typing.Optional[typing.List[Descriptor.Structs.SemanticTagStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -2794,6 +2795,7 @@ class Descriptor(Cluster):
     serverList: 'typing.List[uint]' = None
     clientList: 'typing.List[uint]' = None
     partsList: 'typing.List[uint]' = None
+    tagList: 'typing.Optional[typing.List[Descriptor.Structs.SemanticTagStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -2814,6 +2816,23 @@ class Descriptor(Cluster):
 
             deviceType: 'uint' = 0
             revision: 'uint' = 0
+
+        @dataclass
+        class SemanticTagStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="namespaceID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="tag", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="label", Tag=3, Type=typing.Union[None, Nullable, str]),
+                    ])
+
+            mfgCode: 'typing.Union[Nullable, uint]' = NullValue
+            namespaceID: 'uint' = 0
+            tag: 'uint' = 0
+            label: 'typing.Union[None, Nullable, str]' = None
 
     class Attributes:
         @dataclass
@@ -2879,6 +2898,22 @@ class Descriptor(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.List[uint])
 
             value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class TagList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x001D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[Descriptor.Structs.SemanticTagStruct]])
+
+            value: 'typing.Optional[typing.List[Descriptor.Structs.SemanticTagStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -13416,6 +13451,10 @@ class GroupKeyManagement(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
+    class Bitmaps:
+        class Feature(IntFlag):
+            kCacheAndSync = 0x1
+
     class Structs:
         @dataclass
         class GroupInfoMapStruct(ClusterObject):
@@ -14666,11 +14705,11 @@ class IcdManagement(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="checkInNodeID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="key", Tag=1, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="verificationKey", Tag=1, Type=typing.Optional[bytes]),
                     ])
 
             checkInNodeID: 'uint' = 0
-            key: 'typing.Optional[bytes]' = None
+            verificationKey: 'typing.Optional[bytes]' = None
 
         @dataclass
         class StayActiveRequest(ClusterCommand):
@@ -19123,6 +19162,7 @@ class HepaFilterMonitoring(Cluster):
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+            kReplacementProductList = 0x3
 
     class Structs:
         @dataclass
@@ -19417,6 +19457,7 @@ class ActivatedCarbonFilterMonitoring(Cluster):
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+            kReplacementProductList = 0x3
 
     class Structs:
         @dataclass

@@ -17,11 +17,11 @@
  */
 
 #include <app/AttributeAccessInterface.h>
-#include <app/AttributePersistenceProvider.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/InteractionModelEngine.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
 #include <app/data-model/Nullable.h>
@@ -116,11 +116,16 @@ chip::Protocols::InteractionModel::Status Instance::UpdateLastChangedTime(DataMo
     mLastChangedTime        = aNewLastChangedTime;
     if (mLastChangedTime != oldLastchangedTime)
     {
-        chip::app::GetAttributePersistenceProvider()->WriteScalarValue(
+        chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
             ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id), mLastChangedTime);
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::LastChangedTime::Id);
     }
     return Protocols::InteractionModel::Status::Success;
+}
+
+void Instance::SetReplacementProductListManagerInstance(ReplacementProductListManager * aReplacementProductListManager)
+{
+    mReplacementProductListManager = aReplacementProductListManager;
 }
 
 uint8_t Instance::GetCondition() const
@@ -145,6 +150,11 @@ bool Instance::GetInPlaceIndicator() const
 DataModel::Nullable<uint32_t> Instance::GetLastChangedTime() const
 {
     return mLastChangedTime;
+}
+
+ReplacementProductListManager * Instance::GetReplacementProductListManagerInstance()
+{
+    return mReplacementProductListManager;
 }
 
 Status Instance::OnResetCondition()
@@ -232,6 +242,35 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR Instance::ReadReplacableProductList(AttributeValueEncoder & aEncoder)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (HasFeature(ResourceMonitoring::Feature::kReplacementProductList))
+    {
+        ReplacementProductListManager * productListManagerInstance = GetReplacementProductListManagerInstance();
+        if (nullptr == productListManagerInstance)
+        {
+            aEncoder.EncodeEmptyList();
+            return CHIP_NO_ERROR;
+        }
+
+        productListManagerInstance->Reset();
+
+        err = aEncoder.EncodeList([productListManagerInstance](const auto & encoder) -> CHIP_ERROR {
+            ReplacementProductStruct replacementProductStruct;
+            CHIP_ERROR iteratorError = productListManagerInstance->Next(replacementProductStruct);
+
+            while (CHIP_NO_ERROR == iteratorError)
+            {
+                ReturnErrorOnFailure(encoder.Encode(replacementProductStruct));
+                iteratorError = productListManagerInstance->Next(replacementProductStruct);
+            }
+            return (CHIP_ERROR_PROVIDER_LIST_EXHAUSTED == iteratorError) ? CHIP_NO_ERROR : iteratorError;
+        });
+    }
+    return err;
+}
+
 // Implements the read functionality for non-standard attributes.
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -259,6 +298,10 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     }
     case Attributes::LastChangedTime::Id: {
         ReturnErrorOnFailure(aEncoder.Encode(mLastChangedTime));
+        break;
+    }
+    case Attributes::ReplacementProductList::Id: {
+        return ReadReplacableProductList(aEncoder);
         break;
     }
     }
@@ -308,7 +351,7 @@ void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
 
 void Instance::LoadPersistentAttributes()
 {
-    CHIP_ERROR err = chip::app::GetAttributePersistenceProvider()->ReadScalarValue(
+    CHIP_ERROR err = chip::app::GetSafeAttributePersistenceProvider()->ReadScalarValue(
         ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id), mLastChangedTime);
     if (err == CHIP_NO_ERROR)
     {

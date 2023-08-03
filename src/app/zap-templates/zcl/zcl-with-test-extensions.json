@@ -314,6 +314,41 @@
             "DSTOffsetListMaxSize"
         ],
         "Temperature Control": ["SupportedTemperatureLevels"],
+        "Dishwasher Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "StartUpMode",
+            "OnMode",
+            "FeatureMap"
+        ],
+        "Laundry Washer Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "StartUpMode",
+            "OnMode",
+            "FeatureMap"
+        ],
+        "Refrigerator And Temperature Controlled Cabinet Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "StartUpMode",
+            "OnMode",
+            "FeatureMap"
+        ],
+        "RVC Clean Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "StartUpMode",
+            "OnMode",
+            "FeatureMap"
+        ],
+        "RVC Run Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "StartUpMode",
+            "OnMode",
+            "FeatureMap"
+        ],
         "Operational State": [
             "OperationalState",
             "OperationalError",
@@ -332,6 +367,7 @@
             "ChangeIndication",
             "InPlaceIndicator",
             "LastChangedTime",
+            "ReplacementProductList",
             "FeatureMap"
         ],
         "HEPA Filter Monitoring": [
@@ -340,6 +376,7 @@
             "ChangeIndication",
             "InPlaceIndicator",
             "LastChangedTime",
+            "ReplacementProductList",
             "FeatureMap"
         ]
     },

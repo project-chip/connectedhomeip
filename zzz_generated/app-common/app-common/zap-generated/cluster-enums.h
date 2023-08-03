@@ -1444,6 +1444,12 @@ enum class GroupKeySecurityPolicyEnum : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kCacheAndSync = 0x1,
+};
 } // namespace GroupKeyManagement
 
 namespace FixedLabel {} // namespace FixedLabel
@@ -1904,8 +1910,9 @@ enum class ProductIdentifierTypeEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kCondition = 0x1,
-    kWarning   = 0x2,
+    kCondition              = 0x1,
+    kWarning                = 0x2,
+    kReplacementProductList = 0x3,
 };
 } // namespace HepaFilterMonitoring
 
@@ -1954,8 +1961,9 @@ enum class ProductIdentifierTypeEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kCondition = 0x1,
-    kWarning   = 0x2,
+    kCondition              = 0x1,
+    kWarning                = 0x2,
+    kReplacementProductList = 0x3,
 };
 } // namespace ActivatedCarbonFilterMonitoring
 

@@ -29,7 +29,9 @@ namespace app {
 namespace Clusters {
 namespace ResourceMonitoring {
 
-static constexpr std::array<ClusterId, 2> AliasedClusters = { 0x0071, 0x0072 };
+// max of 20 characters as defined by the constraint on the ProductIdentifierValue in the specification
+static constexpr size_t kProductIdentifierValueMaxNameLength = 20u;
+static constexpr std::array<ClusterId, 2> AliasedClusters    = { HepaFilterMonitoring::Id, ActivatedCarbonFilterMonitoring::Id };
 
 // Enum for ChangeIndicationEnum
 enum class ChangeIndicationEnum : uint8_t
@@ -59,9 +61,87 @@ enum class DegradationDirectionEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kCondition = 0x1,
-    kWarning   = 0x2,
-    // TODO(#27577): add server support for REP feature (ReplacementProductList)
+    kCondition              = 0x1,
+    kWarning                = 0x2,
+    kReplacementProductList = 0x3
+};
+
+// Enum for ProductIdentifierTypeEnum
+enum class ProductIdentifierTypeEnum : uint8_t
+{
+    kUpc    = 0x00,
+    kGtin8  = 0x01,
+    kEan    = 0x02,
+    kGtin14 = 0x03,
+    kOem    = 0x04
+};
+
+// A struct used during reads of the ReplacementProductList to store a single list instance we request
+// from the application.
+//
+// Inherit from an auto-generated struct to pick up the implementation bits, but make
+// it private inheritance so people can't accidentally use this struct where the other
+// is expected.
+struct ReplacementProductStruct : private HepaFilterMonitoring::Structs::ReplacementProductStruct::Type
+{
+private:
+    char productIdentifierValueBuffer[kProductIdentifierValueMaxNameLength];
+
+public:
+    static constexpr bool kIsFabricScoped = false;
+    virtual ~ReplacementProductStruct()   = default;
+    ReplacementProductStruct() {}
+    ReplacementProductStruct(ResourceMonitoring::ProductIdentifierTypeEnum aProductIdentifierType,
+                             chip::CharSpan aProductIdentifierValue)
+    {
+        SetProductIdentifierType(aProductIdentifierType);
+        SetProductIdentifierValue(aProductIdentifierValue);
+    }
+
+    ReplacementProductStruct & operator=(const ReplacementProductStruct & aReplacementProductStruct)
+    {
+        SetProductIdentifierType(aReplacementProductStruct.GetProductIdentifierType());
+        SetProductIdentifierValue(aReplacementProductStruct.GetProductIdentifierValue());
+        return *this;
+    }
+
+    using HepaFilterMonitoring::Structs::ReplacementProductStruct::Type::Encode;
+
+    /**
+     * Sets the product identifier type.
+     *
+     * @param aProductIdentifierType The product identifier type.
+     */
+    void SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum aProductIdentifierType)
+    {
+        productIdentifierType = static_cast<HepaFilterMonitoring::ProductIdentifierTypeEnum>(aProductIdentifierType);
+    }
+
+    /**
+     * Sets the product identifier value.
+     * This implementation will copy the argument into this struct's buffer.
+     *
+     * @param aProductIdentifierValue The value of the product identifier to set.
+     * @return CHIP_ERROR_INVALID_ARGUMENT when aProductIdentifierValue is invalid
+     * or the size exceeds kProductIdentifierValueMaxNameLength, returns CHIP_NO_ERROR
+     * otherwise.
+     */
+    CHIP_ERROR SetProductIdentifierValue(chip::CharSpan aProductIdentifierValue)
+    {
+        VerifyOrReturnError(IsSpanUsable(aProductIdentifierValue), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(aProductIdentifierValue.size() <= sizeof(productIdentifierValueBuffer), CHIP_ERROR_INVALID_ARGUMENT);
+
+        memcpy(productIdentifierValueBuffer, aProductIdentifierValue.data(), aProductIdentifierValue.size());
+        productIdentifierValue = CharSpan(productIdentifierValueBuffer, aProductIdentifierValue.size());
+
+        return CHIP_NO_ERROR;
+    }
+
+    ProductIdentifierTypeEnum GetProductIdentifierType() const
+    {
+        return static_cast<ProductIdentifierTypeEnum>(productIdentifierType);
+    };
+    chip::CharSpan GetProductIdentifierValue() const { return productIdentifierValue; };
 };
 
 namespace Attributes {
@@ -130,6 +210,10 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LastChangedTime
+
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000005;
+}
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

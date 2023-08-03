@@ -1,11 +1,11 @@
-ARG VERSION=latest
+ARG VERSION=1
 FROM ghcr.io/project-chip/chip-build:${VERSION} as build
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
-    wget=1.20.3-1ubuntu2 \
+    wget \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line

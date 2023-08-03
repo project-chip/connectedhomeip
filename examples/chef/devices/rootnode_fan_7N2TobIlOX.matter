@@ -155,6 +155,13 @@ server cluster Descriptor = 29 {
     int16u revision = 1;
   }
 
+  struct SemanticTagStruct {
+    nullable vendor_id mfgCode = 0;
+    enum8 namespaceID = 1;
+    enum8 tag = 2;
+    optional nullable char_string label = 3;
+  }
+
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
   readonly attribute CLUSTER_ID serverList[] = 1;
   readonly attribute CLUSTER_ID clientList[] = 2;
@@ -1123,6 +1130,10 @@ server cluster GroupKeyManagement = 63 {
   enum GroupKeySecurityPolicyEnum : ENUM8 {
     kTrustFirst = 0;
     kCacheAndSync = 1;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kCacheAndSync = 0x1;
   }
 
   fabric_scoped struct GroupInfoMapStruct {

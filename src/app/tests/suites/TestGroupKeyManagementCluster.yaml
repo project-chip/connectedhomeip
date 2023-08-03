@@ -74,6 +74,345 @@ tests:
           constraints:
               minValue: 3
 
+    # TODO(#28396): Re-enabled when CI wouldn't break on this syntax
+    #
+    #   command: "readAttribute"
+    #   attribute: "ClusterRevision"
+    #   response:
+    #       saveAs: ClusterRevisionValue
+    #       constraints:
+    #           minValue: 1
+    #           maxValue: 2
+    #           type: int16u
+
+    # - label: "Creates a new variable to hold if the cluster revision is == 2"
+    #   cluster: EqualityCommands
+    #   command: UnsignedNumberEquals
+    #   arguments:
+    #       values:
+    #           - name: Value1
+    #             value: ClusterRevisionValue
+    #           - name: Value2
+    #             value: 2
+    #   response:
+    #       - values:
+    #             - name: Equals
+    #               saveAs: ClusterIsRevision2
+
+    ########### KeySetWrite Epoch0 field validations
+    - label: "KeySetWrite with EpochKey0 null fails INVALID_COMMAND"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: null,
+                        EpochStartTime0: 1110000,
+                        EpochKey1: null,
+                        EpochStartTime1: null,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label: "KeySetWrite with EpochStartTime0 null fails INVALID_COMMAND"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: null,
+                        EpochKey1: null,
+                        EpochStartTime1: null,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "KeySetWrite with EpochStartTime0 set to zero fails INVALID_COMMAND"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 0,
+                        EpochKey1: null,
+                        EpochStartTime1: null,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "KeySetWrite with EpochKey0 with length 1 != 16 fails with
+          CONSTRAINT_ERROR"
+      # runIf: ClusterIsRevision2
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0",
+                        EpochStartTime0: 1,
+                        EpochKey1: null,
+                        EpochStartTime1: null,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "KeySetWrite with EpochKey0 with length 0 != 16 fails with
+          CONSTRAINT_ERROR"
+      # runIf: ClusterIsRevision2
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "",
+                        EpochStartTime0: 1,
+                        EpochKey1: null,
+                        EpochStartTime1: null,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: CONSTRAINT_ERROR
+
+    ########### KeySetWrite Epoch1 field validations
+    - label: "KeySetWrite with EpochStartTime1 null fails INVALID_COMMAND"
+      # runIf: ClusterIsRevision2
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: null,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label: "KeySetWrite with EpochKey1 null fails INVALID_COMMAND"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: null,
+                        EpochStartTime1: 1110001,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "KeySetWrite with EpochKey1 with length 1 != 16 fails with
+          CONSTRAINT_ERROR"
+      # runIf: ClusterIsRevision2
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "KeySetWrite with EpochKey1 with length 0 != 16 fails with
+          CONSTRAINT_ERROR"
+      # runIf: ClusterIsRevision2
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "KeySetWrite with EpochStartTime1 not later than EpochStart0 fails
+          with INVALID_COMMAND"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    ########### KeySetWrite Epoch2 field validations
+    - label: "KeySetWrite with EpochStartTime2 null fails INVALID_COMMAND"
+      command: "KeySetWrite"
+      # runIf: ClusterIsRevision2
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label: "KeySetWrite with EpochKey2 null fails INVALID_COMMAND"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: null,
+                        EpochStartTime2: 1110002,
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "KeySetWrite with EpochKey2 with length 1 != 16 fails with
+          CONSTRAINT_ERROR"
+      # runIf: ClusterIsRevision2
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: "\xc0",
+                        EpochStartTime2: 1110002,
+                    }
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "KeySetWrite with EpochKey2 with length 0 != 16 fails with
+          CONSTRAINT_ERROR"
+      # runIf: ClusterIsRevision2
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: "",
+                        EpochStartTime2: 1110002,
+                    }
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "KeySetWrite with EpochStartTime2 not later than EpochStart1 fails
+          with INVALID_COMMAND"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
+                        EpochStartTime2: 100,
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    ################ Rest of normal checks for KeySetWrite
     - label: "KeySet Write 1"
       command: "KeySetWrite"
       arguments:

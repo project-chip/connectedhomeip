@@ -948,6 +948,12 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000004: {
+                "attributeName": "TagList",
+                "attributeId": 0x00000004,
+                "type": "",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -4189,7 +4195,7 @@ class ChipClusters:
                 "commandName": "UnregisterClient",
                 "args": {
                     "checkInNodeID": "int",
-                    "key": "bytes",
+                    "verificationKey": "bytes",
                 },
             },
             0x00000003: {

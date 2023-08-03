@@ -23,6 +23,7 @@
  */
 
 #include <app/InteractionModelEngine.h>
+#include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
@@ -48,6 +49,9 @@ class TestInteractionModelEngine
 public:
     static void TestAttributePathParamsPushRelease(nlTestSuite * apSuite, void * apContext);
     static void TestRemoveDuplicateConcreteAttribute(nlTestSuite * apSuite, void * apContext);
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    static void TestSubscriptionResumptionTimer(nlTestSuite * apSuite, void * apContext);
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     static int GetAttributePathListLength(ObjectList<AttributePathParams> * apattributePathParamsList);
 };
 
@@ -67,7 +71,8 @@ void TestInteractionModelEngine::TestAttributePathParamsPushRelease(nlTestSuite 
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
-    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(),
+                                                      app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ObjectList<AttributePathParams> * attributePathParamsList = nullptr;
     AttributePathParams attributePathParams1;
@@ -104,7 +109,8 @@ void TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute(nlTestSuit
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
-    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(),
+                                                      app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ObjectList<AttributePathParams> * attributePathParamsList = nullptr;
     AttributePathParams attributePathParams1;
@@ -223,6 +229,38 @@ void TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute(nlTestSuit
     InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
 }
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+void TestInteractionModelEngine::TestSubscriptionResumptionTimer(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(),
+                                                      app::reporting::GetDefaultReportScheduler());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    uint32_t timeTillNextResubscriptionMs;
+    InteractionModelEngine::GetInstance()->mNumSubscriptionResumptionRetries = 0;
+    timeTillNextResubscriptionMs = InteractionModelEngine::GetInstance()->ComputeTimeSecondsTillNextSubscriptionResumption();
+    NL_TEST_ASSERT(apSuite, timeTillNextResubscriptionMs == CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MIN_RETRY_INTERVAL_SECS);
+
+    uint32_t lastTimeTillNextResubscriptionMs = timeTillNextResubscriptionMs;
+    for (InteractionModelEngine::GetInstance()->mNumSubscriptionResumptionRetries = 1;
+         InteractionModelEngine::GetInstance()->mNumSubscriptionResumptionRetries <=
+         CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_FIBONACCI_STEP_INDEX;
+         InteractionModelEngine::GetInstance()->mNumSubscriptionResumptionRetries++)
+    {
+        timeTillNextResubscriptionMs = InteractionModelEngine::GetInstance()->ComputeTimeSecondsTillNextSubscriptionResumption();
+        NL_TEST_ASSERT(apSuite, timeTillNextResubscriptionMs >= lastTimeTillNextResubscriptionMs);
+        NL_TEST_ASSERT(apSuite, timeTillNextResubscriptionMs < CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_RETRY_INTERVAL_SECS);
+        lastTimeTillNextResubscriptionMs = timeTillNextResubscriptionMs;
+    }
+
+    InteractionModelEngine::GetInstance()->mNumSubscriptionResumptionRetries = 2000;
+    timeTillNextResubscriptionMs = InteractionModelEngine::GetInstance()->ComputeTimeSecondsTillNextSubscriptionResumption();
+    NL_TEST_ASSERT(apSuite, timeTillNextResubscriptionMs == CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_RETRY_INTERVAL_SECS);
+}
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+
 } // namespace app
 } // namespace chip
 
@@ -233,6 +271,9 @@ const nlTest sTests[] =
         {
                 NL_TEST_DEF("TestAttributePathParamsPushRelease", chip::app::TestInteractionModelEngine::TestAttributePathParamsPushRelease),
                 NL_TEST_DEF("TestRemoveDuplicateConcreteAttribute", chip::app::TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute),
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+                NL_TEST_DEF("TestSubscriptionResumptionTimer", chip::app::TestInteractionModelEngine::TestSubscriptionResumptionTimer),
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
                 NL_TEST_SENTINEL()
         };
 // clang-format on

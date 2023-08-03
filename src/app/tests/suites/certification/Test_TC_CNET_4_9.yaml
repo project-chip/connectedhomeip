@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    12.4.7. [TC-CNET-4.9] [Wi-Fi] Verification for RemoveNetwork Command
+    12.4.7. [TC-CNET-4.9] [WiFi] Verification for RemoveNetwork Command
     [DUT-Server]
 
 PICS:
@@ -37,7 +37,7 @@ tests:
       verification: |
           ./chip-tool descriptor read server-list 1 0
 
-          Verify the "descriptor" on the TH(Chip-tool) log
+          Via the TH (chip-tool), verify that the server list has value as 49.
 
           [1653474860.462391][29901:29906] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 1237231415
           [1653474860.462487][29901:29906] CHIP:TOO:   server list: 25 entries
@@ -73,7 +73,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read feature-map 1 0
 
-          Verify the "feature-map" on the TH(Chip-tool) log
+          Via the TH (chip-tool), verify that FeatureMap attribute value as 1 for WiFi NetworkInterface.
 
           [1653474932.055513][29920:29925] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFC DataVersion: 1600858167
           [1653474932.055578][29920:29925] CHIP:TOO:   FeatureMap: 1
@@ -101,7 +101,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read max-networks 1 0
 
-          Verify the "max-networks" on the TH(Chip-tool) log
+          Via the TH (chip-tool), Verify the MaxNetworks attribute that contains value in the range of 1 to 255.
 
           [1653476960.303444][30164:30169] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0000 DataVersion: 1600858167
           [1653476960.303531][30164:30169] CHIP:TOO:   MaxNetworks: 1
@@ -109,12 +109,12 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
-          to 900"
+          "Step 1: TH sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds set to 900"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 900 1 1 0
 
-          Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool),  Verify the DUT sends ArmFailSafe with timeout as 900 secs to the TH.
 
           [1653478311.640549][30368:30373] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1653478311.640646][30368:30373] CHIP:TOO:   ArmFailSafeResponse: {
@@ -126,13 +126,15 @@ tests:
       disabled: true
 
     - label:
-          "TH reads Networks attribute from the DUT and saves the number of
-          entries as 'NumNetworks'"
+          "Step 2: TH reads Networks attribute from the DUT and saves the number
+          of entries as 'NumNetworks'"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
-          Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify:
+          -the Networks attribute has NetworkID that value as PIXIT.CNET.WIFI_1ST_ ACCESSPOINT_SSID.
+          -that the connected status is in the the type of bool value as TRUE.
 
           [1654250379.881780][5309:5314] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 3741733376
           [1654250379.881974][5309:5314] CHIP:TOO:   Networks: 1 entries
@@ -143,21 +145,23 @@ tests:
       disabled: true
 
     - label:
-          "TH finds the index of the Networks list entry with NetworkID field
-          value PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT_SSID and saves it as
-          Userwifi_netidx"
+          "Step 3: TH finds the index of the Networks list entry with NetworkID
+          field value PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and saves it as
+          'Userwifi_netidx'"
       verification: |
           ./chip-tool networkcommissioning read last-network-id 1 0
 
-          Verify "LastNetworkID" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify:
+          -that the LastNetworkID attribute that contains NetworkID that should be the type of octstr with a length range 1 to 32.
 
           [1657198553.376268][5799:5804] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0006 DataVersion: 2494552649
           [1657198553.376351][5799:5804] CHIP:TOO:   LastNetworkID: 47524C50726976617465
       disabled: true
 
     - label:
-          "TH sends RemoveNetwork Command to the DUT with NetworkID field set to
-          PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT _SSID and Breadcrumb field set to 1"
+          "Step 4: TH sends RemoveNetwork Command to the DUT with NetworkID
+          field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field
+          set to 1"
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
           ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
@@ -166,8 +170,7 @@ tests:
 
           ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
 
-          Verify "NetworkConfigResponse and its arguments" on the TH(Chip-tool) Log:
-
+          Via the TH (chip-tool), Verify the NetworkConfigResponse that contains Networking Status value as 0 (success).
 
           [1653478327.351092][30388:30393] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
           [1653478327.351200][30388:30393] CHIP:TOO:   NetworkConfigResponse: {
@@ -178,58 +181,58 @@ tests:
           [1653478327.351449][30388:30393] CHIP:EM: Sending Standalone Ack for MessageCounter:14887098 on exchange 8676i
       disabled: true
 
-    - label: "TH1 reads Networks attribute from the DUT"
+    - label: "Step 5: TH reads Networks attribute from the DUT"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
-          Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify that the Networks attribute list has empty(0 entries).
 
           [1653478331.979300][30395:30400] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 1600858167
           [1653478331.979380][30395:30400] CHIP:TOO:   Networks: 0 entries
           [1653478331.979496][30395:30400] CHIP:EM: Sending Standalone Ack for MessageCounter:609449 on exchange 40264i
       disabled: true
 
-    - label: "TH reads LastNetworkingStatus attribute from the DUT"
+    - label: "Step 6: TH reads LastNetworkingStatus attribute from the DUT"
       PICS: CNET.S.A0005
       verification: |
           ./chip-tool networkcommissioning read last-networking-status 1 0
 
-          Verify "LastNetworkingStatus" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify the LastNetworkingStatus attribute that contains value as 0 that mentions success.
 
           [1653478850.425096][30420:30425] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0005 DataVersion: 1600858167
           [1653478850.425170][30420:30425] CHIP:TOO:   LastNetworkingStatus: 0
           [1653478850.425269][30420:30425] CHIP:EM: Sending Standalone Ack for MessageCounter:8275942 on exchange 13394i
       disabled: true
 
-    - label: "TH reads LastNetworkID attribute from the DUT"
+    - label: "Step 7: TH reads LastNetworkID attribute from the DUT"
       PICS: CNET.S.A0006
       verification: |
           ./chip-tool networkcommissioning read last-network-id 1 0
 
-          Verify "LastNetworkID" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify that the LastNetworkID has PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT _SSID.
 
           [1657197861.497831][5737:5742] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0006 DataVersion: 2494552649
           [1657197861.497897][5737:5742] CHIP:TOO:   LastNetworkID: 47524C50726976617465
       disabled: true
 
     - label:
-          "TH reads Breadcrumb attribute from the General Commissioning cluster
-          of the DUT"
+          "Step 8: TH reads Breadcrumb attribute from the General Commissioning
+          cluster of the DUT"
       PICS: CNET.S.C04.Rsp
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
 
-          Verify "Breadcrumb: 1" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the Breadcumb attribute that contains value as 1.
 
           [1657197903.686316][5745:5750] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 2805642043
           [1657197903.686428][5745:5750] CHIP:TOO:   Breadcrumb: 1
       disabled: true
 
     - label:
-          "TH sends ConnectNetwork command to the DUT with NetworkID field set
-          to PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT _SSID and Breadcrumb field set to
-          2"
+          "Step 9: TH sends ConnectNetwork command to the DUT with NetworkID
+          field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field
+          set to 2"
       PICS: CNET.S.C04.Rsp
       verification: |
           ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
@@ -238,7 +241,7 @@ tests:
 
           ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0 --Breadcrumb 2
 
-          Verify "ConnectNetworkResponse and its arguments" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify the ConnectNetworkResponse that contains networkingStatus value as 3(NetworkIdNotFound).
 
           [1657288261.892249][2347:2352] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
           [1657288261.892304][2347:2352] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
@@ -249,27 +252,25 @@ tests:
       disabled: true
 
     - label:
-          "TH reads Breadcrumb attribute from the General Commissioning cluster
-          of the DUT"
+          "Step 10: TH reads Breadcrumb attribute from the General Commissioning
+          cluster of the DUT"
       PICS: CNET.S.C04.Rsp
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
 
-          Verify "Breadcrumb: 1" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the Breadcumb attribute that contains value as 1.
 
           [1657288331.671111][2360:2365] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 3470734109
           [1657288331.671207][2360:2365] CHIP:TOO:   Breadcrumb: 1
       disabled: true
 
     - label:
-          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
-          to 0"
+          "Step 11: TH sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds set to 0"
       verification: |
-          Mark as not applicable and proceed to next step
-
           ./chip-tool generalcommissioning arm-fail-safe 0 0 1 0
 
-          Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool),  Verify the DUT sends ArmFailSafe with timeout as 0 secs to the TH.
 
           [1657288382.006035][2369:2374] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1657288382.006094][2369:2374] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -279,28 +280,31 @@ tests:
           [1657288382.006263][2369:2374] CHIP:TOO:    }
       disabled: true
 
-    - label: "TH reads Networks attribute from the DUT"
+    - label: "Step 10: TH reads Networks attribute from the DUT"
       PICS: CNET.S.A0001
       verification: |
-          Mark as not applicable and proceed to next step
-
           ./chip-tool networkcommissioning read networks 1 0
 
-          Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify:
+          -the Networks attribute has NetworkID that contains value as PIXIT.CNET.WIFI_1ST_ ACCESSPOINT_SSID.
+          -that the connected status should be the type of bool value as TRUE.
 
-          [1657288403.226567][2376:2381] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 1420716065
-          [1657288403.226663][2376:2381] CHIP:TOO:   Networks: 0 entries
+          1684494160.580218][15306:15308] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 130057616
+          [1684494160.580248][15306:15308] CHIP:TOO:   Networks: 1 entries
+          [1684494160.580273][15306:15308] CHIP:TOO:     [1]: {
+          [1684494160.580288][15306:15308] CHIP:TOO:       NetworkID: 47524C50726976617465
+          [1684494160.580298][15306:15308] CHIP:TOO:       Connected: TRUE
+          [1684494160.580307][15306:15308] CHIP:TOO:      }
+          [1684494160.580360][15306:15308] CHIP:EM: <<< [E:26231i S:16056 M:263765151 (Ack:216379970)] (S) Msg TX to 1:0000000000000001 [4DB7] --- Type 0000:10 (SecureChannel:StandaloneAck)
       disabled: true
 
     - label:
-          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
-          to 90"
+          "Step 11: TH sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds set to 900"
       verification: |
-          Mark as not applicable and proceed to next step
-
           ./chip-tool generalcommissioning arm-fail-safe 90 1 1 0
 
-          Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool),  Verify the DUT sends ArmFailSafe with timeout as 90 secs to the TH.
 
           [1657288428.409103][2382:2388] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1657288428.409191][2382:2388] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -311,32 +315,32 @@ tests:
       disabled: true
 
     - label:
-          "TH sends RemoveNetwork Command to the DUT with NetworkID field set to
-          PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT _SSID and Breadcrumb field set to 1"
+          "Step 12: TH sends RemoveNetwork Command to the DUT with NetworkID
+          field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field
+          set to 1"
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
-          Mark as not applicable and proceed to next step
-
           ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
           Below is an example:
 
           ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1  0 --Breadcrumb 1
 
-          Verify "NetworkConfigResponse and its arguments" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify the NetworkConfigResponse that contains Networking Status value as 0 (success).
 
-          [1657288459.534546][2390:2395] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
-          [1657288459.534622][2390:2395] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
-          [1657288459.534720][2390:2395] CHIP:TOO:   NetworkConfigResponse: {
-          [1657288459.534779][2390:2395] CHIP:TOO:     networkingStatus: 3
-          [1657288459.534824][2390:2395] CHIP:TOO:    }
+          [1687240172.756582][17509:17511] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          [1687240172.756684][17509:17511] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1687240172.756847][17509:17511] CHIP:TOO:   NetworkConfigResponse: {
+          [1687240172.756951][17509:17511] CHIP:TOO:     networkingStatus: 0
+          [1687240172.757011][17509:17511] CHIP:TOO:     networkIndex: 0
+          [1687240172.757062][17509:17511] CHIP:TOO:    }
       disabled: true
 
-    - label: "TH sends the CommissioningCo mplete command to the DUT"
+    - label: "Step 13: TH sends the CommissioningComplete command to the DUT"
       PICS: CNET.S.C04.Rsp
       verification: |
           ./chip-tool generalcommissioning commissioning-complete 1 0
 
-          Verify "CommissioningCompleteResponse and its arguments" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify the DUT sends CommissioningComplete command and the errorCode field is 0(OK).
 
           [1657288504.905001][2397:2402] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
           [1657288504.905050][2397:2402] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0005
@@ -347,14 +351,14 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
-          to 0 to ensure the CommissioningCo mplete call properly persisted the
-          failsafe context. This call should have no effect if Commissionining
-          Complete call is handled correctly"
+          "Step 14: TH sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds set to 0 to ensure the CommissioningComplete call
+          properly persisted the failsafe context. This call should have no
+          effect if Commissioning Complete call is handled correctly"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 0 0 1 0
 
-          Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool),  Verify the DUT sends ArmFailSafe with timeout as 0 secs to the TH.
 
           [1657288529.987350][2404:2409] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1657288529.987514][2404:2409] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -364,12 +368,12 @@ tests:
           [1657288529.987772][2404:2409] CHIP:TOO:    }
       disabled: true
 
-    - label: "TH reads Networks attribute from the DUT"
+    - label: "Step 15: TH reads Networks attribute from the DUT"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
-          Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify that the Networks attribute list has empty(0 entries).
 
           [1657288549.446752][2412:2417] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 1420716065
           [1657288549.446852][2412:2417] CHIP:TOO:   Networks: 0 entries

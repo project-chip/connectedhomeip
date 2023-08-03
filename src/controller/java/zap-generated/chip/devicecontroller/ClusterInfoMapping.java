@@ -1389,6 +1389,25 @@ public class ClusterInfoMapping {
           callback.onFailure(ex);
         }
       }
+      public static class DelegatedDescriptorClusterTagListAttributeCallback implements ChipClusters.DescriptorCluster.TagListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<ChipStructs.DescriptorClusterSemanticTagStruct> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.DescriptorClusterSemanticTagStruct>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
       public static class DelegatedDescriptorClusterGeneratedCommandListAttributeCallback implements ChipClusters.DescriptorCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
@@ -17468,8 +17487,8 @@ public class ClusterInfoMapping {
        CommandParameterInfo icdManagementunregisterClientcheckInNodeIDCommandParameterInfo = new CommandParameterInfo("checkInNodeID", Long.class, Long.class);
        icdManagementunregisterClientCommandParams.put("checkInNodeID",icdManagementunregisterClientcheckInNodeIDCommandParameterInfo);
       
-       CommandParameterInfo icdManagementunregisterClientkeyCommandParameterInfo = new CommandParameterInfo("key", Optional.class, byte[].class);
-       icdManagementunregisterClientCommandParams.put("key",icdManagementunregisterClientkeyCommandParameterInfo);
+       CommandParameterInfo icdManagementunregisterClientverificationKeyCommandParameterInfo = new CommandParameterInfo("verificationKey", Optional.class, byte[].class);
+       icdManagementunregisterClientCommandParams.put("verificationKey",icdManagementunregisterClientverificationKeyCommandParameterInfo);
      
        InteractionInfo icdManagementunregisterClientInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -17478,7 +17497,7 @@ public class ClusterInfoMapping {
            , (Long)
            commandArguments.get("checkInNodeID")
            , (Optional<byte[]>)
-           commandArguments.get("key")
+           commandArguments.get("verificationKey")
            
            );
          },

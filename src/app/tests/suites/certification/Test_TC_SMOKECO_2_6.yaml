@@ -1,0 +1,501 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    4.2.6. [TC-SMOKECO-2.6] ExpressedState Attribute - Multiple Alarms with DUT
+    as Server
+
+PICS:
+    - SMOKECO.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Smoke CO Alarm"
+    endpoint: 1
+    timeout: 3090
+    TEST_EVENT_TRIGGER_KEY:
+        type: octet_string
+        defaultValue: "hex:00112233445566778899aabbccddeeff"
+    TEST_EVENT_TRIGGER_WARNING_SMOKE_ALARM:
+        type: int64u
+        defaultValue: "0xffffffff00000090"
+    TEST_EVENT_TRIGGER_SMOKE_ALARM_CLEAR:
+        type: int64u
+        defaultValue: "0xffffffff000000a0"
+    TEST_EVENT_TRIGGER_WARNING_CO_ALARM:
+        type: int64u
+        defaultValue: "0xffffffff00000091"
+    TEST_EVENT_TRIGGER_CO_ALARM_CLEAR:
+        type: int64u
+        defaultValue: "0xffffffff000000a1"
+    TEST_EVENT_TRIGGER_WARNING_BATTERY_ALERT:
+        type: int64u
+        defaultValue: "0xffffffff00000095"
+    TEST_EVENT_TRIGGER_BATTERY_ALERT_CLEAR:
+        type: int64u
+        defaultValue: "0xffffffff000000a5"
+    TEST_EVENT_TRIGGER_INTERCONNECT_SMOKE_ALARM:
+        type: int64u
+        defaultValue: "0xffffffff00000092"
+    TEST_EVENT_TRIGGER_INTERCONNECT_SMOKE_ALARM_CLEAR:
+        type: int64u
+        defaultValue: "0xffffffff000000a2"
+    TEST_EVENT_TRIGGER_INTERCONNECT_CO_ALARM:
+        type: int64u
+        defaultValue: "0xffffffff00000094"
+    TEST_EVENT_TRIGGER_INTERCONNECT_CO_ALARM_CLEAR:
+        type: int64u
+        defaultValue: "0xffffffff000000a4"
+    HIEST_PRI_ALARM:
+        type: int8u
+        defaultValue: 1
+    HIEST_PRI_ALARM_2:
+        type: int8u
+        defaultValue: 2
+    HIEST_PRI_ALARM_3:
+        type: int8u
+        defaultValue: 7
+    HIEST_PRI_ALARM_4:
+        type: int8u
+        defaultValue: 7
+    HIEST_PRI_ALARM_5:
+        type: int8u
+        defaultValue: 3
+
+tests:
+    - label: "Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH subscribes to BatteryAlert attribute from DUT"
+      PICS: SMOKECO.S.A0003
+      command: "subscribeAttribute"
+      attribute: "BatteryAlert"
+      minInterval: 3
+      maxInterval: 30
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH subscribes to InterconnectSmokeAlarm attribute from DUT"
+      PICS: SMOKECO.S.A0008
+      command: "subscribeAttribute"
+      attribute: "InterconnectSmokeAlarm"
+      minInterval: 3
+      maxInterval: 30
+      keepSubscriptions: true
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH subscribes to InterconnectCOAlarm attribute from DUT"
+      PICS: SMOKECO.S.A0009
+      command: "subscribeAttribute"
+      attribute: "InterconnectCOAlarm"
+      minInterval: 3
+      maxInterval: 30
+      keepSubscriptions: true
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH subscribes to COState attribute from DUT"
+      PICS: SMOKECO.S.A0002
+      command: "subscribeAttribute"
+      attribute: "COState"
+      minInterval: 3
+      maxInterval: 30
+      keepSubscriptions: true
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH subscribes to SmokeState attribute from DUT"
+      PICS: SMOKECO.S.A0001
+      command: "subscribeAttribute"
+      attribute: "SmokeState"
+      minInterval: 3
+      maxInterval: 30
+      keepSubscriptions: true
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label:
+          "TH reads TestEventTriggersEnabled attribute from General Diagnostics
+          Cluster"
+      PICS: DGGEN.S.A0008
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "readAttribute"
+      attribute: "TestEventTriggersEnabled"
+      response:
+          value: 1
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Warning Battery Alert Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_WARNING_BATTERY_ALERT
+
+    - label:
+          "TH waits for a report of BatteryAlert attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A0003
+      command: "waitForReport"
+      attribute: "BatteryAlert"
+      timeout: 300
+      response:
+          value: 1
+          constraints:
+              type: enum8
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect Smoke Alarm Test
+          Event"
+      PICS: SMOKECO.S.A0008 && DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_INTERCONNECT_SMOKE_ALARM
+
+    - label:
+          "TH waits for a report of InterconnectSmokeAlarm attribute from DUT
+          with a timeout of 300 seconds"
+      PICS: SMOKECO.S.A0008
+      command: "waitForReport"
+      attribute: "InterconnectSmokeAlarm"
+      timeout: 300
+      response:
+          constraints:
+              type: enum8
+              minValue: 1
+              maxValue: 2
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect CO Alarm Test Event"
+      PICS: SMOKECO.S.A0009 && DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_INTERCONNECT_CO_ALARM
+
+    - label:
+          "TH waits for a report of InterconnectCOAlarm attribute from DUT with
+          a timeout of 300 seconds"
+      PICS: SMOKECO.S.A0009
+      command: "waitForReport"
+      attribute: "InterconnectCOAlarm"
+      timeout: 300
+      response:
+          constraints:
+              type: enum8
+              minValue: 1
+              maxValue: 2
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Warning CO Alarm Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_WARNING_CO_ALARM
+
+    - label:
+          "TH waits for a report of COState attribute from DUT with a timeout of
+          300 seconds"
+      PICS: SMOKECO.S.A0002
+      command: "waitForReport"
+      attribute: "COState"
+      timeout: 300
+      response:
+          value: 1
+          constraints:
+              type: enum8
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Warning Smoke Alarm Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_WARNING_SMOKE_ALARM
+
+    - label:
+          "TH waits for a report of SmokeState attribute from DUT with a timeout
+          of 300 seconds"
+      PICS: SMOKECO.S.A0001
+      command: "waitForReport"
+      attribute: "SmokeState"
+      timeout: 300
+      response:
+          value: 1
+          constraints:
+              type: enum8
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: HIEST_PRI_ALARM
+          constraints:
+              type: enum8
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Smoke Alarm Test Event Clear"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_SMOKE_ALARM_CLEAR
+
+    - label:
+          "TH waits for a report of SmokeState attribute from DUT with a timeout
+          of 300 seconds"
+      PICS: SMOKECO.S.A0001
+      command: "waitForReport"
+      attribute: "SmokeState"
+      timeout: 300
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: HIEST_PRI_ALARM_2
+          constraints:
+              type: enum8
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for CO Alarm Test Event clear"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_CO_ALARM_CLEAR
+
+    - label:
+          "TH waits for a report of COState attribute from DUT with a timeout of
+          300 seconds"
+      PICS: SMOKECO.S.A0002
+      command: "waitForReport"
+      attribute: "COState"
+      timeout: 300
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: HIEST_PRI_ALARM_3
+          constraints:
+              type: enum8
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect CO Alarm Test Event
+          Clear"
+      PICS: SMOKECO.S.A0009 && DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_INTERCONNECT_CO_ALARM_CLEAR
+
+    - label:
+          "TH waits for a report of InterconnectCOAlarm attribute from DUT with
+          a timeout of 300 seconds"
+      PICS: SMOKECO.S.A0009
+      command: "waitForReport"
+      attribute: "InterconnectCOAlarm"
+      timeout: 300
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: HIEST_PRI_ALARM_4
+          constraints:
+              type: enum8
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect Smoke Alarm Test
+          Event Clear"
+      PICS: SMOKECO.S.A0008 && DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_INTERCONNECT_SMOKE_ALARM_CLEAR
+
+    - label:
+          "TH waits for a report of InterconnectSmokeAlarm attribute from DUT
+          with a timeout of 300 seconds"
+      PICS: SMOKECO.S.A0008
+      command: "waitForReport"
+      attribute: "InterconnectSmokeAlarm"
+      timeout: 300
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: HIEST_PRI_ALARM_5
+          constraints:
+              type: enum8
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Battery Alert Test Event Clear"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_BATTERY_ALERT_CLEAR
+
+    - label:
+          "TH waits for a report of BatteryAlert attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A0003
+      command: "waitForReport"
+      attribute: "BatteryAlert"
+      timeout: 300
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 0
+          constraints:
+              type: enum8

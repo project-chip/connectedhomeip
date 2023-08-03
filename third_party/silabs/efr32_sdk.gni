@@ -46,10 +46,16 @@ declare_args() {
   # Enable Segger System View
   use_system_view = false
 
-  # ICD Configuration flags
-  sl_ot_idle_interval_ms = 30000  # 30s Idle Intervals
-  sl_ot_active_interval_ms = 200  # 500ms Active Intervals
-  sl_active_mode_threshold = 1000  # 1s Active mode threshold
+  # ICD Openthread Configuration flags
+  sl_ot_idle_interval_ms = 15000  # 15s Idle Intervals
+  sl_ot_active_interval_ms = 200  # 200ms Active Intervals
+
+  # ICD Matter Configuration flags
+  sl_idle_mode_interval_ms = 600000  # 10min Idle Mode Interval
+  sl_active_mode_interval_ms = 1000  # 1s Active Mode Interval
+  sl_active_mode_threshold_ms = 500  # 500ms Active Mode Threshold
+  sl_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
+  sl_use_subscription_synching = false
 
   silabs_log_enabled = true
 
@@ -149,12 +155,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/system/inc",
       "${efr32_sdk_root}/platform/service/udelay/inc",
       "${efr32_sdk_root}/platform/service/legacy_hal/inc",
-      "${efr32_sdk_root}/platform/service/token_manager/config",
-      "${efr32_sdk_root}/platform/service/token_manager/inc",
-      "${efr32_sdk_root}/platform/service/token_manager/test",
-      "${efr32_sdk_root}/platform/service/token_manager/test/include",
-      "${efr32_sdk_root}/platform/service/token_manager/test/stack/config",
-      "${efr32_sdk_root}/platform/service/token_manager/test/stack/include",
       "${efr32_sdk_root}/platform/middleware/glib",
       "${efr32_sdk_root}/platform/middleware/glib/config",
       "${efr32_sdk_root}/platform/middleware/glib/glib",
@@ -181,6 +181,9 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/driver/debug/inc",
       "${silabs_gen_folder}/config",
       "${silabs_gen_folder}/autogen",
+
+      # Headers needed for Init no function will be called if OT is not used
+      "${sl_ot_efr32_root}",
     ]
 
     if (silabs_family != "mgm24") {
@@ -332,10 +335,20 @@ template("efr32_sdk") {
 
     if (chip_enable_icd_server) {
       defines += [
-        "SL_OT_IDLE_INTERVAL=${sl_ot_idle_interval_ms}",
-        "SL_OT_ACTIVE_INTERVAL=${sl_ot_active_interval_ms}",
-        "SL_ACTIVE_MODE_THRESHOLD=${sl_active_mode_threshold}",
+        "SL_ICD_ENABLED=1",
+        "SL_ACTIVE_MODE_THRESHOLD=${sl_active_mode_threshold_ms}",
+        "SL_ACTIVE_MODE_INTERVAL=${sl_active_mode_interval_ms}",
+        "SL_IDLE_MODE_INTERVAL=${sl_idle_mode_interval_ms}",
+        "SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${sl_icd_supported_clients_per_fabric}",
       ]
+
+      if (defined(invoker.chip_enable_openthread) &&
+          invoker.chip_enable_openthread) {
+        defines += [
+          "SL_OT_IDLE_INTERVAL=${sl_ot_idle_interval_ms}",
+          "SL_OT_ACTIVE_INTERVAL=${sl_ot_active_interval_ms}",
+        ]
+      }
 
       if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
         defines += [
@@ -377,9 +390,15 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/hardware/driver/memlcd/inc/memlcd_usart",
       ]
     }
+
     if (invoker.enable_dic) {
       _include_dirs += [ "${chip_root}/third_party/silabs/mqtt/stack" ]
     }
+
+    if (sl_use_subscription_synching) {
+      defines += [ "CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED=1" ]
+    }
+
     if (silabs_family == "efr32mg12") {
       _include_dirs += [
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG12P/Include",
@@ -393,6 +412,7 @@ template("efr32_sdk") {
       libs += [
         "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg12_gcc_release.a",
         "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a",
+        "${sdk_support_root}/protocol/openthread/libs/libsl_openthread_efr32mg1x_gcc.a",
       ]
 
       if (!chip_enable_ble_rs911x) {
@@ -400,26 +420,6 @@ template("efr32_sdk") {
       }
 
       defines += [ "EFR32MG12" ]
-    } else if (silabs_family == "efr32mg21") {
-      _include_dirs += [
-        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG21/Include",
-        "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/efr32xg2x",
-        "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure",
-        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg21",
-        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg21/config",
-        "${efr32_sdk_root}/platform/service/device_init/config/s2/",
-      ]
-
-      libs += [
-        "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG21/GCC/libbluetooth.a",
-        "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg21_gcc_release.a",
-        "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
-      ]
-
-      defines += [
-        "EFR32MG21",
-        "EFR32_SERIES2_CONFIG1_MICRO",
-      ]
     } else if (silabs_family == "efr32mg24") {
       _include_dirs += [
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG24/Include",
@@ -435,6 +435,7 @@ template("efr32_sdk") {
         "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG24/GCC/libbluetooth.a",
         "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg24_gcc_release.a",
         "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
+        "${sdk_support_root}/protocol/openthread/libs/libsl_openthread_efr32mg2x_gcc.a",
       ]
 
       defines += [
@@ -601,7 +602,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfrco.c",
       "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_nvic.c",
       "${efr32_sdk_root}/platform/service/hfxo_manager/src/sl_hfxo_manager.c",
-      "${efr32_sdk_root}/platform/service/legacy_hal/src/token_legacy.c",
       "${efr32_sdk_root}/platform/service/mpu/src/sl_mpu.c",
       "${efr32_sdk_root}/platform/service/power_manager/src/sl_power_manager.c",
       "${efr32_sdk_root}/platform/service/power_manager/src/sl_power_manager_debug.c",
@@ -612,9 +612,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_sysrtc.c",
       "${efr32_sdk_root}/platform/service/system/src/sl_system_init.c",
       "${efr32_sdk_root}/platform/service/system/src/sl_system_kernel.c",
-      "${efr32_sdk_root}/platform/service/token_manager/src/sl_token_def.c",
-      "${efr32_sdk_root}/platform/service/token_manager/src/sl_token_manager.c",
-      "${efr32_sdk_root}/platform/service/token_manager/src/sl_token_manufacturing.c",
       "${efr32_sdk_root}/platform/service/udelay/src/sl_udelay.c",
       "${efr32_sdk_root}/platform/service/udelay/src/sl_udelay_armv6m_gcc.S",
       "${efr32_sdk_root}/util/plugin/security_manager/security_manager.c",
@@ -839,84 +836,12 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfxo_s1.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM4F/port.c",
       ]
-    } else if (silabs_family == "efr32mg21") {
-      sources += [
-        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG21/Source/startup_efr32mg21.c",
-        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG21/Source/system_efr32mg21.c",
-        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_rf_path/sl_rail_util_rf_path.c",
-        "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager.c",
-        "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_cipher.c",
-        "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_entropy.c",
-        "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_hash.c",
-        "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_key_derivation.c",
-        "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_key_handling.c",
-        "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_signature.c",
-        "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_util.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_alt/source/sl_se_management.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/se_aes.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/se_gcm.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/se_jpake.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_protocol_crypto/src/sli_radioaes_management.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_aead.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_cipher.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_key_derivation.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_key_management.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_mac.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_opaque_driver_aead.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_opaque_driver_cipher.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_opaque_driver_mac.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_opaque_key_derivation.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_transparent_driver_cipher.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_transparent_driver_hash.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_transparent_driver_mac.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_transparent_key_derivation.c",
-        "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_emu_s2.c",
-        "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_hfrco.c",
-        "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_hfxo_s2.c",
-        "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfxo_s2.c",
-        "${efr32_sdk_root}/platform/service/hfxo_manager/src/sl_hfxo_manager_hal_s2.c",
-        "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
-        "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
-      ]
     } else if (silabs_family == "efr32mg24") {
       sources += [
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG24/Source/startup_efr32mg24.c",
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG24/Source/system_efr32mg24.c",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/pa_curves_efr32.c",
-        "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager.c",
-        "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_attestation.c",
-        "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_cipher.c",
-        "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_entropy.c",
-        "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_hash.c",
-        "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_key_derivation.c",
-        "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_key_handling.c",
-        "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_signature.c",
-        "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_util.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/se_aes.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/se_jpake.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_protocol_crypto/src/sli_radioaes_management.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_aead.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_cipher.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_key_derivation.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_key_management.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_mac.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_opaque_driver_aead.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_opaque_driver_cipher.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_opaque_driver_mac.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_opaque_key_derivation.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_transparent_driver_aead.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_transparent_driver_cipher.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_transparent_driver_hash.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_transparent_driver_mac.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_transparent_key_derivation.c",
-        "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dcdc_s2.c",
-        "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dpll_s2.c",
-        "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_emu_s2.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_hfxo_s2.c",
-        "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfxo_s2.c",
-        "${efr32_sdk_root}/platform/service/hfxo_manager/src/sl_hfxo_manager_hal_s2.c",
-        "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
-        "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
       ]
     } else if (silabs_family == "mgm24") {
       sources += [
@@ -924,6 +849,12 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/Device/SiliconLabs/MGM24/Source/system_mgm24.c",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/fem_util/sl_fem_util.c",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_rssi/sl_rail_util_rssi.c",
+        "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_hfxo_mgm24.c",
+      ]
+    }
+
+    if (silabs_family == "mgm24" || silabs_family == "efr32mg24") {
+      sources += [
         "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager.c",
         "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_attestation.c",
         "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_cipher.c",
@@ -953,7 +884,6 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dcdc_s2.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dpll_s2.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_emu_s2.c",
-        "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_hfxo_mgm24.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfxo_s2.c",
         "${efr32_sdk_root}/platform/service/hfxo_manager/src/sl_hfxo_manager_hal_s2.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",

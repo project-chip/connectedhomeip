@@ -2835,6 +2835,11 @@ public class ChipClusters {
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
+      public interface TagListAttributeCallback {
+        void onSuccess( List<ChipStructs.DescriptorClusterSemanticTagStruct> valueList);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
       public interface GeneratedCommandListAttributeCallback {
         void onSuccess( List<Long> valueList);
         void onError(Exception ex);
@@ -2902,6 +2907,18 @@ public class ChipClusters {
       ,
       int minInterval, int maxInterval) {
       subscribePartsListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readTagListAttribute(
+      TagListAttributeCallback callback
+    ) {
+      readTagListAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeTagListAttribute(
+        TagListAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeTagListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -3002,6 +3019,13 @@ public class ChipClusters {
     );
     private native void subscribePartsListAttribute(long chipClusterPtr,
         PartsListAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readTagListAttribute(long chipClusterPtr,
+        TagListAttributeCallback callback
+    );
+    private native void subscribeTagListAttribute(long chipClusterPtr,
+        TagListAttributeCallback callback
       , int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(long chipClusterPtr,
@@ -13221,14 +13245,14 @@ public class ChipClusters {
     }
 
     public void unregisterClient(DefaultClusterCallback callback
-      , Long checkInNodeID, Optional<byte[]> key) {
-      unregisterClient(chipClusterPtr, callback, checkInNodeID, key, null);
+      , Long checkInNodeID, Optional<byte[]> verificationKey) {
+      unregisterClient(chipClusterPtr, callback, checkInNodeID, verificationKey, null);
     }
 
     public void unregisterClient(DefaultClusterCallback callback
-      , Long checkInNodeID, Optional<byte[]> key
+      , Long checkInNodeID, Optional<byte[]> verificationKey
       , int timedInvokeTimeoutMs) {
-      unregisterClient(chipClusterPtr, callback, checkInNodeID, key, timedInvokeTimeoutMs);
+      unregisterClient(chipClusterPtr, callback, checkInNodeID, verificationKey, timedInvokeTimeoutMs);
     }
 
     public void stayActiveRequest(DefaultClusterCallback callback
@@ -13245,7 +13269,7 @@ public class ChipClusters {
       , Long checkInNodeID, Long monitoredSubject, byte[] key, Optional<byte[]> verificationKey
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void unregisterClient(long chipClusterPtr, DefaultClusterCallback Callback
-      , Long checkInNodeID, Optional<byte[]> key
+      , Long checkInNodeID, Optional<byte[]> verificationKey
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void stayActiveRequest(long chipClusterPtr, DefaultClusterCallback Callback
       

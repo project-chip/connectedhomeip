@@ -24,12 +24,18 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Please use Interactive mode to Verify this test case
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
+      disabled: true
+
     - label:
-          "TH1 reads the TrustedRootCertificates attribute from the Node
+          "Step 1: TH1 reads the TrustedRootCertificates attribute from the Node
           Operational Credentials cluster and saves the number of list items as
           numTrustedRootsOriginal"
       verification: |
-          ./chip-tool operationalcredentials read  trusted-root-certificates 1 0
+          operationalcredentials read  trusted-root-certificates 1 0
           On TH1 verify the TrustedRootCertificates entries from DUT and saves the number of list items as numTrustedRootsOriginal
 
           [1658482014.176273][26852:26857] CHIP:DMG: }
@@ -40,11 +46,11 @@ tests:
       disabled: true
 
     - label:
-          "TH1 reads the BasicCommissioningInfo attribute and saves the
+          "Step 2: TH1 reads the BasicCommissioningInfo attribute and saves the
           MaxCumulativeFailsafeSeconds as maxFailsafe"
       PICS: CGEN.S.A0001
       verification: |
-          ./chip-tool generalcommissioning read  basic-commissioning-info 1 0
+          generalcommissioning read  basic-commissioning-info 1 0
           On TH1 verify the BasicCommissioningInfo attribute from DUT  and saves the MaxCumulativeFailsafeSeconds as maxFailsafe
 
           [1658482413.950617][27013:27018] CHIP:DMG: }
@@ -57,12 +63,12 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds
-          field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds and the Breadcrumb
-          value as 1"
+          "Step 3: TH1 sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds field set to
+          PIXIT.CGEN.FailsafeExpiryLengthSeconds and the Breadcrumb value as 1"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
-          ./chip-tool generalcommissioning  arm-fail-safe   60 1 1 0
+          generalcommissioning  arm-fail-safe   60 1 1 0
           On TH1 Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0) and DebugText argument is of type string with max length 512 or empty
 
           [1658482454.092676][27036:27041] CHIP:DMG: },
@@ -76,10 +82,10 @@ tests:
           [1658482454.092955][27036:27041] CHIP:EM: Sending Standalone Ack for MessageCounter:147679912 on exchange 8754i
       disabled: true
 
-    - label: "TH1 reads the Breadcrumb attribute"
+    - label: "Step 4: TH1 reads the Breadcrumb attribute"
       PICS: CGEN.S.A0000
       verification: |
-          ./chip-tool generalcommissioning read breadcrumb 1 0
+          generalcommissioning read breadcrumb 1 0
 
           On TH1 Verify that the breadcrumb attribute value is 1
           [1658482504.991161][27058:27064] CHIP:DMG: }
@@ -89,7 +95,7 @@ tests:
       disabled: true
 
     - label:
-          "TH1 obtains or generates a new TrustedRootCertificate that is
+          "Step 5: TH1 obtains or generates a new TrustedRootCertificate that is
           different from the previously commissioned TrustedRootCertificate for
           TH1. TH1 sends an AddTrustedRootCertificate command to the Node
           Operational Credentials cluster to install this new certificate"
@@ -103,7 +109,8 @@ tests:
           5. cat Chip-Root-Cert.txt
 
           While adding new add-trusted-root-certificate  please use the above generated new root key
-          ./chip-tool operationalcredentials add-trusted-root-certificate  hex:1530010828c376ebc17f21512402013703271401000000cacacaca182604ef171b2726056eb5b94c3706271401000000cacacaca182407012408013009410452c19fd9d329a738fd65722a8309fa68bcaa9ffe87d8114b802c922e5066d0b2f0573b89b38bf98fc9c424ab8ffdabcb18d42e623d82a02d0ca0c062ccadb4bc370a350129011824026030041457934de5405e9a40eacb86ee647e583141ae78f430051457934de5405e9a40eacb86ee647e583141ae78f418300b40a0b0d57bddbc7bcf44480a8b7bd0231d54ccacd68d90efb67b7aa3206adbd268725092992a0388c8e934504178613c5b932d422eed7463f38fd82aaa429b574a18 1 0
+
+          operationalcredentials add-trusted-root-certificate  hex:1530010828c376ebc17f21512402013703271401000000cacacaca182604ef171b2726056eb5b94c3706271401000000cacacaca182407012408013009410452c19fd9d329a738fd65722a8309fa68bcaa9ffe87d8114b802c922e5066d0b2f0573b89b38bf98fc9c424ab8ffdabcb18d42e623d82a02d0ca0c062ccadb4bc370a350129011824026030041457934de5405e9a40eacb86ee647e583141ae78f430051457934de5405e9a40eacb86ee647e583141ae78f418300b40a0b0d57bddbc7bcf44480a8b7bd0231d54ccacd68d90efb67b7aa3206adbd268725092992a0388c8e934504178613c5b932d422eed7463f38fd82aaa429b574a18 1 0
 
 
           on TH1, Verify that the DUT responds with SUCCESS
@@ -116,10 +123,10 @@ tests:
       disabled: true
 
     - label:
-          "TH1 reads the TrustedRootCertificates attribute from the Node
+          "Step 6: TH1 reads the TrustedRootCertificates attribute from the Node
           Operational Credentials cluster"
       verification: |
-          ./chip-tool operationalcredentials read  trusted-root-certificates 1 0
+          operationalcredentials read  trusted-root-certificates 1 0
           On TH1 verify the TrustedRootCertificates entries from DUT
           [1658482718.809139][27144:27149] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687668
           [1658482718.809271][27144:27149] CHIP:TOO:   TrustedRootCertificates: 2 entries
@@ -130,17 +137,18 @@ tests:
       disabled: true
 
     - label:
-          "TH1 waits for PIXIT.CGEN.FailsafeExpiryLengthSeconds to ensure the
-          failsafe timer has expired"
+          "Step 7: TH1 waits for PIXIT.CGEN.FailsafeExpiryLengthSeconds to
+          ensure the failsafe timer has expired"
       verification: |
           The expiry length is mentioned in above step as 60 secs so wait till 60secs and proceed for next step
       disabled: true
 
     - label:
-          "TH1 reads the TrustedRootCertificates attribute from the Node
+          "Step 8: TH1 reads the TrustedRootCertificates attribute from the Node
           Operational Credentials cluster"
       verification: |
-          ./chip-tool operationalcredentials read  trusted-root-certificates 1 0
+          operationalcredentials read  trusted-root-certificates 1 0
+
           On TH1 Verify that the number of items in the returned list is numTrustedRootsOriginal
           [1658483361.121153][27343:27348] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687668
           [1658483361.121212][27343:27348] CHIP:TOO:   TrustedRootCertificates: 1 entries
@@ -148,10 +156,10 @@ tests:
           [1658483361.121342][27343:27348] CHIP:EM: Sending Standalone Ack for MessageCounter:8407614 on exchange 22615i
       disabled: true
 
-    - label: "TH1 reads the Breadcrumb attribute"
+    - label: "Step 9: TH1 reads the Breadcrumb attribute"
       PICS: CGEN.S.C00.Rsp && CGEN.S.A0000
       verification: |
-          ./chip-tool generalcommissioning read breadcrumb 1 0
+          generalcommissioning read breadcrumb 1 0
 
           On TH1 Verify that the breadcrumb attribute is 0
           [1658483428.627422][27375:27380] CHIP:DMG: }
@@ -160,10 +168,11 @@ tests:
           [1658483428.627696][27375:27380] CHIP:EM: Sending Standalone Ack for MessageCounter:242324966 on exchange 46358i
       disabled: true
 
-    - label: "TH1 repeats steps 3 through 5"
+    - label: "Step 10: TH1 repeats steps 3 through 5"
       verification: |
           To repeat Step 3 please send below mentioned command
-           ./chip-tool generalcommissioning  arm-fail-safe   60 1 1 0
+
+          generalcommissioning  arm-fail-safe   60 1 1 0
           On TH1 verify the ArmFailSafeResponse from DUT
 
           [1658482454.092676][27036:27041] CHIP:DMG: },
@@ -177,7 +186,7 @@ tests:
           [1658482454.092955][27036:27041] CHIP:EM: Sending Standalone Ack for MessageCounter:147679912 on exchange 8754i
 
           To repeat Step 4 please send below mentioned command
-          ./chip-tool generalcommissioning read breadcrumb 1 0
+          generalcommissioning read breadcrumb 1 0
 
           On TH1 Verify that the breadcrumb attribute value as 1
           [1658482504.991161][27058:27064] CHIP:DMG: }
@@ -195,7 +204,7 @@ tests:
           5. cat Chip-Root-Cert.txt
 
           While adding new add-trusted-root-certificate  please use the above generated new root key
-          ./chip-tool operationalcredentials add-trusted-root-certificate  hex:1530010828c376ebc17f21512402013703271401000000cacacaca182604ef171b2726056eb5b94c3706271401000000cacacaca182407012408013009410452c19fd9d329a738fd65722a8309fa68bcaa9ffe87d8114b802c922e5066d0b2f0573b89b38bf98fc9c424ab8ffdabcb18d42e623d82a02d0ca0c062ccadb4bc370a350129011824026030041457934de5405e9a40eacb86ee647e583141ae78f430051457934de5405e9a40eacb86ee647e583141ae78f418300b40a0b0d57bddbc7bcf44480a8b7bd0231d54ccacd68d90efb67b7aa3206adbd268725092992a0388c8e934504178613c5b932d422eed7463f38fd82aaa429b574a18 1 0
+           operationalcredentials add-trusted-root-certificate  hex:1530010828c376ebc17f21512402013703271401000000cacacaca182604ef171b2726056eb5b94c3706271401000000cacacaca182407012408013009410452c19fd9d329a738fd65722a8309fa68bcaa9ffe87d8114b802c922e5066d0b2f0573b89b38bf98fc9c424ab8ffdabcb18d42e623d82a02d0ca0c062ccadb4bc370a350129011824026030041457934de5405e9a40eacb86ee647e583141ae78f430051457934de5405e9a40eacb86ee647e583141ae78f418300b40a0b0d57bddbc7bcf44480a8b7bd0231d54ccacd68d90efb67b7aa3206adbd268725092992a0388c8e934504178613c5b932d422eed7463f38fd82aaa429b574a18 1 0
 
 
           on TH1, Verify that the DUT responds with SUCCESS
@@ -208,11 +217,12 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds
-          field set to 0"
+          "Step 11: TH1 sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds field set to 0"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
-          ./chip-tool generalcommissioning  arm-fail-safe  0 1 1 0
+          generalcommissioning  arm-fail-safe  0 1 1 0
+
           On TH1 Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0) and DebugText argument is of type string with max length 512 or empty
           [1658483503.637026][27397:27402] CHIP:DMG: },
           [1658483503.637054][27397:27402] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
@@ -225,10 +235,12 @@ tests:
           [1658483503.637176][27397:27402] CHIP:EM: Sending Standalone Ack for MessageCounter:200752002 on exchange 2227i
       disabled: true
 
-    - label: "Repeat steps 8 through 9"
+    - label: "Step 12: Repeat steps 8 through 9"
       verification: |
           To repeat Step 8 please send below mentioned command
-          ./chip-tool operationalcredentials read  trusted-root-certificates 1 0
+
+          operationalcredentials read  trusted-root-certificates 1 0
+
           On TH1 verify the TrustedRootCertificates entries from DUT
           [1658483361.121153][27343:27348] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687668
           [1658483361.121212][27343:27348] CHIP:TOO:   TrustedRootCertificates: 1 entries
@@ -236,7 +248,7 @@ tests:
           [1658483361.121342][27343:27348] CHIP:EM: Sending Standalone Ack for MessageCounter:8407614 on exchange 22615i
 
           To repeat Step 9 please send below mentioned command
-          ./chip-tool generalcommissioning read breadcrumb 1 0
+          generalcommissioning read breadcrumb 1 0
           On TH1 Verify  the breadcrumb attribute value as 0
           [1658483428.627422][27375:27380] CHIP:DMG: }
           [1658483428.627566][27375:27380] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 2195123770
@@ -245,10 +257,11 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends the OpenCommissioningWindow command to the Administrator
-          Commissioning cluster"
+          "Step 13: TH1 sends the OpenCommissioningWindow command to the
+          Administrator Commissioning cluster"
       verification: |
-          ./chip-tool pairing open-commissioning-window 1 1 400 2000 3840
+          pairing open-commissioning-window 1 1 400 2000 3840
+
           On TH1 Verify that the DUT returns a status code of SUCCESS
           [1658483545.889080][27420:27425] CHIP:DMG: },
           [1658483545.889093][27420:27425] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
@@ -259,11 +272,13 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds
-          field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds"
+          "Step 14: TH1 sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds field set to
+          PIXIT.CGEN.FailsafeExpiryLengthSeconds"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
-          ./chip-tool generalcommissioning  arm-fail-safe   900 1 1 0
+          generalcommissioning  arm-fail-safe   900 1 1 0
+
           On TH1 Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as BusyWithOtherAdmin(4)
           [1658483622.896405][27446:27451] CHIP:DMG: },
           [1658483622.896466][27446:27451] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
@@ -276,7 +291,7 @@ tests:
           [1658483622.896705][27446:27451] CHIP:EM: Sending Standalone Ack for MessageCounter:156899074 on exchange 18880i
       disabled: true
 
-    - label: "TH2 opens a PASE session with the DUT"
+    - label: "Step 15: TH2 opens a PASE session with the DUT"
       verification: |
           Use the interactive mode to verify this test step
           ./chip-tool interactive start
@@ -290,10 +305,10 @@ tests:
       disabled: true
 
     - label:
-          "TH2 obtains or generates a TrustedRootCertificate that is different
-          from the previously commissioned TrustedRootCertificate for TH1. TH2
-          sends an AddTrustedRootCertificate command to the Node Operational
-          Credentials cluster to install this new certificate"
+          "Step 16: TH2 obtains or generates a TrustedRootCertificate that is
+          different from the previously commissioned TrustedRootCertificate for
+          TH1. TH2 sends an AddTrustedRootCertificate command to the Node
+          Operational Credentials cluster to install this new certificate"
       verification: |
           To generate TrustedRootCertificate, need to buld chip-cert in connectedhomeip by giving below mentioned commands
           1. gn gen --check out/debug
@@ -318,14 +333,14 @@ tests:
       disabled: true
 
     - label:
-          "TH2 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds
-          field set to 0"
+          "Step 17: TH2 sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds field set to 0"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
           Use the interactive mode to verify this test step
           ./chip-tool interactive start
 
-          ./chip-tool generalcommissioning  arm-fail-safe  0 1 2 0 --commissioner-name beta
+          generalcommissioning  arm-fail-safe  0 1 2 0 --commissioner-name beta
 
           on TH2, verify the SUCCESS response from DUT
           [1661516003.514158][37550:37555] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
@@ -339,11 +354,12 @@ tests:
       disabled: true
 
     - label:
-          "TH1 reads the NOCs attribute from the Node Operational Credentials
-          cluster using a non-fabric-filtered read and saves the returned list
-          as nocs"
+          "Step 18: TH1 reads the NOCs attribute from the Node Operational
+          Credentials cluster using a non-fabric-filtered read and saves the
+          returned list as nocs"
       verification: |
-          ./chip-tool operationalcredentials read  nocs  1 0 --fabric-filtered 0
+          operationalcredentials read  nocs  1 0 --fabric-filtered 0
+
           On TH1 verify the nocs entries from DUT
           [1661453224.011668][30146:30151] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 4026370800
           [1661453224.011688][30146:30151] CHIP:TOO:   NOCs: 1 entries
@@ -356,11 +372,12 @@ tests:
       disabled: true
 
     - label:
-          "TH1 reads the Fabrics attribute from the Node Operational Credentials
-          cluster using a non-fabric-filtered read and saves the returned list
-          as fabrics"
+          "Step 19: TH1 reads the Fabrics attribute from the Node Operational
+          Credentials cluster using a non-fabric-filtered read and saves the
+          returned list as fabrics"
       verification: |
-          ./chip-tool operationalcredentials read fabrics    1  0 --fabric-filtered 0
+          operationalcredentials read fabrics    1  0 --fabric-filtered 0
+
           On TH1 verify the fabrics list from DUT
           [1661453244.946344][30146:30151] CHIP:DMG: }
           [1661453244.946489][30146:30151] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 4026370800
@@ -377,11 +394,12 @@ tests:
       disabled: true
 
     - label:
-          "TH1 reads the TrustedRootCertificates attribute from the Node
-          Operational Credentials cluster and saves the returned list as
+          "Step 20: TH1 reads the TrustedRootCertificates attribute from the
+          Node Operational Credentials cluster and saves the returned list as
           trustedroots"
       verification: |
-          ./chip-tool operationalcredentials read  trusted-root-certificates   1  0
+          operationalcredentials read  trusted-root-certificates   1  0
+
           On TH1 verify that TrustedRootCertificates entries from DUT
 
           [1661453263.251640][30146:30151] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 4026370800
@@ -391,14 +409,14 @@ tests:
       disabled: true
 
     - label:
-          "TH2 starts commissioning the DUT. It performs all steps up to
-          establishing a CASE connection, but DOES NOT send the
+          "Step 21: TH2 starts commissioning the DUT. It performs all steps up
+          to establishing a CASE connection, but DOES NOT send the
           CommissioningComplete command"
       verification: |
           restart interactive mode
           ./chip-tool interactive start
 
-          ./chip-tool generalcommissioning  arm-fail-safe  900 1 2 0 --commissioner-name beta
+          generalcommissioning  arm-fail-safe  900 1 2 0 --commissioner-name beta
           [1661526846.890010][39790:39795] CHIP:DMG: },
           [1661526846.890045][39790:39795] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1661526846.890068][39790:39795] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -409,7 +427,7 @@ tests:
           [1661526846.890152][39790:39795] CHIP:DMG: ICR moving to [AwaitingDe]
           [1661526846.890175][39790:39795] CHIP:EM: Sending Standalone Ack for MessageCounter:154983735 on exchange 28847i
 
-          ./chip-tool generalcommissioning read  basic-commissioning-info 2 0 --commissioner-name beta
+          generalcommissioning read  basic-commissioning-info 2 0 --commissioner-name beta
           [1661526855.258145][39790:39795] CHIP:DMG: }
           [1661526855.258251][39790:39795] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0001 DataVersion: 2812726199
           [1661526855.258272][39790:39795] CHIP:TOO:   BasicCommissioningInfo: {
@@ -419,7 +437,7 @@ tests:
           [1661526855.258357][39790:39795] CHIP:EM: Sending Standalone Ack for MessageCounter:154983736 on exchange 28848i
 
 
-           ./chip-tool operationalcredentials certificate-chain-request 1  2 0 --commissioner-name beta
+           operationalcredentials certificate-chain-request 1  2 0 --commissioner-name beta
           1661526863.203027][39790:39795] CHIP:DMG:         InteractionModelRevision = 1
           [1661526863.203035][39790:39795] CHIP:DMG: },
           [1661526863.203066][39790:39795] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0003
@@ -430,7 +448,7 @@ tests:
           [1661526863.203158][39790:39795] CHIP:TOO:    }
           [1661526863.203177][39790:39795] CHIP:DMG: ICR moving to [AwaitingDe]
 
-          ./chip-tool operationalcredentials certificate-chain-request 2  2 0 --commissioner-name beta
+          operationalcredentials certificate-chain-request 2  2 0 --commissioner-name beta
           [1661526869.868162][39790:39795] CHIP:DMG: },
           [1661526869.868190][39790:39795] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0003
           [1661526869.868200][39790:39795] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0003
@@ -440,7 +458,7 @@ tests:
           [1661526869.868264][39790:39795] CHIP:TOO:    }
           [1661526869.868280][39790:39795] CHIP:DMG: ICR moving to [AwaitingDe]
 
-          ./chip-tool generalcommissioning  set-regulatory-config 1 xx 1 2 0 --commissioner-name beta
+          generalcommissioning  set-regulatory-config 1 xx 1 2 0 --commissioner-name beta
             [1661526876.824085][39790:39795] CHIP:DMG: },
           [1661526876.824116][39790:39795] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0003
           [1661526876.824127][39790:39795] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0003
@@ -482,7 +500,7 @@ tests:
           [1661526895.276061][39790:39795] CHIP:DMG: ICR moving to [AwaitingDe]
           [1661526895.276069][39790:39795] CHIP:EM: Sending Standalone Ack for MessageCounter:154983743 on exchange 28853i
 
-          operationalcredentials add-trusted-root-certificate  hex:1530010872A919278B9C6D342402013703271401000000CACACACA182604EF171B2726056EB5B94C3706271401000000CACACACA1824070124080130094104C5E4D28C17F94A9A9E65D524F6708233D232AEBBBDDB82A9182D471D109FF1E05D633B14B0FE64F40A8A7F9E0D0996B6D786B025B4489D1B000384083D840CDE370A3501290118240260300414DB754184659F929C86EAA58A442DACFCD6DD6222300514DB754184659F929C86EAA58A442DACFCD6DD622218300B40B5143626E30CADB003A8DAC2C9B2A28991EC64D3557889CA626A3FD3D12F93D5AAF370F6BBC9D976127B34179EE5937909C7D49C868804B6FE5ECD8F090A169D18 2 0  --commissioner-name beta
+           operationalcredentials add-trusted-root-certificate  hex:1530010872A919278B9C6D342402013703271401000000CACACACA182604EF171B2726056EB5B94C3706271401000000CACACACA1824070124080130094104C5E4D28C17F94A9A9E65D524F6708233D232AEBBBDDB82A9182D471D109FF1E05D633B14B0FE64F40A8A7F9E0D0996B6D786B025B4489D1B000384083D840CDE370A3501290118240260300414DB754184659F929C86EAA58A442DACFCD6DD6222300514DB754184659F929C86EAA58A442DACFCD6DD622218300B40B5143626E30CADB003A8DAC2C9B2A28991EC64D3557889CA626A3FD3D12F93D5AAF370F6BBC9D976127B34179EE5937909C7D49C868804B6FE5ECD8F090A169D18 2 0  --commissioner-name beta
           [1661526904.272468][39790:39795] CHIP:DMG:         InteractionModelRevision = 1
           [1661526904.272474][39790:39795] CHIP:DMG: },
           [1661526904.272503][39790:39795] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003E Command=0x0000_000B Status=0x0
@@ -490,14 +508,14 @@ tests:
       disabled: true
 
     - label:
-          "TH2 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds
-          field set to 0"
+          "Step 22: TH2 sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds field set to 0"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
           Use the interactive mode to verify this test step
           ./chip-tool interactive start
 
-          ./chip-tool generalcommissioning arm-fail-safe 0 1 2 0 --commissioner-name beta
+          generalcommissioning arm-fail-safe 0 1 2 0 --commissioner-name beta
           [1661526922.517693][39790:39795] CHIP:DMG: },
           [1661526922.517742][39790:39795] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1661526922.517754][39790:39795] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -510,13 +528,13 @@ tests:
       disabled: true
 
     - label:
-          "TH1 reads the NOCs attribute from the Node Operational Credentials
-          cluster using a non-fabric-filtered read"
+          "Step 23: TH1 reads the NOCs attribute from the Node Operational
+          Credentials cluster using a non-fabric-filtered read"
       verification: |
           Use the interactive mode to verify this test step
           ./chip-tool interactive start
 
-          ./chip-tool operationalcredentials read  nocs  1 0
+          operationalcredentials read  nocs  1 0
           On TH1 verify the nocs entries from DUT and Verify that the returned list matches nocs
           [1661527716.060615][39909:39914] CHIP:DMG: }
           [1661527716.060749][39909:39914] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 415933492
@@ -530,13 +548,13 @@ tests:
       disabled: true
 
     - label:
-          "TH1 reads the Fabrics attribute from the Node Operational Credentials
-          cluster using a non-fabric-filtered read"
+          "Step 24: TH1 reads the Fabrics attribute from the Node Operational
+          Credentials cluster using a non-fabric-filtered read"
       verification: |
           Use the interactive mode to verify this test step
           ./chip-tool interactive start
 
-          ./chip-tool operationalcredentials read fabrics    1  0 --fabric-filtered 0
+          operationalcredentials read fabrics    1  0 --fabric-filtered 0
           On TH1 verify the fabrics list from DUT and Verify that the returned list matches fabrics
           [1658484405.562192][27710:27716] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 527687672
           [1658484405.562321][27710:27716] CHIP:TOO:   Fabrics: 2 entries
@@ -560,13 +578,13 @@ tests:
       disabled: true
 
     - label:
-          "TH1 reads the TrustedRootCertificates attribute from the Node
-          Operational Credentials cluster"
+          "Step 25: TH1 reads the TrustedRootCertificates attribute from the
+          Node Operational Credentials cluster"
       verification: |
           Use the interactive mode to verify this test step
           ./chip-tool interactive start
 
-          ./chip-tool operationalcredentials read  trusted-root-certificates   1  0
+          operationalcredentials read  trusted-root-certificates   1  0
           On TH1 verify the TrustedRootCertificates entries from DUT and Verify that the returned list matches trustedroots
           [1658484601.144043][28501:28506] CHIP:DMG:         InteractionModelRevision = 1
           [1658484601.144050][28501:28506] CHIP:DMG: }
@@ -580,7 +598,7 @@ tests:
           [1658484601.144408][28501:28506] CHIP:EM: Flushed pending ack for MessageCounter:68619713 on exchange 46067i
       disabled: true
 
-    - label: "TH2 fully commissions the DUT"
+    - label: "Step 26: TH2 fully commissions the DUT"
       verification: |
           While pairing between DUT and TH2, On TH2 verify that commissioning completes successfully
           [1660748637.271112][21572:21577] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
@@ -591,9 +609,9 @@ tests:
       disabled: true
 
     - label:
-          "TH2 obtains or generates a new TrustedRootCertificate that is
-          different from the previously commissioned TrustedRootCertificate for
-          TH2. TH2 sends an AddTrustedRootCertificate command to the Node
+          "Step 27: TH2 obtains or generates a new TrustedRootCertificate that
+          is different from the previously commissioned TrustedRootCertificate
+          for TH2. TH2 sends an AddTrustedRootCertificate command to the Node
           Operational Credentials cluster to install this new certificate"
       verification: |
           To generate TrustedRootCertificate, need to buld chip-cert in connectedhomeip by giving below mentioned commands
@@ -606,7 +624,7 @@ tests:
 
           While adding new add-trusted-root-certificate  please use the above generated new root key
 
-          ./chip-tool operationalcredentials add-trusted-root-certificate    04614D01D2897082D7F85832CE00AC787A5A221A6F7B19C4202C069E3D70DDC615E5B9436919266360AC847F2FAB3EAEE3902B43812A13D18C061CC5028EADB775583DCB1008E4CEBFF810EEB2BC60FF7A3CF954C57101798443DA39E75F5FFDEA 2 0 --commissioner-name beta
+           operationalcredentials add-trusted-root-certificate    04614D01D2897082D7F85832CE00AC787A5A221A6F7B19C4202C069E3D70DDC615E5B9436919266360AC847F2FAB3EAEE3902B43812A13D18C061CC5028EADB775583DCB1008E4CEBFF810EEB2BC60FF7A3CF954C57101798443DA39E75F5FFDEA 2 0 --commissioner-name beta
           On TH2 verify that DUT responds with FAILSAFE_REQUIRED
           [1658484766.785916][8132:8137] CHIP:DMG:
           [1658484766.785961][8132:8137] CHIP:DMG:         InteractionModelRevision = 1
@@ -617,10 +635,10 @@ tests:
       disabled: true
 
     - label:
-          "TH1 reads the Fabrics attribute from the Node Operational Credentials
-          cluster using a non-fabric-filtered read"
+          "Step 28: TH1 reads the Fabrics attribute from the Node Operational
+          Credentials cluster using a non-fabric-filtered read"
       verification: |
-          ./chip-tool operationalcredentials read fabrics    1  0 --fabric-filtered 0
+          operationalcredentials read fabrics    1  0 --fabric-filtered 0
           On TH1 verify the fabrics list from DUT and Verify that the returned list includes an additional entry for TH2 when compared to fabrics
           [1658484405.562192][27710:27716] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 527687672
           [1658484405.562321][27710:27716] CHIP:TOO:   Fabrics: 2 entries
@@ -644,12 +662,12 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds
-          field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds and the Breadcrumb
-          value as 1"
+          "Step 29: TH1 sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds field set to
+          PIXIT.CGEN.FailsafeExpiryLengthSeconds and the Breadcrumb value as 1"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
-          ./chip-tool generalcommissioning  arm-fail-safe   900 1 1 0
+          generalcommissioning  arm-fail-safe   900 1 1 0
           On TH1 Verify that  DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0) and DebugText argument is of type string with max length 512 or empty
           [1658485224.066397][28732:28737] CHIP:DMG:         InteractionModelRevision = 1
           [1658485224.066407][28732:28737] CHIP:DMG: },
@@ -663,9 +681,9 @@ tests:
       disabled: true
 
     - label:
-          "TH1 obtains or generates a new TrustedRootCertificate that is
-          different from the previously commissioned TrustedRootCertificate for
-          TH1. TH1 sends an AddTrustedRootCertificate command to the Node
+          "Step 30: TH1 obtains or generates a new TrustedRootCertificate that
+          is different from the previously commissioned TrustedRootCertificate
+          for TH1. TH1 sends an AddTrustedRootCertificate command to the Node
           Operational Credentials cluster to install this new certificate"
       verification: |
           To generate TrustedRootCertificate, need to buld chip-cert in connectedhomeip by giving below mentioned commands
@@ -680,7 +698,7 @@ tests:
           While adding new add-trusted-root-certificate  please use the above generated new root key
 
 
-          ./chip-tool operationalcredentials add-trusted-root-certificate  hex:1530010828c376ebc17f21512402013703271401000000cacacaca182604ef171b2726056eb5b94c3706271401000000cacacaca182407012408013009410452c19fd9d329a738fd65722a8309fa68bcaa9ffe87d8114b802c922e5066d0b2f0573b89b38bf98fc9c424ab8ffdabcb18d42e623d82a02d0ca0c062ccadb4bc370a350129011824026030041457934de5405e9a40eacb86ee647e583141ae78f430051457934de5405e9a40eacb86ee647e583141ae78f418300b40a0b0d57bddbc7bcf44480a8b7bd0231d54ccacd68d90efb67b7aa3206adbd268725092992a0388c8e934504178613c5b932d422eed7463f38fd82aaa429b574a18 1 0
+          operationalcredentials add-trusted-root-certificate  hex:1530010828c376ebc17f21512402013703271401000000cacacaca182604ef171b2726056eb5b94c3706271401000000cacacaca182407012408013009410452c19fd9d329a738fd65722a8309fa68bcaa9ffe87d8114b802c922e5066d0b2f0573b89b38bf98fc9c424ab8ffdabcb18d42e623d82a02d0ca0c062ccadb4bc370a350129011824026030041457934de5405e9a40eacb86ee647e583141ae78f430051457934de5405e9a40eacb86ee647e583141ae78f418300b40a0b0d57bddbc7bcf44480a8b7bd0231d54ccacd68d90efb67b7aa3206adbd268725092992a0388c8e934504178613c5b932d422eed7463f38fd82aaa429b574a18 1 0
 
           On TH1 verify that DUT responds as success
           [1658485618.508499][28884:28890] CHIP:DMG:
@@ -692,10 +710,10 @@ tests:
       disabled: true
 
     - label:
-          "TH1 reads the TrustedRootCertificates attribute from the Node
-          Operational Credentials cluster"
+          "Step 31: TH1 reads the TrustedRootCertificates attribute from the
+          Node Operational Credentials cluster"
       verification: |
-          ./chip-tool operationalcredentials read  trusted-root-certificates   1  0
+          operationalcredentials read  trusted-root-certificates   1  0
 
           On TH1 verify the TrustedRootCertificates entries from DUT and Verify that the number of items in the returned list is numTrustedRootsOriginal + 1
           [1658485696.739931][28920:28925] CHIP:DMG:         InteractionModelRevision = 1
@@ -709,11 +727,11 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds
-          field set to maxFailsafe"
+          "Step 32: TH1 sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds field set to maxFailsafe"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
-          ./chip-tool generalcommissioning  arm-fail-safe   900 1 1 0
+          generalcommissioning  arm-fail-safe   900 1 1 0
           On TH1 verify the ArmFailSafe command from DUT
           [1658486181.080260][29218:29223] CHIP:DMG: },
           [1658486181.080289][29218:29223] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
@@ -726,16 +744,16 @@ tests:
           [1658486181.080408][29218:29223] CHIP:EM: Sending Standalone Ack for MessageCounter:68810716 on exchange 21458i
       disabled: true
 
-    - label: "TH1 waits for PIXIT.CGEN.FailsafeExpiryLengthSeconds"
+    - label: "Step 33: TH1 waits for PIXIT.CGEN.FailsafeExpiryLengthSeconds"
       verification: |
           The expiry length is mentioned in above step as 900 secs so wait till 900secs and proced for next step
       disabled: true
 
     - label:
-          "TH1 reads the TrustedRootCertificates attribute from the Node
-          Operational Credentials cluster"
+          "Step 34: TH1 reads the TrustedRootCertificates attribute from the
+          Node Operational Credentials cluster"
       verification: |
-          ./chip-tool operationalcredentials read  trusted-root-certificates   1  0
+          operationalcredentials read  trusted-root-certificates   1  0
           On TH1 verify that  TH reads TrustedRootCertificates entries from DUT and Verify that the number of entries in the returned list is still numTrustedRootsOriginal + 1
           [1658486366.493185][29315:29320] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687672
           [1658486366.493236][29315:29320] CHIP:TOO:   TrustedRootCertificates: 2 entries
@@ -745,12 +763,12 @@ tests:
       disabled: true
 
     - label:
-          "TH2 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds
-          field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds and the Breadcrumb
-          value as 1"
+          "Step 35: TH2 sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds field set to
+          PIXIT.CGEN.FailsafeExpiryLengthSeconds and the Breadcrumb value as 1"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
-          ./chip-tool generalcommissioning  arm-fail-safe   60 1 2 0 --commissioner-name beta
+          generalcommissioning  arm-fail-safe   60 1 2 0 --commissioner-name beta
           On TH2 Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as BusyWithOtherAdmin
           [1658486289.473526][8200:8205] CHIP:DMG:         InteractionModelRevision = 1
           [1658486289.473563][8200:8205] CHIP:DMG: },
@@ -765,11 +783,11 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends ArmFailSafeCommand to the DUT with ExpiryLengthSeconds
-          field set to 0"
+          "Step 36: TH1 sends ArmFailSafeCommand to the DUT with
+          ExpiryLengthSeconds field set to 0"
       PICS: CGEN.S.C00.Rsp
       verification: |
-          ./chip-tool generalcommissioning  arm-fail-safe 0 1 1 0
+          generalcommissioning  arm-fail-safe 0 1 1 0
           On TH1 verify the ArmFailSafe command from DUT
           [1658486510.232274][29388:29393] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1658486510.232302][29388:29393] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -782,11 +800,11 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends ArmFailsafeCommand to the DUT with ExpiryLengthSeconds
-          field set to maxFailsafe"
+          "Step 37: TH1 sends ArmFailsafeCommand to the DUT with
+          ExpiryLengthSeconds field set to maxFailsafe"
       PICS: CGEN.S.C00.Rsp
       verification: |
-          ./chip-tool generalcommissioning  arm-fail-safe 900 1 1 0
+          generalcommissioning  arm-fail-safe 900 1 1 0
           On TH1 Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0) and DebugText argument is of type string with max length 512 or empty
           [1658486418.024554][29343:29348] CHIP:DMG:         InteractionModelRevision = 1
           [1658486418.024559][29343:29348] CHIP:DMG: },
@@ -800,15 +818,16 @@ tests:
           [1658486418.024725][29343:29348] CHIP:EM: Sending Standalone Ack for MessageCounter:21602903 on exchange 9289i
       disabled: true
 
-    - label: "TH1 saves the current wall time clock in seconds as Tstart"
+    - label:
+          "Step 38: TH1 saves the current wall time clock in seconds as Tstart"
       verification: |
           this can be calculated manually from the value obtained from the previous steps
       disabled: true
 
     - label:
-          "TH1 obtains or generates a new TrustedRootCertificate that is
-          different from the previously commissioned TrustedRootCertificate for
-          TH1. TH1 sends an AddTrustedRootCertificate command to the Node
+          "Step 39: TH1 obtains or generates a new TrustedRootCertificate that
+          is different from the previously commissioned TrustedRootCertificate
+          for TH1. TH1 sends an AddTrustedRootCertificate command to the Node
           Operational Credentials cluster to install this new certificate"
       verification: |
           To generate TrustedRootCertificate, need to buld chip-cert in connectedhomeip by giving below mentioned commands
@@ -820,7 +839,7 @@ tests:
           5. cat Chip-Root-Cert.txt
 
           While adding new add-trusted-root-certificate  please use the above generated new root key
-          ./chip-tool operationalcredentials add-trusted-root-certificate
+           operationalcredentials add-trusted-root-certificate
           hex:1530010828c376ebc17f21512402013703271401000000cacacaca182604ef171b2726056eb5b94c3706271401000000cacacaca182407012408013009410452c19fd9d329a738fd65722a8309fa68bcaa9ffe87d8114b802c922e5066d0b2f0573b89b38bf98fc9c424ab8ffdabcb18d42e623d82a02d0ca0c062ccadb4bc370a350129011824026030041457934de5405e9a40eacb86ee647e583141ae78f430051457934de5405e9a40eacb86ee647e583141ae78f418300b40a0b0d57bddbc7bcf44480a8b7bd0231d54ccacd68d90efb67b7aa3206adbd268725092992a0388c8e934504178613c5b932d422eed7463f38fd82aaa429b574a18 1 0
           On TH1 verify that DUT responds as success
           [1658487558.547191][30203:30208] CHIP:DMG: },
@@ -830,10 +849,10 @@ tests:
       disabled: true
 
     - label:
-          "TH1 reads the TrustedRootCertificates attribute from the Node
-          Operational Credentials cluster"
+          "Step 40: TH1 reads the TrustedRootCertificates attribute from the
+          Node Operational Credentials cluster"
       verification: |
-          ./chip-tool operationalcredentials read  trusted-root-certificates   1  0
+          operationalcredentials read  trusted-root-certificates   1  0
           On TH1 Verify that the number of items in the returned list is numTrustedRootsOriginal + 1
 
           [1658487613.357548][30232:30237] CHIP:DMG: }
@@ -849,17 +868,18 @@ tests:
       disabled: true
 
     - label:
-          "TH1 waits until the current wall time clock is Tstart + maxFailsafe/2"
+          "Step 41: TH1 waits until the current wall time clock is Tstart +
+          maxFailsafe/2"
       verification: |
           this can be calculated manually from the value obtained from the previous steps
       disabled: true
 
     - label:
-          "TH1 sends ArmFailsafeCommand to the DUT with ExpiryLengthSeconds
-          field set to maxFailsafe"
+          "Step 42: TH1 sends ArmFailsafeCommand to the DUT with
+          ExpiryLengthSeconds field set to maxFailsafe"
       PICS: CGEN.S.C00.Rsp
       verification: |
-          ./chip-tool generalcommissioning  arm-fail-safe   900 0 1  0
+          generalcommissioning  arm-fail-safe   900 0 1  0
           On TH1 Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0) and DebugText argument is of type string with max length 512 or empty
 
           [1658487663.593485][30268:30273] CHIP:DMG:         InteractionModelRevision = 1
@@ -875,19 +895,19 @@ tests:
       disabled: true
 
     - label:
-          "TH1 waits until the current wall time clock is Tstart + maxFailsafe.
-          maxFailsafe is the maximum amount of time a failsafe can be armed for,
-          so the failsafe is required to time out at this point, despite having
-          been re-armed in step 42."
+          "Step 43: TH1 waits until the current wall time clock is Tstart +
+          maxFailsafe. maxFailsafe is the maximum amount of time a failsafe can
+          be armed for, so the failsafe is required to time out at this point,
+          despite having been re-armed in step 42."
       verification: |
           this can be calculated manually from the value obtained from the previous steps
       disabled: true
 
     - label:
-          "TH1 reads the TrustedRootCertificates attribute from the Node
-          Operational Credentials cluster"
+          "Step 44: TH1 reads the TrustedRootCertificates attribute from the
+          Node Operational Credentials cluster"
       verification: |
-          ./chip-tool operationalcredentials read  trusted-root-certificates   1  0
+          operationalcredentials read  trusted-root-certificates   1  0
           On TH1 Verify that the number of items in the returned list is numTrustedRootsOriginal
           [1658489869.278413][31188:31193] CHIP:DMG: }
           [1658489869.278997][31188:31193] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687672

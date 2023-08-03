@@ -30,8 +30,9 @@ config("includes") {
 
 executable("chip-resource-monitoring-app") {
   sources = [
+    "${chip_root}/examples/resource-monitoring-app/resource-monitoring-common/src/ReplacementProductListManager.cpp",
     "${chip_root}/examples/resource-monitoring-app/resource-monitoring-common/src/instances/ActivatedCarbonFilterMonitoring.cpp",
-    "${chip_root}/examples/resource-monitoring-app/resource-monitoring-common/src/instances/HepafilterMonitoring.cpp",
+    "${chip_root}/examples/resource-monitoring-app/resource-monitoring-common/src/instances/HepaFilterMonitoring.cpp",
     "include/CHIPProjectAppConfig.h",
     "src/main.cpp",
   ]

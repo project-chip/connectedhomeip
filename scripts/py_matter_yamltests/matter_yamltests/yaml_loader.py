@@ -15,9 +15,9 @@
 
 from typing import Tuple, Union
 
-from .errors import (TestStepError, TestStepGroupEndPointError, TestStepGroupResponseError, TestStepInvalidTypeError,
-                     TestStepKeyError, TestStepNodeIdAndGroupIdError, TestStepResponseVariableError, TestStepValueAndValuesError,
-                     TestStepVerificationStandaloneError, TestStepWaitResponseError)
+from .errors import (TestStepArgumentsValueError, TestStepError, TestStepGroupEndPointError, TestStepGroupResponseError,
+                     TestStepInvalidTypeError, TestStepKeyError, TestStepNodeIdAndGroupIdError, TestStepResponseVariableError,
+                     TestStepValueAndValuesError, TestStepVerificationStandaloneError, TestStepWaitResponseError)
 from .fixes import add_yaml_support_for_scientific_notation_without_dot
 
 try:
@@ -103,6 +103,7 @@ class YamlLoader:
             'PICS': str,
             'arguments': dict,
             'response': (dict, list, str),  # Can be a variable
+            'saveResponseAs': str,
             'minInterval': int,
             'maxInterval': int,
             'timeout': int,
@@ -120,6 +121,7 @@ class YamlLoader:
             content)
         self.__rule_wait_should_not_expect_a_response(content)
         self.__rule_response_variable_should_exist_in_config(config, content)
+        self.__rule_argument_value_is_only_when_writing_attributes(content)
 
         if 'arguments' in content:
             arguments = content.get('arguments')
@@ -260,3 +262,10 @@ class YamlLoader:
             response = content.get('response')
             if isinstance(response, str) and response not in config:
                 raise TestStepResponseVariableError(content)
+
+    def __rule_argument_value_is_only_when_writing_attributes(self, content):
+        if 'arguments' in content:
+            command = content.get('command')
+            arguments = content.get('arguments')
+            if 'value' in arguments and command != 'writeAttribute':
+                raise TestStepArgumentsValueError(content)

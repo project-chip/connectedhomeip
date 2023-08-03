@@ -155,6 +155,13 @@ server cluster Descriptor = 29 {
     int16u revision = 1;
   }
 
+  struct SemanticTagStruct {
+    nullable vendor_id mfgCode = 0;
+    enum8 namespaceID = 1;
+    enum8 tag = 2;
+    optional nullable char_string label = 3;
+  }
+
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
   readonly attribute CLUSTER_ID serverList[] = 1;
   readonly attribute CLUSTER_ID clientList[] = 2;
@@ -1401,6 +1408,10 @@ server cluster GroupKeyManagement = 63 {
     kCacheAndSync = 1;
   }
 
+  bitmap Feature : BITMAP32 {
+    kCacheAndSync = 0x1;
+  }
+
   fabric_scoped struct GroupInfoMapStruct {
     group_id groupId = 1;
     endpoint_no endpoints[] = 2;
@@ -1519,6 +1530,7 @@ server cluster HepaFilterMonitoring = 113 {
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+    kReplacementProductList = 0x3;
   }
 
   struct ReplacementProductStruct {
@@ -1531,6 +1543,7 @@ server cluster HepaFilterMonitoring = 113 {
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute boolean inPlaceIndicator = 3;
   attribute nullable epoch_s lastChangedTime = 4;
+  readonly attribute ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1565,6 +1578,7 @@ server cluster ActivatedCarbonFilterMonitoring = 114 {
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+    kReplacementProductList = 0x3;
   }
 
   struct ReplacementProductStruct {
@@ -1577,6 +1591,7 @@ server cluster ActivatedCarbonFilterMonitoring = 114 {
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute boolean inPlaceIndicator = 3;
   attribute nullable epoch_s lastChangedTime = 4;
+  readonly attribute ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1949,7 +1964,6 @@ endpoint 1 {
     ram      attribute identifyType default = 0x0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
@@ -1959,7 +1973,6 @@ endpoint 1 {
     ram      attribute nameSupport;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
@@ -1972,7 +1985,6 @@ endpoint 1 {
     callback attribute partsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -1984,9 +1996,9 @@ endpoint 1 {
     callback attribute changeIndication default = 0;
     callback attribute inPlaceIndicator;
     callback attribute lastChangedTime;
+    callback attribute replacementProductList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -1998,9 +2010,9 @@ endpoint 1 {
     callback attribute changeIndication default = 0;
     callback attribute inPlaceIndicator;
     callback attribute lastChangedTime;
+    callback attribute replacementProductList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2013,7 +2025,6 @@ endpoint 1 {
     ram      attribute percentCurrent default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;

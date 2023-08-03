@@ -28,17 +28,21 @@ using namespace chip::app::Clusters::ResourceMonitoring;
 using chip::Protocols::InteractionModel::Status;
 
 constexpr std::bitset<4> gHepaFilterFeatureMap{ static_cast<uint32_t>(Feature::kCondition) |
-                                                static_cast<uint32_t>(Feature::kWarning) };
+                                                static_cast<uint32_t>(Feature::kWarning) |
+                                                static_cast<uint32_t>(Feature::kReplacementProductList) };
 constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Feature::kCondition) |
-                                                     static_cast<uint32_t>(Feature::kWarning) };
+                                                     static_cast<uint32_t>(Feature::kWarning) |
+                                                     static_cast<uint32_t>(Feature::kReplacementProductList) };
 
-static HepaFilterMonitoringInstance * gHepafilterInstance                       = nullptr;
+static HepaFilterMonitoringInstance * gHepaFilterInstance                       = nullptr;
 static ActivatedCarbonFilterMonitoringInstance * gActivatedCarbonFilterInstance = nullptr;
+static ImmutableReplacementProductListManager sReplacementProductListManager;
 
 //-- Activated Carbon Filter Monitoring Instance methods
 CHIP_ERROR ActivatedCarbonFilterMonitoringInstance::AppInit()
 {
     ChipLogDetail(Zcl, "ActivatedCarbonFilterMonitoringDelegate::Init()");
+    SetReplacementProductListManagerInstance(&sReplacementProductListManager);
     return CHIP_NO_ERROR;
 }
 
@@ -58,6 +62,7 @@ Status ActivatedCarbonFilterMonitoringInstance::PostResetCondition()
 CHIP_ERROR HepaFilterMonitoringInstance::AppInit()
 {
     ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::Init()");
+    SetReplacementProductListManagerInstance(&sReplacementProductListManager);
     return CHIP_NO_ERROR;
 }
 
@@ -82,8 +87,46 @@ void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId 
 }
 void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
 {
-    VerifyOrDie(gActivatedCarbonFilterInstance == nullptr);
-    gHepafilterInstance = new HepaFilterMonitoringInstance(endpoint, static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
+    VerifyOrDie(gHepaFilterInstance == nullptr);
+    gHepaFilterInstance = new HepaFilterMonitoringInstance(endpoint, static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
                                                            DegradationDirectionEnum::kDown, true);
-    gHepafilterInstance->Init();
+    gHepaFilterInstance->Init();
+}
+
+CHIP_ERROR ImmutableReplacementProductListManager::Next(ReplacementProductStruct & item)
+{
+    if (mIndex >= kReplacementProductListMaxSize)
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+
+    switch (mIndex)
+    {
+    case 0: {
+        item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kUpc);
+        item.SetProductIdentifierValue(CharSpan::fromCharString("111112222233"));
+        break;
+    case 1:
+        item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8);
+        item.SetProductIdentifierValue(CharSpan::fromCharString("gtin8xxx"));
+        break;
+    case 2:
+        item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kEan);
+        item.SetProductIdentifierValue(CharSpan::fromCharString("4444455555666"));
+        break;
+    case 3:
+        item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14);
+        item.SetProductIdentifierValue(CharSpan::fromCharString("gtin14xxxxxxxx"));
+        break;
+    case 4:
+        item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kOem);
+        item.SetProductIdentifierValue(CharSpan::fromCharString("oem20xxxxxxxxxxxxxxx"));
+        break;
+    default:
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+        break;
+    }
+    }
+    mIndex++;
+    return CHIP_NO_ERROR;
 }

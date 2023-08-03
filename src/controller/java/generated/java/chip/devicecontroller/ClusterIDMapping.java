@@ -1681,6 +1681,7 @@ public class ClusterIDMapping {
             ServerList(1L),
             ClientList(2L),
             PartsList(3L),
+            TagList(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -6043,7 +6044,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum UnregisterClientCommandField {CheckInNodeID(0),Key(1),;
+                }public enum UnregisterClientCommandField {CheckInNodeID(0),VerificationKey(1),;
                     private final int id;
                     UnregisterClientCommandField(int id) {
                         this.id = id;

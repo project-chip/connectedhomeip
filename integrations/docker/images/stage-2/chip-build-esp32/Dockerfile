@@ -1,4 +1,4 @@
-ARG VERSION=latest
+ARG VERSION=1
 FROM ghcr.io/project-chip/chip-build:${VERSION} as build
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
@@ -11,7 +11,7 @@ RUN set -x \
     && : # last line
 
 RUN set -x \
-    && git clone --recursive -b v4.4.4 --depth 1 --shallow-submodule https://github.com/espressif/esp-idf.git /tmp/esp-idf \
+    && git clone --recursive -b v5.1 --depth 1 --shallow-submodule https://github.com/espressif/esp-idf.git /tmp/esp-idf \
     && : # last line
 
 FROM ghcr.io/project-chip/chip-build:${VERSION}

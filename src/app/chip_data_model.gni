@@ -215,6 +215,13 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/supported-temperature-levels-manager.h",
         ]
+      } else if (cluster == "mode-base-server") {
+        sources += [
+          "${_app_root}/clusters/mode-base-server/mode-base-cluster-objects.cpp",
+          "${_app_root}/clusters/mode-base-server/mode-base-cluster-objects.h",
+          "${_app_root}/clusters/mode-base-server/mode-base-server.cpp",
+          "${_app_root}/clusters/mode-base-server/mode-base-server.h",
+        ]
       } else if (cluster == "application-launcher-server") {
         sources += [
           "${_app_root}/app-platform/ContentApp.cpp",
@@ -263,6 +270,12 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.h",
           "${_app_root}/clusters/${cluster}/operational-state-delegate.h",
         ]
+      } else if (cluster == "dishwasher-alarm-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/dishwasher-alarm-delegate.h",
+        ]
       } else if (cluster == "icd-management-server") {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
 
@@ -271,6 +284,7 @@ template("chip_data_model") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/replacement-product-list-manager.h",
           "${_app_root}/clusters/${cluster}/resource-monitoring-cluster-objects.cpp",
           "${_app_root}/clusters/${cluster}/resource-monitoring-cluster-objects.h",
         ]

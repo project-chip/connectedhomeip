@@ -1387,6 +1387,7 @@ private:
 | * ServerList                                                        | 0x0001 |
 | * ClientList                                                        | 0x0002 |
 | * PartsList                                                         | 0x0003 |
+| * TagList                                                           | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -3944,7 +3945,7 @@ public:
         ClusterCommand("unregister-client", credsIssuerConfig)
     {
         AddArgument("CheckInNodeID", 0, UINT64_MAX, &mRequest.checkInNodeID);
-        AddArgument("Key", &mRequest.key);
+        AddArgument("VerificationKey", &mRequest.verificationKey);
         ClusterCommand::AddArguments();
     }
 
@@ -10482,6 +10483,7 @@ void registerClusterDescriptor(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "server-list", Attributes::ServerList::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "client-list", Attributes::ClientList::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "parts-list", Attributes::PartsList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "tag-list", Attributes::TagList::Id, credsIssuerConfig),                            //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -10498,6 +10500,9 @@ void registerClusterDescriptor(Commands & commands, CredentialIssuerCommands * c
             Id, "client-list", Attributes::ClientList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EndpointId>>>(
             Id, "parts-list", Attributes::PartsList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>>>(
+            Id, "tag-list", Attributes::TagList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -10516,6 +10521,7 @@ void registerClusterDescriptor(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "server-list", Attributes::ServerList::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "client-list", Attributes::ClientList::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "parts-list", Attributes::PartsList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "tag-list", Attributes::TagList::Id, credsIssuerConfig),                            //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -19835,7 +19841,9 @@ void registerClusterAny(Commands & commands, CredentialIssuerCommands * credsIss
         make_unique<SubscribeAttribute>(credsIssuerConfig), //
         make_unique<ReadEvent>(credsIssuerConfig),          //
         make_unique<SubscribeEvent>(credsIssuerConfig),     //
+        make_unique<ReadNone>(credsIssuerConfig),           //
         make_unique<ReadAll>(credsIssuerConfig),            //
+        make_unique<SubscribeNone>(credsIssuerConfig),      //
         make_unique<SubscribeAll>(credsIssuerConfig),       //
     };
 

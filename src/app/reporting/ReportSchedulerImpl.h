@@ -32,6 +32,9 @@ public:
     ReportSchedulerImpl(TimerDelegate * aTimerDelegate);
     ~ReportSchedulerImpl() override { UnregisterAllHandlers(); }
 
+    // ICDStateObserver
+    void OnEnterActiveMode() override;
+
     // ReadHandlerObserver
     void OnReadHandlerCreated(ReadHandler * aReadHandler) final;
     void OnBecameReportable(ReadHandler * aReadHandler) final;

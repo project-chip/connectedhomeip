@@ -247,7 +247,9 @@ source_set("siwx917-common") {
   ]
 
   sources = [
+    "${silabs_common_plat_dir}/BaseApplication.cpp",
     "${silabs_common_plat_dir}/LEDWidget.cpp",
+    "${silabs_common_plat_dir}/MatterConfig.cpp",
     "${silabs_common_plat_dir}/SoftwareFaultReports.cpp",
     "${silabs_common_plat_dir}/heap_4_silabs.c",
     "${silabs_common_plat_dir}/silabs_utils.cpp",
@@ -256,11 +258,8 @@ source_set("siwx917-common") {
     "${wifi_sdk_dir}/ethernetif.cpp",
     "${wifi_sdk_dir}/lwip_netif.cpp",
     "${wifi_sdk_dir}/wfx_notify.cpp",
-    "BaseApplication.cpp",
     "SiWx917/rsi_if.c",
     "SiWx917/wfx_rsi_host.c",
-    "init_ccpPlatform.cpp",
-    "matter_config.cpp",
   ]
 
   if (chip_enable_pw_rpc || chip_build_libshell) {
