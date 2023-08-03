@@ -20,6 +20,7 @@ import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
 import("${chip_root}/src/lib/trusty.gni")
+import("${chip_root}/src/lib/imx_ele.gni")
 
 if (current_os != "nuttx") {
   import("//build_overrides/jsoncpp.gni")
@@ -106,6 +107,13 @@ source_set("app-main") {
     ]
   }
 
+  if (chip_with_imx_ele == 1) {
+    sources += [
+      "PersistentStorageOperationalKeystoreEle.cpp",
+      "PersistentStorageOperationalKeystoreEle.h",
+    ]
+  }
+
   public_deps = [
     ":boolean-state-configuration-test-event-trigger",
     ":commissioner-main",
@@ -136,6 +144,10 @@ source_set("app-main") {
     public_deps += [ "${chip_root}/third_party/libtrustymatter" ]
   }
 
+  if (chip_with_imx_ele == 1) {
+    public_deps += [ "${chip_root}/third_party/imx-secure-enclave:libelematter" ]
+  }
+
   if (chip_with_trusty_os == 1) {
     defines += [ "CHIP_ATTESTATION_TRUSTY_OS=1" ]
   } else {
@@ -146,6 +158,12 @@ source_set("app-main") {
     defines += [ "CHIP_OP_KEYSTORE_TRUSTY_OS=1" ]
   } else {
     defines += [ "CHIP_OP_KEYSTORE_TRUSTY_OS=0" ]
+  }
+
+  if (chip_with_imx_ele == 1) {
+    defines += [ "CHIP_OP_KEYSTORE_ELE=1" ]
+  } else {
+    defines += [ "CHIP_OP_KEYSTORE_ELE=0" ]
   }
 
   if (chip_enable_pw_rpc) {
