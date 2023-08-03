@@ -37,6 +37,23 @@ ReportSchedulerImpl::ReportSchedulerImpl(TimerDelegate * aTimerDelegate) : Repor
     VerifyOrDie(nullptr != mTimerDelegate);
 }
 
+/// @brief Method that triggers a report emission on each ReadHandler that is not blocked on its min interval.
+///        Each read handler that is not blocked is immediately marked dirty so that it will report as soon as possible.
+void ReportSchedulerImpl::OnEnterActiveMode()
+{
+#if ICD_REPORT_ON_ENTER_ACTIVE_MODE
+    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+    mNodesPool.ForEachActiveObject([now, this](ReadHandlerNode * node) {
+        if (now >= node->GetMinTimestamp())
+        {
+            this->HandlerForceDirtyState(node->GetReadHandler());
+        }
+
+        return Loop::Continue;
+    });
+#endif
+}
+
 /// @brief When a ReadHandler is added, register it, which will schedule an engine run
 void ReportSchedulerImpl::OnReadHandlerCreated(ReadHandler * aReadHandler)
 {
