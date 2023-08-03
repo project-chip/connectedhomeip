@@ -37,7 +37,7 @@ tests:
       verification: |
           ./chip-tool dishwashermode read supported-modes 1 1
 
-          On TH(chip-tool) log, Verify SupportedModes attribute should contain atleast two ModeOptionsStruct entries with unique mode field value and label field value. Below is the sample log provided for the raspi platform:
+          On TH(chip-tool) log, Verify SupportedModes attribute should contain at least two ModeOptionsStruct entries with unique mode field value and label field value. Below is the sample log provided for the raspi platform:
 
           [1687687925.438666][18054:18056] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0002 DataVersion: 4148960394
           [1687687925.438838][18054:18056] CHIP:TOO: SupportedModes: 3 entries
