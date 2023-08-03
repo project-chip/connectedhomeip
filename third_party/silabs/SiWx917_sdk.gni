@@ -167,6 +167,7 @@ template("siwx917_sdk") {
       defines += [ "BRD4325A",
                    "BRD4325B",
                    "DUAL_FLASH_EN",
+                   "COMMON_FLASH_EN=1",
       ]
     }
     if ( silabs_board == "BRD4325C" ) {

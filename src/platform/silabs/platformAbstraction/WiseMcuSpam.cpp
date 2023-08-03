@@ -29,6 +29,7 @@ extern "C" void RSI_Board_LED_Set(int, bool);
 extern "C" void RSI_Board_LED_Toggle(int);
 extern "C" void RSI_Wakeupsw_config(void);
 extern "C" void RSI_Wakeupsw_config_gpio0(void);
+extern "C" void sl_platform_init(void);
 
 #if SILABS_LOG_ENABLED
 #include "silabs_utils.h"
@@ -47,6 +48,9 @@ CHIP_ERROR SilabsPlatform::Init(void)
     RSI_Wakeupsw_config();
 
     RSI_Wakeupsw_config_gpio0();
+
+    sl_platform_init();  // platform initialization for wifi-sdk 3.0
+
 #if SILABS_LOG_ENABLED
     silabsInitLog();
 #endif
