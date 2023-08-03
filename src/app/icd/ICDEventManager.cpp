@@ -23,6 +23,7 @@ namespace chip {
 namespace app {
 
 uint8_t ICDEventManager::expectedMsgCount = 0;
+uint8_t ICDEventManager::awaitingAckCount = 0;
 static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDEventManager::expectedMsgCount cannot hold count for the max exchange count");
 
@@ -97,7 +98,19 @@ void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t ar
         {
             icdManager->UpdateOperationState(ICDManager::OperationalState::ActiveMode);
         }
+        break;
+    case DeviceEventType::kICDMsgAckSyncEvent:
+        // When a Reliable Message Context is awaiting an ack, we keep the ICD in its active mode
+        if (event->AckSync.awaitingAck)
+        {
+            awaitingAckCount++;
+        }
+        else if (awaitingAckCount > 0)
+        {
+            awaitingAckCount--;
+        }
 
+        icdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kAwaitingMsgAck, (awaitingAckCount != 0));
         break;
     case DeviceEventType::kAppWakeUpEvent:
         icdManager->UpdateOperationState(ICDManager::OperationalState::ActiveMode);
