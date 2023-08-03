@@ -34,9 +34,9 @@ app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSup
 
 void ApplicationInit()
 {
-    //set Parent Endpoint and Composition Type for an Endpoint
-    EndpointId kRefEndpointId = 1;
-    EndpointId kColdCabinetEndpointId = 2;
+    // set Parent Endpoint and Composition Type for an Endpoint
+    EndpointId kRefEndpointId           = 1;
+    EndpointId kColdCabinetEndpointId   = 2;
     EndpointId kFreezeCabinetEndpointId = 3;
     SetTreeCompositionForEndpoint(kRefEndpointId);
     SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
