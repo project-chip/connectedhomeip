@@ -34,7 +34,7 @@ namespace {
 
 constexpr const char kShellPrompt[] = "matterCli> ";
 
-// max > 1
+// To track carriage returns of Windows return cases of '\r\n'
 bool haveCR = false;
 
 void ReadLine(char * buffer, size_t max)
@@ -71,12 +71,13 @@ void ReadLine(char * buffer, size_t max)
             read++;
         }
 #endif
+        // Process all characters that were read until we run out or exceed max char limit
         while (line_sz < read && line_sz < max)
         {
-            // Process character we just read.
             switch (buffer[line_sz])
             {
             case '\r':
+                // Mac OS return case of '\r' or beginning of Windows return case '\r\n'
                 buffer[line_sz] = '\0';
                 streamer_printf(streamer_get(), "\r\n");
                 haveCR = true;
@@ -84,12 +85,14 @@ void ReadLine(char * buffer, size_t max)
                 line_sz++;
                 break;
             case '\n':
+                // True if Windows return case of '\r\n'
                 if (haveCR)
                 {
                     // Do nothing - already taken care of with CR, return to loop and don't increment buffer
                     haveCR = false;
                     read--;
                 }
+                // Linux return case of just '\n'
                 else
                 {
                     buffer[line_sz] = '\0';
