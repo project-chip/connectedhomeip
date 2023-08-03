@@ -81,7 +81,6 @@ public:
 protected:
     Span<const GenericOperationalState> mOperationalStateList;
     Span<const GenericOperationalPhase> mOperationalPhaseList;
-
 };
 
 // This is an application level delegate to handle operational state commands according to the specific business logic.
@@ -106,13 +105,11 @@ public:
         GenericOperationalStateDelegateImpl::mOperationalStateList = Span<const GenericOperationalState>(opStateList);
         GenericOperationalStateDelegateImpl::mOperationalPhaseList = Span<const GenericOperationalPhase>(opPhaseList);
     }
-
 };
 
 void Shutdown();
 
-} // OperationalState
-
+} // namespace OperationalState
 
 namespace RvcOperationalState {
 
@@ -125,7 +122,8 @@ private:
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)),
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused)),
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kError)),
-        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kSeekingCharger)),
+        OperationalState::GenericOperationalState(
+            to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kSeekingCharger)),
         OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kCharging)),
         OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kDocked)),
     };
@@ -138,10 +136,11 @@ private:
 public:
     RvcOperationalStateDelegate()
     {
-        GenericOperationalStateDelegateImpl::mOperationalStateList = Span<const OperationalState::GenericOperationalState>(rvcOpStateList);
-        GenericOperationalStateDelegateImpl::mOperationalPhaseList = Span<const OperationalState::GenericOperationalPhase>(rvcOpPhaseList);
+        GenericOperationalStateDelegateImpl::mOperationalStateList =
+            Span<const OperationalState::GenericOperationalState>(rvcOpStateList);
+        GenericOperationalStateDelegateImpl::mOperationalPhaseList =
+            Span<const OperationalState::GenericOperationalPhase>(rvcOpPhaseList);
     }
-
 };
 
 void Shutdown();

@@ -99,7 +99,7 @@ void OperationalStateDelegate::HandleStopStateCallback(GenericOperationalError &
 }
 
 static OperationalState::Instance * gOperationalStateInstance = nullptr;
-static OperationalStateDelegate * gOperationalStateDelegate = nullptr;
+static OperationalStateDelegate * gOperationalStateDelegate   = nullptr;
 
 void OperationalState::Shutdown()
 {
@@ -121,7 +121,7 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(gOperationalStateInstance == nullptr && gOperationalStateDelegate == nullptr);
 
     gOperationalStateDelegate = new OperationalStateDelegate;
-    gOperationalStateInstance = new Instance(gOperationalStateDelegate, 0x01,Clusters::OperationalState::Id);
+    gOperationalStateInstance = new Instance(gOperationalStateDelegate, 0x01, Clusters::OperationalState::Id);
 
     gOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
     gOperationalStateInstance->SetOperationalError(to_underlying(OperationalState::ErrorStateEnum::kNoError));

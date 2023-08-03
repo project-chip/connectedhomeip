@@ -21,9 +21,9 @@
 #include "dishwasher-mode.h"
 #include "include/tv-callbacks.h"
 #include "laundry-washer-mode.h"
+#include "operational-state-delegate-impl.h"
 #include "rvc-modes.h"
 #include "tcc-mode.h"
-#include "operational-state-delegate-impl.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/att-storage.h>

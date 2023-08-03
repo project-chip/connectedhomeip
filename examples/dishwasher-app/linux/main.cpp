@@ -15,8 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <AppMain.h>
 #include "operational-state-delegate-impl.h"
+#include <AppMain.h>
 
 using namespace chip;
 using namespace chip::app;

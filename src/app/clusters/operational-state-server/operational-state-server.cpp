@@ -35,10 +35,8 @@ using namespace chip::app::Clusters::OperationalState::Attributes;
 using Status = Protocols::InteractionModel::Status;
 
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId) :
-    CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId),
-    AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId),
-    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId),
-    mOperationalState(0), // assume 0 for now.
+    CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId), AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId),
+    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId), mOperationalState(0), // assume 0 for now.
     mOperationalError(to_underlying(ErrorStateEnum::kNoError))
 {
     mDelegate->SetServer(this);
@@ -73,7 +71,7 @@ CHIP_ERROR Instance::SetCurrentPhase(const DataModel::Nullable<uint8_t> & aPhase
     // todo check it the value is valid else return Protocols::InteractionModel::Status::ConstraintError;
 
     DataModel::Nullable<uint8_t> oldPhase = mCurrentPhase;
-    mCurrentPhase = aPhase;
+    mCurrentPhase                         = aPhase;
     if (mCurrentPhase != oldPhase)
     {
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentPhase::Id);
@@ -93,7 +91,7 @@ CHIP_ERROR Instance::SetOperationalState(uint8_t opState)
 {
     // todo check it the value is valid else return Protocols::InteractionModel::Status::ConstraintError;
 
-    uint8_t oldState = mOperationalState;
+    uint8_t oldState  = mOperationalState;
     mOperationalState = opState;
     if (mOperationalState != oldState)
     {
@@ -106,7 +104,7 @@ CHIP_ERROR Instance::SetOperationalState(uint8_t opState)
 CHIP_ERROR Instance::SetOperationalError(const GenericOperationalError & opErrState)
 {
     GenericOperationalError oldError = mOperationalError;
-    mOperationalError = opErrState;
+    mOperationalError                = opErrState;
     // todo should we have a != operator in GenericOperationalError or is this enough?
     if (mOperationalError.errorStateID != oldError.errorStateID)
     {
@@ -154,8 +152,8 @@ void Instance::OnOperationalErrorDetected(const Structs::ErrorStateStruct::Type 
 }
 
 void Instance::OnOperationCompletionDetected(uint8_t aCompletionErrorCode,
-                                                           const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime,
-                                                           const Optional<DataModel::Nullable<uint32_t>> & aPausedTime) const
+                                             const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime,
+                                             const Optional<DataModel::Nullable<uint32_t>> & aPausedTime) const
 {
     ChipLogDetail(Zcl, "OperationalStateServer: OnOperationCompletionDetected");
 

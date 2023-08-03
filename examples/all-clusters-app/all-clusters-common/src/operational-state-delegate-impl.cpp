@@ -102,7 +102,7 @@ void GenericOperationalStateDelegateImpl::HandleStopStateCallback(GenericOperati
 // Init Operational State cluster
 
 static OperationalState::Instance * gOperationalStateInstance = nullptr;
-static OperationalStateDelegate * gOperationalStateDelegate = nullptr;
+static OperationalStateDelegate * gOperationalStateDelegate   = nullptr;
 
 void OperationalState::Shutdown()
 {
@@ -151,14 +151,13 @@ void RvcOperationalState::Shutdown()
     }
 }
 
-
 void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gRvcOperationalStateInstance == nullptr && gRvcOperationalStateDelegate == nullptr);
 
     gRvcOperationalStateDelegate = new RvcOperationalStateDelegate;
-    gRvcOperationalStateInstance = new Instance(gRvcOperationalStateDelegate, 0x01,Clusters::RvcOperationalState::Id);
+    gRvcOperationalStateInstance = new Instance(gRvcOperationalStateDelegate, 0x01, Clusters::RvcOperationalState::Id);
 
     gRvcOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
     gRvcOperationalStateInstance->SetOperationalError(to_underlying(OperationalState::ErrorStateEnum::kNoError));

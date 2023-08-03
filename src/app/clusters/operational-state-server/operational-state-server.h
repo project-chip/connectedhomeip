@@ -17,11 +17,11 @@
  */
 
 #pragma once
+#include "operational-state-cluster-objects.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/util/af.h>
-#include "operational-state-cluster-objects.h"
 
 namespace chip {
 namespace app {
@@ -261,7 +261,6 @@ public:
      * @param[out] err operational error after callback.
      */
     virtual void HandleStopStateCallback(GenericOperationalError & err) = 0;
-
 };
 
 } // namespace OperationalState
