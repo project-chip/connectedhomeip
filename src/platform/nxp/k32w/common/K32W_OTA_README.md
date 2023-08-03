@@ -120,11 +120,13 @@ implementation. The OTA image should be generated with the
 `create_ota_images.sh` script from `./scripts/tools/nxp/ota/examples`.
 
 ## Factory data restore mechanism
+
 Prior to factory data update, the old factory data is backed up in external
 flash. If anything interrupts the update (e.g. power loss), there is a slight
 chance the internal flash factory data section is erased and has to be restored
 at next boot. The `FactoryDataProvider` offers a default restore mechanism and
-support for registering additional restore mechanisms or overwriting the default one.
+support for registering additional restore mechanisms or overwriting the default
+one.
 
 Restore mechanisms are just functions that have this signature:
 `CHIP_ERROR (*)(void)`. Any such function can be registered through

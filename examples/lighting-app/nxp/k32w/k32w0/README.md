@@ -192,8 +192,8 @@ effects:
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
-
--   Start building the application either with Secure Element or without, SDK is downloaded with west tool.
+-   Start building the application either with Secure Element or without, SDK is
+    downloaded with west tool.
     -   without Secure Element
 
 ```
@@ -204,13 +204,15 @@ user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west u
 ```
 
 In case there are local modification to the already installed git NXP SDK: Use
-the below west `forall` command instead of the west init command to reset the west
-workspace. Warning: all local changes will be lost after running this command.
+the below west `forall` command instead of the west init command to reset the
+west workspace. Warning: all local changes will be lost after running this
+command.
 
 ```bash
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
 user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$west forall -c "git reset --hard && git clean -xdf" -a
 ```
+
 Build the application
 
 ```
@@ -276,8 +278,8 @@ k32w0_sdk("sdk") {
 }
 ```
 
-This variable will be used by `k32w0_sdk.gni` to overwrite `chip_with_DK6` option,
-thus the reference board configuration files will no longer be used.
+This variable will be used by `k32w0_sdk.gni` to overwrite `chip_with_DK6`
+option, thus the reference board configuration files will no longer be used.
 
 ## Known issues building
 

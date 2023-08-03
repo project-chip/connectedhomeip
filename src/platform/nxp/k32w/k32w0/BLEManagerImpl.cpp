@@ -15,10 +15,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
- 
+
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
- 
+
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
 #include "PWR_Configuration.h"
 #include "PWR_Interface.h"
@@ -47,7 +47,7 @@ namespace Internal {
 
 BLEManagerImpl BLEManagerImpl::sInstance;
 
-BLEManagerCommon* BLEManagerImpl::GetImplInstance()
+BLEManagerCommon * BLEManagerImpl::GetImplInstance()
 {
     return &BLEManagerImpl::sInstance;
 }

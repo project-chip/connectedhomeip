@@ -72,7 +72,7 @@ CHIP_ERROR RamStorage::Init(uint16_t aInitialSize, bool extendedSearch)
 {
     CHIP_ERROR err;
 
-    mBuffer = getRamBuffer(mPdmId, aInitialSize, extendedSearch);
+    mBuffer         = getRamBuffer(mPdmId, aInitialSize, extendedSearch);
     mExtendedSearch = extendedSearch;
 
     return mBuffer ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;

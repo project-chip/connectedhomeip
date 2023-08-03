@@ -18,8 +18,8 @@
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <platform/CommissionableDataProvider.h>
-#include <platform/internal/GenericDeviceInstanceInfoProvider.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
+#include <platform/internal/GenericDeviceInstanceInfoProvider.h>
 #include <src/lib/core/CHIPError.h>
 
 #include <vector>
@@ -108,10 +108,10 @@ public:
     static constexpr uint32_t kHashLen      = 4;
     static constexpr size_t kHashId         = 0xCE47BA5E;
 
-	FactoryDataProvider();
+    FactoryDataProvider();
     virtual ~FactoryDataProvider();
 
-    virtual CHIP_ERROR Init() = 0;
+    virtual CHIP_ERROR Init()                                                                          = 0;
     virtual CHIP_ERROR SignWithDacKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) = 0;
 
     // ===== Members functions that implement the CommissionableDataProvider
@@ -146,7 +146,7 @@ public:
 
 protected:
     CHIP_ERROR Validate();
-    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, uint16_t & length, uint32_t * offset=nullptr);
+    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length, uint32_t * offset = nullptr);
 
     uint16_t maxLengths[kNumberOfIds];
     Header mHeader;

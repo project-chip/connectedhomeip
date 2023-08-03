@@ -131,12 +131,12 @@ static void CheckOtaEntry()
 {
     K32W_LOG("Current OTA_ENTRY_TOP_ADDR: 0x%x", OTA_ENTRY_TOP_ADDR);
 
-	CustomOtaEntries_t ota_entries;
-	if(gOtaSuccess_c == OTA_GetCustomEntries(&ota_entries) && ota_entries.ota_state != otaNoImage)
-	{
-		if(ota_entries.ota_state == otaApplied)
-		{
-			K32W_LOG("OTA successfully applied");
+    CustomOtaEntries_t ota_entries;
+    if (gOtaSuccess_c == OTA_GetCustomEntries(&ota_entries) && ota_entries.ota_state != otaNoImage)
+    {
+        if (ota_entries.ota_state == otaApplied)
+        {
+            K32W_LOG("OTA successfully applied");
 #if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA && CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
             // If this point is reached, it means OTA_CommitCustomEntries was successfully called.
             // Delete the factory data backup to stop doing a restore when the factory data provider

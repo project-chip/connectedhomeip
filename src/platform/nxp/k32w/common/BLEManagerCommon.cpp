@@ -66,7 +66,7 @@ namespace {
  * Macros & Constants definitions
  *******************************************************************************/
 /* Timeout of BLE commands */
-#define CHIP_BLE_KW_EVNT_TIMEOUT 1000/portTICK_PERIOD_MS
+#define CHIP_BLE_KW_EVNT_TIMEOUT 1000 / portTICK_PERIOD_MS
 
 /** BLE advertisement state changed */
 #define CHIP_BLE_KW_EVNT_ADV_CHANGED 0x0001
@@ -91,7 +91,7 @@ namespace {
 /** Maximal time of connection without activity */
 #define CHIP_BLE_KW_CONN_TIMEOUT 60000
 /** Maximum number of pending BLE events */
-#define CHIP_BLE_EVENT_QUEUE_MAX_ENTRIES  10
+#define CHIP_BLE_EVENT_QUEUE_MAX_ENTRIES 10
 
 #define LOOP_EV_BLE (0x08)
 
@@ -116,7 +116,7 @@ TimerHandle_t sbleAdvTimeoutTimer;
 QueueHandle_t sBleEventQueue;
 
 /* Used to manage asynchronous events from BLE Stack: e.g.: GAP setup finished */
-EventGroupHandle_t  sEventGroup;
+EventGroupHandle_t sEventGroup;
 
 TimerHandle_t connectionTimeout;
 
@@ -130,7 +130,7 @@ const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0
 static bool bleAppStopInProgress;
 #endif
 
-BLEManagerCommon* sImplInstance;
+BLEManagerCommon * sImplInstance;
 
 } // namespace
 
@@ -159,15 +159,12 @@ CHIP_ERROR BLEManagerCommon::_Init()
     VerifyOrExit(sEventGroup != NULL, err = CHIP_ERROR_INCORRECT_STATE);
 
     /* Prepare callback input queue.*/
-    sBleEventQueue = xQueueCreate(CHIP_BLE_EVENT_QUEUE_MAX_ENTRIES, sizeof(blekw_msg_t*));
+    sBleEventQueue = xQueueCreate(CHIP_BLE_EVENT_QUEUE_MAX_ENTRIES, sizeof(blekw_msg_t *));
     VerifyOrExit(sBleEventQueue != NULL, err = CHIP_ERROR_INCORRECT_STATE);
 
     /* Create the connection timeout timer. */
-    connectionTimeout = xTimerCreate("bleTimeoutTmr",
-                                     pdMS_TO_TICKS(CHIP_BLE_KW_CONN_TIMEOUT),
-                                     pdFALSE,
-                                     (void *) 0,
-                                     blekw_connection_timeout_cb);
+    connectionTimeout =
+        xTimerCreate("bleTimeoutTmr", pdMS_TO_TICKS(CHIP_BLE_KW_CONN_TIMEOUT), pdFALSE, (void *) 0, blekw_connection_timeout_cb);
     VerifyOrExit(connectionTimeout != NULL, err = CHIP_ERROR_INCORRECT_STATE);
 
     /* BLE platform code initialization */
@@ -188,7 +185,8 @@ CHIP_ERROR BLEManagerCommon::_Init()
 
     GattServer_RegisterHandlesForWriteNotifications(1, attChipRxHandle);
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    VerifyOrExit(GattServer_RegisterHandlesForReadNotifications(1, attChipC3Handle) == gBleSuccess_c, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(GattServer_RegisterHandlesForReadNotifications(1, attChipC3Handle) == gBleSuccess_c,
+                 err = CHIP_ERROR_INCORRECT_STATE);
 #endif
 
     mFlags.Set(Flags::kK32WBLEStackInitialized);
@@ -246,8 +244,7 @@ CHIP_ERROR BLEManagerCommon::_SetAdvertisingMode(BLEAdvertisingMode mode)
     case BLEAdvertisingMode::kFastAdvertising:
         mFlags.Set(Flags::kFastAdvertisingEnabled);
         break;
-    case BLEAdvertisingMode::kSlowAdvertising:
-    {
+    case BLEAdvertisingMode::kSlowAdvertising: {
         // We are in FreeRTOS timer service context, which is a default daemon task and has
         // the highest priority. Stop advertising should be scheduled to run from Matter task.
         mFlags.Clear(Flags::kFastAdvertisingEnabled);
@@ -358,21 +355,21 @@ uint16_t BLEManagerCommon::GetMTU(BLE_CONNECTION_OBJECT conId) const
 }
 
 bool BLEManagerCommon::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                      PacketBufferHandle pBuf)
+                                        PacketBufferHandle pBuf)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerCommon::SendWriteRequest() not supported");
     return false;
 }
 
 bool BLEManagerCommon::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                     PacketBufferHandle pBuf)
+                                       PacketBufferHandle pBuf)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerCommon::SendReadRequest() not supported");
     return false;
 }
 
 bool BLEManagerCommon::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
-                                      const ChipBleUUID * svcId, const ChipBleUUID * charId)
+                                        const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerCommon::SendReadResponse() not supported");
     return false;
@@ -384,7 +381,7 @@ void BLEManagerCommon::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 }
 
 bool BLEManagerCommon::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                    PacketBufferHandle data)
+                                      PacketBufferHandle data)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint16_t cId   = (UUIDsMatch(&ChipUUID_CHIPoBLEChar_TX, charId) ? value_chipoble_tx : 0);
@@ -413,7 +410,8 @@ bool BLEManagerCommon::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBle
     return false;
 }
 
-BLEManagerCommon::ble_err_t BLEManagerCommon::blekw_send_event(int8_t connection_handle, uint16_t handle, uint8_t * data, uint32_t len)
+BLEManagerCommon::ble_err_t BLEManagerCommon::blekw_send_event(int8_t connection_handle, uint16_t handle, uint8_t * data,
+                                                               uint32_t len)
 {
     EventBits_t eventBits;
 
@@ -443,8 +441,8 @@ BLEManagerCommon::ble_err_t BLEManagerCommon::blekw_send_event(int8_t connection
     }
 
     /* Wait until BLE Stack is ready */
-    eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_INDICATION_CONFIRMED | CHIP_BLE_KW_EVNT_INDICATION_FAILED,
-                                    pdTRUE, pdFALSE, CHIP_BLE_KW_EVNT_TIMEOUT);
+    eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_INDICATION_CONFIRMED | CHIP_BLE_KW_EVNT_INDICATION_FAILED, pdTRUE,
+                                    pdFALSE, CHIP_BLE_KW_EVNT_TIMEOUT);
 
     if (eventBits & CHIP_BLE_KW_EVNT_INDICATION_FAILED)
     {
@@ -463,9 +461,9 @@ BLEManagerCommon::ble_err_t BLEManagerCommon::blekw_send_event(int8_t connection
  *******************************************************************************/
 
 BLEManagerCommon::ble_err_t BLEManagerCommon::blekw_start_advertising(gapAdvertisingParameters_t * adv_params,
-                                                                  gapAdvertisingData_t * adv, gapScanResponseData_t * scnrsp)
+                                                                      gapAdvertisingData_t * adv, gapScanResponseData_t * scnrsp)
 {
-	EventBits_t eventBits;
+    EventBits_t eventBits;
 
     /************* Set the advertising parameters *************/
     xEventGroupClearBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED | CHIP_BLE_KW_EVNT_ADV_PAR_SETUP_COMPLETE);
@@ -532,8 +530,8 @@ BLEManagerCommon::ble_err_t BLEManagerCommon::blekw_start_advertising(gapAdverti
     PWR_DisallowDeviceToSleep();
 #endif
 
-    eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_CHANGED | CHIP_BLE_KW_EVNT_ADV_FAILED,
-                                    pdTRUE, pdFALSE, CHIP_BLE_KW_EVNT_TIMEOUT);
+    eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_CHANGED | CHIP_BLE_KW_EVNT_ADV_FAILED, pdTRUE, pdFALSE,
+                                    CHIP_BLE_KW_EVNT_TIMEOUT);
     if (!(eventBits & CHIP_BLE_KW_EVNT_ADV_CHANGED))
     {
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
@@ -551,7 +549,7 @@ BLEManagerCommon::ble_err_t BLEManagerCommon::blekw_start_advertising(gapAdverti
 
 BLEManagerCommon::ble_err_t BLEManagerCommon::blekw_stop_advertising(void)
 {
-	EventBits_t eventBits;
+    EventBits_t eventBits;
     bleResult_t res;
 
     xEventGroupClearBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_CHANGED | CHIP_BLE_KW_EVNT_ADV_FAILED);
@@ -564,8 +562,8 @@ BLEManagerCommon::ble_err_t BLEManagerCommon::blekw_stop_advertising(void)
         return BLE_E_STOP;
     }
 
-    eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_CHANGED | CHIP_BLE_KW_EVNT_ADV_FAILED,
-                                      pdTRUE, pdFALSE, CHIP_BLE_KW_EVNT_TIMEOUT);
+    eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_CHANGED | CHIP_BLE_KW_EVNT_ADV_FAILED, pdTRUE, pdFALSE,
+                                    CHIP_BLE_KW_EVNT_TIMEOUT);
 
     if (eventBits & CHIP_BLE_KW_EVNT_ADV_FAILED)
     {
@@ -706,8 +704,8 @@ CHIP_ERROR BLEManagerCommon::EncodeAdditionalDataTlv()
     params.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueIdSpan;
     dataFields.Set(AdditionalDataFields::RotatingDeviceId);
 #endif /* CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID) */
-    err =
-        AdditionalDataPayloadGenerator().generateAdditionalDataPayload(params, sImplInstance->c3AdditionalDataBufferHandle, dataFields);
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(params, sImplInstance->c3AdditionalDataBufferHandle,
+                                                                         dataFields);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -776,7 +774,7 @@ CHIP_ERROR BLEManagerCommon::StopAdvertising(void)
         mFlags.Clear(Flags::kAdvertising);
         mFlags.Clear(Flags::kRestartAdvertising);
 
-        if(!mDeviceConnected)
+        if (!mDeviceConnected)
         {
             ble_err_t err = blekw_stop_advertising();
             VerifyOrReturnError(err == BLE_OK, CHIP_ERROR_INCORRECT_STATE);
@@ -784,7 +782,7 @@ CHIP_ERROR BLEManagerCommon::StopAdvertising(void)
         }
 
 #if CONFIG_CHIP_NFC_COMMISSIONING
-		/* schedule NFC emulation stop */
+        /* schedule NFC emulation stop */
         ChipDeviceEvent advChange;
         advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
         advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
@@ -894,8 +892,8 @@ void BLEManagerCommon::DoBleProcessing(void)
         }
 
         /* Free the message from the queue */
-       free(msg);
-       msg = NULL;
+        free(msg);
+        msg = NULL;
     }
 }
 
@@ -910,7 +908,7 @@ void BLEManagerCommon::HandleConnectEvent(blekw_msg_t * msg)
 #endif
 #endif
 
-    mDeviceId = deviceId;
+    mDeviceId        = deviceId;
     mDeviceConnected = true;
 
     blekw_start_connection_timeout();
@@ -977,7 +975,7 @@ void BLEManagerCommon::HandleWriteEvent(blekw_msg_t * msg)
 
 void BLEManagerCommon::HandleTXCharCCCDWrite(blekw_msg_t * msg)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                         = CHIP_NO_ERROR;
     blekw_att_written_data_t * att_wr_data = (blekw_att_written_data_t *) msg->data.data;
     ChipDeviceEvent event;
 
@@ -1272,9 +1270,9 @@ void BLEManagerCommon::blekw_gatt_server_cb(deviceId_t deviceId, gattServerEvent
  * Add to message queue functions
  *******************************************************************************/
 CHIP_ERROR BLEManagerCommon::blekw_msg_add_att_written(blekw_msg_type_t type, uint8_t device_id, uint16_t handle, uint8_t * data,
-                                                     uint16_t length)
+                                                       uint16_t length)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
     blekw_msg_t * msg = NULL;
     blekw_att_written_data_t * att_wr_data;
 
@@ -1299,7 +1297,7 @@ exit:
 
 CHIP_ERROR BLEManagerCommon::blekw_msg_add_att_read(blekw_msg_type_t type, uint8_t device_id, uint16_t handle)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
     blekw_msg_t * msg = NULL;
     blekw_att_read_data_t * att_rd_data;
 
@@ -1322,7 +1320,7 @@ exit:
 
 CHIP_ERROR BLEManagerCommon::blekw_msg_add_u8(blekw_msg_type_t type, uint8_t data)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
     blekw_msg_t * msg = NULL;
 
     /* Allocate a buffer with enough space to store the packet */
@@ -1342,7 +1340,7 @@ exit:
 
 CHIP_ERROR BLEManagerCommon::blekw_msg_add_u16(blekw_msg_type_t type, uint16_t data)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
     blekw_msg_t * msg = NULL;
 
     /* Allocate a buffer with enough space to store the packet */

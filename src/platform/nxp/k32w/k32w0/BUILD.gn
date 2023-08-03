@@ -27,10 +27,10 @@ if (chip_enable_openthread) {
 static_library("k32w0") {
   sources = [
     "../../../SingletonConfigurationManager.cpp",
-    "BLEManagerImpl.cpp",
-    "BLEManagerImpl.h",
     "../common/BLEManagerCommon.cpp",
     "../common/BLEManagerCommon.h",
+    "BLEManagerImpl.cpp",
+    "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "ConfigurationManagerImpl.cpp",

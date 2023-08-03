@@ -37,7 +37,7 @@ public:
     CHIP_ERROR SignWithDacKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) override;
 
 #if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
-    virtual ~FactoryDataProviderImpl() { }
+    virtual ~FactoryDataProviderImpl() {}
     // Custom factory data providers must implement this method in order to define
     // their own custom IDs.
     virtual CHIP_ERROR SetCustomIds() = 0;
@@ -46,7 +46,7 @@ public:
 #if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
     using RestoreMechanism = CHIP_ERROR (*)(void);
 
-    static CHIP_ERROR UpdateData(uint8_t* pBuf);
+    static CHIP_ERROR UpdateData(uint8_t * pBuf);
     CHIP_ERROR ValidateWithRestore();
     void RegisterRestoreMechanism(RestoreMechanism mechanism);
 

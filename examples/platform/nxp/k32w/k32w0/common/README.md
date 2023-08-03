@@ -4,23 +4,22 @@ orphan: true
 
 ## Usage of custom Factory Data Provider
 
-`FactoryDataProviderImpl` is the default factory data provider.
-It is an extension of `FactoryDataProvider` K32W common class,
-which implements the following interfaces:
+`FactoryDataProviderImpl` is the default factory data provider. It is an
+extension of `FactoryDataProvider` K32W common class, which implements the
+following interfaces:
 
 -   CommissionableDataProvider
 -   DeviceAttestationCredentialsProvider
 -   DeviceInstanceInfoProvider
 
-A user can inherit `FactoryDataProviderImpl` to provide additional
-functionality (such as parsing custom factory data fields) that is
-customer specific.
+A user can inherit `FactoryDataProviderImpl` to provide additional functionality
+(such as parsing custom factory data fields) that is customer specific.
 
 What **shall** be done to enable usage of a custom factory provider:
 
 -   Set `use_custom_factory_provider=1`. This option is only available when
-    factory data is used (`chip_with_factory_data=1`). An assert will be
-    raised if the condition is not met.
+    factory data is used (`chip_with_factory_data=1`). An assert will be raised
+    if the condition is not met.
 -   Modify the `BUILD.gn` of the application to take into account the new files
     where the custom factory provider is implemented:
 
@@ -50,9 +49,9 @@ What **shall** be done to enable usage of a custom factory provider:
 
 -   The default IDs are validated directly in `SearchForId`, but custom IDs
     should set their maximum lengths through `SetCustomIds` method.
--   `FactoryDataProvider::kNumberOfIds` is computed at compile time and
-    should represent the number of IDs (custom + default). Custom IDs should
-    start from `FactoryDataId::kMaxId`, which is the next valid ID. IDs
+-   `FactoryDataProvider::kNumberOfIds` is computed at compile time and should
+    represent the number of IDs (custom + default). Custom IDs should start from
+    `FactoryDataId::kMaxId`, which is the next valid ID. IDs
     `[1, FactoryDataId::kMaxId - 1]` are reserved for default factory data IDs.
 
 Please refer to `CustomFactoryDataProvider` for a minimal example of a custom

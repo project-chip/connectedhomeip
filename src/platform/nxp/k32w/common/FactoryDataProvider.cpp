@@ -38,11 +38,10 @@ namespace DeviceLayer {
 
 static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
     BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
-static constexpr size_t kSpake2pSalt_MaxBase64Len =
-    BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
+static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
 
-uint32_t FactoryDataProvider::kFactoryDataStart        = (uint32_t)__FACTORY_DATA_START;
-uint32_t FactoryDataProvider::kFactoryDataSize         = (uint32_t)__FACTORY_DATA_SIZE;
+uint32_t FactoryDataProvider::kFactoryDataStart        = (uint32_t) __FACTORY_DATA_START;
+uint32_t FactoryDataProvider::kFactoryDataSize         = (uint32_t) __FACTORY_DATA_SIZE;
 uint32_t FactoryDataProvider::kFactoryDataPayloadStart = kFactoryDataStart + sizeof(FactoryDataProvider::Header);
 
 FactoryDataProvider::FactoryDataProvider()
@@ -70,7 +69,7 @@ FactoryDataProvider::FactoryDataProvider()
     maxLengths[FactoryDataId::kProductLabel]         = ConfigurationManager::kMaxProductLabelLength;
 }
 
-FactoryDataProvider::~FactoryDataProvider() { }
+FactoryDataProvider::~FactoryDataProvider() {}
 
 CHIP_ERROR FactoryDataProvider::Validate()
 {
@@ -79,17 +78,17 @@ CHIP_ERROR FactoryDataProvider::Validate()
     memcpy(&mHeader, (void *) kFactoryDataStart, sizeof(Header));
     ReturnErrorCodeIf(mHeader.hashId != kHashId, CHIP_FACTORY_DATA_HASH_ID);
 
-    ReturnErrorOnFailure(Crypto::Hash_SHA256((uint8_t *)kFactoryDataPayloadStart, mHeader.size, output));
+    ReturnErrorOnFailure(Crypto::Hash_SHA256((uint8_t *) kFactoryDataPayloadStart, mHeader.size, output));
     ReturnErrorCodeIf(memcmp(output, mHeader.hash, kHashLen) != 0, CHIP_FACTORY_DATA_SHA_CHECK);
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
-                                                 uint32_t * offset)
+                                            uint32_t * offset)
 {
-    uint32_t addr  = kFactoryDataPayloadStart;
-    uint8_t type   = 0;
+    uint32_t addr = kFactoryDataPayloadStart;
+    uint8_t type  = 0;
 
     while (addr < (kFactoryDataPayloadStart + mHeader.size))
     {

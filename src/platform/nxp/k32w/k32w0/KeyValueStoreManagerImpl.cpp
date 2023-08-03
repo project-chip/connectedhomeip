@@ -25,9 +25,9 @@
 
 #include <lib/support/CHIPMem.h>
 #include <platform/KeyValueStoreManager.h>
-#include <platform/nxp/k32w/k32w0/RamStorage.h>
 #include <platform/nxp/k32w/k32w0/K32W0Config.h>
 #include <platform/nxp/k32w/k32w0/KeyValueStoreManagerImpl.h>
+#include <platform/nxp/k32w/k32w0/RamStorage.h>
 #include <string>
 
 namespace chip {

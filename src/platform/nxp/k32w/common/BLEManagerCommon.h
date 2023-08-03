@@ -212,7 +212,7 @@ protected:
                                                 uint16_t length);
     static CHIP_ERROR blekw_msg_add_att_read(blekw_msg_type_t type, uint8_t device_id, uint16_t handle);
     static BLEManagerCommon::ble_err_t blekw_start_advertising(gapAdvertisingParameters_t * adv_params, gapAdvertisingData_t * adv,
-                                                             gapScanResponseData_t * scnrsp);
+                                                               gapScanResponseData_t * scnrsp);
     static BLEManagerCommon::ble_err_t blekw_stop_advertising(void);
     static void blekw_gap_advertising_cb(gapAdvertisingEvent_t * pAdvertisingEvent);
     static void blekw_gap_connection_cb(deviceId_t deviceId, gapConnectionEvent_t * pConnectionEvent);
@@ -222,7 +222,7 @@ protected:
 
 public:
     virtual CHIP_ERROR InitHostController(ble_generic_cb_fp cb_fp) = 0;
-    virtual BLEManagerCommon* GetImplInstance() = 0;
+    virtual BLEManagerCommon * GetImplInstance()                   = 0;
     void DoBleProcessing(void);
 };
 

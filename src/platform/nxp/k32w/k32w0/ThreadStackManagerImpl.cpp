@@ -72,8 +72,8 @@ void ThreadStackManagerImpl::ProcessThreadActivity()
      * by doing this, we avoid allocating a new stack for short-lived
      * BLE processing (e.g.: only during Matter commissioning)
      */
-     auto* bleManager = &chip::DeviceLayer::Internal::BLEMgrImpl();
-     bleManager->DoBleProcessing();
+    auto * bleManager = &chip::DeviceLayer::Internal::BLEMgrImpl();
+    bleManager->DoBleProcessing();
 
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
     if (isThreadInitialized())

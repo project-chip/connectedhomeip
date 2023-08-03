@@ -50,12 +50,10 @@ CHIP_ERROR FactoryDataProviderImpl::Init()
         sum += maxLengths[i];
     }
 
-    if(sum > kFactoryDataSize)
+    if (sum > kFactoryDataSize)
     {
-        ChipLogError(DeviceLayer,
-            "Max size of factory data: %lu is bigger than reserved factory data size: %lu",
-            sum, kFactoryDataSize
-        );
+        ChipLogError(DeviceLayer, "Max size of factory data: %lu is bigger than reserved factory data size: %lu", sum,
+                     kFactoryDataSize);
     }
 
 #if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
@@ -103,7 +101,7 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & messageToSig
 #if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
 extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism()
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    CHIP_ERROR error      = CHIP_NO_ERROR;
     uint16_t backupLength = 0;
 
     // Check if PDM id related to factory data backup exists.
@@ -116,8 +114,8 @@ extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism()
         buffer.Calloc(FactoryDataProvider::kFactoryDataSize);
         ReturnErrorCodeIf(buffer.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
 
-        auto status =
-            PDM_eReadDataFromRecord(kNvmId_FactoryDataBackup, (void*)buffer.Get(), FactoryDataProvider::kFactoryDataSize, &backupLength);
+        auto status = PDM_eReadDataFromRecord(kNvmId_FactoryDataBackup, (void *) buffer.Get(),
+                                              FactoryDataProvider::kFactoryDataSize, &backupLength);
         ReturnErrorCodeIf(PDM_E_STATUS_OK != status, CHIP_FACTORY_DATA_PDM_RESTORE);
 
         error = FactoryDataProviderImpl::UpdateData(buffer.Get());
@@ -136,7 +134,7 @@ CHIP_ERROR FactoryDataProviderImpl::ValidateWithRestore()
 
     VerifyOrReturnError(mRestoreMechanisms.size() > 0, CHIP_FACTORY_DATA_RESTORE_MECHANISM);
 
-    for (auto& restore : mRestoreMechanisms)
+    for (auto & restore : mRestoreMechanisms)
     {
         error = restore();
         if (error != CHIP_NO_ERROR)
@@ -161,7 +159,7 @@ CHIP_ERROR FactoryDataProviderImpl::ValidateWithRestore()
     return error;
 }
 
-CHIP_ERROR FactoryDataProviderImpl::UpdateData(uint8_t* pBuf)
+CHIP_ERROR FactoryDataProviderImpl::UpdateData(uint8_t * pBuf)
 {
     NV_Init();
 
@@ -180,7 +178,6 @@ void FactoryDataProviderImpl::RegisterRestoreMechanism(RestoreMechanism restore)
     mRestoreMechanisms.insert(mRestoreMechanisms.end(), restore);
 }
 #endif // CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
-
 
 } // namespace DeviceLayer
 } // namespace chip

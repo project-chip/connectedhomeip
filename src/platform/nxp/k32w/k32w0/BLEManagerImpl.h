@@ -45,7 +45,7 @@ public:
     friend BLEManager;
 
     CHIP_ERROR InitHostController(ble_generic_cb_fp cb_fp) override;
-    BLEManagerCommon* GetImplInstance() override;
+    BLEManagerCommon * GetImplInstance() override;
 
 private:
     static BLEManagerImpl sInstance;
