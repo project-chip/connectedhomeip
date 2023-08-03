@@ -432,7 +432,7 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 
 void AppTask::KBD_Callback(uint8_t events)
 {
-    eventMask = eventMask | (uint32_t) (1 << events);
+    eventMask = eventMask | (uint32_t)(1 << events);
 }
 
 void AppTask::HandleKeyboard(void)
