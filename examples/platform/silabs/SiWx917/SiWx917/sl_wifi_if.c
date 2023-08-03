@@ -246,12 +246,6 @@ int32_t wfx_wifi_rsi_init(void)
 static int32_t wfx_rsi_init(void)
 {
     sl_status_t status;
-    status = sl_wifi_init(&config  , default_wifi_event_handler);
-    SILABS_LOG("wfx_wifi_rsi_init #2 ");
-    if(status != SL_STATUS_OK){
-      SILABS_LOG("wfx_wifi_rsi_init failed %x", status);
-      return status;
-    }
     status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, (sl_mac_address_t *) &wfx_rsi.sta_mac.octet[0]);
     if (status != SL_STATUS_OK)
     {

@@ -132,8 +132,6 @@ template("siwx917_sdk") {
       "USE_NVM3=1",
       "RSI_ARM_CM4F",
       "SIWX_917",
-      "BRD4325A",
-      "BRD4325B",
       "CHIP_9117",
       "BLE_ENABLE=1",
       "RSI_LITTLE_ENDIAN=1",
@@ -150,7 +148,6 @@ template("siwx917_sdk") {
       "SL_WIFI_COMPONENT_INCLUDED",
       "CHIP_917",
       "ROMDRIVER_PRESENT",
-      "EXECUTION_FROM_RAM",
       "SL_CATALOG_FREERTOS_KERNEL_PRESENT=1",
       "SL_PLATFORM_EXAMPLES_ENABLE",
       "SI91X_DEVICE",
@@ -158,7 +155,6 @@ template("siwx917_sdk") {
       # "SL_NET_COMPONENT_INCLUDED",
       "FLASH_PAGE_SIZE",
       "SL_NVM3_PRESENT",
-      "DUAL_FLASH_EN",
       "ROM_WIRELESS",
       "SRAM_BASE=0x0C000000UL",
       "SRAM_SIZE=0x00040000UL",
@@ -167,9 +163,20 @@ template("siwx917_sdk") {
       # "SL_WIFI_PSK=\"matter@123\"",
     ]
 
+    if ( silabs_board == "BRD4325B" ) {
+      defines += [ "BRD4325A",
+                   "BRD4325B",
+                   "DUAL_FLASH_EN",
+      ]
+    }
     if ( silabs_board == "BRD4325C" ) {
       defines += [ "BRD4325C",
-                  "EXECUTION_FROM_RAM",
+                   "CHIP_917 = 1",
+                   "CHIP_917B0 = 1",
+                   "SL_BOARD_NAME=\"BRD4325C\"",
+                   "COMMON_FLASH_EN=1",
+                   "EXECUTION_FROM_RAM",
+                   "SL_BOARD_REV=\"A01\"",
       ]
     }
 
@@ -398,9 +405,9 @@ template("siwx917_sdk") {
         ]
       }
 
-      if (silabs_board != "BRD4325B" ) {
+      if (silabs_board == "BRD4325C" ) {
       sources += [
-        "${wifi_sdk_root}/components/siwx917_soc/core/chip/src/startup_si91x.c",
+        "${examples_plat_dir}/device/src/startup_common_RS1xxxx.c",
         "${wifi_sdk_root}/components/siwx917_soc/drivers/middleware/nvm3/src/sl_si91x_common_flash_intf.c",
         ]
       }

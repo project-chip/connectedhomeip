@@ -69,7 +69,7 @@ static_library("efr32") {
   if (chip_enable_ble_rs911x) {
     sources += [
       "../rs911x/BLEManagerImpl.cpp",
-      "../rs911x/rsi_ble_config.h",
+      "../rs911x/ble_config.h",
       "../rs911x/wfx_sl_ble_init.c",
       "../rs911x/wfx_sl_ble_init.h",
     ]

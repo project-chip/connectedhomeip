@@ -103,7 +103,7 @@ if (silabs_board == "BRD4304A") {
   show_qr_code = false
   wifi_soc = true
 } else if (silabs_board == "BRD4325C") {
-  silabs_family = "SiWx917-com"
+  silabs_family = "SiWx917-common"
   silabs_mcu = "EFR32MG12P432F1024GL125"
   disable_lcd = true
   show_qr_code = false
