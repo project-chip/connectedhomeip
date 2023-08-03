@@ -159,7 +159,6 @@ int TokenizeLine(char * buffer, char ** tokens, int max_tokens)
     tokens[cursor++] = &buffer[i];
 
     for (; i < len && cursor < max_tokens; i++)
-
     {
         if (IsEscape(buffer[i]) && IsEscapable(buffer[i + 1]))
         {
