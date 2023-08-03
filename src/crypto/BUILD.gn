@@ -21,6 +21,7 @@ import("${chip_root}/build/chip/buildconfig_header.gni")
 
 import("crypto.gni")
 
+import("${chip_root}/src/lib/imx_ele.gni")
 import("${chip_root}/src/lib/trusty.gni")
 
 if (chip_crypto == "") {
