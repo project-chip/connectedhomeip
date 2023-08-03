@@ -20,7 +20,6 @@ package chip.objecttlv
 import chip.jsontlv.fromJson
 import chip.tlv.AnonymousTag
 import chip.tlv.Tag
-import chip.tlv.TlvEncodingException
 import chip.tlv.TlvWriter
 
 fun TlvWriter.fromObject(value: Any?, tag: Tag = AnonymousTag): TlvWriter {
@@ -28,11 +27,29 @@ fun TlvWriter.fromObject(value: Any?, tag: Tag = AnonymousTag): TlvWriter {
     null -> {
       putNull(tag)
     }
-    is Int, is Long, is Short, is Byte  -> {
-      fromSignedObject(value, tag)
+    is Int -> {
+      put(tag, value)
     }
-    is UInt, is ULong, is UShort, is UByte -> {
-      fromUnsignedObject(value, tag)
+    is Long -> {
+      put(tag, value)
+    }
+    is Short -> {
+      put(tag, value)
+    }
+    is Byte -> {
+      put(tag, value)
+    }
+    is UInt -> {
+      put(tag, value)
+    }
+    is ULong -> {
+      put(tag, value)
+    }
+    is UShort -> {
+      put(tag, value)
+    }
+    is UByte -> {
+      put(tag, value)
     }
     is Boolean -> {
       put(tag, value)
@@ -58,50 +75,7 @@ fun TlvWriter.fromObject(value: Any?, tag: Tag = AnonymousTag): TlvWriter {
         // If json parsing exception, judged by string value.
         put(tag, value)
       }
-  }
-  return this
-}
-
-private fun TlvWriter.fromUnsignedObject(value: Any?, tag: Tag): TlvWriter {
-  val ret = when(value) {
-    is UInt -> {
-      value.toULong()
-    }
-    is UShort -> {
-      value.toULong()
-    }
-    is UByte -> {
-      value.toULong()
-    }
-    is ULong -> {
-      value
-    }
-    else -> {
-      return this
     }
   }
-  put(tag, ret)
-  return this
-}
-
-private fun TlvWriter.fromSignedObject(value: Any?, tag: Tag): TlvWriter {
-  val ret = when(value) {
-    is Int -> {
-      value.toLong()
-    }
-    is Short -> {
-      value.toLong()
-    }
-    is Byte -> {
-      value.toLong()
-    }
-    is Long -> {
-      value
-    }
-    else -> {
-      return this
-    }
-  }
-  put(tag, ret)
   return this
 }
