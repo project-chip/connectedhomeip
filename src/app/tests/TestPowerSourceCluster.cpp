@@ -127,6 +127,12 @@ void TestPowerSourceCluster::TestEndpointList(nlTestSuite * apSuite, void * apCo
         NL_TEST_ASSERT(apSuite, vec.size() == 0);
     }
 
+    if (powerSourceServer.GetNumSupportedEndpointLists() < 2)
+    {
+        // Test assumes at least two endpoints. This runs on linux, not worthwhile to run on platforms with fewer endpoints.
+        return;
+    }
+
     // *****************
     // Test setting, getting and reading through the attribute access interface
     // *****************
