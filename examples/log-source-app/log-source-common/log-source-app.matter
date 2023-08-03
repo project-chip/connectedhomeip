@@ -498,6 +498,7 @@ server cluster OperationalCredentials = 62 {
 }
 
 endpoint 0 {
+  device type anonymousEndpointType = 0, version 1;
   binding cluster DiagnosticLogs;
 
   server cluster AccessControl {
