@@ -22,6 +22,7 @@ import("${chip_root}/build/chip/buildconfig_header.gni")
 import("crypto.gni")
 
 import("${chip_root}/src/lib/trusty.gni")
+import("${chip_root}/src/lib/imx_ele.gni")
 
 if (chip_crypto == "") {
   if (current_os == "android" || current_os == "freertos" ||
