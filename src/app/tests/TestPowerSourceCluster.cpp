@@ -127,7 +127,8 @@ void TestPowerSourceCluster::TestEndpointList(nlTestSuite * apSuite, void * apCo
         NL_TEST_ASSERT(apSuite, vec.size() == 0);
     }
 
-    if (powerSourceServer.GetNumSupportedEndpointLists() < 2)
+    if (powerSourceServer.GetNumSupportedEndpointLists() < 2 ||
+        powerSourceServer.GetNumSupportedEndpointLists() > std::numeric_limits<uint16_t>::max())
     {
         // Test assumes at least two endpoints. This runs on linux, not worthwhile to run on platforms with fewer endpoints.
         return;
@@ -139,6 +140,11 @@ void TestPowerSourceCluster::TestEndpointList(nlTestSuite * apSuite, void * apCo
     EndpointId list0[5]    = { 1, 2, 3, 4, 5 };
     EndpointId list1[10]   = { 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
     EndpointId listRest[1] = { 2 };
+
+    // we checked earlier that this fit
+    // This test just uses endpoints in order, so we want to set endpoints from
+    // 0 to numEndpoints - 1, and use this for overflow checking
+    EndpointId numEndpoints = static_cast<EndpointId>(powerSourceServer.GetNumSupportedEndpointLists());
 
     // Endpoint 0 - list of 5
     err = powerSourceServer.SetEndpointList(0, Span<EndpointId>(list0));
@@ -163,7 +169,7 @@ void TestPowerSourceCluster::TestEndpointList(nlTestSuite * apSuite, void * apCo
     }
 
     // Remaining endpoints - list of 1
-    for (EndpointId ep = 2; ep < powerSourceServer.GetNumSupportedEndpointLists(); ++ep)
+    for (EndpointId ep = 2; ep < numEndpoints; ++ep)
     {
         err = powerSourceServer.SetEndpointList(ep, Span<EndpointId>(listRest));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -205,7 +211,7 @@ void TestPowerSourceCluster::TestEndpointList(nlTestSuite * apSuite, void * apCo
     }
 
     // Remaining endpoints
-    for (EndpointId ep = 2; ep < powerSourceServer.GetNumSupportedEndpointLists(); ++ep)
+    for (EndpointId ep = 2; ep < numEndpoints; ++ep)
     {
         readBack = powerSourceServer.GetEndpointList(ep);
         NL_TEST_EXIT_ON_FAILED_ASSERT(apSuite, readBack != nullptr);
@@ -230,7 +236,7 @@ void TestPowerSourceCluster::TestEndpointList(nlTestSuite * apSuite, void * apCo
     }
 
     // Ensure only the overwritten list was changed, using read interface
-    for (EndpointId ep = 0; ep < powerSourceServer.GetNumSupportedEndpointLists() + 1; ++ep)
+    for (EndpointId ep = 0; ep < numEndpoints + 1; ++ep)
     {
         std::vector<EndpointId> vec = ReadEndpointsThroughAttributeReader(apSuite, ep);
         if (ep == 0)
@@ -241,7 +247,7 @@ void TestPowerSourceCluster::TestEndpointList(nlTestSuite * apSuite, void * apCo
                 NL_TEST_ASSERT(apSuite, vec[j] == list0[j]);
             }
         }
-        else if (ep == powerSourceServer.GetNumSupportedEndpointLists())
+        else if (ep == numEndpoints)
         {
             NL_TEST_ASSERT(apSuite, vec.size() == 0);
         }
@@ -258,7 +264,7 @@ void TestPowerSourceCluster::TestEndpointList(nlTestSuite * apSuite, void * apCo
     // *****************
     // Test removal
     // *****************
-    for (EndpointId ep = 0; ep < powerSourceServer.GetNumSupportedEndpointLists(); ++ep)
+    for (EndpointId ep = 0; ep < numEndpoints; ++ep)
     {
         err = powerSourceServer.SetEndpointList(ep, Span<EndpointId>());
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -267,7 +273,7 @@ void TestPowerSourceCluster::TestEndpointList(nlTestSuite * apSuite, void * apCo
     }
 
     // Check through the read interface
-    for (EndpointId ep = 0; ep < powerSourceServer.GetNumSupportedEndpointLists() + 1; ++ep)
+    for (EndpointId ep = 0; ep < numEndpoints + 1; ++ep)
     {
         std::vector<EndpointId> vec = ReadEndpointsThroughAttributeReader(apSuite, ep);
         NL_TEST_ASSERT(apSuite, vec.size() == 0);
