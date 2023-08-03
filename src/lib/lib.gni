@@ -32,4 +32,7 @@ declare_args() {
 
   # Set to true to enable Trusty OS
   chip_with_trusty_os = false
+
+  # Set to true to enable ele firmware
+  chip_with_imx_ele = false
 }
