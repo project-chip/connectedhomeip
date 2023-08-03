@@ -130,7 +130,7 @@ extern EmberAfDefinedEndpoint emAfEndpoints[];
 #endif
 
 /**
- * @brief Returns root endpoint of a composed bridged device
+ * @brief Returns parent endpoint for a given endpoint index
  */
 chip::EndpointId emberAfParentEndpointFromIndex(uint16_t index);
 
@@ -302,6 +302,31 @@ private:
     uint16_t mEndpointCount = emberAfEndpointCount();
     ClusterId mClusterId;
 };
+
+/**
+ * @brief Sets the parent endpoint for a given endpoint
+ */
+CHIP_ERROR SetParentEndpointForEndpoint(EndpointId childEndpoint, EndpointId parentEndpoint);
+
+/**
+ * @brief Sets an Endpoint to use Flat Composition
+ */
+CHIP_ERROR SetFlatCompositionForEndpoint(EndpointId endpoint);
+
+/**
+ * @brief Sets an Endpoint to use Tree Composition
+ */
+CHIP_ERROR SetTreeCompositionForEndpoint(EndpointId endpoint);
+
+/**
+ * @brief Returns true is an Endpoint has flat composition
+ */
+bool IsFlatCompositionForEndpoint(EndpointId endpoint);
+
+/**
+ * @brief Returns true is an Endpoint has tree composition
+ */
+bool IsTreeCompositionForEndpoint(EndpointId endpoint);
 
 } // namespace app
 } // namespace chip

@@ -632,6 +632,7 @@ hci
 hciattach
 hciconfig
 hdlc
+HEPA
 HKDF
 HMAC
 hoc
@@ -641,7 +642,6 @@ HomePods
 hostapd
 hostname
 href
-HEPA
 HTTPS
 HW
 hwadr
@@ -652,6 +652,7 @@ IasWd
 iaszone
 ibb
 ICA
+ICD
 iCloud
 ICMP
 IDF
