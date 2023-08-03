@@ -208,6 +208,7 @@ exceptions:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/SensorClientFragment.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/Argument.kt"
+            - "**/src/controller/java/src/chip/objecttlv/ObjectToTlv.kt"
     TooGenericExceptionThrown:
         excludes:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/discover/DiscoverCommissionablesCommand.kt"
@@ -298,6 +299,7 @@ complexity:
             - "**/src/controller/java/src/chip/tlv/TlvReader.kt"
             - "**/src/controller/java/src/chip/tlv/types.kt"
             - "**/src/controller/java/src/chip/jsontlv/TlvToJson.kt"
+            - "**/src/controller/java/src/chip/objecttlv/ObjectToTlv.kt"
     ComplexCondition:
         excludes:
             - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
