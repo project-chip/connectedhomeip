@@ -976,6 +976,10 @@ server cluster GroupKeyManagement = 63 {
     kCacheAndSync = 1;
   }
 
+  bitmap Feature : BITMAP32 {
+    kCacheAndSync = 0x1;
+  }
+
   fabric_scoped struct GroupInfoMapStruct {
     group_id groupId = 1;
     endpoint_no endpoints[] = 2;
@@ -1338,7 +1342,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type dimmablelight = 112, version 1;
+  device type refrigerator = 112, version 1;
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0000;
@@ -1423,7 +1427,7 @@ endpoint 2 {
     callback attribute generatedCommandList default = 0;
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
   }
 }
@@ -1448,7 +1452,7 @@ endpoint 3 {
     callback attribute generatedCommandList default = 0;
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
   }
 }

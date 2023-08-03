@@ -33,7 +33,33 @@
   ],
   "endpointTypes": [
     {
+      "id": 5,
       "name": "MA-rootdevice",
+      "deviceTypeRef": {
+        "id": 2,
+        "code": 22,
+        "profileId": 259,
+        "label": "MA-rootdevice",
+        "name": "MA-rootdevice"
+      },
+      "deviceTypes": [
+        {
+          "id": 2,
+          "code": 22,
+          "profileId": 259,
+          "label": "MA-rootdevice",
+          "name": "MA-rootdevice"
+        }
+      ],
+      "deviceTypeRefs": [
+        2
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        22
+      ],
       "deviceTypeName": "MA-rootdevice",
       "deviceTypeCode": 22,
       "deviceTypeProfileId": 259,
@@ -6226,7 +6252,33 @@
       ]
     },
     {
-      "name": "MA-dimmablelight",
+      "id": 8,
+      "name": "MA-refrigerator",
+      "deviceTypeRef": {
+        "id": 48,
+        "code": 112,
+        "profileId": 259,
+        "label": "MA-refrigerator",
+        "name": "MA-refrigerator"
+      },
+      "deviceTypes": [
+        {
+          "id": 48,
+          "code": 112,
+          "profileId": 259,
+          "label": "MA-refrigerator",
+          "name": "MA-refrigerator"
+        }
+      ],
+      "deviceTypeRefs": [
+        48
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        112
+      ],
       "deviceTypeName": "MA-refrigerator",
       "deviceTypeCode": 112,
       "deviceTypeProfileId": 259,
@@ -11634,7 +11686,33 @@
       ]
     },
     {
+      "id": 6,
       "name": "Anonymous Endpoint Type",
+      "deviceTypeRef": {
+        "id": 51,
+        "code": 113,
+        "profileId": 259,
+        "label": "MA-temperature-controlled-cabinet",
+        "name": "MA-temperature-controlled-cabinet"
+      },
+      "deviceTypes": [
+        {
+          "id": 51,
+          "code": 113,
+          "profileId": 259,
+          "label": "MA-temperature-controlled-cabinet",
+          "name": "MA-temperature-controlled-cabinet"
+        }
+      ],
+      "deviceTypeRefs": [
+        51
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        113
+      ],
       "deviceTypeName": "MA-temperature-controlled-cabinet",
       "deviceTypeCode": 113,
       "deviceTypeProfileId": 259,
@@ -11696,7 +11774,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -11712,7 +11790,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -11728,7 +11806,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -11744,7 +11822,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -11760,7 +11838,7 @@
               "side": "server",
               "type": "array",
               "included": 0,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -11776,7 +11854,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -11792,7 +11870,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -11808,7 +11886,7 @@
               "side": "server",
               "type": "array",
               "included": 0,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -11824,7 +11902,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -12097,7 +12175,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "2",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -12124,7 +12202,33 @@
       ]
     },
     {
+      "id": 7,
       "name": "Anonymous Endpoint Type",
+      "deviceTypeRef": {
+        "id": 51,
+        "code": 113,
+        "profileId": 259,
+        "label": "MA-temperature-controlled-cabinet",
+        "name": "MA-temperature-controlled-cabinet"
+      },
+      "deviceTypes": [
+        {
+          "id": 51,
+          "code": 113,
+          "profileId": 259,
+          "label": "MA-temperature-controlled-cabinet",
+          "name": "MA-temperature-controlled-cabinet"
+        }
+      ],
+      "deviceTypeRefs": [
+        51
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        113
+      ],
       "deviceTypeName": "MA-temperature-controlled-cabinet",
       "deviceTypeCode": 113,
       "deviceTypeProfileId": 259,
@@ -12186,7 +12290,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -12202,7 +12306,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -12218,7 +12322,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -12234,7 +12338,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -12250,7 +12354,7 @@
               "side": "server",
               "type": "array",
               "included": 0,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -12266,7 +12370,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -12282,7 +12386,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -12298,7 +12402,7 @@
               "side": "server",
               "type": "array",
               "included": 0,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -12314,7 +12418,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -12364,6 +12468,16 @@
           "define": "TEMPERATURE_CONTROL_CLUSTER",
           "side": "client",
           "enabled": 0,
+          "commands": [
+            {
+              "name": "SetTemperature",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            }
+          ],
           "attributes": [
             {
               "name": "FeatureMap",
@@ -12417,7 +12531,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "0",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -12433,7 +12547,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "0",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -12449,7 +12563,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "0",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -12465,7 +12579,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "0",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -12577,7 +12691,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "2",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -12610,36 +12724,28 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 22
+      "networkId": 0
     },
     {
-      "endpointTypeName": "MA-dimmablelight",
+      "endpointTypeName": "MA-refrigerator",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 112
+      "networkId": 0
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 2,
       "profileId": 259,
       "endpointId": 2,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 113
+      "networkId": 0
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 3,
       "profileId": 259,
       "endpointId": 3,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 113
+      "networkId": 0
     }
   ],
   "log": []

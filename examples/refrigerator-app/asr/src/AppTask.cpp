@@ -107,6 +107,14 @@ void AppTask::AppTaskMain(void * pvParameter)
     PrintOnboardingCodes(RendezvousInformationFlag(RendezvousInformationFlag::kOnNetwork));
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
+    //set Parent Endpoint and Composition Type for an Endpoint
+    app::EndpointId kRefEndpointId = 1;
+    app::EndpointId kColdCabinetEndpointId = 2;
+    app::EndpointId kFreezeCabinetEndpointId = 3;
+    app::SetTreeCompositionForEndpoint(kRefEndpointId);
+    app::SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
+    app::SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
+
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 
     /* Delete task */

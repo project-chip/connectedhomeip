@@ -26,13 +26,13 @@ using namespace chip::app::Clusters::TemperatureControl;
 using chip::Protocols::InteractionModel::Status;
 
 // TODO: Configure your options for each endpoint
-CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { CharSpan("Hot", 3), CharSpan("Warm", 4),
-                                                                              CharSpan("Freezing", 8) };
+CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { CharSpan::fromCharString("Hot"), CharSpan::fromCharString("Warm"),
+                                                                              CharSpan::fromCharString("Freezing") };
 
 const AppSupportedTemperatureLevelsDelegate::EndpointPair AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints
     [EMBER_AF_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = {
-        EndpointPair(2, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions, 3), // Options for Endpoint 2
-        EndpointPair(3, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions, 3), // Options for Endpoint 3
+        EndpointPair(2, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions, ArraySize(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions)), // Options for Endpoint 2
+        EndpointPair(3, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions, ArraySize(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions)), // Options for Endpoint 3
     };
 
 uint8_t AppSupportedTemperatureLevelsDelegate::Size()
