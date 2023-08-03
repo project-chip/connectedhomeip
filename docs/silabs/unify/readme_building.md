@@ -116,7 +116,7 @@ root@docker:/matter/examples/chip-tool$ ninja -C out/arm64
 ## Unit Testing
 
 Unit testing is always a good idea for quality software. Documentation on writing unit tests for the Matter Unify Bridge is in the
-[README.md](https://github.com/SiliconLabs/matter/blob/latest/silabs_examples/unify/linux/src/tests/README.md) in the `linux/src/tests` folder.
+[README.md](https://github.com/SiliconLabs/matter/blob/latest/silabs_examples/unify-matter-bridge/linux/src/tests/README.md).
 
 ## Troubleshooting
 
