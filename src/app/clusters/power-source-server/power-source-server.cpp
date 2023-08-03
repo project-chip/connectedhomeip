@@ -114,8 +114,13 @@ CHIP_ERROR PowerSourceAttrAccess::Read(const ConcreteReadAttributePath & aPath, 
         }
         else
         {
-            DataModel::List<EndpointId> list(*span);
-            err = aEncoder.Encode(list);
+            err = aEncoder.EncodeList([span](const auto & encoder) -> CHIP_ERROR {
+                for (auto id : *span)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(id));
+                }
+                return CHIP_NO_ERROR;
+            });
         }
         break;
     }
@@ -139,7 +144,8 @@ PowerSourceServer & PowerSourceServer::Instance()
 // Caller does not need to retain the span past the call point as these are copied into an internal storage
 CHIP_ERROR PowerSourceServer::SetEndpointList(EndpointId powerSourceClusterEndpoint, Span<EndpointId> endpointList)
 {
-    // TODO: should check here that the power source cluster exists on the endpoint, but for now let's take the caller's word for it
+    // TODO: should check here that the power source cluster exists on the endpoint, but for now let's take the caller's word
+    // for it
 
     size_t idx = PowerSourceClusterEndpointIndex(powerSourceClusterEndpoint);
     if (idx >= kNumSupportedEndpoints)
