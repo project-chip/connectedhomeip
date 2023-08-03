@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <StaticReplacementProductListManager.h>
+#include <ImmutableReplacementProductListManager.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
@@ -31,22 +31,10 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
+using namespace chip::app::Clusters::ResourceMonitoring::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
-static ResourceMonitoring::Attributes::ReplacementProductStruct::Type sHepaFilterReplacementProductsList[] = {
-    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kUpc,
-      .productIdentifierValue = CharSpan::fromCharString("111112222233") },
-    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8,
-      .productIdentifierValue = CharSpan::fromCharString("gtin8xhe") },
-    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kEan,
-      .productIdentifierValue = CharSpan::fromCharString("4444455555666") },
-    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14,
-      .productIdentifierValue = CharSpan::fromCharString("gtin14xhepaxxx") },
-    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kOem,
-      .productIdentifierValue = CharSpan::fromCharString("oem20xhepaxxxxxxxxxx") },
-};
-StaticReplacementProductListManager sHepaFilterReplacementProductListManager(&sHepaFilterReplacementProductsList[0],
-                                                                             ArraySize(sHepaFilterReplacementProductsList));
+static ImmutableReplacementProductListManager sHepaFilterReplacementProductListManager;
 
 //-- Hepa filter Monitoring instance methods
 CHIP_ERROR HepaFilterMonitoringInstance::AppInit()

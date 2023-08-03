@@ -198,7 +198,7 @@ tests:
               contains: [18]
 
     - label: "Step 5a: TH reads optional event(StartUp) in EventList"
-      PICS: BRBINFO.S.E00
+      PICS: PICS_EVENT_LIST_ENABLED && BRBINFO.S.E00
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -207,7 +207,7 @@ tests:
               contains: [0]
 
     - label: "Step 5b: TH reads optional attribute(ShutDown) in EventList"
-      PICS: BRBINFO.S.E01
+      PICS: PICS_EVENT_LIST_ENABLED && BRBINFO.S.E01
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -216,7 +216,7 @@ tests:
               contains: [1]
 
     - label: "Step 5c: TH reads optional attribute(Leave) in EventList"
-      PICS: BRBINFO.S.E02
+      PICS: PICS_EVENT_LIST_ENABLED && BRBINFO.S.E02
       command: "readAttribute"
       attribute: "EventList"
       response:

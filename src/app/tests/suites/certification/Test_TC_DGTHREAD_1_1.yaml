@@ -96,6 +96,7 @@ tests:
               hasMasksSet: [0x8]
 
     - label: "Step 4a: TH reads mandatory attributes in AttributeList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -123,6 +124,40 @@ tests:
                       65528,
                       65529,
                       65530,
+                      65531,
+                      65532,
+                      65533,
+                  ]
+
+    - label: "Step 4a: TH reads mandatory attributes in AttributeList from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [
+                      0,
+                      1,
+                      2,
+                      3,
+                      4,
+                      5,
+                      7,
+                      8,
+                      9,
+                      10,
+                      11,
+                      12,
+                      13,
+                      59,
+                      60,
+                      61,
+                      62,
+                      65528,
+                      65529,
+
                       65531,
                       65532,
                       65533,
@@ -229,7 +264,7 @@ tests:
               contains: [58]
 
     - label: "Step 5a: TH reads EventList from DUT"
-      PICS: " !DGTHREAD.S.E00 && !DGTHREAD.S.E01 "
+      PICS: "PICS_EVENT_LIST_ENABLED &&  !DGTHREAD.S.E00 && !DGTHREAD.S.E01 "
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -239,7 +274,7 @@ tests:
 
     - label:
           "Step 5b: TH reads DGTHREAD.S.E00(ConnectionStatus) event in EventList"
-      PICS: DGTHREAD.S.E00
+      PICS: PICS_EVENT_LIST_ENABLED && DGTHREAD.S.E00
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -250,7 +285,7 @@ tests:
     - label:
           "Step 5c: TH reads DGTHREAD.S.E01(NetworkFaultChange) event in
           EventList"
-      PICS: DGTHREAD.S.E01
+      PICS: PICS_EVENT_LIST_ENABLED && DGTHREAD.S.E01
       command: "readAttribute"
       attribute: "EventList"
       response:

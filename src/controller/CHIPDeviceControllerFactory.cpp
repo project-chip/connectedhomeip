@@ -65,6 +65,7 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     mOperationalKeystore       = params.operationalKeystore;
     mOpCertStore               = params.opCertStore;
     mCertificateValidityPolicy = params.certificateValidityPolicy;
+    mSessionResumptionStorage  = params.sessionResumptionStorage;
     mEnableServerInteractions  = params.enableServerInteractions;
 
     CHIP_ERROR err = InitSystemState(params);
@@ -94,6 +95,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
         params.operationalKeystore       = mOperationalKeystore;
         params.opCertStore               = mOpCertStore;
         params.certificateValidityPolicy = mCertificateValidityPolicy;
+        params.sessionResumptionStorage  = mSessionResumptionStorage;
     }
 
     return InitSystemState(params);
@@ -195,12 +197,24 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         tempFabricTable         = stateParams.fabricTable;
     }
 
-    auto sessionResumptionStorage = chip::Platform::MakeUnique<SimpleSessionResumptionStorage>();
-    ReturnErrorOnFailure(sessionResumptionStorage->Init(params.fabricIndependentStorage));
-    stateParams.sessionResumptionStorage = std::move(sessionResumptionStorage);
+    SessionResumptionStorage * sessionResumptionStorage;
+    if (params.sessionResumptionStorage == nullptr)
+    {
+        auto ownedSessionResumptionStorage = chip::Platform::MakeUnique<SimpleSessionResumptionStorage>();
+        ReturnErrorOnFailure(ownedSessionResumptionStorage->Init(params.fabricIndependentStorage));
+        stateParams.ownedSessionResumptionStorage    = std::move(ownedSessionResumptionStorage);
+        stateParams.externalSessionResumptionStorage = nullptr;
+        sessionResumptionStorage                     = stateParams.ownedSessionResumptionStorage.get();
+    }
+    else
+    {
+        stateParams.ownedSessionResumptionStorage    = nullptr;
+        stateParams.externalSessionResumptionStorage = params.sessionResumptionStorage;
+        sessionResumptionStorage                     = stateParams.externalSessionResumptionStorage;
+    }
 
     auto delegate = chip::Platform::MakeUnique<ControllerFabricDelegate>();
-    ReturnErrorOnFailure(delegate->Init(stateParams.sessionResumptionStorage.get(), stateParams.groupDataProvider));
+    ReturnErrorOnFailure(delegate->Init(sessionResumptionStorage, stateParams.groupDataProvider));
     stateParams.fabricTableDelegate = delegate.get();
     ReturnErrorOnFailure(stateParams.fabricTable->AddFabricDelegate(stateParams.fabricTableDelegate));
     delegate.release();
@@ -222,7 +236,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
         // Enable listening for session establishment messages.
         ReturnErrorOnFailure(stateParams.caseServer->ListenForSessionEstablishment(
-            stateParams.exchangeMgr, stateParams.sessionMgr, stateParams.fabricTable, stateParams.sessionResumptionStorage.get(),
+            stateParams.exchangeMgr, stateParams.sessionMgr, stateParams.fabricTable, sessionResumptionStorage,
             stateParams.certificateValidityPolicy, stateParams.groupDataProvider));
 
         //
@@ -256,7 +270,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     CASEClientInitParams sessionInitParams = {
         .sessionManager            = stateParams.sessionMgr,
-        .sessionResumptionStorage  = stateParams.sessionResumptionStorage.get(),
+        .sessionResumptionStorage  = sessionResumptionStorage,
         .certificateValidityPolicy = stateParams.certificateValidityPolicy,
         .exchangeMgr               = stateParams.exchangeMgr,
         .fabricTable               = stateParams.fabricTable,
@@ -373,6 +387,7 @@ void DeviceControllerFactory::Shutdown()
     mOperationalKeystore       = nullptr;
     mOpCertStore               = nullptr;
     mCertificateValidityPolicy = nullptr;
+    mSessionResumptionStorage  = nullptr;
 }
 
 void DeviceControllerSystemState::Shutdown()

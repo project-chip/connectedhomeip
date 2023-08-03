@@ -71,13 +71,22 @@ tests:
               hasMasksSet: [0x2]
 
     - label: "Step 4a: TH reads AttributeList from DUT"
-      PICS: DGETH.S.Afffb
+      PICS: PICS_EVENT_LIST_ENABLED && DGETH.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains: [65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED && DGETH.S.Afffb"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65528, 65529, 65531, 65532, 65533]
 
     - label: "Step 4b: TH reads optional attribute(PHYRate) in AttributeList"
       PICS: DGETH.S.A0000 && DGETH.S.Afffb
