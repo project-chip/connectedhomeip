@@ -111,7 +111,7 @@ private:
 
     // If we are in the middle of handshake and receive a Sigma1 then respond with Busy status code.
     // @param[in] ec              Exchange Context
-    // @param[in] minimumWaitTime Minimum wait time before client resends sigma1
+    // @param[in] minimumWaitTime Minimum wait time reported to client before it can attempt to resend sigma1
     //
     // @return CHIP_NO_ERROR on success, error code otherwise
     CHIP_ERROR SendBusyStatusReport(Messaging::ExchangeContext * ec, System::Clock::Milliseconds16 minimumWaitTime);

@@ -112,7 +112,7 @@ System::PacketBufferHandle StatusReport::MakeBusyStatusReportMessage(System::Clo
                         ChipLogError(SecureChannel, "Failed to finalize protocol data for busy status report"));
 
     // Build a busy status report
-    StatusReport statusReport(GeneralStatusCode::kBusy, Id, kProtocolCodeBusy, std::move(handle));
+    StatusReport statusReport(GeneralStatusCode::kBusy, Protocols::SecureChannel::Id, kProtocolCodeBusy, std::move(handle));
 
     // Build the status report message
     handle = System::PacketBufferHandle::New(statusReport.Size());
