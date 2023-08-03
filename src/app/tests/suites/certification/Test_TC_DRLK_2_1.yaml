@@ -1597,4 +1597,3 @@ tests:
           values:
               - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
-
