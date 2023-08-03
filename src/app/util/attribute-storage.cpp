@@ -192,7 +192,9 @@ void emberAfEndpointConfigure()
         emAfEndpoints[ep].deviceTypeList = endpointDeviceTypeList(ep);
         emAfEndpoints[ep].endpointType   = endpointTypeMacro(ep);
         emAfEndpoints[ep].dataVersions   = currentDataVersions;
-        emAfEndpoints[ep].bitmask        = EMBER_AF_ENDPOINT_ENABLED;
+
+        emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isEnabled);
+        emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isFlatComposition);
 
         // Increment currentDataVersions by 1 (slot) for every server cluster
         // this endpoint has.
@@ -271,7 +273,7 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const Emb
     emAfEndpoints[index].endpointType   = ep;
     emAfEndpoints[index].dataVersions   = dataVersionStorage.data();
     // Start the endpoint off as disabled.
-    emAfEndpoints[index].bitmask          = EMBER_AF_ENDPOINT_DISABLED;
+    emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
     emAfEndpoints[index].parentEndpointId = parentEndpointId;
 
     emberAfSetDynamicEndpointCount(MAX_ENDPOINT_COUNT - FIXED_ENDPOINT_COUNT);
@@ -322,7 +324,7 @@ uint16_t emberAfEndpointCount()
 
 bool emberAfEndpointIndexIsEnabled(uint16_t index)
 {
-    return (emAfEndpoints[index].bitmask & EMBER_AF_ENDPOINT_ENABLED);
+    return (emAfEndpoints[index].bitmask.Has(EmberAfEndpointOptions::isEnabled));
 }
 
 bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType)
@@ -838,7 +840,7 @@ static uint16_t findIndexFromEndpoint(EndpointId endpoint, bool ignoreDisabledEn
     for (epi = 0; epi < emberAfEndpointCount(); epi++)
     {
         if (emAfEndpoints[epi].endpoint == endpoint &&
-            (!ignoreDisabledEndpoints || emAfEndpoints[epi].bitmask & EMBER_AF_ENDPOINT_ENABLED))
+            (!ignoreDisabledEndpoints || emAfEndpoints[epi].bitmask.Has(EmberAfEndpointOptions::isEnabled)))
         {
             return epi;
         }
@@ -919,11 +921,11 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
         return false;
     }
 
-    currentlyEnabled = emAfEndpoints[index].bitmask & EMBER_AF_ENDPOINT_ENABLED;
+    currentlyEnabled = emAfEndpoints[index].bitmask.Has(EmberAfEndpointOptions::isEnabled);
 
     if (enable)
     {
-        emAfEndpoints[index].bitmask |= EMBER_AF_ENDPOINT_ENABLED;
+        emAfEndpoints[index].bitmask.Set(EmberAfEndpointOptions::isEnabled);
     }
 
 #if defined(EZSP_HOST)
@@ -962,7 +964,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
 
     if (!enable)
     {
-        emAfEndpoints[index].bitmask &= EMBER_AF_ENDPOINT_DISABLED;
+        emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
     }
 
     return true;
@@ -1421,6 +1423,64 @@ app::AttributeAccessInterface * GetAttributeAccessOverride(EndpointId endpointId
 
     return nullptr;
 }
+
+CHIP_ERROR SetParentEndpointForEndpoint(EndpointId childEndpoint, EndpointId parentEndpoint)
+{
+    uint16_t childIndex  = emberAfIndexFromEndpoint(childEndpoint);
+    uint16_t parentIndex = emberAfIndexFromEndpoint(parentEndpoint);
+
+    if (childIndex == kEmberInvalidEndpointIndex || parentIndex == kEmberInvalidEndpointIndex)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    emAfEndpoints[childIndex].parentEndpointId = parentEndpoint;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SetFlatCompositionForEndpoint(EndpointId endpoint)
+{
+    uint16_t index = emberAfIndexFromEndpoint(endpoint);
+    if (index == kEmberInvalidEndpointIndex)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isTreeComposition);
+    emAfEndpoints[index].bitmask.Set(EmberAfEndpointOptions::isFlatComposition);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SetTreeCompositionForEndpoint(EndpointId endpoint)
+{
+    uint16_t index = emberAfIndexFromEndpoint(endpoint);
+    if (index == kEmberInvalidEndpointIndex)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isFlatComposition);
+    emAfEndpoints[index].bitmask.Set(EmberAfEndpointOptions::isTreeComposition);
+    return CHIP_NO_ERROR;
+}
+
+bool IsFlatCompositionForEndpoint(EndpointId endpoint)
+{
+    uint16_t index = emberAfIndexFromEndpoint(endpoint);
+    if (index == kEmberInvalidEndpointIndex)
+    {
+        return false;
+    }
+    return emAfEndpoints[index].bitmask.Has(EmberAfEndpointOptions::isFlatComposition);
+}
+
+bool IsTreeCompositionForEndpoint(EndpointId endpoint)
+{
+    uint16_t index = emberAfIndexFromEndpoint(endpoint);
+    if (index == kEmberInvalidEndpointIndex)
+    {
+        return false;
+    }
+    return emAfEndpoints[index].bitmask.Has(EmberAfEndpointOptions::isTreeComposition);
+}
+
 } // namespace app
 } // namespace chip
 

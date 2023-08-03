@@ -15,6 +15,9 @@
 java_path = getenv("JAVA_PATH")
 declare_args() {
   java_matter_controller_dependent_paths = []
+
+  # The class of each cluster created by ZAP is added to the library. (e.g., ChipClusters)
+  matter_enable_java_generated_api = true
   matter_enable_java_compilation = false
   if (java_path != "" && current_os == "linux") {
     java_matter_controller_dependent_paths += [ "${java_path}/include/" ]
@@ -27,6 +30,7 @@ declare_args() {
           [ "${java_path}/include/linux/" ]
     }
 
+    matter_enable_java_generated_api = false
     matter_enable_java_compilation = true
   }
 }

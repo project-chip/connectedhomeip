@@ -33,6 +33,11 @@
 #define ICD_ENFORCE_SIT_SLOW_POLL_LIMIT 0
 #endif
 
+#ifndef ICD_REPORT_ON_ENTER_ACTIVE_MODE
+// Enabling this makes the device emit subscription reports when transitioning from idle to active mode.
+#define ICD_REPORT_ON_ENTER_ACTIVE_MODE 0
+#endif
+
 namespace chip {
 namespace app {
 
@@ -40,12 +45,15 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IcdManagement;
 
-void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable)
+void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ICDStateObserver * stateObserver)
 {
     VerifyOrDie(storage != nullptr);
     VerifyOrDie(fabricTable != nullptr);
-    mStorage     = storage;
-    mFabricTable = fabricTable;
+    VerifyOrDie(stateObserver != nullptr);
+
+    mStorage       = storage;
+    mFabricTable   = fabricTable;
+    mStateObserver = stateObserver;
 
     uint32_t activeModeInterval = IcdManagementServer::GetInstance().GetActiveModeInterval();
     VerifyOrDie(kFastPollingInterval.count() < activeModeInterval);
@@ -152,6 +160,8 @@ void ICDManager::UpdateOperationState(OperationalState state)
             {
                 ChipLogError(AppServer, "Failed to set Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
             }
+
+            mStateObserver->OnEnterActiveMode();
         }
         else
         {
