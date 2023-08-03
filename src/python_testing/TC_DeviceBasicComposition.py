@@ -466,10 +466,15 @@ class TC_DeviceBasicComposition(MatterBaseTest):
             if Clusters.PowerSource not in endpoint:
                 continue
             location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
-            if Clusters.PowerSource.Attributes.ClusterRevision not in endpoint[Clusters.PowerSource]:
+            cluster_revision = Clusters.PowerSource.Attributes.ClusterRevision
+            if cluster_revision not in endpoint[Clusters.PowerSource]:
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
+                                                 attribute_id=cluster_revision.attribute_id)
                 self.record_error(self.get_test_name(
                 ), location=location, problem=f'Did not find Cluster revision on {location.as_cluster_string(self.cluster_mapper)}', spec_location='Global attributes')
-            if endpoint[Clusters.PowerSource][Clusters.PowerSource.Attributes.ClusterRevision] < 2:
+            if endpoint[Clusters.PowerSource][cluster_revision] < 2:
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
+                                                 attribute_id=cluster_revision.attribute_id)
                 self.record_note(self.get_test_name(), location=location,
                                  problem='Power source ClusterRevision is < 2, skipping remainder of test for this endpoint')
                 continue
