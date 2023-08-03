@@ -136,6 +136,11 @@ using namespace chip::Credentials::Trusty;
 using namespace chip::Trusty;
 #endif
 
+#if CHIP_OP_KEYSTORE_ELE
+#include "PersistentStorageOperationalKeystoreEle.h"
+using namespace chip::ele;
+#endif
+
 using namespace chip;
 using namespace chip::ArgParser;
 using namespace chip::Credentials;
@@ -568,6 +573,11 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
 #if CHIP_OP_KEYSTORE_TRUSTY_OS
     static chip::Trusty::PersistentStorageOperationalKeystoreTrusty sPersistentStorageOperationalKeystore;
+    initParams.operationalKeystore = &sPersistentStorageOperationalKeystore;
+#endif
+
+#if CHIP_OP_KEYSTORE_ELE
+    static chip::ele::PersistentStorageOperationalKeystoreEle sPersistentStorageOperationalKeystore;
     initParams.operationalKeystore = &sPersistentStorageOperationalKeystore;
 #endif
 

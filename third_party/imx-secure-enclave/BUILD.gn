@@ -1,0 +1,187 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+declare_args() {
+    NOT_SUPPORTED = 0
+    ROM = 1
+    FMW = 2
+
+    MAJOR_VER = 1
+    MINOR_VER = 0
+
+    PLAT_PATH = "src/plat/ele"
+    PLAT_COMMON_PATH = "src/common"
+}
+
+config("libele_config") {
+  defines = [
+    "DEBUG=0",
+    "LIB_MAJOR_VERSION=${MAJOR_VER}",
+    "LIB_MINOR_VERSION=${MINOR_VER}",
+
+    "CONFIG_PLAT_ELE=1",
+    "PLAT_ELE_FEAT_NOT_SUPPORTED=0",
+    "PSA_COMPLIANT=1",
+    "SECONDARY_API_SUPPORTED=1",
+
+    "MT_SAB_SIGN_GEN=${FMW}",
+    "MT_SAB_VERIFY_SIGN=${FMW}",
+    "MT_SAB_KEY_GENERATE=${FMW}",
+    "MT_SAB_MANAGE_KEY_GROUP=${FMW}",
+    "MT_SAB_IMPORT_KEY=${FMW}",
+    "MT_SAB_DELETE_KEY=${FMW}",
+    "MT_SAB_GET_KEY_ATTR=${FMW}",
+    "MT_SAB_HASH_GEN=${FMW}",
+    "MT_SAB_CIPHER=${FMW}",
+    "MT_SAB_SESSION=${FMW}",
+    "MT_SAB_KEY_STORE=${FMW}",
+    "MT_SAB_KEY_STORE_REPROV_EN=${FMW}",
+    "MT_SAB_KEY_MANAGEMENT=${FMW}",
+    "MT_SAB_MAC=${FMW}",
+    "MT_SAB_RNG=${FMW}",
+    "MT_SAB_KEY_RECOVERY=${FMW}",
+    "MT_SAB_GET_INFO=${FMW}",
+    "MT_SAB_AUTH_ENC=${FMW}",
+    "MT_SAB_AUTH_ENC_NEW=${FMW}",
+    "MT_SAB_DATA_STORAGE=${FMW}",
+    "MT_SAB_DATA_STORAGE_DELETE=${FMW}",
+    "MT_SAB_DEBUG_DUMP=${ROM}",
+    "MT_SAB_DEV_ATTEST=${ROM}",
+    "MT_SAB_DEV_GETINFO=${ROM}",
+    "MT_SAB_LC_UPDATE=${ROM}",
+    "MT_SAB_STORAGE_MASTER_IMPORT=${FMW}",
+    "MT_SAB_STORAGE_MASTER_EXPORT_REQ=${FMW}",
+    "MT_SAB_STORAGE_EXPORT_FINISH_REQ=${FMW}",
+    "MT_SAB_STORAGE_CHUNK_GET_REQ=${FMW}",
+    "MT_SAB_STORAGE_CHUNK_GET_DONE_REQ=${FMW}",
+    "MT_SAB_STORAGE_CHUNK_EXPORT_REQ=${FMW}",
+    "MT_SAB_STORAGE_OPEN=${FMW}",
+    "MT_SAB_STORAGE_CLOSE=${FMW}",
+    "MT_SAB_STORAGE_KEY_DB_REQ=${FMW}",
+    "MT_SAB_ENC_DATA_STORAGE=${FMW}",
+
+    "HSM_SIGN_GEN=1",
+    "HSM_VERIFY_SIGN=1",
+    "HSM_KEY_GENERATE=1",
+    "HSM_MANAGE_KEY_GROUP=1",
+    "HSM_IMPORT_KEY=1",
+    "HSM_DELETE_KEY=1",
+    "HSM_GET_KEY_ATTR=1",
+    "HSM_HASH_GEN=1",
+    "HSM_CIPHER=1",
+    "HSM_SESSION=1",
+    "HSM_KEY_STORE=1",
+    "HSM_KEY_MANAGEMENT=1",
+    "HSM_MAC=1",
+    "HSM_RNG=1",
+    "HSM_KEY_RECOVERY=1",
+    "HSM_GET_INFO=1",
+    "HSM_AUTH_ENC=1",
+    "HSM_DATA_STORAGE=1",
+    "HSM_DEBUG_DUMP=1",
+    "HSM_DEV_ATTEST=1",
+    "HSM_DEV_GETINFO=1",
+    "HSM_LC_UPDATE=1",
+    "HSM_ENC_DATA_STORAGE=1",
+  ]
+
+  include_dirs = [
+    "repo/src/plat/ele/include",
+    "repo/src/common/include",
+    "repo/src/common/sab_msg/include",
+    "repo/include",
+    "repo/include/common",
+    "repo/include/hsm",
+    "repo/include/she",
+  ]
+}
+
+source_set("libelematter") {
+  sources = [
+    "repo/${PLAT_COMMON_PATH}/hsm_lib.c",
+    "repo/${PLAT_PATH}/plat_err.c",
+    "repo/${PLAT_PATH}/ele_utils.c",
+
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_process_msg.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_init_proc_msg.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_sign_gen.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_verify_sign.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_key_generate.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_manage_key_group.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_import_key.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_delete_key.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_get_key_attr.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_hash.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_cipher.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_session.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_key_store.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_key_management.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_mac.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_rng.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_key_recovery.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_get_info.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_auth_enc.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_data_storage.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_debug_dump.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_dev_attest.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_dev_getinfo.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_lc_update.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_storage_master_import.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_storage_master_export.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_storage_export_finish.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_storage_get_chunk.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_storage_get_chunk_done.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_storage_chunk_export.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_storage_open.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_storage_close.c",
+    "repo/${PLAT_COMMON_PATH}/sab_msg/sab_storage_key_db.c",
+
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_handle.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_utils.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_sign_gen.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_verify_sign.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_key_generate.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_manage_key_group.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_importkey.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_delete_key.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_get_key_attr.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_hash.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_cipher.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_session.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_key_store.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_key_management.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_mac.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_rng.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_key_recovery.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_get_info.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_auth_enc.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_data_storage.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_debug_dump.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_dev_attest.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_dev_getinfo.c",
+    "repo/${PLAT_COMMON_PATH}/hsm_api/hsm_lc_update.c",
+
+    "repo/${PLAT_COMMON_PATH}/sab_messaging.c",
+    "repo/${PLAT_COMMON_PATH}/sab_common_err.c",
+    "repo/${PLAT_COMMON_PATH}/se_global_info.c",
+    "repo/${PLAT_PATH}/ele_os_abs_linux.c",
+  ]
+
+  cflags = [ "-Wno-implicit-fallthrough -O1 -Werror -Wformat -fPIC" ]
+  cflags_cc = [ "-std=c++17" ]
+
+  public_configs = [ ":libele_config" ]
+}
