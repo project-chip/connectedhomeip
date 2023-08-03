@@ -58,6 +58,10 @@ Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
 Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 } // namespace
 
+#ifdef EMBER_AF_PLUGIN_DISHWASHER_ALARM_SERVER
+extern void MatterDishwasherAlarmServerInit();
+#endif
+
 void OnIdentifyStart(::Identify *)
 {
     ChipLogProgress(Zcl, "OnIdentifyStart");
@@ -175,6 +179,9 @@ void ApplicationInit()
         SetDeviceInstanceInfoProvider(&gExampleDeviceInstanceInfoProvider);
     }
 
+#ifdef EMBER_AF_PLUGIN_DISHWASHER_ALARM_SERVER
+    MatterDishwasherAlarmServerInit();
+#endif
     Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
