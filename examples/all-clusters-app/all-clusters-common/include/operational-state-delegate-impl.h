@@ -37,7 +37,7 @@ public:
      * Fills in the provided GenericOperationalState with the state at index `index` if there is one,
      * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of states.
      * Note: This is used by the SDK to populate the operational state list attribute. If the contents of this list changes,
-     * the device must call the Instance's ReportOperationalStateListChange method to report that this attribute has changed.
+     * the device SHALL call the Instance's ReportOperationalStateListChange method to report that this attribute has changed.
      * @param index The index of the state, with 0 representing the first state.
      * @param operationalState  The GenericOperationalState is filled.
      */
@@ -47,7 +47,7 @@ public:
      * Fills in the provided GenericOperationalPhase with the phase at index `index` if there is one,
      * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of phases.
      * Note: This is used by the SDK to populate the phase list attribute. If the contents of this list changes, the
-     * device must call the Instance's ReportPhaseListChange method to report that this attribute has changed.
+     * device SHALL call the Instance's ReportPhaseListChange method to report that this attribute has changed.
      * @param index The index of the phase, with 0 representing the first phase.
      * @param operationalPhase  The GenericOperationalPhase is filled.
      */

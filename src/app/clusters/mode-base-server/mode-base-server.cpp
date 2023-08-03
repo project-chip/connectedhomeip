@@ -224,6 +224,11 @@ DataModel::Nullable<uint8_t> Instance::GetOnMode() const
     return mOnMode;
 }
 
+void Instance::ReportSupportedModesChange()
+{
+    MatterReportingAttributeChangeCallback(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::SupportedModes::Id));
+}
+
 bool Instance::HasFeature(Feature feature) const
 {
     return (mFeature & to_underlying(feature)) != 0;
