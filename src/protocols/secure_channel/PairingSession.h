@@ -183,7 +183,6 @@ protected:
                     Encoding::LittleEndian::Reader reader(report.GetProtocolData()->Start(),
                                                           report.GetProtocolData()->DataLength());
 
-                    // TODO: CASE: Notify minimum wait time to clients on receiving busy status report #28290
                     uint16_t minimumWaitTime = 0;
                     err                      = reader.Read16(&minimumWaitTime).StatusCode();
                     if (err != CHIP_NO_ERROR)
@@ -192,6 +191,7 @@ protected:
                     }
                     else
                     {
+                        // TODO: CASE: Notify minimum wait time to clients on receiving busy status report #28290
                         ChipLogProgress(SecureChannel, "Received busy status report with minimum wait time: %u ms",
                                         minimumWaitTime);
                     }
