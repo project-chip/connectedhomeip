@@ -170,6 +170,16 @@ void Instance::OnOperationCompletionDetected(uint8_t aCompletionErrorCode,
     }
 }
 
+void Instance::ReportOperationalStateListChange()
+{
+    MatterReportingAttributeChangeCallback(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OperationalStateList::Id));
+}
+
+void Instance::ReportPhaseListChange()
+{
+    MatterReportingAttributeChangeCallback(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::PhaseList::Id));
+}
+
 // private
 
 template <typename RequestT, typename FuncT>

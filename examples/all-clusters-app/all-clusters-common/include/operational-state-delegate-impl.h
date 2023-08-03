@@ -34,20 +34,20 @@ class GenericOperationalStateDelegateImpl : public Delegate
 {
 public:
     /**
-     * Get the list of supported operational states.
      * Fills in the provided GenericOperationalState with the state at index `index` if there is one,
      * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of states.
-     * Note todo if changed call MatterReportingAttributeChangeCallback
+     * Note: This is used by the SDK to populate the operational state list attribute. If the contents of this list changes,
+     * the device must call the Instance's ReportOperationalStateListChange method to report that this attribute has changed.
      * @param index The index of the state, with 0 representing the first state.
      * @param operationalState  The GenericOperationalState is filled.
      */
     CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) override;
 
     /**
-     * Get the list of supported operational phases.
      * Fills in the provided GenericOperationalPhase with the phase at index `index` if there is one,
      * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of phases.
-     * Note todo if changed call MatterReportingAttributeChangeCallback
+     * Note: This is used by the SDK to populate the phase list attribute. If the contents of this list changes, the
+     * device must call the Instance's ReportPhaseListChange method to report that this attribute has changed.
      * @param index The index of the phase, with 0 representing the first phase.
      * @param operationalPhase  The GenericOperationalPhase is filled.
      */
@@ -78,8 +78,8 @@ public:
      */
     void HandleStopStateCallback(GenericOperationalError & err) override;
 
-private:
-    app::DataModel::List<const GenericOperationalState> mOperationalStateList;
+protected:
+    Span<const GenericOperationalState> mOperationalStateList;
     Span<const GenericOperationalPhase> mOperationalPhaseList;
 
 };
@@ -88,21 +88,24 @@ private:
 class OperationalStateDelegate : public GenericOperationalStateDelegateImpl
 {
 private:
-    const GenericOperationalState rvcOpStateList[4] = {
+    const GenericOperationalState opStateList[4] = {
         GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
         GenericOperationalState(to_underlying(OperationalStateEnum::kRunning)),
         GenericOperationalState(to_underlying(OperationalStateEnum::kPaused)),
         GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
     };
 
-    app::DataModel::List<const GenericOperationalState> mOperationalStateList = Span<const GenericOperationalState>(rvcOpStateList);
-
     const GenericOperationalPhase opPhaseList[1] = {
         // Phase List is null
         GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
     };
 
-    Span<const GenericOperationalPhase> mOperationalPhaseList = Span<const GenericOperationalPhase>(opPhaseList);
+public:
+    OperationalStateDelegate()
+    {
+        GenericOperationalStateDelegateImpl::mOperationalStateList = Span<const GenericOperationalState>(opStateList);
+        GenericOperationalStateDelegateImpl::mOperationalPhaseList = Span<const GenericOperationalPhase>(opPhaseList);
+    }
 
 };
 
@@ -127,14 +130,17 @@ private:
         OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kDocked)),
     };
 
-    app::DataModel::List<const OperationalState::GenericOperationalState> mOperationalStateList = Span<const OperationalState::GenericOperationalState>(rvcOpStateList);
-
-    const OperationalState::GenericOperationalPhase opPhaseList[1] = {
+    const OperationalState::GenericOperationalPhase rvcOpPhaseList[1] = {
         // Phase List is null
         OperationalState::GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
     };
 
-    Span<const OperationalState::GenericOperationalPhase> mOperationalPhaseList = Span<const OperationalState::GenericOperationalPhase>(opPhaseList);
+public:
+    RvcOperationalStateDelegate()
+    {
+        GenericOperationalStateDelegateImpl::mOperationalStateList = Span<const OperationalState::GenericOperationalState>(rvcOpStateList);
+        GenericOperationalStateDelegateImpl::mOperationalPhaseList = Span<const OperationalState::GenericOperationalPhase>(rvcOpPhaseList);
+    }
 
 };
 

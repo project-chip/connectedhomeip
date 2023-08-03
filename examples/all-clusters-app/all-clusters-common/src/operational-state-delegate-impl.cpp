@@ -25,7 +25,7 @@ using namespace chip::app::Clusters::RvcOperationalState;
 
 CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
 {
-    if (index > mOperationalStateList.size() - 1)
+    if (index >= mOperationalStateList.size())
     {
         return CHIP_ERROR_NOT_FOUND;
     }
@@ -35,7 +35,7 @@ CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalStateAtIndex(size_
 
 CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase)
 {
-    if (index > mOperationalPhaseList.size() - 1)
+    if (index >= mOperationalPhaseList.size())
     {
         return CHIP_ERROR_NOT_FOUND;
     }
