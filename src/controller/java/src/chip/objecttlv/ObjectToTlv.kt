@@ -55,11 +55,9 @@ fun TlvWriter.fromObject(value: Any?, tag: Tag = AnonymousTag): TlvWriter {
       try {
         fromJson(value)
       } catch (e: IllegalArgumentException) {
-        put(tag, value)
-      } catch (e: TlvEncodingException) {
-        put(tag, value)
+        // If json parsing exception, judged by string value.
+        return put(tag, value)
       }
-    }
   }
   return this
 }
