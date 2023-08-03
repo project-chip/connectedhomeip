@@ -59,23 +59,24 @@
 
 #if CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_RAM_HEAP
 
-struct mem {
-  mem_size_t next;
-  mem_size_t prev;
-  u8_t used;
+struct mem
+{
+    mem_size_t next;
+    mem_size_t prev;
+    u8_t used;
 #if MEM_OVERFLOW_CHECK
-  mem_size_t user_size;
+    mem_size_t user_size;
 #endif
 };
 
 #if MEM_OVERFLOW_CHECK
-#define MEM_SANITY_OFFSET   MEM_SANITY_REGION_BEFORE_ALIGNED
+#define MEM_SANITY_OFFSET MEM_SANITY_REGION_BEFORE_ALIGNED
 #define MEM_SANITY_OVERHEAD (MEM_SANITY_REGION_BEFORE_ALIGNED + MEM_SANITY_REGION_AFTER_ALIGNED)
 #else
-#define MEM_SANITY_OFFSET   0
+#define MEM_SANITY_OFFSET 0
 #define MEM_SANITY_OVERHEAD 0
 #endif
-#define SIZEOF_STRUCT_MEM    LWIP_MEM_ALIGN_SIZE(sizeof(struct mem))
+#define SIZEOF_STRUCT_MEM LWIP_MEM_ALIGN_SIZE(sizeof(struct mem))
 
 extern "C" uint8_t ram_heap[];
 #endif
@@ -488,7 +489,8 @@ bool PacketBuffer::AlignPayload(uint16_t aAlignBytes)
  */
 uint32_t PacketBuffer::MemorySize() const
 {
-    struct mem * lMem = reinterpret_cast<struct mem*>(reinterpret_cast<uintptr_t>(&(this->next)) - (SIZEOF_STRUCT_MEM + MEM_SANITY_OFFSET));
+    struct mem * lMem =
+        reinterpret_cast<struct mem *>(reinterpret_cast<uintptr_t>(&(this->next)) - (SIZEOF_STRUCT_MEM + MEM_SANITY_OFFSET));
 
     mem_size_t lSize = lMem->next - (reinterpret_cast<uint32_t>(lMem) - reinterpret_cast<uint32_t>(ram_heap));
 
