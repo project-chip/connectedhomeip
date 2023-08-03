@@ -18,7 +18,6 @@
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <platform/CommissionableDataProvider.h>
-#include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <platform/internal/GenericDeviceInstanceInfoProvider.h>
 #include <src/lib/core/CHIPError.h>
 
