@@ -115,8 +115,6 @@ source_set("siwx917-matter-shell") {
 
     sources = [
       "${silabs_common_plat_dir}/matter_shell.cpp",
-      "${wisemcu_sdk_root}/platforms/si91x/drivers/cmsis_driver/UDMA.c",
-      "${wisemcu_sdk_root}/platforms/si91x/drivers/cmsis_driver/USART.c",
     ]
     include_dirs = [
       ".",
