@@ -110,7 +110,6 @@ private:
     static void HandleDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
                                       const chip::SessionHandle & sessionHandle)
     {
-        ChipLogProgress(AppServer, "tmplog: HandleDeviceConnected called");
         VideoPlayerConnectionContext * connectionContext = static_cast<VideoPlayerConnectionContext *>(context);
         if (connectionContext == nullptr || connectionContext->mTargetVideoPlayerInfo == nullptr)
         {
