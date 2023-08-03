@@ -18,10 +18,8 @@
 
 #include "Esp32AppServer.h"
 #include "CHIPDeviceManager.h"
-#include <app/TimerDelegates.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
-#include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
@@ -99,10 +97,7 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 {
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
-    // Report scheduler and timer delegate instance
-    static chip::app::DefaultTimerDelegate sTimerDelegate;
-    static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
-    initParams.reportScheduler = &sReportScheduler;
+
 #if CONFIG_TEST_EVENT_TRIGGER_ENABLED && CONFIG_ENABLE_OTA_REQUESTOR
     if (hex_string_to_binary(CONFIG_TEST_EVENT_TRIGGER_ENABLE_KEY, sTestEventTriggerEnableKey,
                              sizeof(sTestEventTriggerEnableKey)) == 0)
