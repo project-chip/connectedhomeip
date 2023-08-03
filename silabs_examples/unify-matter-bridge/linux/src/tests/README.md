@@ -66,3 +66,5 @@ To understand unit test coverage, run the following helper script:
 ```bash
 matter/silabs_examples/unify-matter-bridge/linux$ ../../../scripts/build_coverage.sh --output_root out/host
 ```
+
+Refer [Cluster Unit Test Case](readme_clustertest.md) for more details on how to write unit test to test cluster support added to matter bridge.
