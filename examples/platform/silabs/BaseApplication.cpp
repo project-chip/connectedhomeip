@@ -25,9 +25,11 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 
-#if defined(ENABLE_WSTK_LEDS) && defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
+#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
 #include "LEDWidget.h"
+#ifndef SIWX_917
 #include "sl_simple_led_instances.h"
+#endif
 #endif // ENABLE_WSTK_LEDS
 
 #ifdef DISPLAY_ENABLED
@@ -74,7 +76,7 @@
 #define APP_EVENT_QUEUE_SIZE 10
 #define EXAMPLE_VENDOR_ID 0xcafe
 
-#if defined(ENABLE_WSTK_LEDS) && defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
+#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
 #define SYSTEM_STATE_LED 0
 #endif // ENABLE_WSTK_LEDS
 #define APP_FUNCTION_BUTTON 0
@@ -96,7 +98,7 @@ TimerHandle_t sLightTimer;
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
-#if defined(ENABLE_WSTK_LEDS) && defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
+#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
 LEDWidget sStatusLED;
 #endif // ENABLE_WSTK_LEDS
 
@@ -215,7 +217,7 @@ CHIP_ERROR BaseApplication::Init()
     SILABS_LOG("Current Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
     SILABS_LOG("Current Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
 
-#if defined(ENABLE_WSTK_LEDS) && defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
+#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
     LEDWidget::InitGpio();
     sStatusLED.Init(SYSTEM_STATE_LED);
 #endif // ENABLE_WSTK_LEDS
@@ -267,7 +269,7 @@ void BaseApplication::FunctionEventHandler(AppEvent * aEvent)
 
         mFunction = kFunction_FactoryReset;
 
-#if defined(ENABLE_WSTK_LEDS) && defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
+#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
         // Turn off all LEDs before starting blink to make sure blink is
         // co-ordinated.
         sStatusLED.Set(false);
@@ -290,7 +292,7 @@ void BaseApplication::FunctionEventHandler(AppEvent * aEvent)
 bool BaseApplication::ActivateStatusLedPatterns()
 {
     bool isPatternSet = false;
-#if defined(ENABLE_WSTK_LEDS) && defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
+#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
 #ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
     if (gIdentify.mActive)
     {
@@ -392,7 +394,7 @@ void BaseApplication::LightEventHandler()
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-#if defined(ENABLE_WSTK_LEDS) && defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
+#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
     // Update the status LED if factory reset has not been initiated.
     //
     // If system has "full connectivity", keep the LED On constantly.
@@ -531,7 +533,7 @@ void BaseApplication::StartStatusLEDTimer()
 
 void BaseApplication::StopStatusLEDTimer()
 {
-#if defined(ENABLE_WSTK_LEDS) && defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
+#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
     sStatusLED.Set(false);
 #endif // ENABLE_WSTK_LEDS
 
