@@ -48,6 +48,11 @@ fun TlvWriter.fromJsonString(json: String): ByteArray {
   return validateTlv().getEncoded()
 }
 
+fun TlvWriter.fromJson(json: String): TlvWriter {
+  validateIsJsonObjectAndConvert(JsonParser.parseString(json), AnonymousTag)
+  return this
+}
+
 /**
  * Converts Json Object into TLV Structure or TLV top level elements.
  *

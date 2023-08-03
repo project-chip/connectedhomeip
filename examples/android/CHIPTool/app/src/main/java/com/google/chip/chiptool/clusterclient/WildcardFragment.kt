@@ -27,6 +27,7 @@ import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.ChipPathId
 import chip.devicecontroller.model.InvokeElement
 import chip.devicecontroller.model.NodeState
+import chip.objecttlv.toObject
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.TlvReader
@@ -219,7 +220,8 @@ class WildcardFragment : Fragment() {
         stringBuilder.append("\t${ChipIdLookup.clusterIdToName(clusterId)}Cluster: {\n")
         clusterState.attributeStates.forEach { (attributeId, attributeState) ->
           val attributeName = ChipIdLookup.attributeIdToName(clusterId, attributeId)
-          stringBuilder.append("\t\t$attributeName: ${attributeState.value}\n")
+          val value = TlvReader(attributeState.tlv).toObject()
+          stringBuilder.append("\t\t$attributeName: $value\n")
         }
         clusterState.eventStates.forEach { (eventId, events) ->
           for (event in events) {
@@ -228,7 +230,8 @@ class WildcardFragment : Fragment() {
             stringBuilder.append("\t\tsystemTimeStamp: ${event.systemTimeStamp}\n")
 
             val eventName = ChipIdLookup.eventIdToName(clusterId, eventId)
-            stringBuilder.append("\t\t$eventName: ${event.value}\n")
+            val value = TlvReader(event.tlv).toObject()
+            stringBuilder.append("\t\t$eventName: $value\n")
           }
         }
         stringBuilder.append("\t}\n")

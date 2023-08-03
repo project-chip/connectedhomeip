@@ -22,14 +22,15 @@ import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.InvokeElement
 import chip.devicecontroller.model.NodeState
+import chip.objecttlv.toObject
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.OnOffClientFragmentBinding
-import com.google.chip.chiptool.util.TlvParseUtil
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -116,13 +117,13 @@ class OnOffClientFragment : Fragment() {
           }
 
           override fun onReport(nodeState: NodeState?) {
-            val value =
+            val tlv =
               nodeState
                 ?.getEndpointState(endpointId)
                 ?.getClusterState(clusterId)
                 ?.getAttributeState(attributeId)
-                ?.value
-                ?: "null"
+                ?.tlv
+            val value = tlv?.let { TlvReader(it).toObject() }
             Log.v(TAG, "On/Off attribute value: $value")
             showMessage("On/Off attribute value: $value")
           }
@@ -201,7 +202,8 @@ class OnOffClientFragment : Fragment() {
               ?.tlv
               ?: return
           // TODO : Need to be implement poj-to-tlv
-          val value = TlvParseUtil.decodeBoolean(tlv)
+          val obj = TlvReader(tlv).toObject()
+          val value = if (obj is Boolean) { obj } else { return }
           val formatter = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
           val time = formatter.format(Calendar.getInstance(Locale.getDefault()).time)
           val message = "Subscribed on/off value at $time: ${if (value) "ON" else "OFF"}"
