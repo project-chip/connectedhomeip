@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "1. Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads from the DUT the Mask attribute"
+    - label: "2. TH reads from the DUT the Mask attribute"
       PICS: DISHALM.S.A0000
       command: "readAttribute"
       attribute: "Mask"
@@ -39,7 +39,7 @@ tests:
           constraints:
               type: int32u
 
-    - label: "TH reads from the DUT the Latch attribute"
+    - label: "3. TH reads from the DUT the Latch attribute"
       PICS: DISHALM.S.A0001
       command: "readAttribute"
       attribute: "Latch"
@@ -47,7 +47,7 @@ tests:
           constraints:
               type: int32u
 
-    - label: "TH reads from the DUT the State attribute"
+    - label: "4. TH reads from the DUT the State attribute"
       PICS: DISHALM.S.A0002
       command: "readAttribute"
       attribute: "State"
@@ -55,7 +55,7 @@ tests:
           constraints:
               type: int32u
 
-    - label: "TH reads from the DUT the Supported attribute"
+    - label: "5. TH reads from the DUT the Supported attribute"
       PICS: DISHALM.S.A0003
       command: "readAttribute"
       attribute: "Supported"

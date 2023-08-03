@@ -67,7 +67,7 @@ tests:
               type: list
               contains: [0, 1, 2, 3, 65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label: "TH reads the attribute(Latch) in AttributeList from the DUT"
+    - label: "4. TH reads the attribute(Latch) in AttributeList from the DUT"
       PICS: " !DISHALM.S.F00 "
       command: "readAttribute"
       attribute: "AttributeList"
