@@ -318,3 +318,6 @@
 	url = https://github.com/asriot/ASR550X_Freertos.git
 	branch = matter
 	platforms = asr
+[submodule "third_party/silabs/wifi_sdk"]
+	path = third_party/silabs/wifi_sdk
+	url = https://github.com/SiliconLabs/wiseconnect
