@@ -108,6 +108,7 @@ void InteractionModelEngine::Shutdown()
 
     mReadHandlers.ReleaseAll();
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
     // Shut down any subscription clients that are still around.  They won't be
     // able to work after this point anyway, since we're about to drop our refs
     // to them.
@@ -134,6 +135,7 @@ void InteractionModelEngine::Shutdown()
     // After that, we just null out our tracker.
     //
     mpActiveReadClientList = nullptr;
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
     for (auto & writeHandler : mWriteHandlers)
     {
@@ -254,6 +256,7 @@ uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
     return numActive;
 }
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
 CHIP_ERROR InteractionModelEngine::ShutdownSubscription(const ScopedNodeId & aPeerNodeId, SubscriptionId aSubscriptionId)
 {
     assertChipStackLockedByCurrentThread();
@@ -311,6 +314,7 @@ void InteractionModelEngine::ShutdownMatchingSubscriptions(const Optional<Fabric
         readClient = nextClient;
     }
 }
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
 void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
 {
@@ -794,6 +798,7 @@ CHIP_ERROR InteractionModelEngine::OnTimedRequest(Messaging::ExchangeContext * a
     return handler->OnMessageReceived(apExchangeContext, aPayloadHeader, std::move(aPayload));
 }
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
 Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext,
                                                        const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
@@ -849,6 +854,7 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
 
     return Status::InvalidSubscription;
 }
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
 CHIP_ERROR InteractionModelEngine::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader,
                                                                 ExchangeDelegate *& newDelegate)
@@ -892,10 +898,12 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
         status =
             OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), ReadHandler::InteractionType::Subscribe);
     }
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
     {
         status = OnUnsolicitedReportData(apExchangeContext, aPayloadHeader, std::move(aPayload));
     }
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
     else if (aPayloadHeader.HasMessageType(MsgType::TimedRequest))
     {
         OnTimedRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), status);
@@ -920,11 +928,13 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
                  ChipLogValueExchange(ec));
 }
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
 void InteractionModelEngine::AddReadClient(ReadClient * apReadClient)
 {
     apReadClient->SetNextClient(mpActiveReadClientList);
     mpActiveReadClientList = apReadClient;
 }
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
 bool InteractionModelEngine::TrimFabricForSubscriptions(FabricIndex aFabricIndex, bool aForceEvict)
 {
@@ -1322,6 +1332,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
     return Status::Success;
 }
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
 void InteractionModelEngine::RemoveReadClient(ReadClient * apReadClient)
 {
     ReadClient * pPrevListItem = nullptr;
@@ -1380,6 +1391,7 @@ bool InteractionModelEngine::InActiveReadClientList(ReadClient * apReadClient)
 
     return false;
 }
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
 bool InteractionModelEngine::HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath)
 {
@@ -1738,6 +1750,7 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
         return Loop::Continue;
     });
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
     for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
     {
         if (readClient->GetFabricIndex() == fabricIndex)
@@ -1746,6 +1759,7 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
             readClient->Close(CHIP_ERROR_IM_FABRIC_DELETED, false);
         }
     }
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
     for (auto & handler : mWriteHandlers)
     {
