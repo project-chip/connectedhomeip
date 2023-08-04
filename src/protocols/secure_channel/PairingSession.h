@@ -174,6 +174,29 @@ protected:
         else
         {
             err = OnFailureStatusReport(report.GetGeneralCode(), report.GetProtocolCode());
+
+            if (report.GetGeneralCode() == Protocols::SecureChannel::GeneralStatusCode::kBusy &&
+                report.GetProtocolCode() == Protocols::SecureChannel::kProtocolCodeBusy)
+            {
+                if (!report.GetProtocolData().IsNull())
+                {
+                    Encoding::LittleEndian::Reader reader(report.GetProtocolData()->Start(),
+                                                          report.GetProtocolData()->DataLength());
+
+                    uint16_t minimumWaitTime = 0;
+                    err                      = reader.Read16(&minimumWaitTime).StatusCode();
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(SecureChannel, "Failed to read the minimum wait time: %" CHIP_ERROR_FORMAT, err.Format());
+                    }
+                    else
+                    {
+                        // TODO: CASE: Notify minimum wait time to clients on receiving busy status report #28290
+                        ChipLogProgress(SecureChannel, "Received busy status report with minimum wait time: %u ms",
+                                        minimumWaitTime);
+                    }
+                }
+            }
         }
 
         return err;
