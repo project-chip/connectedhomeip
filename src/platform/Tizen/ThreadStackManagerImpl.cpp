@@ -120,6 +120,13 @@ void ThreadStackManagerImpl::_ThreadDeviceRoleChangedCb(thread_device_role_e dev
     sInstance.ThreadDeviceRoleChangedHandler(deviceRole);
 }
 
+CHIP_ERROR ThreadStackManagerImpl::TriggerInit(void * userData)
+{
+    // TODO: Trigger Init
+    ChipLogError(DeviceLayer, "Not implemented");
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
     int threadErr = THREAD_ERROR_NONE;
@@ -496,6 +503,21 @@ void ThreadStackManagerImpl::_SetRouterPromotion(bool val)
     // Set Router Promotion is not supported on Tizen
 }
 
+CHIP_ERROR ThreadStackManagerImpl::TriggerScan(ThreadStackManagerImpl * self)
+{
+    // TODO: Trigger Scan
+    ChipLogError(DeviceLayer, "Not implemented");
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+void ThreadStackManagerImpl::ThreadScanResultCb(int result, thread_network_scanning_state_e state, uint64_t extAddress,
+                                                const char * networkName, uint64_t extPanid, const uint8_t * steeringData,
+                                                int length, uint16_t panid, uint16_t joinerDdpPort, uint8_t channel, int16_t rssi,
+                                                uint8_t lqi, uint8_t version, bool isNative, bool isJoinable, void * userData)
+{
+    ChipLogError(DeviceLayer, "Not implemented");
+}
+
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
 {
     ChipLogError(DeviceLayer, "Not implemented");
@@ -527,6 +549,11 @@ ThreadStackManagerImpl::_AttachToThreadNetwork(const Thread::OperationalDataset 
     }
 
     return CHIP_NO_ERROR;
+}
+
+void ThreadStackManagerImpl::_UpdateNetworkStatus()
+{
+    ChipLogError(DeviceLayer, "Not implemented");
 }
 
 ThreadStackManager & ThreadStackMgr()

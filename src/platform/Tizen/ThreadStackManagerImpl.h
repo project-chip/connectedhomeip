@@ -80,6 +80,8 @@ public:
 
     void _OnThreadAttachFinished(void);
 
+    void _UpdateNetworkStatus();
+
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType();
 
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
@@ -156,6 +158,13 @@ private:
 
     void ThreadDeviceRoleChangedHandler(thread_device_role_e role);
 
+    static CHIP_ERROR TriggerInit(void * userData);
+    static CHIP_ERROR TriggerScan(ThreadStackManagerImpl * self);
+    static void ThreadScanResultCb(int result, thread_network_scanning_state_e state, uint64_t ext_address,
+                                   const char * network_name, uint64_t ext_panid, const uint8_t * steering_data, int length,
+                                   uint16_t panid, uint16_t joiner_udp_port, uint8_t channel, int16_t rssi, uint8_t lqi,
+                                   uint8_t version, bool is_native, bool is_joinable, void * user_data);
+
     const char * _ThreadRoleToStr(thread_device_role_e role);
     const char * _ThreadTypeToStr(thread_device_type_e type);
     static void _ThreadDeviceRoleChangedCb(thread_device_role_e deviceRole, void * userData);
@@ -163,7 +172,9 @@ private:
 
     Thread::OperationalDataset mDataset = {};
 
+    NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback;
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
+    NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 
     bool mIsAttached;
     bool mIsInitialized;
@@ -171,6 +182,8 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     std::vector<SrpClientService> mSrpClientServices;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    thread_scan_param_h mScanParam;
+    std::vector<NetworkCommissioning::ThreadScanResponse> * mScanResult;
 };
 
 } // namespace DeviceLayer
