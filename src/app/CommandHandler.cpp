@@ -470,8 +470,7 @@ CHIP_ERROR CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, c
     return AddStatusInternal(aCommandPath, StatusIB(aStatus));
 }
 
-void CommandHandler::AddStatusAndLogIfFailure(const ConcreteCommandPath & aCommandPath, const Status aStatus,
-                                                    const char * aMessage)
+void CommandHandler::AddStatusAndLogIfFailure(const ConcreteCommandPath & aCommandPath, const Status aStatus, const char * aMessage)
 {
     if (aStatus != Status::Success)
     {

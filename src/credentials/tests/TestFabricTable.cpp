@@ -2382,7 +2382,7 @@ void TestFabricLookup(nlTestSuite * inSuite, void * inContext)
 
     // Attempt lookup of FabricIndex 0 --> should always fail.
     {
-      NL_TEST_ASSERT(inSuite, fabricTable.FindFabricWithIndex(0) == nullptr);
+        NL_TEST_ASSERT(inSuite, fabricTable.FindFabricWithIndex(0) == nullptr);
     }
 }
 

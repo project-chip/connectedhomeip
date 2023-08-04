@@ -405,19 +405,18 @@ constexpr uint16_t GroupKeyManagementAttributeAccess::kClusterRevision;
 
 GroupKeyManagementAttributeAccess gAttribute;
 
-bool ValidateAndGetProviderAndFabric(chip::app::CommandHandler * commandObj,
-    const chip::app::ConcreteCommandPath & commandPath,
-    Credentials::GroupDataProvider ** outGroupDataProvider,
-    const FabricInfo** outFabricInfo
-    ) {
-    VerifyOrDie( (outGroupDataProvider != nullptr ) && (outFabricInfo != nullptr));
+bool ValidateAndGetProviderAndFabric(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                     Credentials::GroupDataProvider ** outGroupDataProvider, const FabricInfo ** outFabricInfo)
+{
+    VerifyOrDie((outGroupDataProvider != nullptr) && (outFabricInfo != nullptr));
 
     // Else if the command in the path is fabric-scoped and there is no accessing fabric,
     // a CommandStatusIB SHALL be generated with the UNSUPPORTED_ACCESS Status Code.
     auto accessingFabricIndex = commandObj->GetAccessingFabricIndex();
     if (kUndefinedFabricIndex == accessingFabricIndex)
     {
-        commandObj->AddStatusAndLogIfFailure(commandPath, Status::UnsupportedAccess, "GroupKeyManagement command received without accessing fabric.");
+        commandObj->AddStatusAndLogIfFailure(commandPath, Status::UnsupportedAccess,
+                                             "GroupKeyManagement command received without accessing fabric.");
         return false;
     }
 
@@ -438,7 +437,7 @@ bool ValidateAndGetProviderAndFabric(chip::app::CommandHandler * commandObj,
     }
 
     *outGroupDataProvider = provider;
-    *outFabricInfo = fabric;
+    *outFabricInfo        = fabric;
 
     return true;
 }
@@ -458,13 +457,14 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData)
 {
-    Credentials::GroupDataProvider *provider = nullptr;
-    const FabricInfo* fabric = nullptr;
+    Credentials::GroupDataProvider * provider = nullptr;
+    const FabricInfo * fabric                 = nullptr;
 
     // Flight-check fabric scoping.
-    if (!ValidateAndGetProviderAndFabric(commandObj, commandPath, &provider, &fabric)) {
-      // Command will already have status populated from validation.
-      return true;
+    if (!ValidateAndGetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
+    {
+        // Command will already have status populated from validation.
+        return true;
     }
 
     // Pre-validate all complex data dependency assumptions about the epoch keys
@@ -562,13 +562,14 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::DecodableType & commandData)
 {
-    Credentials::GroupDataProvider *provider = nullptr;
-    const FabricInfo* fabric = nullptr;
+    Credentials::GroupDataProvider * provider = nullptr;
+    const FabricInfo * fabric                 = nullptr;
 
     // Flight-check fabric scoping.
-    if (!ValidateAndGetProviderAndFabric(commandObj, commandPath, &provider, &fabric)) {
-      // Command will already have status populated from validation.
-      return true;
+    if (!ValidateAndGetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
+    {
+        // Command will already have status populated from validation.
+        return true;
     }
 
     FabricIndex fabricIndex = fabric->GetFabricIndex();
@@ -627,27 +628,30 @@ bool emberAfGroupKeyManagementClusterKeySetRemoveCallback(
     const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::DecodableType & commandData)
 
 {
-    Credentials::GroupDataProvider *provider = nullptr;
-    const FabricInfo* fabric = nullptr;
+    Credentials::GroupDataProvider * provider = nullptr;
+    const FabricInfo * fabric                 = nullptr;
 
     // Flight-check fabric scoping.
-    if (!ValidateAndGetProviderAndFabric(commandObj, commandPath, &provider, &fabric)) {
+    if (!ValidateAndGetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
+    {
         // Command will already have status populated from validation.
         return true;
     }
 
     if (commandData.groupKeySetID == GroupDataProvider::kIdentityProtectionKeySetId)
     {
-        // SPEC: This command SHALL fail with an INVALID_COMMAND status code back to the initiator if the GroupKeySetID being removed is 0, which is the Key Set associated with the Identity Protection Key (IPK).
-        commandObj->AddStatusAndLogIfFailure(commandPath, Status::InvalidCommand, "Attempted to KeySetRemove the identity protection key!");
+        // SPEC: This command SHALL fail with an INVALID_COMMAND status code back to the initiator if the GroupKeySetID being
+        // removed is 0, which is the Key Set associated with the Identity Protection Key (IPK).
+        commandObj->AddStatusAndLogIfFailure(commandPath, Status::InvalidCommand,
+                                             "Attempted to KeySetRemove the identity protection key!");
         return true;
     }
 
     // Remove keyset
     FabricIndex fabricIndex = fabric->GetFabricIndex();
-    CHIP_ERROR err = provider->RemoveKeySet(fabricIndex, commandData.groupKeySetID);
+    CHIP_ERROR err          = provider->RemoveKeySet(fabricIndex, commandData.groupKeySetID);
 
-    Status status   = Status::Success;
+    Status status = Status::Success;
     if (CHIP_ERROR_KEY_NOT_FOUND == err)
     {
         status = Status::NotFound;
@@ -697,17 +701,18 @@ bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::DecodableType & commandData)
 {
-    Credentials::GroupDataProvider *provider = nullptr;
-    const FabricInfo* fabric = nullptr;
+    Credentials::GroupDataProvider * provider = nullptr;
+    const FabricInfo * fabric                 = nullptr;
 
     // Flight-check fabric scoping.
-    if (!ValidateAndGetProviderAndFabric(commandObj, commandPath, &provider, &fabric)) {
-      // Command will already have status populated from validation.
-      return true;
+    if (!ValidateAndGetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
+    {
+        // Command will already have status populated from validation.
+        return true;
     }
 
     FabricIndex fabricIndex = fabric->GetFabricIndex();
-    auto keysIt = provider->IterateKeySets(fabricIndex);
+    auto keysIt             = provider->IterateKeySets(fabricIndex);
     if (nullptr == keysIt)
     {
         commandObj->AddStatusAndLogIfFailure(commandPath, Status::Failure, "Failed iteration of key set indices!");
