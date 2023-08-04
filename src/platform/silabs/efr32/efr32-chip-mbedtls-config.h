@@ -150,6 +150,7 @@
 #define MBEDTLS_CIPHER_MODE_WITH_PADDING
 
 #include "check_crypto_config.h"
-#include "config-device-acceleration.h"
 #include "mbedtls/check_config.h"
 #include "mbedtls/config_psa.h"
+#include "sli_mbedtls_acceleration.h"
+#include "sli_mbedtls_omnipresent.h"

@@ -74,8 +74,8 @@ assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
 
 declare_args() {
   sl_ot_libs_path = "${efr32_sdk_root}/protocol/openthread"
-  sl_ot_efr32_root =
-      "${efr32_sdk_root}/protocol/openthread/platform-abstraction/efr32"
+  sl_ot_platform_abstraction =
+      "${efr32_sdk_root}/protocol/openthread/platform-abstraction"
   sl_openthread_root = "${efr32_sdk_root}/util/third_party/openthread"
 
   # board related pre-generated files path (default)
@@ -84,6 +84,10 @@ declare_args() {
 
   # board related generated files path (used if slc_generate or slc_reuse_files is set)
   slc_gen_path = "${chip_root}/third_party/silabs/slc_gen/${silabs_board}/"
+}
+
+declare_args() {
+  sl_ot_efr32_root = "${sl_ot_platform_abstraction}/efr32"
 }
 
 if (slc_generate || slc_reuse_files) {
@@ -143,6 +147,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/rf/common/cortex",
       "${efr32_sdk_root}/platform/radio/rail_lib/protocol/ieee802154",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions",
+      "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_power_manager_init",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_pti",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_rf_path",
       "${efr32_sdk_root}/platform/service/device_init/inc",
@@ -162,6 +167,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/base/hal/plugin/psstore",
       "${efr32_sdk_root}/platform/base/hal/plugin/antenna",
       "${efr32_sdk_root}/protocol/bluetooth/inc/",
+      "${efr32_sdk_root}/protocol/bluetooth/bgstack/ll/inc",
       "${efr32_sdk_root}/util/plugin/plugin-common/fem-control",
       "${efr32_sdk_root}/util/silicon_labs/silabs_core/graphics",
       "${efr32_sdk_root}/util/silicon_labs/silabs_core/memory_manager",
@@ -416,7 +422,7 @@ template("efr32_sdk") {
       ]
 
       if (!chip_enable_ble_rs911x) {
-        libs += [ "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG12P/GCC/libbluetooth.a" ]
+        libs += [ "${sdk_support_root}/protocol/bluetooth/lib/EFR32XG12/GCC/libbluetooth.a" ]
       }
 
       defines += [ "EFR32MG12" ]
@@ -432,11 +438,14 @@ template("efr32_sdk") {
       ]
 
       libs += [
-        "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG24/GCC/libbluetooth.a",
         "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg24_gcc_release.a",
         "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
         "${sdk_support_root}/protocol/openthread/libs/libsl_openthread_efr32mg2x_gcc.a",
       ]
+
+      if (!chip_enable_ble_rs911x) {
+        libs += [ "${sdk_support_root}/protocol/bluetooth/lib/EFR32XG24/GCC/libbluetooth.a" ]
+      }
 
       defines += [
         "EFR32MG24",
@@ -458,7 +467,7 @@ template("efr32_sdk") {
       ]
 
       libs += [
-        "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG24/GCC/libbluetooth.a",
+        "${sdk_support_root}/protocol/bluetooth/lib/EFR32XG24/GCC/libbluetooth.a",
         "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_module_efr32xg24_gcc_release.a",
         "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
         "${sdk_support_root}/protocol/openthread/libs/libsl_openthread_efr32mg2x_gcc.a",
@@ -572,6 +581,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/emlib/src/em_timer.c",
       "${efr32_sdk_root}/platform/peripheral/src/peripheral_sysrtc.c",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/pa_conversions_efr32.c",
+      "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_power_manager_init/sl_rail_util_power_manager_init.c",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_pti/sl_rail_util_pti.c",
       "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/aes_aes.c",
       "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/crypto_aes.c",

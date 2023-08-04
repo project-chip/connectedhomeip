@@ -27,7 +27,7 @@ include:
   file_list:
   - {path: app.h}
   - {path: reset_util.h}
-sdk: {id: gecko_sdk, version: 4.2.0}
+sdk: {id: gecko_sdk, version: 4.3.1}
 toolchain_settings: []
 
 component:
@@ -48,6 +48,7 @@ component:
 - {id: rail_lib_multiprotocol}
 - {id: bluetooth_feature_system}
 - {id: bluetooth_feature_scanner}
+- {id: rail_util_power_manager_init}
 
 config_file:
   - override:
