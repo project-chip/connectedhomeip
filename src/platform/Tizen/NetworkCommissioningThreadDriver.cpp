@@ -154,14 +154,42 @@ void TizenThreadDriver::ScanNetworks(ThreadDriver::ScanCallback * callback)
 
 size_t TizenThreadDriver::ThreadNetworkIterator::Count()
 {
-    ChipLogError(NetworkProvisioning, "Not implemented");
-    return 0;
+    size_t count = driver->mStagingNetwork.IsCommissioned() ? 1 : 0;
+    ChipLogProgress(NetworkProvisioning, "%s, Count: %zu", __func__, count);
+    return count;
 }
 
 bool TizenThreadDriver::ThreadNetworkIterator::Next(Network & item)
 {
-    ChipLogError(NetworkProvisioning, "Not implemented");
-    return false;
+    uint8_t extpanid[Thread::kSizeExtendedPanId];
+    uint8_t enabledExtPanId[Thread::kSizeExtendedPanId];
+    Thread::OperationalDataset currentDataset;
+
+    ChipLogProgress(NetworkProvisioning, "%s enter", __func__);
+
+    if (exhausted || !driver->mStagingNetwork.IsCommissioned())
+    {
+        return false;
+    }
+
+    VerifyOrReturnError(driver->mStagingNetwork.GetExtendedPanId(extpanid) == CHIP_NO_ERROR, false);
+
+    memcpy(item.networkID, extpanid, Thread::kSizeExtendedPanId);
+    item.networkIDLen = Thread::kSizeExtendedPanId;
+    item.connected    = false;
+    exhausted         = true;
+
+    // The Thread network is not actually enabled.
+    VerifyOrReturnError(ConnectivityMgrImpl().IsThreadAttached(), true);
+    VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(currentDataset) == CHIP_NO_ERROR, true);
+    // The Thread network is not enabled, but has a different extended pan id.
+    VerifyOrReturnError(currentDataset.GetExtendedPanId(enabledExtPanId) == CHIP_NO_ERROR, true);
+    VerifyOrReturnError(memcmp(extpanid, enabledExtPanId, Thread::kSizeExtendedPanId) == 0, true);
+
+    // The Thread network is enabled and has the same extended pan id as the one in our record.
+    item.connected = true;
+
+    return true;
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
