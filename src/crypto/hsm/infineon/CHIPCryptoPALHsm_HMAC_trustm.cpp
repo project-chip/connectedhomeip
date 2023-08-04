@@ -81,15 +81,15 @@ CHIP_ERROR HMAC_shaHSM::HMAC_SHA256(const uint8_t * key, size_t key_length, cons
     // What is the max length supported ?
     return_status = hmac_sha256(OPTIGA_HMAC_SHA_256, message, message_length_u32, out_buffer, &out_length_u32);
 
-    VerifyOrExit(return_status == OPTIGA_LIB_SUCCESS, error = CHIP_ERROR_INTERNAL) ;
+    VerifyOrExit(return_status == OPTIGA_LIB_SUCCESS, error = CHIP_ERROR_INTERNAL);
     error = CHIP_NO_ERROR;
 
-    exit:
-        if (error != CHIP_NO_ERROR)
-        {
+exit:
+    if (error != CHIP_NO_ERROR)
+    {
         trustm_close();
-        }
-        return error;
+    }
+    return error;
 }
 } // namespace Crypto
 } // namespace chip
