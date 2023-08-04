@@ -170,6 +170,14 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
     {
         SILABS_LOG("F: Join Event received with %u bytes payload\n", result_length);
         callback_status = *(sl_status_t *) result;
+        wfx_rsi.join_retries += 1;
+        wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
+        wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries++);
+        if (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
+        {
+            xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
+        }
+        is_wifi_disconnection_event = true;
         return SL_STATUS_FAIL;
     }
     /*
@@ -178,6 +186,10 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
     SILABS_LOG("%s: join completed.", __func__);
     SILABS_LOG("%c: Join Event received with %u bytes payload\n", *result, result_length);
     xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_CONN);
+    wfx_rsi.join_retries = 0;
+    retryInterval        = WLAN_MIN_RETRY_TIMER_MS;
+    if (is_wifi_disconnection_event)
+        is_wifi_disconnection_event = false;
     callback_status = SL_STATUS_OK;
     return SL_STATUS_OK;
 }
@@ -485,14 +497,18 @@ static void wfx_rsi_do_join(void)
         }
         else
         {
-            while (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
+            if (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
             {
                 SILABS_LOG("%s: failed. retry: %d", __func__, wfx_rsi.join_retries);
-                wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries++);
-                if (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
-                    xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
                 SILABS_LOG("%s: starting JOIN to %s after %d tries\n", __func__, (char *) &wfx_rsi.sec.ssid[0],
                            wfx_rsi.join_retries);
+                wfx_rsi.join_retries += 1;
+                wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
+                if (wfx_rsi.join_retries <= MAX_JOIN_RETRIES_COUNT)
+                {
+                    xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
+                }
+                wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries);
             }
         }
     }
