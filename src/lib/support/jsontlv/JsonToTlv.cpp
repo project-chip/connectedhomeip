@@ -26,7 +26,8 @@ namespace chip {
 
 namespace {
 
-// Not directly used: TLV encoding will not encode
+// Not directly used: TLV encoding will not encode this number and
+// will just encode "Implicit profile tag"
 // This profile, but will be used for deciding what binary values to encode.
 constexpr uint32_t kTemporaryImplicitProfileId = 0xFF01;
 

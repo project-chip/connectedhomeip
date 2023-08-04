@@ -23,7 +23,11 @@
 
 namespace {
 
-constexpr uint32_t kTemporaryImplicitProfileId = 0x1122;
+// Never directly stored in TLV, but used as a fillter to
+// extract 32-bit numbers when reading "Implicit Profile Tags"
+// from TLV. Any number could work, picked a test resrved id
+// to make it more obviously unused and not clash with other uses.
+constexpr uint32_t kTemporaryImplicitProfileId = 0xFF01;
 
 /// RAII to switch the implicit profile id for a reader
 class ImplicitProfileIdChange
