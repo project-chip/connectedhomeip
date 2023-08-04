@@ -364,9 +364,24 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     readerForJavaTLV.Init(*apData);
     readerForJson.Init(*apData);
 
-    jlong eventNumber  = static_cast<jlong>(aEventHeader.mEventNumber);
+    jlong eventNumber   = static_cast<jlong>(aEventHeader.mEventNumber);
     jint priorityLevel = static_cast<jint>(aEventHeader.mPriorityLevel);
-    jlong timestamp    = static_cast<jlong>(aEventHeader.mTimestamp.mValue);
+    jlong timestamp     = static_cast<jlong>(aEventHeader.mTimestamp.mValue);
+
+    jobject value = nullptr;
+#if USE_JAVA_TLV_ENCODE_DECODE
+    TLV::TLVReader readerForJavaObject;
+    readerForJavaObject.Init(*apData);
+    value = DecodeEventValue(aEventHeader.mPath, readerForJavaObject, &err);
+    // If we don't know this event, just skip it.
+    if (err == CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(nullptr, eventPathObj, err));
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe(),
+                   ReportError(nullptr, eventPathObj, CHIP_JNI_ERROR_EXCEPTION_THROWN));
+#endif
 
     // Create TLV byte array to pass to Java layer
     size_t bufferLen                  = readerForJavaTLV.GetRemainingLength() + readerForJavaTLV.GetLengthRead();
@@ -397,7 +412,7 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     chip::JniClass eventStateJniCls(eventStateCls);
     jmethodID eventStateCtor = env->GetMethodID(eventStateCls, "<init>", "(JIJLjava/lang/Object;[BLjava/lang/String;)V");
     VerifyOrReturn(eventStateCtor != nullptr, ChipLogError(Controller, "Could not find EventState constructor"));
-    jobject eventStateObj = env->NewObject(eventStateCls, eventStateCtor, eventNumber, priorityLevel, timestamp, nullptr,
+    jobject eventStateObj = env->NewObject(eventStateCls, eventStateCtor, eventNumber, priorityLevel, timestamp, value,
                                            jniByteArray.jniValue(), jsonString.jniValue());
     VerifyOrReturn(eventStateObj != nullptr, ChipLogError(Controller, "Could not create EventState object"));
 
