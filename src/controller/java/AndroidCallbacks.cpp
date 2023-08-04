@@ -364,10 +364,9 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     readerForJavaTLV.Init(*apData);
     readerForJson.Init(*apData);
 
-    jlong eventNumber   = static_cast<jlong>(aEventHeader.mEventNumber);
+    jlong eventNumber  = static_cast<jlong>(aEventHeader.mEventNumber);
     jint priorityLevel = static_cast<jint>(aEventHeader.mPriorityLevel);
-    jlong timestamp     = static_cast<jlong>(aEventHeader.mTimestamp.mValue);
-
+    jlong timestamp    = static_cast<jlong>(aEventHeader.mTimestamp.mValue);
 
     // Create TLV byte array to pass to Java layer
     size_t bufferLen                  = readerForJavaTLV.GetRemainingLength() + readerForJavaTLV.GetLengthRead();
