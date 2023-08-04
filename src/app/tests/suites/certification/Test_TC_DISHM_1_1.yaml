@@ -59,6 +59,7 @@ tests:
           constraints:
               type: bitmap32
     # Reference for "SHALL NOT contain" issue: https://github.com/project-chip/connectedhomeip/issues/28287
+    # Reference for "Test Failure: value expects the the value 65530 but the list does not contan it": https://github.com/project-chip/connectedhomeip/issues/28525
     - label: "4. TH reads AttributeList from DUT"
       command: "readAttribute"
       attribute: "AttributeList"
