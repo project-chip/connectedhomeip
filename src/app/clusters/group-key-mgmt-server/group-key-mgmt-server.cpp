@@ -408,7 +408,7 @@ bool ValidateAndGetProviderAndFabric(chip::app::CommandHandler * commandObj, con
 
     // Internal failures on internal inconsistencies.
     auto provider = GetGroupDataProvider();
-    auto fabric   = Server::GetInstance().GetFabricTable().FindFabricWithIndex(accessingFabricIndex);
+    auto fabric   = Server::GetInstance().GetFabricTable().FindFabricWithIndex(commandObj->GetAccessingFabricIndex());
 
     if (nullptr == provider)
     {
