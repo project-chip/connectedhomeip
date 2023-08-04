@@ -76,7 +76,7 @@ limitations of this format are:
 -   TLV Array cannot contain another TLV Array.
 -   The top-level container MUST be an anonymous STRUCT.
 -   Elements of the TLV Structure MUST have Context or Implicit Profile Tags.
--   Implicit Profile Tag number MUST be larger or equal to 256 and smaller that
+-   Implicit Profile Tag number MUST be larger or equal to 256 and smaller than
     2^32 + 1.
 -   TLV Structure element MUST be sorted by tag numbers from low to high, where
     sorted elements with Context Tags MUST appear first followed by sorted
