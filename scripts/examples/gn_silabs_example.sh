@@ -86,6 +86,9 @@ if [ "$#" == "0" ]; then
         chip_enable_icd_server
             Configure has a Intermitently connected device. (Default false)
             Must also set chip_openthread_ftd=false
+        enable_synchronized_sed
+            Enable Synchronized Sleepy end device. (Default false)
+            Must also set chip_enable_icd_server=true chip_openthread_ftd=false
         use_rs9116
             Build wifi example with extension board rs9116. (Default false)
         use_SiWx917
@@ -120,6 +123,9 @@ if [ "$#" == "0" ]; then
         Presets
         --icd
             enable ICD features, set thread mtd
+            For minimum consumption, add --low-power
+        --ssed
+            enable synchronized sleepy end device, with csl
             For minimum consumption, add --low-power
         --low-power
             disables all power consuming features for the most power efficient build

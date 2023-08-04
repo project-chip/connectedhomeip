@@ -49,6 +49,9 @@ declare_args() {
   # ICD Openthread Configuration flags
   sl_ot_idle_interval_ms = 15000  # 15s Idle Intervals
   sl_ot_active_interval_ms = 200  # 200ms Active Intervals
+  
+  # SSED Specific configurations
+  sl_ot_csl_timeout_sec = 30  # 30s CSL timeout
 
   # ICD Matter Configuration flags
   sl_idle_mode_interval_s = 600  # 10min Idle Mode Interval
@@ -58,6 +61,9 @@ declare_args() {
   sl_use_subscription_synching = false
 
   silabs_log_enabled = true
+
+  # Enable Synchronized Sleepy End Device
+  enable_synchronized_sed = false
 
   # Argument to enable IPv4 for wifi
   # aligning to match chip_inet_config_enable_ipv4 default configuration
@@ -160,7 +166,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/radio/rail_lib/protocol/ieee802154",
       "${efr32_sdk_root}/platform/radio/rail_lib/protocol/ble",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions",
-      "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_power_manager_init",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_pti",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_power_manager_init",
       "${efr32_sdk_root}/platform/service/device_init/inc",
@@ -433,6 +438,18 @@ template("efr32_sdk") {
           "SL_OT_IDLE_INTERVAL=${sl_ot_idle_interval_ms}",
           "SL_OT_ACTIVE_INTERVAL=${sl_ot_active_interval_ms}",
         ]
+
+        if (enable_synchronized_sed) {
+          defines += [
+            "CHIP_DEVICE_CONFIG_THREAD_SSED=1",
+            "OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE=1",
+            "OPENTHREAD_CONFIG_MAC_CSL_AUTO_SYNC_ENABLE=1",
+            "OPENTHREAD_CONFIG_PLATFORM_USEC_TIMER_ENABLE=1",
+            "OPENTHREAD_CONFIG_CHILD_SUPERVISION_CHECK_TIMEOUT=0",
+            "SL_OPENTHREAD_CSL_TX_UNCERTAINTY=200",
+            "OPENTHREAD_CONFIG_CSL_TIMEOUT=${sl_ot_csl_timeout_sec}",
+          ]
+        }
       }
 
       if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {

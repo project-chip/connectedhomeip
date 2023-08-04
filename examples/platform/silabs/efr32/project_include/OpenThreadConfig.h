@@ -45,6 +45,13 @@
 // Timeout after 2 missed checkin or 4 mins if sleep interval is too short.
 #define OPENTHREAD_CONFIG_MLE_CHILD_TIMEOUT_DEFAULT ((SL_MLE_TIMEOUT_s < 120) ? 240 : ((SL_MLE_TIMEOUT_s * 2) + 1))
 
+
+#define OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE 1
+#define OPENTHREAD_CONFIG_MAC_CSL_AUTO_SYNC_ENABLE 1
+#define OPENTHREAD_CONFIG_PLATFORM_USEC_TIMER_ENABLE 1
+#define OPENTHREAD_CONFIG_CHILD_SUPERVISION_CHECK_TIMEOUT 0
+#define SL_OPENTHREAD_CSL_TX_UNCERTAINTY 200
+
 #endif // SL_ICD_ENABLED
 
 /****Uncomment below section for OpenThread Debug logs*/

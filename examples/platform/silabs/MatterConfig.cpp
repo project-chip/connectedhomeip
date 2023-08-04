@@ -87,6 +87,10 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
 
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+#include "sl_power_manager.h"
+#endif
+
 // ================================================================================
 // Matter Networking Callbacks
 // ================================================================================
@@ -113,7 +117,11 @@ CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
     ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router));
 #else // CHIP_DEVICE_CONFIG_THREAD_FTD
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_DEVICE_CONFIG_THREAD_SSED
+    ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SynchronizedSleepyEndDevice));
+#else
     ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice));
+#endif
 #else  // CHIP_CONFIG_ENABLE_ICD_SERVER
     ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice));
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -144,6 +152,20 @@ void SilabsMatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event
         chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
                                                     InitOTARequestorHandler, nullptr);
 #endif
+    
+    SILABS_LOG("------------------------------------ Send Data Request -------------------------------------")
+    otLinkSendDataRequest(chip::DeviceLayer::ThreadStackMgrImpl().OTInstance());
+
+    }
+
+    if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
+    {
+#if CHIP_ENABLE_OPENTHREAD
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+        SILABS_LOG("------------------------------------ REMOVE EM 1 REQUIREMENT -------------------------------------")
+        sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
+#endif
+#endif // CHIP_ENABLE_OPENTHREAD
     }
 }
 
