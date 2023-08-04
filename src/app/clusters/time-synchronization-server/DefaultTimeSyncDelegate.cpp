@@ -55,7 +55,7 @@ CHIP_ERROR DefaultTimeSyncDelegate::UpdateTimeFromPlatformSource(chip::Callback:
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
-    else if (System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR)
+    if (System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR)
     {
         // Default assumes the time came from NTP. Platforms using other sources should overwrite this
         // with their own delegates

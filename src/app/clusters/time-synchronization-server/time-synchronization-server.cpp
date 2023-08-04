@@ -427,12 +427,10 @@ CHIP_ERROR TimeSynchronizationServer::AttemptToGetTimeFromTrustedNode()
         caseSessionManager->FindOrEstablishSession(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
         return CHIP_NO_ERROR;
     }
-    else
-    {
-        return CHIP_ERROR_NOT_FOUND;
-    }
-#endif
+    return CHIP_ERROR_NOT_FOUND;
+#else
     return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
 }
 
 void TimeSynchronizationServer::AttemptToGetTime()
