@@ -58,15 +58,25 @@ tests:
           value: 1
           constraints:
               type: bitmap32
+ 
     # Reference for "SHALL NOT contain" issue: https://github.com/project-chip/connectedhomeip/issues/28287
-    # Reference for "Test Failure: value expects the the value 65530 but the list does not contan it": https://github.com/project-chip/connectedhomeip/issues/28525
     - label: "4. TH reads AttributeList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains: [0, 1, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "4. TH reads AttributeList from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 65528, 65529, 65531, 65532, 65533]
 
     - label:
           "4. TH reads optional attribute (DISHM.S.A0002(StartUpMode)) in
@@ -114,7 +124,7 @@ tests:
 
     # Reference for "SHALL NOT contain" issue: https://github.com/project-chip/connectedhomeip/issues/28287
     - label: "5. TH reads from the DUT the EventList attribute"
-      PICS: DISHM.S.F00
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
