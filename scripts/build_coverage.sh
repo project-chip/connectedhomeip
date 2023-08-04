@@ -119,7 +119,13 @@ if [ "$skip_gn" == false ]; then
     source "$CHIP_ROOT/scripts/activate.sh"
 
     # Generates ninja files
-    gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args='use_coverage=true chip_build_all_clusters_app=true'
+    EXTRA_GN_ARGS=""
+    if [[ "$TESTS" == "yaml" || "$TESTS" == "all" ]]; then
+      EXTRA_GN_ARGS="$EXTRA_GN_ARGS chip_build_all_clusters_app=true"
+    else
+        EXTRA_GN_ARGS="$EXTRA_GN_ARGS chip_build_tools=false"
+    fi
+    gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="use_coverage=true$EXTRA_GN_ARGS"
     ninja -C "$OUTPUT_ROOT"
 
     # Run unit tests

@@ -13,39 +13,29 @@ step.
 
 ### Install Prerequisites
 
--   [Linux](https://docs.espressif.com/projects/esp-idf/en/v4.4.4/esp32/get-started/linux-setup.html)
--   [macOS](https://docs.espressif.com/projects/esp-idf/en/v4.4.4/esp32/get-started/macos-setup.html)
+-   [Linux](https://docs.espressif.com/projects/esp-idf/en/v5.1/esp32/get-started/linux-macos-setup.html#for-linux-users)
+-   [macOS](https://docs.espressif.com/projects/esp-idf/en/v5.1/esp32/get-started/linux-macos-setup.html#for-macos-users)
 
-### Get IDF v4.4.4
+### Get IDF v5.1
 
 -   Clone ESP-IDF
-    [v4.4.4 release](https://github.com/espressif/esp-idf/releases/tag/v4.4.4)
+    [v5.1 release](https://github.com/espressif/esp-idf/releases/tag/v5.1)
 
     ```
-    $ git clone -b v4.4.4 --recursive https://github.com/espressif/esp-idf.git
+    $ git clone -b v5.1 --recursive --depth 1 --shallow-submodule https://github.com/espressif/esp-idf.git
     $ cd esp-idf
     $ ./install.sh
     ```
 
--   To update an existing esp-idf toolchain to v4.4.4:
+-   To update an existing esp-idf toolchain to v5.1:
 
     ```
     $ cd path/to/esp-idf
     $ git fetch origin
-    $ git checkout v4.4.4
-    $ git reset --hard origin/v4.4.4
+    $ git checkout v5.1
+    $ git reset --hard origin/v5.1
     $ git submodule update --recursive --init
     $ git clean -fdx
-    $ ./install.sh
-    ```
-
--   For ESP32C6 & ESP32H2, please use commit
-    [ea5e0ff](https://github.com/espressif/esp-idf/tree/ea5e0ff).
-
-    ```
-    $ cd esp-idf
-    $ git checkout ea5e0ff
-    $ git submodule update --init
     $ ./install.sh
     ```
 
@@ -78,22 +68,6 @@ below:
 ```
 # Please make sure to run this command in the Matter Python environment
 python3 -m pip install esptool
-```
-
-For MacOS, `gdbgui` python package will not be installed using `bootstrap.sh`
-script as it is restricted only for x64 Linux platforms. It is restricted
-because, building wheels for `gevent` (dependency of `gdbgui`) fails on MacOS.
-
-For ARM-based Mac, no further installation steps are necessary if Python3
-version is greater than or equal to 3.11.
-
-If Python3 version is less than 3.11 or you are using x86(Intel-based) Mac then
-please run the below commands after every bootstrapping to install gdbgui wheels
-as binary
-
-```
-python3 -m pip install -c scripts/setup/constraints.txt --no-cache --prefer-binary gdbgui==0.13.2.0
-deactivate
 ```
 
 ---
