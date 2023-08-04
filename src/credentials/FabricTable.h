@@ -220,12 +220,6 @@ private:
         return TLV::EstimateStructOverhead(sizeof(uint16_t), Crypto::P256SerializedKeypair::Capacity());
     }
 
-    static void StaticAsserts()
-    {
-        static_assert(offsetof(FabricInfo, mOperationalKey) - offsetof(FabricInfo, mHasExternallyOwnedOperationalKey) == 4,
-                      "We should have 3 bytes of padding before mOperationalKey");
-    }
-
     NodeId mNodeId     = kUndefinedNodeId;
     FabricId mFabricId = kUndefinedFabricId;
     // We cache the compressed fabric id since it's used so often and costly to get.
