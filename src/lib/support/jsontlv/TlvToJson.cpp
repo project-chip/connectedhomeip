@@ -30,7 +30,7 @@ namespace {
 
 constexpr uint32_t kTemporaryImplicitProfileId = 0x1122;
 
-/// RAII to switch the implicit profie id for a reader
+/// RAII to switch the implicit profile id for a reader
 class ImplicitProfileIdChange
 {
 public:
