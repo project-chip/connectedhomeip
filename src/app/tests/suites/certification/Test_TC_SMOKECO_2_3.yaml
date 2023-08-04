@@ -55,7 +55,7 @@ tests:
       minInterval: 3
       maxInterval: 30
       response:
-          Value: 0
+          value: 0
           constraints:
               type: enum8
 

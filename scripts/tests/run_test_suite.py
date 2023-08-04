@@ -174,6 +174,9 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
             TestTag.FLAKY,
         }
 
+        if runtime != TestRunTime.CHIP_TOOL_PYTHON:
+            exclude_tags.add(TestTag.CHIP_TOOL_PYTHON_ONLY)
+
     if 'all' not in target:
         tests = []
         for name in target:
