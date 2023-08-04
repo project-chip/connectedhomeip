@@ -80,7 +80,7 @@ const char * GetJsonElementStrFromType(const ElementTypeContext & ctx)
 /*
  * Encapsulates the element information required to construct a JSON element name string in a JSON object.
  *
- * The generated Json element name string is constructed as:
+ * The generated JSON element name string is constructed as:
  *     'TagNumber:ElementType-SubElementType'.
  */
 struct JsonObjectElementContext
