@@ -142,9 +142,7 @@ struct ServerInitParams
     // Operational certificate store with access to the operational certs in persisted storage:
     // must not be null at timne of Server::Init().
     Credentials::OperationalCertificateStore * opCertStore = nullptr;
-    // Required, if not provided, the Server::Init() WILL fail. The default reportScheduler implementation will be used when using
-    // CommonCaseDeviceServerInitParams, but the injection of a custom scheduler requires using the ServerInitParams base class to
-    // avoid dual allocation of memory for the scheduler.
+    // Required, if not provided, the Server::Init() WILL fail.
     app::reporting::ReportScheduler * reportScheduler = nullptr;
 };
 
