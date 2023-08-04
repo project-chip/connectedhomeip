@@ -16,9 +16,13 @@
 {{/all_user_clusters}}
 {{#user_endpoints}}
 endpoint {{endpointId}} {
-  {{#if deviceIdentifier}}
-  device type {{chip_friendly_endpoint_type_name}} = {{deviceIdentifier}}, version {{endpointVersion}};
-  {{/if~}}
+  {{#user_device_types}}
+  device type 
+    {{~#zcl_device_types}}
+      {{~#if (is_num_equal id ../deviceTypeRef)}} {{as_underscore_lowercase name}} {{/if~}}
+    {{/zcl_device_types~}}
+    = {{deviceIdentifier}}, version {{deviceVersion}};
+  {{/user_device_types}}
 
   {{#user_clusters}}
     {{#if enabled}}
