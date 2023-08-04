@@ -21,41 +21,22 @@
  *          for Tizen platform.
  */
 
-/**
- * Note: ThreadStackManager requires ConnectivityManager to be defined
- *       beforehand, otherwise we will face circular dependency between them. */
-#include <platform/ConnectivityManager.h>
-
-/**
- * Note: Use public include for ThreadStackManager which includes our local
- *       platform/<PLATFORM>/ThreadStackManagerImpl.h after defining interface
- *       class. */
-#include <platform/ThreadStackManager.h>
-
-#include <endian.h>
-
-#include <cstring>
-
-#include <thread.h>
-
-#include <app/AttributeAccessInterface.h>
-#include <inet/IPAddress.h>
-#include <lib/core/CHIPError.h>
-#include <lib/core/DataModelTypes.h>
-#include <lib/dnssd/Constants.h>
-#include <lib/dnssd/platform/Dnssd.h>
-#include <lib/support/CHIPMemString.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
-#include <lib/support/Span.h>
-#include <lib/support/ThreadOperationalDataset.h>
-#include <platform/CHIPDeviceConfig.h>
-#include <platform/CHIPDeviceEvent.h>
-#include <platform/NetworkCommissioning.h>
-#include <platform/PlatformManager.h>
-
-#include <platform/Tizen/ThreadStackManagerImpl.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/internal/DeviceNetworkInfo.h>
+
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/SafeInt.h>
+#include <platform/PlatformManager.h>
+#include <platform/ThreadStackManager.h>
+#include <platform/Tizen/NetworkCommissioningDriver.h>
+
+#include "ThreadStackManagerImpl.h"
+#include <lib/dnssd/platform/Dnssd.h>
+
+using namespace ::chip::DeviceLayer::Internal;
+using namespace chip::DeviceLayer::NetworkCommissioning;
 
 namespace chip {
 namespace DeviceLayer {
@@ -74,7 +55,9 @@ constexpr char ThreadStackManagerImpl::kOpenthreadDeviceTypeFullEndDevice[];
 constexpr char ThreadStackManagerImpl::kOpenthreadDeviceTypeMinimalEndDevice[];
 constexpr char ThreadStackManagerImpl::kOpenthreadDeviceTypeSleepyEndDevice[];
 
-ThreadStackManagerImpl::ThreadStackManagerImpl() : mIsAttached(false), mIsInitialized(false), mThreadInstance(nullptr) {}
+ThreadStackManagerImpl::ThreadStackManagerImpl() :
+    mIsAttached(false), mIsInitialized(false), mThreadInstance(nullptr), mScanParam(nullptr)
+{}
 
 const char * ThreadStackManagerImpl::_ThreadRoleToStr(thread_device_role_e role)
 {
@@ -122,15 +105,39 @@ void ThreadStackManagerImpl::_ThreadDeviceRoleChangedCb(thread_device_role_e dev
 
 CHIP_ERROR ThreadStackManagerImpl::TriggerInit(void * userData)
 {
-    // TODO: Trigger Init
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    int threadErr = THREAD_ERROR_NONE;
+    thread_device_role_e deviceRole;
+
+    threadErr = thread_initialize();
+    VerifyOrExit(threadErr == THREAD_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: initialize thread"));
+    ChipLogProgress(DeviceLayer, "Thread initialized");
+
+    threadErr = thread_enable(&sInstance.mThreadInstance);
+    VerifyOrExit(threadErr == THREAD_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: enable thread"));
+    ChipLogProgress(DeviceLayer, "Thread enabled");
+
+    threadErr = thread_get_device_role(sInstance.mThreadInstance, &deviceRole);
+    VerifyOrExit(threadErr == THREAD_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: get device role"));
+    sInstance.ThreadDeviceRoleChangedHandler(deviceRole);
+
+    /* Set callback for change of device role */
+    threadErr = thread_set_device_role_changed_cb(sInstance.mThreadInstance, _ThreadDeviceRoleChangedCb, nullptr);
+    VerifyOrExit(threadErr == THREAD_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: set device role changed cb"));
+
+    sInstance.mScanResult    = new std::vector<NetworkCommissioning::ThreadScanResponse>();
+    sInstance.mIsInitialized = true;
+    ChipLogProgress(DeviceLayer, "Thread stack manager initialized");
+    return CHIP_NO_ERROR;
+
+exit:
+    thread_deinitialize();
+    ChipLogError(DeviceLayer, "FAIL: initialize thread stack");
+    return CHIP_ERROR_INTERNAL;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
-    int threadErr = THREAD_ERROR_NONE;
-    thread_device_role_e deviceRole;
+    CHIP_ERROR err;
 
     if (mIsInitialized)
     {
@@ -138,29 +145,12 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
         return CHIP_NO_ERROR;
     }
 
-    threadErr = thread_initialize();
-    VerifyOrExit(threadErr == THREAD_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: initialize thread"));
-    ChipLogProgress(DeviceLayer, "Thread initialized");
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(TriggerInit, static_cast<void *>(nullptr));
+    SuccessOrExit(err);
 
-    threadErr = thread_enable(&mThreadInstance);
-    VerifyOrExit(threadErr == THREAD_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: enable thread"));
-    ChipLogProgress(DeviceLayer, "Thread enabled");
-
-    threadErr = thread_get_device_role(mThreadInstance, &deviceRole);
-    VerifyOrExit(threadErr == THREAD_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: get device role"));
-    ThreadDeviceRoleChangedHandler(deviceRole);
-
-    /* Set callback for change of device role */
-    threadErr = thread_set_device_role_changed_cb(mThreadInstance, _ThreadDeviceRoleChangedCb, nullptr);
-    VerifyOrExit(threadErr == THREAD_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: set device role changed cb"));
-
-    mIsInitialized = true;
-    ChipLogProgress(DeviceLayer, "Thread stack manager initialized");
     return CHIP_NO_ERROR;
 
 exit:
-    thread_deinitialize();
-    ChipLogError(DeviceLayer, "FAIL: initialize thread stack");
     return CHIP_ERROR_INTERNAL;
 }
 
@@ -182,38 +172,6 @@ void ThreadStackManagerImpl::ThreadDeviceRoleChangedHandler(thread_device_role_e
     }
 
     mIsAttached = isAttached;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    int threadErr = THREAD_ERROR_NONE;
-
-    if (role == THREAD_DEVICE_ROLE_DISABLED)
-    {
-        /* start srp client */
-        threadErr = thread_srp_client_start(mThreadInstance);
-        if (threadErr != THREAD_ERROR_NONE && threadErr != THREAD_ERROR_ALREADY_DONE)
-            ChipLogError(DeviceLayer, "FAIL: thread_srp_client_start");
-    }
-    else if (role == THREAD_DEVICE_ROLE_ROUTER || role == THREAD_DEVICE_ROLE_CHILD)
-    {
-        threadErr = thread_srp_server_stop(mThreadInstance);
-        if (threadErr != THREAD_ERROR_NONE && threadErr != THREAD_ERROR_ALREADY_DONE)
-            ChipLogError(DeviceLayer, "FAIL: thread_srp_server_stop");
-
-        threadErr = thread_srp_client_start(mThreadInstance);
-        if (threadErr != THREAD_ERROR_NONE && threadErr != THREAD_ERROR_ALREADY_DONE)
-            ChipLogError(DeviceLayer, "FAIL: thread_srp_client_start");
-    }
-    else if (role == THREAD_DEVICE_ROLE_LEADER)
-    {
-        threadErr = thread_srp_client_stop(mThreadInstance);
-        if (threadErr != THREAD_ERROR_NONE && threadErr != THREAD_ERROR_ALREADY_DONE)
-            ChipLogError(DeviceLayer, "FAIL: thread_srp_client_stop");
-
-        threadErr = thread_srp_server_start(mThreadInstance);
-        if (threadErr != THREAD_ERROR_NONE && threadErr != THREAD_ERROR_ALREADY_DONE)
-            ChipLogError(DeviceLayer, "FAIL: thread_srp_server_start");
-    }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     ChipLogProgress(DeviceLayer, "Thread role state changed [%s]", mIsAttached ? "Attached" : "Detached");
     event.Type                          = DeviceEventType::kThreadStateChange;
@@ -319,17 +277,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     if (val && !isEnabled)
     {
         threadErr = thread_network_attach(mThreadInstance);
-        DeviceLayer::SystemLayer().ScheduleLambda([&, threadErr]() {
-            if (this->mpConnectCallback != nullptr && threadErr != THREAD_ERROR_NONE)
-            {
-                this->mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), 0);
-                this->mpConnectCallback = nullptr;
-            }
-        });
-
-        VerifyOrExit(threadErr == THREAD_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: attach thread network"));
-
-        threadErr = thread_start(mThreadInstance);
+        ChipLogProgress(DeviceLayer, "Network attach %s", threadErr == THREAD_ERROR_NONE ? "successfully" : "failed");
         DeviceLayer::SystemLayer().ScheduleLambda([&, threadErr]() {
             if (this->mpConnectCallback != nullptr)
             {
@@ -444,24 +392,33 @@ exit:
 
 bool ThreadStackManagerImpl::_HaveMeshConnectivity()
 {
+    // TODO: Remove Weave legacy APIs
+    // For a leader with a child, the child is considered to have mesh connectivity
+    // and the leader is not, which is a very confusing definition.
+    // This API is Weave legacy and should be removed.
+
+    ChipLogError(DeviceLayer, "HaveMeshConnectivity has confusing behavior and shouldn't be called");
     return false;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadStatsCounters()
 {
-    ChipLogError(DeviceLayer, "Not implemented");
+    // TODO: Remove Weave legacy APIs
+    ChipLogError(DeviceLayer, "%s not implemented", __func__);
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadTopologyMinimal()
 {
-    ChipLogError(DeviceLayer, "Not implemented");
+    // TODO: Remove Weave legacy APIs
+    ChipLogError(DeviceLayer, "%s not implemented", __func__);
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadTopologyFull()
 {
-    ChipLogError(DeviceLayer, "Not implemented");
+    // TODO: Remove Weave legacy APIs
+    ChipLogError(DeviceLayer, "%s not implemented", __func__);
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
@@ -482,19 +439,22 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
 
 CHIP_ERROR ThreadStackManagerImpl::_GetExternalIPv6Address(chip::Inet::IPAddress & addr)
 {
-    ChipLogError(DeviceLayer, "Not implemented");
+    // TODO: Remove Weave legacy APIs
+    ChipLogError(DeviceLayer, "%s not implemented", __func__);
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
 {
-    ChipLogError(DeviceLayer, "Not implemented");
+    // TODO: Remove Weave legacy APIs
+    ChipLogError(DeviceLayer, "%s not implemented", __func__);
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
 {
-    ChipLogError(DeviceLayer, "Not implemented");
+    // TODO: Remove Weave legacy APIs
+    ChipLogError(DeviceLayer, "%s not implemented", __func__);
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
@@ -503,25 +463,94 @@ void ThreadStackManagerImpl::_SetRouterPromotion(bool val)
     // Set Router Promotion is not supported on Tizen
 }
 
-CHIP_ERROR ThreadStackManagerImpl::TriggerScan(ThreadStackManagerImpl * self)
-{
-    // TODO: Trigger Scan
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
 void ThreadStackManagerImpl::ThreadScanResultCb(int result, thread_network_scanning_state_e state, uint64_t extAddress,
                                                 const char * networkName, uint64_t extPanid, const uint8_t * steeringData,
                                                 int length, uint16_t panid, uint16_t joinerDdpPort, uint8_t channel, int16_t rssi,
                                                 uint8_t lqi, uint8_t version, bool isNative, bool isJoinable, void * userData)
 {
-    ChipLogError(DeviceLayer, "Not implemented");
+    ThreadStackManagerImpl * self = (ThreadStackManagerImpl *) userData;
+    if (state == THREAD_SCANNING_STARTED)
+    {
+        ChipLogProgress(DeviceLayer, "Scanning started");
+    }
+    else if (state == THREAD_SCANNING_FINISHED)
+    {
+        ChipLogProgress(DeviceLayer, "Scanning finished");
+        DeviceLayer::SystemLayer().ScheduleLambda([self]() {
+            // Note: We cannot post a event in ScheduleLambda since std::vector is not trivial copiable. This results in the use of
+            // const_cast but should be fine for almost all cases, since we actually handled the ownership of this element to this
+            // lambda.
+            if (self->mpScanCallback != nullptr)
+            {
+                TizenScanResponseIterator<NetworkCommissioning::ThreadScanResponse> iter(
+                    const_cast<std::vector<ThreadScanResponse> *>(self->mScanResult));
+                self->mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
+                self->mpScanCallback = nullptr;
+            }
+            delete const_cast<std::vector<ThreadScanResponse> *>(self->mScanResult);
+        });
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "Scan device found. panid: %u, channel %u, extAddress: %llu, rssi: %u, lqi: %u", panid,
+                        channel, extAddress, rssi, lqi);
+
+        NetworkCommissioning::ThreadScanResponse networkScanned;
+        networkScanned.panId         = panid;
+        networkScanned.extendedPanId = extPanid;
+        size_t networkNameLen        = strlen(networkName);
+        if (networkNameLen > 16)
+        {
+            ChipLogProgress(DeviceLayer, "Network name is too long, ignore it.");
+            return;
+        }
+        networkScanned.networkNameLen = static_cast<uint8_t>(networkNameLen);
+        memcpy(networkScanned.networkName, networkName, networkNameLen);
+        networkScanned.channel         = channel;
+        networkScanned.version         = version;
+        networkScanned.extendedAddress = extAddress;
+        networkScanned.rssi            = (int8_t)rssi;
+        networkScanned.lqi             = lqi;
+
+        self->mScanResult->push_back(networkScanned);
+    }
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
+CHIP_ERROR ThreadStackManagerImpl::TriggerScan(ThreadStackManagerImpl * self)
 {
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    ChipLogProgress(DeviceLayer, "%s enter", __func__);
+    int ret = thread_scan(self->mThreadInstance, self->mScanParam, ThreadScanResultCb, self);
+    if (ret == THREAD_ERROR_NONE)
+    {
+        ChipLogProgress(DeviceLayer, "scan start successfully");
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "scan starting failed");
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(ThreadDriver::ScanCallback * callback)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    int ret;
+
+    // There is another ongoing scan request, reject the new one.
+    VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    ret = thread_scan_param_create(mThreadInstance, 80, &mScanParam);
+    VerifyOrExit(ret == THREAD_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: scan param create"));
+
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(TriggerScan, this);
+    SuccessOrExit(err);
+
+    mpScanCallback = callback;
+    return CHIP_NO_ERROR;
+
+exit:
+    return CHIP_ERROR_INTERNAL;
 }
 
 void ThreadStackManagerImpl::_ResetThreadNetworkDiagnosticsCounts() {}
@@ -529,7 +558,7 @@ void ThreadStackManagerImpl::_ResetThreadNetworkDiagnosticsCounts() {}
 CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
                                                                                app::AttributeValueEncoder & encoder)
 {
-    ChipLogError(DeviceLayer, "Not implemented");
+    ChipLogError(DeviceLayer, "%s not implemented", __func__);
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
@@ -553,17 +582,43 @@ ThreadStackManagerImpl::_AttachToThreadNetwork(const Thread::OperationalDataset 
 
 void ThreadStackManagerImpl::_UpdateNetworkStatus()
 {
-    ChipLogError(DeviceLayer, "Not implemented");
+    // Thread is not enabled, then we are not trying to connect to the network.
+    VerifyOrReturn(IsThreadEnabled() && mpStatusChangeCallback != nullptr);
+
+    Thread::OperationalDataset dataset;
+    uint8_t extpanid[Thread::kSizeExtendedPanId];
+
+    // If we have not provisioned any Thread network, return the status from last network scan,
+    // If we have provisioned a network, we assume the ot-br-posix is activitely connecting to that network.
+    CHIP_ERROR err = ThreadStackMgrImpl().GetThreadProvision(dataset);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to get configured network when updating network status: %s", err.AsString());
+        return;
+    }
+
+    // The Thread network is not enabled, but has a different extended pan id.
+    VerifyOrReturn(dataset.GetExtendedPanId(extpanid) == CHIP_NO_ERROR);
+
+    // We have already connected to the network, thus return success.
+    if (ThreadStackMgrImpl().IsThreadAttached())
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(ByteSpan(extpanid)), NullOptional);
+    }
+    else
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kNetworkNotFound, MakeOptional(ByteSpan(extpanid)), NullOptional);
+    }
 }
 
 ThreadStackManager & ThreadStackMgr()
 {
-    return DeviceLayer::ThreadStackManagerImpl::sInstance;
+    return chip::DeviceLayer::ThreadStackManagerImpl::sInstance;
 }
 
 ThreadStackManagerImpl & ThreadStackMgrImpl()
 {
-    return DeviceLayer::ThreadStackManagerImpl::sInstance;
+    return chip::DeviceLayer::ThreadStackManagerImpl::sInstance;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
