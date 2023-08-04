@@ -233,7 +233,8 @@ Secure Element. These can be changed if building without Secure Element
 
 -   K32W041AM flavor
 
-    Exactly the same steps as above but set argument build_for_k32w041am=1 in the gn command.
+    Exactly the same steps as above but set argument build_for_k32w041am=1 in
+    the gn command.
 
 Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
 build argument (chip_with_OM15082) inside the gn build instruction should be set
