@@ -43,7 +43,7 @@ public:
     CHIP_ERROR GetSpinSpeedAtIndex(size_t index, MutableCharSpan & spinSpeed);
     CHIP_ERROR GetSupportedRinseAtIndex(size_t index, NumberOfRinsesEnum & supportedRinse);
 
-    LaundryWasherControlDelegate() = default;
+    LaundryWasherControlDelegate()  = default;
     ~LaundryWasherControlDelegate() = default;
 
     static inline LaundryWasherControlDelegate & getLaundryWasherControlDelegate() { return instance; }
