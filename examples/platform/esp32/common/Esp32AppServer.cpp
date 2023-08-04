@@ -97,7 +97,6 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 {
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
-
 #if CONFIG_TEST_EVENT_TRIGGER_ENABLED && CONFIG_ENABLE_OTA_REQUESTOR
     if (hex_string_to_binary(CONFIG_TEST_EVENT_TRIGGER_ENABLE_KEY, sTestEventTriggerEnableKey,
                              sizeof(sTestEventTriggerEnableKey)) == 0)

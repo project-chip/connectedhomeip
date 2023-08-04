@@ -32,8 +32,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/TimerDelegates.h>
-#include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/af-types.h>
@@ -1067,10 +1065,6 @@ static void run_chip_srv(System::Layer * aSystemLayer, void * aAppState)
         // chip::Server::GetInstance().Init(nullptr, securePort, unsecurePort);
 
         static chip::CommonCaseDeviceServerInitParams initParams;
-        // Report scheduler and timer delegate instance
-        static chip::app::DefaultTimerDelegate sTimerDelegate;
-        static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
-        initParams.reportScheduler = &sReportScheduler;
         (void) initParams.InitializeStaticResourcesBeforeServerInit();
         chip::Server::GetInstance().Init(initParams);
         PRINTF("Done to call chip::Server() \r\n");

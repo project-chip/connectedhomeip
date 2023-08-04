@@ -24,8 +24,6 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
-#include <app/TimerDelegates.h>
-#include <app/reporting/ReportSchedulerImpl.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
@@ -943,10 +941,6 @@ int main(int argc, char * argv[])
 
     // Init Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
-    // Report scheduler and timer delegate instance
-    static chip::app::DefaultTimerDelegate sTimerDelegate;
-    static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
-    initParams.reportScheduler = &sReportScheduler;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
 #if CHIP_DEVICE_ENABLE_PORT_PARAMS

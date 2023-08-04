@@ -157,7 +157,6 @@ void InitServer(intptr_t)
 {
     // Start IM server
     static chip::CommonCaseDeviceServerInitParams initParams;
-
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 

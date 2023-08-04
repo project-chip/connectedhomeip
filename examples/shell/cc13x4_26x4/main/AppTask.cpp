@@ -17,8 +17,6 @@
  */
 
 #include "AppTask.h"
-#include <app/TimerDelegates.h>
-#include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/Server.h>
 #include <lib/support/ErrorStr.h>
 
@@ -154,10 +152,6 @@ CHIP_ERROR AppTask::Init()
 
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
-    // Report scheduler and timer delegate instance
-    static chip::app::DefaultTimerDelegate sTimerDelegate;
-    static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
-    initParams.reportScheduler = &sReportScheduler;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 

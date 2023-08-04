@@ -18,8 +18,6 @@
  */
 #include "AppTask.h"
 #include "AppEvent.h"
-#include <app/TimerDelegates.h>
-#include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/Server.h>
 #include <lib/support/ErrorStr.h>
 
@@ -141,10 +139,6 @@ void UnlockOpenThreadTask(void)
 void AppTask::InitServer(intptr_t arg)
 {
     static chip::CommonCaseDeviceServerInitParams initParams;
-    // Report scheduler and timer delegate instance
-    static chip::app::DefaultTimerDelegate sTimerDelegate;
-    static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
-    initParams.reportScheduler = &sReportScheduler;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
     // Init ZCL Data Model and start server

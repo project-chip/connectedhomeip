@@ -24,8 +24,6 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 
-#include <app/TimerDelegates.h>
-#include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -59,10 +57,6 @@ static CHIP_ERROR CmdAppServerStart(int argc, char ** argv)
 {
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
-    // Report scheduler and timer delegate instance
-    static chip::app::DefaultTimerDelegate sTimerDelegate;
-    static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
-    initParams.reportScheduler = &sReportScheduler;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.operationalServicePort        = sServerPortOperational;
     initParams.userDirectedCommissioningPort = sServerPortCommissioning;

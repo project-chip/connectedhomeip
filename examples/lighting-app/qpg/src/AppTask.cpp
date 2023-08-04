@@ -38,8 +38,6 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 
-#include <app/TimerDelegates.h>
-#include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -236,10 +234,6 @@ CHIP_ERROR AppTask::StartAppTask()
 void AppTask::InitServer(intptr_t arg)
 {
     static chip::CommonCaseDeviceServerInitParams initParams;
-    // Report scheduler and timer delegate instance
-    static chip::app::DefaultTimerDelegate sTimerDelegate;
-    static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
-    initParams.reportScheduler = &sReportScheduler;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);

@@ -31,8 +31,6 @@
 
 #include "LinuxCommissionableDataProvider.h"
 #include "Options.h"
-#include <app/TimerDelegates.h>
-#include <app/reporting/ReportSchedulerImpl.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
@@ -140,10 +138,6 @@ int main(int argc, char * argv[])
 
     // Enter commissioning mode, open commissioning window
     static chip::CommonCaseDeviceServerInitParams initParams;
-    // Report scheduler and timer delegate instance
-    static chip::app::DefaultTimerDelegate sTimerDelegate;
-    static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
-    initParams.reportScheduler = &sReportScheduler;
     VerifyOrDie(CHIP_NO_ERROR == initParams.InitializeStaticResourcesBeforeServerInit());
     VerifyOrDie(CHIP_NO_ERROR == chip::Server::GetInstance().Init(initParams));
 

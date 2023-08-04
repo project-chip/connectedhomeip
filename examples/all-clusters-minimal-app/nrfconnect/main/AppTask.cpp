@@ -21,8 +21,6 @@
 #include "LEDUtil.h"
 #include "binding-handler.h"
 
-#include <app/TimerDelegates.h>
-#include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 
@@ -151,10 +149,6 @@ CHIP_ERROR AppTask::Init()
 #endif
 
     static chip::CommonCaseDeviceServerInitParams initParams;
-    // Report scheduler and timer delegate instance
-    static chip::app::DefaultTimerDelegate sTimerDelegate;
-    static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
-    initParams.reportScheduler = &sReportScheduler;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 

@@ -21,8 +21,6 @@
 #include "AppEvent.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
-#include <app/TimerDelegates.h>
-#include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 
@@ -221,10 +219,6 @@ int AppTask::Init()
 
     // Init ZCL Data Model
     static chip::CommonCaseDeviceServerInitParams initParams;
-    // Report scheduler and timer delegate instance
-    static chip::app::DefaultTimerDelegate sTimerDelegate;
-    static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
-    initParams.reportScheduler = &sReportScheduler;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 

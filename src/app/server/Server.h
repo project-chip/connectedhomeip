@@ -64,12 +64,8 @@
 #include <transport/raw/BLE.h>
 #endif
 #include <app/TimerDelegates.h>
-#include <transport/raw/UDP.h>
-#if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
-#include <app/reporting/SynchronizedReportSchedulerImpl.h>
-#else
 #include <app/reporting/ReportSchedulerImpl.h>
-#endif
+#include <transport/raw/UDP.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/ICDEventManager.h> // nogncheck
@@ -100,7 +96,7 @@ struct ServerInitParams
     ServerInitParams() = default;
 
     // Not copyable
-    ServerInitParams(const ServerInitParams &) = delete;
+    ServerInitParams(const ServerInitParams &)             = delete;
     ServerInitParams & operator=(const ServerInitParams &) = delete;
 
     // Application delegate to handle some commissioning lifecycle events
@@ -146,7 +142,9 @@ struct ServerInitParams
     // Operational certificate store with access to the operational certs in persisted storage:
     // must not be null at timne of Server::Init().
     Credentials::OperationalCertificateStore * opCertStore = nullptr;
-    // Report Scheduler Must be injected. If none injected the IM engine will throw an error on Init()
+    // Required, if not provided, the Server::Init() WILL fail. The default reportScheduler implementation will be used when using
+    // CommonCaseDeviceServerInitParams, but the injection of a custom scheduler requires using the ServerInitParams base class to
+    // avoid dual allocation of memory for the scheduler.
     app::reporting::ReportScheduler * reportScheduler = nullptr;
 };
 
@@ -182,7 +180,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
     CommonCaseDeviceServerInitParams() = default;
 
     // Not copyable
-    CommonCaseDeviceServerInitParams(const CommonCaseDeviceServerInitParams &) = delete;
+    CommonCaseDeviceServerInitParams(const CommonCaseDeviceServerInitParams &)             = delete;
     CommonCaseDeviceServerInitParams & operator=(const CommonCaseDeviceServerInitParams &) = delete;
 
     /**
@@ -224,6 +222,9 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
             this->opCertStore = &sPersistentStorageOpCertStore;
         }
 
+        // Injection of report scheduler WILL lead to two schedulers being allocated. As recommended above, this should only be used
+        // for IN-TREE examples. If a default scheduler is desired, the basic ServerInitParams should be used by the application and
+        // CommonCaseDeviceServerInitParams should not be allocated.
         if (this->reportScheduler == nullptr)
         {
             reportScheduler = &sReportScheduler;
@@ -268,11 +269,8 @@ private:
     static Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
     static Credentials::GroupDataProviderImpl sGroupDataProvider;
     static chip::app::DefaultTimerDelegate sTimerDelegate;
-#if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
-    static app::reporting::SynchronizedReportSchedulerImpl sReportScheduler;
-#else
     static app::reporting::ReportSchedulerImpl sReportScheduler;
-#endif
+
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
     static SimpleSessionResumptionStorage sSessionResumptionStorage;
 #endif

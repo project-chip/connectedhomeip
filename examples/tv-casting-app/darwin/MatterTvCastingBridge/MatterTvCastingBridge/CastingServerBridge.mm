@@ -25,8 +25,6 @@
 #import "MatterCallbacks.h"
 #import "OnboardingPayload.h"
 
-#include <app/TimerDelegates.h>
-#include <app/reporting/ReportSchedulerImpl.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
@@ -334,10 +332,6 @@
 
     // init app Server
     _serverInitParams = new chip::CommonCaseDeviceServerInitParams();
-    // Report scheduler and timer delegate instance
-    chip::app::DefaultTimerDelegate * timerDelegate = new chip::app::DefaultTimerDelegate();
-    chip::app::reporting::ReportSchedulerImpl * reportScheduler = new chip::app::reporting::ReportSchedulerImpl(timerDelegate);
-    _serverInitParams->reportScheduler = reportScheduler;
     err = _serverInitParams->InitializeStaticResourcesBeforeServerInit();
     if (err != CHIP_NO_ERROR) {
         ChipLogError(AppServer, "InitializeStaticResourcesBeforeServerInit failed: %s", ErrorStr(err));
