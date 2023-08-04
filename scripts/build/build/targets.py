@@ -237,8 +237,8 @@ def BuildEfr32Target():
 
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('with-ota-requestor', enable_ota_requestor=True)
-    target.AppendModifier('sed', enable_sed=True)
-    target.AppendModifier('low-power', enable_low_power=True).OnlyIfRe('-sed')
+    target.AppendModifier('icd', enable_icd=True)
+    target.AppendModifier('low-power', enable_low_power=True).OnlyIfRe('-icd')
     target.AppendModifier('shell', chip_build_libshell=True)
     target.AppendModifier('no_logging', chip_logging=False)
     target.AppendModifier('openthread_mtd', chip_openthread_ftd=False)
