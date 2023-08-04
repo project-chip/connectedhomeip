@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/platform/device.gni")
 
 static_library("helpers") {
@@ -77,6 +78,18 @@ source_set("time-sync-data-provider-test-srcs") {
   ]
 }
 
+source_set("power-cluster-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/clusters/power-source-server/power-source-server.cpp",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
 source_set("scenes-table-test-srcs") {
   sources = [
     "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSets.h",
@@ -132,6 +145,7 @@ chip_test_suite("tests") {
     "TestNumericAttributeTraits.cpp",
     "TestOperationalStateDelegate.cpp",
     "TestPendingNotificationMap.cpp",
+    "TestPowerSourceCluster.cpp",
     "TestReadInteraction.cpp",
     "TestReportingEngine.cpp",
     "TestSceneTable.cpp",
@@ -182,11 +196,11 @@ chip_test_suite("tests") {
     ":binding-test-srcs",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
+    ":power-cluster-test-srcs",
     ":scenes-table-test-srcs",
     ":time-sync-data-provider-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
-    "${chip_root}/src/app/icd:cluster-srcs",
     "${chip_root}/src/app/icd:manager-srcs",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_ember",
@@ -195,7 +209,10 @@ chip_test_suite("tests") {
     "${nlunit_test_root}:nlunit-test",
   ]
 
-  if (chip_config_network_layer_ble &&
+  # Do not run TestCommissionManager when running ICD specific unit tests.
+  # ICDManager has a dependency on the Accessors.h file which causes a link error
+  # when building the TestCommissionManager
+  if (!chip_enable_icd_server && chip_config_network_layer_ble &&
       (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
     test_sources += [ "TestCommissionManager.cpp" ]
     public_deps += [ "${chip_root}/src/app/server" ]

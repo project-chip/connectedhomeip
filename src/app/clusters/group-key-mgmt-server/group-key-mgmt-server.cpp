@@ -500,6 +500,12 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
 
     // Set KeySet
     err = provider->SetKeySet(fabric->GetFabricIndex(), compressed_fabric_id, keyset);
+    if (CHIP_ERROR_INVALID_LIST_LENGTH == err)
+    {
+        commandObj->AddStatusAndLogIfFailure(commandPath, Status::ResourceExhausted, "Not enough space left to add a new KeySet");
+        return true;
+    }
+
     if (CHIP_NO_ERROR == err)
     {
         ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetWrite OK");

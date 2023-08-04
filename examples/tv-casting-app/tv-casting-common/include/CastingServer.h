@@ -22,6 +22,7 @@
 #include "ApplicationBasic.h"
 #include "ApplicationLauncher.h"
 #include "Channel.h"
+#include "CommissioningCallbacks.h"
 #include "ContentLauncher.h"
 #include "KeypadInput.h"
 #include "LevelControl.h"
@@ -33,6 +34,7 @@
 #include "TargetVideoPlayerInfo.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/server/AppDelegate.h>
 #include <app/server/Server.h>
 #include <controller/CHIPCluster.h>
 #include <controller/CHIPCommissionableNodeController.h>
@@ -45,7 +47,7 @@ constexpr chip::System::Clock::Seconds16 kCommissioningWindowTimeout = chip::Sys
  *  and then have it send TV Casting/Media related commands. This is to be instantiated
  *  as a singleton and is to be used across Linux, Android and iOS.
  */
-class CastingServer
+class CastingServer : public AppDelegate
 {
 public:
     CastingServer(CastingServer & other) = delete;
@@ -55,11 +57,12 @@ public:
     CHIP_ERROR PreInit(AppParams * AppParams = nullptr);
     CHIP_ERROR Init(AppParams * AppParams = nullptr);
     CHIP_ERROR InitBindingHandlers();
+    void InitAppDelegation();
 
     CHIP_ERROR DiscoverCommissioners(chip::Controller::DeviceDiscoveryDelegate * deviceDiscoveryDelegate = nullptr);
     const chip::Dnssd::DiscoveredNodeData *
     GetDiscoveredCommissioner(int index, chip::Optional<TargetVideoPlayerInfo *> & outAssociatedConnectableVideoPlayer);
-    CHIP_ERROR OpenBasicCommissioningWindow(std::function<void(CHIP_ERROR)> commissioningCompleteCallback,
+    CHIP_ERROR OpenBasicCommissioningWindow(CommissioningCallbacks commissioningCallbacks,
                                             std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
                                             std::function<void(CHIP_ERROR)> onConnectionFailure,
                                             std::function<void(TargetEndpointInfo *)> onNewOrUpdatedEndpoint);
@@ -429,6 +432,13 @@ private:
     static void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     void ReadServerClusters(chip::EndpointId endpointId);
 
+    void OnCommissioningSessionEstablishmentStarted() override;
+    void OnCommissioningSessionStarted() override;
+    void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) override;
+    void OnCommissioningSessionStopped() override;
+    void OnCommissioningWindowOpened() override {}
+    void OnCommissioningWindowClosed() override {}
+
     /**
      * @brief Retrieve the IP Address to use for the UDC request.
      * This function will look for an IPv4 address in the list of IPAddresses passed in if available and return
@@ -456,7 +466,8 @@ private:
     chip::Inet::IPAddress mTargetVideoPlayerIpAddress[chip::Dnssd::CommonResolutionData::kMaxIPAddresses];
 
     chip::Controller::CommissionableNodeController mCommissionableNodeController;
-    std::function<void(CHIP_ERROR)> mCommissioningCompleteCallback;
+
+    CommissioningCallbacks mCommissioningCallbacks;
 
     std::function<void(TargetEndpointInfo *)> mOnNewOrUpdatedEndpoint;
     std::function<void(TargetVideoPlayerInfo *)> mOnConnectionSuccessClientCallback;

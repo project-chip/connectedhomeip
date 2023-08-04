@@ -46,7 +46,7 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
                                  deviceID:(NSNumber *)deviceID
                             xpcConnection:(MTRDeviceControllerXPCConnection *)xpcConnection
 {
-    _controllerID = controllerOverXPC.controllerID;
+    _controllerID = controllerOverXPC.controllerXPCID;
     _controller = controllerOverXPC;
     _nodeID = deviceID;
     _xpcConnection = xpcConnection;

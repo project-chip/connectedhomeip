@@ -141,6 +141,11 @@ void AttributePathExpandIterator::PrepareAttributeIndexRange(const AttributePath
             }
             mGlobalAttributeEndIndex = static_cast<uint8_t>(mGlobalAttributeIndex + 1);
         }
+        else
+        {
+            mGlobalAttributeIndex    = UINT8_MAX;
+            mGlobalAttributeEndIndex = 0;
+        }
     }
 }
 

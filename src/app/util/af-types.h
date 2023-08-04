@@ -181,14 +181,11 @@ typedef struct
     uint16_t endpointSize;
 } EmberAfEndpointType;
 
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum EmberAfEndpointBitmask;
-#else
-typedef uint8_t EmberAfEndpointBitmask;
-enum
-#endif
-{ EMBER_AF_ENDPOINT_DISABLED = 0x00,
-  EMBER_AF_ENDPOINT_ENABLED  = 0x01,
+enum class EmberAfEndpointOptions : uint8_t
+{
+    isEnabled         = 0x1,
+    isFlatComposition = 0x2,
+    isTreeComposition = 0x3,
 };
 
 /**
@@ -209,7 +206,7 @@ struct EmberAfDefinedEndpoint
     /**
      * Meta-data about the endpoint
      */
-    EmberAfEndpointBitmask bitmask = EMBER_AF_ENDPOINT_DISABLED;
+    chip::BitMask<EmberAfEndpointOptions> bitmask;
     /**
      * Endpoint type for this endpoint.
      */
