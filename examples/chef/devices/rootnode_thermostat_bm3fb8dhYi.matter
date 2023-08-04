@@ -929,58 +929,6 @@ server cluster SoftwareDiagnostics = 52 {
   command ResetWatermarks(): DefaultSuccess = 0;
 }
 
-/** This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.
-Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
-Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
-server cluster Switch = 59 {
-  bitmap Feature : BITMAP32 {
-    kLatchingSwitch = 0x1;
-    kMomentarySwitch = 0x2;
-    kMomentarySwitchRelease = 0x4;
-    kMomentarySwitchLongPress = 0x8;
-    kMomentarySwitchMultiPress = 0x10;
-  }
-
-  info event SwitchLatched = 0 {
-    INT8U newPosition = 0;
-  }
-
-  info event InitialPress = 1 {
-    INT8U newPosition = 0;
-  }
-
-  info event LongPress = 2 {
-    INT8U newPosition = 0;
-  }
-
-  info event ShortRelease = 3 {
-    INT8U previousPosition = 0;
-  }
-
-  info event LongRelease = 4 {
-    INT8U previousPosition = 0;
-  }
-
-  info event MultiPressOngoing = 5 {
-    INT8U newPosition = 0;
-    INT8U currentNumberOfPressesCounted = 1;
-  }
-
-  info event MultiPressComplete = 6 {
-    INT8U previousPosition = 0;
-    INT8U totalNumberOfPressesCounted = 1;
-  }
-
-  readonly attribute int8u numberOfPositions = 0;
-  readonly attribute int8u currentPosition = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 server cluster AdministratorCommissioning = 60 {
   enum CommissioningWindowStatusEnum : ENUM8 {
@@ -1499,12 +1447,6 @@ endpoint 0 {
   device type rootdevice = 22, version 1;
   binding cluster OtaSoftwareUpdateProvider;
 
-  server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
-  }
-
   server cluster Descriptor {
     callback attribute deviceTypeList;
     callback attribute serverList;
@@ -1631,13 +1573,6 @@ endpoint 0 {
     callback attribute currentHeapHighWatermark default = 0x0000000000000000;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 0x0001;
-  }
-
-  server cluster Switch {
-    ram      attribute numberOfPositions default = 2;
-    ram      attribute currentPosition;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
   }
 
   server cluster AdministratorCommissioning {

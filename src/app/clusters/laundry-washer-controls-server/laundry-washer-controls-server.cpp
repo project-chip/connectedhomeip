@@ -83,14 +83,13 @@ LaundryWasherControlsServer & LaundryWasherControlsServer::Instance()
     return sInstance;
 }
 
-EmberAfStatus LaundryWasherControlsServer::SetSpinSpeedCurrent(EndpointId endpointId,
-                                                               DataModel::Nullable<uint8_t> newSpinSpeedCurrent)
+EmberAfStatus LaundryWasherControlsServer::SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> spinSpeedCurrent)
 {
-    DataModel::Nullable<uint8_t> spinSpeedCurrent;
-    EmberAfStatus res = SpinSpeedCurrent::Get(endpointId, spinSpeedCurrent);
-    if ((res == EMBER_ZCL_STATUS_SUCCESS) && (spinSpeedCurrent != newSpinSpeedCurrent))
+    DataModel::Nullable<uint8_t> spinSpeedCurrentNow;
+    EmberAfStatus res = SpinSpeedCurrent::Get(endpointId, spinSpeedCurrentNow);
+    if ((res == EMBER_ZCL_STATUS_SUCCESS) && (spinSpeedCurrentNow != spinSpeedCurrent))
     {
-        res = SpinSpeedCurrent::Set(endpointId, newSpinSpeedCurrent);
+        res = SpinSpeedCurrent::Set(endpointId, spinSpeedCurrent);
     }
 
     return res;
