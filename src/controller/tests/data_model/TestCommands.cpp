@@ -85,8 +85,8 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
 
         if (DataModel::Decode(aReader, dataRequest) != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Unable to decode the request");
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
+            apCommandObj->AddStatusAndLogIfFailure(aCommandPath, Protocols::InteractionModel::Status::Failure,
+                                                   "Unable to decode the request");
             return;
         }
 
@@ -120,7 +120,8 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
             // test is not really testing what it should.
             for (size_t i = 0; i < 4; ++i)
             {
-                apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Success);
+                apCommandObj->AddStatusAndLogIfFailure(aCommandPath, Protocols::InteractionModel::Status::Success,
+                                                       "No error but testing AddStatusAndLogIfFailure in success case");
             }
             // And one failure on the end.
             apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);

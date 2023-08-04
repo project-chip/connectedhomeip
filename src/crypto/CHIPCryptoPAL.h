@@ -803,7 +803,7 @@ CHIP_ERROR Hash_SHA1(const uint8_t * data, size_t data_length, uint8_t * out_buf
  *        All implementations must check for std::is_trivially_copyable.
  **/
 
-struct alignas(size_t) HashSHA256OpaqueContext
+struct alignas(CHIP_CONFIG_SHA256_CONTEXT_ALIGN) HashSHA256OpaqueContext
 {
     uint8_t mOpaque[kMAX_Hash_SHA256_Context_Size];
 };
@@ -1581,6 +1581,16 @@ CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
  *          CHIP_NO_ERROR otherwise.
  **/
 CHIP_ERROR ExtractCRLDistributionPointURIFromX509Cert(const ByteSpan & certificate, MutableCharSpan & cdpurl);
+
+/**
+ * @brief Extracts the CRL Distribution Point (CDP) extension's cRLIssuer Name from an X509 ASN.1 Encoded Certificate.
+ *        The value is copied into buffer in a raw ASN.1 X.509 format. This format should be directly comparable
+ *        with the result of ExtractSubjectFromX509Cert().
+ *
+ * @returns CHIP_ERROR_NOT_FOUND if not found or wrong format.
+ *          CHIP_NO_ERROR otherwise.
+ **/
+CHIP_ERROR ExtractCDPExtensionCRLIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSpan & crlIssuer);
 
 /**
  * @brief Extracts Serial Number from X509 Certificate.

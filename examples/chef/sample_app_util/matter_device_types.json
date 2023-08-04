@@ -41,5 +41,7 @@
     "Video Remote Control": 42,
     "Mode Select": 39,
     "Air Purifier": 45,
-    "Air Quality Sensor": 44
+    "Air Quality Sensor": 44,
+    "Robotic Vacuum Cleaner": 116,
+    "Room Air Conditioner": 114
 }

@@ -134,9 +134,9 @@ void ChefChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannel
         {
             matchedChannels[totalMatchedChannels++] = (channel);
         }
-        else if (matchedChannels.size() == 0)
+        else if (totalMatchedChannels == 0)
         {
-            // "index" is only used when we end up with matchedChannels.size() == 1.
+            // "index" is only used when we end up with totalMatchedChannels == 1.
             // In that case, we want it to be the number of non-matching channels we saw before
             // the matching one.
             index++;
@@ -146,12 +146,12 @@ void ChefChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannel
     ChangeChannelResponseType response;
 
     // Error: Found multiple matches
-    if (matchedChannels.size() > 1)
+    if (totalMatchedChannels > 1)
     {
         response.status = chip::app::Clusters::Channel::ChannelStatusEnum::kMultipleMatches;
         helper.Success(response);
     }
-    else if (matchedChannels.size() == 0)
+    else if (totalMatchedChannels == 0)
     {
         // Error: Found no match
         response.status = chip::app::Clusters::Channel::ChannelStatusEnum::kNoMatches;

@@ -42,51 +42,19 @@ public:
      * Set the default delegate of laundry washer server at endpoint x
      * @param endpoint ID of the endpoint
      * @param delegate The default delegate at the endpoint
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     static void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 
     /**
-     * Init the laundry washer server.
-     * @param void
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     * API to set/get the SpinSpeedCurrent attribute
      */
-    //    CHIP_ERROR Init();
-
-    /**
-     * @brief Set the attribute newSpinSpeedCurrent
-     *
-     * @param endpointId ID of the endpoint
-     * @param newSpinSpeedCurrent attribute SpinSpeedCurrent
-     * @return true on success, false on failure
-     */
-    EmberAfStatus SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> newSpinSpeedCurrent);
-
-    /**
-     * @brief Get the attribute newSpinSpeedCurrent
-     *
-     * @param endpointId ID of the endpoint
-     * @param SpinSpeedCurrent attribute SpinSpeedCurrent
-     * @return true on success, false on failure
-     */
+    EmberAfStatus SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> spinSpeedCurrent);
     EmberAfStatus GetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> & spinSpeedCurrent);
 
     /**
-     * @brief Set the attribute NumberOfRinses
-     *
-     * @param endpointId ID of the endpoint
-     * @param newNumberOfRinses attribute NumberOfRinses
-     * @return true on success, false on failure
+     * API to set/get the NumberOfRinses attribute
      */
     EmberAfStatus SetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses);
-
-    /**
-     * @brief Get the attribute NumberOfRinses
-     *
-     * @param endpointId ID of the endpoint
-     * @param NumberOfRinses attribute NumberOfRinses
-     * @return true on success, false on failure
-     */
     EmberAfStatus GetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses);
 
 private:
