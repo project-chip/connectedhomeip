@@ -67,7 +67,7 @@ sed -r -i "s|image: ghcr\.io/project-chip/(.*):[0-9,a-z,A-Z,-]*(\..*)?|image: gh
 sed -r -i "s|image: ghcr\.io/project-chip/(.*):[0-9,a-z,A-Z,-]*(\..*)?|image: ghcr.io/project-chip/\1:$NEXT_VERSION|" .github/workflows/*.yml
 
 echo "Rolling cloudbuild"
-sed -r -i "s|ghcr\.io/project-chip/(.*):[0-9,a-z,A-Z,-]*(\..*)?|image: ghcr.io/project-chip/\1:$NEXT_VERSION|" integrations/cloudbuild/*.yaml
+sed -r -i "s|ghcr\.io/project-chip/(.*):[0-9,a-z,A-Z,-]*(\..*)?|ghcr.io/project-chip/\1:$NEXT_VERSION|" integrations/cloudbuild/*.yaml
 
 echo "Rolling VSCode container"
 sed -r -i "s|matter-dev-environment:local --version [0-9,a-z,A-Z,-]*|matter-dev-environment:local --version $NEXT_VERSION|" .devcontainer/devcontainer.json
