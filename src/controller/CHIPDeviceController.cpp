@@ -2154,7 +2154,7 @@ void DeviceCommissioner::ParseFabrics()
 
     if (mPairingDelegate != nullptr)
     {
-        mPairingDelegate->OnFabricCheck(info);
+        mPairingDelegate->OnFabricCheck(info.nodeId);
     }
 
     CommissioningDelegate::CommissioningReport report;
@@ -2403,7 +2403,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     break;
     case CommissioningStage::kCheckForMatchingFabric: {
         // Read the current fabrics
-        if (params.GetCheckForMatchingFabric())
+        if (!params.GetCheckForMatchingFabric())
         {
             // We don't actually want to do this step, so just bypass it
             ChipLogProgress(Controller, "kCheckForMatchingFabric step called without parameter set, skipping");
