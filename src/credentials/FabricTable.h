@@ -222,51 +222,8 @@ private:
 
     static void StaticAsserts()
     {
-        static_assert(sizeof(void *) == 4 || sizeof(void *) == 8,
-                      "Unexpected pointer width, computation of expected size will be off.");
-
-        constexpr size_t expected_size = []() -> size_t {
-            // mNodeId, mFabricId, mCompressedFabricId are 8 bytes each.
-            size_t totalSize = 8 * 3;
-
-            // Root public key is a vtable pointer followed by 65 bytes of data,
-            // but the space it takes up needs to end on a void * alignment
-            // boundary.  So it's 72 (= 69 + 3) bytes on 32-bit and 80 (= 73 + 7)
-            // bytes on 64-bit.
-            if constexpr (sizeof(void *) == 4)
-            {
-                totalSize += 72;
-            }
-            else
-            {
-                totalSize += 80;
-            }
-
-            // mFabricLabel is 33 bytes and has no alignment requirements.
-            totalSize += 33;
-
-            // mFabricIndex, mVendorId, mHasExternallyOwnedOperationalKey are
-            // 1, 2, 1 bytes respectively, and doing them in that order has no
-            // alignment issues.
-            totalSize += 1 + 2 + 1;
-
-            // mOperationalKey has to be aligned on a void * alignment
-            // boundary.  We are 37 bytes past an 8-byte boundary here, so we
-            // have a 3-byte gap.  Then the pointer itself.  Then we need to end
-            // up 8-byte aligned, so on 32-bit we have another 4-byte gap.
-            if constexpr (sizeof(void *) == 4)
-            {
-                totalSize += 3 + 4 + 4;
-            }
-            else
-            {
-                totalSize += 3 + 8;
-            }
-
-            return totalSize;
-        }();
-
-        static_assert(sizeof(FabricInfo) == expected_size, "FabricInfo size unexpected N");
+        static_assert(offsetof(FabricInfo, mOperationalKey) - offsetof(FabricInfo, mHasExternallyOwnedOperationalKey) == 4,
+                      "We should have 3 bytes of padding before mOperationalKey");
     }
 
     NodeId mNodeId     = kUndefinedNodeId;
@@ -276,11 +233,18 @@ private:
     // We cache the root public key since it's used so often and costly to get.
     Crypto::P256PublicKey mRootPublicKey;
 
+    // mFabricLabel is 33 bytes, so ends on a 1 mod 4 byte boundary.
     char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
 
+    // mFabricIndex, mVendorId, mHasExternallyOwnedOperationalKey are 4 bytes
+    // and do not end up with any padding if they come after the 33-byte
+    // mFabricLabel, so end on a 1 mod 4 byte boundary.
     FabricIndex mFabricIndex               = kUndefinedFabricIndex;
     VendorId mVendorId                     = VendorId::NotSpecified;
     bool mHasExternallyOwnedOperationalKey = false;
+
+    // 3 bytes of padding here, since mOperationalKey needs to be void*-aligned,
+    // so has to be at a 0 mod 4 byte location.
 
     mutable Crypto::P256Keypair * mOperationalKey = nullptr;
 
