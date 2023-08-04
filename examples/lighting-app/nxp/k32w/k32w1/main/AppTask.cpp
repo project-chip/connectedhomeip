@@ -30,6 +30,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <src/platform/nxp/k32w/k32w1/DefaultTestEventTriggerDelegate.h>
+#if defined(USE_SMU2_DYNAMIC)
+#include <src/platform/nxp/k32w/k32w1/SMU2Manager.h>
+#endif
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -220,6 +223,10 @@ void AppTask::InitServer(intptr_t arg)
     static chip::K32W1PersistentStorageOpKeystore sK32W1PersistentStorageOpKeystore;
     VerifyOrDie((sK32W1PersistentStorageOpKeystore.Init(initParams.persistentStorageDelegate)) == CHIP_NO_ERROR);
     initParams.operationalKeystore = &sK32W1PersistentStorageOpKeystore;
+#endif
+
+#if defined(USE_SMU2_DYNAMIC)
+    VerifyOrDie(SMU2::Init(initParams.persistentStorageDelegate) == CHIP_NO_ERROR);
 #endif
 
     // Init ZCL Data Model and start server

@@ -148,13 +148,13 @@ see the files prefixed with `chip-k32w1-light-example`.
 
 Some Matter instances and global variables can be placed in the `NBU` `SMU2`
 memory. When compiling with OpenThread FTD support (`chip_openthread_ftd=true`)
-and with `use_smu2_as_system_memory=true`, the following components are placed
+and with `use_smu2_static=true`, the following components are placed
 in `SMU2` memory:
 
--   `gImageProcessor` from `OTAImageProcessorImpl.cpp`.
--   `gApplicationProcessor` from `OTAHooks.cpp`.
--   `Server::sServer` from `Server.cpp`.
--   `ThreadStackManagerImpl::sInstance` from `ThreadStackManagerImpl.cpp`.
+* `gImageProcessor` from `OTAImageProcessorImpl.cpp`.
+* `gApplicationProcessor` from `OTAHooks.cpp`.
+* `Server::sServer` from `Server.cpp`.
+* `ThreadStackManagerImpl::sInstance` from `ThreadStackManagerImpl.cpp`.
 
 These instances and global variables are placed in `SMU2` memory through name
 matching in the application linker script. They should not be changed or, if
@@ -162,9 +162,11 @@ changed, the names must be updated in `k32w1_app.ld`. See
 [k32w1_app.ld](../../../../platform/nxp/k32w/k32w1/app/ldscripts/k32w1_app.ld)
 for names and `SMU2` memory range size.
 
-To use the `SMU2` Memory an optimized `NBU` binary is also needed. See
-[Flashing the NBU image](#flashing-the-nbu-image).
-To use the `SMU2` Memory an optimized `NBU` binary is also needed. See [Flashing the NBU image](#flashing-the-nbu-image).
+The OpenThread buffers can be allocated from a 13KB SMU2 range after
+a successful commmissioning process until a factory reset is initiated.
+This way, the OpenThread buffers will be dynamically allocated instead
+of statically, freeing some SRAM. To enable this feature compile with
+OpenThread FTD support (`chip_openthread_ftd=true`) and with `use_smu2_dynamic=true`.
 
 ## Manufacturing data
 

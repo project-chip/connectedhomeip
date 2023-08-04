@@ -33,6 +33,13 @@ config("openthread_k32w1_config") {
     "MBEDTLS_THREADING_C=1",
     "MBEDTLS_THREADING_ALT=1"
   ]
+
+  if (use_smu2_dynamic) {
+    defines += [
+      "OPENTHREAD_CONFIG_MESSAGE_USE_HEAP_ENABLE=1",
+      "OPENTHREAD_CONFIG_ENABLE_BUILTIN_MBEDTLS_MANAGEMENT=0",
+    ]
+  }
 }
 
 source_set("openthread_core_config_k32w1") {

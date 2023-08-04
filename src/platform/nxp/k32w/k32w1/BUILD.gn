@@ -131,6 +131,13 @@ static_library("nxp_platform") {
       ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
+
+    if (use_smu2_dynamic) {
+      sources += [
+        "SMU2Manager.cpp",
+        "SMU2Manager.h",
+      ]
+    }
   }
 
   public_deps += [ "${chip_root}/src/crypto" ]

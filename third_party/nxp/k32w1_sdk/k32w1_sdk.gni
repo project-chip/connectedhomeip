@@ -26,14 +26,21 @@ import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
 declare_args() {
   # Location of the k32w1 SDK.
   k32w1_sdk_root = getenv("NXP_K32W1_SDK_ROOT")
-  use_smu2_as_system_memory = false
+  use_smu2_static = false
+  use_smu2_dynamic = false
+
+  # icd configuration flags
+  chip_enable_icd_subscription_handle = false
+  chip_ot_idle_interval_ms = 1000  # 1s Idle Intervals
+  chip_ot_active_interval_ms = 100  # 100ms Active Intervals
+  chip_active_mode_threshold = 500  # 500ms Active mode threshold
 }
 
 openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 
 assert(k32w1_sdk_root != "", "k32w1_sdk_root must be specified")
 
-assert(!(use_smu2_as_system_memory && !chip_openthread_ftd),
+assert(!((use_smu2_static && !chip_openthread_ftd) || ((use_smu2_dynamic && !chip_openthread_ftd))),
     "SMU2 can be used as system memory only with OT-FTD suppport")
 
 # Defines an k32w1 SDK build target.
@@ -268,10 +275,18 @@ template("k32w1_sdk") {
       defines += [ "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1" ]
     }
 
-    if (use_smu2_as_system_memory) {
+    if (use_smu2_static) {
       defines += [
         "__STARTUP_CLEAR_SMU2",
         "USE_SMU2_AS_SYSTEM_MEMORY",
+        "USE_SMU2_STATIC",
+      ]
+    }
+
+    if (use_smu2_dynamic) {
+      defines += [
+        "USE_SMU2_AS_SYSTEM_MEMORY",
+        "USE_SMU2_DYNAMIC",
       ]
     }
 

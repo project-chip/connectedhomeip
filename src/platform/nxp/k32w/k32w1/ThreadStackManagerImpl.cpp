@@ -27,13 +27,15 @@
 
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 
+#if defined(USE_SMU2_DYNAMIC)
+#include <src/platform/nxp/k32w/k32w1/SMU2Manager.h>
+#endif
 #include <lib/support/CHIPPlatformMemory.h>
 
 namespace chip {
@@ -83,6 +85,7 @@ bool ThreadStackManagerImpl::IsInitialized()
 } // namespace DeviceLayer
 } // namespace chip
 
+using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
 /**
@@ -113,7 +116,11 @@ extern "C" void * pvPortCallocRtos(size_t num, size_t size)
 
 extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
 {
+#if defined(USE_SMU2_DYNAMIC)
+    return SMU2::Allocate(aNum * aSize);
+#else
     return CHIPPlatformMemoryCalloc(aNum, aSize);
+#endif
 }
 
 extern "C" void otPlatFree(void * aPtr)
