@@ -31,7 +31,7 @@ namespace {
 // actual value of this does not actually matter, however we need
 // a value to be able to read 32-bit implicit profile tags
 //
-// JSON format never as this and TLV payload contains "implicit profile"
+// JSON format never has this and TLV payload contains "implicit profile"
 // and this value is never stored.
 constexpr uint32_t kTemporaryImplicitProfileId = 0xFF01;
 
