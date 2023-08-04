@@ -34,15 +34,15 @@ class TestDriver:
         self.script_path = os.path.abspath(os.path.join(
             DEFAULT_CHIP_ROOT, 'src', 'python_testing', 'TestTimeSyncTrustedTimeSource.py'))
         if not os.path.exists(self.app_path):
-            msg = f'chip-all-clusters-app not found'
+            msg = 'chip-all-clusters-app not found'
             logging.error(msg)
             raise FileNotFoundError(msg)
         if not os.path.exists(self.run_python_test_path):
-            msg = f'run_python_test.py script not found'
+            msg = 'run_python_test.py script not found'
             logging.error(msg)
             raise FileNotFoundError(msg)
         if not os.path.exists(self.script_path):
-            msg = f'TestTimeSyncTrustedTimeSource.py script not found'
+            msg = 'TestTimeSyncTrustedTimeSource.py script not found'
             logging.error(msg)
             raise FileNotFoundError(msg)
 
@@ -135,9 +135,8 @@ def main():
         kill_process(app2_process)
         return ret
 
-    logging.warning("Stopping app with SIGINT")
-    app2_process.send_signal(signal.SIGINT.value)
-    app2_process.wait()
+    kill_process(app2_process)
+    sys.exit(0)
 
 
 if __name__ == '__main__':
