@@ -87,8 +87,9 @@ struct JsonObjectElementContext
 {
     JsonObjectElementContext(TLV::TLVReader & reader)
     {
-        tag          = reader.GetTag();
-        type.tlvType = reader.GetType();
+        tag               = reader.GetTag();
+        implicitProfileId = reader.ImplicitProfileId;
+        type.tlvType      = reader.GetType();
         if (type.tlvType == TLV::kTLVType_FloatingPointNumber)
         {
             type.isDouble = reader.IsElementDouble();
@@ -97,8 +98,30 @@ struct JsonObjectElementContext
 
     std::string GenerateJsonElementName() const
     {
-        std::string str = std::to_string(TLV::TagNumFromTag(tag));
-        str             = str + ":" + GetJsonElementStrFromType(type);
+        std::string str = "???";
+        if (TLV::IsContextTag(tag))
+        {
+            // common case for context tags: raw value
+            str = std::to_string(TLV::TagNumFromTag(tag));
+        }
+        else if (TLV::IsProfileTag(tag))
+        {
+            if (TLV::ProfileIdFromTag(tag) == implicitProfileId)
+            {
+                // Explicit assume implicit tags are just things we want
+                // 32-bit numbers for
+                str = std::to_string(TLV::TagNumFromTag(tag));
+            }
+            else
+            {
+                // UNEXPECTED, create a full 64-bit number here
+                str = std::to_string(TLV::ProfileIdFromTag(tag)) + "/" + std::to_string(TLV::TagNumFromTag(tag));
+            }
+
+            // NOTE: this does NOT preserve the profile number here,
+            //       because the TLV supported by json supports
+        }
+        str = str + ":" + GetJsonElementStrFromType(type);
         if (type.tlvType == TLV::kTLVType_Array)
         {
             str = str + "-" + GetJsonElementStrFromType(subType);
@@ -107,6 +130,7 @@ struct JsonObjectElementContext
     }
 
     TLV::Tag tag;
+    uint32_t implicitProfileId;
     ElementTypeContext type;
     ElementTypeContext subType;
 };
