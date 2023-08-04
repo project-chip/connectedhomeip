@@ -56,6 +56,14 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include "SilabsDeviceDataProvider.h"
 #include "SilabsTestEventTriggerDelegate.h"
 #include <app/InteractionModelEngine.h>
+#include <app/TimerDelegates.h>
+
+#if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
+#include <app/reporting/SynchronizedReportSchedulerImpl.h>
+#else
+#include <app/reporting/ReportSchedulerImpl.h>
+#endif
+
 #include <lib/support/BytesToHex.h>
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -182,7 +190,18 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
     // Create initParams with SDK example defaults here
+    // TODO: replace with our own init param to avoid double allocation in examples
     static chip::CommonCaseDeviceServerInitParams initParams;
+
+    // Report scheduler and timer delegate instance
+    static chip::app::DefaultTimerDelegate sTimerDelegate;
+#if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
+    static chip::app::reporting::SynchronizedReportSchedulerImpl sReportScheduler(&sTimerDelegate);
+#else
+    static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
+#endif
+
+    initParams.reportScheduler = &sReportScheduler;
 
 #if SILABS_TEST_EVENT_TRIGGER_ENABLED
     if (Encoding::HexToBytes(SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY, strlen(SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY),
