@@ -15,7 +15,7 @@
 #   limitations under the License.
 #
 
-ARG VERSION=1
+ARG VERSION=5
 FROM ghcr.io/project-chip/chip-cirque-device-base:${VERSION}
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 

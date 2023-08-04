@@ -32,7 +32,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:2
+            image: ghcr.io/project-chip/chip-build-esp32:5
 
         steps:
             - name: Checkout
@@ -68,7 +68,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-efr32:1
+            image: ghcr.io/project-chip/chip-build-efr32:5
         steps:
             - name: Checkout
               uses: actions/checkout@v3

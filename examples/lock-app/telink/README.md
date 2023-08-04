@@ -12,13 +12,13 @@ a reference for creating your own application.
 1. Pull docker image from repository:
 
     ```bash
-    $ docker pull ghcr.io/project-chip/chip-build-telink:1
+    $ docker pull ghcr.io/project-chip/chip-build-telink:5
     ```
 
 1. Run docker container:
 
     ```bash
-    $ docker run -it --rm -v ${CHIP_BASE}:/root/chip -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" ghcr.io/project-chip/chip-build-telink:1
+    $ docker run -it --rm -v ${CHIP_BASE}:/root/chip -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" ghcr.io/project-chip/chip-build-telink:5
     ```
 
     here `${CHIP_BASE}` is directory which contains CHIP repo files **!!!Pay
