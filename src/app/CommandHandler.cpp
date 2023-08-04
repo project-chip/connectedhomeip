@@ -303,6 +303,9 @@ Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElem
 
     if (CommandIsFabricScoped(concretePath.mClusterId, concretePath.mCommandId))
     {
+        // SPEC: Else if the command in the path is fabric-scoped and there is no accessing fabric,
+        // a CommandStatusIB SHALL be generated with the UNSUPPORTED_ACCESS Status Code.
+
         // Fabric-scoped commands are not allowed before a specific accessing fabric is available.
         // This is mostly just during a PASE session before AddNOC.
         if (GetAccessingFabricIndex() == kUndefinedFabricIndex)

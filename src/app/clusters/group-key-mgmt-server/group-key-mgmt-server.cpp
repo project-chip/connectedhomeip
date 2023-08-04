@@ -401,24 +401,10 @@ ValidateKeySetWriteArguments(const chip::app::Clusters::GroupKeyManagement::Comm
     return Status::Success;
 }
 
-constexpr uint16_t GroupKeyManagementAttributeAccess::kClusterRevision;
-
-GroupKeyManagementAttributeAccess gAttribute;
-
 bool ValidateAndGetProviderAndFabric(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                      Credentials::GroupDataProvider ** outGroupDataProvider, const FabricInfo ** outFabricInfo)
 {
     VerifyOrDie((outGroupDataProvider != nullptr) && (outFabricInfo != nullptr));
-
-    // Else if the command in the path is fabric-scoped and there is no accessing fabric,
-    // a CommandStatusIB SHALL be generated with the UNSUPPORTED_ACCESS Status Code.
-    auto accessingFabricIndex = commandObj->GetAccessingFabricIndex();
-    if (kUndefinedFabricIndex == accessingFabricIndex)
-    {
-        commandObj->AddStatusAndLogIfFailure(commandPath, Status::UnsupportedAccess,
-                                             "GroupKeyManagement command received without accessing fabric.");
-        return false;
-    }
 
     // Internal failures on internal inconsistencies.
     auto provider = GetGroupDataProvider();
@@ -441,6 +427,8 @@ bool ValidateAndGetProviderAndFabric(chip::app::CommandHandler * commandObj, con
 
     return true;
 }
+
+GroupKeyManagementAttributeAccess gAttribute;
 
 } // anonymous namespace
 
