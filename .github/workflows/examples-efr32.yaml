@@ -67,7 +67,7 @@ jobs:
              "./scripts/build/build_examples.py \
                 --enable-flashbundle \
                 --target efr32-brd4187c-thermostat-openthread_mtd \
-                --target efr32-brd4187c-switch-sed-shell-use_ot_coap_lib \
+                --target efr32-brd4187c-switch-shell-use_ot_coap_lib \
                 --target efr32-brd4187c-unit-test \
                 build \
                 --copy-artifacts-to out/artifacts \
@@ -81,7 +81,7 @@ jobs:
                 --enable-flashbundle \
                 --target efr32-brd4187c-light-use_ot_lib \
                 --target efr32-brd4187c-pump \
-                --target efr32-brd4187c-lock-rpc-shell-enable_heap_monitoring \
+                --target efr32-brd4187c-lock-shell-enable_heap_monitoring \
                 build \
                 --copy-artifacts-to out/artifacts \
              "
