@@ -117,9 +117,6 @@ struct JsonObjectElementContext
                 // UNEXPECTED, create a full 64-bit number here
                 str = std::to_string(TLV::ProfileIdFromTag(tag)) + "/" + std::to_string(TLV::TagNumFromTag(tag));
             }
-
-            // NOTE: this does NOT preserve the profile number here,
-            //       because the TLV supported by json supports
         }
         str = str + ":" + GetJsonElementStrFromType(type);
         if (type.tlvType == TLV::kTLVType_Array)
