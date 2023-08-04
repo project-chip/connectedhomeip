@@ -37,6 +37,10 @@
 #define HOST_TASK_PRIORITY (4U)
 #define HOST_TASK_STACK_SIZE (gHost_TaskStackSize_c / sizeof(StackType_t))
 
+#ifndef HCI_RESET_WAIT_TIME_US
+#define HCI_RESET_WAIT_TIME_US 30000
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -52,6 +56,7 @@ public:
 
     CHIP_ERROR InitHostController(BLECallbackDelegate::GapGenericCallback cb_fp) override;
     BLEManagerCommon * GetImplInstance() override;
+    CHIP_ERROR ResetController() override;
 
 private:
     static BLEManagerImpl sInstance;
