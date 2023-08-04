@@ -54,7 +54,7 @@ public:
     {
         uint8_t value[sizeof(T)];
         auto w = Encoding::LittleEndian::BufferWriter(value, sizeof(T));
-        if (std::is_signed_v<T>)
+        if constexpr (std::is_signed_v<T>)
         {
             w.EndianPutSigned(aValue, sizeof(T));
         }
