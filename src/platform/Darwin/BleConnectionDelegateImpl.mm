@@ -181,8 +181,10 @@ namespace DeviceLayer {
 
                 [ble stop];
                 ble = [[BleConnection alloc] initWithDelegate:delegate queue:bleWorkQueue];
-                ble.onConnectionComplete = OnConnectionComplete;
-                ble.onConnectionError = OnConnectionError;
+                // Do _not_ set onConnectionComplete and onConnectionError
+                // here.  The connection callbacks we have expect an appState
+                // that we do not have here, and in any case connection
+                // complete/error make no sense for a scan.
                 ble.centralManager = [ble.centralManager initWithDelegate:ble queue:bleWorkQueue];
             });
         }
