@@ -22,29 +22,6 @@
 #include <lib/support/jsontlv/TlvJson.h>
 
 namespace {
-
-// Never directly stored in TLV, but used as a fillter to
-// extract 32-bit numbers when reading "Implicit Profile Tags"
-// from TLV. Any number could work, picked a test resrved id
-// to make it more obviously unused and not clash with other uses.
-constexpr uint32_t kTemporaryImplicitProfileId = 0xFF01;
-
-/// RAII to switch the implicit profile id for a reader
-class ImplicitProfileIdChange
-{
-public:
-    ImplicitProfileIdChange(chip::TLV::TLVReader & reader, uint32_t id) :
-        mReader(reader), mOldImplicitProfileId(reader.ImplicitProfileId)
-    {
-        reader.ImplicitProfileId = id;
-    }
-    ~ImplicitProfileIdChange() { mReader.ImplicitProfileId = mOldImplicitProfileId; }
-
-private:
-    chip::TLV::TLVReader & mReader;
-    uint32_t mOldImplicitProfileId;
-};
-
 /*
  * Encapsulates the different types of keys permissible.
  *
@@ -108,7 +85,7 @@ template <typename T>
 void InsertKeyValue(Json::Value & json, const KeyContext & keyContext, T val)
 {
     //
-    // This needs to accommodate either the string 'value', or a 32-bit integer.
+    // This needs to accomodate either the string 'value', or a 32-bit integer.
     // The size of the largest 32-bit integer key represented as a string is 11 characters long.
     // Tack on 1 byte for the null character.
     //
@@ -139,8 +116,6 @@ std::string JsonToString(Json::Value & json)
 
 CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & parent)
 {
-    ImplicitProfileIdChange implicitProfileIdChange(reader, kTemporaryImplicitProfileId);
-
     switch (reader.GetType())
     {
     case TLV::kTLVType_UnsignedInteger: {
