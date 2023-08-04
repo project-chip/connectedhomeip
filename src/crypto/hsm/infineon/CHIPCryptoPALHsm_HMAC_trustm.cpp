@@ -73,7 +73,7 @@ CHIP_ERROR HMAC_shaHSM::HMAC_SHA256(const uint8_t * key, size_t key_length, cons
     // Write metada for secret OID
     write_metadata(TRUSTM_HMAC_OID_KEY, metadata_hmac, sizeof(metadata_hmac));
     // Update the secret key
-    write_data(TRUSTM_HMAC_OID_KEY, key, key_length_u16;
+    write_data(TRUSTM_HMAC_OID_KEY, key, key_length_u16);
 
     // Start HMAC operation
     return_status = OPTIGA_LIB_BUSY;
