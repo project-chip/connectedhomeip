@@ -508,6 +508,11 @@ FabricInfo * FabricTable::GetMutableFabricByIndex(FabricIndex fabricIndex)
 
 const FabricInfo * FabricTable::FindFabricWithIndex(FabricIndex fabricIndex) const
 {
+    if (fabricIndex == kUndefinedFabricIndex)
+    {
+        return nullptr;
+    }
+
     // Try to match pending fabric first if available
     if (HasPendingFabricUpdate() && (mPendingFabric.GetFabricIndex() == fabricIndex))
     {

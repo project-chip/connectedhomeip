@@ -470,7 +470,7 @@ CHIP_ERROR CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, c
     return AddStatusInternal(aCommandPath, StatusIB(aStatus));
 }
 
-CHIP_ERROR CommandHandler::AddStatusAndLogIfFailure(const ConcreteCommandPath & aCommandPath, const Status aStatus,
+void CommandHandler::AddStatusAndLogIfFailure(const ConcreteCommandPath & aCommandPath, const Status aStatus,
                                                     const char * aMessage)
 {
     if (aStatus != Status::Success)
@@ -482,7 +482,7 @@ CHIP_ERROR CommandHandler::AddStatusAndLogIfFailure(const ConcreteCommandPath & 
                      ChipLogValueIMStatus(aStatus), aMessage);
     }
 
-    return AddStatus(aCommandPath, aStatus);
+    LogErrorOnFailure(AddStatus(aCommandPath, aStatus));
 }
 
 CHIP_ERROR CommandHandler::AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus)
