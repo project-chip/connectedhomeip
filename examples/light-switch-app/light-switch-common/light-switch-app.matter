@@ -2276,7 +2276,8 @@ client cluster ColorControl = 768 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Descriptor {
@@ -2582,7 +2583,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type onofflightswitch = 259, version 1;
+  device type ma_onofflightswitch = 259, version 1;
+
   binding cluster Identify;
   binding cluster Scenes;
   binding cluster OnOff;
@@ -2619,7 +2621,8 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type genericswitch = 15, version 1;
+  device type ma_genericswitch = 15, version 1;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;

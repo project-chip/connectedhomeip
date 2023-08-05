@@ -16,6 +16,7 @@
  */
 
 #import "AppParameters.h"
+#import "CommissioningCallbackHandlers.h"
 #import "ContentApp.h"
 #import "ContentLauncherTypes.h"
 #import "DiscoveredNodeData.h"
@@ -109,8 +110,7 @@
 
  @param clientQueue Queue to dispatch the call to the commissioningWindowRequestedHandler on
 
- @param commissioningCompleteCallback Callback for when commissioning of this app has been completed  via a call to the general
- commissioning cluster (by usually an on-network TV/Media device acting as a Matter commissioner)
+ @param commissioningCallbackHandlers Optional parameter to specific handlers for callbacks during commissioning
 
  @param onConnectionSuccessCallback Handles a VideoPlayer * once connection is successfully established
 
@@ -118,15 +118,12 @@
 
  @param onNewOrUpdatedEndpointCallback Handles a ContentApp * for each new ContentApp is found. May be called multiple times based
  on the number of ContentApp
-
- @param commissioningWindowRequestedHandler Handler to call on requesting the opening of a commissioning window
  */
 - (void)openBasicCommissioningWindow:(dispatch_queue_t _Nonnull)clientQueue
-    commissioningWindowRequestedHandler:(void (^_Nonnull)(bool))commissioningWindowRequestedHandler
-          commissioningCompleteCallback:(void (^_Nonnull)(bool))commissioningCompleteCallback
-            onConnectionSuccessCallback:(void (^_Nonnull)(VideoPlayer * _Nonnull))onConnectionSuccessCallback
-            onConnectionFailureCallback:(void (^_Nonnull)(MatterError * _Nonnull))onConnectionFailureCallback
-         onNewOrUpdatedEndpointCallback:(void (^_Nonnull)(ContentApp * _Nonnull))onNewOrUpdatedEndpointCallback;
+       commissioningCallbackHandlers:(CommissioningCallbackHandlers * _Nullable)commissioningCallbackHandlers
+         onConnectionSuccessCallback:(void (^_Nonnull)(VideoPlayer * _Nonnull))onConnectionSuccessCallback
+         onConnectionFailureCallback:(void (^_Nonnull)(MatterError * _Nonnull))onConnectionFailureCallback
+      onNewOrUpdatedEndpointCallback:(void (^_Nonnull)(ContentApp * _Nonnull))onNewOrUpdatedEndpointCallback;
 
 /*!
  @brief Gets the list of VideoPlayers currently connected
