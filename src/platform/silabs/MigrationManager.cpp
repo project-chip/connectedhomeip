@@ -17,7 +17,6 @@
 
 #include "MigrationManager.h"
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/KeyValueStoreManager.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <stdio.h>
 
@@ -38,7 +37,10 @@ typedef struct
 
 #define COUNT_OF(A) (sizeof(A) / sizeof((A)[0]))
 static migrationData_t migrationTable[] = {
-    { .migrationGroup = 1, .migrationFunc = &KeyValueStoreMgrImpl().KvsMapMigration },
+    { .migrationGroup = 1, .migrationFunc = MigrateKvsMap },
+#ifdef SILABS_ATTESTATION_CREDENTIALS
+    { .migrationGroup = 2, .migrationFunc = MigrateDacProvider },
+#endif
     // add any additional migration neccesary. migrationGroup should stay equal if done in the same commit or increment by 1 for
     // each new entry.
 };

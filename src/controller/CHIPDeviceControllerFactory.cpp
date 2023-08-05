@@ -25,6 +25,8 @@
 #include <controller/CHIPDeviceControllerFactory.h>
 
 #include <app/OperationalSessionSetup.h>
+#include <app/TimerDelegates.h>
+#include <app/reporting/ReportSchedulerImpl.h>
 #include <app/util/DataModelHandler.h>
 #include <lib/support/ErrorStr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
@@ -63,6 +65,7 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     mOperationalKeystore       = params.operationalKeystore;
     mOpCertStore               = params.opCertStore;
     mCertificateValidityPolicy = params.certificateValidityPolicy;
+    mSessionResumptionStorage  = params.sessionResumptionStorage;
     mEnableServerInteractions  = params.enableServerInteractions;
 
     CHIP_ERROR err = InitSystemState(params);
@@ -92,6 +95,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
         params.operationalKeystore       = mOperationalKeystore;
         params.opCertStore               = mOpCertStore;
         params.certificateValidityPolicy = mCertificateValidityPolicy;
+        params.sessionResumptionStorage  = mSessionResumptionStorage;
     }
 
     return InitSystemState(params);
@@ -170,6 +174,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.exchangeMgr               = chip::Platform::New<Messaging::ExchangeManager>();
     stateParams.messageCounterManager     = chip::Platform::New<secure_channel::MessageCounterManager>();
     stateParams.groupDataProvider         = params.groupDataProvider;
+    stateParams.timerDelegate             = chip::Platform::New<chip::app::DefaultTimerDelegate>();
+    stateParams.reportScheduler           = chip::Platform::New<app::reporting::ReportSchedulerImpl>(stateParams.timerDelegate);
     stateParams.sessionKeystore           = params.sessionKeystore;
 
     // if no fabricTable was provided, create one and track it in stateParams for cleanup
@@ -191,12 +197,24 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         tempFabricTable         = stateParams.fabricTable;
     }
 
-    auto sessionResumptionStorage = chip::Platform::MakeUnique<SimpleSessionResumptionStorage>();
-    ReturnErrorOnFailure(sessionResumptionStorage->Init(params.fabricIndependentStorage));
-    stateParams.sessionResumptionStorage = std::move(sessionResumptionStorage);
+    SessionResumptionStorage * sessionResumptionStorage;
+    if (params.sessionResumptionStorage == nullptr)
+    {
+        auto ownedSessionResumptionStorage = chip::Platform::MakeUnique<SimpleSessionResumptionStorage>();
+        ReturnErrorOnFailure(ownedSessionResumptionStorage->Init(params.fabricIndependentStorage));
+        stateParams.ownedSessionResumptionStorage    = std::move(ownedSessionResumptionStorage);
+        stateParams.externalSessionResumptionStorage = nullptr;
+        sessionResumptionStorage                     = stateParams.ownedSessionResumptionStorage.get();
+    }
+    else
+    {
+        stateParams.ownedSessionResumptionStorage    = nullptr;
+        stateParams.externalSessionResumptionStorage = params.sessionResumptionStorage;
+        sessionResumptionStorage                     = stateParams.externalSessionResumptionStorage;
+    }
 
     auto delegate = chip::Platform::MakeUnique<ControllerFabricDelegate>();
-    ReturnErrorOnFailure(delegate->Init(stateParams.sessionResumptionStorage.get(), stateParams.groupDataProvider));
+    ReturnErrorOnFailure(delegate->Init(sessionResumptionStorage, stateParams.groupDataProvider));
     stateParams.fabricTableDelegate = delegate.get();
     ReturnErrorOnFailure(stateParams.fabricTable->AddFabricDelegate(stateParams.fabricTableDelegate));
     delegate.release();
@@ -218,7 +236,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
         // Enable listening for session establishment messages.
         ReturnErrorOnFailure(stateParams.caseServer->ListenForSessionEstablishment(
-            stateParams.exchangeMgr, stateParams.sessionMgr, stateParams.fabricTable, stateParams.sessionResumptionStorage.get(),
+            stateParams.exchangeMgr, stateParams.sessionMgr, stateParams.fabricTable, sessionResumptionStorage,
             stateParams.certificateValidityPolicy, stateParams.groupDataProvider));
 
         //
@@ -252,7 +270,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     CASEClientInitParams sessionInitParams = {
         .sessionManager            = stateParams.sessionMgr,
-        .sessionResumptionStorage  = stateParams.sessionResumptionStorage.get(),
+        .sessionResumptionStorage  = sessionResumptionStorage,
         .certificateValidityPolicy = stateParams.certificateValidityPolicy,
         .exchangeMgr               = stateParams.exchangeMgr,
         .fabricTable               = stateParams.fabricTable,
@@ -270,8 +288,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.caseSessionManager = Platform::New<CASESessionManager>();
     ReturnErrorOnFailure(stateParams.caseSessionManager->Init(stateParams.systemLayer, sessionManagerConfig));
 
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr, stateParams.fabricTable,
-                                                                                stateParams.caseSessionManager));
+    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(
+        stateParams.exchangeMgr, stateParams.fabricTable, stateParams.reportScheduler, stateParams.caseSessionManager));
 
     // store the system state
     mSystemState = chip::Platform::New<DeviceControllerSystemState>(std::move(stateParams));
@@ -369,6 +387,7 @@ void DeviceControllerFactory::Shutdown()
     mOperationalKeystore       = nullptr;
     mOpCertStore               = nullptr;
     mCertificateValidityPolicy = nullptr;
+    mSessionResumptionStorage  = nullptr;
 }
 
 void DeviceControllerSystemState::Shutdown()
@@ -485,6 +504,18 @@ void DeviceControllerSystemState::Shutdown()
     {
         chip::Platform::Delete(mSessionMgr);
         mSessionMgr = nullptr;
+    }
+
+    if (mReportScheduler != nullptr)
+    {
+        chip::Platform::Delete(mReportScheduler);
+        mReportScheduler = nullptr;
+    }
+
+    if (mTimerDelegate != nullptr)
+    {
+        chip::Platform::Delete(mTimerDelegate);
+        mTimerDelegate = nullptr;
     }
 
     if (mTempFabricTable != nullptr)

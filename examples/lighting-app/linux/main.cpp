@@ -85,7 +85,7 @@ void ApplicationInit()
     }
 }
 
-void ApplicationExit()
+void ApplicationShutdown()
 {
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {

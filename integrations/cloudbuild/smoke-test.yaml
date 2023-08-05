@@ -1,5 +1,5 @@
 steps:
-    - name: "ghcr.io/project-chip/chip-build-vscode:1"
+    - name: "ghcr.io/project-chip/chip-build-vscode:2"
       entrypoint: "bash"
       args:
           - "-c"
@@ -7,7 +7,7 @@ steps:
               git config --global --add safe.directory "*"
               git submodule update --init --recursive
       id: Submodules
-    - name: "ghcr.io/project-chip/chip-build-vscode:1"
+    - name: "ghcr.io/project-chip/chip-build-vscode:2"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -22,7 +22,7 @@ steps:
             path: /pwenv
       timeout: 900s
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:1"
+    - name: "ghcr.io/project-chip/chip-build-vscode:2"
       id: ESP32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -32,7 +32,7 @@ steps:
               ./scripts/build/build_examples.py --enable-flashbundle --target
               esp32-devkitc-light-rpc --target
               esp32-m5stack-all-clusters-ipv6only --target
-              esp32-m5stack-all-clusters-rpc --target
+              esp32-m5stack-all-clusters-rpc-ipv6only --target
               esp32-m5stack-light --target
               esp32-m5stack-light-ipv6only --target
               esp32-m5stack-ota-requestor build --create-archives
@@ -43,7 +43,7 @@ steps:
       volumes:
           - name: pwenv
             path: /pwenv
-    - name: "ghcr.io/project-chip/chip-build-vscode:1"
+    - name: "ghcr.io/project-chip/chip-build-vscode:2"
       id: NRFConnect
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -64,7 +64,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:1"
+    - name: "ghcr.io/project-chip/chip-build-vscode:2"
       id: EFR32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -86,7 +86,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:1"
+    - name: "ghcr.io/project-chip/chip-build-vscode:2"
       id: Linux
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -139,7 +139,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:1"
+    - name: "ghcr.io/project-chip/chip-build-vscode:2"
       id: Android
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv

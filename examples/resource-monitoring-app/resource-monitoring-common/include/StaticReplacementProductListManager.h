@@ -34,20 +34,17 @@ namespace ResourceMonitoring {
 class StaticReplacementProductListManager : public ReplacementProductListManager
 {
 public:
-    uint8_t Size() override { return mReplacementProductListSize; };
-
-    CHIP_ERROR Next(Attributes::ReplacementProductStruct::Type & item) override;
+    CHIP_ERROR Next(ReplacementProductStruct & item) override;
 
     ~StaticReplacementProductListManager() {}
-    StaticReplacementProductListManager(Attributes::ReplacementProductStruct::Type * aReplacementProductsList,
-                                        uint8_t aReplacementProductListSize)
+    StaticReplacementProductListManager(ReplacementProductStruct * aReplacementProductsList, uint8_t aReplacementProductListSize)
     {
         mReplacementProductsList    = aReplacementProductsList;
         mReplacementProductListSize = aReplacementProductListSize;
     }
 
 private:
-    Attributes::ReplacementProductStruct::Type * mReplacementProductsList;
+    ReplacementProductStruct * mReplacementProductsList;
     uint8_t mReplacementProductListSize;
 };
 

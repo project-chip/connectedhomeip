@@ -307,7 +307,7 @@
 	path = third_party/perfetto/repo
 	url = https://github.com/google/perfetto.git
 	branch = master
-	platforms = linux,android
+	platforms = linux,android,darwin
 [submodule "third_party/asr/components"]
 	path = third_party/asr/components
 	url = https://github.com/asriot/asriot_components.git

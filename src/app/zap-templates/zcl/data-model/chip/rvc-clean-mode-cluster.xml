@@ -30,7 +30,7 @@ limitations under the License.
   </enum>
 
   <cluster>
-    <domain>General</domain>
+    <domain>Robots</domain>
     <name>RVC Clean Mode</name>
     <code>0x0055</code>
     <define>RVC_CLEAN_MODE_CLUSTER</define>

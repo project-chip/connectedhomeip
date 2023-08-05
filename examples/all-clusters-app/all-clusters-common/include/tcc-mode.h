@@ -67,6 +67,8 @@ public:
     ~TccModeDelegate() override = default;
 };
 
+void Shutdown();
+
 } // namespace RefrigeratorAndTemperatureControlledCabinetMode
 
 } // namespace Clusters

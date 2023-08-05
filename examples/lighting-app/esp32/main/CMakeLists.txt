@@ -69,6 +69,10 @@ set(SRC_DIRS_LIST
 
 set(PRIV_REQUIRES_LIST chip QRCode bt led_strip app_update openthread driver nvs_flash spi_flash)
 
+if(${IDF_TARGET} STREQUAL "esp32")
+    list(APPEND PRIV_REQUIRES_LIST spidriver screen-framework)
+endif()
+
 if (CONFIG_ENABLE_PW_RPC)
 # Append additional directories for RPC build
 set(PRIV_INCLUDE_DIRS_LIST  "${PRIV_INCLUDE_DIRS_LIST}"
@@ -77,18 +81,20 @@ set(PRIV_INCLUDE_DIRS_LIST  "${PRIV_INCLUDE_DIRS_LIST}"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed/esp32"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/lib/support"
-                     "${IDF_PATH}/components/freertos/include/freertos"
 )
+
+if (${IDF_VERSION_MAJOR} LESS 5)
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${IDF_PATH}/components/freertos/include/freertos")
+else()
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${IDF_PATH}/components/freertos/FreeRTOS-Kernel/include/freertos")
+endif()
+
 set(SRC_DIRS_LIST  "${SRC_DIRS_LIST}"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed/esp32"
 )
 endif (CONFIG_ENABLE_PW_RPC)
-
-if (CONFIG_HAVE_DISPLAY)
-    list(APPEND PRIV_REQUIRES_LIST tft screen-framework)
-endif()
 
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
                        SRC_DIRS ${SRC_DIRS_LIST}

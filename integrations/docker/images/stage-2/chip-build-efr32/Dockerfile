@@ -6,12 +6,12 @@ LABEL org.opencontainers.image.source https://github.com/project-chip/connectedh
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
-    gcc-arm-none-eabi=15:9-2019-q4-0ubuntu1 \
-    binutils-arm-none-eabi=2.34-4ubuntu1+13ubuntu1 \
+    gcc-arm-none-eabi \
+    binutils-arm-none-eabi \
     git-lfs \
     openjdk-17-jdk \
     python3-sphinx \
-    ccache=3.7.7-1 \
+    ccache \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line

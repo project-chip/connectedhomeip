@@ -1,5 +1,5 @@
 {
-  "featureLevel": 96,
+  "featureLevel": 97,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -4009,6 +4009,15 @@
               "maxInterval": 65534,
               "reportableChange": 0
             }
+          ],
+          "events": [
+            {
+              "name": "SwitchLatched",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            }
           ]
         },
         {
@@ -5341,7 +5350,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "array",
-              "included": 1,
+              "included": 0,
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
@@ -7749,5 +7758,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 257
     }
-  ]
+  ],
+  "log": []
 }
