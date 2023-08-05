@@ -26,6 +26,7 @@ public interface ConfigurationManager {
 
   // Keys stored in the Chip-factory namespace
   String kConfigKey_SerialNum = "serial-num";
+  String kConfigKey_MfrDeviceName = "device-name";
   String kConfigKey_MfrDeviceId = "device-id";
   String kConfigKey_MfrDeviceCert = "device-cert";
   String kConfigKey_MfrDeviceICACerts = "device-ca-certs";

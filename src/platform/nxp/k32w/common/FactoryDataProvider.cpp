@@ -57,6 +57,7 @@ FactoryDataProvider::FactoryDataProvider()
     maxLengths[FactoryDataId::kVidId]                = sizeof(uint16_t);
     maxLengths[FactoryDataId::kPidId]                = sizeof(uint16_t);
     maxLengths[FactoryDataId::kCertDeclarationId]    = Credentials::kMaxCMSSignedCDMessage;
+    maxLengths[FactoryDataId::kDeviceName]           = ConfigurationManager::kMaxDeviceNameLength;
     maxLengths[FactoryDataId::kVendorNameId]         = ConfigurationManager::kMaxVendorNameLength;
     maxLengths[FactoryDataId::kProductNameId]        = ConfigurationManager::kMaxProductNameLength;
     maxLengths[FactoryDataId::kSerialNumberId]       = ConfigurationManager::kMaxSerialNumberLength;
@@ -218,6 +219,11 @@ CHIP_ERROR FactoryDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
 }
 
 CHIP_ERROR FactoryDataProvider::SetSetupPasscode(uint32_t setupPasscode)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR FactoryDataProvider::GetDeviceName(MutableCharSpan & deviceNameSpan)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }

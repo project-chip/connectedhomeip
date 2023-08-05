@@ -78,6 +78,7 @@ public:
         kVidId,
         kPidId,
         kCertDeclarationId,
+        kDeviceNameId,
         kVendorNameId,
         kProductNameId,
         kSerialNumberId,
@@ -130,6 +131,7 @@ public:
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) override;
 
     // ===== Members functions that implement the GenericDeviceInstanceInfoProvider
+    CHIP_ERROR GetDeviceName(MutableCharSpan & deviceNameSpan) override;
     CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetVendorId(uint16_t & vendorId) override;
     CHIP_ERROR GetProductName(char * buf, size_t bufSize) override;
