@@ -37,11 +37,11 @@ class JsonToTlvToJsonTest {
     tlvEncoding: ByteArray,
     jsonExpected: String = jsonOriginal
   ) {
-    assertThat(TlvWriter().fromJsonString(jsonOriginal)).isEqualTo(tlvEncoding)
+    assertThat(TlvWriter().fromJsonStringToByteArray(jsonOriginal)).isEqualTo(tlvEncoding)
     assertThat(TlvReader(tlvEncoding).toJsonString())
       .isEqualTo(JsonParser.parseString(jsonExpected).asJsonObject.toString())
     if (jsonOriginal != jsonExpected) {
-      assertThat(TlvWriter().fromJsonString(jsonExpected)).isEqualTo(tlvEncoding)
+      assertThat(TlvWriter().fromJsonStringToByteArray(jsonExpected)).isEqualTo(tlvEncoding)
     }
   }
 
@@ -865,7 +865,7 @@ class JsonToTlvToJsonTest {
     // Throws exception because subtype encoded in the Json key (Boolean) doesn't match the
     // String
     // type of the elements in the array
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
   }
 
   @Test
@@ -884,7 +884,7 @@ class JsonToTlvToJsonTest {
     // Throws exception because subtype encoded in the Json key (Boolean) doesn't match the
     // String
     // type of the elements in the array
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
   }
 
   @Test
@@ -905,7 +905,7 @@ class JsonToTlvToJsonTest {
     // Throws exception because subtype encoded in the Json key (Float) doesn't match the
     // Structure
     // type of the elements in the array
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
   }
 
   @Test
@@ -921,7 +921,7 @@ class JsonToTlvToJsonTest {
 
     // Throws exception because subtype encoded in the Json key (UInt) doesn't match the Null
     // type of the elements in the array
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
   }
 
   @Test
@@ -937,7 +937,7 @@ class JsonToTlvToJsonTest {
       """
 
     // Throws exception because string is invalid base64 encoded value
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
   }
 
   @Test
@@ -972,7 +972,7 @@ class JsonToTlvToJsonTest {
       """
 
     // Throws exception because element within structure cannot have anonymous tag
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
   }
 
   @Test
@@ -985,7 +985,7 @@ class JsonToTlvToJsonTest {
       """
 
     // Throws exception because Json key must have valid tag field
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
   }
 
   @Test
@@ -1074,7 +1074,7 @@ class JsonToTlvToJsonTest {
       """
 
     // 4294967296 exceeds valid context specific or common profile tag value of 32-bits
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
   }
 
   @Test
@@ -1632,5 +1632,78 @@ class JsonToTlvToJsonTest {
       """
 
     checkValidConversion(json, encoding)
+  }
+
+  @Test
+  fun convertJsonString() {
+    val encoding =
+      TlvWriter()
+        .startStructure(AnonymousTag)
+        .put(ContextSpecificTag(0), 42)
+        .put(ContextSpecificTag(1), "Test array member 0".toByteArray())
+        .put(ContextSpecificTag(2), 156.398)
+        .put(ContextSpecificTag(3), 73709551615U)
+        .put(ContextSpecificTag(4), true)
+        .putNull(ContextSpecificTag(5))
+        .startStructure(ContextSpecificTag(6))
+        .put(ContextSpecificTag(1), "John")
+        .put(ContextSpecificTag(2), 34U)
+        .put(ContextSpecificTag(3), true)
+        .startArray(ContextSpecificTag(4))
+        .put(AnonymousTag, 5)
+        .put(AnonymousTag, 9)
+        .put(AnonymousTag, 10)
+        .endArray()
+        .startArray(ContextSpecificTag(5))
+        .put(AnonymousTag, "Ammy")
+        .put(AnonymousTag, "David")
+        .put(AnonymousTag, "Larry")
+        .endArray()
+        .startArray(ContextSpecificTag(6))
+        .put(AnonymousTag, true)
+        .put(AnonymousTag, false)
+        .put(AnonymousTag, true)
+        .endArray()
+        .endStructure()
+        .put(ContextSpecificTag(7), 0.0f)
+        .endStructure()
+        .validateTlv()
+        .getEncoded()
+
+    val compareJson =
+      """
+      {
+        "0:INT": 42,
+        "1:BYTES": "VGVzdCBhcnJheSBtZW1iZXIgMA==",
+        "2:DOUBLE": 156.398,
+        "3:UINT": "73709551615",
+        "4:BOOL": true,
+        "5:NULL": null,
+        "6:STRUCT": {
+          "1:STRING": "John",
+          "2:UINT": 34,
+          "3:BOOL": true,
+          "4:ARRAY-INT": [
+            5,
+            9,
+            10
+          ],
+          "5:ARRAY-STRING": [
+            "Ammy",
+            "David",
+            "Larry"
+          ],
+          "6:ARRAY-BOOL": [
+            true,
+            false,
+            true
+          ]
+        },
+        "7:FLOAT": 0.0
+      }
+      """
+    val tlvWriterJson = TlvWriter().fromJsonString(compareJson)
+
+    assertThat(encoding).isEqualTo(tlvWriterJson.getEncoded())
   }
 }

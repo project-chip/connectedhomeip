@@ -17,7 +17,7 @@
 
 package chip.objecttlv
 
-import chip.jsontlv.fromJson
+import chip.jsontlv.fromJsonString
 import chip.tlv.AnonymousTag
 import chip.tlv.Tag
 import chip.tlv.TlvWriter
@@ -70,8 +70,11 @@ fun TlvWriter.fromObject(value: Any?, tag: Tag = AnonymousTag): TlvWriter {
     }
     is String -> {
       try {
-        fromJson(value)
+        fromJsonString(value)
       } catch (e: IllegalArgumentException) {
+        // If json parsing exception, judged by string value.
+        put(tag, value)
+      } catch (e: com.google.gson.JsonSyntaxException) {
         // If json parsing exception, judged by string value.
         put(tag, value)
       }

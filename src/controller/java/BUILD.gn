@@ -267,6 +267,22 @@ kotlin_library("objecttlv") {
   kotlinc_flags = [ "-Xlint:deprecation" ]
 }
 
+kotlin_library("object_to_tlv_to_object_test") {
+  output_name = "ObjectToTlvToObjectTest.jar"
+
+  deps = [
+    ":objecttlv",
+    "${chip_root}/third_party/java_deps:gson",
+    "${chip_root}/third_party/java_deps:junit-4",
+    "${chip_root}/third_party/java_deps:kotlin-test",
+    "${chip_root}/third_party/java_deps:truth",
+  ]
+
+  sources = [ "tests/chip/objecttlv/ObjectToTlvToObjectTest.kt" ]
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
+}
+
 kotlin_library("onboarding_payload") {
   output_name = "OnboardingPayload.jar"
 
@@ -321,6 +337,7 @@ kotlin_library("onboardingpayload_qr_code_test") {
 group("unit_tests") {
   deps = [
     ":json_to_tlv_to_json_test",
+    ":object_to_tlv_to_object_test",
     ":onboardingpayload_manual_code_test",
     ":onboardingpayload_qr_code_test",
     ":tlv_read_write_test",
