@@ -1196,7 +1196,8 @@ server cluster FlowMeasurement = 1028 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Descriptor {
@@ -1362,7 +1363,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 774, version 1;
+  device type ma_flowsensor = 774, version 1;
+
   binding cluster Groups;
   binding cluster Binding;
 

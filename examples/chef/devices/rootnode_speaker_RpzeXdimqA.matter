@@ -1251,7 +1251,8 @@ server cluster FixedLabel = 64 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Descriptor {
@@ -1417,7 +1418,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 34, version 1;
+  device type ma_speaker = 34, version 1;
+
   binding cluster Binding;
 
   server cluster Identify {

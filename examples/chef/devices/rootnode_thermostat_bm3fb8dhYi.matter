@@ -1444,7 +1444,8 @@ client cluster OccupancySensing = 1030 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Descriptor {
@@ -1610,7 +1611,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 769, version 1;
+  device type ma_thermostat = 769, version 1;
+
   binding cluster Binding;
   binding cluster FanControl;
   binding cluster TemperatureMeasurement;

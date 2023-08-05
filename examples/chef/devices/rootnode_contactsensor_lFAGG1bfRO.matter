@@ -1191,7 +1191,8 @@ server cluster BooleanState = 69 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Descriptor {
@@ -1357,7 +1358,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 21, version 1;
+  device type ma_contactsensor = 21, version 1;
+
   binding cluster Binding;
 
   server cluster Identify {

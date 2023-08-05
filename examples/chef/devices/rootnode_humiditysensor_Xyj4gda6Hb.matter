@@ -1196,7 +1196,8 @@ server cluster RelativeHumidityMeasurement = 1029 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Descriptor {
@@ -1362,7 +1363,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 775, version 1;
+  device type ma_humiditysensor = 775, version 1;
+
   binding cluster Groups;
   binding cluster Binding;
 
