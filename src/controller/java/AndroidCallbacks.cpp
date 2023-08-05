@@ -368,9 +368,9 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     readerForJavaTLV.Init(*apData);
     readerForJson.Init(*apData);
 
-    jlong eventNumber  = static_cast<jlong>(aEventHeader.mEventNumber);
-    jint priorityLevel = static_cast<jint>(aEventHeader.mPriorityLevel);
-    jlong timestampValue    = static_cast<jlong>(aEventHeader.mTimestamp.mValue);
+    jlong eventNumber    = static_cast<jlong>(aEventHeader.mEventNumber);
+    jint priorityLevel   = static_cast<jint>(aEventHeader.mPriorityLevel);
+    jlong timestampValue = static_cast<jlong>(aEventHeader.mTimestamp.mValue);
 
     jint timestampType = 0;
     if (aEventHeader.mTimestamp.mType == app::Timestamp::Type::kSystem)
