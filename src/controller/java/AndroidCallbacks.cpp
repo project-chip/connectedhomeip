@@ -370,7 +370,7 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
 
     jlong eventNumber  = static_cast<jlong>(aEventHeader.mEventNumber);
     jint priorityLevel = static_cast<jint>(aEventHeader.mPriorityLevel);
-    jlong timestamp    = static_cast<jlong>(aEventHeader.mTimestamp.mValue);
+    jlong timestampValue    = static_cast<jlong>(aEventHeader.mTimestamp.mValue);
 
     jint timestampType = 0;
     if (aEventHeader.mTimestamp.mType == app::Timestamp::Type::kSystem)
@@ -432,7 +432,7 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     chip::JniClass eventStateJniCls(eventStateCls);
     jmethodID eventStateCtor = env->GetMethodID(eventStateCls, "<init>", "(JIIJLjava/lang/Object;[BLjava/lang/String;)V");
     VerifyOrReturn(eventStateCtor != nullptr, ChipLogError(Controller, "Could not find EventState constructor"));
-    jobject eventStateObj = env->NewObject(eventStateCls, eventStateCtor, eventNumber, priorityLevel, timestampType, timestamp,
+    jobject eventStateObj = env->NewObject(eventStateCls, eventStateCtor, eventNumber, priorityLevel, timestampType, timestampValue,
                                            value, jniByteArray.jniValue(), jsonString.jniValue());
     VerifyOrReturn(eventStateObj != nullptr, ChipLogError(Controller, "Could not create EventState object"));
 

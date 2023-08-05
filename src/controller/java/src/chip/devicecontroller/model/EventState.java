@@ -30,7 +30,7 @@ public final class EventState {
   private long eventNumber;
   private int priorityLevel;
   private int timestampType;
-  private long systemTimeStamp;
+  private long timestampValue;
 
   private Object valueObject;
   private byte[] tlv;
@@ -47,7 +47,7 @@ public final class EventState {
     this.eventNumber = eventNumber;
     this.priorityLevel = priorityLevel;
     this.timestampType = timestampType;
-    this.systemTimeStamp = systemTimeStamp;
+    this.timestampValue = timestampValue;
 
     this.valueObject = valueObject;
     this.tlv = tlv;
@@ -70,8 +70,8 @@ public final class EventState {
     return timestampType;
   }
 
-  public long getSystemTimeStamp() {
-    return systemTimeStamp;
+  public long getTimestampValue() {
+    return timestampValue;
   }
 
   public Object getValue() {
