@@ -1193,7 +1193,8 @@ server cluster RvcOperationalState = 97 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
 
   server cluster Descriptor {
     callback attribute deviceTypeList;
@@ -1316,7 +1317,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 116, version 1;
+  device type ma_robotic_vacuum_cleaner = 116, version 1;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;

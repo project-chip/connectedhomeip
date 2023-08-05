@@ -1212,7 +1212,8 @@ server cluster OccupancySensing = 1030 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Descriptor {
@@ -1378,7 +1379,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 263, version 1;
+  device type ma_occupancysensor = 263, version 1;
+
   binding cluster Groups;
   binding cluster Binding;
 

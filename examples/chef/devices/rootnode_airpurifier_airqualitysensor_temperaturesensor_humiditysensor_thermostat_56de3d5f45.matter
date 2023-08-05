@@ -1753,7 +1753,8 @@ server cluster RadonConcentrationMeasurement = 1071 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
 
   server cluster Descriptor {
     callback attribute deviceTypeList;
@@ -1876,7 +1877,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 45, version 1;
+  device type ma_air_purifier = 45, version 1;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;
@@ -1960,7 +1962,8 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type anonymousEndpointType = 44, version 1;
+  device type ma_air_quality_sensor = 44, version 1;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;
@@ -2187,7 +2190,8 @@ endpoint 2 {
   }
 }
 endpoint 3 {
-  device type anonymousEndpointType = 770, version 1;
+  device type ma_tempsensor = 770, version 1;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;
@@ -2226,7 +2230,8 @@ endpoint 3 {
   }
 }
 endpoint 4 {
-  device type anonymousEndpointType = 775, version 1;
+  device type ma_humiditysensor = 775, version 1;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;
@@ -2265,7 +2270,8 @@ endpoint 4 {
   }
 }
 endpoint 5 {
-  device type anonymousEndpointType = 769, version 1;
+  device type ma_thermostat = 769, version 1;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;
