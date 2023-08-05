@@ -374,9 +374,9 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
 
     jint timestampType = 0;
     if (aEventHeader.mTimestamp.mType == app::Timestamp::Type::kSystem) {
-       timestampType = static_cast<jint>(MILLIS_SINCE_BOOT);  
+       timestampType = static_cast<jint>(MILLIS_SINCE_BOOT);
     } else if (aEventHeader.mTimestamp.mType == app::Timestamp::Type::kEpoch) {
-       timestampType = static_cast<jint>(MILLIS_SINCE_EPOCH);  
+       timestampType = static_cast<jint>(MILLIS_SINCE_EPOCH);
     } else {
         ChipLogError(Controller, "Unsupported event timestamp type");
         ReportError(nullptr, eventPathObj, CHIP_ERROR_INVALID_ARGUMENT);
@@ -425,7 +425,7 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Failed to find EventState class"));
     VerifyOrReturn(eventStateCls != nullptr, ChipLogError(Controller, "Could not find EventState class"));
     chip::JniClass eventStateJniCls(eventStateCls);
-    jmethodID eventStateCtor = env->GetMethodID(eventStateCls, "<init>", 
+    jmethodID eventStateCtor = env->GetMethodID(eventStateCls, "<init>",
                                                 "(JIIJLjava/lang/Object;[BLjava/lang/String;)V");
     VerifyOrReturn(eventStateCtor != nullptr, ChipLogError(Controller, "Could not find EventState constructor"));
     jobject eventStateObj = env->NewObject(eventStateCls, eventStateCtor, eventNumber, priorityLevel,
