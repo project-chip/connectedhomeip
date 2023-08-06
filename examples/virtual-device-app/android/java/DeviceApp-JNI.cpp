@@ -25,6 +25,7 @@
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/server/Dnssd.h>
 #include <app/server/java/AndroidAppServerWrapper.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
@@ -139,8 +140,7 @@ JNI_METHOD(void, setDACProvider)(JNIEnv *, jobject, jobject provider)
 {
     if (!chip::Credentials::IsDeviceAttestationCredentialsProviderSet())
     {
-        JNIDACProvider * p = new JNIDACProvider(provider);
-        chip::Credentials::SetDeviceAttestationCredentialsProvider(p);
+        chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
     }
 }
 
