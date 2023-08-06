@@ -6,4 +6,7 @@
     <string name="dialog_factory_reset_message">"The Matter device app will be reset and closed. Continue?"</string>
     <string name="dialog_user_factory_reset_message">"The commissioning was not completed. The Matter device app will be reset and closed. Continue?"</string>
     <string name="dialog_fabric_removed_factory_reset_message">"The fabric was removed. The Matter device app will be reset and closed."</string>    
+
+    <string name="on_off_switch_power_on">On</string>
+    <string name="on_off_switch_power_off">Off</string>
 </resources>
