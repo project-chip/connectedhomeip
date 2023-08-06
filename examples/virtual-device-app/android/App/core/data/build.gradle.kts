@@ -36,9 +36,15 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    sourceSets {
+        getByName("main") {
+            jniLibs.setSrcDirs(listOf("../../app/libs/jniLibs"))
+        }
+    }
 }
 
 dependencies {
+    implementation(fileTree(mapOf("dir" to "../../app/libs", "include" to listOf("*.jar"))))
 
     implementation(project(":core:common"))
     implementation(project(":core:matter"))
