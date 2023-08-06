@@ -8,10 +8,17 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.view.Gravity
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.matter.virtual.device.app.core.common.EventObserver
+import com.matter.virtual.device.app.core.ui.SharedViewModel
+import com.matter.virtual.device.app.core.ui.UiState
 import com.matter.virtual.device.app.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
@@ -20,6 +27,7 @@ import timber.log.Timber
 class MainActivity : AppCompatActivity() {
 
   private lateinit var binding: ActivityMainBinding
+  private val viewModel by viewModels<SharedViewModel>()
 
   private val permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
 
@@ -57,6 +65,25 @@ class MainActivity : AppCompatActivity() {
 
     binding = ActivityMainBinding.inflate(layoutInflater)
     setContentView(binding.root)
+
+    viewModel.uiState.observe(
+      this,
+      EventObserver { uiState ->
+        when (uiState) {
+          UiState.Waiting -> {
+            binding.progress.visibility = View.VISIBLE
+          }
+          UiState.Exit -> {
+            binding.progress.visibility = View.GONE
+            finishAffinity()
+          }
+          is UiState.Reset -> {
+            showFactoryResetPopup(getString(uiState.messageResId), uiState.isCancelable)
+          }
+          else -> {}
+        }
+      }
+    )
   }
 
   override fun onDestroy() {
@@ -82,5 +109,29 @@ class MainActivity : AppCompatActivity() {
   ) {
     Timber.d("RequestCode:$requestCode")
     super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+  }
+
+  private fun showFactoryResetPopup(message: String, isCancelable: Boolean) {
+    val builder =
+      AlertDialog.Builder(this)
+        .setTitle("Factory Reset")
+        .setMessage(message)
+        .setPositiveButton("Ok") { dialog, _ ->
+          Timber.d("Ok")
+          dialog.dismiss()
+          viewModel.resetMatterAppServer()
+        }
+        .setCancelable(false)
+
+    if (isCancelable) {
+      builder.setNegativeButton("Cancel") { dialog, _ ->
+        Timber.d("Cancel")
+        dialog.dismiss()
+      }
+    }
+
+    val dialog = builder.create()
+    dialog.window?.setGravity(Gravity.BOTTOM)
+    dialog.show()
   }
 }
