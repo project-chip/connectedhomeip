@@ -29,7 +29,13 @@ class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
   private val viewModel by viewModels<SharedViewModel>()
 
-  private val permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+  private val permissions =
+    arrayOf(
+      Manifest.permission.BLUETOOTH_SCAN,
+      Manifest.permission.BLUETOOTH_ADVERTISE,
+      Manifest.permission.BLUETOOTH_CONNECT,
+      Manifest.permission.ACCESS_FINE_LOCATION
+    )
 
   private val requestMultiplePermissions =
     registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
