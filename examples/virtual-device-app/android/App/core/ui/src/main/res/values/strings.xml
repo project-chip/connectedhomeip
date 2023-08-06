@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="description_button" translatable="false">button</string>
     <string name="more_menu_reset" translatable="false">Reset</string>
 
     <string name="dialog_factory_reset_message">"The Matter device app will be reset and closed. Continue?"</string>
