@@ -9,6 +9,9 @@ import com.matter.virtual.device.app.core.matter.*
 import com.matter.virtual.device.app.core.model.Payload
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -67,6 +70,72 @@ constructor(
     }
   }
 
+  override fun reset() {
+    Timber.d("reset()")
+    matterApp.reset()
+  }
+
+  override suspend fun isCommissioningCompleted() =
+    withTimeout(300000) {
+      suspendCancellableCoroutine { cancellableContinuation ->
+        Timber.d("isCommissioningCompleted()")
+        val deviceEventCallback =
+          object : MatterDeviceEventCallback {
+            override fun onCommissioningCompleted() {
+              Timber.d("onCommissioningCompleted()")
+              if (cancellableContinuation.isActive) {
+                cancellableContinuation.resume(true)
+              }
+            }
+          }
+
+        matterApp.addDeviceEventCallback(deviceEventCallback)
+
+        cancellableContinuation.invokeOnCancellation {
+          matterApp.removeDeviceEventCallback(deviceEventCallback)
+        }
+      }
+    }
+
+  override suspend fun isCommissioningSessionEstablishmentStarted() =
+    suspendCancellableCoroutine { cancellableContinuation ->
+      Timber.d("isCommissioningSessionEstablishmentStarted()")
+      val deviceEventCallback =
+        object : MatterDeviceEventCallback {
+          override fun onCommissioningSessionEstablishmentStarted() {
+            Timber.d("onCommissioningSessionEstablishmentStarted()")
+            if (cancellableContinuation.isActive) {
+              cancellableContinuation.resume(true)
+            }
+          }
+        }
+
+      matterApp.addDeviceEventCallback(deviceEventCallback)
+
+      cancellableContinuation.invokeOnCancellation {
+        matterApp.removeDeviceEventCallback(deviceEventCallback)
+      }
+    }
+
+  override suspend fun isFabricRemoved() = suspendCancellableCoroutine { cancellableContinuation ->
+    Timber.d("isFabricRemoved()")
+    val deviceEventCallback =
+      object : MatterDeviceEventCallback {
+        override fun onFabricRemoved() {
+          Timber.d("onFabricRemoved()")
+          if (cancellableContinuation.isActive) {
+            cancellableContinuation.resume(true)
+          }
+        }
+      }
+
+    matterApp.addDeviceEventCallback(deviceEventCallback)
+
+    cancellableContinuation.invokeOnCancellation {
+      matterApp.removeDeviceEventCallback(deviceEventCallback)
+    }
+  }
+
   private fun isMatterAppServiceRunning(): Boolean {
     val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
     activityManager?.let {
@@ -81,5 +150,5 @@ constructor(
 
     Timber.d("false")
     return false
-  }  
+  }
 }

@@ -10,5 +10,13 @@ interface MatterRepository {
 
   suspend fun startMatterAppService(matterSettings: MatterSettings)
 
-  suspend fun stopMatterAppService()  
+  suspend fun stopMatterAppService()
+
+  fun reset()
+
+  suspend fun isCommissioningCompleted(): Boolean
+
+  suspend fun isCommissioningSessionEstablishmentStarted(): Boolean
+
+  suspend fun isFabricRemoved(): Boolean
 }
