@@ -1,8 +1,13 @@
 package com.matter.virtual.device.app
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -23,6 +28,7 @@ class MainActivity : AppCompatActivity() {
       permissions.entries.forEach { Timber.d("${it.key}:${it.value}") }
     }
 
+  @SuppressLint("BatteryLife")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     Timber.d("onCreate()")
@@ -34,6 +40,19 @@ class MainActivity : AppCompatActivity() {
 
     if (!isPermissionsGranted) {
       requestMultiplePermissions.launch(permissions)
+    }
+
+    val powerManager = applicationContext.getSystemService(POWER_SERVICE) as PowerManager?
+    powerManager?.let { manager ->
+      if (!manager.isIgnoringBatteryOptimizations(packageName)) {
+        Timber.d("not in battery optimization whitelist")
+        val intent =
+          Intent().apply {
+            action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+            data = Uri.parse("package:$packageName")
+          }
+        startActivity(intent)
+      }
     }
 
     binding = ActivityMainBinding.inflate(layoutInflater)
