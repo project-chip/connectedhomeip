@@ -9,10 +9,14 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.matter.virtual.device.app.core.common.DeepLink
 import com.matter.virtual.device.app.core.common.MatterSettings
+import com.matter.virtual.device.app.core.ui.SharedViewModel
 import com.matter.virtual.device.app.feature.main.databinding.FragmentMainBinding
 import com.matter.virtual.device.app.feature.main.model.Menu
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,6 +30,9 @@ import timber.log.Timber
 class MainFragment : Fragment() {
 
   private lateinit var binding: FragmentMainBinding
+  private val viewModel by viewModels<MainViewModel>()
+  private val sharedViewModel by activityViewModels<SharedViewModel>()
+
   private lateinit var onBackPressedCallback: OnBackPressedCallback
 
   override fun onCreateView(
@@ -33,7 +40,7 @@ class MainFragment : Fragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
-    Timber.d("Hit")
+    Timber.d("onCreateView()")
     binding = DataBindingUtil.inflate(inflater, R.layout.fragment_main, container, false)
     binding.lifecycleOwner = viewLifecycleOwner
 
@@ -42,7 +49,7 @@ class MainFragment : Fragment() {
 
   @OptIn(ExperimentalSerializationApi::class)
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    Timber.d("Hit")
+    Timber.d("onViewCreated()")
     super.onViewCreated(view, savedInstanceState)
 
     (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
@@ -58,34 +65,69 @@ class MainFragment : Fragment() {
       binding.toolbarTitle.alpha = (ratio - 0.5f) * 2f + 0.1f
     }
 
-    val itemList = arrayListOf(Menu.ON_OFF_SWITCH)
+    viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
+      Timber.d("uiState:$uiState")
+      when (uiState) {
+        MainUiState.Loading -> {}
+        is MainUiState.CommissioningCompleted -> {
+          try {
+            val navOptions =
+              NavOptions.Builder()
+                .setPopUpTo(destinationId = R.id.mainFragment, inclusive = true)
+                .build()
 
-    val menuAdapter =
-      MenuAdapter(
-          object : MenuAdapter.ItemHandler {
-            override fun onClick(item: Menu) {
-              val matterSettings = MatterSettings(device = item.device)
-              val jsonSettings = Json.encodeToString(matterSettings)
-              try {
-                findNavController()
-                  .navigate(DeepLink.getDeepLinkRequestForSetupFragment(jsonSettings))
-              } catch (e: Exception) {
-                Timber.e(e, "navigate failure")
-              }
-            }
+            findNavController()
+              .navigate(
+                DeepLink.getDeepLinkRequestFromDevice(
+                  uiState.device,
+                  Json.encodeToString(MatterSettings(device = uiState.device))
+                ),
+                navOptions
+              )
+          } catch (e: Exception) {
+            Timber.e("navigate failure")
           }
-        )
-        .apply { submitList(itemList) }
+        }
+        is MainUiState.Reset -> {
+          sharedViewModel.requestFactoryReset(
+            messageResId = uiState.messageResId,
+            isCancelable = uiState.isCancelable
+          )
+        }
+        MainUiState.Start -> {
+          val itemList = arrayListOf(Menu.ON_OFF_SWITCH)
 
-    val sideSpace = resources.getDimension(R.dimen.menu_item_side_space).toInt()
-    val bottomSpace = resources.getDimension(R.dimen.menu_item_bottom_space).toInt()
+          val menuAdapter =
+            MenuAdapter(
+                object : MenuAdapter.ItemHandler {
+                  override fun onClick(item: Menu) {
+                    viewModel.consumeUiState()
 
-    binding.recyclerView.apply {
-      layoutManager = LinearLayoutManager(requireContext())
-      if (itemDecorationCount == 0) {
-        addItemDecoration(VerticalSpaceItemDecoration(sideSpace, bottomSpace))
+                    val matterSettings = MatterSettings(device = item.device)
+                    val jsonSettings = Json.encodeToString(matterSettings)
+                    try {
+                      findNavController()
+                        .navigate(DeepLink.getDeepLinkRequestForSetupFragment(jsonSettings))
+                    } catch (e: Exception) {
+                      Timber.e(e, "navigate failure")
+                    }
+                  }
+                }
+              )
+              .apply { submitList(itemList) }
+
+          val sideSpace = resources.getDimension(R.dimen.menu_item_side_space).toInt()
+          val bottomSpace = resources.getDimension(R.dimen.menu_item_bottom_space).toInt()
+
+          binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            if (itemDecorationCount == 0) {
+              addItemDecoration(VerticalSpaceItemDecoration(sideSpace, bottomSpace))
+            }
+            adapter = menuAdapter
+          }
+        }
       }
-      adapter = menuAdapter
     }
   }
 
@@ -95,7 +137,7 @@ class MainFragment : Fragment() {
   }
 
   override fun onAttach(context: Context) {
-    Timber.d("Hit")
+    Timber.d("onAttach()")
     super.onAttach(context)
 
     onBackPressedCallback =
