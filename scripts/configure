@@ -226,8 +226,21 @@ function check_build_env() {
 
 function configure_python_env() {
     progress "Setting up Python venv"
-    "$PYTHON" -m venv --clear "$BUILD_ENV_PATH"
+    # Debian and Ubuntu ship python3 with a broken venv module unless the
+    # python3-venv package is installed (https://bugs.launchpad.net/bugs/1290847)
+    local withoutpip=() pip="${BUILD_ENV_PATH}/bin/pip"
+    if ! "$PYTHON" -m ensurepip --version >/dev/null 2>&1; then
+        withoutpip=(--without-pip) pip="${pip}.pyz" # bootstrapped below
+    fi
+    "$PYTHON" -m venv --clear "${withoutpip[@]}" "$BUILD_ENV_PATH"
     info "$BUILD_ENV_PATH"
+
+    # Download a standalone pip.pyz from pypa.io if necessary
+    if [[ -n "$withoutpip" ]]; then
+        progress "Bootstrapping pip via pypa.io (venv module is missing ensurepip dependency)"
+        call_impl download https://bootstrap.pypa.io/pip/pip.pyz "$pip"
+        info "ok"
+    fi
 
     # Install our auto-loading venvactivate module so that running scripts via
     # the venv python has the side-effect of fully activating the environment.
@@ -236,7 +249,9 @@ function configure_python_env() {
     cp "${CHIP_ROOT}/scripts/configure.venv/venvactivate".{pth,py} "${sitepkgs}/"
 
     progress "Installing Python build dependencies"
-    "${BUILD_ENV_PATH}/bin/pip" install --require-virtualenv --quiet --upgrade pip wheel
+    # Ensure pip and wheel are up to date first (using pip.pyz if necessary)
+    "${BUILD_ENV_PATH}/bin/python3" "$pip" install --require-virtualenv --quiet --upgrade pip wheel
+
     "${BUILD_ENV_PATH}/bin/pip" install --require-virtualenv --quiet \
         -r "${CHIP_ROOT}/scripts/setup/requirements.build.txt" \
         -c "${CHIP_ROOT}/scripts/setup/constraints.txt"
