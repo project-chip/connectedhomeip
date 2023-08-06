@@ -27,6 +27,7 @@ constructor(
 
   private var androidChipPlatform: AndroidChipPlatform? = null
   private var chipAppServer: ChipAppServer? = null
+  private val deviceEventCallbackList = ArrayList<MatterDeviceEventCallback>()
 
   fun start(matterSettings: MatterSettings) {
     Timber.d("start():$matterSettings")
@@ -55,9 +56,11 @@ constructor(
             }
             DeviceEventType.EventId_CommissioningComplete -> {
               Timber.d("Commissioning Complete")
+              deviceEventCallbackList.forEach { callback -> callback.onCommissioningCompleted() }
             }
             DeviceEventType.EventId_FabricRemoved -> {
               Timber.d("Fabric Removed")
+              deviceEventCallbackList.forEach { callback -> callback.onFabricRemoved() }
             }
           }
         }
@@ -95,13 +98,16 @@ constructor(
       matterSettings.discriminator
     )
 
-    deviceApp.preServerInit()       
+    deviceApp.preServerInit()
 
     chipAppServer = ChipAppServer()
     chipAppServer?.startAppWithDelegate(
       object : ChipAppServerDelegate {
         override fun onCommissioningSessionEstablishmentStarted() {
           Timber.d("onCommissioningSessionEstablishmentStarted()")
+          deviceEventCallbackList.forEach { callback ->
+            callback.onCommissioningSessionEstablishmentStarted()
+          }
         }
 
         override fun onCommissioningSessionStarted() {
@@ -110,6 +116,9 @@ constructor(
 
         override fun onCommissioningSessionEstablishmentError(errorCode: Int) {
           Timber.d("onCommissioningSessionEstablishmentError():$errorCode")
+          deviceEventCallbackList.forEach { callback ->
+            callback.onCommissioningSessionEstablishmentError(errorCode)
+          }
         }
 
         override fun onCommissioningSessionStopped() {
@@ -135,5 +144,21 @@ constructor(
 
   fun reset() {
     chipAppServer?.resetApp()
+  }
+
+  fun addDeviceEventCallback(deviceEventCallback: MatterDeviceEventCallback) {
+    Timber.d("Hit")
+    if (!this.deviceEventCallbackList.contains(deviceEventCallback)) {
+      Timber.d("Add")
+      this.deviceEventCallbackList.add(deviceEventCallback)
+    }
+  }
+
+  fun removeDeviceEventCallback(deviceEventCallback: MatterDeviceEventCallback) {
+    Timber.d("Hit")
+    if (this.deviceEventCallbackList.contains(deviceEventCallback)) {
+      Timber.d("Remove")
+      this.deviceEventCallbackList.remove(deviceEventCallback)
+    }
   }
 }
