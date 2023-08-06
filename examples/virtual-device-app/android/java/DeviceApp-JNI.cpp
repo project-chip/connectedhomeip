@@ -58,14 +58,14 @@ void DeviceAppJNI::InitializeWithObjects(jobject app)
     jclass managerClass = env->GetObjectClass(mDeviceAppObject);
     VerifyOrReturn(managerClass != nullptr, ChipLogError(Zcl, "Failed to get DeviceAppJNI Java class"));
 
-    mPostClusterInitMethod = env->GetMethodID(managerClass, "postClusterInit", "(II)V");
+    mPostClusterInitMethod = env->GetMethodID(managerClass, "postClusterInit", "(JI)V");
     if (mPostClusterInitMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access DeviceApp 'postClusterInit' method");
         env->ExceptionClear();
     }
 
-    mPostEventMethod = env->GetMethodID(managerClass, "postEvent", "(I)V");
+    mPostEventMethod = env->GetMethodID(managerClass, "postEvent", "(J)V");
     if (mPostEventMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access DeviceApp 'postEvent' method");
@@ -80,7 +80,7 @@ void DeviceAppJNI::PostClusterInit(int clusterId, int endpoint)
     VerifyOrReturn(mDeviceAppObject != nullptr, ChipLogError(Zcl, "DeviceAppJNI::mDeviceAppObject null"));
     VerifyOrReturn(mPostClusterInitMethod != nullptr, ChipLogError(Zcl, "DeviceAppJNI::mPostClusterInitMethod null"));
 
-    env->CallVoidMethod(mDeviceAppObject, mPostClusterInitMethod, static_cast<jint>(clusterId), static_cast<jint>(endpoint));
+    env->CallVoidMethod(mDeviceAppObject, mPostClusterInitMethod, static_cast<jlong>(clusterId), static_cast<jint>(endpoint));
     if (env->ExceptionCheck())
     {
         ChipLogError(Zcl, "Failed to call DeviceAppJNI 'postClusterInit' method");
@@ -95,7 +95,7 @@ void DeviceAppJNI::PostEvent(int event)
     VerifyOrReturn(mDeviceAppObject != nullptr, ChipLogError(Zcl, "DeviceAppJNI::mDeviceAppObject null"));
     VerifyOrReturn(mPostEventMethod != nullptr, ChipLogError(Zcl, "DeviceAppJNI::mPostEventMethod null"));
 
-    env->CallVoidMethod(mDeviceAppObject, mPostEventMethod, static_cast<jint>(event));
+    env->CallVoidMethod(mDeviceAppObject, mPostEventMethod, static_cast<jlong>(event));
     if (env->ExceptionCheck())
     {
         ChipLogError(Zcl, "Failed to call DeviceAppJNI 'postEventMethod' method");
