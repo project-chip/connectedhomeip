@@ -44,6 +44,8 @@ dependencies {
     implementation(project(":core:matter"))
     implementation(project(":core:model"))
 
+    implementation(Deps.Kotlin.serialization)
+
     implementation(Deps.Dagger.hiltAndroid)
     kapt(Deps.Dagger.hiltAndroidCompiler)
 
