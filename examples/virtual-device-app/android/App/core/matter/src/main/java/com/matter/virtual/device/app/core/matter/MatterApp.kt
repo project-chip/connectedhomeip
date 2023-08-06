@@ -1,17 +1,102 @@
 package com.matter.virtual.device.app.core.matter
 
+import android.content.Context
 import chip.appserver.ChipAppServer
 import chip.appserver.ChipAppServerDelegate
+import chip.platform.*
+import com.matter.virtual.device.app.Clusters
+import com.matter.virtual.device.app.DeviceApp
+import com.matter.virtual.device.app.DeviceAppCallback
+import com.matter.virtual.device.app.DeviceEventType
+import com.matter.virtual.device.app.core.common.MatterConstants
+import com.matter.virtual.device.app.core.common.MatterSettings
+import com.matter.virtual.device.app.core.matter.manager.OnOffManagerStub
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 import timber.log.Timber
 
 @Singleton
-class MatterApp @Inject constructor() {
+class MatterApp
+@Inject
+constructor(
+  @ApplicationContext private val context: Context,
+  private val deviceApp: DeviceApp,
+  private val onOffManagerStub: OnOffManagerStub
+) {
 
+  private var androidChipPlatform: AndroidChipPlatform? = null
   private var chipAppServer: ChipAppServer? = null
 
-  fun start() {
+  fun start(matterSettings: MatterSettings) {
+    Timber.d("start():$matterSettings")
+
+    deviceApp.setCallback(
+      object : DeviceAppCallback {
+        override fun onClusterInit(app: DeviceApp, clusterId: Long, endpoint: Int) {
+          Timber.d("onClusterInit():clusterId:$clusterId,endpoint:$endpoint")
+          when (clusterId) {
+            Clusters.ClusterId_OnOff -> {
+              app.setOnOffManager(endpoint, onOffManagerStub)
+              onOffManagerStub.initAttributeValue()
+            }
+          }
+        }
+
+        override fun onEvent(event: Long) {
+          Timber.d("onEvent():event:$event")
+
+          when (event) {
+            DeviceEventType.EventId_DnssdInitialized -> {
+              Timber.d("DNS-SD Platform Initialized")
+            }
+            DeviceEventType.EventId_CHIPoBLEConnectionEstablished -> {
+              Timber.d("BLE Connection Established")
+            }
+            DeviceEventType.EventId_CommissioningComplete -> {
+              Timber.d("Commissioning Complete")
+            }
+            DeviceEventType.EventId_FabricRemoved -> {
+              Timber.d("Fabric Removed")
+            }
+          }
+        }
+      }
+    )
+
+    val preferencesConfigurationManager = PreferencesConfigurationManager(context)
+    // Write discriminator
+    try {
+      preferencesConfigurationManager.writeConfigValueLong(
+        ConfigurationManager.kConfigNamespace_ChipFactory,
+        ConfigurationManager.kConfigKey_SetupDiscriminator,
+        matterSettings.discriminator.toLong()
+      )
+    } catch (e: AndroidChipPlatformException) {
+      e.printStackTrace()
+    }
+
+    androidChipPlatform =
+      AndroidChipPlatform(
+        AndroidBleManager(),
+        PreferencesKeyValueStoreManager(context),
+        preferencesConfigurationManager,
+        NsdManagerServiceResolver(context),
+        NsdManagerServiceBrowser(context),
+        ChipMdnsCallbackImpl(),
+        DiagnosticDataProviderImpl(context)
+      )
+
+    androidChipPlatform?.updateCommissionableDataProviderData(
+      MatterConstants.TEST_SPAKE2P_VERIFIER,
+      MatterConstants.TEST_SPAKE2P_SALT,
+      MatterConstants.TEST_SPAKE2P_ITERATION_COUNT,
+      MatterConstants.TEST_SETUP_PASSCODE,
+      matterSettings.discriminator
+    )
+
+    deviceApp.preServerInit()       
+
     chipAppServer = ChipAppServer()
     chipAppServer?.startAppWithDelegate(
       object : ChipAppServerDelegate {
@@ -40,6 +125,8 @@ class MatterApp @Inject constructor() {
         }
       }
     )
+
+    deviceApp.postServerInit(matterSettings.device.deviceTypeId.toInt())
   }
 
   fun stop() {
