@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dialog_user_factory_reset_message">"The commissioning was not completed. The Matter device app will be reset and closed. Continue?"</string>
+</resources>
