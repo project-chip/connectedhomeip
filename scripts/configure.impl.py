@@ -48,8 +48,10 @@ def process_project_args(gn_args_json_file, *params):
 
 class ProjectArgProcessor:
     # Prefixes to try when mapping parameters to GN arguments
-    BOOL_ARG_PREFIXES = ('is_', 'enable_', 'use_', 'chip_', 'chip_enable', 'chip_use_', 'chip_config_')
-    GENERIC_ARG_PREFIXES = ('chip_', 'chip_config_')
+    BOOL_ARG_PREFIXES = ('is_', 'enable_', 'use_',
+                         'chip_', 'chip_enable_', 'chip_use_', 'chip_config_',
+                         'matter_', 'matter_enable_', 'matter_use_', 'matter_config_')
+    GENERIC_ARG_PREFIXES = ('chip_', 'chip_config_', 'matter_', 'matter_config_')
 
     gn_args = {}  # GN arg -> type ('s'tring, 'b'ool, 'i'integer, '[' list, '{' struct)
     args = collections.OrderedDict()  # collected arguments
