@@ -13,7 +13,8 @@
 # limitations under the License.
 
 name: List Workflows
-on: workflow_dispatch:
+on:
+  workflow_dispatch:
 
 jobs:
   list_workflows:
