@@ -1597,7 +1597,8 @@ server cluster UserLabel = 65 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
 
   server cluster Descriptor {
     callback attribute deviceTypeList;
@@ -1880,7 +1881,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type videoplayer = 256, version 1;
+  device type ma_onofflight = 256, version 1;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;

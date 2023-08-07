@@ -18,4 +18,12 @@ object DeepLink {
       )
       .build()
   }
+
+  fun getDeepLinkRequestForLoadingFragment(setting: String): NavDeepLinkRequest {
+    return NavDeepLinkRequest.Builder.fromUri(
+        "android-app://com.matter.virtual.device.app.feature.main/loadingFragment/${setting}"
+          .toUri()
+      )
+      .build()
+  }
 }
