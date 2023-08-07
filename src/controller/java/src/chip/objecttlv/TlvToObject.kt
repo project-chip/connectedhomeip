@@ -32,6 +32,7 @@ import chip.tlv.TlvReader
 import chip.tlv.UnsignedIntValue
 import chip.tlv.Utf8StringValue
 
+/** Converts TLV to kotlin value. */
 fun TlvReader.toObject(tag: Tag = AnonymousTag): Any? {
   val element = peekElement()
   return when (element.value) {

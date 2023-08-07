@@ -22,6 +22,12 @@ import chip.tlv.AnonymousTag
 import chip.tlv.Tag
 import chip.tlv.TlvWriter
 
+/**
+ * Converts kotlin value into TLV.
+ *
+ * @param value kotlin value to be converted to TLV. If String value is in json format, it is judged
+ *   as json and converted to TLV.
+ */
 fun TlvWriter.fromObject(value: Any?, tag: Tag = AnonymousTag): TlvWriter {
   when (value) {
     null -> {
