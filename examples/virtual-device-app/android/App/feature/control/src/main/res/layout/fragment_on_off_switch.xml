@@ -1,10 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
+        <!-- appbar -->
+        <include
+            android:id="@+id/appbar"
+            layout="@layout/layout_appbar" />
+        <!-- appbar -->
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nested_scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- title -->
+                    <include
+                        android:id="@+id/on_off_switch_title_layout"
+                        layout="@layout/layout_title" />
+                    <!-- title -->
+
+                    <!-- Top Space -->
+                    <include layout="@layout/layout_space_top" />
+                    <!-- Top Space -->
+
+                    <!-- On Off Button -->
+                    <include
+                        android:id="@+id/on_off_switch_on_off_layout"
+                        layout="@layout/layout_item_value_on_off_button" />
+                    <!-- On Off Button -->
+
+                    <!-- Bottom Space -->
+                    <include layout="@layout/layout_space_bottom" />
+                    <!-- Bottom Space -->
+                </LinearLayout>
+            </ScrollView>
+        </androidx.core.widget.NestedScrollView>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
