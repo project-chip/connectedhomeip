@@ -345,8 +345,6 @@ android_library("java") {
     "src/chip/devicecontroller/PaseVerifierParams.java",
     "src/chip/devicecontroller/ReportCallback.java",
     "src/chip/devicecontroller/ReportCallbackJni.java",
-    "src/chip/devicecontroller/ReportEventCallback.java",
-    "src/chip/devicecontroller/ReportEventCallbackJni.java",
     "src/chip/devicecontroller/ResubscriptionAttemptCallback.java",
     "src/chip/devicecontroller/SubscriptionEstablishedCallback.java",
     "src/chip/devicecontroller/ThreadScanResult.java",
