@@ -39,6 +39,7 @@ style:
             - "**/src/controller/java/src/chip/WildcardImport
               examples/android/CHIPTest/app/src/androidTest/java/com/tcl/chip/chiptest/ExampleInstrumentedTest.kt"
             - "**/src/controller/java/tests/chip/jsontlv/JsonToTlvToJsonTest.kt"
+            - "**/src/controller/java/tests/chip/objecttlv/ObjectToTlvToObjectTest.kt"
             - "**/src/controller/java/tests/chip/onboardingpayload/ManualCodeTest.kt"
             - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"
             - "**/src/controller/java/tests/chip/tlv/TlvReaderTest.kt"
@@ -61,6 +62,7 @@ style:
             - "**/src/controller/java/src/chip/jsontlv/JsonToTlv.kt"
             - "**/src/controller/java/src/chip/jsontlv/TlvToJson.kt"
             - "**/src/controller/java/tests/chip/jsontlv/JsonToTlvToJsonTest.kt"
+            - "**/src/controller/java/tests/chip/objecttlv/ObjectToTlvToObjectTest.kt"
     NewLineAtEndOfFile:
         excludes:
             - "**/examples/android/CHIPTest/app/src/androidTest/java/com/tcl/chip/chiptest/ExampleInstrumentedTest.kt"
@@ -128,6 +130,7 @@ style:
             - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadParser.kt"
             - "**/src/controller/java/src/chip/onboardingpayload/OnboardingPayload.kt"
             - "**/src/controller/java/src/chip/onboardingpayload/QRCodeBasicOnboardingPayloadGenerator.kt"
+            - "**/src/controller/java/tests/chip/objecttlv/ObjectToTlvToObjectTest.kt"
             - "**/src/controller/java/tests/chip/onboardingpayload/ManualCodeTest.kt"
             - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"
     UnusedParameter:
@@ -268,6 +271,7 @@ complexity:
             - "**/src/controller/java/src/chip/tlv/TlvReader.kt"
             - "**/src/controller/java/src/chip/tlv/TlvWriter.kt"
             - "**/src/controller/java/tests/chip/jsontlv/JsonToTlvToJsonTest.kt"
+            - "**/src/controller/java/tests/chip/objecttlv/ObjectToTlvToObjectTest.kt"
             - "**/src/controller/java/tests/chip/onboardingpayload/ManualCodeTest.kt"
             - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"
             - "**/src/controller/java/tests/chip/tlv/TlvReadWriteTest.kt"

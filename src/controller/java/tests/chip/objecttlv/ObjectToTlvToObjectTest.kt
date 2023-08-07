@@ -29,9 +29,6 @@ class ObjectToTlvToObjectTest {
   private fun String.octetsToByteArray(): ByteArray =
     replace(" ", "").chunked(2).map { it.toInt(16) and 0xFF }.map { it.toByte() }.toByteArray()
 
-  private fun ByteArray.toHexString(): String =
-    joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
-
   @Test
   fun convertNullToTlv() {
     val value: Any? = null
@@ -223,14 +220,15 @@ class ObjectToTlvToObjectTest {
     val tlvReader = TlvReader(tlv)
     val compareValue = tlvReader.toObject()
 
-    // Json can't compare String (because of '\n', '\t' etc.). In this reason, check to compare re-parse tlv packet.
+    // Json can't compare String (because of '\n', '\t' etc.). In this reason, check to compare
+    // re-parse tlv packet.
     val reparseTlvWriter = TlvWriter().fromObject(compareValue)
 
     assertThat(tlvWriter.getEncoded()).isEqualTo(reparseTlvWriter.getEncoded())
   }
 
   @Test
-  fun convertListToTlv() {
+  fun convertListToTlv1() {
     // Int
     val test1 = listOf(1, 3, 5, 7, 9, 2, 4, 6, 8, 10)
     val tlvWriter1 =
@@ -278,7 +276,10 @@ class ObjectToTlvToObjectTest {
     val compareTlvWriter4 = TlvWriter().fromObject(test4)
 
     assertThat(tlvWriter4.getEncoded()).isEqualTo(compareTlvWriter4.getEncoded())
+  }
 
+  @Test
+  fun convertListToTlv2() {
     // String
     val test5 = listOf("January", "Feb.", "April", "december", "Happy new year!")
     val tlvWriter5 =
