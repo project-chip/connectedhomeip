@@ -137,6 +137,17 @@ set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
 # Define 'chip-ota-image' target for building CHIP OTA image
 # ==============================================================================
 
+
+if(${TLNK_USB_DONGLE} MATCHES y)
+  if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BOARD}_usb_boot.overlay")
+    set(USB_BOOT_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}_usb_boot.overlay")
+  else()
+    unset(USB_BOOT_DTC_OVERLAY_FILE)
+  endif()
+else()
+  unset(USB_BOOT_DTC_OVERLAY_FILE)
+endif()
+
 if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BOARD}.overlay")
     set(GLOBAL_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}.overlay")
 else()
@@ -153,7 +164,7 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
     add_custom_target(build_mcuboot ALL
         COMMAND
         west build -b ${BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
-            -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE} -DDTC_OVERLAY_FILE=${GLOBAL_DTC_OVERLAY_FILE}
+            -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE} -DDTC_OVERLAY_FILE="${GLOBAL_DTC_OVERLAY_FILE};${USB_BOOT_DTC_OVERLAY_FILE}"
     )
 
     add_custom_target(merge_mcuboot ALL

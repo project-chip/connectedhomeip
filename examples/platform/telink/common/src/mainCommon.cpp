@@ -23,9 +23,17 @@
 
 #include <zephyr/kernel.h>
 
+#ifdef CONFIG_USB_DEVICE_STACK
+#include <zephyr/usb/usb_device.h>
+#endif /* CONFIG_USB_DEVICE_STACK */
+
 #ifdef CONFIG_CHIP_PW_RPC
 #include "Rpc.h"
 #endif
+
+#ifdef CONFIG_BOOTLOADER_MCUBOOT
+#include <zephyr/dfu/mcuboot.h>
+#endif /* CONFIG_BOOTLOADER_MCUBOOT */
 
 LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
@@ -94,6 +102,10 @@ static void FactoryResetOnBoot(void)
 
 int main(void)
 {
+#if defined(CONFIG_USB_DEVICE_STACK) && !defined(CONFIG_CHIP_PW_RPC)
+    usb_enable(NULL);
+#endif /* CONFIG_USB_DEVICE_STACK */
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 
 #ifdef CONFIG_CHIP_PW_RPC
@@ -142,6 +154,17 @@ int main(void)
         LOG_ERR("SetThreadDeviceType fail");
         goto exit;
     }
+
+#ifdef CONFIG_BOOTLOADER_MCUBOOT
+    if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT) {
+        int img_confirmation = boot_write_img_confirmed();
+        if (img_confirmation) {
+            LOG_ERR("Image not confirmed %d. Will be reverted!", img_confirmation);
+        } else {
+            LOG_INF("Image confirmed");
+        }
+    }
+#endif /* CONFIG_BOOTLOADER_MCUBOOT */
 
     err = GetAppTask().StartApp();
 
