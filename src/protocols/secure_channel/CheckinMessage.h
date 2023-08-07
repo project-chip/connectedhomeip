@@ -69,6 +69,15 @@ public:
     static CHIP_ERROR GenerateCheckinMessagePayload(Crypto::Aes128KeyHandle & key, uint32_t counter, const ByteSpan & appData,
                                                     MutableByteSpan & output, uint16_t * payloadSize = nullptr);
 
+    /**
+     * @brief Parse Check-in Message payload
+     *
+     * @param key       Key with which to decrypt the check-in payload
+     * @param payload   The received payload to decrypt and parse
+     * @param counter   The counter value retrieved from the payload
+     * @param appData   The optionnal application data decrypted
+     * @return CHIP_ERROR
+     */
     static CHIP_ERROR ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & key, ByteSpan & payload, uint32_t & counter,
                                                  MutableByteSpan & appData);
 
