@@ -28,6 +28,10 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+class RvcDevice;
+
+typedef void (RvcDevice::*HandleChangeToModeA)(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response);
+
 namespace RvcRunMode {
 
 const uint8_t ModeIdle     = 0;
@@ -62,7 +66,15 @@ private:
     CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override;
     CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & tags) override;
 
+    RvcDevice *mRvcDeviceInstance;
+    HandleChangeToModeA mCallback;
+
 public:
+    void SetHandleChangeToMode(HandleChangeToModeA aCallback, RvcDevice *aInstance) {
+        mCallback = aCallback;
+        mRvcDeviceInstance = aInstance;
+    };
+
     ~RvcRunModeDelegate() override = default;
 };
 
@@ -72,30 +84,49 @@ void Shutdown();
 
 namespace RvcCleanMode {
 
-const uint8_t ModeVacuum    = 0;
-const uint8_t ModeWash      = 1;
+const uint8_t ModeQuick    = 0;
+const uint8_t ModeAuto      = 1;
 const uint8_t ModeDeepClean = 2;
+const uint8_t ModeQuiet = 3;
+const uint8_t ModeMaxVac = 4;
 
 /// This is an application level delegate to handle RvcClean commands according to the specific business logic.
 class RvcCleanModeDelegate : public ModeBase::Delegate
 {
 private:
     using ModeTagStructType            = detail::Structs::ModeTagStruct::Type;
-    ModeTagStructType modeTagsVac[1]   = { { .value = to_underlying(ModeTag::kVacuum) } };
-    ModeTagStructType modeTagsMop[1]   = { { .value = to_underlying(ModeTag::kMop) } };
-    ModeTagStructType modeTagsBoost[2] = { { .value = to_underlying(ModeBase::ModeTag::kMax) },
-                                           { .value = to_underlying(ModeTag::kDeepClean) } };
+    ModeTagStructType modeTagsQuick[2]     = { { .value = to_underlying(ModeTag::kVacuum) },
+                                               { .value = to_underlying(ModeBase::ModeTag::kQuick) } };
 
-    const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Vacuum"),
-                                                 .mode     = ModeVacuum,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsVac) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Wash"),
-                                                 .mode     = ModeWash,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsMop) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Deep clean"),
+    ModeTagStructType modeTagsAuto[2]      = { { .value = to_underlying(ModeBase::ModeTag::kAuto) },
+                                               { .value = to_underlying(ModeTag::kVacuum) } };
+
+    ModeTagStructType modeTagsDeepClean[3] = { { .value = to_underlying(ModeTag::kMop) },
+                                               { .value = to_underlying(ModeTag::kDeepClean) },
+                                               { .value = to_underlying(ModeTag::kVacuum) } };
+
+    ModeTagStructType modeTagsQuiet[2]     = { { .value = to_underlying(ModeBase::ModeTag::kQuiet) },
+                                               { .value = to_underlying(ModeTag::kVacuum) } };
+
+    ModeTagStructType modeTagsMaxVac[2]    = { { .value = to_underlying(ModeTag::kVacuum) },
+                                               { .value = to_underlying(ModeTag::kDeepClean) } };
+
+    const detail::Structs::ModeOptionStruct::Type kModeOptions[5] = {
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Quick"),
+                                                 .mode     = ModeQuick,
+                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsQuick) },
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Auto"),
+                                                 .mode     = ModeAuto,
+                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsAuto) },
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Deep Clean"),
                                                  .mode     = ModeDeepClean,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsBoost) },
+                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsDeepClean) },
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Quiet"),
+                                                 .mode     = ModeQuiet,
+                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsQuiet) },
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Max Vac"),
+                                                 .mode     = ModeMaxVac,
+                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsMaxVac) },
     };
 
     CHIP_ERROR Init() override;
@@ -105,7 +136,15 @@ private:
     CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override;
     CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & tags) override;
 
+    RvcDevice *mRvcDeviceInstance;
+    HandleChangeToModeA mCallback;
+
 public:
+    void SetHandleChangeToMode(HandleChangeToModeA aCallback, RvcDevice *aInstance) {
+        mCallback = aCallback;
+        mRvcDeviceInstance = aInstance;
+    };
+
     ~RvcCleanModeDelegate() override = default;
 };
 

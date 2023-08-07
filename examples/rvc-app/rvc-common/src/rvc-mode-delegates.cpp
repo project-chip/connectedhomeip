@@ -24,13 +24,8 @@ using namespace chip::app::Clusters::RvcCleanMode;
 using chip::Protocols::InteractionModel::Status;
 template <typename T>
 using List              = chip::app::DataModel::List<T>;
-using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
 // RVC Run
-
-static RvcRunModeDelegate * gRvcRunModeDelegate = nullptr;
-static ModeBase::Instance * gRvcRunModeInstance = nullptr;
-
 CHIP_ERROR RvcRunModeDelegate::Init()
 {
     return CHIP_NO_ERROR;
@@ -38,17 +33,7 @@ CHIP_ERROR RvcRunModeDelegate::Init()
 
 void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    uint8_t currentMode = mInstance->GetCurrentMode();
-
-    // Our business logic states that we can only switch into the mapping state from the idle state.
-    if (NewMode == RvcRunMode::ModeMapping && currentMode != RvcRunMode::ModeIdle)
-    {
-        response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
-        response.statusText.SetValue(chip::CharSpan::fromCharString("Change to the mapping mode is only allowed from idle"));
-        return;
-    }
-
-    response.status = to_underlying(ModeBase::StatusCode::kSuccess);
+    (mRvcDeviceInstance->*mCallback)(NewMode, response);
 }
 
 CHIP_ERROR RvcRunModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
@@ -88,33 +73,8 @@ CHIP_ERROR RvcRunModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTa
     return CHIP_NO_ERROR;
 }
 
-void RvcRunMode::Shutdown()
-{
-    if (gRvcRunModeInstance != nullptr)
-    {
-        delete gRvcRunModeInstance;
-        gRvcRunModeInstance = nullptr;
-    }
-    if (gRvcRunModeDelegate != nullptr)
-    {
-        delete gRvcRunModeDelegate;
-        gRvcRunModeDelegate = nullptr;
-    }
-}
-
-void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
-{
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gRvcRunModeDelegate == nullptr && gRvcRunModeInstance == nullptr);
-    gRvcRunModeDelegate = new RvcRunMode::RvcRunModeDelegate;
-    gRvcRunModeInstance =
-        new ModeBase::Instance(gRvcRunModeDelegate, 0x1, RvcRunMode::Id, chip::to_underlying(RvcRunMode::Feature::kOnOff));
-    gRvcRunModeInstance->Init();
-}
 
 // RVC Clean
-static RvcCleanModeDelegate * gRvcCleanModeDelegate = nullptr;
-static ModeBase::Instance * gRvcCleanModeInstance   = nullptr;
 
 CHIP_ERROR RvcCleanModeDelegate::Init()
 {
@@ -123,17 +83,9 @@ CHIP_ERROR RvcCleanModeDelegate::Init()
 
 void RvcCleanModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    uint8_t rvcRunCurrentMode = gRvcRunModeInstance->GetCurrentMode();
-
-    if (rvcRunCurrentMode == RvcRunMode::ModeCleaning)
-    {
-        response.status = to_underlying(RvcCleanMode::StatusCode::kCleaningInProgress);
-        response.statusText.SetValue(chip::CharSpan::fromCharString("Cannot change the cleaning mode during a clean"));
-        return;
-    }
-
-    response.status = to_underlying(ModeBase::StatusCode::kSuccess);
+    (mRvcDeviceInstance->*mCallback)(NewMode, response);
 }
+
 
 CHIP_ERROR RvcCleanModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
@@ -170,28 +122,4 @@ CHIP_ERROR RvcCleanModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<Mode
     tags.reduce_size(kModeOptions[modeIndex].modeTags.size());
 
     return CHIP_NO_ERROR;
-}
-
-void RvcCleanMode::Shutdown()
-{
-    if (gRvcCleanModeInstance != nullptr)
-    {
-        delete gRvcCleanModeInstance;
-        gRvcCleanModeInstance = nullptr;
-    }
-    if (gRvcCleanModeDelegate != nullptr)
-    {
-        delete gRvcCleanModeDelegate;
-        gRvcCleanModeDelegate = nullptr;
-    }
-}
-
-void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
-{
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gRvcCleanModeDelegate == nullptr && gRvcCleanModeInstance == nullptr);
-    gRvcCleanModeDelegate = new RvcCleanMode::RvcCleanModeDelegate;
-    gRvcCleanModeInstance =
-        new ModeBase::Instance(gRvcCleanModeDelegate, 0x1, RvcCleanMode::Id, chip::to_underlying(RvcCleanMode::Feature::kOnOff));
-    gRvcCleanModeInstance->Init();
 }

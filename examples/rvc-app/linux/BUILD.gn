@@ -25,6 +25,8 @@ config("includes") {
 executable("chip-rvc-app") {
   sources = [
     "${chip_root}/examples/rvc-app/rvc-common/src/rvc-mode-delegates.cpp",
+    "${chip_root}/examples/rvc-app/rvc-common/src/rvc-operational-state-delegate.cpp",
+    "${chip_root}/examples/rvc-app/rvc-common/src/rvc-device.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]

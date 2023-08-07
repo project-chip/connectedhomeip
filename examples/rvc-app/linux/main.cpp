@@ -15,19 +15,24 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "rvc-mode-delegates.h"
+#include "rvc-device.h"
 #include <AppMain.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-void ApplicationInit() {}
+RvcDevice *rvcDevice = nullptr;
+
+void ApplicationInit() {
+    rvcDevice = new RvcDevice;
+    rvcDevice->Init();
+}
 
 void ApplicationShutdown()
 {
-    Clusters::RvcCleanMode::Shutdown();
-    Clusters::RvcRunMode::Shutdown();
+    delete rvcDevice;
+    rvcDevice = nullptr;
 }
 
 int main(int argc, char * argv[])
