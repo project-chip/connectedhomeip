@@ -22,6 +22,16 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int32_t wfx_wifi_rsi_init(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 class SilabsMatterConfig
 {
 public:
