@@ -19,7 +19,7 @@ on:
 jobs:
   list_workflows:
     name: List Workflows with GitHub CLI
-    if: github.repository_owner == 'project-chip'
+    #if: github.repository_owner == 'project-chip'
     runs-on: ubuntu-latest
     steps:
       - run: gh workflow list
