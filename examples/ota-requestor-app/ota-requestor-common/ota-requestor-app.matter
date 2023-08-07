@@ -1072,6 +1072,10 @@ server cluster GroupKeyManagement = 63 {
     kCacheAndSync = 1;
   }
 
+  bitmap Feature : BITMAP32 {
+    kCacheAndSync = 0x1;
+  }
+
   fabric_scoped struct GroupInfoMapStruct {
     group_id groupId = 1;
     endpoint_no endpoints[] = 2;
@@ -1167,7 +1171,8 @@ server cluster UserLabel = 65 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Descriptor {
@@ -1325,7 +1330,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 259, version 1;
+  device type ma_onofflightswitch = 259, version 1;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;
@@ -1363,7 +1369,8 @@ endpoint 1 {
   }
 }
 endpoint 65534 {
-  device type anonymousEndpointType = 61442, version 1;
+  device type ma_secondary_network_commissioning = 61442, version 1;
+
 
   server cluster Descriptor {
     callback attribute deviceTypeList;

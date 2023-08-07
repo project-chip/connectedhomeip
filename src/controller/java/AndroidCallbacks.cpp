@@ -17,8 +17,10 @@
 #include "AndroidCallbacks.h"
 #include <controller/java/AndroidClusterExceptions.h>
 #include <controller/java/AndroidControllerExceptions.h>
+#if USE_JAVA_TLV_ENCODE_DECODE
 #include <controller/java/CHIPAttributeTLVValueDecoder.h>
 #include <controller/java/CHIPEventTLVValueDecoder.h>
+#endif
 #include <jni.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
@@ -243,14 +245,17 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
         return;
     }
 
-    TLV::TLVReader readerForJavaObject;
     TLV::TLVReader readerForJavaTLV;
     TLV::TLVReader readerForJson;
-    readerForJavaObject.Init(*apData);
     readerForJavaTLV.Init(*apData);
     readerForJson.Init(*apData);
 
-    jobject value = DecodeAttributeValue(aPath, readerForJavaObject, &err);
+    jobject value = nullptr;
+#if USE_JAVA_TLV_ENCODE_DECODE
+    TLV::TLVReader readerForJavaObject;
+    readerForJavaObject.Init(*apData);
+
+    value = DecodeAttributeValue(aPath, readerForJavaObject, &err);
     // If we don't know this attribute, suppress it.
     if (err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB)
     {
@@ -260,7 +265,7 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(attributePathObj, nullptr, err));
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe(),
                    ReportError(attributePathObj, nullptr, CHIP_JNI_ERROR_EXCEPTION_THROWN));
-
+#endif
     // Create TLV byte array to pass to Java layer
     size_t bufferLen                  = readerForJavaTLV.GetRemainingLength() + readerForJavaTLV.GetLengthRead();
     std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(new uint8_t[bufferLen]);
@@ -354,18 +359,20 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
         return;
     }
 
-    TLV::TLVReader readerForJavaObject;
     TLV::TLVReader readerForJavaTLV;
     TLV::TLVReader readerForJson;
-    readerForJavaObject.Init(*apData);
     readerForJavaTLV.Init(*apData);
     readerForJson.Init(*apData);
 
-    jlong eventNumber   = static_cast<jlong>(aEventHeader.mEventNumber);
-    jlong priorityLevel = static_cast<jint>(aEventHeader.mPriorityLevel);
-    jlong timestamp     = static_cast<jlong>(aEventHeader.mTimestamp.mValue);
+    jlong eventNumber  = static_cast<jlong>(aEventHeader.mEventNumber);
+    jint priorityLevel = static_cast<jint>(aEventHeader.mPriorityLevel);
+    jlong timestamp    = static_cast<jlong>(aEventHeader.mTimestamp.mValue);
 
-    jobject value = DecodeEventValue(aEventHeader.mPath, readerForJavaObject, &err);
+    jobject value = nullptr;
+#if USE_JAVA_TLV_ENCODE_DECODE
+    TLV::TLVReader readerForJavaObject;
+    readerForJavaObject.Init(*apData);
+    value = DecodeEventValue(aEventHeader.mPath, readerForJavaObject, &err);
     // If we don't know this event, just skip it.
     if (err == CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB)
     {
@@ -374,6 +381,7 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(nullptr, eventPathObj, err));
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe(),
                    ReportError(nullptr, eventPathObj, CHIP_JNI_ERROR_EXCEPTION_THROWN));
+#endif
 
     // Create TLV byte array to pass to Java layer
     size_t bufferLen                  = readerForJavaTLV.GetRemainingLength() + readerForJavaTLV.GetLengthRead();
@@ -602,259 +610,6 @@ void ReportCallback::ReportError(jobject attributePath, jobject eventPath, const
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(mReportCallbackRef, onErrorMethod, attributePath, eventPath, exception);
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
-}
-
-ReportEventCallback::ReportEventCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject reportCallback,
-                                         jobject resubscriptionAttemptCallback) :
-    mBufferedReadAdapter(*this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
-    if (subscriptionEstablishedCallback != nullptr)
-    {
-        mSubscriptionEstablishedCallbackRef = env->NewGlobalRef(subscriptionEstablishedCallback);
-        if (mSubscriptionEstablishedCallbackRef == nullptr)
-        {
-            ChipLogError(Controller, "Could not create global reference for Java callback");
-        }
-    }
-    mReportCallbackRef = env->NewGlobalRef(reportCallback);
-    if (mReportCallbackRef == nullptr)
-    {
-        ChipLogError(Controller, "Could not create global reference for Java callback");
-    }
-    mWrapperCallbackRef = env->NewGlobalRef(wrapperCallback);
-    if (mWrapperCallbackRef == nullptr)
-    {
-        ChipLogError(Controller, "Could not create global reference for Java callback");
-    }
-    if (resubscriptionAttemptCallback != nullptr)
-    {
-        mResubscriptionAttemptCallbackRef = env->NewGlobalRef(resubscriptionAttemptCallback);
-        if (mResubscriptionAttemptCallbackRef == nullptr)
-        {
-            ChipLogError(Controller, "Could not create global reference for Java callback");
-        }
-    }
-}
-
-ReportEventCallback::~ReportEventCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
-    if (mSubscriptionEstablishedCallbackRef != nullptr)
-    {
-        env->DeleteGlobalRef(mSubscriptionEstablishedCallbackRef);
-    }
-    env->DeleteGlobalRef(mReportCallbackRef);
-    if (mReadClient != nullptr)
-    {
-        Platform::Delete(mReadClient);
-    }
-}
-
-void ReportEventCallback::OnReportBegin()
-{
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/model/NodeState", mNodeStateCls);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not get NodeState class"));
-    jmethodID nodeStateCtor = env->GetMethodID(mNodeStateCls, "<init>", "(Ljava/util/Map;)V");
-    VerifyOrReturn(nodeStateCtor != nullptr, ChipLogError(Controller, "Could not find NodeState constructor"));
-
-    jobject map = nullptr;
-    err         = JniReferences::GetInstance().CreateHashMap(map);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not create HashMap"));
-    mNodeStateObj = env->NewObject(mNodeStateCls, nodeStateCtor, map);
-}
-
-void ReportEventCallback::OnReportEnd()
-{
-    // Transform C++ jobject pair list to a Java HashMap, and call onReport() on the Java callback.
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-
-    jmethodID onReportMethod;
-    err = JniReferences::GetInstance().FindMethod(env, mReportCallbackRef, "onReport", "(Lchip/devicecontroller/model/NodeState;)V",
-                                                  &onReportMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onReport method"));
-
-    DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mReportCallbackRef, onReportMethod, mNodeStateObj);
-}
-
-void ReportEventCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLVReader * apData,
-                                      const app::StatusIB * apStatus)
-{
-    CHIP_ERROR err       = CHIP_NO_ERROR;
-    JNIEnv * env         = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject eventPathObj = nullptr;
-    err                  = CreateChipEventPath(aEventHeader.mPath, eventPathObj);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to create Java ChipEventPath: %s", ErrorStr(err)));
-
-    if (apData == nullptr)
-    {
-        ReportError(eventPathObj, CHIP_ERROR_INVALID_ARGUMENT);
-        return;
-    }
-
-    TLV::TLVReader readerForJavaObject;
-    TLV::TLVReader readerForJavaTLV;
-    TLV::TLVReader readerForJson;
-    readerForJavaObject.Init(*apData);
-    readerForJavaTLV.Init(*apData);
-    readerForJson.Init(*apData);
-
-    jlong eventNumber   = static_cast<jlong>(aEventHeader.mEventNumber);
-    jlong priorityLevel = static_cast<jint>(aEventHeader.mPriorityLevel);
-    jlong timestamp     = static_cast<jlong>(aEventHeader.mTimestamp.mValue);
-
-    jobject value = DecodeEventValue(aEventHeader.mPath, readerForJavaObject, &err);
-    // If we don't know this event, just skip it.
-    VerifyOrReturn(err != CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(eventPathObj, err));
-    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe(), ReportError(eventPathObj, CHIP_JNI_ERROR_EXCEPTION_THROWN));
-
-    // Create TLV byte array to pass to Java layer
-    size_t bufferLen                  = readerForJavaTLV.GetRemainingLength() + readerForJavaTLV.GetLengthRead();
-    std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(new uint8_t[bufferLen]);
-    uint32_t size                     = 0;
-    // The TLVReader's read head is not pointing to the first element in the container, instead of the container itself, use
-    // a TLVWriter to get a TLV with a normalized TLV buffer (Wrapped with an anonymous tag, no extra "end of container" tag
-    // at the end.)
-    TLV::TLVWriter writer;
-    writer.Init(buffer.get(), bufferLen);
-    err = writer.CopyElement(TLV::AnonymousTag(), readerForJavaTLV);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(eventPathObj, err));
-    size = writer.GetLengthWritten();
-    chip::ByteArray jniByteArray(env, reinterpret_cast<jbyte *>(buffer.get()), size);
-
-    // Convert TLV to JSON
-    Json::Value json;
-    err = TlvToJson(readerForJson, json);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(eventPathObj, err));
-
-    UtfString jsonString(env, JsonToString(json).c_str());
-
-    // Create EventState object
-    jclass eventStateCls;
-    err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/model/EventState", eventStateCls);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find EventState class"));
-    VerifyOrReturn(eventStateCls != nullptr, ChipLogError(Controller, "Could not find EventState class"));
-    chip::JniClass eventStateJniCls(eventStateCls);
-    jmethodID eventStateCtor = env->GetMethodID(eventStateCls, "<init>", "(JIJLjava/lang/Object;[BLjava/lang/String;)V");
-    VerifyOrReturn(eventStateCtor != nullptr, ChipLogError(Controller, "Could not find EventState constructor"));
-    jobject eventStateObj = env->NewObject(eventStateCls, eventStateCtor, eventNumber, priorityLevel, timestamp, value,
-                                           jniByteArray.jniValue(), jsonString.jniValue());
-    VerifyOrReturn(eventStateObj != nullptr, ChipLogError(Controller, "Could not create EventState object"));
-
-    // Add EventState to NodeState
-    jmethodID addEventMethod;
-    err = JniReferences::GetInstance().FindMethod(env, mNodeStateObj, "addEvent", "(IJJLchip/devicecontroller/model/EventState;)V",
-                                                  &addEventMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find addEvent method"));
-    env->CallVoidMethod(mNodeStateObj, addEventMethod, static_cast<jint>(aEventHeader.mPath.mEndpointId),
-                        static_cast<jlong>(aEventHeader.mPath.mClusterId), static_cast<jlong>(aEventHeader.mPath.mEventId),
-                        eventStateObj);
-    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
-}
-
-CHIP_ERROR ReportEventCallback::CreateChipEventPath(const app::ConcreteEventPath & aPath, jobject & outObj)
-{
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    jclass eventPathCls = nullptr;
-    err                 = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/model/ChipEventPath", eventPathCls);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
-    JniClass eventPathJniCls(eventPathCls);
-
-    jmethodID eventPathCtor =
-        env->GetStaticMethodID(eventPathCls, "newInstance", "(IJJ)Lchip/devicecontroller/model/ChipEventPath;");
-    VerifyOrReturnError(eventPathCtor != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
-
-    outObj = env->CallStaticObjectMethod(eventPathCls, eventPathCtor, static_cast<jint>(aPath.mEndpointId),
-                                         static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mEventId));
-    VerifyOrReturnError(outObj != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
-
-    return err;
-}
-
-void ReportEventCallback::OnError(CHIP_ERROR aError)
-{
-    ReportError(nullptr, aError);
-}
-
-void ReportEventCallback::OnDone(app::ReadClient *)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-
-    jmethodID onDoneMethod;
-    err = JniReferences::GetInstance().FindMethod(env, mReportCallbackRef, "onDone", "()V", &onDoneMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onDone method"));
-
-    DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mReportCallbackRef, onDoneMethod);
-
-    JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mWrapperCallbackRef);
-}
-
-void ReportEventCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef, aSubscriptionId);
-}
-
-CHIP_ERROR ReportEventCallback::OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause)
-{
-    VerifyOrReturnLogError(mResubscriptionAttemptCallbackRef != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-
-    ReturnErrorOnFailure(app::ReadClient::Callback::OnResubscriptionNeeded(apReadClient, aTerminationCause));
-
-    jmethodID onResubscriptionAttemptMethod;
-    ReturnLogErrorOnFailure(JniReferences::GetInstance().FindMethod(
-        env, mResubscriptionAttemptCallbackRef, "onResubscriptionAttempt", "(JJ)V", &onResubscriptionAttemptMethod));
-
-    DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mResubscriptionAttemptCallbackRef, onResubscriptionAttemptMethod,
-                        static_cast<jlong>(aTerminationCause.AsInteger()),
-                        static_cast<jlong>(apReadClient->ComputeTimeTillNextSubscription()));
-
-    return CHIP_NO_ERROR;
-}
-
-void ReportEventCallback::ReportError(jobject eventPath, CHIP_ERROR err)
-{
-    ReportError(eventPath, ErrorStr(err), err.AsInteger());
-}
-
-void ReportEventCallback::ReportError(jobject eventPath, Protocols::InteractionModel::Status status)
-{
-    ReportError(eventPath, "IM Status", static_cast<std::underlying_type_t<Protocols::InteractionModel::Status>>(status));
-}
-
-void ReportEventCallback::ReportError(jobject eventPath, const char * message, ChipError::StorageType errorCode)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-
-    jthrowable exception;
-    err = AndroidControllerExceptions::GetInstance().CreateAndroidControllerException(env, message, errorCode, exception);
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   ChipLogError(Controller, "Unable to create AndroidControllerException: %s on eportEventCallback::ReportError",
-                                ErrorStr(err)));
-
-    jmethodID onErrorMethod;
-    err = JniReferences::GetInstance().FindMethod(
-        env, mReportCallbackRef, "onError", "(Lchip/devicecontroller/model/ChipEventPath;Ljava/lang/Exception;)V", &onErrorMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onError method: %s", ErrorStr(err)));
-
-    DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mReportCallbackRef, onErrorMethod, eventPath, exception);
 }
 
 WriteAttributesCallback::WriteAttributesCallback(jobject wrapperCallback, jobject javaCallback) : mChunkedWriteCallback(this)

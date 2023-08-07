@@ -27,6 +27,8 @@
 		3CCB8743286A593700771BAD /* CastingServerBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CCB873D286A593700771BAD /* CastingServerBridge.mm */; };
 		3CCB8744286A593700771BAD /* ConversionUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CCB873E286A593700771BAD /* ConversionUtils.mm */; };
 		3CD6D01A298CDA2100D7569A /* CommissionerDiscoveryDelegateImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CD6D019298CDA2100D7569A /* CommissionerDiscoveryDelegateImpl.h */; };
+		3CE5ECCE2A673B30007CF331 /* CommissioningCallbackHandlers.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CE5ECCD2A673B30007CF331 /* CommissioningCallbackHandlers.h */; };
+		3CE5ECD02A673E2C007CF331 /* CommissioningCallbackHandlers.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CE5ECCF2A673E2C007CF331 /* CommissioningCallbackHandlers.m */; };
 		3CE868F42946D76200FCB92B /* CommissionableDataProviderImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CE868F32946D76200FCB92B /* CommissionableDataProviderImpl.mm */; };
 		3CF8532728E37F1000F07B9F /* MatterError.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CF8532628E37F1000F07B9F /* MatterError.mm */; };
 /* End PBXBuildFile section */
@@ -62,6 +64,8 @@
 		3CCB873D286A593700771BAD /* CastingServerBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CastingServerBridge.mm; sourceTree = "<group>"; };
 		3CCB873E286A593700771BAD /* ConversionUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ConversionUtils.mm; sourceTree = "<group>"; };
 		3CD6D019298CDA2100D7569A /* CommissionerDiscoveryDelegateImpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommissionerDiscoveryDelegateImpl.h; sourceTree = "<group>"; };
+		3CE5ECCD2A673B30007CF331 /* CommissioningCallbackHandlers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommissioningCallbackHandlers.h; sourceTree = "<group>"; };
+		3CE5ECCF2A673E2C007CF331 /* CommissioningCallbackHandlers.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CommissioningCallbackHandlers.m; sourceTree = "<group>"; };
 		3CE868F32946D76200FCB92B /* CommissionableDataProviderImpl.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CommissionableDataProviderImpl.mm; sourceTree = "<group>"; };
 		3CF8532528E37ED800F07B9F /* MatterError.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MatterError.h; sourceTree = "<group>"; };
 		3CF8532628E37F1000F07B9F /* MatterError.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MatterError.mm; sourceTree = "<group>"; };
@@ -131,6 +135,8 @@
 				3C0D9CDF2920A30C00D3332B /* CommissionableDataProviderImpl.hpp */,
 				3CE868F32946D76200FCB92B /* CommissionableDataProviderImpl.mm */,
 				3CD6D019298CDA2100D7569A /* CommissionerDiscoveryDelegateImpl.h */,
+				3CE5ECCD2A673B30007CF331 /* CommissioningCallbackHandlers.h */,
+				3CE5ECCF2A673E2C007CF331 /* CommissioningCallbackHandlers.m */,
 			);
 			path = MatterTvCastingBridge;
 			sourceTree = "<group>";
@@ -145,6 +151,7 @@
 				3CD6D01A298CDA2100D7569A /* CommissionerDiscoveryDelegateImpl.h in Headers */,
 				3C26AC8C2926FE0C00BA6881 /* DeviceAttestationCredentialsProviderImpl.hpp in Headers */,
 				3CCB8740286A593700771BAD /* CastingServerBridge.h in Headers */,
+				3CE5ECCE2A673B30007CF331 /* CommissioningCallbackHandlers.h in Headers */,
 				3CCB8742286A593700771BAD /* ConversionUtils.hpp in Headers */,
 				3CCB8741286A593700771BAD /* DiscoveredNodeData.h in Headers */,
 				3CCB87212869085400771BAD /* MatterTvCastingBridge.h in Headers */,
@@ -249,6 +256,7 @@
 			files = (
 				3CCB8743286A593700771BAD /* CastingServerBridge.mm in Sources */,
 				3C4E53B228E5184C00F293E8 /* TargetNavigatorTypes.mm in Sources */,
+				3CE5ECD02A673E2C007CF331 /* CommissioningCallbackHandlers.m in Sources */,
 				3CF8532728E37F1000F07B9F /* MatterError.mm in Sources */,
 				3C4E53B628E5595A00F293E8 /* ContentLauncherTypes.mm in Sources */,
 				3C81C75028F7A7D3001CB9D1 /* VideoPlayer.m in Sources */,
@@ -419,9 +427,6 @@
 					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 					"$(TEMP_DIR)/out/gen/include",
-					/* Compile time codegen would need this: 
-					   "$(TEMP_DIR)/out/gen/src/controller/data_model/zapgen/", 
-					 */
 					"$(CHIP_ROOT)/zzz_generated/app-common",
 				);
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -502,9 +507,6 @@
 					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 					"$(TEMP_DIR)/out/gen/include",
-					/* Compile time codegen would need this: 
-					   "$(TEMP_DIR)/out/gen/src/controller/data_model/zapgen/", 
-					 */
 					"$(CHIP_ROOT)/zzz_generated/app-common",
 				);
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
