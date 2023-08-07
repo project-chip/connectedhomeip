@@ -289,7 +289,6 @@ class JinjaCodegenTarget():
         except Exception as err:
             traceback.print_exception(err)
 
-
     def codeFormat(self):
         outputs = subprocess.check_output(["./scripts/codegen.py", "--name-only", "--generator",
                                            self.generator, "--log-level", "fatal", self.idl_path]).decode("utf8").split("\n")
