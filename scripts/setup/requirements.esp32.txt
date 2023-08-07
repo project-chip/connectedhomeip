@@ -1,18 +1,15 @@
 click>=7.0
 future>=0.15.2
-pyparsing>=2.0.3,<2.4.0
+# pyparsing: Min version was set based on https://github.com/pyparsing/pyparsing/issues/319
+# pyparsing: Max version was set to avoid breaking changes
+pyparsing>=3.0.3,<3.1
 idf-component-manager
 pygdbmi<=0.9.0.2
 reedsolo>=1.5.3,<=1.5.4
 bitstring>=3.1.6,<4
 ecdsa>=0.16.0
-kconfiglib==13.7.1
 construct==2.10.54
 python-socketio<5
 itsdangerous<2.1 ; python_version < "3.11"
-#
-# gdbgui pulls in gevent which fails to compile due to cython updates.
-# Could not find a good way to fix this dependency, so commenting it
-# out here.
-#
-# gdbgui==0.13.2.0 ; python_version < "3.11" and platform_machine != 'aarch64' and sys_platform == 'linux'
+esp_idf_monitor==1.1.1
+esp-idf-kconfig==1.2.0

@@ -2006,7 +2006,8 @@ client cluster AccountLogin = 1294 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
 
   server cluster Descriptor {
     callback attribute deviceTypeList;
@@ -2195,7 +2196,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type videoplayer = 41, version 1;
+  device type ma_casting_videoclient = 41, version 1;
+
   binding cluster OnOff;
   binding cluster LevelControl;
   binding cluster Descriptor;

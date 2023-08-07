@@ -2449,7 +2449,8 @@ server cluster AccountLogin = 1294 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
   binding cluster Binding;
   binding cluster GeneralCommissioning;
   binding cluster NetworkCommissioning;
@@ -2743,7 +2744,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type videoplayer = 35, version 1;
+  device type ma_casting_videoplayer = 35, version 1;
+
 
   server cluster OnOff {
     ram      attribute onOff default = 0x00;
@@ -2838,7 +2840,8 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type speaker = 34, version 1;
+  device type ma_speaker = 34, version 1;
+
 
   server cluster OnOff {
     ram      attribute onOff default = 0x00;
@@ -2875,7 +2878,8 @@ endpoint 2 {
   }
 }
 endpoint 3 {
-  device type contentapplication = 36, version 1;
+  device type ma_contentapp = 36, version 1;
+
 
   server cluster Descriptor {
     callback attribute deviceTypeList;

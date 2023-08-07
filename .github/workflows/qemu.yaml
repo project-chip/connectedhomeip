@@ -38,7 +38,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32-qemu:1
+            image: ghcr.io/project-chip/chip-build-esp32-qemu:2
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -49,9 +49,6 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: esp32
-
-            - name: Fixup GdbGui requirement
-              run: perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt
 
             - name: Build ESP32 QEMU test images
               run: |

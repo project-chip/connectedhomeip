@@ -713,6 +713,57 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     ReturnErrorOnFailure(subscribeRequestParser.GetMaxIntervalCeilingSeconds(&mMaxInterval));
     VerifyOrReturnError(mMinIntervalFloorSeconds <= mMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+
+    // Default behavior for ICDs where the wanted MaxInterval for a subscription is the IdleModeInterval
+    // defined in the ICD Management Cluster.
+    // Behavior can be changed with the OnSubscriptionRequested function defined in the application callbacks
+
+    // Default Behavior Steps :
+    // If MinInterval > IdleModeInterval, try to set the MaxInterval to the first interval of IdleModeIntervals above the
+    // MinInterval.
+    // If the next interval is greater than the MaxIntervalCeiling, use the MaxIntervalCeiling.
+    // Otherwise, use IdleModeInterval as MaxInterval
+
+    // GetPublisherSelectedIntervalLimit() returns the IdleModeInterval if the device is an ICD
+    uint32_t decidedMaxInterval = GetPublisherSelectedIntervalLimit();
+
+    // Check if the PublisherSelectedIntervalLimit is 0. If so, set decidedMaxInterval to MaxIntervalCeiling
+    if (decidedMaxInterval == 0)
+    {
+        decidedMaxInterval = mMaxInterval;
+    }
+
+    // If requestedMinInterval is greater than the IdleTimeInterval, select next active up time as max interval
+    if (mMinIntervalFloorSeconds > decidedMaxInterval)
+    {
+        uint16_t ratio = mMinIntervalFloorSeconds / static_cast<uint16_t>(decidedMaxInterval);
+        if (mMinIntervalFloorSeconds % decidedMaxInterval)
+        {
+            ratio++;
+        }
+
+        decidedMaxInterval *= ratio;
+    }
+
+    // Verify that decidedMaxInterval is an acceptable value (overflow)
+    if (decidedMaxInterval > System::Clock::Seconds16::max().count())
+    {
+        decidedMaxInterval = System::Clock::Seconds16::max().count();
+    }
+
+    // Verify that the decidedMaxInterval respects MAX(GetPublisherSelectedIntervalLimit(), MaxIntervalCeiling)
+    uint16_t maximumMaxInterval = std::max(GetPublisherSelectedIntervalLimit(), mMaxInterval);
+    if (decidedMaxInterval > maximumMaxInterval)
+    {
+        decidedMaxInterval = maximumMaxInterval;
+    }
+
+    // Set max interval of the subscription
+    mMaxInterval = static_cast<uint16_t>(decidedMaxInterval);
+
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
     //
     // Notify the application (if requested) of the impending subscription and check whether we should still proceed to set it up.
     // This also provides the application an opportunity to modify the negotiated min/max intervals set above.

@@ -77,29 +77,30 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         defined_states = [state.value for state in Clusters.OperationalState.Enums.OperationalStateEnum
                           if state is not Clusters.OperationalState.Enums.OperationalStateEnum.kUnknownEnumValue]
 
-        state_ids = [s.operationalStateID for s in op_state_list]
+        state_ids = set([s.operationalStateID for s in op_state_list])
 
         asserts.assert_true(all(id in state_ids for id in defined_states), "OperationalStateList is missing a required entry")
 
         self.print_step(4, "Send Pause command")
         ret = await self.send_pause_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
-                             "ErrorStateID should be NoError(0x00)")
+                             "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
 
         self.print_step(5, "Read OperationalState attribute")
         operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                          attribute=attributes.OperationalState)
         logging.info("OperationalState: %s" % (operational_state))
         asserts.assert_equal(operational_state, Clusters.OperationalState.Enums.OperationalStateEnum.kPaused,
-                             "OperationalState ID should be Paused(0x02)")
+                             "OperationalState(%s) should be Paused(0x02)" % operational_state)
 
         self.print_step(6, "Read CountdownTime attribute")
         initial_countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                               attribute=attributes.CountdownTime)
         logging.info("CountdownTime: %s" % (initial_countdown_time))
         if initial_countdown_time is not NullValue:
-            in_range = (1 <= initial_countdown_time and initial_countdown_time <= 259200)
-        asserts.assert_true(initial_countdown_time is NullValue or in_range, "invalid CountdownTime")
+            in_range = (1 <= initial_countdown_time <= 259200)
+        asserts.assert_true(initial_countdown_time is NullValue or in_range,
+                            "invalid CountdownTime(%s). Must be in between 1 and 259200, or null" % initial_countdown_time)
 
         self.print_step(7, "Waiting for 5 seconds")
         time.sleep(5)
@@ -107,31 +108,32 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         self.print_step(8, "Read CountdownTime attribute")
         countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CountdownTime)
         logging.info("CountdownTime: %s" % (countdown_time))
-        asserts.assert_true(countdown_time != 0 or countdown_time == NullValue, "invalid CountdownTime")
+        asserts.assert_true(countdown_time != 0 or countdown_time == NullValue,
+                            "invalid CountdownTime(%s). Must be a non zero integer, or null" % countdown_time)
         asserts.assert_equal(countdown_time, initial_countdown_time,
-                             "CountdownTime does not equal to the intial CountdownTime %s" % initial_countdown_time)
+                             "CountdownTime(%s) does not equal to the intial CountdownTime (%s)" % (countdown_time, initial_countdown_time))
 
         self.print_step(9, "Send Pause command")
         ret = await self.send_pause_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
-                             "ErrorStateID should be NoError(0x00)")
+                             "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
 
         self.print_step(10, "Send Resume command")
         ret = await self.send_resume_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
-                             "ErrorStateID should be NoError(0x00)")
+                             "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
 
         self.print_step(11, "Read OperationalState attribute")
         operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                          attribute=attributes.OperationalState)
         logging.info("OperationalState: %s" % (operational_state))
         asserts.assert_equal(operational_state, Clusters.OperationalState.Enums.OperationalStateEnum.kRunning,
-                             "OperationalState ID should be Running(0x01)")
+                             "OperationalState(%s) should be Running(0x01)" % operational_state)
 
         self.print_step(12, "Send Resume command")
         ret = await self.send_resume_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
-                             "errorStateID should be NoError(0x00)")
+                             "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
 
         self.print_step(13, "Manually put the device in a state where it cannot receive a Pause command")
         input("Press Enter when done.\n")
@@ -140,7 +142,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         ret = await self.send_pause_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID,
                              Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
-                             "errorStateID should be CommandInvalidInState(0x03)")
+                             "errorStateID(%s) should be CommandInvalidInState(0x03)" % ret.commandResponseState.errorStateID)
 
         self.print_step(15, "Manually put the device in a state where it cannot receive a Resume command")
         input("Press Enter when done.\n")
@@ -149,7 +151,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         ret = await self.send_resume_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID,
                              Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
-                             "errorStateID should be CommandInvalidInState(0x03)")
+                             "errorStateID(%s) should be CommandInvalidInState(0x03)" % ret.commandResponseState.errorStateID)
 
 
 if __name__ == "__main__":

@@ -1500,7 +1500,8 @@ server cluster OccupancySensing = 1030 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Groups {
@@ -1781,7 +1782,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type dimmablelight = 21, version 1;
+  device type ma_contactsensor = 21, version 1;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0000;
