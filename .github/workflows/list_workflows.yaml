@@ -22,7 +22,7 @@ jobs:
     #if: github.repository_owner == 'project-chip'
     runs-on: ubuntu-latest
     steps:
-      - run: gh workflow list
+      - run: gh workflow list -R project-chip/connectedhomeip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
