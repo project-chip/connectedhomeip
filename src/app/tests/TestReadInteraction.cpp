@@ -1309,8 +1309,8 @@ void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void 
                     !aPath.IsListItemOperation())
                 {
                     mGotStartOfSecondReport = true;
-                    // Wait for an actual data chunk.
-                    return;
+                    // We always have data chunks, so go ahead to mark things
+                    // dirty as needed.
                 }
 
                 if (!mGotStartOfSecondReport)
@@ -2359,12 +2359,12 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
 #else
         // When EventList is not enabled, the packet boundaries shift and for the first
         // report for the list attribute we receive two of its items in the initial list,
-        // then 4 additional items.  For the second report we receive 0 items in
-        // the initial list followed by 6 additional items.
+        // then 4 additional items.  For the second report we receive 3 items in
+        // the initial list followed by 3 additional items.
         //
-        // Thus we should receive 29*2 + 4 + 6 = 68 attribute data when the eventlist
+        // Thus we should receive 29*2 + 4 + 3 = 65 attribute data when the eventlist
         // attribute is not available.
-        constexpr size_t kExpectedAttributeResponse = 68;
+        constexpr size_t kExpectedAttributeResponse = 65;
 #endif
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == kExpectedAttributeResponse);
         NL_TEST_ASSERT(apSuite, delegate.mNumArrayItems == 12);
