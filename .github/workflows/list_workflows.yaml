@@ -23,5 +23,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: gh workflow list
-        env: GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
