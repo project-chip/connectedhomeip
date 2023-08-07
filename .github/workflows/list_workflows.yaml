@@ -13,3 +13,14 @@
 # limitations under the License.
 
 name: List Workflows
+on: workflow_dispatch
+
+jobs:
+  list_workflows:
+    name: List Workflows
+    if: github.repository_owner == 'project-chip'
+    runs-on: ubuntu-latest
+    steps:
+      - run: gh workflow list
+        env: GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
