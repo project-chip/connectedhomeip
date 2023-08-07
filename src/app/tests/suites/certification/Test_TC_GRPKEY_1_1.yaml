@@ -31,25 +31,14 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Issue: Expected 1 got 2.
+    #Please refer Issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3280
     - label: "Step 2: TH reads the ClusterRevision from DUT"
-      verification: |
-          ./chip-tool groupkeymanagement read cluster-revision 1 0
-
-          Verify "ClusterRevision" value is of unit16 and reflects the highest revision number, in RPI the value of ClusterRevision is 1 on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
-
-          [1689922832.721611][6094:6096] CHIP:DMG: }
-          [1689922832.728414][6094:6096] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_FFFD DataVersion: 4114127542
-          [1689922832.730922][6094:6096] CHIP:TOO:   ClusterRevision: 1
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 2
+          constraints:
+              type: int16u
 
     - label: "Step 3a: TH reads the FeatureMap from DUT"
       PICS: " !GRPKEY.S.F00 "
