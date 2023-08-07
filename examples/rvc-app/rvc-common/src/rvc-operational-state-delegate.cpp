@@ -44,29 +44,11 @@ CHIP_ERROR RvcOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index,
 
 void RvcOperationalStateDelegate::HandlePauseStateCallback(OperationalState::GenericOperationalError & err)
 {
-    // placeholder implementation
-    auto error = mServer->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
-    if (error == CHIP_NO_ERROR)
-    {
-        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
-    }
-    else
-    {
-        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
-    }
+    (mPauseRvcDeviceInstance->*mPauseCallback)(err);
 }
 
 void RvcOperationalStateDelegate::HandleResumeStateCallback(OperationalState::GenericOperationalError & err)
 {
-    // placeholder implementation
-    auto error = mServer->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
-    if (error == CHIP_NO_ERROR)
-    {
-        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
-    }
-    else
-    {
-        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
-    }
+    (mResumeRvcDeviceInstance->*mResumeCallback)(err);
 }
 

@@ -13,30 +13,30 @@ namespace Clusters {
 class RvcDevice
 {
 private:
-    RvcRunMode::RvcRunModeDelegate mRvcRunModeDelegate;
-    ModeBase::Instance mRvcRunModeInstance;
+    RvcRunMode::RvcRunModeDelegate mRunModeDelegate;
+    ModeBase::Instance mRunModeInstance;
 
-    RvcCleanMode::RvcCleanModeDelegate mRvcCleanModeDelegate;
-    ModeBase::Instance mRvcCleanModeInstance;
+    RvcCleanMode::RvcCleanModeDelegate mCleanModeDelegate;
+    ModeBase::Instance mCleanModeInstance;
 
-    RvcOperationalState::RvcOperationalStateDelegate mRvcOperationalStateDelegate;
-    OperationalState::Instance mRvcOperationalStateInstance;
+    RvcOperationalState::RvcOperationalStateDelegate mOperationalStateDelegate;
+    OperationalState::Instance mOperationalStateInstance;
 
 public:
     RvcDevice():
-        mRvcRunModeDelegate(),
-        mRvcRunModeInstance(&mRvcRunModeDelegate, 0x1, RvcRunMode::Id, chip::to_underlying(RvcRunMode::Feature::kOnOff)),
-        mRvcCleanModeDelegate(),
-        mRvcCleanModeInstance(&mRvcCleanModeDelegate, 0x1, RvcCleanMode::Id, chip::to_underlying(RvcCleanMode::Feature::kOnOff)),
-        mRvcOperationalStateDelegate(),
-        mRvcOperationalStateInstance(&mRvcOperationalStateDelegate, 0x01, RvcOperationalState::Id)
+        mRunModeDelegate(),
+        mRunModeInstance(&mRunModeDelegate, 0x1, RvcRunMode::Id, chip::to_underlying(RvcRunMode::Feature::kOnOff)),
+        mCleanModeDelegate(),
+        mCleanModeInstance(&mCleanModeDelegate, 0x1, RvcCleanMode::Id, chip::to_underlying(RvcCleanMode::Feature::kOnOff)),
+        mOperationalStateDelegate(), mOperationalStateInstance(&mOperationalStateDelegate, 0x01, RvcOperationalState::Id)
     {
         // todo set start-up modes and state?
 
         // set callback functions
-        mRvcRunModeDelegate.SetHandleChangeToMode(&RvcDevice::HandleRvcRunChangeToMode, this);
-        mRvcCleanModeDelegate.SetHandleChangeToMode(&RvcDevice::HandleRvcCleanChangeToMode, this);
-
+        mRunModeDelegate.SetHandleChangeToMode(&RvcDevice::HandleRvcRunChangeToMode, this);
+        mCleanModeDelegate.SetHandleChangeToMode(&RvcDevice::HandleRvcCleanChangeToMode, this);
+        mOperationalStateDelegate.SetPauseCallback(&RvcDevice::HandleOpStatePauseCallback, this);
+        mOperationalStateDelegate.SetResumeCallback(&RvcDevice::HandleOpStateResumeCallback, this);
     }
 
     /**
@@ -47,6 +47,10 @@ public:
     void HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response);
 
     void HandleRvcCleanChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response);
+
+    void HandleOpStatePauseCallback(Clusters::OperationalState::GenericOperationalError & err);
+
+    void HandleOpStateResumeCallback(Clusters::OperationalState::GenericOperationalError & err);
 };
 
 } // namespace Clusters

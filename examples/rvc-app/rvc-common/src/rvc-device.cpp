@@ -4,14 +4,14 @@ using namespace chip::app::Clusters;
 
 void RvcDevice::Init()
 {
-    mRvcRunModeInstance.Init();
-    mRvcCleanModeInstance.Init();
-    mRvcOperationalStateInstance.Init();
+    mRunModeInstance.Init();
+    mCleanModeInstance.Init();
+    mOperationalStateInstance.Init();
 }
 
 void RvcDevice::HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    uint8_t currentMode = mRvcRunModeInstance.GetCurrentMode();
+    uint8_t currentMode = mRunModeInstance.GetCurrentMode();
 
     // Our business logic states that we can only switch into the mapping state from the idle state.
     switch (NewMode)
@@ -25,10 +25,10 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::Ch
             return;
         }
 
-        mRvcRunModeInstance.UpdateCurrentMode(NewMode);
+        mRunModeInstance.UpdateCurrentMode(NewMode);
         // Set operational state to running
         ChipError err =
-            mRvcOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+            mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
         if (err != CHIP_NO_ERROR)
         {
             response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
@@ -38,10 +38,10 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::Ch
         break;
     }
     case RvcRunMode::ModeCleaning: {
-        mRvcRunModeInstance.UpdateCurrentMode(NewMode);
+        mRunModeInstance.UpdateCurrentMode(NewMode);
         // Set operational state to running
         ChipError err =
-            mRvcOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+            mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
         if (err != CHIP_NO_ERROR)
         {
             response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
@@ -51,10 +51,10 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::Ch
     }
         break;
     case RvcRunMode::ModeIdle: {
-        mRvcRunModeInstance.UpdateCurrentMode(NewMode);
+        mRunModeInstance.UpdateCurrentMode(NewMode);
         // Set operational state to running
         ChipError err =
-            mRvcOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+            mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
         if (err != CHIP_NO_ERROR)
         {
             response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
@@ -70,7 +70,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::Ch
 
 void RvcDevice::HandleRvcCleanChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    uint8_t rvcRunCurrentMode = mRvcRunModeInstance.GetCurrentMode();
+    uint8_t rvcRunCurrentMode = mRunModeInstance.GetCurrentMode();
 
     if (rvcRunCurrentMode != RvcRunMode::ModeIdle)
     {
@@ -80,4 +80,30 @@ void RvcDevice::HandleRvcCleanChangeToMode(uint8_t NewMode, ModeBase::Commands::
     }
 
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
+}
+
+void RvcDevice::HandleOpStatePauseCallback(Clusters::OperationalState::GenericOperationalError & err)
+{
+    auto error = mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
+    if (error == CHIP_NO_ERROR)
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    }
+    else
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
+    }
+}
+
+void RvcDevice::HandleOpStateResumeCallback(Clusters::OperationalState::GenericOperationalError & err)
+{
+    auto error = mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+    if (error == CHIP_NO_ERROR)
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    }
+    else
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
+    }
 }

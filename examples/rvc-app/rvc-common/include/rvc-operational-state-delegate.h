@@ -26,9 +26,12 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace RvcOperationalState {
 
-typedef void (*HandleCommandCallback)(Clusters::OperationalState::GenericOperationalError & err);
+class RvcDevice;
+
+typedef void (RvcDevice::*HandleOpStateCommand)(Clusters::OperationalState::GenericOperationalError & err);
+
+namespace RvcOperationalState {
 
 // This is an application level delegate to handle operational state commands according to the specific business logic.
 class RvcOperationalStateDelegate : public OperationalState::Delegate
@@ -50,8 +53,10 @@ private:
         OperationalState::GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
     };
 
-    HandleCommandCallback mPauseCallback;
-    HandleCommandCallback mResumeCallback;
+    RvcDevice *mPauseRvcDeviceInstance;
+    HandleOpStateCommand mPauseCallback;
+    RvcDevice *mResumeRvcDeviceInstance;
+    HandleOpStateCommand mResumeCallback;
 
 public:
     /**
@@ -103,9 +108,15 @@ public:
         // not enabled
     };
 
-    void SetPauseCallback(HandleCommandCallback aCallback) {mPauseCallback = aCallback; };
+    void SetPauseCallback(HandleOpStateCommand aCallback, RvcDevice *aInstance) {
+        mPauseCallback = aCallback;
+        mPauseRvcDeviceInstance = aInstance;
+    };
 
-    void SetResumeCallback(HandleCommandCallback aCallback) {mResumeCallback = aCallback; };
+    void SetResumeCallback(HandleOpStateCommand aCallback, RvcDevice *aInstance) {
+        mResumeCallback = aCallback;
+        mResumeRvcDeviceInstance = aInstance;
+    };
 
 };
 
