@@ -66,36 +66,10 @@ public:
     bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override;
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
 
-    using ExpressedStateEnum = app::Clusters::SmokeCoAlarm::ExpressedStateEnum;
-    using AlarmStateEnum     = app::Clusters::SmokeCoAlarm::AlarmStateEnum;
-    using EndOfServiceEnum   = app::Clusters::SmokeCoAlarm::EndOfServiceEnum;
-
-    /**
-     * @brief The priority order for expressed alarms from Highest to lowest.
-     */
-    std::array<ExpressedStateEnum, 8> priorityOrder = { ExpressedStateEnum::kSmokeAlarm,    ExpressedStateEnum::kInterconnectSmoke,
-                                                        ExpressedStateEnum::kCOAlarm,       ExpressedStateEnum::kInterconnectCO,
-                                                        ExpressedStateEnum::kHardwareFault, ExpressedStateEnum::kTesting,
-                                                        ExpressedStateEnum::kEndOfService,  ExpressedStateEnum::kBatteryAlert };
-
 private:
     ByteSpan mEnableKey;
     TestEventTriggerDelegate * mOtherDelegate;
     EndpointId mEndpointId;
-
-    AlarmStateEnum mCurrentSmokeAlarm;
-    AlarmStateEnum mCurrentInterconnectSmokeAlarm;
-    AlarmStateEnum mCurrentCoAlarm;
-    AlarmStateEnum mCurrentInterconnectCoAlarm;
-    AlarmStateEnum mCurrentBatteryState;
-    EndOfServiceEnum mCurrentEndOfService;
-    bool mCurrentTestInProgress;
-    bool mCurrentHardwareFault;
-
-    /**
-     * @brief Highest level of Expressed state is Manufacturer specific.
-     */
-    void SetExpressedState(void);
 };
 
 } // namespace chip

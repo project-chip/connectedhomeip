@@ -38,6 +38,9 @@ class SmokeCoAlarmServer
 public:
     static SmokeCoAlarmServer & Instance();
 
+    /* Expected byte size of the PriorityOrder */
+    static constexpr size_t kPriorityOrderLength = 8;
+
     using AlarmStateEnum         = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
     using ContaminationStateEnum = chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum;
     using EndOfServiceEnum       = chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum;
@@ -60,6 +63,19 @@ public:
      * @return true on success, false on failure
      */
     bool SetExpressedState(chip::EndpointId endpointId, ExpressedStateEnum newExpressedState);
+
+    /**
+     * @brief Set the highest level of Expressed State according to priorityOrder
+     * @param endpointId ID of the endpoint
+     * @return true on success, false on failure
+     */
+    bool AutoSetExpressedState(chip::EndpointId endpointId);
+
+    /**
+     * @brief Set priority order
+     * @param newPriorityOrder new priority order
+     */
+    void SetPriorityOrder(std::array<ExpressedStateEnum, kPriorityOrderLength> newPriorityOrder);
 
     bool SetSmokeState(chip::EndpointId endpointId, AlarmStateEnum newSmokeState);
     bool SetCOState(chip::EndpointId endpointId, AlarmStateEnum newCOState);
@@ -147,6 +163,24 @@ private:
     friend bool emberAfSmokeCoAlarmClusterSelfTestRequestCallback(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::SmokeCoAlarm::Commands::SelfTestRequest::DecodableType & commandData);
+
+    /**
+     * @brief The priority order of expressed state from highest to lowest
+     */
+    std::array<ExpressedStateEnum, kPriorityOrderLength> mPriorityOrder = {
+        ExpressedStateEnum::kSmokeAlarm,     ExpressedStateEnum::kInterconnectSmoke, ExpressedStateEnum::kCOAlarm,
+        ExpressedStateEnum::kInterconnectCO, ExpressedStateEnum::kHardwareFault,     ExpressedStateEnum::kTesting,
+        ExpressedStateEnum::kEndOfService,   ExpressedStateEnum::kBatteryAlert
+    };
+
+    AlarmStateEnum mCurrentSmokeAlarm;
+    AlarmStateEnum mCurrentInterconnectSmokeAlarm;
+    AlarmStateEnum mCurrentCoAlarm;
+    AlarmStateEnum mCurrentInterconnectCoAlarm;
+    AlarmStateEnum mCurrentBatteryState;
+    EndOfServiceEnum mCurrentEndOfService;
+    bool mCurrentTestInProgress;
+    bool mCurrentHardwareFault;
 
     static SmokeCoAlarmServer sInstance;
 };

@@ -15,19 +15,12 @@
  *    limitations under the License.
  */
 
-#include <lib/core/DataModelTypes.h>
-
 #include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerDelegate.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/Linux/NetworkCommissioningDriver.h>
-#include <platform/Linux/ThreadStackManagerImpl.h>
-#include <platform/ThreadStackManager.h>
 
-#include <chrono>   // std::chrono::seconds
-#include <iostream> // std::cout
-#include <thread>   // std::thread, std::this_thread::sleep_for
+#include <thread>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -39,22 +32,10 @@ void TestModeTimeoutThread(int timeout)
     ChipLogProgress(Support, "  \033[0;96m[Smoke-CO-Alarm] => Self test running\033[0;37m");
 
     std::this_thread::sleep_for(std::chrono::seconds(timeout));
+
     PlatformMgr().LockChipStack();
     SmokeCoAlarmServer::Instance().SetTestInProgress(1, false);
-
-    SmokeCoAlarm::AlarmStateEnum currentBatteryState       = SmokeCoAlarm::AlarmStateEnum::kNormal;
-    SmokeCoAlarm::EndOfServiceEnum currentEndOfService     = SmokeCoAlarm::EndOfServiceEnum::kNormal;
-    SmokeCoAlarm::ExpressedStateEnum currentExpressedState = SmokeCoAlarm::ExpressedStateEnum::kNormal;
-
-    SmokeCoAlarmServer::Instance().GetBatteryAlert(1, currentBatteryState);
-    SmokeCoAlarmServer::Instance().GetEndOfServiceAlert(1, currentEndOfService);
-
-    if (currentBatteryState != SmokeCoAlarm::AlarmStateEnum::kNormal)
-        currentExpressedState = SmokeCoAlarm::ExpressedStateEnum::kBatteryAlert;
-    if (currentEndOfService != SmokeCoAlarm::EndOfServiceEnum::kNormal)
-        currentExpressedState = SmokeCoAlarm::ExpressedStateEnum::kEndOfService;
-    SmokeCoAlarmServer::Instance().SetExpressedState(1, currentExpressedState);
-
+    SmokeCoAlarmServer::Instance().AutoSetExpressedState(1);
     PlatformMgr().UnlockChipStack();
 
     ChipLogProgress(Support, "  \033[0;96m[Smoke-CO-Alarm] => Self Test Timer Complete\033[0;37m");

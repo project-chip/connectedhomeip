@@ -72,6 +72,97 @@ bool SmokeCoAlarmServer::SetExpressedState(EndpointId endpointId, ExpressedState
     return success;
 }
 
+bool SmokeCoAlarmServer::AutoSetExpressedState(EndpointId endpointId)
+{
+    ExpressedStateEnum currentExpressedState = ExpressedStateEnum::kNormal;
+
+    for (ExpressedStateEnum priority : mPriorityOrder)
+    {
+        switch (priority)
+        {
+        case ExpressedStateEnum::kSmokeAlarm: {
+            VerifyOrReturnValue(GetSmokeState(endpointId, mCurrentSmokeAlarm), false);
+            if (mCurrentSmokeAlarm != AlarmStateEnum::kNormal)
+            {
+                currentExpressedState = ExpressedStateEnum::kSmokeAlarm;
+            }
+        }
+        break;
+        case ExpressedStateEnum::kCOAlarm: {
+            VerifyOrReturnValue(GetCOState(endpointId, mCurrentCoAlarm), false);
+            if (mCurrentCoAlarm != AlarmStateEnum::kNormal)
+            {
+                currentExpressedState = ExpressedStateEnum::kCOAlarm;
+            }
+        }
+        break;
+        case ExpressedStateEnum::kBatteryAlert: {
+            VerifyOrReturnValue(GetBatteryAlert(endpointId, mCurrentBatteryState), false);
+            if (mCurrentBatteryState != AlarmStateEnum::kNormal)
+            {
+                currentExpressedState = ExpressedStateEnum::kBatteryAlert;
+            }
+        }
+        break;
+        case ExpressedStateEnum::kTesting: {
+            VerifyOrReturnValue(GetTestInProgress(endpointId, mCurrentTestInProgress), false);
+            if (mCurrentTestInProgress != false)
+            {
+                currentExpressedState = ExpressedStateEnum::kTesting;
+            }
+        }
+        break;
+        case ExpressedStateEnum::kHardwareFault: {
+            VerifyOrReturnValue(GetHardwareFaultAlert(endpointId, mCurrentHardwareFault), false);
+            if (mCurrentHardwareFault != false)
+            {
+                currentExpressedState = ExpressedStateEnum::kHardwareFault;
+            }
+        }
+        break;
+        case ExpressedStateEnum::kEndOfService: {
+            VerifyOrReturnValue(GetEndOfServiceAlert(endpointId, mCurrentEndOfService), false);
+            if (mCurrentEndOfService != EndOfServiceEnum::kNormal)
+            {
+                currentExpressedState = ExpressedStateEnum::kEndOfService;
+            }
+        }
+        break;
+        case ExpressedStateEnum::kInterconnectSmoke: {
+            VerifyOrReturnValue(GetInterconnectSmokeAlarm(endpointId, mCurrentInterconnectSmokeAlarm), false);
+            if (mCurrentInterconnectSmokeAlarm != AlarmStateEnum::kNormal)
+            {
+                currentExpressedState = ExpressedStateEnum::kInterconnectSmoke;
+            }
+        }
+        break;
+        case ExpressedStateEnum::kInterconnectCO: {
+            VerifyOrReturnValue(GetInterconnectCOAlarm(endpointId, mCurrentInterconnectCoAlarm), false);
+            if (mCurrentInterconnectCoAlarm != AlarmStateEnum::kNormal)
+            {
+                currentExpressedState = ExpressedStateEnum::kInterconnectCO;
+            }
+        }
+        break;
+
+        default:
+            break;
+        }
+
+        if (currentExpressedState != ExpressedStateEnum::kNormal)
+        {
+            break;
+        }
+    }
+
+    return SetExpressedState(endpointId, currentExpressedState);
+}
+
+void SmokeCoAlarmServer::SetPriorityOrder(std::array<ExpressedStateEnum, kPriorityOrderLength> newPriorityOrder)
+{
+    mPriorityOrder = newPriorityOrder;
+}
+
 bool SmokeCoAlarmServer::SetSmokeState(EndpointId endpointId, AlarmStateEnum newSmokeState)
 {
     AlarmStateEnum smokeState;
