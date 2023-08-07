@@ -16,13 +16,6 @@
 
 set(CHIP_APP_BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
 
-if (NOT CHIP_ROOT)
-    # TODO: these are WORKAROUNDS and should be removed
-    if(DEFINED ameba_matter_root)
-        SET(CHIP_ROOT "${ameba_matter_root}")
-    endif()
-endif()
-
 include("${CHIP_ROOT}/build/chip/chip_codegen.cmake")
 
 # Configure ${APP_TARGET} with source files associated with ${CLUSTER} cluster

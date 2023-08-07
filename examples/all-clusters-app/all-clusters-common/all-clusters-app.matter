@@ -6063,7 +6063,8 @@ server cluster FaultInjection = 4294048774 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Identify {
@@ -6440,7 +6441,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type onofflight = 256, version 1;
+  device type ma_onofflight = 256, version 1;
+
   binding cluster OnOff;
 
   server cluster Identify {
@@ -7449,7 +7451,8 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type onofflight = 256, version 1;
+  device type ma_onofflight = 256, version 1;
+
 
   server cluster Groups {
     ram      attribute nameSupport;
@@ -7497,7 +7500,8 @@ endpoint 2 {
   }
 }
 endpoint 65534 {
-  device type anonymousEndpointType = 61442, version 1;
+  device type ma_secondary_network_commissioning = 61442, version 1;
+
 
   server cluster Descriptor {
     callback attribute deviceTypeList;

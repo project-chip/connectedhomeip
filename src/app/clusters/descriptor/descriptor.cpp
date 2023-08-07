@@ -76,7 +76,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
             return CHIP_NO_ERROR;
         });
     }
-    else
+    else if (IsFlatCompositionForEndpoint(endpoint))
     {
         err = aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
             for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
@@ -98,6 +98,24 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
                     }
 
                     childIndex = emberAfIndexFromEndpoint(parentEndpointId);
+                }
+            }
+
+            return CHIP_NO_ERROR;
+        });
+    }
+    else if (IsTreeCompositionForEndpoint(endpoint))
+    {
+        err = aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
+            for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+            {
+                if (!emberAfEndpointIndexIsEnabled(index))
+                    continue;
+
+                EndpointId parentEndpointId = emberAfParentEndpointFromIndex(index);
+                if (parentEndpointId == endpoint)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(emberAfEndpointFromIndex(index)));
                 }
             }
 
