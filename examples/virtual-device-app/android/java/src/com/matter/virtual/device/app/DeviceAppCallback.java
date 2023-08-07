@@ -17,7 +17,7 @@
 package com.matter.virtual.device.app;
 
 public interface DeviceAppCallback {
-    void onClusterInit(DeviceApp app, long clusterId, int endpoint);
+  void onClusterInit(DeviceApp app, long clusterId, int endpoint);
 
-    void onEvent(long event);
+  void onEvent(long event);
 }
