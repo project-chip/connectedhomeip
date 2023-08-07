@@ -30,7 +30,10 @@ public:
         mCleanModeInstance(&mCleanModeDelegate, 0x1, RvcCleanMode::Id, chip::to_underlying(RvcCleanMode::Feature::kOnOff)),
         mOperationalStateDelegate(), mOperationalStateInstance(&mOperationalStateDelegate, 0x01, RvcOperationalState::Id)
     {
-        // todo set start-up modes and state?
+        // set start-up modes and state
+        mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
+        // Assume that the device is not docked.
+        mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
 
         // set callback functions
         mRunModeDelegate.SetHandleChangeToMode(&RvcDevice::HandleRvcRunChangeToMode, this);
@@ -40,16 +43,28 @@ public:
     }
 
     /**
-     * set up all the clusters and callback functions.
+     * Init all the clusters used by this device.
      */
     void Init();
 
+    /**
+     * Handles the RvcRunMode command requesting a mode change.
+     */
     void HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response);
 
+    /**
+     * Handles the RvcCleanMode command requesting a mode change.
+     */
     void HandleRvcCleanChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response);
 
+    /**
+     * Handles the RvcOperationalState pause command.
+     */
     void HandleOpStatePauseCallback(Clusters::OperationalState::GenericOperationalError & err);
 
+    /**
+     * Handles the RvcOperationalState resume command.
+     */
     void HandleOpStateResumeCallback(Clusters::OperationalState::GenericOperationalError & err);
 };
 

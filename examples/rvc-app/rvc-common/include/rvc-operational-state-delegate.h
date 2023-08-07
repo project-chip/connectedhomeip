@@ -97,7 +97,7 @@ public:
      * @param[out] get operational error after callback.
      */
     void HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err) override {
-        // not enabled
+        // This command in not supported.
     };
 
     /**
@@ -105,7 +105,7 @@ public:
      * @param[out] get operational error after callback.
      */
     void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override {
-        // not enabled
+        // This command in not supported.
     };
 
     void SetPauseCallback(HandleOpStateCommand aCallback, RvcDevice *aInstance) {

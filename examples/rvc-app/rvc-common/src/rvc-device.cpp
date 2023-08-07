@@ -13,7 +13,6 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::Ch
 {
     uint8_t currentMode = mRunModeInstance.GetCurrentMode();
 
-    // Our business logic states that we can only switch into the mapping state from the idle state.
     switch (NewMode)
     {
     case RvcRunMode::ModeMapping: {
