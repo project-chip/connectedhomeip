@@ -201,6 +201,14 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 
     Build the application
 
+    Prior to building, the user can specify a custom `SDK` path by
+    setting `NXP_K32W0_SDK_ROOT`:
+    ```
+    user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=$(pwd)/third_party/nxp/k32w0_sdk/repo/core
+    ```
+    If the environment variable `NXP_K32W0_SDK_ROOT` is not set, it
+    will default to the `SDK` found in `third_party/nxp/k32w0_sdk/repo/core`.
+
     ```
     user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/contact-sensor-app/nxp/k32w/k32w0
     user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w0$ gn gen out/debug --args="chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
