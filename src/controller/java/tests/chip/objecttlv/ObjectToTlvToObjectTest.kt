@@ -49,7 +49,7 @@ class ObjectToTlvToObjectTest {
 
   @Test
   fun convertIntToTlv() {
-    val value = 33
+    val value = 33L
     val tlv = "0021".octetsToByteArray()
 
     val tlvWriter = TlvWriter().put(AnonymousTag, value)
@@ -67,7 +67,7 @@ class ObjectToTlvToObjectTest {
 
   @Test
   fun convertUIntToTlv() {
-    val value = 475U
+    val value = 475UL
     val tlv = "05db01".octetsToByteArray()
 
     val tlvWriter = TlvWriter().put(AnonymousTag, value)
