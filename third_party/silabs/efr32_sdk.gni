@@ -211,7 +211,7 @@ template("efr32_sdk") {
     # declared in efr32_mbedtls_config further down this file.
     defines = [
       "MBEDTLS_CONFIG_FILE=\"efr32-chip-mbedtls-config.h\"",
-      "MBEDTLS_PSA_CRYPTO_CONFIG_FILE=\"psa_crypto_config.h\"",
+      "MBEDTLS_PSA_CRYPTO_CONFIG_FILE=\"matter_psa_crypto_config.h\"",
       "__STARTUP_CLEAR_BSS",
       "HARD_FAULT_LOG_ENABLE",
       "CORTEXM3_EFM32_MICRO",
@@ -541,7 +541,7 @@ template("efr32_sdk") {
     # edited.
     sources = [
       "${chip_root}/src/platform/silabs/efr32/efr32-chip-mbedtls-config.h",
-      "${chip_root}/src/platform/silabs/efr32/psa_crypto_config.h",
+      "${chip_root}/src/platform/silabs/efr32/matter_psa_crypto_config.h",
     ]
 
     public_configs = [ "${chip_root}/src:includes" ]

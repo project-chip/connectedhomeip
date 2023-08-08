@@ -1,0 +1,50 @@
+/*
+ *
+ *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#pragma once
+
+#include "em_device.h"
+#if defined(SEMAILBOX_PRESENT) || defined(CRYPTOACC_PRESENT)
+// Use accelerated HMAC when we have it
+#define MBEDTLS_PSA_ACCEL_ALG_HMAC
+// Use accelerated ECDSA/ECDH when we have it
+#define MBEDTLS_PSA_ACCEL_KEY_TYPE_ECC_KEY_PAIR
+#define MBEDTLS_PSA_ACCEL_KEY_TYPE_ECC_PUBLIC_KEY
+#define MBEDTLS_PSA_ACCEL_ECC_SECP_R1_256
+#define MBEDTLS_PSA_ACCEL_ALG_ECDH
+#define MBEDTLS_PSA_ACCEL_ALG_ECDSA
+#else
+// Devices without SEMAILBOX or CRYPTOACC don't have HMAC top-level accelerated
+#define MBEDTLS_PSA_BUILTIN_ALG_HMAC 1
+// Devices without SEMAILBOX or CRYPTOACC don't have fully implemented ECDSA/ECDH
+#define MBEDTLS_PSA_BUILTIN_KEY_TYPE_ECC_PUBLIC_KEY 1
+#define MBEDTLS_PSA_BUILTIN_KEY_TYPE_ECC_KEY_PAIR 1
+#define MBEDTLS_PSA_BUILTIN_ECC_SECP_R1_256 1
+#define MBEDTLS_PSA_BUILTIN_ALG_ECDH 1
+#define MBEDTLS_PSA_BUILTIN_ALG_ECDSA 1
+#endif
+// end of user configuration section >>>
+
+#ifdef DIC_ENABLE
+#define PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY
+#define PSA_WANT_ALG_CBC_NO_PADDING
+#define PSA_WANT_ALG_RSA_PKCS1V15_SIGN
+#endif // DIC_ENABLE
+
+// Include Generated fies
+#include "psa_crypto_config.h"

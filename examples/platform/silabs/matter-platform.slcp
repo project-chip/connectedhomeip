@@ -49,6 +49,20 @@ component:
 - {id: bluetooth_feature_system}
 - {id: bluetooth_feature_scanner}
 - {id: rail_util_power_manager_init}
+- {id: mbedtls_aes}
+- {id: mbedtls_ccm}
+- {id: mbedtls_cmac}
+- {id: mbedtls_ecc}
+- {id: mbedtls_ecdh}
+- {id: mbedtls_ecdsa}
+- {id: mbedtls_ecdsa_deterministic}
+- {id: mbedtls_hash}
+- {id: mbedtls_hkdf}
+- {id: mbedtls_entropy_default}
+- {id: mbedtls_x509}
+- {id: mbedtls_platform_dynamic_memory_allocation_config_init_runtime }
+- {id: mbedtls_pkcs5}
+- {id: psa_crypto_config}
 
 config_file:
   - override:
