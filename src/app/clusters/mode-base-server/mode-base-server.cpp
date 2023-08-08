@@ -44,7 +44,7 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClus
     AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
     mClusterId(aClusterId),
     mCurrentMode(0), // This is a temporary value and may not be valid. We will change this to the value of the first
-    // mode in the list at the start of the Init function to ensure that it represents a valid mode.
+                     // mode in the list at the start of the Init function to ensure that it represents a valid mode.
     mFeature(aFeature)
 {
     mDelegate->SetInstance(this);
