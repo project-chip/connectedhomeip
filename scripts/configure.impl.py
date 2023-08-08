@@ -24,6 +24,10 @@ import urllib.request
 import zipfile
 
 
+def download(url, dest):
+    urllib.request.urlretrieve(url, dest)
+
+
 def download_and_extract_zip(url, dest_dir, *member_names):
     file, *_ = urllib.request.urlretrieve(url)
     with zipfile.ZipFile(file) as zip:
@@ -44,8 +48,10 @@ def process_project_args(gn_args_json_file, *params):
 
 class ProjectArgProcessor:
     # Prefixes to try when mapping parameters to GN arguments
-    BOOL_ARG_PREFIXES = ('is_', 'enable_', 'use_', 'chip_', 'chip_enable', 'chip_use_', 'chip_config_')
-    GENERIC_ARG_PREFIXES = ('chip_', 'chip_config_')
+    BOOL_ARG_PREFIXES = ('is_', 'enable_', 'use_',
+                         'chip_', 'chip_enable_', 'chip_use_', 'chip_config_',
+                         'matter_', 'matter_enable_', 'matter_use_', 'matter_config_')
+    GENERIC_ARG_PREFIXES = ('chip_', 'chip_config_', 'matter_', 'matter_config_')
 
     gn_args = {}  # GN arg -> type ('s'tring, 'b'ool, 'i'integer, '[' list, '{' struct)
     args = collections.OrderedDict()  # collected arguments
@@ -84,7 +90,8 @@ class ProjectArgProcessor:
         value = os.environ.get(envvar, default)
         if not value:
             return
-        if not (type := self.gn_args.get(arg, None)):
+        type = self.gn_args.get(arg, None)
+        if not type:
             info("Warning: Not propagating %s, project has no build arg '%s'" % (envvar, arg))
             return
         self.args[arg] = json.dumps(value if type != '[' else value.split() if list else [value])
@@ -94,7 +101,8 @@ class ProjectArgProcessor:
         arg = name.translate(str.maketrans('-', '_'))
         candidates = [p + arg for p in (('',) + prefixes) if (p + arg) in self.gn_args]
         preferred = [c for c in candidates if self.gn_args[c] == type] if type else []
-        if not (match := next(iter(preferred + candidates), None)):
+        match = next(iter(preferred + candidates), None)
+        if not match:
             info("Warning: Project has no build arg '%s'" % arg)
         return match
 
@@ -109,7 +117,8 @@ class ProjectArgProcessor:
         self.add_arg(prefix + 'os', triplet[1 if len(triplet) == 2 else 2])
 
     def process_enable_parameter(self, name, value):
-        if not (arg := self.gn_arg(name[len('enable-'):], self.BOOL_ARG_PREFIXES, 'b')):
+        arg = self.gn_arg(name[len('enable-'):], self.BOOL_ARG_PREFIXES, 'b')
+        if not arg:
             return
         if self.gn_args[arg] != 'b':
             fail("Project build arg '%s' is not a boolean" % arg)
@@ -118,7 +127,8 @@ class ProjectArgProcessor:
         self.add_arg(arg, value is None)
 
     def process_generic_parameter(self, name, value):
-        if not (arg := self.gn_arg(name, self.GENERIC_ARG_PREFIXES)):
+        arg = self.gn_arg(name, self.GENERIC_ARG_PREFIXES)
+        if not arg:
             return
         if self.gn_args[arg] == 'b':
             fail("Project build arg '%s' is a boolean, use --enable-..." % arg)
@@ -137,9 +147,10 @@ class ProjectArgProcessor:
     def process_parameters(self, args):
         """Process GNU-style configure command line parameters"""
         for arg in args:
-            if not (m := re.fullmatch(r'--([a-z][a-z0-9-]*)(?:=(.*))?', arg)):
+            match = re.fullmatch(r'--([a-z][a-z0-9-]*)(?:=(.*))?', arg)
+            if not match:
                 fail("Invalid argument: '%s'" % arg)
-            self.process_parameter(m.group(1), m.group(2))
+            self.process_parameter(match.group(1), match.group(2))
 
 
 def info(message):
