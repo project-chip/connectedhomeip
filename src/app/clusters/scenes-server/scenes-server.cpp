@@ -513,11 +513,7 @@ void ScenesServer::GroupWillBeRemoved(FabricIndex aFabricIx, EndpointId aEndpoin
     chip::GroupId currentGroup;
     Attributes::CurrentGroup::Get(aEndpointId, &currentGroup);
 
-    chip::SceneId currentScene;
-    Attributes::CurrentScene::Get(aEndpointId, &currentScene);
-
     // Validate if the Current Group = RemovedGroup before invalidating the scene.
-    SceneTableEntry entry;
     if (aGroupId == currentGroup)
     {
         MakeSceneInvalid(aEndpointId);
