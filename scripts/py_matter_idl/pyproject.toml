@@ -13,5 +13,11 @@
 # limitations under the License.
 
 [build-system]
-requires = ['setuptools', 'wheel']
+requires = [
+   'jinja2',
+   'lark',
+   'setuptools',
+   'stringcase',
+   'wheel',
+]
 build-backend = 'setuptools.build_meta'

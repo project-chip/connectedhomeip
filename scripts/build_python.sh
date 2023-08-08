@@ -214,7 +214,8 @@ if [ -n "$install_virtual_env" ]; then
 
     if [ "$install_pytest_requirements" = "yes" ]; then
         echo_blue "Installing python test dependencies ..."
-        "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/scripts/setup/requirements.python_tests.txt"
+        "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/scripts/tests/requirements.txt"
+        "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/src/python_testing/requirements.txt"
     fi
 
     echo ""
