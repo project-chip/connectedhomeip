@@ -202,6 +202,23 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
     API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
+/**
+ * Perform device attestation on the device.
+ *
+ * If getting the various attestation information succeeds, completion will be
+ * called with an MTRDeviceAttestationResult that contains the information being
+ * verified and the verification result.  The verification will be done in the
+ * same way as for devices being commissioned.  In particular, which things are
+ * verified will depend on whether the controller has an
+ * MTROperationalCertificateIssuer, if it does on what its
+ * shouldSkipAttestationCertificateValidation property is set to.
+ *
+ * If getting the attestation information fails, so that attestation could not
+ * be checked at all, completion will be called with an NSError.
+ */
+- (void)verifyAttestationWithQueue:(dispatch_queue_t)queue
+                        completion:(MTRDeviceAttestationVerificationHandler)completion MTR_NEWLY_AVAILABLE;
+
 @end
 
 @protocol MTRDeviceDelegate <NSObject>

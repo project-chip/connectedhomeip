@@ -156,6 +156,8 @@
 		51565CAE2A79D42100469F18 /* MTRConversion.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51565CAD2A79D42100469F18 /* MTRConversion.mm */; };
 		515C1C6F284F9FFB00A48F0C /* MTRFramework.mm in Sources */ = {isa = PBXBuildFile; fileRef = 515C1C6D284F9FFB00A48F0C /* MTRFramework.mm */; };
 		515C1C70284F9FFB00A48F0C /* MTRFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = 515C1C6E284F9FFB00A48F0C /* MTRFramework.h */; };
+		516122182A82CF6700D15825 /* MTRDeviceAttestationResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 516122172A82CF6700D15825 /* MTRDeviceAttestationResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5161221A2A82D46000D15825 /* MTRDeviceAttestationResult.mm in Sources */ = {isa = PBXBuildFile; fileRef = 516122192A82D46000D15825 /* MTRDeviceAttestationResult.mm */; };
 		51669AF02913204400F4AA36 /* MTRBackwardsCompatTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 51669AEF2913204400F4AA36 /* MTRBackwardsCompatTests.m */; };
 		5173A47529C0E2ED00F67F48 /* MTRFabricInfo_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 5173A47229C0E2ED00F67F48 /* MTRFabricInfo_Internal.h */; };
 		5173A47629C0E2ED00F67F48 /* MTRFabricInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5173A47329C0E2ED00F67F48 /* MTRFabricInfo.mm */; };
@@ -460,6 +462,8 @@
 		51565CAD2A79D42100469F18 /* MTRConversion.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRConversion.mm; sourceTree = "<group>"; };
 		515C1C6D284F9FFB00A48F0C /* MTRFramework.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRFramework.mm; sourceTree = "<group>"; };
 		515C1C6E284F9FFB00A48F0C /* MTRFramework.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRFramework.h; sourceTree = "<group>"; };
+		516122172A82CF6700D15825 /* MTRDeviceAttestationResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDeviceAttestationResult.h; sourceTree = "<group>"; };
+		516122192A82D46000D15825 /* MTRDeviceAttestationResult.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceAttestationResult.mm; sourceTree = "<group>"; };
 		51669AEF2913204400F4AA36 /* MTRBackwardsCompatTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRBackwardsCompatTests.m; sourceTree = "<group>"; };
 		5173A47229C0E2ED00F67F48 /* MTRFabricInfo_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRFabricInfo_Internal.h; sourceTree = "<group>"; };
 		5173A47329C0E2ED00F67F48 /* MTRFabricInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRFabricInfo.mm; sourceTree = "<group>"; };
@@ -1037,6 +1041,8 @@
 				7534F12628BFF20300390851 /* MTRDeviceAttestationDelegate.mm */,
 				88EBF8CD27FABDD500686BC1 /* MTRDeviceAttestationDelegateBridge.h */,
 				88EBF8CC27FABDD500686BC1 /* MTRDeviceAttestationDelegateBridge.mm */,
+				516122172A82CF6700D15825 /* MTRDeviceAttestationResult.h */,
+				516122192A82D46000D15825 /* MTRDeviceAttestationResult.mm */,
 				2C5EEEF4268A85C400CAE3D3 /* MTRDeviceConnectionBridge.h */,
 				2C5EEEF5268A85C400CAE3D3 /* MTRDeviceConnectionBridge.mm */,
 				991DC0822475F45400C13860 /* MTRDeviceController.h */,
@@ -1198,6 +1204,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				516122182A82CF6700D15825 /* MTRDeviceAttestationResult.h in Headers */,
 				510A07492A685D3900A9241C /* Matter.apinotes in Headers */,
 				51EF279F2A2A3EB100E33F75 /* MTRBackwardsCompatShims.h in Headers */,
 				5173A47729C0E2ED00F67F48 /* MTRFabricInfo.h in Headers */,
@@ -1502,6 +1509,7 @@
 				51E51FC1282AD37A00FC978D /* MTRDeviceControllerStartupParams.mm in Sources */,
 				51565CAE2A79D42100469F18 /* MTRConversion.mm in Sources */,
 				1ED276E026C57CF000547A89 /* MTRCallbackBridge.mm in Sources */,
+				5161221A2A82D46000D15825 /* MTRDeviceAttestationResult.mm in Sources */,
 				517BF3F1282B62B800A8B7DB /* MTRCertificates.mm in Sources */,
 				5A6FEC9627B5983000F25F42 /* MTRDeviceControllerXPCConnection.mm in Sources */,
 				511913FB28C100EF009235E9 /* MTRBaseSubscriptionCallback.mm in Sources */,

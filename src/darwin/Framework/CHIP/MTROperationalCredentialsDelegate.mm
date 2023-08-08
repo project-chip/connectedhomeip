@@ -177,7 +177,9 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
                      deviceAttestationCertificate:AsData(DAC)
         productAttestationIntermediateCertificate:AsData(PAI)
                          certificationDeclaration:AsData(certificationDeclarationSpan)
-                                     firmwareInfo:firmwareInfo];
+                                     firmwareInfo:firmwareInfo
+                         basicInformationVendorID:@(commissioningParameters.Value().GetRemoteVendorId().Value())
+                        basicInformationProductID:@(commissioningParameters.Value().GetRemoteProductId().Value())];
 
     MTRDeviceController * __weak weakController = mWeakController;
     dispatch_async(mOperationalCertificateIssuerQueue, ^{

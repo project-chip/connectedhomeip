@@ -29,6 +29,8 @@ NS_ASSUME_NONNULL_BEGIN
          productAttestationIntermediateCertificate:(MTRCertificateDERBytes)productAttestationIntermediateCertificate
                           certificationDeclaration:(NSData *)certificationDeclaration
                                       firmwareInfo:(NSData *)firmwareInfo
+                          basicInformationVendorID:(NSNumber *)basicInformationVendorID
+                         basicInformationProductID:(NSNumber *)basicInformationProductID
 {
     if (self = [super init]) {
         _challenge = challenge;
@@ -39,8 +41,31 @@ NS_ASSUME_NONNULL_BEGIN
         _productAttestationIntermediateCertificate = productAttestationIntermediateCertificate;
         _certificationDeclaration = certificationDeclaration;
         _firmwareInfo = firmwareInfo;
+        _basicInformationVendorID = basicInformationVendorID;
+        _basicInformationProductID = basicInformationProductID;
     }
     return self;
+}
+
+- (instancetype)initWithDeviceAttestationChallenge:(NSData *)challenge
+                                             nonce:(NSData *)nonce
+                                       elementsTLV:(MTRTLVBytes)elementsTLV
+                                 elementsSignature:(NSData *)elementsSignature
+                      deviceAttestationCertificate:(MTRCertificateDERBytes)deviceAttestationCertificate
+         productAttestationIntermediateCertificate:(MTRCertificateDERBytes)productAttestationIntermediateCertificate
+                          certificationDeclaration:(NSData *)certificationDeclaration
+                                      firmwareInfo:(NSData *)firmwareInfo
+{
+    return [self initWithDeviceAttestationChallenge:challenge
+                                              nonce:nonce
+                                        elementsTLV:elementsTLV
+                                  elementsSignature:elementsSignature
+                       deviceAttestationCertificate:deviceAttestationCertificate
+          productAttestationIntermediateCertificate:productAttestationIntermediateCertificate
+                           certificationDeclaration:certificationDeclaration
+                                       firmwareInfo:firmwareInfo
+                           basicInformationVendorID:@(0)
+                          basicInformationProductID:@(0)];
 }
 
 @end
