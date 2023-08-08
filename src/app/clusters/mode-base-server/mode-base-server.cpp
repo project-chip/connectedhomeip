@@ -24,6 +24,7 @@
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <app/util/config.h>
 
 using namespace chip;
 using namespace chip::app;

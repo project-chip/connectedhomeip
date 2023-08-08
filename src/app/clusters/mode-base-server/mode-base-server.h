@@ -104,7 +104,7 @@ public:
 
     // List change reporting
     /**
-     * Reports that the contents of the supported modes attribute has changed.
+     * Reports that the contents of the supported modes attribute have changed.
      * The device SHALL call this method whenever it changes the list of supported modes.
      */
     void ReportSupportedModesChange();
@@ -204,7 +204,7 @@ public:
      * @return Returns a CHIP_NO_ERROR if there was no error and the label was returned successfully.
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the modeIndex in beyond the list of available labels.
      *
-     * Note: This is used by the SDK to populate the supported modes attribute. If the contents of this list changes,
+     * Note: This is used by the SDK to populate the supported modes attribute. If the contents of this list change,
      * the device SHALL call the Instance's ReportSupportedModesChange method to report that this attribute has changed.
      */
     virtual CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) = 0;
@@ -216,7 +216,7 @@ public:
      * @return Returns a CHIP_NO_ERROR if there was no error and the value was returned successfully.
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the modeIndex in beyond the list of available values.
      *
-     * Note: This is used by the SDK to populate the supported modes attribute. If the contents of this list changes,
+     * Note: This is used by the SDK to populate the supported modes attribute. If the contents of this list change,
      * the device SHALL call the Instance's ReportSupportedModesChange method to report that this attribute has changed.
      */
     virtual CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) = 0;
@@ -234,7 +234,7 @@ public:
      * @return Returns a CHIP_NO_ERROR if there was no error and the mode tags were returned successfully.
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the modeIndex in beyond the list of available mode tags.
      *
-     * Note: This is used by the SDK to populate the supported modes attribute. If the contents of this list changes,
+     * Note: This is used by the SDK to populate the supported modes attribute. If the contents of this list change,
      * the device SHALL call the Instance's ReportSupportedModesChange method to report that this attribute has changed.
      */
     virtual CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<detail::Structs::ModeTagStruct::Type> & modeTags) = 0;
