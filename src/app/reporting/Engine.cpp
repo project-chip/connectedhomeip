@@ -98,6 +98,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
     bool hasMoreChunks        = true;
     TLV::TLVWriter backup;
     const uint32_t kReservedSizeEndOfReportIBs = 1;
+    bool reservedEndOfReportIBs                = false;
 
     aReportDataBuilder.Checkpoint(backup);
 
@@ -110,7 +111,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
     //
     // Reserve enough space for closing out the Report IB list
     //
-    attributeReportIBs.GetWriter()->ReserveBuffer(kReservedSizeEndOfReportIBs);
+    SuccessOrExit(err = attributeReportIBs.GetWriter()->ReserveBuffer(kReservedSizeEndOfReportIBs));
+    reservedEndOfReportIBs = true;
 
     {
         // TODO: Figure out how AttributePathExpandIterator should handle read
@@ -251,7 +253,7 @@ exit:
     // These are are guaranteed to not fail since we've already reserved memory for the remaining 'close out' TLV operations in this
     // function and its callers.
     //
-    if (IsOutOfWriterSpaceError(err))
+    if (IsOutOfWriterSpaceError(err) && reservedEndOfReportIBs)
     {
         ChipLogDetail(DataManagement, "<RE:Run> We cannot put more chunks into this report. Enable chunking.");
         err = CHIP_NO_ERROR;

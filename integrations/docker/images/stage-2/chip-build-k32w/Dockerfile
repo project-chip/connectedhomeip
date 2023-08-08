@@ -11,15 +11,19 @@ RUN set -x \
     && : # last line
 
 WORKDIR /opt/sdk
-# Setup the K32W SDK
+
 RUN set -x \
-    && wget https://cache.nxp.com/lgfiles/bsps/SDK_2_6_11_K32W061DK6.zip \
-    && unzip SDK_2_6_11_K32W061DK6.zip \
-    && rm -rf SDK_2_6_11_K32W061DK6.zip \
+    && python3 -m pip install -U --no-cache-dir west==1.0.0 \
+    && west init -m https://github.com/nxp-mcuxpresso/mcux-sdk --mr "release/2.6.x_k32w0" \
+    && west update \
+    && chmod +x core/tools/imagetool/sign_images.sh \
+    && ln -sf ../rtos core \
+    && ln -sf ../middleware core \
+    && cp -R examples/* core/boards && rm -rf examples \
     && : # last line
 
 FROM ghcr.io/project-chip/chip-build:${VERSION}
 
 COPY --from=build /opt/sdk/ /opt/sdk/
 
-ENV NXP_K32W0_SDK_ROOT=/opt/sdk
+ENV NXP_K32W0_SDK_ROOT=/opt/sdk/core

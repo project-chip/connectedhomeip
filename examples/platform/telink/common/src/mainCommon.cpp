@@ -33,6 +33,65 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 
+#ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
+static constexpr uint32_t kFactoryResetOnBootMaxCnt       = 5;
+static constexpr const char * kFactoryResetOnBootStoreKey = "TelinkFactoryResetOnBootCnt";
+static constexpr uint32_t kFactoryResetUsualBootTimeoutMs = 5000;
+
+static k_timer FactoryResetUsualBootTimer;
+
+static void FactoryResetUsualBoot(struct k_timer * dummy)
+{
+    (void) dummy;
+    (void) chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kFactoryResetOnBootStoreKey);
+    LOG_INF("Schedule factory counter deleted");
+}
+
+static void FactoryResetOnBoot(void)
+{
+    uint32_t FactoryResetOnBootCnt;
+    CHIP_ERROR FactoryResetOnBootErr = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(
+        kFactoryResetOnBootStoreKey, &FactoryResetOnBootCnt, sizeof(FactoryResetOnBootCnt));
+
+    if (FactoryResetOnBootErr == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        FactoryResetOnBootCnt = 1;
+        if (chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kFactoryResetOnBootStoreKey, &FactoryResetOnBootCnt,
+                                                                        sizeof(FactoryResetOnBootCnt)) != CHIP_NO_ERROR)
+        {
+            LOG_ERR("FactoryResetOnBootCnt write fail");
+        }
+        else
+        {
+            LOG_INF("Schedule factory counter %u", FactoryResetOnBootCnt);
+        }
+    }
+    else if (FactoryResetOnBootErr == CHIP_NO_ERROR)
+    {
+        FactoryResetOnBootCnt++;
+        if (chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kFactoryResetOnBootStoreKey, &FactoryResetOnBootCnt,
+                                                                        sizeof(FactoryResetOnBootCnt)) != CHIP_NO_ERROR)
+        {
+            LOG_ERR("FactoryResetOnBootCnt write fail");
+        }
+        else
+        {
+            LOG_INF("Schedule factory counter %u", FactoryResetOnBootCnt);
+            if (FactoryResetOnBootCnt >= kFactoryResetOnBootMaxCnt)
+            {
+                GetAppTask().PowerOnFactoryReset();
+            }
+        }
+    }
+    else
+    {
+        LOG_ERR("FactoryResetOnBootCnt read fail");
+    }
+    k_timer_init(&FactoryResetUsualBootTimer, FactoryResetUsualBoot, nullptr);
+    k_timer_start(&FactoryResetUsualBootTimer, K_MSEC(kFactoryResetUsualBootTimeoutMs), K_NO_WAIT);
+}
+#endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
+
 int main(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -61,7 +120,9 @@ int main(void)
         LOG_ERR("StartEventLoopTask fail");
         goto exit;
     }
-
+#ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
+    FactoryResetOnBoot();
+#endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
     err = ThreadStackMgr().InitThreadStack();
     if (err != CHIP_NO_ERROR)
     {
