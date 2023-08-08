@@ -24,5 +24,6 @@ default_args = {
   target_cpu = "arm"
   target_os = "freertos"
   chip_openthread_ftd = true
-  import("//args.gni")
+
+  import("//openthread.gni")
 }

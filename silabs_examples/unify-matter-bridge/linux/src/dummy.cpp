@@ -16,6 +16,8 @@ void ApplicationInit()
     // sEthernetNetworkCommissioningInstance.Init();
 }
 
+void ApplicationShutdown() {}
+
 void MatterThreadNetworkDiagnosticsPluginServerInitCallback() {}
 
 void MatterWiFiNetworkDiagnosticsPluginServerInitCallback() {}

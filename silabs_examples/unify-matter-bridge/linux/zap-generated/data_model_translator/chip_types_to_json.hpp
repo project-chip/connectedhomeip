@@ -150,6 +150,7 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::OnOff::Fe
     using namespace chip::app::Clusters::OnOff;
     nlohmann::json obj;
     obj["Lighting"] = static_cast<bool>(value.GetField(Feature::kLighting));
+    obj["DeadFront"] = static_cast<bool>(value.GetField(Feature::kDeadFront));
     return obj;
 }
 template <>
@@ -1034,7 +1035,7 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::FanContro
 {
     using namespace chip::app::Clusters::FanControl;
     nlohmann::json obj;
-    obj["Multi-Speed"] = static_cast<bool>(value.GetField(Feature::kMultiSpeed));
+    obj["MultiSpeed"] = static_cast<bool>(value.GetField(Feature::kMultiSpeed));
     obj["Auto"] = static_cast<bool>(value.GetField(Feature::kAuto));
     obj["Rocking"] = static_cast<bool>(value.GetField(Feature::kRocking));
     obj["Wind"] = static_cast<bool>(value.GetField(Feature::kWind));
@@ -1043,31 +1044,22 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::FanContro
     return obj;
 }
 template <>
-nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::FanControl::RockSupportMask>& value)
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>& value)
 {
     using namespace chip::app::Clusters::FanControl;
     nlohmann::json obj;
-    obj["RockLeftRight"] = static_cast<bool>(value.GetField(RockSupportMask::kRockLeftRight));
-    obj["RockUpDown"] = static_cast<bool>(value.GetField(RockSupportMask::kRockUpDown));
-    obj["RockRound"] = static_cast<bool>(value.GetField(RockSupportMask::kRockRound));
+    obj["RockLeftRight"] = static_cast<bool>(value.GetField(RockBitmap::kRockLeftRight));
+    obj["RockUpDown"] = static_cast<bool>(value.GetField(RockBitmap::kRockUpDown));
+    obj["RockRound"] = static_cast<bool>(value.GetField(RockBitmap::kRockRound));
     return obj;
 }
 template <>
-nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::FanControl::WindSettingMask>& value)
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>& value)
 {
     using namespace chip::app::Clusters::FanControl;
     nlohmann::json obj;
-    obj["Sleep Wind"] = static_cast<bool>(value.GetField(WindSettingMask::kSleepWind));
-    obj["Natural Wind"] = static_cast<bool>(value.GetField(WindSettingMask::kNaturalWind));
-    return obj;
-}
-template <>
-nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::FanControl::WindSupportMask>& value)
-{
-    using namespace chip::app::Clusters::FanControl;
-    nlohmann::json obj;
-    obj["Sleep Wind"] = static_cast<bool>(value.GetField(WindSupportMask::kSleepWind));
-    obj["Natural Wind"] = static_cast<bool>(value.GetField(WindSupportMask::kNaturalWind));
+    obj["Sleep Wind"] = static_cast<bool>(value.GetField(WindBitmap::kSleepWind));
+    obj["Natural Wind"] = static_cast<bool>(value.GetField(WindBitmap::kNaturalWind));
     return obj;
 }
 
@@ -1085,58 +1077,58 @@ nlohmann::json inline to_json(const chip::app::Clusters::FanControl::AirflowDire
     }
 }
 template <>
-nlohmann::json inline to_json(const chip::app::Clusters::FanControl::DirectionEnum& value)
+nlohmann::json inline to_json(const chip::app::Clusters::FanControl::FanModeEnum& value)
 {
     using namespace chip::app::Clusters::FanControl;
     switch (value) {
-    case DirectionEnum::kIncrease:
-        return "Increase";
-    case DirectionEnum::kDecrease:
-        return "Decrease";
+    case FanModeEnum::kOff:
+        return "Off";
+    case FanModeEnum::kLow:
+        return "Low";
+    case FanModeEnum::kMedium:
+        return "Medium";
+    case FanModeEnum::kHigh:
+        return "High";
+    case FanModeEnum::kOn:
+        return "On";
+    case FanModeEnum::kAuto:
+        return "Auto";
+    case FanModeEnum::kSmart:
+        return "Smart";
     default:
         return "{}";
     }
 }
 template <>
-nlohmann::json inline to_json(const chip::app::Clusters::FanControl::FanModeSequenceType& value)
+nlohmann::json inline to_json(const chip::app::Clusters::FanControl::FanModeSequenceEnum& value)
 {
     using namespace chip::app::Clusters::FanControl;
     switch (value) {
-    case FanModeSequenceType::kOffLowMedHigh:
+    case FanModeSequenceEnum::kOffLowMedHigh:
         return "Off/Low/Med/High";
-    case FanModeSequenceType::kOffLowHigh:
+    case FanModeSequenceEnum::kOffLowHigh:
         return "Off/Low/High";
-    case FanModeSequenceType::kOffLowMedHighAuto:
+    case FanModeSequenceEnum::kOffLowMedHighAuto:
         return "Off/Low/Med/High/Auto";
-    case FanModeSequenceType::kOffLowHighAuto:
+    case FanModeSequenceEnum::kOffLowHighAuto:
         return "Off/Low/High/Auto";
-    case FanModeSequenceType::kOffOnAuto:
+    case FanModeSequenceEnum::kOffOnAuto:
         return "Off/On/Auto";
-    case FanModeSequenceType::kOffOn:
+    case FanModeSequenceEnum::kOffOn:
         return "Off/On";
     default:
         return "{}";
     }
 }
 template <>
-nlohmann::json inline to_json(const chip::app::Clusters::FanControl::FanModeType& value)
+nlohmann::json inline to_json(const chip::app::Clusters::FanControl::StepDirectionEnum& value)
 {
     using namespace chip::app::Clusters::FanControl;
     switch (value) {
-    case FanModeType::kOff:
-        return "Off";
-    case FanModeType::kLow:
-        return "Low";
-    case FanModeType::kMedium:
-        return "Medium";
-    case FanModeType::kHigh:
-        return "High";
-    case FanModeType::kOn:
-        return "On";
-    case FanModeType::kAuto:
-        return "Auto";
-    case FanModeType::kSmart:
-        return "Smart";
+    case StepDirectionEnum::kIncrease:
+        return "Increase";
+    case StepDirectionEnum::kDecrease:
+        return "Decrease";
     default:
         return "{}";
     }

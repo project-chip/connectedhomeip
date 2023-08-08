@@ -51,7 +51,7 @@ declare_args() {
 if (wifi_soc) {
   siwx917_sdk("sdk") {
     sources = [
-      "${examples_plat_dir}/FreeRTOSConfig.h",
+      "${examples_common_plat_dir}/FreeRTOSConfig.h",
       "${silabs_project_dir}/include/CHIPProjectConfig.h",
     ]
 
@@ -74,8 +74,8 @@ if (wifi_soc) {
 } else {
   efr32_sdk("sdk") {
     sources = [
+      "${examples_common_plat_dir}/FreeRTOSConfig.h",
       "${silabs_project_dir}/include/CHIPProjectConfig.h",
-      "${examples_plat_dir}/FreeRTOSConfig.h",
     ]
 
     include_dirs = [
@@ -182,7 +182,7 @@ silabs_executable("onoff_plug_app") {
     ]
   }
 
-  ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
+  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
 

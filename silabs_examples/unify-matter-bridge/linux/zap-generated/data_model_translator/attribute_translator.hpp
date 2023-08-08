@@ -233,23 +233,21 @@ private:
 // Skipping Boolean State
 // Skipping ICD Management
 // Skipping Mode Select
+// Skipping Laundry Washer Mode
+// Skipping Refrigerator And Temperature Controlled Cabinet Mode
+// Skipping Laundry Washer Controls
+// Skipping RVC Run Mode
+// Skipping RVC Clean Mode
 // Skipping Temperature Control
 // Skipping Refrigerator Alarm
+// Skipping Dishwasher Mode
 // Skipping Air Quality
 // Skipping Smoke CO Alarm
+// Skipping Dishwasher Alarm
 // Skipping Operational State
+// Skipping RVC Operational State
 // Skipping HEPA Filter Monitoring
 // Skipping Activated Carbon Filter Monitoring
-// Skipping Ceramic Filter Monitoring
-// Skipping Electrostatic Filter Monitoring
-// Skipping UV Filter Monitoring
-// Skipping Ionizing Filter Monitoring
-// Skipping Zeolite Filter Monitoring
-// Skipping Ozone Filter Monitoring
-// Skipping Water Tank Monitoring
-// Skipping Fuel Tank Monitoring
-// Skipping Ink Cartridge Monitoring
-// Skipping Toner Cartridge Monitoring
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attribute Handler for the Door Lock cluster
@@ -688,34 +686,8 @@ private:
 };
 // Skipping Carbon Monoxide Concentration Measurement
 // Skipping Carbon Dioxide Concentration Measurement
-// Skipping Ethylene Concentration Measurement
-// Skipping Ethylene Oxide Concentration Measurement
-// Skipping Hydrogen Concentration Measurement
-// Skipping Hydrogen Sulfide Concentration Measurement
-// Skipping Nitric Oxide Concentration Measurement
 // Skipping Nitrogen Dioxide Concentration Measurement
-// Skipping Oxygen Concentration Measurement
 // Skipping Ozone Concentration Measurement
-// Skipping Sulfur Dioxide Concentration Measurement
-// Skipping Dissolved Oxygen Concentration Measurement
-// Skipping Bromate Concentration Measurement
-// Skipping Chloramines Concentration Measurement
-// Skipping Chlorine Concentration Measurement
-// Skipping Fecal coliform & E. Coli Concentration Measurement
-// Skipping Fluoride Concentration Measurement
-// Skipping Haloacetic Acids Concentration Measurement
-// Skipping Total Trihalomethanes Concentration Measurement
-// Skipping Total Coliform Bacteria Concentration Measurement
-// Skipping Turbidity Concentration Measurement
-// Skipping Copper Concentration Measurement
-// Skipping Lead Concentration Measurement
-// Skipping Manganese Concentration Measurement
-// Skipping Sulfate Concentration Measurement
-// Skipping Bromodichloromethane Concentration Measurement
-// Skipping Bromoform Concentration Measurement
-// Skipping Chlorodibromomethane Concentration Measurement
-// Skipping Chloroform Concentration Measurement
-// Skipping Sodium Concentration Measurement
 // Skipping PM2.5 Concentration Measurement
 // Skipping Formaldehyde Concentration Measurement
 // Skipping PM1 Concentration Measurement

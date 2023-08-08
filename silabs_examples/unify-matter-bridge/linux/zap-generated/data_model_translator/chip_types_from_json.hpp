@@ -131,6 +131,7 @@ inline std::optional<chip::BitMask<OnOff::Feature>> from_json(const nlohmann::js
 {
     chip::BitMask<OnOff::Feature> r;
     r.SetField(OnOff::Feature::kLighting, obj.value("Lighting", false));
+    r.SetField(OnOff::Feature::kDeadFront, obj.value("DeadFront", false));
     return r;
 }
 template <>
@@ -958,7 +959,7 @@ template <>
 inline std::optional<chip::BitMask<FanControl::Feature>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<FanControl::Feature> r;
-    r.SetField(FanControl::Feature::kMultiSpeed, obj.value("Multi-Speed", false));
+    r.SetField(FanControl::Feature::kMultiSpeed, obj.value("MultiSpeed", false));
     r.SetField(FanControl::Feature::kAuto, obj.value("Auto", false));
     r.SetField(FanControl::Feature::kRocking, obj.value("Rocking", false));
     r.SetField(FanControl::Feature::kWind, obj.value("Wind", false));
@@ -967,28 +968,20 @@ inline std::optional<chip::BitMask<FanControl::Feature>> from_json(const nlohman
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<FanControl::RockSupportMask>> from_json(const nlohmann::json& obj)
+inline std::optional<chip::BitMask<FanControl::RockBitmap>> from_json(const nlohmann::json& obj)
 {
-    chip::BitMask<FanControl::RockSupportMask> r;
-    r.SetField(FanControl::RockSupportMask::kRockLeftRight, obj.value("RockLeftRight", false));
-    r.SetField(FanControl::RockSupportMask::kRockUpDown, obj.value("RockUpDown", false));
-    r.SetField(FanControl::RockSupportMask::kRockRound, obj.value("RockRound", false));
+    chip::BitMask<FanControl::RockBitmap> r;
+    r.SetField(FanControl::RockBitmap::kRockLeftRight, obj.value("RockLeftRight", false));
+    r.SetField(FanControl::RockBitmap::kRockUpDown, obj.value("RockUpDown", false));
+    r.SetField(FanControl::RockBitmap::kRockRound, obj.value("RockRound", false));
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<FanControl::WindSettingMask>> from_json(const nlohmann::json& obj)
+inline std::optional<chip::BitMask<FanControl::WindBitmap>> from_json(const nlohmann::json& obj)
 {
-    chip::BitMask<FanControl::WindSettingMask> r;
-    r.SetField(FanControl::WindSettingMask::kSleepWind, obj.value("Sleep Wind", false));
-    r.SetField(FanControl::WindSettingMask::kNaturalWind, obj.value("Natural Wind", false));
-    return r;
-}
-template <>
-inline std::optional<chip::BitMask<FanControl::WindSupportMask>> from_json(const nlohmann::json& obj)
-{
-    chip::BitMask<FanControl::WindSupportMask> r;
-    r.SetField(FanControl::WindSupportMask::kSleepWind, obj.value("Sleep Wind", false));
-    r.SetField(FanControl::WindSupportMask::kNaturalWind, obj.value("Natural Wind", false));
+    chip::BitMask<FanControl::WindBitmap> r;
+    r.SetField(FanControl::WindBitmap::kSleepWind, obj.value("Sleep Wind", false));
+    r.SetField(FanControl::WindBitmap::kNaturalWind, obj.value("Natural Wind", false));
     return r;
 }
 
@@ -1008,11 +1001,16 @@ inline std::optional<FanControl::AirflowDirectionEnum> from_json(const nlohmann:
     }
 }
 template <>
-inline std::optional<FanControl::DirectionEnum> from_json(const nlohmann::json& value)
+inline std::optional<FanControl::FanModeEnum> from_json(const nlohmann::json& value)
 {
-    const std::map<std::string, FanControl::DirectionEnum> table = {
-        { "Increase", FanControl::DirectionEnum::kIncrease },
-        { "Decrease", FanControl::DirectionEnum::kDecrease },
+    const std::map<std::string, FanControl::FanModeEnum> table = {
+        { "Off", FanControl::FanModeEnum::kOff },
+        { "Low", FanControl::FanModeEnum::kLow },
+        { "Medium", FanControl::FanModeEnum::kMedium },
+        { "High", FanControl::FanModeEnum::kHigh },
+        { "On", FanControl::FanModeEnum::kOn },
+        { "Auto", FanControl::FanModeEnum::kAuto },
+        { "Smart", FanControl::FanModeEnum::kSmart },
     };
 
     auto i = table.find(value);
@@ -1023,15 +1021,15 @@ inline std::optional<FanControl::DirectionEnum> from_json(const nlohmann::json& 
     }
 }
 template <>
-inline std::optional<FanControl::FanModeSequenceType> from_json(const nlohmann::json& value)
+inline std::optional<FanControl::FanModeSequenceEnum> from_json(const nlohmann::json& value)
 {
-    const std::map<std::string, FanControl::FanModeSequenceType> table = {
-        { "Off/Low/Med/High", FanControl::FanModeSequenceType::kOffLowMedHigh },
-        { "Off/Low/High", FanControl::FanModeSequenceType::kOffLowHigh },
-        { "Off/Low/Med/High/Auto", FanControl::FanModeSequenceType::kOffLowMedHighAuto },
-        { "Off/Low/High/Auto", FanControl::FanModeSequenceType::kOffLowHighAuto },
-        { "Off/On/Auto", FanControl::FanModeSequenceType::kOffOnAuto },
-        { "Off/On", FanControl::FanModeSequenceType::kOffOn },
+    const std::map<std::string, FanControl::FanModeSequenceEnum> table = {
+        { "Off/Low/Med/High", FanControl::FanModeSequenceEnum::kOffLowMedHigh },
+        { "Off/Low/High", FanControl::FanModeSequenceEnum::kOffLowHigh },
+        { "Off/Low/Med/High/Auto", FanControl::FanModeSequenceEnum::kOffLowMedHighAuto },
+        { "Off/Low/High/Auto", FanControl::FanModeSequenceEnum::kOffLowHighAuto },
+        { "Off/On/Auto", FanControl::FanModeSequenceEnum::kOffOnAuto },
+        { "Off/On", FanControl::FanModeSequenceEnum::kOffOn },
     };
 
     auto i = table.find(value);
@@ -1042,16 +1040,11 @@ inline std::optional<FanControl::FanModeSequenceType> from_json(const nlohmann::
     }
 }
 template <>
-inline std::optional<FanControl::FanModeType> from_json(const nlohmann::json& value)
+inline std::optional<FanControl::StepDirectionEnum> from_json(const nlohmann::json& value)
 {
-    const std::map<std::string, FanControl::FanModeType> table = {
-        { "Off", FanControl::FanModeType::kOff },
-        { "Low", FanControl::FanModeType::kLow },
-        { "Medium", FanControl::FanModeType::kMedium },
-        { "High", FanControl::FanModeType::kHigh },
-        { "On", FanControl::FanModeType::kOn },
-        { "Auto", FanControl::FanModeType::kAuto },
-        { "Smart", FanControl::FanModeType::kSmart },
+    const std::map<std::string, FanControl::StepDirectionEnum> table = {
+        { "Increase", FanControl::StepDirectionEnum::kIncrease },
+        { "Decrease", FanControl::StepDirectionEnum::kDecrease },
     };
 
     auto i = table.find(value);

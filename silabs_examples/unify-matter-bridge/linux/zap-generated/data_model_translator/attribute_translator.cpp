@@ -3734,28 +3734,28 @@ FanControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attribut
 
     try {
         switch (aPath.mAttributeId) {
-        case MN::FanMode::Id: { // type is FanModeType
+        case MN::FanMode::Id: { // type is FanModeEnum
             MN::FanMode::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::FanModeSequence::Id: { // type is FanModeSequenceType
+        case MN::FanModeSequence::Id: { // type is FanModeSequenceEnum
             MN::FanModeSequence::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::PercentSetting::Id: { // type is int8u
+        case MN::PercentSetting::Id: { // type is Percent
             MN::PercentSetting::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::PercentCurrent::Id: { // type is int8u
+        case MN::PercentCurrent::Id: { // type is Percent
             MN::PercentCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
@@ -3783,28 +3783,28 @@ FanControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attribut
             }
             break;
         }
-        case MN::RockSupport::Id: { // type is bitmap8
+        case MN::RockSupport::Id: { // type is RockBitmap
             MN::RockSupport::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::RockSetting::Id: { // type is bitmap8
+        case MN::RockSetting::Id: { // type is RockBitmap
             MN::RockSetting::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::WindSupport::Id: { // type is bitmap8
+        case MN::WindSupport::Id: { // type is WindBitmap
             MN::WindSupport::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::WindSetting::Id: { // type is bitmap8
+        case MN::WindSetting::Id: { // type is WindBitmap
             MN::WindSetting::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
@@ -3921,7 +3921,7 @@ void FanControlAttributeAccess::reported_updated(const bridged_endpoint* ep, con
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::FanControl::Id, attribute_id.value());
     switch (attribute_id.value()) {
-    // type is FanModeType
+    // type is FanModeEnum
     case MN::FanMode::Id: {
         using T = MN::FanMode::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3933,7 +3933,7 @@ void FanControlAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is FanModeSequenceType
+        // type is FanModeSequenceEnum
     case MN::FanModeSequence::Id: {
         using T = MN::FanModeSequence::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);

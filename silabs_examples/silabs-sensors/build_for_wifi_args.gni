@@ -19,4 +19,4 @@ chip_enable_openthread = false
 import("${chip_root}/src/platform/silabs/wifi_args.gni")
 
 chip_enable_ota_requestor = true
-app_data_model = "${chip_root}/examples/lighting-app/lighting-common"
+app_data_model = "${chip_root}/silabs_examples/silabs-sensors/data_model:sensor_data_model"
