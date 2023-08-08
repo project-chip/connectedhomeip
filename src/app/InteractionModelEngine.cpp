@@ -622,7 +622,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
                                     "Deleting previous subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
                                     ChipLogValueX64(apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId()),
                                     apExchangeContext->GetSessionHandle()->GetFabricIndex());
-                    mReadHandlers.ReleaseObject(handler);
+                    handler->Close();
                 }
 
                 return Loop::Continue;
