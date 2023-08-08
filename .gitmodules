@@ -27,10 +27,6 @@
 	url = https://github.com/jeremyjh/ESP32_TFT_library.git
 	branch  = master
 	platforms = esp32
-[submodule "pigweed"]
-	path = third_party/pigweed/repo
-	url = https://github.com/google/pigweed.git
-	branch  = main
 [submodule "openthread"]
 	path = third_party/openthread/repo
 	url = https://github.com/openthread/openthread.git
