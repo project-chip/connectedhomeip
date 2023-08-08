@@ -21,7 +21,7 @@ jobs:
     name: List Workflows with GitHub CLI
     runs-on: ubuntu-latest
     steps:
-      - run: gh run list -R project-chip/connectedhomeip
+      - run: gh run list -R project-chip/connectedhomeip -b master -s failure
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
