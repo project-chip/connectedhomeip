@@ -401,7 +401,7 @@ ValidateKeySetWriteArguments(const chip::app::Clusters::GroupKeyManagement::Comm
     return Status::Success;
 }
 
-bool ValidateAndGetProviderAndFabric(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+bool GetProviderAndFabric(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                      Credentials::GroupDataProvider ** outGroupDataProvider, const FabricInfo ** outFabricInfo)
 {
     VerifyOrDie((outGroupDataProvider != nullptr) && (outFabricInfo != nullptr));
@@ -449,7 +449,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     const FabricInfo * fabric                 = nullptr;
 
     // Flight-check fabric scoping.
-    if (!ValidateAndGetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
+    if (!GetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
     {
         // Command will already have status populated from validation.
         return true;
@@ -554,7 +554,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
     const FabricInfo * fabric                 = nullptr;
 
     // Flight-check fabric scoping.
-    if (!ValidateAndGetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
+    if (!GetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
     {
         // Command will already have status populated from validation.
         return true;
@@ -620,7 +620,7 @@ bool emberAfGroupKeyManagementClusterKeySetRemoveCallback(
     const FabricInfo * fabric                 = nullptr;
 
     // Flight-check fabric scoping.
-    if (!ValidateAndGetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
+    if (!GetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
     {
         // Command will already have status populated from validation.
         return true;
@@ -693,7 +693,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(
     const FabricInfo * fabric                 = nullptr;
 
     // Flight-check fabric scoping.
-    if (!ValidateAndGetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
+    if (!GetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
     {
         // Command will already have status populated from validation.
         return true;
