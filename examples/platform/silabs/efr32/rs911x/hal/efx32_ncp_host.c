@@ -45,12 +45,12 @@ sl_status_t sli_wifi_select_option(const uint8_t configuration);
 
 void sl_si91x_host_set_sleep_indicator(void)
 {
-  GPIO_PinOutSet(WFX_SLEEP_CONFIRM_PIN, WFX_SLEEP_CONFIRM_PIN);
+  GPIO_PinOutSet(WFX_SLEEP_CONFIRM_PIN.port, WFX_SLEEP_CONFIRM_PIN.pin);
 }
 
 void sl_si91x_host_clear_sleep_indicator(void)
 {
-  GPIO_PinOutClear(WFX_SLEEP_CONFIRM_PIN, WFX_SLEEP_CONFIRM_PIN);
+  GPIO_PinOutClear(WFX_SLEEP_CONFIRM_PIN.port, WFX_SLEEP_CONFIRM_PIN.pin);
 }
 
 uint32_t sl_si91x_host_get_wake_indicator(void)
@@ -67,17 +67,17 @@ sl_status_t sl_si91x_host_init(void)
   VERIFY_STATUS(status);
 
   // Start reset line low
-  GPIO_PinModeSet(WFX_RESET_PIN, WFX_RESET_PIN, gpioModePushPull, 0);
+  GPIO_PinModeSet(WFX_RESET_PIN.port, WFX_RESET_PIN.pin, gpioModePushPull, 0);
 
   // configure packet pending interrupt priority
   NVIC_SetPriority(GPIO_ODD_IRQn, PACKET_PENDING_INT_PRI);
 
   // Configure interrupt, sleep and wake confirmation pins
   GPIOINT_CallbackRegister(WFX_INTERRUPT_PIN, gpio_interrupt);
-  GPIO_PinModeSet(WFX_INTERRUPT_PIN, WFX_INTERRUPT_PIN, gpioModeInputPullFilter, 0);
-  GPIO_ExtIntConfig(WFX_INTERRUPT_PIN, WFX_INTERRUPT_PIN, WFX_INTERRUPT_PIN, true, false, true);
-  GPIO_PinModeSet(WFX_SLEEP_CONFIRM_PIN, WFX_SLEEP_CONFIRM_PIN, gpioModeWiredOrPullDown, 1);
-  GPIO_PinModeSet(WAKE_INDICATOR_PIN.port, WAKE_INDICATOR_PIN.pin, gpioModeWiredOrPullDown, 0);
+  GPIO_PinModeSet(WFX_INTERRUPT_PIN.port, WFX_INTERRUPT_PIN.pin, gpioModeInputPullFilter, 0);
+  GPIO_ExtIntConfig(WFX_INTERRUPT_PIN.port, WFX_INTERRUPT_PIN.pin, SL_WFX_HOST_PINOUT_SPI_IRQ, true, false, true);
+  GPIO_PinModeSet(WFX_SLEEP_CONFIRM_PIN.port, WFX_SLEEP_CONFIRM_PIN.pin, gpioModeWiredOrPullDown, 1);
+  GPIO_PinModeSet(WAKE_INDICATOR_PIN.port.port, WAKE_INDICATOR_PIN.pin, gpioModeWiredOrPullDown, 0);
 
   memset(cmd_queues, 0, sizeof(cmd_queues));
 
