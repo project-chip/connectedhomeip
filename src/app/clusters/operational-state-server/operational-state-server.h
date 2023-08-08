@@ -95,7 +95,6 @@ public:
                                        const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime = NullOptional,
                                        const Optional<DataModel::Nullable<uint32_t>> & aPausedTime           = NullOptional);
 
-
 private:
     // Inherited from CommandHandlerInterface
     template <typename RequestT, typename FuncT>

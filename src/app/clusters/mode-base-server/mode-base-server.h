@@ -235,7 +235,6 @@ public:
      *
      */
     virtual void HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response) = 0;
-
 };
 
 // A set of pointers to all initialised ModeBase instances. It provides a way to access all ModeBase derived clusters.
