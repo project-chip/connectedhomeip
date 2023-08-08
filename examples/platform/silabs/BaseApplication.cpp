@@ -27,9 +27,6 @@
 
 #if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
 #include "LEDWidget.h"
-#ifndef SIWX_917
-#include "sl_simple_led_instances.h"
-#endif
 #endif // ENABLE_WSTK_LEDS
 
 #ifdef DISPLAY_ENABLED

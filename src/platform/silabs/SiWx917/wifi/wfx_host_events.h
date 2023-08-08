@@ -211,7 +211,6 @@ bool wfx_is_sta_mode_enabled(void);
 int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap);
 int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
 int32_t wfx_reset_counts();
-// int32_t wfx_rsi_platform();
 
 void wfx_clear_wifi_provision(void);
 sl_status_t wfx_connect_to_ap(void);
@@ -253,7 +252,6 @@ sl_status_t wfx_power_save();
 void wfx_ipv6_notify(int got_ip);
 
 /* RSI for LWIP */
-// void * wfx_rsi_alloc_pkt(void);
 void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off);
 int32_t wfx_rsi_send_data(void * p, uint16_t len);
 sl_status_t sl_si91x_driver_send_data_packet(sl_si91x_queue_type_t queue_type, sl_wifi_buffer_t * buffer, uint32_t wait_time);

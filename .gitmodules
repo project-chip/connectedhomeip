@@ -321,3 +321,5 @@
 [submodule "third_party/silabs/wifi_sdk"]
 	path = third_party/silabs/wifi_sdk
 	url = https://github.com/SiliconLabs/wiseconnect
+	branch = master
+	platforms = efr32

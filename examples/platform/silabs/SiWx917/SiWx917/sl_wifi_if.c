@@ -787,7 +787,6 @@ void * wfx_rsi_alloc_pkt(uint16_t data_length)
 
     status = sl_si91x_allocate_command_buffer(&buffer, (void **) &packet, sizeof(sl_si91x_packet_t) + data_length,
                                               SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME);
-    //    VERIFY_STATUS_AND_RETURN(status);
     if (packet == NULL)
     {
         return SL_STATUS_ALLOCATION_FAILED;
@@ -811,27 +810,4 @@ void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off)
     sl_si91x_packet_t * pkt;
     pkt = (sl_si91x_packet_t *) p;
     memcpy(((char *) pkt->data) + off, buf, len);
-}
-
-/********************************************************************************************
- * @fn   int32_t wfx_rsi_send_data(void *p, uint16_t len)
- * @brief
- *       Driver send a data
- * @param[in]  p:
- * @param[in]  len:
- * @return
- *        None
- **********************************************************************************************/
-int32_t wfx_rsi_send_data(void * p, uint16_t len)
-{
-    int32_t status;
-    sl_wifi_buffer_t * buffer;
-    buffer = (sl_wifi_buffer_t *) p;
-
-    if (sl_si91x_driver_send_data_packet(SI91X_WLAN_CMD_QUEUE, buffer, RSI_SEND_RAW_DATA_RESPONSE_WAIT_TIME))
-    {
-        SILABS_LOG("*ERR*EN-RSI:Send fail");
-        return ERR_IF;
-    }
-    return status;
 }

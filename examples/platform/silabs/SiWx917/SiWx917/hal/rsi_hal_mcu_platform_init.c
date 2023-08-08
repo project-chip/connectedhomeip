@@ -195,7 +195,6 @@ void rsi_hal_board_init(void)
 
     /* configure clock for SiWx917 SoC */
     soc_pll_config();
-    // SILABS_LOG("%s, soc_pll_config, SystemCoreClock=%d\n", __func__, SystemCoreClock);
 
 #ifdef COMMON_FLASH_EN
     /* Before TA going to power save mode ,set m4ss_ref_clk_mux_ctrl ,tass_ref_clk_mux_ctrl,

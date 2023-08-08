@@ -194,10 +194,11 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     sl_wifi_buffer_t * buffer;
     sl_si91x_packet_t * packet;
     sl_status_t status = SL_STATUS_OK;
-    void * rsipkt;
     struct pbuf * q;
     uint16_t framelength;
+#ifdef WIFI_DEBUG_ENABLED
     SILABS_LOG("LWIP : low_level_output");
+#endif
     if (xSemaphoreTake(ethout_sem, portMAX_DELAY) != pdTRUE)
     {
         return ERR_IF;
