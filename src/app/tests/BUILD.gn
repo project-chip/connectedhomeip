@@ -109,7 +109,7 @@ source_set("scenes-table-test-srcs") {
 }
 
 source_set("operational-state-test-srcs") {
-  sources = [ "${chip_root}/src/app/clusters/operational-state-server/operational-state-delegate.h" ]
+  sources = [ "${chip_root}/src/app/clusters/operational-state-server/operational-state-cluster-objects.h" ]
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",
@@ -143,7 +143,7 @@ chip_test_suite("tests") {
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
-    "TestOperationalStateDelegate.cpp",
+    "TestOperationalStateClusterObjects.cpp",
     "TestPendingNotificationMap.cpp",
     "TestPowerSourceCluster.cpp",
     "TestReadInteraction.cpp",
