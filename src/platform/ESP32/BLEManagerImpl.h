@@ -71,6 +71,8 @@ struct ble_gatt_char_context
 #include <platform/ESP32/ChipDeviceScanner.h>
 #endif
 
+#define MAX_SCAN_RSP_DATA_LEN 31
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -132,6 +134,7 @@ class BLEManagerImpl final : public BLEManager,
 #endif
 {
 public:
+    uint8_t scanResponseBuffer[MAX_SCAN_RSP_DATA_LEN];
     BLEManagerImpl() {}
 #if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     CHIP_ERROR ConfigureBle(uint32_t aAdapterId, bool aIsCentral);
@@ -140,10 +143,11 @@ public:
 #endif
 #endif
 
-    void ConfigureScanResponseData(ByteSpan data);
+    CHIP_ERROR ConfigureScanResponseData(ByteSpan data);
+    void ClearScanResponseData(void);
 
 private:
-    chip::Optional<chip::ByteSpan> scanResponse;
+    chip::Optional<chip::ByteSpan> mScanResponse;
 
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
