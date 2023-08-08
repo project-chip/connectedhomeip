@@ -340,6 +340,32 @@ private:
   
 
   
+class CHIPSecondFabricsAttributeCallback : public chip::Callback::Callback<CHIPSecondClusterFabricsAttributeCallbackType>
+{
+public:
+    CHIPSecondFabricsAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPSecondFabricsAttributeCallback();
+
+    static void maybeDestroy(CHIPSecondFabricsAttributeCallback * callback) {
+        if (!callback->keepAlive) {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPSecondFabricsAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::Second::Structs::FabricDescriptorStruct::DecodableType> & list);
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId) {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(reinterpret_cast<CHIPSecondFabricsAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+  
 
   
 class CHIPThirdSomeEnumAttributeCallback : public chip::Callback::Callback<CHIPThirdClusterSomeEnumAttributeCallbackType>
