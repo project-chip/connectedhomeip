@@ -24,8 +24,6 @@
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
 #include <imgui_ui/ui.h>
-#include <imgui_ui/windows/boolean_state.h>
-#include <imgui_ui/windows/occupancy_sensing.h>
 #include <imgui_ui/windows/qrcode.h>
 #endif
 

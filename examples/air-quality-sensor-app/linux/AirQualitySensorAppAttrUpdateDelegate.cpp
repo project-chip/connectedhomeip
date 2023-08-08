@@ -186,15 +186,13 @@ void AirQualitySensorAttrUpdateHandler::OnAirQualityChangeHandler(uint8_t newVal
 
 void AirQualitySensorAttrUpdateHandler::OnTemperatureChangeHandler(int16_t newValue)
 {
-    DataModel::Nullable<int16_t> minVal;
-    DataModel::Nullable<int16_t> maxVal;
     EndpointId endpoint = 1;
-
     EmberAfStatus status = TemperatureMeasurement::Attributes::MeasuredValue::Set(endpoint, newValue);
     VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
                    ChipLogError(NotSpecified, "Failed to TemperatureMeasurement MeasuredValue attribute"));
     ChipLogDetail(NotSpecified, "The new TemperatureMeasurement value: %d", newValue);
 
+    DataModel::Nullable<int16_t> minVal;
     TemperatureMeasurement::Attributes::MinMeasuredValue::Get(endpoint, minVal);
     if (minVal.IsNull())
     {
@@ -207,6 +205,7 @@ void AirQualitySensorAttrUpdateHandler::OnTemperatureChangeHandler(int16_t newVa
                        ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MinMeasuredValue attribute"));
     }
 
+    DataModel::Nullable<int16_t> maxVal;
     TemperatureMeasurement::Attributes::MaxMeasuredValue::Get(endpoint, maxVal);
     if (maxVal.IsNull())
     {
