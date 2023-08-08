@@ -256,13 +256,6 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         // Consequently, reach in set the fabric table pointer to point to the right version.
         //
         app::DnssdServer::Instance().SetFabricTable(stateParams.fabricTable);
-
-        //
-        // Start up the DNS-SD server.  We are not giving it a
-        // CommissioningModeProvider, so it will not claim we are in
-        // commissioning mode.
-        //
-        chip::app::DnssdServer::Instance().StartServer();
     }
 
     stateParams.sessionSetupPool = Platform::New<DeviceControllerSystemStateParams::SessionSetupPool>();
@@ -315,6 +308,18 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
     controllerParams.enableServerInteractions = params.enableServerInteractions;
 }
 
+void DeviceControllerFactory::ControllerInitialized(const DeviceController & controller)
+{
+    if (mEnableServerInteractions && controller.GetFabricIndex() != kUndefinedFabricIndex)
+    {
+        // Restart DNS-SD advertising, because initialization of this controller could
+        // have modified whether a particular fabric identity should be
+        // advertised.  Just calling AdvertiseOperational() is not good enough
+        // here, since we might be removing advertising.
+        app::DnssdServer::Instance().StartServer();
+    }
+}
+
 CHIP_ERROR DeviceControllerFactory::SetupController(SetupParams params, DeviceController & controller)
 {
     VerifyOrReturnError(mSystemState != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -326,6 +331,12 @@ CHIP_ERROR DeviceControllerFactory::SetupController(SetupParams params, DeviceCo
     PopulateInitParams(controllerParams, params);
 
     CHIP_ERROR err = controller.Init(controllerParams);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        ControllerInitialized(controller);
+    }
+
     return err;
 }
 
@@ -347,6 +358,12 @@ CHIP_ERROR DeviceControllerFactory::SetupCommissioner(SetupParams params, Device
     commissionerParams.deviceAttestationVerifier = params.deviceAttestationVerifier;
 
     CHIP_ERROR err = commissioner.Init(commissionerParams);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        ControllerInitialized(commissioner);
+    }
+
     return err;
 }
 
