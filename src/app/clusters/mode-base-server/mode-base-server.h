@@ -115,11 +115,12 @@ public:
 private:
     Delegate * mDelegate;
 
-    EndpointId mEndpointId{};
-    ClusterId mClusterId{};
+    EndpointId mEndpointId;
+    ClusterId mClusterId;
 
     // Attribute data store
-    uint8_t mCurrentMode;
+    uint8_t mCurrentMode = 0; // This is a temporary value and may not be valid. We will change this to the value of the first
+                              // mode in the list at the start of the Init function to ensure that it represents a valid mode.
     DataModel::Nullable<uint8_t> mStartUpMode;
     DataModel::Nullable<uint8_t> mOnMode;
     uint32_t mFeature;
