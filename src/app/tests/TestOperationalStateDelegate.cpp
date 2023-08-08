@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/operational-state-server/operational-state-delegate.h>
+#include <app/clusters/operational-state-server/operational-state-cluster-objects.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
 
