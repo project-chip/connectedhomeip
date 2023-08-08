@@ -351,8 +351,9 @@ public:
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler1->SetMaxReportingInterval(2));
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler1->SetMinReportingIntervalForTests(1));
         sScheduler.OnReadHandlerSubscribed(readHandler1);
-        readHandler1->ClearStateFlag(ReadHandler::ReadHandlerFlags::PrimingReports);
         readHandler1->MoveToState(ReadHandler::HandlerState::CanStartReporting);
+        readHandler1->ClearStateFlag(ReadHandler::ReadHandlerFlags::PrimingReports);
+
         readHandler1->ForceDirtyState();
 
         // Clean read handler, will be triggered at max interval
@@ -362,8 +363,8 @@ public:
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler2->SetMaxReportingInterval(3));
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler2->SetMinReportingIntervalForTests(0));
         sScheduler.OnReadHandlerSubscribed(readHandler2);
-        readHandler2->ClearStateFlag(ReadHandler::ReadHandlerFlags::PrimingReports);
         readHandler2->MoveToState(ReadHandler::HandlerState::CanStartReporting);
+        readHandler2->ClearStateFlag(ReadHandler::ReadHandlerFlags::PrimingReports);
 
         // Clean read handler, will be triggered at max interval, but will be cancelled before
         ReadHandler * readHandler3 =
@@ -371,8 +372,8 @@ public:
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler3->SetMaxReportingInterval(3));
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler3->SetMinReportingIntervalForTests(0));
         sScheduler.OnReadHandlerSubscribed(readHandler3);
-        readHandler3->ClearStateFlag(ReadHandler::ReadHandlerFlags::PrimingReports);
         readHandler3->MoveToState(ReadHandler::HandlerState::CanStartReporting);
+        readHandler3->ClearStateFlag(ReadHandler::ReadHandlerFlags::PrimingReports);
 
         // Confirms that none of the ReadHandlers are currently reportable
         NL_TEST_ASSERT(aSuite, !sScheduler.IsReportableNow(readHandler1));
@@ -428,8 +429,8 @@ public:
             readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler->SetMaxReportingInterval(2));
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler->SetMinReportingIntervalForTests(1));
-
         sScheduler.OnReadHandlerSubscribed(readHandler);
+        readHandler->MoveToState(ReadHandler::HandlerState::CanStartReporting);
         readHandler->ClearStateFlag(ReadHandler::ReadHandlerFlags::PrimingReports);
 
         // Verifies OnReadHandlerSubscribed registered the ReadHandler in the scheduler
@@ -444,8 +445,6 @@ public:
         NL_TEST_ASSERT(aSuite, node->GetMinTimestamp().count() == 1000);
         NL_TEST_ASSERT(aSuite, node->GetMaxTimestamp().count() == 2000);
 
-        // Do those manually to avoid scheduling an engine run
-        readHandler->MoveToState(ReadHandler::HandlerState::CanStartReporting);
         NL_TEST_ASSERT(aSuite, sScheduler.IsReportScheduled(readHandler));
 
         NL_TEST_ASSERT(aSuite, nullptr != node);
@@ -511,18 +510,18 @@ public:
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler1->SetMaxReportingInterval(2));
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler1->SetMinReportingIntervalForTests(0));
         syncScheduler.OnReadHandlerSubscribed(readHandler1);
+        readHandler1->MoveToState(ReadHandler::HandlerState::CanStartReporting);
         readHandler1->ClearStateFlag(ReadHandler::ReadHandlerFlags::PrimingReports);
         ReadHandlerNode * node1 = syncScheduler.FindReadHandlerNode(readHandler1);
-        readHandler1->MoveToState(ReadHandler::HandlerState::CanStartReporting);
 
         ReadHandler * readHandler2 =
             readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &syncScheduler);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler2->SetMaxReportingInterval(3));
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler2->SetMinReportingIntervalForTests(1));
         syncScheduler.OnReadHandlerSubscribed(readHandler2);
+        readHandler2->MoveToState(ReadHandler::HandlerState::CanStartReporting);
         readHandler2->ClearStateFlag(ReadHandler::ReadHandlerFlags::PrimingReports);
         ReadHandlerNode * node2 = syncScheduler.FindReadHandlerNode(readHandler2);
-        readHandler2->MoveToState(ReadHandler::HandlerState::CanStartReporting);
 
         // Confirm all handler are currently registered in the scheduler
         NL_TEST_ASSERT(aSuite, syncScheduler.GetNumReadHandlers() == 2);
@@ -626,9 +625,9 @@ public:
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler3->SetMaxReportingInterval(3));
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler3->SetMinReportingIntervalForTests(2));
         syncScheduler.OnReadHandlerSubscribed(readHandler3);
+        readHandler3->MoveToState(ReadHandler::HandlerState::CanStartReporting);
         readHandler3->ClearStateFlag(ReadHandler::ReadHandlerFlags::PrimingReports);
         ReadHandlerNode * node3 = syncScheduler.FindReadHandlerNode(readHandler3);
-        readHandler3->MoveToState(ReadHandler::HandlerState::CanStartReporting);
 
         // Confirm all handler are currently registered in the scheduler
         NL_TEST_ASSERT(aSuite, syncScheduler.GetNumReadHandlers() == 3);
@@ -684,9 +683,9 @@ public:
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler4->SetMaxReportingInterval(1));
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler4->SetMinReportingIntervalForTests(0));
         syncScheduler.OnReadHandlerSubscribed(readHandler4);
+        readHandler4->MoveToState(ReadHandler::HandlerState::CanStartReporting);
         readHandler4->ClearStateFlag(ReadHandler::ReadHandlerFlags::PrimingReports);
         ReadHandlerNode * node4 = syncScheduler.FindReadHandlerNode(readHandler4);
-        readHandler4->MoveToState(ReadHandler::HandlerState::CanStartReporting);
 
         // Confirm all handler are currently registered in the scheduler
         NL_TEST_ASSERT(aSuite, syncScheduler.GetNumReadHandlers() == 4);

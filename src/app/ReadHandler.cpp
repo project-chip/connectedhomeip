@@ -604,7 +604,7 @@ void ReadHandler::MoveToState(const HandlerState aTargetState)
     //
     if (aTargetState == HandlerState::CanStartReporting)
     {
-        if (IsType(ReadHandler::InteractionType::Read) || IsPriming())
+        if (CanEmitReadReport())
         {
             InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
         }
@@ -884,7 +884,7 @@ void ReadHandler::SetStateFlag(ReadHandlerFlags aFlag, bool aValue)
     // If we became reportable, schedule a reporting run.
     if (!oldReportable && ShouldStartReporting())
     {
-        if (IsType(ReadHandler::InteractionType::Read) || IsPriming())
+        if (CanEmitReadReport())
         {
             InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
         }

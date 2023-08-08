@@ -166,8 +166,8 @@ public:
     public:
         virtual ~Observer() = default;
 
-        /// @brief Callback invoked to notify a ReadHandler was created and can be registered
-        /// @param[in] apReadHandler  ReadHandler getting added
+        /// @brief Callback invoked to notify a subscription was successfully established for a read handler
+        /// @param[in] apReadHandler  ReadHandler that completed its subscription
         virtual void OnReadHandlerSubscribed(ReadHandler * apReadHandler) = 0;
 
         /// @brief Callback invoked when a ReadHandler went from a non reportable state to a reportable state. Indicates to the
@@ -335,10 +335,11 @@ private:
     bool ShouldStartReporting() const
     {
         // Important: Anything that changes ShouldStartReporting() from false to true
-        // (which can only happen for subscriptions) must call 
+        // (which can only happen for subscriptions) must call
         // mObserver->OnBecameReportable(this).
-        return mState == HandlerState::CanStartReporting && IsDirty();
+        return mState == HandlerState::CanStartReporting && (CanEmitReadReport() || IsDirty());
     }
+    bool CanEmitReadReport() const { return IsType(ReadHandler::InteractionType::Read) || IsPriming(); }
     bool CanStartReporting() const { return mState == HandlerState::CanStartReporting; }
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
 

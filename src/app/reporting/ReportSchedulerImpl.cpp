@@ -68,6 +68,10 @@ void ReportSchedulerImpl::OnReadHandlerSubscribed(ReadHandler * aReadHandler)
                     "Registered a ReadHandler that will schedule a report between system Timestamp: %" PRIu64
                     " and system Timestamp %" PRIu64 ".",
                     newNode->GetMinTimestamp().count(), newNode->GetMaxTimestamp().count());
+
+    Milliseconds32 newTimeout;
+    CalculateNextReportTimeout(newTimeout, newNode);
+    ScheduleReport(newTimeout, newNode);
 }
 
 /// @brief When a ReadHandler becomes reportable, schedule, recalculate and reschedule the report.
