@@ -28,6 +28,17 @@ namespace app {
 namespace Clusters {
 namespace ConcentrationMeasurement {
 
+static constexpr std::array<ClusterId, 10> AliasedClusters = { CarbonDioxideConcentrationMeasurement::Id,
+                                                               CarbonMonoxideConcentrationMeasurement::Id,
+                                                               NitrogenDioxideConcentrationMeasurement::Id,
+                                                               Pm1ConcentrationMeasurement::Id,
+                                                               Pm10ConcentrationMeasurement::Id,
+                                                               Pm25ConcentrationMeasurement::Id,
+                                                               RadonConcentrationMeasurement::Id,
+                                                               TotalVolatileOrganicCompoundsConcentrationMeasurement::Id,
+                                                               OzoneConcentrationMeasurement::Id,
+                                                               FormaldehydeConcentrationMeasurement::Id };
+
 enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
