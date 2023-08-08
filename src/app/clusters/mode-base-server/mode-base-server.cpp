@@ -42,8 +42,7 @@ namespace ModeBase {
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :
     CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
     AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
-    mClusterId(aClusterId),
-    mFeature(aFeature)
+    mClusterId(aClusterId), mFeature(aFeature)
 {
     mDelegate->SetInstance(this);
 }
