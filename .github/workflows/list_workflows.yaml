@@ -19,10 +19,9 @@ on:
 jobs:
   list_workflows:
     name: List Workflows with GitHub CLI
-    #if: github.repository_owner == 'project-chip'
     runs-on: ubuntu-latest
     steps:
-      - run: gh pr list -R project-chip/connectedhomeip
+      - run: gh run list -R project-chip/connectedhomeip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
