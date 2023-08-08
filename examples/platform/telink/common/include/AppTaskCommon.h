@@ -63,6 +63,9 @@ constexpr uint8_t kButtonReleaseEvent   = 0;
 class AppTaskCommon
 {
 public:
+#ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
+    void PowerOnFactoryReset(void);
+#endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
     CHIP_ERROR StartApp();
     void PostEvent(AppEvent * event);
 

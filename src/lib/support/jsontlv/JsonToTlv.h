@@ -1,6 +1,6 @@
-/**
+/*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,23 +15,21 @@
  *    limitations under the License.
  */
 
-#include "error-mapping.h"
+#include <lib/core/TLV.h>
+#include <string>
 
 namespace chip {
-namespace app {
 
-Protocols::InteractionModel::Status ToInteractionModelStatus(EmberAfStatus code)
-{
-    using imcode = Protocols::InteractionModel::Status;
-    if (code == EMBER_ZCL_STATUS_DUPLICATE_EXISTS /* 0x8A */)
-    {
-        // For now, this is still used, and should be mapped to success.  Once
-        // we update bindings to no longer use it, this case can go away.
-        return imcode::Success;
-    }
+/*
+ * Given a JSON object that represents TLV, this function writes the corresponding TLV bytes into the provided buffer.
+ * The size of tlv will be adjusted to the size of the actual data written to the buffer.
+ */
+CHIP_ERROR JsonToTlv(const std::string & jsonString, MutableByteSpan & tlv);
 
-    return static_cast<imcode>(code);
-}
+/*
+ * Given a JSON object that represents TLV, this function makes encode calls on the given TLVWriter to encode the corresponding TLV
+ * bytes.
+ */
+CHIP_ERROR JsonToTlv(const std::string & jsonString, TLV::TLVWriter & writer);
 
-} // namespace app
 } // namespace chip
