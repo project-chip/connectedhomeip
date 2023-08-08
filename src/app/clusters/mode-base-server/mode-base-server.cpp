@@ -23,7 +23,6 @@
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/config.h>
 #include <platform/DiagnosticDataProvider.h>
 
 using namespace chip;
@@ -112,6 +111,7 @@ CHIP_ERROR Instance::Init()
             }
         }
     }
+
 #ifdef EMBER_AF_PLUGIN_ON_OFF_SERVER
     // OnMode with Power Up
     // If the On/Off feature is supported and the On/Off cluster attribute StartUpOnOff is present, with a
@@ -147,6 +147,7 @@ CHIP_ERROR Instance::Init()
         }
     }
 #endif // EMBER_AF_PLUGIN_ON_OFF_SERVER
+
     return CHIP_NO_ERROR;
 }
 
@@ -225,6 +226,11 @@ DataModel::Nullable<uint8_t> Instance::GetOnMode() const
     return mOnMode;
 }
 
+void Instance::ReportSupportedModesChange()
+{
+    MatterReportingAttributeChangeCallback(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::SupportedModes::Id));
+}
+
 bool Instance::HasFeature(Feature feature) const
 {
     return (mFeature & to_underlying(feature)) != 0;
@@ -244,6 +250,7 @@ bool Instance::IsSupportedMode(uint8_t modeValue)
     return false;
 }
 
+// private methods
 template <typename RequestT, typename FuncT>
 void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
 {
