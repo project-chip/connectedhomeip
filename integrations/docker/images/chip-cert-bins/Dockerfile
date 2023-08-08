@@ -268,5 +268,6 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-app1 chip-app1
 # Stage 3.1 Setup the Matter Python environment
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_lib python_lib
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing python_testing
-RUN pip install click websockets lark diskcache
+RUN pip install -r /root/connectedhomeip/scripts/tests/requirements.txt
+RUN pip install -r /root/connectedhomeip/src/python_testing/requirements.txt
 RUN pip install --no-cache-dir python_lib/controller/python/chip*.whl
