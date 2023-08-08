@@ -85,7 +85,10 @@
 /**
  * CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_RAM_HEAP
  *
- * True if packet buffers are allocated from an LwIP RAM Heap.
+ * True if packet buffers are allocated from LwIP RAM Heap.
+ * 
+ * Platform developer should implement and maintain their own customized function size_t lwip_mem_size(const void *p_mem).
+ * 
  */
 #if CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL && LWIP_PBUF_FROM_CUSTOM_RAM_HEAP
 #define CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_RAM_HEAP 1
