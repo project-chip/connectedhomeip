@@ -302,7 +302,7 @@
         "Test_TC_G_2_1"
     ],
     "Scenes": ["Test_TC_S_1_1"],
-    "RVCOperationalState": [ "Test_TC_RVCOPSTATE_1_1"],
+    "RVCOperationalState": ["Test_TC_RVCOPSTATE_1_1"],
     "ResourceMonitoring": [
         "TestActivatedCarbonFilterMonitoring",
         "TestHepaFilterMonitoring",
