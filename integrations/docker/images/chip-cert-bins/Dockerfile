@@ -3,7 +3,7 @@ FROM ubuntu:22.04 as chip-build-cert
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 ARG TARGETPLATFORM
 # COMMITHASH defines the target commit to build from. May be passed in using --build-arg.
-ARG COMMITHASH=7b99e6399c6069037c613782d78132c69b9dcabb
+ARG COMMITHASH=c1ec2d777456924dcaa59b53351b00d73caf378f
 
 # Ensure TARGETPLATFORM is set
 RUN case ${TARGETPLATFORM} in \
