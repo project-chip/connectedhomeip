@@ -19,7 +19,7 @@
 #define RSI_CONFIG_H
 
 #include "ble_config.h"
-#include "rsi_wisemcu_hardware_setup.h"
+//#include "rsi_wisemcu_hardware_setup.h"
 #include "rsi_wlan_defines.h"
 #include "sl_wifi_device.h"
 

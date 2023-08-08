@@ -51,10 +51,25 @@
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
+#ifdef CHIP_9117
+#include "sl_si91x_driver.h"
+#include "cmsis_os2.h"
+#include "sl_net.h"
+//#include "sl_uart.h"
+#include "sl_board_configuration.h"
+#include "sl_wifi_types.h"
+#include "sl_si91x_types.h"
+#include "sl_wifi_callback_framework.h"
+#include "sl_wifi_constants.h"
+#else
 #include "rsi_board_configuration.h"
 #include "rsi_driver.h"
+#endif
+
 #include "sl_device_init_dpll.h"
 #include "sl_device_init_hfxo.h"
+
+#define DEFAULT_SPI_TRASFER_MODE 0
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #include "sl_power_manager.h"
@@ -116,7 +131,7 @@ void sl_wfx_host_gpio_init(void)
     GPIO_PinModeSet(WFX_INTERRUPT_PIN.port, WFX_INTERRUPT_PIN.pin, gpioModeInputPull, PINOUT_CLEAR);
     GPIO_ExtIntConfig(WFX_INTERRUPT_PIN.port, WFX_INTERRUPT_PIN.pin, SL_WFX_HOST_PINOUT_SPI_IRQ, true, false, true);
     GPIOINT_CallbackRegister(SL_WFX_HOST_PINOUT_SPI_IRQ, rsi_gpio_irq_cb);
-    GPIO_IntDisable(1 << SL_WFX_HOST_PINOUT_SPI_IRQ); /* Will be enabled by RSI */
+    GPIO_IntDisable(1 << SG+SL_WFX_HOST_PINOUT_SPI_IRQ); /* Will be enabled by RSI */
 
     // Change GPIO interrupt priority (FreeRTOS asserts unless this is done here!)
     NVIC_SetPriority(GPIO_EVEN_IRQn, WFX_SPI_NVIC_PRIORITY);
@@ -172,6 +187,13 @@ void rsi_hal_board_init(void)
 
     /* Reset of Wifi chip */
     sl_wfx_host_reset_chip();
+}
+
+// wifi-sdk
+sl_status_t si91x_host_bus_init(void)
+{
+    rsi_hal_board_init();
+    return SL_STATUS_OK;
 }
 
 #if defined(EFR32MG24)
@@ -346,7 +368,7 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     }
 
     (void) mode; // currently not used;
-    rsi_error_t rsiError = RSI_ERROR_NONE;
+    error_t rsiError = RSI_ERROR_NONE;
 
     xSemaphoreTake(spiTransferLock, portMAX_DELAY);
 
@@ -397,4 +419,21 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     sl_wfx_host_spi_cs_deassert();
 #endif /* EFR32MG24 */
     return rsiError;
+}
+
+
+/*********************************************************************
+ * @fn   int16_t rsi_spi_transfer(uint8_t *tx_buf, uint8_t *rx_buf, uint16_t xlen, uint8_t mode)
+ * @brief
+ *       Do a SPI transfer - Mode is 8/16 bit - But every 8 bit is aligned
+ * @param[in] tx_buf:
+ * @param[in] rx_buf:
+ * @param[in] xlen:
+ * @param[in] mode:
+ * @return
+ *        None
+ **************************************************************************/
+sl_status_t si91x_host_spi_transfer(const void *tx_buf, void *rx_buf, uint16_t xlen)
+{
+    rsi_spi_transfer(tx_buf, rx_buf, xlen, DEFAULT_SPI_TRASFER_MODE);
 }

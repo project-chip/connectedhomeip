@@ -38,9 +38,16 @@
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
+/* wifi-sdk
 #include "rsi_board_configuration.h"
 #include "rsi_driver.h"
+*/
 
+#include "sl_board_configuration.h"
+
+#include "sl_si91x_host_interface.h"
+
+void gpio_interrupt(uint8_t interrupt_number);
 typedef void (*UserIntCallBack_t)(void);
 UserIntCallBack_t call_back, gpio_callback;
 #ifdef LOGGING_STATS
@@ -52,9 +59,12 @@ void rsi_gpio_irq_cb(uint8_t irqnum)
 {
     if (irqnum != SL_WFX_HOST_PINOUT_SPI_IRQ)
         return;
-    GPIO_IntClear(1 << SL_WFX_HOST_PINOUT_SPI_IRQ);
-    if (call_back != NULL)
-        (*call_back)();
+
+   sl_si91x_host_set_event(NCP_HOST_BUS_RX_EVENT);
+//   GPIO_IntClear(1 << SL_WFX_HOST_PINOUT_SPI_IRQ);
+ //   GPIO_IntClear(0xAAAA);
+  //  if (call_back != NULL)
+  //      (*call_back)();
 }
 
 /*===================================================*/
