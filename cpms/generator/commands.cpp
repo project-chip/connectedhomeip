@@ -3,6 +3,7 @@
 #include "platform.h"
 #include "assert.h"
 #include <string.h>
+#include <stdio.h>
 
 using namespace chip::DeviceLayer::Internal;
 
@@ -244,6 +245,7 @@ int SetupCommand::decode(Encoder & in)
 {
     uint8_t temp[512] = { 0 };
     size_t size = 0;
+    uint16_t hw_version = 0;
     int err = 0;
 
     // vendor_id
@@ -306,15 +308,9 @@ int SetupCommand::decode(Encoder & in)
     }
 
     // hw_version
-    err = in.getArray(temp, sizeof(temp), size);
+    err = in.getUint16(hw_version);
     ASSERT(!err, goto exit, "Decode error");
-    if(0 == size)
-    {
-        // 0x0000
-        temp[size++] = 0;
-        temp[size++] = 0;
-    }
-    err = Config::WriteBin(SilabsConfig::kConfigKey_HardwareVersion, temp, size);
+    err = Config::Write(SilabsConfig::kConfigKey_HardwareVersion, hw_version);
     ASSERT(!err, goto exit, "Write error");
 
     // hw_version_str
@@ -322,8 +318,8 @@ int SetupCommand::decode(Encoder & in)
     ASSERT(!err, goto exit, "Decode error");
     if(0 == size)
     {
-        // Empty string
-        temp[size++] = 0;
+        // string(hw_version)
+        size = snprintf((char*)temp, sizeof(temp), "%d", hw_version);
     }
     err = Config::WriteBin(SilabsConfig::kConfigKey_HardwareVersionString, temp, size);
     ASSERT(!err, goto exit, "Write error");

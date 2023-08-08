@@ -162,7 +162,7 @@ class SetupCommand(Command):
         if args.hw_version is None:
             self.hw_version = None
         else:
-            self.hw_version = args.hw_version.to_bytes(2, "little")
+            self.hw_version = args.hw_version
 
         if args.hw_version_str is None:
             self.hw_version_str = None
@@ -197,7 +197,7 @@ class SetupCommand(Command):
         enc.addArray(self.product_label)
         enc.addArray(self.product_url)
         enc.addArray(self.part_number)
-        enc.addArray(self.hw_version)
+        enc.addUint16(self.hw_version)
         enc.addArray(self.hw_version_str)
         enc.addArray(self.manufacturing_date)
         enc.addArray(self.unique_id)
