@@ -39,104 +39,22 @@ namespace app {
 namespace Clusters {
 namespace ModeBase {
 
-void Instance::RegisterInstance()
+Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :
+    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
+    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
+    mClusterId(aClusterId),
+    mCurrentMode(0), // This is a temporary value and may not be valid. We will change this to the value of the first
+    // mode in the list at the start of the Init function to ensure that it represents a valid mode.
+    mFeature(aFeature)
 {
-    if (!gModeBaseAliasesInstances.Contains(this))
-    {
-        gModeBaseAliasesInstances.PushBack(this);
-    }
+    mDelegate->SetInstance(this);
 }
 
-void Instance::UnregisterInstance()
+Instance::~Instance()
 {
-    gModeBaseAliasesInstances.Remove(this);
-}
-
-bool Instance::HasFeature(Feature feature) const
-{
-    return (mFeature & to_underlying(feature)) != 0;
-}
-
-void Instance::LoadPersistentAttributes()
-{
-    // Load Current Mode
-    uint8_t tempCurrentMode;
-    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
-        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id), tempCurrentMode);
-    if (err == CHIP_NO_ERROR)
-    {
-        Status status = UpdateCurrentMode(tempCurrentMode);
-        if (status == Status::Success)
-        {
-            ChipLogDetail(Zcl, "ModeBase: Loaded CurrentMode as %u", GetCurrentMode());
-        }
-        else
-        {
-            ChipLogError(Zcl, "ModeBase: Could not update CurrentMode to %u: %u", tempCurrentMode, to_underlying(status));
-        }
-    }
-    else
-    {
-        // If we cannot find the previous CurrentMode, we will assume it to be the first mode in the
-        // list, as was initialised in the constructor.
-        ChipLogDetail(Zcl, "ModeBase: Unable to load the CurrentMode from the KVS. Assuming %u", GetCurrentMode());
-    }
-
-    // Load Start-Up Mode
-    DataModel::Nullable<uint8_t> tempStartUpMode;
-    err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
-        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id), tempStartUpMode);
-    if (err == CHIP_NO_ERROR)
-    {
-        Status status = UpdateStartUpMode(tempStartUpMode);
-        if (status == Status::Success)
-        {
-            if (GetStartUpMode().IsNull())
-            {
-                ChipLogDetail(Zcl, "ModeBase: Loaded StartUpMode as null");
-            }
-            else
-            {
-                ChipLogDetail(Zcl, "ModeBase: Loaded StartUpMode as %u", GetStartUpMode().Value());
-            }
-        }
-        else
-        {
-            ChipLogError(Zcl, "ModeBase: Could not update StartUpMode: %u", to_underlying(status));
-        }
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "ModeBase: Unable to load the StartUpMode from the KVS. Assuming null");
-    }
-
-    // Load On Mode
-    DataModel::Nullable<uint8_t> tempOnMode;
-    err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
-        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id), tempOnMode);
-    if (err == CHIP_NO_ERROR)
-    {
-        Status status = UpdateOnMode(tempOnMode);
-        if (status == Status::Success)
-        {
-            if (GetOnMode().IsNull())
-            {
-                ChipLogDetail(Zcl, "ModeBase: Loaded OnMode as null");
-            }
-            else
-            {
-                ChipLogDetail(Zcl, "ModeBase: Loaded OnMode as %u", GetOnMode().Value());
-            }
-        }
-        else
-        {
-            ChipLogError(Zcl, "ModeBase: Could not update OnMode: %u", to_underlying(status));
-        }
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "ModeBase: Unable to load the OnMode from the KVS.      Assuming null");
-    }
+    UnregisterInstance();
+    chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
+    unregisterAttributeAccessOverride(this);
 }
 
 CHIP_ERROR Instance::Init()
@@ -232,161 +150,6 @@ CHIP_ERROR Instance::Init()
     return CHIP_NO_ERROR;
 }
 
-template <typename RequestT, typename FuncT>
-void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
-{
-    if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mCommandId == RequestT::GetCommandId()))
-    {
-        RequestT requestPayload;
-
-        // If the command matches what the caller is looking for, let's mark this as being handled
-        // even if errors happen after this. This ensures that we don't execute any fall-back strategies
-        // to handle this command since at this point, the caller is taking responsibility for handling
-        // the command in its entirety, warts and all.
-        //
-        handlerContext.SetCommandHandled();
-
-        if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
-                                                     Protocols::InteractionModel::Status::InvalidCommand);
-            return;
-        }
-
-        func(handlerContext, requestPayload);
-    }
-}
-
-void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & commandData)
-{
-    uint8_t newMode = commandData.newMode;
-
-    Commands::ChangeToModeResponse::Type response;
-
-    if (!IsSupportedMode(newMode))
-    {
-        ChipLogError(Zcl, "ModeBase: Failed to find the option with mode %u", newMode);
-        response.status = to_underlying(StatusCode::kUnsupportedMode);
-        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-        return;
-    }
-
-    mDelegate->HandleChangeToMode(newMode, response);
-
-    if (response.status == to_underlying(StatusCode::kSuccess))
-    {
-        UpdateCurrentMode(newMode);
-        ChipLogProgress(Zcl, "ModeBase: HandleChangeToMode changed to mode %u", newMode);
-    }
-
-    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-}
-
-// This function is called by the interaction model engine when a command destined for this instance is received.
-void Instance::InvokeCommand(HandlerContext & handlerContext)
-{
-    switch (handlerContext.mRequestPath.mCommandId)
-    {
-    case ModeBase::Commands::ChangeToMode::Id:
-        ChipLogDetail(Zcl, "ModeBase: Entering handling ChangeToModeWithStatus");
-
-        HandleCommand<Commands::ChangeToMode::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleChangeToMode(ctx, commandData); });
-    }
-}
-
-// List the commands supported by this instance.
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                               CommandHandlerInterface::CommandIdCallback callback, void * context)
-{
-    callback(ModeBase::Commands::ChangeToMode::Id, context);
-    return CHIP_NO_ERROR;
-}
-
-// List the commands generated by this instance.
-CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
-{
-    callback(ModeBase::Commands::ChangeToModeResponse::Id, context);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR Instance::EncodeSupportedModes(const AttributeValueEncoder::ListEncodeHelper & encoder)
-{
-    for (uint8_t i = 0; true; i++)
-    {
-        ModeOptionStructType mode;
-
-        // Get the mode label
-        char buffer[kMaxModeLabelSize];
-        MutableCharSpan label(buffer);
-        auto err = mDelegate->GetModeLabelByIndex(i, label);
-        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-        {
-            return CHIP_NO_ERROR;
-        }
-        ReturnErrorOnFailure(err);
-
-        mode.label = label;
-
-        // Get the mode value
-        ReturnErrorOnFailure(mDelegate->GetModeValueByIndex(i, mode.mode));
-
-        // Get the mode tags
-        ModeTagStructType tagsBuffer[kMaxNumOfModeTags];
-        DataModel::List<ModeTagStructType> tags(tagsBuffer);
-        ReturnErrorOnFailure(mDelegate->GetModeTagsByIndex(i, tags));
-        mode.modeTags = tags;
-
-        ReturnErrorOnFailure(encoder.Encode(mode));
-    }
-    return CHIP_NO_ERROR;
-}
-
-// Implements the read functionality for complex attributes.
-CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    switch (aPath.mAttributeId)
-    {
-    case Attributes::CurrentMode::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(mCurrentMode));
-        break;
-    case Attributes::StartUpMode::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(mStartUpMode));
-        break;
-    case Attributes::OnMode::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(mOnMode));
-        break;
-    case Attributes::FeatureMap::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(mFeature));
-        break;
-    case Attributes::SupportedModes::Id:
-        Instance * d   = this;
-        CHIP_ERROR err = aEncoder.EncodeList([d](const auto & encoder) -> CHIP_ERROR { return d->EncodeSupportedModes(encoder); });
-        return err;
-    }
-    return CHIP_NO_ERROR;
-}
-
-// Implements checking before attribute writes.
-CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, AttributeValueDecoder & aDecoder)
-{
-    DataModel::Nullable<uint8_t> newMode;
-    ReturnErrorOnFailure(aDecoder.Decode(newMode));
-    Status status;
-
-    switch (attributePath.mAttributeId)
-    {
-    case ModeBase::Attributes::StartUpMode::Id:
-        status = UpdateStartUpMode(newMode);
-        return StatusIB(status).ToChipError();
-    case ModeBase::Attributes::OnMode::Id:
-        status = UpdateOnMode(newMode);
-        return StatusIB(status).ToChipError();
-    }
-
-    return CHIP_ERROR_INCORRECT_STATE;
-}
-
 Status Instance::UpdateCurrentMode(uint8_t aNewMode)
 {
     if (!IsSupportedMode(aNewMode))
@@ -447,6 +210,11 @@ Status Instance::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
     return Protocols::InteractionModel::Status::Success;
 }
 
+uint8_t Instance::GetCurrentMode() const
+{
+    return mCurrentMode;
+}
+
 DataModel::Nullable<uint8_t> Instance::GetStartUpMode() const
 {
     return mStartUpMode;
@@ -457,9 +225,9 @@ DataModel::Nullable<uint8_t> Instance::GetOnMode() const
     return mOnMode;
 }
 
-uint8_t Instance::GetCurrentMode() const
+bool Instance::HasFeature(Feature feature) const
 {
-    return mCurrentMode;
+    return (mFeature & to_underlying(feature)) != 0;
 }
 
 bool Instance::IsSupportedMode(uint8_t modeValue)
@@ -476,22 +244,254 @@ bool Instance::IsSupportedMode(uint8_t modeValue)
     return false;
 }
 
-Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :
-    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
-    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
-    mClusterId(aClusterId),
-    mCurrentMode(0), // This is a temporary value and may not be valid. We will change this to the value of the first
-                     // mode in the list at the start of the Init function to ensure that it represents a valid mode.
-    mFeature(aFeature)
+template <typename RequestT, typename FuncT>
+void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
 {
-    mDelegate->SetInstance(this);
+    if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mCommandId == RequestT::GetCommandId()))
+    {
+        RequestT requestPayload;
+
+        // If the command matches what the caller is looking for, let's mark this as being handled
+        // even if errors happen after this. This ensures that we don't execute any fall-back strategies
+        // to handle this command since at this point, the caller is taking responsibility for handling
+        // the command in its entirety, warts and all.
+        //
+        handlerContext.SetCommandHandled();
+
+        if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)
+        {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
+                                                     Protocols::InteractionModel::Status::InvalidCommand);
+            return;
+        }
+
+        func(handlerContext, requestPayload);
+    }
 }
 
-Instance::~Instance()
+// This function is called by the interaction model engine when a command destined for this instance is received.
+void Instance::InvokeCommand(HandlerContext & handlerContext)
 {
-    UnregisterInstance();
-    chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
-    unregisterAttributeAccessOverride(this);
+    switch (handlerContext.mRequestPath.mCommandId)
+    {
+    case ModeBase::Commands::ChangeToMode::Id:
+        ChipLogDetail(Zcl, "ModeBase: Entering handling ChangeToModeWithStatus");
+
+        HandleCommand<Commands::ChangeToMode::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleChangeToMode(ctx, commandData); });
+    }
+}
+
+// List the commands supported by this instance.
+CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                               CommandHandlerInterface::CommandIdCallback callback, void * context)
+{
+    callback(ModeBase::Commands::ChangeToMode::Id, context);
+    return CHIP_NO_ERROR;
+}
+
+// List the commands generated by this instance.
+CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+{
+    callback(ModeBase::Commands::ChangeToModeResponse::Id, context);
+    return CHIP_NO_ERROR;
+}
+
+// Implements the read functionality for complex attributes.
+CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    switch (aPath.mAttributeId)
+    {
+    case Attributes::CurrentMode::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mCurrentMode));
+        break;
+    case Attributes::StartUpMode::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mStartUpMode));
+        break;
+    case Attributes::OnMode::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mOnMode));
+        break;
+    case Attributes::FeatureMap::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mFeature));
+        break;
+    case Attributes::SupportedModes::Id:
+        Instance * d   = this;
+        CHIP_ERROR err = aEncoder.EncodeList([d](const auto & encoder) -> CHIP_ERROR { return d->EncodeSupportedModes(encoder); });
+        return err;
+    }
+    return CHIP_NO_ERROR;
+}
+
+// Implements checking before attribute writes.
+CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, AttributeValueDecoder & aDecoder)
+{
+    DataModel::Nullable<uint8_t> newMode;
+    ReturnErrorOnFailure(aDecoder.Decode(newMode));
+    Status status;
+
+    switch (attributePath.mAttributeId)
+    {
+    case ModeBase::Attributes::StartUpMode::Id:
+        status = UpdateStartUpMode(newMode);
+        return StatusIB(status).ToChipError();
+    case ModeBase::Attributes::OnMode::Id:
+        status = UpdateOnMode(newMode);
+        return StatusIB(status).ToChipError();
+    }
+
+    return CHIP_ERROR_INCORRECT_STATE;
+}
+
+void Instance::RegisterInstance()
+{
+    if (!gModeBaseAliasesInstances.Contains(this))
+    {
+        gModeBaseAliasesInstances.PushBack(this);
+    }
+}
+
+void Instance::UnregisterInstance()
+{
+    gModeBaseAliasesInstances.Remove(this);
+}
+
+void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & commandData)
+{
+    uint8_t newMode = commandData.newMode;
+
+    Commands::ChangeToModeResponse::Type response;
+
+    if (!IsSupportedMode(newMode))
+    {
+        ChipLogError(Zcl, "ModeBase: Failed to find the option with mode %u", newMode);
+        response.status = to_underlying(StatusCode::kUnsupportedMode);
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
+    }
+
+    mDelegate->HandleChangeToMode(newMode, response);
+
+    if (response.status == to_underlying(StatusCode::kSuccess))
+    {
+        UpdateCurrentMode(newMode);
+        ChipLogProgress(Zcl, "ModeBase: HandleChangeToMode changed to mode %u", newMode);
+    }
+
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+}
+
+void Instance::LoadPersistentAttributes()
+{
+    // Load Current Mode
+    uint8_t tempCurrentMode;
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id), tempCurrentMode);
+    if (err == CHIP_NO_ERROR)
+    {
+        Status status = UpdateCurrentMode(tempCurrentMode);
+        if (status == Status::Success)
+        {
+            ChipLogDetail(Zcl, "ModeBase: Loaded CurrentMode as %u", GetCurrentMode());
+        }
+        else
+        {
+            ChipLogError(Zcl, "ModeBase: Could not update CurrentMode to %u: %u", tempCurrentMode, to_underlying(status));
+        }
+    }
+    else
+    {
+        // If we cannot find the previous CurrentMode, we will assume it to be the first mode in the
+        // list, as was initialised in the constructor.
+        ChipLogDetail(Zcl, "ModeBase: Unable to load the CurrentMode from the KVS. Assuming %u", GetCurrentMode());
+    }
+
+    // Load Start-Up Mode
+    DataModel::Nullable<uint8_t> tempStartUpMode;
+    err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id), tempStartUpMode);
+    if (err == CHIP_NO_ERROR)
+    {
+        Status status = UpdateStartUpMode(tempStartUpMode);
+        if (status == Status::Success)
+        {
+            if (GetStartUpMode().IsNull())
+            {
+                ChipLogDetail(Zcl, "ModeBase: Loaded StartUpMode as null");
+            }
+            else
+            {
+                ChipLogDetail(Zcl, "ModeBase: Loaded StartUpMode as %u", GetStartUpMode().Value());
+            }
+        }
+        else
+        {
+            ChipLogError(Zcl, "ModeBase: Could not update StartUpMode: %u", to_underlying(status));
+        }
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "ModeBase: Unable to load the StartUpMode from the KVS. Assuming null");
+    }
+
+    // Load On Mode
+    DataModel::Nullable<uint8_t> tempOnMode;
+    err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id), tempOnMode);
+    if (err == CHIP_NO_ERROR)
+    {
+        Status status = UpdateOnMode(tempOnMode);
+        if (status == Status::Success)
+        {
+            if (GetOnMode().IsNull())
+            {
+                ChipLogDetail(Zcl, "ModeBase: Loaded OnMode as null");
+            }
+            else
+            {
+                ChipLogDetail(Zcl, "ModeBase: Loaded OnMode as %u", GetOnMode().Value());
+            }
+        }
+        else
+        {
+            ChipLogError(Zcl, "ModeBase: Could not update OnMode: %u", to_underlying(status));
+        }
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "ModeBase: Unable to load the OnMode from the KVS.      Assuming null");
+    }
+}
+
+CHIP_ERROR Instance::EncodeSupportedModes(const AttributeValueEncoder::ListEncodeHelper & encoder)
+{
+    for (uint8_t i = 0; true; i++)
+    {
+        ModeOptionStructType mode;
+
+        // Get the mode label
+        char buffer[kMaxModeLabelSize];
+        MutableCharSpan label(buffer);
+        auto err = mDelegate->GetModeLabelByIndex(i, label);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
+            return CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
+
+        mode.label = label;
+
+        // Get the mode value
+        ReturnErrorOnFailure(mDelegate->GetModeValueByIndex(i, mode.mode));
+
+        // Get the mode tags
+        ModeTagStructType tagsBuffer[kMaxNumOfModeTags];
+        DataModel::List<ModeTagStructType> tags(tagsBuffer);
+        ReturnErrorOnFailure(mDelegate->GetModeTagsByIndex(i, tags));
+        mode.modeTags = tags;
+
+        ReturnErrorOnFailure(encoder.Encode(mode));
+    }
+    return CHIP_NO_ERROR;
 }
 
 IntrusiveList<Instance> & GetModeBaseInstanceList()
