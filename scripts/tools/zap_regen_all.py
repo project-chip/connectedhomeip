@@ -286,7 +286,7 @@ class JinjaCodegenTarget():
             with tempfile.TemporaryDirectory(prefix='ktfmt') as tmpdir:
                 path, http_message = urllib.request.urlretrieve(jar_url, Path(tmpdir).joinpath(JAR_NAME).as_posix())
                 subprocess.check_call(['java', '-jar', path, '--google-style'] + paths)
-        except Exception as err:
+        except Exception:
             traceback.print_exc()
 
     def codeFormat(self):
