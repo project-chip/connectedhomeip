@@ -171,7 +171,7 @@ public:
         virtual void OnReadHandlerSubscribed(ReadHandler * apReadHandler) = 0;
 
         /// @brief Callback invoked when a ReadHandler went from a non reportable state to a reportable state. Indicates to the
-        /// observer that a report should be emitted if the min interval allows it.
+        /// observer that a report should be emitted when the min interval allows it.
         /// @param[in] apReadHandler  ReadHandler that became dirty and in HandlerState::CanStartReporting state
         virtual void OnBecameReportable(ReadHandler * apReadHandler) = 0;
 
@@ -334,9 +334,9 @@ private:
     /// @brief Returns whether the ReadHandler is in a state where it can send a report and there is data to report.
     bool ShouldStartReporting() const
     {
-        // Important: Anything that changes the state ShouldStartReporting() must either call mObserver->OnBecameReportable(this)
-        // for active subscription or InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun() for read request and
-        // priming subscription.
+        // Important: Anything that changes ShouldStartReporting() from false to true
+        // (which can only happen for subscriptions) must call 
+        // mObserver->OnBecameReportable(this).
         return mState == HandlerState::CanStartReporting && IsDirty();
     }
     bool CanStartReporting() const { return mState == HandlerState::CanStartReporting; }
