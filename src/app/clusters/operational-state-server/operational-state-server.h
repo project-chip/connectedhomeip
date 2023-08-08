@@ -46,6 +46,23 @@ class OperationalStateServer : public CommandHandlerInterface, public AttributeA
 {
 public:
     /**
+     * Creates an operational state cluster instance. The Init() function needs to be called for this instance to be registered and
+     * called by the interaction model at the appropriate times.
+     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
+     * @param aClusterId The ID of the operational state aliased cluster to be instantiated.
+     */
+    OperationalStateServer(EndpointId aEndpointId, ClusterId aClusterId) :
+        CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId),
+        AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId)
+    {
+
+        mEndpointId = aEndpointId;
+        mClusterId  = aClusterId;
+    }
+
+    ~OperationalStateServer() override {}
+
+    /**
      * Init the operational state server.
      * This function must be called after defining a OperationalStateServer class object.
      * @param void
@@ -76,22 +93,6 @@ public:
                                        const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime = NullOptional,
                                        const Optional<DataModel::Nullable<uint32_t>> & aPausedTime           = NullOptional);
 
-    /**
-     * Creates an operational state cluster instance. The Init() function needs to be called for this instance to be registered and
-     * called by the interaction model at the appropriate times.
-     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aClusterId The ID of the operational state aliased cluster to be instantiated.
-     */
-    OperationalStateServer(EndpointId aEndpointId, ClusterId aClusterId) :
-        CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId),
-        AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId)
-    {
-
-        mEndpointId = aEndpointId;
-        mClusterId  = aClusterId;
-    }
-
-    ~OperationalStateServer() override {}
 
 private:
     // Inherited from CommandHandlerInterface
