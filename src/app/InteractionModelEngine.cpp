@@ -615,7 +615,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             // Walk through all existing subscriptions and shut down those whose subscriber matches
             // that which just came in.
             //
-            mReadHandlers.ForEachActiveObject([this, apExchangeContext](ReadHandler * handler) {
+            mReadHandlers.ForEachActiveObject([apExchangeContext](ReadHandler * handler) {
                 if (handler->IsFromSubscriber(*apExchangeContext))
                 {
                     ChipLogProgress(InteractionModel,
