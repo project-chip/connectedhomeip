@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include <sdkconfig.h>
+
+#if CONFIG_OPENTHREAD_ENABLED
 #include "esp_openthread_types.h"
 
 #define ESP_OPENTHREAD_DEFAULT_RADIO_CONFIG()                                                                                      \
@@ -31,5 +34,8 @@
 
 #define ESP_OPENTHREAD_DEFAULT_PORT_CONFIG()                                                                                       \
     {                                                                                                                              \
-        .storage_partition_name = "ot_storage", .netif_queue_size = 10, .task_queue_size = 10,                                     \
+        .storage_partition_name = "nvs", .netif_queue_size = 10, .task_queue_size = 10,                                            \
     }
+#endif // CONFIG_OPENTHREAD_ENABLED
+
+void ESPOpenThreadInit();
