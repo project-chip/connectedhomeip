@@ -17,13 +17,12 @@
 
 #pragma once
 
-#include <app/TestEventTriggerDelegate.h>
-
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/TestEventTriggerDelegate.h>
 
 namespace chip {
 
-enum class Trigger : uint64_t
+enum class SmokeCOTrigger : uint64_t
 {
     // Force alarm commands
     kForceSmokeWarning           = 0xffffffff00000090,
@@ -57,10 +56,8 @@ enum class Trigger : uint64_t
 class SmokeCOTestEventTriggerDelegate : public TestEventTriggerDelegate
 {
 public:
-    explicit SmokeCOTestEventTriggerDelegate(const ByteSpan & enableKey, TestEventTriggerDelegate * otherDelegate,
-                                             EndpointId endpointId) :
-        mEnableKey(enableKey),
-        mOtherDelegate(otherDelegate), mEndpointId(endpointId)
+    explicit SmokeCOTestEventTriggerDelegate(const ByteSpan & enableKey, TestEventTriggerDelegate * otherDelegate) :
+        mEnableKey(enableKey), mOtherDelegate(otherDelegate)
     {}
 
     bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override;
@@ -69,7 +66,18 @@ public:
 private:
     ByteSpan mEnableKey;
     TestEventTriggerDelegate * mOtherDelegate;
-    EndpointId mEndpointId;
 };
 
 } // namespace chip
+
+/**
+ * @brief User handler for handling the test event trigger
+ *
+ * @note If TestEventTrigger is enabled, it needs to be implemented in the app
+ *
+ * @param eventTrigger Event trigger to handle
+ *
+ * @retval true on success
+ * @retval false if error happened
+ */
+bool emberAfHandleEventTrigger(uint64_t eventTrigger);

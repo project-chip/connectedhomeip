@@ -22,23 +22,12 @@
  */
 
 #include "smoke-co-alarm-server.h"
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/EventLogging.h>
-#include <app/server/Server.h>
-#include <app/util/af.h>
-#include <app/util/error-mapping.h>
-#include <cinttypes>
 
-#include <app/CommandHandler.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/ConcreteCommandPath.h>
-#include <lib/support/CodeUtils.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/EventLogging.h>
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::SmokeCoAlarm;
 using chip::Protocols::InteractionModel::Status;
 
@@ -72,73 +61,82 @@ bool SmokeCoAlarmServer::SetExpressedState(EndpointId endpointId, ExpressedState
     return success;
 }
 
-bool SmokeCoAlarmServer::AutoSetExpressedState(EndpointId endpointId)
+bool SmokeCoAlarmServer::AutoSetExpressedState(EndpointId endpointId,
+                                               std::array<ExpressedStateEnum, kPriorityOrderLength> priorityOrder)
 {
     ExpressedStateEnum currentExpressedState = ExpressedStateEnum::kNormal;
 
-    for (ExpressedStateEnum priority : mPriorityOrder)
+    for (ExpressedStateEnum priority : priorityOrder)
     {
         switch (priority)
         {
         case ExpressedStateEnum::kSmokeAlarm: {
-            VerifyOrReturnValue(GetSmokeState(endpointId, mCurrentSmokeAlarm), false);
-            if (mCurrentSmokeAlarm != AlarmStateEnum::kNormal)
+            AlarmStateEnum currentSmokeAlarm;
+            VerifyOrReturnValue(GetSmokeState(endpointId, currentSmokeAlarm), false);
+            if (currentSmokeAlarm != AlarmStateEnum::kNormal)
             {
                 currentExpressedState = ExpressedStateEnum::kSmokeAlarm;
             }
         }
         break;
         case ExpressedStateEnum::kCOAlarm: {
-            VerifyOrReturnValue(GetCOState(endpointId, mCurrentCoAlarm), false);
-            if (mCurrentCoAlarm != AlarmStateEnum::kNormal)
+            AlarmStateEnum currentCoAlarm;
+            VerifyOrReturnValue(GetCOState(endpointId, currentCoAlarm), false);
+            if (currentCoAlarm != AlarmStateEnum::kNormal)
             {
                 currentExpressedState = ExpressedStateEnum::kCOAlarm;
             }
         }
         break;
         case ExpressedStateEnum::kBatteryAlert: {
-            VerifyOrReturnValue(GetBatteryAlert(endpointId, mCurrentBatteryState), false);
-            if (mCurrentBatteryState != AlarmStateEnum::kNormal)
+            AlarmStateEnum currentBatteryState;
+            VerifyOrReturnValue(GetBatteryAlert(endpointId, currentBatteryState), false);
+            if (currentBatteryState != AlarmStateEnum::kNormal)
             {
                 currentExpressedState = ExpressedStateEnum::kBatteryAlert;
             }
         }
         break;
         case ExpressedStateEnum::kTesting: {
-            VerifyOrReturnValue(GetTestInProgress(endpointId, mCurrentTestInProgress), false);
-            if (mCurrentTestInProgress != false)
+            bool currentTestInProgress;
+            VerifyOrReturnValue(GetTestInProgress(endpointId, currentTestInProgress), false);
+            if (currentTestInProgress != false)
             {
                 currentExpressedState = ExpressedStateEnum::kTesting;
             }
         }
         break;
         case ExpressedStateEnum::kHardwareFault: {
-            VerifyOrReturnValue(GetHardwareFaultAlert(endpointId, mCurrentHardwareFault), false);
-            if (mCurrentHardwareFault != false)
+            bool currentHardwareFault;
+            VerifyOrReturnValue(GetHardwareFaultAlert(endpointId, currentHardwareFault), false);
+            if (currentHardwareFault != false)
             {
                 currentExpressedState = ExpressedStateEnum::kHardwareFault;
             }
         }
         break;
         case ExpressedStateEnum::kEndOfService: {
-            VerifyOrReturnValue(GetEndOfServiceAlert(endpointId, mCurrentEndOfService), false);
-            if (mCurrentEndOfService != EndOfServiceEnum::kNormal)
+            EndOfServiceEnum currentEndOfService;
+            VerifyOrReturnValue(GetEndOfServiceAlert(endpointId, currentEndOfService), false);
+            if (currentEndOfService != EndOfServiceEnum::kNormal)
             {
                 currentExpressedState = ExpressedStateEnum::kEndOfService;
             }
         }
         break;
         case ExpressedStateEnum::kInterconnectSmoke: {
-            VerifyOrReturnValue(GetInterconnectSmokeAlarm(endpointId, mCurrentInterconnectSmokeAlarm), false);
-            if (mCurrentInterconnectSmokeAlarm != AlarmStateEnum::kNormal)
+            AlarmStateEnum currentInterconnectSmokeAlarm;
+            VerifyOrReturnValue(GetInterconnectSmokeAlarm(endpointId, currentInterconnectSmokeAlarm), false);
+            if (currentInterconnectSmokeAlarm != AlarmStateEnum::kNormal)
             {
                 currentExpressedState = ExpressedStateEnum::kInterconnectSmoke;
             }
         }
         break;
         case ExpressedStateEnum::kInterconnectCO: {
-            VerifyOrReturnValue(GetInterconnectCOAlarm(endpointId, mCurrentInterconnectCoAlarm), false);
-            if (mCurrentInterconnectCoAlarm != AlarmStateEnum::kNormal)
+            AlarmStateEnum currentInterconnectCOAlarm;
+            VerifyOrReturnValue(GetInterconnectCOAlarm(endpointId, currentInterconnectCOAlarm), false);
+            if (currentInterconnectCOAlarm != AlarmStateEnum::kNormal)
             {
                 currentExpressedState = ExpressedStateEnum::kInterconnectCO;
             }
@@ -156,11 +154,6 @@ bool SmokeCoAlarmServer::AutoSetExpressedState(EndpointId endpointId)
     }
 
     return SetExpressedState(endpointId, currentExpressedState);
-}
-
-void SmokeCoAlarmServer::SetPriorityOrder(std::array<ExpressedStateEnum, kPriorityOrderLength> newPriorityOrder)
-{
-    mPriorityOrder = newPriorityOrder;
 }
 
 bool SmokeCoAlarmServer::SetSmokeState(EndpointId endpointId, AlarmStateEnum newSmokeState)

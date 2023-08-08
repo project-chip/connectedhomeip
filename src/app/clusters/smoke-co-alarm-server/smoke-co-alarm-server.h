@@ -25,10 +25,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
-#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
-#include <app/util/config.h>
-#include <protocols/interaction_model/StatusCode.h>
 
 /**
  * @brief Smoke CO Alarm Server Plugin class
@@ -67,15 +64,10 @@ public:
     /**
      * @brief Set the highest level of Expressed State according to priorityOrder
      * @param endpointId ID of the endpoint
+     * @param priorityOrder Priority order of expressed state from highest to lowest
      * @return true on success, false on failure
      */
-    bool AutoSetExpressedState(chip::EndpointId endpointId);
-
-    /**
-     * @brief Set priority order
-     * @param newPriorityOrder new priority order
-     */
-    void SetPriorityOrder(std::array<ExpressedStateEnum, kPriorityOrderLength> newPriorityOrder);
+    bool AutoSetExpressedState(chip::EndpointId endpointId, std::array<ExpressedStateEnum, kPriorityOrderLength> priorityOrder);
 
     bool SetSmokeState(chip::EndpointId endpointId, AlarmStateEnum newSmokeState);
     bool SetCOState(chip::EndpointId endpointId, AlarmStateEnum newCOState);
@@ -163,24 +155,6 @@ private:
     friend bool emberAfSmokeCoAlarmClusterSelfTestRequestCallback(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::SmokeCoAlarm::Commands::SelfTestRequest::DecodableType & commandData);
-
-    /**
-     * @brief The priority order of expressed state from highest to lowest
-     */
-    std::array<ExpressedStateEnum, kPriorityOrderLength> mPriorityOrder = {
-        ExpressedStateEnum::kSmokeAlarm,     ExpressedStateEnum::kInterconnectSmoke, ExpressedStateEnum::kCOAlarm,
-        ExpressedStateEnum::kInterconnectCO, ExpressedStateEnum::kHardwareFault,     ExpressedStateEnum::kTesting,
-        ExpressedStateEnum::kEndOfService,   ExpressedStateEnum::kBatteryAlert
-    };
-
-    AlarmStateEnum mCurrentSmokeAlarm;
-    AlarmStateEnum mCurrentInterconnectSmokeAlarm;
-    AlarmStateEnum mCurrentCoAlarm;
-    AlarmStateEnum mCurrentInterconnectCoAlarm;
-    AlarmStateEnum mCurrentBatteryState;
-    EndOfServiceEnum mCurrentEndOfService;
-    bool mCurrentTestInProgress;
-    bool mCurrentHardwareFault;
 
     static SmokeCoAlarmServer sInstance;
 };

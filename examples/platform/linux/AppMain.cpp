@@ -528,7 +528,7 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER
     static SmokeCOTestEventTriggerDelegate smokeCOTestEventTriggerDelegate{
-        ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey), otherDelegate, 1
+        ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey), otherDelegate
     };
     otherDelegate = &smokeCOTestEventTriggerDelegate;
 #endif
