@@ -23,20 +23,7 @@
 #pragma once
 
 #include <crypto/CHIPCryptoPAL.h>
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
-#include <lib/support/Base64.h>
-#include <messaging/ExchangeContext.h>
-#include <messaging/ExchangeDelegate.h>
-#include <messaging/ExchangeMessageDispatch.h>
 #include <protocols/secure_channel/Constants.h>
-#include <protocols/secure_channel/PairingSession.h>
-#include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
-#include <system/SystemPacketBuffer.h>
-#include <transport/CryptoContext.h>
-#include <transport/raw/MessageHeader.h>
-#include <transport/raw/PeerAddress.h>
 
 namespace chip {
 namespace Protocols {
@@ -44,6 +31,8 @@ namespace SecureChannel {
 using namespace Crypto;
 
 #define CHIP_CHECK_IN_APP_DATA_MAX_SIZE 1024
+
+using CounterType = uint32_t;
 
 /**
  * @brief   Implement section 4.18.2 of the spec regarding
@@ -63,11 +52,10 @@ public:
      * @param output    Buffer in Which to store the generated payload. SUFFICIENT SPACE MUST BE ALLOCATED by the caller
      *                  Required Buffer Size is : User Data + CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES + SizeOf(uint32_t) +
      * CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES
-     * @param payloadSize (Optionnal) Total size of the generated payload
      * @return CHIP_ERROR
      */
     static CHIP_ERROR GenerateCheckinMessagePayload(Crypto::Aes128KeyHandle & key, uint32_t counter, const ByteSpan & appData,
-                                                    MutableByteSpan & output, uint16_t * payloadSize = nullptr);
+                                                    MutableByteSpan & output);
 
     /**
      * @brief Parse Check-in Message payload
@@ -75,11 +63,16 @@ public:
      * @param key       Key with which to decrypt the check-in payload
      * @param payload   The received payload to decrypt and parse
      * @param counter   The counter value retrieved from the payload
-     * @param appData   The optionnal application data decrypted
+     * @param appData   The optional application data decrypted
      * @return CHIP_ERROR
      */
     static CHIP_ERROR ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & key, ByteSpan & payload, uint32_t & counter,
                                                  MutableByteSpan & appData);
+
+    static inline uint64_t GetRequiredBufferSize(uint32_t & payloadSize) { return payloadSize + sMinPayloadSize; }
+
+    static constexpr uint16_t sMinPayloadSize =
+        CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES + sizeof(CounterType) + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
 
 private:
     static uint16_t GetAppDataSize(ByteSpan & payload);

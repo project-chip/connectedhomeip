@@ -23,51 +23,39 @@
 #include "CheckinMessage.h"
 #include <lib/core/CHIPCore.h>
 
+#include <lib/core/CHIPEncoding.h>
+
 namespace chip {
 namespace Protocols {
 namespace SecureChannel {
 
-static constexpr uint16_t sMinPayloadSize =
-    CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES + sizeof(uint32_t) + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
-
 CHIP_ERROR CheckinMessage::GenerateCheckinMessagePayload(Crypto::Aes128KeyHandle & key, uint32_t counter, const ByteSpan & appData,
-                                                         MutableByteSpan & output, uint16_t * payloadSize)
+                                                         MutableByteSpan & output)
 {
     VerifyOrReturnError(appData.size() <= CHIP_CHECK_IN_APP_DATA_MAX_SIZE, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(output.size() >= (appData.size() + sMinPayloadSize), CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ERROR err            = CHIP_NO_ERROR;
     uint8_t * appDataStartPtr = output.data() + CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES;
+    Encoding::LittleEndian::Put32(appDataStartPtr, counter);
 
-    // Write32 increase the pointer by sizeof(uint32_t)
-    Encoding::LittleEndian::Write32(appDataStartPtr, counter);
-    appDataStartPtr -= sizeof(uint32_t);
+    chip::Crypto::HMAC_sha shaHandler;
+    uint8_t nonceWorkBuffer[CHIP_CRYPTO_HASH_LEN_BYTES] = { 0 };
 
-    {
-        chip::Crypto::HMAC_sha shaHandler;
-        uint8_t nonceWorkBuffer[CHIP_CRYPTO_HASH_LEN_BYTES] = { 0 };
-        ReturnErrorOnFailure(shaHandler.HMAC_SHA256(key.As<Aes128KeyByteArray>(), sizeof(Aes128KeyByteArray), appDataStartPtr,
-                                                    sizeof(counter), nonceWorkBuffer, CHIP_CRYPTO_HASH_LEN_BYTES));
-        memcpy(output.data(), nonceWorkBuffer, CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES);
-    }
+    ReturnErrorOnFailure(shaHandler.HMAC_SHA256(key.As<Aes128KeyByteArray>(), sizeof(Aes128KeyByteArray), appDataStartPtr,
+                                                sizeof(counter), nonceWorkBuffer, CHIP_CRYPTO_HASH_LEN_BYTES));
+
+    memcpy(output.data(), nonceWorkBuffer, CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES);
 
     // In place encryption to save some RAM
     memcpy(appDataStartPtr + sizeof(counter), appData.data(), appData.size());
 
-    // API constraint. Mic buffer needs to be separated.
-    uint8_t mic[CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
-    uint8_t * micPtr = appDataStartPtr + appData.size() + sizeof(counter);
-
-    ReturnErrorOnFailure(Crypto::AES_CCM_encrypt(appDataStartPtr, appData.size() + sizeof(counter), nullptr, 0, key, output.data(),
-                                                 CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, appDataStartPtr, mic,
+    uint8_t * micPtr = appDataStartPtr + sizeof(counter) + appData.size();
+    ReturnErrorOnFailure(Crypto::AES_CCM_encrypt(appDataStartPtr, sizeof(counter) + appData.size(), nullptr, 0, key, output.data(),
+                                                 CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, appDataStartPtr, micPtr,
                                                  CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
-    memcpy(micPtr, mic, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
-
-    if (payloadSize != nullptr)
-    {
-        *payloadSize = static_cast<uint16_t>(appData.size() + sMinPayloadSize);
-    }
+    output.reduce_size(appData.size() + sMinPayloadSize);
 
     return err;
 }
@@ -82,7 +70,7 @@ CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & 
     uint16_t appDataSize = GetAppDataSize(payload);
 
     // To prevent workbuffer usage, appData size need to be large enough to hold both the appData and the counter
-    VerifyOrReturnError(appData.size() >= appDataSize + sizeof(uint32_t), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(appData.size() >= sizeof(uint32_t) + appDataSize, CHIP_ERROR_INVALID_ARGUMENT);
 
     ByteSpan nonce         = payload.SubSpan(0, CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES);
     ByteSpan encryptedData = payload.SubSpan(CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, appDataSize + sizeof(counter));
@@ -97,6 +85,8 @@ CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & 
     counter = Encoding::LittleEndian::Get32(appData.data());
     // Shift to remove the counter from the appData
     memcpy(appData.data(), appData.data() + sizeof(uint32_t), appDataSize);
+
+    appData.reduce_size(appDataSize);
     return err;
 }
 
