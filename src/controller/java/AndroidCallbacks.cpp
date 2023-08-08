@@ -21,6 +21,7 @@
 #include <controller/java/CHIPAttributeTLVValueDecoder.h>
 #include <controller/java/CHIPEventTLVValueDecoder.h>
 #endif
+#include <app/EventLoggingTypes.h>
 #include <jni.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
@@ -34,6 +35,9 @@
 
 namespace chip {
 namespace Controller {
+
+static const int MILLIS_SINCE_BOOT  = 0;
+static const int MILLIS_SINCE_EPOCH = 1;
 
 GetConnectedDeviceCallback::GetConnectedDeviceCallback(jobject wrapperCallback, jobject javaCallback) :
     mOnSuccess(OnDeviceConnectedFn, this), mOnFailure(OnDeviceConnectionFailureFn, this)
@@ -364,9 +368,25 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     readerForJavaTLV.Init(*apData);
     readerForJson.Init(*apData);
 
-    jlong eventNumber  = static_cast<jlong>(aEventHeader.mEventNumber);
-    jint priorityLevel = static_cast<jint>(aEventHeader.mPriorityLevel);
-    jlong timestamp    = static_cast<jlong>(aEventHeader.mTimestamp.mValue);
+    jlong eventNumber    = static_cast<jlong>(aEventHeader.mEventNumber);
+    jint priorityLevel   = static_cast<jint>(aEventHeader.mPriorityLevel);
+    jlong timestampValue = static_cast<jlong>(aEventHeader.mTimestamp.mValue);
+
+    jint timestampType = 0;
+    if (aEventHeader.mTimestamp.mType == app::Timestamp::Type::kSystem)
+    {
+        timestampType = static_cast<jint>(MILLIS_SINCE_BOOT);
+    }
+    else if (aEventHeader.mTimestamp.mType == app::Timestamp::Type::kEpoch)
+    {
+        timestampType = static_cast<jint>(MILLIS_SINCE_EPOCH);
+    }
+    else
+    {
+        ChipLogError(Controller, "Unsupported event timestamp type");
+        ReportError(nullptr, eventPathObj, CHIP_ERROR_INVALID_ARGUMENT);
+        return;
+    }
 
     jobject value = nullptr;
 #if USE_JAVA_TLV_ENCODE_DECODE
@@ -407,13 +427,13 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     // Create EventState object
     jclass eventStateCls;
     err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/model/EventState", eventStateCls);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find EventState class"));
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Failed to find EventState class"));
     VerifyOrReturn(eventStateCls != nullptr, ChipLogError(Controller, "Could not find EventState class"));
     chip::JniClass eventStateJniCls(eventStateCls);
-    jmethodID eventStateCtor = env->GetMethodID(eventStateCls, "<init>", "(JIJLjava/lang/Object;[BLjava/lang/String;)V");
+    jmethodID eventStateCtor = env->GetMethodID(eventStateCls, "<init>", "(JIIJLjava/lang/Object;[BLjava/lang/String;)V");
     VerifyOrReturn(eventStateCtor != nullptr, ChipLogError(Controller, "Could not find EventState constructor"));
-    jobject eventStateObj = env->NewObject(eventStateCls, eventStateCtor, eventNumber, priorityLevel, timestamp, value,
-                                           jniByteArray.jniValue(), jsonString.jniValue());
+    jobject eventStateObj = env->NewObject(eventStateCls, eventStateCtor, eventNumber, priorityLevel, timestampType, timestampValue,
+                                           value, jniByteArray.jniValue(), jsonString.jniValue());
     VerifyOrReturn(eventStateObj != nullptr, ChipLogError(Controller, "Could not create EventState object"));
 
     // Add EventState to NodeState

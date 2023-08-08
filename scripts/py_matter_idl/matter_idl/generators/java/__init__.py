@@ -23,7 +23,7 @@ from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.generators.types import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
                                          ParseDataType, TypeLookupContext)
 from matter_idl.matter_idl_types import (Attribute, Cluster, ClusterSide, Command, DataType, Field, FieldQuality, Idl, Struct,
-                                         StructTag)
+                                         StructQuality, StructTag)
 from stringcase import capitalcase
 
 
@@ -638,6 +638,14 @@ def CanGenerateSubscribe(attr: Attribute, lookup: TypeLookupContext) -> bool:
     return not lookup.is_struct_type(attr.definition.data_type.name)
 
 
+def IsFabricScopedList(attr: Attribute, lookup: TypeLookupContext) -> bool:
+    if not attr.definition.is_list:
+        return False
+
+    struct = lookup.find_struct(attr.definition.data_type.name)
+    return struct and struct.qualities == StructQuality.FABRIC_SCOPED
+
+
 def IsResponseStruct(s: Struct) -> bool:
     return s.tag == StructTag.RESPONSE
 
@@ -669,6 +677,7 @@ class __JavaCodeGenerator(CodeGenerator):
         self.jinja_env.filters['createLookupContext'] = CreateLookupContext
         self.jinja_env.filters['canGenerateSubscribe'] = CanGenerateSubscribe
         self.jinja_env.filters['decodableJniType'] = DecodableJniType
+        self.jinja_env.filters['isFabricScopedList'] = IsFabricScopedList
 
         self.jinja_env.tests['is_response_struct'] = IsResponseStruct
         self.jinja_env.tests['is_using_global_callback'] = _IsUsingGlobalCallback

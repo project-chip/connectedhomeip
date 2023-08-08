@@ -100,7 +100,7 @@ tests:
               contains: [0x01]
 
     - label: "Step 6a: Read the optional command(Start) in AcceptedCommandList"
-      PICS: RVCOPSTATE.S.C02 && RVCOPSTATE.S.Afff9
+      PICS: RVCOPSTATE.S.C02.Rsp && RVCOPSTATE.S.Afff9
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -109,7 +109,7 @@ tests:
               contains: [1, 2]
 
     - label: "Step 6b: Read the optional command(Stop) in AcceptedCommandList"
-      PICS: RVCOPSTATE.S.C01 && RVCOPSTATE.S.Afff9
+      PICS: RVCOPSTATE.S.C01.Rsp && RVCOPSTATE.S.Afff9
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -118,7 +118,7 @@ tests:
               contains: [1]
 
     - label: "Step 6c: Read the optional command(Pause) in AcceptedCommandList"
-      PICS: RVCOPSTATE.S.C00 && RVCOPSTATE.S.Afff9
+      PICS: RVCOPSTATE.S.C00.Rsp && RVCOPSTATE.S.Afff9
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -127,7 +127,7 @@ tests:
               contains: [0, 3]
 
     - label: "Step 6d: Read the optional command(Resume) in AcceptedCommandList"
-      PICS: RVCOPSTATE.S.C03 && RVCOPSTATE.S.Afff9
+      PICS: RVCOPSTATE.S.C03.Rsp && RVCOPSTATE.S.Afff9
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -137,8 +137,8 @@ tests:
 
     - label: "Step 7: Read the global attribute: GeneratedCommandList"
       PICS:
-          RVCOPSTATE.S.Afff8 && (RVCOPSTATE.S.C00 || RVCOPSTATE.S.C01 ||
-          RVCOPSTATE.S.C02 || RVCOPSTATE.S.C03)
+          RVCOPSTATE.S.Afff8 && (RVCOPSTATE.S.C00.Rsp || RVCOPSTATE.S.C01.Rsp ||
+          RVCOPSTATE.S.C02.Rsp || RVCOPSTATE.S.C03.Rsp)
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

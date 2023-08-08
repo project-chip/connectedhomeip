@@ -1,4 +1,4 @@
-package com.matter.virtual.device.app.core.common.ui
+package com.matter.virtual.device.app.core.ui
 
 import android.content.Context
 import android.util.AttributeSet
