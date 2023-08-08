@@ -22,21 +22,22 @@ step.
     [v5.1 release](https://github.com/espressif/esp-idf/releases/tag/v5.1)
 
     ```
-    $ git clone -b v5.1 --recursive --depth 1 --shallow-submodule https://github.com/espressif/esp-idf.git
-    $ cd esp-idf
-    $ ./install.sh
+    git clone -b v5.1 --recursive --depth 1 --shallow-submodule https://github.com/espressif/esp-idf.git
+    cd esp-idf
+    ./install.sh
     ```
 
 -   To update an existing esp-idf toolchain to v5.1:
 
     ```
-    $ cd path/to/esp-idf
-    $ git fetch origin
-    $ git checkout v5.1
-    $ git reset --hard origin/v5.1
-    $ git submodule update --recursive --init
-    $ git clean -fdx
-    $ ./install.sh
+    cd path/to/esp-idf
+    git fetch --depth 1 origin v5.1
+    git reset --hard FETCH_HEAD
+    git submodule update --depth 1 --recursive --init
+
+    # -ff is for cleaning untracked files as well as submodules
+    git clean -ffdx
+    ./install.sh
     ```
 
 ## Setup Matter environment
