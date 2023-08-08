@@ -64,7 +64,8 @@ Input Options:
                                                             <path> represents where the virtual environment is to be created.
   -c, --clean_virtual_env  <yes|no>                         When installing a virtual environment, create/clean it first.
                                                             Defaults to yes.
-  --include_pytest_deps  <yes|no>                           Install requirements.python_tests.txt.
+  --include_pytest_deps  <yes|no>                           Install requirements.txt for running scripts/tests and
+                                                            src/python_testing scripts.
                                                             Defaults to yes.
   --extra_packages PACKAGES                                 Install extra Python packages from PyPI
   --include_yamltests                                       Whether to install the matter_yamltests wheel.
