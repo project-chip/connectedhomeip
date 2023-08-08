@@ -15,14 +15,16 @@ Once you have all the necessary submodules, source the Matter environment with t
 ## Check Out Submodules
 
 Check out the necessary submodules with the following command.
+> 🔴 Assuming you have cloned the matter repo in `~/matter`
+>
+>**Note:**
+  To clone the matter repo, refer Software Setup section from ([SW_SETUP.md](../../docs/silabs/wifi/SW_SETUP.md))
 
 ```bash
 dev-machine:~/matter$ ./scripts/checkout_submodules.py --platform linux
 ```
 
 ## Clone and Stage the Unify SDK Repository 
-
-> 🔴 Assuming you have cloned the matter repo in `~/matter` 
 
 ```bash
 dev-machine:~/matter$ git clone --depth 1 https://github.com/SiliconLabs/UnifySDK.git --recursive ../uic-matter
@@ -51,7 +53,7 @@ dev-machine:~$ cd matter
 dev-machine:~/matter$ docker run -it -v $PWD:/matter -v $PWD/../uic-matter:/uic unify-matter-host
 ```
 
-Compile and install libunify for host.
+### Compile and install libunify for host.
 
 ```bash
 root@docker:/uic$ cmake -DCMAKE_INSTALL_PREFIX=$PWD/stage -GNinja -B build_unify_amd64/ -S components
@@ -60,9 +62,11 @@ root@docker:/uic$ cmake --install build_unify_amd64 --prefix $PWD/stage
 root@docker:/uic$ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$PWD/stage/share/pkgconfig
 ```
 
-Activate Matter development environment.
+### Activate Matter development environment.
 
 ```bash
+root@docker:/matter$ git config --global --add safe.directory /matter
+root@docker:/matter$ git config --global --add safe.directory /matter/third_party/pigweed/repo
 root@docker:/matter$ source ./scripts/activate.sh
 ```
 
@@ -89,7 +93,7 @@ root@docker:/matter/examples/chip-tool$ gn gen out/amd64
 root@docker:/matter/examples/chip-tool$ ninja -C out/amd64
 ```
 
-> 🔴 After building, the chip-tool binary is located at `/matter/examples/chip-tool/out/amd64/obj/bin/chip-tool`.
+> 🔴 After building, the chip-tool binary is located at `/matter/examples/chip-tool/out/amd64/chip-tool`.
 
 ## Troubleshooting
 
