@@ -1977,6 +1977,10 @@ CHIP_ERROR CASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralS
         err = CHIP_ERROR_NO_SHARED_TRUSTED_ROOT;
         break;
 
+    case kProtocolCodeBusy:
+        err = CHIP_ERROR_BUSY;
+        break;
+
     default:
         err = CHIP_ERROR_INTERNAL;
         break;

@@ -1935,7 +1935,8 @@ server cluster WindowCovering = 258 {
 }
 
 endpoint 0 {
-  device type windowcovering = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Descriptor {
@@ -2260,7 +2261,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type windowcovering = 514, version 2;
+  device type ma_windowcovering = 514, version 2;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;
@@ -2337,7 +2339,8 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type windowcovering = 514, version 2;
+  device type ma_windowcovering = 514, version 2;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;

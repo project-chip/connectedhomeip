@@ -7621,10 +7621,28 @@
       attributes:
           PowerSource:
               - EndpointList
+          Descriptor:
+              - TagList
+      structs:
+          Descriptor:
+              - SemanticTagStruct
+      struct fields:
+          Descriptor:
+              SemanticTagStruct:
+                  - mfgCode
+                  - namespaceID
+                  - tag
+                  - label
+      bitmaps:
+          GroupKeyManagement:
+              - Feature
       bitmap values:
           OnOff:
               Feature:
                   - DeadFront
+          GroupKeyManagement:
+              Feature:
+                  - CacheAndSync
   removed:
       clusters:
           # Clusters that really should just not be exposed, even if they're in our XML.

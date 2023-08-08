@@ -111,7 +111,6 @@
 		2CB7163B252E8A7B0026E2BB /* MTRDeviceControllerDelegateBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CB71638252E8A7B0026E2BB /* MTRDeviceControllerDelegateBridge.h */; };
 		2CB7163C252E8A7C0026E2BB /* MTRDeviceControllerDelegateBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2CB71639252E8A7B0026E2BB /* MTRDeviceControllerDelegateBridge.mm */; };
 		2CB7163F252F731E0026E2BB /* MTRDeviceControllerDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CB7163E252F731E0026E2BB /* MTRDeviceControllerDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2FD775552695557E00FF4B12 /* error-mapping.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FD775542695557E00FF4B12 /* error-mapping.cpp */; };
 		3CF134A7289D8ADA0017A19E /* MTRCSRInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CF134A6289D8AD90017A19E /* MTRCSRInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3CF134A9289D8D800017A19E /* MTRCSRInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CF134A8289D8D800017A19E /* MTRCSRInfo.mm */; };
 		3CF134AB289D8DF70017A19E /* MTRDeviceAttestationInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CF134AA289D8DF70017A19E /* MTRDeviceAttestationInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -392,7 +391,6 @@
 		2CB71638252E8A7B0026E2BB /* MTRDeviceControllerDelegateBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDeviceControllerDelegateBridge.h; sourceTree = "<group>"; };
 		2CB71639252E8A7B0026E2BB /* MTRDeviceControllerDelegateBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceControllerDelegateBridge.mm; sourceTree = "<group>"; };
 		2CB7163E252F731E0026E2BB /* MTRDeviceControllerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDeviceControllerDelegate.h; sourceTree = "<group>"; };
-		2FD775542695557E00FF4B12 /* error-mapping.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "error-mapping.cpp"; path = "util/error-mapping.cpp"; sourceTree = "<group>"; };
 		3CF134A6289D8AD90017A19E /* MTRCSRInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRCSRInfo.h; sourceTree = "<group>"; };
 		3CF134A8289D8D800017A19E /* MTRCSRInfo.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRCSRInfo.mm; sourceTree = "<group>"; };
 		3CF134AA289D8DF70017A19E /* MTRDeviceAttestationInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceAttestationInfo.h; sourceTree = "<group>"; };
@@ -852,7 +850,6 @@
 		1E857311265519DE0050A4D9 /* app */ = {
 			isa = PBXGroup;
 			children = (
-				2FD775542695557E00FF4B12 /* error-mapping.cpp */,
 				5143041F2914CED9004DC7FE /* generic-callback-stubs.cpp */,
 				51431AFA27D29CA4008A7943 /* ota-provider.cpp */,
 				3D84374A29498BAE0070D20A /* privilege-storage.cpp */,
@@ -1513,7 +1510,6 @@
 				5ACDDD7D27CD16D200EFD68A /* MTRClusterStateCacheContainer.mm in Sources */,
 				513DDB8A2761F6F900DAA01A /* MTRAttributeTLVValueDecoder.mm in Sources */,
 				5117DD3829A931AE00FFA1AA /* MTROperationalBrowser.mm in Sources */,
-				2FD775552695557E00FF4B12 /* error-mapping.cpp in Sources */,
 				3D843757294AD25A0070D20A /* MTRCertificateInfo.mm in Sources */,
 				5A7947E427C0129600434CF2 /* MTRDeviceController+XPC.mm in Sources */,
 				5A6FEC9027B563D900F25F42 /* MTRDeviceControllerOverXPC.mm in Sources */,

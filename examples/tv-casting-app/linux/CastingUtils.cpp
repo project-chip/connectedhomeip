@@ -18,6 +18,8 @@
 
 #include "CastingUtils.h"
 
+#include "CommissioningCallbacks.h"
+
 using namespace chip;
 using namespace chip::System;
 using namespace chip::DeviceLayer;
@@ -62,8 +64,10 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
 {
     CastingServer::GetInstance()->Init();
 
-    CastingServer::GetInstance()->OpenBasicCommissioningWindow(HandleCommissioningCompleteCallback, OnConnectionSuccess,
-                                                               OnConnectionFailure, OnNewOrUpdatedEndpoint);
+    CommissioningCallbacks commissioningCallbacks;
+    commissioningCallbacks.commissioningComplete = HandleCommissioningCompleteCallback;
+    CastingServer::GetInstance()->OpenBasicCommissioningWindow(commissioningCallbacks, OnConnectionSuccess, OnConnectionFailure,
+                                                               OnNewOrUpdatedEndpoint);
 
     // Display onboarding payload
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
