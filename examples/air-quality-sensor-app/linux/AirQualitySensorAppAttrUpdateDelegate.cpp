@@ -186,7 +186,7 @@ void AirQualitySensorAttrUpdateHandler::OnAirQualityChangeHandler(uint8_t newVal
 
 void AirQualitySensorAttrUpdateHandler::OnTemperatureChangeHandler(int16_t newValue)
 {
-    EndpointId endpoint = 1;
+    EndpointId endpoint  = 1;
     EmberAfStatus status = TemperatureMeasurement::Attributes::MeasuredValue::Set(endpoint, newValue);
     VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
                    ChipLogError(NotSpecified, "Failed to TemperatureMeasurement MeasuredValue attribute"));
