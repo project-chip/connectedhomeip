@@ -55,7 +55,7 @@ void ReportSchedulerImpl::OnEnterActiveMode()
 }
 
 /// @brief When a ReadHandler is added, register it, which will schedule an engine run
-void ReportSchedulerImpl::OnReadHandlerCreated(ReadHandler * aReadHandler)
+void ReportSchedulerImpl::OnReadHandlerSubscribed(ReadHandler * aReadHandler)
 {
     ReadHandlerNode * newNode = FindReadHandlerNode(aReadHandler);
     // Handler must not be registered yet; it's just being constructed.

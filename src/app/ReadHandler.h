@@ -168,12 +168,11 @@ public:
 
         /// @brief Callback invoked to notify a ReadHandler was created and can be registered
         /// @param[in] apReadHandler  ReadHandler getting added
-        virtual void OnReadHandlerCreated(ReadHandler * apReadHandler) = 0;
+        virtual void OnReadHandlerSubscribed(ReadHandler * apReadHandler) = 0;
 
-        /// @brief Callback invoked when a ReadHandler went from a non reportable state to a reportable state so a report can be
-        /// sent immediately if the minimal interval allows it. Otherwise the report should be rescheduled to the earliest time
-        /// allowed.
-        /// @param[in] apReadHandler  ReadHandler that became dirty
+        /// @brief Callback invoked when a ReadHandler went from a non reportable state to a reportable state. Indicates to the
+        /// observer that a report should be emitted if the min interval allows it.
+        /// @param[in] apReadHandler  ReadHandler that became dirty and in HandlerState::CanStartReporting state
         virtual void OnBecameReportable(ReadHandler * apReadHandler) = 0;
 
         /// @brief Callback invoked when the read handler needs to make sure to send a message to the subscriber within the next
@@ -333,13 +332,14 @@ private:
     bool IsIdle() const { return mState == HandlerState::Idle; }
 
     /// @brief Returns whether the ReadHandler is in a state where it can send a report and there is data to report.
-    bool IsReportable() const
+    bool ShouldStartReporting() const
     {
-        // Important: Anything that changes the state IsReportable must call mObserver->OnBecameReportable(this) for the scheduler
-        // to plan the next run accordingly.
-        return mState == HandlerState::GeneratingReports && IsDirty();
+        // Important: Anything that changes the state ShouldStartReporting() must either call mObserver->OnBecameReportable(this)
+        // for active subscription or InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun() for read request and
+        // priming subscription.
+        return mState == HandlerState::CanStartReporting && IsDirty();
     }
-    bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
+    bool CanStartReporting() const { return mState == HandlerState::CanStartReporting; }
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
 
     // Resets the path iterator to the beginning of the whole report for generating a series of new reports.
@@ -418,14 +418,14 @@ private:
     friend class chip::app::reporting::Engine;
     friend class chip::app::InteractionModelEngine;
 
-    // The report scheduler needs to be able to access StateFlag private functions IsReportable(), IsGeneratingReports(),
+    // The report scheduler needs to be able to access StateFlag private functions ShouldStartReporting(), CanStartReporting(),
     // ForceDirtyState() and IsDirty() to know when to schedule a run so it is declared as a friend class.
     friend class chip::app::reporting::ReportScheduler;
 
     enum class HandlerState : uint8_t
     {
         Idle,                   ///< The handler has been initialized and is ready
-        GeneratingReports,      ///< The handler has is now capable of generating reports and may generate one immediately
+        CanStartReporting,      ///< The handler has is now capable of generating reports and may generate one immediately
                                 ///< or later when other criteria are satisfied (e.g hold-off for min reporting interval).
         AwaitingReportResponse, ///< The handler has sent the report to the client and is awaiting a status response.
         AwaitingDestruction,    ///< The object has completed its work and is awaiting destruction by the application.
