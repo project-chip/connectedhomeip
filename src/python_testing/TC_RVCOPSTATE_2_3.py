@@ -124,12 +124,13 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
                              "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
 
-        self.print_step(11, "Read OperationalState attribute")
-        operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
-                                                                         attribute=attributes.OperationalState)
-        logging.info("OperationalState: %s" % (operational_state))
-        asserts.assert_equal(operational_state, Clusters.OperationalState.Enums.OperationalStateEnum.kRunning,
-                             "OperationalState(%s) should be Running(0x01)" % operational_state)
+        if self.check_pics("RVCOPSTATE.S.M.ST_RUNNING"):
+            self.print_step(11, "Read OperationalState attribute")
+            operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
+                                                                             attribute=attributes.OperationalState)
+            logging.info("OperationalState: %s" % (operational_state))
+            asserts.assert_equal(operational_state, Clusters.OperationalState.Enums.OperationalStateEnum.kRunning,
+                                 "OperationalState(%s) should be Running(0x01)" % operational_state)
 
         self.print_step(12, "Send Resume command")
         ret = await self.send_resume_cmd()
