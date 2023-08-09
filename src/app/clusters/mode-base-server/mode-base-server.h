@@ -38,8 +38,10 @@ public:
     /**
      * Creates a mode base cluster instance. The Init() function needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
+     * @param aDelegate A pointer to the delegate to be used by this server.
+     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aClusterId The ID of the ModeBase aliased cluster to be instantiated.
+     * @param aClusterId The ID of the ModeBase derived cluster to be instantiated.
      * @param aFeature The bitmask value that identifies which features are supported by this instance.
      */
     Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature);
@@ -99,6 +101,13 @@ public:
     // Cluster constants, from the spec.
     static constexpr uint8_t kMaxModeLabelSize = 64;
     static constexpr uint8_t kMaxNumOfModeTags = 8;
+
+    // List change reporting
+    /**
+     * Reports that the contents of the supported modes attribute have changed.
+     * The device SHALL call this method whenever it changes the list of supported modes.
+     */
+    void ReportSupportedModesChange();
 
     /**
      * Returns true if the feature is supported.
@@ -195,6 +204,9 @@ public:
      * CopyCharSpanToMutableCharSpan to copy into the MutableCharSpan.
      * @return Returns a CHIP_NO_ERROR if there was no error and the label was returned successfully.
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the modeIndex in beyond the list of available labels.
+     *
+     * Note: This is used by the SDK to populate the supported modes attribute. If the contents of this list change,
+     * the device SHALL call the Instance's ReportSupportedModesChange method to report that this attribute has changed.
      */
     virtual CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) = 0;
 
@@ -204,6 +216,9 @@ public:
      * @param value a reference to the uint8_t variable that is to contain the mode value.
      * @return Returns a CHIP_NO_ERROR if there was no error and the value was returned successfully.
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the modeIndex in beyond the list of available values.
+     *
+     * Note: This is used by the SDK to populate the supported modes attribute. If the contents of this list change,
+     * the device SHALL call the Instance's ReportSupportedModesChange method to report that this attribute has changed.
      */
     virtual CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) = 0;
 
@@ -219,6 +234,9 @@ public:
      * to copy into the buffer.
      * @return Returns a CHIP_NO_ERROR if there was no error and the mode tags were returned successfully.
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the modeIndex in beyond the list of available mode tags.
+     *
+     * Note: This is used by the SDK to populate the supported modes attribute. If the contents of this list change,
+     * the device SHALL call the Instance's ReportSupportedModesChange method to report that this attribute has changed.
      */
     virtual CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<detail::Structs::ModeTagStruct::Type> & modeTags) = 0;
 

@@ -40,8 +40,8 @@ tests:
           saveAs: rSpeedMax
 
     - label:
-          "Step 3: TH writes TH writes to the DUT the a value less than or equal
-          to the value read in step 2"
+          "Step 3: TH writes to the DUT the a value less than or equal to the
+          value read in step 2"
       PICS: FAN.S.A0005
       command: "writeAttribute"
       attribute: "SpeedSetting"
@@ -57,14 +57,14 @@ tests:
               - name: "ms"
                 value: 1000
 
-    - label: "Step 4: TH reads from the DUT the the SpeedSetting attribute"
+    - label: "Step 4: TH reads from the DUT the SpeedSetting attribute"
       PICS: FAN.S.A0005
       command: "readAttribute"
       attribute: "SpeedSetting"
       response:
           value: rSpeedMax
 
-    - label: "Step 5: TH reads from the DUT the the SpeedCurrent attribute"
+    - label: "Step 5: TH reads from the DUT the SpeedCurrent attribute"
       PICS: FAN.S.A0006
       command: "readAttribute"
       attribute: "SpeedCurrent"

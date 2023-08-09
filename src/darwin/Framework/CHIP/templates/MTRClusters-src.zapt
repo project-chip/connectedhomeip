@@ -1,6 +1,7 @@
 {{> header excludeZapComment=true}}
 
 #import <Foundation/Foundation.h>
+#import <Matter/MTRBaseClusters.h>
 
 #import "MTRAsyncCallbackWorkQueue.h"
 #import "MTRBaseClusterUtils.h"
@@ -49,14 +50,11 @@ static void MTRClustersLogCompletion(NSString *logPrefix, id value, NSError *err
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
 {
-    if (self = [super initWithQueue:queue]) {
+    if (self = [super initWithEndpointID:endpointID queue:queue]) {
         if (device == nil) {
             return nil;
         }
 
-        {{!TODO consider range-checking the incoming number to make sure it's
-                actually in the uint16_t range}}
-        _endpoint = [endpointID unsignedShortValue];
         _device = device;
     }
     return self;
@@ -90,6 +88,20 @@ MTRClusterIDType{{cluster}}ID
 MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
 {{/unless}}
 {{/inline}}
+{{#*inline "baseCluster"}}
+{{#if (isSupported cluster command=command)}}
+MTRBaseCluster{{cluster}}
+{{else}}
+MTRBaseCluster{{compatClusterNameRemapping parent.name}}
+{{/if}}
+{{/inline}}
+{{#*inline "completionName"}}
+{{#if (isSupported cluster command=command)}}
+completion
+{{else}}
+completionHandler
+{{/if}}
+{{/inline}}
 {{#unless hasArguments}}
 - (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
 {
@@ -98,73 +110,38 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
 {{/unless}}
 - (void){{asLowerCamelCase name}}WithParams: ({{> paramsType}} * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint, (unsigned int){{> clusterId}}, (unsigned int){{> commandId}}];
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int){{> clusterId}}, (unsigned int){{> commandId}}];
     // Make a copy of params before we go async.
     params = [params copy];
-    NSNumber *timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
-    if (timedInvokeTimeoutMsParam) {
-      timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
-    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        MTRBaseDevice *baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * bridge = new MTR{{>callbackName}}CallbackBridge(self.device.queue,
-          ^(id _Nullable value, NSError * _Nullable error) {
+        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
+        auto * cluster = [[{{> baseCluster}} alloc] initWithDevice:baseDevice endpointID:@(self.endpoint) queue:self.device.queue];
+        [cluster {{asLowerCamelCase name}}WithParams:params {{> completionName}}:
+        {{#if hasSpecificResponse}}
+        ^(MTR{{cluster}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}Params * _Nullable value, NSError * _Nullable error) {
             MTRClustersLogCompletion(logPrefix, value, error);
             dispatch_async(self.callbackQueue, ^{
-          {{#if hasSpecificResponse}}
-            {{! This treats completion as taking an id for the data.  This is
-                not great from a type-safety perspective, of course. }}
-            completion(value, error);
-          {{else}}
-            {{! For now, don't change the bridge API; instead just use an adapter
-                to invoke our completion handler. This is not great from a
-                type-safety perspective, of course. }}
-            completion(error);
-          {{/if}}
+              {{! This treats completion as taking an id for the data.  This is
+                  not great from a type-safety perspective, of course. }}
+              completion(value, error);
             });
             [workItem endWork];
-          },
-          ^(ExchangeManager & exchangeManager, const SessionHandle & session, {{>callbackName}}CallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-            auto * typedBridge = static_cast<MTR{{>callbackName}}CallbackBridge *>(bridge);
-            Optional<uint16_t> timedInvokeTimeoutMs;
-            Optional<Timeout> invokeTimeout;
-            ListFreer listFreer;
-            {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
-            if (timedInvokeTimeoutMsParam != nil) {
-              timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
-            }
-            if (params != nil) {
-              if (params.serverSideProcessingTimeout != nil) {
-                // Clamp to a number of seconds that will not overflow 32-bit
-                // int when converted to ms.
-                auto * serverSideProcessingTimeout = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
-                invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
-              }
-            }
-            {{#if mustUseTimedInvoke}}
-            if (!timedInvokeTimeoutMs.HasValue()) {
-              timedInvokeTimeoutMs.SetValue(10000);
-            }
-            {{/if}}
-            {{#zcl_command_arguments}}
-              {{#first}}
-                {{#unless parent.commandHasRequiredField}}
-                if (params != nil) {
-                {{/unless}}
-              {{/first}}
-              {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(concat "params." (asStructPropertyName label)) cluster=parent.parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
-              {{#last}}
-                {{#unless parent.commandHasRequiredField}}
-                }
-               {{/unless}}
-              {{/last}}
-            {{/zcl_command_arguments}}
-
-            return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb, self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
-        });
-        std::move(*bridge).DispatchAction(baseDevice);
+        }
+        {{else}}
+        ^(NSError * _Nullable error) {
+            MTRClustersLogCompletion(logPrefix, nil, error);
+            dispatch_async(self.callbackQueue, ^{
+              {{! For now, don't change the bridge API; instead just use an adapter
+                  to invoke our completion handler. This is not great from a
+                  type-safety perspective, of course. }}
+              completion(error);
+            });
+            [workItem endWork];
+        }
+        {{/if}}
+        ];
     };
     workItem.readyHandler = readyHandler;
     MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
@@ -198,7 +175,7 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
 {{#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {
-    return [self.device readAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) params:params];
 }
 
 {{#if isWritableAttribute}}
@@ -216,7 +193,7 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
     }
     {{/if}}
 
-    [self.device writeAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+    [self.device writeAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 {{/if}}
