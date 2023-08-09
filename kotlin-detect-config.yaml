@@ -38,6 +38,8 @@ style:
             - "**/src/controller/java/src/chip/tlv/values.kt"
             - "**/src/controller/java/src/chip/WildcardImport
               examples/android/CHIPTest/app/src/androidTest/java/com/tcl/chip/chiptest/ExampleInstrumentedTest.kt"
+            - "**/src/controller/java/tests/chip/devicecontroller/cluster/ChipClusterEventStructTest.kt"
+            - "**/src/controller/java/tests/chip/devicecontroller/cluster/ChipClusterStructTest.kt"
             - "**/src/controller/java/tests/chip/jsontlv/JsonToTlvToJsonTest.kt"
             - "**/src/controller/java/tests/chip/onboardingpayload/ManualCodeTest.kt"
             - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"
@@ -58,6 +60,7 @@ style:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/SelectActionFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/setuppayloadscanner/BarcodeFragment.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/Main.kt"
+            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/jsontlv/JsonToTlv.kt"
             - "**/src/controller/java/src/chip/jsontlv/TlvToJson.kt"
             - "**/src/controller/java/tests/chip/jsontlv/JsonToTlvToJsonTest.kt"
@@ -123,6 +126,7 @@ style:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/MatterCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairingCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImSubscribeCommand.kt"
+            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/jsontlv/TlvToJson.kt"
             - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
             - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadParser.kt"
@@ -133,12 +137,14 @@ style:
     UnusedParameter:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/bluetooth/BluetoothManager.kt"
+            - "**/src/controller/java/generated/java/**/*"
     ReturnCount:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/CHIPToolActivity.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/SensorClientFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/EnterNetworkFragment.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/CommandManager.kt"
+            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/onboardingpayload/Verhoeff.kt"
             - "**/src/controller/java/src/chip/onboardingpayload/OnboardingPayload.kt"
     UnusedPrivateProperty:
@@ -162,6 +168,7 @@ style:
     ThrowsCount:
         excludes:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/CommandManager.kt"
+            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/tlv/TlvReader.kt"
             - "**/src/controller/java/src/chip/jsontlv/JsonToTlv.kt"
             - "**/src/controller/java/src/chip/jsontlv/TlvToJson.kt"
@@ -174,13 +181,16 @@ style:
     UnusedPrivateMember:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/setuppayloadscanner/BarcodeFragment.kt"
+            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/onboardingpayload/OnboardingPayload.kt"
     UseCheckOrError:
         excludes:
+            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/tlv/tags.kt"
             - "**/src/controller/java/src/chip/tlv/types.kt"
     UseRequire:
         excludes:
+            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/jsontlv/JsonToTlv.kt"
             - "**/src/controller/java/src/chip/onboardingpayload/Verhoeff10.kt"
     UtilityClassWithPublicConstructor:
@@ -188,9 +198,11 @@ style:
             - "**/src/controller/java/src/chip/onboardingpayload/Verhoeff.kt"
     MayBeConst:
         excludes:
+            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/onboardingpayload/Base38.kt"
     FunctionOnlyReturningConstant:
         excludes:
+            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/onboardingpayload/QRCodeOnboardingPayloadGenerator.kt"
 
 exceptions:
@@ -202,6 +214,7 @@ exceptions:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/setuppayloadscanner/BarcodeFragment.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/Argument.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/Main.kt"
+            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/tests/chip/onboardingpayload/ManualCodeTest.kt"
             - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"
     SwallowedException:
@@ -211,14 +224,17 @@ exceptions:
     TooGenericExceptionThrown:
         excludes:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/discover/DiscoverCommissionablesCommand.kt"
+            - "**/src/controller/java/generated/java/**/*"
     ThrowingExceptionsWithoutMessageOrCause:
         excludes:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/CommandManager.kt"
+            - "**/src/controller/java/generated/java/**/*"
 
 naming:
     FunctionNaming:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/SelectActionFragment.kt"
+            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/tests/chip/tlv/TlvReadWriteTest.kt"
             - "**/src/controller/java/tests/chip/tlv/TlvWriterTest.kt"
             - "**/src/controller/java/tests/chip/tlv/TlvReaderTest.kt"
@@ -229,21 +245,26 @@ naming:
     ConstructorParameterNaming:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/HistoryCommandAdapter.kt"
+            - "**/src/controller/java/generated/java/**/*"
     TopLevelPropertyNaming:
         excludes:
+            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/onboardingpayload/OnboardingPayload.kt"
 
 performance:
     SpreadOperator:
         excludes:
+            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/tests/chip/tlv/TlvReaderTest.kt"
 
 potential-bugs:
     EqualsWithHashCodeExist:
         excludes:
+            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/onboardingpayload/OnboardingPayload.kt"
     ImplicitDefaultLocale:
         excludes:
+            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/onboardingpayload/OnboardingPayload.kt"
             - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
 
@@ -262,6 +283,7 @@ complexity:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/Command.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/CommandManager.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairingCommand.kt"
+            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/jsontlv/JsonToTlv.kt"
             - "**/src/controller/java/src/chip/onboardingpayload/OnboardingPayload.kt"
             - "**/src/controller/java/src/chip/tlv/TlvReader.kt"
@@ -273,15 +295,18 @@ complexity:
     NestedBlockDepth:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/WildcardFragment.kt"
+            - "**/src/controller/java/generated/java/**/*"
     LongParameterList:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterDetailFragment.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/Command.kt"
+            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/onboardingpayload/OnboardingPayload.kt"
     LongMethod:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/AddressCommissioningFragment.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/CommandManager.kt"
+            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/onboardingpayload/Base38.kt"
             - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
             - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadParser.kt"
@@ -291,15 +316,18 @@ complexity:
             - "**/src/controller/java/tests/chip/tlv/TlvReaderTest.kt"
     LargeClass:
         excludes:
+            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/tests/chip/tlv/TlvReadWriteTest.kt"
             - "**/src/controller/java/tests/chip/jsontlv/JsonToTlvToJsonTest.kt"
     CyclomaticComplexMethod:
         excludes:
+            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/tlv/TlvReader.kt"
             - "**/src/controller/java/src/chip/tlv/types.kt"
             - "**/src/controller/java/src/chip/jsontlv/TlvToJson.kt"
     ComplexCondition:
         excludes:
+            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
 
 empty-blocks:
@@ -324,3 +352,4 @@ empty-blocks:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkShortCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkVendorCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/UnpairCommand.kt"
+            - "**/src/controller/java/generated/java/**/*"
