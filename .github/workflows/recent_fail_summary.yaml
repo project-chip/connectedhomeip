@@ -27,4 +27,6 @@ jobs:
         run: |
           gh run list -b master -s failure -L 100 > runlist
           python scripts/tools/summarize_fail.py
+        env:
+          GH_TOKEN: ${{ github.token }}
         
