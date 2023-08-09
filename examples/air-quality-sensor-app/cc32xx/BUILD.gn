@@ -22,7 +22,7 @@ import("${ti_simplelink_sdk_build_root}/ti_simplelink_sdk.gni")
 
 assert(current_os == "freertos")
 
-project_dir = "${chip_root}/examples/lock-app/cc32xx"
+project_dir = "${chip_root}/examples/air-quality-sensor-app/cc32xx"
 
 ti_simplelink_sdk("sdk") {
   include_dirs = [ "${project_dir}/main/include" ]
