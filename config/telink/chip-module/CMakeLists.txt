@@ -147,7 +147,7 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
     add_custom_target(build_mcuboot ALL
         COMMAND
         west build -b ${BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
-            -- -DCONFIG_BOOT_SWAP_USING_MOVE=y -DDTC_OVERLAY_FILE=${GLOBAL_DTC_OVERLAY_FILE}
+            -- -DCONFIG_BOOT_SWAP_USING_MOVE=y -DCONFIG_BOOT_MAX_IMG_SECTORS=4096 -DDTC_OVERLAY_FILE=${GLOBAL_DTC_OVERLAY_FILE}
     )
 
     add_custom_target(merge_mcuboot ALL
