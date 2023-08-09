@@ -147,14 +147,14 @@ private:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     /**
-     * Register this ModeBase instance.
+     * Register this ModeBase instance in gModeBaseAliasesInstances.
      */
-    void RegisterInstance();
+    void RegisterThisInstance();
 
     /**
-     * Unregister this ModeBase instance.
+     * Unregister this ModeBase instance in gModeBaseAliasesInstances.
      */
-    void UnregisterInstance();
+    void UnregisterThisInstance();
 
     /**
      * Internal change-to-mode command handler function.

@@ -23,7 +23,6 @@
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/config.h>
 #include <platform/DiagnosticDataProvider.h>
 
 using namespace chip;
@@ -42,14 +41,17 @@ namespace ModeBase {
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :
     CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
     AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
-    mClusterId(aClusterId), mFeature(aFeature)
+    mClusterId(aClusterId),
+    mCurrentMode(0), // This is a temporary value and may not be valid. We will change this to the value of the first
+                     // mode in the list at the start of the Init function to ensure that it represents a valid mode.
+    mFeature(aFeature)
 {
     mDelegate->SetInstance(this);
 }
 
 Instance::~Instance()
 {
-    UnregisterInstance();
+    UnregisterThisInstance();
     chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
     unregisterAttributeAccessOverride(this);
 }
@@ -66,7 +68,7 @@ CHIP_ERROR Instance::Init()
 
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
-    RegisterInstance();
+    RegisterThisInstance();
     ReturnErrorOnFailure(mDelegate->Init());
 
     // If the StartUpMode is set, the CurrentMode attribute SHALL be set to the StartUpMode value, when the server is powered up.
@@ -110,7 +112,7 @@ CHIP_ERROR Instance::Init()
         }
     }
 
-#ifdef EMBER_AF_PLUGIN_ON_OFF_SERVER
+#ifdef EMBER_AF_PLUGIN_ON_OFF
     // OnMode with Power Up
     // If the On/Off feature is supported and the On/Off cluster attribute StartUpOnOff is present, with a
     // value of On (turn on at power up), then the CurrentMode attribute SHALL be set to the OnMode attribute
@@ -144,7 +146,7 @@ CHIP_ERROR Instance::Init()
             }
         }
     }
-#endif // EMBER_AF_PLUGIN_ON_OFF_SERVER
+#endif
 
     return CHIP_NO_ERROR;
 }
@@ -347,7 +349,7 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, Attr
     return CHIP_ERROR_INCORRECT_STATE;
 }
 
-void Instance::RegisterInstance()
+void Instance::RegisterThisInstance()
 {
     if (!gModeBaseAliasesInstances.Contains(this))
     {
@@ -355,7 +357,7 @@ void Instance::RegisterInstance()
     }
 }
 
-void Instance::UnregisterInstance()
+void Instance::UnregisterThisInstance()
 {
     gModeBaseAliasesInstances.Remove(this);
 }
