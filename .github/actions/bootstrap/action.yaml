@@ -10,4 +10,4 @@ runs:
   steps:
     - name: Bootstrap
       shell: bash
-      run: bash scripts/bootstrap.sh -p ${{ inputs.platform }}
+      run: bash scripts/bootstrap.sh -p all,${{ inputs.platform }}
