@@ -188,7 +188,7 @@ tests:
               - name: "ms"
                 value: 1000
 
-    #Issue : https://github.com/project-chip/connectedhomeip/issues/27967
+    #Issue : https://github.com/project-chip/connectedhomeip/issues/27982
     - label:
           "Step 7: TH sends a AddGroup Command to the Groups cluster with the
           GroupID field set to 0x0105 and the GroupName set to an empty string.
