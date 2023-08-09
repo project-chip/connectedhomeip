@@ -40,6 +40,7 @@
         "TestGroupDemoConfig",
         "Test_TC_G_2_2",
         "Test_TC_G_2_3",
+        "Test_TC_G_2_4",
         "Test_TC_G_3_2"
     ],
     "BulkDataExchangeProtocol": [
@@ -102,9 +103,6 @@
         "Test_TC_CNET_4_14",
         "Test_TC_CNET_4_15",
         "Test_TC_CNET_4_16",
-        "Test_TC_CNET_4_17",
-        "Test_TC_CNET_4_18",
-        "Test_TC_CNET_4_19",
         "Test_TC_CNET_4_20",
         "Test_TC_CNET_4_21",
         "Test_TC_CNET_4_22"
@@ -115,13 +113,9 @@
         "Test_TC_DLOG_3_1"
     ],
     "Descriptor": ["Test_TC_DESC_2_1"],
-    "FanControl": ["Test_TC_FAN_3_3", "Test_TC_FAN_3_5"],
+    "FanControl": [],
     "GeneralCommissioning": ["Test_TC_CGEN_2_2"],
-    "GeneralDiagnostics": [
-        "Test_TC_DGGEN_2_2",
-        "Test_TC_DGGEN_2_3",
-        "Test_TC_DGGEN_3_1"
-    ],
+    "GeneralDiagnostics": ["Test_TC_DGGEN_2_2", "Test_TC_DGGEN_2_3"],
     "Identify": ["Test_TC_I_3_2"],
     "IcdManagement": ["Test_TC_ICDM_2_2", "Test_TC_ICDM_2_3"],
     "IlluminanceMeasurement": [],
@@ -142,7 +136,9 @@
         "Test_TC_IDM_6_3",
         "Test_TC_IDM_6_4",
         "Test_TC_IDM_7_1",
-        "Test_TC_IDM_8_1"
+        "Test_TC_IDM_8_1",
+        "Test_TC_IDM_10_1",
+        "Test_TC_IDM_11_1"
     ],
     "MediaControl": [
         "Test_TC_LOWPOWER_2_2",
@@ -191,7 +187,9 @@
         "Test_TC_CADMIN_1_10",
         "Test_TC_CADMIN_1_13",
         "Test_TC_CADMIN_1_23",
-        "Test_TC_CADMIN_1_24"
+        "Test_TC_CADMIN_1_24",
+        "Test_TC_CADMIN_1_25",
+        "Test_TC_CADMIN_1_26"
     ],
     "ModeSelect": [
         "Test_TC_MOD_1_2",
@@ -267,9 +265,9 @@
         "Test_TC_CC_9_2",
         "Test_TC_CC_9_3"
     ],
-    "DoorLock": ["Test_TC_DRLK_2_10", "Test_TC_DRLK_3_2", "Test_TC_DRLK_3_3"],
+    "DoorLock": ["Test_TC_DRLK_2_10", "Test_TC_DRLK_3_2"],
     "LocalizationConfiguration": ["Test_TC_LCFG_2_1"],
-    "LevelControl": ["Test_TC_LVL_8_1"],
+    "LevelControl": [],
     "LaundryWasherMode": [
         "Test_TC_LWM_1_1",
         "Test_TC_LWM_1_2",
@@ -321,23 +319,19 @@
         "Test_TC_TCTL_3_3"
     ],
     "TemperatureMeasurement": ["Test_TC_TMP_2_2"],
-    "Thermostat": ["Test_TC_TSTAT_3_1", "Test_TC_TSTAT_3_2"],
+    "Thermostat": ["Test_TC_TSTAT_3_2"],
     "ThermostatUserConfiguration": [],
     "ThreadNetworkDiagnostics": ["Test_TC_DGTHREAD_2_5"],
     "Actions": ["Test_TC_ACT_2_1", "Test_TC_ACT_2_2", "Test_TC_ACT_3_2"],
-    "TimeFormatLocalization": ["Test_TC_LTIME_2_1", "Test_TC_LTIME_3_1"],
-    "TimeSynchronization": ["Test_TC_TIMESYNC_2_15"],
+    "TimeFormatLocalization": ["Test_TC_LTIME_3_1"],
+    "TimeSynchronization": [],
     "UnitLocalization": [],
     "Binding": ["Test_TC_BIND_2_1", "Test_TC_BIND_2_2", "Test_TC_BIND_2_3"],
     "Scenes": [
         "Test_TC_S_1_1",
         "Test_TC_S_2_1",
-        "Test_TC_S_2_2",
-        "Test_TC_S_2_3",
-        "Test_TC_S_2_4",
         "Test_TC_S_2_5",
-        "Test_TC_S_2_6",
-        "Test_TC_S_3_1"
+        "Test_TC_S_2_6"
     ],
     "PumpConfigurationControl": [],
     "AccessControl": [],

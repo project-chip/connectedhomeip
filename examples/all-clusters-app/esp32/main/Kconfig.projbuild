@@ -54,6 +54,9 @@ menu "Demo"
         config DEVICE_TYPE_ESP32_C6_DEVKITC
             bool "ESP32C6-DevKitC"
             depends on IDF_TARGET_ESP32C6
+        config DEVICE_TYPE_ESP32_H2_DEVKITM
+            bool "ESP32H2-DevKitM"
+            depends on IDF_TARGET_ESP32H2
     endchoice
 
     choice
@@ -84,7 +87,7 @@ menu "Demo"
     config TFT_PREDEFINED_DISPLAY_TYPE
         int
         range 0 5
-        default 0 if DEVICE_TYPE_ESP32_DEVKITC
+        default 0 if DEVICE_TYPE_ESP32_DEVKITC || DEVICE_TYPE_ESP32_H2_DEVKITM
         default 0 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_C2_DEVKITM || DEVICE_TYPE_ESP32_C6_DEVKITC
         default 3 if DEVICE_TYPE_M5STACK
         default 4 if DEVICE_TYPE_ESP32_WROVER_KIT
@@ -115,7 +118,7 @@ menu "Demo"
         range 0 40
         default 2 if DEVICE_TYPE_ESP32_DEVKITC         #Use LED1 (blue LED) as status LED on DevKitC
         default 2 if DEVICE_TYPE_ESP32_ETHERNET_KIT
-        default 8 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_C2_DEVKITM || DEVICE_TYPE_ESP32_C6_DEVKITC
+        default 8 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_C2_DEVKITM || DEVICE_TYPE_ESP32_C6_DEVKITC || DEVICE_TYPE_ESP32_H2_DEVKITM
         default 26 if DEVICE_TYPE_ESP32_WROVER_KIT
         default 40 if DEVICE_TYPE_M5STACK
         help

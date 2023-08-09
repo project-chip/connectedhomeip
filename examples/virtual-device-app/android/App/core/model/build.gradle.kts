@@ -38,6 +38,9 @@ android {
 
 dependencies {
 
+    implementation(Deps.AndroidX.core)
+    implementation(Deps.AndroidX.Lifecycle.livedata)
+
     testImplementation(Deps.Test.junit)
     androidTestImplementation(Deps.Test.junitExt)
     androidTestImplementation(Deps.Test.espresso)

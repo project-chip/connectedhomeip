@@ -64,7 +64,7 @@ tests:
       attribute: "SceneValid"
       response:
           constraints:
-              type: uint8
+              type: int8u
 
     - label: "Step 6: TH reads from the DUT the (0x0004) NameSupport attribute"
       PICS: S.S.A0003 && S.S.F00
@@ -73,7 +73,7 @@ tests:
       response:
           value: 0x80
           constraints:
-              type: uint8
+              type: int8u
 
     - label: "Step 6: TH reads from the DUT the (0x0004) NameSupport attribute"
       PICS: S.S.A0004 && (!S.S.F00)
@@ -82,7 +82,7 @@ tests:
       response:
           value: 0x00
           constraints:
-              type: uint8
+              type: int8u
 
     - label:
           "Step 7: TH reads from the DUT the (0x0005) LastConfiguredBy attribute"
@@ -110,4 +110,4 @@ tests:
       attribute: "RemainingCapacity"
       response:
           constraints:
-              type: uint8
+              type: int8u

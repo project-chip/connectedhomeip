@@ -300,8 +300,43 @@ kotlin_library("onboardingpayload_qr_code_test") {
   kotlinc_flags = [ "-Xlint:deprecation" ]
 }
 
+kotlin_library("chipcluster") {
+  import(
+      "${chip_root}/src/controller/java/src/chip/devicecontroller/cluster/files.gni")
+
+  output_name = "CHIPClusters.jar"
+
+  deps = [ ":tlv" ]
+
+  sources = [ "src/chip/devicecontroller/cluster/TlvReaderExtension.kt" ]
+
+  sources += structs_sources
+  sources += eventstructs_sources
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
+}
+
+kotlin_library("chipcluster_test") {
+  output_name = "CHIPClustersTest.jar"
+
+  deps = [
+    ":chipcluster",
+    ":tlv",
+    "${chip_root}/third_party/java_deps:junit-4",
+    "${chip_root}/third_party/java_deps:truth",
+  ]
+
+  sources = [
+    "tests/chip/devicecontroller/cluster/ChipClusterEventStructTest.kt",
+    "tests/chip/devicecontroller/cluster/ChipClusterStructTest.kt",
+  ]
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
+}
+
 group("unit_tests") {
   deps = [
+    ":chipcluster_test",
     ":json_to_tlv_to_json_test",
     ":onboardingpayload_manual_code_test",
     ":onboardingpayload_qr_code_test",
@@ -311,10 +346,26 @@ group("unit_tests") {
   ]
 }
 
+android_library("chipclusterID") {
+  output_name = "CHIPClusterID.jar"
+
+  sources = [
+    "generated/java/chip/devicecontroller/ClusterIDMapping.java",
+    "src/chip/devicecontroller/ChipIdLookup.java",
+  ]
+
+  javac_flags = [
+    "-Xlint:deprecation",
+    "-parameters",  # Store infomation about method parameters
+  ]
+}
+
 android_library("java") {
   output_name = "CHIPController.jar"
 
   deps = [
+    ":chipcluster",
+    ":chipclusterID",
     ":tlv",
     "${chip_root}/third_party/java_deps:annotation",
   ]
@@ -322,7 +373,6 @@ android_library("java") {
   data_deps = [ ":jni" ]
 
   sources = [
-    "generated/java/chip/devicecontroller/ClusterIDMapping.java",
     "src/chip/devicecontroller/AttestationInfo.java",
     "src/chip/devicecontroller/AttestationTrustStoreDelegate.java",
     "src/chip/devicecontroller/CSRInfo.java",
@@ -330,7 +380,6 @@ android_library("java") {
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
-    "src/chip/devicecontroller/ChipIdLookup.java",
     "src/chip/devicecontroller/ControllerParams.java",
     "src/chip/devicecontroller/DeviceAttestationDelegate.java",
     "src/chip/devicecontroller/DiscoveredDevice.java",

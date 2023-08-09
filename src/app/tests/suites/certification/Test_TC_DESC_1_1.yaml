@@ -33,7 +33,6 @@ tests:
                 value: nodeId
 
     - label: "Step 2: Read the global attribute: ClusterRevision"
-      PICS: DESC.S.Afffd
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -42,7 +41,6 @@ tests:
               type: int16u
 
     - label: "Step 3: Read the global attribute: FeatureMap"
-      PICS: DESC.S.Afffc
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -51,7 +49,7 @@ tests:
               type: bitmap32
 
     - label: "Step 4a: Read the global attribute: AttributeList"
-      PICS: PICS_EVENT_LIST_ENABLED && DESC.S.Afffb
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -61,7 +59,7 @@ tests:
 
     #List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
     - label: "Step 4a: Read the global attribute: AttributeList"
-      PICS: "!PICS_EVENT_LIST_ENABLED && DESC.S.Afffb"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -100,7 +98,7 @@ tests:
           [1676280023.477370][3892:3894] CHIP:TOO:     [10]: 65533
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DESC.S.Afffb
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
@@ -125,7 +123,7 @@ tests:
           [1676366852.531334][9747:9749] CHIP:TOO:   EventList: 0 entries
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DESC.S.Afffa
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
@@ -152,7 +150,7 @@ tests:
           [1649425400.031430][3493:3498] CHIP:TOO:   AcceptedCommandList: 0 entries
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DESC.S.Afff9
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
@@ -179,7 +177,7 @@ tests:
           [1649425614.162088][3509:3514] CHIP:TOO:   GeneratedCommandList: 0 entries
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DESC.S.Afff8
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
