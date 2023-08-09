@@ -62,13 +62,22 @@ tests:
               hasMasksSet: [0x1]
 
     - label: "Step 4a: TH reads AttributeList from DUT"
-      PICS: DGSW.S.Afffb
+      PICS: PICS_EVENT_LIST_ENABLED && DGSW.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains: [65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED && DGSW.S.Afffb"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65528, 65529, 65531, 65532, 65533]
 
     - label:
           "Step 4b: TH reads optional attribute(ThreadMetrics) in AttributeList"
@@ -154,7 +163,7 @@ tests:
                 value: "y"
 
     - label: "Step 5a: TH reads EventList from DUT"
-      PICS: DGSW.S.E00 && DGSW.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && DGSW.S.E00 && DGSW.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -163,7 +172,7 @@ tests:
               contains: [0]
 
     - label: "Step 5b: TH reads EventList from DUT"
-      PICS: " !DGSW.S.E00 && DGSW.S.Afffa "
+      PICS: "PICS_EVENT_LIST_ENABLED &&  !DGSW.S.E00 && DGSW.S.Afffa "
       command: "readAttribute"
       attribute: "EventList"
       response:

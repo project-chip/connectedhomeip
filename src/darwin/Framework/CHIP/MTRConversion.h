@@ -19,6 +19,8 @@
 
 #import <Foundation/Foundation.h>
 
+#include <lib/core/CASEAuthTag.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/support/TimeUtils.h>
 #include <type_traits>
@@ -37,5 +39,11 @@ inline NSDate * ChipEpochSecondsAsDate(uint32_t chipEpochSeconds)
 {
     return [NSDate dateWithTimeIntervalSince1970:(chip::kChipEpochSecondsSinceUnixEpoch + (NSTimeInterval) chipEpochSeconds)];
 }
+
+/**
+ * Utilities for converting between NSSet<NSNumber *> and chip::CATValues.
+ */
+CHIP_ERROR SetToCATValues(NSSet<NSNumber *> * catSet, chip::CATValues & values);
+NSSet<NSNumber *> * CATValuesToSet(const chip::CATValues & values);
 
 NS_ASSUME_NONNULL_END

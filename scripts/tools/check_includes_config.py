@@ -159,6 +159,8 @@ ALLOW: Dict[str, Set[str]] = {
     'src/tracing/json/json_tracing.cpp': {'string', 'sstream'},
     'src/tracing/json/json_tracing.h': {'fstream'},
 
-    # Temporary solution util the OnOff server can provide a callback API for state change.
-    'src/app/clusters/mode-base-server/mode-base-server.h': {'set'}
+    # Not intended for embedded clients
+    'src/lib/support/jsontlv/JsonToTlv.cpp': {'sstream'},
+    'src/lib/support/jsontlv/JsonToTlv.h': {'string'},
+    'src/lib/support/jsontlv/TlvToJson.h': {'string'}
 }

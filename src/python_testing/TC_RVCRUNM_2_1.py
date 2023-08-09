@@ -23,7 +23,7 @@ from mobly import asserts
 
 # This test requires several additional command line arguments
 # run with
-# --int-arg PIXIT_ENDPOINT:<endpoint> PIXIT_MODEOK:<mode id> PIXIT_MODEFAIL:<mode id>
+# --int-arg PIXIT_ENDPOINT:<endpoint> PIXIT.RVCRUNM.MODE_CHANGE_OK:<mode id> PIXIT.RVCRUNM.MODE_CHANGE_FAIL:<mode id>
 
 
 class TC_RVCRUNM_2_1(MatterBaseTest):
@@ -44,16 +44,16 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
         asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
                             "PIXIT_ENDPOINT must be included on the command line in "
                             "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
-        asserts.assert_true('PIXIT_MODEOK' in self.matter_test_config.global_test_params,
-                            "PIXIT_MODEOK must be included on the command line in "
-                            "the --int-arg flag as PIXIT_MODEOK:<mode id>")
-        asserts.assert_true('PIXIT_MODEFAIL' in self.matter_test_config.global_test_params,
-                            "PIXIT_MODEFAIL must be included on the command line in "
-                            "the --int-arg flag as PIXIT_MODEFAIL:<mode id>")
+        asserts.assert_true('PIXIT.RVCRUNM.MODE_CHANGE_OK' in self.matter_test_config.global_test_params,
+                            "PIXIT.RVCRUNM.MODE_CHANGE_OK must be included on the command line in "
+                            "the --int-arg flag as PIXIT.RVCRUNM.MODE_CHANGE_OK:<mode id>")
+        asserts.assert_true('PIXIT.RVCRUNM.MODE_CHANGE_FAIL' in self.matter_test_config.global_test_params,
+                            "PIXIT.RVCRUNM.MODE_CHANGE_FAIL must be included on the command line in "
+                            "the --int-arg flag as PIXIT.RVCRUNM.MODE_CHANGE_FAIL:<mode id>")
 
         self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
-        self.modeok = self.matter_test_config.global_test_params['PIXIT_MODEOK']
-        self.modefail = self.matter_test_config.global_test_params['PIXIT_MODEFAIL']
+        self.modeok = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_CHANGE_OK']
+        self.modefail = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_CHANGE_FAIL']
 
         asserts.assert_true(self.check_pics("RVCRUNM.S.A0000"), "RVCRUNM.S.A0000 must be supported")
         asserts.assert_true(self.check_pics("RVCRUNM.S.A0001"), "RVCRUNM.S.A0001 must be supported")
@@ -97,30 +97,32 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
         ret = await self.send_change_to_mode_cmd(newMode=old_current_mode)
         asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode to the current mode should be a no-op")
 
-        self.print_step(5, "Manually put the device in a state from which it will FAIL to transition to mode %d" % (self.modefail))
-        input("Press Enter when done.\n")
+        if self.check_pics("RVCRUNM.S.M.CAN_TEST_MODE_FAILURE"):
+            self.print_step(5, "Manually put the device in a state from which it will FAIL to transition to mode %d" % (self.modefail))
+            input("Press Enter when done.\n")
 
-        self.print_step(6, "Read CurrentMode attribute")
-        old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+            self.print_step(6, "Read CurrentMode attribute")
+            old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        logging.info("CurrentMode: %s" % (old_current_mode))
+            logging.info("CurrentMode: %s" % (old_current_mode))
 
-        self.print_step(7, "Send ChangeToMode command with NewMode set to %d" % (self.modefail))
+            self.print_step(7, "Send ChangeToMode command with NewMode set to %d" % (self.modefail))
 
-        ret = await self.send_change_to_mode_cmd(newMode=self.modefail)
-        st = ret.status
-        is_mfg_code = st in range(0x80, 0xC0)
-        is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st in rvcRunCodes) or is_mfg_code
-        asserts.assert_true(is_err_code, "Changing to mode %d must fail due to the current state of the device" % (self.modefail))
-        st_text_len = len(ret.statusText)
-        asserts.assert_true(st_text_len in range(1, 65), "StatusText length (%d) must be between 1 and 64" % (st_text_len))
+            ret = await self.send_change_to_mode_cmd(newMode=self.modefail)
+            st = ret.status
+            is_mfg_code = st in range(0x80, 0xC0)
+            is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st in rvcRunCodes) or is_mfg_code
+            asserts.assert_true(
+                is_err_code, "Changing to mode %d must fail due to the current state of the device" % (self.modefail))
+            st_text_len = len(ret.statusText)
+            asserts.assert_true(st_text_len in range(1, 65), "StatusText length (%d) must be between 1 and 64" % (st_text_len))
 
-        self.print_step(8, "Read CurrentMode attribute")
-        current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+            self.print_step(8, "Read CurrentMode attribute")
+            current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        logging.info("CurrentMode: %s" % (current_mode))
+            logging.info("CurrentMode: %s" % (current_mode))
 
-        asserts.assert_true(current_mode == old_current_mode, "CurrentMode changed after failed ChangeToMode command!")
+            asserts.assert_true(current_mode == old_current_mode, "CurrentMode changed after failed ChangeToMode command!")
 
         self.print_step(9, "Manually put the device in a state from which it will SUCCESSFULLY transition to mode %d" % (self.modeok))
         input("Press Enter when done.\n")

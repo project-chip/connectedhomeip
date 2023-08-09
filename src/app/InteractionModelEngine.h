@@ -57,6 +57,7 @@
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
+#include <app/reporting/ReportScheduler.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/basic-types.h>
 
@@ -115,7 +116,7 @@ public:
      *
      */
     CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
-                    CASESessionManager * apCASESessionMgr                         = nullptr,
+                    reporting::ReportScheduler * reportScheduler, CASESessionManager * apCASESessionMgr = nullptr,
                     SubscriptionResumptionStorage * subscriptionResumptionStorage = nullptr);
 
     void Shutdown();
@@ -128,6 +129,7 @@ public:
      */
     CASESessionManager * GetCASESessionManager() const { return mpCASESessionMgr; }
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**
      * Tears down an active subscription.
      *
@@ -150,6 +152,7 @@ public:
      * Tears down all active subscriptions.
      */
     void ShutdownAllSubscriptions();
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
     uint32_t GetNumActiveReadHandlers() const;
     uint32_t GetNumActiveReadHandlers(ReadHandler::InteractionType type) const;
@@ -177,6 +180,8 @@ public:
     uint32_t GetMagicNumber() const { return mMagic; }
 
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
+
+    reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
 
     void ReleaseAttributePathList(ObjectList<AttributePathParams> *& aAttributePathList);
 
@@ -231,6 +236,7 @@ public:
     void OnTimedWrite(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**
      * Add a read client to the internally tracked list of weak references. This list is used to
      * correctly dispatch unsolicited reports to the right matching handler by subscription ID.
@@ -251,6 +257,7 @@ public:
      * Return the number of active read clients being tracked by the engine.
      */
     size_t GetNumActiveReadClients();
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
     /**
      * Returns the number of dirty subscriptions. Including the subscriptions that are generating reports.
@@ -345,6 +352,7 @@ public:
     //
     void ShutdownActiveReads()
     {
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
         for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
         {
             readClient->mpImEngine = nullptr;
@@ -358,6 +366,7 @@ public:
         // After that, we just null out our tracker.
         //
         mpActiveReadClientList = nullptr;
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
         mReadHandlers.ReleaseAll();
     }
@@ -566,6 +575,7 @@ private:
     ObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER> mTimedHandlers;
     WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
+    reporting::ReportScheduler * mReportScheduler = nullptr;
 
     static constexpr size_t kReservedHandlersForReads = kMinSupportedReadRequestsPerFabric * (CHIP_CONFIG_MAX_FABRICS);
     static constexpr size_t kReservedPathsForReads    = kMinSupportedPathsPerReadRequest * kReservedHandlersForReads;
@@ -595,7 +605,9 @@ private:
 
     ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> mReadHandlers;
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
     ReadClient * mpActiveReadClientList = nullptr;
+#endif
 
     ReadHandler::ApplicationCallback * mpReadHandlerApplicationCallback = nullptr;
 

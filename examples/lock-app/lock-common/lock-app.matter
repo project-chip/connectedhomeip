@@ -1564,6 +1564,10 @@ server cluster GroupKeyManagement = 63 {
     kCacheAndSync = 1;
   }
 
+  bitmap Feature : BITMAP32 {
+    kCacheAndSync = 0x1;
+  }
+
   fabric_scoped struct GroupInfoMapStruct {
     group_id groupId = 1;
     endpoint_no endpoints[] = 2;
@@ -1650,6 +1654,30 @@ server cluster UserLabel = 65 {
   }
 
   attribute access(write: manage) LabelStruct labelList[] = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Allows servers to ensure that listed clients are notified when a server is available for communication. */
+server cluster IcdManagement = 70 {
+  bitmap Feature : BITMAP32 {
+    kCheckInProtocolSupport = 0x1;
+  }
+
+  fabric_scoped struct MonitoringRegistrationStruct {
+    fabric_sensitive node_id checkInNodeID = 1;
+    fabric_sensitive int64u monitoredSubject = 2;
+    fabric_sensitive octet_string<16> key = 3;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute int32u idleModeInterval = 0;
+  readonly attribute int32u activeModeInterval = 1;
+  readonly attribute int16u activeModeThreshold = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2535,6 +2563,14 @@ endpoint 0 {
   server cluster UserLabel {
     callback attribute labelList;
     ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster IcdManagement {
+    callback attribute idleModeInterval default = 500;
+    callback attribute activeModeInterval default = 300;
+    callback attribute activeModeThreshold default = 300;
+    ram      attribute featureMap default = 0x0000;
     ram      attribute clusterRevision default = 1;
   }
 }

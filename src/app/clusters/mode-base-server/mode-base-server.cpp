@@ -17,12 +17,13 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/AttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <platform/DiagnosticDataProvider.h>
 
 using namespace chip;
@@ -38,6 +39,19 @@ namespace app {
 namespace Clusters {
 namespace ModeBase {
 
+void Instance::RegisterInstance()
+{
+    if (!gModeBaseAliasesInstances.Contains(this))
+    {
+        gModeBaseAliasesInstances.PushBack(this);
+    }
+}
+
+void Instance::UnregisterInstance()
+{
+    gModeBaseAliasesInstances.Remove(this);
+}
+
 bool Instance::HasFeature(Feature feature) const
 {
     return (mFeature & to_underlying(feature)) != 0;
@@ -47,7 +61,7 @@ void Instance::LoadPersistentAttributes()
 {
     // Load Current Mode
     uint8_t tempCurrentMode;
-    CHIP_ERROR err = GetAttributePersistenceProvider()->ReadScalarValue(
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
         ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id), tempCurrentMode);
     if (err == CHIP_NO_ERROR)
     {
@@ -70,7 +84,7 @@ void Instance::LoadPersistentAttributes()
 
     // Load Start-Up Mode
     DataModel::Nullable<uint8_t> tempStartUpMode;
-    err = GetAttributePersistenceProvider()->ReadScalarValue(
+    err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
         ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id), tempStartUpMode);
     if (err == CHIP_NO_ERROR)
     {
@@ -98,8 +112,8 @@ void Instance::LoadPersistentAttributes()
 
     // Load On Mode
     DataModel::Nullable<uint8_t> tempOnMode;
-    err = GetAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id),
-                                                             tempOnMode);
+    err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id), tempOnMode);
     if (err == CHIP_NO_ERROR)
     {
         Status status = UpdateOnMode(tempOnMode);
@@ -137,9 +151,8 @@ CHIP_ERROR Instance::Init()
 
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    RegisterInstance();
     ReturnErrorOnFailure(mDelegate->Init());
-
-    ModeBaseAliasesInstances.insert(this);
 
     // If the StartUpMode is set, the CurrentMode attribute SHALL be set to the StartUpMode value, when the server is powered up.
     if (!mStartUpMode.IsNull())
@@ -181,7 +194,7 @@ CHIP_ERROR Instance::Init()
             }
         }
     }
-
+#ifdef EMBER_AF_PLUGIN_ON_OFF_SERVER
     // OnMode with Power Up
     // If the On/Off feature is supported and the On/Off cluster attribute StartUpOnOff is present, with a
     // value of On (turn on at power up), then the CurrentMode attribute SHALL be set to the OnMode attribute
@@ -215,7 +228,7 @@ CHIP_ERROR Instance::Init()
             }
         }
     }
-
+#endif // EMBER_AF_PLUGIN_ON_OFF_SERVER
     return CHIP_NO_ERROR;
 }
 
@@ -386,7 +399,7 @@ Status Instance::UpdateCurrentMode(uint8_t aNewMode)
     {
         // Write new value to persistent storage.
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id);
-        GetAttributePersistenceProvider()->WriteScalarValue(path, mCurrentMode);
+        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mCurrentMode);
         MatterReportingAttributeChangeCallback(path);
     }
     return Protocols::InteractionModel::Status::Success;
@@ -407,7 +420,7 @@ Status Instance::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode)
     {
         // Write new value to persistent storage.
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id);
-        GetAttributePersistenceProvider()->WriteScalarValue(path, mStartUpMode);
+        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mStartUpMode);
         MatterReportingAttributeChangeCallback(path);
     }
     return Protocols::InteractionModel::Status::Success;
@@ -428,7 +441,7 @@ Status Instance::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
     {
         // Write new value to persistent storage.
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id);
-        GetAttributePersistenceProvider()->WriteScalarValue(path, mOnMode);
+        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mOnMode);
         MatterReportingAttributeChangeCallback(path);
     }
     return Protocols::InteractionModel::Status::Success;
@@ -476,14 +489,14 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClus
 
 Instance::~Instance()
 {
-    ModeBaseAliasesInstances.erase(this);
+    UnregisterInstance();
     chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
     unregisterAttributeAccessOverride(this);
 }
 
-std::set<Instance *> * GetModeBaseInstances()
+IntrusiveList<Instance> & GetModeBaseInstanceList()
 {
-    return &ModeBaseAliasesInstances;
+    return gModeBaseAliasesInstances;
 }
 
 } // namespace ModeBase

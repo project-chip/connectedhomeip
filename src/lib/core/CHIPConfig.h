@@ -186,6 +186,15 @@
 #endif // CHIP_CONFIG_SHA256_CONTEXT_SIZE
 
 /**
+ *  @def CHIP_CONFIG_SHA256_CONTEXT_ALIGN
+ *
+ * @brief The alignment of SHA256 context buffer.
+ */
+#ifndef CHIP_CONFIG_SHA256_CONTEXT_ALIGN
+#define CHIP_CONFIG_SHA256_CONTEXT_ALIGN size_t
+#endif // CHIP_CONFIG_SHA256_CONTEXT_ALIGN
+
+/**
  *  @def CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
  *
  *  @brief
@@ -1470,7 +1479,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief Default value for the ICD Management cluster IdleModeInterval attribute, in milliseconds
  */
 #ifndef CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL
-#define CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL 500
+#define CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL 2000
 #endif
 
 /**
@@ -1556,5 +1565,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_RETRY_INTERVAL_SECS
 
 /**
- *  @}
+ * @def CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
+ *
+ * @brief Controls whether the synchronized report scheduler is used.
+ *
+ * The use of the synchronous reports feature aims to reduce the number of times an ICD needs to wake up to emit reports to its
+ * various subscribers.
+ */
+#ifndef CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
+#define CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED 0
+#endif
+
+/**
+ * @}
  */

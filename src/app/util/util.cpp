@@ -156,6 +156,7 @@ void MatterLaundryWasherModePluginServerInitCallback() {}
 void MatterRefrigeratorAndTemperatureControlledCabinetModePluginServerInitCallback() {}
 void MatterOperationalStatePluginServerInitCallback() {}
 void MatterRvcOperationalStatePluginServerInitCallback() {}
+void MatterDishwasherAlarmPluginServerInitCallback() {}
 // ****************************************
 // Print out information about each cluster
 // ****************************************
