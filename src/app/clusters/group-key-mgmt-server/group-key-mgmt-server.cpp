@@ -402,7 +402,7 @@ ValidateKeySetWriteArguments(const chip::app::Clusters::GroupKeyManagement::Comm
 }
 
 bool GetProviderAndFabric(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                     Credentials::GroupDataProvider ** outGroupDataProvider, const FabricInfo ** outFabricInfo)
+                          Credentials::GroupDataProvider ** outGroupDataProvider, const FabricInfo ** outFabricInfo)
 {
     VerifyOrDie(commandObj != nullptr);
     VerifyOrDie(outGroupDataProvider != nullptr);
