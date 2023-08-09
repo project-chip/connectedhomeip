@@ -88,15 +88,15 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         if self.check_pics("RVCOPSTATE.S.M.ST_PAUSED"):
             self.print_step(5, "Read OperationalState attribute")
             operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
-                                                                            attribute=attributes.OperationalState)
+                                                                             attribute=attributes.OperationalState)
             logging.info("OperationalState: %s" % (operational_state))
             asserts.assert_equal(operational_state, Clusters.OperationalState.Enums.OperationalStateEnum.kPaused,
-                                "OperationalState(%s) should be Paused(0x02)" % operational_state)
+                                 "OperationalState(%s) should be Paused(0x02)" % operational_state)
 
         if self.check_pics("RVCOPSTATE.S.A0002"):
             self.print_step(6, "Read CountdownTime attribute")
             initial_countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
-                                                                                attribute=attributes.CountdownTime)
+                                                                                  attribute=attributes.CountdownTime)
             logging.info("CountdownTime: %s" % (initial_countdown_time))
             if initial_countdown_time is not NullValue:
                 in_range = (1 <= initial_countdown_time <= 259200)
@@ -112,7 +112,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             asserts.assert_true(countdown_time != 0 or countdown_time == NullValue,
                                 "invalid CountdownTime(%s). Must be a non zero integer, or null" % countdown_time)
             asserts.assert_equal(countdown_time, initial_countdown_time,
-                                "CountdownTime(%s) does not equal to the intial CountdownTime (%s)" % (countdown_time, initial_countdown_time))
+                                 "CountdownTime(%s) does not equal to the intial CountdownTime (%s)" % (countdown_time, initial_countdown_time))
 
         self.print_step(9, "Send Pause command")
         ret = await self.send_pause_cmd()
