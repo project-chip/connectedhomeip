@@ -20,8 +20,6 @@ jobs:
   list_workflows:
     name: Summarize Recent Workflow Failures
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/project-chip/chip-build:1
     steps:
       - name: Checkout
         uses: actions/checkout@v3
