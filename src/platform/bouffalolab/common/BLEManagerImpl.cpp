@@ -150,7 +150,7 @@ void BLEManagerImpl::_Shutdown()
 {
     // Release BLE Stack resources
     mFlags.Set(Flags::kChipoBleShutDown);
-    
+
 }
 
 void BLEManagerImpl::DriveBLEState(intptr_t arg)
