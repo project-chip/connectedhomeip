@@ -1534,14 +1534,9 @@ server cluster ColorControl = 768 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
-  binding cluster OtaSoftwareUpdateProvider;
+  device type ma_rootdevice = 22, version 1;
 
-  server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
-  }
+  binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Descriptor {
     callback attribute deviceTypeList;
@@ -1685,7 +1680,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 268, version 1;
+  device type ma_colortemperaturelight = 268, version 1;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;

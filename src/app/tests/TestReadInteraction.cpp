@@ -67,11 +67,20 @@ chip::EndpointId kInvalidTestEndpointId = 3;
 chip::DataVersion kTestDataVersion1     = 3;
 chip::DataVersion kTestDataVersion2     = 5;
 
+// Number of items in the list for MockAttributeId(4).
+constexpr int kMockAttribute4ListLength = 6;
+
+static chip::System::Clock::Internal::MockClock gMockClock;
+static chip::System::Clock::ClockBase * gRealClock;
+
 class TestContext : public chip::Test::AppContext
 {
 public:
     static int Initialize(void * context)
     {
+        gRealClock = &chip::System::SystemClock();
+        chip::System::Clock::Internal::SetSystemClockForTesting(&gMockClock);
+
         if (AppContext::Initialize(context) != SUCCESS)
             return FAILURE;
 
@@ -97,6 +106,7 @@ public:
     static int Finalize(void * context)
     {
         chip::app::EventManagement::DestroyEventManagement();
+        chip::System::Clock::Internal::SetSystemClockForTesting(gRealClock);
 
         if (AppContext::Finalize(context) != SUCCESS)
             return FAILURE;
@@ -1207,7 +1217,8 @@ void TestReadInteraction::TestReadChunking(nlTestSuite * apSuite, void * apConte
     NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
 
     chip::app::AttributePathParams attributePathParams[1];
-    // Mock Attribute 4 is a big attribute, with 6 large OCTET_STRING
+    // Mock Attribute 4 is a big attribute, with kMockAttribute4ListLength large
+    // OCTET_STRING elements.
     attributePathParams[0].mEndpointId  = Test::kMockEndpoint3;
     attributePathParams[0].mClusterId   = Test::MockClusterId(2);
     attributePathParams[0].mAttributeId = Test::MockAttributeId(4);
@@ -1227,8 +1238,10 @@ void TestReadInteraction::TestReadChunking(nlTestSuite * apSuite, void * apConte
 
         ctx.DrainAndServiceIO();
 
-        // We get one chunk with 3 array elements, and then one chunk per element.
-        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 4);
+        // We get one chunk with 4 array elements, and then one chunk per
+        // element, and the total size of the array is
+        // kMockAttribute4ListLength.
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1 + (kMockAttribute4ListLength - 4));
         NL_TEST_ASSERT(apSuite, delegate.mNumArrayItems == 6);
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
@@ -1302,8 +1315,8 @@ void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void 
                     !aPath.IsListItemOperation())
                 {
                     mGotStartOfSecondReport = true;
-                    // Wait for an actual data chunk.
-                    return;
+                    // We always have data chunks, so go ahead to mark things
+                    // dirty as needed.
                 }
 
                 if (!mGotStartOfSecondReport)
@@ -1373,13 +1386,16 @@ void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void 
 
         ctx.DrainAndServiceIO();
 
-        // We should receive another (3 + 1) = 4 attribute reports represeting 6
-        // array items, since the underlying path iterator should be reset to
-        // the beginning of the cluster it is currently iterating.
+        // Our list has length kMockAttribute4ListLength.  Since the underlying
+        // path iterator should be reset to the beginning of the cluster it is
+        // currently iterating, we expect to get another value for our
+        // attribute.  The way the packet boundaries happen to fall, that value
+        // will encode 4 items in the first IB and then one IB per item.
+        const int expectedIBs = 1 + (kMockAttribute4ListLength - 4);
         ChipLogError(DataManagement, "OLD: %d\n", currentAttributeResponsesWhenSetDirty);
         ChipLogError(DataManagement, "NEW: %d\n", delegate.mNumAttributeResponse);
-        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == currentAttributeResponsesWhenSetDirty + 4);
-        NL_TEST_ASSERT(apSuite, delegate.mNumArrayItems == currentArrayItemsWhenSetDirty + 6);
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == currentAttributeResponsesWhenSetDirty + expectedIBs);
+        NL_TEST_ASSERT(apSuite, delegate.mNumArrayItems == currentArrayItemsWhenSetDirty + kMockAttribute4ListLength);
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         // By now we should have closed all exchanges and sent all pending acks, so
@@ -1918,8 +1934,8 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
 
     readPrepareParams.mAttributePathParamsListSize = 2;
 
-    readPrepareParams.mMinIntervalFloorSeconds   = 2;
-    readPrepareParams.mMaxIntervalCeilingSeconds = 5;
+    readPrepareParams.mMinIntervalFloorSeconds   = 1;
+    readPrepareParams.mMaxIntervalCeilingSeconds = 2;
     printf("\nSend first subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
     {
@@ -1983,7 +1999,11 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         dirtyPath5.mAttributeId = 4;
 
         // Test report with 2 different path
-        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
+
+        // Advance monotonic timestamp for min interval to elapse
+        gMockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMinIntervalFloorSeconds));
+        ctx.GetIOContext().DriveIO();
+
         delegate.mGotReport            = false;
         delegate.mGotEventResponse     = false;
         delegate.mNumAttributeResponse = 0;
@@ -1995,15 +2015,15 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
 
         ctx.DrainAndServiceIO();
 
-        NL_TEST_ASSERT(
-            apSuite,
-            !reportScheduler->CheckFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed));
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse == true);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test report with 2 different path, and 1 same path
-        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
+        // Advance monotonic timestamp for min interval to elapse
+        gMockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMinIntervalFloorSeconds));
+        ctx.GetIOContext().DriveIO();
+
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         err                            = engine->GetReportingEngine().SetDirty(dirtyPath1);
@@ -2015,14 +2035,14 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
 
         ctx.DrainAndServiceIO();
 
-        NL_TEST_ASSERT(
-            apSuite,
-            !reportScheduler->CheckFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed));
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test report with 3 different path, and one path is overlapped with another
-        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
+        // Advance monotonic timestamp for min interval to elapse
+        gMockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMinIntervalFloorSeconds));
+        ctx.GetIOContext().DriveIO();
+
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         err                            = engine->GetReportingEngine().SetDirty(dirtyPath1);
@@ -2034,14 +2054,14 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
 
         ctx.DrainAndServiceIO();
 
-        NL_TEST_ASSERT(
-            apSuite,
-            !reportScheduler->CheckFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed));
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test report with 3 different path, all are not overlapped, one path is not interested for current subscription
-        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
+        // Advance monotonic timestamp for min interval to elapse
+        gMockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMinIntervalFloorSeconds));
+        ctx.GetIOContext().DriveIO();
+
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         err                            = engine->GetReportingEngine().SetDirty(dirtyPath1);
@@ -2053,18 +2073,13 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
 
         ctx.DrainAndServiceIO();
 
-        NL_TEST_ASSERT(
-            apSuite,
-            !reportScheduler->CheckFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed));
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test empty report
-        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
-        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MaxIntervalElapsed, true);
-        // Manually trigger the callback that would schedule the next report as it would normally have been called if the time had
-        // elapsed as simulated above
-        reportScheduler->RunNodeCallbackForHandler(delegate.mpReadHandler);
+        // Advance monotonic timestamp for min interval to elapse
+        gMockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds));
+        ctx.GetIOContext().DriveIO();
 
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().IsRunScheduled());
         delegate.mGotReport            = false;
@@ -2117,7 +2132,7 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
     readPrepareParams.mpAttributePathParamsList    = nullptr;
     readPrepareParams.mAttributePathParamsListSize = 0;
 
-    readPrepareParams.mMinIntervalFloorSeconds   = 2;
+    readPrepareParams.mMinIntervalFloorSeconds   = 1;
     readPrepareParams.mMaxIntervalCeilingSeconds = 3600;
     printf("\nSend first subscribe request message with wildcard urgent event to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
@@ -2138,8 +2153,7 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         ctx.DrainAndServiceIO();
-
-        System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicTimestamp();
+        System::Clock::Timestamp startTime = gMockClock.GetMonotonicTimestamp();
 
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 2);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
@@ -2163,40 +2177,39 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
         nonUrgentDelegate.mGotEventResponse = false;
         nonUrgentDelegate.mGotReport        = false;
 
-        // wait for min interval 2 seconds (in test, we use 1.6 seconds considering the time variation), expect no event is
+        // wait for min interval 1 seconds (in test, we use 0.6 seconds considering the time variation), expect no event is
         // received, then wait for 0.8 seconds, then the urgent event would be sent out
         //  currently DriveIOUntil will call `DriveIO` at least once, which means that if there is any CPU scheduling issues,
         // there's a chance 1.9s will already have elapsed by the time we get there, which will result in DriveIO being called when
         // it shouldn't. Better fix could happen inside DriveIOUntil, not sure the sideeffect there.
-        while (true)
-        {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(1600))
-            {
-                break;
-            }
-            ctx.GetIOContext().DriveIO(); // at least one IO loop is guaranteed
-        }
+
+        // Advance monotonic looping to allow events to trigger
+        gMockClock.AdvanceMonotonic(System::Clock::Milliseconds32(600));
+        ctx.GetIOContext().DriveIO();
 
         NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mGotEventResponse);
 
-        startTime = System::SystemClock().GetMonotonicTimestamp();
-        while (true)
-        {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(800))
-            {
-                break;
-            }
-            ctx.GetIOContext().DriveIO(); // at least one IO loop is guaranteed
-        }
+        // Advance monotonic timestamp for min interval to elapse
+        startTime = gMockClock.GetMonotonicTimestamp();
+        gMockClock.AdvanceMonotonic(System::Clock::Milliseconds32(800));
+
+        // Service Timer expired event
+        ctx.GetIOContext().DriveIO();
+
+        // Service Engine Run
+        ctx.GetIOContext().DriveIO();
+
+        // Service EventManagement event
+        ctx.GetIOContext().DriveIO();
+
         NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mGotEventResponse);
 
         // Since we just sent a report for our urgent subscription, the min interval of the urgent subcription should have been
         // updated
         NL_TEST_ASSERT(apSuite,
-                       reportScheduler->GetMinTimestampForHandler(delegate.mpReadHandler) >
-                           System::SystemClock().GetMonotonicTimestamp());
+                       reportScheduler->GetMinTimestampForHandler(delegate.mpReadHandler) > gMockClock.GetMonotonicTimestamp());
         NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsDirty());
         delegate.mGotEventResponse = false;
 
@@ -2204,19 +2217,12 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
         // should be in the past
         NL_TEST_ASSERT(apSuite,
                        reportScheduler->GetMinTimestampForHandler(nonUrgentDelegate.mpReadHandler) <
-                           System::SystemClock().GetMonotonicTimestamp());
+                           gMockClock.GetMonotonicTimestamp());
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
 
-        // Wait for the min interval timer to fire.
-        startTime = System::SystemClock().GetMonotonicTimestamp();
-        while (true)
-        {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(2100))
-            {
-                break;
-            }
-            ctx.GetIOContext().DriveIO(); // at least one IO loop is guaranteed
-        }
+        // Advance monotonic timestamp for min interval to elapse
+        gMockClock.AdvanceMonotonic(System::Clock::Milliseconds32(2100));
+        ctx.GetIOContext().DriveIO();
 
         // No reporting should have happened.
         NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
@@ -2344,7 +2350,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
         // paths, for a total of 58 attributes.
         //
         // Attribute 0xFFFC::0xFFF1'FC02::0xFFF1'0004 (kMockEndpoint3::MockClusterId(2)::MockAttributeId(4))
-        // is a list of 6 elements of size 256 bytes each, which cannot fit in a single
+        // is a list of kMockAttribute4ListLength elements of size 256 bytes each, which cannot fit in a single
         // packet, so gets list chunking applied to it.
         //
         // Because delegate.mNumAttributeResponse counts AttributeDataIB instances, not attributes,
@@ -2353,21 +2359,16 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
         // in the response, there will be one AttributeDataIB for the start of the list (which will include
         // some number of 256-byte elements), then one AttributeDataIB for each of the remaining elements.
         //
-        // When EventList is enabled, for the first report for the list attribute we receive two
-        // of its items in the initial list, then 4 additional items.  For the second report we
-        // receive 3 items in the initial list followed by 3 additional items.
-        //
-        // Thus we should receive 29*2 + 4 + 3 = 65 attribute data in total.
-        constexpr size_t kExpectedAttributeResponse = 65;
+        // When EventList is enabled, for the first report for the list attribute we receive three
+        // of its items in the initial list, then the remaining items.  For the second report we
+        // receive 2 items in the initial list followed by the remaining items.
+        constexpr size_t kExpectedAttributeResponse = 29 * 2 + (kMockAttribute4ListLength - 3) + (kMockAttribute4ListLength - 2);
 #else
         // When EventList is not enabled, the packet boundaries shift and for the first
-        // report for the list attribute we receive two of its items in the initial list,
-        // then 4 additional items.  For the second report we receive 0 items in
-        // the initial list followed by 6 additional items.
-        //
-        // Thus we should receive 29*2 + 4 + 6 = 68 attribute data when the eventlist
-        // attribute is not available.
-        constexpr size_t kExpectedAttributeResponse = 68;
+        // report for the list attribute we receive four of its items in the initial list,
+        // then additional items.  For the second report we receive 4 items in
+        // the initial list followed by additional items.
+        constexpr size_t kExpectedAttributeResponse = 29 * 2 + (kMockAttribute4ListLength - 4) + (kMockAttribute4ListLength - 4);
 #endif
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == kExpectedAttributeResponse);
         NL_TEST_ASSERT(apSuite, delegate.mNumArrayItems == 12);
@@ -2377,7 +2378,6 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
 
         // Set a concrete path dirty
         {
-            reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
             delegate.mGotReport            = false;
             delegate.mNumAttributeResponse = 0;
 
@@ -2391,9 +2391,6 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
 
             ctx.DrainAndServiceIO();
 
-            NL_TEST_ASSERT(
-                apSuite,
-                !reportScheduler->CheckFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed));
             NL_TEST_ASSERT(apSuite, delegate.mGotReport);
             // We subscribed wildcard path twice, so we will receive two reports here.
             NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
@@ -2401,7 +2398,6 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
 
         // Set a endpoint dirty
         {
-            reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
             delegate.mGotReport            = false;
             delegate.mNumAttributeResponse = 0;
             delegate.mNumArrayItems        = 0;
@@ -2423,10 +2419,6 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
                 ctx.DrainAndServiceIO();
             } while (last != delegate.mNumAttributeResponse);
 
-            NL_TEST_ASSERT(
-                apSuite,
-                !reportScheduler->CheckFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed));
-            NL_TEST_ASSERT(apSuite, delegate.mGotReport);
             // Mock endpoint3 has 13 attributes in total, and we subscribed twice.
             // And attribute 3/2/4 is a list with 6 elements and list chunking
             // is applied to it, but the way the packet boundaries fall we get two of
@@ -2497,7 +2489,6 @@ void TestReadInteraction::TestSubscribePartialOverlap(nlTestSuite * apSuite, voi
 
         // Set a partial overlapped path dirty
         {
-            reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
             delegate.mGotReport            = false;
             delegate.mNumAttributeResponse = 0;
 
@@ -2510,9 +2501,6 @@ void TestReadInteraction::TestSubscribePartialOverlap(nlTestSuite * apSuite, voi
 
             ctx.DrainAndServiceIO();
 
-            NL_TEST_ASSERT(
-                apSuite,
-                !reportScheduler->CheckFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed));
             NL_TEST_ASSERT(apSuite, delegate.mGotReport);
             NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
             NL_TEST_ASSERT(apSuite, delegate.mReceivedAttributePaths[0].mEndpointId == Test::kMockEndpoint2);
@@ -2578,7 +2566,6 @@ void TestReadInteraction::TestSubscribeSetDirtyFullyOverlap(nlTestSuite * apSuit
 
         // Set a full overlapped path dirty and expect to receive one E2C3A1
         {
-            reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
             delegate.mGotReport            = false;
             delegate.mNumAttributeResponse = 0;
 
@@ -2588,9 +2575,6 @@ void TestReadInteraction::TestSubscribeSetDirtyFullyOverlap(nlTestSuite * apSuit
 
             ctx.DrainAndServiceIO();
 
-            NL_TEST_ASSERT(
-                apSuite,
-                !reportScheduler->CheckFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed));
             NL_TEST_ASSERT(apSuite, delegate.mGotReport);
             NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
             NL_TEST_ASSERT(apSuite, delegate.mReceivedAttributePaths[0].mEndpointId == Test::kMockEndpoint2);
@@ -2705,11 +2689,11 @@ void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);
 
-        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
-        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MaxIntervalElapsed, true);
-        // Manually trigger the callback that would schedule the next report as it would normally have been called if the time had
-        // elapsed as simulated above
-        reportScheduler->RunNodeCallbackForHandler(delegate.mpReadHandler);
+        // Advance monotonic timestamp for min interval to elapse
+        gMockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds));
+        ctx.GetIOContext().DriveIO();
+
+        NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().IsRunScheduled());
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().IsRunScheduled());
 
         ctx.DrainAndServiceIO();
@@ -2848,8 +2832,8 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
 
     readPrepareParams.mAttributePathParamsListSize = 2;
 
-    readPrepareParams.mMinIntervalFloorSeconds   = 2;
-    readPrepareParams.mMaxIntervalCeilingSeconds = 5;
+    readPrepareParams.mMinIntervalFloorSeconds   = 0;
+    readPrepareParams.mMaxIntervalCeilingSeconds = 1;
 
     delegate.mNumAttributeResponse       = 0;
     readPrepareParams.mKeepSubscriptions = false;
@@ -2885,7 +2869,6 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
         dirtyPath2.mAttributeId = 2;
 
         // Test report with 2 different path
-        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
 
@@ -2896,14 +2879,13 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
 
         ctx.DrainAndServiceIO();
 
-        NL_TEST_ASSERT(
-            apSuite,
-            !reportScheduler->CheckFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed));
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
-        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
-        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MaxIntervalElapsed, true);
+        // Wait for max interval to elapse
+        gMockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds));
+        ctx.GetIOContext().DriveIO();
+
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         ctx.ExpireSessionBobToAlice();
@@ -3221,8 +3203,8 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout(nlT
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 1;
 
-    readPrepareParams.mMinIntervalFloorSeconds   = 2;
-    readPrepareParams.mMaxIntervalCeilingSeconds = 5;
+    readPrepareParams.mMinIntervalFloorSeconds   = 0;
+    readPrepareParams.mMaxIntervalCeilingSeconds = 1;
 
     delegate.mNumAttributeResponse       = 0;
     readPrepareParams.mKeepSubscriptions = false;
@@ -3251,8 +3233,9 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout(nlT
         dirtyPath1.mEndpointId  = Test::kMockEndpoint3;
         dirtyPath1.mAttributeId = Test::MockAttributeId(4);
 
-        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
-        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MaxIntervalElapsed, true);
+        gMockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds));
+        ctx.GetIOContext().DriveIO();
+
         err = engine->GetReportingEngine().SetDirty(dirtyPath1);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         delegate.mGotReport            = false;
@@ -3324,8 +3307,8 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout(nlTestSui
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 1;
 
-    readPrepareParams.mMinIntervalFloorSeconds   = 2;
-    readPrepareParams.mMaxIntervalCeilingSeconds = 5;
+    readPrepareParams.mMinIntervalFloorSeconds   = 0;
+    readPrepareParams.mMaxIntervalCeilingSeconds = 1;
 
     delegate.mNumAttributeResponse       = 0;
     readPrepareParams.mKeepSubscriptions = false;
@@ -3354,8 +3337,9 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout(nlTestSui
         dirtyPath1.mEndpointId  = Test::kMockEndpoint3;
         dirtyPath1.mAttributeId = Test::MockAttributeId(4);
 
-        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
-        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MaxIntervalElapsed, true);
+        gMockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds));
+        ctx.GetIOContext().DriveIO();
+
         err = engine->GetReportingEngine().SetDirty(dirtyPath1);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         delegate.mGotReport            = false;
@@ -3425,7 +3409,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReport(nlTestSuite * ap
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 1;
 
-    readPrepareParams.mMinIntervalFloorSeconds   = 2;
+    readPrepareParams.mMinIntervalFloorSeconds   = 1;
     readPrepareParams.mMaxIntervalCeilingSeconds = 5;
 
     delegate.mNumAttributeResponse       = 0;
@@ -3460,32 +3444,30 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReport(nlTestSuite * ap
         delegate.mNumAttributeResponse = 0;
         delegate.mNumArrayItems        = 0;
 
-        // wait for min interval 2 seconds(in test, we use 1.9second considering the time variation), expect no event is received,
+        // wait for min interval 1 seconds(in test, we use 0.9second considering the time variation), expect no event is received,
         // then wait for 0.5 seconds, then all chunked dirty reports are sent out, which would not honor minInterval
-        System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicTimestamp();
-        while (true)
-        {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(1900))
-            {
-                break;
-            }
-            ctx.GetIOContext().DriveIO();
-        }
+        gMockClock.AdvanceMonotonic(System::Clock::Milliseconds32(900));
+        ctx.GetIOContext().DriveIO();
+
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
-        startTime = System::SystemClock().GetMonotonicTimestamp();
+        System::Clock::Timestamp startTime = gMockClock.GetMonotonicTimestamp();
+
+        // Increment in time is done by steps here to allow for multiple IO processing at the right time and allow the timer to be
+        // rescheduled accordingly
         while (true)
         {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(500))
+            ctx.GetIOContext().DriveIO();
+            if ((gMockClock.GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(500))
             {
                 break;
             }
-            ctx.GetIOContext().DriveIO();
+            gMockClock.AdvanceMonotonic(System::Clock::Milliseconds32(10));
         }
-        ctx.DrainAndServiceIO();
     }
-    // Two chunked reports carry 4 attributeDataIB: 1 with a list of 3 items,
-    // and then one per remaining item.
-    NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 4);
+    // We get one chunk with 4 array elements, and then one chunk per
+    // element, and the total size of the array is
+    // kMockAttribute4ListLength.
+    NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1 + (kMockAttribute4ListLength - 4));
     NL_TEST_ASSERT(apSuite, delegate.mNumArrayItems == 6);
 
     NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
@@ -4736,14 +4718,11 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession(nlTestSuite *
         NL_TEST_ASSERT(apSuite, SessionHandle(*readHandler->GetSession()) == ctx.GetSessionAliceToBob());
 
         // Test that we send reports as needed.
-        reportScheduler->SetFlagsForHandler(readHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         engine->GetReportingEngine().SetDirty(subscribePath);
-
         ctx.DrainAndServiceIO();
-        NL_TEST_ASSERT(apSuite,
-                       !reportScheduler->CheckFlagsForHandler(readHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed));
+
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
@@ -4753,7 +4732,6 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession(nlTestSuite *
         // Test that if the session is defunct we don't send reports and clean
         // up properly.
         readHandler->GetSession()->MarkAsDefunct();
-        reportScheduler->SetFlagsForHandler(readHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         engine->GetReportingEngine().SetDirty(subscribePath);

@@ -153,8 +153,8 @@ tests:
     ##### Test Implementation
 
     - label:
-          "TH sends the Invoke Request Message to the DUT with the path that
-          indicates a specific endpoint that is unsupported."
+          "Step 1: TH sends the Invoke Request Message to the DUT with the path
+          that indicates a specific endpoint that is unsupported."
       cluster: "AnyCommands"
       command: "CommandById"
       endpoint: PIXIT.IDM.UnsupportedEndPoint
@@ -170,8 +170,8 @@ tests:
           error: UNSUPPORTED_ENDPOINT
 
     - label:
-          "TH sends the Invoke Request Message to the DUT with the path that
-          indicates a specific cluster that is unsupported."
+          "Step 2: TH sends the Invoke Request Message to the DUT with the path
+          that indicates a specific cluster that is unsupported."
       cluster: "AnyCommands"
       command: "CommandById"
       endpoint: InvokeRequestMessage.EndPoint
@@ -187,8 +187,8 @@ tests:
           error: UNSUPPORTED_CLUSTER
 
     - label:
-          "TH sends the Invoke Request Message to the DUT with the path that
-          indicates a specific command that is unsupported."
+          "Step 3: TH sends the Invoke Request Message to the DUT with the path
+          that indicates a specific command that is unsupported."
       cluster: "AnyCommands"
       command: "CommandById"
       endpoint: InvokeRequestMessage.EndPoint
@@ -204,8 +204,8 @@ tests:
           error: UNSUPPORTED_COMMAND
 
     - label:
-          "Setup the TH such that it should not have the privilege for the
-          cluster in the path."
+          "Step 4: Setup the TH such that it should not have the privilege for
+          the cluster in the path."
       cluster: "AccessControl"
       command: "writeAttribute"
       attribute: "ACL"
@@ -230,7 +230,7 @@ tests:
               ]
 
     - label:
-          "TH sends the Invoke Request Message to the DUT with a valid
+          "Step 4: TH sends the Invoke Request Message to the DUT with a valid
           CommandDataIB"
       cluster: "AnyCommands"
       command: "CommandById"
@@ -247,8 +247,8 @@ tests:
           error: UNSUPPORTED_ACCESS
 
     - label:
-          "TH sends the Invoke Request Message to the DUT with a valid and
-          fabric-scoped CommandDataIB"
+          "Step 5: TH sends the Invoke Request Message to the DUT with a valid
+          and fabric-scoped CommandDataIB"
       cluster: "General Commissioning"
       command: "CommissioningComplete"
       endpoint: PIXIT.Cluster.GeneralCommissioning.EndPoint
@@ -275,8 +275,8 @@ tests:
               ]
 
     - label:
-          "(OPTIONAL) TH sends the Invoke Request Message to the DUT with the
-          command which requires a data response to be sent back."
+          "Step 6: (OPTIONAL) TH sends the Invoke Request Message to the DUT
+          with the command which requires a data response to be sent back."
       cluster: "General Commissioning"
       command: "ArmFailSafe"
       endpoint: PIXIT.Cluster.GeneralCommissioning.EndPoint
@@ -292,7 +292,7 @@ tests:
                 value: 0
 
     - label:
-          "TH sends the Invoke Request Message to the DUT with a valid
+          "Step 7: TH sends the Invoke Request Message to the DUT with a valid
           CommandDataIB and SuppressResponse set to True"
       disabled: true
       verification: |
@@ -333,8 +333,9 @@ tests:
               ]
 
     - label:
-          "TH sends a Invoke Request Message to the DUT with the TimedRequest
-          set as TRUE.(There should be no previous Timed Invoke action.)"
+          "Step 8: TH sends a Invoke Request Message to the DUT with the
+          TimedRequest set as TRUE.(There should be no previous Timed Invoke
+          action.)"
       cluster: "AnyCommands"
       command: "CommandById"
       endpoint: InvokeRequestMessage.EndPoint
@@ -370,9 +371,9 @@ tests:
               ]
 
     - label:
-          "TH sends Invoke Request Message to the DUT with the command in the
-          path that requires a Timed Invoke transaction to invoke and this
-          action is not part of a Timed Invoke transaction"
+          "Step 9: TH sends Invoke Request Message to the DUT with the command
+          in the path that requires a Timed Invoke transaction to invoke and
+          this action is not part of a Timed Invoke transaction"
       cluster: "AdministratorCommissioning"
       command: "OpenBasicCommissioningWindow"
       endpoint: PIXIT.Cluster.AdministratorCommissioning.EndPoint

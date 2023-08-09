@@ -152,7 +152,7 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "TStep 2f: H reads CurrentHue attribute from DUT"
+    - label: "Step 2f: H reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -336,7 +336,7 @@ tests:
                 value: 100
 
     - label:
-          "TStep 4b: H sends MoveToHue command to DUT with Hue=120,
+          "Step 4b: H sends MoveToHue command to DUT with Hue=120,
           Direction=0x02 (up) and TransitionTime=300 (30s)"
       PICS: CC.S.F00 && CC.S.C00.Rsp
       command: "MoveToHue"
