@@ -58,6 +58,7 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION=${chip_subscription_timeout_resumption}",
     "CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE=${enable_eventlist_attribute}",
     "CHIP_CONFIG_ENABLE_ICD_SERVER=${chip_enable_icd_server}",
+    "CHIP_CONFIG_ENABLE_READ_CLIENT=${chip_enable_read_client}",
   ]
 }
 
@@ -76,7 +77,6 @@ static_library("app") {
     "AttributePathExpandIterator.h",
     "AttributePathParams.h",
     "AttributePersistenceProvider.h",
-    "BufferedReadCallback.cpp",
     "CASEClient.cpp",
     "CASEClient.h",
     "CASEClientPool.h",
@@ -84,8 +84,6 @@ static_library("app") {
     "CASESessionManager.h",
     "ChunkedWriteCallback.cpp",
     "ChunkedWriteCallback.h",
-    "ClusterStateCache.cpp",
-    "ClusterStateCache.h",
     "CommandHandler.cpp",
     "CommandResponseHelper.h",
     "CommandSender.cpp",
@@ -179,7 +177,6 @@ static_library("app") {
     "OperationalSessionSetup.cpp",
     "OperationalSessionSetup.h",
     "OperationalSessionSetupPool.h",
-    "ReadClient.cpp",
     "ReadHandler.cpp",
     "RequiredPrivilege.cpp",
     "RequiredPrivilege.h",
@@ -191,6 +188,8 @@ static_library("app") {
     "TimedHandler.h",
     "TimedRequest.cpp",
     "TimedRequest.h",
+    "TimerDelegates.cpp",
+    "TimerDelegates.h",
     "WriteClient.cpp",
     "WriteHandler.cpp",
     "reporting/Engine.cpp",
@@ -207,6 +206,15 @@ static_library("app") {
     sources += [
       "SimpleSubscriptionResumptionStorage.cpp",
       "SimpleSubscriptionResumptionStorage.h",
+    ]
+  }
+
+  if (chip_enable_read_client) {
+    sources += [
+      "BufferedReadCallback.cpp",
+      "ClusterStateCache.cpp",
+      "ClusterStateCache.h",
+      "ReadClient.cpp",
     ]
   }
 

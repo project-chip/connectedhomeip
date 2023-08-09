@@ -6438,7 +6438,8 @@ server cluster AccountLogin = 1294 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
   binding cluster GeneralCommissioning;
   binding cluster ThreadNetworkDiagnostics;
   binding cluster Switch;
@@ -7085,7 +7086,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 257, version 1;
+  device type ma_dimmablelight = 257, version 1;
+
   binding cluster Identify;
   binding cluster OnOff;
   binding cluster LevelControl;

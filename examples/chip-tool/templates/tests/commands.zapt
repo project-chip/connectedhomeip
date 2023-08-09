@@ -36,6 +36,18 @@ public:
     }
 };
 
+class PythonRunnerOnlyTestList : public Command
+{
+public:
+    PythonRunnerOnlyTestList() : Command("list-python-runner-only") {};
+    CHIP_ERROR Run() override
+    {
+        {{#chip_tests "../../../../src/app/tests/suites/pythonRunnerOnlyTests.json" includeAllClusters=true}}printf("{{filename}}\n");{{/chip_tests}}
+
+        return CHIP_NO_ERROR;
+    }
+};
+
 {{>test_cluster tests="../../../../src/app/tests/suites/ciTests.json" credsIssuerConfigArg=true needsWaitDuration=true}}
 {{>test_cluster tests="../../../../src/app/tests/suites/manualTests.json" credsIssuerConfigArg=true needsWaitDuration=true}}
 
@@ -49,6 +61,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
 #if CONFIG_ENABLE_YAML_TESTS
         make_unique<TestList>(),
         make_unique<ManualTestList>(),
+        make_unique<PythonRunnerOnlyTestList>(),
       {{#chip_tests "../../../../src/app/tests/suites/ciTests.json" includeAllClusters=true}}
         make_unique<{{filename}}Suite>(credsIssuerConfig),
       {{/chip_tests}}

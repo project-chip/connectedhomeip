@@ -63,17 +63,6 @@ public:
     class ReadHandlerNode : public TimerContext
     {
     public:
-#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
-        /// Test flags to allow TestReadInteraction to simulate expiration of the minimal and maximal intervals without
-        /// waiting
-        enum class TestFlags : uint8_t{
-            MinIntervalElapsed = (1 << 0),
-            MaxIntervalElapsed = (1 << 1),
-        };
-        void SetTestFlags(TestFlags aFlag, bool aValue) { mFlags.Set(aFlag, aValue); }
-        bool GetTestFlags(TestFlags aFlag) const { return mFlags.Has(aFlag); }
-#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
-
         ReadHandlerNode(ReadHandler * aReadHandler, TimerDelegate * aTimerDelegate, ReportScheduler * aScheduler) :
             mTimerDelegate(aTimerDelegate), mScheduler(aScheduler)
         {
@@ -93,29 +82,12 @@ public:
         {
             Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
 
-#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
-            return (mReadHandler->IsGeneratingReports() && (now >= mMinTimestamp || mFlags.Has(TestFlags::MinIntervalElapsed)) &&
-                    (mReadHandler->IsDirty() || (now >= mMaxTimestamp || mFlags.Has(TestFlags::MaxIntervalElapsed)) ||
-                     now >= mSyncTimestamp));
-#else
             return (mReadHandler->IsGeneratingReports() &&
                     (now >= mMinTimestamp && (mReadHandler->IsDirty() || now >= mMaxTimestamp || now >= mSyncTimestamp)));
-#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
         }
 
         bool IsEngineRunScheduled() const { return mEngineRunScheduled; }
-        void SetEngineRunScheduled(bool aEngineRunScheduled)
-        {
-            mEngineRunScheduled = aEngineRunScheduled;
-#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
-            // If the engine becomes unscheduled, this means a run just took place so we reset the test flags
-            if (!mEngineRunScheduled)
-            {
-                mFlags.Set(TestFlags::MinIntervalElapsed, false);
-                mFlags.Set(TestFlags::MaxIntervalElapsed, false);
-            }
-#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
-        }
+        void SetEngineRunScheduled(bool aEngineRunScheduled) { mEngineRunScheduled = aEngineRunScheduled; }
 
         void SetIntervalTimeStamps(ReadHandler * aReadHandler)
         {
@@ -146,9 +118,6 @@ public:
         System::Clock::Timestamp GetSyncTimestamp() const { return mSyncTimestamp; }
 
     private:
-#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
-        BitFlags<TestFlags> mFlags;
-#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
         TimerDelegate * mTimerDelegate;
         ReadHandler * mReadHandler;
         ReportScheduler * mScheduler;
@@ -180,22 +149,6 @@ public:
     size_t GetNumReadHandlers() const { return mNodesPool.Allocated(); }
 
 #ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    void RunNodeCallbackForHandler(const ReadHandler * aReadHandler)
-    {
-        ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
-        node->TimerFired();
-    }
-    void SetFlagsForHandler(const ReadHandler * aReadHandler, ReadHandlerNode::TestFlags aFlag, bool aValue)
-    {
-        ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
-        node->SetTestFlags(aFlag, aValue);
-    }
-
-    bool CheckFlagsForHandler(const ReadHandler * aReadHandler, ReadHandlerNode::TestFlags aFlag)
-    {
-        ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
-        return node->GetTestFlags(aFlag);
-    }
     Timestamp GetMinTimestampForHandler(const ReadHandler * aReadHandler)
     {
         ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);

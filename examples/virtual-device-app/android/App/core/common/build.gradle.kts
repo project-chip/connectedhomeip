@@ -52,6 +52,7 @@ dependencies {
     implementation(Deps.Navigation.fragment)
     implementation(Deps.Navigation.ui)
 
+    implementation(Deps.timber)
     implementation(Deps.zxing)
 
     testImplementation(Deps.Test.junit)

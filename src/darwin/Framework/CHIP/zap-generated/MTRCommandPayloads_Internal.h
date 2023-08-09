@@ -21,6 +21,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface MTROperationalCredentialsClusterAttestationResponseParams ()
+@property (nonatomic, strong) NSData * attestationChallenge;
+@end
+
 @interface MTRGroupsClusterAddGroupResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:

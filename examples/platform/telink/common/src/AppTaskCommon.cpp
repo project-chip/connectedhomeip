@@ -222,6 +222,14 @@ SHELL_STATIC_SUBCMD_SET_CREATE(sub_telink, SHELL_CMD(reboot, NULL, "Reboot board
 SHELL_CMD_REGISTER(telink, &sub_telink, "Telink commands", NULL);
 #endif // CONFIG_CHIP_LIB_SHELL
 
+#ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
+void AppTaskCommon::PowerOnFactoryReset(void)
+{
+    LOG_INF("schedule factory reset");
+    chip::Server::GetInstance().ScheduleFactoryReset();
+}
+#endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
+
 CHIP_ERROR AppTaskCommon::StartApp(void)
 {
     CHIP_ERROR err = GetAppTask().Init();
