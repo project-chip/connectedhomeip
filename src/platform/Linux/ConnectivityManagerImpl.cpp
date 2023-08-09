@@ -1552,12 +1552,12 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
             return 0;
         }
 
-        GVariant * keyMgmt = g_variant_lookup_value(wpa, "KeyMgmt", nullptr);
+        GAutoPtr<GVariant> keyMgmt(g_variant_lookup_value(wpa, "KeyMgmt", nullptr));
         if (keyMgmt == nullptr)
         {
             return 0;
         }
-        const gchar ** keyMgmts        = g_variant_get_strv(keyMgmt, nullptr);
+        const gchar ** keyMgmts        = g_variant_get_strv(MakeUniquePointerReceiver(keyMgmt).Get(), nullptr);
         const gchar ** keyMgmtsForFree = keyMgmts;
         uint8_t res                    = 0;
         for (const gchar * keyMgmtVal = (keyMgmts != nullptr ? *keyMgmts : nullptr); keyMgmtVal != nullptr;
@@ -1572,7 +1572,6 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
                 res |= (kEAP);
             }
         }
-        g_variant_unref(keyMgmt);
         g_free(keyMgmtsForFree);
         return res;
     };
@@ -1581,12 +1580,12 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
         {
             return 0;
         }
-        GVariant * keyMgmt = g_variant_lookup_value(rsn, "KeyMgmt", nullptr);
+        GAutoPtr<GVariant> keyMgmt(g_variant_lookup_value(rsn, "KeyMgmt", nullptr));
         if (keyMgmt == nullptr)
         {
             return 0;
         }
-        const gchar ** keyMgmts        = g_variant_get_strv(keyMgmt, nullptr);
+        const gchar ** keyMgmts        = g_variant_get_strv(MakeUniquePointerReceiver(keyMgmt).Get(), nullptr);
         const gchar ** keyMgmtsForFree = keyMgmts;
         uint8_t res                    = 0;
         for (const gchar * keyMgmtVal = (keyMgmts != nullptr ? *keyMgmts : nullptr); keyMgmtVal != nullptr;
@@ -1609,7 +1608,6 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
                 res |= (1 << 4); // SecurityType::WPA3_PERSONAL
             }
         }
-        g_variant_unref(keyMgmt);
         g_free(keyMgmtsForFree);
         return res;
     };
