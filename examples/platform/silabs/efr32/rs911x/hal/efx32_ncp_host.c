@@ -31,6 +31,7 @@ typedef struct {
 } si91x_packet_queue_t;
 
 osEventFlagsId_t si91x_events   = 0;
+osEventFlagsId_t si91x_bus_events   = 0;
 osThreadId_t si91x_thread       = 0;
 osMutexId_t si91x_bus_mutex     = 0;
 osThreadId_t si91x_event_thread = 0;
@@ -180,6 +181,10 @@ void sl_si91x_host_delay_ms(uint32_t delay_milliseconds)
 void sl_si91x_host_set_event(uint32_t event_mask)
 {
   osEventFlagsSet(si91x_events, event_mask);
+}
+void sl_si91x_host_set_bus_event(uint32_t event_mask)
+{
+  osEventFlagsSet(si91x_bus_events, event_mask);
 }
 
 /*Note: This function is only used to queue the responses in to corresponding response queues*/

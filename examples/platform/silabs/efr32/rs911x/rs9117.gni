@@ -14,7 +14,29 @@ rs911x_src_plat = [
 ]
 
 rs911x_cflags = [ "-Wno-empty-body" ]
-rs911x_src_sapi = []
+rs911x_src_sapi = [
+   "${wifi_sdk_root}/components/si91x/src/sl_si91x_driver.c",
+      "${wifi_sdk_root}/components/si91x/src/sl_rsi_utility.c",
+      "${wifi_sdk_root}/components/si91x/src/sl_si91x_callback_framework.c",
+      "${wifi_sdk_root}/components/si91x/threading/sli_si91x_multithreaded.c",
+      "${wifi_sdk_root}/components/si91x/sl_net/src/sl_net_si91x.c",
+      "${wifi_sdk_root}/components/si91x/sl_net/src/sl_net_rsi_utility.c",
+      "${wifi_sdk_root}/components/si91x/sl_net/src/sl_net_si91x_integration_handler.c",
+       # wifi component
+      "${wifi_sdk_root}/components/protocol/wifi/src/sl_wifi_callback_framework.c",
+      "${wifi_sdk_root}/components/protocol/wifi/si91x/sl_wifi.c",
+          # basic_network_manager component
+      "${wifi_sdk_root}/components/service/network_manager/src/sl_net_basic_credentials.c",
+      "${wifi_sdk_root}/components/service/network_manager/src/sl_net_basic_profiles.c",
+      # si91x_basic_buffers component
+      "${wifi_sdk_root}/components/si91x/memory/malloc_buffers.c",
+      # si91x_support component
+      "${wifi_sdk_root}/components/si91x_support/src/sl_utility.c",
+          # network_manager component
+      "${wifi_sdk_root}/components/service/network_manager/src/sl_net_basic_certificate_store.c",
+      "${wifi_sdk_root}/components/service/network_manager/src/sl_net.c",
+]
+
 
 rs911x_inc_plat = [
   "${examples_plat_dir}/rs911x",
