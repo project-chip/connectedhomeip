@@ -24,5 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Run Summarization Script
-        run: python scripts/tools/summarize_fail.py
+        run: |
+          gh run list -b master -status failure -L 100 > runlist \
+          python scripts/tools/summarize_fail.py
         
