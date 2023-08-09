@@ -27,8 +27,8 @@ if (chip_enable_openthread) {
 static_library("k32w0") {
   sources = [
     "../../../SingletonConfigurationManager.cpp",
-    "../common/RamStorage.cpp",
-    "../common/RamStorageKey.cpp",
+    "../common/BLEManagerCommon.cpp",
+    "../common/BLEManagerCommon.h",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",
@@ -50,6 +50,7 @@ static_library("k32w0") {
     "NFCManagerImpl.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
+    "RamStorage.cpp",
     "SystemTimeSupport.cpp",
     "ble_function_mux.c",
   ]
@@ -59,14 +60,12 @@ static_library("k32w0") {
     "${chip_root}/src/credentials/examples/DeviceAttestationCredsExample.h",
     "${chip_root}/src/credentials/examples/ExampleDACs.h",
     "${chip_root}/src/credentials/examples/ExamplePAI.h",
-    "../common/RamStorage.h",
-    "../common/RamStorageKey.h",
   ]
 
   if (chip_with_factory_data == 1) {
     sources += [
-      "K32W0FactoryDataProvider.cpp",
-      "K32W0FactoryDataProvider.h",
+      "../common/FactoryDataProvider.cpp",
+      "FactoryDataProviderImpl.cpp",
     ]
     public += [
       "${chip_root}/src/credentials/CHIPCert.h",
