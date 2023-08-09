@@ -198,7 +198,10 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     struct pbuf * q;
     uint16_t framelength = 0;
     uint16_t datalength = 0;
+
+#ifdef WIFI_DEBUG_ENABLED
     SILABS_LOG("LWIP : low_level_output");
+#endif
     if (xSemaphoreTake(ethout_sem, portMAX_DELAY) != pdTRUE)
     {
         return ERR_IF;
@@ -210,6 +213,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     if (framelength < LWIP_FRAME_ALIGNMENT) {
         framelength = LWIP_FRAME_ALIGNMENT;
     }
+
     /* Confirm if packet is allocated */
     status = sl_si91x_allocate_command_buffer(&buffer, (void **) &packet, sizeof(sl_si91x_packet_t) + framelength,
                                               SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME);
@@ -237,7 +241,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
 #endif
     /* Generate the packet */
     for (q = p, datalength = 0; q != NULL; q = q->next)
-     {
+    {
         wfx_rsi_pkt_add_data(packet, (uint8_t *) (q->payload), (uint16_t) q->len, datalength);
         datalength += q->len;
     }
