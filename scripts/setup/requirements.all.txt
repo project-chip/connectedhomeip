@@ -8,13 +8,9 @@ virtualenv
 -c constraints.esp32.txt
 -r requirements.esp32.txt
 
--r requirements.mbed.txt
--r requirements.openiotsdk.txt
--r requirements.infineon.txt
 -r requirements.zephyr.txt
 -r requirements.cirque.txt
 -r requirements.memory.txt
--r requirements.yaml_tests.txt
 
 # device controller wheel package
 wheel; sys_platform == 'linux'
