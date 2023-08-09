@@ -1,0 +1,74 @@
+/**
+ * Import the modules used in this configuration.
+ */
+const Display        = scripting.addModule("/ti/display/Display");
+const Display1       = Display.addInstance();
+const SPI            = scripting.addModule("/ti/drivers/SPI");
+const Button         = scripting.addModule("/ti/drivers/apps/Button");
+const Button1        = Button.addInstance();
+const Button2        = Button.addInstance();
+const LED            = scripting.addModule("/ti/drivers/apps/LED");
+const LED1           = LED.addInstance();
+const LED2           = LED.addInstance();
+const LED3           = LED.addInstance();
+const SimpleLinkWifi = scripting.addModule("/ti/drivers/net/wifi/SimpleLinkWifi");
+const net_utils      = scripting.addModule("/ti/drivers/net/wifi/net_utils", {}, false);
+const net_utils1     = net_utils.addInstance();
+const HTTPClient     = scripting.addModule("/ti/net/HTTPClient", {}, false);
+const HTTPClient1    = HTTPClient.addInstance();
+const MQTT           = scripting.addModule("/ti/net/MQTT", {}, false);
+const MQTT1          = MQTT.addInstance();
+const SNTP           = scripting.addModule("/ti/net/SNTP");
+const SlNet          = scripting.addModule("/ti/net/SlNet", {}, false);
+const SlNet1         = SlNet.addInstance();
+
+/**
+ * Write custom configuration values to the imported modules.
+ */
+Display1.$name      = "CONFIG_Display_0";
+Display1.$hardware  = system.deviceData.board.components.XDS110UART;
+Display1.uart.$name = "CONFIG_UART2_0";
+
+const Power          = scripting.addModule("/ti/drivers/Power", {}, false);
+Power.parkPins.$name = "ti_drivers_power_PowerCC32XXPins0";
+
+Button1.$hardware = system.deviceData.board.components.SW2;
+Button1.$name     = "CONFIG_BTN_LEFT";
+
+Button2.$hardware = system.deviceData.board.components.SW3;
+Button2.$name     = "CONFIG_BTN_RIGHT";
+
+LED1.$hardware = system.deviceData.board.components.LED_BLUE;
+LED1.$name     = "CONFIG_LED_BLUE";
+
+LED2.$hardware = system.deviceData.board.components.LED_GREEN;
+LED2.$name     = "CONFIG_LED_GREEN";
+
+LED3.$hardware = system.deviceData.board.components.LED_RED;
+LED3.dimmable  = true;
+LED3.$name     = "CONFIG_LED_RED";
+
+net_utils1.$name = "CONFIG_NET_UTILS_0";
+
+HTTPClient1.$name = "CONFIG_HTTPCLIENT_0";
+
+MQTT1.$name = "CONFIG_MQTT_0";
+
+SlNet1.$name = "CONFIG_SLNET_0";
+
+/**
+ * Pinmux solution for unlocked pins/peripherals. This ensures that minor changes to the automatic solver in a future
+ * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
+ * re-solve from scratch.
+ */
+Display1.uart.uart.$suggestSolution              = "UART1";
+Display1.uart.uart.txPin.$suggestSolution        = "ball.55";
+Display1.uart.uart.txDmaChannel.$suggestSolution = "UDMA_CH11";
+Display1.uart.uart.rxPin.$suggestSolution        = "ball.57";
+Display1.uart.uart.rxDmaChannel.$suggestSolution = "UDMA_CH10";
+Button1.button.$suggestSolution                  = "boosterpack.3";
+Button2.button.$suggestSolution                  = "boosterpack.11";
+LED1.ledPin.$suggestSolution                     = "boosterpack.29";
+LED2.ledPin.$suggestSolution                     = "boosterpack.10";
+LED3.pwmPin.timer.$suggestSolution               = "Timer3";
+LED3.pwmPin.timer.pwmPin.$suggestSolution        = "boosterpack.9";
