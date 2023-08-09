@@ -448,6 +448,9 @@ chip_python_wheel_action("chip-repl") {
     "ipython!=8.1.0",
     "rich",
     "ipykernel",
+
+    # dependencies for running yaml tests
+    "lark",
   ]
 
   if (current_os == "mac") {
