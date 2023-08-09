@@ -80,4 +80,4 @@ private:
  * @retval true on success
  * @retval false if error happened
  */
-bool emberAfHandleEventTrigger(uint64_t eventTrigger);
+bool HandleSmokeCOTestEventTrigger(uint64_t eventTrigger);

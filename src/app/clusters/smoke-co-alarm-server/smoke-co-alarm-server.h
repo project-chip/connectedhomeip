@@ -65,9 +65,9 @@ public:
      * @brief Set the highest level of Expressed State according to priorityOrder
      * @param endpointId ID of the endpoint
      * @param priorityOrder Priority order of expressed state from highest to lowest
-     * @return true on success, false on failure
      */
-    bool AutoSetExpressedState(chip::EndpointId endpointId, std::array<ExpressedStateEnum, kPriorityOrderLength> priorityOrder);
+    void SetExpressedStateByPriority(chip::EndpointId endpointId,
+                                     const std::array<ExpressedStateEnum, kPriorityOrderLength> & priorityOrder);
 
     bool SetSmokeState(chip::EndpointId endpointId, AlarmStateEnum newSmokeState);
     bool SetCOState(chip::EndpointId endpointId, AlarmStateEnum newCOState);

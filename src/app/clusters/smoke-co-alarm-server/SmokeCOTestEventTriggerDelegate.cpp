@@ -28,7 +28,7 @@ bool SmokeCOTestEventTriggerDelegate::DoesEnableKeyMatch(const ByteSpan & enable
 
 CHIP_ERROR SmokeCOTestEventTriggerDelegate::HandleEventTrigger(uint64_t eventTrigger)
 {
-    VerifyOrReturnValue(emberAfHandleEventTrigger(eventTrigger),
+    VerifyOrReturnValue(HandleSmokeCOTestEventTrigger(eventTrigger),
                         (mOtherDelegate != nullptr) ? mOtherDelegate->HandleEventTrigger(eventTrigger)
                                                     : CHIP_ERROR_INVALID_ARGUMENT);
 
