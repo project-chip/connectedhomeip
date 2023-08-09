@@ -150,7 +150,6 @@ void BLEManagerImpl::_Shutdown()
 {
     // Release BLE Stack resources
     mFlags.Set(Flags::kChipoBleShutDown);
-
 }
 
 void BLEManagerImpl::DriveBLEState(intptr_t arg)
@@ -442,7 +441,7 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
         {
         case BT_HCI_ERR_REMOTE_USER_TERM_CONN:
             // Do not treat proper connection termination as an error and exit.
-            VerifyOrExit(!ConfigurationMgr().IsFullyProvisioned(),BLEMgrImpl()._Shutdown());
+            VerifyOrExit(!ConfigurationMgr().IsFullyProvisioned(), BLEMgrImpl()._Shutdown());
             disconReason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
             break;
         case BT_HCI_ERR_LOCALHOST_TERM_CONN:
@@ -467,9 +466,9 @@ exit:
     if (mFlags.Has(Flags::kChipoBleShutDown))
     {
         int ret = bt_disable();
-        if(ret)
+        if (ret)
         {
-            ChipLogError(DeviceLayer, "CHIPoBLE Shutdown faild =%d",ret);
+            ChipLogError(DeviceLayer, "CHIPoBLE Shutdown faild =%d", ret);
         }
         else
         {

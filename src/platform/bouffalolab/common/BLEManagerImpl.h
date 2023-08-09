@@ -83,9 +83,9 @@ private:
         kFastAdvertisingEnabled = 0x0004, /**< The application has enabled fast advertising. */
         kAdvertising            = 0x0008, /**< The system is currently CHIPoBLE advertising. */
         kAdvertisingRefreshNeeded =
-0x0010, /**< The advertising state/configuration has changed, but the SoftDevice has yet to be updated. */
+            0x0010, /**< The advertising state/configuration has changed, but the SoftDevice has yet to be updated. */
         kChipoBleGattServiceRegister = 0x0020, /**< The system has currently CHIPoBLE GATT service registered. */
-        kChipoBleShutDown= 0x0040, /**< The system has disable ble stack. */
+        kChipoBleShutDown            = 0x0040, /**< The system has disable ble stack. */
     };
 
     struct ServiceData;
