@@ -13,13 +13,5 @@
 # limitations under the License.
 
 [build-system]
-requires = [
-   'setuptools',
-   'wheel',
-   'websockets',
-   # Indirect dependencies to run py_matter_idl from the file system
-   'jinja2',
-   'lark',
-   'stringcase',
-]
+requires = ['setuptools', 'wheel']
 build-backend = 'setuptools.build_meta'
