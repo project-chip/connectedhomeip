@@ -13,7 +13,6 @@ virtualenv
 -r requirements.openiotsdk.txt
 -r requirements.infineon.txt
 -r requirements.ti.txt
--r requirements.telink.txt
 -r requirements.zephyr.txt
 -r requirements.cirque.txt
 -r requirements.memory.txt
