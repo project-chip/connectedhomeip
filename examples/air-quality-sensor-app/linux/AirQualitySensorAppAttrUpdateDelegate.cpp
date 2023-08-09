@@ -34,83 +34,44 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
 
-struct MinMaxValues
-{
-    float minValue;
-    float maxValue;
-};
-
 struct ConcentrationFuncPointers
 {
     EmberAfStatus (*setMeasuredValue)(chip::EndpointId, float);
-    EmberAfStatus (*getMinValue)(chip::EndpointId endpoint, DataModel::Nullable<float> & value);
-    EmberAfStatus (*setMinValue)(chip::EndpointId, float);
-    EmberAfStatus (*getMaxValue)(chip::EndpointId endpoint, DataModel::Nullable<float> & value);
-    EmberAfStatus (*setMaxValue)(chip::EndpointId, float);
+    /* Add required function maps */
 };
 
 // Define a map of string keys to function pointers
 std::map<std::string, ConcentrationFuncPointers> ConcentrationFuncMap = {
     { "CarbonMonoxideConcentrationMeasurement",
-      { &CarbonMonoxideConcentrationMeasurement::Attributes::MeasuredValue::Set,
-        &CarbonMonoxideConcentrationMeasurement::Attributes::MinMeasuredValue::Get,
-        &CarbonMonoxideConcentrationMeasurement::Attributes::MinMeasuredValue::Set,
-        &CarbonMonoxideConcentrationMeasurement::Attributes::MaxMeasuredValue::Get,
-        &CarbonMonoxideConcentrationMeasurement::Attributes::MaxMeasuredValue::Set } },
+      { &CarbonMonoxideConcentrationMeasurement::Attributes::MeasuredValue::Set
+        /* Add required function maps */ } },
     { "CarbonDioxideConcentrationMeasurement",
-      { &CarbonDioxideConcentrationMeasurement::Attributes::MeasuredValue::Set,
-        &CarbonDioxideConcentrationMeasurement::Attributes::MinMeasuredValue::Get,
-        &CarbonDioxideConcentrationMeasurement::Attributes::MinMeasuredValue::Set,
-        &CarbonDioxideConcentrationMeasurement::Attributes::MaxMeasuredValue::Get,
-        &CarbonDioxideConcentrationMeasurement::Attributes::MaxMeasuredValue::Set } },
+      { &CarbonDioxideConcentrationMeasurement::Attributes::MeasuredValue::Set
+        /* Add required function maps */ } },
     { "NitrogenDioxideConcentrationMeasurement",
-      { &NitrogenDioxideConcentrationMeasurement::Attributes::MeasuredValue::Set,
-        &NitrogenDioxideConcentrationMeasurement::Attributes::MinMeasuredValue::Get,
-        &NitrogenDioxideConcentrationMeasurement::Attributes::MinMeasuredValue::Set,
-        &NitrogenDioxideConcentrationMeasurement::Attributes::MaxMeasuredValue::Get,
-        &NitrogenDioxideConcentrationMeasurement::Attributes::MaxMeasuredValue::Set } },
+      { &NitrogenDioxideConcentrationMeasurement::Attributes::MeasuredValue::Set
+        /* Add required function maps */ } },
     { "OzoneConcentrationMeasurement",
-      { &OzoneConcentrationMeasurement::Attributes::MeasuredValue::Set,
-        &OzoneConcentrationMeasurement::Attributes::MinMeasuredValue::Get,
-        &OzoneConcentrationMeasurement::Attributes::MinMeasuredValue::Set,
-        &OzoneConcentrationMeasurement::Attributes::MaxMeasuredValue::Get,
-        &OzoneConcentrationMeasurement::Attributes::MaxMeasuredValue::Set } },
+      { &OzoneConcentrationMeasurement::Attributes::MeasuredValue::Set
+        /* Add required function maps */ } },
     { "Pm25ConcentrationMeasurement",
-      { &Pm25ConcentrationMeasurement::Attributes::MeasuredValue::Set,
-        &Pm25ConcentrationMeasurement::Attributes::MinMeasuredValue::Get,
-        &Pm25ConcentrationMeasurement::Attributes::MinMeasuredValue::Set,
-        &Pm25ConcentrationMeasurement::Attributes::MaxMeasuredValue::Get,
-        &Pm25ConcentrationMeasurement::Attributes::MaxMeasuredValue::Set } },
+      { &Pm25ConcentrationMeasurement::Attributes::MeasuredValue::Set
+        /* Add required function maps */ } },
     { "FormaldehydeConcentration",
-      { &FormaldehydeConcentrationMeasurement::Attributes::MeasuredValue::Set,
-        &FormaldehydeConcentrationMeasurement::Attributes::MinMeasuredValue::Get,
-        &FormaldehydeConcentrationMeasurement::Attributes::MinMeasuredValue::Set,
-        &FormaldehydeConcentrationMeasurement::Attributes::MaxMeasuredValue::Get,
-        &FormaldehydeConcentrationMeasurement::Attributes::MaxMeasuredValue::Set } },
+      { &FormaldehydeConcentrationMeasurement::Attributes::MeasuredValue::Set
+        /* Add required function maps */ } },
     { "Pm1ConcentrationMeasurement",
-      { &Pm1ConcentrationMeasurement::Attributes::MeasuredValue::Set,
-        &Pm1ConcentrationMeasurement::Attributes::MinMeasuredValue::Get,
-        &Pm1ConcentrationMeasurement::Attributes::MinMeasuredValue::Set,
-        &Pm1ConcentrationMeasurement::Attributes::MaxMeasuredValue::Get,
-        &Pm1ConcentrationMeasurement::Attributes::MaxMeasuredValue::Set } },
+      { &Pm1ConcentrationMeasurement::Attributes::MeasuredValue::Set
+        /* Add required function maps */ } },
     { "Pm10ConcentrationMeasurement",
-      { &Pm10ConcentrationMeasurement::Attributes::MeasuredValue::Set,
-        &Pm10ConcentrationMeasurement::Attributes::MinMeasuredValue::Get,
-        &Pm10ConcentrationMeasurement::Attributes::MinMeasuredValue::Set,
-        &Pm10ConcentrationMeasurement::Attributes::MaxMeasuredValue::Get,
-        &Pm10ConcentrationMeasurement::Attributes::MaxMeasuredValue::Set } },
+      { &Pm10ConcentrationMeasurement::Attributes::MeasuredValue::Set
+        /* Add required function maps */ } },
     { "TotalVolatileOrganicCompoundsConcentrationMeasurement",
-      { &TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::MeasuredValue::Set,
-        &TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::MinMeasuredValue::Get,
-        &TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::MinMeasuredValue::Set,
-        &TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::MaxMeasuredValue::Get,
-        &TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::MaxMeasuredValue::Set } },
+      { &TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::MeasuredValue::Set
+        /* Add required function maps */ } },
     { "RadonConcentrationMeasurement",
-      { &RadonConcentrationMeasurement::Attributes::MeasuredValue::Set,
-        &RadonConcentrationMeasurement::Attributes::MinMeasuredValue::Get,
-        &RadonConcentrationMeasurement::Attributes::MinMeasuredValue::Set,
-        &RadonConcentrationMeasurement::Attributes::MaxMeasuredValue::Get,
-        &RadonConcentrationMeasurement::Attributes::MaxMeasuredValue::Set } }
+      { &RadonConcentrationMeasurement::Attributes::MeasuredValue::Set
+        /* Add required function maps */ } }
 };
 
 AirQualitySensorAttrUpdateHandler * AirQualitySensorAttrUpdateHandler::FromJSON(const char * json)
@@ -204,7 +165,7 @@ void AirQualitySensorAttrUpdateHandler::OnHumidityChangeHandler(uint16_t newValu
 
 void AirQualitySensorAttrUpdateHandler::OnConcetratorChangeHandler(std::string ConcentrationName, float newValue)
 {
-    auto [setMeasuredValue, getMinValue, setMinValue, getMaxValue, setMaxValue] = ConcentrationFuncMap[ConcentrationName];
+    auto [setMeasuredValue] = ConcentrationFuncMap[ConcentrationName];
 
     VerifyOrReturn(setMeasuredValue != NULL, ChipLogError(NotSpecified, "Invalid Concentration %s", ConcentrationName.c_str()));
 
