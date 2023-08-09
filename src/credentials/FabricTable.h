@@ -112,6 +112,8 @@ public:
 
     bool HasOperationalKey() const { return mOperationalKey != nullptr; }
 
+    bool ShouldAdvertiseIdentity() const { return mShouldAdvertiseIdentity; }
+
     friend class FabricTable;
 
 private:
@@ -125,6 +127,7 @@ private:
         VendorId vendorId                        = VendorId::NotSpecified; /**< Vendor ID for commissioner of fabric */
         Crypto::P256Keypair * operationalKeypair = nullptr;
         bool hasExternallyOwnedKeypair           = false;
+        bool advertiseIdentity                   = false;
 
         CHIP_ERROR AreValid() const
         {
@@ -204,7 +207,9 @@ private:
         {
             chip::Platform::Delete(mOperationalKey);
         }
-        mOperationalKey = nullptr;
+        mOperationalKey                   = nullptr;
+        mHasExternallyOwnedOperationalKey = false;
+        mShouldAdvertiseIdentity          = true;
 
         mFabricIndex = kUndefinedFabricIndex;
         mNodeId      = kUndefinedNodeId;
@@ -230,14 +235,16 @@ private:
     // mFabricLabel is 33 bytes, so ends on a 1 mod 4 byte boundary.
     char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
 
-    // mFabricIndex, mVendorId, mHasExternallyOwnedOperationalKey are 4 bytes
-    // and do not end up with any padding if they come after the 33-byte
-    // mFabricLabel, so end on a 1 mod 4 byte boundary.
+    // mFabricIndex, mVendorId, mHasExternallyOwnedOperationalKey,
+    // mShouldAdvertiseIdentity are 5 bytes and do not include any padding if
+    // they come after the 33-byte mFabricLabel, so end on a 2 mod 4 byte
+    // boundary.
     FabricIndex mFabricIndex               = kUndefinedFabricIndex;
     VendorId mVendorId                     = VendorId::NotSpecified;
     bool mHasExternallyOwnedOperationalKey = false;
+    bool mShouldAdvertiseIdentity          = true;
 
-    // 3 bytes of padding here, since mOperationalKey needs to be void*-aligned,
+    // 2 bytes of padding here, since mOperationalKey needs to be void*-aligned,
     // so has to be at a 0 mod 4 byte location.
 
     mutable Crypto::P256Keypair * mOperationalKey = nullptr;
@@ -399,6 +406,12 @@ public:
     // Non-copyable
     FabricTable(FabricTable const &) = delete;
     void operator=(FabricTable const &) = delete;
+
+    enum class AdvertiseIdentity : uint8_t
+    {
+        Yes,
+        No
+    };
 
     // Returns CHIP_ERROR_NOT_FOUND if there is no fabric for that index.
     CHIP_ERROR Delete(FabricIndex fabricIndex);
@@ -783,9 +796,10 @@ public:
      * @retval other CHIP_ERROR_* on internal errors or certificate validation errors.
      */
     CHIP_ERROR AddNewPendingFabricWithOperationalKeystore(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId,
-                                                          FabricIndex * outNewFabricIndex)
+                                                          FabricIndex * outNewFabricIndex,
+                                                          AdvertiseIdentity advertiseIdentity = AdvertiseIdentity::Yes)
     {
-        return AddNewPendingFabricCommon(noc, icac, vendorId, nullptr, false, outNewFabricIndex);
+        return AddNewPendingFabricCommon(noc, icac, vendorId, nullptr, false, advertiseIdentity, outNewFabricIndex);
     };
 
     /**
@@ -818,9 +832,11 @@ public:
      */
     CHIP_ERROR AddNewPendingFabricWithProvidedOpKey(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId,
                                                     Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
-                                                    FabricIndex * outNewFabricIndex)
+                                                    FabricIndex * outNewFabricIndex,
+                                                    AdvertiseIdentity advertiseIdentity = AdvertiseIdentity::Yes)
     {
-        return AddNewPendingFabricCommon(noc, icac, vendorId, existingOpKey, isExistingOpKeyExternallyOwned, outNewFabricIndex);
+        return AddNewPendingFabricCommon(noc, icac, vendorId, existingOpKey, isExistingOpKeyExternallyOwned, advertiseIdentity,
+                                         outNewFabricIndex);
     };
 
     /**
@@ -852,9 +868,10 @@ public:
      * @retval CHIP_ERROR_INVALID_ARGUMENT if any of the arguments are invalid such as too large or out of bounds.
      * @retval other CHIP_ERROR_* on internal errors or certificate validation errors.
      */
-    CHIP_ERROR UpdatePendingFabricWithOperationalKeystore(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac)
+    CHIP_ERROR UpdatePendingFabricWithOperationalKeystore(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
+                                                          AdvertiseIdentity advertiseIdentity = AdvertiseIdentity::Yes)
     {
-        return UpdatePendingFabricCommon(fabricIndex, noc, icac, nullptr, false);
+        return UpdatePendingFabricCommon(fabricIndex, noc, icac, nullptr, false, advertiseIdentity);
     }
 
     /**
@@ -886,9 +903,10 @@ public:
      */
 
     CHIP_ERROR UpdatePendingFabricWithProvidedOpKey(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
-                                                    Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned)
+                                                    Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
+                                                    AdvertiseIdentity advertiseIdentity = AdvertiseIdentity::Yes)
     {
-        return UpdatePendingFabricCommon(fabricIndex, noc, icac, existingOpKey, isExistingOpKeyExternallyOwned);
+        return UpdatePendingFabricCommon(fabricIndex, noc, icac, existingOpKey, isExistingOpKeyExternallyOwned, advertiseIdentity);
     }
 
     /**
@@ -1050,16 +1068,17 @@ private:
 
     // Core validation logic for fabric additions/updates
     CHIP_ERROR AddOrUpdateInner(FabricIndex fabricIndex, bool isAddition, Crypto::P256Keypair * existingOpKey,
-                                bool isExistingOpKeyExternallyOwned, uint16_t vendorId);
+                                bool isExistingOpKeyExternallyOwned, uint16_t vendorId, AdvertiseIdentity advertiseIdentity);
 
     // Common code for fabric addition, for either OperationalKeystore or injected key scenarios.
     CHIP_ERROR AddNewPendingFabricCommon(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId,
                                          Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
-                                         FabricIndex * outNewFabricIndex);
+                                         AdvertiseIdentity advertiseIdentity, FabricIndex * outNewFabricIndex);
 
     // Common code for fabric updates, for either OperationalKeystore or injected key scenarios.
     CHIP_ERROR UpdatePendingFabricCommon(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
-                                         Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned);
+                                         Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
+                                         AdvertiseIdentity advertiseIdentity);
 
     // Common code for looking up a fabric given a root public key, a fabric ID and an optional node id scoped to that fabric.
     const FabricInfo * FindFabricCommon(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId,

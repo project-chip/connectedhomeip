@@ -17,6 +17,7 @@
  */
 
 #pragma once
+
 #include "operational-state-cluster-objects.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>

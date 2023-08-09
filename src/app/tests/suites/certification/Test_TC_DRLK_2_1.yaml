@@ -583,7 +583,7 @@ tests:
           constraints:
               type: int16u
               minValue: 0
-              maxValue: 65534
+              maxValue: 255
 
     - label: "Step 17b: TH writes MinRFIDCodeLength attribute as 17"
       PICS: DRLK.S.F01 && DRLK.S.A001a
