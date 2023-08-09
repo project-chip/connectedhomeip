@@ -63,7 +63,8 @@ public:
      * @param key       Key with which to decrypt the check-in payload
      * @param payload   The received payload to decrypt and parse
      * @param counter   The counter value retrieved from the payload
-     * @param appData   The optional application data decrypted
+     * @param appData   The optional application data decrypted. Size can be retrieved prior to decryption by using the 
+     *                  GetAppDataSize() method.
      * @return CHIP_ERROR
      */
     static CHIP_ERROR ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & key, ByteSpan & payload, uint32_t & counter,
@@ -71,11 +72,17 @@ public:
 
     static inline uint64_t GetRequiredBufferSize(uint32_t & payloadSize) { return payloadSize + sMinPayloadSize; }
 
+    /**
+     * @brief Get the App Data Size
+     * 
+     * @param payload   The undecrypted payload
+     * @return uint16_t size in byte of the application data from the payload
+     */
+    static uint16_t GetAppDataSize(ByteSpan & payload);
+
     static constexpr uint16_t sMinPayloadSize =
         CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES + sizeof(CounterType) + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
 
-private:
-    static uint16_t GetAppDataSize(ByteSpan & payload);
 };
 
 } // namespace SecureChannel

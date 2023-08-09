@@ -92,7 +92,7 @@ CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & 
 
 uint16_t CheckinMessage::GetAppDataSize(ByteSpan & payload)
 {
-    return (payload.size() < sMinPayloadSize) ? 0 : static_cast<uint16_t>(payload.size() - sMinPayloadSize);
+    return (payload.size() <= sMinPayloadSize) ? 0 : static_cast<uint16_t>(payload.size() - sMinPayloadSize);
 }
 
 } // namespace SecureChannel

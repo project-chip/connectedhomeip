@@ -53,6 +53,7 @@ static_library("secure_channel") {
   public_deps = [
     ":type_definitions",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/crypto",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/system",
