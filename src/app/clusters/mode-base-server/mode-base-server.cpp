@@ -369,10 +369,26 @@ void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeTo
 
     Commands::ChangeToModeResponse::Type response;
 
+    // If the NewMode field doesn't match the Mode field of any entry of the SupportedModes list,
+    // the ChangeToModeResponse command's Status field SHALL indicate UnsupportedMode and
+    // the StatusText field SHALL be included and MAY be used to indicate the issue, with a human readable string,
+    // or include an empty string.
+    // We are leaving the StatusText empty since the Status is descriptive enough.
     if (!IsSupportedMode(newMode))
     {
         ChipLogError(Zcl, "ModeBase: Failed to find the option with mode %u", newMode);
         response.status = to_underlying(StatusCode::kUnsupportedMode);
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
+    }
+
+    // If the NewMode field is the same as the value of the CurrentMode attribute
+    // the ChangeToModeResponse command SHALL have the Status field set to Success and
+    // the StatusText field MAY be supplied with a human readable string or include an empty string.
+    // We are leaving the StatusText empty since the Status is descriptive enough.
+    if (newMode == GetCurrentMode())
+    {
+        response.status = to_underlying(ModeBase::StatusCode::kSuccess);
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
         return;
     }
