@@ -89,7 +89,7 @@ volatile sl_status_t callback_status = SL_STATUS_OK;
 int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
 {
     sl_status_t status            = SL_STATUS_OK;
-    uint8_t rssi = 0;
+    int32_t rssi = 0;
     ap->security = wfx_rsi.sec.security;
     ap->chan     = wfx_rsi.ap_chan;
     memcpy(&ap->bssid[0], &wfx_rsi.ap_mac.octet[0], BSSID_MAX_STR_LEN);
@@ -299,7 +299,7 @@ sl_status_t scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t *
     }
     wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
     wfx_rsi.ap_chan      = scan_result->scan_info[0].rf_channel;
-    memcpy(&wfx_rsi.ap_mac.octet[0], scan_result->scan_info[0].bssid[0], BSSID_MAX_STR_LEN);
+    memcpy(&wfx_rsi.ap_mac.octet, scan_result->scan_info[0].bssid, BSSID_MAX_STR_LEN);
     switch (scan_result->scan_info[0].security_mode)
     {
     case SL_WIFI_OPEN:
@@ -338,10 +338,10 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t *scan_result)
   wfx_wifi_scan_result_t ap;
   if (wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED)
   {
-    for (x = 0; x < scan_result->scan_count; x++)
+    for (x = 0; x < (int)scan_result->scan_count; x++)
     {
       strcpy(&ap.ssid[0], (char *) &scan_result->scan_info[x].ssid);
-      uint8_t *bssid = (uint8_t *)&scan_result->scan_info[x].bssid;
+     // uint8_t *bssid = (uint8_t *)&scan_result->scan_info[x].bssid;
       if (wfx_rsi.scan_ssid)
       {
         SILABS_LOG("SCAN SSID: %s , ap scan: %s", wfx_rsi.scan_ssid, ap.ssid);
@@ -408,7 +408,7 @@ static void wfx_rsi_save_ap_info() // translation
         }
         status = scan_results_complete ? callback_status : SL_STATUS_TIMEOUT;
     }
-    return status;
+    return ;
 }
 
 /********************************************************************************************
@@ -475,7 +475,7 @@ static void wfx_rsi_do_join(void)
         status = sl_net_set_credential(id, SL_NET_WIFI_PSK, &wfx_rsi.sec.passkey[0], strlen(wfx_rsi.sec.passkey));
         if (SL_STATUS_OK != status)
         {
-            return status;
+            return ;
         }
 
         sl_wifi_client_configuration_t ap = { 0 };
@@ -660,10 +660,8 @@ void wfx_rsi_task(void * arg)
             if (!(wfx_rsi.dev_state & WFX_RSI_ST_SCANSTARTED))
             {
                 SILABS_LOG("%s: start SSID scan", __func__);
-                int x;
                 sl_wifi_scan_configuration_t wifi_scan_configuration              = { 0 };
-                wfx_wifi_scan_result_t ap;
-                // TODO: Add scan logic
+
                 sl_wifi_advanced_scan_configuration_t advanced_scan_configuration = { 0 };
                 int32_t status;
                 advanced_scan_configuration.active_channel_time  = ADV_ACTIVE_SCAN_DURATION;
@@ -672,7 +670,6 @@ void wfx_rsi_task(void * arg)
                 advanced_scan_configuration.trigger_level_change = ADV_RSSI_TOLERANCE_THRESHOLD;
                 advanced_scan_configuration.enable_multi_probe   = ADV_MULTIPROBE;
                 status = sl_wifi_set_advanced_scan_configuration(&advanced_scan_configuration);
-                VERIFY_STATUS_AND_RETURN(status);
                 /* Terminate with end of scan which is no ap sent back */
                 wifi_scan_configuration.type                   = SL_WIFI_SCAN_TYPE_ADV_SCAN;
                 wifi_scan_configuration.periodic_scan_interval = ADV_SCAN_PERIODICITY;
@@ -735,32 +732,6 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
  * see also: int32_t rsi_wlan_send_data_xx(uint8_t *buffer, uint32_t length)
  */
 /********************************************************************************************
- * @fn   void *wfx_rsi_alloc_pkt()
- * @brief
- *       Allocate packet to send data
- * @param[in] None
- * @return
- *        None
- **********************************************************************************************/
-void * wfx_rsi_alloc_pkt(uint16_t data_length)
-{
-    sl_wifi_buffer_t * buffer;
-    sl_si91x_packet_t * packet;
-    sl_status_t status = SL_STATUS_OK;
-
-    /* Confirm if packet is allocated */
-
-    status = sl_si91x_allocate_command_buffer(&buffer, (void **) &packet, sizeof(sl_si91x_packet_t) + data_length,
-                                              SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME);
-    //    VERIFY_STATUS_AND_RETURN(status);
-    if (packet == NULL)
-    {
-        return SL_STATUS_ALLOCATION_FAILED;
-    }
-    return (void *) packet;
-}
-
-/********************************************************************************************
  * @fn   void wfx_rsi_pkt_add_data(void *p, uint8_t *buf, uint16_t len, uint16_t off)
  * @brief
  *       add the data into packet
@@ -776,27 +747,4 @@ void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off)
     sl_si91x_packet_t * pkt;
     pkt = (sl_si91x_packet_t *) p;
     memcpy(((char *) pkt->data) + off, buf, len);
-}
-
-/********************************************************************************************
- * @fn   int32_t wfx_rsi_send_data(void *p, uint16_t len)
- * @brief
- *       Driver send a data
- * @param[in]  p:
- * @param[in]  len:
- * @return
- *        None
- **********************************************************************************************/
-int32_t wfx_rsi_send_data(void * p, uint16_t len)
-{
-    int32_t status;
-    sl_wifi_buffer_t * buffer;
-    buffer = (sl_wifi_buffer_t *) p;
-
-    if (sl_si91x_driver_send_data_packet(SI91X_WLAN_CMD_QUEUE, buffer, RSI_SEND_RAW_DATA_RESPONSE_WAIT_TIME))
-    {
-        SILABS_LOG("*ERR*EN-RSI:Send fail");
-        return ERR_IF;
-    }
-    return status;
 }

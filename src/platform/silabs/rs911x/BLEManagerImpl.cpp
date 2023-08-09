@@ -42,7 +42,7 @@ extern "C" {
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 #include "wfx_sl_ble_init.h"
-#ifndef SIWX_917
+#if !(SI917 | EXP_BOARD)
 #include <rsi_driver.h>
 #endif
 #include <rsi_utils.h>

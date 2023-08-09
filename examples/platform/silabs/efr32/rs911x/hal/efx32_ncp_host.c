@@ -73,11 +73,11 @@ sl_status_t sl_si91x_host_init(void)
   NVIC_SetPriority(GPIO_ODD_IRQn, PACKET_PENDING_INT_PRI);
 
   // Configure interrupt, sleep and wake confirmation pins
-  GPIOINT_CallbackRegister(WFX_INTERRUPT_PIN, gpio_interrupt);
+  GPIOINT_CallbackRegister(WFX_INTERRUPT_PIN.pin, gpio_interrupt);
   GPIO_PinModeSet(WFX_INTERRUPT_PIN.port, WFX_INTERRUPT_PIN.pin, gpioModeInputPullFilter, 0);
   GPIO_ExtIntConfig(WFX_INTERRUPT_PIN.port, WFX_INTERRUPT_PIN.pin, SL_WFX_HOST_PINOUT_SPI_IRQ, true, false, true);
   GPIO_PinModeSet(WFX_SLEEP_CONFIRM_PIN.port, WFX_SLEEP_CONFIRM_PIN.pin, gpioModeWiredOrPullDown, 1);
-  GPIO_PinModeSet(WAKE_INDICATOR_PIN.port.port, WAKE_INDICATOR_PIN.pin, gpioModeWiredOrPullDown, 0);
+  GPIO_PinModeSet(WAKE_INDICATOR_PIN.port, WAKE_INDICATOR_PIN.pin, gpioModeWiredOrPullDown, 0);
 
   memset(cmd_queues, 0, sizeof(cmd_queues));
 
@@ -337,13 +337,13 @@ uint32_t si91x_host_clear_events(uint32_t event_mask)
 
 void sl_si91x_host_hold_in_reset(void)
 {
-  GPIO_PinModeSet(WFX_RESET_PIN, WFX_RESET_PIN, gpioModePushPull, 1);
-  GPIO_PinOutClear(WFX_RESET_PIN, WFX_RESET_PIN);
+  GPIO_PinModeSet(WFX_RESET_PIN.port, WFX_RESET_PIN.pin, gpioModePushPull, 1);
+  GPIO_PinOutClear(WFX_RESET_PIN.port, WFX_RESET_PIN.pin);
 }
 
 void sl_si91x_host_release_from_reset(void)
 {
-  GPIO_PinModeSet(WFX_RESET_PIN, WFX_RESET_PIN, gpioModeWiredOrPullDown, 1);
+  GPIO_PinModeSet(WFX_RESET_PIN.port, WFX_RESET_PIN.pin, gpioModeWiredOrPullDown, 1);
 }
 
 void sl_si91x_host_enable_bus_interrupt(void)

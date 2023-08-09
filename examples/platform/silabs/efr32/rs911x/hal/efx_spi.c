@@ -70,7 +70,8 @@
 #include "sl_device_init_hfxo.h"
 
 #define DEFAULT_SPI_TRASFER_MODE 0
-
+// Macro to drive semaphore block minimun timer in milli seconds
+#define RSI_SEM_BLOCK_MIN_TIMER_VALUE_MS (50)
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #include "sl_power_manager.h"
 #endif
@@ -131,7 +132,7 @@ void sl_wfx_host_gpio_init(void)
     GPIO_PinModeSet(WFX_INTERRUPT_PIN.port, WFX_INTERRUPT_PIN.pin, gpioModeInputPull, PINOUT_CLEAR);
     GPIO_ExtIntConfig(WFX_INTERRUPT_PIN.port, WFX_INTERRUPT_PIN.pin, SL_WFX_HOST_PINOUT_SPI_IRQ, true, false, true);
     GPIOINT_CallbackRegister(SL_WFX_HOST_PINOUT_SPI_IRQ, rsi_gpio_irq_cb);
-    GPIO_IntDisable(1 << SG+SL_WFX_HOST_PINOUT_SPI_IRQ); /* Will be enabled by RSI */
+    GPIO_IntDisable(1 << SL_WFX_HOST_PINOUT_SPI_IRQ); /* Will be enabled by RSI */
 
     // Change GPIO interrupt priority (FreeRTOS asserts unless this is done here!)
     NVIC_SetPriority(GPIO_EVEN_IRQn, WFX_SPI_NVIC_PRIORITY);
@@ -435,5 +436,5 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
  **************************************************************************/
 sl_status_t si91x_host_spi_transfer(const void *tx_buf, void *rx_buf, uint16_t xlen)
 {
-    rsi_spi_transfer(tx_buf, rx_buf, xlen, DEFAULT_SPI_TRASFER_MODE);
+    return(rsi_spi_transfer((uint8_t *)tx_buf, rx_buf, xlen, DEFAULT_SPI_TRASFER_MODE));
 }

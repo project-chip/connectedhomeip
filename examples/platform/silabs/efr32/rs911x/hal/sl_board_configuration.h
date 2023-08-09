@@ -24,10 +24,13 @@ typedef struct
     unsigned char pin;
 } sl_pin_t;
 
-#define PACKET_PENDING_INT_PRI 3
+#define PIN(port_id, pin_id)                 \
+  (sl_pin_t)                                 \
+  {                                          \
+    .port = gpioPort##port_id, .pin = pin_id \
+  }
 
-#define PIN(port_id, pin_id)                                                                                                       \
-    (sl_pin_t) { .port = gpioPort##port_id, .pin = pin_id }
+#define PACKET_PENDING_INT_PRI 3
 
 #if defined(EFR32MG12_BRD4161A) || defined(BRD4161A) || defined(EFR32MG12_BRD4162A) || defined(BRD4162A) ||                        \
     defined(EFR32MG12_BRD4163A) || defined(BRD4163A) || defined(EFR32MG12_BRD4164A) || defined(BRD4164A) ||                        \
