@@ -1,7 +1,10 @@
-# Unify matter bridge unit testing
+# Unify matter pc unit testing
 
-The Matter bridge test infrastructure leverages the test ecosystem of Matter itself. Writing a unit test is done with the NL Unit test framework and Matter
-helper functions. Please refer to [Test example](TestExample.cpp) for an example of how to write a simple unit test. After writing a unit test remember to add the source file in the [BUILD.gn](BUILD.gn).
+The Matter PC test infrastructure leverages the test ecosystem of Matter itself.
+Writing a unit test is done with the NL Unit test framework and Matter helper
+functions. Please refer to [Test example](TestExample.cpp) for an example of how
+to write a simple unit test. After writing a unit test remember to add the
+source file in the [BUILD.gn](BUILD.gn).
 
 ## Build the docker container (host compilation)
 
@@ -32,16 +35,18 @@ root@docker:/matter$ source ./scripts/activate.sh
 
 ## Compiling the unit test
 
-Before compiliing a unit test, use the following GN command to generate the ninja files necessary for the build process:
+Before compiliing a unit test, use the following GN command to generate the
+ninja files necessary for the build process:
 
 ```bash
-silabs_examples/unify-matter-bridge/linux$ gn gen out/host --args='chip_build_tests=true use_coverage=true'
+silabs_examples/unify-matter-pc/linux$ gn gen out/host --args='chip_build_tests=true use_coverage=true'
 ```
 
-After generating the ninja files, the tests are generated with the following command:
+After generating the ninja files, the tests are generated with the following
+command:
 
 ```bash
-silabs_examples/unify-matter-bridge/linux$ ninja -C out/host check
+silabs_examples/unify-matter-pc/linux$ ninja -C out/host check
 ```
 
 This generates test binaries inside `out/host/tests` where test executables can
@@ -52,7 +57,7 @@ be found.
 Unit tests are run by first locating your test binary and then executing it.
 
 ```bash
-matter/silabs_examples/unify-matter-bridge/linux$ ./out/host/tests/TestExample
+matter/silabs_examples/unify-matter-pc/linux$ ./out/host/tests/TestExample
 '#0:','ExampleTests'
 '#3:','Example::TestExample','PASSED'
 '#6:','0','1'
@@ -64,7 +69,5 @@ matter/silabs_examples/unify-matter-bridge/linux$ ./out/host/tests/TestExample
 To understand unit test coverage, run the following helper script:
 
 ```bash
-matter/silabs_examples/unify-matter-bridge/linux$ ../../../scripts/build_coverage.sh --output_root out/host
+matter/silabs_examples/unify-matter-pc/linux$ ../../../scripts/build_coverage.sh --output_root out/host
 ```
-
-Refer [Cluster Unit Test Case](readme_clustertest.md) for more details on how to write unit test to test cluster support added to matter bridge.

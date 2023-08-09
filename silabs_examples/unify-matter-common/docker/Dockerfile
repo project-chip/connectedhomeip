@@ -23,7 +23,8 @@ ARG HOST_DEPS="ninja-build=1.10.1-1 git=1:2.30.2-1* git-lfs=2.13.2-1+b5 \
   build-essential=12.9 \
   clang=1:11.0-51+nmu5 nlohmann-json3-dev=3.9.1-1 \
   libdbus-glib-1-dev=0.110-6 libssl-dev=1.1.1n-0* \
-  libgirepository1.0-dev=1.66.1-1+b1"
+  libgirepository1.0-dev=1.66.1-1+b1 \
+  fakeroot=1.25.3-1.1"
 
 # configure additional arches in dpkg/apt
 RUN for arch in ${ARCH} ; do \
@@ -52,7 +53,7 @@ RUN curl -L https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86
   && ln -sf /usr/local/miniconda/bin/pip3 /usr/bin/pip3
 
 # Install gcvor
-RUN pip3 install --no-cache-dir gcovr==5.2
+RUN pip3 install --no-cache-dir gcovr==5.2 deb-pkg-tools==8.4
 
 # Rust Version to install
 ENV RUST_VERSION=1.65.0

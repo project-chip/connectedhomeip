@@ -33,7 +33,7 @@ dev-machine:~/matter$ git clone --depth 1 https://github.com/SiliconLabs/UnifySD
 ## Build the docker container (host compilation)
 
 ```bash
-dev-machine:~/matter$ docker build -t unify-matter-host --build-arg ARCH=amd64 silabs_examples/unify-matter-bridge/docker/
+dev-machine:~/matter$ docker build -t unify-matter-host --build-arg ARCH=amd64 silabs_examples/unify-matter-common/docker/
 ```
 ## Run the docker container (host compilation)
 

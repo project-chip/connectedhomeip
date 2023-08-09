@@ -1,0 +1,101 @@
+/*******************************************************************************
+ * # License
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * The licensor of this software is Silicon Laboratories Inc. Your use of this
+ * software is governed by the terms of Silicon Labs Master Software License
+ * Agreement (MSLA) available at
+ * www.silabs.com/about-us/legal/master-software-license-agreement. This
+ * software is distributed to you in Source Code format and is governed by the
+ * sections of the MSLA applicable to Source Code.
+ *
+ ******************************************************************************/
+
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <AppMain.h>
+#include "sl_log.h"
+#include "dotdot_mqtt.h"
+#include "mpc_sendable_command.hpp"
+#include "mpc_attribute_store.h"
+#include "unify_dotdot_attribute_store.h"
+#include "attribute.hpp"
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::OnOff;
+using namespace chip::app::Clusters::LevelControl;
+using namespace mpc;
+using namespace attribute_store;
+
+#define LOG_TAG "matter_cluster_command_server"
+
+/**
+* @brief Checks if the cluster's command is supported by device with the given UNID under the given endpoint
+*/
+static sl_status_t check_cluster_support_for_node(const dotdot_unid_t unid, dotdot_endpoint_id_t endpoint, 
+    ClusterId clusID, CommandId cmdId)
+{
+    // get the attribute store node for the given endpoint ID 
+    attribute_store_node_t epNode = mpc_attribute_store_network_helper_get_endpoint_node(unid, endpoint);
+
+    //get the cluster's AcceptedCommandList attribute entry from attribute store 
+    attribute_store_type_t type = ((clusID & 0xFFFF) << 16) | chip::app::Clusters::Globals::Attributes::AcceptedCommandList::Id;
+    auto cmdList = attribute(epNode).child_by_type(type);
+    if (!cmdList.is_valid()) return SL_STATUS_FAIL;
+
+    // check if the command ID is listed in the AcceptedCommandList entry
+    if (cmdList.reported<std::string>().find(std::to_string(cmdId)) != std::string::npos)
+        return SL_STATUS_OK;
+    return SL_STATUS_FAIL;
+}
+
+{{#zcl_clusters}}
+{{#if (supportedClusterByMpc code)}}
+// Callbacks used by the {{asSnakeCaseLower label}} cluster
+{{#zcl_commands}}
+static sl_status_t mpc_{{commandCbFnName this}} (
+  const dotdot_unid_t unid,
+  dotdot_endpoint_id_t endpoint,
+  uic_mqtt_dotdot_callback_call_type_t callback_type
+{{#zcl_command_arguments}}{{#first}},{{/first}}
+{{#if (isUnifyEnumNameDifferent type) }}
+  {{unifyEnumName type}} {{asSnakeCaseLower label}}{{listComma this}}
+{{else}}
+  {{asUnderlyingType type}} {{asSnakeCaseLower label}}{{listComma this}}
+{{/if}}
+{{/zcl_command_arguments}}
+) {
+  chip::EndpointId endpointId;
+  chip::NodeId nodeId;
+  SendableCommand<chip::app::Clusters::{{clusterNameWithoutSlash parent.label}}::Commands::{{label}}::Type> cmd;
+{{#zcl_command_arguments}}
+  cmd.Data().{{asLowerCamelCase label}} = static_cast<{{zapTypeToEncodableClusterObjectType type}}>({{asSnakeCaseLower label}});
+{{/zcl_command_arguments}}
+  
+  if (UIC_MQTT_DOTDOT_CALLBACK_TYPE_SUPPORT_CHECK == callback_type)
+        return check_cluster_support_for_node(unid, endpoint, chip::app::Clusters::{{clusterNameWithoutSlash parent.label}}::Id, chip::app::Clusters::{{clusterNameWithoutSlash parent.label}}::Commands::{{label}}::Id);
+
+  if (mpc_attribute_store_get_endpoint_and_node_from_unid(unid, endpoint, nodeId, endpointId ) == SL_STATUS_OK) {
+    cmd.Send(chip::ScopedNodeId(nodeId, 1), endpointId);
+    return SL_STATUS_OK;
+  } 
+  return SL_STATUS_FAIL;
+}
+
+{{/zcl_commands}}
+
+sl_status_t mpc_{{clusterInitName this}} ()
+{
+  sl_log_debug(LOG_TAG, "{{asSnakeCaseLower label}} Cluster mapper initialization\n");
+{{#zcl_commands}}
+  uic_mqtt_dotdot_{{asSnakeCaseLower parent.label}}_{{asSnakeCaseLower label}}_callback_set(&mpc_{{commandCbFnName this}});
+{{/zcl_commands}}
+
+  return SL_STATUS_OK;
+}
+{{/if}}
+{{/zcl_clusters}}

@@ -1,0 +1,36 @@
+# ******************************************************************************
+# * # License
+# * <b>Copyright 2023 Silicon Laboratories Inc. www.silabs.com</b>
+# ******************************************************************************
+# * The licensor of this software is Silicon Laboratories Inc. Your use of this
+# * software is governed by the terms of Silicon Labs Master Software License
+# * Agreement (MSLA) available at
+# * www.silabs.com/about-us/legal/master-software-license-agreement. This
+# * software is distributed to you in Source Code format and is governed by the
+# * sections of the MSLA applicable to Source Code.
+# *
+# ******************************************************************************
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/config/standalone/args.gni")
+
+chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
+chip_project_config_include = "<CHIPProjectAppConfig.h>"
+chip_system_project_config_include = "<SystemProjectConfig.h>"
+
+chip_project_config_include_dirs = [ "//../unify-matter-pc-common/include" ]
+chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
+
+chip_build_libshell = false
+chip_enable_additional_data_advertising = false
+chip_enable_rotating_device_id = false
+chip_config_network_layer_ble = false
+
+cpp_standard = "c++17"
+enable_pic = false
+is_debug = true
+chip_config_network_layer_ble = false
+
+default_configs_exceptions =
+    [ "//third_party/connectedhomeip/build/config/compiler:exceptions" ]

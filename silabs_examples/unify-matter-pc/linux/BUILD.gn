@@ -1,0 +1,123 @@
+# ******************************************************************************
+# * # License
+# * <b>Copyright 2023 Silicon Laboratories Inc. www.silabs.com</b>
+# ******************************************************************************
+# * The licensor of this software is Silicon Laboratories Inc. Your use of this
+# * software is governed by the terms of Silicon Labs Master Software License
+# * Agreement (MSLA) available at
+# * www.silabs.com/about-us/legal/master-software-license-agreement. This
+# * software is distributed to you in Source Code format and is governed by the
+# * sections of the MSLA applicable to Source Code.
+# *
+# ******************************************************************************
+
+import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/tests.gni")
+import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/build/config/compiler/compiler.gni")
+import("${chip_root}/build/config/linux/pkg_config.gni")
+
+assert(chip_build_tools)
+
+declare_args() {
+  # need to be true only for internal builds
+  is_debug_build = false
+}
+
+pkg_config("unify") {
+  packages = [ "libunify" ]
+}
+
+config("unify-config") {
+  include_dirs = [
+    "src/components/mpc_datastore/include",
+    "src/components/mpc_config/include",
+    "src/components/mpc_application_monitoring/include",
+    "src/components/mpc_attribute_resolver/include",
+    "src/components/mpc_nw_monitor/include",
+    "src/components/mpc_attribute_store/include",
+    "src",
+    "zap-generated",
+  ]
+  ldflags = [ "-lboost_system" ]
+  cflags = [ "-Wno-unused-const-variable" ]
+  defines = []
+  if (is_debug_build) {
+    defines += [ "DEBUG_BUILD" ]
+  }
+  # flag to temporarily disable node discovery until the changes are available from CSA
+  defines += ["UMPC_DISABLE_DISCOVERY"]
+}
+
+config("coverage") {
+  cflags = [
+    "-fprofile-arcs",
+    "-ftest-coverage",
+  ]
+}
+
+static_library("unify-matter-pc-lib") {
+  sources = [
+    "src/components/mpc_application_monitoring/src/mpc_application_monitoring.c",
+    "src/components/mpc_attribute_resolver/src/mpc_attribute_cluster_parser.cpp",
+    "src/components/mpc_attribute_resolver/src/mpc_attribute_parser_fwk.cpp",
+    "src/components/mpc_attribute_resolver/src/mpc_attribute_resolver.cpp",
+    "src/components/mpc_attribute_resolver/src/mpc_attribute_resolver_callbacks.cpp",
+    "src/components/mpc_attribute_resolver/src/mpc_attribute_resolver_cluster_rules.cpp",
+    "src/components/mpc_attribute_resolver/src/mpc_attribute_resolver_rules.cpp",
+    "src/components/mpc_attribute_resolver/src/mpc_attribute_resolver_send.cpp",
+    "src/components/mpc_attribute_store/src/mpc_attribute_store.cpp",
+    "src/components/mpc_attribute_store/src/mpc_attribute_store_type_registration.cpp",
+    "src/components/mpc_config/src/mpc_config.c",
+    "src/components/mpc_datastore/src/mpc_datastore.c",
+    "src/components/mpc_nw_monitor/src/MPCNodeReportables.cpp",
+    "src/components/mpc_nw_monitor/src/mpc_node_monitor.cpp",
+    "src/components/mpc_nw_monitor/src/mpc_nw_monitor.cpp",
+    "src/mpc_cli.cpp",
+    "src/mpc_command_sender.cpp",
+    "zap-generated/dotdot_mqtt_to_matter.cpp",
+  ]
+
+  public_deps = [
+    "${chip_root}/examples/platform/linux:app-main",
+    "//../unify-matter-pc-common",  # do we need this in MPC ?
+  ]
+
+  output_dir = root_out_dir
+
+  public_configs = [
+    ":unify-config",
+    ":unify",
+  ]
+
+  if (use_coverage) {
+    configs += [ ":coverage" ]
+  }
+}
+
+executable("unify-matter-pc") {
+  sources = [ "src/matter_pc_main.cpp" ]
+
+  deps = [ ":unify-matter-pc-lib" ]
+}
+
+action("debian") {
+  # create_package.py <pkg cfg file> <pkg name> <pkg bin> <pkg dir> --output-dir <out dir> <arch>
+  deps = [":unify-matter-pc"]
+  script = "../../unify-matter-common/scripts/create_package.py"
+  sources = ["package.cfg"]
+  outputs = ["$root_out_dir/packages/*.deb"]
+  args = rebase_path(sources, root_build_dir) + ["uic-mpc", rebase_path(target_out_dir + "/bin/unify-matter-pc",
+          root_build_dir), rebase_path(target_gen_dir + "/uic-mpc", root_build_dir), "--output-dir",
+          rebase_path(root_out_dir + "/packages", root_build_dir), target_cpu]
+}
+
+group("linux") {
+  deps = [ ":unify-matter-pc", ":debian" ]
+}
+
+if (chip_build_tests) {
+  group("check") {
+    deps = [ "//src/tests" ]
+  }
+}
