@@ -17,7 +17,6 @@
 
 #include "rsi_board.h"
 #include "rsi_chip.h"
-#include "rsi_driver.h"
 #include "rsi_m4.h"
 #ifdef COMMON_FLASH_EN
 #include "rsi_power_save.h"

@@ -152,15 +152,11 @@ template("siwx917_sdk") {
       "SL_PLATFORM_EXAMPLES_ENABLE",
       "SI91X_DEVICE",
       "SI917_RADIO_BOARD",
-      # "SL_NET_COMPONENT_INCLUDED",
       "FLASH_PAGE_SIZE",
       "SL_NVM3_PRESENT",
       "ROM_WIRELESS",
       "SRAM_BASE=0x0C000000UL",
       "SRAM_SIZE=0x00040000UL",
-      # "SL_ONNETWORK_PAIRING=1",
-      # "SL_WIFI_SSID=\"matter_openwrt\"",
-      # "SL_WIFI_PSK=\"matter@123\"",
     ]
 
     if ( silabs_board == "BRD4325B" ) {

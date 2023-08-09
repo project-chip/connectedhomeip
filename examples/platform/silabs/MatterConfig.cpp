@@ -155,17 +155,6 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     SILABS_LOG("%s starting", appName);
     SILABS_LOG("==================================================");
 
-#ifdef SI917
-    sl_status_t status;
-    SILABS_LOG("Wireless init starting");
-    if ((status = wfx_wifi_rsi_init()) != SL_STATUS_OK)
-    {
-        SILABS_LOG("wfx_wifi_start() failed: %s", status);
-        ReturnErrorOnFailure((CHIP_ERROR)status);
-    }
-    SILABS_LOG("WIFI init completed");
-#endif // SI917
-
 #if PW_RPC_ENABLED
     chip::rpc::Init();
 #endif
@@ -275,6 +264,15 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
     wfx_securelink_task_start(); // start securelink key renegotiation task
 #endif                           // SL_WFX_USE_SECURE_LINK
 #endif /* WF200_WIFI */
+
+#ifdef SI917
+    sl_status_t status;
+    if ((status = wfx_wifi_rsi_init()) != SL_STATUS_OK)
+    {
+        ReturnErrorOnFailure((CHIP_ERROR)status);
+    }
+#endif // SI917
+
     return CHIP_NO_ERROR;
 }
 #endif // SL_WIFI
