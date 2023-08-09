@@ -12,16 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: List Workflows
+name: Recent Fail Summary
 on:
   workflow_dispatch:
 
 jobs:
   list_workflows:
-    name: List Workflows with GitHub CLI
+    name: Summarize Recent Workflow Failures
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/project-chip/chip-build:1
     steps:
-      - run: gh run list -R project-chip/connectedhomeip -b master -s failure
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run Summarization Script
+        run: scripts/tools/summarize_fail.py
         
