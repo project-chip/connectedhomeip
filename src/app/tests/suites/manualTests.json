@@ -297,9 +297,7 @@
         "Test_TC_RVCCLEANM_3_1",
         "Test_TC_RVCCLEANM_3_3"
     ],
-    "RVCOperationalState": [
-        "Test_TC_RVCOPSTATE_2_2"
-    ],
+    "RVCOperationalState": ["Test_TC_RVCOPSTATE_2_2"],
     "RVCRunMode": [
         "Test_TC_RVCRUNM_1_1",
         "Test_TC_RVCRUNM_3_1",
