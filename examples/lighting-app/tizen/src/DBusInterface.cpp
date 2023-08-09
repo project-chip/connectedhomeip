@@ -131,8 +131,8 @@ CHIP_ERROR DBusInterface::InitOnGLibMatterContext(DBusInterface * self)
     g_object_unref(object);
 
     g_signal_connect(self->mIfaceOnOff, "notify::on-off", G_CALLBACK(OnOnOffChanged), self);
-    g_signal_connect(self->mIfaceLevelControl, "notify::level", G_CALLBACK(OnCurrentLevelChanged), self);
-    g_signal_connect(self->mIfaceColorControl, "notify::color-temperature", G_CALLBACK(OnColorTemperatureChanged), self);
+    g_signal_connect(self->mIfaceLevelControl, "notify::current-level", G_CALLBACK(OnCurrentLevelChanged), self);
+    g_signal_connect(self->mIfaceColorControl, "notify::color-temperature-mireds", G_CALLBACK(OnColorTemperatureChanged), self);
 
     g_bus_own_name_on_connection(bus, "org.tizen.matter.example.lighting", G_BUS_NAME_OWNER_FLAGS_NONE,
                                  reinterpret_cast<GBusAcquiredCallback>(OnBusAcquired),
