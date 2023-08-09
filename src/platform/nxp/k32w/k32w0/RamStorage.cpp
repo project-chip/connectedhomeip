@@ -18,7 +18,7 @@
 #include <openthread/platform/memory.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/nxp/k32w/common/RamStorage.h>
+#include <platform/nxp/k32w/k32w0/RamStorage.h>
 
 #include "pdm_ram_storage_glue.h"
 
@@ -39,13 +39,41 @@
 #define ot_free(...)
 #endif
 
+#if PDM_SAVE_IDLE
+// Segment data size is: D_SEGMENT_MEMORY_SIZE (4096) - D_PDM_NVM_SEGMENT_HEADER_SIZE (size of internal header).
+// Subtract 64 to have more margin.
+#define PDM_SEGMENT_SIZE (4096 - 64)
+#endif
+
 namespace chip::DeviceLayer::Internal {
 
-CHIP_ERROR RamStorage::Init(uint16_t aInitialSize)
+RamStorageKey::RamStorageKey(RamStorage * storage, uint8_t keyId, uint8_t internalId)
+{
+    mStorage = storage;
+    mId      = GetInternalId(keyId, internalId);
+}
+
+CHIP_ERROR RamStorageKey::Read(uint8_t * buf, uint16_t & sizeToRead) const
+{
+    return mStorage->Read(mId, 0, buf, &sizeToRead);
+}
+
+CHIP_ERROR RamStorageKey::Write(const uint8_t * buf, uint16_t length)
+{
+    return mStorage->Write(mId, buf, length);
+}
+
+CHIP_ERROR RamStorageKey::Delete()
+{
+    return mStorage->Delete(mId, -1);
+}
+
+CHIP_ERROR RamStorage::Init(uint16_t aInitialSize, bool extendedSearch)
 {
     CHIP_ERROR err;
 
-    mBuffer = getRamBuffer(mPdmId, aInitialSize);
+    mBuffer         = getRamBuffer(mPdmId, aInitialSize, extendedSearch);
+    mExtendedSearch = extendedSearch;
 
     return mBuffer ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
@@ -124,8 +152,25 @@ exit:
 
 void RamStorage::OnFactoryReset()
 {
+    uint16_t i = 0;
+    uint16_t length;
+
     mutex_lock(mBuffer, osaWaitForever_c);
-    PDM_vDeleteDataRecord(mPdmId);
+    // Have to cover the extended search case, in which a large RAM
+    // buffer is saved at multiple PDM ids.
+    if (mExtendedSearch)
+    {
+        while (PDM_bDoesDataExist(mPdmId + i, &length))
+        {
+            ChipLogProgress(DeviceLayer, "Ram Storage: delete PDM id: %x", mPdmId + i);
+            PDM_vDeleteDataRecord(mPdmId + i);
+            i++;
+        }
+    }
+    else
+    {
+        PDM_vDeleteDataRecord(mPdmId);
+    }
     mutex_unlock(mBuffer);
     FreeBuffer();
 }
