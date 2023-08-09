@@ -404,7 +404,9 @@ ValidateKeySetWriteArguments(const chip::app::Clusters::GroupKeyManagement::Comm
 bool GetProviderAndFabric(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                      Credentials::GroupDataProvider ** outGroupDataProvider, const FabricInfo ** outFabricInfo)
 {
-    VerifyOrDie((outGroupDataProvider != nullptr) && (outFabricInfo != nullptr));
+    VerifyOrDie(commandObj != nullptr);
+    VerifyOrDie(outGroupDataProvider != nullptr);
+    VerifyOrDie(outFabricInfo != nullptr);
 
     // Internal failures on internal inconsistencies.
     auto provider = GetGroupDataProvider();
