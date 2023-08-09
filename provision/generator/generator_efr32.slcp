@@ -1,7 +1,7 @@
 project_name: generator
 package: platform
 quality: production
-label: Matter CPMS Generator
+label: Matter Provisioner Generator
 description: >
   Generates the key-pair, and CSR for the DAC
 category: Example|Platform

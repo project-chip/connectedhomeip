@@ -20,7 +20,7 @@ def main(argv):
     base_dir = os.path.normpath(os.path.dirname(__file__))
 
     # Parse arguments
-    parser = argparse.ArgumentParser(description='CPMS Support')
+    parser = argparse.ArgumentParser(description='Provisioner Support')
     parser.add_argument('parts')
     args = parser.parse_args()
 

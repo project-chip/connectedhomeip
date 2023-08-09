@@ -24,7 +24,7 @@ def encode(d, k, v):
 class BaseArguments:
 
     def load(self):
-        parser = argparse.ArgumentParser(description='CPMS')
+        parser = argparse.ArgumentParser(description='Provision')
         self.configure(parser)
         args = parser.parse_args()
 
@@ -89,7 +89,7 @@ class Arguments(BaseArguments):
         self.version = Arguments.VERSION
         self.conn = None
         self.generate = None
-        self.cpms = None
+        self.stop = None
         self.csr = None
         self.gen_fw = None
         self.prod_fw = None
@@ -114,7 +114,7 @@ class Arguments(BaseArguments):
         super().configure(parser)
         parser.add_argument('-j', '--jlink', type=str, help='[string] J-Link connection.')
         parser.add_argument('-g', '--generate', action='store_true', help='[boolean] Generate certificates.', default=None)
-        parser.add_argument('-m', '--cpms', action='store_true', help='[string] Generate JSON file only', default=None)
+        parser.add_argument('-s', '--stop', action='store_true', help='[string] Generate JSON file and stop', default=None)
         parser.add_argument('-r', '--csr', action='store_true', help='[boolean] Generate Certificate Signing Request', default=None)
         parser.add_argument('-gf', '--gen_fw', type=str, help='[string] Path to the Generator Firmware image')
         parser.add_argument('-pf', '--prod_fw', type=str, help='[string] Path to the Production Firmware image')
@@ -157,7 +157,7 @@ class Arguments(BaseArguments):
 
         c.jlink = decode(d, 'jlink', args.jlink)
         c.generate = decode(d, 'generate', args.generate)
-        c.cpms = decode(d, 'cpms', args.cpms)
+        c.stop = decode(d, 'stop', args.stop)
         c.csr = decode(d, 'csr', args.csr)
         c.gen_fw = decode(d, 'gen_fw', args.gen_fw)
         c.prod_fw = decode(d, 'prod_fw', args.prod_fw)
@@ -203,7 +203,7 @@ class Arguments(BaseArguments):
         d = {}
         encode(d, 'jlink', self.conn.encode())
         encode(d, 'generate', self.generate)
-        encode(d, 'cpms', self.cpms)
+        encode(d, 'stop', self.stop)
         encode(d, 'csr', self.csr)
         encode(d, 'gen_fw', self.gen_fw)
         encode(d, 'prod_fw', self.prod_fw)
@@ -252,7 +252,7 @@ class Arguments(BaseArguments):
         self.conn.decode(args)
 
         self.generate = args.generate
-        self.cpms = args.cpms
+        self.stop = args.stop
         self.csr = args.csr
 
         self.gen_fw = args.gen_fw

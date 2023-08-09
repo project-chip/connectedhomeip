@@ -1,10 +1,11 @@
-# Matter Custom Part Manufacturing Service (CPMS)
+# Matter Provisioning
 
 
-Tools in this folder are used to load mandatory authentication information into Matter devices.
-Most of the required parameters are stored once during the manufacturing process, and shall not
-change during the lifetime of the device. During runtime, two interfaces are
-used to pull the authentication data from permanent storage:
+The provisioning script is used to load mandatory information into Matter devices, including commissioning and authentication
+parameters. To facilitate the transition between development and production, this tool uses the same inputs as Silicon Labs's
+[Custom Part Manufacturing Service](https://www.silabs.com/services/custom-part-manufacturing-service). Most of the parameters
+are stored once during the manufacturing process, and shall not change during the lifetime of the device.
+During runtime, two interfaces are used to pull the authentication data from permanent storage:
 * [CommissionableDataProvider](https://github.com/project-chip/connectedhomeip/blob/master/src/include/platform/CommissionableDataProvider.h), implemented as [EFR32DeviceDataProvider](https://github.com/project-chip/connectedhomeip/blob/master/examples/platform/silabs/efr32/EFR32DeviceDataProvider.cpp)
 * [DeviceAttestationCredsProvider](https://github.com/project-chip/connectedhomeip/blob/master/src/credentials/DeviceAttestationCredsProvider.h), implemented as [SilabsDeviceAttestationCreds](https://github.com/project-chip/connectedhomeip/blob/master/examples/platform/silabs/SilabsDeviceAttestationCreds.h)
 
@@ -37,10 +38,10 @@ The Generator Firmware (GFW) is a baremetal application that runs on the targete
 * Stores the Attestation Data on the main flash (CD, PAI, DAC)
 * Stores the size and offsets used to store the Attestation Data, along with the KeyId used to generate the private-key
 
-The main source code of the GFW is located under `cpms/generator`, while the board support is located under `cpms/support`. Pre-compiled images for the supported chips can be found in `cpms/images`.
+The main source code of the GFW is located under `provision/generator`, while the board support is located under `provision/support`. Pre-compiled images for the supported chips can be found in `provision/images`.
 
 The directory structure is as follows:
-- cpms
+- provision
     - generator
     - images
     - modules
@@ -64,12 +65,12 @@ The Provisioner Script executes the following steps:
 2. Obtains the Part Number from the connected device (using Simplicity Commander)
 3. If no SPAKE2+ verifier is provided:
    3.1. Generates SPAKE2+ verifier (using the external `spake2p` tool)
-4. Loads the Generator Firmware into the device (if no GFW path is provided, the Part Number is used to choose the corresponding file from the `cpms/images`)
+4. Loads the Generator Firmware into the device (if no GFW path is provided, the Part Number is used to choose the corresponding file from the `provision/images`)
 5. Configures the NVM3 based on the flash size of the connected device
 6. If CSR mode is used (--csr):
    6.1. Requests a CSR from the device
     - The GFW generates the key-pair and CSR, then returns the the CSR to the host script
-   6.2. Sends the CSR to the Signing Server (`cpms/modules/signing_server.py`), and retrieves the DAC
+   6.2. Sends the CSR to the Signing Server (`provision/modules/signing_server.py`), and retrieves the DAC
 7. Sends CD, PAI, and DAC to the GFW
     - The GFW stores CD, PAI, and DAC on the last page of main flash, and updates the offsets and sizes in NVM3
 
@@ -86,7 +87,7 @@ The provisioning script and the GFW communicates through J-Link RTT using the Py
 | -c,  --config             | optional             | string             | Path to a JSON configuration file            |
 | -j,  --jlink              | optional<sup>1</sup> | dec/hex            | JLink connection string.  |
 | -g,  --generate           | optional             | flag               | Auto-generate test certificates            |
-| -m,  --cpms               | optional             | flag               | CPMS mode: When true, only generate the JSON configuration, and exit.                    |
+| -s,  --stop               | optional             | flag               | Stop mode: When true, only generate the JSON configuration, and exit.                    |
 | -r,  --csr                | optional             | flag               | CSR mode: When true, instructs the GFW to generate the private key, and issue a CSR.                    |
 | -gf, --gen_fw             | optional             | dec/hex            | Path to the Generator Firmware image.                                                   |
 | -pf, --prod_fw            | optional             | dec/hex            | Path to the Production Firmware image.                                                   |
@@ -130,7 +131,7 @@ For the hex type, provide the value with the `0x` prefix. For hex string type, d
 The -c/--config argument allows to read all the required parameters from a JSON file. The same validation rules apply
 both for command line or configuration file, but JSON does not support hexadecimal numbers. Command line arguments
 override arguments read from a configuration file.
-For instance, with the configuration `cpms.json`:
+For instance, with the configuration `example.json`:
 ```
 {
     "version": "1.0",
@@ -155,7 +156,7 @@ For instance, with the configuration `cpms.json`:
 ```
 You may run:
 ```
-python3 ./provision.py -c cpms.json -d 2748 -p 0x8006 -si 10000
+python3 ./provision.py -c example.json -d 2748 -p 0x8006 -si 10000
 ```
 Which will set the connected device with discriminator 2748 (instead of 3841), product ID 32774 (instead of 32773),
 and use 10000 SPAKE2+ iterations (instead of 15000).
@@ -190,8 +191,8 @@ Which will generate the test certificates using `chip-cert`, and set the device 
 }
 ```
 
-For each run, `provision.py` will generate the file `cpms/config/latest.json`, containing the arguments used to set up the device.
-A default configuration with developer settings can be found at `cpms/config/develop.json`:
+For each run, `provision.py` will generate the file `provision/config/latest.json`, containing the arguments used to set up the device.
+A default configuration with developer settings can be found at `provision/config/develop.json`:
 
 ```
 python ./provision.py -c config/develop.json
@@ -201,7 +202,7 @@ python ./provision.py -c config/develop.json
 
 The `--generate` option instructs the `provider.py` script to generate test attestation files with the given Vendor ID, and Product ID.
 These files are generated using [the chip-cert tool](https://github.com/project-chip/connectedhomeip/tree/master/src/tools/chip-cert),
-and stored under the `cpms/temp` folder.
+and stored under the `provision/temp` folder.
 
 To generate the certificates manually:
 ```
@@ -377,8 +378,8 @@ must match the contents of `cd.der`, `pai_cert.der`, and `dac.der`, respectively
 
 ## Board Support
 
-Pre-compiled images of the Generator Firmware can be found under cpms/images. The source
-code of these images is found under cpms/support. A single image is provided for all EFR32MG12
+Pre-compiled images of the Generator Firmware can be found under provision/images. The source
+code of these images is found under provision/support. A single image is provided for all EFR32MG12
 parts, and another one for the EFR32MG24 family. To copy with the different flash sizes, the
 `provision.py` script reads the device information using `commander`, and send it to the GFW,
 which configures the NVM3 during the initialization step.

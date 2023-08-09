@@ -2,7 +2,7 @@
 
 ## New Features for v2.1.0-1.1
 - ### Update to GSDK Version 4.2.3
-  
+
   The GSDK Version 4.2.3 includes important security enhancements for the Open Thread Stack which in turn updates all Matter over Thread implementations.
 
 ## New Features for v2.0.0-1.1
@@ -32,7 +32,7 @@ For this feature to take affect, there needs to be at least one message coming i
 
 ## Matter Sleepy End Devices over Wi-Fi
 
-- A Matter Sleepy End Device is a device where the EFR32 along with the Wi-Fi coprocessor go into sleep mode during idle time resulting in less power consumption. This helps devices running on limited power sources like battery powered devices. 
+- A Matter Sleepy End Device is a device where the EFR32 along with the Wi-Fi coprocessor go into sleep mode during idle time resulting in less power consumption. This helps devices running on limited power sources like battery powered devices.
 The EFR32 goes into sleep mode whenever the device is idle. The Wi-Fi coprocessor goes into Power Save (PS) Poll legacy power save mode where it wakes for every Delivery Traffic Information Map (DTIM) interval to check for any packets.
 
     For more details see the [Wi-Fi Sleepy End Device](wifi/WIFI_SLEEPY_END_DEVICE.md) section.
@@ -43,7 +43,7 @@ The EFR32 goes into sleep mode whenever the device is idle. The Wi-Fi coprocesso
 
     The provisioning script may be used to set all factory settings, including Discriminator, Passcode, and the attestation credentials (PAI, DAC and CD).
 
-    The cpms/provision.py tool supersedes the silabs_example/credentials/creds.py script.
+    The provision/provision.py tool supersedes the silabs_example/credentials/creds.py script.
 
 ## Matter Wi-Fi Direct Internet Connectivity
 

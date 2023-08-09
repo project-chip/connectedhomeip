@@ -19,11 +19,11 @@ class Paths:
     kDefaultToolPath = '../out/tools/chip-cert'
 
     def __init__(self, info, args):
-        self.cpms = os.path.normpath(os.path.dirname(__file__))
-        self.root = self.cpms + '/..'
+        self.stop = os.path.normpath(os.path.dirname(__file__))
+        self.root = self.stop + '/..'
         self.debug = self.root + '/out/debug'
-        self.temp = self.cpms + '/temp'
-        self.out_default = "{}/paa_cert.pem".format(self.cpms)
+        self.temp = self.stop + '/temp'
+        self.out_default = "{}/paa_cert.pem".format(self.stop)
         self.att_certs = args.attest.paa_cert or "{}/certs.p12".format(self.temp)
         self.paa_cert_pem = args.attest.paa_cert or "{}/paa_cert.pem".format(self.temp)
         self.paa_cert_der = "{}/paa_cert.der".format(self.temp)
@@ -38,11 +38,11 @@ class Paths:
         self.dac_key_pem = "{}/dac_key.pem".format(self.temp)
         self.dac_key_der = "{}/dac_key.der".format(self.temp)
         self.cert_tool = os.path.normpath(Paths.kDefaultToolPath)
-        self.config = "{}/config/latest.json".format(self.cpms)
+        self.config = "{}/config/latest.json".format(self.stop)
         self.cd = "{}/cd.der".format(self.temp)
         self.csr_pem = self.temp + '/csr.pem'
-        self.gen_fw = "{}/images/{}.s37".format(self.cpms, info.family)
-        self.template = "{}/silabs_creds.tmpl".format(self.cpms)
+        self.gen_fw = "{}/images/{}.s37".format(self.stop, info.family)
+        self.template = "{}/silabs_creds.tmpl".format(self.stop)
         self.header = "{}/silabs_creds.h".format(self.temp)
         execute(["mkdir", "-p", self.temp ])
 
@@ -185,7 +185,7 @@ def generateAttestation(conn, args, paths):
 
     # Generate DAC
     print("\n◆ Credentials: DAC\n")
-    signer = SigningServer(paths.cpms)
+    signer = SigningServer(paths.stop)
     (pai_path, dac_path) = signer.sign(csr)
     x509Copy('cert', pai_path, paths.temp, 'pai_cert')
     x509Copy('cert', dac_path, paths.temp, 'dac_cert')
@@ -267,7 +267,7 @@ def main(argv):
         generateCerts(args, paths)
     # Export configuration to JSON
     args.write(paths.config)
-    if args.cpms:
+    if args.stop:
         exit()
 
     print("\n◆ Loading Generator Firmware")
