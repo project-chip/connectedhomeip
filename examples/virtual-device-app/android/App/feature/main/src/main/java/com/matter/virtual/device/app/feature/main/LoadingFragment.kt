@@ -9,14 +9,21 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.matter.virtual.device.app.core.common.DeepLink
+import com.matter.virtual.device.app.core.common.EventObserver
 import com.matter.virtual.device.app.core.common.MatterSettings
+import com.matter.virtual.device.app.core.ui.SharedViewModel
 import com.matter.virtual.device.app.feature.main.databinding.FragmentLoadingBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.math.abs
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import timber.log.Timber
 
@@ -24,6 +31,8 @@ import timber.log.Timber
 class LoadingFragment : Fragment() {
 
   private lateinit var binding: FragmentLoadingBinding
+  private val viewModel by viewModels<LoadingViewModel>()
+  private val sharedViewModel by activityViewModels<SharedViewModel>()
 
   private lateinit var matterSettings: MatterSettings
   private lateinit var onBackPressedCallback: OnBackPressedCallback
@@ -60,6 +69,40 @@ class LoadingFragment : Fragment() {
 
     val args: LoadingFragmentArgs by navArgs()
     this.matterSettings = Json.decodeFromString(args.setting)
+
+    viewModel.uiState.observe(
+      viewLifecycleOwner,
+      EventObserver { uiStete ->
+        when (uiStete) {
+          is LoadingUiState.Complete -> {
+            matterSettings.device = uiStete.device
+
+            try {
+              val navOptions = NavOptions.Builder().setPopUpTo(R.id.mainFragment, true).build()
+
+              findNavController()
+                .navigate(
+                  DeepLink.getDeepLinkRequestFromDevice(
+                    uiStete.device,
+                    Json.encodeToString(matterSettings)
+                  ),
+                  navOptions
+                )
+            } catch (e: Exception) {
+              Timber.e(e, "navigate failure")
+            }
+          }
+          LoadingUiState.Failure -> {
+            Timber.e("Failure or Timeout")
+            sharedViewModel.requestFactoryReset(
+              messageResId = R.string.dialog_timeout_factory_reset_message,
+              isCancelable = false
+            )
+          }
+          LoadingUiState.Loading -> {}
+        }
+      }
+    )
   }
 
   override fun onResume() {
@@ -75,7 +118,10 @@ class LoadingFragment : Fragment() {
       object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
           Timber.d("handleOnBackPressed()")
-          findNavController().popBackStack()
+          sharedViewModel.requestFactoryReset(
+            messageResId = R.string.dialog_user_factory_reset_message,
+            isCancelable = true
+          )
         }
       }
 

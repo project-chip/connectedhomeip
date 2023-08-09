@@ -18,11 +18,15 @@
 
 #include "Esp32AppServer.h"
 #include "CHIPDeviceManager.h"
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
+#if CONFIG_ENABLE_ICD_SERVER
+#include <ICDSubscriptionCallback.h>
+#endif
 #include <string.h>
 
 using namespace chip;
@@ -49,6 +53,9 @@ static app::Clusters::NetworkCommissioning::Instance
 static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
                                                                                           0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
                                                                                           0xcc, 0xdd, 0xee, 0xff };
+#endif
+#if CONFIG_ENABLE_ICD_SERVER
+static ICDSubscriptionCallback sICDSubscriptionHandler;
 #endif
 } // namespace
 
@@ -113,6 +120,10 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
         initParams.appDelegate = sAppDelegate;
     }
     chip::Server::GetInstance().Init(initParams);
+#if CONFIG_ENABLE_ICD_SERVER
+    // Register ICD subscription callback to match subscription max intervals to its idle time interval
+    chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&sICDSubscriptionHandler);
+#endif // CONFIG_ENABLE_ICD_SERVER
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     sWiFiNetworkCommissioningInstance.Init();

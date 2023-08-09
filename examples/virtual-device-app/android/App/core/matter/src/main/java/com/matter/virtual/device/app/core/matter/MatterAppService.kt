@@ -8,11 +8,18 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import com.matter.virtual.device.app.core.common.MatterSettings
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import timber.log.Timber
 
 @AndroidEntryPoint
 class MatterAppService : Service() {
+
+  @Inject lateinit var matterApp: MatterApp
 
   override fun onCreate() {
     super.onCreate()
@@ -29,17 +36,24 @@ class MatterAppService : Service() {
     return null
   }
 
+  @OptIn(ExperimentalSerializationApi::class)
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-    Timber.d("Hit")
+    Timber.d("onStartCommand()")
 
     intent?.let {
       when (it.action) {
         MatterAppServiceConstants.ACTION_START_MATTER_APP_SERVICE -> {
           Timber.i("Start matter app service")
           startService()
+          val jsonSetting = it.getStringExtra("setting")
+          jsonSetting?.let {
+            val matterSettings = Json.decodeFromString<MatterSettings>(jsonSetting)
+            startApp(matterSettings)
+          }
         }
         MatterAppServiceConstants.ACTION_STOP_MATTER_APP_SERVICE -> {
           Timber.i("Stop matter app service")
+          stopApp()
           stopService()
         }
         else -> {}
@@ -69,7 +83,7 @@ class MatterAppService : Service() {
   }
 
   private fun startService() {
-    Timber.d("Hit")
+    Timber.d("startService()")
 
     createNotificationChannel()
 
@@ -84,9 +98,19 @@ class MatterAppService : Service() {
   }
 
   private fun stopService() {
-    Timber.d("Hit")
+    Timber.d("stopService()")
     cancelNotificationChannel()
     stopForeground(true)
     stopSelf()
+  }
+
+  private fun startApp(matterSettings: MatterSettings) {
+    Timber.d("startApp()")
+    matterApp.start(matterSettings)
+  }
+
+  private fun stopApp() {
+    Timber.d("stopApp()")
+    matterApp.stop()
   }
 }

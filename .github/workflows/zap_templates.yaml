@@ -45,7 +45,12 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
-
+            # Java formatting requires a newer java to run ktfmt
+            # TODO: this should be eventually inside Docker files
+            - name: Update java
+              run: |
+                apt-get update
+                DEBIAN_FRONTEND=noninteractive apt-get install -fy --fix-missing openjdk-17-jre
             - name: Generate all
               run: ./scripts/run_in_build_env.sh scripts/tools/zap_regen_all.py
             - name: Ensure git works in current working directory

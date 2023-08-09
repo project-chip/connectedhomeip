@@ -32,7 +32,7 @@ tests:
     - label: "Step 2: Set up a subscription to the OperationalError event"
       PICS: OPSTATE.S.E00
       verification: |
-
+          ./chip-tool operationalstate subscribe operational-error 5 15 1 1
       disabled: true
 
     - label:
@@ -40,15 +40,18 @@ tests:
           OperationalError event"
       PICS: OPSTATE.S.E00
       verification: |
-          Receive an Notify event containing an ErrorState struct populated as follows:
-          An ErrorStateID that shall contain an enum 8. Verify the ErrorStateID is a defined error (NoError(0x00), UnableToStartOrResume(0x01), UnableToCompleteOperation(0x02), CommandInvalidInState(0x03)) or in the range 0x8000 to 0xBFFF.
-          If the ErrorStateID is in the range 0x8000 to 0xBFFF, then an ErrorStateLabel that is a human readable string.
-          If the ErrorStateId is not in the range 0x8000 to 0xBFFF then no ErrorStateLabel shall be present.
-          Optionally an ErrorStateDetails. If present, this shall be a human readable string.
+          After the subscription interval via the TH (chip-tool) verify:
+          - reception of an OperationalError Event
+          - ErrorStateID is a defined error
+          - If the ErrorStateID is manufacturer specific, inclusion of an ErrorStateLabel, not present otherwise
+          - Optionally an ErrorStateDetails
       disabled: true
 
     - label: "Step 4: TH reads from the DUT the OperationalState attribute"
       PICS: OPSTATE.S.A0004
       verification: |
-          Verify that the DUT response contains an enum8 set to Error(0x03).
+          ./chip-tool operationalstate read operational-state 1 1
+
+          Via the TH (chip-tool), verify:
+          - the response has an OperationalStateID field that is set to 0x03 (Error)
       disabled: true

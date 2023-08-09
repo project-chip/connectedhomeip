@@ -22,7 +22,7 @@ PICS:
 config:
     nodeId: 0x12344321
     cluster: "Occupancy Sensing"
-    endpoint: 0
+    endpoint: 1
 
 tests:
     #- label: "Wait for the device to be commissioned"

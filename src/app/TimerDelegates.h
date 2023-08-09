@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <app/InteractionModelEngine.h>
 #include <app/reporting/ReportScheduler.h>
 #include <system/SystemClock.h>
 
@@ -29,28 +28,10 @@ class DefaultTimerDelegate : public reporting::ReportScheduler::TimerDelegate
 public:
     using TimerContext = reporting::TimerContext;
     using Timeout      = System::Clock::Timeout;
-    static void TimerCallbackInterface(System::Layer * aLayer, void * aAppState)
-    {
-        TimerContext * context = static_cast<TimerContext *>(aAppState);
-        context->TimerFired();
-    }
-    CHIP_ERROR StartTimer(TimerContext * context, Timeout aTimeout) override
-    {
-        return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-            aTimeout, TimerCallbackInterface, context);
-    }
-    void CancelTimer(TimerContext * context) override
-    {
-        InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
-            TimerCallbackInterface, context);
-    }
-    bool IsTimerActive(TimerContext * context) override
-    {
-        return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->IsTimerActive(
-            TimerCallbackInterface, context);
-    }
-
-    System::Clock::Timestamp GetCurrentMonotonicTimestamp() override { return System::SystemClock().GetMonotonicTimestamp(); }
+    CHIP_ERROR StartTimer(TimerContext * context, Timeout aTimeout) override;
+    void CancelTimer(TimerContext * context) override;
+    bool IsTimerActive(TimerContext * context) override;
+    System::Clock::Timestamp GetCurrentMonotonicTimestamp() override;
 };
 
 } // namespace app
