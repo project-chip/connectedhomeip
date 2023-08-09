@@ -54,7 +54,9 @@ void ReportSchedulerImpl::OnEnterActiveMode()
 #endif
 }
 
-/// @brief When a ReadHandler is added, register it, which will schedule an engine run
+/// @brief When a ReadHandler is added, register it in the scheduler node pool. Scheduling the report here is un-necessary since the
+/// ReadHandler will call MoveToState(HandlerState::CanStartReporting);, which will call OnBecameReportable() and schedule the
+/// report.
 void ReportSchedulerImpl::OnReadHandlerSubscribed(ReadHandler * aReadHandler)
 {
     ReadHandlerNode * newNode = FindReadHandlerNode(aReadHandler);
@@ -68,10 +70,6 @@ void ReportSchedulerImpl::OnReadHandlerSubscribed(ReadHandler * aReadHandler)
                     "Registered a ReadHandler that will schedule a report between system Timestamp: %" PRIu64
                     " and system Timestamp %" PRIu64 ".",
                     newNode->GetMinTimestamp().count(), newNode->GetMaxTimestamp().count());
-
-    Milliseconds32 newTimeout;
-    CalculateNextReportTimeout(newTimeout, newNode);
-    ScheduleReport(newTimeout, newNode);
 }
 
 /// @brief When a ReadHandler becomes reportable, schedule, recalculate and reschedule the report.
@@ -84,7 +82,7 @@ void ReportSchedulerImpl::OnBecameReportable(ReadHandler * aReadHandler)
     ScheduleReport(newTimeout, node);
 }
 
-void ReportSchedulerImpl::OnSubscriptionAction(ReadHandler * aReadHandler)
+void ReportSchedulerImpl::OnSubscriptionReportSent(ReadHandler * aReadHandler)
 {
     ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
     VerifyOrReturn(nullptr != node);

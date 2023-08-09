@@ -334,7 +334,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
         // Priming reports are handled when we send a SubscribeResponse.
         if (IsType(InteractionType::Subscribe) && !IsPriming() && !IsChunkedReport())
         {
-            mObserver->OnSubscriptionAction(this);
+            mObserver->OnSubscriptionReportSent(this);
         }
     }
     if (!aMoreChunks)
@@ -604,7 +604,7 @@ void ReadHandler::MoveToState(const HandlerState aTargetState)
     //
     if (aTargetState == HandlerState::CanStartReporting)
     {
-        if (CanEmitReadReport())
+        if (ShouldReportUnscheduled())
         {
             InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
         }
@@ -652,8 +652,6 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
 
     ReturnErrorOnFailure(writer.Finalize(&packet));
     VerifyOrReturnLogError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
-
-    mObserver->OnSubscriptionAction(this);
 
     ClearStateFlag(ReadHandlerFlags::PrimingReports);
     return mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeResponse, std::move(packet));
@@ -884,14 +882,14 @@ void ReadHandler::SetStateFlag(ReadHandlerFlags aFlag, bool aValue)
     // If we became reportable, schedule a reporting run.
     if (!oldReportable && ShouldStartReporting())
     {
-        if (CanEmitReadReport())
-        {
-            InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
-        }
-        else
+        if (IsActiveSubscription())
         {
             // If we became reportable, the scheduler will schedule a run as soon as allowed
             mObserver->OnBecameReportable(this);
+        }
+        else if (ShouldReportUnscheduled())
+        {
+            InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
         }
     }
 }

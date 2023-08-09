@@ -178,7 +178,7 @@ public:
         /// @brief Callback invoked when the read handler needs to make sure to send a message to the subscriber within the next
         /// maxInterval time period.
         /// @param[in] apReadHandler ReadHandler that has generated a report
-        virtual void OnSubscriptionAction(ReadHandler * apReadHandler) = 0;
+        virtual void OnSubscriptionReportSent(ReadHandler * apReadHandler) = 0;
 
         /// @brief Callback invoked when a ReadHandler is getting removed so it can be unregistered
         /// @param[in] apReadHandler  ReadHandler getting destroyed
@@ -337,10 +337,17 @@ private:
         // Important: Anything that changes ShouldStartReporting() from false to true
         // (which can only happen for subscriptions) must call
         // mObserver->OnBecameReportable(this).
-        return mState == HandlerState::CanStartReporting && (CanEmitReadReport() || IsDirty());
+        return CanStartReporting() && (ShouldReportUnscheduled() || IsDirty());
     }
-    bool CanEmitReadReport() const { return IsType(ReadHandler::InteractionType::Read) || IsPriming(); }
+    /// @brief CanStartReporting() is true if the ReadHandler is in a state where it could generate
+    /// a (possibly empty) report if someone asked it to.
     bool CanStartReporting() const { return mState == HandlerState::CanStartReporting; }
+    /// @brief ShouldReportUnscheduled() is true if the ReadHandler should be asked to generate reports
+    /// without consulting the report scheduler.
+    bool ShouldReportUnscheduled() const
+    {
+        return CanStartReporting() && (IsType(ReadHandler::InteractionType::Read) || IsPriming()) && !IsActiveSubscription();
+    }
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
 
     // Resets the path iterator to the beginning of the whole report for generating a series of new reports.
