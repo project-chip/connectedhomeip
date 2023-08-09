@@ -71,6 +71,18 @@ int main(void)
 
 void application_start(void * unused)
 {
+
+#ifdef SI917
+    sl_status_t status;
+    SILABS_LOG("Wireless init starting");
+    if ((status = wfx_wifi_rsi_init()) != SL_STATUS_OK)
+    {
+        SILABS_LOG("wfx_wifi_start() failed: %s", status);
+        return;
+    }
+    SILABS_LOG("WIFI init completed");
+#endif // SI917
+
     if (SilabsMatterConfig::InitMatter(BLE_DEV_NAME) != CHIP_NO_ERROR)
         appError(CHIP_ERROR_INTERNAL);
 

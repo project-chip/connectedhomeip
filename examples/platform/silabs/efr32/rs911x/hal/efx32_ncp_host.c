@@ -20,7 +20,8 @@
   } while (0);
 
 #ifndef SL_WIFI_BOARD_READY_WAIT_TIME
-#define SL_WIFI_BOARD_READY_WAIT_TIME 5000
+#define SL_WIFI_BOARD_READY_WAIT_TIME \
+  40000 //some scenarios like after firmware upgrade, it will take 40 seconds to boad ready
 #endif
 
 typedef struct {
@@ -32,6 +33,7 @@ typedef struct {
 
 osEventFlagsId_t si91x_events   = 0;
 osEventFlagsId_t si91x_bus_events   = 0;
+osEventFlagsId_t si91x_async_events = 0;
 osThreadId_t si91x_thread       = 0;
 osMutexId_t si91x_bus_mutex     = 0;
 osThreadId_t si91x_event_thread = 0;
@@ -66,7 +68,7 @@ sl_status_t sl_si91x_host_init(void)
 
   status = sl_si91x_host_bus_init();
   VERIFY_STATUS(status);
-
+#if 0
   // Start reset line low
   GPIO_PinModeSet(WFX_RESET_PIN.port, WFX_RESET_PIN.pin, gpioModePushPull, 0);
 
@@ -74,16 +76,22 @@ sl_status_t sl_si91x_host_init(void)
   NVIC_SetPriority(GPIO_ODD_IRQn, PACKET_PENDING_INT_PRI);
 
   // Configure interrupt, sleep and wake confirmation pins
-  GPIOINT_CallbackRegister(WFX_INTERRUPT_PIN.pin, gpio_interrupt);
+  GPIOINT_CallbackRegister(WFX_INTERRUPT_PIN.pin, rsi_gpio_irq_cb);
   GPIO_PinModeSet(WFX_INTERRUPT_PIN.port, WFX_INTERRUPT_PIN.pin, gpioModeInputPullFilter, 0);
   GPIO_ExtIntConfig(WFX_INTERRUPT_PIN.port, WFX_INTERRUPT_PIN.pin, SL_WFX_HOST_PINOUT_SPI_IRQ, true, false, true);
   GPIO_PinModeSet(WFX_SLEEP_CONFIRM_PIN.port, WFX_SLEEP_CONFIRM_PIN.pin, gpioModeWiredOrPullDown, 1);
   GPIO_PinModeSet(WAKE_INDICATOR_PIN.port, WAKE_INDICATOR_PIN.pin, gpioModeWiredOrPullDown, 0);
-
+#endif
   memset(cmd_queues, 0, sizeof(cmd_queues));
 
   if (NULL == si91x_events) {
     si91x_events = osEventFlagsNew(NULL);
+  }
+  if (NULL == si91x_bus_events) {
+    si91x_bus_events = osEventFlagsNew(NULL);
+  }
+  if (NULL == si91x_async_events) {
+    si91x_async_events = osEventFlagsNew(NULL);
   }
 
   if (NULL == si91x_thread) {
@@ -151,6 +159,14 @@ sl_status_t sl_si91x_host_deinit(void)
     si91x_events = NULL;
   }
 
+  if (NULL != si91x_bus_events) {
+    osEventFlagsDelete(si91x_bus_events);
+    si91x_bus_events = NULL;
+  }
+  if (NULL != si91x_async_events) {
+    osEventFlagsDelete(si91x_async_events);
+    si91x_async_events = NULL;
+  }
   if (NULL != si91x_bus_mutex) {
     osMutexDelete(si91x_bus_mutex);
     si91x_bus_mutex = NULL;
@@ -185,6 +201,10 @@ void sl_si91x_host_set_event(uint32_t event_mask)
 void sl_si91x_host_set_bus_event(uint32_t event_mask)
 {
   osEventFlagsSet(si91x_bus_events, event_mask);
+}
+void sl_si91x_host_set_async_event(uint32_t event_mask)
+{
+  osEventFlagsSet(si91x_async_events, event_mask);
 }
 
 /*Note: This function is only used to queue the responses in to corresponding response queues*/
@@ -310,6 +330,18 @@ sl_status_t sl_si91x_host_remove_node_from_queue(sl_si91x_queue_type_t queue,
   return status;
 }
 
+/* This function is used to flush the pending TX packets from the specified queue */
+sl_status_t sl_si91x_host_flush_nodes_from_queue(sl_si91x_queue_type_t queue,
+                                                 void *user_data,
+                                                 sl_si91x_compare_function_t compare_function,
+                                                 sl_si91x_node_free_function_t node_free_function)
+{
+  UNUSED_PARAMETER(queue);
+  UNUSED_PARAMETER(user_data);
+  UNUSED_PARAMETER(compare_function);
+  UNUSED_PARAMETER(node_free_function);
+  return SL_STATUS_OK;
+}
 uint32_t sl_si91x_host_queue_status(sl_si91x_queue_type_t queue)
 {
   uint32_t status = 0;
@@ -331,9 +363,44 @@ uint32_t si91x_host_wait_for_event(uint32_t event_mask, uint32_t timeout)
   return result;
 }
 
+uint32_t si91x_host_wait_for_bus_event(uint32_t event_mask, uint32_t timeout)
+{
+  uint32_t result = osEventFlagsWait(si91x_bus_events, event_mask, (osFlagsWaitAny | osFlagsNoClear), timeout);
+  osEventFlagsClear(si91x_bus_events, event_mask);
+  if (result == (uint32_t)osErrorTimeout || result == (uint32_t)osErrorResource) {
+    return 0;
+  }
+  return result;
+}
+uint32_t si91x_host_wait_for_async_event(uint32_t event_mask, uint32_t timeout)
+{
+  uint32_t result = osEventFlagsWait(si91x_async_events, event_mask, (osFlagsWaitAny | osFlagsNoClear), timeout);
+  osEventFlagsClear(si91x_async_events, event_mask);
+  if (result == (uint32_t)osErrorTimeout || result == (uint32_t)osErrorResource) {
+    return 0;
+  }
+  return result;
+}
 uint32_t si91x_host_clear_events(uint32_t event_mask)
 {
   uint32_t result = osEventFlagsClear(si91x_events, event_mask);
+  if (result == (uint32_t)osErrorResource) {
+    return 0;
+  }
+  return result;
+}
+
+uint32_t si91x_host_clear_bus_events(uint32_t event_mask)
+{
+  uint32_t result = osEventFlagsClear(si91x_bus_events, event_mask);
+  if (result == (uint32_t)osErrorResource) {
+    return 0;
+  }
+  return result;
+}
+uint32_t si91x_host_clear_async_events(uint32_t event_mask)
+{
+  uint32_t result = osEventFlagsClear(si91x_async_events, event_mask);
   if (result == (uint32_t)osErrorResource) {
     return 0;
   }
@@ -364,7 +431,7 @@ void sl_si91x_host_disable_bus_interrupt(void)
 static void gpio_interrupt(uint8_t interrupt_number)
 {
   UNUSED_PARAMETER(interrupt_number);
-  sl_si91x_host_set_event(NCP_HOST_BUS_RX_EVENT);
+  sl_si91x_host_set_bus_event(NCP_HOST_BUS_RX_EVENT);
   //  GPIO_IntClear(0xAAAA);
 }
 

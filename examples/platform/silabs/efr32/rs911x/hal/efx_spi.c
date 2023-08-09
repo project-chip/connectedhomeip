@@ -88,6 +88,8 @@ StaticSemaphore_t xEfxSpiIntfSemaBuffer;
 static SemaphoreHandle_t spiTransferLock;
 static TaskHandle_t spiInitiatorTaskHandle = NULL;
 
+static uint32_t dummy_buffer; /* Used for DMA - when results don't matter */
+
 #if defined(EFR32MG12)
 #include "sl_spidrv_exp_config.h"
 extern SPIDRV_Handle_t sl_spidrv_exp_handle;
@@ -191,11 +193,17 @@ void rsi_hal_board_init(void)
 }
 
 // wifi-sdk
-sl_status_t si91x_host_bus_init(void)
+sl_status_t sl_si91x_host_bus_init(void)
 {
     rsi_hal_board_init();
     return SL_STATUS_OK;
 }
+
+void sl_si91x_host_enable_high_speed_bus()
+{
+   //dummy function for wifi-sdk
+}
+
 
 #if defined(EFR32MG24)
 
@@ -365,7 +373,9 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     */
     if (xlen <= MIN_XLEN || (tx_buf == NULL && rx_buf == NULL))
     {
-        return RSI_ERROR_INVALID_PARAM;
+        rx_buf = dummy_buffer;
+        tx_buf = dummy_buffer;
+        //return RSI_ERROR_INVALID_PARAM;
     }
 
     (void) mode; // currently not used;
@@ -434,7 +444,7 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
  * @return
  *        None
  **************************************************************************/
-sl_status_t si91x_host_spi_transfer(const void *tx_buf, void *rx_buf, uint16_t xlen)
+sl_status_t sl_si91x_host_spi_transfer(const void *tx_buf, void *rx_buf, uint16_t xlen)
 {
     return(rsi_spi_transfer((uint8_t *)tx_buf, rx_buf, xlen, DEFAULT_SPI_TRASFER_MODE));
 }
