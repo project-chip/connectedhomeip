@@ -55,18 +55,18 @@ class TC_OPSTATE_2_3(MatterBaseTest):
 
         self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
 
-        asserts.assert_true(self.check_pics("OPSTATE.S.A0002"), "OPSTATE.S.A0002 must be supported")
         asserts.assert_true(self.check_pics("OPSTATE.S.A0003"), "OPSTATE.S.A0003 must be supported")
         asserts.assert_true(self.check_pics("OPSTATE.S.A0004"), "OPSTATE.S.A0004 must be supported")
-        asserts.assert_true(self.check_pics("OPSTATE.S.C00.Rsp"), "OPSTATE.S.C00.Rsp must be supported")
-        asserts.assert_true(self.check_pics("OPSTATE.S.C03.Rsp"), "OPSTATE.S.C03.Rsp must be supported")
+        asserts.assert_true(self.check_pics("OPSTATE.S.C00.Rsp") or self.check_pics("OPSTATE.S.C03.Rsp"),
+                            "At least one must be supported: OPSTATE.S.C00.Rsp, OPSTATE.S.C03.Rsp")
 
         attributes = Clusters.OperationalState.Attributes
 
         self.print_step(1, "Commissioning, already done")
 
-        self.print_step(2, "Manually put the device in a state where it can receive a Pause command")
-        input("Press Enter when done.\n")
+        if self.check_pics("OPSTATE.S.C00.Rsp"):
+            self.print_step(2, "Manually put the device in a state where it can receive a Pause command")
+            input("Press Enter when done.\n")
 
         self.print_step(3, "Read OperationalStateList attribute")
         op_state_list = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
@@ -81,77 +81,85 @@ class TC_OPSTATE_2_3(MatterBaseTest):
 
         asserts.assert_true(all(id in state_ids for id in defined_states), "OperationalStateList is missing a required entry")
 
-        self.print_step(4, "Send Pause command")
-        ret = await self.send_pause_cmd()
-        asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
-                             "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
+        if self.check_pics("OPSTATE.S.C00.Rsp"):
+            self.print_step(4, "Send Pause command")
+            ret = await self.send_pause_cmd()
+            asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
+                                 "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
 
-        self.print_step(5, "Read OperationalState attribute")
-        operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
-                                                                         attribute=attributes.OperationalState)
-        logging.info("OperationalState: %s" % (operational_state))
-        asserts.assert_equal(operational_state, Clusters.OperationalState.Enums.OperationalStateEnum.kPaused,
-                             "OperationalState ID should be Paused(0x02)")
+            if self.check_pics("OPSTATE.S.M.ST_PAUSED"):
+                self.print_step(5, "Read OperationalState attribute")
+                operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
+                                                                                 attribute=attributes.OperationalState)
+                logging.info("OperationalState: %s" % (operational_state))
+                asserts.assert_equal(operational_state, Clusters.OperationalState.Enums.OperationalStateEnum.kPaused,
+                                     "OperationalState ID should be Paused(0x02)")
 
-        self.print_step(6, "Read CountdownTime attribute")
-        initial_countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
-                                                                              attribute=attributes.CountdownTime)
-        logging.info("CountdownTime: %s" % (initial_countdown_time))
-        if initial_countdown_time is not NullValue:
-            in_range = (1 <= initial_countdown_time <= 259200)
-        asserts.assert_true(initial_countdown_time is NullValue or in_range,
-                            "invalid CountdownTime(%s). Must be in between 1 and 259200, or null " % initial_countdown_time)
+        if self.check_pics("OPSTATE.S.A0002"):
+            self.print_step(6, "Read CountdownTime attribute")
+            initial_countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
+                                                                                 attribute=attributes.CountdownTime)
+            logging.info("CountdownTime: %s" % (initial_countdown_time))
+            if initial_countdown_time is not NullValue:
+                in_range = (1 <= initial_countdown_time <= 259200)
+            asserts.assert_true(initial_countdown_time is NullValue or in_range,
+                                "invalid CountdownTime(%s). Must be in between 1 and 259200, or null " % initial_countdown_time)
 
-        self.print_step(7, "Waiting for 5 seconds")
-        time.sleep(5)
+            self.print_step(7, "Waiting for 5 seconds")
+            time.sleep(5)
 
-        self.print_step(8, "Read CountdownTime attribute")
-        countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CountdownTime)
-        logging.info("CountdownTime: %s" % (countdown_time))
-        asserts.assert_true(countdown_time != 0 or countdown_time == NullValue,
-                            "invalid CountdownTime(%s). Must be a non zero integer, or null" % countdown_time)
-        asserts.assert_equal(countdown_time, initial_countdown_time, "CountdownTime(%s) does not equal to the intial CountdownTime(%s)"
-                             % (countdown_time, initial_countdown_time))
+            self.print_step(8, "Read CountdownTime attribute")
+            countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CountdownTime)
+            logging.info("CountdownTime: %s" % (countdown_time))
+            asserts.assert_true(countdown_time != 0 or countdown_time == NullValue,
+                                "invalid CountdownTime(%s). Must be a non zero integer, or null" % countdown_time)
+            asserts.assert_equal(countdown_time, initial_countdown_time, "CountdownTime(%s) does not equal to the intial CountdownTime(%s)"
+                                 % (countdown_time, initial_countdown_time))
 
-        self.print_step(9, "Send Pause command")
-        ret = await self.send_pause_cmd()
-        asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
-                             "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
+        if self.check_pics("OPSTATE.S.C00.Rsp"):
+            self.print_step(9, "Send Pause command")
+            ret = await self.send_pause_cmd()
+            asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
+                                 "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
 
-        self.print_step(10, "Send Resume command")
-        ret = await self.send_resume_cmd()
-        asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
-                             "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
+        if self.check_pics("OPSTATE.S.C03.Rsp"):
+            self.print_step(10, "Send Resume command")
+            ret = await self.send_resume_cmd()
+            asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
+                                 "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
 
-        self.print_step(11, "Read OperationalState attribute")
-        operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
-                                                                         attribute=attributes.OperationalState)
-        logging.info("OperationalState: %s" % (operational_state))
-        asserts.assert_equal(operational_state, Clusters.OperationalState.Enums.OperationalStateEnum.kRunning,
-                             "OperationalState(%s) should be Running(0x01)" % operational_state)
+            if self.check_pics("OPSTATE.S.M.ST_RUNNING"):
+                self.print_step(11, "Read OperationalState attribute")
+                operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
+                                                                                 attribute=attributes.OperationalState)
+                logging.info("OperationalState: %s" % (operational_state))
+                asserts.assert_equal(operational_state, Clusters.OperationalState.Enums.OperationalStateEnum.kRunning,
+                                     "OperationalState(%s) should be Running(0x01)" % operational_state)
 
-        self.print_step(12, "Send Resume command")
-        ret = await self.send_resume_cmd()
-        asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
-                             "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
+            self.print_step(12, "Send Resume command")
+            ret = await self.send_resume_cmd()
+            asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
+                                 "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
 
-        self.print_step(13, "Manually put the device in a state where it cannot receive a Pause command")
-        input("Press Enter when done.\n")
+        if self.check_pics("OPSTATE.S.C00.Rsp"):
+            self.print_step(13, "Manually put the device in a state where it cannot receive a Pause command")
+            input("Press Enter when done.\n")
 
-        self.print_step(14, "Send Pause command")
-        ret = await self.send_pause_cmd()
-        asserts.assert_equal(ret.commandResponseState.errorStateID,
-                             Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
-                             "errorStateID(%s) should be CommandInvalidInState(0x03)" % ret.commandResponseState.errorStateID)
+            self.print_step(14, "Send Pause command")
+            ret = await self.send_pause_cmd()
+            asserts.assert_equal(ret.commandResponseState.errorStateID,
+                                 Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
+                                 "errorStateID(%s) should be CommandInvalidInState(0x03)" % ret.commandResponseState.errorStateID)
 
-        self.print_step(15, "Manually put the device in a state where it cannot receive a Resume command")
-        input("Press Enter when done.\n")
+        if self.check_pics("OPSTATE.S.C03.Rsp"):
+            self.print_step(15, "Manually put the device in a state where it cannot receive a Resume command")
+            input("Press Enter when done.\n")
 
-        self.print_step(16, "Send Resume command")
-        ret = await self.send_resume_cmd()
-        asserts.assert_equal(ret.commandResponseState.errorStateID,
-                             Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
-                             "errorStateID(%s) should be CommandInvalidInState(0x03)" % ret.commandResponseState.errorStateID)
+            self.print_step(16, "Send Resume command")
+            ret = await self.send_resume_cmd()
+            asserts.assert_equal(ret.commandResponseState.errorStateID,
+                                 Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
+                                 "errorStateID(%s) should be CommandInvalidInState(0x03)" % ret.commandResponseState.errorStateID)
 
 
 if __name__ == "__main__":
