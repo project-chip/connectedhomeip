@@ -255,10 +255,10 @@ public:
     {
         ReturnErrorOnFailure(readHandler->SetMaxReportingInterval(max_interval_seconds));
         ReturnErrorOnFailure(readHandler->SetMinReportingIntervalForTests(min_interval_seconds));
-        scheduler->OnReadHandlerSubscribed(readHandler);
-        readHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::ActiveSubscription);
-        readHandler->MoveToState(ReadHandler::HandlerState::CanStartReporting);
         readHandler->ClearStateFlag(ReadHandler::ReadHandlerFlags::PrimingReports);
+        readHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::ActiveSubscription);
+        scheduler->OnSubscriptionEstablished(readHandler);
+        readHandler->MoveToState(ReadHandler::HandlerState::CanStartReporting);
 
         return CHIP_NO_ERROR;
     }
@@ -299,7 +299,7 @@ public:
         {
             ReadHandler * readHandler =
                 readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
-            sScheduler.OnReadHandlerSubscribed(readHandler);
+            sScheduler.OnSubscriptionEstablished(readHandler);
             NL_TEST_ASSERT(aSuite, nullptr != readHandler);
             VerifyOrReturn(nullptr != readHandler);
             NL_TEST_ASSERT(aSuite, nullptr != sScheduler.FindReadHandlerNode(readHandler));
@@ -431,7 +431,7 @@ public:
             readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == MockReadHandlerSubscriptionTransation(readHandler, &sScheduler, 1, 2));
 
-        // Verifies OnReadHandlerSubscribed registered the ReadHandler in the scheduler
+        // Verifies OnSubscriptionEstablished registered the ReadHandler in the scheduler
         NL_TEST_ASSERT(aSuite, nullptr != sScheduler.FindReadHandlerNode(readHandler));
 
         // Should have registered the read handler in the scheduler and scheduled a report

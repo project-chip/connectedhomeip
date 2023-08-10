@@ -233,7 +233,7 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
                 {
                     appCallback->OnSubscriptionEstablished(*this);
                 }
-                mObserver->OnReadHandlerSubscribed(this);
+                mObserver->OnSubscriptionEstablished(this);
             }
         }
         else
@@ -882,14 +882,14 @@ void ReadHandler::SetStateFlag(ReadHandlerFlags aFlag, bool aValue)
     // If we became reportable, schedule a reporting run.
     if (!oldReportable && ShouldStartReporting())
     {
-        if (IsActiveSubscription())
+        if (ShouldReportUnscheduled())
+        {
+            InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+        }
+        else
         {
             // If we became reportable, the scheduler will schedule a run as soon as allowed
             mObserver->OnBecameReportable(this);
-        }
-        else if (ShouldReportUnscheduled())
-        {
-            InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
         }
     }
 }

@@ -349,7 +349,7 @@ private:
     /// without consulting the report scheduler.
     bool ShouldReportUnscheduled() const
     {
-        return CanStartReporting() && (IsType(ReadHandler::InteractionType::Read) || IsPriming()) && !IsActiveSubscription();
+        return CanStartReporting() && (IsType(ReadHandler::InteractionType::Read) || IsPriming());
     }
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
 

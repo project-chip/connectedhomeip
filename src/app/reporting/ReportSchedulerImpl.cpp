@@ -57,7 +57,7 @@ void ReportSchedulerImpl::OnEnterActiveMode()
 /// @brief When a ReadHandler is added, register it in the scheduler node pool. Scheduling the report here is un-necessary since the
 /// ReadHandler will call MoveToState(HandlerState::CanStartReporting);, which will call OnBecameReportable() and schedule the
 /// report.
-void ReportSchedulerImpl::OnReadHandlerSubscribed(ReadHandler * aReadHandler)
+void ReportSchedulerImpl::OnSubscriptionEstablished(ReadHandler * aReadHandler)
 {
     ReadHandlerNode * newNode = FindReadHandlerNode(aReadHandler);
     // Handler must not be registered yet; it's just being constructed.

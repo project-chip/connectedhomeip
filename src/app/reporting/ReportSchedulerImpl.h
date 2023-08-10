@@ -36,7 +36,7 @@ public:
     void OnEnterActiveMode() override;
 
     // ReadHandlerObserver
-    void OnReadHandlerSubscribed(ReadHandler * aReadHandler) final;
+    void OnSubscriptionEstablished(ReadHandler * aReadHandler) final;
     void OnBecameReportable(ReadHandler * aReadHandler) final;
     void OnSubscriptionReportSent(ReadHandler * aReadHandler) final;
     void OnReadHandlerDestroyed(ReadHandler * aReadHandler) override;
