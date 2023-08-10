@@ -1095,7 +1095,7 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure(nlTe
 
     err = commandHandler.AddResponseData(ConcreteCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId), BadFields());
     NL_TEST_ASSERT(apSuite, err != CHIP_NO_ERROR);
-    err = commandHandler.FailableAddStatus(ConcreteCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId),
+    err = commandHandler.FallibleAddStatus(ConcreteCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId),
                                            Protocols::InteractionModel::Status::Failure);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = commandHandler.Finalize(commandPacket);

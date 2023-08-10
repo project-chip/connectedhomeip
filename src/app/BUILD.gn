@@ -87,8 +87,6 @@ static_library("app") {
     "CommandHandler.cpp",
     "CommandResponseHelper.h",
     "CommandSender.cpp",
-    "CommandStatus.cpp",
-    "CommandStatus.h",
     "DefaultAttributePersistenceProvider.cpp",
     "DefaultAttributePersistenceProvider.h",
     "DeferredAttributePersistenceProvider.cpp",

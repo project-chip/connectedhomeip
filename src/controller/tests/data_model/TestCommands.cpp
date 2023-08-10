@@ -122,11 +122,11 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
             // test is not really testing what it should.
             for (size_t i = 0; i < 3; ++i)
             {
-                (void) apCommandObj->FailableAddStatus(aCommandPath, Protocols::InteractionModel::Status::Success,
+                (void) apCommandObj->FallibleAddStatus(aCommandPath, Protocols::InteractionModel::Status::Success,
                                                        "No error but testing status success case");
             }
             // And one failure on the end.
-            (void) apCommandObj->FailableAddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
+            (void) apCommandObj->FallibleAddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
         }
         else if (responseDirective == kSendError)
         {
@@ -140,7 +140,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
             // test is not really testing what it should.
             for (size_t i = 0; i < 3; ++i)
             {
-                (void) apCommandObj->FailableAddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
+                (void) apCommandObj->FallibleAddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
             }
         }
         else if (responseDirective == kSendSuccessStatusCodeWithClusterStatus)

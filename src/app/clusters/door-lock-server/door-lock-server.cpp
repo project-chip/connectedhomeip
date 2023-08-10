@@ -3327,7 +3327,7 @@ CHIP_ERROR DoorLockServer::sendClusterResponse(chip::app::CommandHandler * comma
     }
     else
     {
-        err = commandObj->FailableAddStatus(commandPath, ToInteractionModelStatus(status));
+        err = commandObj->FallibleAddStatus(commandPath, ToInteractionModelStatus(status));
     }
 
     return err;

@@ -30,7 +30,6 @@
 
 #pragma once
 
-#include <app/CommandStatus.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
@@ -152,13 +151,6 @@ public:
         uint32_t mMagic            = 0;
     };
 
-    enum class LogOption
-    {
-        kFailures,
-        kAll,
-        kNone,
-    };
-
     /*
      * Constructor.
      *
@@ -182,33 +174,19 @@ public:
     /**
      * Adds the given command status and returns any failures in adding statuses (e.g. out
      * of buffer space) to the caller
-     *
-     * [logging_option] controls what statuses are being logged.
      */
-    CHIP_ERROR FailableAddStatus(const CommandPathStatus & status, const char * context = nullptr,
-                                 LogOption logging_option = LogOption::kFailures);
+    CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
+                                 const char * context = nullptr);
 
     /**
      * Adds a status when the caller is unable to handle any failures. Logging is performed
      * and failure to register the status is checked with VerifyOrDie.
      */
-    inline void AddStatus(const CommandPathStatus & status, const char * context = nullptr,
-                          LogOption logging_option = LogOption::kFailures)
-    {
-        VerifyOrDie(FailableAddStatus(status, context, logging_option) == CHIP_NO_ERROR);
-    }
-
-    inline CHIP_ERROR FailableAddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
-                                        const char * context = nullptr, LogOption logging_option = LogOption::kFailures)
-    {
-        return FailableAddStatus(CommandPathStatus(aCommandPath, aStatus), context, logging_option);
-    }
-
     inline void AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
-                          const char * context = nullptr, LogOption logging_option = LogOption::kFailures)
+                          const char * context = nullptr)
     {
 
-        VerifyOrDie(FailableAddStatus(aCommandPath, aStatus, context, logging_option) == CHIP_NO_ERROR);
+        VerifyOrDie(FallibleAddStatus(aCommandPath, aStatus, context) == CHIP_NO_ERROR);
     }
 
     CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
