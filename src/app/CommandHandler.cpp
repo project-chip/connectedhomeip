@@ -484,7 +484,15 @@ void CommandHandler::AddStatusAndLogIfFailure(const ConcreteCommandPath & aComma
                      ChipLogValueIMStatus(aStatus), aMessage);
     }
 
-    LogErrorOnFailure(AddStatus(aCommandPath, aStatus));
+    CHIP_ERROR err = AddStatus(aCommandPath, aStatus);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement,
+                     "Failed to set status on Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI
+                     ": %" CHIP_ERROR_FORMAT,
+                     aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId),
+                     err.Format());
+    }
 }
 
 CHIP_ERROR CommandHandler::AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus)
