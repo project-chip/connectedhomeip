@@ -129,15 +129,6 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     if (params.operationalKeypair != nullptr || !params.controllerNOC.empty() || !params.controllerRCAC.empty())
     {
         ReturnErrorOnFailure(InitControllerNOCChain(params));
-
-        if (params.enableServerInteractions)
-        {
-            //
-            // Advertise our operational identity on the network to facilitate discovery by clients that look to
-            // establish CASE with a controller that is also offering server-side capabilities (e.g an OTA provider).
-            //
-            app::DnssdServer::Instance().AdvertiseOperational();
-        }
     }
 
     mSystemState = params.systemState->Retain();
@@ -239,6 +230,9 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    auto advertiseOperational =
+        params.enableServerInteractions ? FabricTable::AdvertiseIdentity::Yes : FabricTable::AdvertiseIdentity::No;
+
     //
     // We permit colliding fabrics when multiple controllers are present on the same logical fabric
     // since each controller is associated with a unique FabricInfo 'identity' object and consequently,
@@ -261,7 +255,7 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
         if (fabricFoundInTable)
         {
             err = fabricTable->UpdatePendingFabricWithProvidedOpKey(fabricIndex, nocSpan, icacSpan, externalOperationalKeypair,
-                                                                    hasExternallyOwnedKeypair);
+                                                                    hasExternallyOwnedKeypair, advertiseOperational);
         }
         else
         // CASE 2: New fabric with injected key
@@ -269,8 +263,9 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
             err = fabricTable->AddNewPendingTrustedRootCert(rcacSpan);
             if (err == CHIP_NO_ERROR)
             {
-                err = fabricTable->AddNewPendingFabricWithProvidedOpKey(
-                    nocSpan, icacSpan, newFabricVendorId, externalOperationalKeypair, hasExternallyOwnedKeypair, &fabricIndex);
+                err = fabricTable->AddNewPendingFabricWithProvidedOpKey(nocSpan, icacSpan, newFabricVendorId,
+                                                                        externalOperationalKeypair, hasExternallyOwnedKeypair,
+                                                                        &fabricIndex, advertiseOperational);
             }
         }
     }
@@ -283,7 +278,7 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
         {
             VerifyOrReturnError(fabricTable->HasOperationalKeyForFabric(fabricIndex), CHIP_ERROR_KEY_NOT_FOUND);
 
-            err = fabricTable->UpdatePendingFabricWithOperationalKeystore(fabricIndex, nocSpan, icacSpan);
+            err = fabricTable->UpdatePendingFabricWithOperationalKeystore(fabricIndex, nocSpan, icacSpan, advertiseOperational);
         }
         else
         // CASE 4: New fabric with operational keystore
@@ -291,7 +286,8 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
             err = fabricTable->AddNewPendingTrustedRootCert(rcacSpan);
             if (err == CHIP_NO_ERROR)
             {
-                err = fabricTable->AddNewPendingFabricWithOperationalKeystore(nocSpan, icacSpan, newFabricVendorId, &fabricIndex);
+                err = fabricTable->AddNewPendingFabricWithOperationalKeystore(nocSpan, icacSpan, newFabricVendorId, &fabricIndex,
+                                                                              advertiseOperational);
             }
 
             if (err == CHIP_NO_ERROR)

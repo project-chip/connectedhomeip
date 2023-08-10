@@ -40,7 +40,7 @@ public final class EventState {
       long eventNumber,
       int priorityLevel,
       int timestampType,
-      long systemTimeStamp,
+      long timestampValue,
       Object valueObject,
       byte[] tlv,
       String jsonString) {

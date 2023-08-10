@@ -19617,6 +19617,7 @@ void MTRGroupsClusterAddGroupResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19629,6 +19630,7 @@ void MTRGroupsClusterViewGroupResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19641,6 +19643,7 @@ void MTRGroupsClusterGetGroupMembershipResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19653,6 +19656,7 @@ void MTRGroupsClusterRemoveGroupResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19665,6 +19669,7 @@ void MTRScenesClusterAddSceneResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19677,6 +19682,7 @@ void MTRScenesClusterViewSceneResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19689,6 +19695,7 @@ void MTRScenesClusterRemoveSceneResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19701,6 +19708,7 @@ void MTRScenesClusterRemoveAllScenesResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19713,6 +19721,7 @@ void MTRScenesClusterStoreSceneResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19725,6 +19734,7 @@ void MTRScenesClusterGetSceneMembershipResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19737,6 +19747,7 @@ void MTRScenesClusterEnhancedAddSceneResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19749,6 +19760,7 @@ void MTRScenesClusterEnhancedViewSceneResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19761,6 +19773,7 @@ void MTRScenesClusterCopySceneResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19773,6 +19786,7 @@ void MTROTASoftwareUpdateProviderClusterQueryImageResponseCallbackBridge::OnSucc
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19785,6 +19799,7 @@ void MTROTASoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge::OnSuc
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19797,6 +19812,7 @@ void MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge::OnSuccessF
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19809,6 +19825,7 @@ void MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge::On
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19821,6 +19838,7 @@ void MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge::
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19833,6 +19851,7 @@ void MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSuccess
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19845,6 +19864,7 @@ void MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge::OnSucces
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19857,6 +19877,7 @@ void MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge::OnSucce
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19869,6 +19890,7 @@ void MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19881,6 +19903,7 @@ void MTRTimeSynchronizationClusterSetTimeZoneResponseCallbackBridge::OnSuccessFn
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19893,6 +19916,7 @@ void MTROperationalCredentialsClusterAttestationResponseCallbackBridge::OnSucces
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19905,6 +19929,7 @@ void MTROperationalCredentialsClusterCertificateChainResponseCallbackBridge::OnS
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19917,6 +19942,7 @@ void MTROperationalCredentialsClusterCSRResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19929,6 +19955,7 @@ void MTROperationalCredentialsClusterNOCResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19941,6 +19968,7 @@ void MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19953,6 +19981,7 @@ void MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge::OnS
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19965,6 +19994,7 @@ void MTRICDManagementClusterRegisterClientResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19977,6 +20007,7 @@ void MTRLaundryWasherModeClusterChangeToModeResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -19990,6 +20021,7 @@ void MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeRespon
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20002,6 +20034,7 @@ void MTRRVCRunModeClusterChangeToModeResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20014,6 +20047,7 @@ void MTRRVCCleanModeClusterChangeToModeResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20026,6 +20060,7 @@ void MTRDishwasherModeClusterChangeToModeResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20038,6 +20073,7 @@ void MTROperationalStateClusterOperationalCommandResponseCallbackBridge::OnSucce
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20050,6 +20086,7 @@ void MTRRVCOperationalStateClusterOperationalCommandResponseCallbackBridge::OnSu
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20062,6 +20099,7 @@ void MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20074,6 +20112,7 @@ void MTRDoorLockClusterGetYearDayScheduleResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20086,6 +20125,7 @@ void MTRDoorLockClusterGetHolidayScheduleResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20098,6 +20138,7 @@ void MTRDoorLockClusterGetUserResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20110,6 +20151,7 @@ void MTRDoorLockClusterSetCredentialResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20122,6 +20164,7 @@ void MTRDoorLockClusterGetCredentialStatusResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20134,6 +20177,7 @@ void MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20146,6 +20190,7 @@ void MTRChannelClusterChangeChannelResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20158,6 +20203,7 @@ void MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20170,6 +20216,7 @@ void MTRMediaPlaybackClusterPlaybackResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20182,6 +20229,7 @@ void MTRKeypadInputClusterSendKeyResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20194,6 +20242,7 @@ void MTRContentLauncherClusterLauncherResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20206,6 +20255,7 @@ void MTRApplicationLauncherClusterLauncherResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20218,6 +20268,7 @@ void MTRAccountLoginClusterGetSetupPINResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20230,6 +20281,7 @@ void MTRUnitTestingClusterTestSpecificResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20242,6 +20294,7 @@ void MTRUnitTestingClusterTestAddArgumentsResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20254,6 +20307,7 @@ void MTRUnitTestingClusterTestSimpleArgumentResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20266,6 +20320,7 @@ void MTRUnitTestingClusterTestStructArrayArgumentResponseCallbackBridge::OnSucce
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20278,6 +20333,7 @@ void MTRUnitTestingClusterTestListInt8UReverseResponseCallbackBridge::OnSuccessF
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20290,6 +20346,7 @@ void MTRUnitTestingClusterTestEnumsResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20302,6 +20359,7 @@ void MTRUnitTestingClusterTestNullableOptionalResponseCallbackBridge::OnSuccessF
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20314,6 +20372,7 @@ void MTRUnitTestingClusterTestComplexNullableOptionalResponseCallbackBridge::OnS
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20326,6 +20385,7 @@ void MTRUnitTestingClusterBooleanResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20338,6 +20398,7 @@ void MTRUnitTestingClusterSimpleStructResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20350,6 +20411,7 @@ void MTRUnitTestingClusterTestEmitTestEventResponseCallbackBridge::OnSuccessFn(
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 
@@ -20362,6 +20424,7 @@ void MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackBridge::O
         OnFailureFn(context, err);
         return;
     }
+    SetAttestationChallengeIfNeeded(context, response);
     DispatchSuccess(context, response);
 };
 

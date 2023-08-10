@@ -228,7 +228,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TStep 3c: H reads CurrentSaturation attribute from DUT"
+    - label: "Step 3c: H reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
@@ -317,7 +317,7 @@ tests:
               minValue: 0
               maxValue: 2
 
-    - label: "TStep 4b: H reads EnhancedColorMode attribute from DUT"
+    - label: "Step 4b: H reads EnhancedColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A4001
       command: "readAttribute"
       attribute: "EnhancedColorMode"

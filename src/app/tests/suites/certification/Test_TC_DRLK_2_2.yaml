@@ -227,7 +227,7 @@ tests:
       response:
           error: FAILURE
 
-    - label: "TStep 10a: H reads the WrongCodeEntryLimit attribute from the DUT"
+    - label: "Step 10a: H reads the WrongCodeEntryLimit attribute from the DUT"
       PICS: DRLK.S.A0030
       command: "readAttribute"
       attribute: "WrongCodeEntryLimit"
