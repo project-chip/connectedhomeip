@@ -166,12 +166,15 @@ public:
     public:
         virtual ~Observer() = default;
 
-        /// @brief Callback invoked to notify a subscription was successfully established for a read handler
+        /// @brief Callback invoked to notify a subscription was successfully established for the ReadHandler
         /// @param[in] apReadHandler  ReadHandler that completed its subscription
-        virtual void OnReadHandlerSubscribed(ReadHandler * apReadHandler) = 0;
+        virtual void OnSubscriptionEstablished(ReadHandler * apReadHandler) = 0;
 
         /// @brief Callback invoked when a ReadHandler went from a non reportable state to a reportable state. Indicates to the
         /// observer that a report should be emitted when the min interval allows it.
+        ///
+        /// This will only be invoked for subscribe-type ReadHandler objects, and only after
+        /// OnSubscriptionEstablished has been called.
         /// @param[in] apReadHandler  ReadHandler that became dirty and in HandlerState::CanStartReporting state
         virtual void OnBecameReportable(ReadHandler * apReadHandler) = 0;
 
