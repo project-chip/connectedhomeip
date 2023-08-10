@@ -72,6 +72,7 @@ source_set("air_quality_sensor_app_sdk") {
     ":sdk",
     ":sysconfig",
     "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common",
+    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common:air-quality-sensor-attr-update-handler",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]
@@ -84,8 +85,10 @@ ti_simplelink_executable("air_quality_sensor_app") {
   sources = [
     "${project_dir}/main/AppTask.cpp",
     "${project_dir}/main/CHIPDeviceManager.cpp",
-    "${project_dir}/main/CXXExceptionStubs.cpp",
+# This causes redefinitions of excpetion handler, alread defined in libstdc++_nano.a. Maybe a complier version issue.
+#    "${project_dir}/main/CXXExceptionStubs.cpp",
     "${project_dir}/main/DeviceCallbacks.cpp",
+    "${project_dir}/main/AirQualitySensorAppAttrUpdateDelegate.cpp"
   ]
 
   deps = [
@@ -93,9 +96,11 @@ ti_simplelink_executable("air_quality_sensor_app") {
     ":sdk",
     ":sysconfig",
     "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common",
+    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common:air-quality-sensor-attr-update-handler",    
     "${chip_root}/examples/platform/cc32xx:cc32xx-attestation-credentials",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/third_party/jsoncpp",
   ]
 
   include_dirs = [

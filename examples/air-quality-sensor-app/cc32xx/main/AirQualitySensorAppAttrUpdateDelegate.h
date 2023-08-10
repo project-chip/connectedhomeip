@@ -16,22 +16,14 @@
  *    limitations under the License.
  */
 
-#include "AirQualitySensorAppAttrUpdateDelegate.h"
-#include "AirQualitySensorAttrUpdateHandler.h"
+#pragma once
 
-#include <platform/PlatformManager.h>
+#include <json/json.h>
+#include <platform/DiagnosticDataProvider.h>
 
-using namespace chip;
-
-void AirQualitySensorAppAttrUpdateDelegate::OnEventCommandReceived(const char * json)
+class AirQualitySensorAppAttrUpdateDelegate
 {
-    auto handler = AirQualitySensorAttrUpdateHandler::FromJSON(json);
-    if (nullptr == handler)
-    {
-        ChipLogError(NotSpecified, "AirQualitySensor App: Unable to instantiate a command handler");
-        return;
-    }
-
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(AirQualitySensorAttrUpdateHandler::HandleCommand,
-                                                  reinterpret_cast<intptr_t>(handler));
-}
+public:
+    AirQualitySensorAppAttrUpdateDelegate(void);
+    void OnEventCommandReceived(const char * json);
+};

@@ -23,6 +23,11 @@
 
 using namespace chip;
 
+AirQualitySensorAppAttrUpdateDelegate::AirQualitySensorAppAttrUpdateDelegate(void)
+{
+    // Set up UART and send JSON commands to OnEventCommandReceived
+}
+
 void AirQualitySensorAppAttrUpdateDelegate::OnEventCommandReceived(const char * json)
 {
     auto handler = AirQualitySensorAttrUpdateHandler::FromJSON(json);

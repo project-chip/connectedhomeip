@@ -60,6 +60,7 @@ int main(void)
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
     int ret = GetAppTask().StartAppTask();
+
     if (ret != 0)
     {
         // can't log until the kernel is started
