@@ -493,7 +493,6 @@ void CommandHandler::AddStatusAndLogIfFailure(const ConcreteCommandPath & aComma
                      aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId),
                      err.Format());
     }
-    return AddStatus(aCommandPath, aStatus);
 }
 
 CHIP_ERROR CommandHandler::AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus)
