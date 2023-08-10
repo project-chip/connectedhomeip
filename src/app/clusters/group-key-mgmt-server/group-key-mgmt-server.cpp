@@ -554,7 +554,6 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
     Credentials::GroupDataProvider * provider = nullptr;
     const FabricInfo * fabric                 = nullptr;
 
-    // Flight-check fabric scoping.
     if (!GetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
     {
         // Command will already have status populated from validation.
@@ -692,7 +691,6 @@ bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(
     Credentials::GroupDataProvider * provider = nullptr;
     const FabricInfo * fabric                 = nullptr;
 
-    // Flight-check fabric scoping.
     if (!GetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
     {
         // Command will already have status populated from validation.
