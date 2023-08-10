@@ -57,10 +57,10 @@ CHIP_ERROR DeferredAttributePersistenceProvider::WriteValue(const ConcreteAttrib
     return mPersister.WriteValue(aPath, aValue);
 }
 
-CHIP_ERROR DeferredAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType,
-                                                           size_t aSize, MutableByteSpan & aValue)
+CHIP_ERROR DeferredAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & aPath,
+                                                           const EmberAfAttributeMetadata * aMetadata, MutableByteSpan & aValue)
 {
-    return mPersister.ReadValue(aPath, aType, aSize, aValue);
+    return mPersister.ReadValue(aPath, aMetadata, aValue);
 }
 
 void DeferredAttributePersistenceProvider::FlushAndScheduleNext()
