@@ -72,7 +72,7 @@ Status LaundryWasherControlDelegate::PreAttributeCheck(AttributeId attributeId, 
         {
             return Status::InvalidDataType;
         }
-        for (uint8_t index = 0; index < ArraySize(supportRinsesOptions); index++)
+        for (uint16_t index = 0; index < ArraySize(supportRinsesOptions); index++)
         {
             if (static_cast<NumberOfRinsesEnum>(*value) == LaundryWasherControlDelegate::supportRinsesOptions[index])
             {
@@ -95,5 +95,4 @@ void LaundryWasherControlDelegate::Init(EndpointId endpointId)
     GetSupportedRinseAtIndex(kDefaultRinseIndex, supportedRinse);
     LaundryWasherControlsServer::Instance().SetNumberOfRinses(endpointId, supportedRinse);
     LaundryWasherControlsServer::Instance().SetSpinSpeedCurrent(endpointId, DataModel::Nullable<uint8_t>(kDefaultSpinSpeedIndex));
-    return;
 }
