@@ -33,7 +33,7 @@
   ],
   "endpointTypes": [
     {
-      "id": 5,
+      "id": 12,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
         "id": 177,
@@ -9506,7 +9506,7 @@
       ]
     },
     {
-      "id": 7,
+      "id": 10,
       "name": "MA-onofflight",
       "deviceTypeRef": {
         "id": 183,
@@ -14125,8 +14125,8 @@
               "mfgCode": null,
               "side": "server",
               "type": "array",
-              "included": 0,
-              "storageOption": "RAM",
+              "included": 1,
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -14141,7 +14141,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "int8u",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -14157,7 +14157,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "NumberOfRinsesEnum",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -14173,8 +14173,8 @@
               "mfgCode": null,
               "side": "server",
               "type": "array",
-              "included": 0,
-              "storageOption": "RAM",
+              "included": 1,
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -14190,7 +14190,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -14206,7 +14206,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -14222,7 +14222,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -14238,7 +14238,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -29197,7 +29197,7 @@
       ]
     },
     {
-      "id": 6,
+      "id": 9,
       "name": "MA-onofflight",
       "deviceTypeRef": {
         "id": 183,
@@ -32829,7 +32829,7 @@
       ]
     },
     {
-      "id": 8,
+      "id": 11,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 228,
