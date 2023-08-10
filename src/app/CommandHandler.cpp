@@ -468,6 +468,13 @@ CHIP_ERROR CommandHandler::AddStatusInternal(const ConcreteCommandPath & aComman
     return FinishStatus();
 }
 
+void CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
+                               const char * context)
+{
+
+    VerifyOrDie(FallibleAddStatus(aCommandPath, aStatus, context) == CHIP_NO_ERROR);
+}
+
 CHIP_ERROR CommandHandler::FallibleAddStatus(const ConcreteCommandPath & path, const Protocols::InteractionModel::Status status,
                                              const char * context)
 {

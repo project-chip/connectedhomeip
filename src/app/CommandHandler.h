@@ -182,12 +182,8 @@ public:
      * Adds a status when the caller is unable to handle any failures. Logging is performed
      * and failure to register the status is checked with VerifyOrDie.
      */
-    inline void AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
-                          const char * context = nullptr)
-    {
-
-        VerifyOrDie(FallibleAddStatus(aCommandPath, aStatus, context) == CHIP_NO_ERROR);
-    }
+    void AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
+                   const char * context = nullptr);
 
     CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
 
