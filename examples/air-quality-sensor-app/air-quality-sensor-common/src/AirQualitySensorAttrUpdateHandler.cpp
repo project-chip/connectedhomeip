@@ -100,7 +100,10 @@ void AirQualitySensorAttrUpdateHandler::HandleCommand(intptr_t context)
     auto * self             = reinterpret_cast<AirQualitySensorAttrUpdateHandler *>(context);
     std::string clusterName = self->mJsonValue["Name"].asString();
 
-    VerifyOrReturn(!self->mJsonValue.empty(), ChipLogError(NotSpecified, "Invalid JSON event command received"));
+    VerifyOrReturn(!self->mJsonValue.empty(), {
+      ChipLogError(NotSpecified, "Invalid JSON event command received");
+      Platform::Delete(self);
+    });
 
     if (clusterName == "AirQuality")
     {
