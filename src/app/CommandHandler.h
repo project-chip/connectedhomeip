@@ -173,9 +173,10 @@ public:
     CHIP_ERROR AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus);
 
     // Same as AddStatus, but logs that the command represented by aCommandPath failed with the given
-    // error status and error message, if aStatus is an error.
-    CHIP_ERROR AddStatusAndLogIfFailure(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
-                                        const char * aMessage);
+    // error status and error message, if aStatus is an error. Errors on AddStatus are just logged
+    // (since the caller likely can only log and not further add a status).
+    void AddStatusAndLogIfFailure(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
+                                  const char * aMessage);
 
     CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
 

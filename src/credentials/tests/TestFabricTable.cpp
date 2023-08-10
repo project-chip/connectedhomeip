@@ -2391,6 +2391,11 @@ void TestFabricLookup(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricIndex() == 2);
         NL_TEST_ASSERT(inSuite, !fabricInfo->ShouldAdvertiseIdentity());
     }
+
+    // Attempt lookup of FabricIndex 0 --> should always fail.
+    {
+        NL_TEST_ASSERT(inSuite, fabricTable.FindFabricWithIndex(0) == nullptr);
+    }
 }
 
 void TestFetchCATs(nlTestSuite * inSuite, void * inContext)
