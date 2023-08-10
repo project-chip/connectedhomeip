@@ -199,8 +199,7 @@ public:
     }
 
     inline CHIP_ERROR FailableAddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
-                                        const char * context     = nullptr,
-                                        LogOption logging_option = LogOption::kFailures)
+                                        const char * context = nullptr, LogOption logging_option = LogOption::kFailures)
     {
         return FailableAddStatus(CommandPathStatus(aCommandPath, aStatus), context, logging_option);
     }
