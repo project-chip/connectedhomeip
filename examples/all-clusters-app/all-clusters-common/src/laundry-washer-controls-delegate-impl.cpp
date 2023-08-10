@@ -61,7 +61,7 @@ Status LaundryWasherControlDelegate::PreAttributeCheck(AttributeId attributeId, 
     switch (attributeId)
     {
     case Attributes::SpinSpeedCurrent::Id: {
-        if ( *value >= ArraySize(spinSpeedsNameOptions))
+        if (*value >= ArraySize(spinSpeedsNameOptions))
         {
             return Status::ConstraintError;
         }
@@ -72,7 +72,7 @@ Status LaundryWasherControlDelegate::PreAttributeCheck(AttributeId attributeId, 
         {
             return Status::InvalidDataType;
         }
-        for (uint8_t index = 0 ; index < ArraySize(supportRinsesOptions) ; index++)
+        for (uint8_t index = 0; index < ArraySize(supportRinsesOptions); index++)
         {
             if (static_cast<NumberOfRinsesEnum>(*value) == LaundryWasherControlDelegate::supportRinsesOptions[index])
             {
@@ -94,6 +94,6 @@ void LaundryWasherControlDelegate::Init(EndpointId endpointId)
     NumberOfRinsesEnum supportedRinse;
     GetSupportedRinseAtIndex(kDefaultRinseIndex, supportedRinse);
     LaundryWasherControlsServer::Instance().SetNumberOfRinses(endpointId, supportedRinse);
-    LaundryWasherControlsServer::Instance().SetSpinSpeedCurrent(endpointId,  DataModel::Nullable<uint8_t>(kDefaultSpinSpeedIndex));
+    LaundryWasherControlsServer::Instance().SetSpinSpeedCurrent(endpointId, DataModel::Nullable<uint8_t>(kDefaultSpinSpeedIndex));
     return;
 }

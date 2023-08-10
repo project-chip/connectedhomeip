@@ -193,8 +193,9 @@ void MatterLaundryWasherControlsPluginServerInitCallback()
     registerAttributeAccessOverride(&laundryWasherControlsServer);
 }
 
-Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(
-    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
+Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                                           EmberAfAttributeType attributeType, uint16_t size,
+                                                                           uint8_t * value)
 {
     Delegate * delegate = GetDelegate(attributePath.mEndpointId);
     if (delegate == nullptr)

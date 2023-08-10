@@ -40,7 +40,7 @@ class LaundryWasherControlDelegate : public Delegate
     static LaundryWasherControlDelegate instance;
 
 public:
-    static constexpr uint8_t kDefaultRinseIndex = 0;
+    static constexpr uint8_t kDefaultRinseIndex     = 0;
     static constexpr uint8_t kDefaultSpinSpeedIndex = 0;
 
     CHIP_ERROR GetSpinSpeedAtIndex(size_t index, MutableCharSpan & spinSpeed);
