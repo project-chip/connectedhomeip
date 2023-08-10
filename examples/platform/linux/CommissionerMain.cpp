@@ -351,7 +351,7 @@ void PairingCommand::OnFabricCheck(NodeId matchingNodeId)
 {
     if (matchingNodeId != kUndefinedNodeId)
     {
-        ChipLogProgress(AppServer, "ALREADY ON FABRIC WITH nodeId=0x" ChipLogFormatX64, ChipLogValueX64(info.nodeId));
+        ChipLogProgress(AppServer, "ALREADY ON FABRIC WITH nodeId=0x" ChipLogFormatX64, ChipLogValueX64(matchingNodeId));
         // wait until attestation verification before cancelling so we can validate vid/pid
     }
 }
