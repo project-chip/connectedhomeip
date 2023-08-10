@@ -139,6 +139,7 @@ class TlvReadWriteTest {
         .isEqualTo("This is a test")
       assertThat(getFloat(ImplicitProfileTag(2, 65535u))).isEqualTo(17.9f)
       assertThat(getDouble(ImplicitProfileTag(4, 65536u))).isEqualTo(17.9)
+      assertThat(isLastElement()).isTrue()
       exitContainer()
       assertThat(getLengthRead()).isEqualTo(testTlvSampleData.size)
       assertThat(isEndOfTlv()).isEqualTo(true)
