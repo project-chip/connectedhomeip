@@ -115,12 +115,12 @@ CHIP_ERROR Instance::SetOperationalError(const GenericOperationalError & opErrSt
     return CHIP_NO_ERROR;
 }
 
-DataModel::Nullable<uint8_t> Instance::GetCurrentPhase()
+DataModel::Nullable<uint8_t> Instance::GetCurrentPhase() const
 {
     return mCurrentPhase;
 }
 
-DataModel::Nullable<uint32_t> Instance::GetCountdownTime()
+DataModel::Nullable<uint32_t> Instance::GetCountdownTime() const
 {
     return mCountdownTime;
 }
@@ -131,7 +131,7 @@ uint8_t Instance::GetCurrentOperationalState() const
     return mOperationalState;
 }
 
-void Instance::GetCurrentOperationalError(GenericOperationalError & error)
+void Instance::GetCurrentOperationalError(GenericOperationalError & error) const
 {
     error = mOperationalError;
 }
