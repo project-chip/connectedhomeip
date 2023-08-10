@@ -287,6 +287,13 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/resource-monitoring-cluster-objects.cpp",
           "${_app_root}/clusters/${cluster}/resource-monitoring-cluster-objects.h",
         ]
+      } else if (cluster == "smoke-co-alarm-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/SmokeCOTestEventTriggerDelegate.cpp",
+          "${_app_root}/clusters/${cluster}/SmokeCOTestEventTriggerDelegate.h",
+        ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }

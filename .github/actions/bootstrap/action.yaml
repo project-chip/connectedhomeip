@@ -1,8 +1,13 @@
 name: Bootstrap
 description: Bootstrap
+inputs:
+  platform:
+    description: "Platform name"
+    required: false
+    default: none
 runs:
   using: "composite"
   steps:
     - name: Bootstrap
       shell: bash
-      run: bash scripts/bootstrap.sh
+      run: bash scripts/bootstrap.sh -p all,${{ inputs.platform }}
