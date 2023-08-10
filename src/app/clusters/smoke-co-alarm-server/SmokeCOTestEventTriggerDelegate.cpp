@@ -28,11 +28,15 @@ bool SmokeCOTestEventTriggerDelegate::DoesEnableKeyMatch(const ByteSpan & enable
 
 CHIP_ERROR SmokeCOTestEventTriggerDelegate::HandleEventTrigger(uint64_t eventTrigger)
 {
-    VerifyOrReturnValue(HandleSmokeCOTestEventTrigger(eventTrigger),
-                        (mOtherDelegate != nullptr) ? mOtherDelegate->HandleEventTrigger(eventTrigger)
-                                                    : CHIP_ERROR_INVALID_ARGUMENT);
-
-    return CHIP_NO_ERROR;
+    if (HandleSmokeCOTestEventTrigger(eventTrigger)) 
+    {
+        return CHIP_NO_ERROR;
+    }
+    if (mOtherDelegate != nullptr) 
+    {
+        return mOtherDelegate->HandleEventTrigger(eventTrigger);
+    }
+    return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
 } // namespace chip
