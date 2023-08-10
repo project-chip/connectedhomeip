@@ -103,9 +103,15 @@ void SmokeCoAlarmServer::SetExpressedStateByPriority(EndpointId endpointId,
         VerifyOrReturn(alarmState == AlarmStateEnum::kNormal, SetExpressedState(endpointId, priority));
         VerifyOrReturn(endOfServiceState == EndOfServiceEnum::kNormal, SetExpressedState(endpointId, priority));
         VerifyOrReturn(active == false, SetExpressedState(endpointId, priority));
+
+        if ((alarmState != AlarmStateEnum::kNormal) || (endOfServiceState != EndOfServiceEnum::kNormal) || active)
+        {
+            VerifyOrDo(SetExpressedState(endpointId, priority), ChipLogError(NotSpecified, "Set ExpressedState failed"));
+            return;
+        }
     }
 
-    SetExpressedState(endpointId, ExpressedStateEnum::kNormal);
+    VerifyOrDo(SetExpressedState(endpointId, ExpressedStateEnum::kNormal), ChipLogError(NotSpecified, "Set ExpressedState failed"));
 }
 
 bool SmokeCoAlarmServer::SetSmokeState(EndpointId endpointId, AlarmStateEnum newSmokeState)
