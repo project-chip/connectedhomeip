@@ -26,6 +26,8 @@ static_library("bdx") {
     "BdxUri.h",
     "TransferFacilitator.cpp",
     "TransferFacilitator.h",
+    "AsyncTransferFacilitator.cpp",
+    "AsyncTransferFacilitator.h",
   ]
 
   cflags = [ "-Wconversion" ]

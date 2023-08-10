@@ -64,10 +64,13 @@ TransferSession::TransferSession()
     mSuppportedXferOpts.ClearAll();
 }
 
+void TransferSession::GetNextAction(OutputEvent & event)
+{
+    PollOutput(event, System::SystemClock().GetMonotonicTimestamp());
+}
+
 void TransferSession::PollOutput(OutputEvent & event, System::Clock::Timestamp curTime)
 {
-    event = OutputEvent(OutputEventType::kNone);
-
     if (mShouldInitTimeoutStart)
     {
         mTimeoutStartTime       = curTime;

@@ -33,7 +33,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <platform/LockTracker.h>
 #include <protocols/bdx/BdxUri.h>
-#include <protocols/bdx/TransferFacilitator.h>
+#include <protocols/bdx/AsyncTransferFacilitator.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -58,15 +58,15 @@ constexpr System::Clock::Timeout kBdxInitReceivedTimeout = System::Clock::Second
 constexpr uint32_t kDelayedActionTimeSeconds = 600;
 
 constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60); // OTA Spec mandates >= 5 minutes
-constexpr System::Clock::Timeout kBdxPollIntervalMs = System::Clock::Milliseconds32(50);
 constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kSender;
 
-class BdxOTASender : public bdx::Responder {
+class BdxOTASender : public bdx::AsyncResponder {
 public:
     BdxOTASender() {};
 
     CHIP_ERROR PrepareForTransfer(FabricIndex fabricIndex, NodeId nodeId)
     {
+        ChipLogError(BDX, "preparefortransfer AsyncResponder");
         assertChipStackLockedByCurrentThread();
 
         VerifyOrReturnError(mDelegate != nil, CHIP_ERROR_INCORRECT_STATE);
@@ -76,7 +76,8 @@ public:
         ReturnErrorOnFailure(ConfigureState(fabricIndex, nodeId));
 
         BitFlags<bdx::TransferControlFlags> flags(bdx::TransferControlFlags::kReceiverDrive);
-        return Responder::PrepareForTransfer(mSystemLayer, kBdxRole, flags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollIntervalMs);
+
+        return AsyncResponder::PrepareForTransfer(mExchangeMgr, kBdxRole, flags, kMaxBdxBlockSize, kBdxTimeout);
     }
 
     CHIP_ERROR Init(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeMgr)
@@ -88,7 +89,7 @@ public:
         VerifyOrReturnError(systemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(exchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        exchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id, this);
+        //exchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id, this);
 
         mSystemLayer = systemLayer;
         mExchangeMgr = exchangeMgr;
@@ -103,8 +104,8 @@ public:
         VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        mExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id);
-        ResetState();
+        //mExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id);
+        ResetState(nullptr);
 
         mExchangeMgr = nullptr;
         mSystemLayer = nullptr;
@@ -118,7 +119,7 @@ public:
         assertChipStackLockedByCurrentThread();
 
         if (mInitialized && mFabricIndex.Value() == controller.fabricIndex) {
-            ResetState();
+            ResetState(nullptr);
         }
     }
 
@@ -128,13 +129,13 @@ public:
             mDelegate = delegate;
             mDelegateNotificationQueue = delegateNotificationQueue;
         } else {
-            ResetState();
+            ResetState(nullptr);
             mDelegate = nil;
             mDelegateNotificationQueue = nil;
         }
     }
 
-    void ResetState()
+    void ResetState(chip::Messaging::ExchangeContext * ec)
     {
         assertChipStackLockedByCurrentThread();
         if (mNodeId.HasValue() && mFabricIndex.HasValue()) {
@@ -152,16 +153,16 @@ public:
         if (!mInitialized) {
             return;
         }
-        Responder::ResetTransfer();
+
+        AsyncResponder::ResetTransfer();
         ++mTransferGeneration;
         mFabricIndex.ClearValue();
         mNodeId.ClearValue();
 
-        if (mExchangeCtx != nullptr) {
-            mExchangeCtx->Close();
-            mExchangeCtx = nullptr;
+        if (ec != nullptr) {
+            ec->Close();
+            ec = nullptr;
         }
-
         mInitialized = false;
     }
 
@@ -172,14 +173,14 @@ private:
     static void HandleBdxInitReceivedTimeoutExpired(chip::System::Layer * systemLayer, void * state)
     {
         VerifyOrReturn(state != nullptr);
-        static_cast<BdxOTASender *>(state)->ResetState();
+        static_cast<BdxOTASender *>(state)->ResetState(nullptr);
     }
 
-    CHIP_ERROR OnMessageToSend(TransferSession::OutputEvent & event)
+    CHIP_ERROR OnMessageToSend(chip::Messaging::ExchangeContext * ec, TransferSession::OutputEvent & event)
     {
         assertChipStackLockedByCurrentThread();
 
-        VerifyOrReturnError(mExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(mDelegate != nil, CHIP_ERROR_INCORRECT_STATE);
 
         Messaging::SendFlags sendFlags;
@@ -191,19 +192,18 @@ private:
         }
 
         auto & msgTypeData = event.msgTypeData;
+        ChipLogError(BDX, "OnMessageToSend msgTypeData.MessageType = %hu", msgTypeData.MessageType);
         // If there's an error sending the message, close the exchange and call ResetState.
         // TODO: If we can remove the !mInitialized check in ResetState(), just calling ResetState() will suffice here.
         CHIP_ERROR err
-            = mExchangeCtx->SendMessage(msgTypeData.ProtocolId, msgTypeData.MessageType, std::move(event.MsgData), sendFlags);
+            = ec->SendMessage(msgTypeData.ProtocolId, msgTypeData.MessageType, std::move(event.MsgData), sendFlags);
         if (err != CHIP_NO_ERROR) {
-            mExchangeCtx->Close();
-            mExchangeCtx = nullptr;
-            ResetState();
+            ResetState(ec);
         } else if (event.msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport)) {
             // If the send was successful for a status report, since we are not expecting a response the exchange context is
             // already closed. We need to null out the reference to avoid having a dangling pointer.
-            mExchangeCtx = nullptr;
-            ResetState();
+            ec = nullptr;
+            ResetState(ec);
         }
         return err;
     }
@@ -219,7 +219,7 @@ private:
         return bdx::StatusCode::kUnknown;
     }
 
-    CHIP_ERROR OnTransferSessionBegin(TransferSession::OutputEvent & event)
+    CHIP_ERROR OnTransferSessionBegin(chip::Messaging::ExchangeContext * ec, TransferSession::OutputEvent & event)
     {
         assertChipStackLockedByCurrentThread();
         // Once we receive the BDX init, cancel the BDX Init timeout and start the BDX session
@@ -231,6 +231,7 @@ private:
         VerifyOrReturnError(mNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
         uint16_t fdl = 0;
         auto fd = mTransfer.GetFileDesignator(fdl);
+        ChipLogError(BDX, "OnTransferSessionBegin fd %s", fd);
         VerifyOrReturnError(fdl <= bdx::kMaxFileDesignatorLen, CHIP_ERROR_INVALID_ARGUMENT);
         CharSpan fileDesignatorSpan(Uint8::to_const_char(fd), fdl);
 
@@ -242,7 +243,9 @@ private:
         auto offset = @(mTransfer.GetStartOffset());
 
         auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
+        ChipLogError(BDX, "OnTransferSessionBegin runningControllerForFabricIndex");
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
+        ChipLogError(BDX, "OnTransferSessionBegin runningControllerForFabricIndex1");
 
         auto transferGeneration = mTransferGeneration;
 
@@ -253,13 +256,14 @@ private:
 
                     if (!mInitialized || mTransferGeneration != transferGeneration) {
                         // Callback for a stale transfer.
+                        AsyncResponder::OnEventHandled(ec, CHIP_ERROR_INCORRECT_STATE);
                         return;
                     }
 
                     if (error != nil) {
                         CHIP_ERROR err = [MTRError errorToCHIPErrorCode:error];
                         LogErrorOnFailure(err);
-                        LogErrorOnFailure(mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err)));
+                        AsyncResponder::OnEventHandled(ec, err);
                         return;
                     }
 
@@ -273,6 +277,7 @@ private:
                     acceptData.Length = mTransfer.GetTransferLength();
 
                     LogErrorOnFailure(mTransfer.AcceptTransfer(acceptData));
+                    AsyncResponder::OnEventHandled(ec, [MTRError errorToCHIPErrorCode:error]);
                 }
                               errorHandler:^(NSError *) {
                                   // Not much we can do here
@@ -285,6 +290,7 @@ private:
         dispatch_async(mDelegateNotificationQueue, ^{
             if ([strongDelegate respondsToSelector:@selector
                                 (handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:)]) {
+                   ChipLogError(BDX, "handleBDXTransferSessionBeginForNodeID called");             
                 [strongDelegate handleBDXTransferSessionBeginForNodeID:nodeId
                                                             controller:controller
                                                         fileDesignator:fileDesignator
@@ -302,7 +308,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR OnTransferSessionEnd(TransferSession::OutputEvent & event)
+    CHIP_ERROR OnTransferSessionEnd(chip::Messaging::ExchangeContext * ec, TransferSession::OutputEvent & event)
     {
         assertChipStackLockedByCurrentThread();
 
@@ -328,12 +334,12 @@ private:
                                                                error:[MTRError errorForCHIPErrorCode:error]];
             });
         }
-
-        ResetState();
+        AsyncResponder::OnEventHandled(ec, error);
+        ResetState(ec);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR OnBlockQuery(TransferSession::OutputEvent & event)
+    CHIP_ERROR OnBlockQuery(chip::Messaging::ExchangeContext * ec, TransferSession::OutputEvent & event)
     {
         assertChipStackLockedByCurrentThread();
 
@@ -360,11 +366,12 @@ private:
 
                     if (!mInitialized || mTransferGeneration != transferGeneration) {
                         // Callback for a stale transfer.
+                        AsyncResponder::OnEventHandled(ec, CHIP_ERROR_INCORRECT_STATE);
                         return;
                     }
 
                     if (data == nil) {
-                        LogErrorOnFailure(mTransfer.AbortTransfer(bdx::StatusCode::kUnknown));
+                        AsyncResponder::OnEventHandled(ec, CHIP_ERROR_INCORRECT_STATE);
                         return;
                     }
 
@@ -376,8 +383,8 @@ private:
                     CHIP_ERROR err = mTransfer.PrepareBlock(blockData);
                     if (CHIP_NO_ERROR != err) {
                         LogErrorOnFailure(err);
-                        LogErrorOnFailure(mTransfer.AbortTransfer(bdx::StatusCode::kUnknown));
                     }
+                    AsyncResponder::OnEventHandled(ec, err);
                 }
                               errorHandler:^(NSError *) {
                                   // Not much we can do here
@@ -411,16 +418,19 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void HandleTransferSessionOutput(TransferSession::OutputEvent & event) override
+    void HandleAsyncTransferSessionOutput(chip::Messaging::ExchangeContext * ec, TransferSession::OutputEvent & event) override
     {
+        ChipLogError(BDX, "HandleAsyncTransferSessionOutput %s", event.ToString(event.EventType));
         VerifyOrReturn(mDelegate != nil);
-
+        ChipLogError(BDX, "HandleTransferSessionOutput event %s", event.ToString(event.EventType));
         CHIP_ERROR err = CHIP_NO_ERROR;
         switch (event.EventType) {
         case TransferSession::OutputEventType::kInitReceived:
-            err = OnTransferSessionBegin(event);
+            err = OnTransferSessionBegin(ec, event);
             if (err != CHIP_NO_ERROR) {
-                LogErrorOnFailure(mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err)));
+                LogErrorOnFailure(err);
+                AsyncResponder::OnEventHandled(ec, err);
+                ResetState(ec);
             }
             break;
         case TransferSession::OutputEventType::kStatusReceived:
@@ -429,14 +439,29 @@ private:
         case TransferSession::OutputEventType::kAckEOFReceived:
         case TransferSession::OutputEventType::kInternalError:
         case TransferSession::OutputEventType::kTransferTimeout:
-            err = OnTransferSessionEnd(event);
+            err = OnTransferSessionEnd(ec, event);
+            if (err != CHIP_NO_ERROR) {
+                LogErrorOnFailure(err);
+                AsyncResponder::OnEventHandled(ec, err);
+                ResetState(ec);
+            }
             break;
         case TransferSession::OutputEventType::kQueryWithSkipReceived:
         case TransferSession::OutputEventType::kQueryReceived:
-            err = OnBlockQuery(event);
+            err = OnBlockQuery(ec, event);
+            if (err != CHIP_NO_ERROR) {
+                LogErrorOnFailure(err);
+                AsyncResponder::OnEventHandled(ec, err);
+                ResetState(ec);
+            }
             break;
         case TransferSession::OutputEventType::kMsgToSend:
-            err = OnMessageToSend(event);
+            err = OnMessageToSend(ec, event);
+            if (err != CHIP_NO_ERROR) {
+                LogErrorOnFailure(err);
+                AsyncResponder::OnEventHandled(ec, err);
+                ResetState(ec);
+            }
             break;
         case TransferSession::OutputEventType::kNone:
         case TransferSession::OutputEventType::kAckReceived:
@@ -461,7 +486,7 @@ private:
             VerifyOrReturnError(mFabricIndex.Value() == fabricIndex && mNodeId.Value() == nodeId, CHIP_ERROR_BUSY);
 
             // Reset stale connection from the same Node if exists.
-            ResetState();
+            ResetState(nullptr);
         }
 
         // Start a timer to track whether we receive a BDX init after a successful query image in a reasonable amount of time
@@ -700,7 +725,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                     handle.Release();
                     // We need to reset state here to clean up any initialization we might have done including starting the BDX
                     // timeout timer while preparing for transfer if any failure occurs afterwards.
-                    gOtaSender.ResetState();
+                    gOtaSender.ResetState(nullptr);
                     return;
                 }
 
@@ -711,12 +736,13 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                     LogErrorOnFailure(err);
                     handler->AddStatus(cachedCommandPath, StatusIB(err).mStatus);
                     handle.Release();
-                    gOtaSender.ResetState();
+                    gOtaSender.ResetState(nullptr);
                     return;
                 }
                 delegateResponse.imageURI.SetValue(uri);
                 handler->AddResponse(cachedCommandPath, delegateResponse);
                 handle.Release();
+                gOtaSender.OnEventHandled(commandObj->GetExchangeContext(), CHIP_NO_ERROR);
             }
                           errorHandler:^(NSError *) {
                               // Not much we can do here

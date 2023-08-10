@@ -146,6 +146,28 @@ public:
 
     /**
      * @brief
+     *   Gets the next pending output from the transfer session along with any data for the caller to take action on.
+     *
+     *   It is a wrapper around PollOutput which is a misnomer since the intent of the PollOutput was not to use a polling
+     *   mechanism to get the next action for the client to take. It is highly encourgaed to use GetNextAction in lieu of
+     *   PollOuput to get the pending output event.
+     *
+     *   This method should be called asynchronously based on events received by the exchange context or events sent by
+     *   the entity using the Transfer session for BDX.
+     *
+     *   It is possible that consecutive calls to this method may emit different outputs depending on the state of the
+     *   TransferSession object and so we need to call this until we get an event of type - OutputEventType::kNone
+     *
+     *   Note that if the type outputted is kMsgToSend, the caller is expected to send the message immediately
+     *
+     *   See OutputEventType for all possible output event types.
+     *
+     * @param event     Reference to an OutputEvent struct that will be filled out with any pending output data
+     */
+    void GetNextAction(OutputEvent & event);
+
+    /**
+     * @brief
      *   Indicates the presence of pending output and includes any data for the caller to take action on.
      *
      *   This method should be called frequently in order to be notified about any messages received. It should also be called after
