@@ -697,7 +697,9 @@ tests:
           [1658223096.125372][4517:4522] CHIP:TOO:    }
       disabled: true
 
-    - label: "Step 5g: TH sends Clear User Command to DUT for user created in Step 5a"
+    - label:
+          "Step 5g: TH sends Clear User Command to DUT for user created in Step
+          5a"
       PICS: DRLK.S.C1d.Rsp
       verification: |
           ./chip-tool doorlock clear-user 4 1 1 --timedInteractionTimeoutMs 1000
@@ -720,7 +722,9 @@ tests:
           [1658142762.493258][2993:2998] CHIP:DMG: },
       disabled: true
 
-    - label: "Step 6a: TH sends Clear Credential Command to DUT for Credential created in Step 3a"
+    - label:
+          "Step 6a: TH sends Clear Credential Command to DUT for Credential
+          created in Step 3a"
       PICS: DRLK.S.C26.Rsp
       verification: |
           ./chip-tool doorlock clear-credential  '{ "credentialType" : 1 , "credentialIndex" : 1 }'  1 1 --timedInteractionTimeoutMs 1000
@@ -744,7 +748,9 @@ tests:
           [1658142697.890616][2985:2990] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
-    - label: "Step 6b: TH sends Clear User Command to DUT for User created in Step 3a"
+    - label:
+          "Step 6b: TH sends Clear User Command to DUT for User created in Step
+          3a"
       PICS: DRLK.S.C1d.Rsp
       verification: |
           ./chip-tool doorlock clear-user 1 1 1 --timedInteractionTimeoutMs 1000
