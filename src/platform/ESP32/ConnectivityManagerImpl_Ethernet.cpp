@@ -57,8 +57,8 @@ CHIP_ERROR ConnectivityManagerImpl::InitEthernet()
 
 void ConnectivityManagerImpl::OnEthernetIPv4AddressAvailable(const ip_event_got_ip_t & got_ip)
 {
-    ChipLogProgress(DeviceLayer, "IPv4 address available on Ethernet interface: " IPSTR "/" IPSTR " gateway " IPSTR, IP2STR(&got_ip.ip_info.ip), IP2STR(&got_ip.ip_info.netmask),
-                    IP2STR(&got_ip.ip_info.gw));
+    ChipLogProgress(DeviceLayer, "IPv4 address available on Ethernet interface: " IPSTR "/" IPSTR " gateway " IPSTR,
+                    IP2STR(&got_ip.ip_info.ip), IP2STR(&got_ip.ip_info.netmask), IP2STR(&got_ip.ip_info.gw));
 
     ChipDeviceEvent event;
     event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
@@ -78,8 +78,7 @@ void ConnectivityManagerImpl::OnEthernetIPv4AddressLost(void)
 
 void ConnectivityManagerImpl::OnEthernetIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip)
 {
-    ChipLogProgress(DeviceLayer, "IPv6 address available on Ethernet interface: " IPV6STR,
-                    IPV62STR(got_ip.ip6_info.ip));
+    ChipLogProgress(DeviceLayer, "IPv6 address available on Ethernet interface: " IPV6STR, IPV62STR(got_ip.ip6_info.ip));
 
     ChipDeviceEvent event;
     event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
