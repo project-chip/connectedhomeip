@@ -140,7 +140,7 @@ class AppCallbacks : public AppDelegate
 public:
     void OnCommissioningSessionEstablishmentStarted() {}
     void OnCommissioningSessionStarted() override { isComissioningStarted = true; }
-    void OnCommissioningSessionStopped(CHIP_ERROR err) override { isComissioningStarted = false; }
+    void OnCommissioningSessionStopped() override { isComissioningStarted = false; }
     void OnCommissioningWindowClosed() override
     {
         if (!isComissioningStarted)
@@ -157,6 +157,7 @@ class AppFabricTableDelegate : public FabricTable::Delegate
     {
         if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
         {
+            bool isCommissioningFailed = chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen();
             ChipLogProgress(DeviceLayer, "Performing erasing of settings partition");
 
 #ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_NVS
@@ -168,9 +169,12 @@ class AppFabricTableDelegate : public FabricTable::Delegate
                 status = nvs_clear(static_cast<nvs_fs *>(storage));
             }
 
-            if (!status)
+            if (!isCommissioningFailed)
             {
-                status = nvs_mount(static_cast<nvs_fs *>(storage));
+                if (!status)
+                {
+                    status = nvs_mount(static_cast<nvs_fs *>(storage));
+                }
             }
 
             if (status)
@@ -187,6 +191,10 @@ class AppFabricTableDelegate : public FabricTable::Delegate
 
             ConnectivityMgr().ErasePersistentInfo();
 #endif
+            if (isCommissioningFailed)
+            {
+                PlatformMgr().Shutdown();
+            }
         }
     }
 };
@@ -221,6 +229,14 @@ SHELL_STATIC_SUBCMD_SET_CREATE(sub_telink, SHELL_CMD(reboot, NULL, "Reboot board
                                SHELL_SUBCMD_SET_END);
 SHELL_CMD_REGISTER(telink, &sub_telink, "Telink commands", NULL);
 #endif // CONFIG_CHIP_LIB_SHELL
+
+#ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
+void AppTaskCommon::PowerOnFactoryReset(void)
+{
+    LOG_INF("schedule factory reset");
+    chip::Server::GetInstance().ScheduleFactoryReset();
+}
+#endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
 
 CHIP_ERROR AppTaskCommon::StartApp(void)
 {

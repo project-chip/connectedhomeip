@@ -40,9 +40,6 @@ declare_args() {
   #default Wifi Password
   chip_default_wifi_psk = ""
 
-  # Use default handler to negotiate subscription max interval
-  chip_config_use_icd_subscription_callbacks = chip_enable_icd_server
-
   # Enable TestEventTrigger in GeneralDiagnostics cluster
   silabs_test_event_trigger_enabled = false
 
@@ -197,21 +194,6 @@ source_set("silabs-factory-data-provider") {
   ]
 }
 
-config("ICD-subscription-callback-config") {
-  defines = [ "CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS=1" ]
-}
-
-source_set("efr32-ICD-subscription-callback") {
-  sources = [
-    "${silabs_common_plat_dir}/ICDSubscriptionCallback.cpp",
-    "${silabs_common_plat_dir}/ICDSubscriptionCallback.h",
-  ]
-
-  public_deps = [ "${chip_root}/src/app:app" ]
-
-  public_configs = [ ":ICD-subscription-callback-config" ]
-}
-
 config("efr32-common-config") {
   defines = [ "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout_sec}" ]
 
@@ -285,14 +267,13 @@ source_set("efr32-common") {
   include_dirs = [ "." ]
 
   sources = [
+    "${silabs_common_plat_dir}/BaseApplication.cpp",
     "${silabs_common_plat_dir}/LEDWidget.cpp",
+    "${silabs_common_plat_dir}/MatterConfig.cpp",
     "${silabs_common_plat_dir}/SoftwareFaultReports.cpp",
     "${silabs_common_plat_dir}/heap_4_silabs.c",
     "${silabs_common_plat_dir}/silabs_utils.cpp",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
-    "BaseApplication.cpp",
-    "init_efrPlatform.cpp",
-    "matter_config.cpp",
   ]
 
   if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
@@ -355,10 +336,6 @@ source_set("efr32-common") {
   # Factory Data Provider
   if (use_efr32_factory_data_provider) {
     public_deps += [ ":silabs-factory-data-provider" ]
-  }
-
-  if (chip_config_use_icd_subscription_callbacks) {
-    public_deps += [ ":efr32-ICD-subscription-callback" ]
   }
 
   if (silabs_test_event_trigger_enabled) {

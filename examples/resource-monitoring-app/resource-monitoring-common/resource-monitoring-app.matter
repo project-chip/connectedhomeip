@@ -1408,6 +1408,10 @@ server cluster GroupKeyManagement = 63 {
     kCacheAndSync = 1;
   }
 
+  bitmap Feature : BITMAP32 {
+    kCacheAndSync = 0x1;
+  }
+
   fabric_scoped struct GroupInfoMapStruct {
     group_id groupId = 1;
     endpoint_no endpoints[] = 2;
@@ -1662,7 +1666,8 @@ server cluster FanControl = 514 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Groups {
@@ -1953,14 +1958,14 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 43, version 1;
+  device type ma_fan = 43, version 1;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
@@ -1970,7 +1975,6 @@ endpoint 1 {
     ram      attribute nameSupport;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
@@ -1983,7 +1987,6 @@ endpoint 1 {
     callback attribute partsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -1998,7 +2001,6 @@ endpoint 1 {
     callback attribute replacementProductList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2013,7 +2015,6 @@ endpoint 1 {
     callback attribute replacementProductList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2026,7 +2027,6 @@ endpoint 1 {
     ram      attribute percentCurrent default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;

@@ -16,11 +16,11 @@
  *    limitations under the License.
  */
 
-#include "main-common.h"
 #include "AllClustersCommandDelegate.h"
 #include "WindowCoveringManager.h"
 #include "dishwasher-mode.h"
 #include "include/tv-callbacks.h"
+#include "laundry-washer-controls-delegate-impl.h"
 #include "laundry-washer-mode.h"
 #include "rvc-modes.h"
 #include "tcc-mode.h"
@@ -28,6 +28,7 @@
 #include <app/CommandHandler.h>
 #include <app/att-storage.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
@@ -191,12 +192,25 @@ void ApplicationInit()
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
-void ApplicationExit()
+void ApplicationShutdown()
 {
+    // These may have been initialised via the emberAfXxxClusterInitCallback methods. We need to destroy them before shutdown.
+    Clusters::DishwasherMode::Shutdown();
+    Clusters::LaundryWasherMode::Shutdown();
+    Clusters::RvcCleanMode::Shutdown();
+    Clusters::RvcRunMode::Shutdown();
+    Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Shutdown();
+
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to stop CHIP NamedPipeCommands");
     }
+}
+
+using namespace chip::app::Clusters::LaundryWasherControls;
+void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
+{
+    LaundryWasherControlsServer::SetDefaultDelegate(1, &LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
 }
 
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)

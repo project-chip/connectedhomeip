@@ -119,10 +119,8 @@ private:
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR _GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
-    CHIP_ERROR _SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
-    CHIP_ERROR _RequestSEDActiveMode(bool onOff, bool delayIdle = false);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 #endif
     // ===== Private members reserved for use by this class only.
 

@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="appbar_layout_height">350dp</dimen>
-    <dimen name="collapse_title_text_size">25sp</dimen>
-    <dimen name="toolbar_title_text_size">17sp</dimen>
-
     <dimen name="menu_item_side_space">10dp</dimen>
     <dimen name="menu_item_image_width">48dp</dimen>
     <dimen name="menu_item_image_height">48dp</dimen>

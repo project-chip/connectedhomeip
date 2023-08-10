@@ -3,12 +3,7 @@ FROM ubuntu:22.04 as chip-build-cert
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 ARG TARGETPLATFORM
 # COMMITHASH defines the target commit to build from. May be passed in using --build-arg.
-ARG COMMITHASH=7b99e6399c6069037c613782d78132c69b9dcabb
-
-# ZAP Development install, so that it runs on both x64 and arm64
-# Generally this should match with the ZAP version that is used for codegen within the
-# specified SHA
-ARG ZAP_VERSION=v2023.07.21-nightly
+ARG COMMITHASH=c1ec2d777456924dcaa59b53351b00d73caf378f
 
 # Ensure TARGETPLATFORM is set
 RUN case ${TARGETPLATFORM} in \
@@ -157,45 +152,6 @@ RUN set -x \
     && rm -rf bloaty \
     && : # last line
 
-# NodeJS: install a newer version than what apt-get would read
-# This installs the latest LTS version of nodejs
-RUN case ${TARGETPLATFORM} in \
-    "linux/amd64") \
-    set -x \
-    && mkdir node_js \
-    && cd node_js \
-    && wget https://nodejs.org/dist/v12.22.12/node-v12.22.12-linux-x64.tar.xz \
-    && tar xfvJ node-v12.22.12-linux-x64.tar.xz \
-    && mv node-v12.22.12-linux-x64 /opt/ \
-    && ln -s /opt/node-v12.22.12-linux-x64 /opt/node \
-    && ln -s /opt/node/bin/* /usr/bin \
-    && cd .. \
-    && rm -rf node_js \
-    ;; \
-    "linux/arm64")\
-    set -x \
-    && mkdir node_js \
-    && cd node_js \
-    && wget https://nodejs.org/dist/v12.22.12/node-v12.22.12-linux-arm64.tar.xz \
-    && tar xfvJ node-v12.22.12-linux-arm64.tar.xz \
-    && mv node-v12.22.12-linux-arm64 /opt/ \
-    && ln -s /opt/node-v12.22.12-linux-arm64 /opt/node \
-    && ln -s /opt/node/bin/* /usr/bin \
-    && cd .. \
-    && rm -rf node_js \
-    ;; \
-    *) ;; \
-    esac
-
-RUN set -x \
-    && mkdir -p /opt/zap-${ZAP_VERSION} \
-    && git clone https://github.com/project-chip/zap.git /opt/zap-${ZAP_VERSION} \
-    && cd /opt/zap-${ZAP_VERSION} \
-    && git checkout ${ZAP_VERSION} \
-    && npm config set user 0 \
-    && npm ci
-ENV ZAP_DEVELOPMENT_PATH=/opt/zap-${ZAP_VERSION}
-
 # Stage 1.5: Bootstrap Matter.
 RUN mkdir /root/connectedhomeip
 RUN git clone https://github.com/project-chip/connectedhomeip.git /root/connectedhomeip
@@ -312,5 +268,11 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-app1 chip-app1
 # Stage 3.1 Setup the Matter Python environment
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_lib python_lib
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing python_testing
-RUN pip install click websockets lark diskcache
+
+COPY --from=chip-build-cert-bins /root/connectedhomeip/scripts/tests/requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt && rm /tmp/requirements.txt
+
+COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing/requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt && rm /tmp/requirements.txt
+
 RUN pip install --no-cache-dir python_lib/controller/python/chip*.whl

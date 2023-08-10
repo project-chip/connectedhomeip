@@ -65,7 +65,7 @@ TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
 static QueueHandle_t sAppEventQueue;
 
-#if !cPWR_UsePowerDownMode
+#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
 static LEDWidget sStatusLED;
 static LEDWidget sContactSensorLED;
 #endif
@@ -85,6 +85,9 @@ using namespace chip;
 using namespace chip::app;
 
 AppTask AppTask::sAppTask;
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+static AppTask::FactoryDataProvider sFactoryDataProvider;
+#endif
 
 static Identify gIdentify = { chip::EndpointId{ 1 }, AppTask::OnIdentifyStart, AppTask::OnIdentifyStop,
                               Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator };
@@ -99,7 +102,7 @@ static BDXDownloader gDownloader;
 constexpr uint16_t requestedOtaBlockSize = 1024;
 #endif
 
-#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA && CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
 CHIP_ERROR CustomFactoryDataRestoreMechanism(void)
 {
     K32W_LOG("This is a custom factory data restore mechanism.");
@@ -134,7 +137,7 @@ static void CheckOtaEntry()
         if (ota_entries.ota_state == otaApplied)
         {
             K32W_LOG("OTA successfully applied");
-#if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA && CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
             // If this point is reached, it means OTA_CommitCustomEntries was successfully called.
             // Delete the factory data backup to stop doing a restore when the factory data provider
             // is initialized. This ensures that both the factory data and app were updated, otherwise
@@ -177,26 +180,27 @@ CHIP_ERROR AppTask::Init()
 #endif
 
     // Initialize device attestation config
-#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
-    // Initialize factory data provider
-    ReturnErrorOnFailure(AppTask::FactoryDataProvider::GetDefaultInstance().Init());
-    AppTask::FactoryDataProvider::GetDefaultInstance().RegisterRestoreMechanism(CustomFactoryDataRestoreMechanism);
-    SetDeviceInstanceInfoProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
-    SetDeviceAttestationCredentialsProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
-    SetCommissionableDataProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+#if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
+    sFactoryDataProvider.RegisterRestoreMechanism(CustomFactoryDataRestoreMechanism);
+#endif
+    ReturnErrorOnFailure(sFactoryDataProvider.Init());
+    SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
+    SetCommissionableDataProvider(&sFactoryDataProvider);
 #else
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProvider());
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
-#endif // CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#endif // CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
 
     // QR code will be used with CHIP Tool
     AppTask::PrintOnboardingInfo();
 
     /* HW init leds */
-#if !cPWR_UsePowerDownMode
+#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
     LED_Init();
 
     /* start with all LEDS turnedd off */
@@ -323,7 +327,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     {
         TickType_t xTicksToWait = pdMS_TO_TICKS(10);
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
         xTicksToWait = portMAX_DELAY;
 #endif
 
@@ -361,7 +365,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         //
         // Otherwise, blink the LED ON for a very short time.
 
-#if !cPWR_UsePowerDownMode
+#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
         if (sAppTask.mFunction != Function::kFactoryReset && sAppTask.mFunction != Function::kIdentify)
         {
             if (sIsThreadProvisioned)
@@ -513,7 +517,7 @@ void AppTask::ResetActionEventHandler(void * aGenericEvent)
         sAppTask.CancelTimer();
         sAppTask.mFunction = Function::kNoneSelected;
 
-#if !cPWR_UsePowerDownMode
+#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
         /* restore initial state for the LED indicating contact state */
         if (!ContactSensorMgr().IsContactClosed())
         {
@@ -541,7 +545,7 @@ void AppTask::ResetActionEventHandler(void * aGenericEvent)
         sAppTask.mFunction = Function::kFactoryReset;
 
         /* LEDs will start blinking to signal that a Factory Reset was scheduled */
-#if !cPWR_UsePowerDownMode
+#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
         sStatusLED.Set(false);
         sContactSensorLED.Set(false);
 
@@ -639,7 +643,7 @@ void AppTask::BleStartAdvertising(intptr_t arg)
     if (ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(false);
-#if !cPWR_UsePowerDownMode
+#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
         sStatusLED.Set(false);
 #endif
         K32W_LOG("Stopped BLE Advertising!");
@@ -650,7 +654,7 @@ void AppTask::BleStartAdvertising(intptr_t arg)
 
         if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
         {
-#if !cPWR_UsePowerDownMode
+#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
             sStatusLED.Set(true);
 #endif
             K32W_LOG("Started BLE Advertising!");
@@ -750,14 +754,14 @@ void AppTask::OnStateChanged(ContactSensorManager::State aState)
     if (ContactSensorManager::State::kContactClosed == aState)
     {
         K32W_LOG("Contact state changed to closed.")
-#if !cPWR_UsePowerDownMode
+#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
         sContactSensorLED.Set(true);
 #endif
     }
     else if (ContactSensorManager::State::kContactOpened == aState)
     {
         K32W_LOG("Contact state changed to opened.")
-#if !cPWR_UsePowerDownMode
+#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
         sContactSensorLED.Set(false);
 #endif
     }
@@ -781,7 +785,7 @@ void AppTask::OnIdentifyStart(Identify * identify)
         }
         K32W_LOG("Identify process has started. Status LED should blink every 0.5 seconds.");
         sAppTask.mFunction = Function::kIdentify;
-#if !cPWR_UsePowerDownMode
+#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
         sStatusLED.Set(false);
         sStatusLED.Blink(500);
 #endif
@@ -831,7 +835,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
 
 void AppTask::DispatchEvent(AppEvent * aEvent)
 {
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
     /* specific processing for events sent from App_PostCallbackMessage (see main.cpp) */
     if (aEvent->Type == AppEvent::kEventType_Lp)
     {
@@ -879,7 +883,7 @@ void AppTask::UpdateDeviceStateInternal(intptr_t arg)
 
     /* get onoff attribute value */
     (void) app::Clusters::BooleanState::Attributes::StateValue::Get(1, &stateValueAttrValue);
-#if !cPWR_UsePowerDownMode
+#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
     /* set the device state */
     sContactSensorLED.Set(stateValueAttrValue);
 #endif

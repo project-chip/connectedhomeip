@@ -104,6 +104,30 @@ template <typename T>
 SuccessHandlerJNI<T>::~SuccessHandlerJNI(){};
 
 // COMMISSIONING AND CONNECTION
+class SessionEstablishmentStartedHandlerJNI : public SuccessHandlerJNI<void *>
+{
+public:
+    SessionEstablishmentStartedHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Object;)V") {}
+    jobject ConvertToJObject(void * responseData)
+    {
+        // return nullptr because the Java callback extends SuccessCallback<Void> and its handle() expects a Void param.
+        // It expects a Void becauase no value is passed as part of this callback.
+        return nullptr;
+    }
+};
+
+class SessionEstablishedHandlerJNI : public SuccessHandlerJNI<void *>
+{
+public:
+    SessionEstablishedHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Object;)V") {}
+    jobject ConvertToJObject(void * responseData)
+    {
+        // return nullptr because the Java callback extends SuccessCallback<Void> and its handle() expects a Void param.
+        // It expects a Void becauase no value is passed as part of this callback.
+        return nullptr;
+    }
+};
+
 class OnConnectionSuccessHandlerJNI : public SuccessHandlerJNI<TargetVideoPlayerInfo *>
 {
 public:

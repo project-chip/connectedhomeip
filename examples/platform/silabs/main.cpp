@@ -22,9 +22,9 @@
 #include "AppConfig.h"
 
 #include <DeviceInfoProviderImpl.h>
+#include <MatterConfig.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <matter_config.h>
 #ifdef SILABS_ATTESTATION_CREDENTIALS
 #include <examples/platform/silabs/SilabsDeviceAttestationCreds.h>
 #else

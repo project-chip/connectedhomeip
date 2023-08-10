@@ -36,6 +36,7 @@ public:
     CHIP_ERROR StoreRebootCount(uint32_t rebootCount);
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
     CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours);
+    bool IsFullyProvisioned();
 
 private:
     // ===== Members that implement the ConfigurationManager private interface.

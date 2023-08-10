@@ -6438,7 +6438,8 @@ server cluster AccountLogin = 1294 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
   binding cluster GeneralCommissioning;
   binding cluster ThreadNetworkDiagnostics;
   binding cluster Switch;
@@ -6478,7 +6479,6 @@ endpoint 0 {
     callback attribute accessControlEntriesPerFabric;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -7086,7 +7086,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 257, version 1;
+  device type ma_dimmablelight = 257, version 1;
+
   binding cluster Identify;
   binding cluster OnOff;
   binding cluster LevelControl;
@@ -7100,7 +7101,6 @@ endpoint 1 {
     ram      attribute identifyType default = 0x0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
@@ -7110,7 +7110,6 @@ endpoint 1 {
     ram      attribute nameSupport;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
@@ -7124,7 +7123,6 @@ endpoint 1 {
     ram      attribute nameSupport;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 5;
@@ -7138,7 +7136,6 @@ endpoint 1 {
     ram      attribute startUpOnOff default = 0xFF;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0001;
     ram      attribute clusterRevision default = 5;
@@ -7161,7 +7158,6 @@ endpoint 1 {
     ram      attribute startUpCurrentLevel;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 5;
@@ -7174,7 +7170,6 @@ endpoint 1 {
     callback attribute partsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;

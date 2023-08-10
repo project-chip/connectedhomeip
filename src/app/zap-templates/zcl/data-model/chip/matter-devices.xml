@@ -1906,6 +1906,7 @@ limitations under the License.
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x002D</deviceId>
         <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
@@ -1924,6 +1925,7 @@ limitations under the License.
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x002C</deviceId>
         <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
@@ -1987,6 +1989,21 @@ limitations under the License.
             <include cluster="Laundry Washer Controls" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Temperature Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-robotic-vacuum-cleaner</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Robotic Vacuum Cleaner</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0074</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="RVC Run Mode" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="RVC Clean Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="RVC Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>

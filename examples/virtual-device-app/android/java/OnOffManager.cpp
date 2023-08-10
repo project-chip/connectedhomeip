@@ -97,10 +97,10 @@ CHIP_ERROR OnOffManager::InitializeWithObjects(jobject managerObject)
     jclass OnOffManagerClass = env->GetObjectClass(managerObject);
     VerifyOrReturnLogError(OnOffManagerClass != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mHandleOnOffChangedMethod = env->GetMethodID(OnOffManagerClass, "HandleOnOffChanged", "(Z)V");
+    mHandleOnOffChangedMethod = env->GetMethodID(OnOffManagerClass, "handleOnOffChanged", "(Z)V");
     if (mHandleOnOffChangedMethod == nullptr)
     {
-        ChipLogError(Zcl, "Failed to access OnOffManager 'HandleOnOffChanged' method");
+        ChipLogError(Zcl, "Failed to access OnOffManager 'handleOnOffChanged' method");
         env->ExceptionClear();
         return CHIP_ERROR_INVALID_ARGUMENT;
     }

@@ -75,6 +75,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER
+#include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerDelegate.h>
+#endif
 #include <app/TestEventTriggerDelegate.h>
 
 #include <signal.h>
@@ -523,6 +526,12 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
         LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey) };
     otherDelegate = &otaTestEventTriggerDelegate;
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER
+    static SmokeCOTestEventTriggerDelegate smokeCOTestEventTriggerDelegate{
+        ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey), otherDelegate
+    };
+    otherDelegate = &smokeCOTestEventTriggerDelegate;
+#endif
     // For general testing of TestEventTrigger, we have a common "core" event trigger delegate.
     static SampleTestEventTriggerDelegate testEventTriggerDelegate;
     VerifyOrDie(testEventTriggerDelegate.Init(ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey),
@@ -577,6 +586,8 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
         DeviceLayer::PlatformMgr().RunEventLoop();
     }
     gMainLoopImplementation = nullptr;
+
+    ApplicationShutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     ShutdownCommissioner();

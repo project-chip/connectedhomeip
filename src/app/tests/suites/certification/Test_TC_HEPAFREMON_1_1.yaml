@@ -82,6 +82,7 @@ tests:
               hasMasksSet: [0x3]
 
     - label: "Step 4: Read the global attribute: AttributeList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -89,8 +90,17 @@ tests:
               type: list
               contains: [2, 65528, 65529, 65530, 65531, 65532, 65533]
 
+    - label: "Step 4: Read the global attribute: AttributeList"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [2, 65528, 65529, 65531, 65532, 65533]
+
     - label:
-          "Step 4a: Read the feature dependent(HEPAFREMON.S.F00) attribute in
+          "Step 4b: Read the feature dependent(HEPAFREMON.S.F00) attribute in
           AttributeList"
       PICS: HEPAFREMON.S.F00
       command: "readAttribute"
@@ -101,9 +111,9 @@ tests:
               contains: [0, 1, 2]
 
     - label:
-          "Step 4b: Read the optional attribute InPlaceIndicator
-          (HEPAFREMON.S.A0002) in AttributeList"
-      PICS: HEPAFREMON.S.A0002
+          "Step 4c: Read the optional attribute InPlaceIndicator
+          (HEPAFREMON.S.A0003) in AttributeList"
+      PICS: HEPAFREMON.S.A0003
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -111,7 +121,30 @@ tests:
               type: list
               contains: [3]
 
+    - label:
+          "Step 4d: Read the optional attribute LastChangedTime
+          (HEPAFREMON.S.A0004) in AttributeList"
+      PICS: HEPAFREMON.S.A0004
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [4]
+
+    - label:
+          "Step 4e: Read the optional attribute ReplacementProductList
+          (HEPAFREMON.S.F02) in AttributeList"
+      PICS: HEPAFREMON.S.F02
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [5]
+
     - label: "Step 5: TH reads EventList attribute from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:

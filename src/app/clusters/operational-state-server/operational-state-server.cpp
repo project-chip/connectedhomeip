@@ -20,7 +20,6 @@
  * @brief Implementation for the Operational State Server Cluster
  ***************************************************************************/
 #include "operational-state-server.h"
-#include "operational-state-delegate.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -30,7 +29,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
-#include <app/EventLoggingDelegate.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
@@ -302,44 +300,34 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     return CHIP_NO_ERROR;
 }
 
-void OperationalStateServer::OnOperationalErrorDetect(const Structs::ErrorStateStruct::Type & aError)
+void OperationalStateServer::OnOperationalErrorDetected(const Structs::ErrorStateStruct::Type & aError)
 {
-    ChipLogDetail(Zcl, "OperationalStateServer: OnOperationalErrorDetect");
-    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, OperationalState::Attributes::OperationalState::Id);
+    ChipLogDetail(Zcl, "OperationalStateServer: OnOperationalErrorDetected");
+    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::OperationalState::Id);
 
+    GenericErrorEvent event(mClusterId, aError);
     EventNumber eventNumber;
-    Events::OperationalError::Type event{ aError };
-    EventLogger<Events::OperationalError::Type> eventData(event);
-    ConcreteEventPath path(mEndpointId, mClusterId, event.GetEventId());
-    EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
-    EventOptions eventOptions;
-    eventOptions.mPath     = path;
-    eventOptions.mPriority = event.GetPriorityLevel();
+    CHIP_ERROR error = app::LogEvent(event, mEndpointId, eventNumber);
 
-    CHIP_ERROR err = logMgmt.LogEvent(&eventData, eventOptions, eventNumber);
-    if (err != CHIP_NO_ERROR)
+    if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "OperationalStateServer: Failed to record OperationalError event: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl, "OperationalStateServer: Failed to record OperationalError event: %" CHIP_ERROR_FORMAT, error.Format());
     }
 }
 
-void OperationalStateServer::OnOperationCompletionDetect(const Events::OperationCompletion::Type & aEvent)
+void OperationalStateServer::OnOperationCompletionDetected(uint8_t aCompletionErrorCode,
+                                                           const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime,
+                                                           const Optional<DataModel::Nullable<uint32_t>> & aPausedTime)
 {
-    ChipLogDetail(Zcl, "OperationalStateServer: OnOperationCompletionDetect");
-    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, OperationalState::Attributes::OperationalState::Id);
+    ChipLogDetail(Zcl, "OperationalStateServer: OnOperationCompletionDetected");
 
+    GenericOperationCompletionEvent event(mClusterId, aCompletionErrorCode, aTotalOperationalTime, aPausedTime);
     EventNumber eventNumber;
-    EventLogger<Events::OperationCompletion::Type> eventData(aEvent);
-    ConcreteEventPath path(mEndpointId, mClusterId, aEvent.GetEventId());
-    EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
-    EventOptions eventOptions;
-    eventOptions.mPath     = path;
-    eventOptions.mPriority = aEvent.GetPriorityLevel();
+    CHIP_ERROR error = app::LogEvent(event, mEndpointId, eventNumber);
 
-    CHIP_ERROR err = logMgmt.LogEvent(&eventData, eventOptions, eventNumber);
-    if (err != CHIP_NO_ERROR)
+    if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "OperationalStateServer: Failed to record OnOperationCompletionDetect event: %" CHIP_ERROR_FORMAT,
-                     err.Format());
+        ChipLogError(Zcl, "OperationalStateServer: Failed to record OperationCompletion event: %" CHIP_ERROR_FORMAT,
+                     error.Format());
     }
 }

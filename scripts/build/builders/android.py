@@ -235,6 +235,8 @@ class AndroidBuilder(Builder):
             "OnboardingPayload.jar": "src/controller/java/OnboardingPayload.jar",
             "AndroidPlatform.jar": "src/platform/android/AndroidPlatform.jar",
             "libCHIPTlv.jar": "src/controller/java/libCHIPTlv.jar",
+            "CHIPClusters.jar": "src/controller/java/CHIPClusters.jar",
+            "CHIPClusterID.jar": "src/controller/java/CHIPClusterID.jar",
         }
 
         for jarName in jars.keys():
@@ -572,6 +574,16 @@ class AndroidBuilder(Builder):
                     self.output_dir,
                     "lib",
                     "src/controller/java/OnboardingPayload.jar",
+                ),
+                "CHIPClusters.jar": os.path.join(
+                    self.output_dir,
+                    "lib",
+                    "src/controller/java/CHIPClusters.jar",
+                ),
+                "CHIPClusterID.jar": os.path.join(
+                    self.output_dir,
+                    "lib",
+                    "src/controller/java/CHIPClusterID.jar",
                 ),
                 "jni/%s/libCHIPController.so"
                 % self.board.AbiName(): os.path.join(
