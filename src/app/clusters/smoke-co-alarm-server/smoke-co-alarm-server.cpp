@@ -100,12 +100,14 @@ void SmokeCoAlarmServer::SetExpressedStateByPriority(EndpointId endpointId,
             break;
         }
 
-        VerifyOrReturn(alarmState == AlarmStateEnum::kNormal, SetExpressedState(endpointId, priority));
-        VerifyOrReturn(endOfServiceState == EndOfServiceEnum::kNormal, SetExpressedState(endpointId, priority));
-        VerifyOrReturn(active == false, SetExpressedState(endpointId, priority));
+        if ((alarmState != AlarmStateEnum::kNormal) || (endOfServiceState != EndOfServiceEnum::kNormal) || active)
+        {
+            LogErrorOnFailure(SetExpressedState(endpointId, priority));
+            return;
+        }
     }
 
-    SetExpressedState(endpointId, ExpressedStateEnum::kNormal);
+    LogErrorOnFailure(SetExpressedState(endpointId, ExpressedStateEnum::kNormal));
 }
 
 bool SmokeCoAlarmServer::SetSmokeState(EndpointId endpointId, AlarmStateEnum newSmokeState)
