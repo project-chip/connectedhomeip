@@ -272,8 +272,10 @@ public:
     template <typename CommandData>
     void AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        VerifyOrDie(AddResponseData(aRequestCommandPath, aData) == CHIP_NO_ERROR);
-        AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
+        if (AddResponseData(aRequestCommandPath, aData) != CHIP_NO_ERROR)
+        {
+            AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
+        }
     }
 
     /**
