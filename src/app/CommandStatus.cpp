@@ -36,6 +36,11 @@ const CommandPathStatus & CommandPathStatus::LogIfFailure(const char * contextMe
 
 const CommandPathStatus & CommandPathStatus::LogStatus(const char * contextMessage) const
 {
+    if (contextMessage == nullptr)
+    {
+        contextMessage = "no additional context";
+    }
+
     if (mStatus == Status::Success)
     {
         ChipLogProgress(DataManagement, "Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " status SUCCESS (%s)",

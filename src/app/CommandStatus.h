@@ -42,13 +42,13 @@ public:
     /// `contextMessage` will be part of the logged message.
     ///
     /// returns self
-    const CommandPathStatus & LogIfFailure(const char * contextMessage) const;
+    const CommandPathStatus & LogIfFailure(const char * contextMessage = nullptr) const;
 
     /// Logs the status given the current path
     ///
     /// If status is success, logs will be progress. If status
     /// is failure, log will be at error level.
-    const CommandPathStatus & LogStatus(const char * contextMessage) const;
+    const CommandPathStatus & LogStatus(const char * contextMessage = nullptr) const;
 
 private:
     const ConcreteCommandPath & mPath;

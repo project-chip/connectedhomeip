@@ -185,28 +185,28 @@ public:
      *
      * [logging_option] controls what statuses are being logged.
      */
-    CHIP_ERROR FailableAddStatus(const CommandPathStatus & status, const char * context = "No additional context",
+    CHIP_ERROR FailableAddStatus(const CommandPathStatus & status, const char * context = nullptr,
                                  LogOption logging_option = LogOption::kFailures);
 
     /**
      * Adds a status when the caller is unable to handle any failures. Logging is performed
      * and failure to register the status is checked with VerifyOrDie.
      */
-    inline void AddStatus(const CommandPathStatus & status, const char * context = "No additional context",
+    inline void AddStatus(const CommandPathStatus & status, const char * context = nullptr,
                           LogOption logging_option = LogOption::kFailures)
     {
         VerifyOrDie(FailableAddStatus(status, context, logging_option) == CHIP_NO_ERROR);
     }
 
     inline CHIP_ERROR FailableAddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
-                                        const char * context     = "No additional context",
+                                        const char * context     = nullptr,
                                         LogOption logging_option = LogOption::kFailures)
     {
         return FailableAddStatus(CommandPathStatus(aCommandPath, aStatus), context, logging_option);
     }
 
     inline void AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
-                          const char * context = "No additional context", LogOption logging_option = LogOption::kFailures)
+                          const char * context = nullptr, LogOption logging_option = LogOption::kFailures)
     {
 
         VerifyOrDie(FailableAddStatus(aCommandPath, aStatus, context, logging_option) == CHIP_NO_ERROR);
