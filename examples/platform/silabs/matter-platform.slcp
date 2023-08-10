@@ -62,7 +62,16 @@ component:
 - {id: mbedtls_x509}
 - {id: mbedtls_platform_dynamic_memory_allocation_config_init_runtime }
 - {id: mbedtls_pkcs5}
+- {id: mbedtls_base64}
+- {id: mbedtls_jpake}
 - {id: psa_crypto_config}
+- {id: psa_crypto_sha512}
+- {id: psa_crypto_tls12_prf}
+- {id: mbedtls_sha512}
+- {id: mbedtls_tls}
+- {id: mbedtls_dtls}
+- {id: mbedtls_tls_server}
+
 
 config_file:
   - override:

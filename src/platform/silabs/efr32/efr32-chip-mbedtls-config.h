@@ -40,7 +40,7 @@
 #endif // CHIP_HAVE_CONFIG_H
 
 /**
- * Enable H Crypto and Entropy modules
+ * DIC Specific Configurations
  */
 #ifdef DIC_ENABLE
 #define MBEDTLS_PKCS1_V15
@@ -50,44 +50,17 @@
 #define MBEDTLS_SSL_IN_CONTENT_LEN 5120
 #define MBEDTLS_SSL_OUT_CONTENT_LEN 1560
 #define MBEDTLS_PSA_BUILTIN_ALG_TLS12_PRF
-#endif // DIC_ENABLE
+#define MBEDTLS_MPI_MAX_SIZE 512 /**< Maximum number of bytes for usable MPIs. */
+#endif                           // DIC_ENABLE
 
 #define MBEDTLS_PLATFORM_SNPRINTF_MACRO snprintf
 
 #define MBEDTLS_AES_ROM_TABLES
-#define MBEDTLS_BASE64_C
-#define MBEDTLS_ECDH_LEGACY_CONTEXT
-#define MBEDTLS_ECJPAKE_C
-#define MBEDTLS_ECP_NIST_OPTIM
-#define MBEDTLS_ERROR_STRERROR_DUMMY
-#define MBEDTLS_HAVE_ASM
-#define MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED
-#define MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED
-#define MBEDTLS_KEY_EXCHANGE_PSK_ENABLED
+// #define MBEDTLS_AES_FEWER_TABLES /* Check if we want this */
+
 #define MBEDTLS_PLATFORM_NO_STD_FUNCTIONS
-#define MBEDTLS_SHA256_SMALLER
-#define MBEDTLS_SHA512_C
-#define MBEDTLS_SSL_COOKIE_C
-#define MBEDTLS_SSL_DTLS_ANTI_REPLAY
-#define MBEDTLS_SSL_DTLS_HELLO_VERIFY
-#define MBEDTLS_SSL_EXPORT_KEYS
-#define MBEDTLS_SSL_MAX_FRAGMENT_LENGTH
-#define MBEDTLS_SSL_PROTO_DTLS
-#define MBEDTLS_SSL_SRV_C
-#define MBEDTLS_X509_USE_C
+#define MBEDTLS_SHA256_SMALLER    /* Check if we want this */
 #define MBEDTLS_MPI_WINDOW_SIZE 1 /**< Maximum windows size used. */
-
-#ifdef DIC_ENABLE
-#define MBEDTLS_MPI_MAX_SIZE 512    /**< Maximum number of bytes for usable MPIs. */
-#else
-#define MBEDTLS_MPI_MAX_SIZE 32     /**< Maximum number of bytes for usable MPIs. */
-#endif  // DIC_ENABLE
-
-#define MBEDTLS_ECP_MAX_BITS 256        /**< Maximum bit size of groups */
-#define MBEDTLS_ECP_WINDOW_SIZE 2       /**< Maximum window size used */
-#define MBEDTLS_ECP_FIXED_POINT_OPTIM 0 /**< Enable fixed-point speed-up */
-
-#define MBEDTLS_CIPHER_MODE_WITH_PADDING
 
 // Includes generated file for all generic defines.
 #include "sl_mbedtls_config.h"

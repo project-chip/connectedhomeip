@@ -211,7 +211,7 @@ template("efr32_sdk") {
     # declared in efr32_mbedtls_config further down this file.
     defines = [
       "MBEDTLS_CONFIG_FILE=\"efr32-chip-mbedtls-config.h\"",
-      "MBEDTLS_PSA_CRYPTO_CONFIG_FILE=\"matter_psa_crypto_config.h\"",
+      "MBEDTLS_PSA_CRYPTO_CONFIG_FILE=\"efr32-psa-crypto-config.h\"",
       "__STARTUP_CLEAR_BSS",
       "HARD_FAULT_LOG_ENABLE",
       "CORTEXM3_EFM32_MICRO",
@@ -541,7 +541,14 @@ template("efr32_sdk") {
     # edited.
     sources = [
       "${chip_root}/src/platform/silabs/efr32/efr32-chip-mbedtls-config.h",
-      "${chip_root}/src/platform/silabs/efr32/matter_psa_crypto_config.h",
+      "${chip_root}/src/platform/silabs/efr32/efr32-psa-crypto-config.h",
+      "${silabs_gen_folder}/autogen/sli_mbedtls_config_autogen.h",
+      "${silabs_gen_folder}/autogen/sli_mbedtls_config_transform_autogen.h",
+      "${silabs_gen_folder}/autogen/sli_psa_builtin_config_autogen.h",
+      "${silabs_gen_folder}/autogen/sli_psa_config_autogen.h",
+      "${silabs_gen_folder}/config/psa_crypto_config.h",
+      "${silabs_gen_folder}/config/sl_mbedtls_config.h",
+      "${silabs_gen_folder}/config/sl_mbedtls_device_config.h",
     ]
 
     public_configs = [ "${chip_root}/src:includes" ]
@@ -553,13 +560,11 @@ template("efr32_sdk") {
       "${chip_root}/third_party/mbedtls/repo/include/mbedtls/platform.h",
       "${efr32_sdk_root}/hardware/board/src/sl_board_control_gpio.c",
       "${efr32_sdk_root}/hardware/board/src/sl_board_init.c",
-      "${efr32_sdk_root}/hardware/driver/configuration_over_swo/src/sl_cos.c",
       "${efr32_sdk_root}/platform/CMSIS/RTOS2/Source/os_systick.c",
       "${efr32_sdk_root}/platform/bootloader/api/btl_interface.c",
       "${efr32_sdk_root}/platform/bootloader/api/btl_interface_storage.c",
       "${efr32_sdk_root}/platform/bootloader/security/sha/crypto_sha.c",
       "${efr32_sdk_root}/platform/common/src/sl_slist.c",
-      "${efr32_sdk_root}/platform/driver/debug/src/sl_debug_swo.c",
       "${efr32_sdk_root}/platform/emdrv/dmadrv/src/dmadrv.c",
       "${efr32_sdk_root}/platform/emdrv/gpiointerrupt/src/gpiointerrupt.c",
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default.c",
