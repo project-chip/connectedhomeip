@@ -40,11 +40,16 @@ class LaundryWasherControlDelegate : public Delegate
     static LaundryWasherControlDelegate instance;
 
 public:
+    static constexpr uint8_t kDefaultRinseIndex = 0;
+    static constexpr uint8_t kDefaultSpinSpeedIndex = 0;
+
     CHIP_ERROR GetSpinSpeedAtIndex(size_t index, MutableCharSpan & spinSpeed);
     CHIP_ERROR GetSupportedRinseAtIndex(size_t index, NumberOfRinsesEnum & supportedRinse);
+    Protocols::InteractionModel::Status PreAttributeCheck(AttributeId attributeId, uint16_t size, uint8_t * value);
 
     LaundryWasherControlDelegate()  = default;
     ~LaundryWasherControlDelegate() = default;
+    void Init(EndpointId endpointId);
 
     static inline LaundryWasherControlDelegate & getLaundryWasherControlDelegate() { return instance; }
 };

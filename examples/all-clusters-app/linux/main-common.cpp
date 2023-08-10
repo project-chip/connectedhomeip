@@ -210,7 +210,10 @@ void ApplicationShutdown()
 using namespace chip::app::Clusters::LaundryWasherControls;
 void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
 {
-    LaundryWasherControlsServer::SetDefaultDelegate(1, &LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
+    LaundryWasherControlDelegate & laundryWasherControlDelegate = LaundryWasherControlDelegate::getLaundryWasherControlDelegate();
+
+    LaundryWasherControlsServer::SetDefaultDelegate(endpoint, &laundryWasherControlDelegate);
+    laundryWasherControlDelegate.Init(endpoint);
 }
 
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)

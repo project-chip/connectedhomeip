@@ -21,6 +21,7 @@
 
 using namespace chip;
 using namespace chip::app::Clusters::LaundryWasherControls;
+using namespace chip::Protocols::InteractionModel;
 
 const CharSpan LaundryWasherControlDelegate::spinSpeedsNameOptions[] = {
     CharSpan::fromCharString("Off"),
@@ -53,4 +54,46 @@ CHIP_ERROR LaundryWasherControlDelegate::GetSupportedRinseAtIndex(size_t index, 
     }
     supportedRinse = LaundryWasherControlDelegate::supportRinsesOptions[index];
     return CHIP_NO_ERROR;
+}
+
+Status LaundryWasherControlDelegate::PreAttributeCheck(AttributeId attributeId, uint16_t size, uint8_t * value)
+{
+    switch (attributeId)
+    {
+    case Attributes::SpinSpeedCurrent::Id: {
+        if ( *value >= ArraySize(spinSpeedsNameOptions))
+        {
+            return Status::ConstraintError;
+        }
+        return Status::Success;
+    }
+    case Attributes::NumberOfRinses::Id: {
+        if (size != sizeof(NumberOfRinsesEnum))
+        {
+            return Status::InvalidDataType;
+        }
+        for (uint8_t index = 0 ; index < ArraySize(supportRinsesOptions) ; index++)
+        {
+            if (static_cast<NumberOfRinsesEnum>(*value) == LaundryWasherControlDelegate::supportRinsesOptions[index])
+            {
+                return Status::Success;
+            }
+        }
+        return Status::InvalidInState;
+    }
+    case Attributes::SpinSpeeds::Id:
+    case Attributes::SupportedRinses::Id:
+        return Status::UnsupportedWrite;
+    default:
+        return Status::UnsupportedAttribute;
+    }
+}
+
+void LaundryWasherControlDelegate::Init(EndpointId endpointId)
+{
+    NumberOfRinsesEnum supportedRinse;
+    GetSupportedRinseAtIndex(kDefaultRinseIndex, supportedRinse);
+    LaundryWasherControlsServer::Instance().SetNumberOfRinses(endpointId, supportedRinse);
+    LaundryWasherControlsServer::Instance().SetSpinSpeedCurrent(endpointId,  DataModel::Nullable<uint8_t>(kDefaultSpinSpeedIndex));
+    return;
 }
