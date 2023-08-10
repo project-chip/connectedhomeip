@@ -468,11 +468,18 @@ CHIP_ERROR CommandHandler::AddStatusInternal(const ConcreteCommandPath & aComman
     return FinishStatus();
 }
 
-CHIP_ERROR CommandHandler::FailableAddStatus(const CommandPathStatus &status, const char *context, LogOption logging_option) {
-    switch (logging_option) {
-        case LogOption::kFailures: status.LogIfFailure(context); break;
-        case LogOption::kAll: status.LogStatus(context); break;
-        case LogOption::kNone: break;
+CHIP_ERROR CommandHandler::FailableAddStatus(const CommandPathStatus & status, const char * context, LogOption logging_option)
+{
+    switch (logging_option)
+    {
+    case LogOption::kFailures:
+        status.LogIfFailure(context);
+        break;
+    case LogOption::kAll:
+        status.LogStatus(context);
+        break;
+    case LogOption::kNone:
+        break;
     }
 
     return AddStatusInternal(status.GetPath(), StatusIB(status.GetStatus()));

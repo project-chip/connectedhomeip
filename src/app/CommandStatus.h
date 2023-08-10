@@ -27,11 +27,12 @@ namespace app {
 ///
 /// NOTE: points to a REFERENCE of a command path, so lifetime of this
 ///       depends on the lifetime of the reference
-class CommandPathStatus {
-  public:
-    CommandPathStatus(const ConcreteCommandPath &path, 
-                      const Protocols::InteractionModel::Status status)
-            : mPath(path), mStatus(status) {}
+class CommandPathStatus
+{
+public:
+    CommandPathStatus(const ConcreteCommandPath & path, const Protocols::InteractionModel::Status status) :
+        mPath(path), mStatus(status)
+    {}
 
     const ConcreteCommandPath & GetPath() const { return mPath; }
     Protocols::InteractionModel::Status GetStatus() const { return mStatus; }
@@ -41,18 +42,17 @@ class CommandPathStatus {
     /// `contextMessage` will be part of the logged message.
     ///
     /// returns self
-    const CommandPathStatus &LogIfFailure(const char *contextMessage) const;
+    const CommandPathStatus & LogIfFailure(const char * contextMessage) const;
 
     /// Logs the status given the current path
     ///
     /// If status is success, logs will be progress. If status
     /// is failure, log will be at error level.
-    const CommandPathStatus &LogStatus(const char *contextMessage) const;
+    const CommandPathStatus & LogStatus(const char * contextMessage) const;
 
-  private:
-    const ConcreteCommandPath &mPath;
+private:
+    const ConcreteCommandPath & mPath;
     const Protocols::InteractionModel::Status mStatus;
-    
 };
 
 } // namespace app

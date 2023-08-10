@@ -39,8 +39,7 @@ const CommandPathStatus & CommandPathStatus::LogStatus(const char * contextMessa
     if (mStatus == Status::Success)
     {
         ChipLogProgress(DataManagement, "Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " status SUCCESS (%s)",
-                        mPath.mEndpointId, ChipLogValueMEI(mPath.mClusterId),
-                        ChipLogValueMEI(mPath.mCommandId), contextMessage);
+                        mPath.mEndpointId, ChipLogValueMEI(mPath.mClusterId), ChipLogValueMEI(mPath.mCommandId), contextMessage);
     }
     else
     {
