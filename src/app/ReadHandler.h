@@ -175,6 +175,7 @@ public:
         ///
         /// This will only be invoked for subscribe-type ReadHandler objects, and only after
         /// OnSubscriptionEstablished has been called.
+        ///
         /// @param[in] apReadHandler  ReadHandler that became dirty and in HandlerState::CanStartReporting state
         virtual void OnBecameReportable(ReadHandler * apReadHandler) = 0;
 
