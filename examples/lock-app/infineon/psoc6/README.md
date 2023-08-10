@@ -96,7 +96,7 @@ Run the built executable and pass it the discriminator and pairing code of the
 remote device, as well as the network credentials to use.
 
          $ ./out/debug/chip-tool pairing ble-wifi 1234 ${SSID} ${PASSWORD} 20202021 3840
-    
+
          Parameters:
          1. Discriminator: 3840
          2. Setup-pin-code: 20202021
@@ -145,9 +145,11 @@ Infineon Hardware Security Module-OPTIGA™ Trust M is a high-end security
 solution that provides an anchor of trust for connecting IoT devices to the
 cloud, giving every IoT device its own unique identity.
 
-For different security use cases, please set the flags in CHIPCryptoPALHsm_config.h which is located at _/src/crypto/hsm/_
+For different security use cases, please set the flags in
+CHIPCryptoPALHsm*config.h which is located at */src/crypto/hsm/\_
 
-For device attestation please enable the flag ENABLE_HSM_DEVICE_ATTESTATION in CHIPCryptoPALHsm_config.h which is located at _/src/crypto/hsm/_
+For device attestation please enable the flag ENABLE*HSM_DEVICE_ATTESTATION in
+CHIPCryptoPALHsm_config.h which is located at */src/crypto/hsm/\_
 
 -   Supported hardware setup:
     [CY8CKIT-062S2-43012](https://www.cypress.com/CY8CKIT-062S2-43012)

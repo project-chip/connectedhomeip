@@ -75,7 +75,13 @@ extern uint32_t SystemCoreClock;
 #define configTOTAL_HEAP_SIZE ((size_t)(CY_SRAM_SIZE - (64 * 1024)))
 /* Hook function related definitions. */
 #define configUSE_IDLE_HOOK 0
+
+#ifdef ENABLE_HSM_DEVICE_ATTESTATION
 #define configUSE_TICK_HOOK 1
+#else
+#define configUSE_TICK_HOOK 0
+#endif
+
 #define configCHECK_FOR_STACK_OVERFLOW 2
 
 #define configUSE_MALLOC_FAILED_HOOK 1
