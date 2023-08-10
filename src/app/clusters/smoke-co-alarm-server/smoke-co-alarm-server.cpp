@@ -100,10 +100,6 @@ void SmokeCoAlarmServer::SetExpressedStateByPriority(EndpointId endpointId,
             break;
         }
 
-        VerifyOrReturn(alarmState == AlarmStateEnum::kNormal, SetExpressedState(endpointId, priority));
-        VerifyOrReturn(endOfServiceState == EndOfServiceEnum::kNormal, SetExpressedState(endpointId, priority));
-        VerifyOrReturn(active == false, SetExpressedState(endpointId, priority));
-
         if ((alarmState != AlarmStateEnum::kNormal) || (endOfServiceState != EndOfServiceEnum::kNormal) || active)
         {
             VerifyOrDo(SetExpressedState(endpointId, priority), ChipLogError(NotSpecified, "Set ExpressedState failed"));
