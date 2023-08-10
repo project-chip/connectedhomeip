@@ -17,8 +17,8 @@ RUN set -x \
     && : # last line
 
 
-#Clone Gecko SDK 4.2.0 (ef05eb6)
-RUN git clone --depth=1 --branch=v4.2.3 https://github.com/SiliconLabs/gecko_sdk.git && \
+#Clone Gecko SDK 4.3.1 (2ba59bf)
+RUN git clone --depth=1 --branch=v4.3.1 https://github.com/SiliconLabs/gecko_sdk.git && \
     cd gecko_sdk && \
     rm -rf .git \
     && : # last line

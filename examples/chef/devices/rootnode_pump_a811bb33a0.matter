@@ -1016,7 +1016,8 @@ server cluster PumpConfigurationAndControl = 512 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
 
   server cluster Descriptor {
     callback attribute deviceTypeList;
@@ -1168,7 +1169,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 771, version 1;
+  device type ma_pump = 771, version 1;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;

@@ -379,7 +379,7 @@ wheel==0.38.4 ; sys_platform == "linux"
     #   pip-tools
 
 # The following packages are considered to be unsafe in a requirements file:
-pip==23.2
+pip==23.2.1
     # via
     #   fastcore
     #   ghapi

@@ -32,7 +32,7 @@ CustomFactoryDataProvider & CustomFactoryDataProvider::GetDefaultInstance()
 
 CHIP_ERROR CustomFactoryDataProvider::SetCustomIds()
 {
-    static_assert(CustomFactoryIds::kCustomMaxId == K32W0FactoryDataProvider::kNumberOfIds,
+    static_assert(CustomFactoryIds::kCustomMaxId == FactoryDataProvider::kNumberOfIds,
                   "kNumberOfIds is computed based on CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS.");
     maxLengths[CustomFactoryIds::kCustomId1] = kMaxLengthCustomId1;
     maxLengths[CustomFactoryIds::kCustomId2] = kMaxLengthCustomId2;
@@ -47,7 +47,7 @@ CHIP_ERROR CustomFactoryDataProvider::ParseFunctionExample()
     MutableByteSpan buffer(data_buf);
     memset(buffer.data(), 0, buffer.size());
     uint16_t userDataSize = 0;
-    // A user can use K32W0FactoryDataProvider::SearchForId to read an id from internal
+    // A user can use FactoryDataProvider::SearchForId to read an id from internal
     // flash factory data section.
     ReturnErrorOnFailure(SearchForId(CustomFactoryIds::kCustomId1, buffer.data(), buffer.size(), userDataSize));
 

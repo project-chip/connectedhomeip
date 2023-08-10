@@ -130,29 +130,53 @@ def _GetSlowTests() -> Set[str]:
 def _GetInDevelopmentTests() -> Set[str]:
     """Tests that fail in YAML for some reason."""
     return {
+        "Test_TC_TIMESYNC_1_1.yaml",         # Time sync SDK is not yet ready
+        "Test_TC_TIMESYNC_2_3.yaml",         # Time sync SDK is not yet ready
+        "Test_TC_PSCFG_1_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
+        "Test_TC_PSCFG_2_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
+        "Test_TC_PSCFG_2_2.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
+        "Test_TC_SMOKECO_2_6.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
+                                             # TestEventTriggersEnabled is true, which it's not in CI. Also, test
+                                             # has wrong key for eventNumber: because using the right key leads to
+                                             # codegen that does not compile.
+        "Test_TC_SMOKECO_2_2.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
+                                             # TestEventTriggersEnabled is true, which it's not in CI. Also, test
+                                             # has wrong key for eventNumber: because using the right key leads to
+                                             # codegen that does not compile.
+        "Test_TC_SMOKECO_2_3.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
+                                             # TestEventTriggersEnabled is true, which it's not in CI. Also, test
+                                             # has wrong key for eventNumber: because using the right key leads to
+                                             # codegen that does not compile.
+        "Test_TC_SMOKECO_2_4.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
+                                             # TestEventTriggersEnabled is true, which it's not in CI. Also, test
+                                             # has wrong key for eventNumber: because using the right key leads to
+                                             # codegen that does not compile.
+        "Test_TC_SMOKECO_2_5.yaml",          # chip-repl does not support local timeout (07/20/2023) and test uses unknown
+                                             # keepSubscriptions key in the YAML. Also, test has wrong key for eventNumber:
+                                             # because using the right key leads to codegen that does not compile.
+    }
+
+
+def _GetChipReplUnsupportedTests() -> Set[str]:
+    """Tests that fail in chip-repl for some reason"""
+    return {
         "Test_AddNewFabricFromExistingFabric.yaml",     # chip-repl does not support GetCommissionerRootCertificate and IssueNocChain command
         "TestEqualities.yaml",              # chip-repl does not support pseudo-cluster commands that return a value
         "TestExampleCluster.yaml",          # chip-repl does not load custom pseudo clusters
-        "Test_TC_TIMESYNC_1_1.yaml",         # Time sync SDK is not yet ready
-        "Test_TC_TIMESYNC_2_3.yaml",         # Time sync SDK is not yet ready
         "TestAttributesById.yaml",           # chip-repl does not support AnyCommands (06/06/2023)
         "TestCommandsById.yaml",             # chip-repl does not support AnyCommands (06/06/2023)
         "TestEventsById.yaml",               # chip-repl does not support AnyCommands (06/06/2023)
         "TestReadNoneSubscribeNone.yaml",    # chip-repl does not support AnyCommands (07/27/2023)
         "Test_TC_DRLK_2_8.yaml",   # Test fails only in chip-repl: Refer--> https://github.com/project-chip/connectedhomeip/pull/27011#issuecomment-1593339855
         "Test_TC_ACE_1_6.yaml",    # Test fails only in chip-repl: Refer--> https://github.com/project-chip/connectedhomeip/pull/27910#issuecomment-1632485584
-        "Test_TC_PSCFG_1_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
-        "Test_TC_PSCFG_2_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
-        "Test_TC_PSCFG_2_2.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
-        "Test_TC_SMOKECO_2_2.yaml",          # chip-repl does not support local timeout (07/20/2023)
-        "Test_TC_SMOKECO_2_3.yaml",          # chip-repl does not support local timeout (07/20/2023)
-        "Test_TC_SMOKECO_2_4.yaml",          # chip-repl does not support local timeout (07/20/2023)
-        "Test_TC_SMOKECO_2_5.yaml",          # chip-repl does not support local timeout (07/20/2023)
-        "Test_TC_SMOKECO_2_6.yaml",          # chip-repl does not support local timeout (07/20/2023)
         "Test_TC_IDM_1_2.yaml",              # chip-repl does not support AnyCommands (19/07/2023)
         "Test_TC_DRLK_2_2.yaml",             # chip-repl does not support EqualityCommands pseudo-cluster (08/04/2023)
         "Test_TC_DRLK_2_3.yaml",             # chip-repl does not support EqualityCommands pseudo-cluster (08/04/2023)
         "Test_TC_DRLK_2_12.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster (08/04/2023)
+        "TestGroupKeyManagementCluster.yaml",  # chip-repl does not support EqualityCommands (2023-08-04)
+        "Test_TC_S_2_2.yaml",              # chip-repl does not support scenes cluster commands
+        "Test_TC_S_2_3.yaml",              # chip-repl does not support scenes cluster commands
+        "Test_TC_S_2_4.yaml",              # chip-repl does not support scenes cluster commands
     }
 
 
@@ -188,19 +212,23 @@ def target_for_name(name: str):
     return TestTarget.ALL_CLUSTERS
 
 
-def tests_with_command(chip_tool: str, is_manual: bool):
+def tests_with_command(chip_tool: str, is_manual: bool, is_chip_tool_python_only: bool = False):
     """Executes `chip_tool` binary to see what tests are available, using cmd
     to get the list.
     """
     cmd = "list"
     if is_manual:
         cmd += "-manual"
+    elif is_chip_tool_python_only:
+        cmd += "-python-runner-only"
 
     result = subprocess.run([chip_tool, "tests", cmd], capture_output=True)
 
     test_tags = set()
     if is_manual:
         test_tags.add(TestTag.MANUAL)
+    if is_chip_tool_python_only:
+        test_tags.add(TestTag.CHIP_TOOL_PYTHON_ONLY)
 
     in_development_tests = [s.replace(".yaml", "") for s in _GetInDevelopmentTests()]
 
@@ -225,6 +253,7 @@ def _hardcoded_python_yaml_tests():
     flaky_tests = _GetFlakyTests()
     slow_tests = _GetSlowTests()
     in_development_tests = _GetInDevelopmentTests()
+    chip_repl_unsupported_tests = _GetChipReplUnsupportedTests()
 
     for path in _AllYamlTests():
         if not _IsValidYamlTest(path.name):
@@ -241,6 +270,9 @@ def _hardcoded_python_yaml_tests():
             tags.add(TestTag.SLOW)
 
         if path.name in in_development_tests:
+            tags.add(TestTag.IN_DEVELOPMENT)
+
+        if path.name in chip_repl_unsupported_tests:
             tags.add(TestTag.IN_DEVELOPMENT)
 
         yield TestDefinition(
@@ -261,6 +293,9 @@ def AllChipToolTests(chip_tool: str):
         yield test
 
     for test in tests_with_command(chip_tool, is_manual=True):
+        yield test
+
+    for test in tests_with_command(chip_tool, is_manual=False, is_chip_tool_python_only=True):
         yield test
 
 

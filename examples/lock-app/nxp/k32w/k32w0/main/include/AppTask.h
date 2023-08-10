@@ -26,8 +26,8 @@
 
 #include "CHIPProjectConfig.h"
 
-#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
-#include "K32W0FactoryDataProvider.h"
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+#include <platform/nxp/k32w/k32w0/FactoryDataProviderImpl.h>
 #if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
 #include "CustomFactoryDataProvider.h"
 #endif
@@ -41,11 +41,11 @@
 class AppTask
 {
 public:
-#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
 #if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
     using FactoryDataProvider = chip::DeviceLayer::CustomFactoryDataProvider;
 #else
-    using FactoryDataProvider = chip::DeviceLayer::K32W0FactoryDataProvider;
+    using FactoryDataProvider = chip::DeviceLayer::FactoryDataProviderImpl;
 #endif
 #endif
 

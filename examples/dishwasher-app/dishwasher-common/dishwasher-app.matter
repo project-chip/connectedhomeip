@@ -1102,7 +1102,8 @@ server cluster OperationalState = 96 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0000;
@@ -1309,7 +1310,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type dimmablelight = 117, version 1;
+  device type ma_dishwasher = 117, version 1;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0000;

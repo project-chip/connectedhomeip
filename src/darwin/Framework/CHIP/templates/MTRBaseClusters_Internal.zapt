@@ -10,7 +10,6 @@
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
 @interface MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}} ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 {{/if}}
 

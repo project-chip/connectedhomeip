@@ -1063,7 +1063,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
     }
 
     // Read of E2C3A* and E3C2A2, and inject a large amount of event path list, then it would try to apply previous cache
-    // latest data version and construct data version list but no enough memory, finally fully rollback data version filter. Expect
+    // latest data version and construct data version list but run out of memory, finally fully rollback data version filter. Expect
     // E2C3A* attributes in report, and E3C2A2 attribute in report
     {
         testId++;
@@ -1081,8 +1081,12 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
         readPrepareParams.mAttributePathParamsListSize = 2;
 
-        readPrepareParams.mpEventPathParamsList    = eventPathParams;
-        readPrepareParams.mEventPathParamsListSize = 64;
+        readPrepareParams.mpEventPathParamsList = eventPathParams;
+        // This size needs to be big enough that we can't fit our
+        // DataVersionFilterIBs in the same packet.  Max size is
+        // ArraySize(eventPathParams);
+        static_assert(75 <= ArraySize(eventPathParams));
+        readPrepareParams.mEventPathParamsListSize = 75;
 
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1252,8 +1256,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
 
     // Read of E1C2A*(3 attributes) and E2C3A*(5 attributes) and E2C2A*(4 attributes), and inject a large amount of event path
     // list, then it would try to apply previous cache latest data version and construct data version list with the ordering from
-    // largest cluster size to smallest cluster size(C2, C3, C1) but no enough memory, finally partially rollback data version
-    // filter with only C2. Expect E1C2A*, E2C2A* attributes(7 attributes) in report,
+    // largest cluster size to smallest cluster size(C3, C2, C1) but run out of memory, finally partially rollback data version
+    // filter with only C3. Expect E1C2A*, E2C2A* attributes(7 attributes) in report,
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
@@ -1275,8 +1279,12 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         readPrepareParams.mpAttributePathParamsList    = attributePathParams3;
         readPrepareParams.mAttributePathParamsListSize = 3;
         readPrepareParams.mpEventPathParamsList        = eventPathParams;
-        readPrepareParams.mEventPathParamsListSize     = 62;
-        err                                            = readClient.SendRequest(readPrepareParams);
+
+        // This size needs to be big enough that we can only fit our first
+        // DataVersionFilterIB. Max size is ArraySize(eventPathParams);
+        static_assert(73 <= ArraySize(eventPathParams));
+        readPrepareParams.mEventPathParamsListSize = 73;
+        err                                        = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         ctx.DrainAndServiceIO();

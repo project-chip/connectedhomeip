@@ -33,7 +33,33 @@
   ],
   "endpointTypes": [
     {
+      "id": 10,
       "name": "MA-rootdevice",
+      "deviceTypeRef": {
+        "id": 2,
+        "code": 22,
+        "profileId": 259,
+        "label": "MA-rootdevice",
+        "name": "MA-rootdevice"
+      },
+      "deviceTypes": [
+        {
+          "id": 2,
+          "code": 22,
+          "profileId": 259,
+          "label": "MA-rootdevice",
+          "name": "MA-rootdevice"
+        }
+      ],
+      "deviceTypeRefs": [
+        2
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        22
+      ],
       "deviceTypeName": "MA-rootdevice",
       "deviceTypeCode": 22,
       "deviceTypeProfileId": 259,
@@ -198,7 +224,7 @@
           "mfgCode": null,
           "define": "GROUPS_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "AddGroupResponse",
@@ -4619,7 +4645,7 @@
           "mfgCode": null,
           "define": "SWITCH_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "NumberOfPositions",
@@ -5394,7 +5420,33 @@
       ]
     },
     {
+      "id": 9,
       "name": "Anonymous Endpoint Type",
+      "deviceTypeRef": {
+        "id": 37,
+        "code": 40,
+        "profileId": 259,
+        "label": "MA-basic-videoplayer",
+        "name": "MA-basic-videoplayer"
+      },
+      "deviceTypes": [
+        {
+          "id": 37,
+          "code": 40,
+          "profileId": 259,
+          "label": "MA-basic-videoplayer",
+          "name": "MA-basic-videoplayer"
+        }
+      ],
+      "deviceTypeRefs": [
+        37
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        40
+      ],
       "deviceTypeName": "MA-basic-videoplayer",
       "deviceTypeCode": 40,
       "deviceTypeProfileId": 259,
@@ -7488,18 +7540,14 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 22
+      "networkId": 0
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 40
+      "networkId": 0
     }
   ],
   "log": []
