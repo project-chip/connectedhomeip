@@ -53,7 +53,7 @@ public:
 
     CHIP_ERROR Failure(Protocols::InteractionModel::Status aStatus)
     {
-        CHIP_ERROR err = mCommandHandler->AddStatus(mCommandPath, aStatus);
+        CHIP_ERROR err = mCommandHandler->FailableAddStatus(mCommandPath, aStatus);
         if (err == CHIP_NO_ERROR)
         {
             mSentResponse = true;

@@ -198,13 +198,19 @@ public:
         VerifyOrDie(FailableAddStatus(status, context, logging_option) == CHIP_NO_ERROR);
     }
 
-    CHIP_ERROR AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus);
+    inline CHIP_ERROR FailableAddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
+                                        const char * context     = "No additional context",
+                                        LogOption logging_option = LogOption::kFailures)
+    {
+        return FailableAddStatus(CommandPathStatus(aCommandPath, aStatus), context, logging_option);
+    }
 
-    // Same as AddStatus, but logs that the command represented by aCommandPath failed with the given
-    // error status and error message, if aStatus is an error. Errors on AddStatus are just logged
-    // (since the caller likely can only log and not further add a status).
-    void AddStatusAndLogIfFailure(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
-                                  const char * aMessage);
+    inline void AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
+                          const char * context = "No additional context", LogOption logging_option = LogOption::kFailures)
+    {
+
+        VerifyOrDie(FailableAddStatus(aCommandPath, aStatus, context, logging_option) == CHIP_NO_ERROR);
+    }
 
     CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
 
@@ -266,14 +272,8 @@ public:
     template <typename CommandData>
     void AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        if (CHIP_NO_ERROR != AddResponseData(aRequestCommandPath, aData))
-        {
-            CHIP_ERROR err = AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(DataManagement, "Failed to encode status: %" CHIP_ERROR_FORMAT, err.Format());
-            }
-        }
+        VerifyOrDie(AddResponseData(aRequestCommandPath, aData) == CHIP_NO_ERROR);
+        AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
     }
 
     /**

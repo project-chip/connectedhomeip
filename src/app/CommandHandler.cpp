@@ -272,7 +272,7 @@ Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElem
             ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%x",
                           ChipLogValueMEI(concretePath.mCommandId), ChipLogValueMEI(concretePath.mClusterId),
                           concretePath.mEndpointId);
-            return AddStatus(concretePath, commandExists) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
+            return FailableAddStatus(concretePath, commandExists) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
         }
     }
 
@@ -287,10 +287,10 @@ Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElem
         {
             if (err != CHIP_ERROR_ACCESS_DENIED)
             {
-                return AddStatus(concretePath, Status::Failure) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
+                return FailableAddStatus(concretePath, Status::Failure) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
             }
             // TODO: when wildcard invokes are supported, handle them to discard rather than fail with status
-            return AddStatus(concretePath, Status::UnsupportedAccess) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
+            return FailableAddStatus(concretePath, Status::UnsupportedAccess) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
         }
     }
 
@@ -298,7 +298,7 @@ Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElem
     {
         // TODO: when wildcard invokes are supported, discard a
         // wildcard-expanded path instead of returning a status.
-        return AddStatus(concretePath, Status::NeedsTimedInteraction) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
+        return FailableAddStatus(concretePath, Status::NeedsTimedInteraction) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
     }
 
     if (CommandIsFabricScoped(concretePath.mClusterId, concretePath.mCommandId))
@@ -312,7 +312,7 @@ Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElem
         {
             // TODO: when wildcard invokes are supported, discard a
             // wildcard-expanded path instead of returning a status.
-            return AddStatus(concretePath, Status::UnsupportedAccess) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
+            return FailableAddStatus(concretePath, Status::UnsupportedAccess) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
         }
     }
 
@@ -337,7 +337,7 @@ Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElem
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        return AddStatus(concretePath, Status::InvalidCommand) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
+        return FailableAddStatus(concretePath, Status::InvalidCommand) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
     }
 
     // We have handled the error status above and put the error status in response, now return success status so we can process
@@ -468,11 +468,6 @@ CHIP_ERROR CommandHandler::AddStatusInternal(const ConcreteCommandPath & aComman
     return FinishStatus();
 }
 
-CHIP_ERROR CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, const Status aStatus)
-{
-    return AddStatusInternal(aCommandPath, StatusIB(aStatus));
-}
-
 CHIP_ERROR CommandHandler::FailableAddStatus(const CommandPathStatus &status, const char *context, LogOption logging_option) {
     switch (logging_option) {
         case LogOption::kFailures: status.LogIfFailure(context); break;
@@ -481,28 +476,6 @@ CHIP_ERROR CommandHandler::FailableAddStatus(const CommandPathStatus &status, co
     }
 
     return AddStatusInternal(status.GetPath(), StatusIB(status.GetStatus()));
-}
-
-void CommandHandler::AddStatusAndLogIfFailure(const ConcreteCommandPath & aCommandPath, const Status aStatus, const char * aMessage)
-{
-    if (aStatus != Status::Success)
-    {
-        ChipLogError(DataManagement,
-                     "Failed to handle on Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI
-                     " with " ChipLogFormatIMStatus ": %s",
-                     aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId),
-                     ChipLogValueIMStatus(aStatus), aMessage);
-    }
-
-    CHIP_ERROR err = AddStatus(aCommandPath, aStatus);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DataManagement,
-                     "Failed to set status on Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI
-                     ": %" CHIP_ERROR_FORMAT,
-                     aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId),
-                     err.Format());
-    }
 }
 
 CHIP_ERROR CommandHandler::AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus)
