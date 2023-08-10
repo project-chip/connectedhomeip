@@ -23,10 +23,10 @@ RUN set -x \
     && : # last line
 
 RUN set -x \
-    && mkdir -p k32w1
+    && mkdir -p k32w1 \
     && wget https://cache.nxp.com/lgfiles/bsps/SDK_2_12_5_K32W148-EVK.zip \
     && unzip SDK_2_12_5_K32W148-EVK.zip -d k32w1 \
-    && rm -rf SDK_2_12_5_K32W148-EVK.zip \
+    && rm -rf SDK_2_12_5_K32W148-EVK.zip
 
 FROM ghcr.io/project-chip/chip-build:${VERSION}
 
