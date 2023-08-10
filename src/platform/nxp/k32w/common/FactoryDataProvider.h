@@ -19,16 +19,11 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/internal/GenericDeviceInstanceInfoProvider.h>
-
-#include "CHIPPlatformConfig.h"
-#include "K32W0Config.h"
-#include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <src/lib/core/CHIPError.h>
 
-#include "OtaUtils.h"
-#include "SecLib.h"
-
 #include <vector>
+
+#include "CHIPPlatformConfig.h"
 
 /* Grab symbol for the base address from the linker file. */
 extern uint32_t __FACTORY_DATA_START[];
@@ -57,9 +52,9 @@ namespace DeviceLayer {
  *        and Device Instance Info.
  */
 
-class K32W0FactoryDataProvider : public DeviceInstanceInfoProvider,
-                                 public CommissionableDataProvider,
-                                 public Credentials::DeviceAttestationCredentialsProvider
+class FactoryDataProvider : public DeviceInstanceInfoProvider,
+                            public CommissionableDataProvider,
+                            public Credentials::DeviceAttestationCredentialsProvider
 {
 public:
     struct Header
@@ -112,24 +107,11 @@ public:
     static constexpr uint32_t kHashLen      = 4;
     static constexpr size_t kHashId         = 0xCE47BA5E;
 
-    typedef otaUtilsResult_t (*OtaUtils_EEPROM_ReadData)(uint16_t nbBytes, uint32_t address, uint8_t * pInbuf);
+    FactoryDataProvider();
+    virtual ~FactoryDataProvider();
 
-    using RestoreMechanism = CHIP_ERROR (*)(void);
-
-    static uint8_t ReadDataMemcpy(uint16_t num, uint32_t src, uint8_t * dst);
-    static K32W0FactoryDataProvider & GetDefaultInstance();
-
-    K32W0FactoryDataProvider();
-
-    CHIP_ERROR Init();
-    CHIP_ERROR Validate();
-    void RegisterRestoreMechanism(RestoreMechanism mechanism);
-    CHIP_ERROR UpdateData(uint8_t * pBuf);
-    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length, uint32_t * offset = nullptr);
-
-    // Custom factory data providers must implement this method in order to define
-    // their own custom IDs.
-    virtual CHIP_ERROR SetCustomIds();
+    virtual CHIP_ERROR Init()                                                                          = 0;
+    virtual CHIP_ERROR SignWithDacKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) = 0;
 
     // ===== Members functions that implement the CommissionableDataProvider
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
@@ -162,9 +144,11 @@ public:
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
 
 protected:
+    CHIP_ERROR Validate();
+    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length, uint32_t * offset = nullptr);
+
     uint16_t maxLengths[kNumberOfIds];
     Header mHeader;
-    std::vector<RestoreMechanism> mRestoreMechanisms;
 };
 
 } // namespace DeviceLayer

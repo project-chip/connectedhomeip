@@ -22,13 +22,14 @@ network.
     -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
 -   [Device UI](#device-ui)
 -   [Building](#building)
-    -   [Known issues](#known-issues-building)
+    -   [Overwrite board config files](#overwrite-board-config-files)
+    -   [Known issues building](#known-issues-building)
 -   [Manufacturing data](#manufacturing-data)
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Pigweed Tokenizer](#pigweed-tokenizer)
     -   [Detokenizer script](#detokenizer-script)
     -   [Notes](#notes)
-    -   [Known issues](#known-issues-tokenizer)
+    -   [Known issues tokenizer](#known-issues-tokenizer)
 -   [NXP Ultrafast P256 ECC Library](#nxp-ultrafast-p256-ecc-library)
     -   [Building steps](#building-steps)
 -   [Tinycrypt ECC library](#tinycrypt-ecc-library)
@@ -38,7 +39,7 @@ network.
     -   [Writing the PSECT](#writing-the-psect)
     -   [Writing the application](#writing-the-application)
     -   [OTA Testing](#ota-testing)
-    -   [Known issues](#known-issues-ota)
+    -   [Known issues OTA](#known-issues-ota)
         </hr>
 
 ## Introduction
@@ -191,23 +192,51 @@ effects:
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
--   Download
-    [K32W061DK6 SDK 2.6.11](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_11_K32W061DK6.zip).
-
--   Start building the application either with Secure Element or without
+-   Start building the application either with Secure Element or without, SDK is
+    downloaded with west tool.
     -   without Secure Element
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/home/user/Desktop/SDK_2_6_11_K32W061DK6/
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
+user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
+user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west init -l manifest --mf west.yml
+user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west update
+```
+
+In case there are local modification to the already installed git NXP SDK: Use
+the below west `forall` command instead of the west init command to reset the
+west workspace. Warning: all local changes will be lost after running this
+command.
+
+```bash
+user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
+user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$west forall -c "git reset --hard && git clean -xdf" -a
+```
+
+Build the application
+
+Prior to building, the user can specify a custom `SDK` path by setting
+`NXP_K32W0_SDK_ROOT`:
+
+```
+user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=$(pwd)/third_party/nxp/k32w0_sdk/repo/core
+```
+
+If the environment variable `NXP_K32W0_SDK_ROOT` is not set, it will default to
+the `SDK` found in `third_party/nxp/k32w0_sdk/repo/core`.
+
+```
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lighting-app/nxp/k32w/k32w0
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ gn gen out/debug --args="k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\" chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ gn gen out/debug --args="chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ ninja -C out/debug
 ```
 
     -   with Secure element
+
+```
         Exactly the same steps as above but set chip_with_se05x=1 in the gn command
         and add argument chip_enable_ota_requestor=false
+```
 
 Note that option chip_enable_ota_requestor=false are required for building with
 Secure Element. These can be changed if building without Secure Element
@@ -215,8 +244,7 @@ Secure Element. These can be changed if building without Secure Element
 -   K32W041AM flavor
 
     Exactly the same steps as above but set argument build_for_k32w041am=1 in
-    the gn command and use
-    [K32W041AMDK6 SDK 2.6.11](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_11_K32W041AMDK6.zip).
+    the gn command.
 
 Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
 build argument (chip_with_OM15082) inside the gn build instruction should be set
@@ -244,6 +272,23 @@ pycryptodome           3.9.8
 ```
 
 The resulting output file can be found in out/debug/chip-k32w0x-light-example.
+
+### Overwrite board config files
+
+The example uses template/reference board configuration files.
+
+To overwrite the board configuration files, set `override_is_DK6=false` in the
+`k32w0_sdk` target from the app `BUILD.gn`:
+
+```
+k32w0_sdk("sdk") {
+    override_is_DK6 = false
+    ...
+}
+```
+
+This variable will be used by `k32w0_sdk.gni` to overwrite `chip_with_DK6`
+option, thus the reference board configuration files will no longer be used.
 
 ## Known issues building
 
@@ -287,7 +332,7 @@ CHIPProjectConfig.h.
 
 Regarding factory data provider, there are two options:
 
--   use the default factory data provider: `K32W0FactoryDataProvider` by setting
+-   use the default factory data provider: `FactoryDataProviderImpl` by setting
     `chip_with_factory_data=1` in the gn build command.
 -   use a custom factory data provider: please see
     [Guide for implementing a custom factory data provider](../../../../platform/nxp/k32w/k32w0/common/README.md).
