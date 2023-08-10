@@ -24,7 +24,7 @@ namespace app {
 
 using Protocols::InteractionModel::Status;
 
-CommandPathStatus & CommandPathStatus::LogIfFailure(const char * contextMessage)
+const CommandPathStatus & CommandPathStatus::LogIfFailure(const char * contextMessage) const
 {
     if (mStatus == Status::Success)
     {
@@ -34,7 +34,7 @@ CommandPathStatus & CommandPathStatus::LogIfFailure(const char * contextMessage)
     return LogStatus(contextMessage);
 }
 
-CommandPathStatus & CommandPathStatus::LogStatus(const char * contextMessage)
+const CommandPathStatus & CommandPathStatus::LogStatus(const char * contextMessage) const
 {
     if (mStatus == Status::Success)
     {

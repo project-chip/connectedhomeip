@@ -30,6 +30,7 @@
 
 #pragma once
 
+#include <app/CommandStatus.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
@@ -151,6 +152,13 @@ public:
         uint32_t mMagic            = 0;
     };
 
+    enum class LogOption
+    {
+        kFailures,
+        kAll,
+        kNone,
+    };
+
     /*
      * Constructor.
      *
@@ -170,6 +178,26 @@ public:
      */
     void OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                 System::PacketBufferHandle && payload, bool isTimedInvoke);
+
+    /**
+     * Adds the given command status and returns any failures in adding statuses (e.g. out
+     * of buffer space) to the caller
+     *
+     * [logging_option] controls what statuses are being logged.
+     */
+    CHIP_ERROR FailableAddStatus(const CommandPathStatus & status, const char * context = "No additional context",
+                                 LogOption logging_option = LogOption::kFailures);
+
+    /**
+     * Adds a status when the caller is unable to handle any failures. Logging is performed
+     * and failure to register the status is checked with VerifyOrDie.
+     */
+    inline void AddStatus(const CommandPathStatus & status, const char * context = "No additional context",
+                          LogOption logging_option = LogOption::kFailures)
+    {
+        VerifyOrDie(FailableAddStatus(status, context, logging_option) == CHIP_NO_ERROR);
+    }
+
     CHIP_ERROR AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus);
 
     // Same as AddStatus, but logs that the command represented by aCommandPath failed with the given

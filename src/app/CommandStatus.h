@@ -41,14 +41,14 @@ class CommandPathStatus {
     /// `contextMessage` will be part of the logged message.
     ///
     /// returns self
-    CommandPathStatus &LogIfFailure(const char *contextMessage);
-
+    const CommandPathStatus &LogIfFailure(const char *contextMessage) const;
 
     /// Logs the status given the current path
     ///
     /// If status is success, logs will be progress. If status
     /// is failure, log will be at error level.
-    CommandPathStatus &LogStatus(const char *contextMessage);
+    const CommandPathStatus &LogStatus(const char *contextMessage) const;
+
   private:
     const ConcreteCommandPath &mPath;
     const Protocols::InteractionModel::Status mStatus;

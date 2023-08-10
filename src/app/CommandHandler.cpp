@@ -473,6 +473,16 @@ CHIP_ERROR CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, c
     return AddStatusInternal(aCommandPath, StatusIB(aStatus));
 }
 
+CHIP_ERROR CommandHandler::FailableAddStatus(const CommandPathStatus &status, const char *context, LogOption logging_option) {
+    switch (logging_option) {
+        case LogOption::kFailures: status.LogIfFailure(context); break;
+        case LogOption::kAll: status.LogStatus(context); break;
+        case LogOption::kNone: break;
+    }
+
+    return AddStatusInternal(status.GetPath(), StatusIB(status.GetStatus()));
+}
+
 void CommandHandler::AddStatusAndLogIfFailure(const ConcreteCommandPath & aCommandPath, const Status aStatus, const char * aMessage)
 {
     if (aStatus != Status::Success)
