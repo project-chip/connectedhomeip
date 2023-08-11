@@ -26,8 +26,8 @@
 extern "C" {
 #endif
 
-#include "cmsis_os2.h"
 #include "FreeRTOS.h"
+#include "cmsis_os2.h"
 #include "event_groups.h"
 #include "task.h"
 
@@ -48,7 +48,7 @@ const osThreadAttr_t thread_attributes = {
     .cb_size    = 0,
     .stack_mem  = 0,
     .stack_size = MAIN_TASK_STACK_SIZE,
-    .priority   = (osPriority_t)MAIN_TASK_PRIORITY,
+    .priority   = (osPriority_t) MAIN_TASK_PRIORITY,
     .tz_module  = 0,
     .reserved   = 0,
 };
