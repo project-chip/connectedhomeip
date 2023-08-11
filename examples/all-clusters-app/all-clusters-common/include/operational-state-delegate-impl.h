@@ -34,6 +34,12 @@ class GenericOperationalStateDelegateImpl : public Delegate
 {
 public:
     /**
+     * Get the countdown time. This attribute is not used in this application.
+     * @return The current countdown time.
+     */
+    app::DataModel::Nullable<uint32_t> GetCountdownTime() override { return {}; };
+
+    /**
      * Fills in the provided GenericOperationalState with the state at index `index` if there is one,
      * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of states.
      * Note: This is used by the SDK to populate the operational state list attribute. If the contents of this list changes,

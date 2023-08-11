@@ -81,13 +81,6 @@ CHIP_ERROR Instance::SetCurrentPhase(const DataModel::Nullable<uint8_t> & aPhase
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::SetCountdownTime(const DataModel::Nullable<uint32_t> & time)
-{
-    mCountdownTime = time;
-    // We should not report this change.
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR Instance::SetOperationalState(uint8_t opState)
 {
     // todo check it the value is valid else return Protocols::InteractionModel::Status::ConstraintError;
@@ -118,11 +111,6 @@ CHIP_ERROR Instance::SetOperationalError(const GenericOperationalError & opErrSt
 DataModel::Nullable<uint8_t> Instance::GetCurrentPhase() const
 {
     return mCurrentPhase;
-}
-
-DataModel::Nullable<uint32_t> Instance::GetCountdownTime() const
-{
-    return mCountdownTime;
 }
 
 uint8_t Instance::GetCurrentOperationalState() const
@@ -305,7 +293,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     break;
 
     case OperationalState::Attributes::CountdownTime::Id: {
-        ReturnErrorOnFailure(aEncoder.Encode(GetCountdownTime()));
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate->GetCountdownTime()));
     }
     break;
     }

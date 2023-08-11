@@ -77,12 +77,6 @@ public:
     CHIP_ERROR SetCurrentPhase(const app::DataModel::Nullable<uint8_t> & phase);
 
     /**
-     * Set countdown time.
-     * @param time The countdown time that should now be the current one.
-     */
-    CHIP_ERROR SetCountdownTime(const app::DataModel::Nullable<uint32_t> & time);
-
-    /**
      * Set current operational state.
      * @param opState The operational state that should now be the current one.
      */
@@ -100,12 +94,6 @@ public:
      * @return The current phase.
      */
     app::DataModel::Nullable<uint8_t> GetCurrentPhase() const;
-
-    /**
-     * Get countdown time.
-     * @return The current countdown time.
-     */
-    app::DataModel::Nullable<uint32_t> GetCountdownTime() const;
 
     /**
      * Get the current operational state.
@@ -158,7 +146,6 @@ private:
 
     // Attribute Data Store
     app::DataModel::Nullable<uint8_t> mCurrentPhase;
-    app::DataModel::Nullable<uint32_t> mCountdownTime;
     uint8_t mOperationalState;
     GenericOperationalError mOperationalError;
 
@@ -217,6 +204,14 @@ public:
      * @param aServer A pointer to the Server object related to this delegate object.
      */
     void SetServer(Instance * aServer) { mServer = aServer; }
+
+    /**
+     * Get the countdown time.
+     * NOTE: Changes to this attribute should not be reported.
+     * From the spec: Changes to this value SHALL NOT be reported in a subscription.
+     * @return The current countdown time.
+     */
+    virtual app::DataModel::Nullable<uint32_t> GetCountdownTime() = 0;
 
     /**
      * Fills in the provided GenericOperationalState with the state at index `index` if there is one,
