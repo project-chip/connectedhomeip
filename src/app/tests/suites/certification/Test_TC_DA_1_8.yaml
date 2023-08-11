@@ -1,0 +1,375 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    29.1.8. [TC-DA-1.8] Device Attestation Request Validation-Success Scenario
+    [DUT-Commissioner]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Precondition/Test case description"
+      verification: |
+          (for all steps, PIs use equivalent command on their respective platform)
+          set the $CHIP_ROOT environment variable to the location of the connectedhomeip directory (cd to the connectedhomeip directory, use command `export CHIP_ROOT=$(pwd -P)`
+          For each scenario outlined in the sheet TC-DA-1.8 test cases, perform the following actions 
+          - Start the TH using the required certificate set and PID. For chip-all-clusters-app, use the command given in the chip-all-clusters app command column
+          - Have the DUT commission the TH. Verify that the DUT indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface.
+          - factory reset the TH
+      disabled: true
+
+    - label:
+          "Step : For each of the following test cases, start the TH using the
+          appropriate certificate set, commission the TH using the DUT, then
+          factory reset the TH:"
+      verification: |
+          Perform the following actions (PIs use equivalent command on their respective platform)
+          - Start the TH using the required certificate set and PID. For chip-all-clusters-app, use the command given in the chip-all-clusters app command column
+          - Have the DUT commission the TH. Verify that the TH is successfully commissioned for each test case
+          - factory reset the TH
+            command when using chip-all-clusters-app: sudo rm -rf /tmp/chip_*
+
+      disabled: true
+
+    - label:
+          "Step 1: CD Test Vector: The product_id_array field has one PID value
+          which matches the PID value in DAC."
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : PAI Test Vector: Fallback VID and PID encoding example from
+          spec: valid example showing that order or separators are not
+          considered at all for the overall validity of the embedded fields"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : PAI Test Vector: Fallback VID and PID encoding example: valid
+          but less human-readable"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : CD Test Vector: The authorized_paa_list contains two PAAs one
+          of which is valid PAA authorized to sign the PAI."
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : DAC Test Vector: Valid certificate public key curve prime256v1"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : PAI Test Vector: Valid certificate public key curve prime256v1"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : PAI Test Vector: Certificate includes optional Authority
+          Information Access extension"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : PAI Test Vector: Certificate includes optional Subject
+          Alternative Name extension"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : DAC Test Vector: Certificate includes optional Extended Key
+          Usage extension"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : CD Test Vector: The product_id_array field has 100 PID values
+          one of which matches the PID value in DAC."
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : PAI Test Vector: Fallback VID and PID encoding example from
+          spec: valid but less readable"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : DAC Test Vector: Fallback VID and PID encoding example: valid
+          but less human-readable"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : DAC Test Vector: Mix of Fallback and Matter OID encoding for
+          VID and PID: valid Matter OIDs are used and wrong values in the
+          common-name are ignored"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : CD Test Vector: The dac_origin_vendor_id and
+          dac_origin_product_id fields are not present."
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : PAI Test Vector: Certificate Key Usage extension
+          diginalSignature field is wrong (not present for DAC and present for
+          PAI which is OK as optional)"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : PAI Test Vector: Valid certificate signature algorithm
+          ECDSA_WITH_SHA256"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : DAC Test Vector: Valid certificate signature algorithm
+          ECDSA_WITH_SHA256"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : DAC Test Vector: Fallback VID and PID encoding example from
+          spec: valid example showing that order or separators are not
+          considered at all for the overall validity of the embedded fields"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label: "Step : CD Test Vector: Valid CMS version set to v3."
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : PAI Test Vector: Fallback VID and PID encoding example from
+          spec: valid and recommended since easily human-readable"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : CD Test Vector: The subjectKeyIdentifier contains SKID of a
+          well-known Zigbee Alliance certificate."
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : PAI Test Vector: Certificate Basic Constraint extension
+          PathLen field set to 0"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : DAC Test Vector: Certificate includes optional Authority
+          Information Access extension"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : PAI Test Vector: Fallback VID and PID encoding example from
+          spec: invalid since substring following Mpid: is not exactly 4
+          uppercase hexadecimal digits"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : DAC Test Vector: Fallback VID and PID encoding example from
+          spec: valid but less readable"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : PAI Test Vector: Certificate includes optional Extended Key
+          Usage extension"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : PAI Test Vector: Fallback VID and PID encoding example from
+          spec: valid and recommended since easily human-readable"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : CD Test Vector: The product_id_array field has 10 PID values
+          one of which matches the PID value in DAC."
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label: "Step : CD Test Vector: Valid CMS digest algorithm SHA256."
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label: "Step : CD Test Vector: Valid format_version field set to 1."
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : PAI Test Vector: Fallback VID and PID encoding example from
+          spec: valid but highly discouraged since embedding of substrings
+          within other substrings may be confusing to human readers"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : CD Test Vector: The version_number field matches the VID and
+          PID used in a DeviceSoftwareVersionModel entry in the DCL matching the
+          certification record associated with the product presenting this CD."
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label: "Step : CD Test Vector: Valid CMS eContentType pkcs7-data."
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : CD Test Vector: The optional authorized_paa_list field is not
+          present."
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : CD Test Vector: The authorized_paa_list contains one valid PAA
+          which is authorized to sign the PAI."
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : DAC Test Vector: Certificate includes optional Subject
+          Alternative Name extension"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : CD Test Vector: The authorized_paa_list contains ten PAAs one
+          of which is valid PAA authorized to sign the PAI."
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : CD Test Vector: The dac_origin_vendor_id and
+          dac_origin_product_id fields present and contain the VID and PID
+          values that match the VID and PID found in the DAC Subject DN."
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : PAI Test Vector: Valid certificate version field set to v3(2)"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : PAI Test Vector: Fallback VID and PID encoding example from
+          spec: invalid since substring following Mpid: is not exactly 4
+          uppercase hexadecimal digits"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : CD Test Vector: Origin VID/PID different than VID/PID (correct
+          use of origin)"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : DAC Test Vector: Valid certificate version field set to v3(2)"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : DAC Test Vector: Fallback VID and PID encoding example from
+          spec: valid and recommended since easily human-readable"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : PAI Test Vector: Mix of Fallback and Matter OID encoding for
+          VID and PID: valid Matter OIDs are used and wrong values in the
+          common-name are ignored"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : DAC Test Vector: Fallback VID and PID encoding example from
+          spec: valid but highly discouraged since embedding of substrings
+          within other substrings may be confusing to human readers"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : CD Test Vector: Valid CMS signature algorithm
+          ECDSA_WITH_SHA256."
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true
+
+    - label:
+          "Step : DAC Test Vector: Fallback VID and PID encoding example from
+          spec: valid and recommended since easily human-readable"
+      verification: |
+          Verify that the TH is successfully commissioned for each test case
+      disabled: true

@@ -50,17 +50,6 @@ tests:
               type: bitmap32
 
     - label: "Step 3a: Read the global attribute: AttributeList"
-      PICS: PICS_EVENT_LIST_ENABLED
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains:
-                  [2, 4, 5, 6, 7, 65528, 65529, 65530, 65531, 65532, 65533]
-
-    - label: "Step 3a: Read the global attribute: AttributeList"
-      PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -111,11 +100,11 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 6: Read the global attribute: EventList"
-      PICS: PICS_EVENT_LIST_ENABLED
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          value: []
-          constraints:
-              type: list
+    # EventList disabled for 1.2
+    # - label: "Step 6: Read the global attribute: EventList"
+    #   command: "readAttribute"
+    #   attribute: "EventList"
+    #   response:
+    #       value: []
+    #       constraints:
+    #           type: list

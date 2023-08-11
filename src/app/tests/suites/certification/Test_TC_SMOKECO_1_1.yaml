@@ -164,70 +164,71 @@ tests:
               type: list
               contains: [12]
 
-    - label: "TH reads from the DUT the EventList attribute"
-      PICS: PICS_EVENT_LIST_ENABLED
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
-              contains: [2, 3, 4, 5, 10]
+    #EventList disabled for 1.2
+    # - label: "TH reads from the DUT the EventList attribute"
+    #   PICS: PICS_EVENT_LIST_ENABLED
+    #   command: "readAttribute"
+    #   attribute: "EventList"
+    #   response:
+    #       constraints:
+    #           type: list
+    #           contains: [2, 3, 4, 5, 10]
 
-    - label: "TH reads from the DUT the EventList attribute(SmokeAlarm)"
-      PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E00
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
-              contains: [0]
+    # - label: "TH reads from the DUT the EventList attribute(SmokeAlarm)"
+    #   PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E00
+    #   command: "readAttribute"
+    #   attribute: "EventList"
+    #   response:
+    #       constraints:
+    #           type: list
+    #           contains: [0]
 
-    - label: "TH reads from the DUT the EventList attribute(COAlarm)"
-      PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E01
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
-              contains: [1]
+    # - label: "TH reads from the DUT the EventList attribute(COAlarm)"
+    #   PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E01
+    #   command: "readAttribute"
+    #   attribute: "EventList"
+    #   response:
+    #       constraints:
+    #           type: list
+    #           contains: [1]
 
-    - label: "TH reads from the DUT the EventList attribute(AlarmMuted)"
-      PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E06
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
-              contains: [6]
+    # - label: "TH reads from the DUT the EventList attribute(AlarmMuted)"
+    #   PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E06
+    #   command: "readAttribute"
+    #   attribute: "EventList"
+    #   response:
+    #       constraints:
+    #           type: list
+    #           contains: [6]
 
-    - label: "TH reads from the DUT the EventList attribute(MuteEnded)"
-      PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E07
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
-              contains: [7]
+    # - label: "TH reads from the DUT the EventList attribute(MuteEnded)"
+    #   PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E07
+    #   command: "readAttribute"
+    #   attribute: "EventList"
+    #   response:
+    #       constraints:
+    #           type: list
+    #           contains: [7]
 
-    - label:
-          "TH reads from the DUT the EventList attribute(InterconnectSmokeAlarm)"
-      PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E08
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
-              contains: [8]
+    # - label:
+    #       "TH reads from the DUT the EventList attribute(InterconnectSmokeAlarm)"
+    #   PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E08
+    #   command: "readAttribute"
+    #   attribute: "EventList"
+    #   response:
+    #       constraints:
+    #           type: list
+    #           contains: [8]
 
-    - label:
-          "TH reads from the DUT the EventList attribute(InterconnectCOAlarm)"
-      PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E09
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
-              contains: [9]
+    # - label:
+    #       "TH reads from the DUT the EventList attribute(InterconnectCOAlarm)"
+    #   PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E09
+    #   command: "readAttribute"
+    #   attribute: "EventList"
+    #   response:
+    #       constraints:
+    #           type: list
+    #           contains: [9]
 
     - label: "TH reads from the DUT the AcceptedCommandList attribute"
       PICS: "!SMOKECO.S.C00.Rsp"
