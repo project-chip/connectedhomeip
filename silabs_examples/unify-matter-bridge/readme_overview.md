@@ -66,20 +66,20 @@ for details on feature additions, bug fixes, and known issues.
 The Unify Matter Bridge currently supports mapping the following clusters/device
 types.
 
-| Cluster                      |
-| ---------------------------- |
-| Bridge Device Information    |
-| Level                        |
-| OnOff                        |
-| Identify                     |
-| Group                        |
-| Color Control                |
-| Occupancy Sensing            |
-| Temperature Measurement      |
-| Illuminance Measurement      |
-| Pressure Measurement         |
-| Flow Measurement             |
-| RelativeHumidity Measurement |
+| Cluster                       |Zigbee Support| Z-Wave Support|
+| :---------------------------- | :-----: | :-----: |
+| Bridge Device Information     |❌|✅| 
+| Level                         |✅|✅|
+| OnOff                         |✅|✅|
+| Identify                      |✅|❌|
+| Group                         |✅|✅|
+| Color Control                 |✅|✅|
+| Occupancy Sensing             |✅|✅|
+| Temperature Measurement       |❌|✅|
+| Illuminance Measurement       |❌|✅|
+| Pressure Measurement          |❌|✅|
+| Flow Measurement              |❌|❌|
+| RelativeHumidity Measurement  |❌|✅|
 
 ## Next Steps
 
