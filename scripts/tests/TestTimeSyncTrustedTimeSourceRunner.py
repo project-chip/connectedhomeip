@@ -115,7 +115,7 @@ def main():
     # App1 will come up, it is simulating having no internal time (confirmed in previous test), but we have
     # set up app2 as the trusted time source, so it should query out to app2 for the time.
     app2_cmd = str(driver.app_path) + ' ' + app2_args
-    app2_process = subprocess.Popen(app2_cmd, stdout=sys.stdout, stderr=sys.stderr, shell=True, bufsize=1)
+    app2_process = subprocess.Popen(app2_cmd.split(), stdout=sys.stdout, stderr=sys.stderr, bufsize=0)
 
     # Give app2 a second to come up and start advertising
     time.sleep(1)
@@ -132,9 +132,7 @@ def main():
     script_args = base_script_args + ' --tests test_ReadFromTrustedTimeSource'
     ret = driver.run_test_section(app_args, script_args)
 
-    logging.warning(f'Killing the App2 process, ret = {ret}')
     kill_process(app2_process)
-    logging.warning('App process has been killed')
     sys.exit(ret)
 
 
