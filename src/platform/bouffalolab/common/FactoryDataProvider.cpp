@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include "FactoryDataProvider.h"
 #include "CHIPDevicePlatformConfig.h"
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -32,7 +31,8 @@ extern "C" {
 extern "C" {
 #include <utils_base64.h>
 }
-#include <platform/bouffalolab/common/FactoryDataProvider.h>
+
+#include "FactoryDataProvider.h"
 
 namespace chip {
 namespace DeviceLayer {

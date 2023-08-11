@@ -32,7 +32,7 @@ static_library("BL702L") {
     "PlatformManagerImpl.cpp",
   ]
 
-  common_sources = [
+  sources += [
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
     "../common/BLConfig.cpp",
@@ -57,20 +57,14 @@ static_library("BL702L") {
       "../common/BLEManagerImpl.h",
     ]
   }
-
+  
+  defines = [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
   if (chip_enable_factory_data || chip_enable_factory_data_test) {
-    if (chip_enable_factory_data) {
-      defines = [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE" ]
-    }
-    common_sources += [
-      "${chip_root}/src/credentials/CHIPCert.h",
-      "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+    sources += [
       "../common/FactoryDataProvider.cpp",
       "../common/FactoryDataProvider.h",
     ]
   }
-
-  sources += common_sources
 
   if (chip_enable_openthread) {
     # needed for MTD/FTD
@@ -94,5 +88,6 @@ static_library("BL702L") {
     }
   }
 
+  deps += [ "${chip_root}/src/credentials:credentials_header" ]
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 }

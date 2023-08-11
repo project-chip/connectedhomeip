@@ -31,7 +31,7 @@ static_library("BL602") {
     "wifi_mgmr_portable.c",
   ]
 
-  common_sources = [
+  sources += [
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
     "../common/BLConfig.cpp",
@@ -44,33 +44,30 @@ static_library("BL602") {
   ]
 
   if (chip_enable_ota_requestor) {
-    common_sources += [
+    sources += [
       "../common/OTAImageProcessorImpl.cpp",
       "../common/OTAImageProcessorImpl.h",
     ]
   }
 
   if (chip_enable_ble) {
-    common_sources += [
+    sources += [
       "../common/BLEManagerImpl.cpp",
       "../common/BLEManagerImpl.h",
     ]
   }
 
+  defines = [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
   if (chip_enable_factory_data || chip_enable_factory_data_test) {
-    if (chip_enable_factory_data) {
-      defines = [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE" ]
-    }
-    common_sources += [
-      "${chip_root}/src/credentials/CHIPCert.h",
-      "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+    sources += [
       "../common/FactoryDataProvider.cpp",
       "../common/FactoryDataProvider.h",
     ]
   }
 
-  sources += common_sources
-
-  deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
+  deps = [ 
+    "${chip_root}/src/lib/dnssd:platform_header", 
+    "${chip_root}/src/credentials:credentials_header" 
+  ]
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 }
