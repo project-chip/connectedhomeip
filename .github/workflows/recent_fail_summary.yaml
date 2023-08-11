@@ -23,11 +23,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Run Summarization Script
+      - name: Setup
         run: |
           gh run list -b master -s failure --json displayTitle,workflowName > runlist.json
           pip install pandas
-          python scripts/tools/summarize_fail.py
         env:
           GH_TOKEN: ${{ github.token }}
+      - name: Run Summarization Script
+        run: python scripts/tools/summarize_fail.py
         
