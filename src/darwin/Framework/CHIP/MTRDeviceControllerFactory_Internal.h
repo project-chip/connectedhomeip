@@ -43,6 +43,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)controllerShuttingDown:(MTRDeviceController *)controller;
 
 /**
+ * Get the list of running controllers.  This will include controllers that are
+ * in the middle of starting up or shutting down.
+ */
+- (NSArray<MTRDeviceController *> *)getRunningControllers;
+
+/**
  * Find a running controller, if any, for the given fabric index.
  */
 - (nullable MTRDeviceController *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex;

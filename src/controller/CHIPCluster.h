@@ -221,6 +221,7 @@ public:
         return WriteAttribute<AttributeInfo>(requestData, context, successCb, failureCb, NullOptional, doneCb, aDataVersion);
     }
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**
      * Read an attribute and get a type-safe callback with the attribute value.
      */
@@ -399,6 +400,7 @@ public:
                                                          onSubscriptionEstablishedCb, onResubscriptionAttemptCb,
                                                          aKeepPreviousSubscriptions, aIsUrgentEvent);
     }
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
 protected:
     Messaging::ExchangeManager & mExchangeManager;

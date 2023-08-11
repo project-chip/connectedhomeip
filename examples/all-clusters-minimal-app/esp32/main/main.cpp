@@ -39,6 +39,7 @@
 #include <app/util/af.h>
 #include <binding-handler.h>
 #include <common/Esp32AppServer.h>
+#include <common/Esp32ThreadInit.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/ESP32Utils.h>
@@ -49,12 +50,6 @@
 
 #if CONFIG_ENABLE_PW_RPC
 #include "Rpc.h"
-#endif
-
-#if CONFIG_OPENTHREAD_ENABLED
-#include <common/OpenthreadConfig.h>
-#include <platform/ESP32/OpenthreadLauncher.h>
-#include <platform/ThreadStackManager.h>
 #endif
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
@@ -188,25 +183,7 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed : %" CHIP_ERROR_FORMAT, error.Format());
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    esp_openthread_platform_config_t config = {
-        .radio_config = ESP_OPENTHREAD_DEFAULT_RADIO_CONFIG(),
-        .host_config  = ESP_OPENTHREAD_DEFAULT_HOST_CONFIG(),
-        .port_config  = ESP_OPENTHREAD_DEFAULT_PORT_CONFIG(),
-    };
-    set_openthread_platform_config(&config);
-
-    if (DeviceLayer::ThreadStackMgr().InitThreadStack() != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "Failed to initialize Thread stack");
-        return;
-    }
-    if (DeviceLayer::ThreadStackMgr().StartThreadTask() != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "Failed to launch Thread task");
-        return;
-    }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    ESPOpenThreadInit();
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }
 

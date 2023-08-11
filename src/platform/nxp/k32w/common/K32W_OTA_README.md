@@ -124,13 +124,19 @@ implementation. The OTA image should be generated with the
 Prior to factory data update, the old factory data is backed up in external
 flash. If anything interrupts the update (e.g. power loss), there is a slight
 chance the internal flash factory data section is erased and has to be restored
-at next boot. The `K32W0FactoryDataProvider` offers a default restore mechanism
-and support for registering additional restore mechanisms or overwriting the
-default one.
+at next boot. The `FactoryDataProvider` offers a default restore mechanism and
+support for registering additional restore mechanisms or overwriting the default
+one.
 
 Restore mechanisms are just functions that have this signature:
 `CHIP_ERROR (*)(void)`. Any such function can be registered through
-`K32W0FactoryDataProvider::RegisterRestoreMechanism`.
+`FactoryDataProvider::RegisterRestoreMechanism`.
+
+The default restore mechanism is implemented as a weak function:
+`FactoryDataDefaultRestoreMechanism`. It is registered in
+`FactoryDataProvider::Init`, before factory data validation, and it can be
+overwritten at application level. When doing the actual restore, the mechanisms
+are called in the order they were registered.
 
 The default restore mechanism is implemented as a weak function:
 `FactoryDataDefaultRestoreMechanism`. It is registered in

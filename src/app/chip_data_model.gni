@@ -171,7 +171,6 @@ template("chip_data_model") {
       "${_app_root}/util/binding-table.cpp",
       "${_app_root}/util/binding-table.h",
       "${_app_root}/util/ember-compatibility-functions.cpp",
-      "${_app_root}/util/error-mapping.cpp",
       "${_app_root}/util/generic-callback-stubs.cpp",
       "${_app_root}/util/message.cpp",
       "${_app_root}/util/privilege-storage.cpp",
@@ -268,7 +267,7 @@ template("chip_data_model") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
-          "${_app_root}/clusters/${cluster}/operational-state-delegate.h",
+          "${_app_root}/clusters/${cluster}/operational-state-cluster-objects.h",
         ]
       } else if (cluster == "dishwasher-alarm-server") {
         sources += [
@@ -287,6 +286,13 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/replacement-product-list-manager.h",
           "${_app_root}/clusters/${cluster}/resource-monitoring-cluster-objects.cpp",
           "${_app_root}/clusters/${cluster}/resource-monitoring-cluster-objects.h",
+        ]
+      } else if (cluster == "smoke-co-alarm-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/SmokeCOTestEventTriggerDelegate.cpp",
+          "${_app_root}/clusters/${cluster}/SmokeCOTestEventTriggerDelegate.h",
         ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]

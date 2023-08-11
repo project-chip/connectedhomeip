@@ -230,7 +230,14 @@ namespace BinaryInputBasic {} // namespace BinaryInputBasic
 
 namespace PulseWidthModulation {} // namespace PulseWidthModulation
 
-namespace Descriptor {} // namespace Descriptor
+namespace Descriptor {
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kTagList = 0x1,
+};
+} // namespace Descriptor
 
 namespace Binding {} // namespace Binding
 
@@ -1443,6 +1450,12 @@ enum class GroupKeySecurityPolicyEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kCacheAndSync = 0x1,
 };
 } // namespace GroupKeyManagement
 

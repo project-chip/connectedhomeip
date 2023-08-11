@@ -39,4 +39,6 @@ public class ChipAppServer {
   public native boolean startAppWithDelegate(ChipAppServerDelegate appDelegate);
 
   public native boolean stopApp();
+
+  public native boolean resetApp();
 }

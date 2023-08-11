@@ -20,6 +20,7 @@ import("$dir_pw_build/python.gni")
 
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/platform/python.gni")
+import("${chip_root}/src/system/system.gni")
 import("${dir_pw_unit_test}/test.gni")
 
 if (current_os == "mac") {
@@ -33,6 +34,7 @@ config("controller_wno_deprecate") {
 declare_args() {
   chip_python_version = "0.0"
   chip_python_package_prefix = "chip"
+  chip_python_supports_stack_locking = chip_system_config_locking != "none"
 }
 
 shared_library("ChipDeviceCtrl") {
@@ -77,12 +79,19 @@ shared_library("ChipDeviceCtrl") {
       "chip/internal/ChipThreadWork.h",
       "chip/internal/CommissionerImpl.cpp",
       "chip/logging/LoggingRedirect.cpp",
+      "chip/native/ChipMainLoopWork.h",
       "chip/native/PyChipError.cpp",
       "chip/tracing/TracingSetup.cpp",
       "chip/utils/DeviceProxyUtils.cpp",
     ]
     defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
     defines += [ "CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC=50" ]
+
+    if (chip_python_supports_stack_locking) {
+      sources += [ "chip/native/ChipMainLoopWork_StackLock.cpp" ]
+    } else {
+      sources += [ "chip/native/ChipMainLoopWork_WorkSchedule.cpp" ]
+    }
   } else {
     sources += [
       "chip/server/Options.cpp",
