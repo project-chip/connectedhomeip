@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Project CHIP Authors
+# Copyright (c) 2022-2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -288,7 +288,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-telink:0.7.14
+            image: ghcr.io/project-chip/chip-build-telink:1
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -460,6 +460,30 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9528a pump-controller-app \
                     out/telink-tlsr9528a-pump-controller/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output
+              run: rm -rf ./out
+
+            - name: Build example Telink Shell App
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-shell' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9528a shell \
+                    out/telink-tlsr9528a-shell/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output
+              run: rm -rf ./out
+
+            - name: Build example Telink Smoke CO Alarm App
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-smoke-co-alarm' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9528a smoke_co_alarm-app \
+                    out/telink-tlsr9528a-smoke-co-alarm/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output
