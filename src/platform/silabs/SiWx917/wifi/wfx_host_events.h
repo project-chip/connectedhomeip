@@ -60,7 +60,6 @@
 #define WLAN_RETRY_TIMER_MS 5000
 #define CONVERT_MS_TO_SEC(TimeInMS) (TimeInMS / 1000)
 
-
 // WLAN related Macros
 #define ETH_FRAME (0)
 #define CMP_SUCCESS (0)

@@ -269,13 +269,13 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 #ifdef SL_WFX_USE_SECURE_LINK
     wfx_securelink_task_start(); // start securelink key renegotiation task
 #endif                           // SL_WFX_USE_SECURE_LINK
-#endif /* WF200_WIFI */
+#endif                           /* WF200_WIFI */
 
 #ifdef SIWX_917
     sl_status_t status;
     if ((status = wfx_wifi_rsi_init()) != SL_STATUS_OK)
     {
-        ReturnErrorOnFailure((CHIP_ERROR)status);
+        ReturnErrorOnFailure((CHIP_ERROR) status);
     }
 #endif // SIWX_917
 

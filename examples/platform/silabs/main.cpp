@@ -49,7 +49,7 @@ int main(void)
 {
     GetPlatform().Init();
 
-    main_Task = osThreadNew((osThreadFunc_t)application_start, NULL, &thread_attributes);
+    main_Task = osThreadNew((osThreadFunc_t) application_start, NULL, &thread_attributes);
 
     SILABS_LOG("Starting scheduler");
     GetPlatform().StartScheduler();
@@ -60,7 +60,7 @@ int main(void)
     appError(CHIP_ERROR_INTERNAL);
 }
 
-void application_start(const void *unused)
+void application_start(const void * unused)
 {
     if (SilabsMatterConfig::InitMatter(BLE_DEV_NAME) != CHIP_NO_ERROR)
         appError(CHIP_ERROR_INTERNAL);

@@ -26,8 +26,8 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include <platform/internal/BLEManager.h>
 #include "cmsis_os2.h"
+#include <platform/internal/BLEManager.h>
 #ifndef SI917
 #include "rail.h"
 #endif

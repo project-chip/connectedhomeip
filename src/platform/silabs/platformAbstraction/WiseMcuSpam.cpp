@@ -25,7 +25,7 @@
 #endif
 
 // TODO add includes ?
-extern "C" { 
+extern "C" {
 #include "sl_event_handler.h"
 
 void RSI_Board_LED_Set(int, bool);
@@ -52,7 +52,7 @@ CHIP_ERROR SilabsPlatform::Init(void)
 
     RSI_Wakeupsw_config_gpio0();
 
-    sl_platform_init();  // platform initialization for wifi-sdk 3.0
+    sl_platform_init(); // platform initialization for wifi-sdk 3.0
 
 #if SILABS_LOG_ENABLED
     silabsInitLog();

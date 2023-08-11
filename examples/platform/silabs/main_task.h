@@ -42,17 +42,17 @@ extern "C" {
 #define MAIN_TASK_PRIORITY 56
 
 const osThreadAttr_t thread_attributes = {
-  .name       = "app",
-  .attr_bits  = 0,
-  .cb_mem     = 0,
-  .cb_size    = 0,
-  .stack_mem  = 0,
-  .stack_size = MAIN_TASK_STACK_SIZE,
-  .priority   = (osPriority_t)MAIN_TASK_PRIORITY,
-  .tz_module  = 0,
-  .reserved   = 0,
+    .name       = "app",
+    .attr_bits  = 0,
+    .cb_mem     = 0,
+    .cb_size    = 0,
+    .stack_mem  = 0,
+    .stack_size = MAIN_TASK_STACK_SIZE,
+    .priority   = (osPriority_t)MAIN_TASK_PRIORITY,
+    .tz_module  = 0,
+    .reserved   = 0,
 };
 
 osThreadId_t main_Task;
 
-void application_start(const void *unused);
+void application_start(const void * unused);

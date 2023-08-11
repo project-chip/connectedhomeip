@@ -189,11 +189,11 @@ void rsi_ble_app_set_event(uint32_t event_num)
 {
     SILABS_LOG("%s: starting", __func__);
     event_msg.ble_app_event_map |= BIT(event_num);
-#ifndef SI917	
+#ifndef SI917
     rsi_semaphore_post(&sl_ble_event_sem);
 #else
     osSemaphoreRelease(sl_ble_event_sem);
-#endif		
+#endif
     return;
 }
 

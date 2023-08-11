@@ -138,7 +138,6 @@ extern uint32_t SystemCoreClock;
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
 
-
 /* Energy saving modes. */
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #define configUSE_TICKLESS_IDLE 1
@@ -175,7 +174,7 @@ extern uint32_t SystemCoreClock;
 #undef __NVIC_PRIO_BITS
 #endif
 #define configPRIO_BITS 6 /* 6 priority levels. */
-#endif // SIWX_917
+#endif                    // SIWX_917
 
 /* Interrupt priorities used by the kernel port layer itself.  These are generic
 to all Cortex-M ports, and do not rely on any particular library functions. */

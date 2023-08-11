@@ -21,7 +21,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #include "wfx_host_events.h"
 #include "wifi_config.h"
 #ifdef __cplusplus
@@ -197,7 +196,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     void * rsipkt;
     struct pbuf * q;
     uint16_t framelength = 0;
-    uint16_t datalength = 0;
+    uint16_t datalength  = 0;
 
 #ifdef WIFI_DEBUG_ENABLED
     SILABS_LOG("LWIP : low_level_output");
@@ -207,10 +206,12 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
         return ERR_IF;
     }
     /* Calculate total packet size */
-    for (q = p, framelength = 0; q != NULL; q = q->next) {
+    for (q = p, framelength = 0; q != NULL; q = q->next)
+    {
         framelength += q->len;
     }
-    if (framelength < LWIP_FRAME_ALIGNMENT) {
+    if (framelength < LWIP_FRAME_ALIGNMENT)
+    {
         framelength = LWIP_FRAME_ALIGNMENT;
     }
 

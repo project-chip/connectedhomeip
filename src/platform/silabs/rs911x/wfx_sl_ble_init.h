@@ -33,8 +33,8 @@
 
 // BLE include file to refer BLE APIs
 #include "FreeRTOS.h"
-#include "event_groups.h"
 #include "ble_config.h"
+#include "event_groups.h"
 #include "task.h"
 #include "timers.h"
 #include "wfx_host_events.h"

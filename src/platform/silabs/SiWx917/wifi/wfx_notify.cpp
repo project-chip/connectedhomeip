@@ -23,8 +23,8 @@
 
 #include "FreeRTOS.h"
 #include "event_groups.h"
-#include "task.h"
 #include "silabs_utils.h"
+#include "task.h"
 #include "wfx_host_events.h"
 
 #ifdef RS911X_WIFI
