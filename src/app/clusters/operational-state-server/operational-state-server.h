@@ -192,19 +192,10 @@ private:
  */
 class Delegate
 {
-protected:
-    Instance * mServer = nullptr;
-
 public:
     Delegate() = default;
 
     virtual ~Delegate() = default;
-
-    /**
-     * This method is used by the SDK to set the instance pointer. This is done during the instantiation of a Server object.
-     * @param aServer A pointer to the Server object related to this delegate object.
-     */
-    void SetServer(Instance * aServer) { mServer = aServer; }
 
     /**
      * Get the countdown time.
@@ -258,6 +249,20 @@ public:
      * @param[out] err operational error after callback.
      */
     virtual void HandleStopStateCallback(GenericOperationalError & err) = 0;
+
+private:
+    friend class Instance;
+
+    Instance * mInstance = nullptr;
+
+    /**
+     * This method is used by the SDK to set the instance pointer. This is done during the instantiation of a Server object.
+     * @param aInstance A pointer to the Instance object related to this delegate object.
+     */
+    void SetServer(Instance * aInstance) { mInstance = aInstance; }
+
+protected:
+    Instance* GetInstance() { return mInstance; }
 };
 
 } // namespace OperationalState

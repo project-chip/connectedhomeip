@@ -46,7 +46,7 @@ CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalPhaseAtIndex(size_
 void GenericOperationalStateDelegateImpl::HandlePauseStateCallback(GenericOperationalError & err)
 {
     // placeholder implementation
-    auto error = mServer->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
+    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
     if (error == CHIP_NO_ERROR)
     {
         err.Set(to_underlying(ErrorStateEnum::kNoError));
@@ -60,7 +60,7 @@ void GenericOperationalStateDelegateImpl::HandlePauseStateCallback(GenericOperat
 void GenericOperationalStateDelegateImpl::HandleResumeStateCallback(GenericOperationalError & err)
 {
     // placeholder implementation
-    auto error = mServer->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
+    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
     {
         err.Set(to_underlying(ErrorStateEnum::kNoError));
@@ -74,7 +74,7 @@ void GenericOperationalStateDelegateImpl::HandleResumeStateCallback(GenericOpera
 void GenericOperationalStateDelegateImpl::HandleStartStateCallback(GenericOperationalError & err)
 {
     // placeholder implementation
-    auto error = mServer->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
+    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
     {
         err.Set(to_underlying(ErrorStateEnum::kNoError));
@@ -88,7 +88,7 @@ void GenericOperationalStateDelegateImpl::HandleStartStateCallback(GenericOperat
 void GenericOperationalStateDelegateImpl::HandleStopStateCallback(GenericOperationalError & err)
 {
     // placeholder implementation
-    auto error = mServer->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
+    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
     if (error == CHIP_NO_ERROR)
     {
         err.Set(to_underlying(ErrorStateEnum::kNoError));

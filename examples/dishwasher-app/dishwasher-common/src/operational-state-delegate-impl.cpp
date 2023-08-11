@@ -45,7 +45,7 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, Ge
 void OperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
 {
     // placeholder implementation
-    auto error = mServer->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
+    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
     if (error == CHIP_NO_ERROR)
     {
         err.Set(to_underlying(ErrorStateEnum::kNoError));
@@ -59,7 +59,7 @@ void OperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError 
 void OperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError & err)
 {
     // placeholder implementation
-    auto error = mServer->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
+    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
     {
         err.Set(to_underlying(ErrorStateEnum::kNoError));
@@ -73,7 +73,7 @@ void OperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError
 void OperationalStateDelegate::HandleStartStateCallback(GenericOperationalError & err)
 {
     // placeholder implementation
-    auto error = mServer->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
+    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
     {
         err.Set(to_underlying(ErrorStateEnum::kNoError));
@@ -87,7 +87,7 @@ void OperationalStateDelegate::HandleStartStateCallback(GenericOperationalError 
 void OperationalStateDelegate::HandleStopStateCallback(GenericOperationalError & err)
 {
     // placeholder implementation
-    auto error = mServer->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
+    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
     if (error == CHIP_NO_ERROR)
     {
         err.Set(to_underlying(ErrorStateEnum::kNoError));
