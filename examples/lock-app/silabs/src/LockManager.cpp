@@ -32,6 +32,7 @@ TimerHandle_t sLockTimer;
 
 using namespace ::chip::DeviceLayer::Internal;
 using namespace EFR32DoorLock::LockInitParams;
+using chip::app::DataModel::MakeNullable;
 
 CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state, LockParam lockParam)
 {
@@ -288,19 +289,22 @@ void LockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
     }
 }
 
-bool LockManager::Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
+bool LockManager::Lock(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                              const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
 {
-    return setLockState(endpointId, DlLockState::kLocked, pin, err);
+    return setLockState(endpointId, fabricIdx, nodeId, DlLockState::kLocked, pin, err);
 }
 
-bool LockManager::Unlock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
+bool LockManager::Unlock(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                              const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
 {
-    return setLockState(endpointId, DlLockState::kUnlocked, pin, err);
+    return setLockState(endpointId, fabricIdx, nodeId, DlLockState::kUnlocked, pin, err);
 }
 
-bool LockManager::Unbolt(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
+bool LockManager::Unbolt(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                              const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
 {
-    return setLockState(endpointId, DlLockState::kUnlocked, pin, err);
+    return setLockState(endpointId, fabricIdx, nodeId, DlLockState::kUnlocked, pin, err);
 }
 
 bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
@@ -664,7 +668,9 @@ const char * LockManager::lockStateToString(DlLockState lockState) const
     return "Unknown";
 }
 
-bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockState, const Optional<chip::ByteSpan> & pin,
+
+bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                              const Nullable<chip::NodeId> & nodeId, DlLockState lockState, const Optional<chip::ByteSpan> & pin,
                                OperationErrorEnum & err)
 {
 
@@ -683,7 +689,7 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
             ChipLogDetail(Zcl, "Door Lock App: setting door lock state to \"%s\" [endpointId=%d]", lockStateToString(lockState),
                           endpointId);
 
-            DoorLockServer::Instance().SetLockState(endpointId, lockState);
+            DoorLockServer::Instance().SetLockState(endpointId, lockState, OperationSourceEnum::kRemote, NullNullable, NullNullable, fabricIdx, nodeId);
 
             return true;
         }
@@ -708,7 +714,7 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
                           "Lock App: specified PIN code was found in the database, setting lock state to \"%s\" [endpointId=%d]",
                           lockStateToString(lockState), endpointId);
 
-            DoorLockServer::Instance().SetLockState(endpointId, lockState);
+            DoorLockServer::Instance().SetLockState(endpointId, lockState, OperationSourceEnum::kRemote, NullNullable, NullNullable, fabricIdx, nodeId);
 
             return true;
         }
