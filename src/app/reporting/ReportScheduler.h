@@ -87,7 +87,7 @@ public:
         void SetEngineRunScheduled(bool aEngineRunScheduled) { mEngineRunScheduled = aEngineRunScheduled; }
 
         /// @brief Set the interval timestamps for the node based on the read handler reporting intervals
-        /// @param aReadHandler
+        /// @param aReadHandler read handler to get the intervals from
         /// @param now current time to calculate the mMin and mMax timestamps, user must ensure to provide a valid time for this to
         /// be reliable
         void SetIntervalTimeStamps(ReadHandler * aReadHandler, const Timestamp & now)
