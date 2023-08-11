@@ -42,9 +42,9 @@ ReportSchedulerImpl::ReportSchedulerImpl(TimerDelegate * aTimerDelegate) : Repor
 void ReportSchedulerImpl::OnEnterActiveMode()
 {
 #if ICD_REPORT_ON_ENTER_ACTIVE_MODE
-    mNow = mTimerDelegate->GetCurrentMonotonicTimestamp();
-    mNodesPool.ForEachActiveObject([this](ReadHandlerNode * node) {
-        if (this->mNow >= node->GetMinTimestamp())
+    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+    mNodesPool.ForEachActiveObject([now](ReadHandlerNode * node) {
+        if (now >= node->GetMinTimestamp())
         {
             this->HandlerForceDirtyState(node->GetReadHandler());
         }
@@ -64,11 +64,11 @@ void ReportSchedulerImpl::OnSubscriptionEstablished(ReadHandler * aReadHandler)
     VerifyOrDie(nullptr == newNode);
 
     // Update the now timestamp to the current time to determine the min and max timestamps
-    mNow = mTimerDelegate->GetCurrentMonotonicTimestamp();
+    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
 
     // The NodePool is the same size as the ReadHandler pool from the IM Engine, so we don't need a check for size here since if a
     // ReadHandler was created, space should be available.
-    newNode = mNodesPool.CreateObject(aReadHandler, this, mNow);
+    newNode = mNodesPool.CreateObject(aReadHandler, this, now);
 
     ChipLogProgress(DataManagement,
                     "Registered a ReadHandler that will schedule a report between system Timestamp: %" PRIu64
@@ -83,11 +83,11 @@ void ReportSchedulerImpl::OnBecameReportable(ReadHandler * aReadHandler)
     VerifyOrReturn(nullptr != node);
 
     // Update the now timestamp to the current time to calculate the next report timeout
-    mNow = mTimerDelegate->GetCurrentMonotonicTimestamp();
+    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
 
     Milliseconds32 newTimeout;
-    CalculateNextReportTimeout(newTimeout, node);
-    ScheduleReport(newTimeout, node);
+    CalculateNextReportTimeout(newTimeout, node, now);
+    ScheduleReport(newTimeout, node, now);
 }
 
 void ReportSchedulerImpl::OnSubscriptionReportSent(ReadHandler * aReadHandler)
@@ -96,12 +96,12 @@ void ReportSchedulerImpl::OnSubscriptionReportSent(ReadHandler * aReadHandler)
     VerifyOrReturn(nullptr != node);
 
     // Update the now timestamp to the current time to update the node's interval timestamps and calculate the next report timeout
-    mNow = mTimerDelegate->GetCurrentMonotonicTimestamp();
+    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
 
-    node->SetIntervalTimeStamps(aReadHandler, mNow);
+    node->SetIntervalTimeStamps(aReadHandler, now);
     Milliseconds32 newTimeout;
-    CalculateNextReportTimeout(newTimeout, node);
-    ScheduleReport(newTimeout, node);
+    CalculateNextReportTimeout(newTimeout, node, now);
+    ScheduleReport(newTimeout, node, now);
     node->SetEngineRunScheduled(false);
 }
 
@@ -117,7 +117,7 @@ void ReportSchedulerImpl::OnReadHandlerDestroyed(ReadHandler * aReadHandler)
     mNodesPool.ReleaseObject(removeNode);
 }
 
-CHIP_ERROR ReportSchedulerImpl::ScheduleReport(Timeout timeout, ReadHandlerNode * node)
+CHIP_ERROR ReportSchedulerImpl::ScheduleReport(Timeout timeout, ReadHandlerNode * node, const Timestamp & now)
 {
     // Cancel Report if it is currently scheduled
     mTimerDelegate->CancelTimer(node);
@@ -153,26 +153,26 @@ bool ReportSchedulerImpl::IsReportScheduled(ReadHandler * aReadHandler)
     return mTimerDelegate->IsTimerActive(node);
 }
 
-CHIP_ERROR ReportSchedulerImpl::CalculateNextReportTimeout(Timeout & timeout, ReadHandlerNode * aNode)
+CHIP_ERROR ReportSchedulerImpl::CalculateNextReportTimeout(Timeout & timeout, ReadHandlerNode * aNode, const Timestamp & now)
 {
     VerifyOrReturnError(nullptr != FindReadHandlerNode(aNode->GetReadHandler()), CHIP_ERROR_INVALID_ARGUMENT);
 
     // If the handler is reportable now, just schedule a report immediately
-    if (aNode->IsReportableNow(mNow))
+    if (aNode->IsReportableNow(now))
     {
         // If the handler is reportable now, just schedule a report immediately
         timeout = Milliseconds32(0);
     }
-    else if (IsReadHandlerReportable(aNode->GetReadHandler()) && (aNode->GetMinTimestamp() > mNow))
+    else if (IsReadHandlerReportable(aNode->GetReadHandler()) && (aNode->GetMinTimestamp() > now))
     {
         // If the handler is reportable now, but the min interval is not elapsed, schedule a report for the moment the min interval
         // has elapsed
-        timeout = aNode->GetMinTimestamp() - mNow;
+        timeout = aNode->GetMinTimestamp() - now;
     }
     else
     {
         // If the handler is not reportable now, schedule a report for the max interval
-        timeout = aNode->GetMaxTimestamp() - mNow;
+        timeout = aNode->GetMaxTimestamp() - now;
     }
     return CHIP_NO_ERROR;
 }

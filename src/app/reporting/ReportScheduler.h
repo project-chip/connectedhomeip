@@ -141,9 +141,9 @@ public:
     bool IsReportableNow(ReadHandler * aReadHandler)
     {
         // Update the now timestamp to ensure external calls to IsReportableNow are always comparing to the current time
-        mNow                   = mTimerDelegate->GetCurrentMonotonicTimestamp();
+        Timestamp now          = mTimerDelegate->GetCurrentMonotonicTimestamp();
         ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
-        return (nullptr != node) ? node->IsReportableNow(mNow) : false;
+        return (nullptr != node) ? node->IsReportableNow(now) : false;
     }
 
     /// @brief Check if a ReadHandler is reportable without considering the timing
@@ -190,11 +190,6 @@ protected:
 
     ObjectPool<ReadHandlerNode, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> mNodesPool;
     TimerDelegate * mTimerDelegate;
-
-    // This represents the current time to be used for scheduling the next report, or to compare against Timestamps to determine
-    // reportability based on time. This timestamp needs to be updated upon each callback that will do scheduling or check the
-    // reportability state.
-    Timestamp mNow = System::Clock::Milliseconds64(0);
 };
 }; // namespace reporting
 }; // namespace app
