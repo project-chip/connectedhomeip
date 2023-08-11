@@ -14,7 +14,12 @@
 
 name: Recent Fail Summary
 on:
+  schedule:
+    - cron: "*/10 * * * *"
   workflow_dispatch:
+
+concurrency:
+    group: ${{ github.workflow }}
 
 jobs:
   list_workflows:
