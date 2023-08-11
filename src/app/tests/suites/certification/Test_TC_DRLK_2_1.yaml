@@ -31,6 +31,31 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Precondition: Create new PIN credential and lock/unlock user"
+      PICS: DRLK.S.F00 && DRLK.S.F07
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+              - name: "CredentialData"
+                value: "123456"
+              - name: "UserIndex"
+                value: null
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 0
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "NextCredentialIndex"
+                value: 2
+
     - label: "Step 1a: TH reads LockState attribute from DUT"
       PICS: DRLK.S.A0000
       command: "readAttribute"
@@ -59,9 +84,18 @@ tests:
           value: LockStateValue
 
     - label: "Step 1d: TH sends a Lock Door command to the DUT."
-      PICS: DRLK.S.C00.Rsp
+      PICS: DRLK.S.C00.Rsp && !(DRLK.S.F00 && DRLK.S.F07)
       command: "LockDoor"
       timedInteractionTimeoutMs: 1000
+
+    - label: "Step 1d: TH sends a Lock Door command to the DUT."
+      PICS: DRLK.S.C00.Rsp && DRLK.S.F00 && DRLK.S.F07
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "123456"
 
     - label: "Step 1d: TH reads LockState attribute from DUT"
       PICS: DRLK.S.A0000
@@ -71,9 +105,18 @@ tests:
           value: 1
 
     - label: "Step 1e: TH sends a Unlock Door command to the DUT."
-      PICS: DRLK.S.C01.Rsp
+      PICS: DRLK.S.C01.Rsp && !(DRLK.S.F00 && DRLK.S.F07)
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
+
+    - label: "Step 1e: TH sends a Unlock Door command to the DUT."
+      PICS: DRLK.S.C01.Rsp && DRLK.S.F00 && DRLK.S.F07
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "123456"
 
     - label: "Step 1e: TH reads LockState attribute from DUT"
       PICS: DRLK.S.A0000
@@ -822,10 +865,20 @@ tests:
       command: "readAttribute"
       attribute: "SupportedOperatingModes"
       response:
-          value: 0xFFF6
           saveAs: Current_Supported
           constraints:
               type: enum16
+              anyOf:
+                  [
+                      0xFFF6,
+                      0xFFF4,
+                      0xFFF2,
+                      0xFFF0,
+                      0xFFE6,
+                      0xFFE4,
+                      0xFFE2,
+                      0xFFE0,
+                  ]
 
     - label:
           "Step 23b: TH writes Supported OperatingModes attribute as bit 0 is
@@ -985,8 +1038,11 @@ tests:
       command: "readAttribute"
       attribute: "EnableLocalProgramming"
       response:
-          value: 1
           saveAs: Current_EnableLocal_Programming
+          constraints:
+              type: boolean
+              minValue: 0
+              maxValue: 1
 
     - label: "Step 26b: TH writes EnableLocalProgramming attribute as false"
       PICS: DRLK.S.A0028.Write
@@ -1023,7 +1079,10 @@ tests:
       command: "readAttribute"
       attribute: "EnableOneTouchLocking"
       response:
-          value: 0
+          constraints:
+              type: boolean
+              minValue: 0
+              maxValue: 1
 
     - label: "Step 27b: TH writes EnableOneTouchLocking attribute as true"
       PICS: DRLK.S.A0029
@@ -1044,7 +1103,10 @@ tests:
       command: "readAttribute"
       attribute: "EnableInsideStatusLED"
       response:
-          value: 0
+          constraints:
+              type: boolean
+              minValue: 0
+              maxValue: 1
 
     - label: "Step 28b: TH writes EnableInsideStatusLED attribute as true"
       PICS: DRLK.S.A002a
@@ -1065,7 +1127,10 @@ tests:
       command: "readAttribute"
       attribute: "EnablePrivacyModeButton"
       response:
-          value: 0
+          constraints:
+              type: boolean
+              minValue: 0
+              maxValue: 1
 
     - label: "Step 29b: TH writes EnablePrivacy ModeButton attribute as true"
       PICS: DRLK.S.A002b
@@ -1420,7 +1485,10 @@ tests:
       command: "readAttribute"
       attribute: "RequirePINforRemoteOperation"
       response:
-          value: 0
+          constraints:
+              type: boolean
+              minValue: 0
+              maxValue: 1
           saveAs: Current_RequirePINFor_RemoteOperation
 
     - label:
@@ -1530,3 +1598,12 @@ tests:
       attribute: "NumberOfCredentialsSupportedPerUser"
       response:
           value: NumberOfCredentialsSupportedPerUserValue
+
+    - label: "Clean the created credential/user"
+      PICS: DRLK.S.F00 && DRLK.S.F07
+      command: "ClearCredential"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }

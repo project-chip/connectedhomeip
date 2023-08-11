@@ -166,20 +166,23 @@ public:
     public:
         virtual ~Observer() = default;
 
-        /// @brief Callback invoked to notify a ReadHandler was created and can be registered
-        /// @param[in] apReadHandler  ReadHandler getting added
-        virtual void OnReadHandlerCreated(ReadHandler * apReadHandler) = 0;
+        /// @brief Callback invoked to notify a subscription was successfully established for the ReadHandler
+        /// @param[in] apReadHandler  ReadHandler that completed its subscription
+        virtual void OnSubscriptionEstablished(ReadHandler * apReadHandler) = 0;
 
-        /// @brief Callback invoked when a ReadHandler went from a non reportable state to a reportable state so a report can be
-        /// sent immediately if the minimal interval allows it. Otherwise the report should be rescheduled to the earliest time
-        /// allowed.
-        /// @param[in] apReadHandler  ReadHandler that became dirty
+        /// @brief Callback invoked when a ReadHandler went from a non reportable state to a reportable state. Indicates to the
+        /// observer that a report should be emitted when the min interval allows it.
+        ///
+        /// This will only be invoked for subscribe-type ReadHandler objects, and only after
+        /// OnSubscriptionEstablished has been called.
+        ///
+        /// @param[in] apReadHandler  ReadHandler that became dirty and in HandlerState::CanStartReporting state
         virtual void OnBecameReportable(ReadHandler * apReadHandler) = 0;
 
         /// @brief Callback invoked when the read handler needs to make sure to send a message to the subscriber within the next
         /// maxInterval time period.
         /// @param[in] apReadHandler ReadHandler that has generated a report
-        virtual void OnSubscriptionAction(ReadHandler * apReadHandler) = 0;
+        virtual void OnSubscriptionReportSent(ReadHandler * apReadHandler) = 0;
 
         /// @brief Callback invoked when a ReadHandler is getting removed so it can be unregistered
         /// @param[in] apReadHandler  ReadHandler getting destroyed
@@ -333,13 +336,22 @@ private:
     bool IsIdle() const { return mState == HandlerState::Idle; }
 
     /// @brief Returns whether the ReadHandler is in a state where it can send a report and there is data to report.
-    bool IsReportable() const
+    bool ShouldStartReporting() const
     {
-        // Important: Anything that changes the state IsReportable must call mObserver->OnBecameReportable(this) for the scheduler
-        // to plan the next run accordingly.
-        return mState == HandlerState::GeneratingReports && IsDirty();
+        // Important: Anything that changes ShouldStartReporting() from false to true
+        // (which can only happen for subscriptions) must call
+        // mObserver->OnBecameReportable(this).
+        return CanStartReporting() && (ShouldReportUnscheduled() || IsDirty());
     }
-    bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
+    /// @brief CanStartReporting() is true if the ReadHandler is in a state where it could generate
+    /// a (possibly empty) report if someone asked it to.
+    bool CanStartReporting() const { return mState == HandlerState::CanStartReporting; }
+    /// @brief ShouldReportUnscheduled() is true if the ReadHandler should be asked to generate reports
+    /// without consulting the report scheduler.
+    bool ShouldReportUnscheduled() const
+    {
+        return CanStartReporting() && (IsType(ReadHandler::InteractionType::Read) || IsPriming());
+    }
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
 
     // Resets the path iterator to the beginning of the whole report for generating a series of new reports.
@@ -418,14 +430,14 @@ private:
     friend class chip::app::reporting::Engine;
     friend class chip::app::InteractionModelEngine;
 
-    // The report scheduler needs to be able to access StateFlag private functions IsReportable(), IsGeneratingReports(),
+    // The report scheduler needs to be able to access StateFlag private functions ShouldStartReporting(), CanStartReporting(),
     // ForceDirtyState() and IsDirty() to know when to schedule a run so it is declared as a friend class.
     friend class chip::app::reporting::ReportScheduler;
 
     enum class HandlerState : uint8_t
     {
         Idle,                   ///< The handler has been initialized and is ready
-        GeneratingReports,      ///< The handler has is now capable of generating reports and may generate one immediately
+        CanStartReporting,      ///< The handler has is now capable of generating reports and may generate one immediately
                                 ///< or later when other criteria are satisfied (e.g hold-off for min reporting interval).
         AwaitingReportResponse, ///< The handler has sent the report to the client and is awaiting a status response.
         AwaitingDestruction,    ///< The object has completed its work and is awaiting destruction by the application.

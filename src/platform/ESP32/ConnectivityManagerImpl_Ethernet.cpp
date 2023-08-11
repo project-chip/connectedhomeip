@@ -55,15 +55,52 @@ CHIP_ERROR ConnectivityManagerImpl::InitEthernet()
     return CHIP_NO_ERROR;
 }
 
+void ConnectivityManagerImpl::OnEthernetIPv4AddressAvailable(const ip_event_got_ip_t & got_ip)
+{
+    ChipLogProgress(DeviceLayer, "IPv4 address available on Ethernet interface: " IPSTR "/" IPSTR " gateway " IPSTR,
+                    IP2STR(&got_ip.ip_info.ip), IP2STR(&got_ip.ip_info.netmask), IP2STR(&got_ip.ip_info.gw));
+
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
+    event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV4_Assigned;
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void ConnectivityManagerImpl::OnEthernetIPv4AddressLost(void)
+{
+    ChipLogProgress(DeviceLayer, "IPv4 address lost on Ethernet interface");
+
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
+    event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV4_Lost;
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void ConnectivityManagerImpl::OnEthernetIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip)
+{
+    ChipLogProgress(DeviceLayer, "IPv6 address available on Ethernet interface: " IPV6STR, IPV62STR(got_ip.ip6_info.ip));
+
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
+    event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV6_Assigned;
+    PlatformMgr().PostEventOrDie(&event);
+}
+
 void ConnectivityManagerImpl::OnEthernetPlatformEvent(const ChipDeviceEvent * event)
 {
     switch (event->Platform.ESPSystemEvent.Id)
     {
     case IP_EVENT_ETH_GOT_IP:
-        ChipLogProgress(DeviceLayer, "Ethernet Link Up");
+        OnEthernetIPv4AddressAvailable(event->Platform.ESPSystemEvent.Data.IpGotIp);
         break;
     case IP_EVENT_ETH_LOST_IP:
-        ChipLogProgress(DeviceLayer, "Ethernet Link Down");
+        OnEthernetIPv4AddressLost();
+        break;
+    case IP_EVENT_GOT_IP6:
+        if (strcmp(esp_netif_get_ifkey(event->Platform.ESPSystemEvent.Data.IpGotIp6.esp_netif), "ETH_DEF") == 0)
+        {
+            OnEthernetIPv6AddressAvailable(event->Platform.ESPSystemEvent.Data.IpGotIp6);
+        }
         break;
     case ETHERNET_EVENT_START:
         ChipLogProgress(DeviceLayer, "Ethernet Started");
