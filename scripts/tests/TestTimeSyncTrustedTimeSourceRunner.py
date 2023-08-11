@@ -131,12 +131,11 @@ def main():
     # This next test ensures the trusted time source is saved during a reboot
     script_args = base_script_args + ' --tests test_ReadFromTrustedTimeSource'
     ret = driver.run_test_section(app_args, script_args)
-    if ret != 0:
-        kill_process(app2_process)
-        return ret
 
+    logging.warning(f'Killing the App2 process, ret = {ret}')
     kill_process(app2_process)
-    sys.exit(0)
+    logging.warning('App process has been killed')
+    sys.exit(ret)
 
 
 if __name__ == '__main__':
