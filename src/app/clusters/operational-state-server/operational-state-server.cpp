@@ -37,8 +37,7 @@ using Status = Protocols::InteractionModel::Status;
 
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId) :
     CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId), AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId),
-    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId), mOperationalState(0), // assume 0 for now.
-    mOperationalError(to_underlying(ErrorStateEnum::kNoError))
+    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId)
 {
     mDelegate->SetServer(this);
 }
@@ -85,24 +84,24 @@ CHIP_ERROR Instance::SetOperationalState(uint8_t opState)
 {
     // todo check it the value is valid else return Protocols::InteractionModel::Status::ConstraintError;
 
+    if (opState == to_underlying(OperationalStateEnum::kError))
+    {
+        // todo is this the correct error?
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (mOperationalError.errorStateID != to_underlying(ErrorStateEnum::kNoError))
+    {
+        mOperationalError.Set(to_underlying(ErrorStateEnum::kNoError));
+        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OperationalError::Id);
+        MatterReportingAttributeChangeCallback(path);
+    }
+
     uint8_t oldState  = mOperationalState;
     mOperationalState = opState;
     if (mOperationalState != oldState)
     {
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OperationalState::Id);
-        MatterReportingAttributeChangeCallback(path);
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR Instance::SetOperationalError(const GenericOperationalError & opErrState)
-{
-    GenericOperationalError oldError = mOperationalError;
-    mOperationalError                = opErrState;
-    // todo should we have a != operator in GenericOperationalError or is this enough?
-    if (mOperationalError.errorStateID != oldError.errorStateID)
-    {
-        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OperationalError::Id);
         MatterReportingAttributeChangeCallback(path);
     }
     return CHIP_NO_ERROR;
@@ -126,9 +125,25 @@ void Instance::GetCurrentOperationalError(GenericOperationalError & error) const
 void Instance::OnOperationalErrorDetected(const Structs::ErrorStateStruct::Type & aError)
 {
     ChipLogDetail(Zcl, "OperationalStateServer: OnOperationalErrorDetected");
-    SetOperationalState(to_underlying(OperationalStateEnum::kError));
-    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::OperationalState::Id);
+    // Set the OperationalState attribute to Error
+    if (mOperationalState != to_underlying(OperationalStateEnum::kError))
+    {
+        mOperationalState = to_underlying(OperationalStateEnum::kError);
+        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OperationalState::Id);
+        MatterReportingAttributeChangeCallback(path);
+    }
 
+    // Set the OperationalError attribute
+    if (aError.errorStateID != mOperationalError.errorStateID ||
+        !aError.errorStateLabel.Value().data_equal(mOperationalError.errorStateLabel.Value()) ||
+        !aError.errorStateDetails.Value().data_equal(mOperationalError.errorStateDetails.Value()))
+    {
+        mOperationalError.Set(aError.errorStateID, aError.errorStateLabel, aError.errorStateDetails);
+        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OperationalError::Id);
+        MatterReportingAttributeChangeCallback(path);
+    }
+
+    // Generate an ErrorDetected event
     GenericErrorEvent event(mClusterId, aError);
     EventNumber eventNumber;
     CHIP_ERROR error = LogEvent(event, mEndpointId, eventNumber);

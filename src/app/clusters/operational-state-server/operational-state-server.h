@@ -52,7 +52,7 @@ public:
     /**
      * Creates an operational state cluster instance. The Init() function needs to be called for this instance
      * to be registered and called by the interaction model at the appropriate times.
-     * It is possible to set the CurrentPhase, OperationalState and OperationalError via the Set... methods before calling Init().
+     * It is possible to set the CurrentPhase and OperationalState via the Set... methods before calling Init().
      * @param aDelegate A pointer to the delegate to be used by this server.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
@@ -79,15 +79,11 @@ public:
 
     /**
      * Set current operational state.
+     * NOTE: This method cannot be used to set the error state. The error state must be set via the
+     * OnOperationalErrorDetected method.
      * @param opState The operational state that should now be the current one.
      */
     CHIP_ERROR SetOperationalState(uint8_t opState);
-
-    /**
-     * Set operational error.
-     * @param opErrState The new operational error.
-     */
-    CHIP_ERROR SetOperationalError(const GenericOperationalError & opErrState);
 
     // Attribute getters
     /**
@@ -147,8 +143,8 @@ private:
 
     // Attribute Data Store
     app::DataModel::Nullable<uint8_t> mCurrentPhase;
-    uint8_t mOperationalState;
-    GenericOperationalError mOperationalError;
+    uint8_t mOperationalState = 0; // assume 0 for now.
+    GenericOperationalError mOperationalError = to_underlying(ErrorStateEnum::kNoError);
 
     // Inherited from CommandHandlerInterface
     template <typename RequestT, typename FuncT>
