@@ -128,7 +128,7 @@ void Instance::OnOperationalErrorDetected(const Structs::ErrorStateStruct::Type 
     // Set the OperationalState attribute to Error
     if (mOperationalState != to_underlying(OperationalStateEnum::kError))
     {
-        mOperationalState = to_underlying(OperationalStateEnum::kError);
+        mOperationalState          = to_underlying(OperationalStateEnum::kError);
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OperationalState::Id);
         MatterReportingAttributeChangeCallback(path);
     }

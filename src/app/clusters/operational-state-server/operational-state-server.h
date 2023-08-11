@@ -143,7 +143,7 @@ private:
 
     // Attribute Data Store
     app::DataModel::Nullable<uint8_t> mCurrentPhase;
-    uint8_t mOperationalState = 0; // assume 0 for now.
+    uint8_t mOperationalState                 = 0; // assume 0 for now.
     GenericOperationalError mOperationalError = to_underlying(ErrorStateEnum::kNoError);
 
     // Inherited from CommandHandlerInterface
@@ -258,7 +258,7 @@ private:
     void SetServer(Instance * aInstance) { mInstance = aInstance; }
 
 protected:
-    Instance* GetInstance() { return mInstance; }
+    Instance * GetInstance() { return mInstance; }
 };
 
 } // namespace OperationalState
