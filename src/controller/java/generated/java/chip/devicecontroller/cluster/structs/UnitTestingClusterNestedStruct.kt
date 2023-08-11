@@ -17,17 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
+import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class UnitTestingClusterNestedStruct(
-  val a: Int,
-  val b: Boolean,
-  val c: UnitTestingClusterSimpleStruct
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class UnitTestingClusterNestedStruct (
+    val a: Int,
+    val b: Boolean,
+    val c: UnitTestingClusterSimpleStruct) {
+  override fun toString(): String  = buildString {
     append("UnitTestingClusterNestedStruct {\n")
     append("\ta : $a\n")
     append("\tb : $b\n")
@@ -50,12 +53,12 @@ class UnitTestingClusterNestedStruct(
     private const val TAG_B = 1
     private const val TAG_C = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): UnitTestingClusterNestedStruct {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader) : UnitTestingClusterNestedStruct {
       tlvReader.enterStructure(tag)
       val a = tlvReader.getInt(ContextSpecificTag(TAG_A))
       val b = tlvReader.getBoolean(ContextSpecificTag(TAG_B))
       val c = UnitTestingClusterSimpleStruct.fromTlv(ContextSpecificTag(TAG_C), tlvReader)
-
+      
       tlvReader.exitContainer()
 
       return UnitTestingClusterNestedStruct(a, b, c)

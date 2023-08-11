@@ -180,7 +180,7 @@
     "RoboticVacuumCleaner": [
         "Test_TC_RVCCLEANM_1_1",
         "Test_TC_RVCRUNM_1_1",
-        "Test_TC_RVCCLEANM_1_1"
+        "Test_TC_RVCOPSTATE_1_1"
     ],
     "SecureChannel": [],
     "SmokeCOAlarm": [

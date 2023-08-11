@@ -17,17 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
+import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
+
 import java.util.Optional
 
-class RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct(
-  val mfgCode: Optional<Int>,
-  val value: Int
-) {
-  override fun toString(): String = buildString {
+class RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct (
+    val mfgCode: Optional<Int>,
+    val value: Int) {
+  override fun toString(): String  = buildString {
     append("RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct {\n")
     append("\tmfgCode : $mfgCode\n")
     append("\tvalue : $value\n")
@@ -38,9 +40,9 @@ class RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct(
     tlvWriter.apply {
       startStructure(tag)
       if (mfgCode.isPresent) {
-        val optmfgCode = mfgCode.get()
-        put(ContextSpecificTag(TAG_MFG_CODE), optmfgCode)
-      }
+      val optmfgCode = mfgCode.get()
+      put(ContextSpecificTag(TAG_MFG_CODE), optmfgCode)
+    }
       put(ContextSpecificTag(TAG_VALUE), value)
       endStructure()
     }
@@ -50,19 +52,15 @@ class RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct(
     private const val TAG_MFG_CODE = 0
     private const val TAG_VALUE = 1
 
-    fun fromTlv(
-      tag: Tag,
-      tlvReader: TlvReader
-    ): RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader) : RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct {
       tlvReader.enterStructure(tag)
-      val mfgCode =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MFG_CODE))) {
-          Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_MFG_CODE)))
-        } else {
-          Optional.empty()
-        }
+      val mfgCode = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MFG_CODE))) {
+      Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_MFG_CODE)))
+    } else {
+      Optional.empty()
+    }
       val value = tlvReader.getInt(ContextSpecificTag(TAG_VALUE))
-
+      
       tlvReader.exitContainer()
 
       return RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct(mfgCode, value)
