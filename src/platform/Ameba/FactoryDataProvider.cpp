@@ -414,6 +414,11 @@ CHIP_ERROR FactoryDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
     return err;
 }
 
+CHIP_ERROR FactoryDataProvider::SetSetupPasscode(uint32_t setupPasscode)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 CHIP_ERROR FactoryDataProvider::GetDeviceName(MutableCharSpan & deviceNameSpan)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;

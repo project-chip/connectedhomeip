@@ -82,16 +82,19 @@ CHIP_ERROR DeviceInstanceInfoProviderImpl::GetDeviceName(MutableCharSpan & devic
 
     err = Internal::AndroidConfig::ReadConfigValueStr(Internal::AndroidConfig::kConfigKey_MfrDeviceName,
                                                       androidDeviceNameSpan.data(), androidDeviceNameSpan.size(), deviceNameSize);
-    ReturnErrorCodeIf(deviceNameSpan.size() < deviceNameSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(deviceNameSpan.data(), androidDeviceNameSpan.data(), deviceNameSize);
-    deviceNameSpan.data()[deviceNameSize] = '\0';
-    deviceNameSpan.reduce_size(deviceNameSize + 1);
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        ReturnErrorCodeIf(deviceNameSpan.size() < sizeof(CHIP_DEVICE_CONFIG_DEVICE_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
-        memcpy(deviceNameSpan.data(), CHIP_DEVICE_CONFIG_DEVICE_NAME, sizeof(CHIP_DEVICE_CONFIG_DEVICE_NAME));
 
-        deviceNameSpan.reduce_size(sizeof(CHIP_DEVICE_CONFIG_DEVICE_NAME));
+    if (err = CHIP_NO_ERROR)
+    {
+        ReturnErrorCodeIf(deviceNameSpan.size() < deviceNameSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(deviceNameSpan.data(), androidDeviceNameSpan.data(), deviceNameSize);
+        deviceNameSpan.reduce_size(deviceNameSize);
+    }
+    else if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        ReturnErrorCodeIf(deviceNameSpan.size() < strlen(CHIP_DEVICE_CONFIG_DEVICE_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(deviceNameSpan.data(), CHIP_DEVICE_CONFIG_DEVICE_NAME, strlen(CHIP_DEVICE_CONFIG_DEVICE_NAME));
+
+        deviceNameSpan.reduce_size(strlen(CHIP_DEVICE_CONFIG_DEVICE_NAME));
     }
     return CHIP_NO_ERROR;
 }

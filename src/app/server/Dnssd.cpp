@@ -241,7 +241,9 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
         CHIP_ERROR err;
         if ((err = DeviceLayer::ConfigurationMgr().GetCommissionableDeviceName(deviceNameSpan)) == CHIP_NO_ERROR)
         {
-            advertiseParameters.SetDeviceName(chip::Optional<const char *>::Value(deviceNameSpan.data()));
+            // Appending a null terminator since SetDeviceName expects a null terminated string
+            deviceName[deviceNameSpan.size()] = '\0';
+            advertiseParameters.SetDeviceName(chip::Optional<const char *>::Value(deviceName));
         }
         else
         {
