@@ -68,6 +68,9 @@ sl_status_t sl_si91x_host_init(void)
 
   status = sl_si91x_host_bus_init();
   VERIFY_STATUS(status);
+
+    // configure packet pending interrupt priority
+  NVIC_SetPriority(GPIO_ODD_IRQn, PACKET_PENDING_INT_PRI);
 #if 0
   // Start reset line low
   GPIO_PinModeSet(WFX_RESET_PIN.port, WFX_RESET_PIN.pin, gpioModePushPull, 0);
@@ -420,7 +423,8 @@ void sl_si91x_host_release_from_reset(void)
 
 void sl_si91x_host_enable_bus_interrupt(void)
 {
-  NVIC_EnableIRQ(GPIO_ODD_IRQn);
+  //NVIC_EnableIRQ(GPIO_ODD_IRQn);
+  rsi_hal_intr_unmask();
 }
 
 void sl_si91x_host_disable_bus_interrupt(void)
