@@ -219,6 +219,7 @@ struct EmberAfDefinedEndpoint
      */
     chip::DataVersion * dataVersions = nullptr;
 
+#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
     /**
      * Pointer to the memory block to be used for automatic attribute storage if
      * this is a dynamic endpoint. If set, the memory block pointed at
@@ -226,6 +227,7 @@ struct EmberAfDefinedEndpoint
      * the sum of all endpointType->clusters[*].clustersize).
      */
     uint8_t * dynamicAttributeStorage = nullptr;
+#endif
 
     /**
      * Root endpoint id for composed device type.
