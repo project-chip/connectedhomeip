@@ -115,7 +115,6 @@ DataModel::Nullable<uint8_t> Instance::GetCurrentPhase() const
 
 uint8_t Instance::GetCurrentOperationalState() const
 {
-    ChipLogError(Zcl, "OperationalState: H2");
     return mOperationalState;
 }
 
@@ -237,11 +236,11 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     switch (aPath.mAttributeId)
     {
     case OperationalState::Attributes::OperationalStateList::Id: {
-        return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        return aEncoder.EncodeList([delegate = mDelegate](const auto & encoder) -> CHIP_ERROR {
             GenericOperationalState opState;
             size_t index   = 0;
             CHIP_ERROR err = CHIP_NO_ERROR;
-            while ((err = this->mDelegate->GetOperationalStateAtIndex(index, opState)) == CHIP_NO_ERROR)
+            while ((err = delegate->GetOperationalStateAtIndex(index, opState)) == CHIP_NO_ERROR)
             {
                 ReturnErrorOnFailure(encoder.Encode(opState));
                 index++;
@@ -262,9 +261,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     break;
 
     case OperationalState::Attributes::OperationalError::Id: {
-        GenericOperationalError opErr(to_underlying(ErrorStateEnum::kNoError));
-        GetCurrentOperationalError(opErr);
-        ReturnErrorOnFailure(aEncoder.Encode(opErr));
+        ReturnErrorOnFailure(aEncoder.Encode(mOperationalError));
     }
     break;
 

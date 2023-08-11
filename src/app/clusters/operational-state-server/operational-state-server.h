@@ -52,6 +52,7 @@ public:
     /**
      * Creates an operational state cluster instance. The Init() function needs to be called for this instance
      * to be registered and called by the interaction model at the appropriate times.
+     * It is possible to set the CurrentPhase, OperationalState and OperationalError via the Set... methods before calling Init().
      * @param aDelegate A pointer to the delegate to be used by this server.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
