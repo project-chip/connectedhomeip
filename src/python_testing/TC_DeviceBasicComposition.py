@@ -27,10 +27,7 @@ from typing import Any, Callable, Optional
 
 import chip.clusters as Clusters
 import chip.tlv
-from chip import discovery
 from chip.clusters.Attribute import ValueDecodeFailure
-from chip.exceptions import ChipStackError
-from chip.setup_payload import SetupPayload
 from matter_testing_support import AttributePathLocation, MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -171,32 +168,10 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         dump_device_composition_path: Optional[str] = self.user_params.get("dump_device_composition_path", None)
 
         if do_test_over_pase:
-            if self.matter_test_config.qr_code_content is not None:
-                qr_code = self.matter_test_config.qr_code_content
-                try:
-                    setup_payload = SetupPayload().ParseQrCode(qr_code)
-                except ChipStackError:
-                    asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
-
-            elif self.matter_test_config.manual_code is not None:
-                manual_code = self.matter_test_config.manual_code
-                try:
-                    setup_payload = SetupPayload().ParseManualPairingCode(manual_code)
-                except ChipStackError:
-                    asserts.fail(
-                        f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
-            else:
-                asserts.fail("Require either --qr-code or --manual-code to proceed with PASE needed for test.")
-
-            if setup_payload.short_discriminator is not None:
-                filter_type = discovery.FilterType.SHORT_DISCRIMINATOR
-                filter_value = setup_payload.short_discriminator
-            else:
-                filter_type = discovery.FilterType.LONG_DISCRIMINATOR
-                filter_value = setup_payload.long_discriminator
+            info = self.get_setup_payload_info()
 
             commissionable_nodes = dev_ctrl.DiscoverCommissionableNodes(
-                filter_type, filter_value, stopOnFirst=True, timeoutSecond=15)
+                info.filter_type, info.filter_value, stopOnFirst=True, timeoutSecond=15)
             logging.info(f"Commissionable nodes: {commissionable_nodes}")
             # TODO: Support BLE
             if commissionable_nodes is not None and len(commissionable_nodes) > 0:
@@ -208,7 +183,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                 logging.info(f"Found instance {instance_name}, VID={vid}, PID={pid}, Address={address}")
 
                 node_id = 1
-                dev_ctrl.EstablishPASESessionIP(address, setup_payload.setup_passcode, node_id)
+                dev_ctrl.EstablishPASESessionIP(address, info.passcode, node_id)
             else:
                 asserts.fail("Failed to find the DUT according to command line arguments.")
         else:
@@ -465,8 +440,20 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         for endpoint_id, endpoint in self.endpoints.items():
             if Clusters.PowerSource not in endpoint:
                 continue
+            location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+            cluster_revision = Clusters.PowerSource.Attributes.ClusterRevision
+            if cluster_revision not in endpoint[Clusters.PowerSource]:
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
+                                                 attribute_id=cluster_revision.attribute_id)
+                self.record_error(self.get_test_name(
+                ), location=location, problem=f'Did not find Cluster revision on {location.as_cluster_string(self.cluster_mapper)}', spec_location='Global attributes')
+            if endpoint[Clusters.PowerSource][cluster_revision] < 2:
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
+                                                 attribute_id=cluster_revision.attribute_id)
+                self.record_note(self.get_test_name(), location=location,
+                                 problem='Power source ClusterRevision is < 2, skipping remainder of test for this endpoint')
+                continue
             if Clusters.PowerSource.Attributes.EndpointList not in endpoint[Clusters.PowerSource]:
-                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                 self.record_error(self.get_test_name(), location=location,
                                   problem=f'Did not find {attribute_string} on {location.as_cluster_string(self.cluster_mapper)}', spec_location="EndpointList Attribute")
                 success = False

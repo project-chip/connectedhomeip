@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    3.4.1. [TC-IDM-4.1] SubscriptionRequestMessage from DUT test cases.
-    [DUT_Client]
+    32.4.1. [TC-IDM-4.1] SubscriptionRequestMessage from DUT test cases. [DUT as
+    Client]
 
 PICS:
     - MCORE.IDM.C.SubscribeRequest
@@ -26,10 +26,16 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Note"
+    - label: "Notes/Testing Considerations"
       verification: |
-          1. Please use Interactive mode to Verify subscription test cases Here the command to enter interactive mode:--   ./chip-tool interactive start
-          2. Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+          1. The Cluster and Commands should be based on the cluster implementation on the DUT.
+          2. The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
+      disabled: true
+
+    - label: "Precondition"
+      verification: |
+          Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:-- ./chip-tool interactive start
       disabled: true
 
     - label:
@@ -111,7 +117,6 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
-
           onoff  subscribe on-off   10 80  1 1 --keepSubscriptions true
 
           Verify on the TH(reference-app) that the status response received from the DUT is "Success"
@@ -170,9 +175,9 @@ tests:
       disabled: true
 
     - label:
-          "Step 3: [OPTIONAL] Activate the subscription between the DUT and the
-          TH for an attribute of data type boolean. Modify that attribute on the
-          TH. TH should send the modified data to the DUT. Modify the attribute
+          "Step 3: Activate the subscription between the DUT and the TH for an
+          attribute of data type boolean. Modify that attribute on the TH. TH
+          should send the modified data to the DUT. Modify the attribute
           multiple times (3 times)."
       PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_Bool
       verification: |
@@ -283,9 +288,9 @@ tests:
       disabled: true
 
     - label:
-          "Step 4: [OPTIONAL] Activate the subscription between the DUT and the
-          TH for an attribute of data type string. Modify that attribute on the
-          TH. TH should send the modified data to the DUT. Modify the attribute
+          "Step 4: Activate the subscription between the DUT and the TH for an
+          attribute of data type string. Modify that attribute on the TH. TH
+          should send the modified data to the DUT. Modify the attribute
           multiple times (3 times)."
       PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_String
       verification: |
@@ -392,10 +397,10 @@ tests:
       disabled: true
 
     - label:
-          "Step 5: [OPTIONAL] Activate the subscription between the DUT and the
-          TH for an attribute of data type unsigned integer. Modify that
-          attribute on the TH. TH should send the modified data to the DUT.
-          Modify the attribute multiple times (3 times)."
+          "Step 5: Activate the subscription between the DUT and the TH for an
+          attribute of data type unsigned integer. Modify that attribute on the
+          TH. TH should send the modified data to the DUT. Modify the attribute
+          multiple times (3 times)."
       PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_UnsignedInteger
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
@@ -500,10 +505,10 @@ tests:
       disabled: true
 
     - label:
-          "Step 6: [OPTIONAL] Activate the subscription between the DUT and the
-          TH for an attribute of data type signed integer. Modify that attribute
-          on the TH. TH should send the modified data to the DUT. Modify the
-          attribute multiple times (3 times)"
+          "Step 6: Activate the subscription between the DUT and the TH for an
+          attribute of data type signed integer. Modify that attribute on the
+          TH. TH should send the modified data to the DUT. Modify the attribute
+          multiple times (3 times)"
       PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_Integer
       verification: |
           DUT implementation required to verify subscribe an attribute of data type signed integer
@@ -513,10 +518,10 @@ tests:
       disabled: true
 
     - label:
-          "Step 7: [OPTIONAL] Activate the subscription between the DUT and the
-          TH for an attribute of data type Floating Point. Modify that attribute
-          on the TH. TH should send the modified data to the DUT. Modify the
-          attribute multiple times (3 times)"
+          "Step 7: Activate the subscription between the DUT and the TH for an
+          attribute of data type Floating Point. Modify that attribute on the
+          TH. TH should send the modified data to the DUT. Modify the attribute
+          multiple times (3 times)"
       PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_FloatingPoint
       verification: |
           DUT implementation required to verify subscribe an attribute of data type floating point
@@ -527,9 +532,9 @@ tests:
       disabled: true
 
     - label:
-          "Step 8: [OPTIONAL] Activate the subscription between the DUT and the
-          TH for an attribute of data type list. Modify that attribute on the
-          TH. TH should send the modified data to the DUT. Modify the attribute
+          "Step 8: Activate the subscription between the DUT and the TH for an
+          attribute of data type list. Modify that attribute on the TH. TH
+          should send the modified data to the DUT. Modify the attribute
           multiple times (3 times)"
       PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_List
       verification: |
@@ -548,12 +553,12 @@ tests:
           activation."
       PICS: MCORE.IDM.C.SubscribeRequest
       verification: |
-          Out of scope
+          Not verifiable/Out of scope
       disabled: true
 
     - label:
           "Step 10: DUT sends a subscription request message to the target
-          node/reference device for multiple attributes(3 attributes)."
+          node/reference device for multiple attributes (>1 attributes)."
       PICS: MCORE.IDM.C.SubscribeRequest.MultipleAttributes
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)

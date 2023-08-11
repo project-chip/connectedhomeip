@@ -22,23 +22,12 @@
  */
 
 #include "smoke-co-alarm-server.h"
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/EventLogging.h>
-#include <app/server/Server.h>
-#include <app/util/af.h>
-#include <app/util/error-mapping.h>
-#include <cinttypes>
 
-#include <app/CommandHandler.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/ConcreteCommandPath.h>
-#include <lib/support/CodeUtils.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/EventLogging.h>
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::SmokeCoAlarm;
 using chip::Protocols::InteractionModel::Status;
 
@@ -70,6 +59,55 @@ bool SmokeCoAlarmServer::SetExpressedState(EndpointId endpointId, ExpressedState
     }
 
     return success;
+}
+
+void SmokeCoAlarmServer::SetExpressedStateByPriority(EndpointId endpointId,
+                                                     const std::array<ExpressedStateEnum, kPriorityOrderLength> & priorityOrder)
+{
+    AlarmStateEnum alarmState          = AlarmStateEnum::kNormal;
+    EndOfServiceEnum endOfServiceState = EndOfServiceEnum::kNormal;
+    bool active                        = false;
+
+    for (ExpressedStateEnum priority : priorityOrder)
+    {
+        switch (priority)
+        {
+        case ExpressedStateEnum::kSmokeAlarm:
+            VerifyOrReturn(GetSmokeState(endpointId, alarmState));
+            break;
+        case ExpressedStateEnum::kCOAlarm:
+            VerifyOrReturn(GetCOState(endpointId, alarmState));
+            break;
+        case ExpressedStateEnum::kBatteryAlert:
+            VerifyOrReturn(GetBatteryAlert(endpointId, alarmState));
+            break;
+        case ExpressedStateEnum::kTesting:
+            VerifyOrReturn(GetTestInProgress(endpointId, active));
+            break;
+        case ExpressedStateEnum::kHardwareFault:
+            VerifyOrReturn(GetHardwareFaultAlert(endpointId, active));
+            break;
+        case ExpressedStateEnum::kEndOfService:
+            VerifyOrReturn(GetEndOfServiceAlert(endpointId, endOfServiceState));
+            break;
+        case ExpressedStateEnum::kInterconnectSmoke:
+            VerifyOrReturn(GetInterconnectSmokeAlarm(endpointId, alarmState));
+            break;
+        case ExpressedStateEnum::kInterconnectCO:
+            VerifyOrReturn(GetInterconnectCOAlarm(endpointId, alarmState));
+            break;
+        default:
+            break;
+        }
+
+        if ((alarmState != AlarmStateEnum::kNormal) || (endOfServiceState != EndOfServiceEnum::kNormal) || active)
+        {
+            VerifyOrDo(SetExpressedState(endpointId, priority), ChipLogError(NotSpecified, "Set ExpressedState failed"));
+            return;
+        }
+    }
+
+    VerifyOrDo(SetExpressedState(endpointId, ExpressedStateEnum::kNormal), ChipLogError(NotSpecified, "Set ExpressedState failed"));
 }
 
 bool SmokeCoAlarmServer::SetSmokeState(EndpointId endpointId, AlarmStateEnum newSmokeState)

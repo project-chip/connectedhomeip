@@ -27,7 +27,7 @@
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipClusters_00024##CLASS_NAME##_##METHOD_NAME
 
 {%-   for attr in cluster.attributes | attributesWithCallback(typeLookup) %}
-JNI_METHOD(void, {{cluster.name | capitalcase}}Cluster, read{{attr.definition.name | capitalcase}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, {{cluster.name | capitalcase}}Cluster, read{{attr.definition.name | capitalcase}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback{% if attr | isFabricScopedList(typeLookup) %}, jboolean isFabricFiltered{% endif %})
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::{{cluster.name | capitalcase}}::Attributes::{{attr.definition.name | capitalcase}}::TypeInfo;
@@ -44,7 +44,7 @@ JNI_METHOD(void, {{cluster.name | capitalcase}}Cluster, read{{attr.definition.na
 
     auto successFn = chip::Callback::Callback<CHIP{{cluster.name | capitalcase}}Cluster{{attr.definition.name | capitalcase}}AttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err = cppCluster->ReadAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    err = cppCluster->ReadAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall{% if attr | isFabricScopedList(typeLookup) %}, isFabricFiltered{% endif %});
     VerifyOrReturn(err == CHIP_NO_ERROR, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error reading attribute", err));
 
     onSuccess.release();

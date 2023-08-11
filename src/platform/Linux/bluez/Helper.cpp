@@ -47,29 +47,31 @@
  *    @file
  *          Provides Bluez dbus implementation for BLE
  */
-#include <ble/BleUUID.h>
-#include <ble/CHIPBleServiceData.h>
-#include <lib/support/BitFlags.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CHIPMemString.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <protocols/Protocols.h>
-#include <setup_payload/AdditionalDataPayloadGenerator.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <cassert>
 #include <errno.h>
-#include <gio/gunixfdlist.h>
 #include <limits>
 #include <stdarg.h>
 #include <strings.h>
 #include <unistd.h>
 #include <utility>
 
+#include <gio/gio.h>
+#include <gio/gunixfdlist.h>
+#include <glib.h>
+
+#include <ble/BleUUID.h>
+#include <ble/CHIPBleServiceData.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/BLEManagerImpl.h>
+#include <protocols/Protocols.h>
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
 #include "BluezObjectIterator.h"
@@ -992,11 +994,10 @@ static void BluezSignalOnObjectRemoved(GDBusObjectManager * aManager, GDBusObjec
     // for Characteristic1, or GattService -- handle here via calling otPlatTobleHandleDisconnected, or ignore.
 }
 
-static BluezGattService1 * BluezServiceCreate(gpointer apClosure)
+static BluezGattService1 * BluezServiceCreate(BluezEndpoint * endpoint)
 {
     BluezObjectSkeleton * object;
     BluezGattService1 * service;
-    BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apClosure);
 
     endpoint->mpServicePath = g_strdup_printf("%s/service", endpoint->mpRootPath);
     ChipLogDetail(DeviceLayer, "CREATE service object at %s", endpoint->mpServicePath);
@@ -1156,7 +1157,7 @@ exit:
 }
 #endif // CHIP_BLUEZ_CENTRAL_SUPPORT
 
-void EndpointCleanup(BluezEndpoint * apEndpoint)
+static void EndpointCleanup(BluezEndpoint * apEndpoint)
 {
     if (apEndpoint != nullptr)
     {
@@ -1262,24 +1263,23 @@ exit:
 }
 #endif
 
-static void BluezPeripheralObjectsSetup(gpointer apClosure)
+static void BluezPeripheralObjectsSetup(BluezEndpoint * endpoint)
 {
 
     static const char * const c1_flags[] = { "write", nullptr };
     static const char * const c2_flags[] = { "read", "indicate", nullptr };
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     static const char * const c3_flags[] = { "read", nullptr };
+#endif
 
-    BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apClosure);
-    VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
-
-    endpoint->mpService = BluezServiceCreate(apClosure);
+    endpoint->mpService = BluezServiceCreate(endpoint);
     // C1 characteristic
     endpoint->mpC1 = BluezCharacteristicCreate(endpoint->mpService, "c1", CHIP_PLAT_BLE_UUID_C1_STRING, endpoint->mpRoot);
     bluez_gatt_characteristic1_set_flags(endpoint->mpC1, c1_flags);
 
-    g_signal_connect(endpoint->mpC1, "handle-read-value", G_CALLBACK(BluezCharacteristicReadValue), apClosure);
+    g_signal_connect(endpoint->mpC1, "handle-read-value", G_CALLBACK(BluezCharacteristicReadValue), endpoint);
     g_signal_connect(endpoint->mpC1, "handle-write-value", G_CALLBACK(BluezCharacteristicWriteValueError), nullptr);
-    g_signal_connect(endpoint->mpC1, "handle-acquire-write", G_CALLBACK(BluezCharacteristicAcquireWrite), apClosure);
+    g_signal_connect(endpoint->mpC1, "handle-acquire-write", G_CALLBACK(BluezCharacteristicAcquireWrite), endpoint);
     g_signal_connect(endpoint->mpC1, "handle-acquire-notify", G_CALLBACK(BluezCharacteristicAcquireNotifyError), nullptr);
     g_signal_connect(endpoint->mpC1, "handle-start-notify", G_CALLBACK(BluezCharacteristicStartNotifyError), nullptr);
     g_signal_connect(endpoint->mpC1, "handle-stop-notify", G_CALLBACK(BluezCharacteristicStopNotifyError), nullptr);
@@ -1287,13 +1287,13 @@ static void BluezPeripheralObjectsSetup(gpointer apClosure)
 
     endpoint->mpC2 = BluezCharacteristicCreate(endpoint->mpService, "c2", CHIP_PLAT_BLE_UUID_C2_STRING, endpoint->mpRoot);
     bluez_gatt_characteristic1_set_flags(endpoint->mpC2, c2_flags);
-    g_signal_connect(endpoint->mpC2, "handle-read-value", G_CALLBACK(BluezCharacteristicReadValue), apClosure);
+    g_signal_connect(endpoint->mpC2, "handle-read-value", G_CALLBACK(BluezCharacteristicReadValue), endpoint);
     g_signal_connect(endpoint->mpC2, "handle-write-value", G_CALLBACK(BluezCharacteristicWriteValueError), nullptr);
     g_signal_connect(endpoint->mpC2, "handle-acquire-write", G_CALLBACK(BluezCharacteristicAcquireWriteError), nullptr);
-    g_signal_connect(endpoint->mpC2, "handle-acquire-notify", G_CALLBACK(BluezCharacteristicAcquireNotify), apClosure);
-    g_signal_connect(endpoint->mpC2, "handle-start-notify", G_CALLBACK(BluezCharacteristicStartNotify), apClosure);
-    g_signal_connect(endpoint->mpC2, "handle-stop-notify", G_CALLBACK(BluezCharacteristicStopNotify), apClosure);
-    g_signal_connect(endpoint->mpC2, "handle-confirm", G_CALLBACK(BluezCharacteristicConfirm), apClosure);
+    g_signal_connect(endpoint->mpC2, "handle-acquire-notify", G_CALLBACK(BluezCharacteristicAcquireNotify), endpoint);
+    g_signal_connect(endpoint->mpC2, "handle-start-notify", G_CALLBACK(BluezCharacteristicStartNotify), endpoint);
+    g_signal_connect(endpoint->mpC2, "handle-stop-notify", G_CALLBACK(BluezCharacteristicStopNotify), endpoint);
+    g_signal_connect(endpoint->mpC2, "handle-confirm", G_CALLBACK(BluezCharacteristicConfirm), endpoint);
 
     ChipLogDetail(DeviceLayer, "CHIP BTP C1 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC1));
     ChipLogDetail(DeviceLayer, "CHIP BTP C2 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC2));
@@ -1303,23 +1303,19 @@ static void BluezPeripheralObjectsSetup(gpointer apClosure)
     // Additional data characteristics
     endpoint->mpC3 = BluezCharacteristicCreate(endpoint->mpService, "c3", CHIP_PLAT_BLE_UUID_C3_STRING, endpoint->mpRoot);
     bluez_gatt_characteristic1_set_flags(endpoint->mpC3, c3_flags);
-    g_signal_connect(endpoint->mpC3, "handle-read-value", G_CALLBACK(BluezCharacteristicReadValue), apClosure);
+    g_signal_connect(endpoint->mpC3, "handle-read-value", G_CALLBACK(BluezCharacteristicReadValue), endpoint);
     g_signal_connect(endpoint->mpC3, "handle-write-value", G_CALLBACK(BluezCharacteristicWriteValueError), nullptr);
     g_signal_connect(endpoint->mpC3, "handle-acquire-write", G_CALLBACK(BluezCharacteristicAcquireWriteError), nullptr);
-    g_signal_connect(endpoint->mpC3, "handle-acquire-notify", G_CALLBACK(BluezCharacteristicAcquireNotify), apClosure);
-    g_signal_connect(endpoint->mpC3, "handle-start-notify", G_CALLBACK(BluezCharacteristicStartNotify), apClosure);
-    g_signal_connect(endpoint->mpC3, "handle-stop-notify", G_CALLBACK(BluezCharacteristicStopNotify), apClosure);
-    g_signal_connect(endpoint->mpC3, "handle-confirm", G_CALLBACK(BluezCharacteristicConfirm), apClosure);
+    g_signal_connect(endpoint->mpC3, "handle-acquire-notify", G_CALLBACK(BluezCharacteristicAcquireNotify), endpoint);
+    g_signal_connect(endpoint->mpC3, "handle-start-notify", G_CALLBACK(BluezCharacteristicStartNotify), endpoint);
+    g_signal_connect(endpoint->mpC3, "handle-stop-notify", G_CALLBACK(BluezCharacteristicStopNotify), endpoint);
+    g_signal_connect(endpoint->mpC3, "handle-confirm", G_CALLBACK(BluezCharacteristicConfirm), endpoint);
     // update the characteristic value
     UpdateAdditionalDataCharacteristic(endpoint->mpC3);
     ChipLogDetail(DeviceLayer, "CHIP BTP C3 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC3));
 #else
     ChipLogDetail(DeviceLayer, "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING is FALSE");
-    (void) c3_flags;
 #endif
-
-exit:
-    return;
 }
 
 static void BluezOnBusAcquired(GDBusConnection * aConn, const gchar * aName, gpointer apClosure)
@@ -1335,7 +1331,7 @@ static void BluezOnBusAcquired(GDBusConnection * aConn, const gchar * aName, gpo
         endpoint->mpRoot     = g_dbus_object_manager_server_new(endpoint->mpRootPath);
         g_dbus_object_manager_server_set_connection(endpoint->mpRoot, aConn);
 
-        BluezPeripheralObjectsSetup(apClosure);
+        BluezPeripheralObjectsSetup(endpoint);
     }
 
 exit:
@@ -1356,38 +1352,34 @@ static void BluezOnNameLost(GDBusConnection * aConn, const gchar * aName, gpoint
 
 static CHIP_ERROR StartupEndpointBindings(BluezEndpoint * endpoint)
 {
-    GDBusObjectManager * manager;
-    GError * error         = nullptr;
-    GDBusConnection * conn = nullptr;
-    VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
+    VerifyOrReturnError(endpoint != nullptr, CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
 
-    conn = g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error);
-    VerifyOrExit(conn != nullptr, ChipLogError(DeviceLayer, "FAIL: get bus sync in %s, error: %s", __func__, error->message));
+    GAutoPtr<GError> err;
+    GAutoPtr<GDBusConnection> conn(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &MakeUniquePointerReceiver(err).Get()));
+    VerifyOrReturnError(conn != nullptr, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "FAIL: get bus sync in %s, error: %s", __func__, err->message));
 
     if (endpoint->mpAdapterName != nullptr)
         endpoint->mpOwningName = g_strdup_printf("%s", endpoint->mpAdapterName);
     else
         endpoint->mpOwningName = g_strdup_printf("C-%04x", getpid() & 0xffff);
 
-    BluezOnBusAcquired(conn, endpoint->mpOwningName, endpoint);
+    BluezOnBusAcquired(conn.get(), endpoint->mpOwningName, endpoint);
 
-    manager = g_dbus_object_manager_client_new_sync(
-        conn, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/", bluez_object_manager_client_get_proxy_type,
-        nullptr /* unused user data in the Proxy Type Func */, nullptr /*destroy notify */, nullptr /* cancellable */, &error);
-
-    VerifyOrExit(manager != nullptr, ChipLogError(DeviceLayer, "FAIL: Error getting object manager client: %s", error->message));
+    GDBusObjectManager * manager = g_dbus_object_manager_client_new_sync(
+        conn.get(), G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/", bluez_object_manager_client_get_proxy_type,
+        nullptr /* unused user data in the Proxy Type Func */, nullptr /*destroy notify */, nullptr /* cancellable */,
+        &MakeUniquePointerReceiver(err).Get());
+    VerifyOrReturnError(manager != nullptr, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "FAIL: Error getting object manager client: %s", err->message));
 
     endpoint->mpObjMgr = manager;
-
     bluezObjectsSetup(endpoint);
 
     g_signal_connect(manager, "object-added", G_CALLBACK(BluezSignalOnObjectAdded), endpoint);
     g_signal_connect(manager, "object-removed", G_CALLBACK(BluezSignalOnObjectRemoved), endpoint);
     g_signal_connect(manager, "interface-proxy-properties-changed", G_CALLBACK(BluezSignalInterfacePropertiesChanged), endpoint);
-
-exit:
-    if (error != nullptr)
-        g_error_free(error);
 
     return CHIP_NO_ERROR;
 }
@@ -1454,10 +1446,9 @@ CHIP_ERROR SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::Packe
     return PlatformMgrImpl().GLibMatterContextInvokeSync(BluezC2Indicate, MakeConnectionDataBundle(apConn, apBuf));
 }
 
-static CHIP_ERROR BluezDisconnect(void * apClosure)
+static CHIP_ERROR BluezDisconnect(BluezConnection * conn)
 {
-    BluezConnection * conn = static_cast<BluezConnection *>(apClosure);
-    GError * error         = nullptr;
+    GError * error = nullptr;
     gboolean success;
 
     VerifyOrExit(conn != nullptr, ChipLogError(DeviceLayer, "conn is NULL in %s", __func__));
@@ -1474,14 +1465,9 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR CloseBleconnectionCB(void * apAppState)
-{
-    return BluezDisconnect(apAppState);
-}
-
 CHIP_ERROR CloseBluezConnection(BLE_CONNECTION_OBJECT apConn)
 {
-    return PlatformMgrImpl().GLibMatterContextInvokeSync(CloseBleconnectionCB, apConn);
+    return PlatformMgrImpl().GLibMatterContextInvokeSync(BluezDisconnect, static_cast<BluezConnection *>(apConn));
 }
 
 CHIP_ERROR StartBluezAdv(BluezEndpoint * apEndpoint)
@@ -1516,12 +1502,12 @@ CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint)
     return err;
 }
 
-CHIP_ERROR ConfigureBluezAdv(BLEAdvConfig & aBleAdvConfig, BluezEndpoint * apEndpoint)
+static CHIP_ERROR ConfigureBluezAdv(const BLEAdvConfig & aBleAdvConfig, BluezEndpoint * apEndpoint)
 {
     const char * msg = nullptr;
     CHIP_ERROR err   = CHIP_NO_ERROR;
     VerifyOrExit(aBleAdvConfig.mpBleName != nullptr, msg = "FAIL: BLE name is NULL");
-    VerifyOrExit(aBleAdvConfig.mpAdvertisingUUID != nullptr, msg = "FAIL: BLE mpAdvertisingUUID is NULL in %s");
+    VerifyOrExit(aBleAdvConfig.mpAdvertisingUUID != nullptr, msg = "FAIL: BLE mpAdvertisingUUID is NULL");
 
     apEndpoint->mpAdapterName     = g_strdup(aBleAdvConfig.mpBleName);
     apEndpoint->mpAdvertisingUUID = g_strdup(aBleAdvConfig.mpAdvertisingUUID);
@@ -1546,20 +1532,14 @@ exit:
     return err;
 }
 
-CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & aBleAdvConfig, BluezEndpoint *& apEndpoint)
+CHIP_ERROR InitBluezBleLayer(bool aIsCentral, const char * apBleAddr, const BLEAdvConfig & aBleAdvConfig,
+                             BluezEndpoint *& apEndpoint)
 {
+    BluezEndpoint * endpoint = g_new0(BluezEndpoint, 1);
     CHIP_ERROR err           = CHIP_NO_ERROR;
-    bool retval              = false;
-    BluezEndpoint * endpoint = nullptr;
-
-    // initialize server endpoint
-    endpoint = g_new0(BluezEndpoint, 1);
-    VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "FAIL: memory allocation in %s", __func__));
 
     if (apBleAddr != nullptr)
         endpoint->mpAdapterAddr = g_strdup(apBleAddr);
-    else
-        endpoint->mpAdapterAddr = nullptr;
 
     endpoint->mpConnMap  = g_hash_table_new(g_str_hash, g_str_equal);
     endpoint->mIsCentral = aIsCentral;
@@ -1578,10 +1558,8 @@ CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & a
     err = PlatformMgrImpl().GLibMatterContextInvokeSync(StartupEndpointBindings, endpoint);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to schedule endpoint initialization"));
 
-    retval = TRUE;
-
 exit:
-    if (retval)
+    if (err == CHIP_NO_ERROR)
     {
         apEndpoint = endpoint;
         ChipLogDetail(DeviceLayer, "PlatformBlueZInit init success");
@@ -1651,12 +1629,12 @@ static void OnCharacteristicChanged(GDBusProxy * aInterface, GVariant * aChanged
                                     gpointer apConnection)
 {
     BLE_CONNECTION_OBJECT connection = static_cast<BLE_CONNECTION_OBJECT>(apConnection);
-    GVariant * value                 = g_variant_lookup_value(aChangedProperties, "Value", G_VARIANT_TYPE_BYTESTRING);
-    VerifyOrReturn(value != nullptr);
+    GAutoPtr<GVariant> dataValue(g_variant_lookup_value(aChangedProperties, "Value", G_VARIANT_TYPE_BYTESTRING));
+    VerifyOrReturn(dataValue != nullptr);
 
     size_t bufferLen;
-    auto buffer = g_variant_get_fixed_array(value, &bufferLen, sizeof(uint8_t));
-    VerifyOrReturn(value != nullptr, ChipLogError(DeviceLayer, "Characteristic value has unexpected type"));
+    auto buffer = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
+    VerifyOrReturn(buffer != nullptr, ChipLogError(DeviceLayer, "Characteristic value has unexpected type"));
 
     BLEManagerImpl::HandleTXCharChanged(connection, static_cast<const uint8_t *>(buffer), bufferLen);
 }
@@ -1735,7 +1713,10 @@ CHIP_ERROR BluezUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn)
 
 struct ConnectParams
 {
-    ConnectParams(BluezDevice1 * device, BluezEndpoint * endpoint) : mDevice(device), mEndpoint(endpoint), mNumRetries(0) {}
+    ConnectParams(BluezDevice1 * device, BluezEndpoint * endpoint) :
+        mDevice(reinterpret_cast<BluezDevice1 *>(g_object_ref(device))), mEndpoint(endpoint), mNumRetries(0)
+    {}
+    ~ConnectParams() { g_object_unref(mDevice); }
     BluezDevice1 * mDevice;
     BluezEndpoint * mEndpoint;
     uint16_t mNumRetries;
@@ -1793,20 +1774,16 @@ static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams)
 
     g_cancellable_reset(endpoint->mpConnectCancellable);
     bluez_device1_call_connect(device, endpoint->mpConnectCancellable, ConnectDeviceDone, apParams);
-    g_object_unref(device);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectDevice(BluezDevice1 * apDevice, BluezEndpoint * apEndpoint)
+CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice, BluezEndpoint * apEndpoint)
 {
-    auto params = chip::Platform::New<ConnectParams>(apDevice, apEndpoint);
-    g_object_ref(apDevice);
-
+    auto params = chip::Platform::New<ConnectParams>(&aDevice, apEndpoint);
     if (PlatformMgrImpl().GLibMatterContextInvokeSync(ConnectDeviceImpl, params) != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed to schedule ConnectDeviceImpl() on CHIPoBluez thread");
-        g_object_unref(apDevice);
         chip::Platform::Delete(params);
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -1823,4 +1800,3 @@ void CancelConnect(BluezEndpoint * apEndpoint)
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

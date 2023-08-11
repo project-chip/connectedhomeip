@@ -82,7 +82,7 @@ public:
         {
             Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
 
-            return (mReadHandler->IsGeneratingReports() &&
+            return (mReadHandler->CanStartReporting() &&
                     (now >= mMinTimestamp && (mReadHandler->IsDirty() || now >= mMaxTimestamp || now >= mSyncTimestamp)));
         }
 
@@ -139,9 +139,13 @@ public:
 
     /// @brief Check whether a ReadHandler is reportable right now, taking into account its minimum and maximum intervals.
     /// @param aReadHandler read handler to check
-    bool IsReportableNow(ReadHandler * aReadHandler) { return FindReadHandlerNode(aReadHandler)->IsReportableNow(); }
+    bool IsReportableNow(ReadHandler * aReadHandler)
+    {
+        ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
+        return (nullptr != node) ? node->IsReportableNow() : false;
+    }
     /// @brief Check if a ReadHandler is reportable without considering the timing
-    bool IsReadHandlerReportable(ReadHandler * aReadHandler) const { return aReadHandler->IsReportable(); }
+    bool IsReadHandlerReportable(ReadHandler * aReadHandler) const { return aReadHandler->ShouldStartReporting(); }
     /// @brief Sets the ForceDirty flag of a ReadHandler
     void HandlerForceDirtyState(ReadHandler * aReadHandler) { aReadHandler->ForceDirtyState(); }
 
