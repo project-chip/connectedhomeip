@@ -94,7 +94,6 @@ CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
     struct rtkTimeVal tv;
     tv.tv_sec  = static_cast<uint32_t>(aNewCurTime.count() / UINT64_C(1000000));
     tv.tv_usec = static_cast<uint32_t>(aNewCurTime.count() % UINT64_C(1000000));
-    matter_rtc_init();
     matter_rtc_write(tv.tv_sec);
 
     return CHIP_NO_ERROR;
