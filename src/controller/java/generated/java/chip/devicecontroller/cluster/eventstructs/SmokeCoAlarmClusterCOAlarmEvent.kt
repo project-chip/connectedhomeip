@@ -17,18 +17,13 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
-import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-import java.util.Optional
-
-class SmokeCoAlarmClusterCOAlarmEvent (
-    val alarmSeverityLevel: Int) {
-  override fun toString(): String  = buildString {
+class SmokeCoAlarmClusterCOAlarmEvent(val alarmSeverityLevel: Int) {
+  override fun toString(): String = buildString {
     append("SmokeCoAlarmClusterCOAlarmEvent {\n")
     append("\talarmSeverityLevel : $alarmSeverityLevel\n")
     append("}\n")
@@ -45,10 +40,10 @@ class SmokeCoAlarmClusterCOAlarmEvent (
   companion object {
     private const val TAG_ALARM_SEVERITY_LEVEL = 0
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader) : SmokeCoAlarmClusterCOAlarmEvent {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader): SmokeCoAlarmClusterCOAlarmEvent {
       tlvReader.enterStructure(tag)
       val alarmSeverityLevel = tlvReader.getInt(ContextSpecificTag(TAG_ALARM_SEVERITY_LEVEL))
-      
+
       tlvReader.exitContainer()
 
       return SmokeCoAlarmClusterCOAlarmEvent(alarmSeverityLevel)

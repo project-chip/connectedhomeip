@@ -17,21 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
-import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
-
 import java.util.Optional
 
-class DescriptorClusterSemanticTagStruct (
-    val mfgCode: Int?,
-    val namespaceID: Int,
-    val tag: Int,
-    val label: Optional<String>?) {
-  override fun toString(): String  = buildString {
+class DescriptorClusterSemanticTagStruct(
+  val mfgCode: Int?,
+  val namespaceID: Int,
+  val tag: Int,
+  val label: Optional<String>?
+) {
+  override fun toString(): String = buildString {
     append("DescriptorClusterSemanticTagStruct {\n")
     append("\tmfgCode : $mfgCode\n")
     append("\tnamespaceID : $namespaceID\n")
@@ -44,20 +42,20 @@ class DescriptorClusterSemanticTagStruct (
     tlvWriter.apply {
       startStructure(tag)
       if (mfgCode != null) {
-      put(ContextSpecificTag(TAG_MFG_CODE), mfgCode)
-    } else {
-      putNull(ContextSpecificTag(TAG_MFG_CODE))
-    }
+        put(ContextSpecificTag(TAG_MFG_CODE), mfgCode)
+      } else {
+        putNull(ContextSpecificTag(TAG_MFG_CODE))
+      }
       put(ContextSpecificTag(TAG_NAMESPACE_I_D), namespaceID)
       put(ContextSpecificTag(TAG_TAG), tag)
       if (label != null) {
-      if (label.isPresent) {
-      val optlabel = label.get()
-      put(ContextSpecificTag(TAG_LABEL), optlabel)
-    }
-    } else {
-      putNull(ContextSpecificTag(TAG_LABEL))
-    }
+        if (label.isPresent) {
+          val optlabel = label.get()
+          put(ContextSpecificTag(TAG_LABEL), optlabel)
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_LABEL))
+      }
       endStructure()
     }
   }
@@ -68,27 +66,29 @@ class DescriptorClusterSemanticTagStruct (
     private const val TAG_TAG = 2
     private const val TAG_LABEL = 3
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader) : DescriptorClusterSemanticTagStruct {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader): DescriptorClusterSemanticTagStruct {
       tlvReader.enterStructure(tag)
-      val mfgCode = if (!tlvReader.isNull()) {
-      tlvReader.getInt(ContextSpecificTag(TAG_MFG_CODE))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_MFG_CODE))
-      null
-    }
+      val mfgCode =
+        if (!tlvReader.isNull()) {
+          tlvReader.getInt(ContextSpecificTag(TAG_MFG_CODE))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_MFG_CODE))
+          null
+        }
       val namespaceID = tlvReader.getInt(ContextSpecificTag(TAG_NAMESPACE_I_D))
       val tag = tlvReader.getInt(ContextSpecificTag(TAG_TAG))
-      val label = if (!tlvReader.isNull()) {
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
-    } else {
-      Optional.empty()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_LABEL))
-      null
-    }
-      
+      val label =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
+            Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_LABEL))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return DescriptorClusterSemanticTagStruct(mfgCode, namespaceID, tag, label)
