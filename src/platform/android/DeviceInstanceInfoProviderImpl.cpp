@@ -83,7 +83,7 @@ CHIP_ERROR DeviceInstanceInfoProviderImpl::GetDeviceName(MutableCharSpan & devic
     err = Internal::AndroidConfig::ReadConfigValueStr(Internal::AndroidConfig::kConfigKey_MfrDeviceName,
                                                       androidDeviceNameSpan.data(), androidDeviceNameSpan.size(), deviceNameSize);
 
-    if (err = CHIP_NO_ERROR)
+    if (err == CHIP_NO_ERROR)
     {
         ReturnErrorCodeIf(deviceNameSpan.size() < deviceNameSize, CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(deviceNameSpan.data(), androidDeviceNameSpan.data(), deviceNameSize);
