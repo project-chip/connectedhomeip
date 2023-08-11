@@ -44,14 +44,14 @@ static_library("BL602") {
   ]
 
   if (chip_enable_ota_requestor) {
-    common_sources += [
+    sources += [
       "../common/OTAImageProcessorImpl.cpp",
       "../common/OTAImageProcessorImpl.h",
     ]
   }
 
   if (chip_enable_ble) {
-    common_sources += [
+    sources += [
       "../common/BLEManagerImpl.cpp",
       "../common/BLEManagerImpl.h",
     ]
