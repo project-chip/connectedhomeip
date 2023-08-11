@@ -538,6 +538,25 @@ tests:
                     # Note: There's always an IPK keyset with index 0
                     contains: [0x01a1, 0x01a2, 0]
 
+    - label: "Write one keyset too many when already full"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x0222,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xd1\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf",
+                        EpochStartTime0: 3110000,
+                        EpochKey1: "\xe1\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef",
+                        EpochStartTime1: 3110001,
+                        EpochKey2: "\xf1\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
+                        EpochStartTime2: 3110002,
+                    }
+      response:
+          error: RESOURCE_EXHAUSTED
+
     - label: "Write Group Keys (invalid)"
       command: "writeAttribute"
       attribute: "GroupKeyMap"

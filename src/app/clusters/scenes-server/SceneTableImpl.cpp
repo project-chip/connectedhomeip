@@ -23,9 +23,7 @@ namespace chip {
 namespace scenes {
 
 CHIP_ERROR
-DefaultSceneHandlerImpl::EncodeAttributeValueList(
-    const app::DataModel::List<app::Clusters::Scenes::Structs::AttributeValuePair::Type> & aVlist,
-    MutableByteSpan & serializedBytes)
+DefaultSceneHandlerImpl::EncodeAttributeValueList(const List<AttributeValuePairType> & aVlist, MutableByteSpan & serializedBytes)
 {
     TLV::TLVWriter writer;
     writer.Init(serializedBytes);
@@ -35,9 +33,8 @@ DefaultSceneHandlerImpl::EncodeAttributeValueList(
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DefaultSceneHandlerImpl::DecodeAttributeValueList(
-    const ByteSpan & serializedBytes,
-    app::DataModel::DecodableList<app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType> & aVlist)
+CHIP_ERROR DefaultSceneHandlerImpl::DecodeAttributeValueList(const ByteSpan & serializedBytes,
+                                                             DecodableList<AttributeValuePairDecodableType> & aVlist)
 {
     TLV::TLVReader reader;
 
@@ -49,11 +46,10 @@ CHIP_ERROR DefaultSceneHandlerImpl::DecodeAttributeValueList(
 }
 
 CHIP_ERROR
-DefaultSceneHandlerImpl::SerializeAdd(EndpointId endpoint,
-                                      const app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet,
+DefaultSceneHandlerImpl::SerializeAdd(EndpointId endpoint, const ExtensionFieldSetDecodableType & extensionFieldSet,
                                       MutableByteSpan & serializedBytes)
 {
-    app::Clusters::Scenes::Structs::AttributeValuePair::Type aVPairs[kMaxAvPair];
+    AttributeValuePairType aVPairs[kMaxAvPair];
 
     size_t pairTotal = 0;
     // Verify size of list
@@ -68,15 +64,15 @@ DefaultSceneHandlerImpl::SerializeAdd(EndpointId endpoint,
         pairCount++;
     }
     ReturnErrorOnFailure(pair_iterator.GetStatus());
-    app::DataModel::List<app::Clusters::Scenes::Structs::AttributeValuePair::Type> attributeValueList(aVPairs, pairCount);
+    List<AttributeValuePairType> attributeValueList(aVPairs, pairCount);
 
     return EncodeAttributeValueList(attributeValueList, serializedBytes);
 }
 
 CHIP_ERROR DefaultSceneHandlerImpl::Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
-                                                app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & extensionFieldSet)
+                                                ExtensionFieldSetType & extensionFieldSet)
 {
-    app::DataModel::DecodableList<app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType> attributeValueList;
+    DecodableList<AttributeValuePairDecodableType> attributeValueList;
 
     ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
 

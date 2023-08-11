@@ -1,1 +1,1 @@
-2 : Update esp-idf to v5.1 and remove few pinned package version
+5 : Use west to download the K32W0 SDK
