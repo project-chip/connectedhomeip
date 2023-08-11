@@ -211,7 +211,7 @@ Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(const
     switch (attributePath.mAttributeId)
     {
     case Attributes::SpinSpeedCurrent::Id: {
-        if (*value >= (uint8_t)delegate->GetGetSpinSpeedSize())
+        if (*value >= (uint8_t) delegate->GetGetSpinSpeedSize())
         {
             return Status::ConstraintError;
         }
@@ -228,7 +228,8 @@ Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(const
                 // Or can't get the correct supported list
                 return Status::InvalidInState;
             }
-            if (supportedRinse == static_cast<NumberOfRinsesEnum>(*value)) {
+            if (supportedRinse == static_cast<NumberOfRinsesEnum>(*value))
+            {
                 // The written attribute is one of the supported item
                 return Status::Success;
             }
