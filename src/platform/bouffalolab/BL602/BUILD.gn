@@ -57,7 +57,8 @@ static_library("BL602") {
     ]
   }
 
-  defines = [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
+  defines =
+      [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
   if (chip_enable_factory_data || chip_enable_factory_data_test) {
     sources += [
       "../common/FactoryDataProvider.cpp",
@@ -65,9 +66,9 @@ static_library("BL602") {
     ]
   }
 
-  deps = [ 
-    "${chip_root}/src/lib/dnssd:platform_header", 
-    "${chip_root}/src/credentials:credentials_header" 
+  deps = [
+    "${chip_root}/src/credentials:credentials_header",
+    "${chip_root}/src/lib/dnssd:platform_header",
   ]
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 }

@@ -57,8 +57,9 @@ static_library("BL702L") {
       "../common/BLEManagerImpl.h",
     ]
   }
-  
-  defines = [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
+
+  defines =
+      [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
   if (chip_enable_factory_data || chip_enable_factory_data_test) {
     sources += [
       "../common/FactoryDataProvider.cpp",
