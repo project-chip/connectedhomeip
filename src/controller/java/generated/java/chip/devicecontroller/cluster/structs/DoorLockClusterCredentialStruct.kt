@@ -17,13 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
+import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class DoorLockClusterCredentialStruct(val credentialType: Int, val credentialIndex: Int) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class DoorLockClusterCredentialStruct (
+    val credentialType: Int,
+    val credentialIndex: Int) {
+  override fun toString(): String  = buildString {
     append("DoorLockClusterCredentialStruct {\n")
     append("\tcredentialType : $credentialType\n")
     append("\tcredentialIndex : $credentialIndex\n")
@@ -43,11 +49,11 @@ class DoorLockClusterCredentialStruct(val credentialType: Int, val credentialInd
     private const val TAG_CREDENTIAL_TYPE = 0
     private const val TAG_CREDENTIAL_INDEX = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): DoorLockClusterCredentialStruct {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader) : DoorLockClusterCredentialStruct {
       tlvReader.enterStructure(tag)
       val credentialType = tlvReader.getInt(ContextSpecificTag(TAG_CREDENTIAL_TYPE))
       val credentialIndex = tlvReader.getInt(ContextSpecificTag(TAG_CREDENTIAL_INDEX))
-
+      
       tlvReader.exitContainer()
 
       return DoorLockClusterCredentialStruct(credentialType, credentialIndex)

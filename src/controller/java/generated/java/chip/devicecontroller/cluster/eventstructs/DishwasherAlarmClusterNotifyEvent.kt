@@ -17,18 +17,21 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
+import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class DishwasherAlarmClusterNotifyEvent(
-  val active: Long,
-  val inactive: Long,
-  val state: Long,
-  val mask: Long
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class DishwasherAlarmClusterNotifyEvent (
+    val active: Long,
+    val inactive: Long,
+    val state: Long,
+    val mask: Long) {
+  override fun toString(): String  = buildString {
     append("DishwasherAlarmClusterNotifyEvent {\n")
     append("\tactive : $active\n")
     append("\tinactive : $inactive\n")
@@ -54,13 +57,13 @@ class DishwasherAlarmClusterNotifyEvent(
     private const val TAG_STATE = 2
     private const val TAG_MASK = 3
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): DishwasherAlarmClusterNotifyEvent {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader) : DishwasherAlarmClusterNotifyEvent {
       tlvReader.enterStructure(tag)
       val active = tlvReader.getLong(ContextSpecificTag(TAG_ACTIVE))
       val inactive = tlvReader.getLong(ContextSpecificTag(TAG_INACTIVE))
       val state = tlvReader.getLong(ContextSpecificTag(TAG_STATE))
       val mask = tlvReader.getLong(ContextSpecificTag(TAG_MASK))
-
+      
       tlvReader.exitContainer()
 
       return DishwasherAlarmClusterNotifyEvent(active, inactive, state, mask)

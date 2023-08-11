@@ -17,17 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
+import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class OtaSoftwareUpdateRequestorClusterProviderLocation(
-  val providerNodeID: Long,
-  val endpoint: Int,
-  val fabricIndex: Int
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class OtaSoftwareUpdateRequestorClusterProviderLocation (
+    val providerNodeID: Long,
+    val endpoint: Int,
+    val fabricIndex: Int) {
+  override fun toString(): String  = buildString {
     append("OtaSoftwareUpdateRequestorClusterProviderLocation {\n")
     append("\tproviderNodeID : $providerNodeID\n")
     append("\tendpoint : $endpoint\n")
@@ -50,19 +53,15 @@ class OtaSoftwareUpdateRequestorClusterProviderLocation(
     private const val TAG_ENDPOINT = 2
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): OtaSoftwareUpdateRequestorClusterProviderLocation {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader) : OtaSoftwareUpdateRequestorClusterProviderLocation {
       tlvReader.enterStructure(tag)
       val providerNodeID = tlvReader.getLong(ContextSpecificTag(TAG_PROVIDER_NODE_I_D))
       val endpoint = tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT))
       val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
-      return OtaSoftwareUpdateRequestorClusterProviderLocation(
-        providerNodeID,
-        endpoint,
-        fabricIndex
-      )
+      return OtaSoftwareUpdateRequestorClusterProviderLocation(providerNodeID, endpoint, fabricIndex)
     }
   }
 }

@@ -17,18 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
+import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
+
 import java.util.Optional
 
-class RvcOperationalStateClusterErrorStateStruct(
-  val errorStateID: Int,
-  val errorStateLabel: Optional<String>,
-  val errorStateDetails: Optional<String>
-) {
-  override fun toString(): String = buildString {
+class RvcOperationalStateClusterErrorStateStruct (
+    val errorStateID: Int,
+    val errorStateLabel: Optional<String>,
+    val errorStateDetails: Optional<String>) {
+  override fun toString(): String  = buildString {
     append("RvcOperationalStateClusterErrorStateStruct {\n")
     append("\terrorStateID : $errorStateID\n")
     append("\terrorStateLabel : $errorStateLabel\n")
@@ -41,13 +43,13 @@ class RvcOperationalStateClusterErrorStateStruct(
       startStructure(tag)
       put(ContextSpecificTag(TAG_ERROR_STATE_I_D), errorStateID)
       if (errorStateLabel.isPresent) {
-        val opterrorStateLabel = errorStateLabel.get()
-        put(ContextSpecificTag(TAG_ERROR_STATE_LABEL), opterrorStateLabel)
-      }
+      val opterrorStateLabel = errorStateLabel.get()
+      put(ContextSpecificTag(TAG_ERROR_STATE_LABEL), opterrorStateLabel)
+    }
       if (errorStateDetails.isPresent) {
-        val opterrorStateDetails = errorStateDetails.get()
-        put(ContextSpecificTag(TAG_ERROR_STATE_DETAILS), opterrorStateDetails)
-      }
+      val opterrorStateDetails = errorStateDetails.get()
+      put(ContextSpecificTag(TAG_ERROR_STATE_DETAILS), opterrorStateDetails)
+    }
       endStructure()
     }
   }
@@ -57,29 +59,23 @@ class RvcOperationalStateClusterErrorStateStruct(
     private const val TAG_ERROR_STATE_LABEL = 1
     private const val TAG_ERROR_STATE_DETAILS = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): RvcOperationalStateClusterErrorStateStruct {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader) : RvcOperationalStateClusterErrorStateStruct {
       tlvReader.enterStructure(tag)
       val errorStateID = tlvReader.getInt(ContextSpecificTag(TAG_ERROR_STATE_I_D))
-      val errorStateLabel =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_STATE_LABEL))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_ERROR_STATE_LABEL)))
-        } else {
-          Optional.empty()
-        }
-      val errorStateDetails =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_STATE_DETAILS))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_ERROR_STATE_DETAILS)))
-        } else {
-          Optional.empty()
-        }
-
+      val errorStateLabel = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_STATE_LABEL))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_ERROR_STATE_LABEL)))
+    } else {
+      Optional.empty()
+    }
+      val errorStateDetails = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_STATE_DETAILS))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_ERROR_STATE_DETAILS)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return RvcOperationalStateClusterErrorStateStruct(
-        errorStateID,
-        errorStateLabel,
-        errorStateDetails
-      )
+      return RvcOperationalStateClusterErrorStateStruct(errorStateID, errorStateLabel, errorStateDetails)
     }
   }
 }

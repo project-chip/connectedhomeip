@@ -17,13 +17,20 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
+import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class ActionsClusterStateChangedEvent(val actionID: Int, val invokeID: Long, val newState: Int) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ActionsClusterStateChangedEvent (
+    val actionID: Int,
+    val invokeID: Long,
+    val newState: Int) {
+  override fun toString(): String  = buildString {
     append("ActionsClusterStateChangedEvent {\n")
     append("\tactionID : $actionID\n")
     append("\tinvokeID : $invokeID\n")
@@ -46,12 +53,12 @@ class ActionsClusterStateChangedEvent(val actionID: Int, val invokeID: Long, val
     private const val TAG_INVOKE_I_D = 1
     private const val TAG_NEW_STATE = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ActionsClusterStateChangedEvent {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader) : ActionsClusterStateChangedEvent {
       tlvReader.enterStructure(tag)
       val actionID = tlvReader.getInt(ContextSpecificTag(TAG_ACTION_I_D))
       val invokeID = tlvReader.getLong(ContextSpecificTag(TAG_INVOKE_I_D))
       val newState = tlvReader.getInt(ContextSpecificTag(TAG_NEW_STATE))
-
+      
       tlvReader.exitContainer()
 
       return ActionsClusterStateChangedEvent(actionID, invokeID, newState)
