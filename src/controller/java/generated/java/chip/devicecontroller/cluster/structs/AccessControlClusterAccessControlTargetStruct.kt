@@ -17,20 +17,17 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
-import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-import java.util.Optional
-
-class AccessControlClusterAccessControlTargetStruct (
-    val cluster: Long?,
-    val endpoint: Int?,
-    val deviceType: Long?) {
-  override fun toString(): String  = buildString {
+class AccessControlClusterAccessControlTargetStruct(
+  val cluster: Long?,
+  val endpoint: Int?,
+  val deviceType: Long?
+) {
+  override fun toString(): String = buildString {
     append("AccessControlClusterAccessControlTargetStruct {\n")
     append("\tcluster : $cluster\n")
     append("\tendpoint : $endpoint\n")
@@ -42,20 +39,20 @@ class AccessControlClusterAccessControlTargetStruct (
     tlvWriter.apply {
       startStructure(tag)
       if (cluster != null) {
-      put(ContextSpecificTag(TAG_CLUSTER), cluster)
-    } else {
-      putNull(ContextSpecificTag(TAG_CLUSTER))
-    }
+        put(ContextSpecificTag(TAG_CLUSTER), cluster)
+      } else {
+        putNull(ContextSpecificTag(TAG_CLUSTER))
+      }
       if (endpoint != null) {
-      put(ContextSpecificTag(TAG_ENDPOINT), endpoint)
-    } else {
-      putNull(ContextSpecificTag(TAG_ENDPOINT))
-    }
+        put(ContextSpecificTag(TAG_ENDPOINT), endpoint)
+      } else {
+        putNull(ContextSpecificTag(TAG_ENDPOINT))
+      }
       if (deviceType != null) {
-      put(ContextSpecificTag(TAG_DEVICE_TYPE), deviceType)
-    } else {
-      putNull(ContextSpecificTag(TAG_DEVICE_TYPE))
-    }
+        put(ContextSpecificTag(TAG_DEVICE_TYPE), deviceType)
+      } else {
+        putNull(ContextSpecificTag(TAG_DEVICE_TYPE))
+      }
       endStructure()
     }
   }
@@ -65,27 +62,30 @@ class AccessControlClusterAccessControlTargetStruct (
     private const val TAG_ENDPOINT = 1
     private const val TAG_DEVICE_TYPE = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader) : AccessControlClusterAccessControlTargetStruct {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader): AccessControlClusterAccessControlTargetStruct {
       tlvReader.enterStructure(tag)
-      val cluster = if (!tlvReader.isNull()) {
-      tlvReader.getLong(ContextSpecificTag(TAG_CLUSTER))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_CLUSTER))
-      null
-    }
-      val endpoint = if (!tlvReader.isNull()) {
-      tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_ENDPOINT))
-      null
-    }
-      val deviceType = if (!tlvReader.isNull()) {
-      tlvReader.getLong(ContextSpecificTag(TAG_DEVICE_TYPE))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_DEVICE_TYPE))
-      null
-    }
-      
+      val cluster =
+        if (!tlvReader.isNull()) {
+          tlvReader.getLong(ContextSpecificTag(TAG_CLUSTER))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_CLUSTER))
+          null
+        }
+      val endpoint =
+        if (!tlvReader.isNull()) {
+          tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_ENDPOINT))
+          null
+        }
+      val deviceType =
+        if (!tlvReader.isNull()) {
+          tlvReader.getLong(ContextSpecificTag(TAG_DEVICE_TYPE))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_DEVICE_TYPE))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return AccessControlClusterAccessControlTargetStruct(cluster, endpoint, deviceType)

@@ -17,20 +17,17 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
-import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-import java.util.Optional
-
-class OperationalCredentialsClusterNOCStruct (
-    val noc: ByteArray,
-    val icac: ByteArray?,
-    val fabricIndex: Int) {
-  override fun toString(): String  = buildString {
+class OperationalCredentialsClusterNOCStruct(
+  val noc: ByteArray,
+  val icac: ByteArray?,
+  val fabricIndex: Int
+) {
+  override fun toString(): String = buildString {
     append("OperationalCredentialsClusterNOCStruct {\n")
     append("\tnoc : $noc\n")
     append("\ticac : $icac\n")
@@ -43,10 +40,10 @@ class OperationalCredentialsClusterNOCStruct (
       startStructure(tag)
       put(ContextSpecificTag(TAG_NOC), noc)
       if (icac != null) {
-      put(ContextSpecificTag(TAG_ICAC), icac)
-    } else {
-      putNull(ContextSpecificTag(TAG_ICAC))
-    }
+        put(ContextSpecificTag(TAG_ICAC), icac)
+      } else {
+        putNull(ContextSpecificTag(TAG_ICAC))
+      }
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
@@ -57,17 +54,18 @@ class OperationalCredentialsClusterNOCStruct (
     private const val TAG_ICAC = 2
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader) : OperationalCredentialsClusterNOCStruct {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader): OperationalCredentialsClusterNOCStruct {
       tlvReader.enterStructure(tag)
       val noc = tlvReader.getByteArray(ContextSpecificTag(TAG_NOC))
-      val icac = if (!tlvReader.isNull()) {
-      tlvReader.getByteArray(ContextSpecificTag(TAG_ICAC))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_ICAC))
-      null
-    }
+      val icac =
+        if (!tlvReader.isNull()) {
+          tlvReader.getByteArray(ContextSpecificTag(TAG_ICAC))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_ICAC))
+          null
+        }
       val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
       return OperationalCredentialsClusterNOCStruct(noc, icac, fabricIndex)

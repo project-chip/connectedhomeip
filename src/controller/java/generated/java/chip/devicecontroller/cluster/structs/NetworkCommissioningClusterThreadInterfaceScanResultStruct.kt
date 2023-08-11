@@ -17,25 +17,22 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
-import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-import java.util.Optional
-
-class NetworkCommissioningClusterThreadInterfaceScanResultStruct (
-    val panId: Int,
-    val extendedPanId: Long,
-    val networkName: String,
-    val channel: Int,
-    val version: Int,
-    val extendedAddress: ByteArray,
-    val rssi: Int,
-    val lqi: Int) {
-  override fun toString(): String  = buildString {
+class NetworkCommissioningClusterThreadInterfaceScanResultStruct(
+  val panId: Int,
+  val extendedPanId: Long,
+  val networkName: String,
+  val channel: Int,
+  val version: Int,
+  val extendedAddress: ByteArray,
+  val rssi: Int,
+  val lqi: Int
+) {
+  override fun toString(): String = buildString {
     append("NetworkCommissioningClusterThreadInterfaceScanResultStruct {\n")
     append("\tpanId : $panId\n")
     append("\textendedPanId : $extendedPanId\n")
@@ -73,7 +70,10 @@ class NetworkCommissioningClusterThreadInterfaceScanResultStruct (
     private const val TAG_RSSI = 6
     private const val TAG_LQI = 7
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader) : NetworkCommissioningClusterThreadInterfaceScanResultStruct {
+    fun fromTlv(
+      tag: Tag,
+      tlvReader: TlvReader
+    ): NetworkCommissioningClusterThreadInterfaceScanResultStruct {
       tlvReader.enterStructure(tag)
       val panId = tlvReader.getInt(ContextSpecificTag(TAG_PAN_ID))
       val extendedPanId = tlvReader.getLong(ContextSpecificTag(TAG_EXTENDED_PAN_ID))
@@ -83,10 +83,19 @@ class NetworkCommissioningClusterThreadInterfaceScanResultStruct (
       val extendedAddress = tlvReader.getByteArray(ContextSpecificTag(TAG_EXTENDED_ADDRESS))
       val rssi = tlvReader.getInt(ContextSpecificTag(TAG_RSSI))
       val lqi = tlvReader.getInt(ContextSpecificTag(TAG_LQI))
-      
+
       tlvReader.exitContainer()
 
-      return NetworkCommissioningClusterThreadInterfaceScanResultStruct(panId, extendedPanId, networkName, channel, version, extendedAddress, rssi, lqi)
+      return NetworkCommissioningClusterThreadInterfaceScanResultStruct(
+        panId,
+        extendedPanId,
+        networkName,
+        channel,
+        version,
+        extendedAddress,
+        rssi,
+        lqi
+      )
     }
   }
 }
