@@ -289,19 +289,19 @@ void LockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
 }
 
 bool LockManager::Lock(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
-                                              const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
+                       const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
 {
     return setLockState(endpointId, fabricIdx, nodeId, DlLockState::kLocked, pin, err);
 }
 
 bool LockManager::Unlock(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
-                                              const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
+                         const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
 {
     return setLockState(endpointId, fabricIdx, nodeId, DlLockState::kUnlocked, pin, err);
 }
 
 bool LockManager::Unbolt(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
-                                              const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
+                         const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
 {
     return setLockState(endpointId, fabricIdx, nodeId, DlLockState::kUnlocked, pin, err);
 }
@@ -667,9 +667,8 @@ const char * LockManager::lockStateToString(DlLockState lockState) const
     return "Unknown";
 }
 
-
 bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
-                                              const Nullable<chip::NodeId> & nodeId, DlLockState lockState, const Optional<chip::ByteSpan> & pin,
+                               const Nullable<chip::NodeId> & nodeId, DlLockState lockState, const Optional<chip::ByteSpan> & pin,
                                OperationErrorEnum & err)
 {
 
@@ -688,7 +687,8 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
             ChipLogDetail(Zcl, "Door Lock App: setting door lock state to \"%s\" [endpointId=%d]", lockStateToString(lockState),
                           endpointId);
 
-            DoorLockServer::Instance().SetLockState(endpointId, lockState, OperationSourceEnum::kRemote, NullNullable, NullNullable, fabricIdx, nodeId);
+            DoorLockServer::Instance().SetLockState(endpointId, lockState, OperationSourceEnum::kRemote, NullNullable, NullNullable,
+                                                    fabricIdx, nodeId);
 
             return true;
         }
@@ -713,7 +713,8 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
                           "Lock App: specified PIN code was found in the database, setting lock state to \"%s\" [endpointId=%d]",
                           lockStateToString(lockState), endpointId);
 
-            DoorLockServer::Instance().SetLockState(endpointId, lockState, OperationSourceEnum::kRemote, NullNullable, NullNullable, fabricIdx, nodeId);
+            DoorLockServer::Instance().SetLockState(endpointId, lockState, OperationSourceEnum::kRemote, NullNullable, NullNullable,
+                                                    fabricIdx, nodeId);
 
             return true;
         }
