@@ -40,6 +40,7 @@
 #include <lwip/udp.h>
 
 static_assert(LWIP_VERSION_MAJOR > 1, "CHIP requires LwIP 2.0 or later");
+static_assert(LWIP_TCPIP_CORE_LOCKING, "CHIP requires config LWIP_TCPIP_CORE_LOCKING enabled");
 
 #if !defined(RAW_FLAGS_MULTICAST_LOOP) || !defined(UDP_FLAGS_MULTICAST_LOOP) || !defined(raw_clear_flags) ||                       \
     !defined(raw_set_flags) || !defined(udp_clear_flags) || !defined(udp_set_flags)
@@ -62,13 +63,26 @@ static_assert(LWIP_VERSION_MAJOR > 1, "CHIP requires LwIP 2.0 or later");
 namespace chip {
 namespace Inet {
 
+namespace {
+/**
+ * @brief
+ * RAII locking for LwIP core to simplify management of
+ * LOCK_TCPIP_CORE()/UNLOCK_TCPIP_CORE() calls.
+ */
+class ScopedLwIPLock
+{
+public:
+    ScopedLwIPLock() { LOCK_TCPIP_CORE(); }
+    ~ScopedLwIPLock() { UNLOCK_TCPIP_CORE(); }
+};
+} // anonymous namespace
+
 EndpointQueueFilter * UDPEndPointImplLwIP::sQueueFilter = nullptr;
 
 CHIP_ERROR UDPEndPointImplLwIP::BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port,
                                          InterfaceId interfaceId)
 {
-    // Lock LwIP stack
-    LOCK_TCPIP_CORE();
+    ScopedLwIPLock lwipLock;
 
     // Make sure we have the appropriate type of PCB.
     CHIP_ERROR res = GetPCB(addressType);
@@ -90,9 +104,6 @@ CHIP_ERROR UDPEndPointImplLwIP::BindImpl(IPAddressType addressType, const IPAddr
         res = LwIPBindInterface(mUDP, interfaceId);
     }
 
-    // Unlock LwIP stack
-    UNLOCK_TCPIP_CORE();
-
     return res;
 }
 
@@ -101,7 +112,7 @@ CHIP_ERROR UDPEndPointImplLwIP::BindInterfaceImpl(IPAddressType addrType, Interf
     // A lock is required because the LwIP thread may be referring to intf_filter,
     // while this code running in the Inet application is potentially modifying it.
     // NOTE: this only supports LwIP interfaces whose number is no bigger than 9.
-    LOCK_TCPIP_CORE();
+    ScopedLwIPLock lwipLock;
 
     // Make sure we have the appropriate type of PCB.
     CHIP_ERROR err = GetPCB(addrType);
@@ -110,9 +121,6 @@ CHIP_ERROR UDPEndPointImplLwIP::BindInterfaceImpl(IPAddressType addrType, Interf
     {
         err = LwIPBindInterface(mUDP, intfId);
     }
-
-    UNLOCK_TCPIP_CORE();
-
     return err;
 }
 
@@ -134,6 +142,8 @@ CHIP_ERROR UDPEndPointImplLwIP::LwIPBindInterface(struct udp_pcb * aUDP, Interfa
 
 InterfaceId UDPEndPointImplLwIP::GetBoundInterface() const
 {
+    ScopedLwIPLock lwipLock;
+
 #if HAVE_LWIP_UDP_BIND_NETIF
     return InterfaceId(netif_get_by_index(mUDP->netif_idx));
 #else
@@ -148,14 +158,9 @@ uint16_t UDPEndPointImplLwIP::GetBoundPort() const
 
 CHIP_ERROR UDPEndPointImplLwIP::ListenImpl()
 {
-    // Lock LwIP stack
-    LOCK_TCPIP_CORE();
+    ScopedLwIPLock lwipLock;
 
     udp_recv(mUDP, LwIPReceiveUDPMessage, this);
-
-    // Unlock LwIP stack
-    UNLOCK_TCPIP_CORE();
-
     return CHIP_NO_ERROR;
 }
 
@@ -174,14 +179,12 @@ CHIP_ERROR UDPEndPointImplLwIP::SendMsgImpl(const IPPacketInfo * pktInfo, System
         VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_NO_MEMORY);
     }
 
-    // Lock LwIP stack
-    LOCK_TCPIP_CORE();
+    ScopedLwIPLock lwipLock;
 
     // Make sure we have the appropriate type of PCB based on the destination address.
     CHIP_ERROR res = GetPCB(destAddr.Type());
     if (res != CHIP_NO_ERROR)
     {
-        UNLOCK_TCPIP_CORE();
         return res;
     }
 
@@ -219,9 +222,6 @@ CHIP_ERROR UDPEndPointImplLwIP::SendMsgImpl(const IPPacketInfo * pktInfo, System
 
     ip_addr_copy(mUDP->local_ip, boundAddr);
 
-    // Unlock LwIP stack
-    UNLOCK_TCPIP_CORE();
-
     if (lwipErr != ERR_OK)
     {
         res = chip::System::MapErrorLwIP(lwipErr);
@@ -232,9 +232,7 @@ CHIP_ERROR UDPEndPointImplLwIP::SendMsgImpl(const IPPacketInfo * pktInfo, System
 
 void UDPEndPointImplLwIP::CloseImpl()
 {
-
-    // Lock LwIP stack
-    LOCK_TCPIP_CORE();
+    ScopedLwIPLock lwipLock;
 
     // Since UDP PCB is released synchronously here, but UDP endpoint itself might have to wait
     // for destruction asynchronously, there could be more allocated UDP endpoints than UDP PCBs.
@@ -260,9 +258,6 @@ void UDPEndPointImplLwIP::CloseImpl()
             }
         }
     }
-
-    // Unlock LwIP stack
-    UNLOCK_TCPIP_CORE();
 }
 
 void UDPEndPointImplLwIP::Free()
@@ -473,6 +468,8 @@ CHIP_ERROR UDPEndPointImplLwIP::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInt
     const ip4_addr_t lIPv4Address = aAddress.ToIPv4();
     err_t lStatus;
 
+    ScopedLwIPLock lwipLock;
+
     if (aInterfaceId.IsPresent())
     {
 
@@ -504,6 +501,9 @@ CHIP_ERROR UDPEndPointImplLwIP::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInt
 #ifdef HAVE_IPV6_MULTICAST
     const ip6_addr_t lIPv6Address = aAddress.ToIPv6();
     err_t lStatus;
+
+    ScopedLwIPLock lwipLock;
+
     if (aInterfaceId.IsPresent())
     {
         struct netif * const lNetif = FindNetifFromInterfaceId(aInterfaceId);
