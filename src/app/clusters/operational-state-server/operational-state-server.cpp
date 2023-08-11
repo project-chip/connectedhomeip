@@ -39,7 +39,7 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClus
     CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId), AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId),
     mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId)
 {
-    mDelegate->SetServer(this);
+    mDelegate->SetInstance(this);
 }
 
 Instance::~Instance()
@@ -64,11 +64,15 @@ CHIP_ERROR Instance::Init()
     return CHIP_NO_ERROR;
 }
 
-// todo change CHIP_ERROR -> Status?
-
 CHIP_ERROR Instance::SetCurrentPhase(const DataModel::Nullable<uint8_t> & aPhase)
 {
-    // todo check it the value is valid else return Protocols::InteractionModel::Status::ConstraintError;
+    if (!aPhase.IsNull())
+    {
+        if (!IsSupportedPhase(aPhase.Value()))
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+    }
 
     DataModel::Nullable<uint8_t> oldPhase = mCurrentPhase;
     mCurrentPhase                         = aPhase;
@@ -80,13 +84,11 @@ CHIP_ERROR Instance::SetCurrentPhase(const DataModel::Nullable<uint8_t> & aPhase
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::SetOperationalState(uint8_t opState)
+CHIP_ERROR Instance::SetOperationalState(uint8_t aOpState)
 {
-    // todo check it the value is valid else return Protocols::InteractionModel::Status::ConstraintError;
-
-    if (opState == to_underlying(OperationalStateEnum::kError))
+    // Error is only allowed to be set by OnOperationalErrorDetected.
+    if (aOpState == to_underlying(OperationalStateEnum::kError) || !IsSupportedOperationalState(aOpState))
     {
-        // todo is this the correct error?
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -98,7 +100,7 @@ CHIP_ERROR Instance::SetOperationalState(uint8_t opState)
     }
 
     uint8_t oldState  = mOperationalState;
-    mOperationalState = opState;
+    mOperationalState = aOpState;
     if (mOperationalState != oldState)
     {
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OperationalState::Id);
@@ -181,6 +183,30 @@ void Instance::ReportPhaseListChange()
     MatterReportingAttributeChangeCallback(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::PhaseList::Id));
 }
 
+bool Instance::IsSupportedPhase(uint8_t aPhase)
+{
+    GenericOperationalPhase phase = GenericOperationalPhase(DataModel::Nullable<CharSpan>());
+    if (mDelegate->GetOperationalPhaseAtIndex(aPhase, phase) != CHIP_ERROR_NOT_FOUND)
+    {
+        return true;
+    }
+    return false;
+}
+
+bool Instance::IsSupportedOperationalState(uint8_t aState)
+{
+    GenericOperationalState opState;
+    for (uint8_t i = 0; mDelegate->GetOperationalStateAtIndex(i, opState) != CHIP_ERROR_NOT_FOUND; i++)
+    {
+        if (opState.operationalStateID == aState)
+        {
+            return true;
+        }
+    }
+    ChipLogDetail(Zcl, "Cannot find an operational state with value %u", aState);
+    return false;
+}
+
 // private
 
 template <typename RequestT, typename FuncT>
@@ -190,7 +216,6 @@ void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
     {
         RequestT requestPayload;
 
-        //
         // If the command matches what the caller is looking for, let's mark this as being handled
         // even if errors happen after this. This ensures that we don't execute any fall-back strategies
         // to handle this command since at this point, the caller is taking responsibility for handling

@@ -73,17 +73,19 @@ public:
     // Attribute setters
     /**
      * Set operational phase.
-     * @param phase The operational phase that should now be the current one.
+     * @param aPhase The operational phase that should now be the current one.
+     * @return CHIP_ERROR_INVALID_ARGUMENT if aPhase is an invalid value. CHIP_NO_ERROR if set was successful.
      */
-    CHIP_ERROR SetCurrentPhase(const app::DataModel::Nullable<uint8_t> & phase);
+    CHIP_ERROR SetCurrentPhase(const app::DataModel::Nullable<uint8_t> & aPhase);
 
     /**
      * Set current operational state.
      * NOTE: This method cannot be used to set the error state. The error state must be set via the
      * OnOperationalErrorDetected method.
-     * @param opState The operational state that should now be the current one.
+     * @param aOpState The operational state that should now be the current one.
+     * @return CHIP_ERROR_INVALID_ARGUMENT if aOpState is an invalid value. CHIP_NO_ERROR if set was successful.
      */
-    CHIP_ERROR SetOperationalState(uint8_t opState);
+    CHIP_ERROR SetOperationalState(uint8_t aOpState);
 
     // Attribute getters
     /**
@@ -134,6 +136,17 @@ public:
      * The device SHALL call this method whenever it changes the phase list.
      */
     void ReportPhaseListChange();
+
+    /**
+     * This function returns true if the phase value given exists in the PhaseList attribute, otherwise it returns false.
+     */
+    bool IsSupportedPhase(uint8_t aPhase);
+
+    /**
+     * This function returns true if the operational state value given exists in the OperationalStateList attribute,
+     * otherwise it returns false.
+     */
+    bool IsSupportedOperationalState(uint8_t aState);
 
 private:
     Delegate * mDelegate;
@@ -252,10 +265,10 @@ private:
     Instance * mInstance = nullptr;
 
     /**
-     * This method is used by the SDK to set the instance pointer. This is done during the instantiation of a Server object.
+     * This method is used by the SDK to set the instance pointer. This is done during the instantiation of a Instance object.
      * @param aInstance A pointer to the Instance object related to this delegate object.
      */
-    void SetServer(Instance * aInstance) { mInstance = aInstance; }
+    void SetInstance(Instance * aInstance) { mInstance = aInstance; }
 
 protected:
     Instance * GetInstance() { return mInstance; }
