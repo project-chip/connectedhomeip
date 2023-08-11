@@ -794,6 +794,14 @@ template("efr32_sdk") {
       ]
     }
 
+    # COS and SWO sources files for when we use generate with slc
+    if (slc_generate || slc_reuse_files) {
+      sources += [
+        "${efr32_sdk_root}/hardware/driver/configuration_over_swo/src/sl_cos.c",
+        "${efr32_sdk_root}/platform/driver/debug/src/sl_debug_swo.c",
+      ]
+    }
+
     # USART sources files
     if ((defined(invoker.chip_enable_pw_rpc) && invoker.chip_enable_pw_rpc) ||
         chip_build_libshell || enable_openthread_cli ||
