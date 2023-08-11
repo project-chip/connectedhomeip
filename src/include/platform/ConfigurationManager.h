@@ -64,7 +64,7 @@ public:
 
     enum
     {
-        kMaxDeviceNameLength            = 32,
+        kMaxDeviceNameLen               = 32,
         kMaxVendorNameLength            = 32,
         kMaxProductNameLength           = 32,
         kMaxLocationLength              = 2,

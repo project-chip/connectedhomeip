@@ -77,7 +77,7 @@ CHIP_ERROR DeviceInstanceInfoProviderImpl::GetDeviceName(MutableCharSpan & devic
 {
     CHIP_ERROR err;
     size_t deviceNameSize = 0;
-    char androidDeviceName[ConfigurationManager::kMaxDeviceNameLength];
+    char androidDeviceName[ConfigurationManager::kMaxDeviceNameLen];
     MutableCharSpan androidDeviceNameSpan(androidDeviceName);
 
     err = Internal::AndroidConfig::ReadConfigValueStr(Internal::AndroidConfig::kConfigKey_MfrDeviceName,
