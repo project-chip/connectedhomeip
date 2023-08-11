@@ -85,7 +85,7 @@ void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
         uint8_t data[]                                               = { "This is some user Data. It should be encrypted" };
         userData                                                     = chip::ByteSpan(data, 50);
         const ccm_128_test_vector & test                             = *ccm_128_test_vectors[0];
-        uint8_t gargantuaBuffer[2 * CHIP_CHECK_IN_APP_DATA_MAX_SIZE] = { 0 };
+        uint8_t gargantuaBuffer[2 * CheckinMessage::sMaxAppDataSize] = { 0 };
 
         Aes128KeyByteArray keyMaterial;
         memcpy(keyMaterial, test.key, test.key_len);

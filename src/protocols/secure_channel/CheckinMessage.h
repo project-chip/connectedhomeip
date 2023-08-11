@@ -23,14 +23,13 @@
 #pragma once
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <protocols/secure_channel/Constants.h>
+#include <lib/support/Span.h>
+#include <stdint.h>
 
 namespace chip {
 namespace Protocols {
 namespace SecureChannel {
 using namespace Crypto;
-
-#define CHIP_CHECK_IN_APP_DATA_MAX_SIZE 1024
 
 using CounterType = uint32_t;
 
@@ -48,13 +47,12 @@ public:
      *
      * @param key       Key with which to encrypt the check-in payload
      * @param counter   Check-in counter
-     * @param appData   Optionnal : Application Data to incorporate within the Check-in message
+     * @param appData   Application Data to incorporate within the Check-in message. Allowed to be empty.
      * @param output    Buffer in Which to store the generated payload. SUFFICIENT SPACE MUST BE ALLOCATED by the caller
-     *                  Required Buffer Size is : User Data + CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES + SizeOf(uint32_t) +
-     * CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES
+     *                  Required Buffer Size is : GetCheckinPayloadSize(appData.size())
      * @return CHIP_ERROR
      */
-    static CHIP_ERROR GenerateCheckinMessagePayload(Crypto::Aes128KeyHandle & key, uint32_t counter, const ByteSpan & appData,
+    static CHIP_ERROR GenerateCheckinMessagePayload(Crypto::Aes128KeyHandle & key, CounterType counter, const ByteSpan & appData,
                                                     MutableByteSpan & output);
 
     /**
@@ -63,18 +61,18 @@ public:
      * @param key       Key with which to decrypt the check-in payload
      * @param payload   The received payload to decrypt and parse
      * @param counter   The counter value retrieved from the payload
-     * @param appData   The optional application data decrypted. Size can be retrieved prior to decryption by using the 
-     *                  GetAppDataSize() method.
+     * @param appData   The optional application data decrypted. The size of appData must be at least the size of
+     *                  GetAppDataSize(payload) + sizeof(CounterType)
      * @return CHIP_ERROR
      */
-    static CHIP_ERROR ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & key, ByteSpan & payload, uint32_t & counter,
+    static CHIP_ERROR ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & key, ByteSpan & payload, CounterType & counter,
                                                  MutableByteSpan & appData);
 
-    static inline uint64_t GetRequiredBufferSize(uint32_t & payloadSize) { return payloadSize + sMinPayloadSize; }
+    static inline size_t GetCheckinPayloadSize(uint16_t & appDataSize) { return appDataSize + sMinPayloadSize; }
 
     /**
      * @brief Get the App Data Size
-     * 
+     *
      * @param payload   The undecrypted payload
      * @return uint16_t size in byte of the application data from the payload
      */
@@ -83,6 +81,8 @@ public:
     static constexpr uint16_t sMinPayloadSize =
         CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES + sizeof(CounterType) + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
 
+    // Issue #28603
+    static constexpr uint16_t sMaxAppDataSize = 1024;
 };
 
 } // namespace SecureChannel
