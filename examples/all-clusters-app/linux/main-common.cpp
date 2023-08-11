@@ -207,13 +207,9 @@ void ApplicationShutdown()
     }
 }
 
-using namespace chip::app::Clusters::LaundryWasherControls;
 void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
 {
-    LaundryWasherControlDelegate & laundryWasherControlDelegate = LaundryWasherControlDelegate::getLaundryWasherControlDelegate();
-
-    LaundryWasherControlsServer::SetDefaultDelegate(endpoint, &laundryWasherControlDelegate);
-    laundryWasherControlDelegate.Init(endpoint);
+    Clusters::LaundryWasherControls::LaundryWasherControlDelegate::getLaundryWasherControlDelegate().Init(endpoint);
 }
 
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)

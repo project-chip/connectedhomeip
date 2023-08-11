@@ -51,7 +51,7 @@ public:
      */
     virtual CHIP_ERROR GetSupportedRinseAtIndex(size_t index, NumberOfRinsesEnum & supportedRinse) = 0;
 
-    virtual Protocols::InteractionModel::Status PreAttributeCheck(AttributeId attributeId, uint16_t size, uint8_t * value) = 0;
+    virtual size_t GetGetSpinSpeedSize() = 0;
 };
 
 } // namespace LaundryWasherControls

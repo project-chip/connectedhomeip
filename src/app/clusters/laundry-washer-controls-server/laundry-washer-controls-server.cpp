@@ -197,10 +197,43 @@ Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(const
                                                                            EmberAfAttributeType attributeType, uint16_t size,
                                                                            uint8_t * value)
 {
+    switch (attributePath.mAttributeId)
+    {
+    case Attributes::SpinSpeeds::Id:
+    case Attributes::SupportedRinses::Id:
+        return Status::UnsupportedWrite;
+    }
     Delegate * delegate = GetDelegate(attributePath.mEndpointId);
     if (delegate == nullptr)
     {
         return Status::Success;
     }
-    return delegate->PreAttributeCheck(attributePath.mAttributeId, size, value);
+    switch (attributePath.mAttributeId)
+    {
+    case Attributes::SpinSpeedCurrent::Id: {
+        if (*value >= (uint8_t)delegate->GetGetSpinSpeedSize())
+        {
+            return Status::ConstraintError;
+        }
+        return Status::Success;
+    }
+    case Attributes::NumberOfRinses::Id: {
+        for (uint8_t i = 0; true; i++)
+        {
+            NumberOfRinsesEnum supportedRinse;
+            auto err = delegate->GetSupportedRinseAtIndex(i, supportedRinse);
+            if (err != CHIP_NO_ERROR)
+            {
+                // Can't find the attribute to be written in the supported list (CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                // Or can't get the correct supported list
+                return Status::InvalidInState;
+            }
+            if (supportedRinse == static_cast<NumberOfRinsesEnum>(*value)) {
+                // The written attribute is one of the supported item
+                return Status::Success;
+            }
+        }
+    }
+    }
+    return Status::Success;
 }

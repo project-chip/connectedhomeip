@@ -56,43 +56,18 @@ CHIP_ERROR LaundryWasherControlDelegate::GetSupportedRinseAtIndex(size_t index, 
     return CHIP_NO_ERROR;
 }
 
-Status LaundryWasherControlDelegate::PreAttributeCheck(AttributeId attributeId, uint16_t size, uint8_t * value)
+size_t LaundryWasherControlDelegate::GetGetSpinSpeedSize()
 {
-    switch (attributeId)
-    {
-    case Attributes::SpinSpeedCurrent::Id: {
-        if (*value >= ArraySize(spinSpeedsNameOptions))
-        {
-            return Status::ConstraintError;
-        }
-        return Status::Success;
-    }
-    case Attributes::NumberOfRinses::Id: {
-        if (size != sizeof(NumberOfRinsesEnum))
-        {
-            return Status::InvalidDataType;
-        }
-        for (uint16_t index = 0; index < ArraySize(supportRinsesOptions); index++)
-        {
-            if (static_cast<NumberOfRinsesEnum>(*value) == LaundryWasherControlDelegate::supportRinsesOptions[index])
-            {
-                return Status::Success;
-            }
-        }
-        return Status::InvalidInState;
-    }
-    case Attributes::SpinSpeeds::Id:
-    case Attributes::SupportedRinses::Id:
-        return Status::UnsupportedWrite;
-    default:
-        return Status::UnsupportedAttribute;
-    }
+    return ArraySize(spinSpeedsNameOptions);
 }
 
 void LaundryWasherControlDelegate::Init(EndpointId endpointId)
 {
+    LaundryWasherControlsServer laundryWasherControlsServer = LaundryWasherControlsServer::Instance();
     NumberOfRinsesEnum supportedRinse;
+
     GetSupportedRinseAtIndex(kDefaultRinseIndex, supportedRinse);
-    LaundryWasherControlsServer::Instance().SetNumberOfRinses(endpointId, supportedRinse);
-    LaundryWasherControlsServer::Instance().SetSpinSpeedCurrent(endpointId, DataModel::Nullable<uint8_t>(kDefaultSpinSpeedIndex));
+    laundryWasherControlsServer.SetNumberOfRinses(endpointId, supportedRinse);
+    laundryWasherControlsServer.SetSpinSpeedCurrent(endpointId, DataModel::Nullable<uint8_t>(kDefaultSpinSpeedIndex));
+    LaundryWasherControlsServer::SetDefaultDelegate(endpointId, this);
 }
