@@ -33,33 +33,7 @@
   ],
   "endpointTypes": [
     {
-      "id": 13,
       "name": "MA-rootdevice",
-      "deviceTypeRef": {
-        "id": 177,
-        "code": 22,
-        "profileId": 259,
-        "label": "MA-rootdevice",
-        "name": "MA-rootdevice"
-      },
-      "deviceTypes": [
-        {
-          "id": 177,
-          "code": 22,
-          "profileId": 259,
-          "label": "MA-rootdevice",
-          "name": "MA-rootdevice"
-        }
-      ],
-      "deviceTypeRefs": [
-        177
-      ],
-      "deviceVersions": [
-        1
-      ],
-      "deviceIdentifiers": [
-        22
-      ],
       "deviceTypeName": "MA-rootdevice",
       "deviceTypeCode": 22,
       "deviceTypeProfileId": 259,
@@ -9506,33 +9480,7 @@
       ]
     },
     {
-      "id": 16,
       "name": "MA-onofflight",
-      "deviceTypeRef": {
-        "id": 183,
-        "code": 256,
-        "profileId": 259,
-        "label": "MA-onofflight",
-        "name": "MA-onofflight"
-      },
-      "deviceTypes": [
-        {
-          "id": 183,
-          "code": 256,
-          "profileId": 259,
-          "label": "MA-onofflight",
-          "name": "MA-onofflight"
-        }
-      ],
-      "deviceTypeRefs": [
-        183
-      ],
-      "deviceVersions": [
-        1
-      ],
-      "deviceIdentifiers": [
-        256
-      ],
       "deviceTypeName": "MA-onofflight",
       "deviceTypeCode": 256,
       "deviceTypeProfileId": 259,
@@ -14046,218 +13994,6 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "1",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            }
-          ]
-        },
-        {
-          "name": "Laundry Washer Controls",
-          "code": 83,
-          "mfgCode": null,
-          "define": "LAUNDRY_WASHER_CONTROLS_CLUSTER",
-          "side": "client",
-          "enabled": 0,
-          "attributes": [
-            {
-              "name": "FeatureMap",
-              "code": 65532,
-              "mfgCode": null,
-              "side": "client",
-              "type": "bitmap32",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "1",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            }
-          ]
-        },
-        {
-          "name": "Laundry Washer Controls",
-          "code": 83,
-          "mfgCode": null,
-          "define": "LAUNDRY_WASHER_CONTROLS_CLUSTER",
-          "side": "server",
-          "enabled": 1,
-          "attributes": [
-            {
-              "name": "SpinSpeeds",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "type": "array",
-              "included": 1,
-              "storageOption": "External",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "SpinSpeedCurrent",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int8u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "NumberOfRinses",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "type": "NumberOfRinsesEnum",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "SupportedRinses",
-              "code": 3,
-              "mfgCode": null,
-              "side": "server",
-              "type": "array",
-              "included": 1,
-              "storageOption": "External",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "GeneratedCommandList",
-              "code": 65528,
-              "mfgCode": null,
-              "side": "server",
-              "type": "array",
-              "included": 1,
-              "storageOption": "External",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "AcceptedCommandList",
-              "code": 65529,
-              "mfgCode": null,
-              "side": "server",
-              "type": "array",
-              "included": 1,
-              "storageOption": "External",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "EventList",
-              "code": 65530,
-              "mfgCode": null,
-              "side": "server",
-              "type": "array",
-              "included": 1,
-              "storageOption": "External",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "AttributeList",
-              "code": 65531,
-              "mfgCode": null,
-              "side": "server",
-              "type": "array",
-              "included": 1,
-              "storageOption": "External",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "FeatureMap",
-              "code": 65532,
-              "mfgCode": null,
-              "side": "server",
-              "type": "bitmap32",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "3",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -29197,33 +28933,7 @@
       ]
     },
     {
-      "id": 15,
       "name": "MA-onofflight",
-      "deviceTypeRef": {
-        "id": 183,
-        "code": 256,
-        "profileId": 259,
-        "label": "MA-onofflight",
-        "name": "MA-onofflight"
-      },
-      "deviceTypes": [
-        {
-          "id": 183,
-          "code": 256,
-          "profileId": 259,
-          "label": "MA-onofflight",
-          "name": "MA-onofflight"
-        }
-      ],
-      "deviceTypeRefs": [
-        183
-      ],
-      "deviceVersions": [
-        1
-      ],
-      "deviceIdentifiers": [
-        256
-      ],
       "deviceTypeName": "MA-onofflight",
       "deviceTypeCode": 256,
       "deviceTypeProfileId": 259,
@@ -32829,33 +32539,7 @@
       ]
     },
     {
-      "id": 14,
       "name": "Anonymous Endpoint Type",
-      "deviceTypeRef": {
-        "id": 228,
-        "code": 61442,
-        "profileId": 259,
-        "label": "MA-secondary-network-commissioning",
-        "name": "MA-secondary-network-commissioning"
-      },
-      "deviceTypes": [
-        {
-          "id": 228,
-          "code": 61442,
-          "profileId": 259,
-          "label": "MA-secondary-network-commissioning",
-          "name": "MA-secondary-network-commissioning"
-        }
-      ],
-      "deviceTypeRefs": [
-        228
-      ],
-      "deviceVersions": [
-        1
-      ],
-      "deviceIdentifiers": [
-        61442
-      ],
       "deviceTypeName": "MA-secondary-network-commissioning",
       "deviceTypeCode": 61442,
       "deviceTypeProfileId": 259,
@@ -33337,28 +33021,36 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
-      "networkId": 0
+      "networkId": 0,
+      "endpointVersion": 1,
+      "deviceIdentifier": 22
     },
     {
       "endpointTypeName": "MA-onofflight",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0
+      "networkId": 0,
+      "endpointVersion": 1,
+      "deviceIdentifier": 256
     },
     {
       "endpointTypeName": "MA-onofflight",
       "endpointTypeIndex": 2,
       "profileId": 259,
       "endpointId": 2,
-      "networkId": 0
+      "networkId": 0,
+      "endpointVersion": 1,
+      "deviceIdentifier": 256
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 3,
       "profileId": 259,
       "endpointId": 65534,
-      "networkId": 0
+      "networkId": 0,
+      "endpointVersion": 1,
+      "deviceIdentifier": 61442
     }
   ],
   "log": []

@@ -17,25 +17,22 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
-import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-import java.util.Optional
-
-class GroupKeyManagementClusterGroupKeySetStruct (
-    val groupKeySetID: Int,
-    val groupKeySecurityPolicy: Int,
-    val epochKey0: ByteArray?,
-    val epochStartTime0: Long?,
-    val epochKey1: ByteArray?,
-    val epochStartTime1: Long?,
-    val epochKey2: ByteArray?,
-    val epochStartTime2: Long?) {
-  override fun toString(): String  = buildString {
+class GroupKeyManagementClusterGroupKeySetStruct(
+  val groupKeySetID: Int,
+  val groupKeySecurityPolicy: Int,
+  val epochKey0: ByteArray?,
+  val epochStartTime0: Long?,
+  val epochKey1: ByteArray?,
+  val epochStartTime1: Long?,
+  val epochKey2: ByteArray?,
+  val epochStartTime2: Long?
+) {
+  override fun toString(): String = buildString {
     append("GroupKeyManagementClusterGroupKeySetStruct {\n")
     append("\tgroupKeySetID : $groupKeySetID\n")
     append("\tgroupKeySecurityPolicy : $groupKeySecurityPolicy\n")
@@ -54,35 +51,35 @@ class GroupKeyManagementClusterGroupKeySetStruct (
       put(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D), groupKeySetID)
       put(ContextSpecificTag(TAG_GROUP_KEY_SECURITY_POLICY), groupKeySecurityPolicy)
       if (epochKey0 != null) {
-      put(ContextSpecificTag(TAG_EPOCH_KEY0), epochKey0)
-    } else {
-      putNull(ContextSpecificTag(TAG_EPOCH_KEY0))
-    }
+        put(ContextSpecificTag(TAG_EPOCH_KEY0), epochKey0)
+      } else {
+        putNull(ContextSpecificTag(TAG_EPOCH_KEY0))
+      }
       if (epochStartTime0 != null) {
-      put(ContextSpecificTag(TAG_EPOCH_START_TIME0), epochStartTime0)
-    } else {
-      putNull(ContextSpecificTag(TAG_EPOCH_START_TIME0))
-    }
+        put(ContextSpecificTag(TAG_EPOCH_START_TIME0), epochStartTime0)
+      } else {
+        putNull(ContextSpecificTag(TAG_EPOCH_START_TIME0))
+      }
       if (epochKey1 != null) {
-      put(ContextSpecificTag(TAG_EPOCH_KEY1), epochKey1)
-    } else {
-      putNull(ContextSpecificTag(TAG_EPOCH_KEY1))
-    }
+        put(ContextSpecificTag(TAG_EPOCH_KEY1), epochKey1)
+      } else {
+        putNull(ContextSpecificTag(TAG_EPOCH_KEY1))
+      }
       if (epochStartTime1 != null) {
-      put(ContextSpecificTag(TAG_EPOCH_START_TIME1), epochStartTime1)
-    } else {
-      putNull(ContextSpecificTag(TAG_EPOCH_START_TIME1))
-    }
+        put(ContextSpecificTag(TAG_EPOCH_START_TIME1), epochStartTime1)
+      } else {
+        putNull(ContextSpecificTag(TAG_EPOCH_START_TIME1))
+      }
       if (epochKey2 != null) {
-      put(ContextSpecificTag(TAG_EPOCH_KEY2), epochKey2)
-    } else {
-      putNull(ContextSpecificTag(TAG_EPOCH_KEY2))
-    }
+        put(ContextSpecificTag(TAG_EPOCH_KEY2), epochKey2)
+      } else {
+        putNull(ContextSpecificTag(TAG_EPOCH_KEY2))
+      }
       if (epochStartTime2 != null) {
-      put(ContextSpecificTag(TAG_EPOCH_START_TIME2), epochStartTime2)
-    } else {
-      putNull(ContextSpecificTag(TAG_EPOCH_START_TIME2))
-    }
+        put(ContextSpecificTag(TAG_EPOCH_START_TIME2), epochStartTime2)
+      } else {
+        putNull(ContextSpecificTag(TAG_EPOCH_START_TIME2))
+      }
       endStructure()
     }
   }
@@ -97,50 +94,66 @@ class GroupKeyManagementClusterGroupKeySetStruct (
     private const val TAG_EPOCH_KEY2 = 6
     private const val TAG_EPOCH_START_TIME2 = 7
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader) : GroupKeyManagementClusterGroupKeySetStruct {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader): GroupKeyManagementClusterGroupKeySetStruct {
       tlvReader.enterStructure(tag)
       val groupKeySetID = tlvReader.getInt(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D))
-      val groupKeySecurityPolicy = tlvReader.getInt(ContextSpecificTag(TAG_GROUP_KEY_SECURITY_POLICY))
-      val epochKey0 = if (!tlvReader.isNull()) {
-      tlvReader.getByteArray(ContextSpecificTag(TAG_EPOCH_KEY0))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_KEY0))
-      null
-    }
-      val epochStartTime0 = if (!tlvReader.isNull()) {
-      tlvReader.getLong(ContextSpecificTag(TAG_EPOCH_START_TIME0))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_START_TIME0))
-      null
-    }
-      val epochKey1 = if (!tlvReader.isNull()) {
-      tlvReader.getByteArray(ContextSpecificTag(TAG_EPOCH_KEY1))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_KEY1))
-      null
-    }
-      val epochStartTime1 = if (!tlvReader.isNull()) {
-      tlvReader.getLong(ContextSpecificTag(TAG_EPOCH_START_TIME1))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_START_TIME1))
-      null
-    }
-      val epochKey2 = if (!tlvReader.isNull()) {
-      tlvReader.getByteArray(ContextSpecificTag(TAG_EPOCH_KEY2))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_KEY2))
-      null
-    }
-      val epochStartTime2 = if (!tlvReader.isNull()) {
-      tlvReader.getLong(ContextSpecificTag(TAG_EPOCH_START_TIME2))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_START_TIME2))
-      null
-    }
-      
+      val groupKeySecurityPolicy =
+        tlvReader.getInt(ContextSpecificTag(TAG_GROUP_KEY_SECURITY_POLICY))
+      val epochKey0 =
+        if (!tlvReader.isNull()) {
+          tlvReader.getByteArray(ContextSpecificTag(TAG_EPOCH_KEY0))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_KEY0))
+          null
+        }
+      val epochStartTime0 =
+        if (!tlvReader.isNull()) {
+          tlvReader.getLong(ContextSpecificTag(TAG_EPOCH_START_TIME0))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_START_TIME0))
+          null
+        }
+      val epochKey1 =
+        if (!tlvReader.isNull()) {
+          tlvReader.getByteArray(ContextSpecificTag(TAG_EPOCH_KEY1))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_KEY1))
+          null
+        }
+      val epochStartTime1 =
+        if (!tlvReader.isNull()) {
+          tlvReader.getLong(ContextSpecificTag(TAG_EPOCH_START_TIME1))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_START_TIME1))
+          null
+        }
+      val epochKey2 =
+        if (!tlvReader.isNull()) {
+          tlvReader.getByteArray(ContextSpecificTag(TAG_EPOCH_KEY2))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_KEY2))
+          null
+        }
+      val epochStartTime2 =
+        if (!tlvReader.isNull()) {
+          tlvReader.getLong(ContextSpecificTag(TAG_EPOCH_START_TIME2))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_START_TIME2))
+          null
+        }
+
       tlvReader.exitContainer()
 
-      return GroupKeyManagementClusterGroupKeySetStruct(groupKeySetID, groupKeySecurityPolicy, epochKey0, epochStartTime0, epochKey1, epochStartTime1, epochKey2, epochStartTime2)
+      return GroupKeyManagementClusterGroupKeySetStruct(
+        groupKeySetID,
+        groupKeySecurityPolicy,
+        epochKey0,
+        epochStartTime0,
+        epochKey1,
+        epochStartTime1,
+        epochKey2,
+        epochStartTime2
+      )
     }
   }
 }
