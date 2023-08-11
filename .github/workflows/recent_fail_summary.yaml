@@ -26,6 +26,7 @@ jobs:
       - name: Run Summarization Script
         run: |
           gh run list -b master -s failure > runlist
+          pip install pandas
           python scripts/tools/summarize_fail.py
         env:
           GH_TOKEN: ${{ github.token }}
