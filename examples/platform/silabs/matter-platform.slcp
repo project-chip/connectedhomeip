@@ -71,6 +71,7 @@ component:
 - {id: mbedtls_tls}
 - {id: mbedtls_dtls}
 - {id: mbedtls_tls_server}
+- {id: psa_its}
 
 
 config_file:
@@ -81,20 +82,21 @@ config_file:
     directory: btconf
 
 configuration:
-- {name: SL_BOARD_ENABLE_VCOM, value: '1'}
 - {name: SL_MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED, value: '1'}
 - {name: SL_MBEDTLS_KEY_EXCHANGE_PSK_ENABLED, value: '1'}
 - condition: [uartdrv_usart]
   name: UARTDRV_RESTRICT_ENERGY_MODE_TO_ALLOW_RECEPTION
-  value: '0'
+  value: '1'
 - condition: [iostream_usart]
   name: SL_IOSTREAM_USART_VCOM_RESTRICT_ENERGY_MODE_TO_ALLOW_RECEPTION
-  value: '0'
+  value: '1'
 - condition: [iostream_usart]
   name: SL_IOSTREAM_USART_VCOM_RX_BUFFER_SIZE
   value: '128'
-- {name: SL_HEAP_SIZE, value: '16384'}
-- {name: SL_STACK_SIZE, value: '4608'}
+- {name: SL_HEAP_SIZE, value: '0'}
+- {name: SL_STACK_SIZE, value: '0'}
+- {name: SL_BOARD_ENABLE_VCOM, value: '0'}
+- {name: EMDRV_UARTDRV_FLOW_CONTROL_ENABLE, value: '0'}
 
 requires:
 - condition: [device_series_1]
