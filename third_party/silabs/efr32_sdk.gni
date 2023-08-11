@@ -274,7 +274,9 @@ template("efr32_sdk") {
     }
 
     if (chip_enable_ble_rs911x) {
-      defines += [ "RSI_BLE_ENABLE=1" ]
+      defines += [ "RSI_BLE_ENABLE=1" ,
+            "BLE_ENABLE=1",
+      "RSI_LITTLE_ENDIAN=1",]
     }
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
