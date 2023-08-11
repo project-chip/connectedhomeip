@@ -77,9 +77,6 @@ public:
      */
     virtual bool IsNTPAddressDomain(const CharSpan ntp) = 0;
 
-    // TODO: All of these will need to be async. That's going to be a LOT more code, so leaving that until the end since
-    // none of them return anything useful right now anyway.
-
     /**
      * @brief Delegate should attempt to get time from a platform-defined source using the ordering defined in the
      * Time source prioritization spec section. Delegate may skip any unsupported sources
