@@ -33,7 +33,7 @@
   ],
   "endpointTypes": [
     {
-      "id": 12,
+      "id": 13,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
         "id": 177,
@@ -9506,7 +9506,7 @@
       ]
     },
     {
-      "id": 10,
+      "id": 16,
       "name": "MA-onofflight",
       "deviceTypeRef": {
         "id": 183,
@@ -14157,7 +14157,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "NumberOfRinsesEnum",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -14173,7 +14173,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "array",
-              "included": 0,
+              "included": 1,
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
@@ -14257,7 +14257,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "3",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -29197,7 +29197,7 @@
       ]
     },
     {
-      "id": 9,
+      "id": 15,
       "name": "MA-onofflight",
       "deviceTypeRef": {
         "id": 183,
@@ -32829,7 +32829,7 @@
       ]
     },
     {
-      "id": 11,
+      "id": 14,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 228,
