@@ -268,9 +268,8 @@ source_set("siwx917-common") {
 
   # DIC
   if (enable_dic) {
-    public_deps += [
-      "${silabs_common_plat_dir}/DIC/matter_abs_interface:silabs-dic",
-    ]
+    public_deps +=
+        [ "${silabs_common_plat_dir}/DIC/matter_abs_interface:silabs-dic" ]
   }
 
   # Attestation Credentials
