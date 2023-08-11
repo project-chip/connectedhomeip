@@ -85,13 +85,12 @@ class TC_OPSTATE_2_3(MatterBaseTest):
         asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
                              "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
 
-        if self.check_pics("OPSTATE.S.M.ST_PAUSED"):
-            self.print_step(5, "Read OperationalState attribute")
-            operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
-                                                                             attribute=attributes.OperationalState)
-            logging.info("OperationalState: %s" % (operational_state))
-            asserts.assert_equal(operational_state, Clusters.OperationalState.Enums.OperationalStateEnum.kPaused,
-                                 "OperationalState ID should be Paused(0x02)")
+        self.print_step(5, "Read OperationalState attribute")
+        operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
+                                                                         attribute=attributes.OperationalState)
+        logging.info("OperationalState: %s" % (operational_state))
+        asserts.assert_equal(operational_state, Clusters.OperationalState.Enums.OperationalStateEnum.kPaused,
+                             "OperationalState ID should be Paused(0x02)")
 
         if self.check_pics("OPSTATE.S.A0002"):
             self.print_step(6, "Read CountdownTime attribute")
@@ -124,13 +123,12 @@ class TC_OPSTATE_2_3(MatterBaseTest):
         asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
                              "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
 
-        if self.check_pics("OPSTATE.S.M.ST_RUNNING"):
-            self.print_step(11, "Read OperationalState attribute")
-            operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
-                                                                             attribute=attributes.OperationalState)
-            logging.info("OperationalState: %s" % (operational_state))
-            asserts.assert_equal(operational_state, Clusters.OperationalState.Enums.OperationalStateEnum.kRunning,
-                                 "OperationalState(%s) should be Running(0x01)" % operational_state)
+        self.print_step(11, "Read OperationalState attribute")
+        operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
+                                                                         attribute=attributes.OperationalState)
+        logging.info("OperationalState: %s" % (operational_state))
+        asserts.assert_equal(operational_state, Clusters.OperationalState.Enums.OperationalStateEnum.kRunning,
+                             "OperationalState(%s) should be Running(0x01)" % operational_state)
 
         self.print_step(12, "Send Resume command")
         ret = await self.send_resume_cmd()
