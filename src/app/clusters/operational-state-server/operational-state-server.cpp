@@ -119,7 +119,7 @@ uint8_t Instance::GetCurrentOperationalState() const
 
 void Instance::GetCurrentOperationalError(GenericOperationalError & error) const
 {
-    error = mOperationalError;
+    error.Set(mOperationalError.errorStateID, mOperationalError.errorStateLabel, mOperationalError.errorStateDetails);
 }
 
 void Instance::OnOperationalErrorDetected(const Structs::ErrorStateStruct::Type & aError)
