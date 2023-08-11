@@ -291,7 +291,7 @@ tests:
 
           Verify "AcceptedCommandList: 1 entries" on the TH(Chip-tool)  Log:
 
-          [1649748231.835572][9579:9584] CHIP:DMG:         SuppressResponse = true, 
+          [1649748231.835572][9579:9584] CHIP:DMG:         SuppressResponse = true,
           [1649748231.835633][9579:9584] CHIP:DMG:         InteractionModelRevision = 1
           [1649748231.835690][9579:9584] CHIP:DMG: }
           [1649748231.836192][9579:9584] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_FFF9 DataVersion: 1406212801
@@ -330,7 +330,7 @@ tests:
 
           Verify "GeneratedCommandList: 0 entries" on the TH(Chip-tool)  Log:
 
-          [1649748201.118100][9570:9575] CHIP:DMG:         SuppressResponse = true, 
+          [1649748201.118100][9570:9575] CHIP:DMG:         SuppressResponse = true,
           [1649748201.118163][9570:9575] CHIP:DMG:         InteractionModelRevision = 1
           [1649748201.118221][9570:9575] CHIP:DMG: }
           [1649748201.118561][9570:9575] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_FFF8 DataVersion: 1406212801

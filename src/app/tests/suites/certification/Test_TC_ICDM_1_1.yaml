@@ -111,22 +111,22 @@ tests:
       verification: |
           ./chip-tool icdmanagement read attribute-list 1 0
 
-          Verify " AttributeList "should include the mandatory attributes (values 0, 1, 2) and  
+          Verify " AttributeList "should include the mandatory attributes (values 0, 1, 2) and
           global attributes  (value 65533, 65532, 65531, 65530, 65529 and 65528)
           The list include entries based on feature support:
-          0x0003: SHALL be included if and only if ICDM.S.A0003(RegisteredClients) 
-          0x0004: SHALL be included if and only if ICDM.S.A0004(IcdCounter) 
+          0x0003: SHALL be included if and only if ICDM.S.A0003(RegisteredClients)
+          0x0004: SHALL be included if and only if ICDM.S.A0004(IcdCounter)
           0x0005: SHALL be included if and only if ICDM.S.A0005(ClientsSupportedPerFabric) on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
 
 
           [1685123797636] [39641:392416] [TOO] Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_FFFB DataVersion: 93993128
           [1685123797636] [39641:392416] [TOO]   AttributeList: 12 entries
-          [1685123797636] [39641:392416] [TOO]     [1]: 0 
-          [1685123797636] [39641:392416] [TOO]     [2]: 1 
-          [1685123797636] [39641:392416] [TOO]     [3]: 2 
-          [1685123797636] [39641:392416] [TOO]     [4]: 3 
-          [1685123797636] [39641:392416] [TOO]     [5]: 4 
-          [1685123797637] [39641:392416] [TOO]     [6]: 5 
+          [1685123797636] [39641:392416] [TOO]     [1]: 0
+          [1685123797636] [39641:392416] [TOO]     [2]: 1
+          [1685123797636] [39641:392416] [TOO]     [3]: 2
+          [1685123797636] [39641:392416] [TOO]     [4]: 3
+          [1685123797636] [39641:392416] [TOO]     [5]: 4
+          [1685123797637] [39641:392416] [TOO]     [6]: 5
           [1685123797637] [39641:392416] [TOO]     [7]: 65528
           [1685123797637] [39641:392416] [TOO]     [8]: 65529
           [1685123797637] [39641:392416] [TOO]     [9]: 65530
@@ -197,8 +197,8 @@ tests:
       verification: |
           ./chip-tool icdmanagement read accepted-command-list 1 0
 
-          Verify the "AcceptedCommandList" contains feature dependent commands 
-          if ICDM.S.F00(CIP) feature supports list includes(value 0x0000 and 0x02) and 
+          Verify the "AcceptedCommandList" contains feature dependent commands
+          if ICDM.S.F00(CIP) feature supports list includes(value 0x0000 and 0x02) and
           The list MAY include these optional entries:
           if ICDM.S.C01.Rsp(StayActiveRequest) feature supports list includes(value 0x0003) on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 

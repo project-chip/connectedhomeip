@@ -39,9 +39,9 @@ tests:
     - label: "Step 2: TH reads from the DUT the PhaseList attribute"
       PICS: OPSTATE.S.A0000
       verification: |
-          ./chip-tool operationalstate read phase-list 1 1 
+          ./chip-tool operationalstate read phase-list 1 1
            Via the TH (chip-tool), verify:
-           - that PhaseList attribute value contains either null or a list of strings. 
+           - that PhaseList attribute value contains either null or a list of strings.
            - that the list has no more than 32 entries. on TH(chip-tool)
 
           [1689673042.242432][16559:16561] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0000 DataVersion: 2102885775
@@ -54,7 +54,7 @@ tests:
     - label: "Step 3: TH reads from the DUT the CurrentPhase attribute"
       PICS: OPSTATE.S.A0001
       verification: |
-          ./chip-tool operationalstate read current-phase 1  1 
+          ./chip-tool operationalstate read current-phase 1  1
 
 
            Via the TH (chip-tool), verify:
@@ -72,7 +72,7 @@ tests:
       PICS: OPSTATE.S.A0002
       verification: |
           ./chip-tool operationalstate read countdown-time 1 1
-           
+
            Via the TH (chip-tool), verify:
            - that CountdownTime attribute contains either null our a uint32 value
            - if non-null, verify that the value is in the range 0 to 259200
@@ -90,7 +90,7 @@ tests:
       PICS: OPSTATE.S.A0003
       verification: |
           ./chip-tool operationalstate read operational-state-list 1 1
-           
+
            Via the TH (chip-tool), verify:
            - the provided list contains the Error state (an entry with an ID of 0x03).
            - all entries include an ID (enum8) and a label (string)
@@ -151,7 +151,7 @@ tests:
           ./chip-tool operationalstate read operational-state 1 1
            Via the TH (chip-tool), Verify that the DUT response contains an OperationalStateEnum value. Verify this is set to Stopped(0x00)
 
-          [1690201842.479098][15020:15022] CHIP:DMG:         SuppressResponse = true, 
+          [1690201842.479098][15020:15022] CHIP:DMG:         SuppressResponse = true,
           [1690201842.479158][15020:15022] CHIP:DMG:         InteractionModelRevision = 1
           [1690201842.479211][15020:15022] CHIP:DMG: }
           [1690201842.479528][15020:15022] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0004 DataVersion: 3675566847
@@ -177,7 +177,7 @@ tests:
           ./chip-tool operationalstate read operational-state 1 1
            Via the TH (chip-tool), Verify that the DUT response contains an OperationalStateEnum value. Verify this is set to Running(0x01)
 
-          [1690201842.479098][15020:15022] CHIP:DMG:         SuppressResponse = true, 
+          [1690201842.479098][15020:15022] CHIP:DMG:         SuppressResponse = true,
           [1690201842.479158][15020:15022] CHIP:DMG:         InteractionModelRevision = 1
           [1690201842.479211][15020:15022] CHIP:DMG: }
           [1690201842.479528][15020:15022] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0004 DataVersion: 3675566847
@@ -203,7 +203,7 @@ tests:
           ./chip-tool operationalstate read operational-state 1 1
            Via the TH (chip-tool), Verify that the DUT response contains an OperationalStateEnum value. Verify this is set to Paused(0x02)
 
-          [1690201842.479098][15020:15022] CHIP:DMG:         SuppressResponse = true, 
+          [1690201842.479098][15020:15022] CHIP:DMG:         SuppressResponse = true,
           [1690201842.479158][15020:15022] CHIP:DMG:         InteractionModelRevision = 1
           [1690201842.479211][15020:15022] CHIP:DMG: }
           [1690201842.479528][15020:15022] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0004 DataVersion: 3675566847
@@ -228,7 +228,7 @@ tests:
           ./chip-tool operationalstate read operational-state 1 1
            Via the TH (chip-tool), Verify that the DUT response contains an OperationalStateEnum value. Verify this is set to Error(0x03)
 
-          [1690201842.479098][15020:15022] CHIP:DMG:         SuppressResponse = true, 
+          [1690201842.479098][15020:15022] CHIP:DMG:         SuppressResponse = true,
           [1690201842.479158][15020:15022] CHIP:DMG:         InteractionModelRevision = 1
           [1690201842.479211][15020:15022] CHIP:DMG: }
           [1690201842.479528][15020:15022] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0004 DataVersion: 3675566847
@@ -245,7 +245,7 @@ tests:
       verification: |
           ./chip-tool operationalstate read operational-state 1 1
            Via the TH (chip-tool), Verify that the DUT response contains an instance of ErrorStateStruct and Verify the ErrorStateID is a defined error (NoError(0x00), UnableToStartOrResume(0x01), UnableToCompleteOperation(0x02), CommandInvalidInState(0x03)) or in the range 0x80 to 0xBF.
-          [1690201842.479098][15020:15022] CHIP:DMG:         SuppressResponse = true, 
+          [1690201842.479098][15020:15022] CHIP:DMG:         SuppressResponse = true,
           [1690201842.479158][15020:15022] CHIP:DMG:         InteractionModelRevision = 1
           [1690201842.479211][15020:15022] CHIP:DMG: }
           [1690201842.479528][15020:15022] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0004 DataVersion: 3675566847
@@ -269,7 +269,7 @@ tests:
           ./chip-tool operationalstate read operational-state 1 1
            Via the TH (chip-tool), Verify that the DUT response contains an OperationalStateEnum value. Verify this is set to SeekingCharger(0x40)
 
-          [1690201842.479098][15020:15022] CHIP:DMG:         SuppressResponse = true, 
+          [1690201842.479098][15020:15022] CHIP:DMG:         SuppressResponse = true,
           [1690201842.479158][15020:15022] CHIP:DMG:         InteractionModelRevision = 1
           [1690201842.479211][15020:15022] CHIP:DMG: }
           [1690201842.479528][15020:15022] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0004 DataVersion: 3675566847
@@ -295,7 +295,7 @@ tests:
           ./chip-tool operationalstate read operational-state 1 1
            Via the TH (chip-tool), Verify that the DUT response contains an OperationalStateEnum value. Verify this is set to Charging(0x41)
 
-          [1690201842.479098][15020:15022] CHIP:DMG:         SuppressResponse = true, 
+          [1690201842.479098][15020:15022] CHIP:DMG:         SuppressResponse = true,
           [1690201842.479158][15020:15022] CHIP:DMG:         InteractionModelRevision = 1
           [1690201842.479211][15020:15022] CHIP:DMG: }
           [1690201842.479528][15020:15022] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0004 DataVersion: 3675566847
@@ -318,9 +318,9 @@ tests:
     - label: "Step 7f: TH reads from the DUT the OperationalError attribute"
       PICS: OPSTATE.S.A0005 && OPSTATE.S.M.ERR_UNABLE_TO_COMPLETE_OPERATION
       verification: |
-          ./chip-tool operationalstate read operational-error 1 1 
+          ./chip-tool operationalstate read operational-error 1 1
            Via the TH (chip-tool), Verify that the DUT response contains an OperationalStateEnum value. Verify this is set to Docked(0x42)
-          [1690201842.479098][15020:15022] CHIP:DMG:         SuppressResponse = true, 
+          [1690201842.479098][15020:15022] CHIP:DMG:         SuppressResponse = true,
           [1690201842.479158][15020:15022] CHIP:DMG:         InteractionModelRevision = 1
           [1690201842.479211][15020:15022] CHIP:DMG: }
           [1690201842.479528][15020:15022] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0004 DataVersion: 3675566847
@@ -337,7 +337,7 @@ tests:
           error state"
       PICS: OPSTATE.S.A0005 && OPSTATE.S.M.ERR_COMMAND_INVALID_IN_STATE
       verification: |
-          ./chip-tool operationalstate read operational-error 1 1 
+          ./chip-tool operationalstate read operational-error 1 1
            Via the TH (chip-tool), Verify that the DUT response contains an instance of ErrorStateStruct and Verify the ErrorStateID is a defined error (NoError(0x00), UnableToStartOrResume(0x01), UnableToCompleteOperation(0x02), CommandInvalidInState(0x03), FailedToFindChargingDock(0x40), Stuck(0x41), DustBinMissing(0x42), DustBinFull(0x43), WaterTankEmpty(0x44), WaterTankMissing(0x45), WaterTankLidOpen(0x46), MopCleaningPadMissing(0x47)) or in the range 0x80 to 0xBF.
 
 
@@ -357,7 +357,7 @@ tests:
     - label: "Step 7h: TH reads from the DUT the OperationalError attribute"
       PICS: OPSTATE.S.A0005 && OPSTATE.S.M.ERR_COMMAND_INVALID_IN_STATE
       verification: |
-          ./chip-tool operationalstate read operational-error 1 1 
+          ./chip-tool operationalstate read operational-error 1 1
            Via the TH (chip-tool), Verify that the DUT response contains an instance of ErrorStateStruct. This shall contain an ErrorStateId with a value of UnableToStartOrResume(0x01)
 
           [1690201879.312424][15025:15027] CHIP:DMG: }

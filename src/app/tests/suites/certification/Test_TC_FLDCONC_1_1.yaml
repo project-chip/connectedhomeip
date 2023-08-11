@@ -318,7 +318,7 @@ tests:
       verification: |
           ./chip-tool formaldehydeconcentrationmeasurement read attribute-list 1 1
 
-          Via the TH (chip-tool), verify that theAttributeList attribute contains 
+          Via the TH (chip-tool), verify that theAttributeList attribute contains
           - Mandatory entries:0x0009,0xfff8, 0xfff9, 0xfffa, 0xfffb, 0xfffc & 0xfffd
           - Optional entries:- 0x0007
           - Based on feature support:- 0x0000,0x0001.0x0002,0x0003,0x0004,0x0005,0x0006,0x0007,0x0008,0x000a

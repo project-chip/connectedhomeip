@@ -79,7 +79,7 @@ tests:
       verification: |
           ./chip-tool operationalstate read attribute-list 1 1
 
-          Verify " AttributeList " value consists the list of mandatory attributes (0, 1, 3, 4, 5, 65533, 65532, 65531, 65529, 65528) and it may include the optional attribute (2) on the TH(Chip-tool) Log: 
+          Verify " AttributeList " value consists the list of mandatory attributes (0, 1, 3, 4, 5, 65533, 65532, 65531, 65529, 65528) and it may include the optional attribute (2) on the TH(Chip-tool) Log:
           Below is the sample log provided for the raspi platform:
 
           [1689672825.768926][16510:16512] CHIP:DMG: }

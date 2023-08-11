@@ -27,7 +27,7 @@ tests:
       verification: |
           (for all steps, PIs use equivalent command on their respective platform)
           set the $CHIP_ROOT environment variable to the location of the connectedhomeip directory (cd to the connectedhomeip directory, use command `export CHIP_ROOT=$(pwd -P)`
-          For each scenario outlined in the sheet TC-DA-1.8 test cases, perform the following actions 
+          For each scenario outlined in the sheet TC-DA-1.8 test cases, perform the following actions
           - Start the TH using the required certificate set and PID. For chip-all-clusters-app, use the command given in the chip-all-clusters app command column
           - Have the DUT commission the TH. Verify that the DUT indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface.
           - factory reset the TH

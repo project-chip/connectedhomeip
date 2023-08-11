@@ -103,8 +103,8 @@ tests:
       verification: |
           ./chip-tool onoff read attribute-list 1 1
 
-          Verify "AttributeList" contains a list of mandatory attributes (value 0), 
-          - Global attributes (value 65533, 65532, 65531, 65530, 65529 and 65528), 
+          Verify "AttributeList" contains a list of mandatory attributes (value 0),
+          - Global attributes (value 65533, 65532, 65531, 65530, 65529 and 65528),
           - Feature dependent attribute If OO.S.F00(LT) feature supports (Values 0x4000, 0x4001, 0x4002 and 0x4003)  on the TH(Chip-tool) Log and Below is the sample log provided for the raspi platform:
 
           [1676289026.377401][4351:4353] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_FFFB DataVersion: 659547221
@@ -163,7 +163,7 @@ tests:
       verification: |
           ./chip-tool onoff read accepted-command-list 1 1
 
-          Verify "AcceptedCommandList" contains a list of mandatory commands (value 0, 1 and 2) 
+          Verify "AcceptedCommandList" contains a list of mandatory commands (value 0, 1 and 2)
           - If  feature supports OO.S.F00(LT) list contains (values 0x40, 0x41 and 0x42) on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
 
           [1646045691.415739][36078:36083] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_FFF9DataVersion: 1805855192

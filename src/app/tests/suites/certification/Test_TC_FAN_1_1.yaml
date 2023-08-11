@@ -194,7 +194,7 @@ tests:
       verification: |
           ./chip-tool fancontrol read attribute-list 1 1
 
-          Via the TH (chip-tool), verify that  theAttributeListattribute contains 
+          Via the TH (chip-tool), verify that  theAttributeListattribute contains
           - Mandatory entries:0x0000, 0x0001, 0x0002, 0x0003,  0xfff8, 0xfff9, 0xfffa, 0xfffb, 0xfffc & 0xfffd
           - Based on feature support:- 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x000a, 0x000b
           Below mentioned log is based on the RPI implementation, Value may vary on real DUT

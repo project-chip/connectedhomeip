@@ -148,7 +148,7 @@ tests:
       verification: |
           ./chip-tool activatedcarbonfiltermonitoring read attribute-list 1 1
 
-          Via the TH (chip-tool), verify that the AttributeList attribute contains 
+          Via the TH (chip-tool), verify that the AttributeList attribute contains
           - Mandatory entries:0x0002, 0xfff8, 0xfff9, 0xfffa, 0xfffb, 0xfffc & 0xfffd
           - Optional entries:- 0x0003
           - Based on feature support:- 0x0000, 0x0001
