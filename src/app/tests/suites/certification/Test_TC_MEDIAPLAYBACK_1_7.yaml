@@ -234,7 +234,6 @@ tests:
           constraints:
               type: list
               contains: [10]
-
     #EventList disabled for 1.2
     # - label: "Step 6: Read the global attribute: EventList"
     #   PICS: PICS_EVENT_LIST_ENABLED

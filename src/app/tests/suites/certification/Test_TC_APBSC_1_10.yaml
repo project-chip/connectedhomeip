@@ -99,7 +99,6 @@ tests:
           value: []
           constraints:
               type: list
-
     # EventList disabled for 1.2
     # - label: "Step 6: Read the global attribute: EventList"
     #   command: "readAttribute"

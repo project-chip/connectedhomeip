@@ -157,7 +157,6 @@ tests:
           constraints:
               type: list
               contains: [1]
-
     # EventList disabled for 1.2
     # - label: "Step 6: Read the global attribute: EventList"
     #   command: "readAttribute"

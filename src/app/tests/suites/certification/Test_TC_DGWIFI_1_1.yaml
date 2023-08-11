@@ -138,7 +138,6 @@ tests:
           value: []
           constraints:
               type: list
-
     # EventList disabled for 1.2
     # - label: "Step 7a: TH reads EventList from DUT"
     #   PICS: " !DGWIFI.S.E00 && !DGWIFI.S.E01 && !DGWIFI.S.E02 "
@@ -148,7 +147,6 @@ tests:
     #       value: []
     #       constraints:
     #           type: list
-
     # - label:
     #       "Step 7b: TH reads optional attribute (Disconnection) in EventList
     #       from DUT"
@@ -159,7 +157,6 @@ tests:
     #       constraints:
     #           type: list
     #           contains: [0]
-
     # - label:
     #       "Step 7c: TH reads optional attribute (AssociationFailure) in
     #       EventList from DUT"
@@ -170,7 +167,6 @@ tests:
     #       constraints:
     #           type: list
     #           contains: [1]
-
     # - label:
     #       "Step 7d: TH reads optional attribute (ConnectionStatus) in EventList
     #       from DUT"

@@ -70,7 +70,6 @@ tests:
           value: []
           constraints:
               type: list
-
     # EventList disabled for 1.2
     # - label: "Step 7: Read the global attribute: EventList"
     #   PICS: BOOL.S.E00
@@ -80,7 +79,6 @@ tests:
     #       value: [0]
     #       constraints:
     #           type: list
-
     # - label: "Step 7: Read the global attribute: EventList"
     #   PICS: " !BOOL.S.E00 "
     #   command: "readAttribute"

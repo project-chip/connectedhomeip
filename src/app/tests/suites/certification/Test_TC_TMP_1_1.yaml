@@ -79,7 +79,6 @@ tests:
           value: []
           constraints:
               type: list
-
     #EventList disabled for 1.2
     # #Manufacturer specific event IDs check not possible
     # - label:

@@ -72,7 +72,6 @@ tests:
           constraints:
               type: list
               contains: [1]
-
     # EventList disabled for 1.2
     # - label: "Step 6: TH reads EventList attribute from DUT"
     #   command: "readAttribute"

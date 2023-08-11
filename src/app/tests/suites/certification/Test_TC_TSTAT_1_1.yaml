@@ -607,7 +607,6 @@ tests:
           constraints:
               type: list
               contains: [1]
-
     #EVentList disabled for 1.2
     # #Manufacturer specific event IDs check not possible
     # - label:

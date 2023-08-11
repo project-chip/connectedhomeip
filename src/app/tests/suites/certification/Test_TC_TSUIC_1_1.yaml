@@ -173,7 +173,6 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-
     #EventList disabled for 1.2
     # #Manufacturer specific event IDs check not possible
     # - label:
