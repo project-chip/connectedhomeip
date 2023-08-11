@@ -204,7 +204,28 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/components/serial_manager",
       "${k32w0_sdk_root}/components/uart",
       "${k32w0_sdk_root}/devices/${device}",
-      "${k32w0_sdk_root}/devices/${device}/drivers",
+      "${k32w0_sdk_root}/devices/K32W061/drivers",
+      "${k32w0_sdk_root}/drivers/common",
+      "${k32w0_sdk_root}/drivers/lpc_gpio",
+      "${k32w0_sdk_root}/drivers/aes",
+      "${k32w0_sdk_root}/drivers/jn_iocon",
+      "${k32w0_sdk_root}/drivers/lpc_adc",
+      "${k32w0_sdk_root}/drivers/aes",
+      "${k32w0_sdk_root}/drivers/jn_flash",
+      "${k32w0_sdk_root}/drivers/sha",
+      "${k32w0_sdk_root}/drivers/flexcomm",
+      "${k32w0_sdk_root}/drivers/lpc_dma",
+      "${k32w0_sdk_root}/drivers/pint",
+      "${k32w0_sdk_root}/drivers/inputmux",
+      "${k32w0_sdk_root}/drivers/spifi",
+      "${k32w0_sdk_root}/drivers/jn_rtc",
+      "${k32w0_sdk_root}/drivers/fmeas",
+      "${k32w0_sdk_root}/drivers/jn_rng",
+      "${k32w0_sdk_root}/drivers/ctimer",
+      "${k32w0_sdk_root}/drivers/wwdt",
+      "${k32w0_sdk_root}/drivers/gint",
+      "${k32w0_sdk_root}/utilities/debug_console/str",
+      "${k32w0_sdk_root}/utilities/debug_console",
       "${k32w0_sdk_root}/devices/${device}/utilities",
       "${k32w0_sdk_root}/devices/${device}/utilities/debug_console",
       "${k32w0_sdk_root}/devices/${device}/utilities/str",
@@ -257,7 +278,6 @@ template("k32w0_sdk") {
     ]
 
     defines = [
-      "gPWR_CpuClk_48MHz=1",
       "gMainThreadPriority_c=5",
       "CPU_JN518X",
       "CPU_JN518X_REV=2",
@@ -335,9 +355,15 @@ template("k32w0_sdk") {
     }
 
     if (use_fro_32k == 1) {
-      defines += [ "gClkUseFro32K=1" ]
+      defines += [
+        "gClkUseFro32K=1",
+        "gPWR_CpuClk_48MHz=0",
+      ]
     } else {
-      defines += [ "gClkUseFro32K=0" ]
+      defines += [
+        "gClkUseFro32K=0",
+        "gPWR_CpuClk_48MHz=1",
+      ]
     }
 
     if (chip_with_pdm_encryption == 1) {
@@ -399,6 +425,7 @@ template("k32w0_sdk") {
 
     if (chip_with_low_power == 1) {
       defines += [
+        "chip_with_low_power=1",
         "cPWR_UsePowerDownMode=1",
         "cPWR_FullPowerDownMode=1",
         "DBG_PostStepTickAssess=0",
@@ -456,7 +483,7 @@ template("k32w0_sdk") {
     }
 
     if (chip_with_factory_data == 1) {
-      defines += [ "CONFIG_CHIP_K32W0_REAL_FACTORY_DATA=1" ]
+      defines += [ "CONFIG_CHIP_LOAD_REAL_FACTORY_DATA=1" ]
     }
 
     if (defined(invoker.defines)) {
@@ -510,31 +537,29 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/components/serial_manager/serial_manager.c",
       "${k32w0_sdk_root}/components/serial_manager/serial_port_uart.c",
       "${k32w0_sdk_root}/components/uart/usart_adapter.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_adc.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_aes.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_clock.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_common.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_ctimer.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_flash.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_flexcomm.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_fmeas.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_gpio.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_i2c.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_i2c_freertos.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_inputmux.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_pint.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_power.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_reset.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_rng.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_rtc.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_sha.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_spifi.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_usart.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_wtimer.c",
       "${k32w0_sdk_root}/devices/${device}/mcuxpresso/startup_${device_lowercase}.c",
       "${k32w0_sdk_root}/devices/${device}/system_${device}.c",
-      "${k32w0_sdk_root}/devices/${device}/utilities/debug_console/fsl_debug_console.c",
-      "${k32w0_sdk_root}/devices/${device}/utilities/str/fsl_str.c",
+      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_clock.c",
+      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_power.c",
+      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_reset.c",
+      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_wtimer.c",
+      "${k32w0_sdk_root}/drivers/aes/fsl_aes.c",
+      "${k32w0_sdk_root}/drivers/common/fsl_common.c",
+      "${k32w0_sdk_root}/drivers/ctimer/fsl_ctimer.c",
+      "${k32w0_sdk_root}/drivers/flexcomm/fsl_flexcomm.c",
+      "${k32w0_sdk_root}/drivers/flexcomm/fsl_i2c.c",
+      "${k32w0_sdk_root}/drivers/flexcomm/fsl_i2c_freertos.c",
+      "${k32w0_sdk_root}/drivers/flexcomm/fsl_usart.c",
+      "${k32w0_sdk_root}/drivers/fmeas/fsl_fmeas.c",
+      "${k32w0_sdk_root}/drivers/inputmux/fsl_inputmux.c",
+      "${k32w0_sdk_root}/drivers/jn_flash/fsl_flash.c",
+      "${k32w0_sdk_root}/drivers/jn_rng/fsl_rng.c",
+      "${k32w0_sdk_root}/drivers/jn_rtc/fsl_rtc.c",
+      "${k32w0_sdk_root}/drivers/lpc_adc/fsl_adc.c",
+      "${k32w0_sdk_root}/drivers/lpc_gpio/fsl_gpio.c",
+      "${k32w0_sdk_root}/drivers/pint/fsl_pint.c",
+      "${k32w0_sdk_root}/drivers/sha/fsl_sha.c",
+      "${k32w0_sdk_root}/drivers/spifi/fsl_spifi.c",
       "${k32w0_sdk_root}/middleware/wireless/ble_controller/config/controller_config.c",
       "${k32w0_sdk_root}/middleware/wireless/bluetooth/application/common/ble_conn_manager.c",
       "${k32w0_sdk_root}/middleware/wireless/bluetooth/application/common/ble_host_tasks.c",
@@ -574,6 +599,8 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/queue.c",
       "${k32w0_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/tasks.c",
       "${k32w0_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/timers.c",
+      "${k32w0_sdk_root}/utilities/debug_console/fsl_debug_console.c",
+      "${k32w0_sdk_root}/utilities/debug_console/str/fsl_str.c",
     ]
 
     if (chip_with_DK6) {

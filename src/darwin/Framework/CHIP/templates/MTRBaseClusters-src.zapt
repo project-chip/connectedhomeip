@@ -34,15 +34,12 @@ using chip::System::Clock::Seconds16;
 
 - (instancetype)initWithDevice:(MTRBaseDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
 {
-    if (self = [super initWithQueue:queue]) {
+    if (self = [super initWithEndpointID:endpointID queue:queue]) {
         if (device == nil) {
             return nil;
         }
 
         _device = device;
-        {{!TODO consider range-checking the incoming number to make sure it's
-                actually in the uint16_t range}}
-        _endpoint = [endpointID unsignedShortValue];
     }
     return self;
 }
@@ -122,7 +119,7 @@ MTR{{cluster}}Cluster{{command}}Params
           {{/last}}
         {{/zcl_command_arguments}}
 
-        return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb, self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
+        return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb, self.endpoint, timedInvokeTimeoutMs, invokeTimeout);
     });
     std::move(*bridge).DispatchAction(self.device);
 }
@@ -156,7 +153,7 @@ MTR{{cluster}}Cluster{{command}}Params
     using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
     return MTRReadAttribute<MTR{{>attribute_data_callback_name}}CallbackBridge,
                          {{asObjectiveCClass type parent.name}},
-                         TypeInfo::DecodableType>(params, completion, self.callbackQueue, self.device, self->_endpoint, TypeInfo::GetClusterId(), TypeInfo::GetAttributeId());
+                         TypeInfo::DecodableType>(params, completion, self.callbackQueue, self.device, self.endpoint, TypeInfo::GetClusterId(), TypeInfo::GetAttributeId());
 }
 
 {{#if isWritableAttribute}}
@@ -196,7 +193,7 @@ MTR{{cluster}}Cluster{{command}}Params
         TypeInfo::Type cppValue;
         {{>encode_value target="cppValue" source="value" cluster=parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
 
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self->_endpoint);
+        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpoint);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout);
     });
     std::move(*bridge).DispatchAction(self.device);
@@ -209,7 +206,7 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler
 {
     using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
-    MTRSubscribeAttribute<MTR{{>attribute_data_callback_name}}CallbackSubscriptionBridge, {{asObjectiveCClass type parent.name}}, TypeInfo::DecodableType>(params, subscriptionEstablished, reportHandler, self.callbackQueue, self.device, self->_endpoint, TypeInfo::GetClusterId(), TypeInfo::GetAttributeId());
+    MTRSubscribeAttribute<MTR{{>attribute_data_callback_name}}CallbackSubscriptionBridge, {{asObjectiveCClass type parent.name}}, TypeInfo::DecodableType>(params, subscriptionEstablished, reportHandler, self.callbackQueue, self.device, self.endpoint, TypeInfo::GetClusterId(), TypeInfo::GetAttributeId());
 }
 
 + (void) read{{>attribute}}WithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint  queue:(dispatch_queue_t)queue completion:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion

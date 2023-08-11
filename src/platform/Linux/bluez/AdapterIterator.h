@@ -17,11 +17,13 @@
 
 #pragma once
 
+#include <string>
+
+#include <gio/gio.h>
+
 #include "lib/core/CHIPError.h"
 
 #include "Types.h"
-
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 namespace chip {
 namespace DeviceLayer {
@@ -92,5 +94,3 @@ private:
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

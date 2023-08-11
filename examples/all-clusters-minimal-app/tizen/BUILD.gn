@@ -31,6 +31,7 @@ source_set("chip-all-clusters-common") {
 
   deps = [
     "${chip_root}/examples/all-clusters-minimal-app/all-clusters-common",
+    "${chip_root}/examples/platform/tizen:app-main",
     "${chip_root}/src/lib/shell:shell_core",
   ]
 

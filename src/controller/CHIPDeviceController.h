@@ -702,6 +702,8 @@ public:
         mDeviceAttestationVerifier = deviceAttestationVerifier;
     }
 
+    Credentials::DeviceAttestationVerifier * GetDeviceAttestationVerifier() const { return mDeviceAttestationVerifier; }
+
     Optional<CommissioningParameters> GetCommissioningParameters()
     {
         return mDefaultCommissioner == nullptr ? NullOptional : MakeOptional(mDefaultCommissioner->GetCommissioningParameters());
