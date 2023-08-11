@@ -1,4 +1,4 @@
-import pandas
+import pandas as pd
 
-with open("runlist", "r") as runlist:
-  print(runlist.read())
+df = pd.read_json("runlist.json")
+print(df.to_string())
