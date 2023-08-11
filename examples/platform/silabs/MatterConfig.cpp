@@ -41,6 +41,12 @@
 #include "MemMonitoring.h"
 #endif
 
+#ifdef SIWX_917
+extern "C" {
+int32_t wfx_wifi_rsi_init(void);
+}
+#endif /* SIWX_917 */
+
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
@@ -265,13 +271,13 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 #endif                           // SL_WFX_USE_SECURE_LINK
 #endif /* WF200_WIFI */
 
-#ifdef SI917
+#ifdef SIWX_917
     sl_status_t status;
     if ((status = wfx_wifi_rsi_init()) != SL_STATUS_OK)
     {
         ReturnErrorOnFailure((CHIP_ERROR)status);
     }
-#endif // SI917
+#endif // SIWX_917
 
     return CHIP_NO_ERROR;
 }

@@ -108,6 +108,7 @@ extern "C" {
 #include <stdint.h>
 
 #ifdef SIWX_917
+#include "RS1xxxx_9117.h"
 extern uint32_t SystemCoreClock;
 #else // For EFR32
 #include "RTE_Components.h"
@@ -136,6 +137,7 @@ extern uint32_t SystemCoreClock;
  *
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
+
 
 /* Energy saving modes. */
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
@@ -167,6 +169,13 @@ extern uint32_t SystemCoreClock;
 #define configTIMER_TASK_PRIORITY (40) /* Highest priority */
 #define configTIMER_QUEUE_LENGTH (10)
 #define configTIMER_TASK_STACK_DEPTH (1024)
+
+#ifdef SIWX_917
+#ifdef __NVIC_PRIO_BITS
+#undef __NVIC_PRIO_BITS
+#endif
+#define configPRIO_BITS 6 /* 6 priority levels. */
+#endif // SIWX_917
 
 /* Interrupt priorities used by the kernel port layer itself.  These are generic
 to all Cortex-M ports, and do not rely on any particular library functions. */
@@ -213,7 +222,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #ifndef configTOTAL_HEAP_SIZE
 #ifdef SL_WIFI
 #ifdef DIC_ENABLE
-#define configTOTAL_HEAP_SIZE ((size_t)(56 * 1024))
+#define configTOTAL_HEAP_SIZE ((size_t)(50 * 1024))
 #else
 #define configTOTAL_HEAP_SIZE ((size_t)(34 * 1024))
 #endif // DIC

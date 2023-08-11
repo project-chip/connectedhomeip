@@ -190,7 +190,7 @@ sl_status_t wfx_connect_to_ap(void)
     return SL_STATUS_OK;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
 /*********************************************************************
  * @fn  sl_status_t wfx_power_save()
  * @brief

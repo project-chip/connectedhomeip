@@ -30,7 +30,6 @@ extern "C" {
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "task.h"
-int32_t wfx_wifi_rsi_init(void);
 
 #ifdef __cplusplus
 }
