@@ -17,20 +17,22 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
+import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class AccessControlClusterAccessControlEntryChangedEvent(
-  val adminNodeID: Long?,
-  val adminPasscodeID: Int?,
-  val changeType: Int,
-  val latestValue:
-    chip.devicecontroller.cluster.structs.AccessControlClusterAccessControlEntryStruct?,
-  val fabricIndex: Int
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class AccessControlClusterAccessControlEntryChangedEvent (
+    val adminNodeID: Long?,
+    val adminPasscodeID: Int?,
+    val changeType: Int,
+    val latestValue: chip.devicecontroller.cluster.structs.AccessControlClusterAccessControlEntryStruct?,
+    val fabricIndex: Int) {
+  override fun toString(): String  = buildString {
     append("AccessControlClusterAccessControlEntryChangedEvent {\n")
     append("\tadminNodeID : $adminNodeID\n")
     append("\tadminPasscodeID : $adminPasscodeID\n")
@@ -44,21 +46,21 @@ class AccessControlClusterAccessControlEntryChangedEvent(
     tlvWriter.apply {
       startStructure(tag)
       if (adminNodeID != null) {
-        put(ContextSpecificTag(TAG_ADMIN_NODE_I_D), adminNodeID)
-      } else {
-        putNull(ContextSpecificTag(TAG_ADMIN_NODE_I_D))
-      }
+      put(ContextSpecificTag(TAG_ADMIN_NODE_I_D), adminNodeID)
+    } else {
+      putNull(ContextSpecificTag(TAG_ADMIN_NODE_I_D))
+    }
       if (adminPasscodeID != null) {
-        put(ContextSpecificTag(TAG_ADMIN_PASSCODE_I_D), adminPasscodeID)
-      } else {
-        putNull(ContextSpecificTag(TAG_ADMIN_PASSCODE_I_D))
-      }
+      put(ContextSpecificTag(TAG_ADMIN_PASSCODE_I_D), adminPasscodeID)
+    } else {
+      putNull(ContextSpecificTag(TAG_ADMIN_PASSCODE_I_D))
+    }
       put(ContextSpecificTag(TAG_CHANGE_TYPE), changeType)
       if (latestValue != null) {
-        latestValue.toTlv(ContextSpecificTag(TAG_LATEST_VALUE), this)
-      } else {
-        putNull(ContextSpecificTag(TAG_LATEST_VALUE))
-      }
+      latestValue.toTlv(ContextSpecificTag(TAG_LATEST_VALUE), this)
+    } else {
+      putNull(ContextSpecificTag(TAG_LATEST_VALUE))
+    }
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
@@ -71,45 +73,32 @@ class AccessControlClusterAccessControlEntryChangedEvent(
     private const val TAG_LATEST_VALUE = 4
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(
-      tag: Tag,
-      tlvReader: TlvReader
-    ): AccessControlClusterAccessControlEntryChangedEvent {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader) : AccessControlClusterAccessControlEntryChangedEvent {
       tlvReader.enterStructure(tag)
-      val adminNodeID =
-        if (!tlvReader.isNull()) {
-          tlvReader.getLong(ContextSpecificTag(TAG_ADMIN_NODE_I_D))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_ADMIN_NODE_I_D))
-          null
-        }
-      val adminPasscodeID =
-        if (!tlvReader.isNull()) {
-          tlvReader.getInt(ContextSpecificTag(TAG_ADMIN_PASSCODE_I_D))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_ADMIN_PASSCODE_I_D))
-          null
-        }
+      val adminNodeID = if (!tlvReader.isNull()) {
+      tlvReader.getLong(ContextSpecificTag(TAG_ADMIN_NODE_I_D))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_ADMIN_NODE_I_D))
+      null
+    }
+      val adminPasscodeID = if (!tlvReader.isNull()) {
+      tlvReader.getInt(ContextSpecificTag(TAG_ADMIN_PASSCODE_I_D))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_ADMIN_PASSCODE_I_D))
+      null
+    }
       val changeType = tlvReader.getInt(ContextSpecificTag(TAG_CHANGE_TYPE))
-      val latestValue =
-        if (!tlvReader.isNull()) {
-          chip.devicecontroller.cluster.structs.AccessControlClusterAccessControlEntryStruct
-            .fromTlv(ContextSpecificTag(TAG_LATEST_VALUE), tlvReader)
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_LATEST_VALUE))
-          null
-        }
+      val latestValue = if (!tlvReader.isNull()) {
+      chip.devicecontroller.cluster.structs.AccessControlClusterAccessControlEntryStruct.fromTlv(ContextSpecificTag(TAG_LATEST_VALUE), tlvReader)
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_LATEST_VALUE))
+      null
+    }
       val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
-      return AccessControlClusterAccessControlEntryChangedEvent(
-        adminNodeID,
-        adminPasscodeID,
-        changeType,
-        latestValue,
-        fabricIndex
-      )
+      return AccessControlClusterAccessControlEntryChangedEvent(adminNodeID, adminPasscodeID, changeType, latestValue, fabricIndex)
     }
   }
 }

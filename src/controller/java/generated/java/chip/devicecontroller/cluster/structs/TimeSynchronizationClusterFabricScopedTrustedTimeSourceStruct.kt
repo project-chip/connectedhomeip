@@ -17,16 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
+import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct(
-  val nodeID: Long,
-  val endpoint: Int
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct (
+    val nodeID: Long,
+    val endpoint: Int) {
+  override fun toString(): String  = buildString {
     append("TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct {\n")
     append("\tnodeID : $nodeID\n")
     append("\tendpoint : $endpoint\n")
@@ -46,14 +49,11 @@ class TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct(
     private const val TAG_NODE_I_D = 0
     private const val TAG_ENDPOINT = 1
 
-    fun fromTlv(
-      tag: Tag,
-      tlvReader: TlvReader
-    ): TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader) : TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct {
       tlvReader.enterStructure(tag)
       val nodeID = tlvReader.getLong(ContextSpecificTag(TAG_NODE_I_D))
       val endpoint = tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT))
-
+      
       tlvReader.exitContainer()
 
       return TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct(nodeID, endpoint)

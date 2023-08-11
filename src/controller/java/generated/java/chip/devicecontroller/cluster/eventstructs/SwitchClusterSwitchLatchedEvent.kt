@@ -17,13 +17,18 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
+import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class SwitchClusterSwitchLatchedEvent(val newPosition: Int) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class SwitchClusterSwitchLatchedEvent (
+    val newPosition: Int) {
+  override fun toString(): String  = buildString {
     append("SwitchClusterSwitchLatchedEvent {\n")
     append("\tnewPosition : $newPosition\n")
     append("}\n")
@@ -40,10 +45,10 @@ class SwitchClusterSwitchLatchedEvent(val newPosition: Int) {
   companion object {
     private const val TAG_NEW_POSITION = 0
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): SwitchClusterSwitchLatchedEvent {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader) : SwitchClusterSwitchLatchedEvent {
       tlvReader.enterStructure(tag)
       val newPosition = tlvReader.getInt(ContextSpecificTag(TAG_NEW_POSITION))
-
+      
       tlvReader.exitContainer()
 
       return SwitchClusterSwitchLatchedEvent(newPosition)

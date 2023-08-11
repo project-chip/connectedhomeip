@@ -17,13 +17,18 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
+import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class TimeSynchronizationClusterDSTStatusEvent(val DSTOffsetActive: Boolean) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class TimeSynchronizationClusterDSTStatusEvent (
+    val DSTOffsetActive: Boolean) {
+  override fun toString(): String  = buildString {
     append("TimeSynchronizationClusterDSTStatusEvent {\n")
     append("\tDSTOffsetActive : $DSTOffsetActive\n")
     append("}\n")
@@ -40,10 +45,10 @@ class TimeSynchronizationClusterDSTStatusEvent(val DSTOffsetActive: Boolean) {
   companion object {
     private const val TAG_D_S_T_OFFSET_ACTIVE = 0
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): TimeSynchronizationClusterDSTStatusEvent {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader) : TimeSynchronizationClusterDSTStatusEvent {
       tlvReader.enterStructure(tag)
       val DSTOffsetActive = tlvReader.getBoolean(ContextSpecificTag(TAG_D_S_T_OFFSET_ACTIVE))
-
+      
       tlvReader.exitContainer()
 
       return TimeSynchronizationClusterDSTStatusEvent(DSTOffsetActive)
