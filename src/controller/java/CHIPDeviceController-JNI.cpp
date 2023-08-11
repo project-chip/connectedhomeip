@@ -340,20 +340,21 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     SuccessOrExit(err);
 
     {
-        uint64_t fabricId                  = env->CallLongMethod(controllerParams, getFabricId);
-        uint16_t listenPort                = env->CallIntMethod(controllerParams, getUdpListenPort);
-        uint16_t controllerVendorId        = env->CallIntMethod(controllerParams, getControllerVendorId);
+        uint64_t fabricId                  = static_cast<uint64_t>(env->CallLongMethod(controllerParams, getFabricId));
+        uint16_t listenPort                = static_cast<uint16_t>(env->CallIntMethod(controllerParams, getUdpListenPort));
+        uint16_t controllerVendorId        = static_cast<uint16_t>(env->CallIntMethod(controllerParams, getControllerVendorId));
         jobject keypairDelegate            = env->CallObjectMethod(controllerParams, getKeypairDelegate);
         jbyteArray rootCertificate         = (jbyteArray) env->CallObjectMethod(controllerParams, getRootCertificate);
         jbyteArray intermediateCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getIntermediateCertificate);
         jbyteArray operationalCertificate  = (jbyteArray) env->CallObjectMethod(controllerParams, getOperationalCertificate);
         jbyteArray ipk                     = (jbyteArray) env->CallObjectMethod(controllerParams, getIpk);
-        uint16_t failsafeTimerSeconds      = env->CallIntMethod(controllerParams, getFailsafeTimerSeconds);
-        uint16_t caseFailsafeTimerSeconds  = env->CallIntMethod(controllerParams, getCASEFailsafeTimerSeconds);
+        uint16_t failsafeTimerSeconds      = static_cast<uint16_t>(env->CallIntMethod(controllerParams, getFailsafeTimerSeconds));
+        uint16_t caseFailsafeTimerSeconds =
+            static_cast<uint16_t>(env->CallIntMethod(controllerParams, getCASEFailsafeTimerSeconds));
         bool attemptNetworkScanWiFi        = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanWiFi);
         bool attemptNetworkScanThread      = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanThread);
         bool skipCommissioningComplete     = env->CallBooleanMethod(controllerParams, getSkipCommissioningComplete);
-        uint64_t adminSubject              = env->CallLongMethod(controllerParams, getAdminSubject);
+        uint64_t adminSubject              = static_cast<uint64_t>(env->CallLongMethod(controllerParams, getAdminSubject));
         jobject countryCodeOptional        = env->CallObjectMethod(controllerParams, getCountryCode);
         jobject regulatoryLocationOptional = env->CallObjectMethod(controllerParams, getRegulatoryLocation);
 
@@ -630,9 +631,9 @@ JNI_METHOD(void, pairDeviceWithAddress)
 
     RendezvousParameters rendezvousParams =
         RendezvousParameters()
-            .SetDiscriminator(discriminator)
+            .SetDiscriminator(static_cast<uint16_t>(discriminator))
             .SetSetupPINCode(static_cast<uint32_t>(pinCode))
-            .SetPeerAddress(Transport::PeerAddress::UDP(const_cast<char *>(addrJniString.c_str()), port));
+            .SetPeerAddress(Transport::PeerAddress::UDP(const_cast<char *>(addrJniString.c_str()), static_cast<uint16_t>(port)));
 
     CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
     if (csrNonce != nullptr)
@@ -748,7 +749,7 @@ JNI_METHOD(void, establishPaseConnectionByAddress)
     RendezvousParameters rendezvousParams =
         RendezvousParameters()
             .SetSetupPINCode(static_cast<uint32_t>(pinCode))
-            .SetPeerAddress(Transport::PeerAddress::UDP(const_cast<char *>(addrJniString.c_str()), port));
+            .SetPeerAddress(Transport::PeerAddress::UDP(const_cast<char *>(addrJniString.c_str()), static_cast<uint16_t>(port)));
 
     err = wrapper->Controller()->EstablishPASEConnection(deviceId, rendezvousParams);
 
@@ -871,7 +872,7 @@ CHIP_ERROR GetEpochTime(JNIEnv * env, jobject calendar, uint32_t & epochTime)
     universalTime.Year = static_cast<uint16_t>(env->CallIntMethod(calendar, getMethod, yearID));
     // The first month of the year in the Gregorian and Julian calendars is JANUARY which is 0. See detailed in
     // https://docs.oracle.com/javase/8/docs/api/java/util/Calendar.html#MONTH
-    universalTime.Month  = static_cast<uint8_t>(env->CallIntMethod(calendar, getMethod, monthID)) + 1;
+    universalTime.Month  = static_cast<uint8_t>(static_cast<uint8_t>(env->CallIntMethod(calendar, getMethod, monthID)) + 1u);
     universalTime.Day    = static_cast<uint8_t>(env->CallIntMethod(calendar, getMethod, dayID));
     universalTime.Hour   = static_cast<uint8_t>(env->CallIntMethod(calendar, getMethod, hourID));
     universalTime.Minute = static_cast<uint8_t>(env->CallIntMethod(calendar, getMethod, minuteID));
@@ -1505,7 +1506,7 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
     chip::SetupPayload setupPayload;
     err = AutoCommissioningWindowOpener::OpenCommissioningWindow(
         wrapper->Controller(), chipDevice->GetDeviceId(), System::Clock::Seconds16(duration), static_cast<uint32_t>(iteration),
-        discriminator, pinCode, NullOptional, setupPayload);
+        static_cast<uint16_t>(discriminator), pinCode, NullOptional, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -1571,7 +1572,7 @@ JNI_METHOD(jboolean, openPairingWindowWithPINCallback)
     chip::SetupPayload setupPayload;
     err = AndroidCommissioningWindowOpener::OpenCommissioningWindow(
         wrapper->Controller(), chipDevice->GetDeviceId(), System::Clock::Seconds16(duration), static_cast<uint32_t>(iteration),
-        discriminator, pinCode, NullOptional, jcallback, setupPayload);
+        static_cast<uint16_t>(discriminator), pinCode, NullOptional, jcallback, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -1699,11 +1700,12 @@ JNI_METHOD(void, subscribe)
     }
     app::ReadPrepareParams params(device->GetSecureSession().Value());
 
-    params.mMinIntervalFloorSeconds   = minInterval;
-    params.mMaxIntervalCeilingSeconds = maxInterval;
+    uint16_t aImTimeoutMs             = static_cast<uint16_t>(imTimeoutMs);
+    params.mMinIntervalFloorSeconds   = static_cast<uint16_t>(minInterval);
+    params.mMaxIntervalCeilingSeconds = static_cast<uint16_t>(maxInterval);
     params.mKeepSubscriptions         = (keepSubscriptions != JNI_FALSE);
     params.mIsFabricFiltered          = (isFabricFiltered != JNI_FALSE);
-    params.mTimeout                   = imTimeoutMs != 0 ? System::Clock::Milliseconds32(imTimeoutMs) : System::Clock::kZero;
+    params.mTimeout                   = aImTimeoutMs != 0 ? System::Clock::Milliseconds32(aImTimeoutMs) : System::Clock::kZero;
 
     if (attributePathList != nullptr)
     {
@@ -1857,10 +1859,11 @@ JNI_METHOD(void, write)
  jint imTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    jint listSize  = 0;
-    auto callback  = reinterpret_cast<WriteAttributesCallback *>(callbackHandle);
-    app::WriteClient * writeClient;
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    jint listSize                   = 0;
+    auto callback                   = reinterpret_cast<WriteAttributesCallback *>(callbackHandle);
+    app::WriteClient * writeClient  = nullptr;
+    uint16_t convertedTimedRequestTimeoutMs = static_cast<uint16_t>(timedRequestTimeoutMs);
 
     ChipLogDetail(Controller, "IM write() called");
 
@@ -1871,8 +1874,8 @@ JNI_METHOD(void, write)
     SuccessOrExit(err = JniReferences::GetInstance().GetListSize(attributeList, listSize));
 
     writeClient = Platform::New<app::WriteClient>(device->GetExchangeManager(), callback->GetChunkedWriteCallback(),
-                                                  timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs)
-                                                                             : Optional<uint16_t>::Missing());
+                                                  convertedTimedRequestTimeoutMs != 0 ? Optional<uint16_t>(convertedTimedRequestTimeoutMs)
+                                                                              : Optional<uint16_t>::Missing());
 
     for (uint8_t i = 0; i < listSize; i++)
     {
@@ -1987,24 +1990,25 @@ JNI_METHOD(void, invoke)
  jint imTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    auto callback  = reinterpret_cast<InvokeCallback *>(callbackHandle);
-    app::CommandSender * commandSender;
-    uint32_t endpointId             = 0;
-    uint32_t clusterId              = 0;
-    uint32_t commandId              = 0;
-    jmethodID getEndpointIdMethod   = nullptr;
-    jmethodID getClusterIdMethod    = nullptr;
-    jmethodID getCommandIdMethod    = nullptr;
-    jmethodID getTlvByteArrayMethod = nullptr;
-    jobject endpointIdObj           = nullptr;
-    jobject clusterIdObj            = nullptr;
-    jobject commandIdObj            = nullptr;
-    jbyteArray tlvBytesObj          = nullptr;
-    jbyte * tlvBytesObjBytes        = nullptr;
-    jsize length                    = 0;
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    auto callback                      = reinterpret_cast<InvokeCallback *>(callbackHandle);
+    app::CommandSender * commandSender = nullptr;
+    uint32_t endpointId                = 0;
+    uint32_t clusterId                 = 0;
+    uint32_t commandId                 = 0;
+    jmethodID getEndpointIdMethod      = nullptr;
+    jmethodID getClusterIdMethod       = nullptr;
+    jmethodID getCommandIdMethod       = nullptr;
+    jmethodID getTlvByteArrayMethod    = nullptr;
+    jobject endpointIdObj              = nullptr;
+    jobject clusterIdObj               = nullptr;
+    jobject commandIdObj               = nullptr;
+    jbyteArray tlvBytesObj             = nullptr;
+    jbyte * tlvBytesObjBytes           = nullptr;
+    jsize length                       = 0;
     TLV::TLVReader reader;
-    TLV::TLVWriter * writer = nullptr;
+    TLV::TLVWriter * writer         = nullptr;
+    uint16_t convertedTimedRequestTimeoutMs = static_cast<uint16_t>(timedRequestTimeoutMs);
 
     ChipLogDetail(Controller, "IM invoke() called");
 
@@ -2058,9 +2062,8 @@ JNI_METHOD(void, invoke)
     reader.Init(reinterpret_cast<const uint8_t *>(tlvBytesObjBytes), static_cast<size_t>(length));
     reader.Next();
     SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(app::CommandDataIB::Tag::kFields), reader));
-
-    SuccessOrExit(err = commandSender->FinishCommand(timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs)
-                                                                                : Optional<uint16_t>::Missing()));
+    SuccessOrExit(err = commandSender->FinishCommand(convertedTimedRequestTimeoutMs != 0 ? Optional<uint16_t>(convertedTimedRequestTimeoutMs)
+                                                                                 : Optional<uint16_t>::Missing()));
 
     SuccessOrExit(err =
                       commandSender->SendCommandRequest(device->GetSecureSession().Value(),
