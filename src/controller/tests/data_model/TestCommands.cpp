@@ -85,7 +85,8 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
 
         if (DataModel::Decode(aReader, dataRequest) != CHIP_NO_ERROR)
         {
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure, "Unable to decode the request");
+            apCommandObj->AddStatusAndLogIfFailure(aCommandPath, Protocols::InteractionModel::Status::Failure,
+                                                   "Unable to decode the request");
             return;
         }
 
@@ -115,18 +116,15 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         }
         else if (responseDirective == kSendMultipleSuccessStatusCodes)
         {
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Success,
-                                    "No error but testing status success case");
-
             // TODO: Right now all but the first AddStatus call fail, so this
             // test is not really testing what it should.
-            for (size_t i = 0; i < 3; ++i)
+            for (size_t i = 0; i < 4; ++i)
             {
-                (void) apCommandObj->FallibleAddStatus(aCommandPath, Protocols::InteractionModel::Status::Success,
-                                                       "No error but testing status success case");
+                apCommandObj->AddStatusAndLogIfFailure(aCommandPath, Protocols::InteractionModel::Status::Success,
+                                                       "No error but testing AddStatusAndLogIfFailure in success case");
             }
             // And one failure on the end.
-            (void) apCommandObj->FallibleAddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
         }
         else if (responseDirective == kSendError)
         {
@@ -134,13 +132,11 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         }
         else if (responseDirective == kSendMultipleErrors)
         {
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
-
             // TODO: Right now all but the first AddStatus call fail, so this
             // test is not really testing what it should.
-            for (size_t i = 0; i < 3; ++i)
+            for (size_t i = 0; i < 4; ++i)
             {
-                (void) apCommandObj->FallibleAddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
+                apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
             }
         }
         else if (responseDirective == kSendSuccessStatusCodeWithClusterStatus)
