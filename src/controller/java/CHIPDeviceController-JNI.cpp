@@ -1859,10 +1859,10 @@ JNI_METHOD(void, write)
  jint imTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err                  = CHIP_NO_ERROR;
-    jint listSize                   = 0;
-    auto callback                   = reinterpret_cast<WriteAttributesCallback *>(callbackHandle);
-    app::WriteClient * writeClient  = nullptr;
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    jint listSize                           = 0;
+    auto callback                           = reinterpret_cast<WriteAttributesCallback *>(callbackHandle);
+    app::WriteClient * writeClient          = nullptr;
     uint16_t convertedTimedRequestTimeoutMs = static_cast<uint16_t>(timedRequestTimeoutMs);
 
     ChipLogDetail(Controller, "IM write() called");
@@ -1873,9 +1873,9 @@ JNI_METHOD(void, write)
     VerifyOrExit(attributeList != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     SuccessOrExit(err = JniReferences::GetInstance().GetListSize(attributeList, listSize));
 
-    writeClient = Platform::New<app::WriteClient>(device->GetExchangeManager(), callback->GetChunkedWriteCallback(),
-                                                  convertedTimedRequestTimeoutMs != 0 ? Optional<uint16_t>(convertedTimedRequestTimeoutMs)
-                                                                              : Optional<uint16_t>::Missing());
+    writeClient = Platform::New<app::WriteClient>(
+        device->GetExchangeManager(), callback->GetChunkedWriteCallback(),
+        convertedTimedRequestTimeoutMs != 0 ? Optional<uint16_t>(convertedTimedRequestTimeoutMs) : Optional<uint16_t>::Missing());
 
     for (uint8_t i = 0; i < listSize; i++)
     {
@@ -2007,7 +2007,7 @@ JNI_METHOD(void, invoke)
     jbyte * tlvBytesObjBytes           = nullptr;
     jsize length                       = 0;
     TLV::TLVReader reader;
-    TLV::TLVWriter * writer         = nullptr;
+    TLV::TLVWriter * writer                 = nullptr;
     uint16_t convertedTimedRequestTimeoutMs = static_cast<uint16_t>(timedRequestTimeoutMs);
 
     ChipLogDetail(Controller, "IM invoke() called");
@@ -2062,8 +2062,9 @@ JNI_METHOD(void, invoke)
     reader.Init(reinterpret_cast<const uint8_t *>(tlvBytesObjBytes), static_cast<size_t>(length));
     reader.Next();
     SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(app::CommandDataIB::Tag::kFields), reader));
-    SuccessOrExit(err = commandSender->FinishCommand(convertedTimedRequestTimeoutMs != 0 ? Optional<uint16_t>(convertedTimedRequestTimeoutMs)
-                                                                                 : Optional<uint16_t>::Missing()));
+    SuccessOrExit(err = commandSender->FinishCommand(convertedTimedRequestTimeoutMs != 0
+                                                         ? Optional<uint16_t>(convertedTimedRequestTimeoutMs)
+                                                         : Optional<uint16_t>::Missing()));
 
     SuccessOrExit(err =
                       commandSender->SendCommandRequest(device->GetSecureSession().Value(),
