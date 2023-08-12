@@ -55,8 +55,12 @@ MTR_NEWLY_AVAILABLE
  * operationalCertificate.
  *
  * @param storageDelegate The storage to use for the controller.  This will be
- *                        called into on some arbitrary thread, but calls will
- *                        be guaranteed to be serialized not race with each other.
+ *                        called into on storageDelegateQueue.
+ *
+ * @param storageDelegateQueue The queue for calls into storageDelegate.  See
+ *                             MTRDeviceControllerStorageDelegate documentation
+ *                             for the rules about what work is allowed to be
+ *                             done on this queue.
  *
  * @param UUID The unique id to assign to the controller.
  *
@@ -71,6 +75,7 @@ MTR_NEWLY_AVAILABLE
  *                                operationalCertificate.
  */
 - (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
+                   storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
                                    UUID:(NSUUID *)UUID
                                     ipk:(NSData *)ipk
                                vendorID:(NSNumber *)vendorID

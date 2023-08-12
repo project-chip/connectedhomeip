@@ -51,6 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRDeviceControllerStartupParameters ()
 
 - (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
+                   storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
                                    UUID:(NSUUID *)UUID
                                     ipk:(NSData *)ipk
                                vendorID:(NSNumber *)vendorID
@@ -73,6 +74,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable, readonly) dispatch_queue_t operationalCertificateIssuerQueue;
 
 @property (nonatomic, strong, readonly) id<MTRDeviceControllerStorageDelegate> storageDelegate;
+@property (nonatomic, strong, readonly) dispatch_queue_t storageDelegateQueue;
 @property (nonatomic, strong, readonly) NSUUID * UUID;
 
 @end
@@ -100,6 +102,12 @@ MTR_HIDDEN
  * without storage.
  */
 @property (nonatomic, strong, nullable, readonly) id<MTRDeviceControllerStorageDelegate> storageDelegate;
+
+/**
+ * The queue to use for storageDelegate.  This will be nil if and only if
+ * storageDelegate is nil.
+ */
+@property (nonatomic, strong, nullable, readonly) dispatch_queue_t storageDelegateQueue;
 
 /**
  * Helper method that checks that our keypairs match our certificates.

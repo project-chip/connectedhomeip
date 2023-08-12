@@ -117,6 +117,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 - (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
                           queue:(dispatch_queue_t)queue
                 storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
+           storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
                            UUID:(NSUUID *)UUID
 {
     if (self = [super init]) {
@@ -124,7 +125,14 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         // before we start doing anything else with the controller.
         _UUID = UUID;
         if (storageDelegate != nil) {
-            _controllerDataStore = [[MTRDeviceControllerDataStore alloc] initWithController:self storageDelegate:storageDelegate];
+            if (storageDelegateQueue == nil) {
+                MTR_LOG_ERROR("storageDelegate provided without storageDelegateQueue");
+                return nil;
+            }
+
+            _controllerDataStore = [[MTRDeviceControllerDataStore alloc] initWithController:self
+                                                                            storageDelegate:storageDelegate
+                                                                       storageDelegateQueue:storageDelegateQueue];
             if (_controllerDataStore == nil) {
                 return nil;
             }

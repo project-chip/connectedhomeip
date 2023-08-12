@@ -90,6 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
                           queue:(dispatch_queue_t)queue
                 storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
+           storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
                            UUID:(NSUUID *)UUID;
 
 /**

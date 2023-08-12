@@ -32,23 +32,17 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
         [NSString stringWithFormat:@"caseResumptionByResumptionID/%s", [resumptionID base64EncodedStringWithOptions:0].UTF8String];
 }
 
-static dispatch_queue_t sWorkQueue;
-
 @implementation MTRDeviceControllerDataStore {
     id<MTRDeviceControllerStorageDelegate> _delegate;
+    dispatch_queue_t _delegateQueue;
     MTRDeviceController * _controller;
     // Array of nodes with resumption info, oldest-stored first.
     NSMutableArray<NSNumber *> * _nodesWithResumptionInfo;
 }
 
-+ (void)initialize
-{
-    sWorkQueue = dispatch_queue_create(
-        "org.csa-iot.matter.framework.controller-storage.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-}
-
 - (instancetype)initWithController:(MTRDeviceController *)controller
                    storageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
+              storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
 {
     if (!(self = [super init])) {
         return nil;
@@ -56,9 +50,10 @@ static dispatch_queue_t sWorkQueue;
 
     _controller = controller;
     _delegate = storageDelegate;
+    _delegateQueue = storageDelegateQueue;
 
     __block id resumptionNodeList;
-    dispatch_sync(sWorkQueue, ^{
+    dispatch_sync(_delegateQueue, ^{
         resumptionNodeList = [_delegate controller:_controller
                                        valueForKey:sResumptionNodeListKey
                                      securityLevel:MTRStorageSecurityLevelSecure
@@ -89,7 +84,7 @@ static dispatch_queue_t sWorkQueue;
 - (void)storeResumptionInfo:(MTRCASESessionResumptionInfo *)resumptionInfo
 {
     auto * oldInfo = [self findResumptionInfoByNodeID:resumptionInfo.nodeID];
-    dispatch_sync(sWorkQueue, ^{
+    dispatch_sync(_delegateQueue, ^{
         if (oldInfo != nil) {
             // Remove old resumption id key.  No need to do that for the
             // node id, because we are about to overwrite it.
@@ -128,7 +123,7 @@ static dispatch_queue_t sWorkQueue;
     for (NSNumber * nodeID in _nodesWithResumptionInfo) {
         auto * oldInfo = [self findResumptionInfoByNodeID:nodeID];
         if (oldInfo != nil) {
-            dispatch_sync(sWorkQueue, ^{
+            dispatch_sync(_delegateQueue, ^{
                 [_delegate controller:_controller
                     removeValueForKey:ResumptionByResumptionIDKey(oldInfo.resumptionID)
                         securityLevel:MTRStorageSecurityLevelSecure
@@ -147,7 +142,7 @@ static dispatch_queue_t sWorkQueue;
 - (CHIP_ERROR)storeLastUsedNOC:(MTRCertificateTLVBytes)noc
 {
     __block BOOL ok;
-    dispatch_sync(sWorkQueue, ^{
+    dispatch_sync(_delegateQueue, ^{
         ok = [_delegate controller:_controller
                         storeValue:noc
                             forKey:sLastUsedNOCKey
@@ -160,7 +155,7 @@ static dispatch_queue_t sWorkQueue;
 - (MTRCertificateTLVBytes _Nullable)fetchLastUsedNOC
 {
     __block id data;
-    dispatch_sync(sWorkQueue, ^{
+    dispatch_sync(_delegateQueue, ^{
         data = [_delegate controller:_controller
                          valueForKey:sLastUsedNOCKey
                        securityLevel:MTRStorageSecurityLevelSecure
@@ -181,7 +176,7 @@ static dispatch_queue_t sWorkQueue;
 - (nullable MTRCASESessionResumptionInfo *)_findResumptionInfoWithKey:(NSString *)key
 {
     __block id resumptionInfo;
-    dispatch_sync(sWorkQueue, ^{
+    dispatch_sync(_delegateQueue, ^{
         resumptionInfo = [_delegate controller:_controller
                                    valueForKey:key
                                  securityLevel:MTRStorageSecurityLevelSecure

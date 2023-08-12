@@ -247,7 +247,9 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 @interface MTRPerControllerStorageTests : XCTestCase
 @end
 
-@implementation MTRPerControllerStorageTests
+@implementation MTRPerControllerStorageTests {
+    dispatch_queue_t _storageQueue;
+}
 
 + (void)tearDown
 {
@@ -259,6 +261,8 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     [super setUp];
     [self setContinueAfterFailure:NO];
 
+    _storageQueue = dispatch_queue_create("test.storage.queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+
     [self startFactory];
 }
 
@@ -266,6 +270,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 {
     // Per-test teardown, runs after each test.
     [self stopFactory];
+    _storageQueue = nil;
     [super tearDown];
 }
 
@@ -345,6 +350,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
     __auto_type * params =
         [[MTRDeviceControllerExternalCertificateStartupParameters alloc] initWithStorageDelegate:storage
+                                                                            storageDelegateQueue:_storageQueue
                                                                                             UUID:storage.controllerID
                                                                                              ipk:rootKeys.ipk
                                                                                         vendorID:@(kTestVendorId)

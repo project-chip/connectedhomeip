@@ -42,7 +42,8 @@ MTR_HIDDEN
 @interface MTRDeviceControllerDataStore : NSObject
 
 - (instancetype)initWithController:(MTRDeviceController *)controller
-                   storageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate;
+                   storageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
+              storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue;
 
 /**
  * Resumption info APIs.

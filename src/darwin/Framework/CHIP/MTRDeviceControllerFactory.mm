@@ -643,14 +643,17 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     }
 
     id<MTRDeviceControllerStorageDelegate> storageDelegate;
+    dispatch_queue_t storageDelegateQueue;
     NSUUID * uuid;
     if ([startupParams isKindOfClass:[MTRDeviceControllerStartupParameters class]]) {
         MTRDeviceControllerStartupParameters * params = startupParams;
         storageDelegate = params.storageDelegate;
+        storageDelegateQueue = params.storageDelegateQueue;
         uuid = params.UUID;
     } else {
         MTRDeviceControllerStartupParams * params = startupParams;
         storageDelegate = nil;
+        storageDelegateQueue = nil;
         uuid = params.UUID;
     }
 
@@ -672,7 +675,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
     // Create the controller, so we start the event loop, since we plan to do
     // our fabric table operations there.
-    auto * controller = [self _createController:storageDelegate UUID:uuid];
+    auto * controller = [self _createController:storageDelegate storageDelegateQueue:storageDelegateQueue UUID:uuid];
     if (controller == nil) {
         if (error != nil) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY];
@@ -897,6 +900,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 }
 
 - (MTRDeviceController * _Nullable)_createController:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
+                                storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
                                                 UUID:(NSUUID *)UUID
 {
     [self _assertCurrentQueueIsNotMatterQueue];
@@ -904,6 +908,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     MTRDeviceController * controller = [[MTRDeviceController alloc] initWithFactory:self
                                                                               queue:_chipWorkQueue
                                                                     storageDelegate:storageDelegate
+                                                               storageDelegateQueue:storageDelegateQueue
                                                                                UUID:UUID];
     if (controller == nil) {
         MTR_LOG_ERROR("Failed to init controller");

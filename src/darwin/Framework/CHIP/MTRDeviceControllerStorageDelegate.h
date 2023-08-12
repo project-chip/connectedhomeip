@@ -61,11 +61,13 @@ typedef NS_ENUM(NSUInteger, MTRStorageSharingType) {
  *    initialized when the callbacks are called.  The only safe thing to do with
  *    it is to get its controllerID.
  *
- * 2) The delegate method calls will happen serially, not concurrently, on some arbitrary
- *    thread.  During execution of the delegate methods, all Matter work will be
- *    blocked until the method completes.  Attempting to call any Matter API
- *    from inside the delegate methods, apart from de-serializing and
- *    serializing the items being stored, is likely to lead to deadlocks.
+ * 2) The delegate method calls will happen on the queue that was provided along
+ *    with the gelegate.  All Matter work will be blocked until the method
+ *    completes, and these calls may themselves block other Matter API calls
+ *    from completing.  Attempting to call any Matter API on the queue used for
+ *    this delegate, apart from de-serializing and serializing the items being
+ *    stored and calling MTRDeviceControllerStorageClasses(), is likely to lead
+ *    to deadlocks.
  */
 MTR_NEWLY_AVAILABLE
 @protocol MTRDeviceControllerStorageDelegate <NSObject>

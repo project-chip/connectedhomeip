@@ -243,6 +243,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
 @implementation MTRDeviceControllerStartupParameters
 - (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
+                   storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
                                    UUID:(NSUUID *)UUID
                                     ipk:(NSData *)ipk
                                vendorID:(NSNumber *)vendorID
@@ -265,6 +266,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     _operationalCertificateIssuer = nil;
     _operationalCertificateIssuerQueue = nil;
     _storageDelegate = storageDelegate;
+    _storageDelegateQueue = storageDelegateQueue;
     _UUID = UUID;
 
     return self;
@@ -280,6 +282,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
 @implementation MTRDeviceControllerExternalCertificateStartupParameters
 - (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
+                   storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
                                    UUID:(NSUUID *)UUID
                                     ipk:(NSData *)ipk
                                vendorID:(NSNumber *)vendorID
@@ -289,6 +292,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
                         rootCertificate:(MTRCertificateDERBytes)rootCertificate
 {
     return [super initWithStorageDelegate:storageDelegate
+                     storageDelegateQueue:storageDelegateQueue
                                      UUID:UUID
                                       ipk:ipk
                                  vendorID:vendorID
@@ -308,6 +312,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     }
 
     _storageDelegate = nil;
+    _storageDelegateQueue = nil;
 
     if (self.nocSigner == nil && self.rootCertificate == nil) {
         MTR_LOG_ERROR("nocSigner and rootCertificate are both nil; no public key available to identify the fabric");
@@ -589,6 +594,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     _advertiseOperational = advertiseOperational;
     _allowMultipleControllersPerFabric = YES;
     _storageDelegate = params.storageDelegate;
+    _storageDelegateQueue = params.storageDelegateQueue;
 
     return self;
 }
