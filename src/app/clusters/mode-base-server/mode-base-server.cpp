@@ -23,7 +23,6 @@
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/config.h>
 #include <platform/DiagnosticDataProvider.h>
 
 using namespace chip;
@@ -52,7 +51,7 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClus
 
 Instance::~Instance()
 {
-    UnregisterInstance();
+    UnregisterThisInstance();
     chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
     unregisterAttributeAccessOverride(this);
 }
@@ -69,7 +68,7 @@ CHIP_ERROR Instance::Init()
 
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
-    RegisterInstance();
+    RegisterThisInstance();
     ReturnErrorOnFailure(mDelegate->Init());
 
     // If the StartUpMode is set, the CurrentMode attribute SHALL be set to the StartUpMode value, when the server is powered up.
@@ -350,7 +349,7 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, Attr
     return CHIP_ERROR_INCORRECT_STATE;
 }
 
-void Instance::RegisterInstance()
+void Instance::RegisterThisInstance()
 {
     if (!gModeBaseAliasesInstances.Contains(this))
     {
@@ -358,7 +357,7 @@ void Instance::RegisterInstance()
     }
 }
 
-void Instance::UnregisterInstance()
+void Instance::UnregisterThisInstance()
 {
     gModeBaseAliasesInstances.Remove(this);
 }
@@ -369,10 +368,26 @@ void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeTo
 
     Commands::ChangeToModeResponse::Type response;
 
+    // If the NewMode field doesn't match the Mode field of any entry of the SupportedModes list,
+    // the ChangeToModeResponse command's Status field SHALL indicate UnsupportedMode and
+    // the StatusText field SHALL be included and MAY be used to indicate the issue, with a human readable string,
+    // or include an empty string.
+    // We are leaving the StatusText empty since the Status is descriptive enough.
     if (!IsSupportedMode(newMode))
     {
         ChipLogError(Zcl, "ModeBase: Failed to find the option with mode %u", newMode);
         response.status = to_underlying(StatusCode::kUnsupportedMode);
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
+    }
+
+    // If the NewMode field is the same as the value of the CurrentMode attribute
+    // the ChangeToModeResponse command SHALL have the Status field set to Success and
+    // the StatusText field MAY be supplied with a human readable string or include an empty string.
+    // We are leaving the StatusText empty since the Status is descriptive enough.
+    if (newMode == GetCurrentMode())
+    {
+        response.status = to_underlying(ModeBase::StatusCode::kSuccess);
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
         return;
     }

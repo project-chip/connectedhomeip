@@ -26,9 +26,31 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+class RamStorage;
+
 /**
  *
- * All ram storage operations should be managed by this class.
+ * This class describes a RAM storage key wrapper.
+ */
+struct RamStorageKey
+{
+    RamStorageKey(RamStorage * storage, uint8_t keyId, uint8_t internalId);
+
+    CHIP_ERROR Read(uint8_t * buf, uint16_t & sizeToRead) const;
+    CHIP_ERROR Write(const uint8_t * buf, uint16_t length);
+    CHIP_ERROR Delete();
+
+    static uint16_t GetInternalId(uint8_t keyId, uint8_t internalId) { return static_cast<uint16_t>(keyId) << 8 | internalId; }
+
+private:
+    RamStorage * mStorage;
+    uint16_t mId;
+};
+
+/**
+ *
+ * This class manages a RAM buffer and its operations.
+ * All operations on the buffer are protected by a mutex.
  */
 class RamStorage
 {
@@ -39,7 +61,7 @@ public:
 
     RamStorage(uint16_t aPdmId) : mPdmId(aPdmId), mBuffer(nullptr) {}
 
-    CHIP_ERROR Init(uint16_t aInitialSize);
+    CHIP_ERROR Init(uint16_t aInitialSize, bool extendedSearch = false);
     void FreeBuffer();
     Buffer * GetBuffer() const { return mBuffer; }
     CHIP_ERROR Read(uint16_t aKey, int aIndex, uint8_t * aValue, uint16_t * aValueLength) const;
@@ -53,6 +75,7 @@ private:
 
     uint16_t mPdmId;
     Buffer * mBuffer;
+    bool mExtendedSearch;
 };
 
 } // namespace Internal
