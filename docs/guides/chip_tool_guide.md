@@ -1459,7 +1459,7 @@ In this command:
 
 -   _<user-type\>_ is the type of the user, which can have one of the values specified
     in the Matter Application Clusters specification for the `doorlock` cluster
-    (see section "5.2.9.16. UserTypeEnum"). Can be set to `null`.
+    (see section "5.2.9.16. `UserTypeEnum`"). Can be set to `null`.
 -   _<credential-rule\>_ is the number of credentials that must be used to
     unlock the door lock. This parameter can be set to `null` or to one of the
     following values:
@@ -1546,7 +1546,7 @@ In this command:
     [Set up a user](#step-1-set-up-a-user). Can be set to `null`.
 -   _<user-type\>_ is the type of the user, which can have one of the values specified
     in the Matter Application Clusters specification for the `doorlock` cluster
-    (see section "5.2.9.16. UserTypeEnum"). Can be set to `null`.
+    (see section "5.2.9.16. `UserTypeEnum`"). Can be set to `null`.
 -   _<destination-id\>_ is the node ID of the door lock device.
 -   _<endpoint-id\>_ is the ID of the endpoint on the door lock device.
 -   `--timedInteractionTimeoutMs` is the duration in milliseconds (_<ms_value>_)
