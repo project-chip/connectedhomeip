@@ -1176,6 +1176,7 @@ rtld
 RTOS
 RTT
 RTX
+runArgs
 RUNAS
 RunMain
 runtime
