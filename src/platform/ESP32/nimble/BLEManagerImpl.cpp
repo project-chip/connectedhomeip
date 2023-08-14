@@ -1012,6 +1012,25 @@ exit:
     return err;
 }
 
+CHIP_ERROR BLEManagerImpl::ConfigureScanResponseData(ByteSpan data)
+{
+    if (!IsSpanUsable(data) || data.size() > MAX_SCAN_RSP_DATA_LEN)
+    {
+        ChipLogError(DeviceLayer, "scan response data is invalid");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    memcpy(scanResponseBuffer, data.data(), data.size());
+    ByteSpan scanResponseSpan(scanResponseBuffer);
+    mScanResponse = chip::Optional(scanResponseSpan);
+    return CHIP_NO_ERROR;
+}
+
+void BLEManagerImpl::ClearScanResponseData(void)
+{
+    mScanResponse.ClearValue();
+    ChipLogDetail(DeviceLayer, "scan response data is cleared");
+}
+
 void BLEManagerImpl::HandleRXCharWrite(struct ble_gatt_char_context * param)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
@@ -1584,6 +1603,15 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
             }
         }
 #endif
+        if (mScanResponse.HasValue())
+        {
+            err = MapBLEError(ble_gap_adv_rsp_set_data(mScanResponse.Value().data(), mScanResponse.Value().size()));
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "ble_gap_adv_rsp_set_data failed: %s", ErrorStr(err));
+                return err;
+            }
+        }
         err = MapBLEError(ble_gap_adv_start(own_addr_type, NULL, BLE_HS_FOREVER, &adv_params, ble_svr_gap_event, NULL));
         if (err == CHIP_NO_ERROR)
         {
