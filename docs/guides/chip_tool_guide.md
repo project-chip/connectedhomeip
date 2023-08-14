@@ -1442,9 +1442,9 @@ In this command:
     -   `Modify` - This operation modifies an existing user at the slot at
         _<user-index\>_.
 
--   _<user-index\>_ is the index value of the user, between `1` and the
-    value of the `NumberOfTotalUsersSupported` attribute. Setting the
-    user index to `0` will cause an error.
+-   _<user-index\>_ is the index value of the user, between `1` and the value of
+    the `NumberOfTotalUsersSupported` attribute. Setting the user index to `0`
+    will cause an error.
 -   _<user-name\>_ is the name of the user, which can have maximum 10 bytes of
     size. Can be set to `null`.
 -   _<user-unique-id\>_ is a 4-byte number that describes the unique user ID.
@@ -1457,9 +1457,10 @@ In this command:
         slot is used, but disabled. Unlike `0` and `1`, supporting this status
         is optional.
 
--   _<user-type\>_ is the type of the user, which can have one of the values specified
-    in the Matter Application Clusters specification for the `doorlock` cluster
-    (see section "5.2.9.16. `UserTypeEnum`"). Can be set to `null`.
+-   _<user-type\>_ is the type of the user, which can have one of the values
+    specified in the Matter Application Clusters specification for the
+    `doorlock` cluster (see section "5.2.9.16. `UserTypeEnum`"). Can be set to
+    `null`.
 -   _<credential-rule\>_ is the number of credentials that must be used to
     unlock the door lock. This parameter can be set to `null` or to one of the
     following values:
@@ -1471,30 +1472,34 @@ In this command:
 -   _<destination-id\>_ is the node ID of the door lock device.
 -   _<endpoint-id\>_ is the ID of the endpoint on the door lock device.
 -   `--timedInteractionTimeoutMs` is the duration in milliseconds (_<ms_value>_)
-    of the time window for receiving a request on the server side.
-    This should allow enough time for receiving the request.
+    of the time window for receiving a request on the server side. This should
+    allow enough time for receiving the request.
 
 **Examples of command:**
 
-The following command runs the `set-user` command that adds (`0`) a user at the index `1`;
-the user has the name `AAA` and the unique ID `6452`. The user's status is set to `OccupiedEnabled`
-(`1`), the user type is set to `UnrestrictedUser` (`0`), the credential rule is set to single (`0`),
-the targeted node ID of the destination door lock device is `1` and the targeted `doorlock`
-cluster's endpoint ID on that device is `1`. The `--timedInteractionTimeoutMs` has a custom value.
+The following command runs the `set-user` command that adds (`0`) a user at the
+index `1`; the user has the name `AAA` and the unique ID `6452`. The user's
+status is set to `OccupiedEnabled` (`1`), the user type is set to
+`UnrestrictedUser` (`0`), the credential rule is set to single (`0`), the
+targeted node ID of the destination door lock device is `1` and the targeted
+`doorlock` cluster's endpoint ID on that device is `1`. The
+`--timedInteractionTimeoutMs` has a custom value.
 
 ```
 $ ./chip-tool doorlock set-user 0 1 AAA 6452 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 ```
 
-The following command mirrors the action of the command above, but it targets an empty user name
-(`null`) and has `null` for the unique ID. The user status defaults to `OccupiedEnabled`,
-the user type defaults to `UnrestrictedUser`, and the credential rule defaults to single.
+The following command mirrors the action of the command above, but it targets an
+empty user name (`null`) and has `null` for the unique ID. The user status
+defaults to `OccupiedEnabled`, the user type defaults to `UnrestrictedUser`, and
+the credential rule defaults to single.
 
 ```
 $ ./chip-tool doorlock set-user 0 1 null null null null null 1 1 --timedInteractionTimeoutMs 1000
 ```
 
-For more use cases for this command, see the "5.2.7.34. Set User Command" section in the Matter Application Clusters specification.
+For more use cases for this command, see the "5.2.7.34. Set User Command"
+section in the Matter Application Clusters specification.
 
 ### Step 2: Assign a credential
 
@@ -1517,11 +1522,10 @@ In this command:
     -   `Modify` - This operation modifies an existing credential for the user
         at the slot at _<user-index\>_.
 
--   _<{Credential}\>_ is a JSON object, with the following two
-    fields:
+-   _<{Credential}\>_ is a JSON object, with the following two fields:
 
-    -   `"credentialType"` is the key field for the type of the credential.
-        It can have one of the following values:
+    -   `"credentialType"` is the key field for the type of the credential. It
+        can have one of the following values:
 
         -   `0` - Programming PIN
         -   `1` - PIN
@@ -1529,44 +1533,47 @@ In this command:
         -   `3` - Fingerprint
         -   `4` - Finger vein
 
-    -   `"credentialIndex"` is the key field for the index of the credential. If `"credentialType"`
-        is not "Programming PIN", `"credentialIndex"` must be between `1` and
-        the value of the `NumberOfCredentialsSupportedPerUser`
+    -   `"credentialIndex"` is the key field for the index of the credential. If
+        `"credentialType"` is not "Programming PIN", `"credentialIndex"` must be
+        between `1` and the value of the `NumberOfCredentialsSupportedPerUser`
         attribute (see the section 5.2.3.20 of the Matter Application Clusters
-        specification for details). `0` is required for the Programming PIN.
-        In other cases, setting the credential index to `0` will
-        cause an error.
+        specification for details). `0` is required for the Programming PIN. In
+        other cases, setting the credential index to `0` will cause an error.
 
--   _<credential-data\>_ is an octet string parameter with the secret credential data.
-    For example, the PIN code value (`12345` in the example below).
+-   _<credential-data\>_ is an octet string parameter with the secret credential
+    data. For example, the PIN code value (`12345` in the example below).
 -   _<user-index\>_ is the index of the user that will be associated with the
     credential. Can be set to `null` to create a new user.
 -   _<user-status\>_ is the status of the user that will be associated with the
     credential. See the description of this parameter in
     [Set up a user](#step-1-set-up-a-user). Can be set to `null`.
--   _<user-type\>_ is the type of the user, which can have one of the values specified
-    in the Matter Application Clusters specification for the `doorlock` cluster
-    (see section "5.2.9.16. `UserTypeEnum`"). Can be set to `null`.
+-   _<user-type\>_ is the type of the user, which can have one of the values
+    specified in the Matter Application Clusters specification for the
+    `doorlock` cluster (see section "5.2.9.16. `UserTypeEnum`"). Can be set to
+    `null`.
 -   _<destination-id\>_ is the node ID of the door lock device.
 -   _<endpoint-id\>_ is the ID of the endpoint on the door lock device.
 -   `--timedInteractionTimeoutMs` is the duration in milliseconds (_<ms_value>_)
-    of the time window for receiving a request on the server side.
-    This should allow enough time for receiving the request.
+    of the time window for receiving a request on the server side. This should
+    allow enough time for receiving the request.
 
 **Example of command:**
 
-The following command runs the `set-credential` command that adds (`0`) a PIN credential (type `1`)
-at the index `1`. The credential data is set to `12345` (PIN code value). This credential is
-associated with the user at the index `1`. The `null` parameters for the user status
-and the user type indicate that the credentials are added to an existing user.
-The targeted node ID of the destination door lock device is `1` and the targeted `doorlock`
-cluster's endpoint ID on that device is `1`. The `--timedInteractionTimeoutMs` has a custom value.
+The following command runs the `set-credential` command that adds (`0`) a PIN
+credential (type `1`) at the index `1`. The credential data is set to `12345`
+(PIN code value). This credential is associated with the user at the index `1`.
+The `null` parameters for the user status and the user type indicate that the
+credentials are added to an existing user. The targeted node ID of the
+destination door lock device is `1` and the targeted `doorlock` cluster's
+endpoint ID on that device is `1`. The `--timedInteractionTimeoutMs` has a
+custom value.
 
 ```
 $ ./chip-tool doorlock set-credential 0 '{ "credentialType": 1, "credentialIndex": 1 }' "12345" 1 null null 1 1 --timedInteractionTimeoutMs 1000
 ```
 
-For more use cases for this command, see the "5.2.7.40. Set Credential Command" section in the Matter Application Clusters specification.
+For more use cases for this command, see the "5.2.7.40. Set Credential Command"
+section in the Matter Application Clusters specification.
 
 ### Operations on users and credentials
 
