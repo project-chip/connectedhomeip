@@ -48,7 +48,7 @@ using namespace ::chip::DeviceLayer;
 #include <crypto/CHIPCryptoPAL.h>
 // If building with the EFR32-provided crypto backend, we can use the
 // opaque keystore
-#if CHIP_CRYPTO_PLATFORM
+#if CHIP_CRYPTO_PLATFORM && !(defined(SIWX_917))
 #include <platform/silabs/efr32/Efr32PsaOperationalKeystore.h>
 static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeystore;
 #endif
@@ -215,7 +215,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
 #endif // SILABS_TEST_EVENT_TRIGGER_ENABLED
 
-#if CHIP_CRYPTO_PLATFORM
+#if CHIP_CRYPTO_PLATFORM && !(defined(SIWX_917))
     // When building with EFR32 crypto, use the opaque key store
     // instead of the default (insecure) one.
     gOperationalKeystore.Init();
@@ -255,7 +255,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 }
 
 #ifdef SL_WIFI
-void SilabsMatterConfig::InitWiFi(void)
+CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 {
 #ifdef WF200_WIFI
     // Start wfx bus communication task.
@@ -271,6 +271,7 @@ void SilabsMatterConfig::InitWiFi(void)
         return CHIP_ERROR_INTERNAL;
     }
 #endif /* WF200_WIFI */
+    return CHIP_NO_ERROR;
 }
 #endif // SL_WIFI
 
