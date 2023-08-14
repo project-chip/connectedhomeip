@@ -138,7 +138,7 @@ struct GenericOperationalError : public app::Clusters::detail::Structs::ErrorSta
         }
     }
 
-    bool IsEqual(const Structs::ErrorStateStruct::Type& rhs)
+    bool IsEqual(const Structs::ErrorStateStruct::Type & rhs)
     {
         if (errorStateID != rhs.errorStateID)
         {
@@ -158,7 +158,7 @@ struct GenericOperationalError : public app::Clusters::detail::Structs::ErrorSta
         }
         if (errorStateDetails.HasValue())
         {
-            if(!errorStateDetails.Value().data_equal(rhs.errorStateDetails.Value()))
+            if (!errorStateDetails.Value().data_equal(rhs.errorStateDetails.Value()))
             {
                 return false;
             }
