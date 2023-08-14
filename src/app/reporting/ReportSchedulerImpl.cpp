@@ -37,8 +37,27 @@ ReportSchedulerImpl::ReportSchedulerImpl(TimerDelegate * aTimerDelegate) : Repor
     VerifyOrDie(nullptr != mTimerDelegate);
 }
 
-/// @brief When a ReadHandler is added, register it, which will schedule an engine run
-void ReportSchedulerImpl::OnReadHandlerCreated(ReadHandler * aReadHandler)
+/// @brief Method that triggers a report emission on each ReadHandler that is not blocked on its min interval.
+///        Each read handler that is not blocked is immediately marked dirty so that it will report as soon as possible.
+void ReportSchedulerImpl::OnEnterActiveMode()
+{
+#if ICD_REPORT_ON_ENTER_ACTIVE_MODE
+    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+    mNodesPool.ForEachActiveObject([now, this](ReadHandlerNode * node) {
+        if (now >= node->GetMinTimestamp())
+        {
+            this->HandlerForceDirtyState(node->GetReadHandler());
+        }
+
+        return Loop::Continue;
+    });
+#endif
+}
+
+/// @brief When a ReadHandler is added, register it in the scheduler node pool. Scheduling the report here is un-necessary since the
+/// ReadHandler will call MoveToState(HandlerState::CanStartReporting);, which will call OnBecameReportable() and schedule the
+/// report.
+void ReportSchedulerImpl::OnSubscriptionEstablished(ReadHandler * aReadHandler)
 {
     ReadHandlerNode * newNode = FindReadHandlerNode(aReadHandler);
     // Handler must not be registered yet; it's just being constructed.
@@ -51,11 +70,6 @@ void ReportSchedulerImpl::OnReadHandlerCreated(ReadHandler * aReadHandler)
                     "Registered a ReadHandler that will schedule a report between system Timestamp: %" PRIu64
                     " and system Timestamp %" PRIu64 ".",
                     newNode->GetMinTimestamp().count(), newNode->GetMaxTimestamp().count());
-
-    Milliseconds32 newTimeout;
-    // No need to check for error here, since the node is already in the list otherwise we would have Died
-    CalculateNextReportTimeout(newTimeout, newNode);
-    ScheduleReport(newTimeout, newNode);
 }
 
 /// @brief When a ReadHandler becomes reportable, schedule, recalculate and reschedule the report.
@@ -68,7 +82,7 @@ void ReportSchedulerImpl::OnBecameReportable(ReadHandler * aReadHandler)
     ScheduleReport(newTimeout, node);
 }
 
-void ReportSchedulerImpl::OnSubscriptionAction(ReadHandler * aReadHandler)
+void ReportSchedulerImpl::OnSubscriptionReportSent(ReadHandler * aReadHandler)
 {
     ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
     VerifyOrReturn(nullptr != node);

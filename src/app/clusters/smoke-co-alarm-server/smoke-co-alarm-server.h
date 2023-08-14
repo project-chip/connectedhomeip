@@ -25,10 +25,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
-#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
-#include <app/util/config.h>
-#include <protocols/interaction_model/StatusCode.h>
 
 /**
  * @brief Smoke CO Alarm Server Plugin class
@@ -37,6 +34,9 @@ class SmokeCoAlarmServer
 {
 public:
     static SmokeCoAlarmServer & Instance();
+
+    /* Expected byte size of the PriorityOrder */
+    static constexpr size_t kPriorityOrderLength = 8;
 
     using AlarmStateEnum         = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
     using ContaminationStateEnum = chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum;
@@ -60,6 +60,14 @@ public:
      * @return true on success, false on failure
      */
     bool SetExpressedState(chip::EndpointId endpointId, ExpressedStateEnum newExpressedState);
+
+    /**
+     * @brief Set the highest level of Expressed State according to priorityOrder
+     * @param endpointId ID of the endpoint
+     * @param priorityOrder Priority order of expressed state from highest to lowest
+     */
+    void SetExpressedStateByPriority(chip::EndpointId endpointId,
+                                     const std::array<ExpressedStateEnum, kPriorityOrderLength> & priorityOrder);
 
     bool SetSmokeState(chip::EndpointId endpointId, AlarmStateEnum newSmokeState);
     bool SetCOState(chip::EndpointId endpointId, AlarmStateEnum newCOState);

@@ -22,6 +22,7 @@
 #import <Security/Security.h>
 
 #import "MTRCertificates.h"
+#import "MTRConversion.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "NSDataSpanConversion.h"
@@ -48,14 +49,12 @@ MTROperationalCredentialsDelegate::MTROperationalCredentialsDelegate(MTRDeviceCo
 {
 }
 
-CHIP_ERROR MTROperationalCredentialsDelegate::Init(MTRPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner,
-    NSData * ipk, NSData * rootCert, NSData * _Nullable icaCert)
+CHIP_ERROR MTROperationalCredentialsDelegate::Init(
+    ChipP256KeypairPtr nocSigner, NSData * ipk, NSData * rootCert, NSData * _Nullable icaCert)
 {
-    if (storage == nil || ipk == nil || rootCert == nil) {
+    if (ipk == nil || rootCert == nil) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-
-    mStorage = storage;
 
     mIssuerKey = nocSigner;
 
@@ -471,10 +470,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::GenerateOperationalCertificate(id<
 
     CATValues cats;
     if (caseAuthenticatedTags != nil) {
-        size_t idx = 0;
-        for (NSNumber * cat in [caseAuthenticatedTags.allObjects sortedArrayUsingSelector:@selector(compare:)]) {
-            cats.values[idx++] = [cat unsignedIntValue];
-        }
+        ReturnErrorOnFailure(SetToCATValues(caseAuthenticatedTags, cats));
     }
 
     uint8_t nocBuffer[Controller::kMaxCHIPDERCertLength];

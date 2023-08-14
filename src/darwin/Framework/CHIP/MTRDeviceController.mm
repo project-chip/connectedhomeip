@@ -22,6 +22,7 @@
 #import "MTRCommissionableBrowser.h"
 #import "MTRCommissionableBrowserResult_Internal.h"
 #import "MTRCommissioningParameters.h"
+#import "MTRConversion.h"
 #import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceControllerStartupParams.h"
@@ -162,11 +163,17 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 {
     // Invalidate our MTRDevice instances before we shut down our secure
     // sessions and whatnot, so they don't start trying to resubscribe when we
-    // do the secure session shutdowns.
-    for (MTRDevice * device in [self.nodeIDToDeviceMap allValues]) {
+    // do the secure session shutdowns.  Since we don't want to hold the lock
+    // while calling out into arbitrary invalidation code, snapshot the list of
+    // devices before we start invalidating.
+    os_unfair_lock_lock(&_deviceMapLock);
+    NSArray<MTRDevice *> * devices = [self.nodeIDToDeviceMap allValues];
+    [self.nodeIDToDeviceMap removeAllObjects];
+    os_unfair_lock_unlock(&_deviceMapLock);
+
+    for (MTRDevice * device in devices) {
         [device invalidate];
     }
-    [self.nodeIDToDeviceMap removeAllObjects];
     [self stopBrowseForCommissionables];
 
     [_factory controllerShuttingDown:self];
@@ -268,8 +275,8 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
             }
             signingKeypair = &_signingKeypairBridge;
         }
-        errorCode = _operationalCredentialsDelegate->Init(_factory.storageDelegateBridge, signingKeypair, startupParams.ipk,
-            startupParams.rootCertificate, startupParams.intermediateCertificate);
+        errorCode = _operationalCredentialsDelegate->Init(
+            signingKeypair, startupParams.ipk, startupParams.rootCertificate, startupParams.intermediateCertificate);
         if ([self checkForStartError:errorCode logMsg:kErrorOperationalCredentialsInit]) {
             return;
         }
@@ -312,26 +319,10 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
             chip::CATValues cats = chip::kUndefinedCATs;
             if (startupParams.caseAuthenticatedTags != nil) {
-                unsigned long long tagCount = startupParams.caseAuthenticatedTags.count;
-                if (tagCount > chip::kMaxSubjectCATAttributeCount) {
-                    MTR_LOG_ERROR("%llu CASE Authenticated Tags cannot be represented in a certificate.", tagCount);
+                errorCode = SetToCATValues(startupParams.caseAuthenticatedTags, cats);
+                if (errorCode != CHIP_NO_ERROR) {
+                    // SetToCATValues already handles logging.
                     return;
-                }
-
-                size_t tagIndex = 0;
-                for (NSNumber * boxedTag in startupParams.caseAuthenticatedTags) {
-                    if (!chip::CanCastTo<chip::CASEAuthTag>(boxedTag.unsignedLongLongValue)) {
-                        MTR_LOG_ERROR("0x%llx is not a valid CASE Authenticated Tag value.", boxedTag.unsignedLongLongValue);
-                        return;
-                    }
-
-                    auto tag = static_cast<chip::CASEAuthTag>(boxedTag.unsignedLongLongValue);
-                    if (!chip::IsValidCASEAuthTag(tag)) {
-                        MTR_LOG_ERROR("0x%" PRIx32 " is not a valid CASE Authenticated Tag value.", tag);
-                        return;
-                    }
-
-                    cats.values[tagIndex++] = tag;
                 }
             }
 

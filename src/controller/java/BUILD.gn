@@ -29,6 +29,8 @@ shared_library("jni") {
     output_extension = "dylib"
   }
 
+  defines = []
+
   # Temporary while we have circular dependencies between codegen.py and zap
   # generated files
   check_includes = false
@@ -53,23 +55,13 @@ shared_library("jni") {
     "AttestationTrustStoreBridge.h",
     "BaseCHIPCluster-JNI.cpp",
     "CHIPAttributeTLVValueDecoder.h",
-    "CHIPDefaultCallbacks.cpp",
-    "CHIPDefaultCallbacks.h",
     "CHIPDeviceController-JNI.cpp",
-    "CHIPTLVValueDecoder-JNI.cpp",
     "DeviceAttestationDelegateBridge.cpp",
     "DeviceAttestationDelegateBridge.h",
-    "zap-generated/CHIPAttributeTLVValueDecoder.cpp",
-    "zap-generated/CHIPClustersWrite-JNI.cpp",
-    "zap-generated/CHIPEventTLVValueDecoder.cpp",
-    "zap-generated/CHIPInvokeCallbacks.cpp",
-    "zap-generated/CHIPInvokeCallbacks.h",
-    "zap-generated/CHIPReadCallbacks.cpp",
   ]
 
   deps = [
     "${chip_root}/src/controller/data_model",
-    "${chip_root}/src/controller/data_model:java-jni-sources",
     "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib",
@@ -77,8 +69,26 @@ shared_library("jni") {
     "${chip_root}/src/platform",
   ]
 
+  if (matter_enable_java_generated_api) {
+    defines += [ "USE_JAVA_TLV_ENCODE_DECODE" ]
+
+    sources += [
+      "CHIPDefaultCallbacks.cpp",
+      "CHIPDefaultCallbacks.h",
+      "CHIPTLVValueDecoder-JNI.cpp",
+      "zap-generated/CHIPAttributeTLVValueDecoder.cpp",
+      "zap-generated/CHIPClustersWrite-JNI.cpp",
+      "zap-generated/CHIPEventTLVValueDecoder.cpp",
+      "zap-generated/CHIPInvokeCallbacks.cpp",
+      "zap-generated/CHIPInvokeCallbacks.h",
+      "zap-generated/CHIPReadCallbacks.cpp",
+    ]
+
+    deps += [ "${chip_root}/src/controller/data_model:java-jni-sources" ]
+  }
+
   if (matter_enable_java_compilation) {
-    defines = [ "JAVA_MATTER_CONTROLLER_TEST" ]
+    defines += [ "JAVA_MATTER_CONTROLLER_TEST" ]
 
     sources += [
       "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
@@ -94,7 +104,10 @@ shared_library("jni") {
       deps += [ "${chip_root}/src/platform/Linux" ]
     }
 
-    cflags = [ "-Wno-unknown-pragmas" ]
+    cflags = [
+      "-Wno-unknown-pragmas",
+      "-Wconversion",
+    ]
 
     output_dir = "${root_out_dir}/lib/jni"
   } else {
@@ -133,7 +146,10 @@ if (chip_link_tests) {
         deps += [ "${chip_root}/src/platform/Linux" ]
       }
 
-      cflags = [ "-Wno-unknown-pragmas" ]
+      cflags = [
+        "-Wno-unknown-pragmas",
+        "-Wconversion",
+      ]
 
       output_dir = "${root_out_dir}/lib/jni"
     } else {
@@ -290,8 +306,43 @@ kotlin_library("onboardingpayload_qr_code_test") {
   kotlinc_flags = [ "-Xlint:deprecation" ]
 }
 
+kotlin_library("chipcluster") {
+  import(
+      "${chip_root}/src/controller/java/src/chip/devicecontroller/cluster/files.gni")
+
+  output_name = "CHIPClusters.jar"
+
+  deps = [ ":tlv" ]
+
+  sources = [ "src/chip/devicecontroller/cluster/TlvReaderExtension.kt" ]
+
+  sources += structs_sources
+  sources += eventstructs_sources
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
+}
+
+kotlin_library("chipcluster_test") {
+  output_name = "CHIPClustersTest.jar"
+
+  deps = [
+    ":chipcluster",
+    ":tlv",
+    "${chip_root}/third_party/java_deps:junit-4",
+    "${chip_root}/third_party/java_deps:truth",
+  ]
+
+  sources = [
+    "tests/chip/devicecontroller/cluster/ChipClusterEventStructTest.kt",
+    "tests/chip/devicecontroller/cluster/ChipClusterStructTest.kt",
+  ]
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
+}
+
 group("unit_tests") {
   deps = [
+    ":chipcluster_test",
     ":json_to_tlv_to_json_test",
     ":onboardingpayload_manual_code_test",
     ":onboardingpayload_qr_code_test",
@@ -301,10 +352,26 @@ group("unit_tests") {
   ]
 }
 
+android_library("chipclusterID") {
+  output_name = "CHIPClusterID.jar"
+
+  sources = [
+    "generated/java/chip/devicecontroller/ClusterIDMapping.java",
+    "src/chip/devicecontroller/ChipIdLookup.java",
+  ]
+
+  javac_flags = [
+    "-Xlint:deprecation",
+    "-parameters",  # Store infomation about method parameters
+  ]
+}
+
 android_library("java") {
   output_name = "CHIPController.jar"
 
   deps = [
+    ":chipcluster",
+    ":chipclusterID",
     ":tlv",
     "${chip_root}/third_party/java_deps:annotation",
   ]
@@ -312,15 +379,6 @@ android_library("java") {
   data_deps = [ ":jni" ]
 
   sources = [
-    "generated/java/chip/devicecontroller/ClusterIDMapping.java",
-    "generated/java/chip/devicecontroller/ClusterReadMapping.java",
-    "generated/java/chip/devicecontroller/ClusterWriteMapping.java",
-    "src/chip/clusterinfo/ClusterCommandCallback.java",
-    "src/chip/clusterinfo/ClusterInfo.java",
-    "src/chip/clusterinfo/CommandParameterInfo.java",
-    "src/chip/clusterinfo/CommandResponseInfo.java",
-    "src/chip/clusterinfo/DelegatedClusterCallback.java",
-    "src/chip/clusterinfo/InteractionInfo.java",
     "src/chip/devicecontroller/AttestationInfo.java",
     "src/chip/devicecontroller/AttestationTrustStoreDelegate.java",
     "src/chip/devicecontroller/CSRInfo.java",
@@ -328,8 +386,6 @@ android_library("java") {
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
-    "src/chip/devicecontroller/ChipIdLookup.java",
-    "src/chip/devicecontroller/ChipTLVValueDecoder.java",
     "src/chip/devicecontroller/ControllerParams.java",
     "src/chip/devicecontroller/DeviceAttestationDelegate.java",
     "src/chip/devicecontroller/DiscoveredDevice.java",
@@ -344,11 +400,11 @@ android_library("java") {
     "src/chip/devicecontroller/PaseVerifierParams.java",
     "src/chip/devicecontroller/ReportCallback.java",
     "src/chip/devicecontroller/ReportCallbackJni.java",
-    "src/chip/devicecontroller/ReportEventCallback.java",
-    "src/chip/devicecontroller/ReportEventCallbackJni.java",
     "src/chip/devicecontroller/ResubscriptionAttemptCallback.java",
     "src/chip/devicecontroller/SubscriptionEstablishedCallback.java",
+    "src/chip/devicecontroller/ThreadScanResult.java",
     "src/chip/devicecontroller/UnpairDeviceCallback.java",
+    "src/chip/devicecontroller/WiFiScanResult.java",
     "src/chip/devicecontroller/WriteAttributesCallback.java",
     "src/chip/devicecontroller/WriteAttributesCallbackJni.java",
     "src/chip/devicecontroller/model/AttributeState.java",
@@ -361,11 +417,25 @@ android_library("java") {
     "src/chip/devicecontroller/model/EventState.java",
     "src/chip/devicecontroller/model/InvokeElement.java",
     "src/chip/devicecontroller/model/NodeState.java",
-    "zap-generated/chip/devicecontroller/ChipClusters.java",
-    "zap-generated/chip/devicecontroller/ChipEventStructs.java",
-    "zap-generated/chip/devicecontroller/ChipStructs.java",
-    "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
   ]
+
+  if (matter_enable_java_generated_api) {
+    sources += [
+      "generated/java/chip/devicecontroller/ClusterReadMapping.java",
+      "generated/java/chip/devicecontroller/ClusterWriteMapping.java",
+      "src/chip/clusterinfo/ClusterCommandCallback.java",
+      "src/chip/clusterinfo/ClusterInfo.java",
+      "src/chip/clusterinfo/CommandParameterInfo.java",
+      "src/chip/clusterinfo/CommandResponseInfo.java",
+      "src/chip/clusterinfo/DelegatedClusterCallback.java",
+      "src/chip/clusterinfo/InteractionInfo.java",
+      "src/chip/devicecontroller/ChipTLVValueDecoder.java",
+      "zap-generated/chip/devicecontroller/ChipClusters.java",
+      "zap-generated/chip/devicecontroller/ChipEventStructs.java",
+      "zap-generated/chip/devicecontroller/ChipStructs.java",
+      "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
+    ]
+  }
 
   if (matter_enable_java_compilation) {
     deps += [

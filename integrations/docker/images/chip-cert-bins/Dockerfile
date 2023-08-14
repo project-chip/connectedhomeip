@@ -3,7 +3,7 @@ FROM ubuntu:22.04 as chip-build-cert
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 ARG TARGETPLATFORM
 # COMMITHASH defines the target commit to build from. May be passed in using --build-arg.
-ARG COMMITHASH=7b99e6399c6069037c613782d78132c69b9dcabb
+ARG COMMITHASH=c1ec2d777456924dcaa59b53351b00d73caf378f
 
 # Ensure TARGETPLATFORM is set
 RUN case ${TARGETPLATFORM} in \
@@ -268,5 +268,11 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-app1 chip-app1
 # Stage 3.1 Setup the Matter Python environment
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_lib python_lib
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing python_testing
-RUN pip install click websockets lark diskcache
+
+COPY --from=chip-build-cert-bins /root/connectedhomeip/scripts/tests/requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt && rm /tmp/requirements.txt
+
+COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing/requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt && rm /tmp/requirements.txt
+
 RUN pip install --no-cache-dir python_lib/controller/python/chip*.whl

@@ -3110,7 +3110,14 @@ public class ChipClusters {
     public void readBindingAttribute(
       BindingAttributeCallback callback
     ) {
-      readBindingAttribute(chipClusterPtr, callback);
+      readBindingAttribute(chipClusterPtr, callback, true);
+    }
+    public void readBindingAttributeWithFabricFilter(
+      BindingAttributeCallback callback
+    ,
+      boolean isFabricFiltered
+    ) {
+      readBindingAttribute(chipClusterPtr, callback, isFabricFiltered);
     }
     public void writeBindingAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.BindingClusterTargetStruct> value) {
       writeBindingAttribute(chipClusterPtr, callback, value, null);
@@ -3200,6 +3207,7 @@ public class ChipClusters {
 
     private native void readBindingAttribute(long chipClusterPtr,
         BindingAttributeCallback callback
+      , boolean isFabricFiltered
     );
 
     private native void writeBindingAttribute(long chipClusterPtr, DefaultClusterCallback callback, ArrayList<ChipStructs.BindingClusterTargetStruct> value, @Nullable Integer timedWriteTimeoutMs);
@@ -3294,7 +3302,14 @@ public class ChipClusters {
     public void readAclAttribute(
       AclAttributeCallback callback
     ) {
-      readAclAttribute(chipClusterPtr, callback);
+      readAclAttribute(chipClusterPtr, callback, true);
+    }
+    public void readAclAttributeWithFabricFilter(
+      AclAttributeCallback callback
+    ,
+      boolean isFabricFiltered
+    ) {
+      readAclAttribute(chipClusterPtr, callback, isFabricFiltered);
     }
     public void writeAclAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.AccessControlClusterAccessControlEntryStruct> value) {
       writeAclAttribute(chipClusterPtr, callback, value, null);
@@ -3313,7 +3328,14 @@ public class ChipClusters {
     public void readExtensionAttribute(
       ExtensionAttributeCallback callback
     ) {
-      readExtensionAttribute(chipClusterPtr, callback);
+      readExtensionAttribute(chipClusterPtr, callback, true);
+    }
+    public void readExtensionAttributeWithFabricFilter(
+      ExtensionAttributeCallback callback
+    ,
+      boolean isFabricFiltered
+    ) {
+      readExtensionAttribute(chipClusterPtr, callback, isFabricFiltered);
     }
     public void writeExtensionAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.AccessControlClusterAccessControlExtensionStruct> value) {
       writeExtensionAttribute(chipClusterPtr, callback, value, null);
@@ -3439,6 +3461,7 @@ public class ChipClusters {
 
     private native void readAclAttribute(long chipClusterPtr,
         AclAttributeCallback callback
+      , boolean isFabricFiltered
     );
 
     private native void writeAclAttribute(long chipClusterPtr, DefaultClusterCallback callback, ArrayList<ChipStructs.AccessControlClusterAccessControlEntryStruct> value, @Nullable Integer timedWriteTimeoutMs);
@@ -3448,6 +3471,7 @@ public class ChipClusters {
 
     private native void readExtensionAttribute(long chipClusterPtr,
         ExtensionAttributeCallback callback
+      , boolean isFabricFiltered
     );
 
     private native void writeExtensionAttribute(long chipClusterPtr, DefaultClusterCallback callback, ArrayList<ChipStructs.AccessControlClusterAccessControlExtensionStruct> value, @Nullable Integer timedWriteTimeoutMs);
@@ -4706,7 +4730,14 @@ public class ChipClusters {
     public void readDefaultOTAProvidersAttribute(
       DefaultOTAProvidersAttributeCallback callback
     ) {
-      readDefaultOTAProvidersAttribute(chipClusterPtr, callback);
+      readDefaultOTAProvidersAttribute(chipClusterPtr, callback, true);
+    }
+    public void readDefaultOTAProvidersAttributeWithFabricFilter(
+      DefaultOTAProvidersAttributeCallback callback
+    ,
+      boolean isFabricFiltered
+    ) {
+      readDefaultOTAProvidersAttribute(chipClusterPtr, callback, isFabricFiltered);
     }
     public void writeDefaultOTAProvidersAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.OtaSoftwareUpdateRequestorClusterProviderLocation> value) {
       writeDefaultOTAProvidersAttribute(chipClusterPtr, callback, value, null);
@@ -4832,6 +4863,7 @@ public class ChipClusters {
 
     private native void readDefaultOTAProvidersAttribute(long chipClusterPtr,
         DefaultOTAProvidersAttributeCallback callback
+      , boolean isFabricFiltered
     );
 
     private native void writeDefaultOTAProvidersAttribute(long chipClusterPtr, DefaultClusterCallback callback, ArrayList<ChipStructs.OtaSoftwareUpdateRequestorClusterProviderLocation> value, @Nullable Integer timedWriteTimeoutMs);
@@ -11736,7 +11768,14 @@ public class ChipClusters {
     public void readNOCsAttribute(
       NOCsAttributeCallback callback
     ) {
-      readNOCsAttribute(chipClusterPtr, callback);
+      readNOCsAttribute(chipClusterPtr, callback, true);
+    }
+    public void readNOCsAttributeWithFabricFilter(
+      NOCsAttributeCallback callback
+    ,
+      boolean isFabricFiltered
+    ) {
+      readNOCsAttribute(chipClusterPtr, callback, isFabricFiltered);
     }
     public void subscribeNOCsAttribute(
         NOCsAttributeCallback callback
@@ -11748,7 +11787,14 @@ public class ChipClusters {
     public void readFabricsAttribute(
       FabricsAttributeCallback callback
     ) {
-      readFabricsAttribute(chipClusterPtr, callback);
+      readFabricsAttribute(chipClusterPtr, callback, true);
+    }
+    public void readFabricsAttributeWithFabricFilter(
+      FabricsAttributeCallback callback
+    ,
+      boolean isFabricFiltered
+    ) {
+      readFabricsAttribute(chipClusterPtr, callback, isFabricFiltered);
     }
     public void subscribeFabricsAttribute(
         FabricsAttributeCallback callback
@@ -11879,6 +11925,7 @@ public class ChipClusters {
 
     private native void readNOCsAttribute(long chipClusterPtr,
         NOCsAttributeCallback callback
+      , boolean isFabricFiltered
     );
     private native void subscribeNOCsAttribute(long chipClusterPtr,
         NOCsAttributeCallback callback
@@ -11886,6 +11933,7 @@ public class ChipClusters {
 
     private native void readFabricsAttribute(long chipClusterPtr,
         FabricsAttributeCallback callback
+      , boolean isFabricFiltered
     );
     private native void subscribeFabricsAttribute(long chipClusterPtr,
         FabricsAttributeCallback callback
@@ -12074,7 +12122,14 @@ public class ChipClusters {
     public void readGroupKeyMapAttribute(
       GroupKeyMapAttributeCallback callback
     ) {
-      readGroupKeyMapAttribute(chipClusterPtr, callback);
+      readGroupKeyMapAttribute(chipClusterPtr, callback, true);
+    }
+    public void readGroupKeyMapAttributeWithFabricFilter(
+      GroupKeyMapAttributeCallback callback
+    ,
+      boolean isFabricFiltered
+    ) {
+      readGroupKeyMapAttribute(chipClusterPtr, callback, isFabricFiltered);
     }
     public void writeGroupKeyMapAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct> value) {
       writeGroupKeyMapAttribute(chipClusterPtr, callback, value, null);
@@ -12093,7 +12148,14 @@ public class ChipClusters {
     public void readGroupTableAttribute(
       GroupTableAttributeCallback callback
     ) {
-      readGroupTableAttribute(chipClusterPtr, callback);
+      readGroupTableAttribute(chipClusterPtr, callback, true);
+    }
+    public void readGroupTableAttributeWithFabricFilter(
+      GroupTableAttributeCallback callback
+    ,
+      boolean isFabricFiltered
+    ) {
+      readGroupTableAttribute(chipClusterPtr, callback, isFabricFiltered);
     }
     public void subscribeGroupTableAttribute(
         GroupTableAttributeCallback callback
@@ -12200,6 +12262,7 @@ public class ChipClusters {
 
     private native void readGroupKeyMapAttribute(long chipClusterPtr,
         GroupKeyMapAttributeCallback callback
+      , boolean isFabricFiltered
     );
 
     private native void writeGroupKeyMapAttribute(long chipClusterPtr, DefaultClusterCallback callback, ArrayList<ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct> value, @Nullable Integer timedWriteTimeoutMs);
@@ -12209,6 +12272,7 @@ public class ChipClusters {
 
     private native void readGroupTableAttribute(long chipClusterPtr,
         GroupTableAttributeCallback callback
+      , boolean isFabricFiltered
     );
     private native void subscribeGroupTableAttribute(long chipClusterPtr,
         GroupTableAttributeCallback callback
@@ -13346,7 +13410,14 @@ public class ChipClusters {
     public void readRegisteredClientsAttribute(
       RegisteredClientsAttributeCallback callback
     ) {
-      readRegisteredClientsAttribute(chipClusterPtr, callback);
+      readRegisteredClientsAttribute(chipClusterPtr, callback, true);
+    }
+    public void readRegisteredClientsAttributeWithFabricFilter(
+      RegisteredClientsAttributeCallback callback
+    ,
+      boolean isFabricFiltered
+    ) {
+      readRegisteredClientsAttribute(chipClusterPtr, callback, isFabricFiltered);
     }
     public void subscribeRegisteredClientsAttribute(
         RegisteredClientsAttributeCallback callback
@@ -13474,6 +13545,7 @@ public class ChipClusters {
 
     private native void readRegisteredClientsAttribute(long chipClusterPtr,
         RegisteredClientsAttributeCallback callback
+      , boolean isFabricFiltered
     );
     private native void subscribeRegisteredClientsAttribute(long chipClusterPtr,
         RegisteredClientsAttributeCallback callback
@@ -37758,7 +37830,14 @@ public class ChipClusters {
     public void readListFabricScopedAttribute(
       ListFabricScopedAttributeCallback callback
     ) {
-      readListFabricScopedAttribute(chipClusterPtr, callback);
+      readListFabricScopedAttribute(chipClusterPtr, callback, true);
+    }
+    public void readListFabricScopedAttributeWithFabricFilter(
+      ListFabricScopedAttributeCallback callback
+    ,
+      boolean isFabricFiltered
+    ) {
+      readListFabricScopedAttribute(chipClusterPtr, callback, isFabricFiltered);
     }
     public void writeListFabricScopedAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.UnitTestingClusterTestFabricScoped> value) {
       writeListFabricScopedAttribute(chipClusterPtr, callback, value, null);
@@ -38926,6 +39005,7 @@ public class ChipClusters {
 
     private native void readListFabricScopedAttribute(long chipClusterPtr,
         ListFabricScopedAttributeCallback callback
+      , boolean isFabricFiltered
     );
 
     private native void writeListFabricScopedAttribute(long chipClusterPtr, DefaultClusterCallback callback, ArrayList<ChipStructs.UnitTestingClusterTestFabricScoped> value, @Nullable Integer timedWriteTimeoutMs);

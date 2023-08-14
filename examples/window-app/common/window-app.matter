@@ -267,6 +267,10 @@ server cluster Scenes = 5 {
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
+  bitmap Feature : BITMAP32 {
+    kTagList = 0x1;
+  }
+
   struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
@@ -1692,6 +1696,10 @@ server cluster GroupKeyManagement = 63 {
     kCacheAndSync = 1;
   }
 
+  bitmap Feature : BITMAP32 {
+    kCacheAndSync = 0x1;
+  }
+
   fabric_scoped struct GroupInfoMapStruct {
     group_id groupId = 1;
     endpoint_no endpoints[] = 2;
@@ -1931,7 +1939,8 @@ server cluster WindowCovering = 258 {
 }
 
 endpoint 0 {
-  device type windowcovering = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Descriptor {
@@ -2256,7 +2265,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type windowcovering = 514, version 2;
+  device type ma_windowcovering = 514, version 2;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;
@@ -2333,7 +2343,8 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type windowcovering = 514, version 2;
+  device type ma_windowcovering = 514, version 2;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;

@@ -1,5 +1,5 @@
 {
-  "featureLevel": 96,
+  "featureLevel": 97,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -33,7 +33,33 @@
   ],
   "endpointTypes": [
     {
+      "id": 1,
       "name": "MA-rootdevice",
+      "deviceTypeRef": {
+        "id": 2,
+        "code": 22,
+        "profileId": 259,
+        "label": "MA-rootdevice",
+        "name": "MA-rootdevice"
+      },
+      "deviceTypes": [
+        {
+          "id": 2,
+          "code": 22,
+          "profileId": 259,
+          "label": "MA-rootdevice",
+          "name": "MA-rootdevice"
+        }
+      ],
+      "deviceTypeRefs": [
+        2
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        22
+      ],
       "deviceTypeName": "MA-rootdevice",
       "deviceTypeCode": 22,
       "deviceTypeProfileId": 259,
@@ -5555,7 +5581,7 @@
           "mfgCode": null,
           "define": "ICD_MANAGEMENT_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "RegisterClientResponse",
@@ -5574,7 +5600,7 @@
               "side": "server",
               "type": "int32u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "500",
@@ -5590,7 +5616,7 @@
               "side": "server",
               "type": "int32u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "300",
@@ -5606,7 +5632,7 @@
               "side": "server",
               "type": "int16u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "300",
@@ -5638,7 +5664,7 @@
               "side": "server",
               "type": "int32u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -5654,7 +5680,7 @@
               "side": "server",
               "type": "int16u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "1",
@@ -5764,7 +5790,33 @@
       ]
     },
     {
+      "id": 2,
       "name": "MA-dimmablelight",
+      "deviceTypeRef": {
+        "id": 9,
+        "code": 257,
+        "profileId": 259,
+        "label": "MA-dimmablelight",
+        "name": "MA-dimmablelight"
+      },
+      "deviceTypes": [
+        {
+          "id": 9,
+          "code": 257,
+          "profileId": 259,
+          "label": "MA-dimmablelight",
+          "name": "MA-dimmablelight"
+        }
+      ],
+      "deviceTypeRefs": [
+        9
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        257
+      ],
       "deviceTypeName": "MA-dimmablelight",
       "deviceTypeCode": 257,
       "deviceTypeProfileId": 259,
@@ -7760,7 +7812,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -9103,18 +9155,14 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 22
+      "networkId": 0
     },
     {
       "endpointTypeName": "MA-dimmablelight",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 257
+      "networkId": 0
     }
   ],
   "log": []

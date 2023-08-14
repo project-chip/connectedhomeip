@@ -35,7 +35,7 @@
 #include <openthread/platform/settings.h>
 #endif
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
 #include "fsl_gpio.h"
 #include "fsl_iocon.h"
 #include "gpio_pins.h"
@@ -46,7 +46,7 @@ using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Logging;
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
 #include "Keyboard.h"
 #include "OtaSupport.h"
 #include "PWR_Configuration.h"
@@ -67,7 +67,7 @@ extern InitFunc __init_array_end;
 extern "C" void sched_enable();
 
 /* low power requirements */
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
 extern "C" void setThreadInitialized(bool isInitialized);
 extern "C" bool isThreadInitialized();
 #endif
@@ -133,7 +133,7 @@ extern "C" void main_task(void const * argument)
         goto exit;
     }
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
     setThreadInitialized(TRUE);
 #endif
 
@@ -172,7 +172,7 @@ exit:
 extern "C" void otSysEventSignalPending(void)
 {
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
     /* make sure that 15.4 radio is initialized before waking up the Thread task */
     if (isThreadInitialized())
 #endif
@@ -182,7 +182,7 @@ extern "C" void otSysEventSignalPending(void)
     }
 }
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
 extern "C" void vOptimizeConsumption(void)
 {
     /* BUTTON2 change contact, BUTTON4 start adv/factoryreset */

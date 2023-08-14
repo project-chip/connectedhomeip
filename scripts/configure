@@ -226,8 +226,21 @@ function check_build_env() {
 
 function configure_python_env() {
     progress "Setting up Python venv"
-    "$PYTHON" -m venv --clear "$BUILD_ENV_PATH"
+    # Debian and Ubuntu ship python3 with a broken venv module unless the
+    # python3-venv package is installed (https://bugs.launchpad.net/bugs/1290847)
+    local withoutpip=() pip="${BUILD_ENV_PATH}/bin/pip"
+    if ! "$PYTHON" -m ensurepip --version >/dev/null 2>&1; then
+        withoutpip=(--without-pip) pip="${pip}.pyz" # bootstrapped below
+    fi
+    "$PYTHON" -m venv --clear "${withoutpip[@]}" "$BUILD_ENV_PATH"
     info "$BUILD_ENV_PATH"
+
+    # Download a standalone pip.pyz from pypa.io if necessary
+    if [[ -n "$withoutpip" ]]; then
+        progress "Bootstrapping pip via pypa.io (venv module is missing ensurepip dependency)"
+        call_impl download https://bootstrap.pypa.io/pip/pip.pyz "$pip"
+        info "ok"
+    fi
 
     # Install our auto-loading venvactivate module so that running scripts via
     # the venv python has the side-effect of fully activating the environment.
@@ -236,7 +249,9 @@ function configure_python_env() {
     cp "${CHIP_ROOT}/scripts/configure.venv/venvactivate".{pth,py} "${sitepkgs}/"
 
     progress "Installing Python build dependencies"
-    "${BUILD_ENV_PATH}/bin/pip" install --require-virtualenv --quiet --upgrade pip wheel
+    # Ensure pip and wheel are up to date first (using pip.pyz if necessary)
+    "${BUILD_ENV_PATH}/bin/python3" "$pip" install --require-virtualenv --quiet --upgrade pip wheel
+
     "${BUILD_ENV_PATH}/bin/pip" install --require-virtualenv --quiet \
         -r "${CHIP_ROOT}/scripts/setup/requirements.build.txt" \
         -c "${CHIP_ROOT}/scripts/setup/constraints.txt"
@@ -254,19 +269,16 @@ function finalize_build_env() {
 }
 
 function download_zap() {
-    local version platform arch
+    local version
     read -r version <"${CHIP_ROOT}/scripts/setup/zap.version"
-    case "$OSTYPE" in
-    linux*) platform=linux ;;
-    darwin*) platform=mac ;;
-    *) fail "Unable to determine zap platform for OSTYPE='$OSTYPE'" ;;
+    local platform="$(uname -sm)" flavor
+    case "$platform" in
+    Linux\ x86_64) flavor=linux-x64 ;;
+    Linux\ arm64) flavor=linux-arm64 ;;
+    Darwin\ *) flavor=mac-x64 ;; # there is no mac arm build of zap (can run x64 via Rosetta)
+    *) fail "Unable to determine zap flavor for $platform" ;;
     esac
-    case "$(uname -m)" in
-    arm64) arch=arm64 ;;
-    x86_64) arch=x64 ;;
-    *) fail "Unable to determine zap architecture for 'uname -m'='$(uname -m)'" ;;
-    esac
-    local url="https://github.com/project-chip/zap/releases/download/${version}/zap-${platform}-${arch}.zip"
+    local url="https://github.com/project-chip/zap/releases/download/${version}/zap-${flavor}.zip"
 
     progress "Installing zap-cli from $url"
     call_impl download_and_extract_zip "$url" "${BUILD_ENV_PATH}/bin" zap-cli

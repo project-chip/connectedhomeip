@@ -35,15 +35,42 @@
 #include <lib/core/PeerId.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/BufferReader.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
 
+namespace detail {
+// Figure out the max size of a packet we can allocate, including all headers.
+static constexpr size_t kMaxIPPacketSizeBytes       = 1280;
+static constexpr size_t kMaxUDPAndIPHeaderSizeBytes = 48;
+
+static_assert(kMaxIPPacketSizeBytes >= kMaxUDPAndIPHeaderSizeBytes + CHIP_SYSTEM_HEADER_RESERVE_SIZE,
+              "Matter headers and IP headers must fit in an MTU.");
+
+// Max space we have for our Application Payload and MIC, per spec.
+static constexpr size_t kMaxPerSpecApplicationPayloadAndMICSizeBytes =
+    kMaxIPPacketSizeBytes - kMaxUDPAndIPHeaderSizeBytes - CHIP_SYSTEM_HEADER_RESERVE_SIZE;
+
+// Max space we have for our Application Payload and MIC in our actual packet
+// buffers.  This is the size _excluding_ the header reserve.
+static constexpr size_t kMaxPacketBufferApplicationPayloadAndMICSizeBytes = System::PacketBuffer::kMaxSize;
+
+static constexpr size_t kMaxApplicationPayloadAndMICSizeBytes =
+    min(kMaxPerSpecApplicationPayloadAndMICSizeBytes, kMaxPacketBufferApplicationPayloadAndMICSizeBytes);
+
+} // namespace detail
+
 static constexpr size_t kMaxTagLen = 16;
 
-static constexpr size_t kMaxAppMessageLen = 1200;
+static_assert(detail::kMaxApplicationPayloadAndMICSizeBytes > kMaxTagLen, "Need to be able to fit our tag in a message");
+
+// This is somewhat of an under-estimate, because in practice any time we have a
+// tag we will not have source/destination node IDs, but above we are including
+// those in the header sizes.
+static constexpr size_t kMaxAppMessageLen = detail::kMaxApplicationPayloadAndMICSizeBytes - kMaxTagLen;
 
 static constexpr uint16_t kMsgUnicastSessionIdUnsecured = 0x0000;
 
