@@ -234,8 +234,8 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
         advertiseParameters.SetDeviceType(chip::Optional<uint32_t>::Value(val32));
     }
 
-    char deviceName[chip::Dnssd::kKeyDeviceNameMaxLength];
-    MutableCharSpan deviceNameSpan(deviceName);
+    char deviceName[Dnssd::kKeyDeviceNameMaxLength + 1];
+    MutableCharSpan deviceNameSpan(deviceName, Dnssd::kKeyDeviceNameMaxLength);
     if (DeviceLayer::ConfigurationMgr().IsCommissionableDeviceNameEnabled())
     {
         CHIP_ERROR err;
@@ -243,7 +243,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
         {
             // Appending a null terminator since SetDeviceName expects a null terminated string
             deviceName[deviceNameSpan.size()] = '\0';
-            advertiseParameters.SetDeviceName(chip::Optional<const char *>::Value(deviceName));
+            advertiseParameters.SetDeviceName(Optional<const char *>::Value(deviceName));
         }
         else
         {

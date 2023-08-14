@@ -32,7 +32,8 @@ public:
     /**
      * @brief Obtain the Device Name from the device's factory data.
      *
-     * @param[out] deviceName Reference to location where the device name will be copied
+     * @param[out] deviceName Buffer to copy the name into.  On success, will be
+                              resized to the actual size of the name.
      * @returns CHIP_NO_ERROR on success, or another CHIP_ERROR from the underlying implementation
      *          if access fails.
      */

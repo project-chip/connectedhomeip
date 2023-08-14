@@ -47,6 +47,10 @@ static constexpr size_t kKeyRotatingDeviceIdMaxLength   = 100;
 static constexpr size_t kKeyPairingInstructionMaxLength = 128;
 static constexpr size_t kKeyPairingHintMaxLength        = 10;
 
+static_assert(kMaxDeviceNameLen == kKeyDeviceNameMaxLength,
+              "Max device name length constants are not matching: ConfigurationManager::kMaxDeviceNameLen and "
+              "Dnssd::kKeyDeviceNameMaxLength");
+
 enum class TxtKeyUse : uint8_t
 {
     kNone,

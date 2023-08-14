@@ -139,9 +139,10 @@ public:
 
     virtual void LogDeviceConfig() = 0;
 
-    virtual bool IsCommissionableDeviceTypeEnabled()                                 = 0;
-    virtual CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType)                        = 0;
-    virtual bool IsCommissionableDeviceNameEnabled()                                 = 0;
+    virtual bool IsCommissionableDeviceTypeEnabled()          = 0;
+    virtual CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType) = 0;
+    virtual bool IsCommissionableDeviceNameEnabled()          = 0;
+    // deviceNameSpan gets resized to the actual size of the character data
     virtual CHIP_ERROR GetCommissionableDeviceName(MutableCharSpan & deviceNameSpan) = 0;
     virtual CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint)                 = 0;
     virtual CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize)      = 0;

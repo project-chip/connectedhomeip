@@ -26,11 +26,7 @@ CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetDeviceName(Mutable
 {
     constexpr char deviceName[] = CHIP_DEVICE_CONFIG_DEVICE_NAME;
 
-    ReturnErrorCodeIf(sizeof(deviceName) - 1 > deviceNameSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(deviceNameSpan.data(), deviceName, sizeof(deviceName) - 1);
-    deviceNameSpan.reduce_size(sizeof(deviceName) - 1);
-
-    return CHIP_NO_ERROR;
+    return CopyCharSpanToMutableCharSpan(CharSpan::fromCharString(deviceName), deviceNameSpan);
 }
 
 template <class ConfigClass>
