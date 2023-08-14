@@ -155,7 +155,7 @@ limitations under the License.
             <description>Add or update the credentials for a given Wi-Fi network.</description>
             <arg name="SSID" type="octet_string" length="32"/>
             <arg name="Credentials" type="octet_string" length="64"/>
-            <arg name="breadcrumb" type="int64u" optional="true"/>
+            <arg name="Breadcrumb" type="int64u" optional="true"/>
             <access op="invoke" privilege="administer"/>
         </command>
         <command source="client" code="0x03" name="AddOrUpdateThreadNetwork" optional="true" response="NetworkConfigResponse" cli="chip network_commissioning addorupdatethreadnetwork">
