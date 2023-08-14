@@ -17,27 +17,24 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
-import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-import java.util.Optional
-
-class ThreadNetworkDiagnosticsClusterRouteTableStruct (
-    val extAddress: Long,
-    val rloc16: Int,
-    val routerId: Int,
-    val nextHop: Int,
-    val pathCost: Int,
-    val LQIIn: Int,
-    val LQIOut: Int,
-    val age: Int,
-    val allocated: Boolean,
-    val linkEstablished: Boolean) {
-  override fun toString(): String  = buildString {
+class ThreadNetworkDiagnosticsClusterRouteTableStruct(
+  val extAddress: Long,
+  val rloc16: Int,
+  val routerId: Int,
+  val nextHop: Int,
+  val pathCost: Int,
+  val LQIIn: Int,
+  val LQIOut: Int,
+  val age: Int,
+  val allocated: Boolean,
+  val linkEstablished: Boolean
+) {
+  override fun toString(): String = buildString {
     append("ThreadNetworkDiagnosticsClusterRouteTableStruct {\n")
     append("\textAddress : $extAddress\n")
     append("\trloc16 : $rloc16\n")
@@ -81,7 +78,7 @@ class ThreadNetworkDiagnosticsClusterRouteTableStruct (
     private const val TAG_ALLOCATED = 8
     private const val TAG_LINK_ESTABLISHED = 9
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader) : ThreadNetworkDiagnosticsClusterRouteTableStruct {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader): ThreadNetworkDiagnosticsClusterRouteTableStruct {
       tlvReader.enterStructure(tag)
       val extAddress = tlvReader.getLong(ContextSpecificTag(TAG_EXT_ADDRESS))
       val rloc16 = tlvReader.getInt(ContextSpecificTag(TAG_RLOC16))
@@ -93,10 +90,21 @@ class ThreadNetworkDiagnosticsClusterRouteTableStruct (
       val age = tlvReader.getInt(ContextSpecificTag(TAG_AGE))
       val allocated = tlvReader.getBoolean(ContextSpecificTag(TAG_ALLOCATED))
       val linkEstablished = tlvReader.getBoolean(ContextSpecificTag(TAG_LINK_ESTABLISHED))
-      
+
       tlvReader.exitContainer()
 
-      return ThreadNetworkDiagnosticsClusterRouteTableStruct(extAddress, rloc16, routerId, nextHop, pathCost, LQIIn, LQIOut, age, allocated, linkEstablished)
+      return ThreadNetworkDiagnosticsClusterRouteTableStruct(
+        extAddress,
+        rloc16,
+        routerId,
+        nextHop,
+        pathCost,
+        LQIIn,
+        LQIOut,
+        age,
+        allocated,
+        linkEstablished
+      )
     }
   }
 }
