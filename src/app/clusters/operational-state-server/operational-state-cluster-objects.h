@@ -138,6 +138,35 @@ struct GenericOperationalError : public app::Clusters::detail::Structs::ErrorSta
         }
     }
 
+    bool IsEqual(const Structs::ErrorStateStruct::Type& rhs)
+    {
+        if (errorStateID != rhs.errorStateID)
+        {
+            return false;
+        }
+        if (errorStateLabel.HasValue() != rhs.errorStateLabel.HasValue() ||
+            errorStateDetails.HasValue() != rhs.errorStateDetails.HasValue())
+        {
+            return false;
+        }
+        if (errorStateLabel.HasValue())
+        {
+            if (!errorStateLabel.Value().data_equal(rhs.errorStateLabel.Value()))
+            {
+                return false;
+            }
+        }
+        if (errorStateDetails.HasValue())
+        {
+            if(!errorStateDetails.Value().data_equal(rhs.errorStateDetails.Value()))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 private:
     char mErrorStateLabelBuffer[kOperationalErrorLabelMaxSize];
     char mErrorStateDetailsBuffer[kOperationalErrorDetailsMaxSize];

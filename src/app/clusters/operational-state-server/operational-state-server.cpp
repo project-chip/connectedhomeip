@@ -136,9 +136,7 @@ void Instance::OnOperationalErrorDetected(const Structs::ErrorStateStruct::Type 
     }
 
     // Set the OperationalError attribute
-    if (aError.errorStateID != mOperationalError.errorStateID ||
-        !aError.errorStateLabel.Value().data_equal(mOperationalError.errorStateLabel.Value()) ||
-        !aError.errorStateDetails.Value().data_equal(mOperationalError.errorStateDetails.Value()))
+    if (mOperationalError.IsEqual(aError))
     {
         mOperationalError.Set(aError.errorStateID, aError.errorStateLabel, aError.errorStateDetails);
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OperationalError::Id);
