@@ -47,8 +47,7 @@ namespace support {
 
 class AppParameters;
 class ByteSpanDataProvider;
-class CommissionableDataProviderImpl;
-class DeviceAttestationCredentialsProviderImpl;
+class ServerInitParamsProvider;
 
 } // namespace support
 
