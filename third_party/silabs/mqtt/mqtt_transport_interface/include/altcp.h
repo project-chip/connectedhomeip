@@ -41,7 +41,6 @@
 #define TRANSPORT_HDR_ALTCP_H
 
 #include "altcp_opt.h"
-
 #if TRANSPORT_ALTCP /* don't build if not configured for use in lwipopts.h */
 
 #include "lwip/tcpbase.h"
@@ -50,9 +49,7 @@
 #include "lwip/pbuf.h"
 #include "lwip/ip_addr.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 struct altcp_pcb;
 struct altcp_functions;
@@ -101,9 +98,10 @@ typedef struct altcp_allocator_s {
                                      x, __LINE__, __FILE__); fflush(NULL); abort();} while(0)
 #define TRANSPORT_ASSERT(message, assertion) do { if (!(assertion)) { \
   TRANSPORT_PLATFORM_ASSERT(message); }} while(0)
-#ifdef TRANSPORT_DEBUG 
-extern void efr32Log(const char * aFormat, ...);
-#define TRANSPORT_DEBUGF(x) efr32Log x;
+#ifdef TRANSPORT_DEBUG
+#include "silabs_utils.h"
+void silabsLog(const char * aFormat, ...);
+#define TRANSPORT_DEBUGF(x) silabsLog x;
 #else
 #define TRANSPORT_DEBUGF(x)
 #endif
@@ -156,9 +154,6 @@ u16_t altcp_get_port(struct altcp_pcb *conn, int local);
 enum tcp_state altcp_dbg_get_tcp_state(struct altcp_pcb *conn);
 #endif
 
-#ifdef __cplusplus
-}
-#endif
 
 #else /* TRANSPORT_ALTCP */
 

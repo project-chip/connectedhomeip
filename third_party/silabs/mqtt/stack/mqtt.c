@@ -68,8 +68,9 @@ void
 mqtt_output_send(struct mqtt_ringbuf_t *rb, mqtt_transport_intf_t *trans);
 
 #ifdef MQTT_DEBUG
-extern void efr32Log(const char * aFormat, ...);
-#define MQTT_DEBUGF(x) efr32Log x;
+#include "silabs_utils.h"
+void silabsLog(const char * aFormat, ...);
+#define MQTT_DEBUGF(x) silabsLog x;
 #else
 #define MQTT_DEBUGF(x)
 #endif
@@ -700,7 +701,7 @@ mqtt_message_received(mqtt_client_t *client, uint8_t fixed_hdr_idx, uint16_t len
     uint16_t payload_offset = 0;
     uint16_t payload_length = length;
     uint8_t qos = MQTT_CTL_PACKET_QOS(client->rx_buffer[0]);
-
+    uint8_t *topic;
     if (client->msg_idx <= MQTT_VAR_HEADER_BUFFER_LEN) {
       /* Should have topic and pkt id*/
       uint8_t *topic;
@@ -760,7 +761,7 @@ mqtt_message_received(mqtt_client_t *client, uint8_t fixed_hdr_idx, uint16_t len
         MQTT_DEBUGF(( "mqtt_message_received: Received short packet (payload)\n"));
         goto out_disconnect;
       }
-      client->data_cb(client->inpub_arg, var_hdr_payload + payload_offset, payload_length, remaining_length == 0 ? MQTT_DATA_FLAG_LAST : 0);
+      client->data_cb(client->inpub_arg, (const char *)topic, var_hdr_payload + payload_offset, payload_length, remaining_length == 0 ? MQTT_DATA_FLAG_LAST : 0);
       /* Reply if QoS > 0 */
       if (remaining_length == 0 && qos > 0) {
         /* Send PUBACK for QoS 1 or PUBREC for QoS 2 */

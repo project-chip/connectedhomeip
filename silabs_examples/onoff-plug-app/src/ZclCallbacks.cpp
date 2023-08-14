@@ -23,6 +23,10 @@
 #include "AppConfig.h"
 #include "OnOffPlugManager.h"
 
+#ifdef DIC_ENABLE
+#include "dic.h"
+#endif // DIC ENABLE
+
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
@@ -40,6 +44,11 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
     if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
     {
+
+    #ifdef DIC_ENABLE
+        DIC_SendMsg("light/state", (const char *)(value ? ( *value ? "on" : "off") : "invalid"));
+    #endif // DIC ENABLE
+
         PlugMgr().InitiateAction(AppEvent::kEventType_Plug, *value ? OnOffPlugManager::ON_ACTION : OnOffPlugManager::OFF_ACTION);
     }
     else if (clusterId == LevelControl::Id)

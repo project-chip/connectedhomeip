@@ -21,9 +21,6 @@
 #ifndef __DIC_H
 #define __DIC_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 #include "stdint.h"
 
 typedef enum {
@@ -31,18 +28,25 @@ typedef enum {
 	DIC_ERR_INVAL,
 	DIC_ERR_MEM,
 	DIC_ERR_FAIL,
+	DIC_ERR_CONN,
+	DIC_ERR_PUBLISH,
 } dic_err_t;
+
+#define MQTT_QOS_0 0
 
 typedef struct {
 	uint8_t *dataP;
 	uint16_t dataLen;
 } dic_buff_t;
 
-dic_err_t DIC_Init(void);
+typedef void (* dic_subscribe_cb)(void);
+
+dic_err_t DIC_Init(dic_subscribe_cb subs_cb);
+
+typedef void (*dic_incoming_data_cb_t)(void *arg,const char *topic, const uint8_t *data, uint16_t len, uint8_t flags);
+
+dic_err_t dic_mqtt_subscribe(dic_incoming_data_cb_t data_cb, const char * topic, uint8_t qos);
 
 dic_err_t DIC_SendMsg(const char *subject, const char *content);
 
-#ifdef __cplusplus
-}
-#endif
 #endif //__DIC_H

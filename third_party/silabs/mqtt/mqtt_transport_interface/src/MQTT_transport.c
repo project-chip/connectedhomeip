@@ -19,11 +19,7 @@
 
 #include "MQTT_transport.h"
 #include <string.h>
-#ifdef SIWX_917
-#include "siwx917_utils.h"
-#else
-#include "efr32_utils.h"
-#endif
+#include "silabs_utils.h"
 #include "lwip/timeouts.h"
 #include "lwip/dns.h"
 #include "altcp.h"

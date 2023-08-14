@@ -259,6 +259,7 @@ altcp_mbedtls_lower_recv(void *arg, struct altcp_pcb *inner_conn, struct pbuf *p
   }
   //return altcp_mbedtls_lower_recv_process(conn, state);
   /* signal application to process rx packet and return success*/
+  altcp_recved(inner_conn,p->len);
   altcp_mbedtls_lower_recv_signal(conn);
   return ERR_OK;
 }

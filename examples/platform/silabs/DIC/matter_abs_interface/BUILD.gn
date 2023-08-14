@@ -1,0 +1,42 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/platform/silabs/wifi_args.gni")
+
+config("silabs_dic_config") {
+  include_dirs = [
+    "${chip_root}/third_party/silabs/mqtt/stack",
+    "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/include",
+    "${chip_root}/examples/platform/silabs/DIC/matter_abs_interface/include",
+    ]
+}
+source_set("silabs-dic") {
+  sources = [
+    "${chip_root}/examples/platform/silabs/DIC/matter_abs_interface/src/dic.cpp",
+    "${chip_root}/examples/platform/silabs/DIC/matter_abs_interface/src/dic_control.cpp",
+    "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/MQTT_transport.c",
+    "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/altcp.c",
+    "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/altcp_alloc.c",
+    "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/altcp_tcp.c",
+    "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/altcp_tls_mbedtls.c",
+    "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/altcp_tls_mbedtls_mem.c",
+  ]
+  public_deps = [
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lwip",
+    app_data_model,
+  ]
+  public_configs = [ ":silabs_dic_config" ]
+}
