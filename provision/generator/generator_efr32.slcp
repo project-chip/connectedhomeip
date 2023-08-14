@@ -49,3 +49,4 @@ component:
   - id: mbedtls_pkcs5
   - id: mbedtls_ecc
   - id: mbedtls_x509
+  - id: bootloader_app_properties
