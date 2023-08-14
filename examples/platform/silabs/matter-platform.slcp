@@ -49,29 +49,23 @@ component:
 - {id: bluetooth_feature_system}
 - {id: bluetooth_feature_scanner}
 - {id: rail_util_power_manager_init}
-- {id: mbedtls_aes}
-- {id: mbedtls_ccm}
-- {id: mbedtls_cmac}
-- {id: mbedtls_ecc}
-- {id: mbedtls_ecdh}
-- {id: mbedtls_ecdsa}
-- {id: mbedtls_ecdsa_deterministic}
-- {id: mbedtls_hash}
-- {id: mbedtls_hkdf}
-- {id: mbedtls_entropy_default}
-- {id: mbedtls_x509}
-- {id: mbedtls_platform_dynamic_memory_allocation_config_init_runtime }
-- {id: mbedtls_pkcs5}
-- {id: mbedtls_base64}
-- {id: mbedtls_jpake}
-- {id: psa_crypto_config}
-- {id: psa_crypto_sha512}
-- {id: psa_crypto_tls12_prf}
-- {id: mbedtls_sha512}
-- {id: mbedtls_tls}
-- {id: mbedtls_dtls}
-- {id: mbedtls_tls_server}
-- {id: psa_its}
+- {id: mbedtls_aes} # -> ok
+- {id: mbedtls_ccm} # -> ok
+- {id: mbedtls_cmac} # -> ok
+- {id: mbedtls_ecc} # -> ok
+- {id: mbedtls_ecdh} # -> ok
+- {id: mbedtls_ecdsa} # -> ok
+- {id: mbedtls_ecdsa_deterministic} # -> ok
+- {id: mbedtls_hash} # -> ok
+- {id: mbedtls_hkdf} # -> ok
+- {id: mbedtls_entropy_default} # -> ok
+- {id: mbedtls_x509} # -> ok
+- {id: mbedtls_platform_dynamic_memory_allocation_config_init_runtime } # -> ok
+- {id: mbedtls_pkcs5} # -> ok
+- {id: mbedtls_base64} # Not present
+- {id: ot_mbedtls}
+- {id: ot_psa_crypto}
+- {id: bluetooth_crypto}
 
 
 config_file:

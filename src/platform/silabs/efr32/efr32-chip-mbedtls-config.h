@@ -28,13 +28,6 @@
 
 #pragma once
 
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "em_device.h"
-#include "em_se.h"
-
 #if CHIP_HAVE_CONFIG_H
 #include <crypto/CryptoBuildConfig.h>
 #endif // CHIP_HAVE_CONFIG_H
