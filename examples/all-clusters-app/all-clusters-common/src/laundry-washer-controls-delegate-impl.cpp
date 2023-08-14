@@ -21,7 +21,6 @@
 
 using namespace chip;
 using namespace chip::app::Clusters::LaundryWasherControls;
-using namespace chip::Protocols::InteractionModel;
 
 const CharSpan LaundryWasherControlDelegate::spinSpeedsNameOptions[] = {
     CharSpan::fromCharString("Off"),
@@ -54,20 +53,4 @@ CHIP_ERROR LaundryWasherControlDelegate::GetSupportedRinseAtIndex(size_t index, 
     }
     supportedRinse = LaundryWasherControlDelegate::supportRinsesOptions[index];
     return CHIP_NO_ERROR;
-}
-
-size_t LaundryWasherControlDelegate::GetGetSpinSpeedSize()
-{
-    return ArraySize(spinSpeedsNameOptions);
-}
-
-void LaundryWasherControlDelegate::Init(EndpointId endpointId)
-{
-    LaundryWasherControlsServer laundryWasherControlsServer = LaundryWasherControlsServer::Instance();
-    NumberOfRinsesEnum supportedRinse;
-
-    GetSupportedRinseAtIndex(kDefaultRinseIndex, supportedRinse);
-    laundryWasherControlsServer.SetNumberOfRinses(endpointId, supportedRinse);
-    laundryWasherControlsServer.SetSpinSpeedCurrent(endpointId, DataModel::Nullable<uint8_t>(kDefaultSpinSpeedIndex));
-    LaundryWasherControlsServer::SetDefaultDelegate(endpointId, this);
 }

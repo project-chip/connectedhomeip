@@ -197,12 +197,6 @@ Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(const
                                                                            EmberAfAttributeType attributeType, uint16_t size,
                                                                            uint8_t * value)
 {
-    switch (attributePath.mAttributeId)
-    {
-    case Attributes::SpinSpeeds::Id:
-    case Attributes::SupportedRinses::Id:
-        return Status::UnsupportedWrite;
-    }
     Delegate * delegate = GetDelegate(attributePath.mEndpointId);
     if (delegate == nullptr)
     {
@@ -211,11 +205,21 @@ Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(const
     switch (attributePath.mAttributeId)
     {
     case Attributes::SpinSpeedCurrent::Id: {
-        if (*value >= (uint8_t) delegate->GetGetSpinSpeedSize())
+        if (NumericAttributeTraits<uint8_t>::IsNullValue(*value))
+        {
+            return Status::Success;
+        }
+        char buffer[LaundryWasherControlsServer::kMaxSpinSpeedLength];
+        MutableCharSpan spinSpeed(buffer);
+        auto err = delegate->GetSpinSpeedAtIndex((*value), spinSpeed);
+        if (err == CHIP_NO_ERROR)
+        {
+            return Status::Success;
+        }
+        else
         {
             return Status::ConstraintError;
         }
-        return Status::Success;
     }
     case Attributes::NumberOfRinses::Id: {
         for (uint8_t i = 0; true; i++)

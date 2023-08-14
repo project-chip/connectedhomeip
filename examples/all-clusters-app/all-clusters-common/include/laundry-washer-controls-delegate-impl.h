@@ -39,17 +39,12 @@ class LaundryWasherControlDelegate : public Delegate
     static const NumberOfRinsesEnum supportRinsesOptions[];
     static LaundryWasherControlDelegate instance;
 
-    static constexpr uint8_t kDefaultRinseIndex     = 0;
-    static constexpr uint8_t kDefaultSpinSpeedIndex = 0;
-
 public:
     CHIP_ERROR GetSpinSpeedAtIndex(size_t index, MutableCharSpan & spinSpeed);
     CHIP_ERROR GetSupportedRinseAtIndex(size_t index, NumberOfRinsesEnum & supportedRinse);
-    size_t GetGetSpinSpeedSize();
 
     LaundryWasherControlDelegate()  = default;
     ~LaundryWasherControlDelegate() = default;
-    void Init(EndpointId endpointId);
 
     static inline LaundryWasherControlDelegate & getLaundryWasherControlDelegate() { return instance; }
 };

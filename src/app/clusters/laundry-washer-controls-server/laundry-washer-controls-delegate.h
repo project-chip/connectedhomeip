@@ -50,8 +50,6 @@ public:
      * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the list of supported rinses.
      */
     virtual CHIP_ERROR GetSupportedRinseAtIndex(size_t index, NumberOfRinsesEnum & supportedRinse) = 0;
-
-    virtual size_t GetGetSpinSpeedSize() = 0;
 };
 
 } // namespace LaundryWasherControls
