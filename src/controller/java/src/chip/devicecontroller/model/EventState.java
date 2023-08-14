@@ -27,20 +27,20 @@ public final class EventState {
   public static final int MILLIS_SINCE_EPOCH = 1;
   private static final String TAG = "EventState";
 
-  private long eventNumber;
-  private int priorityLevel;
-  private int timestampType;
-  private long timestampValue;
+  private final long eventNumber;
+  private final int priorityLevel;
+  private final int timestampType;
+  private final long timestampValue;
 
-  private Object valueObject;
-  private byte[] tlv;
+  private final Object valueObject;
+  private final byte[] tlv;
   private JSONObject json;
 
   public EventState(
       long eventNumber,
       int priorityLevel,
       int timestampType,
-      long systemTimeStamp,
+      long timestampValue,
       Object valueObject,
       byte[] tlv,
       String jsonString) {

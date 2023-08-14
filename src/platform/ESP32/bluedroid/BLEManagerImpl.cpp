@@ -211,7 +211,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 #endif
     SuccessOrExit(err);
 
-    memset(mCons, 0, sizeof(mCons));
+    memset(reinterpret_cast<void *>(mCons), 0, sizeof(mCons));
     mServiceMode          = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mAppIf                = ESP_GATT_IF_NONE;
     mServiceAttrHandle    = 0;

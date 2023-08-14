@@ -1,0 +1,43 @@
+# The west manifest file (west.yml) for MCUXpresso SDK delivery.
+#
+# See the west documentation for more information:
+#
+# https://docs.zephyrproject.org/latest/guides/west/index.html
+manifest:
+    remotes:
+        - name: nxpmicro
+          url-base: https://github.com/NXPmicro
+    defaults:
+        remote: nxpmicro
+    projects:
+        - name: mcux-sdk
+          revision: b1ce670e8433142a3c78dca7f4597326eb5f5342
+          path: core
+        - name: amazon-freertos
+          url: https://github.com/NXP/amazon-freertos.git
+          path: core/rtos/amazon-freertos
+          revision: fb74168634e716fb5f0a61714e5c0d1ac6246ba
+        - name: mbedtls
+          url: https://github.com/nxp-mcuxpresso/mbedtls.git
+          path: core/middleware/mbedtls
+          revision: 15458495823165de372f62c3dad621a8da6c86e3
+        - name: framework
+          url: https://github.com/NXP/mcux-sdk-middleware-connectivity-framework.git
+          revision: a45ed24bc5f8d54312c4d9243c4423d226084412
+          path: core/middleware/wireless/framework
+        - name: ble_controller
+          url: https://github.com/NXP/mcux-sdk-middleware-bluetooth-controller.git
+          revision: 0e4effc707a0d5569160b9335bc2e57c17255f01
+          path: core/middleware/wireless/ble_controller
+        - name: bluetooth
+          url: https://github.com/NXP/mcux-sdk-middleware-bluetooth-host.git
+          revision: e5a1b7b9e3b44b49c6c0318edfc3acac74b342d8
+          path: core/middleware/wireless/bluetooth
+        - name: ieee-802.15.4
+          url: https://github.com/NXP/mcux-sdk-middleware-ieee_802.15.4.git
+          revision: 7cca871d58e53c78a703a39b269c4366b03f26e4
+          path: core/middleware/wireless/ieee-802.15.4
+        - name: examples
+          url: https://github.com/nxp-mcuxpresso/mcux-sdk-examples.git
+          revision: 39eed09d6a8485dcf365a24cd6ef957e7cc6fbf8
+          path: core/boards

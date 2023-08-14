@@ -202,6 +202,15 @@ protected:
     static void ScheduleFactoryReset();
 
     static void OnPlatformEvent(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t);
+
+    /**
+     * @brief Outputs the QRcode payload and URL to the QR code in the logs
+     *        and conditionally on the device LCD.
+     *
+     * @param refreshLCD When true, The LCD of the device will be refreshed to show the QR code
+     */
+    static void OutputQrCode(bool refreshLCD);
+
     /**********************************************************
      * Protected Attributes declaration
      *********************************************************/
