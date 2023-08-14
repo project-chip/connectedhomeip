@@ -453,14 +453,14 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             // Walk through all existing subscriptions and shut down those whose subscriber matches
             // that which just came in.
             //
-            mReadHandlers.ForEachActiveObject([this, apExchangeContext](ReadHandler * handler) {
+            mReadHandlers.ForEachActiveObject([apExchangeContext](ReadHandler * handler) {
                 if (handler->IsFromSubscriber(*apExchangeContext))
                 {
                     ChipLogProgress(InteractionModel,
                                     "Deleting previous subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
                                     ChipLogValueX64(apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId()),
                                     apExchangeContext->GetSessionHandle()->GetFabricIndex());
-                    mReadHandlers.ReleaseObject(handler);
+                    handler->Close();
                 }
 
                 return Loop::Continue;
