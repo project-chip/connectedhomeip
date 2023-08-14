@@ -271,7 +271,7 @@ private:
     void SetInstance(Instance * aInstance) { mInstance = aInstance; }
 
 protected:
-    Instance * GetInstance() { return mInstance; }
+    Instance * GetInstance() const { return mInstance; }
 };
 
 } // namespace OperationalState
