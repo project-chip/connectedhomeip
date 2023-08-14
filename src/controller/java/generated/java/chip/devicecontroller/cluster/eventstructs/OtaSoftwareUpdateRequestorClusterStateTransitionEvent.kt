@@ -17,18 +17,21 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
+import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class OtaSoftwareUpdateRequestorClusterStateTransitionEvent(
-  val previousState: Int,
-  val newState: Int,
-  val reason: Int,
-  val targetSoftwareVersion: Long?
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class OtaSoftwareUpdateRequestorClusterStateTransitionEvent (
+    val previousState: Int,
+    val newState: Int,
+    val reason: Int,
+    val targetSoftwareVersion: Long?) {
+  override fun toString(): String  = buildString {
     append("OtaSoftwareUpdateRequestorClusterStateTransitionEvent {\n")
     append("\tpreviousState : $previousState\n")
     append("\tnewState : $newState\n")
@@ -44,10 +47,10 @@ class OtaSoftwareUpdateRequestorClusterStateTransitionEvent(
       put(ContextSpecificTag(TAG_NEW_STATE), newState)
       put(ContextSpecificTag(TAG_REASON), reason)
       if (targetSoftwareVersion != null) {
-        put(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION), targetSoftwareVersion)
-      } else {
-        putNull(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION))
-      }
+      put(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION), targetSoftwareVersion)
+    } else {
+      putNull(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION))
+    }
       endStructure()
     }
   }
@@ -58,30 +61,21 @@ class OtaSoftwareUpdateRequestorClusterStateTransitionEvent(
     private const val TAG_REASON = 2
     private const val TAG_TARGET_SOFTWARE_VERSION = 3
 
-    fun fromTlv(
-      tag: Tag,
-      tlvReader: TlvReader
-    ): OtaSoftwareUpdateRequestorClusterStateTransitionEvent {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader) : OtaSoftwareUpdateRequestorClusterStateTransitionEvent {
       tlvReader.enterStructure(tag)
       val previousState = tlvReader.getInt(ContextSpecificTag(TAG_PREVIOUS_STATE))
       val newState = tlvReader.getInt(ContextSpecificTag(TAG_NEW_STATE))
       val reason = tlvReader.getInt(ContextSpecificTag(TAG_REASON))
-      val targetSoftwareVersion =
-        if (!tlvReader.isNull()) {
-          tlvReader.getLong(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION))
-          null
-        }
-
+      val targetSoftwareVersion = if (!tlvReader.isNull()) {
+      tlvReader.getLong(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION))
+      null
+    }
+      
       tlvReader.exitContainer()
 
-      return OtaSoftwareUpdateRequestorClusterStateTransitionEvent(
-        previousState,
-        newState,
-        reason,
-        targetSoftwareVersion
-      )
+      return OtaSoftwareUpdateRequestorClusterStateTransitionEvent(previousState, newState, reason, targetSoftwareVersion)
     }
   }
 }

@@ -17,13 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
+import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class DescriptorClusterDeviceTypeStruct(val deviceType: Long, val revision: Int) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class DescriptorClusterDeviceTypeStruct (
+    val deviceType: Long,
+    val revision: Int) {
+  override fun toString(): String  = buildString {
     append("DescriptorClusterDeviceTypeStruct {\n")
     append("\tdeviceType : $deviceType\n")
     append("\trevision : $revision\n")
@@ -43,11 +49,11 @@ class DescriptorClusterDeviceTypeStruct(val deviceType: Long, val revision: Int)
     private const val TAG_DEVICE_TYPE = 0
     private const val TAG_REVISION = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): DescriptorClusterDeviceTypeStruct {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader) : DescriptorClusterDeviceTypeStruct {
       tlvReader.enterStructure(tag)
       val deviceType = tlvReader.getLong(ContextSpecificTag(TAG_DEVICE_TYPE))
       val revision = tlvReader.getInt(ContextSpecificTag(TAG_REVISION))
-
+      
       tlvReader.exitContainer()
 
       return DescriptorClusterDeviceTypeStruct(deviceType, revision)
