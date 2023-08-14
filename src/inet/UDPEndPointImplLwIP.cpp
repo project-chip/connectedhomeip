@@ -178,48 +178,51 @@ CHIP_ERROR UDPEndPointImplLwIP::SendMsgImpl(const IPPacketInfo * pktInfo, System
         VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_NO_MEMORY);
     }
 
-    ScopedLwIPLock lwipLock;
-
-    // Make sure we have the appropriate type of PCB based on the destination address.
-    CHIP_ERROR res = GetPCB(destAddr.Type());
-    if (res != CHIP_NO_ERROR)
+    // Adding a scope here to unlock the LwIP core when the lock is no longer required.
     {
-        return res;
+        ScopedLwIPLock lwipLock;
+
+        // Make sure we have the appropriate type of PCB based on the destination address.
+        CHIP_ERROR res = GetPCB(destAddr.Type());
+        if (res != CHIP_NO_ERROR)
+        {
+            return res;
+        }
+
+        // Send the message to the specified address/port.
+        // If an outbound interface has been specified, call a specific version of the UDP sendto()
+        // function that accepts the target interface.
+        // If a source address has been specified, temporarily override the local_ip of the PCB.
+        // This results in LwIP using the given address being as the source address for the generated
+        // packet, as if the PCB had been bound to that address.
+        err_t lwipErr              = ERR_VAL;
+        const IPAddress & srcAddr  = pktInfo->SrcAddress;
+        const uint16_t & destPort  = pktInfo->DestPort;
+        const InterfaceId & intfId = pktInfo->Interface;
+
+        ip_addr_t lwipSrcAddr  = srcAddr.ToLwIPAddr();
+        ip_addr_t lwipDestAddr = destAddr.ToLwIPAddr();
+
+        ip_addr_t boundAddr;
+        ip_addr_copy(boundAddr, mUDP->local_ip);
+
+        if (!ip_addr_isany(&lwipSrcAddr))
+        {
+            ip_addr_copy(mUDP->local_ip, lwipSrcAddr);
+        }
+
+        if (intfId.IsPresent())
+        {
+            lwipErr = udp_sendto_if(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort,
+                                    intfId.GetPlatformInterface());
+        }
+        else
+        {
+            lwipErr = udp_sendto(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort);
+        }
+
+        ip_addr_copy(mUDP->local_ip, boundAddr);
     }
-
-    // Send the message to the specified address/port.
-    // If an outbound interface has been specified, call a specific version of the UDP sendto()
-    // function that accepts the target interface.
-    // If a source address has been specified, temporarily override the local_ip of the PCB.
-    // This results in LwIP using the given address being as the source address for the generated
-    // packet, as if the PCB had been bound to that address.
-    err_t lwipErr              = ERR_VAL;
-    const IPAddress & srcAddr  = pktInfo->SrcAddress;
-    const uint16_t & destPort  = pktInfo->DestPort;
-    const InterfaceId & intfId = pktInfo->Interface;
-
-    ip_addr_t lwipSrcAddr  = srcAddr.ToLwIPAddr();
-    ip_addr_t lwipDestAddr = destAddr.ToLwIPAddr();
-
-    ip_addr_t boundAddr;
-    ip_addr_copy(boundAddr, mUDP->local_ip);
-
-    if (!ip_addr_isany(&lwipSrcAddr))
-    {
-        ip_addr_copy(mUDP->local_ip, lwipSrcAddr);
-    }
-
-    if (intfId.IsPresent())
-    {
-        lwipErr = udp_sendto_if(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort,
-                                intfId.GetPlatformInterface());
-    }
-    else
-    {
-        lwipErr = udp_sendto(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort);
-    }
-
-    ip_addr_copy(mUDP->local_ip, boundAddr);
 
     if (lwipErr != ERR_OK)
     {
@@ -467,21 +470,23 @@ CHIP_ERROR UDPEndPointImplLwIP::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInt
     const ip4_addr_t lIPv4Address = aAddress.ToIPv4();
     err_t lStatus;
 
-    ScopedLwIPLock lwipLock;
-
-    if (aInterfaceId.IsPresent())
     {
+        ScopedLwIPLock lwipLock;
 
-        struct netif * const lNetif = FindNetifFromInterfaceId(aInterfaceId);
-        VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
+        if (aInterfaceId.IsPresent())
+        {
 
-        lStatus = join ? igmp_joingroup_netif(lNetif, &lIPv4Address) //
-                       : igmp_leavegroup_netif(lNetif, &lIPv4Address);
-    }
-    else
-    {
-        lStatus = join ? igmp_joingroup(IP4_ADDR_ANY4, &lIPv4Address) //
-                       : igmp_leavegroup(IP4_ADDR_ANY4, &lIPv4Address);
+            struct netif * const lNetif = FindNetifFromInterfaceId(aInterfaceId);
+            VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
+
+            lStatus = join ? igmp_joingroup_netif(lNetif, &lIPv4Address) //
+                           : igmp_leavegroup_netif(lNetif, &lIPv4Address);
+        }
+        else
+        {
+            lStatus = join ? igmp_joingroup(IP4_ADDR_ANY4, &lIPv4Address) //
+                           : igmp_leavegroup(IP4_ADDR_ANY4, &lIPv4Address);
+        }
     }
 
     if (lStatus == ERR_MEM)
@@ -501,19 +506,21 @@ CHIP_ERROR UDPEndPointImplLwIP::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInt
     const ip6_addr_t lIPv6Address = aAddress.ToIPv6();
     err_t lStatus;
 
-    ScopedLwIPLock lwipLock;
+    {
+        ScopedLwIPLock lwipLock;
 
-    if (aInterfaceId.IsPresent())
-    {
-        struct netif * const lNetif = FindNetifFromInterfaceId(aInterfaceId);
-        VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
-        lStatus = join ? mld6_joingroup_netif(lNetif, &lIPv6Address) //
-                       : mld6_leavegroup_netif(lNetif, &lIPv6Address);
-    }
-    else
-    {
-        lStatus = join ? mld6_joingroup(IP6_ADDR_ANY6, &lIPv6Address) //
-                       : mld6_leavegroup(IP6_ADDR_ANY6, &lIPv6Address);
+        if (aInterfaceId.IsPresent())
+        {
+            struct netif * const lNetif = FindNetifFromInterfaceId(aInterfaceId);
+            VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
+            lStatus = join ? mld6_joingroup_netif(lNetif, &lIPv6Address) //
+                           : mld6_leavegroup_netif(lNetif, &lIPv6Address);
+        }
+        else
+        {
+            lStatus = join ? mld6_joingroup(IP6_ADDR_ANY6, &lIPv6Address) //
+                           : mld6_leavegroup(IP6_ADDR_ANY6, &lIPv6Address);
+        }
     }
 
     if (lStatus == ERR_MEM)
