@@ -178,12 +178,15 @@ CHIP_ERROR UDPEndPointImplLwIP::SendMsgImpl(const IPPacketInfo * pktInfo, System
         VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_NO_MEMORY);
     }
 
+    CHIP_ERROR res = CHIP_NO_ERROR;
+    err_t lwipErr  = ERR_VAL;
+
     // Adding a scope here to unlock the LwIP core when the lock is no longer required.
     {
         ScopedLwIPLock lwipLock;
 
         // Make sure we have the appropriate type of PCB based on the destination address.
-        CHIP_ERROR res = GetPCB(destAddr.Type());
+        res = GetPCB(destAddr.Type());
         if (res != CHIP_NO_ERROR)
         {
             return res;
@@ -195,7 +198,6 @@ CHIP_ERROR UDPEndPointImplLwIP::SendMsgImpl(const IPPacketInfo * pktInfo, System
         // If a source address has been specified, temporarily override the local_ip of the PCB.
         // This results in LwIP using the given address being as the source address for the generated
         // packet, as if the PCB had been bound to that address.
-        err_t lwipErr              = ERR_VAL;
         const IPAddress & srcAddr  = pktInfo->SrcAddress;
         const uint16_t & destPort  = pktInfo->DestPort;
         const InterfaceId & intfId = pktInfo->Interface;
