@@ -162,8 +162,9 @@ class TC_DA_1_5(MatterBaseTest):
         await self.send_single_cmd(cmd=gcomm.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=1))
 
         self.print_step(13, "Open commissioning window")
+        discriminator = random.randint(0, 4096)
         params = self.default_controller.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
+            nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=discriminator, option=1)
 
         self.print_step(14, "Commission to TH2")
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
@@ -172,7 +173,7 @@ class TC_DA_1_5(MatterBaseTest):
 
         errcode = TH2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
         asserts.assert_true(errcode.is_success, 'Commissioning on TH2 did not complete successfully')
 
         self.print_step(15, "Read NOCs list for TH1")
