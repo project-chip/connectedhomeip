@@ -37,3 +37,8 @@
  * Reduce packet buffer pool size to 8 (default 15) to reduce ram consumption
  */
 #define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 8
+
+// Enable support functions for parsing command-line arguments
+#define CHIP_CONFIG_ENABLE_ARG_PARSER 1
+
+#define CHIP_DEVICE_CONFIG_DISABLE_SHELL_PING 1

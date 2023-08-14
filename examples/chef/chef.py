@@ -745,10 +745,10 @@ def main() -> int:
         elif options.build_target == "telink":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/telink")
             telink_build_cmds = ["west build"]
-            # if options.do_clean:
-            #     # telink_build_cmds.append("-p always")
-            # if options.do_rpc:
-            #     # telink_build_cmds.append("-- -DOVERLAY_CONFIG=rpc.overlay")
+            if options.do_clean:
+                telink_build_cmds.append("-p always")
+            if options.do_rpc:
+                telink_build_cmds.append("-- -DOVERLAY_CONFIG=rpc.overlay")
             shell.run_cmd(" ".join(telink_build_cmds))
 
         elif options.build_target == "linux":
@@ -925,7 +925,14 @@ def main() -> int:
                 shell.run_cmd(f"screen {config['ameba']['TTY']} 115200")
             else:
                 flush_print("Ameba Z2 image has not been flashed yet")
-
+        elif options.build_target == "telink":
+            if config['telink']['TTY'] is None:
+                flush_print(
+                    'The path for the serial enumeration for telink is not set. '
+                    'Make sure telink.TTY is set on your config.yaml file')
+                exit(1)
+            shell.run_cmd("killall screen")
+            shell.run_cmd(f"screen {config['telink']['TTY']} 115200")
     #
     # RPC Console
     #
