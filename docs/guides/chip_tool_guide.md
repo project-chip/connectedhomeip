@@ -1451,8 +1451,6 @@ In this command:
     Can be set to `null`.
 -   _<user-status\>_ can be set to `null` or to one of the following values:
 
-    -   `0` (`Available`) - This status indicates that the given user slot is
-        available for modification on the device.
     -   `1` (`OccupiedEnabled`) - This status indicates that the given user slot
         is used and active.
     -   `3` (`OccupiedDisabled`) - This status indicates that the given user
@@ -1489,7 +1487,7 @@ $ ./chip-tool doorlock set-user 0 1 AAA 6452 1 0 0 1 1 --timedInteractionTimeout
 ```
 
 The following command mirrors the action of the command above, but it targets an empty user name
-(`null`) with the `0xFFFF` user unique ID (`null`). The user status defaults to `OccupiedEnabled`,
+(`null`) and has `null` for the unique ID. The user status defaults to `OccupiedEnabled`,
 the user type defaults to `UnrestrictedUser`, and the credential rule defaults to single.
 
 ```
@@ -1531,7 +1529,8 @@ In this command:
         -   `3` - Fingerprint
         -   `4` - Finger vein
 
-    -   `"credentialIndex"` is the key field for the index of the credential, between `1` and
+    -   `"credentialIndex"` is the key field for the index of the credential. If `"credentialType"`
+        is not "Programming PIN", `"credentialIndex"` must be between `1` and
         the value of the `NumberOfCredentialsSupportedPerUser`
         attribute (see the section 5.2.3.20 of the Matter Application Clusters
         specification for details). `0` is required for the Programming PIN.
