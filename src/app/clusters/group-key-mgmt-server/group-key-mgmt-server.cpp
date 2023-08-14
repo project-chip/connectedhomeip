@@ -414,13 +414,13 @@ bool GetProviderAndFabric(chip::app::CommandHandler * commandObj, const chip::ap
 
     if (nullptr == provider)
     {
-        commandObj->AddStatus(commandPath, Status::Failure, "Internal consistency error on provider!");
+        commandObj->AddStatusAndLogIfFailure(commandPath, Status::Failure, "Internal consistency error on provider!");
         return false;
     }
 
     if (nullptr == fabric)
     {
-        commandObj->AddStatus(commandPath, Status::Failure, "Internal consistency error on access fabric!");
+        commandObj->AddStatusAndLogIfFailure(commandPath, Status::Failure, "Internal consistency error on access fabric!");
         return false;
     }
 
@@ -460,7 +460,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     Status status = ValidateKeySetWriteArguments(commandData);
     if (status != Status::Success)
     {
-        commandObj->AddStatus(commandPath, status, "Failure to validate KeySet data dependencies.");
+        commandObj->AddStatusAndLogIfFailure(commandPath, status, "Failure to validate KeySet data dependencies.");
         return true;
     }
 
@@ -470,7 +470,8 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
         // supported by the server, because it is ... a new value unrecognized
         // by a legacy server, then the server SHALL generate a general
         // constraint error
-        commandObj->AddStatus(commandPath, Status::ConstraintError, "Received unknown GroupKeySecurityPolicyEnum value");
+        commandObj->AddStatusAndLogIfFailure(commandPath, Status::ConstraintError,
+                                             "Received unknown GroupKeySecurityPolicyEnum value");
         return true;
     }
 
@@ -481,8 +482,8 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
         // any action attempting to set CacheAndSync in the
         // GroupKeySecurityPolicy field SHALL fail with an INVALID_COMMAND
         // error.
-        commandObj->AddStatus(commandPath, Status::InvalidCommand,
-                              "Received a CacheAndSync GroupKeySecurityPolicyEnum when MCSP not supported");
+        commandObj->AddStatusAndLogIfFailure(commandPath, Status::InvalidCommand,
+                                             "Received a CacheAndSync GroupKeySecurityPolicyEnum when MCSP not supported");
         return true;
     }
 
@@ -528,7 +529,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     err = provider->SetKeySet(fabric->GetFabricIndex(), compressed_fabric_id, keyset);
     if (CHIP_ERROR_INVALID_LIST_LENGTH == err)
     {
-        commandObj->AddStatus(commandPath, Status::ResourceExhausted, "Not enough space left to add a new KeySet");
+        commandObj->AddStatusAndLogIfFailure(commandPath, Status::ResourceExhausted, "Not enough space left to add a new KeySet");
         return true;
     }
 
@@ -564,7 +565,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
     if (CHIP_NO_ERROR != provider->GetKeySet(fabricIndex, commandData.groupKeySetID, keyset))
     {
         // KeySet ID not found
-        commandObj->AddStatus(commandPath, Status::NotFound, "Keyset ID not found in KeySetRead");
+        commandObj->AddStatusAndLogIfFailure(commandPath, Status::NotFound, "Keyset ID not found in KeySetRead");
         return true;
     }
 
@@ -628,7 +629,8 @@ bool emberAfGroupKeyManagementClusterKeySetRemoveCallback(
     {
         // SPEC: This command SHALL fail with an INVALID_COMMAND status code back to the initiator if the GroupKeySetID being
         // removed is 0, which is the Key Set associated with the Identity Protection Key (IPK).
-        commandObj->AddStatus(commandPath, Status::InvalidCommand, "Attempted to KeySetRemove the identity protection key!");
+        commandObj->AddStatusAndLogIfFailure(commandPath, Status::InvalidCommand,
+                                             "Attempted to KeySetRemove the identity protection key!");
         return true;
     }
 
@@ -647,7 +649,7 @@ bool emberAfGroupKeyManagementClusterKeySetRemoveCallback(
     }
 
     // Send status response.
-    commandObj->AddStatus(commandPath, status, "KeySetRemove failed");
+    commandObj->AddStatusAndLogIfFailure(commandPath, status, "KeySetRemove failed");
     return true;
 }
 
@@ -699,7 +701,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(
     auto keysIt             = provider->IterateKeySets(fabricIndex);
     if (nullptr == keysIt)
     {
-        commandObj->AddStatus(commandPath, Status::Failure, "Failed iteration of key set indices!");
+        commandObj->AddStatusAndLogIfFailure(commandPath, Status::Failure, "Failed iteration of key set indices!");
         return true;
     }
 

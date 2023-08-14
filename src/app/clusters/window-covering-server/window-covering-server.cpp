@@ -771,8 +771,7 @@ bool emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * comman
         }
     }
 
-    commandObj->AddStatus(commandPath, Status::Success);
-    return true;
+    return CHIP_NO_ERROR == commandObj->AddStatus(commandPath, Status::Success);
 }
 
 /**
