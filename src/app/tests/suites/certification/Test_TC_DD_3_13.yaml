@@ -61,10 +61,11 @@ tests:
       disabled: true
 
     - label:
-          "Custom Commissioning Flow: Use a Commissionee with a QR code that has
-          the Custom Flow field set to 2 and supports BLE for its Discovery
-          Capability. Commissionee is NOT in commissioning mode. Ensure the
-          Version bit string follows the current Matter spec. documentation."
+          "Step 1a: Custom Commissioning Flow: Use a Commissionee with a QR code
+          that has the Custom Flow field set to 2 and supports BLE for its
+          Discovery Capability. Commissionee is NOT in commissioning mode.
+          Ensure the Version bit string follows the current Matter spec.
+          documentation."
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
           Verify on the TH (All-cluster-app)
@@ -76,14 +77,14 @@ tests:
           [1657235055.253774][370941:370941] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0YXE00KA0648G00
       disabled: true
 
-    - label: "Scan the QR code from the previous step using the DUT."
+    - label: "Step 1b: Scan the QR code from the previous step using the DUT."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           1. Verify the QR code is scanned by DUT
           Note: chip-tool does not support physically scanning QR codes
       disabled: true
 
-    - label: "DUT parses QR code."
+    - label: "Step 1c: DUT parses QR code."
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
           1. Parse the payload of the TH commissionee
@@ -103,7 +104,7 @@ tests:
       disabled: true
 
     - label:
-          "User should follow any TH-specific steps, unless the DUT has
+          "Step 1d: User should follow any TH-specific steps, unless the DUT has
           alternative means to guide the user to successful commissioning, for
           putting the TH Commissionee into commissioning mode, for triggering
           the DUT Commissioner for commissioning, and for completing the
@@ -121,9 +122,9 @@ tests:
       disabled: true
 
     - label:
-          "Custom Commissioning Flow: Use a Commissionee with a QR code that has
-          the Custom Flow field set to 2 and supports IP Network for its
-          Discovery Capability. Commissionee is NOT in commissioning mode.
+          "Step 2a: Custom Commissioning Flow: Use a Commissionee with a QR code
+          that has the Custom Flow field set to 2 and supports IP Network for
+          its Discovery Capability. Commissionee is NOT in commissioning mode.
           Ensure the Version bit string follows the current Matter spec.
           documentation."
       PICS: MCORE.DD.DISCOVERY_IP
@@ -137,14 +138,14 @@ tests:
           [1657235141.663189][370963:370963] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J029Q00KA0648G00
       disabled: true
 
-    - label: "Scan the QR code from the previous step using the DUT."
+    - label: "Step 2b: Scan the QR code from the previous step using the DUT."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           1. Verify the QR code is scanned by DUT
           Note: chip-tool does not support physically scanning QR codes
       disabled: true
 
-    - label: "DUT parses QR code."
+    - label: "Step 2c: DUT parses QR code."
       PICS: MCORE.DD.DISCOVERY_IP
       verification: |
           1. Parse the payload of the TH commissionee
@@ -164,7 +165,7 @@ tests:
       disabled: true
 
     - label:
-          "User should follow any TH-specific steps, unless the DUT has
+          "Step 2d: User should follow any TH-specific steps, unless the DUT has
           alternative means to guide the user to successful commissioning, for
           putting the TH Commissionee into commissioning mode, for triggering
           the DUT Commissioner for commissioning, and for completing the
@@ -182,38 +183,39 @@ tests:
       disabled: true
 
     - label:
-          "Custom Commissioning Flow: Use a Commissionee with a QR code that has
-          the Custom Flow field set to 2 and supports SoftAP for its Discovery
-          Capability. Commissionee is NOT in commissioning mode. Ensure the
-          Version bit string follows the current Matter spec. documentation."
+          "Step 3a: Custom Commissioning Flow: Use a Commissionee with a QR code
+          that has the Custom Flow field set to 2 and supports SoftAP for its
+          Discovery Capability. Commissionee is NOT in commissioning mode.
+          Ensure the Version bit string follows the current Matter spec.
+          documentation."
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          Out of Scope for V1.0
+          Out of Scope
           SoftAP commissioning not currently supported
       disabled: true
 
-    - label: "Scan the QR code from the previous step using the DUT."
+    - label: "Step 3b: Scan the QR code from the previous step using the DUT."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
-          Out of Scope for V1.0
+          Out of Scope
           SoftAP commissioning not currently supported
       disabled: true
 
-    - label: "DUT parses QR code."
+    - label: "Step 3c: DUT parses QR code."
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          Out of Scope for V1.0
+          Out of Scope
           SoftAP commissioning not currently supported
       disabled: true
 
     - label:
-          "User should follow any TH-specific steps, unless the DUT has
+          "Step 3d: User should follow any TH-specific steps, unless the DUT has
           alternative means to guide the user to successful commissioning, for
           putting the TH Commissionee into commissioning mode, for triggering
           the DUT Commissioner for commissioning, and for completing the
           commissioning process using SoftAP."
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          Out of Scope for V1.0
+          Out of Scope
           SoftAP commissioning not currently supported
       disabled: true

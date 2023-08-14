@@ -42,7 +42,7 @@ declare_args() {
   # By default, the resources used by each fabric is unlimited if they are allocated on heap. This flag is for checking the resource usage even when they are allocated on heap to increase code coverage in integration tests.
   chip_im_force_fabric_quota_check = false
 
-  enable_eventlist_attribute = true
+  enable_eventlist_attribute = false
 }
 
 buildconfig_header("app_buildconfig") {
@@ -55,8 +55,10 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_ENABLE_SESSION_RESUMPTION=${chip_enable_session_resumption}",
     "CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY=${chip_access_control_policy_logging_verbosity}",
     "CHIP_CONFIG_PERSIST_SUBSCRIPTIONS=${chip_persist_subscriptions}",
+    "CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION=${chip_subscription_timeout_resumption}",
     "CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE=${enable_eventlist_attribute}",
     "CHIP_CONFIG_ENABLE_ICD_SERVER=${chip_enable_icd_server}",
+    "CHIP_CONFIG_ENABLE_READ_CLIENT=${chip_enable_read_client}",
   ]
 }
 
@@ -75,7 +77,6 @@ static_library("app") {
     "AttributePathExpandIterator.h",
     "AttributePathParams.h",
     "AttributePersistenceProvider.h",
-    "BufferedReadCallback.cpp",
     "CASEClient.cpp",
     "CASEClient.h",
     "CASEClientPool.h",
@@ -83,8 +84,6 @@ static_library("app") {
     "CASESessionManager.h",
     "ChunkedWriteCallback.cpp",
     "ChunkedWriteCallback.h",
-    "ClusterStateCache.cpp",
-    "ClusterStateCache.h",
     "CommandHandler.cpp",
     "CommandResponseHelper.h",
     "CommandSender.cpp",
@@ -178,10 +177,10 @@ static_library("app") {
     "OperationalSessionSetup.cpp",
     "OperationalSessionSetup.h",
     "OperationalSessionSetupPool.h",
-    "ReadClient.cpp",
     "ReadHandler.cpp",
     "RequiredPrivilege.cpp",
     "RequiredPrivilege.h",
+    "SafeAttributePersistenceProvider.h",
     "StatusResponse.cpp",
     "StatusResponse.h",
     "SubscriptionResumptionStorage.h",
@@ -189,6 +188,8 @@ static_library("app") {
     "TimedHandler.h",
     "TimedRequest.cpp",
     "TimedRequest.h",
+    "TimerDelegates.cpp",
+    "TimerDelegates.h",
     "WriteClient.cpp",
     "WriteHandler.cpp",
     "reporting/Engine.cpp",
@@ -208,10 +209,19 @@ static_library("app") {
     ]
   }
 
+  if (chip_enable_read_client) {
+    sources += [
+      "BufferedReadCallback.cpp",
+      "ClusterStateCache.cpp",
+      "ClusterStateCache.h",
+      "ReadClient.cpp",
+    ]
+  }
+
   public_deps = [
     ":app_config",
     "${chip_root}/src/access",
-    "${chip_root}/src/app/icd:cluster-srcs",
+    "${chip_root}/src/app/icd:observer-srcs",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",

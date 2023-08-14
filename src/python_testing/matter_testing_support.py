@@ -47,10 +47,14 @@ import chip.CertificateAuthority
 import chip.clusters as Clusters
 import chip.logging
 import chip.native
+from chip import discovery
 from chip.ChipStack import ChipStack
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
+from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
+from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
+from chip.tracing import TracingContext
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
@@ -265,6 +269,8 @@ class MatterTestConfig:
     # If this is set, we will reuse root of trust keys at that location
     chip_tool_credentials_path: Optional[pathlib.Path] = None
 
+    trace_to: List[str] = field(default_factory=list)
+
 
 class ClusterMapper:
     """Describe clusters/attributes using schema names."""
@@ -345,6 +351,13 @@ class ProblemNotice:
     severity: ProblemSeverity
     problem: str
     spec_location: str = ""
+
+
+@dataclass
+class SetupPayloadInfo:
+    filter_type: discovery.FilterType = discovery.FilterType.LONG_DISCRIMINATOR
+    filter_value: int = 0
+    passcode: int = 0
 
 
 class MatterStackState:
@@ -546,6 +559,35 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def record_note(self, test_name: str, location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation], problem: str, spec_location: str = ""):
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.NOTE, problem, spec_location))
+
+    def get_setup_payload_info(self) -> SetupPayloadInfo:
+        if self.matter_test_config.qr_code_content is not None:
+            qr_code = self.matter_test_config.qr_code_content
+            try:
+                setup_payload = SetupPayload().ParseQrCode(qr_code)
+            except ChipStackError:
+                asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
+
+        elif self.matter_test_config.manual_code is not None:
+            manual_code = self.matter_test_config.manual_code
+            try:
+                setup_payload = SetupPayload().ParseManualPairingCode(manual_code)
+            except ChipStackError:
+                asserts.fail(
+                    f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
+        else:
+            asserts.fail("Require either --qr-code or --manual-code.")
+
+        info = SetupPayloadInfo()
+        info.passcode = setup_payload.setup_passcode
+        if setup_payload.short_discriminator is not None:
+            info.filter_type = discovery.FilterType.SHORT_DISCRIMINATOR
+            info.filter_value = setup_payload.short_discriminator
+        else:
+            info.filter_type = discovery.FilterType.LONG_DISCRIMINATOR
+            info.filter_value = setup_payload.long_discriminator
+
+        return info
 
 
 def generate_mobly_test_config(matter_test_config: MatterTestConfig):
@@ -752,12 +794,15 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
         print("error: supplied number of discriminators does not match number of passcodes")
         return False
 
-    if len(config.dut_node_ids) > len(config.discriminators):
+    device_descriptors = [config.qr_code_content] if config.qr_code_content is not None else [
+        config.manual_code] if config.manual_code is not None else config.discriminators
+
+    if len(config.dut_node_ids) > len(device_descriptors):
         print("error: More node IDs provided than discriminators")
         return False
 
-    if len(config.dut_node_ids) < len(config.discriminators):
-        missing = len(config.discriminators) - len(config.dut_node_ids)
+    if len(config.dut_node_ids) < len(device_descriptors):
+        missing = len(device_descriptors) - len(config.dut_node_ids)
         # We generate new node IDs sequentially from the last one seen for all
         # missing NodeIDs when commissioning many nodes at once.
         for i in range(missing):
@@ -815,8 +860,10 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.paa_trust_store_path = args.paa_trust_store_path
     config.ble_interface_id = args.ble_interface_id
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
+    config.tests = [] if args.tests is None else args.tests
 
     config.controller_node_id = args.controller_node_id
+    config.trace_to = args.trace_to
 
     # Accumulate all command-line-passed named args
     all_global_args = []
@@ -847,7 +894,8 @@ def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
                              type=str,
                              metavar='test_a test_b...',
                              help='A list of tests in the test class to execute.')
-
+    basic_group.add_argument('--trace-to', nargs="*", default=[],
+                             help="Where to trace (e.g perfetto, perfetto:path, json:log, json:path)")
     basic_group.add_argument('--storage-path', action="store", type=pathlib.Path,
                              metavar="PATH", help="Location for persisted storage of instance")
     basic_group.add_argument('--logs-path', action="store", type=pathlib.Path, metavar="PATH", help="Location for test logs")
@@ -979,27 +1027,35 @@ class CommissionDeviceTest(MatterBaseTest):
         dev_ctrl = self.default_controller
         conf = self.matter_test_config
 
-        # TODO: support by manual code and QR
+        # TODO: qr code and manual code aren't lists
+
+        if conf.qr_code_content or conf.manual_code:
+            info = self.get_setup_payload_info()
+        else:
+            info = SetupPayloadInfo()
+            info.passcode = conf.setup_passcodes[i]
+            info.filter_type = DiscoveryFilterType.LONG_DISCRIMINATOR
+            info.filter_value = conf.discriminators[i]
 
         if conf.commissioning_method == "on-network":
             return dev_ctrl.CommissionOnNetwork(
                 nodeId=conf.dut_node_ids[i],
-                setupPinCode=conf.setup_passcodes[i],
-                filterType=DiscoveryFilterType.LONG_DISCRIMINATOR,
-                filter=conf.discriminators[i]
+                setupPinCode=info.passcode,
+                filterType=info.filter_type,
+                filter=info.filter_value
             )
         elif conf.commissioning_method == "ble-wifi":
             return dev_ctrl.CommissionWiFi(
-                conf.discriminators[i],
-                conf.setup_passcodes[i],
+                info.filter_value,
+                info.passcode,
                 conf.dut_node_ids[i],
                 conf.wifi_ssid,
                 conf.wifi_passphrase
             )
         elif conf.commissioning_method == "ble-thread":
             return dev_ctrl.CommissionThread(
-                conf.discriminators[i],
-                conf.setup_passcodes[i],
+                info.filter_value,
+                info.passcode,
                 conf.dut_node_ids[i],
                 conf.thread_operational_dataset
             )
@@ -1007,7 +1063,7 @@ class CommissionDeviceTest(MatterBaseTest):
             logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
             return dev_ctrl.CommissionIP(
                 ipaddr=conf.commissionee_ip_address_just_for_testing,
-                setupPinCode=conf.setup_passcodes[i], nodeid=conf.dut_node_ids[i]
+                setupPinCode=info.passcode, nodeid=conf.dut_node_ids[i]
             )
         else:
             raise ValueError("Invalid commissioning method %s!" % conf.commissioning_method)
@@ -1051,44 +1107,49 @@ def default_matter_test_main(argv=None, **kwargs):
         matter_test_config.maximize_cert_chains = kwargs["maximize_cert_chains"]
 
     stack = MatterStackState(matter_test_config)
-    test_config.user_params["matter_stack"] = stash_globally(stack)
 
-    # TODO: Steer to right FabricAdmin!
-    # TODO: If CASE Admin Subject is a CAT tag range, then make sure to issue NOC with that CAT tag
+    with TracingContext() as tracing_ctx:
+        for destination in matter_test_config.trace_to:
+            tracing_ctx.StartFromString(destination)
 
-    default_controller = stack.certificate_authorities[0].adminList[0].NewController(
-        nodeId=matter_test_config.controller_node_id,
-        paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
-        catTags=matter_test_config.controller_cat_tags
-    )
-    test_config.user_params["default_controller"] = stash_globally(default_controller)
+        test_config.user_params["matter_stack"] = stash_globally(stack)
 
-    test_config.user_params["matter_test_config"] = stash_globally(matter_test_config)
+        # TODO: Steer to right FabricAdmin!
+        # TODO: If CASE Admin Subject is a CAT tag range, then make sure to issue NOC with that CAT tag
 
-    test_config.user_params["certificate_authority_manager"] = stash_globally(stack.certificate_authority_manager)
+        default_controller = stack.certificate_authorities[0].adminList[0].NewController(
+            nodeId=matter_test_config.controller_node_id,
+            paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
+            catTags=matter_test_config.controller_cat_tags
+        )
+        test_config.user_params["default_controller"] = stash_globally(default_controller)
 
-    # Execute the test class with the config
-    ok = True
+        test_config.user_params["matter_test_config"] = stash_globally(matter_test_config)
 
-    runner = TestRunner(log_dir=test_config.log_path,
-                        testbed_name=test_config.testbed_name)
+        test_config.user_params["certificate_authority_manager"] = stash_globally(stack.certificate_authority_manager)
 
-    with runner.mobly_logger():
-        if matter_test_config.commissioning_method is not None:
-            runner.add_test_class(test_config, CommissionDeviceTest, None)
+        # Execute the test class with the config
+        ok = True
 
-        # Add the tests selected unless we have a commission-only request
-        if not matter_test_config.commission_only:
-            runner.add_test_class(test_config, test_class, tests)
+        runner = TestRunner(log_dir=test_config.log_path,
+                            testbed_name=test_config.testbed_name)
 
-        try:
-            runner.run()
-            ok = runner.results.is_all_pass and ok
-        except signals.TestAbortAll:
-            ok = False
-        except Exception:
-            logging.exception('Exception when executing %s.', test_config.testbed_name)
-            ok = False
+        with runner.mobly_logger():
+            if matter_test_config.commissioning_method is not None:
+                runner.add_test_class(test_config, CommissionDeviceTest, None)
+
+            # Add the tests selected unless we have a commission-only request
+            if not matter_test_config.commission_only:
+                runner.add_test_class(test_config, test_class, tests)
+
+            try:
+                runner.run()
+                ok = runner.results.is_all_pass and ok
+            except signals.TestAbortAll:
+                ok = False
+            except Exception:
+                logging.exception('Exception when executing %s.', test_config.testbed_name)
+                ok = False
 
     # Shutdown the stack when all done
     stack.Shutdown()

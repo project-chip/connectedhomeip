@@ -12,6 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import inspect
 from typing import List
 
 from .clusters.commissioner_commands import CommissionerCommands
@@ -33,12 +34,16 @@ class PseudoClusters:
     def add(self, cluster: PseudoCluster):
         self.clusters.append(cluster)
 
-    async def execute(self, request):
+    async def execute(self, request, definitions=None):
         status = {'error': 'FAILURE'}
 
         command = self.__get_command(request)
         if command:
-            status = await command(request)
+            if 'definitions' in inspect.signature(command).parameters:
+                status = await command(request, definitions)
+            else:
+                status = await command(request)
+
             # If the command does not returns an error, it is considered a success.
             if status is None:
                 status = {}

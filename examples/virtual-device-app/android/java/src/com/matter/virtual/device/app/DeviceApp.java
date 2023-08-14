@@ -20,22 +20,25 @@ package com.matter.virtual.device.app;
 import android.util.Log;
 
 public class DeviceApp {
-  private DeviceAppCallback mCallback;
+  private DeviceAppCallback mCallback = null;
   private static final String TAG = "DeviceApp";
 
-  public DeviceApp(DeviceAppCallback callback) {
-    mCallback = callback;
+  public DeviceApp() {
     nativeInit();
   }
 
-  private void postClusterInit(int clusterId, int endpoint) {
+  public void setCallback(DeviceAppCallback callback) {
+    mCallback = callback;
+  }
+
+  private void postClusterInit(long clusterId, int endpoint) {
     Log.d(TAG, "postClusterInit for " + clusterId + " at " + endpoint);
     if (mCallback != null) {
       mCallback.onClusterInit(this, clusterId, endpoint);
     }
   }
 
-  private void postEvent(int event) {
+  private void postEvent(long event) {
     Log.d(TAG, "postEvent : " + event);
     if (mCallback != null) {
       mCallback.onEvent(event);

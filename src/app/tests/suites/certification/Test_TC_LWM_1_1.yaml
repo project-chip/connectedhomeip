@@ -1,0 +1,107 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 253.1.1. [TC-LWM-1.1] Global attributes with DUT as Server
+
+PICS:
+    - LWM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
+      verification: |
+          ./chip-tool laundrywashermode read cluster-revision 1 1
+
+          Verify the "ClusterRevision" value is of unit16 and reflects the highest revision number 1 on the TH(Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1690184527.689706][15400:15402] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0051 Attribute 0x0000_FFFD DataVersion: 3075628268
+          [1690184527.689762][15400:15402] CHIP:TOO:   ClusterRevision: 1
+      disabled: true
+
+    - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
+      verification: |
+          ./chip-tool laundrywashermode read feature-map  1 1
+
+          On the TH(Chip-tool) Log, Verify featureMap value is 1 If TCCM.S.F00(DEPONOFF) true, Otherwise 0,  and below is the sample log provided for the raspi platform:
+
+          [1690184539.350009][15403:15405] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0051 Attribute 0x0000_FFFC DataVersion: 3075628268
+          [1690184539.350062][15403:15405] CHIP:TOO:   FeatureMap: 1
+      disabled: true
+
+    - label: "Step 4: TH reads from the DUT the AttributeList attribute."
+      verification: |
+          ./chip-tool laundrywashermode read attribute-list 1 1
+
+          Verify the "AttributeList " should include the mandatory attributes (values 0, 1),
+          - global attributes  (value 65533, 65532, 65531, 65530, 65529 and 65528) and
+          - list may include optional attribute(value 0x0002), if MOD.S.A0004(StartUpMode) supports,
+          - list contains feature dependent attribute (values 0x0003), if MOD.S.F00(DEPONOFF) is true  on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+
+          [1690184549.210762][15408:15410] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0051 Attribute 0x0000_FFFB DataVersion: 3075628268
+          [1690184549.210786][15408:15410] CHIP:TOO:   AttributeList: 10 entries
+          [1690184549.210792][15408:15410] CHIP:TOO:     [1]: 0
+          [1690184549.210797][15408:15410] CHIP:TOO:     [2]: 1
+          [1690184549.210802][15408:15410] CHIP:TOO:     [3]: 2
+          [1690184549.210806][15408:15410] CHIP:TOO:     [4]: 3
+          [1690184549.210810][15408:15410] CHIP:TOO:     [5]: 65528
+          [1690184549.210815][15408:15410] CHIP:TOO:     [6]: 65529
+          [1690184549.210819][15408:15410] CHIP:TOO:     [7]: 65530
+          [1690184549.210823][15408:15410] CHIP:TOO:     [8]: 65531
+          [1690184549.210827][15408:15410] CHIP:TOO:     [9]: 65532
+          [1690184549.210831][15408:15410] CHIP:TOO:     [10]: 65533
+      disabled: true
+
+    - label: "Step 5: TH reads from the DUT the EventList attribute."
+      verification: |
+          ./chip-tool laundrywashermode read event-list 1 1
+
+          Verify "EventList" contains a list of supported events, for this cluster the list is emty(0 entries) on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+
+          [1690184560.096147][15413:15415] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0051 Attribute 0x0000_FFFA DataVersion: 3075628268
+          [1690184560.096165][15413:15415] CHIP:TOO:   EventList: 0 entries
+      disabled: true
+
+    - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
+      verification: |
+          ./chip-tool laundrywashermode read accepted-command-list 1 1
+
+          Verify the "AcceptedCommandList" contains a list of mandatory commands (value 0) on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1690184572.184880][15416:15418] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0051 Attribute 0x0000_FFF9 DataVersion: 3075628268
+          [1690184572.184896][15416:15418] CHIP:TOO:   AcceptedCommandList: 1 entries
+          [1690184572.184901][15416:15418] CHIP:TOO:     [1]: 0
+      disabled: true
+
+    - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute."
+      verification: |
+          ./chip-tool laundrywashermode read generated-command-list 1 1
+
+          Verify " GeneratedCommandList" contains a list of mandatory commands (value 1)  on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+
+          [1690184586.309954][15419:15421] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0051 Attribute 0x0000_FFF8 DataVersion: 3075628268
+          [1690184586.310020][15419:15421] CHIP:TOO:   GeneratedCommandList: 1 entries
+          [1690184586.310043][15419:15421] CHIP:TOO:     [1]: 1
+      disabled: true

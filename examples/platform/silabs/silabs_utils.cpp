@@ -19,7 +19,7 @@
 
 #include "silabs_utils.h"
 #include "SoftwareFaultReports.h"
-#include <matter_config.h>
+#include <MatterConfig.h>
 
 void appError(int err)
 {

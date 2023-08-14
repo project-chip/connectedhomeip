@@ -33,6 +33,7 @@
 #include <set>
 #include <vector>
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
 namespace chip {
 namespace app {
 /*
@@ -631,6 +632,11 @@ private:
         return mCallback.OnUnsolicitedMessageFromPublisher(apReadClient);
     }
 
+    void OnCASESessionEstablished(const SessionHandle & aSession, ReadPrepareParams & aSubscriptionParams) override
+    {
+        return mCallback.OnCASESessionEstablished(aSession, aSubscriptionParams);
+    }
+
     // Commit the pending cluster data version, if there is one.
     void CommitPendingDataVersion();
 
@@ -655,5 +661,6 @@ private:
     const bool mCacheData                   = true;
 };
 
-}; // namespace app
-}; // namespace chip
+};     // namespace app
+};     // namespace chip
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT

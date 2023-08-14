@@ -50,13 +50,23 @@ tests:
               type: bitmap32
 
     - label: "Step 4a: TH reads AttributeList from DUT"
-      PICS: FLABEL.S.Afffb
+      PICS: PICS_EVENT_LIST_ENABLED && FLABEL.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains: [0, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    #List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED && FLABEL.S.Afffb"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 65528, 65529, 65531, 65532, 65533]
 
     #List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
     - label:

@@ -13,10 +13,10 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 80.2.1. [TC-MOD-2.1] ChangeToMode Verification (DUT as Server)
+name: 80.3.1. [TC-MOD-2.1] ChangeToMode verification with DUT as Server
 
 PICS:
-    - MOD.S
+    - MOD.S.C00.Rsp
 
 config:
     nodeId: 0x12344321
@@ -30,18 +30,19 @@ tests:
       disabled: true
 
     - label:
-          "Commission DUT to TH (can be skipped if done in a preceding test)."
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       verification: |
 
       disabled: true
 
-    - label: "TH reads from the DUT the SupportedModes attribute."
+    - label: "Step 1: TH reads the SupportedModes attribute from the DUT"
       PICS: MOD.S.A0002
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
 
-          On TH(chip-tool) log, Verify SupportedModes attribute contains two or more ModeOptionsStruct entries. save the Mode field values as supported_modes_dut.Select a value from supported_modes_dut different from startup_mode_dut and save the value as new_mode_th, below is the sample log provided for the raspi platform:
-
+          On TH(chip-tool) log, Verify that the DUT response contains list of supported modes.
+          Save the Mode numbers for usage in steps 3 and 4 and below is the sample log provided for the raspi platform:
 
           [1654595268.854568][14400:14405] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 366231602
           [1654595268.854678][14400:14405] CHIP:TOO:   SupportedModes: 3 entries
@@ -76,44 +77,21 @@ tests:
           [1649677252.376252][10804:10809] CHIP:TOO:      }
       disabled: true
 
-    - label: "TH reads from the DUT the CurrentMode attribute."
+    - label: "Step 2: TH reads the CurrentMode attribute from the DUT"
       PICS: MOD.S.A0003
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          Verify on TH(chip-tool),  Current modes attribute value is an integer value.
-          - save the value as old_current_mode_dut
-          - select a value from supported_modes_dut, different from old_current_mode_dut, and save it as new_mode_th.
-          - select a value which is NOT in supported_modes_dut and save it as invalid_mode_th
-
-          Note : Below is the sample log provided for the raspi platform
+          Verify on TH(chip-tool), Current modes attribute value is an integer value.
+          - Save the mode values for usage in steps 3 and below is the sample log provided for the raspi platform
 
           [1649678800.298128][10854:10861] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
-
           [1649678800.298279][10854:10861] CHIP:TOO:   CurrentMode: 0
       disabled: true
 
     - label:
-          "TH sends a ChangeToMode command to the DUT with NewMode set to
-          old_current_mode_dut [Petru] note that currently this constraint is
-          not in the spec. The unapproved proposal is here:
-          https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/7096
-          Until that's approved, please skip this step."
-      PICS: MOD.S.C00.Rsp
-      verification: |
-          ./chip-tool modeselect change-to-mode 0 1 1
-
-          Verify on TH(chip-tool) log, DUT responds with a FAILURE (value 0x01) status response and below is the sample log provided for the raspi platform:
-
-          [1649677293.280207][10810:10815] CHIP:DMG:                                 StatusIB =
-          [1649677293.280283][10810:10815] CHIP:DMG:                                 {
-          [1649677293.280358][10810:10815] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1649677293.280421][10810:10815] CHIP:DMG:                                 },
-      disabled: true
-
-    - label:
-          "TH sends a ChangeToMode command to the DUT with NewMode set to
-          new_mode_th"
+          "Step 3a: TH sends a ChangeToMode command to the DUT with a integer
+          from the list in step 1, but different from the integer from step 2"
       PICS: MOD.S.C00.Rsp
       verification: |
           ./chip-tool modeselect change-to-mode 4 1 1
@@ -136,12 +114,12 @@ tests:
           [1685017925.030138][16218:16220] CHIP:DMG:
       disabled: true
 
-    - label: "TH reads from the DUT the CurrentMode attribute."
+    - label: "Step 3b: TH reads the CurrentMode attribute from the DUT"
       PICS: MOD.S.A0003
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          Verify on TH(chip-tool),  Current modes attribute value is an integer and equal to new_mode_th, below is the sample log provided for the raspi platform:
+          Verify on TH(chip-tool),  CurrentMode attribute value is an integer provided in step 3a, not the integer from step 2, below is the sample log provided for the raspi platform:
 
           [1685017991.905343][16336:16338] CHIP:DMG:         ],
           [1685017991.905348][16336:16338] CHIP:DMG:
@@ -153,8 +131,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a ChangeToMode command to the DUT with NewMode set to
-          invalid_mode_th"
+          "Step 4: TH sends a ChangeToMode command to the DUT with a integer
+          that is not in the list in step 1."
       PICS: MOD.S.C00.Rsp
       verification: |
           ./chip-tool modeselect change-to-mode 5 1 1

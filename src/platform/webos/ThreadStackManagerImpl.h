@@ -22,10 +22,10 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <lib/support/ThreadOperationalDataset.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/NetworkCommissioning.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-#include <platform/webos/GlibTypeDeleter.h>
 #include <platform/webos/dbus/openthread/introspect.h>
 
 namespace chip {

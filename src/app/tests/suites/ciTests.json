@@ -48,6 +48,7 @@
         "Test_TC_OPCREDS_1_2",
         "Test_TC_BINFO_1_1",
         "Test_TC_BINFO_2_1",
+        "Test_TC_BINFO_2_2",
         "Test_TC_CNET_1_3"
     ],
     "Descriptor": ["Test_TC_DESC_1_1"],
@@ -72,6 +73,7 @@
     ],
     "GeneralCommissioning": ["Test_TC_CGEN_1_1", "Test_TC_CGEN_2_1"],
     "GeneralDiagnostics": ["Test_TC_DGGEN_1_1", "Test_TC_DGGEN_2_1"],
+    "GroupKeyManagement": ["Test_TC_GRPKEY_1_1"],
     "IcdManagement": ["Test_TC_ICDM_1_1", "Test_TC_ICDM_2_1"],
     "Identify": [
         "Test_TC_I_1_1",
@@ -176,6 +178,15 @@
     "PowerSourceConfiguration": ["Test_TC_PSCFG_1_1", "Test_TC_PSCFG_2_1"],
     "RelativeHumidityMeasurement": ["Test_TC_RH_1_1", "Test_TC_RH_2_1"],
     "SecureChannel": [],
+    "SmokeCOAlarm": [
+        "Test_TC_SMOKECO_1_1",
+        "Test_TC_SMOKECO_2_1",
+        "Test_TC_SMOKECO_2_2",
+        "Test_TC_SMOKECO_2_3",
+        "Test_TC_SMOKECO_2_4",
+        "Test_TC_SMOKECO_2_5",
+        "Test_TC_SMOKECO_2_6"
+    ],
     "Switch": ["Test_TC_SWTCH_1_1", "Test_TC_SWTCH_2_1"],
     "TemperatureMeasurement": ["Test_TC_TMP_1_1", "Test_TC_TMP_2_1"],
     "Thermostat": ["Test_TC_TSTAT_1_1", "Test_TC_TSTAT_2_1"],
@@ -259,7 +270,9 @@
         "TestCommissioningWindow",
         "TestCommissionerNodeId",
         "TestTimeSynchronization",
-        "TestOperationalState"
+        "TestOperationalState",
+        "TestRVCOperationalState",
+        "TestDishwasherAlarm"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": ["Test_TC_DGSW_1_1"],
@@ -272,25 +285,24 @@
         "DL_LockUnlock",
         "DL_Schedules",
         "Test_TC_DRLK_1_1",
-        "Test_TC_DRLK_2_2",
-        "Test_TC_DRLK_2_3",
         "Test_TC_DRLK_2_4",
         "Test_TC_DRLK_2_5",
         "Test_TC_DRLK_2_6",
         "Test_TC_DRLK_2_7",
         "Test_TC_DRLK_2_8",
-        "Test_TC_DRLK_2_11",
-        "Test_TC_DRLK_2_12"
+        "Test_TC_DRLK_2_11"
     ],
     "Groups": [
         "TestGroupMessaging",
         "TestGroupsCluster",
-        "TestGroupKeyManagementCluster",
         "Test_TC_G_1_1",
         "Test_TC_G_2_1"
     ],
     "Scenes": ["Test_TC_S_1_1"],
+    "RVCOperationalState": ["Test_TC_RVCOPSTATE_1_1"],
     "ResourceMonitoring": [
+        "TestActivatedCarbonFilterMonitoring",
+        "TestHepaFilterMonitoring",
         "Test_TC_ACFREMON_1_1",
         "Test_TC_ACFREMON_2_1",
         "Test_TC_HEPAFREMON_1_1",
@@ -338,6 +350,7 @@
         "FanControl",
         "GeneralCommissioning",
         "GeneralDiagnostics",
+        "GroupKeyManagement",
         "IcdManagement",
         "Identify",
         "IlluminanceMeasurement",
@@ -358,7 +371,9 @@
         "PowerSourceConfiguration",
         "RelativeHumidityMeasurement",
         "SecureChannel",
+        "SmokeCOAlarm",
         "Switch",
+        "RVCOperationalState",
         "TemperatureMeasurement",
         "Thermostat",
         "ThermostatUserConfiguration",

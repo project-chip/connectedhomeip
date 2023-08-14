@@ -1,0 +1,49 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 178.2.1. [TC-TCTL-2.1] Attributes with DUT as Server
+
+PICS:
+    - TCTL.S
+    - TCTL.S.F02
+    - TCTL.S.F00
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Step 1: Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the TCTL.S.A0003(Step) attribute"
+      PICS: TCTL.S.A0003
+      verification: |
+          ./chip-tool temperaturecontrol read step 1 1
+
+          On TH(chip-tool), Verify that the DUT response contains a temperature value <= TCTL.S.A0002(MaxTemperature) - TCTL.S.A0001(MinTemperature)
+          and (TCTL.S.A0002(MaxTemperature) - TCTL.S.A0001(MinTemperature)) % TCTL.S.A0003(Step) == 0
+
+
+          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true,
+          [1689770673.417845][9280:9282] CHIP:DMG:         InteractionModelRevision = 1
+          [1689770673.417851][9280:9282] CHIP:DMG: }
+          [1689770673.417920][9280:9282] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0003 DataVersion: 2844459846
+          [1689770673.417946][9280:9282] CHIP:TOO:   step: 0
+          [1689770673.418017][9280:9282] CHIP:EM: <<< [E:21789i S:28147 M:181187483 (Ack:172880761)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true

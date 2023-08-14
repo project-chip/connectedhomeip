@@ -16,6 +16,7 @@
 
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRCertificates.h"
+#import "MTRConversion.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "MTRP256KeypairBridge.h"
@@ -302,13 +303,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
         auto tagCount = cats.GetNumTagsPresent();
         if (tagCount > 0) {
-            auto * catSet = [[NSMutableSet alloc] initWithCapacity:tagCount];
-            for (auto & value : cats.values) {
-                if (value != kUndefinedCAT) {
-                    [catSet addObject:@(value)];
-                }
-            }
-            self.caseAuthenticatedTags = [NSSet setWithSet:catSet];
+            self.caseAuthenticatedTags = CATValuesToSet(cats);
         } else {
             self.caseAuthenticatedTags = nil;
         }

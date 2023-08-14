@@ -129,6 +129,8 @@ void CommissioningWindowManager::ResetState()
 
     DeviceLayer::SystemLayer().CancelTimer(HandleCommissioningWindowTimeout, this);
     mCommissioningTimeoutTimerArmed = false;
+
+    DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
 }
 
 void CommissioningWindowManager::Cleanup()
@@ -150,11 +152,18 @@ void CommissioningWindowManager::HandleFailedAttempt(CHIP_ERROR err)
 #if CONFIG_NETWORK_LAYER_BLE
     mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
+
+    CHIP_ERROR prevErr = err;
     if (mFailedCommissioningAttempts < kMaxFailedCommissioningAttempts)
     {
         // If the number of commissioning attempts has not exceeded maximum
         // retries, let's start listening for commissioning connections again.
         err = AdvertiseAndListenForPASE();
+    }
+
+    if (mAppDelegate != nullptr)
+    {
+        mAppDelegate->OnCommissioningSessionEstablishmentError(prevErr);
     }
 
     if (err != CHIP_NO_ERROR)
@@ -175,6 +184,12 @@ void CommissioningWindowManager::OnSessionEstablishmentStarted()
     // As per specifications, section 5.5: Commissioning Flows
     constexpr System::Clock::Timeout kPASESessionEstablishmentTimeout = System::Clock::Seconds16(60);
     DeviceLayer::SystemLayer().StartTimer(kPASESessionEstablishmentTimeout, HandleSessionEstablishmentTimeout, this);
+
+    ChipLogProgress(AppServer, "Commissioning session establishment step started");
+    if (mAppDelegate != nullptr)
+    {
+        mAppDelegate->OnCommissioningSessionEstablishmentStarted();
+    }
 }
 
 void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & session)

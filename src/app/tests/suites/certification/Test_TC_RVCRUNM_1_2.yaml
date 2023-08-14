@@ -1,0 +1,111 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 87.2.1. [TC-RVCRUNM-1.2] Cluster attributes with DUT as Server
+
+PICS:
+    - RVCRUNM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Precondition"
+      verification: |
+          This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
+      disabled: true
+
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the SupportedModes attribute."
+      PICS: RVCRUNM.S.A0000
+      verification: |
+          ./chip-tool  rvcrunmode read supported-modes 1 1
+
+          Verify that the DUT response contains list of ModeOptionsStruct entries.
+          - Verify that list should contain at least one entry
+          - Verify that each ModeOptionsStruct entry has a unique Mode field value and Label field value
+          -  ModeOptionsStruct entry’s ModeTags field is not empty,  then Verify the values of the Value fields that are not larger than 16 bits, for each Value field: Is the semantic tag value a defined common tag value (Auto(0x0000), Quick(0x0001), Quiet(0x0002), LowNoise(0x0003), LowEnergy(0x0004), Vacation(0x0005), Min(0x0006), Max(0x0007), Night(0x0008), Day(0x0009)) or a defined cluster alias tag value (RapidCool, RapidFreeze) or in the MfgTags (0x8000 to 0xBFFF) range
+          - If the Value field is in the MfgTags (0x8000 to 0xBFFF) range, the TagName field is a string with a length between 1 and 64
+          - Verify that at least one ModeOptionsStruct entry includes either the RapidCool semantic tag or the RapidFreeze semantic tag in the SemanticTags field
+          - Save the Mode field values as supported_modes_dut on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1690177496.793840][6284:6286] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0054 Attribute 0x0000_0000 DataVersion: 551764487
+          [1690177496.794090][6284:6286] CHIP:TOO:   SupportedModes: 3 entries
+          [1690177496.794285][6284:6286] CHIP:TOO:     [1]: {
+          [1690177496.794343][6284:6286] CHIP:TOO:       Label: Idle
+          [1690177496.794396][6284:6286] CHIP:TOO:       Mode: 0
+          [1690177496.794457][6284:6286] CHIP:TOO:       ModeTags: 1 entries
+          [1690177496.794573][6284:6286] CHIP:TOO:         [1]: {
+          [1690177496.794631][6284:6286] CHIP:TOO:           Value: 16384
+          [1690177496.794682][6284:6286] CHIP:TOO:          }
+          [1690177496.794737][6284:6286] CHIP:TOO:      }
+          [1690177496.794809][6284:6286] CHIP:TOO:     [2]: {
+          [1690177496.794861][6284:6286] CHIP:TOO:       Label: Cleaning
+          [1690177496.794910][6284:6286] CHIP:TOO:       Mode: 1
+          [1690177496.794967][6284:6286] CHIP:TOO:       ModeTags: 1 entries
+          [1690177496.795031][6284:6286] CHIP:TOO:         [1]: {
+          [1690177496.795085][6284:6286] CHIP:TOO:           Value: 16385
+          [1690177496.795135][6284:6286] CHIP:TOO:          }
+          [1690177496.795186][6284:6286] CHIP:TOO:      }
+          [1690177496.795257][6284:6286] CHIP:TOO:     [3]: {
+          [1690177496.795309][6284:6286] CHIP:TOO:       Label: Mapping
+          [1690177496.795358][6284:6286] CHIP:TOO:       Mode: 2
+          [1690177496.795415][6284:6286] CHIP:TOO:       ModeTags: 1 entries
+          [1690177496.795478][6284:6286] CHIP:TOO:         [1]: {
+          [1690177496.795531][6284:6286] CHIP:TOO:           Value: 16384
+          [1690177496.795581][6284:6286] CHIP:TOO:          }
+          [1690177496.795632][6284:6286] CHIP:TOO:      }
+      disabled: true
+
+    - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
+      PICS: RVCRUNM.S.A0001
+      verification: |
+          ./chip-tool  rvcrunmode read current-mode 1 1
+
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer and the value is  from supported_modes_dut, below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 0
+
+          [1690177606.359517][6295:6297] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0054 Attribute 0x0000_0001 DataVersion: 551764487
+          [1690177606.359639][6295:6297] CHIP:TOO:   CurrentMode: 0
+      disabled: true
+
+    - label: "Step 4: TH reads from the DUT the OnMode attribute."
+      PICS: RVCRUNM.S.A0003
+      verification: |
+          ./chip-tool  rvcrunmode read on-mode 1 1
+
+          Verify on TH(chip-tool) logs, OnMode attribute value is an integer and the value is from supported_modes_dut (As per spec default value is null), below is the sample log provided for the raspi platform, Here OnMode attribute value is Null
+
+          [1690177656.364979][6304:6306] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0054 Attribute 0x0000_0003 DataVersion: 551764487
+          [1690177656.365109][6304:6306] CHIP:TOO:   OnMode: null
+      disabled: true
+
+    - label: "Step 5: TH reads from the DUT the StartUpMode attribute."
+      PICS: RVCRUNM.S.A0002
+      verification: |
+          ./chip-tool  rvcrunmode read start-up-mode 1 1
+
+          Verify on TH(chip-tool) logs, StartUpMode attribute value is an integer(As per spec default value is null) and value is from supported_modes_dut, below is the sample log provided for the raspi platform, Here StartUpMode attribute value is Null
+
+          [1690177698.954736][6311:6313] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0054 Attribute 0x0000_0002 DataVersion: 551764487
+          [1690177698.954865][6311:6313] CHIP:TOO:   StartUpMode: null
+      disabled: true

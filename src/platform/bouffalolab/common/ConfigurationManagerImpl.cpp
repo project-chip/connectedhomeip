@@ -34,7 +34,17 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
     static ConfigurationManagerImpl sInstance;
     return sInstance;
 }
-
+bool ConfigurationManagerImpl::IsFullyProvisioned()
+{
+    return
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+        ConnectivityMgr().IsWiFiStationProvisioned() &&
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        ConnectivityMgr().IsThreadProvisioned() &&
+#endif
+        true;
+}
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;

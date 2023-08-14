@@ -29,16 +29,15 @@ using ReadHandlerNode = ReportScheduler::ReadHandlerNode;
 void SynchronizedReportSchedulerImpl::OnReadHandlerDestroyed(ReadHandler * aReadHandler)
 {
     // Verify list is populated
-    VerifyOrReturn((!mReadHandlerList.Empty()));
+    VerifyOrReturn(mNodesPool.Allocated());
 
     ReadHandlerNode * removeNode = FindReadHandlerNode(aReadHandler);
     // Nothing to remove if the handler is not found in the list
     VerifyOrReturn(nullptr != removeNode);
 
-    mReadHandlerList.Remove(removeNode);
     mNodesPool.ReleaseObject(removeNode);
 
-    if (mReadHandlerList.Empty())
+    if (!mNodesPool.Allocated())
     {
         // Only cancel the timer if there are no more handlers registered
         CancelReport();
@@ -49,6 +48,11 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::ScheduleReport(Timeout timeout, Read
 {
     // Cancel Report if it is currently scheduled
     mTimerDelegate->CancelTimer(this);
+    if (timeout == Milliseconds32(0))
+    {
+        ReportTimerCallback();
+        return CHIP_NO_ERROR;
+    }
     ReturnErrorOnFailure(mTimerDelegate->StartTimer(this, timeout));
     mTestNextReportTimestamp = mTimerDelegate->GetCurrentMonotonicTimestamp() + timeout;
 
@@ -61,8 +65,7 @@ void SynchronizedReportSchedulerImpl::CancelReport()
     mTimerDelegate->CancelTimer(this);
 }
 
-/// @brief Checks if the timer is active for the given ReadHandler. Since all read handlers are scheduled on the same timer, we
-/// check if the node is in the list and if the timer is active for the ReportScheduler
+/// @brief Checks if the timer is active for the ReportScheduler
 bool SynchronizedReportSchedulerImpl::IsReportScheduled()
 {
     return mTimerDelegate->IsTimerActive(this);
@@ -72,17 +75,18 @@ bool SynchronizedReportSchedulerImpl::IsReportScheduled()
 /// @return NO_ERROR if the smallest maximum interval was found, error otherwise, INVALID LIST LENGTH if the list is empty
 CHIP_ERROR SynchronizedReportSchedulerImpl::FindNextMaxInterval()
 {
-    VerifyOrReturnError(!mReadHandlerList.Empty(), CHIP_ERROR_INVALID_LIST_LENGTH);
+    VerifyOrReturnError(mNodesPool.Allocated(), CHIP_ERROR_INVALID_LIST_LENGTH);
     System::Clock::Timestamp now      = mTimerDelegate->GetCurrentMonotonicTimestamp();
     System::Clock::Timestamp earliest = now + Seconds16::max();
 
-    for (auto & iter : mReadHandlerList)
-    {
-        if (iter.GetMaxTimestamp() < earliest && iter.GetMaxTimestamp() > now)
+    mNodesPool.ForEachActiveObject([&earliest, now](ReadHandlerNode * node) {
+        if (node->GetMaxTimestamp() < earliest && node->GetMaxTimestamp() > now)
         {
-            earliest = iter.GetMaxTimestamp();
+            earliest = node->GetMaxTimestamp();
         }
-    }
+
+        return Loop::Continue;
+    });
 
     mNextMaxTimestamp = earliest;
 
@@ -95,20 +99,19 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::FindNextMaxInterval()
 /// @return NO_ERROR if the highest minimum timestamp was found, error otherwise, INVALID LIST LENGTH if the list is empty
 CHIP_ERROR SynchronizedReportSchedulerImpl::FindNextMinInterval()
 {
-    VerifyOrReturnError(!mReadHandlerList.Empty(), CHIP_ERROR_INVALID_LIST_LENGTH);
+    VerifyOrReturnError(mNodesPool.Allocated(), CHIP_ERROR_INVALID_LIST_LENGTH);
     System::Clock::Timestamp latest = mTimerDelegate->GetCurrentMonotonicTimestamp();
 
-    for (auto & iter : mReadHandlerList)
-    {
-        if (iter.GetMinTimestamp() > latest && IsReadHandlerReportable(iter.GetReadHandler()))
+    mNodesPool.ForEachActiveObject([&latest, this](ReadHandlerNode * node) {
+        if (node->GetMinTimestamp() > latest && this->IsReadHandlerReportable(node->GetReadHandler()) &&
+            node->GetMinTimestamp() <= this->mNextMaxTimestamp)
         {
             // We do not want the new min to be set above the max for any handler
-            if (iter.GetMinTimestamp() <= mNextMaxTimestamp)
-            {
-                latest = iter.GetMinTimestamp();
-            }
+            latest = node->GetMinTimestamp();
         }
-    }
+
+        return Loop::Continue;
+    });
 
     mNextMinTimestamp = latest;
 
@@ -117,7 +120,7 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::FindNextMinInterval()
 
 CHIP_ERROR SynchronizedReportSchedulerImpl::CalculateNextReportTimeout(Timeout & timeout, ReadHandlerNode * aNode)
 {
-    VerifyOrReturnError(mReadHandlerList.Contains(aNode), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(nullptr != FindReadHandlerNode(aNode->GetReadHandler()), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(FindNextMaxInterval());
     ReturnErrorOnFailure(FindNextMinInterval());
     bool reportableNow   = false;
@@ -125,22 +128,23 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::CalculateNextReportTimeout(Timeout &
 
     Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
 
-    for (auto & iter : mReadHandlerList)
-    {
-        if (!iter.IsEngineRunScheduled())
+    mNodesPool.ForEachActiveObject([&reportableNow, &reportableAtMin, this](ReadHandlerNode * node) {
+        if (!node->IsEngineRunScheduled())
         {
-            if (iter.IsReportableNow())
+            if (node->IsReportableNow())
             {
                 reportableNow = true;
-                break;
+                return Loop::Break;
             }
 
-            if (IsReadHandlerReportable(iter.GetReadHandler()) && iter.GetMinTimestamp() <= mNextMaxTimestamp)
+            if (this->IsReadHandlerReportable(node->GetReadHandler()) && node->GetMinTimestamp() <= this->mNextMaxTimestamp)
             {
                 reportableAtMin = true;
             }
         }
-    }
+
+        return Loop::Continue;
+    });
 
     // Find out if any handler is reportable now
 
@@ -159,36 +163,36 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::CalculateNextReportTimeout(Timeout &
     }
 
     // Updates the synching time of each handler
-    for (auto & iter : mReadHandlerList)
-    {
+    mNodesPool.ForEachActiveObject([now, timeout](ReadHandlerNode * node) {
         // Prevent modifying the sync if the handler is currently reportable, sync's purpose is to allow handler to become
         // reportable earlier than their max interval
-        if (!iter.IsReportableNow())
+        if (!node->IsReportableNow())
         {
-            iter.SetSyncTimestamp(Milliseconds64(now + timeout));
+            node->SetSyncTimestamp(Milliseconds64(now + timeout));
         }
-    }
+
+        return Loop::Continue;
+    });
 
     return CHIP_NO_ERROR;
 }
 
 /// @brief Callback called when the report timer expires to schedule an engine run regardless of the state of the ReadHandlers, as
 /// the engine already verifies that read handlers are reportable before sending a report
-void SynchronizedReportSchedulerImpl::ReportTimerCallback()
+void SynchronizedReportSchedulerImpl::TimerFired()
 {
-    ReportSchedulerImpl::ReportTimerCallback();
+    InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 
-    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
-    ChipLogProgress(DataManagement, "Engine run at time: %" PRIu64 " for Handlers:", now.count());
-    for (auto & iter : mReadHandlerList)
-    {
-        if (iter.IsReportableNow())
+    mNodesPool.ForEachActiveObject([](ReadHandlerNode * node) {
+        if (node->IsReportableNow())
         {
-            iter.SetEngineRunScheduled(true);
-            ChipLogProgress(DataManagement, "Handler: %p with min: %" PRIu64 " and max: %" PRIu64 " and sync: %" PRIu64, (&iter),
-                            iter.GetMinTimestamp().count(), iter.GetMaxTimestamp().count(), iter.GetSyncTimestamp().count());
+            node->SetEngineRunScheduled(true);
+            ChipLogProgress(DataManagement, "Handler: %p with min: %" PRIu64 " and max: %" PRIu64 " and sync: %" PRIu64, (node),
+                            node->GetMinTimestamp().count(), node->GetMaxTimestamp().count(), node->GetSyncTimestamp().count());
         }
-    }
+
+        return Loop::Continue;
+    });
 }
 
 } // namespace reporting

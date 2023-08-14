@@ -212,7 +212,12 @@ tests:
     - label: "Step 15: Sends consecutive FastForward commands"
       verification: |
           Send below command consecutively multiple times to get error code as 4
+
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool mediaplayback fast-forward 1 3
+          ./chip-tv-casting-app mediaplayback fast-forward 1 3
+
+          On TH(chip-tool),  Verify that a SPEED_OUT_OF_RANGE (status 4) response is received.
           [1655460522.133486][12273:12278] CHIP:DMG: },
           [1655460522.133550][12273:12278] CHIP:DMG: Received Command Response Data, Endpoint=3 Cluster=0x0000_0506 Command=0x0000_000A
           [1655460522.133603][12273:12278] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0506 Command 0x0000_000A
@@ -233,7 +238,13 @@ tests:
     - label: "Step 16: Sends consecutive Rewind commands"
       verification: |
           Send below command consecutively multiple times to get error code as 4
+
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool mediaplayback rewind 1 3
+          ./chip-tv-casting-app mediaplayback rewind 1 3
+
+          On TH(chip-tool),  Verify that a SPEED_OUT_OF_RANGE (status 4) response is received.
+
           [1655460483.177033][12225:12230] CHIP:DMG: Received Command Response Data, Endpoint=3 Cluster=0x0000_0506 Command=0x0000_000A
           [1655460483.177083][12225:12230] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0506 Command 0x0000_000A
           [1655460483.177146][12225:12230] CHIP:TOO:   PlaybackResponse: {

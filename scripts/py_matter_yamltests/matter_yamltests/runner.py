@@ -186,7 +186,7 @@ class TestRunner(TestRunnerBase):
 
                 start = time.time()
                 if config.pseudo_clusters.supports(request):
-                    responses, logs = await config.pseudo_clusters.execute(request)
+                    responses, logs = await config.pseudo_clusters.execute(request, parser.definitions)
                 else:
                     encoded_request = config.adapter.encode(request)
                     encoded_response = await self.execute(encoded_request)

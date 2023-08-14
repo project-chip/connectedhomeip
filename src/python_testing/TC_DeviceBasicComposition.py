@@ -27,10 +27,7 @@ from typing import Any, Callable, Optional
 
 import chip.clusters as Clusters
 import chip.tlv
-from chip import discovery
 from chip.clusters.Attribute import ValueDecodeFailure
-from chip.exceptions import ChipStackError
-from chip.setup_payload import SetupPayload
 from matter_testing_support import AttributePathLocation, MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -171,32 +168,10 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         dump_device_composition_path: Optional[str] = self.user_params.get("dump_device_composition_path", None)
 
         if do_test_over_pase:
-            if self.matter_test_config.qr_code_content is not None:
-                qr_code = self.matter_test_config.qr_code_content
-                try:
-                    setup_payload = SetupPayload().ParseQrCode(qr_code)
-                except ChipStackError:
-                    asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
-
-            elif self.matter_test_config.manual_code is not None:
-                manual_code = self.matter_test_config.manual_code
-                try:
-                    setup_payload = SetupPayload().ParseManualPairingCode(manual_code)
-                except ChipStackError:
-                    asserts.fail(
-                        f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
-            else:
-                asserts.fail("Require either --qr-code or --manual-code to proceed with PASE needed for test.")
-
-            if setup_payload.short_discriminator is not None:
-                filter_type = discovery.FilterType.SHORT_DISCRIMINATOR
-                filter_value = setup_payload.short_discriminator
-            else:
-                filter_type = discovery.FilterType.LONG_DISCRIMINATOR
-                filter_value = setup_payload.long_discriminator
+            info = self.get_setup_payload_info()
 
             commissionable_nodes = dev_ctrl.DiscoverCommissionableNodes(
-                filter_type, filter_value, stopOnFirst=True, timeoutSecond=15)
+                info.filter_type, info.filter_value, stopOnFirst=True, timeoutSecond=15)
             logging.info(f"Commissionable nodes: {commissionable_nodes}")
             # TODO: Support BLE
             if commissionable_nodes is not None and len(commissionable_nodes) > 0:
@@ -208,7 +183,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                 logging.info(f"Found instance {instance_name}, VID={vid}, PID={pid}, Address={address}")
 
                 node_id = 1
-                dev_ctrl.EstablishPASESessionIP(address, setup_payload.setup_passcode, node_id)
+                dev_ctrl.EstablishPASESessionIP(address, info.passcode, node_id)
             else:
                 asserts.fail("Failed to find the DUT according to command line arguments.")
         else:
@@ -251,16 +226,52 @@ class TC_DeviceBasicComposition(MatterBaseTest):
             asserts.fail(msg)
 
     # ======= START OF ACTUAL TESTS =======
-    def test_endpoint_zero_present(self):
-        logging.info("Validating that the Root Node endpoint is present (EP0)")
+    def test_TC_SM_1_1(self):
+        ROOT_NODE_DEVICE_TYPE = 0x16
+        self.print_step(1, "Perform a wildcard read of attributes on all endpoints - already done")
+        self.print_step(2, "Verify that endpoint 0 exists")
         if 0 not in self.endpoints:
             self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
                               problem="Did not find Endpoint 0.", spec_location="Endpoint Composition")
             self.fail_current_test()
 
-    def test_descriptor_present_on_each_endpoint(self):
-        logging.info("Validating each endpoint has a descriptor cluster")
+        self.print_step(3, "Verify that endpoint 0 descriptor cluster includes the root node device type")
+        if Clusters.Descriptor not in self.endpoints[0]:
+            self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
+                              problem="No descriptor cluster on Endpoint 0", spec_location="Root node device type")
+            self.fail_current_test()
 
+        listed_device_types = [i.deviceType for i in self.endpoints[0]
+                               [Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
+        if ROOT_NODE_DEVICE_TYPE not in listed_device_types:
+            self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
+                              problem="Root node device type not listed on endpoint 0", spec_location="Root node device type")
+            self.fail_current_test()
+
+        self.print_step(4, "Verify that the root node device type does not appear in any of the non-zero endpoints")
+        for endpoint_id, endpoint in self.endpoints.items():
+            if endpoint_id == 0:
+                continue
+            listed_device_types = [i.deviceType for i in endpoint[Clusters.Descriptor]
+                                   [Clusters.Descriptor.Attributes.DeviceTypeList]]
+            if ROOT_NODE_DEVICE_TYPE in listed_device_types:
+                self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id),
+                                  problem=f'Root node device type listed on endpoint {endpoint_id}', spec_location="Root node device type")
+                self.fail_current_test()
+
+        self.print_step(5, "Verify the existence of all the root node clusters on EP0")
+        root = self.endpoints[0]
+        required_clusters = [Clusters.BasicInformation, Clusters.AccessControl, Clusters.GroupKeyManagement,
+                             Clusters.GeneralCommissioning, Clusters.AdministratorCommissioning, Clusters.OperationalCredentials, Clusters.GeneralDiagnostics]
+        for c in required_clusters:
+            if c not in root:
+                self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
+                                  problem=f'Root node does not contain required cluster {c}', spec_location="Root node device type")
+                self.fail_current_test()
+
+    def test_DT_1_1(self):
+        self.print_step(1, "Perform a wildcard read of attributes on all endpoints - already done")
+        self.print_step(2, "Verify that each endpoint includes a descriptor cluster")
         success = True
         for endpoint_id, endpoint in self.endpoints.items():
             has_descriptor = (Clusters.Descriptor in endpoint)
@@ -273,8 +284,10 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         if not success:
             self.fail_current_test("At least one endpoint was missing the descriptor cluster.")
 
-    def test_global_attributes_present_on_each_cluster(self):
-        logging.info("Validating each cluster has the mandatory global attributes")
+    def test_IDM_10_1(self):
+        self.print_step(1, "Perform a wildcard read of attributes on all endpoints - already done")
+
+        self.print_step(2, "Validate all global attributes are present")
 
         @dataclass
         class RequiredMandatoryAttribute:
@@ -297,6 +310,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                                        validator=check_list_of_ints_in_range(0, 0xFFFF_FFFF)),
         ]
 
+        self.print_step(3, "Validate all reported attributes match AttributeList")
         success = True
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
@@ -359,13 +373,37 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                             # Warn only for now
                             # TODO: Fail in the future
                             continue
+                    for attribute_id in cluster:
+                        if attribute_id not in attribute_list:
+                            attribute_string = self.cluster_mapper.get_attribute_string(cluster_id, attribute_id)
+                            location = AttributePathLocation(endpoint_id, cluster_id, attribute_id)
+                            self.record_error(self.get_test_name(), location=location,
+                                              problem=f'Found attribute {attribute_string} on {location.as_cluster_string(self.cluster_mapper)} not listed in attribute list', spec_location="AttributeList Attribute")
+                            success = False
 
         if not success:
             self.fail_current_test(
                 "At least one cluster was missing a mandatory global attribute or had differences between claimed attributes supported and actual.")
 
-    def test_all_attribute_strings_valid(self):
-        asserts.skip("TODO: Validate every string in the attribute tree is valid UTF-8 and has no nulls")
+    def test_IDM_11_1(self):
+        success = True
+        for endpoint_id, endpoint in self.endpoints_tlv.items():
+            for cluster_id, cluster in endpoint.items():
+                for attribute_id, attribute in cluster.items():
+                    if cluster_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES or attribute_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]:
+                        continue
+                    if Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id].attribute_type.Type is not str:
+                        continue
+                    try:
+                        cluster[attribute_id].encode('utf-8', errors='strict')
+                    except UnicodeError:
+                        location = AttributePathLocation(endpoint_id, cluster_id, attribute_id)
+                        attribute_string = self.cluster_mapper.get_attribute_string(cluster_id, attribute_id)
+                        self.record_error(self.get_test_name(
+                        ), location=location, problem=f'Attribute {attribute_string} on {location.as_cluster_string(self.cluster_mapper)} is invalid UTF-8', spec_location="Data types - Character String")
+                        success = False
+        if not success:
+            self.fail_current_test("At least one attribute string was not valid UTF-8")
 
     def test_all_event_strings_valid(self):
         asserts.skip("TODO: Validate every string in the read events is valid UTF-8 and has no nulls")
@@ -389,6 +427,112 @@ class TC_DeviceBasicComposition(MatterBaseTest):
 
     def test_topology_is_valid(self):
         asserts.skip("TODO: Make a test that verifies each endpoint only lists direct descendants, except Root Node and Aggregator endpoints that list all their descendants")
+
+    def test_TC_PS_3_1(self):
+        BRIDGED_NODE_DEVICE_TYPE_ID = 0x13
+        success = True
+        self.print_step(1, "Wildcard read of device - already done")
+
+        self.print_step(2, "Verify that all endpoints listed in the EndpointList are valid")
+        attribute_id = Clusters.PowerSource.Attributes.EndpointList.attribute_id
+        cluster_id = Clusters.PowerSource.id
+        attribute_string = self.cluster_mapper.get_attribute_string(cluster_id, attribute_id)
+        for endpoint_id, endpoint in self.endpoints.items():
+            if Clusters.PowerSource not in endpoint:
+                continue
+            location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+            cluster_revision = Clusters.PowerSource.Attributes.ClusterRevision
+            if cluster_revision not in endpoint[Clusters.PowerSource]:
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
+                                                 attribute_id=cluster_revision.attribute_id)
+                self.record_error(self.get_test_name(
+                ), location=location, problem=f'Did not find Cluster revision on {location.as_cluster_string(self.cluster_mapper)}', spec_location='Global attributes')
+            if endpoint[Clusters.PowerSource][cluster_revision] < 2:
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
+                                                 attribute_id=cluster_revision.attribute_id)
+                self.record_note(self.get_test_name(), location=location,
+                                 problem='Power source ClusterRevision is < 2, skipping remainder of test for this endpoint')
+                continue
+            if Clusters.PowerSource.Attributes.EndpointList not in endpoint[Clusters.PowerSource]:
+                self.record_error(self.get_test_name(), location=location,
+                                  problem=f'Did not find {attribute_string} on {location.as_cluster_string(self.cluster_mapper)}', spec_location="EndpointList Attribute")
+                success = False
+                continue
+
+            endpoint_list = endpoint[Clusters.PowerSource][Clusters.PowerSource.Attributes.EndpointList]
+            non_existent = set(endpoint_list) - set(self.endpoints.keys())
+            if non_existent:
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+                self.record_error(self.get_test_name(), location=location,
+                                  problem=f'{attribute_string} lists a non-existent endpoint', spec_location="EndpointList Attribute")
+                success = False
+
+        self.print_step(3, "Verify that all Bridged Node endpoint lists are correct")
+        device_types = {}
+        parts_list = {}
+        for endpoint_id, endpoint in self.endpoints.items():
+            if Clusters.PowerSource not in endpoint or Clusters.PowerSource.Attributes.EndpointList not in endpoint[Clusters.PowerSource]:
+                continue
+
+            def GetPartValidityProblem(endpoint):
+                if Clusters.Descriptor not in endpoint:
+                    return "Missing cluster descriptor"
+                if Clusters.Descriptor.Attributes.PartsList not in endpoint[Clusters.Descriptor]:
+                    return "Missing PartList in descriptor cluster"
+                if Clusters.Descriptor.Attributes.DeviceTypeList not in endpoint[Clusters.Descriptor]:
+                    return "Missing DeviceTypeList in descriptor cluster"
+                return None
+
+            problem = GetPartValidityProblem(endpoint)
+            if problem:
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=Clusters.Descriptor.id,
+                                                 attribute_id=Clusters.Descriptor.Attributes.PartsList.id)
+                self.record_error(self.get_test_name(), location=location,
+                                  problem=problem, spec_location="PartsList Attribute")
+                success = False
+                continue
+
+            device_types[endpoint_id] = [i.deviceType for i in endpoint[Clusters.Descriptor]
+                                         [Clusters.Descriptor.Attributes.DeviceTypeList]]
+            parts_list[endpoint_id] = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
+
+        bridged_nodes = [id for (id, dev_type) in device_types.items() if BRIDGED_NODE_DEVICE_TYPE_ID in dev_type]
+
+        for endpoint_id in bridged_nodes:
+            if Clusters.PowerSource not in self.endpoints[endpoint_id]:
+                continue
+            # using a list because we do want to preserve duplicates and error on those.
+            desired_endpoint_list = parts_list[endpoint_id].copy()
+            desired_endpoint_list.append(endpoint_id)
+            desired_endpoint_list.sort()
+            ep_list = self.endpoints[endpoint_id][Clusters.PowerSource][Clusters.PowerSource.Attributes.EndpointList]
+            ep_list.sort()
+            if ep_list != desired_endpoint_list:
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+                self.record_error(self.get_test_name(), location=location,
+                                  problem=f'Power source EndpointList on bridged node endpoint {endpoint_id} is not as expected. Desired: {desired_endpoint_list} Actual: {ep_list}', spec_location="EndpointList Attribute")
+                success = False
+
+        self.print_step(4, "Verify that all Bridged Node children endpoint lists are correct")
+        children = []
+        # note, this doesn't handle the full tree structure, single layer only
+        for endpoint_id in bridged_nodes:
+            children = children + parts_list[endpoint_id]
+
+        for endpoint_id in children:
+            if Clusters.PowerSource not in self.endpoints[endpoint_id]:
+                continue
+            desired_endpoint_list = [endpoint_id]
+            ep_list = self.endpoints[endpoint_id][Clusters.PowerSource][Clusters.PowerSource.Attributes.EndpointList]
+            ep_list.sort()
+            if ep_list != desired_endpoint_list:
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+                self.record_error(self.get_test_name(), location=location,
+                                  problem=f'Power source EndpointList on bridged child endpoint {endpoint_id} is not as expected. Desired: {desired_endpoint_list} Actual: {ep_list}', spec_location="EndpointList Attribute")
+                success = False
+
+        if not success:
+            self.fail_current_test("power source EndpointList attribute is incorrect")
 
 
 if __name__ == "__main__":

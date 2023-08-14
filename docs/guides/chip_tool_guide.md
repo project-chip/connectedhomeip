@@ -980,15 +980,15 @@ Complete the following steps:
    fabric by using the following command pattern:
 
     ```
-    $ ./chip-tool pairing code <payload> <node_id> --commissioner-name <commissioner_name>
+    $ ./chip-tool pairing code <node_id> <payload> --commissioner-name <commissioner_name>
     ```
 
     In this command:
 
-    - _<payload\>_ is the the QR code payload or a manual pairing code generated
-      by the first commissioner instance when opened commissioning window
     - _<node_id\>_ is the user-defined ID of the node being commissioned. It
       doesn't need to be the same ID, as for the first fabric.
+    - _<payload\>_ is the the QR code payload or a manual pairing code generated
+      by the first commissioner instance when opened commissioning window
     - _<commissioner_name\>_ is the name of the second fabric. Valid values are
       "alpha", "beta", "gamma", and integers greater than or equal to 4. The
       default if not specified is "alpha".
@@ -996,7 +996,7 @@ Complete the following steps:
     **Example of command:**
 
     ```
-    $ ./chip-tool pairing code 36281602573 1 --commissioner-name beta
+    $ ./chip-tool pairing code 1 36281602573 --commissioner-name beta
     ```
 
 #### Step 5: Test reception of commands

@@ -1,0 +1,5 @@
+{
+    "Groups": ["TestGroupKeyManagementCluster"],
+    "Others": ["TestEqualities"],
+    "collection": ["Groups", "Others"]
+}

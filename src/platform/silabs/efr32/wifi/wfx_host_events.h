@@ -353,9 +353,9 @@ void wfx_ipv6_notify(int got_ip);
 
 #ifdef RS911X_WIFI
 /* RSI Power Save */
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#if SL_ICD_ENABLED
 sl_status_t wfx_power_save();
-#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
+#endif /* SL_ICD_ENABLED */
 /* RSI for LWIP */
 void * wfx_rsi_alloc_pkt(void);
 void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off);
