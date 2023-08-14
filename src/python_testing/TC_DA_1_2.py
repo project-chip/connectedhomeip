@@ -100,6 +100,8 @@ def parse_ids_from_certs(dac: x509.Certificate, pai: x509.Certificate) -> tuple(
 # --string-arg cd_cert_dir:'your_directory_name'
 # ex. --string-arg cd_cert_dir:'credentials/development/cd-certs'
 # default is 'credentials/development/cd-certs'.
+
+
 class TC_DA_1_2(MatterBaseTest):
     @async_test_body
     async def test_TC_DA_1_2(self):
