@@ -63,7 +63,6 @@ void ReportSchedulerImpl::OnSubscriptionEstablished(ReadHandler * aReadHandler)
     // Handler must not be registered yet; it's just being constructed.
     VerifyOrDie(nullptr == newNode);
 
-    // Update the now timestamp to the current time to determine the min and max timestamps
     Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
 
     // The NodePool is the same size as the ReadHandler pool from the IM Engine, so we don't need a check for size here since if a
@@ -82,7 +81,6 @@ void ReportSchedulerImpl::OnBecameReportable(ReadHandler * aReadHandler)
     ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
     VerifyOrReturn(nullptr != node);
 
-    // Update the now timestamp to the current time to calculate the next report timeout
     Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
 
     Milliseconds32 newTimeout;
@@ -95,7 +93,6 @@ void ReportSchedulerImpl::OnSubscriptionReportSent(ReadHandler * aReadHandler)
     ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
     VerifyOrReturn(nullptr != node);
 
-    // Update the now timestamp to the current time to update the node's interval timestamps and calculate the next report timeout
     Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
 
     node->SetIntervalTimeStamps(aReadHandler, now);

@@ -179,7 +179,6 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::CalculateNextReportTimeout(Timeout &
 /// the engine already verifies that read handlers are reportable before sending a report
 void SynchronizedReportSchedulerImpl::TimerFired()
 {
-    // Update the current time to validate reportability upon current time
     Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
