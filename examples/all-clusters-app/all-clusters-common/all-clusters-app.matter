@@ -369,7 +369,7 @@ server cluster OnOff = 6 {
     kAcceptOnlyWhenOn = 0x1;
   }
 
-  readonly nosubscribe attribute boolean onOff = 0;
+  readonly attribute boolean onOff = 0;
   readonly attribute boolean globalSceneControl = 16384;
   attribute int16u onTime = 16385;
   attribute int16u offWaitTime = 16386;
