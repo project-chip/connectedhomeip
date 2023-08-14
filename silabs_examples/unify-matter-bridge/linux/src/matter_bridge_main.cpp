@@ -20,6 +20,10 @@
 #include "Options.h"
 #include "app/server/Server.h"
 
+// including ninja generated version file
+#include "chip_version.hpp"
+
+
 // Application library
 #include "attribute_translator.hpp"
 #include "bridged_device_basic_info_attribute_translator.hpp"
@@ -103,6 +107,9 @@ int main(int argc, char * argv[])
     {
         return -1;
     }
+
+    sl_log_info(LOG_TAG, "Current Matter Version:  %s \n", CHIP_VERSION);
+    sl_log_info(LOG_TAG, "Current Matter Version SHA: %s \n", CHIP_SHA);
 
     const char * __argv__[] = { "matter_bridge", nullptr };
     int __argc__            = sizeof(__argv__) / sizeof(const char *) - 1;

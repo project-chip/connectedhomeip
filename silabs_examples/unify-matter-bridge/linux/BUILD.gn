@@ -76,6 +76,7 @@ static_library("unify-matter-bridge-lib") {
   public_deps = [
     "${chip_root}/examples/platform/linux:app-main",
     "//../unify-matter-bridge-common",
+    ":get_chip_version"
   ]
 
   output_dir = root_out_dir
@@ -90,6 +91,11 @@ static_library("unify-matter-bridge-lib") {
   }
 }
 
+action("get_chip_version") {
+  script = "../scripts/gen_version_info.py"
+  outputs = ["$target_gen_dir/include/chip_version.hpp"]
+  args = rebase_path(outputs, root_build_dir)
+}
 
 executable("unify-matter-bridge") {
   sources = [ "src/matter_bridge_main.cpp" ]
