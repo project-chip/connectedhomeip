@@ -1,20 +1,20 @@
 /*
-*
-*    Copyright (c) 2023 Project CHIP Authors
-*    All rights reserved.
-*
-*    Licensed under the Apache License, Version 2.0 (the "License");
-*    you may not use this file except in compliance with the License.
-*    You may obtain a copy of the License at
-*
-*        http://www.apache.org/licenses/LICENSE-2.0
-*
-*    Unless required by applicable law or agreed to in writing, software
-*    distributed under the License is distributed on an "AS IS" BASIS,
-*    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*    See the License for the specific language governing permissions and
-*    limitations under the License.
-*/
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 
 #include "app-common/zap-generated/ids/Clusters.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -33,9 +33,7 @@ namespace Clusters {
 namespace AirQuality {
 
 Instance::Instance(EndpointId aEndpointId, uint32_t aFeature) :
-    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id),
-    mEndpointId(aEndpointId),
-    mFeature(aFeature)
+    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id), mEndpointId(aEndpointId), mFeature(aFeature)
 {}
 
 Instance::~Instance()
@@ -58,38 +56,33 @@ bool Instance::HasFeature(AirQualityEnum aFeature) const
     return mFeature & to_underlying(aFeature);
 }
 
-
 Protocols::InteractionModel::Status Instance::UpdateAirQuality(AirQualityEnum aNewAirQuality)
 {
     // Check that the value in is valid according to the enabled features.
     switch (aNewAirQuality)
     {
-    case AirQualityEnum::kFair:
-    {
+    case AirQualityEnum::kFair: {
         if (!HasFeature(AirQualityEnum::kFair))
         {
             return Protocols::InteractionModel::Status::ConstraintError;
         }
     }
     break;
-    case AirQualityEnum::kModerate:
-    {
+    case AirQualityEnum::kModerate: {
         if (!HasFeature(AirQualityEnum::kModerate))
         {
             return Protocols::InteractionModel::Status::ConstraintError;
         }
     }
     break;
-    case AirQualityEnum::kPoor:
-    {
+    case AirQualityEnum::kPoor: {
         if (!HasFeature(AirQualityEnum::kPoor))
         {
             return Protocols::InteractionModel::Status::ConstraintError;
         }
     }
     break;
-    case AirQualityEnum::kExtremelyPoor:
-    {
+    case AirQualityEnum::kExtremelyPoor: {
         if (!HasFeature(AirQualityEnum::kExtremelyPoor))
         {
             return Protocols::InteractionModel::Status::ConstraintError;
@@ -107,7 +100,7 @@ Protocols::InteractionModel::Status Instance::UpdateAirQuality(AirQualityEnum aN
 
 AirQualityEnum Instance::GetAirQuality()
 {
-        return mAirQuality;
+    return mAirQuality;
 }
 
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)

@@ -18,6 +18,7 @@
 
 #include "AllClustersCommandDelegate.h"
 #include "WindowCoveringManager.h"
+#include "air-quality-instance.h"
 #include "dishwasher-mode.h"
 #include "include/tv-callbacks.h"
 #include "laundry-washer-controls-delegate-impl.h"
@@ -25,7 +26,6 @@
 #include "operational-state-delegate-impl.h"
 #include "rvc-modes.h"
 #include "tcc-mode.h"
-#include "air-quality-instance.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/att-storage.h>

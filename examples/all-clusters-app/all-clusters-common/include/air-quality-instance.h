@@ -9,7 +9,7 @@ namespace AirQuality {
 
 void Shutdown();
 
-} // chip
-} // app
-} // Clusters
-} // AirQuality
+} // namespace AirQuality
+} // namespace Clusters
+} // namespace app
+} // namespace chip

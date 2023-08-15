@@ -18,12 +18,8 @@ void emberAfAirQualityClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gAirQualityCluster == nullptr);
-    chip::BitMask<Feature, uint32_t> airQualityFeatures(
-        Feature::kModerate,
-        Feature::kFair,
-        Feature::kVeryPoor,
-        Feature::kExtremelyPoor
-    );
+    chip::BitMask<Feature, uint32_t> airQualityFeatures(Feature::kModerate, Feature::kFair, Feature::kVeryPoor,
+                                                        Feature::kExtremelyPoor);
     gAirQualityCluster = new Instance(1, airQualityFeatures.Raw());
     gAirQualityCluster->Init();
 }
