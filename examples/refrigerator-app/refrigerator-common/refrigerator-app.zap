@@ -33,7 +33,7 @@
   ],
   "endpointTypes": [
     {
-      "id": 1,
+      "id": 8,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
         "id": 2,
@@ -1415,7 +1415,7 @@
               "side": "server",
               "type": "char_string",
               "included": 1,
-              "storageOption": "External",
+              "storageOption": "NVM",
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "",
@@ -6252,7 +6252,7 @@
       ]
     },
     {
-      "id": 3,
+      "id": 7,
       "name": "MA-refrigerator",
       "deviceTypeRef": {
         "id": 48,
@@ -11686,7 +11686,7 @@
       ]
     },
     {
-      "id": 2,
+      "id": 5,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 51,
@@ -12202,7 +12202,7 @@
       ]
     },
     {
-      "id": 4,
+      "id": 6,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 51,

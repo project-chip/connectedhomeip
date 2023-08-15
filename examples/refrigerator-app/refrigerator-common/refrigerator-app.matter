@@ -1104,7 +1104,7 @@ endpoint 0 {
     callback attribute vendorID;
     callback attribute productName;
     callback attribute productID;
-    callback attribute nodeLabel;
+    persist  attribute nodeLabel;
     callback attribute location default = "XX";
     callback attribute hardwareVersion default = 0;
     callback attribute hardwareVersionString;
