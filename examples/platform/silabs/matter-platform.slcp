@@ -44,29 +44,30 @@ component:
 - {id: rail_util_pti}
 - {id: bluetooth_feature_gatt}
 - {id: bluetooth_feature_connection}
-- {id: psa_crypto}
 - {id: rail_lib_multiprotocol}
 - {id: bluetooth_feature_system}
 - {id: bluetooth_feature_scanner}
 - {id: rail_util_power_manager_init}
-- {id: mbedtls_aes} # -> ok
-- {id: mbedtls_ccm} # -> ok
-- {id: mbedtls_cmac} # -> ok
-- {id: mbedtls_ecc} # -> ok
-- {id: mbedtls_ecdh} # -> ok
-- {id: mbedtls_ecdsa} # -> ok
-- {id: mbedtls_ecdsa_deterministic} # -> ok
-- {id: mbedtls_hash} # -> ok
-- {id: mbedtls_hkdf} # -> ok
-- {id: mbedtls_entropy_default} # -> ok
-- {id: mbedtls_x509} # -> ok
-- {id: mbedtls_platform_dynamic_memory_allocation_config_init_runtime } # -> ok
-- {id: mbedtls_pkcs5} # -> ok
-- {id: mbedtls_base64} # Not present
-- {id: ot_mbedtls}
+- {id: psa_crypto}
+- {id: psa_crypto_aes}
+- {id: psa_crypto_ccm}
+- {id: psa_crypto_cmac}
+- {id: psa_crypto_ecc}
+- {id: psa_crypto_ecdh}
+- {id: psa_crypto_ecdsa}
+- {id: psa_crypto_hash}
+- {id: psa_crypto_hkdf}
+- {id: mbedtls_x509}
+- {id: mbedtls_cmac}
+- {id: mbedtls_platform_dynamic_memory_allocation_config_init_runtime }
+- {id: mbedtls_base64}
 - {id: ot_psa_crypto}
 - {id: bluetooth_crypto}
-
+# Necessary componenets for ot coap cert lib
+# - {id: mbedtls_dtls} # Requried by COAP lib
+# - {id: mbedtls_tls_server} # Requried by COAP lib
+# - {id: mbedtls_tls} # Requried by COAP lib
+# - {id: mbedtls_jpake} # Required by COAP lib
 
 config_file:
   - override:
@@ -76,7 +77,7 @@ config_file:
     directory: btconf
 
 configuration:
-- {name: SL_MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED, value: '1'}
+- {name: SL_MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED, value: '0'}
 - {name: SL_MBEDTLS_KEY_EXCHANGE_PSK_ENABLED, value: '1'}
 - condition: [uartdrv_usart]
   name: UARTDRV_RESTRICT_ENERGY_MODE_TO_ALLOW_RECEPTION

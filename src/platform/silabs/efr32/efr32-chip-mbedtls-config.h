@@ -32,9 +32,7 @@
 #include <crypto/CryptoBuildConfig.h>
 #endif // CHIP_HAVE_CONFIG_H
 
-/**
- * DIC Specific Configurations
- */
+// DIC Specific Configurations
 #ifdef DIC_ENABLE
 #define MBEDTLS_PKCS1_V15
 #define MBEDTLS_RSA_NO_CRT
@@ -43,8 +41,25 @@
 #define MBEDTLS_SSL_IN_CONTENT_LEN 5120
 #define MBEDTLS_SSL_OUT_CONTENT_LEN 1560
 #define MBEDTLS_PSA_BUILTIN_ALG_TLS12_PRF
-#define MBEDTLS_MPI_MAX_SIZE 512 /**< Maximum number of bytes for usable MPIs. */
-#endif                           // DIC_ENABLE
+#define MBEDTLS_MPI_MAX_SIZE 512
+#endif // DIC_ENABLE
+
+// Configurations necessary for ot coap cert libs
+#if SL_USE_COAP_CONFIG
+#define MBEDTLS_SSL_TLS_C
+#define MBEDTLS_SSL_CLI_C
+#define MBEDTLS_SSL_PROTO_TLS1_2
+#define MBEDTLS_SSL_KEEP_PEER_CERTIFICATE
+#define MBEDTLS_SSL_SRV_C
+#define MBEDTLS_SSL_PROTO_DTLS
+#define MBEDTLS_SSL_DTLS_ANTI_REPLAY
+#define MBEDTLS_SSL_DTLS_HELLO_VERIFY
+#define MBEDTLS_SSL_COOKIE_C
+#define MBEDTLS_CIPHER_MODE_CBC
+#define MBEDTLS_CCM_C
+#define MBEDTLS_ECJPAKE_C
+#define MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED
+#endif // SL_USE_COAP_CONFIG
 
 #define MBEDTLS_PLATFORM_SNPRINTF_MACRO snprintf
 
