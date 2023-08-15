@@ -13,5 +13,3 @@ void Shutdown();
 } // app
 } // Clusters
 } // AirQuality
-
-
