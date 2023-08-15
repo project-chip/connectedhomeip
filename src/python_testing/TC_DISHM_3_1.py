@@ -87,20 +87,7 @@ class TC_DISHM_3_1(MatterBaseTest):
 
         logging.info("OnMode: %s" % (on_mode_dut))
 
-        if on_mode_dut == NullValue:
-            self.print_step(2, "Read SupportedModes attribute")
-            supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
-
-            logging.info("SupportedModes: %s" % (supported_modes))
-
-            asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least two entries!")
-
-            supported_modes_dut = [m.mode for m in supported_modes]
-            on_mode_th = random.choice(supported_modes_dut)
-
-            self.print_step(2, "Write the value %s to OnMode" % (on_mode_th))
-
-            await self.write_on_mode(newMode=on_mode_th)
+        asserts.assert_false(on_mode_dut == NullValue, "On mode value should be an integer value")
 
         self.print_step(3, "Read CurrentMode attribute")
 
