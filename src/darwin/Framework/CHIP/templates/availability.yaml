@@ -7636,6 +7636,8 @@
       bitmaps:
           GroupKeyManagement:
               - Feature
+          Descriptor:
+              - Feature
       bitmap values:
           OnOff:
               Feature:
@@ -7643,6 +7645,9 @@
           GroupKeyManagement:
               Feature:
                   - CacheAndSync
+          Descriptor:
+              Feature:
+                  - TagList
   removed:
       clusters:
           # Clusters that really should just not be exposed, even if they're in our XML.

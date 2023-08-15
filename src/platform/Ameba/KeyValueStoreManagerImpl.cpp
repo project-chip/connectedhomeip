@@ -88,16 +88,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
         goto exit;
     }
 
-    if (checkExist(key, key))
-    {
-        error = deleteKey(key, key);
-        err   = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "Warning, KVS leakage, failed to remove old kvs value");
-        }
-    }
-
+    deleteKey(key, key); // delete key if it exists
     error = setPref_new(key, key, (uint8_t *) value, value_size);
     err   = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
 

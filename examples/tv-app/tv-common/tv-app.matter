@@ -188,6 +188,10 @@ server cluster LevelControl = 8 {
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
+  bitmap Feature : BITMAP32 {
+    kTagList = 0x1;
+  }
+
   struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
@@ -2449,7 +2453,8 @@ server cluster AccountLogin = 1294 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
   binding cluster Binding;
   binding cluster GeneralCommissioning;
   binding cluster NetworkCommissioning;
@@ -2743,7 +2748,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type videoplayer = 35, version 1;
+  device type ma_casting_videoplayer = 35, version 1;
+
 
   server cluster OnOff {
     ram      attribute onOff default = 0x00;
@@ -2838,7 +2844,8 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type speaker = 34, version 1;
+  device type ma_speaker = 34, version 1;
+
 
   server cluster OnOff {
     ram      attribute onOff default = 0x00;
@@ -2875,7 +2882,8 @@ endpoint 2 {
   }
 }
 endpoint 3 {
-  device type contentapplication = 36, version 1;
+  device type ma_contentapp = 36, version 1;
+
 
   server cluster Descriptor {
     callback attribute deviceTypeList;

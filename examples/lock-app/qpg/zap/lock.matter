@@ -150,6 +150,10 @@ server cluster Groups = 4 {
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
+  bitmap Feature : BITMAP32 {
+    kTagList = 0x1;
+  }
+
   struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
@@ -1775,7 +1779,8 @@ server cluster DoorLock = 257 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
+
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Descriptor {
@@ -2044,7 +2049,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type doorlock = 10, version 1;
+  device type ma_doorlock = 10, version 1;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0000;
