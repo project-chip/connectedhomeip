@@ -50,7 +50,7 @@ class TC_DISHM_3_1(MatterBaseTest):
         asserts.assert_true(type_matches(ret, Clusters.Objects.OnOff.Commands.On),
                             "Unexpected return type for OnOff")
 
-    async def write_onoff_off_mode(self) -> Clusters.Objects.OnOff.Commands.Off:
+    async def send_off_command(self) -> Clusters.Objects.OnOff.Commands.Off:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.OnOff.Commands.Off, endpoint=self.endpoint)
         asserts.assert_true(type_matches(ret, Clusters.Objects.OnOff.Commands.Off),
                             "Unexpected return type for OnOff")
