@@ -36,24 +36,24 @@ using chip::Protocols::InteractionModel::Status;
 
 static ImmutableReplacementProductListManager sHepaFilterReplacementProductListManager;
 
-//-- Hepa filter Monitoring instance methods
-CHIP_ERROR HepaFilterMonitoringInstance::AppInit()
+//-- Hepa filter Monitoring Delegate methods
+CHIP_ERROR HepaFilterMonitoringDelegate::Init()
 {
-    ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::Init()");
+    ChipLogDetail(Zcl, "HepaFilterMonitoringDelegate::Init()");
 
-    SetReplacementProductListManagerInstance(&sHepaFilterReplacementProductListManager);
+    mInstance->SetReplacementProductListManagerInstance(&sHepaFilterReplacementProductListManager);
 
     return CHIP_NO_ERROR;
 }
 
-Status HepaFilterMonitoringInstance::PreResetCondition()
+Status HepaFilterMonitoringDelegate::PreResetCondition()
 {
-    ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::PreResetCondition()");
+    ChipLogDetail(Zcl, "HepaFilterMonitoringDelegate::PreResetCondition()");
     return Status::Success;
 }
 
-Status HepaFilterMonitoringInstance::PostResetCondition()
+Status HepaFilterMonitoringDelegate::PostResetCondition()
 {
-    ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::PostResetCondition()");
+    ChipLogDetail(Zcl, "HepaFilterMonitoringDelegate::PostResetCondition()");
     return Status::Success;
 }

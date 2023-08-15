@@ -32,22 +32,17 @@ namespace Clusters {
 
 namespace ResourceMonitoring {
 
-/// This is an application level Instance to handle ActivatedCarbonfilterMonitoringInstance commands according to the specific
+/// This is an application level Instance to handle ActivatedCarbonFilterMonitoringDelegate commands according to the specific
 /// business logic.
-class ActivatedCarbonFilterMonitoringInstance : public ResourceMonitoring::Instance
+class ActivatedCarbonFilterMonitoringDelegate : public ResourceMonitoring::Delegate
 {
 private:
-    CHIP_ERROR AppInit() override;
+    CHIP_ERROR Init() override;
     chip::Protocols::InteractionModel::Status PreResetCondition() override;
     chip::Protocols::InteractionModel::Status PostResetCondition() override;
 
 public:
-    ActivatedCarbonFilterMonitoringInstance(
-        EndpointId aEndpointId, uint32_t aFeature,
-        ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
-        bool aResetConditionCommandSupported) :
-        Instance(aEndpointId, ActivatedCarbonFilterMonitoring::Id, aFeature, aDegradationDirection,
-                 aResetConditionCommandSupported){};
+    ~ActivatedCarbonFilterMonitoringDelegate() override = default;
 };
 
 } // namespace ResourceMonitoring

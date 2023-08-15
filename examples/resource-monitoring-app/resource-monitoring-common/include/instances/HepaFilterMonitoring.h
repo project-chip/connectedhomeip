@@ -32,19 +32,16 @@ namespace Clusters {
 
 namespace ResourceMonitoring {
 
-/// This is an application level instance to handle HepaFilterMonitoringInstance commands according to the specific business logic.
-class HepaFilterMonitoringInstance : public ResourceMonitoring::Instance
+/// This is an application level instance to handle HepaFilterMonitoringDelegate commands according to the specific business logic.
+class HepaFilterMonitoringDelegate : public ResourceMonitoring::Delegate
 {
 private:
-    CHIP_ERROR AppInit() override;
+    CHIP_ERROR Init() override;
     chip::Protocols::InteractionModel::Status PreResetCondition() override;
     chip::Protocols::InteractionModel::Status PostResetCondition() override;
 
 public:
-    HepaFilterMonitoringInstance(EndpointId aEndpointId, uint32_t aFeature,
-                                 ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
-                                 bool aResetConditionCommandSupported) :
-        Instance(aEndpointId, HepaFilterMonitoring::Id, aFeature, aDegradationDirection, aResetConditionCommandSupported){};
+    ~HepaFilterMonitoringDelegate() override = default;
 };
 
 } // namespace ResourceMonitoring
