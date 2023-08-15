@@ -9063,7 +9063,6 @@ PICS:
       id: ICDM.C.C00.Rsp
 
     #
-<<<<<<< HEAD
     #RVC Clean Mode Select
     #
     #Feature
@@ -9135,9 +9134,8 @@ PICS:
     - label:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: DISHM.S.C01.Tx
+    
     #
-=======
->>>>>>> e2cbb33c83 (Modified script Jul 28 (#28361))
     #Operational State
     #
     - label:
