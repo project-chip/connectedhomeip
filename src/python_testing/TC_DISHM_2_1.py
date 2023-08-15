@@ -44,20 +44,16 @@ class TC_DISHM_2_1(MatterBaseTest):
         asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
                             "PIXIT_ENDPOINT must be included on the command line in "
                             "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
-        asserts.assert_true('PIXIT_MODEOK' in self.matter_test_config.global_test_params,
-                            "PIXIT_MODEOK must be included on the command line in "
-                            "the --int-arg flag as PIXIT_MODEOK:<mode id>")
-        asserts.assert_true('PIXIT_MODEFAIL' in self.matter_test_config.global_test_params,
-                            "PIXIT_MODEFAIL must be included on the command line in "
-                            "the --int-arg flag as PIXIT_MODEFAIL:<mode id>")
-        asserts.assert_true('pixit_can_test_mode_failure' in self.matter_test_config.global_test_params,
-                            "PIXIT_CAN_TEST_MODE_FAILURE must be included on the command line in "
-                            "the --bool-arg flag as PIXIT_CAN_TEST_MODE_FAILURE:<true/false>")
+        asserts.assert_true('PIXIT.DISHM.MODE_CHANGE_OK' in self.matter_test_config.global_test_params,
+                            "PIXIT.DISHM.MODE_CHANGE_OK must be included on the command line in "
+                            "the --int-arg flag as PIXIT.DISHM.MODE_CHANGE_OK:<mode id>")
+        asserts.assert_true('PIXIT.DISHM.MODE_CHANGE_FAIL' in self.matter_test_config.global_test_params,
+                            "PIXIT.DISHM.MODE_CHANGE_FAIL must be included on the command line in "
+                            "the --int-arg flag as PIXIT.DISHM.MODE_CHANGE_FAIL:<mode id>")
 
         self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
         self.modeok = self.matter_test_config.global_test_params['PIXIT_MODEOK']
-        self.modefail = self.matter_test_config.global_test_params['PIXIT_MODEFAIL']
-        self.can_test_mode_failure = self.matter_test_config.global_test_params['pixit_can_test_mode_failure']
+        self.can_test_mode_failure = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_FAI']
 
         asserts.assert_true(self.check_pics("DISHM.S.A0000"), "DISHM.S.A0000 must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.A0001"), "DISHM.S.A0001 must be supported")
@@ -84,7 +80,7 @@ class TC_DISHM_2_1(MatterBaseTest):
         logging.info("CurrentMode: %s" % (old_current_mode_dut))
 
         # pick a value that's not in the list of supported modes
-        invalid_mode_th = max(suppoted_modes_dut) + 1
+        invalid_mode_th = max(supported_modes_dut) + 1
 
         from enum import Enum
 
