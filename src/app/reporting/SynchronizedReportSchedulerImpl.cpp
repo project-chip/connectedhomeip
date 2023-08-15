@@ -44,6 +44,19 @@ void SynchronizedReportSchedulerImpl::OnReadHandlerDestroyed(ReadHandler * aRead
     }
 }
 
+void SynchronizedReportSchedulerImpl::OnActiveModeAlmostDone()
+{
+    Timestamp now               = mTimerDelegate->GetCurrentMonotonicTimestamp();
+    uint32_t targetIdleInterval = static_cast<uint32_t>(ICD_SLEEP_TIME_JITTER_MS);
+    VerifyOrReturn(now >= mTestNextReportTimestamp);
+    if (((mTestNextReportTimestamp - now) < Seconds16(targetIdleInterval)) && (now > mNextMinTimestamp))
+    {
+        // If the next report is due in less than the idle mode interval and we are past the min interval, we can just send it now
+        CancelReport();
+        TimerFired();
+    }
+}
+
 CHIP_ERROR SynchronizedReportSchedulerImpl::ScheduleReport(Timeout timeout, ReadHandlerNode * node, const Timestamp & now)
 {
     // Cancel Report if it is currently scheduled

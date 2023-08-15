@@ -75,6 +75,7 @@ protected:
 
     static void OnIdleModeDone(System::Layer * aLayer, void * appState);
     static void OnActiveModeDone(System::Layer * aLayer, void * appState);
+    static void OnActiveModeAlmostDone(System::Layer * aLayer, void * appState);
 
 private:
     // SIT ICDs should have a SlowPollingThreshold shorter than or equal to 15s (spec 9.16.1.5)

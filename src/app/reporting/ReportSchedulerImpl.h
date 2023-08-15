@@ -34,6 +34,7 @@ public:
 
     // ICDStateObserver
     void OnEnterActiveMode() override;
+    void OnActiveModeAlmostDone() override;
 
     // ReadHandlerObserver
     void OnSubscriptionEstablished(ReadHandler * aReadHandler) final;

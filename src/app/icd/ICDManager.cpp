@@ -67,6 +67,7 @@ void ICDManager::Shutdown()
     // cancel any running timer of the icd
     DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
     DeviceLayer::SystemLayer().CancelTimer(OnActiveModeDone, this);
+    DeviceLayer::SystemLayer().CancelTimer(OnActiveModeAlmostDone, this);
     mICDMode          = ICDMode::SIT;
     mOperationalState = OperationalState::IdleMode;
     mStorage          = nullptr;
@@ -157,6 +158,8 @@ void ICDManager::UpdateOperationState(OperationalState state)
             mOperationalState           = OperationalState::ActiveMode;
             uint32_t activeModeInterval = IcdManagementServer::GetInstance().GetActiveModeInterval();
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeInterval), OnActiveModeDone, this);
+            DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeInterval - ICD_ACTIVE_TIME_JITTER_MS),
+                                                  OnActiveModeAlmostDone, this);
 
             CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(GetFastPollingInterval());
             if (err != CHIP_NO_ERROR)
@@ -170,6 +173,8 @@ void ICDManager::UpdateOperationState(OperationalState state)
         {
             uint16_t activeModeThreshold = IcdManagementServer::GetInstance().GetActiveModeThreshold();
             DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Timeout(activeModeThreshold), OnActiveModeDone, this);
+            DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Timeout(activeModeThreshold - ICD_ACTIVE_TIME_JITTER_MS),
+                                                     OnActiveModeAlmostDone, this);
         }
     }
 }
@@ -207,5 +212,15 @@ void ICDManager::OnActiveModeDone(System::Layer * aLayer, void * appState)
         pIcdManager->UpdateOperationState(OperationalState::IdleMode);
     }
 }
+
+void ICDManager::OnActiveModeAlmostDone(System::Layer * aLayer, void * appState)
+{
+    ICDManager * pIcdManager = reinterpret_cast<ICDManager *>(appState);
+
+    // OnActiveModeAlmostDone will trigger a report message if reporting is needed, which should extend the active mode until the
+    // ack for the report is received.
+    pIcdManager->mStateObserver->OnActiveModeAlmostDone();
+}
+
 } // namespace app
 } // namespace chip
