@@ -25,7 +25,6 @@ config("includes") {
 executable("chip-dishwasher-app") {
   sources = [
     "${chip_root}/examples/dishwasher-app/dishwasher-common/src/operational-state-delegate-impl.cpp",
-    "${chip_root}/examples/dishwasher-app/dishwasher-common/src/operational-state-delegates.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
