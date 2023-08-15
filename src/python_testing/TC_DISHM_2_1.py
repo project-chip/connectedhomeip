@@ -83,7 +83,7 @@ class TC_DISHM_2_1(MatterBaseTest):
 
         logging.info("CurrentMode: %s" % (old_current_mode_dut))
 
-        # pick a value that's not on the list of supported modes
+        # pick a value that's not in the list of supported modes
         invalid_mode_th = max(suppoted_modes_dut) + 1
 
         from enum import Enum
