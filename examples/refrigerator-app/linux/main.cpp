@@ -15,7 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "tcc-mode.h"
 #include <AppMain.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -47,8 +46,7 @@ void ApplicationInit()
 
 void ApplicationShutdown()
 {
-    // These may have been initialised via the emberAfXxxClusterInitCallback methods. We need to destroy them before shutdown.
-    Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Shutdown();
+
 }
 
 int main(int argc, char * argv[])

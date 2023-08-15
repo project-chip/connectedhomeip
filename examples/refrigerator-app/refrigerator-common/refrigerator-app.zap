@@ -33,7 +33,7 @@
   ],
   "endpointTypes": [
     {
-      "id": 5,
+      "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
         "id": 2,
@@ -6252,7 +6252,7 @@
       ]
     },
     {
-      "id": 8,
+      "id": 3,
       "name": "MA-refrigerator",
       "deviceTypeRef": {
         "id": 48,
@@ -6349,7 +6349,7 @@
           "mfgCode": null,
           "define": "IDENTIFY_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "IdentifyTime",
@@ -6579,7 +6579,7 @@
           "mfgCode": null,
           "define": "GROUPS_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "AddGroupResponse",
@@ -7953,7 +7953,7 @@
           "mfgCode": null,
           "define": "BINDING_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "Binding",
@@ -8753,7 +8753,7 @@
           "mfgCode": null,
           "define": "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "ChangeToModeResponse",
@@ -9229,7 +9229,7 @@
           "mfgCode": null,
           "define": "REFRIGERATOR_ALARM_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "Mask",
@@ -11686,7 +11686,7 @@
       ]
     },
     {
-      "id": 6,
+      "id": 2,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 51,
@@ -12202,7 +12202,7 @@
       ]
     },
     {
-      "id": 7,
+      "id": 4,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 51,

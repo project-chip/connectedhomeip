@@ -25,7 +25,6 @@ config("includes") {
 executable("chip-refrigerator-app") {
   sources = [
     "${chip_root}/examples/refrigerator-app/refrigerator-common/src/static-supported-temperature-levels.cpp",
-    "${chip_root}/examples/refrigerator-app/refrigerator-common/src/tcc-mode.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]

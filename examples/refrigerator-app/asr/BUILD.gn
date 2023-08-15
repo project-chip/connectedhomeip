@@ -72,7 +72,6 @@ asr_executable("refrigerator_app") {
 
   sources = [
     "${chip_root}/examples/refrigerator-app/refrigerator-common/src/static-supported-temperature-levels.cpp",
-    "${chip_root}/examples/refrigerator-app/refrigerator-common/src/tcc-mode.cpp",
     "${examples_plat_dir}/CHIPDeviceManager.cpp",
     "${examples_plat_dir}/init_Matter.cpp",
     "${examples_plat_dir}/init_asrPlatform.cpp",
