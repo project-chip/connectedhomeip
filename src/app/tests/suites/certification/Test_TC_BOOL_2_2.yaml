@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 68.2.2. [TC-BOOL-2.2] Primary functionality with server as DUT
+name: 69.2.2. [TC-BOOL-2.2] Primary Functionality with Server as DUT
 
 PICS:
     - BOOL.S
@@ -73,7 +73,7 @@ tests:
     - label: "Step 4a: Set up subscription to StateChange event."
       PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
-          Need an SDK implementation required
+          This event is not supported in all clusters app, so there are no reference logs.
 
           Run the below command to start interactive mode
           ./chip-tool interactive start
@@ -86,21 +86,23 @@ tests:
     - label: "Step 4b: Bring the DUT into a state so StateValue is FALSE."
       PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
-          Verify the StateValue value is FALSE On TH(chip-tool), below is the sample log provided for the raspi platform
+          Verify the StateValue value is FALSE On TH(chip-tool), if the state-change event is generated
       disabled: true
 
     - label: "Step 4c: TH reads the StateValue attribute from the DUT."
       PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
+          This event is not supported in all clusters app, so there are no reference logs.
+
           booleanstate read state-value 1 1
 
-          Verify the StateValue value is FALSE On TH(chip-tool), below is the sample log provided for the raspi platform
+          Verify the StateValue value is FALSE On TH(chip-tool)
       disabled: true
 
     - label: "Step 4d: Bring the DUT into a state so StateValue is TRUE."
       PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
-          Verify the StateValue value is TRUE On TH(chip-tool), below is the sample log provided for the raspi platform
+          Verify the StateValue value is TRUE On TH(chip-tool),  if the state-change event is generated
       disabled: true
 
     - label: "Step 4e: TH reads the StateValue attribute from the DUT."
@@ -108,5 +110,5 @@ tests:
       verification: |
           booleanstate read state-value 1 1
 
-          Verify the StateValue value is TRUE On TH(chip-tool), below is the sample log provided for the raspi platform
+          Verify the StateValue value is TRUE On TH(chip-tool)
       disabled: true

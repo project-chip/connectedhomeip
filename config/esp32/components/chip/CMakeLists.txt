@@ -124,8 +124,16 @@ if(CONFIG_DISABLE_IPV4)
     chip_gn_arg_append("chip_inet_config_enable_ipv4"        "false")
 endif()
 
+if(CONFIG_DISABLE_READ_CLIENT)
+    chip_gn_arg_append("chip_enable_read_client"             "false")
+endif()
+
 if(CHIP_CODEGEN_PREGEN_DIR)
     chip_gn_arg_append("chip_code_pre_generated_directory"  "\"${CHIP_CODEGEN_PREGEN_DIR}\"")
+endif()
+
+if(CONFIG_ENABLE_ICD_SERVER)
+    chip_gn_arg_append("chip_enable_icd_server"               "true")
 endif()
 
 if(CONFIG_ENABLE_PW_RPC)

@@ -38,9 +38,9 @@ tests:
 
           - Printed using a minimum font size of 6 points, typically producing a typeface height of 2.1 mm (6/72 inches)
 
-          - Include dashes between the groups of Manual Pairing Code digits (e.g. "MATTER 1234-5678-901")
+          - Include dashes between the groups of Manual Pairing Code digits with the following spacing:
 
-          - If the code is presented in audio format it SHOULD be read in groups of 4 digits, with the last group being only 3 or 1 digits depending on overall size.
+          - For 11 or 21-digit codes, the first row spacing is 4-3-4 (First Row: "1234-567-8901")
 
-          - If a Matter logo cannot be printed alongside the code then the code SHOULD be prefixed with MATTER (e.g. "MATTER 1234-5678-901")
+          - For 21-digit codes, the second row spacing is 4-3-2-1 (Second Row:"9876-543-21-0")
       disabled: true

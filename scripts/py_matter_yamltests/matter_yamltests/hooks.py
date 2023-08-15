@@ -18,6 +18,8 @@ from .parser import TestStep
 
 
 class TestParserHooks():
+    __test__ = False
+
     def start(self, count: int):
         """
         This method is called when the parser starts parsing a set of files.
@@ -77,6 +79,8 @@ class TestParserHooks():
 
 
 class TestRunnerHooks():
+    __test__ = False
+
     def start(self, count: int):
         """
         This method is called when the runner starts running a set of tests.

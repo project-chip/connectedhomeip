@@ -54,7 +54,14 @@ public:
     {
         uint8_t value[sizeof(T)];
         auto w = Encoding::LittleEndian::BufferWriter(value, sizeof(T));
-        w.EndianPut(uint64_t(aValue), sizeof(T));
+        if constexpr (std::is_signed_v<T>)
+        {
+            w.EndianPutSigned(aValue, sizeof(T));
+        }
+        else
+        {
+            w.EndianPut(aValue, sizeof(T));
+        }
 
         return SafeWriteValue(aPath, ByteSpan(value));
     }
@@ -76,7 +83,7 @@ public:
             return err;
         }
 
-        chip::Encoding::LittleEndian::Reader r(tempVal.data(), tempVal.size());
+        Encoding::LittleEndian::Reader r(tempVal.data(), tempVal.size());
         r.RawReadLowLevelBeCareful(&aValue);
         return r.StatusCode();
     }

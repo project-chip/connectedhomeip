@@ -150,6 +150,10 @@ server cluster Groups = 4 {
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
+  bitmap Feature : BITMAP32 {
+    kTagList = 0x1;
+  }
+
   struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
@@ -680,58 +684,6 @@ server cluster GeneralDiagnostics = 51 {
   }
 
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
-}
-
-/** This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.
-Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
-Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
-server cluster Switch = 59 {
-  bitmap Feature : BITMAP32 {
-    kLatchingSwitch = 0x1;
-    kMomentarySwitch = 0x2;
-    kMomentarySwitchRelease = 0x4;
-    kMomentarySwitchLongPress = 0x8;
-    kMomentarySwitchMultiPress = 0x10;
-  }
-
-  info event SwitchLatched = 0 {
-    INT8U newPosition = 0;
-  }
-
-  info event InitialPress = 1 {
-    INT8U newPosition = 0;
-  }
-
-  info event LongPress = 2 {
-    INT8U newPosition = 0;
-  }
-
-  info event ShortRelease = 3 {
-    INT8U previousPosition = 0;
-  }
-
-  info event LongRelease = 4 {
-    INT8U previousPosition = 0;
-  }
-
-  info event MultiPressOngoing = 5 {
-    INT8U newPosition = 0;
-    INT8U currentNumberOfPressesCounted = 1;
-  }
-
-  info event MultiPressComplete = 6 {
-    INT8U previousPosition = 0;
-    INT8U totalNumberOfPressesCounted = 1;
-  }
-
-  readonly attribute int8u numberOfPositions = 0;
-  readonly attribute int8u currentPosition = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
@@ -1805,13 +1757,8 @@ server cluster RadonConcentrationMeasurement = 1071 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 1;
 
-  server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
-  }
 
   server cluster Descriptor {
     callback attribute deviceTypeList;
@@ -1905,13 +1852,6 @@ endpoint 0 {
     ram      attribute clusterRevision default = 0x0001;
   }
 
-  server cluster Switch {
-    ram      attribute numberOfPositions default = 2;
-    ram      attribute currentPosition;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
   server cluster AdministratorCommissioning {
     callback attribute windowStatus default = 0;
     callback attribute adminFabricIndex default = 1;
@@ -1941,7 +1881,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 45, version 1;
+  device type ma_air_purifier = 45, version 1;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;
@@ -2025,7 +1966,8 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type anonymousEndpointType = 44, version 1;
+  device type ma_air_quality_sensor = 44, version 1;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;
@@ -2252,7 +2194,8 @@ endpoint 2 {
   }
 }
 endpoint 3 {
-  device type anonymousEndpointType = 770, version 1;
+  device type ma_tempsensor = 770, version 1;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;
@@ -2291,7 +2234,8 @@ endpoint 3 {
   }
 }
 endpoint 4 {
-  device type anonymousEndpointType = 775, version 1;
+  device type ma_humiditysensor = 775, version 1;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;
@@ -2330,7 +2274,8 @@ endpoint 4 {
   }
 }
 endpoint 5 {
-  device type anonymousEndpointType = 769, version 1;
+  device type ma_thermostat = 769, version 1;
+
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;

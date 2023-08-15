@@ -140,7 +140,7 @@ class Efr32Builder(GnBuilder):
                  show_qr_code: bool = False,
                  enable_rpcs: bool = False,
                  enable_ota_requestor: bool = False,
-                 enable_sed: bool = False,
+                 enable_icd: bool = False,
                  enable_low_power: bool = False,
                  enable_wifi: bool = False,
                  enable_rs911x: bool = False,
@@ -164,7 +164,7 @@ class Efr32Builder(GnBuilder):
         if enable_ota_requestor:
             self.extra_gn_options.append('chip_enable_ota_requestor=true')
 
-        if enable_sed:
+        if enable_icd:
             self.extra_gn_options.append('chip_enable_icd_server=true chip_openthread_ftd=false')
 
         if enable_low_power:

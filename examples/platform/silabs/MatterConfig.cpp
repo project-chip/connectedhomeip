@@ -48,7 +48,7 @@ using namespace ::chip::DeviceLayer;
 #include <crypto/CHIPCryptoPAL.h>
 // If building with the EFR32-provided crypto backend, we can use the
 // opaque keystore
-#if CHIP_CRYPTO_PLATFORM
+#if CHIP_CRYPTO_PLATFORM && !(defined(SIWX_917))
 #include <platform/silabs/efr32/Efr32PsaOperationalKeystore.h>
 static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeystore;
 #endif
@@ -56,11 +56,15 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include "SilabsDeviceDataProvider.h"
 #include "SilabsTestEventTriggerDelegate.h"
 #include <app/InteractionModelEngine.h>
-#include <lib/support/BytesToHex.h>
+#include <app/TimerDelegates.h>
 
-#ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
-ICDSubscriptionCallback SilabsMatterConfig::mICDSubscriptionHandler;
-#endif // CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
+#if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
+#include <app/reporting/SynchronizedReportSchedulerImpl.h>
+#else
+#include <app/reporting/ReportSchedulerImpl.h>
+#endif
+
+#include <lib/support/BytesToHex.h>
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
@@ -186,7 +190,18 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
     // Create initParams with SDK example defaults here
+    // TODO: replace with our own init param to avoid double allocation in examples
     static chip::CommonCaseDeviceServerInitParams initParams;
+
+    // Report scheduler and timer delegate instance
+    static chip::app::DefaultTimerDelegate sTimerDelegate;
+#if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
+    static chip::app::reporting::SynchronizedReportSchedulerImpl sReportScheduler(&sTimerDelegate);
+#else
+    static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
+#endif
+
+    initParams.reportScheduler = &sReportScheduler;
 
 #if SILABS_TEST_EVENT_TRIGGER_ENABLED
     if (Encoding::HexToBytes(SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY, strlen(SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY),
@@ -200,7 +215,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
 #endif // SILABS_TEST_EVENT_TRIGGER_ENABLED
 
-#if CHIP_CRYPTO_PLATFORM
+#if CHIP_CRYPTO_PLATFORM && !(defined(SIWX_917))
     // When building with EFR32 crypto, use the opaque key store
     // instead of the default (insecure) one.
     gOperationalKeystore.Init();
@@ -222,11 +237,6 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     // Init Matter Server and Start Event Loop
     err = chip::Server::GetInstance().Init(initParams);
 
-#ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
-    // Register ICD subscription callback to match subscription max intervals to its idle time interval
-    chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&mICDSubscriptionHandler);
-#endif // CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
-
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     ReturnErrorOnFailure(err);
@@ -245,7 +255,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 }
 
 #ifdef SL_WIFI
-void SilabsMatterConfig::InitWiFi(void)
+CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 {
 #ifdef WF200_WIFI
     // Start wfx bus communication task.
@@ -261,6 +271,7 @@ void SilabsMatterConfig::InitWiFi(void)
         return CHIP_ERROR_INTERNAL;
     }
 #endif /* WF200_WIFI */
+    return CHIP_NO_ERROR;
 }
 #endif // SL_WIFI
 

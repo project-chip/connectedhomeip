@@ -44,7 +44,7 @@ tests:
       command: "On"
 
     - label:
-          "TStep 2a: H sends MoveToHue command to DUT with Hue=200,
+          "Step 2a: H sends MoveToHue command to DUT with Hue=200,
           Direction=0x00 (shortest distance) and TransitionTime=0 (immediately)."
       PICS: CC.S.C00.Rsp
       command: "MoveToHue"
