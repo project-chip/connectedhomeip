@@ -20,9 +20,8 @@
 
 #include <app/server/Dnssd.h>
 
-
-#include <lib/support/CHIPMem.h>
 #include "platform/CHIPDeviceLayer.h"
+#include <lib/support/CHIPMem.h>
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
