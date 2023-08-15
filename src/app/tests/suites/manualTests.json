@@ -63,6 +63,10 @@
         "Test_TC_DA_1_4",
         "Test_TC_DA_1_6"
     ],
+    "DishwasherAlarm": [
+        "Test_TC_DISHALM_1_1",
+        "Test_TC_DISHALM_2_1"
+    ],
     "DishwasherMode": [
         "Test_TC_DISHM_1_1",
         "Test_TC_DISHM_1_2",
@@ -356,6 +360,7 @@
         "DeviceAttestation",
         "DeviceManagement",
         "DiagnosticsLogs",
+        "DishwasherAlarm",
         "DishwasherMode",
         "Descriptor",
         "FanControl",

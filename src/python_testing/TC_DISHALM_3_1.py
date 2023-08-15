@@ -73,7 +73,7 @@ class TC_DISHALM_3_1(MatterBaseTest):
 
         asserts.assert_true(notify_state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kInflowError, "State bit 0 is not set to TRUE")
 
-        self.print_step("2b", "Read from the DUT the State Attribute")
+        self.print_step("2b", "After a few seconds, read from the DUT the State Attribute")
         state = self.read_state_attribute(endpoint=endpoint)
 
         logging.info("State: %s" % (state))
@@ -96,7 +96,7 @@ class TC_DISHALM_3_1(MatterBaseTest):
             asserts.assert_false(notify_state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kInflowError,
                                  "State bit 0 is not set to FALSE")
 
-        self.print_step("2d", "Read from the DUT the State Attribute")
+        self.print_step("2d", "After a few seconds, read from the DUT the State Attribute")
         state = self.read_state_attribute(endpoint=endpoint)
 
         logging.info("State: %s" % (state))
@@ -124,7 +124,7 @@ class TC_DISHALM_3_1(MatterBaseTest):
             asserts.assert_false(notify_state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kInflowError,
                                  "State bit 0 is not set to FALSE")
 
-        self.print_step("3b", "Read from the DUT the State Attribute")
+        self.print_step("3b", "After a few seconds, read from the DUT the State Attribute")
         state = self.read_state_attribute(endpoint=endpoint)
 
         logging.info("State: %s" % (state))
