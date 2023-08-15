@@ -20,8 +20,8 @@
 #include <StaticReplacementProductListManager.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <bitset>
-#include <instances/ActivatedCarbonFilterMonitoring.h>
-#include <instances/HepaFilterMonitoring.h>
+#include <delegates/ActivatedCarbonFilterMonitoring.h>
+#include <delegates/HepaFilterMonitoring.h>
 #include <stdint.h>
 
 using namespace chip;

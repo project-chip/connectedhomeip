@@ -23,7 +23,7 @@
 #include <app/data-model/Nullable.h>
 #include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
-#include <instances/ActivatedCarbonFilterMonitoring.h>
+#include <delegates/ActivatedCarbonFilterMonitoring.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <protocols/interaction_model/StatusCode.h>

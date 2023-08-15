@@ -23,7 +23,7 @@
 #include <app/data-model/Nullable.h>
 #include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
-#include <instances/HepaFilterMonitoring.h>
+#include <delegates/HepaFilterMonitoring.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <protocols/interaction_model/StatusCode.h>
