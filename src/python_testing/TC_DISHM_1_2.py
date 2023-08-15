@@ -29,7 +29,7 @@ from mobly import asserts
 
 class TC_DISHM_1_2(MatterBaseTest):
 
-    async def read_mod_attribute_expect_success(self, endpoint, attribute):
+    async def read_mode_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.DishwasherMode
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
