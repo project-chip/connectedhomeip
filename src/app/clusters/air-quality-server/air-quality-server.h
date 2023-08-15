@@ -58,6 +58,11 @@ public:
      */
     Protocols::InteractionModel::Status UpdateAirQuality(AirQualityEnum aNewAirQuality);
 
+    /**
+     * @return The current AirQuality enum.
+     */
+    AirQualityEnum GetAirQuality();
+
 private:
     EndpointId mEndpointId;
     AirQualityEnum mAirQuality = AirQualityEnum::kUnknown;

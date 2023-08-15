@@ -105,6 +105,11 @@ Protocols::InteractionModel::Status Instance::UpdateAirQuality(AirQualityEnum aN
     return Protocols::InteractionModel::Status::Success;
 }
 
+AirQualityEnum Instance::GetAirQuality()
+{
+        return mAirQuality;
+}
+
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     switch (aPath.mAttributeId)
