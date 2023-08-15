@@ -24,6 +24,7 @@
 #include "laundry-washer-mode.h"
 #include "rvc-modes.h"
 #include "tcc-mode.h"
+#include "air-quality-instance.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/att-storage.h>
@@ -200,6 +201,8 @@ void ApplicationShutdown()
     Clusters::RvcCleanMode::Shutdown();
     Clusters::RvcRunMode::Shutdown();
     Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Shutdown();
+
+    Clusters::AirQuality::Shutdown();
 
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {
