@@ -23,6 +23,7 @@
 #include "laundry-washer-controls-delegate-impl.h"
 #include "laundry-washer-mode.h"
 #include "rvc-modes.h"
+#include "resource-monitoring-delegates.h"
 #include "tcc-mode.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
@@ -200,6 +201,8 @@ void ApplicationShutdown()
     Clusters::RvcCleanMode::Shutdown();
     Clusters::RvcRunMode::Shutdown();
     Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Shutdown();
+    Clusters::HepaFilterMonitoring::Shutdown();
+    Clusters::ActivatedCarbonFilterMonitoring::Shutdown();
 
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {

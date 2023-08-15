@@ -24,6 +24,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+namespace ActivatedCarbonFilterMonitoring {
 /// This is an application level Delegate to handle ActivatedCarbonfilterMonitoringDelegate commands according to the specific
 /// business logic.
 class ActivatedCarbonFilterMonitoringDelegate : public ResourceMonitoring::Delegate
@@ -37,8 +38,12 @@ public:
     ~ActivatedCarbonFilterMonitoringDelegate() override = default;
 };
 
+void Shutdown();
 
-/// This is an application level instance to handle HepaFilterMonitoringDelegate commands according to the specific business logic.
+} // namespace ActivatedCarbonFilterMonitoring
+
+namespace HepaFilterMonitoring {
+/// This is an application level Delegate to handle HepaFilterMonitoringDelegate commands according to the specific business logic.
 class HepaFilterMonitoringDelegate : public ResourceMonitoring::Delegate
 {
 private:
@@ -57,6 +62,9 @@ public:
     Next(chip::app::Clusters::ResourceMonitoring::ReplacementProductStruct & item) override;
 };
 
+void Shutdown();
+
+} // namespace HepaFilterMonitoring
 
 } // namespace Clusters
 } // namespace app

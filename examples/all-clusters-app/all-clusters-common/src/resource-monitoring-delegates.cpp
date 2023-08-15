@@ -25,14 +25,16 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
+using namespace chip::app::Clusters::ActivatedCarbonFilterMonitoring;
+using namespace chip::app::Clusters::HepaFilterMonitoring;
 using chip::Protocols::InteractionModel::Status;
 
-constexpr std::bitset<4> gHepaFilterFeatureMap{ static_cast<uint32_t>(Feature::kCondition) |
-                                                static_cast<uint32_t>(Feature::kWarning) |
-                                                static_cast<uint32_t>(Feature::kReplacementProductList) };
-constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Feature::kCondition) |
-                                                     static_cast<uint32_t>(Feature::kWarning) |
-                                                     static_cast<uint32_t>(Feature::kReplacementProductList) };
+constexpr std::bitset<4> gHepaFilterFeatureMap{ static_cast<uint32_t>(ResourceMonitoring::Feature::kCondition) |
+                                                static_cast<uint32_t>(ResourceMonitoring::Feature::kWarning) |
+                                                static_cast<uint32_t>(ResourceMonitoring::Feature::kReplacementProductList) };
+constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(ResourceMonitoring::Feature::kCondition) |
+                                                     static_cast<uint32_t>(ResourceMonitoring::Feature::kWarning) |
+                                                     static_cast<uint32_t>(ResourceMonitoring::Feature::kReplacementProductList) };
 
 static ActivatedCarbonFilterMonitoringDelegate * gActivatedCarbonFilterDelegate = nullptr;
 static ResourceMonitoring::Instance * gActivatedCarbonFilterInstance            = nullptr;
@@ -62,7 +64,21 @@ Status ActivatedCarbonFilterMonitoringDelegate::PostResetCondition()
     return Status::Success;
 }
 
-//-- Hepa Filter Monitoring instance methods
+void ActivatedCarbonFilterMonitoring::Shutdown()
+{
+    if (gActivatedCarbonFilterInstance != nullptr)
+    {
+        delete gActivatedCarbonFilterInstance;
+        gActivatedCarbonFilterInstance = nullptr;
+    }
+    if (gActivatedCarbonFilterDelegate != nullptr)
+    {
+        delete gActivatedCarbonFilterDelegate;
+        gActivatedCarbonFilterDelegate = nullptr;
+    }
+}
+
+//-- Hepa Filter Monitoring delegate methods
 CHIP_ERROR HepaFilterMonitoringDelegate::Init()
 {
     ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::Init()");
@@ -82,13 +98,27 @@ Status HepaFilterMonitoringDelegate::PostResetCondition()
     return Status::Success;
 }
 
+void HepaFilterMonitoring::Shutdown()
+{
+    if (gHepaFilterInstance != nullptr)
+    {
+        delete gHepaFilterInstance;
+        gHepaFilterInstance = nullptr;
+    }
+    if (gHepaFilterDelegate != nullptr)
+    {
+        delete gHepaFilterDelegate;
+        gHepaFilterDelegate = nullptr;
+    }
+}
+
 void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
 {
     VerifyOrDie(gActivatedCarbonFilterInstance == nullptr && gActivatedCarbonFilterDelegate == nullptr);
     gActivatedCarbonFilterDelegate = new ActivatedCarbonFilterMonitoringDelegate;
     gActivatedCarbonFilterInstance = new ResourceMonitoring::Instance(
         gActivatedCarbonFilterDelegate, endpoint, ActivatedCarbonFilterMonitoring::Id,
-        static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()), DegradationDirectionEnum::kDown, true);
+        static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()), ResourceMonitoring::DegradationDirectionEnum::kDown, true);
     gActivatedCarbonFilterInstance->Init();
 }
 
@@ -99,7 +129,7 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
     gHepaFilterDelegate = new HepaFilterMonitoringDelegate;
     gHepaFilterInstance = new ResourceMonitoring::Instance(gHepaFilterDelegate, endpoint, HepaFilterMonitoring::Id,
                                                            static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
-                                                           DegradationDirectionEnum::kDown, true);
+                                                           ResourceMonitoring::DegradationDirectionEnum::kDown, true);
     gHepaFilterInstance->Init();
 }
 
