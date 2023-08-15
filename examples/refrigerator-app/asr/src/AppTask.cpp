@@ -42,6 +42,7 @@ namespace {
 lega_thread_t sAppTaskHandle;
 } // namespace
 
+using namespace chip;
 using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
@@ -108,9 +109,9 @@ void AppTask::AppTaskMain(void * pvParameter)
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
     // set Parent Endpoint and Composition Type for an Endpoint
-    app::EndpointId kRefEndpointId           = 1;
-    app::EndpointId kColdCabinetEndpointId   = 2;
-    app::EndpointId kFreezeCabinetEndpointId = 3;
+    EndpointId kRefEndpointId           = 1;
+    EndpointId kColdCabinetEndpointId   = 2;
+    EndpointId kFreezeCabinetEndpointId = 3;
     app::SetTreeCompositionForEndpoint(kRefEndpointId);
     app::SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
     app::SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
