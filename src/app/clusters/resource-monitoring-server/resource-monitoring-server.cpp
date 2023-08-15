@@ -45,6 +45,17 @@ namespace app {
 namespace Clusters {
 namespace ResourceMonitoring {
 
+Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeatureMap,
+                   ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
+                   bool aResetConditionCommandSupported) :
+    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
+    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
+    mClusterId(aClusterId), mDegradationDirection(aDegradationDirection), mFeatureMap(aFeatureMap),
+    mResetConditionCommandSupported(aResetConditionCommandSupported)
+{
+    mDelegate->SetInstance(this);
+};
+
 CHIP_ERROR Instance::Init()
 {
     ChipLogDetail(Zcl, "ResourceMonitoring: Init");
@@ -58,8 +69,8 @@ CHIP_ERROR Instance::Init()
 
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
-    ChipLogDetail(Zcl, "ResourceMonitoring: calling AppInit()");
-    ReturnErrorOnFailure(AppInit());
+    ChipLogDetail(Zcl, "ResourceMonitoring: calling mDelegate->Init()");
+    ReturnErrorOnFailure(mDelegate->Init());
 
     return CHIP_NO_ERROR;
 }
@@ -155,63 +166,6 @@ DataModel::Nullable<uint32_t> Instance::GetLastChangedTime() const
 ReplacementProductListManager * Instance::GetReplacementProductListManagerInstance()
 {
     return mReplacementProductListManager;
-}
-
-Status Instance::OnResetCondition()
-{
-    ChipLogDetail(Zcl, "ResourceMonitoringServer::OnResetCondition()");
-
-    // call application specific pre reset logic,
-    // anything other than Success will cause the command to fail, and not do any of the resets
-    auto status = PreResetCondition();
-    if (status != Status::Success)
-    {
-        return status;
-    }
-    // Handle the reset of the condition attribute, if supported
-    if (emberAfContainsAttribute(GetEndpointId(), mClusterId, Attributes::Condition::Id))
-    {
-        if (GetDegradationDirection() == DegradationDirectionEnum::kDown)
-        {
-            UpdateCondition(100);
-        }
-        else if (GetDegradationDirection() == DegradationDirectionEnum::kUp)
-        {
-            UpdateCondition(0);
-        }
-    }
-
-    // handle the reset of the ChangeIndication attribute, mandatory
-    UpdateChangeIndication(ChangeIndicationEnum::kOk);
-
-    // Handle the reset of the LastChangedTime attribute, if supported
-    if (emberAfContainsAttribute(GetEndpointId(), mClusterId, Attributes::LastChangedTime::Id))
-    {
-        System::Clock::Milliseconds64 currentUnixTimeMS;
-        System::Clock::ClockImpl clock;
-        CHIP_ERROR err = clock.GetClock_RealTimeMS(currentUnixTimeMS);
-        if (err == CHIP_NO_ERROR)
-        {
-            System::Clock::Seconds32 currentUnixTime = std::chrono::duration_cast<System::Clock::Seconds32>(currentUnixTimeMS);
-            UpdateLastChangedTime(DataModel::MakeNullable(currentUnixTime.count()));
-        }
-    }
-
-    // call application specific post reset logic
-    status = PostResetCondition();
-    return status;
-}
-
-Status Instance::PreResetCondition()
-{
-    ChipLogDetail(Zcl, "ResourceMonitoringServer::PreResetCondition()");
-    return Status::Success;
-}
-
-Status Instance::PostResetCondition()
-{
-    ChipLogDetail(Zcl, "ResourceMonitoringServer::PostResetCondition()");
-    return Status::Success;
 }
 
 // This method is called by the interaction model engine when a command destined for this instance is received.
@@ -389,8 +343,65 @@ void Instance::HandleResetCondition(HandlerContext & ctx,
                                     const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData)
 {
 
-    Status resetConditionStatus = OnResetCondition();
+    Status resetConditionStatus = mDelegate->OnResetCondition();
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, resetConditionStatus);
+}
+
+Status Delegate::OnResetCondition()
+{
+    ChipLogDetail(Zcl, "ResourceMonitoringServer::OnResetCondition()");
+
+    // call application specific pre reset logic,
+    // anything other than Success will cause the command to fail, and not do any of the resets
+    auto status = PreResetCondition();
+    if (status != Status::Success)
+    {
+        return status;
+    }
+    // Handle the reset of the condition attribute, if supported
+    if (emberAfContainsAttribute(mInstance->GetEndpointId(), mInstance->getClusterId(), Attributes::Condition::Id))
+    {
+        if (mInstance->GetDegradationDirection() == DegradationDirectionEnum::kDown)
+        {
+            mInstance->UpdateCondition(100);
+        }
+        else if (mInstance->GetDegradationDirection() == DegradationDirectionEnum::kUp)
+        {
+            mInstance->UpdateCondition(0);
+        }
+    }
+
+    // handle the reset of the ChangeIndication attribute, mandatory
+    mInstance->UpdateChangeIndication(ChangeIndicationEnum::kOk);
+
+    // Handle the reset of the LastChangedTime attribute, if supported
+    if (emberAfContainsAttribute(mInstance->GetEndpointId(), mInstance->getClusterId(), Attributes::LastChangedTime::Id))
+    {
+        System::Clock::Milliseconds64 currentUnixTimeMS;
+        System::Clock::ClockImpl clock;
+        CHIP_ERROR err = clock.GetClock_RealTimeMS(currentUnixTimeMS);
+        if (err == CHIP_NO_ERROR)
+        {
+            System::Clock::Seconds32 currentUnixTime = std::chrono::duration_cast<System::Clock::Seconds32>(currentUnixTimeMS);
+            mInstance->UpdateLastChangedTime(DataModel::MakeNullable(currentUnixTime.count()));
+        }
+    }
+
+    // call application specific post reset logic
+    status = PostResetCondition();
+    return status;
+}
+
+Status Delegate::PreResetCondition()
+{
+    ChipLogDetail(Zcl, "ResourceMonitoringServer::PreResetCondition()");
+    return Status::Success;
+}
+
+Status Delegate::PostResetCondition()
+{
+    ChipLogDetail(Zcl, "ResourceMonitoringServer::PostResetCondition()");
+    return Status::Success;
 }
 
 } // namespace ResourceMonitoring
