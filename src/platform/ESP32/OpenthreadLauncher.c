@@ -45,7 +45,6 @@ static esp_netif_t * init_openthread_netif(const esp_openthread_platform_config_
 static void ot_task_worker(void * context)
 {
     esp_openthread_platform_config_t * config = (esp_openthread_platform_config_t *) context;
-    printf("radio config mode %d\n", config->radio_config.radio_mode);
     // Initialize the OpenThread stack
     ESP_ERROR_CHECK(esp_openthread_init(config));
     // Initialize the esp_netif bindings

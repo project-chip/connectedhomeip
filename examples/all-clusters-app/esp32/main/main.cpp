@@ -45,6 +45,10 @@
 #include <platform/ESP32/ESP32Utils.h>
 #include <static-supported-temperature-levels.h>
 
+#if CONFIG_PM_ENABLE
+#include "esp_pm.h"
+#endif
+
 #if CONFIG_HAVE_DISPLAY
 #include "DeviceWithDisplay.h"
 #endif
