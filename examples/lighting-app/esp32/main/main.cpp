@@ -59,6 +59,11 @@
 #include <platform/ESP32/ESP32SecureCertDACProvider.h>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <platform/ESP32/OpenthreadLauncher.h>
+#endif
+
+
 using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
@@ -139,6 +144,14 @@ extern "C" void app_main()
         return;
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    esp_openthread_platform_config_t config = {
+        .radio_config = ESP_OPENTHREAD_DEFAULT_RADIO_CONFIG(),
+        .host_config  = ESP_OPENTHREAD_DEFAULT_HOST_CONFIG(),
+        .port_config  = ESP_OPENTHREAD_DEFAULT_PORT_CONFIG(),
+    };
+    esp_launch_openthread(&config);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 

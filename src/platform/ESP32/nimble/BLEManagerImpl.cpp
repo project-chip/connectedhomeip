@@ -62,6 +62,10 @@
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include "platform/ESP32/ThreadStackManagerImpl.h"
+#endif
+
 #define MAX_ADV_DATA_LEN 31
 #define CHIP_ADV_DATA_TYPE_FLAGS 0x01
 #define CHIP_ADV_DATA_FLAGS 0x06
@@ -213,7 +217,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 {
 #if CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    if (ConnectivityMgr().IsThreadProvisioned())
+    if (ThreadStackMgrImpl().IsESPThreadProvisioned())
     {
         ESP_LOGI(TAG, "Thread credentials already provisioned, not initializing BLE");
 #else

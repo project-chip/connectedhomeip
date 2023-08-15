@@ -63,6 +63,10 @@
 #include <DeviceInfoProviderImpl.h>
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <platform/ESP32/OpenthreadLauncher.h>
+#endif
+
 using namespace ::chip;
 using namespace ::chip::Shell;
 using namespace ::chip::DeviceManager;
@@ -174,6 +178,24 @@ extern "C" void app_main()
         return;
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CONFIG_PM_ENABLE
+    esp_pm_config_t pm_config = {
+        .max_freq_mhz = CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ,
+        .min_freq_mhz = CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ,
+#if CONFIG_FREERTOS_USE_TICKLESS_IDLE
+        .light_sleep_enable = true
+#endif // CONFIG_FREERTOS_USE_TICKLESS_IDLE
+    };
+    esp_pm_configure(&pm_config);
+#endif // CONFIG_PM_ENABLE
+    esp_openthread_platform_config_t config = {
+        .radio_config = ESP_OPENTHREAD_DEFAULT_RADIO_CONFIG(),
+        .host_config  = ESP_OPENTHREAD_DEFAULT_HOST_CONFIG(),
+        .port_config  = ESP_OPENTHREAD_DEFAULT_PORT_CONFIG(),
+    };
+    esp_launch_openthread(&config);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 

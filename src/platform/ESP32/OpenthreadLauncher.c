@@ -30,8 +30,7 @@
 #include "openthread/logging.h"
 #include "openthread/tasklet.h"
 
-static esp_netif_t * openthread_netif                       = NULL;
-static esp_openthread_platform_config_t * s_platform_config = NULL;
+static esp_netif_t * openthread_netif = NULL;
 
 static esp_netif_t * init_openthread_netif(const esp_openthread_platform_config_t * config)
 {
@@ -45,6 +44,14 @@ static esp_netif_t * init_openthread_netif(const esp_openthread_platform_config_
 
 static void ot_task_worker(void * context)
 {
+    esp_openthread_platform_config_t * config = (esp_openthread_platform_config_t *) context;
+    printf("radio config mode %d\n", config->radio_config.radio_mode);
+    // Initialize the OpenThread stack
+    ESP_ERROR_CHECK(esp_openthread_init(config));
+    // Initialize the esp_netif bindings
+    openthread_netif = init_openthread_netif(config);
+    // Free the platform config
+    free(config);
     // Run the main loop
     esp_openthread_launch_mainloop();
 
@@ -55,12 +62,7 @@ static void ot_task_worker(void * context)
     vTaskDelete(NULL);
 }
 
-void set_openthread_platform_config(esp_openthread_platform_config_t * config)
-{
-    s_platform_config = config;
-}
-
-esp_err_t openthread_init_stack(void)
+esp_err_t esp_launch_openthread(esp_openthread_platform_config_t * config)
 {
     // Used eventfds:
     // * netif
@@ -72,16 +74,14 @@ esp_err_t openthread_init_stack(void)
 
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_vfs_eventfd_register(&eventfd_config));
-    assert(s_platform_config);
-    // Initialize the OpenThread stack
-    ESP_ERROR_CHECK(esp_openthread_init(s_platform_config));
-    // Initialize the esp_netif bindings
-    openthread_netif = init_openthread_netif(s_platform_config);
-    return ESP_OK;
-}
-
-esp_err_t openthread_launch_task(void)
-{
-    xTaskCreate(ot_task_worker, "ot_task", CONFIG_THREAD_TASK_STACK_SIZE, xTaskGetCurrentTaskHandle(), 5, NULL);
+    assert(config);
+    esp_openthread_platform_config_t * config_copy =
+        (esp_openthread_platform_config_t *) malloc(sizeof(esp_openthread_platform_config_t));
+    memcpy(config_copy, config, sizeof(esp_openthread_platform_config_t));
+    if (xTaskCreate(ot_task_worker, "ot_task", CONFIG_THREAD_TASK_STACK_SIZE, config_copy, 5, NULL) != pdPASS)
+    {
+        free(config_copy);
+        return ESP_FAIL;
+    }
     return ESP_OK;
 }

@@ -52,13 +52,17 @@ ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
-    openthread_init_stack();
-    return GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(esp_openthread_get_instance());
+    otInstance *instance = esp_openthread_get_instance();
+    if (!instance) {
+        ChipLogError(DeviceLayer, "OpenThread not launched");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    return GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(instance);
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask()
 {
-    openthread_launch_task();
+    // Intentionally empty since the task has been started in esp_launch_openthread()
     return CHIP_NO_ERROR;
 }
 
@@ -89,6 +93,22 @@ void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStart()
 void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStop()
 {
     // Intentionally empty.
+}
+
+bool ThreadStackManagerImpl::IsESPThreadProvisioned()
+{
+    bool isProvisioned = false;
+    otInstance *instance = esp_openthread_get_instance();
+    if (!instance)
+    {
+        ChipLogError(DeviceLayer, "OpenThread not Initialized");
+        return false;
+    }
+
+    esp_openthread_lock_acquire(portMAX_DELAY);
+    isProvisioned = otDatasetIsCommissioned(instance);
+    esp_openthread_lock_release();
+    return isProvisioned;
 }
 
 } // namespace DeviceLayer
