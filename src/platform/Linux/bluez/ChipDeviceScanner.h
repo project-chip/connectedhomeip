@@ -19,8 +19,6 @@
 
 #include <platform/CHIPDeviceConfig.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
 #include <glib.h>
 #include <memory>
 
@@ -40,7 +38,7 @@ public:
     virtual ~ChipDeviceScannerDelegate() {}
 
     // Called when a CHIP device was found
-    virtual void OnDeviceScanned(BluezDevice1 * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
+    virtual void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
 
     // Called when a scan was completed (stopped or timed out)
     virtual void OnScanComplete() = 0;
@@ -93,11 +91,11 @@ private:
                                        ChipDeviceScanner * self);
 
     /// Check if a given device is a CHIP device and if yes, report it as discovered
-    void ReportDevice(BluezDevice1 * device);
+    void ReportDevice(BluezDevice1 & device);
 
     /// Check if a given device is a CHIP device and if yes, remove it from the adapter
     /// so that it can be re-discovered if it's still advertising.
-    void RemoveDevice(BluezDevice1 * device);
+    void RemoveDevice(BluezDevice1 & device);
 
     GDBusObjectManager * mManager         = nullptr;
     BluezAdapter1 * mAdapter              = nullptr;
@@ -107,12 +105,10 @@ private:
     gulong mInterfaceChangedSignal        = 0;
     bool mIsScanning                      = false;
     bool mIsStopping                      = false;
-    /// Used to track if timer has alread expired and doesn't need to be canceled.
+    /// Used to track if timer has already expired and doesn't need to be canceled.
     bool mTimerExpired = false;
 };
 
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
