@@ -523,9 +523,9 @@ def main() -> int:
             flush_print(
                 'Path for Telink SDK was not found. Make sure Telink_SDK is set on your config.yaml file')
             exit(1)
-        shell.run_cmd("export ZEPHYR_TOOLCHAIN_VARIANT=zephyr") 
+        shell.run_cmd("export ZEPHYR_TOOLCHAIN_VARIANT=zephyr")
         shell.run_cmd(
-            f"export ZEPHYR_BASE={config['telink']['ZEPHYR_BASE']}")        
+            f"export ZEPHYR_BASE={config['telink']['ZEPHYR_BASE']}")
         shell.run_cmd(
             f'source {config["telink"]["ZEPHYR_BASE"]}/zephyr-env.sh')
     else:
