@@ -75,6 +75,19 @@ tests:
           [1689677267.384931][18335:18337] CHIP:IN: (S) Sending msg 71138788 on secure session with LSID: 49245
       disabled: true
 
+    - label: "Step 5: TH reads from the DUT the EventList attribute."
+      verification: |
+          ./chip-tool refrigeratoralarm read event-list 1 1
+          Verify " EventList attribute " consists the list may contain optional events(1)  on the TH(Chip-tool) Log:
+          Below is the sample log provided for the raspi platform:
+          [1689677416.105596][18367:18369] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0057 Attribute 0x0000_FFFA DataVersion: 1517282962
+          [1689677416.105625][18367:18369] CHIP:TOO:   EventList: 1 entries
+          [1689677416.105635][18367:18369] CHIP:TOO:     [1]: 0
+          [1689677416.105696][18367:18369] CHIP:EM: <<< [E:51484i S:36714 M:192916227 (Ack:1705890)] (S) Msg TX to 1:0000000000000001 [BFDE] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1689677416.105710][18367:18369] CHIP:IN: (S) Sending msg 192916227 on secure session with LSID: 36714
+          [1689677416.105737][18367:18369] CHIP:EM: Flushed pending ack for MessageCounter:1705890 on exchange 51484i
+      disabled: true
+
     - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
       verification: |
           ./chip-tool refrigeratoralarm read accepted-command-list 1 1

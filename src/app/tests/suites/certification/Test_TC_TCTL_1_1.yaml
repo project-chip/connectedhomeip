@@ -113,3 +113,18 @@ tests:
           [1689770475.939872][9215:9217] CHIP:IN: (S) Sending msg 36313621 on secure session with LSID: 30992
           [1689770475.939880][9215:9217] CHIP:EM: Flushed pending ack for MessageCounter:205412119 on exchange 56043i
       disabled: true
+
+    - label: "Step 7: TH reads from the DUT the EventList attribute."
+      verification: |
+          ./chip-tool temperaturecontrol read event-list 1 1
+          Verify "  EventList attribute " consists the list of supported events,  which for this cluster should be an empty list on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+          [1689770528.788582][9233:9235] CHIP:DMG:         InteractionModelRevision = 1
+          [1689770528.788587][9233:9235] CHIP:DMG: }
+          [1689770528.788671][9233:9235] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_FFFA DataVersion: 2844459846
+          [1689770528.788703][9233:9235] CHIP:TOO:   EventList: 0 entries
+          [1689770528.788768][9233:9235] CHIP:EM: <<< [E:60387i S:1870 M:236365893 (Ack:64478273)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1689770528.788782][9233:9235] CHIP:IN: (S) Sending msg 236365893 on secure session with LSID: 1870
+          [1689770528.788826][9233:9235] CHIP:EM: Flushed pending ack for MessageCounter:64478273 on exchange 60387i
+          [1689770528.788927][9233:9233] CHIP:CTL: Shutting down the commissioner
+          [1689770528.788948][9233:9233] CHIP:CTL: Stopping commissioning discovery over DNS-SD
+      disabled: true

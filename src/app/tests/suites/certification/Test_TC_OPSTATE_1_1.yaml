@@ -48,6 +48,17 @@ tests:
               type: bitmap32
 
     - label: "Step 4a: TH reads the AttributeList attribute from the DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [0, 1, 3, 4, 5, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: TH reads the AttributeList attribute from the DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -110,26 +121,62 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    #EventList disabled for 1.2
-    # - label: "Step 5a: TH reads from the DUT the EventList attribute."
-    #   PICS: PICS_EVENT_LIST_ENABLED
-    #   command: "readAttribute"
-    #   attribute: "EventList"
-    #   response:
-    #       constraints:
-    #           type: list
-    #           contains: [0x00]
+    - label: "Step 5a: TH reads from the DUT the EventList attribute."
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0x00]
 
-    # - label:
-    #       "Step 5b: TH reads from the DUT the optional
-    #       event(OperationCompletion) in EventList."
-    #   PICS: PICS_EVENT_LIST_ENABLED && OPSTATE.S.E01
-    #   command: "readAttribute"
-    #   attribute: "EventList"
-    #   response:
-    #       constraints:
-    #           type: list
-    #           contains: [0x01]
+    - label:
+          "Step 5b: TH reads from the DUT the optional
+          event(OperationCompletion) in EventList."
+      PICS: PICS_EVENT_LIST_ENABLED && OPSTATE.S.E01
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0x01]
+
+    - label:
+          "Step 5c: TH reads from the DUT the EventList attribute. 1.The list
+          SHALL NOT contain any additional values in the standard or scoped
+          range: (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE) 2.
+          The list MAY contain values in the Manufacturer Extensible Identifier
+          (MEI) range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed
+          MEI range (0x0001 - 0xFFF1), these values SHALL be ignored. 3. The
+          list SHALL NOT contain any values in the Test Vendor or invalid range:
+          (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 -
+          0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
+          allowed MEI range (0x0001 - 0xFFF1)"
+      verification: |
+          ./chip-tool operationalstate read event-list 1 1
+
+          Verify " EventList attribute " value consists the list of mandatory event (0) and it may include the optional events (1) on the TH(Chip-tool) Log: 
+          Below is the sample log provided for the raspi platform:
+
+
+          [1689672855.519671][16517:16519] CHIP:DMG: }
+          [1689672855.519771][16517:16519] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_FFFA DataVersion: 2102885775
+          [1689672855.519802][16517:16519] CHIP:TOO:   EventList: 2 entries
+          [1689672855.519820][16517:16519] CHIP:TOO:     [1]: 0
+          [1689672855.519826][16517:16519] CHIP:TOO:     [2]: 1
+          [1689672855.519881][16517:16519] CHIP:EM: <<< [E:4310i S:43612 M:6147213 (Ack:7921904)] (S) Msg TX to 1:0000000000000001 [BFDE] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1689672855.519894][16517:16519] CHIP:IN: (S) Sending msg 6147213 on secure session with LSID: 43612
+          [1689672855.519920][16517:16519] CHIP:EM: Flushed pending ack for MessageCounter:7921904 on exchange 4310i
+          [1689672855.520077][16517:16517] CHIP:CTL: Shutting down the commissioner
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 6a: Read the optional command(Start) in AcceptedCommandList"
       PICS: OPSTATE.S.C02

@@ -139,6 +139,25 @@ tests:
     ##########################
     # Mandatory entries
     - label: "TS4: Check for mandatory attributes in AttributeList"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              contains:
+                  [
+                      0x0000,
+                      0x0001,
+                      0xFFF8,
+                      0xFFF9,
+                      0xFFFA,
+                      0xFFFB,
+                      0xFFFC,
+                      0xFFFD,
+                  ]
+
+    - label: "TS4: Check for mandatory attributes in AttributeList"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -283,54 +302,98 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    #EventList disabled for 1.2
     # Note - additional exclusions not handled here
 
     ##########################
     # TS 5: Event list - NOTE: disabled
     ##########################
     # mandatory
-    # - label: "TS5: Check for mandatory events in EventList"
-    #   PICS: PICS_EVENT_LIST_ENABLED
-    #   command: "readAttribute"
-    #   attribute: "EventList"
-    #   response:
-    #       constraints:
-    #           contains: [0x03]
+    - label: "TS5: Check for mandatory events in EventList"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              contains: [0x03]
 
-    # Feature TZ
-    # - label: "TS5: Check for TZ feature-based events in EventList"
-    #   PICS: PICS_EVENT_LIST_ENABLED && TIMESYNC.S.F00
-    #   command: "readAttribute"
-    #   attribute: "EventList"
-    #   response:
-    #       constraints:
-    #           contains: [0x00, 0x01, 0x02]
+    #Feature TZ
+    - label: "TS5: Check for TZ feature-based events in EventList"
+      PICS: PICS_EVENT_LIST_ENABLED && TIMESYNC.S.F00
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              contains: [0x00, 0x01, 0x02]
 
-    # - label: "TS5: Check for TZ feature-based events not in EventList"
-    #   PICS: "PICS_EVENT_LIST_ENABLED && !TIMESYNC.S.F00"
-    #   command: "readAttribute"
-    #   attribute: "EventList"
-    #   response:
-    #       constraints:
-    #           excludes: [0x00, 0x01, 0x02]
+    - label: "TS5: Check for TZ feature-based events not in EventList"
+      PICS: "PICS_EVENT_LIST_ENABLED && !TIMESYNC.S.F00"
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              excludes: [0x00, 0x01, 0x02]
 
-    # Feature TSC
-    # - label: "TS5: Check for TSC feature-based events in EventList"
-    #   PICS: PICS_EVENT_LIST_ENABLED && TIMESYNC.S.F03
-    #   command: "readAttribute"
-    #   attribute: "EventList"
-    #   response:
-    #       constraints:
-    #           contains: [0x04]
+    #Feature TSC
+    - label: "TS5: Check for TSC feature-based events in EventList"
+      PICS: PICS_EVENT_LIST_ENABLED && TIMESYNC.S.F03
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              contains: [0x04]
 
-    # - label: "TS5: Check for TSC feature-based events not in EventList"
-    #   PICS: "PICS_EVENT_LIST_ENABLED && !TIMESYNC.S.F03"
-    #   command: "readAttribute"
-    #   attribute: "EventList"
-    #   response:
-    #       constraints:
-    #           excludes: [0x04]
+    - label: "TS5: Check for TSC feature-based events not in EventList"
+      PICS: "PICS_EVENT_LIST_ENABLED && !TIMESYNC.S.F03"
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              excludes: [0x04]
+
+    - label:
+          "TS5: TH reads from the DUT the EventList attribute. 1.The list SHALL
+          NOT contain any additional values in the standard or scoped range:
+          (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE) 2. The
+          list MAY contain values in the Manufacturer Extensible Identifier
+          (MEI) range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed
+          MEI range (0x0001 - 0xFFF1), these values SHALL be ignored. 3. The
+          list SHALL NOT contain any values in the Test Vendor or invalid range:
+          (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 -
+          0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
+          allowed MEI range (0x0001 - 0xFFF1)"
+      verification: |
+          ./chip-tool timesynchronization read event-list 1 0
+
+          Via the TH (chip-tool), verify:
+          The list SHALL include all the mandatory entries: 0x03
+          The list include entries based on feature support:
+            0x00 SHALL be included if and only if TIMESYNC.S.F00(TZ)
+            0x01 SHALL be included if and only if TIMESYNC.S.F00(TZ)
+            0x02 SHALL be included if and only if TIMESYNC.S.F00(TZ)
+            0x04 SHALL be included if and only if TIMESYNC.S.F03(TSC)
+
+          Below is the example value which is observed in the RPI platform the value may be differ based on the dut implementation.
+
+          [1688648817.829533][149513:149515] CHIP:DMG: }
+          [1688648817.829584][149513:149515] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0038 Attribute 0x0000_FFFA DataVersion: 1776331179
+          [1688648817.829600][149513:149515] CHIP:TOO:   EventList: 5 entries
+          [1688648817.829606][149513:149515] CHIP:TOO:     [1]: 0
+          [1688648817.829607][149513:149515] CHIP:TOO:     [2]: 1
+          [1688648817.829609][149513:149515] CHIP:TOO:     [3]: 2
+          [1688648817.829610][149513:149515] CHIP:TOO:     [4]: 3
+          [1688648817.829612][149513:149515] CHIP:TOO:     [5]: 4
+          [1688648817.829644][149513:149515] CHIP:EM: <<< [E:37598i S:15729 M:18516326 (Ack:233541454)] (S) Msg TX to 1:0000000000000001 [3784] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1688648817.829648][149513:149515] CHIP:IN: (S) Sending msg 18516326 on secure session with LSID: 15729
+          [1688648817.829657][149513:149515] CHIP:EM: Flushed pending ack for MessageCounter:233541454 on exchange 37598i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     # Note - additional exclusions not handled here
 

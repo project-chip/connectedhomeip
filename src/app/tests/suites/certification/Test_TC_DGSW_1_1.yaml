@@ -61,6 +61,16 @@ tests:
               hasMasksSet: [0x1]
 
     - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -151,24 +161,52 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    # EventList disabled for 1.2
-    # - label: "Step 5a: TH reads EventList from DUT"
-    #   PICS: DGSW.S.E00
-    #   command: "readAttribute"
-    #   attribute: "EventList"
-    #   response:
-    #       constraints:
-    #           type: list
-    #           contains: [0]
+    - label: "Step 5a: TH reads EventList from DUT"
+      PICS: DGSW.S.E00 && PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
 
-    # - label: "Step 5b: TH reads EventList from DUT"
-    #   PICS: " !DGSW.S.E00 "
-    #   command: "readAttribute"
-    #   attribute: "EventList"
-    #   response:
-    #       value: []
-    #       constraints:
-    #           type: list
+    - label: "Step 5b: TH reads EventList from DUT"
+      PICS: " !DGSW.S.E00 && PICS_EVENT_LIST_ENABLED "
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label:
+          "Step 5c: TH reads from the DUT the EventList attribute. 1.The list
+          SHALL NOT contain any additional values in the standard or scoped
+          range: (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE) 2.
+          The list MAY contain values in the Manufacturer Extensible Identifier
+          (MEI) range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed
+          MEI range (0x0001 - 0xFFF1), these values SHALL be ignored. 3. The
+          list SHALL NOT contain any values in the Test Vendor or invalid range:
+          (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 -
+          0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
+          allowed MEI range (0x0001 - 0xFFF1)"
+      verification: |
+          ./chip-tool  softwarediagnostics read event-list 1 0
+
+          [1676459464.108583][25294:25296] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_FFFA DataVersion: 650337896
+          [1676459464.108607][25294:25296] CHIP:TOO:   EventList: 1 entries
+          [1676459464.108612][25294:25296] CHIP:TOO:     [1]: 0
+          [1676459464.108635][25294:25296] CHIP:EM: <<< [E:23624i S:46243 M:182610763 (Ack:167177651)] (S) Msg TX to 1:0000000000000001 [110F] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1676459464.108640][25294:25296] CHIP:IN: (S) Sending msg 182610763 on secure session with LSID: 46243
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 6a: TH reads AcceptedCommandList from DUT"
       PICS: DGSW.S.F00

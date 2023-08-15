@@ -51,6 +51,30 @@ tests:
               type: bitmap32
 
     - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [
+                      0xFFFD,
+                      0xFFFC,
+                      0xFFFB,
+                      0xFFFA,
+                      0xFFF9,
+                      0xFFF8,
+                      0x00,
+                      0x01,
+                      0x02,
+                      0x03,
+                      0x04,
+                      0x05,
+                  ]
+
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -107,6 +131,37 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 5: TH reads from the DUT the EventList attribute. 1.The list
+          SHALL NOT contain any additional values in the standard or scoped
+          range: (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE) 2.
+          The list MAY contain values in the Manufacturer Extensible Identifier
+          (MEI) range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed
+          MEI range (0x0001 - 0xFFF1), these values SHALL be ignored. 3. The
+          list SHALL NOT contain any values in the Test Vendor or invalid range:
+          (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 -
+          0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
+          allowed MEI range (0x0001 - 0xFFF1)"
+      verification: |
+          ./chip-tool operationalcredentials read event-list 1 0
+
+          Verify " EventList " on the TH(Chip-tool) Log:
+          Below is the example value which is observed in the RPI platform the value may be differ based on the dut implementation.
+          [1677044259.559572][29732:29734] CHIP:DMG: }
+          [1677044259.559655][29732:29734] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_FFFA DataVersion: 806612356
+          [1677044259.560285][29732:29734] CHIP:TOO:   EventList: 0 entries
+          [1677044259.560354][29732:29734] CHIP:EM: <<< [E:35511i S:22620 M:102340651 (Ack:219865295)] (S) Msg TX to 1:0000000000000001 [682F] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1677044259.560369][29732:29734] CHIP:IN: (S) Sending msg 102340651 on secure session with LSID: 22620
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
       arguments:
           values:
               - name: "message"

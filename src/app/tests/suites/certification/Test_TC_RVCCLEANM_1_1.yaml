@@ -60,6 +60,16 @@ tests:
               hasMasksSet: [0x1]
 
     - label: "Step 4a: TH reads the AttributeList attribute from the DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: TH reads the AttributeList attribute from the DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -142,15 +152,42 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    #EventList disabled for 1.2
-    # - label: "Read the global attribute: EventList from the DUT"
-    #   PICS: PICS_EVENT_LIST_ENABLED && RVCCLEANM.S.Afffa
-    #   command: "readAttribute"
-    #   attribute: "EventList"
-    #   response:
-    #       value: []
-    #       constraints:
-    #           type: list
+    - label: "Step 5a: Read the global attribute: EventList from the DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label:
+          "Step 5b: Read the global attribute: EventList from the DUT. 1.The
+          list SHALL NOT contain any additional values in the standard or scoped
+          range: (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE) 2.
+          The list MAY contain values in the Manufacturer Extensible Identifier
+          (MEI) range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed
+          MEI range (0x0001 - 0xFFF1), these values SHALL be ignored. 3. The
+          list SHALL NOT contain any values in the Test Vendor or invalid range:
+          (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 -
+          0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
+          allowed MEI range (0x0001 - 0xFFF1)"
+      verification: |
+          ./chip-tool  rvccleanmode read event-list 1 1
+
+          Verify "EventList" contains a list of supported events, for this cluster the list is emty(0 entries) on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+
+          [1690182289.222668][14980:14982] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0055 Attribute 0x0000_FFFA DataVersion: 3145953005
+          [1690182289.222680][14980:14982] CHIP:TOO:   EventList: 0 entries
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Step 6a: Read the global attribute AcceptedCommandList. Check if it

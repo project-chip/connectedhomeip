@@ -49,6 +49,16 @@ tests:
               type: bitmap32
 
     - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 8, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -161,41 +171,74 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    # EventList disabled for 1.2
-    # - label: "Step 5a: Read the global attribute: EventList"
-    #   command: "readAttribute"
-    #   attribute: "EventList"
-    #   response:
-    #       constraints:
-    #           type: list
-    #           contains: [3]
+    - label: "Step 5a: Read the global attribute: EventList"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
 
-    # - label: "Step 5b: Read optional event(HardwareFaultChange) in EventList"
-    #   PICS:  DGGEN.S.E00
-    #   command: "readAttribute"
-    #   attribute: "EventList"
-    #   response:
-    #       constraints:
-    #           type: list
-    #           contains: [0]
+    - label: "Step 5b: Read optional event(HardwareFaultChange) in EventList"
+      PICS: DGGEN.S.E00 && PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
 
-    # - label: "Step 5c: Read optional event(RadioFaultChange) in EventList"
-    #   PICS: DGGEN.S.E01
-    #   command: "readAttribute"
-    #   attribute: "EventList"
-    #   response:
-    #       constraints:
-    #           type: list
-    #           contains: [1]
+    - label: "Step 5c: Read optional event(RadioFaultChange) in EventList"
+      PICS: DGGEN.S.E01 && PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
 
-    # - label: "Step 5d: Read optional event(NetworkFaultChange) in EventList"
-    #   PICS:  DGGEN.S.E02
-    #   command: "readAttribute"
-    #   attribute: "EventList"
-    #   response:
-    #       constraints:
-    #           type: list
-    #           contains: [2]
+    - label: "Step 5d: Read optional event(NetworkFaultChange) in EventList"
+      PICS: DGGEN.S.E02 && PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [2]
+
+    - label:
+          "Step 5e: TH reads from the DUT the EventList attribute. 1.The list
+          SHALL NOT contain any additional values in the standard or scoped
+          range: (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE) 2.
+          The list MAY contain values in the Manufacturer Extensible Identifier
+          (MEI) range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed
+          MEI range (0x0001 - 0xFFF1), these values SHALL be ignored. 3. The
+          list SHALL NOT contain any values in the Test Vendor or invalid range:
+          (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 -
+          0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
+          allowed MEI range (0x0001 - 0xFFF1)"
+      verification: |
+          ./chip-tool  generaldiagnostics read event-list 1 0
+
+          [1676459408.977604][25255:25257] CHIP:DMG: }
+          [1676459408.977730][25255:25257] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_FFFA DataVersion: 4000280266
+          [1676459408.977747][25255:25257] CHIP:TOO:   EventList: 4 entries
+          [1676459408.977752][25255:25257] CHIP:TOO:     [1]: 0
+          [1676459408.977755][25255:25257] CHIP:TOO:     [2]: 1
+          [1676459408.977759][25255:25257] CHIP:TOO:     [3]: 2
+          [1676459408.977761][25255:25257] CHIP:TOO:     [4]: 3
+          [1676459408.977790][25255:25257] CHIP:EM: <<< [E:3742i S:56131 M:239009454 (Ack:224914310)] (S) Msg TX to 1:0000000000000001 [110F] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1676459408.977795][25255:25257] CHIP:IN: (S) Sending msg 239009454 on secure session with LSID: 56131
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 6a: Read the global attribute: AcceptedCommandList"
       command: "readAttribute"

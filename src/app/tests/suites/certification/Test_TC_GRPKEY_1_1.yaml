@@ -61,6 +61,16 @@ tests:
               hasMasksSet: [0x1]
 
     - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 3, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: " !PICS_EVENT_LIST_ENABLED "
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -106,13 +116,43 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    # - label: "Step 5a: TH1 reads EventList from DUT"
-    #   command: "readAttribute"
-    #   attribute: "EventList"
-    #   response:
-    #       value: []
-    #       constraints:
-    #           type: list
+    - label: "Step 5a: TH1 reads EventList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label:
+          "Step 5b: TH reads from the DUT the EventList attribute. 1.The list
+          SHALL NOT contain any additional values in the standard or scoped
+          range: (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE) 2.
+          The list MAY contain values in the Manufacturer Extensible Identifier
+          (MEI) range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed
+          MEI range (0x0001 - 0xFFF1), these values SHALL be ignored. 3. The
+          list SHALL NOT contain any values in the Test Vendor or invalid range:
+          (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 -
+          0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
+          allowed MEI range (0x0001 - 0xFFF1)"
+      verification: |
+          ./chip-tool groupkeymanagement read event-list 1 0
+
+          Verify "EventList" contains the list of supported events, for this cluster list is empty(0 entries) on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+
+          [1689923450.468055][6130:6132] CHIP:DMG: }
+          [1689923450.468251][6130:6132] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_FFFA DataVersion: 4114127542
+          [1689923450.468339][6130:6132] CHIP:TOO:   EventList: 0 entries
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Step 5b: TH reads EventList attribute from DUT. 1.The list SHALL NOT

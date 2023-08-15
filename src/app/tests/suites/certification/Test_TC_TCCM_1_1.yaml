@@ -71,6 +71,14 @@ tests:
           [1690189598.832210][16140:16142] CHIP:TOO:     [10]: 65533
       disabled: true
 
+    - label: "Step 5: TH reads from the DUT the EventList attribute."
+      verification: |
+          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read event-list 1 1
+          Verify "EventList" contains a list of supported events, for this cluster the list is emty(0 entries) on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+          [1690189614.840538][16147:16149] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_FFFA DataVersion: 473867547
+          [1690189614.840589][16147:16149] CHIP:TOO:   EventList: 0 entries
+      disabled: true
+
     - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
       verification: |
           ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read accepted-command-list 1 1

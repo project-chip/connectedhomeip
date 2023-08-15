@@ -62,7 +62,34 @@ tests:
     - label:
           "Step 4: Read AttributeList (global attribute 65531) if S.S.A0005 is
           true"
-      PICS: S.S.A0005
+      PICS: S.S.A0005 && PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [
+                      0,
+                      1,
+                      2,
+                      3,
+                      4,
+                      5,
+                      6,
+                      7,
+                      65528,
+                      65529,
+                      65530,
+                      65531,
+                      65532,
+                      65533,
+                  ]
+
+    - label:
+          "Step 4: Read AttributeList (global attribute 65531) if S.S.A0005 is
+          true"
+      PICS: S.S.A0005 && !PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -74,7 +101,33 @@ tests:
     - label:
           "Step 4: Read AttributeList (global attribute 65531) if S.S.A0005 is
           false"
-      PICS: " !S.S.A0005 "
+      PICS: " !S.S.A0005 && PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [
+                      0,
+                      1,
+                      2,
+                      3,
+                      4,
+                      6,
+                      7,
+                      65528,
+                      65529,
+                      65530,
+                      65531,
+                      65532,
+                      65533,
+                  ]
+
+    - label:
+          "Step 4: Read AttributeList (global attribute 65531) if S.S.A0005 is
+          false"
+      PICS: " !S.S.A0005 && !PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -82,15 +135,42 @@ tests:
               type: list
               contains: [0, 1, 2, 3, 4, 6, 7, 65528, 65529, 65531, 65532, 65533]
 
-    #EventList disabled for 1.2
-    # - label: "Step 5: Read EventList (global attribute 65530)"
-    #   PICS: PICS_EVENT_LIST_ENABLED
-    #   command: "readAttribute"
-    #   attribute: "EventList"
-    #   response:
-    #       constraints:
-    #           type: list
-    #           contains: []
+    - label: "Step 5a: Read EventList (global attribute 65530)"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: []
+
+    - label:
+          "Step 5b: TH reads from the DUT the EventList attribute. 1.The list
+          SHALL NOT contain any additional values in the standard or scoped
+          range: (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE) 2.
+          The list MAY contain values in the Manufacturer Extensible Identifier
+          (MEI) range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed
+          MEI range (0x0001 - 0xFFF1), these values SHALL be ignored. 3. The
+          list SHALL NOT contain any values in the Test Vendor or invalid range:
+          (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 -
+          0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
+          allowed MEI range (0x0001 - 0xFFF1)"
+      verification: |
+          ./chip-tool scenes read event-list 1 1
+
+          Verify the "EventList" value on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1685124260776] [40519:400294] [TOO] Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_FFFA DataVersion: 2585861686
+          [1685124260776] [40519:400294] [TOO]   EventList: 0 entries
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 6a: Read AcceptedCommandList (global attribute 65529)"
       PICS: S.S.C40.Rsp

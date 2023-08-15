@@ -64,6 +64,16 @@ tests:
               type: bitmap32
 
     - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [17, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: " !PICS_EVENT_LIST_ENABLED "
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -249,33 +259,62 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    # EventList disabled for 1.2
-    # - label: "Step 5a: TH reads optional event(StartUp) in EventList"
-    #   PICS: BRBINFO.S.E00
-    #   command: "readAttribute"
-    #   attribute: "EventList"
-    #   response:
-    #       constraints:
-    #           type: list
-    #           contains: [0]
+    - label: "Step 5a: TH reads optional event(StartUp) in EventList"
+      PICS: BRBINFO.S.E00 && PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
 
-    # - label: "Step 5b: TH reads optional attribute(ShutDown) in EventList"
-    #   PICS: BRBINFO.S.E01
-    #   command: "readAttribute"
-    #   attribute: "EventList"
-    #   response:
-    #       constraints:
-    #           type: list
-    #           contains: [1]
+    - label: "Step 5b: TH reads optional attribute(ShutDown) in EventList"
+      PICS: BRBINFO.S.E01 && PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
 
-    # - label: "Step 5c: TH reads optional attribute(Leave) in EventList"
-    #   PICS: BRBINFO.S.E02
-    #   command: "readAttribute"
-    #   attribute: "EventList"
-    #   response:
-    #       constraints:
-    #           type: list
-    #           contains: [2]
+    - label: "Step 5c: TH reads optional attribute(Leave) in EventList"
+      PICS: BRBINFO.S.E02 && PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [2]
+
+    - label:
+          "Step 5d: TH reads EventList attribute from DUT. 1.The list SHALL NOT
+          contain any additional values in the standard or scoped range:
+          (0x0000_0000 - 0x0000_00FF). 2.The list MAY contain values in the
+          Manufacturer Extensible Identifier (MEI) range: (0xXXXX_0000 -
+          0xXXXX_00FF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1),
+          these values SHALL be ignored. 3.The list SHALL NOT contain any values
+          in the Test Vendor or invalid range: (0x0000_0100 - 0x0000_FFFF),
+          (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where
+          XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
+      verification: |
+          ./chip-tool bridgeddevicebasicinformation read event-list 1 3
+
+          Via the TH (chip-tool), verify:
+          -that EventList attribute contains list of supported events.
+          -that list has empty (0 entries) for this cluster.
+
+          1676439985.362352][22002:22004] CHIP:DMG: }
+          [1676439985.362396][22002:22004] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_FFFA DataVersion: 266846256
+          [1676439985.362407][22002:22004] CHIP:TOO:   EventList: 0 entries
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 6a: TH1 reads AcceptedCommandList from DUT"
       command: "readAttribute"
