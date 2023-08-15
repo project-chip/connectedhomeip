@@ -22,6 +22,7 @@
 #include "include/tv-callbacks.h"
 #include "laundry-washer-controls-delegate-impl.h"
 #include "laundry-washer-mode.h"
+#include "operational-state-delegate-impl.h"
 #include "rvc-modes.h"
 #include "resource-monitoring-delegates.h"
 #include "tcc-mode.h"
@@ -57,12 +58,9 @@ NamedPipeCommands sChipNamedPipeCommands;
 AllClustersCommandDelegate sAllClustersCommandDelegate;
 Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
 
-app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 } // namespace
 
-#ifdef EMBER_AF_PLUGIN_OPERATIONAL_STATE_SERVER
-extern void MatterOperationalStateServerInit();
-#endif
 #ifdef EMBER_AF_PLUGIN_DISHWASHER_ALARM_SERVER
 extern void MatterDishwasherAlarmServerInit();
 #endif
@@ -183,14 +181,11 @@ void ApplicationInit()
         gExampleDeviceInstanceInfoProvider.Init(defaultProvider);
         SetDeviceInstanceInfoProvider(&gExampleDeviceInstanceInfoProvider);
     }
-#ifdef EMBER_AF_PLUGIN_OPERATIONAL_STATE_SERVER
-    MatterOperationalStateServerInit();
-#endif
 
 #ifdef EMBER_AF_PLUGIN_DISHWASHER_ALARM_SERVER
     MatterDishwasherAlarmServerInit();
 #endif
-    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 void ApplicationShutdown()
@@ -203,6 +198,9 @@ void ApplicationShutdown()
     Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Shutdown();
     Clusters::HepaFilterMonitoring::Shutdown();
     Clusters::ActivatedCarbonFilterMonitoring::Shutdown();
+
+    Clusters::OperationalState::Shutdown();
+    Clusters::RvcOperationalState::Shutdown();
 
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {
