@@ -52,8 +52,9 @@ ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
-    otInstance *instance = esp_openthread_get_instance();
-    if (!instance) {
+    otInstance * instance = esp_openthread_get_instance();
+    if (!instance)
+    {
         ChipLogError(DeviceLayer, "OpenThread not launched");
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -97,8 +98,8 @@ void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStop()
 
 bool ThreadStackManagerImpl::IsESPThreadProvisioned()
 {
-    bool isProvisioned = false;
-    otInstance *instance = esp_openthread_get_instance();
+    bool isProvisioned    = false;
+    otInstance * instance = esp_openthread_get_instance();
     if (!instance)
     {
         ChipLogError(DeviceLayer, "OpenThread not Initialized");

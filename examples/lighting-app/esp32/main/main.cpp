@@ -63,7 +63,6 @@
 #include <platform/ESP32/OpenthreadLauncher.h>
 #endif
 
-
 using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
