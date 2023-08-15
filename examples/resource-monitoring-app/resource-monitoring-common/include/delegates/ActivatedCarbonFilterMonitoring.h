@@ -32,7 +32,7 @@ namespace Clusters {
 
 namespace ResourceMonitoring {
 
-/// This is an application level Instance to handle ActivatedCarbonFilterMonitoringDelegate commands according to the specific
+/// This is an application level delegate to handle ActivatedCarbonFilterMonitoringDelegate commands according to the specific
 /// business logic.
 class ActivatedCarbonFilterMonitoringDelegate : public ResourceMonitoring::Delegate
 {

@@ -44,7 +44,7 @@ static ResourceMonitoring::Instance * gHepaFilterInstance                       
 
 static ImmutableReplacementProductListManager sReplacementProductListManager;
 
-//-- Activated Carbon Filter Monitoring Instance methods
+//-- Activated Carbon Filter Monitoring delegate methods
 CHIP_ERROR ActivatedCarbonFilterMonitoringDelegate::Init()
 {
     ChipLogDetail(Zcl, "ActivatedCarbonFilterMonitoringDelegate::Init()");
@@ -81,20 +81,20 @@ void ActivatedCarbonFilterMonitoring::Shutdown()
 //-- Hepa Filter Monitoring delegate methods
 CHIP_ERROR HepaFilterMonitoringDelegate::Init()
 {
-    ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::Init()");
+    ChipLogDetail(Zcl, "HepaFilterMonitoringDelegate::Init()");
     mInstance->SetReplacementProductListManagerInstance(&sReplacementProductListManager);
     return CHIP_NO_ERROR;
 }
 
 Status HepaFilterMonitoringDelegate::PreResetCondition()
 {
-    ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::PreResetCondition()");
+    ChipLogDetail(Zcl, "HepaFilterMonitoringDelegate::PreResetCondition()");
     return Status::Success;
 }
 
 Status HepaFilterMonitoringDelegate::PostResetCondition()
 {
-    ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::PostResetCondition()");
+    ChipLogDetail(Zcl, "HepaFilterMonitoringDelegate::PostResetCondition()");
     return Status::Success;
 }
 

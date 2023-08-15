@@ -32,7 +32,7 @@ namespace Clusters {
 
 namespace ResourceMonitoring {
 
-/// This is an application level instance to handle HepaFilterMonitoringDelegate commands according to the specific business logic.
+/// This is an application level delegate to handle HepaFilterMonitoringDelegate commands according to the specific business logic.
 class HepaFilterMonitoringDelegate : public ResourceMonitoring::Delegate
 {
 private:
