@@ -75,7 +75,7 @@ class TC_DISHM_2_1(MatterBaseTest):
 
         asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least two entries!")
 
-        suppoted_modes_dut = [m.mode for m in supported_modes]
+        supported_modes_dut = [m.mode for m in supported_modes]
 
         self.print_step(3, "Read CurrentMode attribute")
 
