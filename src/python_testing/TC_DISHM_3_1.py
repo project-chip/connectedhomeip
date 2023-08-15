@@ -45,7 +45,7 @@ class TC_DISHM_3_1(MatterBaseTest):
         ret = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, Clusters.DishwasherMode.Attributes.OnMode(newMode))])
         asserts.assert_equal(ret[0].Status, Status.Success, "Writing to OnMode failed")
 
-    async def write_onoff_on_mode(self) -> Clusters.Objects.OnOff.Commands.On:
+    async def send_on_command(self) -> Clusters.Objects.OnOff.Commands.On:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.OnOff.Commands.On, endpoint=self.endpoint)
         asserts.assert_true(type_matches(ret, Clusters.Objects.OnOff.Commands.On),
                             "Unexpected return type for OnOff")
