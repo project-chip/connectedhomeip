@@ -3314,20 +3314,23 @@ bool DoorLockServer::RemoteOperationEnabled(chip::EndpointId endpointId) const
         mode != OperatingModeEnum::kPrivacy && mode != OperatingModeEnum::kNoRemoteLockUnlock;
 }
 
-void DoorLockServer::sendClusterResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                         EmberAfStatus status)
+CHIP_ERROR DoorLockServer::sendClusterResponse(chip::app::CommandHandler * commandObj,
+                                               const chip::app::ConcreteCommandPath & commandPath, EmberAfStatus status)
 {
     VerifyOrDie(nullptr != commandObj);
 
+    auto err             = CHIP_NO_ERROR;
     auto statusAsInteger = to_underlying(status);
     if (statusAsInteger == to_underlying(DlStatus::kOccupied) || statusAsInteger == to_underlying(DlStatus::kDuplicate))
     {
-        VerifyOrDie(commandObj->AddClusterSpecificFailure(commandPath, static_cast<chip::ClusterStatus>(status)) == CHIP_NO_ERROR);
+        err = commandObj->AddClusterSpecificFailure(commandPath, static_cast<chip::ClusterStatus>(status));
     }
     else
     {
-        commandObj->AddStatus(commandPath, ToInteractionModelStatus(status));
+        err = commandObj->AddStatus(commandPath, ToInteractionModelStatus(status));
     }
+
+    return err;
 }
 
 EmberAfDoorLockEndpointContext * DoorLockServer::getContext(chip::EndpointId endpointId)

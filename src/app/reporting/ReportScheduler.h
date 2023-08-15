@@ -30,8 +30,6 @@ namespace reporting {
 // Forward declaration of TestReportScheduler to allow it to be friend with ReportScheduler
 class TestReportScheduler;
 
-using Timestamp = System::Clock::Timestamp;
-
 class TimerContext
 {
 public:
@@ -42,6 +40,8 @@ public:
 class ReportScheduler : public ReadHandler::Observer, public ICDStateObserver
 {
 public:
+    using Timestamp = System::Clock::Timestamp;
+
     /// @brief This class acts as an interface between the report scheduler and the system timer to reduce dependencies on the
     /// system layer.
     class TimerDelegate
@@ -63,25 +63,22 @@ public:
     class ReadHandlerNode : public TimerContext
     {
     public:
-        ReadHandlerNode(ReadHandler * aReadHandler, TimerDelegate * aTimerDelegate, ReportScheduler * aScheduler) :
-            mTimerDelegate(aTimerDelegate), mScheduler(aScheduler)
+        ReadHandlerNode(ReadHandler * aReadHandler, ReportScheduler * aScheduler, const Timestamp & now) : mScheduler(aScheduler)
         {
             VerifyOrDie(aReadHandler != nullptr);
-            VerifyOrDie(aTimerDelegate != nullptr);
             VerifyOrDie(aScheduler != nullptr);
 
             mReadHandler = aReadHandler;
-            SetIntervalTimeStamps(aReadHandler);
+            SetIntervalTimeStamps(aReadHandler, now);
         }
         ReadHandler * GetReadHandler() const { return mReadHandler; }
 
         /// @brief Check if the Node is reportable now, meaning its readhandler was made reportable by attribute dirtying and
         /// handler state, and minimal time interval since last report has elapsed, or the maximal time interval since last
         /// report has elapsed
-        bool IsReportableNow() const
+        /// @param now current time to use for the check, user must ensure to provide a valid time for this to be reliable
+        bool IsReportableNow(const Timestamp & now) const
         {
-            Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
-
             return (mReadHandler->CanStartReporting() &&
                     (now >= mMinTimestamp && (mReadHandler->IsDirty() || now >= mMaxTimestamp || now >= mSyncTimestamp)));
         }
@@ -89,11 +86,14 @@ public:
         bool IsEngineRunScheduled() const { return mEngineRunScheduled; }
         void SetEngineRunScheduled(bool aEngineRunScheduled) { mEngineRunScheduled = aEngineRunScheduled; }
 
-        void SetIntervalTimeStamps(ReadHandler * aReadHandler)
+        /// @brief Set the interval timestamps for the node based on the read handler reporting intervals
+        /// @param aReadHandler read handler to get the intervals from
+        /// @param now current time to calculate the mMin and mMax timestamps, user must ensure to provide a valid time for this to
+        /// be reliable
+        void SetIntervalTimeStamps(ReadHandler * aReadHandler, const Timestamp & now)
         {
             uint16_t minInterval, maxInterval;
             aReadHandler->GetReportingIntervals(minInterval, maxInterval);
-            Timestamp now  = mTimerDelegate->GetCurrentMonotonicTimestamp();
             mMinTimestamp  = now + System::Clock::Seconds16(minInterval);
             mMaxTimestamp  = now + System::Clock::Seconds16(maxInterval);
             mSyncTimestamp = mMaxTimestamp;
@@ -118,7 +118,6 @@ public:
         System::Clock::Timestamp GetSyncTimestamp() const { return mSyncTimestamp; }
 
     private:
-        TimerDelegate * mTimerDelegate;
         ReadHandler * mReadHandler;
         ReportScheduler * mScheduler;
         Timestamp mMinTimestamp;
@@ -141,9 +140,12 @@ public:
     /// @param aReadHandler read handler to check
     bool IsReportableNow(ReadHandler * aReadHandler)
     {
+        // Update the now timestamp to ensure external calls to IsReportableNow are always comparing to the current time
+        Timestamp now          = mTimerDelegate->GetCurrentMonotonicTimestamp();
         ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
-        return (nullptr != node) ? node->IsReportableNow() : false;
+        return (nullptr != node) ? node->IsReportableNow(now) : false;
     }
+
     /// @brief Check if a ReadHandler is reportable without considering the timing
     bool IsReadHandlerReportable(ReadHandler * aReadHandler) const { return aReadHandler->ShouldStartReporting(); }
     /// @brief Sets the ForceDirty flag of a ReadHandler
