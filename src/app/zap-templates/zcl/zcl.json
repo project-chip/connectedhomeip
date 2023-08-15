@@ -376,6 +376,10 @@
             "LastChangedTime",
             "ReplacementProductList",
             "FeatureMap"
+        ],
+        "Air Quality": [
+            "AirQuality",
+            "FeatureMap"
         ]
     },
     "defaultReportingPolicy": "mandatory",
