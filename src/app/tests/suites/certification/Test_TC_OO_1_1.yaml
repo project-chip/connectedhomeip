@@ -157,7 +157,7 @@ tests:
 
           Verify "EventList" contains a list of supported events, for this cluster the list is emty(0 entries) on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
 
-          [1676352490.164738][6271:6273] CHIP:DMG:         SuppressResponse = true, 
+          [1676352490.164738][6271:6273] CHIP:DMG:         SuppressResponse = true,
           [1676352490.164742][6271:6273] CHIP:DMG:         InteractionModelRevision = 1
           [1676352490.164745][6271:6273] CHIP:DMG: }
           [1676352490.164804][6271:6273] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_FFFA DataVersion: 2406349519

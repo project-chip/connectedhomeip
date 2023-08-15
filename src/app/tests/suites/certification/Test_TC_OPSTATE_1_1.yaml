@@ -155,7 +155,7 @@ tests:
       verification: |
           ./chip-tool operationalstate read event-list 1 1
 
-          Verify " EventList attribute " value consists the list of mandatory event (0) and it may include the optional events (1) on the TH(Chip-tool) Log: 
+          Verify " EventList attribute " value consists the list of mandatory event (0) and it may include the optional events (1) on the TH(Chip-tool) Log:
           Below is the sample log provided for the raspi platform:
 
 

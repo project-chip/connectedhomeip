@@ -608,7 +608,7 @@ tests:
           0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
           allowed MEI range (0x0001 - 0xFFF1)"
       verification: |
-          ./chip-tool pumpconfigurationandcontrol read event-list 1 1 
+          ./chip-tool pumpconfigurationandcontrol read event-list 1 1
 
           On TH(chip-tool) Verify that the DUT response contains the EventList attribute and have the list of supported events:
           The list MAY include these optional entries:

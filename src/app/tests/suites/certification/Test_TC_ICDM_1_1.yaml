@@ -176,7 +176,7 @@ tests:
       verification: |
           ./chip-tool icdmanagement read event-list 1 0
 
-          On TH(chip-tool), Verify that the DUT response provides a list of supported events. 
+          On TH(chip-tool), Verify that the DUT response provides a list of supported events.
           For this cluster the list is usually empty but it can contain manufacturer specific event IDs.
 
 
