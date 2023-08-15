@@ -35,7 +35,7 @@ tests:
                 value: nodeId
 
     - label:
-          "Step 2: TH reads DUT Descriptor cluster ServerList attribute from
+          "Step 2: TH1 reads DUT Descriptor cluster ServerList attribute from
           Endpoint 0"
       cluster: "Descriptor"
       command: "readAttribute"
@@ -46,7 +46,7 @@ tests:
               contains: [31]
 
     - label:
-          "Step 3: TH reads DUT Descriptor cluster ServerList attribute from
+          "Step 3: TH1 reads DUT Descriptor cluster ServerList attribute from
           every Endpoint except 0"
       endpoint: Endpoint_Except_Zero
       cluster: "Descriptor"

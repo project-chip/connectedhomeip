@@ -1,8 +1,16 @@
 darwin:
-  - "(ios|homepod|darwin|mac|macos)"
+  # Make sure we don't match random words that contain "mac" inside.
+  #
+  # Make sure we don't match random words that contain "ios" inside
+  # (like "kiosk" or whatnot), but do allow matching "ios8" and things
+  # like that.
+  #
+  # \\b means "word boundary"
+  # (?![a-z]) means "there is no next char in the range a-z".
+  - "/(\\bios(?![a-z])|homepod|darwin|\\bmac\\b|macos)/i"
 
 linux:
-  - "(linux)"
+  - "/(linux)/i"
 
 # Special Keywords for Cert Blockers
 air purifiers:

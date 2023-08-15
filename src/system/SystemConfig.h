@@ -293,23 +293,17 @@
 #endif // CHIP_SYSTEM_CONFIG_ZEPHYR_LOCKING && CHIP_SYSTEM_CONFIG_NO_LOCKING
 
 /**
- *  @def CHIP_SYSTEM_HEADER_RESERVE_SIZE
+ *  @def CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE
  *
  *  @brief
  *      The number of bytes to reserve in a network packet buffer to contain
- *      the CHIP message and exchange headers.
+ *      the Matter crypto headers.
  *
- *      This number was calculated as follows:
- *
- *      CHIP Crypto Header:
- *
- *          4 -- Length of encrypted block
- *          4 -- Reserve
- *          8 -- Initialization Vector
- *          8 -- Encryption Tag
+ *      This is 0, because Matter does not have any crypto headers.  This define
+ *      is still here only for backwards compatibility.
  */
 #ifndef CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE
-#define CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE 24
+#define CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE 0
 #endif
 
 /**
@@ -317,31 +311,39 @@
  *
  *  @brief
  *      The number of bytes to reserve in a network packet buffer to contain
- *      the CHIP message and exchange headers.
+ *      the CHIP message and payload headers.
  *
  *      This number was calculated as follows:
  *
- *      CHIP Message Header:
+ *      Matter Message Header:
  *
  *          2 -- Frame Length
- *          2 -- Message Header
- *          4 -- Message Id
- *          8 -- Source Node Id
- *          8 -- Destination Node Id
- *          2 -- Key Id
+ *          1 -- Message Flags
+ *          2 -- Session ID
+ *          1 -- Security Flags
+ *          4 -- Message Counter
+ *          8 -- Source Node ID
+ *          8 -- Destination Node ID
  *
- *      CHIP Exchange Header:
+ *      Total: 26 bytes.
  *
- *          1 -- Application Version
- *          1 -- Message Type
- *          2 -- Exchange Id
- *          4 -- Profile Id
- *          4 -- Acknowledged Message Id
+ *      Matter Payload Header:
  *
- *    @note A number of these fields are optional or not presently used. So most headers will be considerably smaller than this.
+ *          1 -- Exhange Flags
+ *          1 -- Protocol Opcode
+ *          2 -- Exchange ID
+ *          2 -- Protocol Vendor ID
+ *          2 -- Protocol ID
+ *          4 -- Acknowledged MEssage Counter
+ *
+ *      Total: 12 bytes.
+ *
+ *    @note A number of these fields are optional or not presently used. So most
+ *          headers will be considerably smaller than this.
+ *    @note This calculation assumes ther are no Message Extensions or Secured Extensions.
  */
 #ifndef CHIP_SYSTEM_HEADER_RESERVE_SIZE
-#define CHIP_SYSTEM_HEADER_RESERVE_SIZE (38 + CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE)
+#define CHIP_SYSTEM_HEADER_RESERVE_SIZE (26 + 12 + CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE)
 #endif /* CHIP_SYSTEM_HEADER_RESERVE_SIZE */
 
 /**

@@ -45,6 +45,7 @@ dependencies {
     implementation(Deps.Kotlin.coroutinesCore)
 
     implementation(Deps.inject)
+    implementation(Deps.timber)
 
     testImplementation(Deps.Test.junit)
     androidTestImplementation(Deps.Test.junitExt)

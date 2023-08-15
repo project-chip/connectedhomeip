@@ -74,30 +74,29 @@ tests:
           constraints:
               minValue: 3
 
-    # TODO(#28396): Re-enabled when CI wouldn't break on this syntax
-    #
-    #   command: "readAttribute"
-    #   attribute: "ClusterRevision"
-    #   response:
-    #       saveAs: ClusterRevisionValue
-    #       constraints:
-    #           minValue: 1
-    #           maxValue: 2
-    #           type: int16u
+    - label: "Read the ClusterRevision attribute"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          saveAs: ClusterRevisionValue
+          constraints:
+              minValue: 1
+              maxValue: 2
+              type: int16u
 
-    # - label: "Creates a new variable to hold if the cluster revision is == 2"
-    #   cluster: EqualityCommands
-    #   command: UnsignedNumberEquals
-    #   arguments:
-    #       values:
-    #           - name: Value1
-    #             value: ClusterRevisionValue
-    #           - name: Value2
-    #             value: 2
-    #   response:
-    #       - values:
-    #             - name: Equals
-    #               saveAs: ClusterIsRevision2
+    - label: "Creates a new variable to hold if the cluster revision is == 2"
+      cluster: EqualityCommands
+      command: UnsignedNumberEquals
+      arguments:
+          values:
+              - name: Value1
+                value: ClusterRevisionValue
+              - name: Value2
+                value: 2
+      response:
+          - values:
+                - name: Equals
+                  saveAs: ClusterIsRevision2
 
     ########### KeySetWrite Epoch0 field validations
     - label: "KeySetWrite with EpochKey0 null fails INVALID_COMMAND"
@@ -161,7 +160,7 @@ tests:
     - label:
           "KeySetWrite with EpochKey0 with length 1 != 16 fails with
           CONSTRAINT_ERROR"
-      # runIf: ClusterIsRevision2
+      runIf: ClusterIsRevision2
       command: "KeySetWrite"
       arguments:
           values:
@@ -183,7 +182,7 @@ tests:
     - label:
           "KeySetWrite with EpochKey0 with length 0 != 16 fails with
           CONSTRAINT_ERROR"
-      # runIf: ClusterIsRevision2
+      runIf: ClusterIsRevision2
       command: "KeySetWrite"
       arguments:
           values:
@@ -204,7 +203,7 @@ tests:
 
     ########### KeySetWrite Epoch1 field validations
     - label: "KeySetWrite with EpochStartTime1 null fails INVALID_COMMAND"
-      # runIf: ClusterIsRevision2
+      runIf: ClusterIsRevision2
       command: "KeySetWrite"
       arguments:
           values:
@@ -245,7 +244,7 @@ tests:
     - label:
           "KeySetWrite with EpochKey1 with length 1 != 16 fails with
           CONSTRAINT_ERROR"
-      # runIf: ClusterIsRevision2
+      runIf: ClusterIsRevision2
       command: "KeySetWrite"
       arguments:
           values:
@@ -267,7 +266,7 @@ tests:
     - label:
           "KeySetWrite with EpochKey1 with length 0 != 16 fails with
           CONSTRAINT_ERROR"
-      # runIf: ClusterIsRevision2
+      runIf: ClusterIsRevision2
       command: "KeySetWrite"
       arguments:
           values:
@@ -310,7 +309,7 @@ tests:
     ########### KeySetWrite Epoch2 field validations
     - label: "KeySetWrite with EpochStartTime2 null fails INVALID_COMMAND"
       command: "KeySetWrite"
-      # runIf: ClusterIsRevision2
+      runIf: ClusterIsRevision2
       arguments:
           values:
               - name: "GroupKeySet"
@@ -350,7 +349,7 @@ tests:
     - label:
           "KeySetWrite with EpochKey2 with length 1 != 16 fails with
           CONSTRAINT_ERROR"
-      # runIf: ClusterIsRevision2
+      runIf: ClusterIsRevision2
       command: "KeySetWrite"
       arguments:
           values:
@@ -372,7 +371,7 @@ tests:
     - label:
           "KeySetWrite with EpochKey2 with length 0 != 16 fails with
           CONSTRAINT_ERROR"
-      # runIf: ClusterIsRevision2
+      runIf: ClusterIsRevision2
       command: "KeySetWrite"
       arguments:
           values:
@@ -537,6 +536,34 @@ tests:
                 constraints:
                     # Note: There's always an IPK keyset with index 0
                     contains: [0x01a1, 0x01a2, 0]
+
+    - label: "Write one keyset too many when already full"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x0222,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xd1\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf",
+                        EpochStartTime0: 3110000,
+                        EpochKey1: "\xe1\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef",
+                        EpochStartTime1: 3110001,
+                        EpochKey2: "\xf1\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
+                        EpochStartTime2: 3110002,
+                    }
+      response:
+          error: RESOURCE_EXHAUSTED
+
+    - label: "Try to remove KeySet index 0 should fail"
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0
+      response:
+          error: INVALID_COMMAND
 
     - label: "Write Group Keys (invalid)"
       command: "writeAttribute"

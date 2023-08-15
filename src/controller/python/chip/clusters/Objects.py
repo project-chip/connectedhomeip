@@ -2803,6 +2803,10 @@ class Descriptor(Cluster):
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
 
+    class Bitmaps:
+        class Feature(IntFlag):
+            kTagList = 0x1
+
     class Structs:
         @dataclass
         class DeviceTypeStruct(ClusterObject):

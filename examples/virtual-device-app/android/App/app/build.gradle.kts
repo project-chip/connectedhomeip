@@ -76,6 +76,8 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:domain"))
     implementation(project(":core:model"))
+    implementation(project(":core:ui"))    
+    implementation(project(":feature:control"))
     implementation(project(":feature:main"))
     implementation(project(":feature:qrcode"))
     implementation(project(":feature:setup"))

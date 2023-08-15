@@ -33,7 +33,33 @@
   ],
   "endpointTypes": [
     {
+      "id": 3,
       "name": "MA-rootdevice",
+      "deviceTypeRef": {
+        "id": 2,
+        "code": 22,
+        "profileId": 259,
+        "label": "MA-rootdevice",
+        "name": "MA-rootdevice"
+      },
+      "deviceTypes": [
+        {
+          "id": 2,
+          "code": 22,
+          "profileId": 259,
+          "label": "MA-rootdevice",
+          "name": "MA-rootdevice"
+        }
+      ],
+      "deviceTypeRefs": [
+        2
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        22
+      ],
       "deviceTypeName": "MA-rootdevice",
       "deviceTypeCode": 22,
       "deviceTypeProfileId": 259,
@@ -198,7 +224,7 @@
           "mfgCode": null,
           "define": "GROUPS_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "AddGroupResponse",
@@ -4619,7 +4645,7 @@
           "mfgCode": null,
           "define": "SWITCH_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "NumberOfPositions",
@@ -5394,7 +5420,33 @@
       ]
     },
     {
+      "id": 7,
       "name": "Anonymous Endpoint Type",
+      "deviceTypeRef": {
+        "id": 45,
+        "code": 45,
+        "profileId": 259,
+        "label": "MA-air-purifier",
+        "name": "MA-air-purifier"
+      },
+      "deviceTypes": [
+        {
+          "id": 45,
+          "code": 45,
+          "profileId": 259,
+          "label": "MA-air-purifier",
+          "name": "MA-air-purifier"
+        }
+      ],
+      "deviceTypeRefs": [
+        45
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        45
+      ],
       "deviceTypeName": "MA-air-purifier",
       "deviceTypeCode": 45,
       "deviceTypeProfileId": 259,
@@ -10884,7 +10936,33 @@
       ]
     },
     {
+      "id": 4,
       "name": "Anonymous Endpoint Type",
+      "deviceTypeRef": {
+        "id": 46,
+        "code": 44,
+        "profileId": 259,
+        "label": "MA-air-quality-sensor",
+        "name": "MA-air-quality-sensor"
+      },
+      "deviceTypes": [
+        {
+          "id": 46,
+          "code": 44,
+          "profileId": 259,
+          "label": "MA-air-quality-sensor",
+          "name": "MA-air-quality-sensor"
+        }
+      ],
+      "deviceTypeRefs": [
+        46
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        44
+      ],
       "deviceTypeName": "MA-air-quality-sensor",
       "deviceTypeCode": 44,
       "deviceTypeProfileId": 259,
@@ -11136,7 +11214,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -11152,7 +11230,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -11168,7 +11246,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -11184,7 +11262,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -11200,7 +11278,7 @@
               "side": "server",
               "type": "array",
               "included": 0,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -11216,7 +11294,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -11232,7 +11310,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -11248,7 +11326,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -11264,7 +11342,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -15138,7 +15216,33 @@
       ]
     },
     {
+      "id": 6,
       "name": "Anonymous Endpoint Type",
+      "deviceTypeRef": {
+        "id": 24,
+        "code": 770,
+        "profileId": 259,
+        "label": "MA-tempsensor",
+        "name": "MA-tempsensor"
+      },
+      "deviceTypes": [
+        {
+          "id": 24,
+          "code": 770,
+          "profileId": 259,
+          "label": "MA-tempsensor",
+          "name": "MA-tempsensor"
+        }
+      ],
+      "deviceTypeRefs": [
+        24
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        770
+      ],
       "deviceTypeName": "MA-tempsensor",
       "deviceTypeCode": 770,
       "deviceTypeProfileId": 259,
@@ -15784,7 +15888,33 @@
       ]
     },
     {
+      "id": 5,
       "name": "Anonymous Endpoint Type",
+      "deviceTypeRef": {
+        "id": 27,
+        "code": 775,
+        "profileId": 259,
+        "label": "MA-humiditysensor",
+        "name": "MA-humiditysensor"
+      },
+      "deviceTypes": [
+        {
+          "id": 27,
+          "code": 775,
+          "profileId": 259,
+          "label": "MA-humiditysensor",
+          "name": "MA-humiditysensor"
+        }
+      ],
+      "deviceTypeRefs": [
+        27
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        775
+      ],
       "deviceTypeName": "MA-humiditysensor",
       "deviceTypeCode": 775,
       "deviceTypeProfileId": 259,
@@ -16430,7 +16560,33 @@
       ]
     },
     {
+      "id": 8,
       "name": "Anonymous Endpoint Type",
+      "deviceTypeRef": {
+        "id": 34,
+        "code": 769,
+        "profileId": 259,
+        "label": "MA-thermostat",
+        "name": "MA-thermostat"
+      },
+      "deviceTypes": [
+        {
+          "id": 34,
+          "code": 769,
+          "profileId": 259,
+          "label": "MA-thermostat",
+          "name": "MA-thermostat"
+        }
+      ],
+      "deviceTypeRefs": [
+        34
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        769
+      ],
       "deviceTypeName": "MA-thermostat",
       "deviceTypeCode": 769,
       "deviceTypeProfileId": 259,
@@ -17928,54 +18084,42 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 22
+      "networkId": 0
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 45
+      "networkId": 0
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 2,
       "profileId": 259,
       "endpointId": 2,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 44
+      "networkId": 0
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 3,
       "profileId": 259,
       "endpointId": 3,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 770
+      "networkId": 0
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 4,
       "profileId": 259,
       "endpointId": 4,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 775
+      "networkId": 0
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 5,
       "profileId": 259,
       "endpointId": 5,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 769
+      "networkId": 0
     }
   ],
   "log": []

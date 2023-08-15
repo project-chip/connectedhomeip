@@ -98,6 +98,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
     bool hasMoreChunks        = true;
     TLV::TLVWriter backup;
     const uint32_t kReservedSizeEndOfReportIBs = 1;
+    bool reservedEndOfReportIBs                = false;
 
     aReportDataBuilder.Checkpoint(backup);
 
@@ -110,7 +111,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
     //
     // Reserve enough space for closing out the Report IB list
     //
-    attributeReportIBs.GetWriter()->ReserveBuffer(kReservedSizeEndOfReportIBs);
+    SuccessOrExit(err = attributeReportIBs.GetWriter()->ReserveBuffer(kReservedSizeEndOfReportIBs));
+    reservedEndOfReportIBs = true;
 
     {
         // TODO: Figure out how AttributePathExpandIterator should handle read
@@ -251,7 +253,7 @@ exit:
     // These are are guaranteed to not fail since we've already reserved memory for the remaining 'close out' TLV operations in this
     // function and its callers.
     //
-    if (IsOutOfWriterSpaceError(err))
+    if (IsOutOfWriterSpaceError(err) && reservedEndOfReportIBs)
     {
         ChipLogDetail(DataManagement, "<RE:Run> We cannot put more chunks into this report. Enable chunking.");
         err = CHIP_NO_ERROR;
@@ -636,7 +638,7 @@ void Engine::Run()
         ReadHandler * readHandler = imEngine->ActiveHandlerAt(mCurReadHandlerIdx % (uint32_t) imEngine->mReadHandlers.Allocated());
         VerifyOrDie(readHandler != nullptr);
 
-        if (imEngine->GetReportScheduler()->IsReportableNow(readHandler))
+        if (readHandler->ShouldReportUnscheduled() || imEngine->GetReportScheduler()->IsReportableNow(readHandler))
         {
             mRunningReadHandler = readHandler;
             CHIP_ERROR err      = BuildAndSendSingleReportData(readHandler);
@@ -829,7 +831,7 @@ CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
             // We call AttributePathIsDirty for both read interactions and subscribe interactions, since we may send inconsistent
             // attribute data between two chunks. AttributePathIsDirty will not schedule a new run for read handlers which are
             // waiting for a response to the last message chunk for read interactions.
-            if (handler->IsGeneratingReports() || handler->IsAwaitingReportResponse())
+            if (handler->CanStartReporting() || handler->IsAwaitingReportResponse())
             {
                 for (auto object = handler->GetAttributePathList(); object != nullptr; object = object->mpNext)
                 {
