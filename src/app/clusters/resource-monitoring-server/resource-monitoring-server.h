@@ -130,7 +130,7 @@ private:
 
     ReplacementProductListManager * GetReplacementProductListManagerInstance();
 
-    CHIP_ERROR ReadReplacableProductList(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadReplaceableProductList(AttributeValueEncoder & aEncoder);
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & ctx) override;

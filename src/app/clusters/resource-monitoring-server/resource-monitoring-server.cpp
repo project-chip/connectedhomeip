@@ -196,7 +196,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::ReadReplacableProductList(AttributeValueEncoder & aEncoder)
+CHIP_ERROR Instance::ReadReplaceableProductList(AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (HasFeature(ResourceMonitoring::Feature::kReplacementProductList))
@@ -255,7 +255,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         break;
     }
     case Attributes::ReplacementProductList::Id: {
-        return ReadReplacableProductList(aEncoder);
+        return ReadReplaceableProductList(aEncoder);
         break;
     }
     }
