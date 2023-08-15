@@ -20,7 +20,6 @@
 #include "AppConfig.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
-#include "operational-state-delegates.h"
 #include "qrcodegen.h"
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/util/attribute-storage.h>
@@ -105,8 +104,6 @@ void AppTask::AppTaskMain(void * pvParameter)
     PrintOnboardingCodes(RendezvousInformationFlag(RendezvousInformationFlag::kOnNetwork));
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
-    /*Operational State Server Init*/
-    MatterOperationalStateServerInit();
     /* Delete task */
     lega_rtos_delete_thread(NULL);
 }
