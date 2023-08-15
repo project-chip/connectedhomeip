@@ -23,9 +23,8 @@ import sys
 import time
 import traceback
 from enum import IntEnum
-from typing import List, Union
+from typing import List, Mapping, Union
 from urllib.parse import urljoin
-from typing import Mapping
 
 import requests
 
