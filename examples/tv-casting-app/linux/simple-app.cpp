@@ -29,7 +29,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 
-using namespace matter::casting::app;
+using namespace matter::casting::core;
 using namespace matter::casting::support;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
@@ -51,7 +51,7 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
 
         ChipLogError(Support,
                      "*** WARNING: Using temporary passcode %u due to no neither --passcode or --spake2p-verifier-base64 "
-                     "given on command line. This is temporary and will disappear. Please update your scripts "
+                     "given on command line. This is temporary and will be deprecated. Please update your scripts "
                      "to explicitly configure onboarding credentials. ***",
                      static_cast<unsigned>(defaultTestPasscode));
         setupPasscode.SetValue(defaultTestPasscode);
@@ -149,5 +149,6 @@ int main(int argc, char * argv[])
                         ChipLogError(AppServer, "CastingApp::Start failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
+
     return 0;
 }

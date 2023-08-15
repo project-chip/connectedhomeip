@@ -22,7 +22,7 @@
 
 namespace matter {
 namespace casting {
-namespace app {
+namespace core {
 
 /**
  * @brief Represents CastingApp state.
@@ -41,18 +41,7 @@ enum CastingAppState
  */
 class CastingApp
 {
-private:
-    CastingApp();
-
-    CastingApp(CastingApp & other) = delete;
-    void operator=(const CastingApp &) = delete;
-
-    const matter::casting::support::AppParameters * mAppParameters;
-
-    CastingAppState mState = UNINITIALIZED;
-
 public:
-    static CastingApp * castingApp_;
     static CastingApp * GetInstance();
 
     /**
@@ -64,11 +53,19 @@ public:
     CHIP_ERROR Initialize(const matter::casting::support::AppParameters & appParameters);
 
     /**
-     * @brief Starts the Matter server that the CastingApp runs on
+     * @brief Starts the Matter server that the CastingApp runs on and calls PostStartRegistrations() to finish starting up the
+     * CastingApp.
      *
      * @return CHIP_ERROR - CHIP_NO_ERROR if Matter server started successfully, specific error code otherwise.
      */
     CHIP_ERROR Start();
+
+    /**
+     * @brief Perform post Matter server startup registrations
+     *
+     * @return CHIP_ERROR  - CHIP_NO_ERROR if all registrations succeeded, specific error code otherwise
+     */
+    CHIP_ERROR PostStartRegistrations();
 
     /**
      * @brief Stops the Matter server that the CastingApp runs on
@@ -76,8 +73,19 @@ public:
      * @return CHIP_ERROR - CHIP_NO_ERROR if Matter server stopped successfully, specific error code otherwise.
      */
     CHIP_ERROR Stop();
+
+private:
+    CastingApp();
+    static CastingApp * _castingApp;
+
+    CastingApp(CastingApp & other) = delete;
+    void operator=(const CastingApp &) = delete;
+
+    const matter::casting::support::AppParameters * mAppParameters;
+
+    CastingAppState mState = UNINITIALIZED;
 };
 
-}; // namespace app
+}; // namespace core
 }; // namespace casting
 }; // namespace matter

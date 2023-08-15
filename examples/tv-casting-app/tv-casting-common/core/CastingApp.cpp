@@ -25,21 +25,21 @@
 
 namespace matter {
 namespace casting {
-namespace app {
+namespace core {
 
 using namespace matter::casting::support;
 
-CastingApp * CastingApp::castingApp_ = nullptr;
+CastingApp * CastingApp::_castingApp = nullptr;
 
 CastingApp::CastingApp() {}
 
 CastingApp * CastingApp::GetInstance()
 {
-    if (castingApp_ == nullptr)
+    if (_castingApp == nullptr)
     {
-        castingApp_ = new CastingApp();
+        _castingApp = new CastingApp();
     }
-    return castingApp_;
+    return _castingApp;
 }
 
 CHIP_ERROR CastingApp::Initialize(const AppParameters & appParameters)
@@ -49,10 +49,10 @@ CHIP_ERROR CastingApp::Initialize(const AppParameters & appParameters)
     VerifyOrReturnError(appParameters.GetDeviceAttestationCredentialsProvider() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(appParameters.GetServerInitParamsProvider() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mAppParameters = &appParameters;
-
     ReturnErrorOnFailure(chip::Platform::MemoryInit());
     ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgr().InitChipStack());
+
+    mAppParameters = &appParameters;
 
     chip::DeviceLayer::SetCommissionableDataProvider(appParameters.GetCommissionableDataProvider());
     chip::Credentials::SetDeviceAttestationCredentialsProvider(appParameters.GetDeviceAttestationCredentialsProvider());
@@ -74,28 +74,37 @@ CHIP_ERROR CastingApp::Initialize(const AppParameters & appParameters)
 CHIP_ERROR CastingApp::Start()
 {
     VerifyOrReturnError(mState == NOT_RUNNING, CHIP_ERROR_INCORRECT_STATE);
-    auto & server = chip::Server::GetInstance();
 
     // start Matter server
     chip::ServerInitParams * serverInitParams = mAppParameters->GetServerInitParamsProvider()->Get();
     VerifyOrReturnError(serverInitParams != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorOnFailure(server.Init(*serverInitParams));
+    ReturnErrorOnFailure(chip::Server::GetInstance().Init(*serverInitParams));
 
-    // TBD: Set CastingApp as AppDelegate
+    // perform post server startup registrations
+    ReturnErrorOnFailure(PostStartRegistrations());
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CastingApp::PostStartRegistrations()
+{
+    VerifyOrReturnError(mState == NOT_RUNNING, CHIP_ERROR_INCORRECT_STATE);
+    auto & server = chip::Server::GetInstance();
+
+    // TODO: Set CastingApp as AppDelegate
     // &server.GetCommissioningWindowManager().SetAppDelegate(??);
 
     // Initialize binding handlers
     chip::BindingManager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
 
-    // TBD: Set FabricDelegate
+    // TODO: Set FabricDelegate
     // chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&mPersistenceManager);
 
-    // TBD: Add DeviceEvent Handler
+    // TODO: Add DeviceEvent Handler
     // ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(DeviceEventCallback, 0));
 
     mState = RUNNING; // CastingApp started successfully, set state to RUNNING
-
     return CHIP_NO_ERROR;
 }
 
@@ -103,7 +112,7 @@ CHIP_ERROR CastingApp::Stop()
 {
     VerifyOrReturnError(mState == RUNNING, CHIP_ERROR_INCORRECT_STATE);
 
-    // TBD: add logic to capture CastingPlayers that we are currently connected to, so we can automatically reconnect with them on
+    // TODO: add logic to capture CastingPlayers that we are currently connected to, so we can automatically reconnect with them on
     // Start() again
 
     // Shutdown the Matter server
@@ -114,6 +123,6 @@ CHIP_ERROR CastingApp::Stop()
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-}; // namespace app
+}; // namespace core
 }; // namespace casting
 }; // namespace matter

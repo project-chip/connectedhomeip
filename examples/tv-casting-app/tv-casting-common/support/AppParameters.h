@@ -35,37 +35,6 @@ namespace support {
  */
 class AppParameters
 {
-private:
-    /**
-     * @brief Provides UniqueId used to generate the RotatingDeviceId advertised by the CastingApp
-     *
-     */
-    MutableByteSpanDataProvider * mRotatingDeviceIdUniqueIdProvider;
-
-    /**
-     * @brief Provides CommissionableData (such as setupPasscode, discriminator, etc) used to get the CastingApp commissioned
-     *
-     */
-    chip::DeviceLayer::CommissionableDataProvider * mCommissionableDataProvider;
-
-    /**
-     * @brief Provides DeviceAttestationCredentials of the CastingApp during commissioning
-     *
-     */
-    chip::Credentials::DeviceAttestationCredentialsProvider * mDeviceAttestationCredentialsProvider;
-
-    /**
-     * @brief DeviceAttestationVerifier used by the CastingApp during commissioning
-     *
-     */
-    chip::Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier;
-
-    /**
-     * @brief Provides params used to initialize the Matter server run by the CastingApp
-     *
-     */
-    ServerInitParamsProvider * mServerInitParamsProvider;
-
 public:
     AppParameters() {}
     CHIP_ERROR Create(MutableByteSpanDataProvider * rotatingDeviceIdUniqueIdProvider,
@@ -100,6 +69,37 @@ public:
     chip::Credentials::DeviceAttestationVerifier * GetDeviceAttestationVerifier() const { return mDeviceAttestationVerifier; }
 
     ServerInitParamsProvider * GetServerInitParamsProvider() const { return mServerInitParamsProvider; }
+
+private:
+    /**
+     * @brief Provides UniqueId used to generate the RotatingDeviceId advertised by the CastingApp
+     *
+     */
+    MutableByteSpanDataProvider * mRotatingDeviceIdUniqueIdProvider;
+
+    /**
+     * @brief Provides CommissionableData (such as setupPasscode, discriminator, etc) used to get the CastingApp commissioned
+     *
+     */
+    chip::DeviceLayer::CommissionableDataProvider * mCommissionableDataProvider;
+
+    /**
+     * @brief Provides DeviceAttestationCredentials of the CastingApp during commissioning
+     *
+     */
+    chip::Credentials::DeviceAttestationCredentialsProvider * mDeviceAttestationCredentialsProvider;
+
+    /**
+     * @brief DeviceAttestationVerifier used by the CastingApp during commissioning
+     *
+     */
+    chip::Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier;
+
+    /**
+     * @brief Provides params used to initialize the Matter server run by the CastingApp
+     *
+     */
+    ServerInitParamsProvider * mServerInitParamsProvider;
 };
 
 }; // namespace support
