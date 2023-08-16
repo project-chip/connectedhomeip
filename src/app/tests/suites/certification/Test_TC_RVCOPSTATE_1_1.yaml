@@ -97,43 +97,6 @@ tests:
               type: list
               contains: [0x01]
 
-    - label:
-          "Step 5c: TH reads from the DUT the EventList attribute. 1.The list
-          SHALL NOT contain any additional values in the standard or scoped
-          range: (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE) 2.
-          The list MAY contain values in the Manufacturer Extensible Identifier
-          (MEI) range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed
-          MEI range (0x0001 - 0xFFF1), these values SHALL be ignored. 3. The
-          list SHALL NOT contain any values in the Test Vendor or invalid range:
-          (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 -
-          0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
-          allowed MEI range (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool rvcoperationalstate read event-list 1 1
-
-          Verify "  EventList attribute " value consists the list of mandatory event (0) and it may include the optional events (1) on the TH(Chip-tool) Log:
-          Below is the sample log provided for the raspi platform:
-          [1690201497.386141][14975:14977] CHIP:DMG:         InteractionModelRevision = 1
-          [1690201497.386195][14975:14977] CHIP:DMG: }
-          [1690201497.386630][14975:14977] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0061 Attribute 0x0000_FFFA DataVersion: 3675566847
-          [1690201497.386776][14975:14977] CHIP:TOO:   EventList: 2 entries
-          [1690201497.386846][14975:14977] CHIP:TOO:     [1]: 0
-          [1690201497.386907][14975:14977] CHIP:TOO:     [2]: 1
-          [1690201497.387222][14975:14977] CHIP:EM: <<< [E:56916i S:1295 M:30022149 (Ack:183426353)] (S) Msg TX to 1:0000000000000001 [9278] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1690201497.387319][14975:14977] CHIP:IN: (S) Sending msg 30022149 on secure session with LSID: 1295
-          [1690201497.387559][14975:14977] CHIP:EM: Flushed pending ack for MessageCounter:183426353 on exchange 56916i
-          [1690201497.387972][14975:14975] CHIP:CTL: Shutting down the commissioner
-          [1690201497.388046][14975:14975] CHIP:CTL: Stopping commissioning discovery over DNS-SD
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
     - label: "Step 6a: Read the optional command(Pause) in AcceptedCommandList"
       PICS: RVCOPSTATE.S.C00.Rsp || RVCOPSTATE.S.C03.Rsp
       command: "readAttribute"
