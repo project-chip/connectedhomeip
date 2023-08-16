@@ -27,6 +27,8 @@ shared_library("jni") {
     "java/AppImpl.cpp",
     "java/AppImpl.h",
     "java/ClusterChangeAttribute.cpp",
+    "java/ColorControlManager.cpp",
+    "java/ColorControlManager.h",
     "java/DeviceApp-JNI.cpp",
     "java/JNIDACProvider.cpp",
     "java/JNIDACProvider.h",
@@ -65,6 +67,7 @@ android_library("java") {
 
   sources = [
     "java/src/com/matter/virtual/device/app/Clusters.java",
+    "java/src/com/matter/virtual/device/app/ColorControlManager.java",
     "java/src/com/matter/virtual/device/app/DACProvider.java",
     "java/src/com/matter/virtual/device/app/DeviceApp.java",
     "java/src/com/matter/virtual/device/app/DeviceAppCallback.java",
