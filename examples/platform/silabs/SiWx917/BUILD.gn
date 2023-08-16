@@ -156,9 +156,10 @@ config("siwx917-common-config") {
     defines += [ "QR_CODE_ENABLED" ]
   }
 
-  if (chip_enable_ota_requestor) {
-    defines += [ "SILABS_OTA_ENABLED" ]
-  }
+  # TODO: Renable once ota is supported
+  # if (chip_enable_ota_requestor) {
+  #   defines += [ "SILABS_OTA_ENABLED" ]
+  # }
 
   if (enable_heap_monitoring) {
     defines += [ "HEAP_MONITORING" ]

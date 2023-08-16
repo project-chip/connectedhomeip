@@ -247,24 +247,7 @@ CHIP_ERROR BaseApplication::Init()
 
     ConfigurationMgr().LogDeviceConfig();
 
-    // Create buffer for QR code that can fit max size and null terminator.
-    char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
-    chip::MutableCharSpan QRCode(qrCodeBuffer);
-
-    if (Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(QRCode) == CHIP_NO_ERROR)
-    {
-        // Print setup info on LCD if available
-#ifdef QR_CODE_ENABLED
-        slLCD.SetQRCode((uint8_t *) QRCode.data(), QRCode.size());
-        slLCD.ShowQRCode(true, true);
-#else
-        PrintQrCodeURL(QRCode);
-#endif // QR_CODE_ENABLED
-    }
-    else
-    {
-        SILABS_LOG("Getting QR code failed!");
-    }
+    OutputQrCode(true /*refreshLCD at init*/);
 
     PlatformMgr().AddEventHandler(OnPlatformEvent, 0);
 #ifdef SL_WIFI
@@ -482,6 +465,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             CancelFunctionTimer();
             mFunction = kFunction_NoneSelected;
 
+            OutputQrCode(false);
 #ifdef QR_CODE_ENABLED
             // TOGGLE QRCode/LCD demo UI
             slLCD.ToggleQRCode();
@@ -723,5 +707,32 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
     if (event->Type == DeviceEventType::kServiceProvisioningChange)
     {
         sIsProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
+    }
+}
+
+void BaseApplication::OutputQrCode(bool refreshLCD)
+{
+    (void) refreshLCD; // could be unused
+
+    // Create buffer for the Qr code setup payload that can fit max size and null terminator.
+    char setupPayloadBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
+    chip::MutableCharSpan setupPayload(setupPayloadBuffer);
+
+    if (Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(setupPayload) == CHIP_NO_ERROR)
+    {
+        // Print setup info on LCD if available
+#ifdef QR_CODE_ENABLED
+        if (refreshLCD)
+        {
+            slLCD.SetQRCode((uint8_t *) setupPayload.data(), setupPayload.size());
+            slLCD.ShowQRCode(true, true);
+        }
+#endif // QR_CODE_ENABLED
+
+        PrintQrCodeURL(setupPayload);
+    }
+    else
+    {
+        SILABS_LOG("Getting QR code failed!");
     }
 }

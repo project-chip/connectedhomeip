@@ -26,6 +26,10 @@ extern "C" void RSI_Board_LED_Toggle(int);
 extern "C" void RSI_Wakeupsw_config(void);
 extern "C" void RSI_Wakeupsw_config_gpio0(void);
 
+#if SILABS_LOG_ENABLED
+#include "silabs_utils.h"
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 namespace Silabs {

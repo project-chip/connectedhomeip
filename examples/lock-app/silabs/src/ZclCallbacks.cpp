@@ -73,7 +73,7 @@ bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const N
                                             OperationErrorEnum & err)
 {
     ChipLogProgress(Zcl, "Door Lock App: Lock Command endpoint=%d", endpointId);
-    bool status = LockMgr().Lock(endpointId, pinCode, err);
+    bool status = LockMgr().Lock(endpointId, fabricIdx, nodeId, pinCode, err);
     if (status == true)
     {
         LockMgr().InitiateAction(AppEvent::kEventType_Lock, LockManager::LOCK_ACTION);
@@ -86,7 +86,7 @@ bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const
                                               OperationErrorEnum & err)
 {
     ChipLogProgress(Zcl, "Door Lock App: Unlock Command endpoint=%d", endpointId);
-    bool status = LockMgr().Unlock(endpointId, pinCode, err);
+    bool status = LockMgr().Unlock(endpointId, fabricIdx, nodeId, pinCode, err);
     if (status == true)
     {
         LockMgr().InitiateAction(AppEvent::kEventType_Lock, LockManager::UNLOCK_ACTION);
@@ -100,7 +100,7 @@ bool emberAfPluginDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId, const
                                               OperationErrorEnum & err)
 {
     ChipLogProgress(Zcl, "Door Lock App: Unbolt Command endpoint=%d", endpointId);
-    bool status = LockMgr().Unlock(endpointId, pinCode, err);
+    bool status = LockMgr().Unlock(endpointId, fabricIdx, nodeId, pinCode, err);
     if (status == true)
     {
         LockMgr().InitiateAction(AppEvent::kEventType_Lock, LockManager::UNLOCK_ACTION);

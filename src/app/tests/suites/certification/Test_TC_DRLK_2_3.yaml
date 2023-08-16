@@ -22,6 +22,9 @@ config:
     cluster: "Door Lock"
     endpoint: 1
     timeout: 200
+    requirePINIsTrue:
+        type: BOOLEAN
+        defaultValue: false
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -127,18 +130,18 @@ tests:
                 value: null
 
     - label:
-          "Step 1a: TH writes the RequirePINforRemoteOperation attribute value
-          as False on the DUT"
-      PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033
+          "Step 1: TH writes the RequirePINforRemoteOperation attribute value as
+          False on the DUT"
+      PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033.Write
       command: "writeAttribute"
       attribute: "RequirePINforRemoteOperation"
       arguments:
           value: false
 
     - label:
-          "Step 1b: TH writes the RequirePINforRemoteOperation attribute value
-          as False on the DUT and Verify DUT responds with UNSUPPORTED_WRITE"
-      PICS: DRLK.S.F07 && DRLK.S.F00 && !DRLK.S.A0033
+          "Step 1: TH writes the RequirePINforRemoteOperation attribute value as
+          False on the DUT"
+      PICS: DRLK.S.F07 && DRLK.S.F00 && !DRLK.S.A0033.Write
       command: "writeAttribute"
       attribute: "RequirePINforRemoteOperation"
       arguments:
@@ -153,13 +156,62 @@ tests:
       command: "readAttribute"
       attribute: "RequirePINforRemoteOperation"
       response:
-          value: false
+          saveAs: requirePINIsTrue
+          constraints:
+              type: boolean
+              minValue: 0
+              maxValue: 1
+
+    - label:
+          "Step 2a: TH verifies the RequirePINforRemoteOperation attribute value
+          is now False on the DUT"
+      PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033.Write
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: requirePINIsTrue
+              - name: "Value2"
+                value: false
+      response:
+          - values:
+                - name: "Equals"
+                  value: true
+
+    - label: "Step 2b: Compute RequirePINforRemoteOperation"
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: requirePINIsTrue
+              - name: "Value2"
+                value: false
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: requirePINIsFalse
+                  constraints:
+                      type: boolean
+                      minValue: 0
+                      maxValue: 1
 
     - label:
           "Step 3: TH sends the unlock Door command to the DUT without PINCode"
+      runIf: requirePINIsFalse
       PICS: DRLK.S.C01.Rsp
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
+
+    - label:
+          "Step 3: TH sends the unlock Door command to the DUT without PINCode"
+      runIf: requirePINIsTrue
+      PICS: DRLK.S.C01.Rsp
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 1000
+      response:
+          error: FAILURE
 
     - label:
           "Step 4: TH sends the unlock Door command to the DUT with valid
@@ -173,18 +225,18 @@ tests:
                 value: "123456"
 
     - label:
-          "Step 5a: TH writes the RequirePINforRemoteOperation attribute value
-          as False on the DUT"
-      PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033
+          "Step 5: TH writes the RequirePINforRemoteOperation attribute value as
+          true on the DUT"
+      PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033.Write
       command: "writeAttribute"
       attribute: "RequirePINforRemoteOperation"
       arguments:
           value: true
 
     - label:
-          "Step 5b: TH writes the RequirePINforRemoteOperation attribute value
-          as False on the DUT and Verify DUT responds with UNSUPPORTED_WRITE"
-      PICS: DRLK.S.F07 && DRLK.S.F00 && !DRLK.S.A0033
+          "Step 5: TH writes the RequirePINforRemoteOperation attribute value as
+          true on the DUT"
+      PICS: DRLK.S.F07 && DRLK.S.F00 && !DRLK.S.A0033.Write
       command: "writeAttribute"
       attribute: "RequirePINforRemoteOperation"
       arguments:
@@ -199,21 +251,49 @@ tests:
       command: "readAttribute"
       attribute: "RequirePINforRemoteOperation"
       response:
-          value: true
+          saveAs: requirePINIsTrue
+          constraints:
+              type: boolean
+              minValue: 0
+              maxValue: 1
 
     - label:
-          "Step 7: TH sends the unlock Door command to the DUT with valid
-          PINCode"
-      PICS: DRLK.S.C01.Rsp && DRLK.S.A0033
-      command: "UnlockDoor"
-      timedInteractionTimeoutMs: 1000
+          "Step 6a: TH verifies the RequirePINforRemoteOperation attribute value
+          is now True on the DUT"
+      PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033.Write
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
       arguments:
           values:
-              - name: "PINCode"
-                value: "123456"
+              - name: "Value1"
+                value: requirePINIsTrue
+              - name: "Value2"
+                value: true
+      response:
+          - values:
+                - name: "Equals"
+                  value: true
+
+    - label: "Step 6b: Compute RequirePINforRemoteOperation"
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: requirePINIsTrue
+              - name: "Value2"
+                value: false
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: requirePINIsFalse
+                  constraints:
+                      type: boolean
+                      minValue: 0
+                      maxValue: 1
 
     - label:
-          "Step 8: TH sends the unlock Door command to the DUT with invalid
+          "Step 7: TH sends the unlock Door command to the DUT with invalid
           PINCode"
       PICS: DRLK.S.C01.Rsp && DRLK.S.A0033
       command: "UnlockDoor"
@@ -226,7 +306,8 @@ tests:
           error: FAILURE
 
     - label:
-          "Step 9: TH sends the unlock Door command to the DUT without PINCode"
+          "Step 8: TH sends the unlock Door command to the DUT without PINCode"
+      runIf: requirePINIsTrue
       PICS: DRLK.S.C01.Rsp && DRLK.S.A0033
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
@@ -234,18 +315,36 @@ tests:
           error: FAILURE
 
     - label:
-          "Step 10a: TH writes WrongCodeEntryLimit attribute value as 3 on the
-          DUT and Verify that the DUT sends Success response"
-      PICS: DRLK.S.F00 && DRLK.S.F01 && DRLK.S.A0030.Write
+          "Step 8: TH sends the unlock Door command to the DUT without PINCode"
+      runIf: requirePINIsFalse
+      PICS: DRLK.S.C01.Rsp && DRLK.S.A0033
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 1000
+
+    - label:
+          "Step 9: TH sends the unlock Door command to the DUT with valid
+          PINCode"
+      PICS: DRLK.S.C01.Rsp && DRLK.S.A0033
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "123456"
+
+    - label:
+          "Step 10: TH writes WrongCodeEntryLimit attribute value as 3 on the
+          DUT"
+      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0030.Write
       command: "writeAttribute"
       attribute: "WrongCodeEntryLimit"
       arguments:
           value: 3
 
     - label:
-          "Step 10b: TH writes WrongCodeEntryLimit attribute value as 3 on the
-          DUT and verify DUT responds with UNSUPPORTED_WRITE"
-      PICS: DRLK.S.F00 && DRLK.S.F01 && !DRLK.S.A0030.Write
+          "Step 10: TH writes WrongCodeEntryLimit attribute value as 3 on the
+          DUT"
+      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && !DRLK.S.A0030.Write
       command: "writeAttribute"
       attribute: "WrongCodeEntryLimit"
       arguments:
@@ -254,18 +353,18 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label:
-          "Step 11a: TH writes UserCodeTemporaryDisableTime attribute value as
-          15 Seconds on the DUT and Verify that the DUT sends Success response"
-      PICS: DRLK.S.F00 && DRLK.S.F01 && DRLK.S.A0031.Write
+          "Step 11: TH writes UserCodeTemporaryDisableTime attribute value as 15
+          Seconds on the DUT and Verify that the DUT sends Success response"
+      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031.Write
       command: "writeAttribute"
       attribute: "UserCodeTemporaryDisableTime"
       arguments:
           value: 15
 
     - label:
-          "Step 11b: TH writes UserCodeTemporaryDisableTime attribute value as
-          15 Seconds on the DUT and Verify that the DUT sends Success response"
-      PICS: DRLK.S.F00 && DRLK.S.F01 && !DRLK.S.A0031.Write
+          "Step 11: TH writes UserCodeTemporaryDisableTime attribute value as 15
+          Seconds on the DUT and Verify that the DUT sends Success response"
+      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && !DRLK.S.A0031.Write
       command: "writeAttribute"
       attribute: "UserCodeTemporaryDisableTime"
       arguments:
@@ -326,9 +425,8 @@ tests:
           error: FAILURE
 
     - label:
-          "Step 13: TH reads the UserCodeTemporaryDisableTime attribute from the
-          DUT and check attribute is triggered"
-      PICS: DRLK.S.F00 && DRLK.S.F01 && DRLK.S.A0031
+          "Step 13: TH reads UserCodedTemporaryDisableTime attribute from DUT"
+      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031
       command: "readAttribute"
       attribute: "UserCodeTemporaryDisableTime"
       response:
@@ -350,7 +448,7 @@ tests:
     - label: "Wait for UserCodeTemporaryDisableTime expires"
       cluster: "DelayCommands"
       command: "WaitForMs"
-      PICS: DRLK.S.F00 && DRLK.S.F01 && DRLK.S.A0031
+      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031
       arguments:
           values:
               - name: "ms"
