@@ -100,7 +100,7 @@ private:
 class MdnsAvahi
 {
 public:
-    MdnsAvahi(const MdnsAvahi &) = delete;
+    MdnsAvahi(const MdnsAvahi &)             = delete;
     MdnsAvahi & operator=(const MdnsAvahi &) = delete;
 
     CHIP_ERROR Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context);
@@ -126,6 +126,9 @@ private:
         void * mContext;
         Inet::IPAddressType mAddressType;
         std::vector<DnssdService> mServices;
+        size_t mBrowseRetries;
+        AvahiIfIndex mInterface;
+        std::string mProtocol;
     };
 
     struct ResolveContext
@@ -165,6 +168,7 @@ private:
     AvahiClient * mClient;
     std::map<std::string, AvahiEntryGroup *> mPublishedGroups;
     Poller mPoller;
+    constexpr kMaxBrowseRetries = 3;
 };
 
 } // namespace Dnssd

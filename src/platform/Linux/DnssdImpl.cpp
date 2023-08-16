@@ -609,8 +609,11 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, DnssdServiceProtocol protocol, c
     {
         avahiInterface = AVAHI_IF_UNSPEC;
     }
+    browseContext->mInterface     = avahiInterface;
+    browseContext->mProtocol      = GetFullType(type, protocol);
+    browseContext->mBrowseRetries = 0;
 
-    browser = avahi_service_browser_new(mClient, avahiInterface, AVAHI_PROTO_UNSPEC, GetFullType(type, protocol).c_str(), nullptr,
+    browser = avahi_service_browser_new(mClient, avahiInterface, AVAHI_PROTO_UNSPEC, browseContext->mProtocol.c_str(), nullptr,
                                         static_cast<AvahiLookupFlags>(0), HandleBrowse, browseContext);
     // Otherwise the browser will be freed in the callback
     if (browser == nullptr)
@@ -697,9 +700,23 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
         break;
     case AVAHI_BROWSER_ALL_FOR_NOW:
         ChipLogProgress(DeviceLayer, "Avahi browse: all for now");
-        context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), true, CHIP_NO_ERROR);
+        need_retries = context->mBrowseRetries++ < kMaxBrowseRetries;
+        if (need_retries)
+        {
+            // TODO: this needs to be on a timer
+            browser = avahi_service_browser_new(mClient, context->mInterface, AVAHI_PROTO_UNSPEC, context->mProtocol.c_str(),
+                                                nullptr, static_cast<AvahiLookupFlags>(0), HandleBrowse, context);
+            if (browser == nullptr)
+            {
+                need_retries = false;
+            }
+        }
+        context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), !need_retries, CHIP_NO_ERROR);
         avahi_service_browser_free(browser);
-        chip::Platform::Delete(context);
+        if (!need_retries)
+        {
+            chip::Platform::Delete(context);
+        }
         break;
     case AVAHI_BROWSER_REMOVE:
         ChipLogProgress(DeviceLayer, "Avahi browse: remove");
@@ -914,6 +931,8 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
 
 CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
 {
+    // TODO: This should, at the very least, stop the retries.
+    // I don't know if we can stop the avahi object, but we can at least stop the callbacks using a flag
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
