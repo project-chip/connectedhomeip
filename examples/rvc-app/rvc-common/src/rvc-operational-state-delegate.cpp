@@ -51,4 +51,3 @@ void RvcOperationalStateDelegate::HandleResumeStateCallback(OperationalState::Ge
 {
     (mResumeRvcDeviceInstance->*mResumeCallback)(err);
 }
-

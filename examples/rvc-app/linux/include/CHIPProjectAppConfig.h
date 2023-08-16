@@ -32,4 +32,3 @@
 
 #define CHIP_DEVICE_CONFIG_DEVICE_TYPE 116 // 0x0074 = 117 = Matter Robotic Vacuum Cleaner
 #define CHIP_DEVICE_CONFIG_DEVICE_NAME "Test RVC"
-
