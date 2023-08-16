@@ -36,4 +36,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
       - name: Run Summarization Script
         run: python scripts/tools/summarize_fail.py
+      - name: Upload Log
+        uses: actions/upload-artifact@v3
+        with:
+          name: fail-summary-logs
+          path: .
+          retention-days: 5
         
