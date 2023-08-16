@@ -55,8 +55,10 @@
 
 #include <string.h>
 
-#include "SecLib_ecp256.h"
 #include "sss_crypto.h"
+extern "C" {
+#include "SecLib.h"
+}
 
 namespace chip {
 namespace Crypto {
@@ -203,6 +205,9 @@ CHIP_ERROR Hash_SHA256(const uint8_t * data, const size_t data_length, uint8_t *
     VerifyOrReturnError(data != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
+#if defined(USE_HW_SHA256)
+    SHA256_Hash(Uint8::to_const_uchar(data), data_length, Uint8::to_uchar(out_buffer));
+#else
 #if (MBEDTLS_VERSION_NUMBER >= 0x03000000)
     const int result = mbedtls_sha256(Uint8::to_const_uchar(data), data_length, Uint8::to_uchar(out_buffer), 0);
 #else
@@ -210,6 +215,7 @@ CHIP_ERROR Hash_SHA256(const uint8_t * data, const size_t data_length, uint8_t *
 #endif
 
     VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
+#endif
 
     return CHIP_NO_ERROR;
 }
@@ -230,6 +236,36 @@ CHIP_ERROR Hash_SHA1(const uint8_t * data, const size_t data_length, uint8_t * o
     return CHIP_NO_ERROR;
 }
 
+#if defined(USE_HW_SHA256)
+/*
+ * These structures are used to save the intermediate
+ * non-hashed data on heap (in a linked list)
+ * and compute the hash on demand.
+ * This solution bypases the sha256 context save/restore
+ * S200 limitation.
+ * */
+typedef struct sha256_node
+{
+    uint8_t *data;
+    uint16_t size;
+    sha256_node *next;
+} sha256_node;
+
+typedef struct S200_context
+{
+    void *sss_context;
+    sha256_node *head;
+    sha256_node *tail;
+} S200_context;
+
+static_assert(kMAX_Hash_SHA256_Context_Size >= sizeof(S200_context),
+              "kMAX_Hash_SHA256_Context_Size is too small for the size of underlying mbedtls_sha256_context");
+
+static inline S200_context * to_inner_hash_sha256_context(HashSHA256OpaqueContext * context)
+{
+    return SafePointerCast<S200_context *>(context);
+}
+#else
 static_assert(kMAX_Hash_SHA256_Context_Size >= sizeof(mbedtls_sha256_context),
               "kMAX_Hash_SHA256_Context_Size is too small for the size of underlying mbedtls_sha256_context");
 
@@ -237,22 +273,45 @@ static inline mbedtls_sha256_context * to_inner_hash_sha256_context(HashSHA256Op
 {
     return SafePointerCast<mbedtls_sha256_context *>(context);
 }
+#endif
 
 Hash_SHA256_stream::Hash_SHA256_stream(void)
 {
+#if defined(USE_HW_SHA256)
+    S200_context * context = to_inner_hash_sha256_context(&mContext);
+
+    context->sss_context = nullptr;
+    context->head = nullptr;
+    context->tail = nullptr;
+#else
     mbedtls_sha256_context * context = to_inner_hash_sha256_context(&mContext);
     mbedtls_sha256_init(context);
+#endif
 }
 
 Hash_SHA256_stream::~Hash_SHA256_stream(void)
 {
+#if defined(USE_HW_SHA256)
+    S200_context * context = to_inner_hash_sha256_context(&mContext);
+
+    context->sss_context = nullptr;
+    context->head = nullptr;
+    context->tail = nullptr;
+#else
     mbedtls_sha256_context * context = to_inner_hash_sha256_context(&mContext);
     mbedtls_sha256_free(context);
+#endif
     Clear();
 }
 
 CHIP_ERROR Hash_SHA256_stream::Begin(void)
 {
+#if defined(USE_HW_SHA256)
+    S200_context * context = to_inner_hash_sha256_context(&mContext);
+    context->sss_context = SHA256_AllocCtx();
+
+    SHA256_Init(context->sss_context);
+#else
     mbedtls_sha256_context * const context = to_inner_hash_sha256_context(&mContext);
 
 #if (MBEDTLS_VERSION_NUMBER >= 0x03000000)
@@ -262,12 +321,37 @@ CHIP_ERROR Hash_SHA256_stream::Begin(void)
 #endif
 
     VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
+#endif
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Hash_SHA256_stream::AddData(const ByteSpan data)
 {
+#if defined(USE_HW_SHA256)
+    S200_context * context = to_inner_hash_sha256_context(&mContext);
+    sha256_node *node = nullptr;
+
+    VerifyOrReturnError(context->sss_context != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    SHA256_HashUpdate(context->sss_context, Uint8::to_const_uchar(data.data()), data.size());
+
+    node = (sha256_node*)malloc(sizeof(sha256_node));
+    node->size = data.size();
+    node->data = (uint8_t*)malloc(data.size());
+    node->next = nullptr;
+    memcpy(node->data, Uint8::to_const_uchar(data.data()), node->size);
+
+    if(context->head == nullptr)
+    {
+        context->head = node;
+        context->tail = node;
+    }
+    else
+    {
+        context->tail->next = node;
+    }
+#else
     mbedtls_sha256_context * const context = to_inner_hash_sha256_context(&mContext);
 
 #if (MBEDTLS_VERSION_NUMBER >= 0x03000000)
@@ -277,12 +361,32 @@ CHIP_ERROR Hash_SHA256_stream::AddData(const ByteSpan data)
 #endif
 
     VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
+#endif
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Hash_SHA256_stream::GetDigest(MutableByteSpan & out_buffer)
 {
+    CHIP_ERROR result = CHIP_NO_ERROR;
+
+#if defined(USE_HW_SHA256)
+    S200_context * context = to_inner_hash_sha256_context(&mContext);
+    sha256_node *node = context->head;
+    void* ctx = SHA256_AllocCtx();
+
+    SHA256_Init(ctx);
+
+    while(node)
+    {
+        SHA256_HashUpdate(ctx, node->data, node->size);
+        node = node->next;
+    }
+
+    SHA256_HashFinish(ctx, Uint8::to_uchar(out_buffer.data()));
+
+    SHA256_FreeCtx(ctx);
+#else
     mbedtls_sha256_context * context = to_inner_hash_sha256_context(&mContext);
 
     // Back-up context as we are about to finalize the hash to extract digest.
@@ -291,17 +395,34 @@ CHIP_ERROR Hash_SHA256_stream::GetDigest(MutableByteSpan & out_buffer)
     mbedtls_sha256_clone(&previous_ctx, context);
 
     // Pad + compute digest, then finalize context. It is restored next line to continue.
-    CHIP_ERROR result = Finish(out_buffer);
+    result = Finish(out_buffer);
 
     // Restore context prior to finalization.
     mbedtls_sha256_clone(context, &previous_ctx);
     mbedtls_sha256_free(&previous_ctx);
+#endif
 
     return result;
 }
 
 CHIP_ERROR Hash_SHA256_stream::Finish(MutableByteSpan & out_buffer)
 {
+#if defined(USE_HW_SHA256)
+    S200_context * context = to_inner_hash_sha256_context(&mContext);
+
+    sha256_node *node = nullptr;
+
+    SHA256_HashFinish(context->sss_context, Uint8::to_uchar(out_buffer.data()));
+    SHA256_FreeCtx(context->sss_context);
+
+    while(context->head)
+    {
+        node = context->head;
+        context->head = context->head->next;
+        free(node->data);
+        free(node);
+    }
+#else
     VerifyOrReturnError(out_buffer.size() >= kSHA256_Hash_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
     mbedtls_sha256_context * const context = to_inner_hash_sha256_context(&mContext);
 
@@ -313,6 +434,7 @@ CHIP_ERROR Hash_SHA256_stream::Finish(MutableByteSpan & out_buffer)
 
     VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
     out_buffer = out_buffer.SubSpan(0, kSHA256_Hash_Length);
+#endif
 
     return CHIP_NO_ERROR;
 }
@@ -360,6 +482,9 @@ CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const u
     VerifyOrReturnError(out_length >= kSHA256_Hash_Length, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
+#if defined(USE_HW_SHA256)
+    ::HMAC_SHA256(Uint8::to_const_uchar(key), (uint32_t)key_length, Uint8::to_const_uchar(message), (uint32_t)message_length, out_buffer);
+#else
     const mbedtls_md_info_t * const md = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
     VerifyOrReturnError(md != nullptr, CHIP_ERROR_INTERNAL);
 
@@ -368,6 +493,7 @@ CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const u
 
     _log_mbedTLS_error(result);
     VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
+#endif
 
     return CHIP_NO_ERROR;
 }

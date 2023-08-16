@@ -28,6 +28,7 @@ declare_args() {
   k32w1_sdk_root = getenv("NXP_K32W1_SDK_ROOT")
   use_smu2_static = false
   use_smu2_dynamic = false
+  use_hw_sha256 = false
 
   # icd configuration flags
   chip_enable_icd_subscription_handle = false
@@ -321,6 +322,12 @@ template("k32w1_sdk") {
       ]
     }
 
+    if (use_hw_sha256) {
+      defines += [
+        "USE_HW_SHA256",
+      ]
+    }
+
     if (defined(invoker.defines)) {
       defines += invoker.defines
     }
@@ -481,6 +488,7 @@ template("k32w1_sdk") {
       "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_init.c",
       "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_aes.c",
       "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_sha256.c",
+      "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_hmac_sha256.c",
       "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_ecdh.c",
       "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_aes_cmac.c",
 
