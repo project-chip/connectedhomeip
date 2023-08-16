@@ -48,7 +48,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::Ch
             return;
         }
     }
-        break;
+    break;
     case RvcRunMode::ModeIdle: {
         mRunModeInstance.UpdateCurrentMode(NewMode);
         // Set operational state to running
@@ -61,7 +61,6 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::Ch
             return;
         }
     }
-
     }
 
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);

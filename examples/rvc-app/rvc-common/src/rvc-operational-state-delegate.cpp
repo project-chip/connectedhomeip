@@ -22,7 +22,8 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::RvcOperationalState;
 
-CHIP_ERROR RvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t index, OperationalState::GenericOperationalState & operationalState)
+CHIP_ERROR RvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
+                                                                   OperationalState::GenericOperationalState & operationalState)
 {
     if (index >= ArraySize(mOperationalStateList))
     {
@@ -32,7 +33,8 @@ CHIP_ERROR RvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR RvcOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, OperationalState::GenericOperationalPhase & operationalPhase)
+CHIP_ERROR RvcOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index,
+                                                                   OperationalState::GenericOperationalPhase & operationalPhase)
 {
     if (index >= ArraySize(mOperationalPhaseList))
     {

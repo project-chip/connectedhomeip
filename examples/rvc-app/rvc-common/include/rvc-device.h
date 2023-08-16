@@ -1,14 +1,13 @@
 #pragma once
 
-#include <app/clusters/mode-base-server/mode-base-server.h>
-#include <app/clusters/operational-state-server/operational-state-server.h>
 #include "rvc-mode-delegates.h"
 #include "rvc-operational-state-delegate.h"
+#include <app/clusters/mode-base-server/mode-base-server.h>
+#include <app/clusters/operational-state-server/operational-state-server.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-
 
 class RvcDevice
 {
@@ -23,13 +22,12 @@ private:
     OperationalState::Instance mOperationalStateInstance;
 
 public:
-    RvcDevice():
+    RvcDevice() :
         mRunModeDelegate(),
         mRunModeInstance(&mRunModeDelegate, 0x1, RvcRunMode::Id, chip::to_underlying(RvcRunMode::Feature::kOnOff)),
         mCleanModeDelegate(),
         mCleanModeInstance(&mCleanModeDelegate, 0x1, RvcCleanMode::Id, chip::to_underlying(RvcCleanMode::Feature::kOnOff)),
-        mOperationalStateDelegate(),
-        mOperationalStateInstance(&mOperationalStateDelegate, 0x01, RvcOperationalState::Id)
+        mOperationalStateDelegate(), mOperationalStateInstance(&mOperationalStateDelegate, 0x01, RvcOperationalState::Id)
     {
         // set start-up modes and state
         mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);

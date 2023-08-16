@@ -53,9 +53,9 @@ private:
         OperationalState::GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
     };
 
-    RvcDevice *mPauseRvcDeviceInstance;
+    RvcDevice * mPauseRvcDeviceInstance;
     HandleOpStateCommand mPauseCallback;
-    RvcDevice *mResumeRvcDeviceInstance;
+    RvcDevice * mResumeRvcDeviceInstance;
     HandleOpStateCommand mResumeCallback;
 
 public:
@@ -73,7 +73,8 @@ public:
      * @param index The index of the state, with 0 representing the first state.
      * @param operationalState  The GenericOperationalState is filled.
      */
-    CHIP_ERROR GetOperationalStateAtIndex(size_t index, Clusters::OperationalState::GenericOperationalState & operationalState) override;
+    CHIP_ERROR GetOperationalStateAtIndex(size_t index,
+                                          Clusters::OperationalState::GenericOperationalState & operationalState) override;
 
     /**
      * Fills in the provided GenericOperationalPhase with the phase at index `index` if there is one,
@@ -83,7 +84,8 @@ public:
      * @param index The index of the phase, with 0 representing the first phase.
      * @param operationalPhase  The GenericOperationalPhase is filled.
      */
-    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, Clusters::OperationalState::GenericOperationalPhase & operationalPhase) override;
+    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index,
+                                          Clusters::OperationalState::GenericOperationalPhase & operationalPhase) override;
 
     // command callback
     /**
@@ -102,7 +104,7 @@ public:
      * Handle Command Callback in application: Start
      * @param[out] get operational error after callback.
      */
-    void HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err) override {
+    void HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err) override{
         // This command in not supported.
     };
 
@@ -110,20 +112,21 @@ public:
      * Handle Command Callback in application: Stop
      * @param[out] get operational error after callback.
      */
-    void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override {
+    void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override{
         // This command in not supported.
     };
 
-    void SetPauseCallback(HandleOpStateCommand aCallback, RvcDevice *aInstance) {
-        mPauseCallback = aCallback;
+    void SetPauseCallback(HandleOpStateCommand aCallback, RvcDevice * aInstance)
+    {
+        mPauseCallback          = aCallback;
         mPauseRvcDeviceInstance = aInstance;
     };
 
-    void SetResumeCallback(HandleOpStateCommand aCallback, RvcDevice *aInstance) {
-        mResumeCallback = aCallback;
+    void SetResumeCallback(HandleOpStateCommand aCallback, RvcDevice * aInstance)
+    {
+        mResumeCallback          = aCallback;
         mResumeRvcDeviceInstance = aInstance;
     };
-
 };
 
 void Shutdown();

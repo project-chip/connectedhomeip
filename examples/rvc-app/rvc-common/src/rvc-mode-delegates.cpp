@@ -23,7 +23,7 @@ using namespace chip::app::Clusters::RvcRunMode;
 using namespace chip::app::Clusters::RvcCleanMode;
 using chip::Protocols::InteractionModel::Status;
 template <typename T>
-using List              = chip::app::DataModel::List<T>;
+using List = chip::app::DataModel::List<T>;
 
 // RVC Run
 CHIP_ERROR RvcRunModeDelegate::Init()
@@ -73,7 +73,6 @@ CHIP_ERROR RvcRunModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTa
     return CHIP_NO_ERROR;
 }
 
-
 // RVC Clean
 
 CHIP_ERROR RvcCleanModeDelegate::Init()
@@ -85,7 +84,6 @@ void RvcCleanModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Command
 {
     (mRvcDeviceInstance->*mCallback)(NewMode, response);
 }
-
 
 CHIP_ERROR RvcCleanModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {

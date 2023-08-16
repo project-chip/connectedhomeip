@@ -22,9 +22,10 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-RvcDevice *rvcDevice = nullptr;
+RvcDevice * rvcDevice = nullptr;
 
-void ApplicationInit() {
+void ApplicationInit()
+{
     rvcDevice = new RvcDevice;
     rvcDevice->Init();
 }
