@@ -141,18 +141,6 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
     AndroidConfig::RunConfigUnitTest();
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-CHIP_ERROR ConfigurationManagerImpl::GetWiFiStationSecurityType(WiFiAuthSecurityType & secType)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ConfigurationManagerImpl::UpdateWiFiStationSecurityType(WiFiAuthSecurityType secType)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     return;
