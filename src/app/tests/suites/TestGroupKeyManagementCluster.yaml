@@ -556,6 +556,15 @@ tests:
       response:
           error: RESOURCE_EXHAUSTED
 
+    - label: "Try to remove KeySet index 0 should fail"
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0
+      response:
+          error: INVALID_COMMAND
+
     - label: "Write Group Keys (invalid)"
       command: "writeAttribute"
       attribute: "GroupKeyMap"

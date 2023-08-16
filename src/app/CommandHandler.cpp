@@ -303,6 +303,9 @@ Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElem
 
     if (CommandIsFabricScoped(concretePath.mClusterId, concretePath.mCommandId))
     {
+        // SPEC: Else if the command in the path is fabric-scoped and there is no accessing fabric,
+        // a CommandStatusIB SHALL be generated with the UNSUPPORTED_ACCESS Status Code.
+
         // Fabric-scoped commands are not allowed before a specific accessing fabric is available.
         // This is mostly just during a PASE session before AddNOC.
         if (GetAccessingFabricIndex() == kUndefinedFabricIndex)
@@ -470,8 +473,7 @@ CHIP_ERROR CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, c
     return AddStatusInternal(aCommandPath, StatusIB(aStatus));
 }
 
-CHIP_ERROR CommandHandler::AddStatusAndLogIfFailure(const ConcreteCommandPath & aCommandPath, const Status aStatus,
-                                                    const char * aMessage)
+void CommandHandler::AddStatusAndLogIfFailure(const ConcreteCommandPath & aCommandPath, const Status aStatus, const char * aMessage)
 {
     if (aStatus != Status::Success)
     {
@@ -482,7 +484,15 @@ CHIP_ERROR CommandHandler::AddStatusAndLogIfFailure(const ConcreteCommandPath & 
                      ChipLogValueIMStatus(aStatus), aMessage);
     }
 
-    return AddStatus(aCommandPath, aStatus);
+    CHIP_ERROR err = AddStatus(aCommandPath, aStatus);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement,
+                     "Failed to set status on Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI
+                     ": %" CHIP_ERROR_FORMAT,
+                     aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId),
+                     err.Format());
+    }
 }
 
 CHIP_ERROR CommandHandler::AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus)
