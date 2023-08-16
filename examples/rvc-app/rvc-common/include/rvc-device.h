@@ -28,7 +28,8 @@ public:
         mRunModeInstance(&mRunModeDelegate, 0x1, RvcRunMode::Id, chip::to_underlying(RvcRunMode::Feature::kOnOff)),
         mCleanModeDelegate(),
         mCleanModeInstance(&mCleanModeDelegate, 0x1, RvcCleanMode::Id, chip::to_underlying(RvcCleanMode::Feature::kOnOff)),
-        mOperationalStateDelegate(), mOperationalStateInstance(&mOperationalStateDelegate, 0x01, RvcOperationalState::Id)
+        mOperationalStateDelegate(),
+        mOperationalStateInstance(&mOperationalStateDelegate, 0x01, RvcOperationalState::Id)
     {
         // set start-up modes and state
         mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
