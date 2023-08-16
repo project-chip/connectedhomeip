@@ -26,14 +26,18 @@ jobs:
     name: Summarize Recent Workflow Failures
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
       - name: Setup
         run: |
-          gh run list -b master -s failure --json displayTitle,workflowName > runlist.json
+          gh run list -R project-chip/connectedhomeip -b master -s failure --json displayTitle,workflowName > runlist.json
           pip install pandas
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Run Summarization Script
         run: python scripts/tools/summarize_fail.py
+      - name: Upload Logs
+        uses: actions/upload-artifact@v3
+        with:
+          name: workflow-fail-summary
+          path: .
+          retention-days: 5
         
