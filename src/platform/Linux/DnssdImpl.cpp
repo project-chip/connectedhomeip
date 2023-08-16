@@ -698,15 +698,16 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
             context->mServices.push_back(service);
         }
         break;
-    case AVAHI_BROWSER_ALL_FOR_NOW:
+    case AVAHI_BROWSER_ALL_FOR_NOW: {
         ChipLogProgress(DeviceLayer, "Avahi browse: all for now");
-        need_retries = context->mBrowseRetries++ < kMaxBrowseRetries;
+        bool need_retries = context->mBrowseRetries++ < kMaxBrowseRetries;
         if (need_retries)
         {
             // TODO: this needs to be on a timer
-            browser = avahi_service_browser_new(mClient, context->mInterface, AVAHI_PROTO_UNSPEC, context->mProtocol.c_str(),
-                                                nullptr, static_cast<AvahiLookupFlags>(0), HandleBrowse, context);
-            if (browser == nullptr)
+            AvahiServiceBrowser * new_browser = avahi_service_browser_new(context->mInstance->mClient, context->mInterface,
+                                                                          AVAHI_PROTO_UNSPEC, context->mProtocol.c_str(), nullptr,
+                                                                          static_cast<AvahiLookupFlags>(0), HandleBrowse, context);
+            if (new_browser == nullptr)
             {
                 need_retries = false;
             }
@@ -718,6 +719,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
             chip::Platform::Delete(context);
         }
         break;
+    }
     case AVAHI_BROWSER_REMOVE:
         ChipLogProgress(DeviceLayer, "Avahi browse: remove");
         if (strcmp("local", domain) == 0)

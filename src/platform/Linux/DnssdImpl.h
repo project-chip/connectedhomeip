@@ -168,7 +168,7 @@ private:
     AvahiClient * mClient;
     std::map<std::string, AvahiEntryGroup *> mPublishedGroups;
     Poller mPoller;
-    constexpr kMaxBrowseRetries = 3;
+    static constexpr size_t kMaxBrowseRetries = 10;
 };
 
 } // namespace Dnssd
