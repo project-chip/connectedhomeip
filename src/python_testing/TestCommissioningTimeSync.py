@@ -26,6 +26,7 @@ from mobly import asserts
 # We don't have a good pipe between the c++ enums in CommissioningDelegate and python
 # so this is hardcoded.
 # I realize this is dodgy, not sure how to cross the enum from c++ to python cleanly
+kCheckForMatchingFabric = 3
 kConfigureUTCTime = 6
 kConfigureTimeZone = 7
 kConfigureDSTOffset = 8
@@ -207,6 +208,27 @@ class TestCommissioningTimeSync(MatterBaseTest):
         asserts.assert_false(self.commissioner.CheckStageSuccessful(kConfigureDefaultNTP), 'kConfigureDefaultNTP incorrectly set')
         asserts.assert_false(self.commissioner.CheckStageSuccessful(
             kConfigureTrustedTimeSource), 'kConfigureTrustedTimeSource incorrectly set')
+
+    @async_test_body
+    async def test_FabricCheckStage(self):
+        await self.create_commissioner()
+
+        # This was moved into a different stage when the time sync stuff was added
+        asserts.assert_equal(self.commissioner.GetFabricCheckResult(), -1, "Fabric check result is already set")
+        self.commissioner.SetCheckMatchingFabric(True)
+        await self.commission_and_base_checks()
+        asserts.assert_true(self.commissioner.CheckStageSuccessful(
+            kCheckForMatchingFabric), "Did not run check for matching fabric stage")
+        asserts.assert_equal(self.commissioner.GetFabricCheckResult(), 0, "Fabric check result did not get set by pairing delegate")
+
+        # Let's try it again with no check
+        await self.create_commissioner()
+        asserts.assert_equal(self.commissioner.GetFabricCheckResult(), -1, "Fabric check result is already set")
+        self.commissioner.SetCheckMatchingFabric(False)
+        await self.commission_and_base_checks()
+        asserts.assert_false(self.commissioner.CheckStageSuccessful(
+            kCheckForMatchingFabric), "Incorrectly ran check for matching fabric stage")
+        asserts.assert_equal(self.commissioner.GetFabricCheckResult(), -1, "Fabric check result incorrectly set")
 
 
 # TODO(cecille): Test - Add hooks to change the time zone response to indicate no DST is needed

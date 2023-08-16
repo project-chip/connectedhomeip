@@ -625,6 +625,7 @@ tests:
           IDs."
       verification: |
           ./chip-tool thermostat read event-list 1 1
+
            On TH(chip-tool), Verify that the DUT response provides a list of supported events. For this cluster the list is usually empty but it can contain manufacturer specific event IDs.
            [1676466998.893033][29061:29063] CHIP:DMG: }
            [1676466998.893114][29061:29063] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_FFFA DataVersion: 2603128677
@@ -633,7 +634,7 @@ tests:
            [1676466998.893221][29061:29063] CHIP:IN: (S) Sending msg 190799889 on secure session with LSID: 59401
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
       arguments:
           values:
               - name: "message"
