@@ -144,6 +144,7 @@ PyChipError pychip_DeviceController_SetTimeZone(int32_t offset, uint64_t validAt
 PyChipError pychip_DeviceController_SetDSTOffset(int32_t offset, uint64_t validStarting, uint64_t validUntil);
 PyChipError pychip_DeviceController_SetDefaultNtp(const char * defaultNTP);
 PyChipError pychip_DeviceController_SetTrustedTimeSource(chip::NodeId nodeId, chip::EndpointId endpoint);
+PyChipError pychip_DeviceController_SetCheckMatchingFabric(bool check);
 PyChipError pychip_DeviceController_ResetCommissioningParameters();
 PyChipError pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
@@ -189,6 +190,8 @@ PyChipError pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
 PyChipError pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback(
     chip::Controller::DeviceCommissioner * devCtrl,
     chip::Controller::DevicePairingDelegate_OnCommissioningStatusUpdateFunct callback);
+PyChipError
+pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback(chip::Controller::DevicePairingDelegate_OnFabricCheckFunct callback);
 PyChipError pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback(
     chip::Controller::DeviceCommissioner * devCtrl, chip::Controller::DevicePairingDelegate_OnWindowOpenCompleteFunct callback);
 
@@ -541,6 +544,12 @@ PyChipError pychip_DeviceController_SetTrustedTimeSource(chip::NodeId nodeId, ch
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
+PyChipError pychip_DeviceController_SetCheckMatchingFabric(bool check)
+{
+    sCommissioningParameters.SetCheckForMatchingFabric(check);
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
 PyChipError pychip_DeviceController_ResetCommissioningParameters()
 {
     sCommissioningParameters = CommissioningParameters();
@@ -690,6 +699,13 @@ PyChipError pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallb
     chip::Controller::DevicePairingDelegate_OnCommissioningStatusUpdateFunct callback)
 {
     sPairingDelegate.SetCommissioningStatusUpdateCallback(callback);
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError
+pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback(chip::Controller::DevicePairingDelegate_OnFabricCheckFunct callback)
+{
+    sPairingDelegate.SetFabricCheckCallback(callback);
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
