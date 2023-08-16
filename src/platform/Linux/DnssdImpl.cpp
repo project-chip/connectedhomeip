@@ -595,7 +595,8 @@ CHIP_ERROR MdnsAvahi::StopPublish()
 }
 
 CHIP_ERROR MdnsAvahi::Browse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                             chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context)
+                             chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
+                             intptr_t * browseIdentifier)
 {
     AvahiServiceBrowser * browser;
     BrowseContext * browseContext = chip::Platform::New<BrowseContext>();
@@ -612,6 +613,7 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, DnssdServiceProtocol protocol, c
     browseContext->mInterface     = avahiInterface;
     browseContext->mProtocol      = GetFullType(type, protocol);
     browseContext->mBrowseRetries = 0;
+    browseContext->mStopped.store(false);
 
     browser = avahi_service_browser_new(mClient, avahiInterface, AVAHI_PROTO_UNSPEC, browseContext->mProtocol.c_str(), nullptr,
                                         static_cast<AvahiLookupFlags>(0), HandleBrowse, browseContext);
@@ -619,9 +621,27 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, DnssdServiceProtocol protocol, c
     if (browser == nullptr)
     {
         chip::Platform::Delete(browseContext);
+        *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
+    }
+    else
+    {
+        *browseIdentifier = reinterpret_cast<intptr_t>(browseContext);
     }
 
     return browser == nullptr ? CHIP_ERROR_INTERNAL : CHIP_NO_ERROR;
+}
+
+CHIP_ERROR MdnsAvahi::StopBrowse(intptr_t browseIdentifier)
+{
+    BrowseContext * browseContext = reinterpret_cast<BrowseContext *>(browseIdentifier);
+    if (browseContext == nullptr)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+    browseContext->mStopped.store(true);
+    // If there was a timer started already, let's stop it
+    DeviceLayer::SystemLayer().CancelTimer(BrowseRetryCallback, browseContext);
+    return CHIP_NO_ERROR;
 }
 
 DnssdServiceProtocol GetProtocolInType(const char * type)
@@ -665,6 +685,26 @@ void CopyTypeWithoutProtocol(char (&dest)[N], const char * typeAndProtocol)
     }
 }
 
+void MdnsAvahi::BrowseRetryCallback(chip::System::Layer * aLayer, void * appState)
+{
+    BrowseContext * context = static_cast<BrowseContext *>(appState);
+    // Don't schedule anything new if we've stopped.
+    if (context->mStopped.load())
+    {
+        return;
+    }
+    AvahiServiceBrowser * newBrowser =
+        avahi_service_browser_new(context->mInstance->mClient, context->mInterface, AVAHI_PROTO_UNSPEC, context->mProtocol.c_str(),
+                                  nullptr, static_cast<AvahiLookupFlags>(0), HandleBrowse, context);
+    if (newBrowser == nullptr)
+    {
+        // If we failed to create the browser, this browse context is effectively done. We need to call the final callback and
+        // delete the context.
+        context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), true, CHIP_NO_ERROR);
+        chip::Platform::Delete(context);
+    }
+}
+
 void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interface, AvahiProtocol protocol, AvahiBrowserEvent event,
                              const char * name, const char * type, const char * domain, AvahiLookupResultFlags /*flags*/,
                              void * userdata)
@@ -700,21 +740,20 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
         break;
     case AVAHI_BROWSER_ALL_FOR_NOW: {
         ChipLogProgress(DeviceLayer, "Avahi browse: all for now");
-        bool need_retries = context->mBrowseRetries++ < kMaxBrowseRetries;
-        if (need_retries)
+        bool needRetries = context->mBrowseRetries++ < kMaxBrowseRetries && !context->mStopped.load();
+        if (needRetries)
         {
-            // TODO: this needs to be on a timer
-            AvahiServiceBrowser * new_browser = avahi_service_browser_new(context->mInstance->mClient, context->mInterface,
-                                                                          AVAHI_PROTO_UNSPEC, context->mProtocol.c_str(), nullptr,
-                                                                          static_cast<AvahiLookupFlags>(0), HandleBrowse, context);
-            if (new_browser == nullptr)
-            {
-                need_retries = false;
-            }
+            DeviceLayer::SystemLayer().StartTimer(context->mNextRetryDelay, BrowseRetryCallback, context);
+            context->mNextRetryDelay *= 2;
         }
-        context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), !need_retries, CHIP_NO_ERROR);
+        // If we were already asked to stop, no need to send a callback - no one is listening.
+        if (!context->mStopped.load())
+        {
+            context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), !needRetries,
+                               CHIP_NO_ERROR);
+        }
         avahi_service_browser_free(browser);
-        if (!need_retries)
+        if (!needRetries)
         {
             chip::Platform::Delete(context);
         }
@@ -927,8 +966,7 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
                            chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
                            intptr_t * browseIdentifier)
 {
-    *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
-    return MdnsAvahi::GetInstance().Browse(type, protocol, addressType, interface, callback, context);
+    return MdnsAvahi::GetInstance().Browse(type, protocol, addressType, interface, callback, context, browseIdentifier);
 }
 
 CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
