@@ -1249,7 +1249,7 @@ The steps are the same as for the `subscribe` or `subscribe-event` commands.
 
 <hr>
 
-## Using wildcards
+### Using wildcards
 
 The CHIP Tool supports command wildcards for parameter values for clusters,
 attributes or events, or endpoints, or any combination of these. With the
@@ -1320,7 +1320,7 @@ In this command:
     $ ./chip-tool doorlock read-by-id 0xFFFFFFFF 1 0xFFFF
     ```
 
-### Using wildcards with `any` command
+#### Using wildcards with `any` command
 
 Using the `any` command lets you use wildcards also for the cluster names. The
 `any` command can be combined with the following commands:
@@ -1393,3 +1393,276 @@ $ ./chip-tool any read-by-id <cluster-ids> <attribute-ids> <destination-id> <end
     ```
     ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
     ```
+
+<hr>
+
+## Saving users and credentials on door lock devices
+
+Matter door lock devices can store pools of users and credentials that allow you
+to configure different access scenarios. Each user and credential in the pool
+has an index value. Additionally, each user has a list of Occupied Credentials.
+
+By default, each door lock device comes with no user or credential defined, but
+it reserves several slots in both pools that can be populated with new users and
+credentials, up to the value specified in the the `NumberOfTotalUsersSupported`
+attribute and the `NumberOfCredentialsSupportedPerUser` attribute, respectively.
+
+All communication between users and credentials happens only using their
+respective index values. No other information is shared between both pools.
+
+The CHIP Tool lets you add users and credentials on door lock devices and
+securely match their indexes to one another. This is an optional feature
+available only when working with devices that implement the `doorlock` cluster.
+
+> **Note:** Users and credentials can only be modified by whoever has the right
+> permissions, as specified in the Access Control List.
+
+To save credentials and users, you need to complete the following steps,
+described in detail in the following sections:
+
+1. Set up a user on the device.
+1. Assign a credential for the newly created user.
+
+### Step 1: Set up a user
+
+To set up a user on a door lock device with the CHIP Tool, use the following
+command pattern:
+
+```
+$ ./chip-tool doorlock set-user <operation-type> <user-index> <user-name> <user-unique-id> <user-status> <user-type> <credential-rule> <destination-id> <endpoint-id> --timedInteractionTimeoutMs <ms_value>
+```
+
+In this command:
+
+-   _<operation-type\>_ is one of the available types of operation for the user:
+
+    -   `Add` - This operation sets a new user in the slot at _<user-index\>_.
+    -   `Clear` - This operation removes an existing user from the slot at
+        _<user-index\>_.
+    -   `Modify` - This operation modifies an existing user at the slot at
+        _<user-index\>_.
+
+-   _<user-index\>_ is the index value of the user, between `1` and the value of
+    the `NumberOfTotalUsersSupported` attribute. Setting the user index to `0`
+    will cause an error.
+-   _<user-name\>_ is the name of the user, which can have maximum 10 bytes of
+    size. Can be set to `null`.
+-   _<user-unique-id\>_ is a 4-byte number that describes the unique user ID.
+    Can be set to `null`.
+-   _<user-status\>_ can be set to `null` or to one of the following values:
+
+    -   `1` (`OccupiedEnabled`) - This status indicates that the given user slot
+        is used and active.
+    -   `3` (`OccupiedDisabled`) - This status indicates that the given user
+        slot is used, but disabled. Unlike `0` and `1`, supporting this status
+        is optional.
+
+-   _<user-type\>_ is the type of the user, which can have one of the values
+    specified in the Matter Application Clusters specification for the
+    `doorlock` cluster (see section "5.2.9.16. `UserTypeEnum`"). Can be set to
+    `null`.
+-   _<credential-rule\>_ is the number of credentials that must be used to
+    unlock the door lock. This parameter can be set to `null` or to one of the
+    following values:
+
+    -   `0` (Single) - One credential type is required to unlock.
+    -   `1` (Dual) - Two credential types are required to unlock.
+    -   `2` (Triple) - Three credential types are required to unlock.
+
+-   _<destination-id\>_ is the node ID of the door lock device.
+-   _<endpoint-id\>_ is the ID of the endpoint on the door lock device.
+-   `--timedInteractionTimeoutMs` is the duration in milliseconds (_<ms_value>_)
+    of the time window for receiving a request on the server side. This should
+    allow enough time for receiving the request.
+
+**Examples of command:**
+
+The following command runs the `set-user` command that adds (`0`) a user at the
+index `1`; the user has the name `AAA` and the unique ID `6452`. The user's
+status is set to `OccupiedEnabled` (`1`), the user type is set to
+`UnrestrictedUser` (`0`), the credential rule is set to single (`0`), the
+targeted node ID of the destination door lock device is `1` and the targeted
+`doorlock` cluster's endpoint ID on that device is `1`. The
+`--timedInteractionTimeoutMs` has a custom value.
+
+```
+$ ./chip-tool doorlock set-user 0 1 AAA 6452 1 0 0 1 1 --timedInteractionTimeoutMs 1000
+```
+
+The following command mirrors the action of the command above, but it targets an
+empty user name (`null`) and has `null` for the unique ID. The user status
+defaults to `OccupiedEnabled`, the user type defaults to `UnrestrictedUser`, and
+the credential rule defaults to single.
+
+```
+$ ./chip-tool doorlock set-user 0 1 null null null null null 1 1 --timedInteractionTimeoutMs 1000
+```
+
+For more use cases for this command, see the "5.2.7.34. Set User Command"
+section in the Matter Application Clusters specification.
+
+### Step 2: Assign a credential
+
+Once you have a user created on the door lock device, use the following command
+pattern to assign a credential to it:
+
+```
+$ ./chip-tool doorlock set-credential <operation-type> <{Credential}> <credential-data> <user-index> <user-status> <user-type> <destination-id> <endpoint-id> --timedInteractionTimeoutMs <ms_value>
+```
+
+In this command:
+
+-   _<operation-type\>_ is one of the available types of operation for the
+    credential:
+
+    -   `Add` - This operation adds a new credential to a user at the slot at
+        _<user-index\>_.
+    -   `Clear` - This operation removes an existing credential from the user at
+        the slot at _<user-index\>_.
+    -   `Modify` - This operation modifies an existing credential for the user
+        at the slot at _<user-index\>_.
+
+-   _<{Credential}\>_ is a JSON object, with the following two fields:
+
+    -   `"credentialType"` is the key field for the type of the credential. It
+        can have one of the following values:
+
+        -   `0` - Programming PIN
+        -   `1` - PIN
+        -   `2` - RFID
+        -   `3` - Fingerprint
+        -   `4` - Finger vein
+
+    -   `"credentialIndex"` is the key field for the index of the credential. If
+        `"credentialType"` is not "Programming PIN", `"credentialIndex"` must be
+        between `1` and the value of the `NumberOfCredentialsSupportedPerUser`
+        attribute (see the section 5.2.3.20 of the Matter Application Clusters
+        specification for details). `0` is required for the Programming PIN. In
+        other cases, setting the credential index to `0` will cause an error.
+
+-   _<credential-data\>_ is an octet string parameter with the secret credential
+    data. For example, the PIN code value (`12345` in the example below).
+-   _<user-index\>_ is the index of the user that will be associated with the
+    credential. Can be set to `null` to create a new user.
+-   _<user-status\>_ is the status of the user that will be associated with the
+    credential. See the description of this parameter in
+    [Set up a user](#step-1-set-up-a-user). Can be set to `null`.
+-   _<user-type\>_ is the type of the user, which can have one of the values
+    specified in the Matter Application Clusters specification for the
+    `doorlock` cluster (see section "5.2.9.16. `UserTypeEnum`"). Can be set to
+    `null`.
+-   _<destination-id\>_ is the node ID of the door lock device.
+-   _<endpoint-id\>_ is the ID of the endpoint on the door lock device.
+-   `--timedInteractionTimeoutMs` is the duration in milliseconds (_<ms_value>_)
+    of the time window for receiving a request on the server side. This should
+    allow enough time for receiving the request.
+
+**Example of command:**
+
+The following command runs the `set-credential` command that adds (`0`) a PIN
+credential (type `1`) at the index `1`. The credential data is set to `12345`
+(PIN code value). This credential is associated with the user at the index `1`.
+The `null` parameters for the user status and the user type indicate that the
+credentials are added to an existing user. The targeted node ID of the
+destination door lock device is `1` and the targeted `doorlock` cluster's
+endpoint ID on that device is `1`. The `--timedInteractionTimeoutMs` has a
+custom value.
+
+```
+$ ./chip-tool doorlock set-credential 0 '{ "credentialType": 1, "credentialIndex": 1 }' "12345" 1 null null 1 1 --timedInteractionTimeoutMs 1000
+```
+
+For more use cases for this command, see the "5.2.7.40. Set Credential Command"
+section in the Matter Application Clusters specification.
+
+### Operations on users and credentials
+
+After you set up users and credentials on your door lock device, you can use
+several CHIP Tool commands to interact with them.
+
+All commands reuse the parameters explained earlier in this section. The
+following command patterns are available:
+
+-   Reading the status of the user:
+
+    ```
+    $ ./chip-tool doorlock get-user <user-index> <destination-id> <endpoint-id>
+    ```
+
+    This command returns the status of the user at the specified _<user-index\>_
+    at the specified _<destination-id\>_ and _<endpoint-id\>_.
+
+-   Reading the status of the credential:
+
+    ```
+    $ ./chip-tool doorlock get-credential-status <{Credential}> <destination-id> <endpoint-id>
+    ```
+
+    This command returns the status of the credential of the specified
+    _<{Credential}\>_ at the specified _<destination-id\>_ and _<endpoint-id\>_.
+
+-   Cleaning the user:
+
+    ```
+    $ ./chip-tool doorlock clear-user <user-index> <destination-id> <endpoint-id> --timedInteractionTimeoutMs <ms_value>
+    ```
+
+    This command cleans the slot containing the specified _<user-index\>_ at the
+    specified _<destination-id\>_ and _<endpoint-id\>_.
+
+-   Cleaning the credential:
+
+    ```
+    $ ./chip-tool doorlock clear-credential <{Credential}> <destination-id> <endpoint-id> --timedInteractionTimeoutMs <ms_value>
+    ```
+
+    This command cleans the slot containing the specified _<{Credential}\>_ at
+    the specified _<destination-id\>_ and _<endpoint-id\>_.
+
+### Operations with user PIN code
+
+If you set the _<credential-type\>_ to PIN when
+[assigning credentials](#step-2-assign-a-credential), you can use the following
+command patterns to verify if it works and invoke it to open or close the door
+lock:
+
+-   Verifying the PIN code:
+
+    ```
+    $ ./chip-tool doorlock read require-pinfor-remote-operation <destination-id> <endpoint-id>
+    ```
+
+    This command returns either `false` or `true`:
+
+    -   `false` indicates that providing the PIN code is not required to close
+        or open the door lock.
+    -   `true` indicates that the PIN code is required to close or open the door
+        lock.
+
+-   Changing the requirement for the PIN code usage:
+
+    ```
+    $ ./chip-tool doorlock write require-pinfor-remote-operation true <destination-id> <endpoint-id>
+    ```
+
+    This command modifies the setting of `require-pinfor-remote-operation` to
+    `true`. After you run it, you will have to use the PIN code to lock or
+    unlock the door.
+
+-   Closing the door lock with the PIN code:
+
+    ```
+    $ ./chip-tool doorlock lock-door <destination-id> <endpoint-id> --timedInteractionTimeoutMs <ms_value> --PinCode 12345
+    ```
+
+    In this command, you need to provide `--PinCode` corresponding to the PIN
+    code you set with _<credential-data\>_ (for example `12345`).
+
+-   Opening the door lock with the PIN code:
+
+    ```
+    $ ./chip-tool doorlock unlock-door <destination-id> <endpoint-id> --timedInteractionTimeoutMs <ms_value> --PinCode 12345
+    ```
+
+    In this command, you need to provide `--PinCode` corresponding to the PIN
+    code you set with _<credential-data\>_ (for example `12345`).
