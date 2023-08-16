@@ -479,6 +479,43 @@ class EncodableValue:
             return "Object"
 
     @property
+    def kotlin_type(self):
+        t = ParseDataType(self.data_type, self.context)
+
+        if isinstance(t, FundamentalType):
+            if t == FundamentalType.BOOL:
+                return "Boolean"
+            elif t == FundamentalType.FLOAT:
+                return "Float"
+            elif t == FundamentalType.DOUBLE:
+                return "Double"
+            else:
+                raise Exception("Unknown fundamental type")
+        elif isinstance(t, BasicInteger):
+            # the >= 3 will include int24_t to be considered "long"
+            if t.byte_count >= 3:
+                return "Long"
+            else:
+                return "Int"
+        elif isinstance(t, BasicString):
+            if t.is_binary:
+                return "ByteArray"
+            else:
+                return "String"
+        elif isinstance(t, IdlEnumType):
+            if t.base_type.byte_count >= 3:
+                return "Long"
+            else:
+                return "Int"
+        elif isinstance(t, IdlBitmapType):
+            if t.base_type.byte_count >= 3:
+                return "Long"
+            else:
+                return "Int"
+        else:
+            return "Any"
+
+    @property
     def unboxed_java_signature(self):
         if self.is_optional or self.is_list:
             raise Exception("Not a basic type: %r" % self)
@@ -752,3 +789,43 @@ class JavaClassGenerator(__JavaCodeGenerator):
                 'clientClusters': clientClusters,
             }
         )
+
+        # Every cluster has its own impl, to avoid
+        # very large compilations (running out of RAM)
+        for cluster in self.idl.clusters:
+            if cluster.side != ClusterSide.CLIENT:
+                continue
+
+            for struct in cluster.structs:
+                if struct.tag:
+                    continue
+
+                output_name = "java/chip/devicecontroller/cluster/structs/{cluster_name}Cluster{struct_name}.kt"
+                self.internal_render_one_output(
+                    template_path="ChipStructs.jinja",
+                    output_file_name=output_name.format(
+                        cluster_name=cluster.name,
+                        struct_name=struct.name),
+                    vars={
+                        'cluster': cluster,
+                        'struct': struct,
+                        'typeLookup': TypeLookupContext(self.idl, cluster),
+                    }
+                )
+
+            for event in cluster.events:
+                if not event.fields:
+                    continue
+
+                output_name = "java/chip/devicecontroller/cluster/eventstructs/{cluster_name}Cluster{event_name}Event.kt"
+                self.internal_render_one_output(
+                    template_path="ChipEventStructs.jinja",
+                    output_file_name=output_name.format(
+                        cluster_name=cluster.name,
+                        event_name=event.name),
+                    vars={
+                        'cluster': cluster,
+                        'event': event,
+                        'typeLookup': TypeLookupContext(self.idl, cluster),
+                    }
+                )

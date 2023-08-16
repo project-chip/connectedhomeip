@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,14 +13,10 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 62.3.1. [TC-PS-3.1] Attributes with client as DUT
+name: 63.2.3. [TC-PS-3.1] Endpoint composition and EndpointList
 
 PICS:
-    - PS.C
-    - PS.C.AM-READ
-    - PS.C.AO-READ
-    - PS.C.AM-WRITE
-    - PS.C.AO-WRITE
+    - PS.S
 
 config:
     nodeId: 0x12344321
@@ -28,678 +24,62 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Note"
+    - label:
+          "Step 1: TH performs a wildcard read of all attributes and endpoints"
       verification: |
-          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+          TH(chip-tool) sends the wildcard read command to read all attributes and endpoints from DUT(Reference app/all-clusters-app)
+          ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF  1 0xFFFF
       disabled: true
 
     - label:
-          "Step 1: DUT reads all supported mandatory attributes from TH one at a
-          time in a manufacturer specific order"
-      PICS: PS.C.AM-READ
+          "Step 2: For each power source cluster with a non-empty EndpointsList
+          attribute, verify that the endpoint exists on the device; also verify
+          that the EndpointsList attribute includes the endpoint on which the
+          cluster is located"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+          TH(chip-tool) sends the wildcard read command to read all attributes and endpoints from DUT(Reference app/all-clusters-app)
 
-          ./chip-tool powersource read status 1 1
-          Verify that TH recieves "status" attribute with value 0 on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
+          ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF  1 0xFFFF
 
-          [1686318196.431501][108731:108731] CHIP:DMG: ReportDataMessage =
-          [1686318196.431509][108731:108731] CHIP:DMG: {
-          [1686318196.431516][108731:108731] CHIP:DMG:         AttributeReportIBs =
-          [1686318196.431531][108731:108731] CHIP:DMG:         [
-          [1686318196.431538][108731:108731] CHIP:DMG:                 AttributeReportIB =
-          [1686318196.431552][108731:108731] CHIP:DMG:                 {
-          [1686318196.431560][108731:108731] CHIP:DMG:                         AttributeDataIB =
-          [1686318196.431570][108731:108731] CHIP:DMG:                         {
-          [1686318196.431580][108731:108731] CHIP:DMG:                                 DataVersion = 0x9b8b1ef2,
-          [1686318196.431590][108731:108731] CHIP:DMG:                                 AttributePathIB =
-          [1686318196.431600][108731:108731] CHIP:DMG:                                 {
-          [1686318196.431611][108731:108731] CHIP:DMG:                                         Endpoint = 0x1,
-          [1686318196.431621][108731:108731] CHIP:DMG:                                         Cluster = 0x2f,
-          [1686318196.431632][108731:108731] CHIP:DMG:                                         Attribute = 0x0000_0000,
-          [1686318196.431641][108731:108731] CHIP:DMG:                                 }
-          [1686318196.431653][108731:108731] CHIP:DMG:
-          [1686318196.431664][108731:108731] CHIP:DMG:                                 Data = 0,
-          [1686318196.431672][108731:108731] CHIP:DMG:                         },
-          [1686318196.431685][108731:108731] CHIP:DMG:
-          [1686318196.431693][108731:108731] CHIP:DMG:                 },
-          [1686318196.431707][108731:108731] CHIP:DMG:
-          [1686318196.431713][108731:108731] CHIP:DMG:         ],
-          [1686318196.431728][108731:108731] CHIP:DMG:
-          [1686318196.431736][108731:108731] CHIP:DMG:         SuppressResponse = true,
-          [1686318196.431745][108731:108731] CHIP:DMG:         InteractionModelRevision = 1
-          [1686318196.431752][108731:108731] CHIP:DMG: }
-          [1686318196.431761][108731:108731] CHIP:DMG:
-          [1686318196.431820][108731:108731] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
-          [1686318196.431829][108731:108731] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
+          [1690195509.133521][44004:44006] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002F Attribute 0x0000_000F DataVersion: 2929707991
+          [1690195509.133523][44004:44006] CHIP:TOO:   BatReplacementNeeded: FALSE
+          [1690195509.133531][44004:44006] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002F Attribute 0x0000_0010 DataVersion: 2929707991
+          [1690195509.133534][44004:44006] CHIP:TOO:   BatReplaceability: 0
+          [1690195509.133549][44004:44006] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002F Attribute 0x0000_001F DataVersion: 2929707991
+          [1690195509.133556][44004:44006] CHIP:TOO:   EndpointList: 0 entries
+          [1690195509.133558][44004:44006] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002F Attribute 0x0000_FFFC DataVersion: 2929707991
+          [1690195509.133560][44004:44006] CHIP:TOO:   FeatureMap: 2
+
+          [1690195509.203569][44004:44006] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_002F Attribute 0x0000_0010 DataVersion: 1378119001
+          [1690195509.203572][44004:44006] CHIP:TOO:   BatReplaceability: 0
+          [1690195509.203587][44004:44006] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_002F Attribute 0x0000_001F DataVersion: 1378119001
+          [1690195509.203592][44004:44006] CHIP:TOO:   EndpointList: 0 entries
+          [1690195509.203595][44004:44006] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_002F Attribute 0x0000_FFFC DataVersion: 1378119001
+          [1690195509.203597][44004:44006] CHIP:TOO:   FeatureMap: 2
 
 
-
-          ./chip-tool powersource read order 1 1
-          Verify that TH recieves "order" attribute with value 2 on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-
-          [1686318245.206127][108731:108731] CHIP:DMG: ReportDataMessage =
-          [1686318245.206130][108731:108731] CHIP:DMG: {
-          [1686318245.206132][108731:108731] CHIP:DMG:         AttributeReportIBs =
-          [1686318245.206137][108731:108731] CHIP:DMG:         [
-          [1686318245.206139][108731:108731] CHIP:DMG:                 AttributeReportIB =
-          [1686318245.206145][108731:108731] CHIP:DMG:                 {
-          [1686318245.206147][108731:108731] CHIP:DMG:                         AttributeDataIB =
-          [1686318245.206151][108731:108731] CHIP:DMG:                         {
-          [1686318245.206154][108731:108731] CHIP:DMG:                                 DataVersion = 0x9b8b1ef2,
-          [1686318245.206157][108731:108731] CHIP:DMG:                                 AttributePathIB =
-          [1686318245.206160][108731:108731] CHIP:DMG:                                 {
-          [1686318245.206164][108731:108731] CHIP:DMG:                                         Endpoint = 0x1,
-          [1686318245.206167][108731:108731] CHIP:DMG:                                         Cluster = 0x2f,
-          [1686318245.206172][108731:108731] CHIP:DMG:                                         Attribute = 0x0000_0001,
-          [1686318245.206175][108731:108731] CHIP:DMG:                                 }
-          [1686318245.206178][108731:108731] CHIP:DMG:
-          [1686318245.206182][108731:108731] CHIP:DMG:                                 Data = 2,
-          [1686318245.206185][108731:108731] CHIP:DMG:                         },
-          [1686318245.206189][108731:108731] CHIP:DMG:
-          [1686318245.206192][108731:108731] CHIP:DMG:                 },
-          [1686318245.206196][108731:108731] CHIP:DMG:
-          [1686318245.206199][108731:108731] CHIP:DMG:         ],
-          [1686318245.206203][108731:108731] CHIP:DMG:
-          [1686318245.206206][108731:108731] CHIP:DMG:         SuppressResponse = true,
-          [1686318245.206209][108731:108731] CHIP:DMG:         InteractionModelRevision = 1
-          [1686318245.206211][108731:108731] CHIP:DMG: }
-          [1686318245.206214][108731:108731] CHIP:DMG:
-          [1686318245.206239][108731:108731] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
-          [1686318245.206243][108731:108731] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
-
-
-
-
-          ./chip-tool powersource read description 1 1
-          Verify that TH recieves "description" attribute with value B2 on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-
-          [1686318263.400126][108731:108731] CHIP:DMG: ReportDataMessage =
-          [1686318263.400128][108731:108731] CHIP:DMG: {
-          [1686318263.400129][108731:108731] CHIP:DMG:         AttributeReportIBs =
-          [1686318263.400133][108731:108731] CHIP:DMG:         [
-          [1686318263.400134][108731:108731] CHIP:DMG:                 AttributeReportIB =
-          [1686318263.400137][108731:108731] CHIP:DMG:                 {
-          [1686318263.400139][108731:108731] CHIP:DMG:                         AttributeDataIB =
-          [1686318263.400142][108731:108731] CHIP:DMG:                         {
-          [1686318263.400144][108731:108731] CHIP:DMG:                                 DataVersion = 0x9b8b1ef2,
-          [1686318263.400146][108731:108731] CHIP:DMG:                                 AttributePathIB =
-          [1686318263.400148][108731:108731] CHIP:DMG:                                 {
-          [1686318263.400150][108731:108731] CHIP:DMG:                                         Endpoint = 0x1,
-          [1686318263.400153][108731:108731] CHIP:DMG:                                         Cluster = 0x2f,
-          [1686318263.400155][108731:108731] CHIP:DMG:                                         Attribute = 0x0000_0002,
-          [1686318263.400157][108731:108731] CHIP:DMG:                                 }
-          [1686318263.400159][108731:108731] CHIP:DMG:
-          [1686318263.400162][108731:108731] CHIP:DMG:                                 Data = "B2" (2 chars),
-          [1686318263.400164][108731:108731] CHIP:DMG:                         },
-          [1686318263.400167][108731:108731] CHIP:DMG:
-          [1686318263.400169][108731:108731] CHIP:DMG:                 },
-          [1686318263.400172][108731:108731] CHIP:DMG:
-          [1686318263.400173][108731:108731] CHIP:DMG:         ],
-          [1686318263.400176][108731:108731] CHIP:DMG:
-          [1686318263.400178][108731:108731] CHIP:DMG:         SuppressResponse = true,
-          [1686318263.400180][108731:108731] CHIP:DMG:         InteractionModelRevision = 1
-          [1686318263.400182][108731:108731] CHIP:DMG: }
-          [1686318263.400183][108731:108731] CHIP:DMG:
-          [1686318263.400206][108731:108731] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
-          [1686318263.400209][108731:108731] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
-
-
-
-          ./chip-tool powersource read bat-charge-level 1 1
-          Verify that TH recieves "bat-charge-level" attribute with value 0 on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-
-          [1686318283.452914][108731:108731] CHIP:DMG: ReportDataMessage =
-          [1686318283.452916][108731:108731] CHIP:DMG: {
-          [1686318283.452918][108731:108731] CHIP:DMG:         AttributeReportIBs =
-          [1686318283.452921][108731:108731] CHIP:DMG:         [
-          [1686318283.452923][108731:108731] CHIP:DMG:                 AttributeReportIB =
-          [1686318283.452926][108731:108731] CHIP:DMG:                 {
-          [1686318283.452928][108731:108731] CHIP:DMG:                         AttributeDataIB =
-          [1686318283.452930][108731:108731] CHIP:DMG:                         {
-          [1686318283.452932][108731:108731] CHIP:DMG:                                 DataVersion = 0x9b8b1ef2,
-          [1686318283.452934][108731:108731] CHIP:DMG:                                 AttributePathIB =
-          [1686318283.452936][108731:108731] CHIP:DMG:                                 {
-          [1686318283.452939][108731:108731] CHIP:DMG:                                         Endpoint = 0x1,
-          [1686318283.452941][108731:108731] CHIP:DMG:                                         Cluster = 0x2f,
-          [1686318283.452943][108731:108731] CHIP:DMG:                                         Attribute = 0x0000_000E,
-          [1686318283.452945][108731:108731] CHIP:DMG:                                 }
-          [1686318283.452948][108731:108731] CHIP:DMG:
-          [1686318283.452950][108731:108731] CHIP:DMG:                                 Data = 0,
-          [1686318283.452952][108731:108731] CHIP:DMG:                         },
-          [1686318283.452955][108731:108731] CHIP:DMG:
-          [1686318283.452957][108731:108731] CHIP:DMG:                 },
-          [1686318283.452959][108731:108731] CHIP:DMG:
-          [1686318283.452961][108731:108731] CHIP:DMG:         ],
-          [1686318283.452964][108731:108731] CHIP:DMG:
-          [1686318283.452966][108731:108731] CHIP:DMG:         SuppressResponse = true,
-          [1686318283.452968][108731:108731] CHIP:DMG:         InteractionModelRevision = 1
-          [1686318283.452969][108731:108731] CHIP:DMG: }
-          [1686318283.452971][108731:108731] CHIP:DMG:
-          [1686318283.452997][108731:108731] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
-          [1686318283.452999][108731:108731] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
-
-
-          ./chip-tool powersource read bat-replacement-needed 1 1
-          Verify that TH recieves "bat-replacement-needed" attribute with value false on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-
-          [1686318298.844920][108731:108731] CHIP:DMG: ReportDataMessage =
-          [1686318298.844922][108731:108731] CHIP:DMG: {
-          [1686318298.844924][108731:108731] CHIP:DMG:         AttributeReportIBs =
-          [1686318298.844927][108731:108731] CHIP:DMG:         [
-          [1686318298.844929][108731:108731] CHIP:DMG:                 AttributeReportIB =
-          [1686318298.844932][108731:108731] CHIP:DMG:                 {
-          [1686318298.844934][108731:108731] CHIP:DMG:                         AttributeDataIB =
-          [1686318298.844936][108731:108731] CHIP:DMG:                         {
-          [1686318298.844938][108731:108731] CHIP:DMG:                                 DataVersion = 0x9b8b1ef2,
-          [1686318298.844940][108731:108731] CHIP:DMG:                                 AttributePathIB =
-          [1686318298.844942][108731:108731] CHIP:DMG:                                 {
-          [1686318298.844945][108731:108731] CHIP:DMG:                                         Endpoint = 0x1,
-          [1686318298.844947][108731:108731] CHIP:DMG:                                         Cluster = 0x2f,
-          [1686318298.844949][108731:108731] CHIP:DMG:                                         Attribute = 0x0000_000F,
-          [1686318298.844951][108731:108731] CHIP:DMG:                                 }
-          [1686318298.844954][108731:108731] CHIP:DMG:
-          [1686318298.844957][108731:108731] CHIP:DMG:                                 Data = false,
-          [1686318298.844958][108731:108731] CHIP:DMG:                         },
-          [1686318298.844961][108731:108731] CHIP:DMG:
-          [1686318298.844963][108731:108731] CHIP:DMG:                 },
-          [1686318298.844966][108731:108731] CHIP:DMG:
-          [1686318298.844967][108731:108731] CHIP:DMG:         ],
-          [1686318298.844970][108731:108731] CHIP:DMG:
-          [1686318298.844972][108731:108731] CHIP:DMG:         SuppressResponse = true,
-          [1686318298.844974][108731:108731] CHIP:DMG:         InteractionModelRevision = 1
-          [1686318298.844975][108731:108731] CHIP:DMG: }
-          [1686318298.844977][108731:108731] CHIP:DMG:
-          [1686318298.845011][108731:108731] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
-          [1686318298.845014][108731:108731] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
-          [1686318298.845016][108731:108731] CHIP:DMG: IM RH moving to [AwaitingDestruction]
-
-
-
-          ./chip-tool powersource read bat-replaceability 1 1
-          Verify that TH recieves "bat-replaceability" attribute with value 0 on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-
-          [1686318315.534100][108731:108731] CHIP:DMG: ReportDataMessage =
-          [1686318315.534102][108731:108731] CHIP:DMG: {
-          [1686318315.534104][108731:108731] CHIP:DMG:         AttributeReportIBs =
-          [1686318315.534107][108731:108731] CHIP:DMG:         [
-          [1686318315.534108][108731:108731] CHIP:DMG:                 AttributeReportIB =
-          [1686318315.534112][108731:108731] CHIP:DMG:                 {
-          [1686318315.534113][108731:108731] CHIP:DMG:                         AttributeDataIB =
-          [1686318315.534116][108731:108731] CHIP:DMG:                         {
-          [1686318315.534118][108731:108731] CHIP:DMG:                                 DataVersion = 0x9b8b1ef2,
-          [1686318315.534120][108731:108731] CHIP:DMG:                                 AttributePathIB =
-          [1686318315.534122][108731:108731] CHIP:DMG:                                 {
-          [1686318315.534124][108731:108731] CHIP:DMG:                                         Endpoint = 0x1,
-          [1686318315.534126][108731:108731] CHIP:DMG:                                         Cluster = 0x2f,
-          [1686318315.534129][108731:108731] CHIP:DMG:                                         Attribute = 0x0000_0010,
-          [1686318315.534131][108731:108731] CHIP:DMG:                                 }
-          [1686318315.534133][108731:108731] CHIP:DMG:
-          [1686318315.534136][108731:108731] CHIP:DMG:                                 Data = 0,
-          [1686318315.534138][108731:108731] CHIP:DMG:                         },
-          [1686318315.534141][108731:108731] CHIP:DMG:
-          [1686318315.534142][108731:108731] CHIP:DMG:                 },
-          [1686318315.534145][108731:108731] CHIP:DMG:
-          [1686318315.534147][108731:108731] CHIP:DMG:         ],
-          [1686318315.534150][108731:108731] CHIP:DMG:
-          [1686318315.534152][108731:108731] CHIP:DMG:         SuppressResponse = true,
-          [1686318315.534153][108731:108731] CHIP:DMG:         InteractionModelRevision = 1
-          [1686318315.534155][108731:108731] CHIP:DMG: }
-          [1686318315.534157][108731:108731] CHIP:DMG:
-          [1686318315.534179][108731:108731] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
-          [1686318315.534181][108731:108731] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
+          [1690195509.133531][44004:44006] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002F Attribute 0x0000_0010 DataVersion: 2929707991
+          [1690195509.133534][44004:44006] CHIP:TOO:   BatReplaceability: 0
+          [1690195509.133549][44004:44006] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002F Attribute 0x0000_001F DataVersion: 2929707991
+          [1690195509.133556][44004:44006] CHIP:TOO:   EndpointList: 0 entries
+          [1690195509.133558][44004:44006] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002F Attribute 0x0000_FFFC DataVersion: 2929707991
+          [1690195509.133560][44004:44006] CHIP:TOO:   FeatureMap: 2
       disabled: true
 
     - label:
-          "Step 2: DUT reads all supported optional attributes from TH one at a
-          time in a manufacturer specific order"
-      PICS: PS.C.AO-READ
+          "Step 3: For each power source cluster on an endpoint with the Bridged
+          Node device type, ensure the EndpointList in the Power Source cluster
+          includes all the endpoints listed in the PartsList of the Descriptor
+          cluster as well as its own endpoint id."
       verification: |
-          OPTIONAL ATTRIBUTES ARE NOT IMPLEMENTED IN SDK, If Implemented we will get the expected outcome that is value of below attributes as per Spec
 
-
-          ./chip-tool powersource read wired-assessed-input-voltage 1 1
-
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-
-          ./chip-tool powersource read wired-assessed-input-frequency 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read wired-current-type 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read wired-assessed-current 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read wired-nominal-voltage 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read wired-maximum-current 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read wired-present 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read active-wired-faults 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read bat-voltage  1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read bat-percent-remaining 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read bat-time-remaining 1 1
-
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read bat-present 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read active-bat-faults 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read bat-replacement-description 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read bat-common-designation 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read bat-ansidesignation 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read bat-iecdesignation 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read bat-approved-chemistry 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read bat-capacity 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-
-          ./chip-tool powersource read bat-quantity 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read bat-charge-state 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read bat-time-to-full-charge 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read bat-functional-while-charging 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read bat-charging-current 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          ./chip-tool powersource read active-bat-charge-faults 1 1
-          Verify that TH recieves  the above attribute read command and provides a plausible value on the TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label:
-          "Step 3: DUT writes a suitable value to all supported mandatory
-          attributes on the TH one at a time in a manufacturer specific order"
-      PICS: PS.C.AM-WRITE
+          "Step 4: For each power source cluster on an endpoint that is a child
+          endpoint of an endpoint with a Bridged Node device type, ensure the
+          EndpointList in the Power Source cluster contains a list with one
+          entry that lists its own endpoint id"
       verification: |
-          This cluster doesn't have any writable attributes
-      disabled: true
 
-    - label:
-          "Step 4: DUT writes a suitable value to all supported optional
-          attributes on the TH one at a time in a manufacturer specific order"
-      PICS: PS.C.AO-WRITE
-      verification: |
-          This cluster doesn't have any writable attributes
-      disabled: true
-
-    - label:
-          "Step 5: Configure TH such that it implements mandatory and none of
-          the optional attributes of the server-side of the cluster, and that it
-          also reflects this in global attributes such as FeatureMap and
-          AttributeList. Commission DUT to TH again"
-      verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
-
-          ./chip-tool powersource read feature-map 1 1
-          Verify that TH recieves "featuremap" attribute with value 0 on the TH (all-clusters-minimal-app) log and below is the sample log provided for the raspi platform:
-          [1686319169.359277][108977:108977] CHIP:DMG: ReportDataMessage =
-          [1686319169.359279][108977:108977] CHIP:DMG: {
-          [1686319169.359280][108977:108977] CHIP:DMG:         AttributeReportIBs =
-          [1686319169.359283][108977:108977] CHIP:DMG:         [
-          [1686319169.359285][108977:108977] CHIP:DMG:                 AttributeReportIB =
-          [1686319169.359288][108977:108977] CHIP:DMG:                 {
-          [1686319169.359290][108977:108977] CHIP:DMG:                         AttributeDataIB =
-          [1686319169.359292][108977:108977] CHIP:DMG:                         {
-          [1686319169.359295][108977:108977] CHIP:DMG:                                 DataVersion = 0xb60028fe,
-          [1686319169.359297][108977:108977] CHIP:DMG:                                 AttributePathIB =
-          [1686319169.359299][108977:108977] CHIP:DMG:                                 {
-          [1686319169.359301][108977:108977] CHIP:DMG:                                         Endpoint = 0x1,
-          [1686319169.359303][108977:108977] CHIP:DMG:                                         Cluster = 0x2f,
-          [1686319169.359306][108977:108977] CHIP:DMG:                                         Attribute = 0x0000_FFFC,
-          [1686319169.359308][108977:108977] CHIP:DMG:                                 }
-          [1686319169.359310][108977:108977] CHIP:DMG:
-          [1686319169.359313][108977:108977] CHIP:DMG:                                 Data = 0,
-          [1686319169.359315][108977:108977] CHIP:DMG:                         },
-          [1686319169.359318][108977:108977] CHIP:DMG:
-          [1686319169.359319][108977:108977] CHIP:DMG:                 },
-          [1686319169.359322][108977:108977] CHIP:DMG:
-          [1686319169.359324][108977:108977] CHIP:DMG:         ],
-          [1686319169.359327][108977:108977] CHIP:DMG:
-          [1686319169.359329][108977:108977] CHIP:DMG:         SuppressResponse = true,
-          [1686319169.359331][108977:108977] CHIP:DMG:         InteractionModelRevision = 1
-          [1686319169.359332][108977:108977] CHIP:DMG: }
-          [1686319169.359334][108977:108977] CHIP:DMG:
-          [1686319169.359357][108977:108977] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
-          [1686319169.359360][108977:108977] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
-
-
-          ./chip-tool powersource read attribute-list 1 1
-          Verify that TH recieves "attribute list" attribute with value 0, 1, 2, 65528, 65529, 65530, 65531, 65532, 65533 on the TH (all-clusters-minimal-app) log and below is the sample log provided for the raspi platform:
-          [1686319262.503993][108977:108977] CHIP:DMG: ReportDataMessage =
-          [1686319262.503995][108977:108977] CHIP:DMG: {
-          [1686319262.503996][108977:108977] CHIP:DMG:         AttributeReportIBs =
-          [1686319262.504001][108977:108977] CHIP:DMG:         [
-          [1686319262.504003][108977:108977] CHIP:DMG:                 AttributeReportIB =
-          [1686319262.504006][108977:108977] CHIP:DMG:                 {
-          [1686319262.504009][108977:108977] CHIP:DMG:                         AttributeDataIB =
-          [1686319262.504011][108977:108977] CHIP:DMG:                         {
-          [1686319262.504013][108977:108977] CHIP:DMG:                                 DataVersion = 0xb60028fe,
-          [1686319262.504015][108977:108977] CHIP:DMG:                                 AttributePathIB =
-          [1686319262.504017][108977:108977] CHIP:DMG:                                 {
-          [1686319262.504019][108977:108977] CHIP:DMG:                                         Endpoint = 0x1,
-          [1686319262.504022][108977:108977] CHIP:DMG:                                         Cluster = 0x2f,
-          [1686319262.504024][108977:108977] CHIP:DMG:                                         Attribute = 0x0000_FFFB,
-          [1686319262.504026][108977:108977] CHIP:DMG:                                 }
-          [1686319262.504028][108977:108977] CHIP:DMG:
-          [1686319262.504031][108977:108977] CHIP:DMG:                                 Data = [
-          [1686319262.504036][108977:108977] CHIP:DMG:                                                 0, 1, 2, 65528, 65529, 65530, 65531, 65532, 65533,
-          [1686319262.504038][108977:108977] CHIP:DMG:                                 ],
-          [1686319262.504040][108977:108977] CHIP:DMG:                         },
-          [1686319262.504043][108977:108977] CHIP:DMG:
-          [1686319262.504045][108977:108977] CHIP:DMG:                 },
-          [1686319262.504049][108977:108977] CHIP:DMG:
-          [1686319262.504050][108977:108977] CHIP:DMG:         ],
-          [1686319262.504054][108977:108977] CHIP:DMG:
-          [1686319262.504056][108977:108977] CHIP:DMG:         SuppressResponse = true,
-          [1686319262.504058][108977:108977] CHIP:DMG:         InteractionModelRevision = 1
-          [1686319262.504060][108977:108977] CHIP:DMG: }
-          [1686319262.504061][108977:108977] CHIP:DMG:
-          [1686319262.504089][108977:108977] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
-          [1686319262.504091][108977:108977] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
-
-
-          ./chip-tool powersource read status 1 1
-          Verify that TH recieves "status" attribute with value 0 on the TH (all-clusters-minimal-app) log and below is the sample log provided for the raspi platform:
-
-          [1686318196.431501][108731:108731] CHIP:DMG: ReportDataMessage =
-          [1686318196.431509][108731:108731] CHIP:DMG: {
-          [1686318196.431516][108731:108731] CHIP:DMG:         AttributeReportIBs =
-          [1686318196.431531][108731:108731] CHIP:DMG:         [
-          [1686318196.431538][108731:108731] CHIP:DMG:                 AttributeReportIB =
-          [1686318196.431552][108731:108731] CHIP:DMG:                 {
-          [1686318196.431560][108731:108731] CHIP:DMG:                         AttributeDataIB =
-          [1686318196.431570][108731:108731] CHIP:DMG:                         {
-          [1686318196.431580][108731:108731] CHIP:DMG:                                 DataVersion = 0x9b8b1ef2,
-          [1686318196.431590][108731:108731] CHIP:DMG:                                 AttributePathIB =
-          [1686318196.431600][108731:108731] CHIP:DMG:                                 {
-          [1686318196.431611][108731:108731] CHIP:DMG:                                         Endpoint = 0x1,
-          [1686318196.431621][108731:108731] CHIP:DMG:                                         Cluster = 0x2f,
-          [1686318196.431632][108731:108731] CHIP:DMG:                                         Attribute = 0x0000_0000,
-          [1686318196.431641][108731:108731] CHIP:DMG:                                 }
-          [1686318196.431653][108731:108731] CHIP:DMG:
-          [1686318196.431664][108731:108731] CHIP:DMG:                                 Data = 0,
-          [1686318196.431672][108731:108731] CHIP:DMG:                         },
-          [1686318196.431685][108731:108731] CHIP:DMG:
-          [1686318196.431693][108731:108731] CHIP:DMG:                 },
-          [1686318196.431707][108731:108731] CHIP:DMG:
-          [1686318196.431713][108731:108731] CHIP:DMG:         ],
-          [1686318196.431728][108731:108731] CHIP:DMG:
-          [1686318196.431736][108731:108731] CHIP:DMG:         SuppressResponse = true,
-          [1686318196.431745][108731:108731] CHIP:DMG:         InteractionModelRevision = 1
-          [1686318196.431752][108731:108731] CHIP:DMG: }
-          [1686318196.431761][108731:108731] CHIP:DMG:
-          [1686318196.431820][108731:108731] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
-          [1686318196.431829][108731:108731] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
-
-
-
-          ./chip-tool powersource read order 1 1
-          Verify that TH recieves "order" attribute with value 2 on the TH (all-clusters-minimal-app) log and below is the sample log provided for the raspi platform:
-
-          [1686318245.206127][108731:108731] CHIP:DMG: ReportDataMessage =
-          [1686318245.206130][108731:108731] CHIP:DMG: {
-          [1686318245.206132][108731:108731] CHIP:DMG:         AttributeReportIBs =
-          [1686318245.206137][108731:108731] CHIP:DMG:         [
-          [1686318245.206139][108731:108731] CHIP:DMG:                 AttributeReportIB =
-          [1686318245.206145][108731:108731] CHIP:DMG:                 {
-          [1686318245.206147][108731:108731] CHIP:DMG:                         AttributeDataIB =
-          [1686318245.206151][108731:108731] CHIP:DMG:                         {
-          [1686318245.206154][108731:108731] CHIP:DMG:                                 DataVersion = 0x9b8b1ef2,
-          [1686318245.206157][108731:108731] CHIP:DMG:                                 AttributePathIB =
-          [1686318245.206160][108731:108731] CHIP:DMG:                                 {
-          [1686318245.206164][108731:108731] CHIP:DMG:                                         Endpoint = 0x1,
-          [1686318245.206167][108731:108731] CHIP:DMG:                                         Cluster = 0x2f,
-          [1686318245.206172][108731:108731] CHIP:DMG:                                         Attribute = 0x0000_0001,
-          [1686318245.206175][108731:108731] CHIP:DMG:                                 }
-          [1686318245.206178][108731:108731] CHIP:DMG:
-          [1686318245.206182][108731:108731] CHIP:DMG:                                 Data = 2,
-          [1686318245.206185][108731:108731] CHIP:DMG:                         },
-          [1686318245.206189][108731:108731] CHIP:DMG:
-          [1686318245.206192][108731:108731] CHIP:DMG:                 },
-          [1686318245.206196][108731:108731] CHIP:DMG:
-          [1686318245.206199][108731:108731] CHIP:DMG:         ],
-          [1686318245.206203][108731:108731] CHIP:DMG:
-          [1686318245.206206][108731:108731] CHIP:DMG:         SuppressResponse = true,
-          [1686318245.206209][108731:108731] CHIP:DMG:         InteractionModelRevision = 1
-          [1686318245.206211][108731:108731] CHIP:DMG: }
-          [1686318245.206214][108731:108731] CHIP:DMG:
-          [1686318245.206239][108731:108731] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
-          [1686318245.206243][108731:108731] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
-
-
-
-
-          ./chip-tool powersource read description 1 1
-          Verify that TH recieves "description" attribute with value B2 on the TH (all-clusters-minimal-app) log and below is the sample log provided for the raspi platform:
-
-          [1686318263.400126][108731:108731] CHIP:DMG: ReportDataMessage =
-          [1686318263.400128][108731:108731] CHIP:DMG: {
-          [1686318263.400129][108731:108731] CHIP:DMG:         AttributeReportIBs =
-          [1686318263.400133][108731:108731] CHIP:DMG:         [
-          [1686318263.400134][108731:108731] CHIP:DMG:                 AttributeReportIB =
-          [1686318263.400137][108731:108731] CHIP:DMG:                 {
-          [1686318263.400139][108731:108731] CHIP:DMG:                         AttributeDataIB =
-          [1686318263.400142][108731:108731] CHIP:DMG:                         {
-          [1686318263.400144][108731:108731] CHIP:DMG:                                 DataVersion = 0x9b8b1ef2,
-          [1686318263.400146][108731:108731] CHIP:DMG:                                 AttributePathIB =
-          [1686318263.400148][108731:108731] CHIP:DMG:                                 {
-          [1686318263.400150][108731:108731] CHIP:DMG:                                         Endpoint = 0x1,
-          [1686318263.400153][108731:108731] CHIP:DMG:                                         Cluster = 0x2f,
-          [1686318263.400155][108731:108731] CHIP:DMG:                                         Attribute = 0x0000_0002,
-          [1686318263.400157][108731:108731] CHIP:DMG:                                 }
-          [1686318263.400159][108731:108731] CHIP:DMG:
-          [1686318263.400162][108731:108731] CHIP:DMG:                                 Data = "B2" (2 chars),
-          [1686318263.400164][108731:108731] CHIP:DMG:                         },
-          [1686318263.400167][108731:108731] CHIP:DMG:
-          [1686318263.400169][108731:108731] CHIP:DMG:                 },
-          [1686318263.400172][108731:108731] CHIP:DMG:
-          [1686318263.400173][108731:108731] CHIP:DMG:         ],
-          [1686318263.400176][108731:108731] CHIP:DMG:
-          [1686318263.400178][108731:108731] CHIP:DMG:         SuppressResponse = true,
-          [1686318263.400180][108731:108731] CHIP:DMG:         InteractionModelRevision = 1
-          [1686318263.400182][108731:108731] CHIP:DMG: }
-          [1686318263.400183][108731:108731] CHIP:DMG:
-          [1686318263.400206][108731:108731] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
-          [1686318263.400209][108731:108731] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
-
-
-
-          ./chip-tool powersource read bat-charge-level 1 1
-          Verify that TH recieves "bat-charge-level" attribute with value 0 on the TH (all-clusters-minimal-app) log and below is the sample log provided for the raspi platform:
-
-          [1686318283.452914][108731:108731] CHIP:DMG: ReportDataMessage =
-          [1686318283.452916][108731:108731] CHIP:DMG: {
-          [1686318283.452918][108731:108731] CHIP:DMG:         AttributeReportIBs =
-          [1686318283.452921][108731:108731] CHIP:DMG:         [
-          [1686318283.452923][108731:108731] CHIP:DMG:                 AttributeReportIB =
-          [1686318283.452926][108731:108731] CHIP:DMG:                 {
-          [1686318283.452928][108731:108731] CHIP:DMG:                         AttributeDataIB =
-          [1686318283.452930][108731:108731] CHIP:DMG:                         {
-          [1686318283.452932][108731:108731] CHIP:DMG:                                 DataVersion = 0x9b8b1ef2,
-          [1686318283.452934][108731:108731] CHIP:DMG:                                 AttributePathIB =
-          [1686318283.452936][108731:108731] CHIP:DMG:                                 {
-          [1686318283.452939][108731:108731] CHIP:DMG:                                         Endpoint = 0x1,
-          [1686318283.452941][108731:108731] CHIP:DMG:                                         Cluster = 0x2f,
-          [1686318283.452943][108731:108731] CHIP:DMG:                                         Attribute = 0x0000_000E,
-          [1686318283.452945][108731:108731] CHIP:DMG:                                 }
-          [1686318283.452948][108731:108731] CHIP:DMG:
-          [1686318283.452950][108731:108731] CHIP:DMG:                                 Data = 0,
-          [1686318283.452952][108731:108731] CHIP:DMG:                         },
-          [1686318283.452955][108731:108731] CHIP:DMG:
-          [1686318283.452957][108731:108731] CHIP:DMG:                 },
-          [1686318283.452959][108731:108731] CHIP:DMG:
-          [1686318283.452961][108731:108731] CHIP:DMG:         ],
-          [1686318283.452964][108731:108731] CHIP:DMG:
-          [1686318283.452966][108731:108731] CHIP:DMG:         SuppressResponse = true,
-          [1686318283.452968][108731:108731] CHIP:DMG:         InteractionModelRevision = 1
-          [1686318283.452969][108731:108731] CHIP:DMG: }
-          [1686318283.452971][108731:108731] CHIP:DMG:
-          [1686318283.452997][108731:108731] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
-          [1686318283.452999][108731:108731] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
-
-
-          ./chip-tool powersource read bat-replacement-needed 1 1
-          Verify that TH recieves "bat-replacement-needed" attribute with value false on the TH (all-clusters-minimal-app) log and below is the sample log provided for the raspi platform:
-
-          [1686318298.844920][108731:108731] CHIP:DMG: ReportDataMessage =
-          [1686318298.844922][108731:108731] CHIP:DMG: {
-          [1686318298.844924][108731:108731] CHIP:DMG:         AttributeReportIBs =
-          [1686318298.844927][108731:108731] CHIP:DMG:         [
-          [1686318298.844929][108731:108731] CHIP:DMG:                 AttributeReportIB =
-          [1686318298.844932][108731:108731] CHIP:DMG:                 {
-          [1686318298.844934][108731:108731] CHIP:DMG:                         AttributeDataIB =
-          [1686318298.844936][108731:108731] CHIP:DMG:                         {
-          [1686318298.844938][108731:108731] CHIP:DMG:                                 DataVersion = 0x9b8b1ef2,
-          [1686318298.844940][108731:108731] CHIP:DMG:                                 AttributePathIB =
-          [1686318298.844942][108731:108731] CHIP:DMG:                                 {
-          [1686318298.844945][108731:108731] CHIP:DMG:                                         Endpoint = 0x1,
-          [1686318298.844947][108731:108731] CHIP:DMG:                                         Cluster = 0x2f,
-          [1686318298.844949][108731:108731] CHIP:DMG:                                         Attribute = 0x0000_000F,
-          [1686318298.844951][108731:108731] CHIP:DMG:                                 }
-          [1686318298.844954][108731:108731] CHIP:DMG:
-          [1686318298.844957][108731:108731] CHIP:DMG:                                 Data = false,
-          [1686318298.844958][108731:108731] CHIP:DMG:                         },
-          [1686318298.844961][108731:108731] CHIP:DMG:
-          [1686318298.844963][108731:108731] CHIP:DMG:                 },
-          [1686318298.844966][108731:108731] CHIP:DMG:
-          [1686318298.844967][108731:108731] CHIP:DMG:         ],
-          [1686318298.844970][108731:108731] CHIP:DMG:
-          [1686318298.844972][108731:108731] CHIP:DMG:         SuppressResponse = true,
-          [1686318298.844974][108731:108731] CHIP:DMG:         InteractionModelRevision = 1
-          [1686318298.844975][108731:108731] CHIP:DMG: }
-          [1686318298.844977][108731:108731] CHIP:DMG:
-          [1686318298.845011][108731:108731] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
-          [1686318298.845014][108731:108731] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
-          [1686318298.845016][108731:108731] CHIP:DMG: IM RH moving to [AwaitingDestruction]
-
-
-
-          ./chip-tool powersource read bat-replaceability 1 1
-          Verify that TH recieves "bat-replaceability" attribute with value 0 on the TH (all-clusters-minimal-app) log and below is the sample log provided for the raspi platform:
-
-          [1686318315.534100][108731:108731] CHIP:DMG: ReportDataMessage =
-          [1686318315.534102][108731:108731] CHIP:DMG: {
-          [1686318315.534104][108731:108731] CHIP:DMG:         AttributeReportIBs =
-          [1686318315.534107][108731:108731] CHIP:DMG:         [
-          [1686318315.534108][108731:108731] CHIP:DMG:                 AttributeReportIB =
-          [1686318315.534112][108731:108731] CHIP:DMG:                 {
-          [1686318315.534113][108731:108731] CHIP:DMG:                         AttributeDataIB =
-          [1686318315.534116][108731:108731] CHIP:DMG:                         {
-          [1686318315.534118][108731:108731] CHIP:DMG:                                 DataVersion = 0x9b8b1ef2,
-          [1686318315.534120][108731:108731] CHIP:DMG:                                 AttributePathIB =
-          [1686318315.534122][108731:108731] CHIP:DMG:                                 {
-          [1686318315.534124][108731:108731] CHIP:DMG:                                         Endpoint = 0x1,
-          [1686318315.534126][108731:108731] CHIP:DMG:                                         Cluster = 0x2f,
-          [1686318315.534129][108731:108731] CHIP:DMG:                                         Attribute = 0x0000_0010,
-          [1686318315.534131][108731:108731] CHIP:DMG:                                 }
-          [1686318315.534133][108731:108731] CHIP:DMG:
-          [1686318315.534136][108731:108731] CHIP:DMG:                                 Data = 0,
-          [1686318315.534138][108731:108731] CHIP:DMG:                         },
-          [1686318315.534141][108731:108731] CHIP:DMG:
-          [1686318315.534142][108731:108731] CHIP:DMG:                 },
-          [1686318315.534145][108731:108731] CHIP:DMG:
-          [1686318315.534147][108731:108731] CHIP:DMG:         ],
-          [1686318315.534150][108731:108731] CHIP:DMG:
-          [1686318315.534152][108731:108731] CHIP:DMG:         SuppressResponse = true,
-          [1686318315.534153][108731:108731] CHIP:DMG:         InteractionModelRevision = 1
-          [1686318315.534155][108731:108731] CHIP:DMG: }
-          [1686318315.534157][108731:108731] CHIP:DMG:
-          [1686318315.534179][108731:108731] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
-          [1686318315.534181][108731:108731] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
-      disabled: true
-
-    - label:
-          "Step 6: DUT reads all supported optional attributes from TH one at a
-          time in a manufacturer specific order"
-      PICS: PS.C.AO-READ
-      verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
-
-
-
-          Verify TH(all-clusters-minimal-app) receives the read command, and responds that this attribute is not available and also DUT is aware that the optional attributes are not available, and does not issue read requests for the attributes which it did read in step 2
-
-
-          ./chip-tool powersource read bat-charge-level 1 1
-
-          on TH all-clusters-minimal-app verify status response as  UNSUPPORTED_ATTRIBUTE
-           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-
-          ./chip-tool powersource read bat-replacement-needed 1 1
-
-          on TH all-clusters-minimal-app verify status response as  UNSUPPORTED_ATTRIBUTE
-           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-
-          ./chip-tool powersource read bat-replaceability 1 1
-
-          on TH all-clusters-minimal-app verify status response as  UNSUPPORTED_ATTRIBUTE
-           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-      disabled: true
-
-    - label:
-          "Step 7: DUT writes a suitable value to all supported optional
-          attributes on the TH one at a time in a manufacturer specific order"
-      PICS: PS.C.AO-WRITE
-      verification: |
-          This cluster doesn't have any writable attributes
       disabled: true

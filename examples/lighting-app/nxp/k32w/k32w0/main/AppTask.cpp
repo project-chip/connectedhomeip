@@ -87,6 +87,9 @@ using namespace chip;
 using namespace chip::app;
 
 AppTask AppTask::sAppTask;
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+static AppTask::FactoryDataProvider sFactoryDataProvider;
+#endif
 
 // This key is for testing/certification only and should not be used in production devices.
 // For production devices this key must be provided from factory data.
@@ -110,7 +113,7 @@ static BDXDownloader gDownloader;
 constexpr uint16_t requestedOtaBlockSize = 1024;
 #endif
 
-#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA && CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
 CHIP_ERROR CustomFactoryDataRestoreMechanism(void)
 {
     K32W_LOG("This is a custom factory data restore mechanism.");
@@ -145,7 +148,7 @@ static void CheckOtaEntry()
         if (ota_entries.ota_state == otaApplied)
         {
             K32W_LOG("OTA successfully applied");
-#if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA && CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
             // If this point is reached, it means OTA_CommitCustomEntries was successfully called.
             // Delete the factory data backup to stop doing a restore when the factory data provider
             // is initialized. This ensures that both the factory data and app were updated, otherwise
@@ -182,20 +185,21 @@ CHIP_ERROR AppTask::Init()
 #endif
 
     // Initialize device attestation config
-#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
-    // Initialize factory data provider
-    ReturnErrorOnFailure(AppTask::FactoryDataProvider::GetDefaultInstance().Init());
-    AppTask::FactoryDataProvider::GetDefaultInstance().RegisterRestoreMechanism(CustomFactoryDataRestoreMechanism);
-    SetDeviceInstanceInfoProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
-    SetDeviceAttestationCredentialsProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
-    SetCommissionableDataProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+#if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
+    sFactoryDataProvider.RegisterRestoreMechanism(CustomFactoryDataRestoreMechanism);
+#endif
+    ReturnErrorOnFailure(sFactoryDataProvider.Init());
+    SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
+    SetCommissionableDataProvider(&sFactoryDataProvider);
 #else
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProvider());
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
-#endif // CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#endif // CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
 
     // QR code will be used with CHIP Tool
     AppTask::PrintOnboardingInfo();

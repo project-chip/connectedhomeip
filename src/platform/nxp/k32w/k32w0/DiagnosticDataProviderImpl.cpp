@@ -117,8 +117,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
             thread->stackFreeMinimum.Emplace(taskStatusArray[x].usStackHighWaterMark);
 
             /* Unsupported metrics */
-            // thread->stackSize;
-            // thread->stackFreeCurrent;
+            thread->stackFreeCurrent.ClearValue();
+            thread->stackSize.ClearValue();
 
             thread->Next = head;
             head         = thread;

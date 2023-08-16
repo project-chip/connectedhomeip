@@ -96,6 +96,11 @@ def parse_ids_from_certs(dac: x509.Certificate, pai: x509.Certificate) -> tuple(
 
     return dac_vid, dac_pid, pai_vid, pai_pid
 
+# To set the directory for the CD certificates use
+# --string-arg cd_cert_dir:'your_directory_name'
+# ex. --string-arg cd_cert_dir:'credentials/development/cd-certs'
+# default is 'credentials/development/cd-certs'.
+
 
 class TC_DA_1_2(MatterBaseTest):
     @async_test_body
@@ -108,6 +113,8 @@ class TC_DA_1_2(MatterBaseTest):
         pics_firmware_info = self.check_pics('MCORE.DA.ATTESTELEMENT_FW_INFO')
         if pics_origin_pid != pics_origin_vid:
             asserts.fail("MCORE.DA.CERTDECL_ORIGIN_PRODUCTID and MCORE.DA.CERTDECL_ORIGIN_VENDORID PICS codes must match")
+
+        cd_cert_dir = self.user_params.get("cd_cert_dir", 'credentials/development/cd-certs')
 
         self.print_step(0, "Commissioning, already done")
 
@@ -319,13 +326,11 @@ class TC_DA_1_2(MatterBaseTest):
 
         self.print_step("8.9", "Check signature")
         signature_cd = bytes(signer_info['signature'])
-        # TODO: Cecille - this path needs to be set as an input
-        cert_dir = 'credentials/development/cd-certs'
         certs = {}
-        for filename in os.listdir(cert_dir):
+        for filename in os.listdir(cd_cert_dir):
             if '.der' not in filename:
                 continue
-            with open(os.path.join(cert_dir, filename), 'rb') as f:
+            with open(os.path.join(cd_cert_dir, filename), 'rb') as f:
                 cert = x509.load_der_x509_certificate(f.read())
                 pub = cert.public_key()
                 ski = x509.SubjectKeyIdentifier.from_public_key(pub).digest

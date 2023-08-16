@@ -252,6 +252,7 @@ private:
     void PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params);
     CHIP_ERROR InitSystemState(FactoryInitParams params);
     CHIP_ERROR InitSystemState();
+    void ControllerInitialized(const DeviceController & controller);
 
     uint16_t mListenPort;
     DeviceControllerSystemState * mSystemState                          = nullptr;
