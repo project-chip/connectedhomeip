@@ -48,6 +48,7 @@ limitations under the License.
         <field name="WPA-PERSONAL" mask="0x4"/>
         <field name="WPA2-PERSONAL" mask="0x8"/>
         <field name="WPA3-PERSONAL" mask="0x10"/>
+        <field name="WPA3-Matter-PDC" mask="0x20"/>
     </bitmap>
 
     <bitmap name="ThreadCapabilitiesBitmap" type="bitmap16" apiMaturity="provisional">
@@ -83,6 +84,8 @@ limitations under the License.
         <cluster code="0x0031"/>
         <item name="NetworkID" type="octet_string" length="32"/>
         <item name="Connected" type="boolean"/>
+        <item name="NetworkIdentifier" type="octet_string" length="20" optional="true" isNullable="true"/>
+        <item name="ClientIdentifier" type="octet_string" length="20" optional="true" isNullable="true"/>
     </struct>
 
     <bitmap name="Feature" type="bitmap32">
@@ -90,6 +93,7 @@ limitations under the License.
       <field name="WiFiNetworkInterface" mask="0x1"/>
       <field name="ThreadNetworkInterface" mask="0x2"/>
       <field name="EthernetNetworkInterface" mask="0x4"/>
+      <field name="PerDeviceCredentials" mask="0x8"/>
     </bitmap>
 
     <cluster>
@@ -156,6 +160,9 @@ limitations under the License.
             <arg name="SSID" type="octet_string" length="32"/>
             <arg name="Credentials" type="octet_string" length="64"/>
             <arg name="Breadcrumb" type="int64u" optional="true"/>
+            <arg name="NetworkIdentity" type="octet_string" length="140" optional="true"/>
+            <arg name="ClientIdentifier" type="octet_string" length="20" optional="true"/>
+            <arg name="PossessionNonce" type="octet_string" length="32" optional="true"/>
             <access op="invoke" privilege="administer"/>
         </command>
         <command source="client" code="0x03" name="AddOrUpdateThreadNetwork" optional="true" response="NetworkConfigResponse" cli="chip network_commissioning addorupdatethreadnetwork">
@@ -175,6 +182,8 @@ limitations under the License.
             <arg name="NetworkingStatus" type="NetworkCommissioningStatusEnum"/>
             <arg name="DebugText" type="char_string" length="512" optional="true" />
             <arg name="NetworkIndex" type="int8u" optional="true" />
+            <arg name="ClientIdentity" type="octet_string" length="140" optional="true"/>
+            <arg name="PossessionSignature" type="octet_string" length="64" optional="true"/>
         </command>
         <command source="client" code="0x06" name="ConnectNetwork" optional="false" response="ConnectNetworkResponse" cli="chip network_commissioning connectnetwork">
             <description>Connect to the specified network, using previously-defined credentials.</description>
@@ -194,6 +203,17 @@ limitations under the License.
             <arg name="NetworkIndex" type="int8u"/>
             <arg name="Breadcrumb" type="int64u" optional="true"/>
             <access op="invoke" privilege="administer"/>
+        </command>
+        <command source="client" code="0x09" name="QueryIdentity" optional="true" response="QueryIdentityResponse" cli="chip network_commissioning queryidentity">
+            <description>Retrieve details about and optionally proof of possession of a network client identity.</description>
+            <arg name="KeyIdentifier" type="OCTET_STRING" length="20"/>
+            <arg name="PossessionNonce" type="OCTET_STRING" length="32" optional="true"/>
+            <access op="invoke" privilege="administer"/>
+        </command>
+        <command source="server" code="0x0a" name="QueryIdentityResponse" optional="false" cli="chip network_commissioning queryidentityresponse">
+            <description>Command that contains details about a network client identity and optionally a proof of possession.</description>
+            <arg name="Identity" type="OCTET_STRING" length="140"/>
+            <arg name="PossessionSignature" type="OCTET_STRING" length="64" optional="true"/>
         </command>
     </cluster>
 </configurator>
