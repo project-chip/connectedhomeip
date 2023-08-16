@@ -20,7 +20,6 @@
 #include <AppTask.h>
 
 #include "AppConfig.h"
-#include "main_task.h"
 
 #include <DeviceInfoProviderImpl.h>
 #include <MatterConfig.h>
@@ -34,11 +33,44 @@
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "FreeRTOS.h"
+#include "cmsis_os2.h"
+#include "event_groups.h"
+#include "task.h"
+
+#ifdef __cplusplus
+}
+#endif
+
+/**********************************************************
+ * Defines
+ *********************************************************/
+#define MAIN_TASK_STACK_SIZE (1024 * 8)
+#define MAIN_TASK_PRIORITY 56
+
+const osThreadAttr_t thread_attributes = {
+    .name       = "app",
+    .attr_bits  = 0,
+    .cb_mem     = 0,
+    .cb_size    = 0,
+    .stack_mem  = 0,
+    .stack_size = MAIN_TASK_STACK_SIZE,
+    .priority   = (osPriority_t) MAIN_TASK_PRIORITY,
+    .tz_module  = 0,
+    .reserved   = 0,
+};
+
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Credentials;
 using namespace chip::DeviceLayer::Silabs;
 
+osThreadId_t main_Task;
+void application_start(const void * unused);
 volatile int apperror_cnt;
 static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 

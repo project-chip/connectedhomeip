@@ -55,10 +55,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-//#ifdef RSI_M4_INTERFACE
-//#include "rsi_board.h"
-//#endif
-
 typedef struct sl_wfx_msg_s
 {
     uint8_t connectionHandle;

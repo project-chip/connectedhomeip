@@ -245,9 +245,11 @@ void wfx_ip_changed_notify(int got_ip);
 
 sl_status_t sl_si91x_host_process_data_frame(sl_wifi_interface_t interface, sl_wifi_buffer_t * buffer);
 void * sl_si91x_host_get_buffer_data(sl_wifi_buffer_t * buffer, uint16_t offset, uint16_t * data_length);
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
+
+#if SL_ICD_ENABLED
 sl_status_t wfx_power_save();
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
+#endif /* SL_ICD_ENABLED */
+
 void wfx_ipv6_notify(int got_ip);
 
 /* RSI for LWIP */

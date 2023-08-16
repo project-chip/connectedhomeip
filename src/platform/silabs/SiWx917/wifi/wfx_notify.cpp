@@ -198,7 +198,7 @@ void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retry
          */
         if (retryJoin < MAX_JOIN_RETRIES_COUNT)
         {
-            SILABS_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(WLAN_RETRY_TIMER_MS));
+            SILABS_LOG("wfx_retry_interval_handler : Next attempt after %d Seconds", CONVERT_MS_TO_SEC(WLAN_RETRY_TIMER_MS));
             vTaskDelay(pdMS_TO_TICKS(WLAN_RETRY_TIMER_MS));
         }
         else
