@@ -26,11 +26,8 @@
 // Global Variables
 rsi_ble_t att_list;
 sl_wfx_msg_t event_msg;
-#ifndef SI917
-extern rsi_semaphore_handle_t sl_ble_event_sem;
-#else
+
 extern osSemaphoreId_t sl_ble_event_sem;
-#endif
 
 // Memory to initialize driver
 uint8_t bt_global_buf[BT_GLOBAL_BUFF_LEN];
@@ -189,11 +186,7 @@ void rsi_ble_app_set_event(uint32_t event_num)
 {
     SILABS_LOG("%s: starting", __func__);
     event_msg.ble_app_event_map |= BIT(event_num);
-#ifndef SI917
-    rsi_semaphore_post(&sl_ble_event_sem);
-#else
     osSemaphoreRelease(sl_ble_event_sem);
-#endif
     return;
 }
 

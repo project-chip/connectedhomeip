@@ -273,8 +273,6 @@ else
 
     # 917 exception. TODO find a more generic way
     if [ "$SILABS_BOARD" == "BRD4325B" ] || [ "$SILABS_BOARD" == "BRD4325C" ]; then
-        # TODO: remove this flag once ota is supported
-        optArgs+="chip_enable_ota_requestor=false "
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
         optArgs+="chip_device_platform =\"SiWx917\" "
