@@ -971,9 +971,7 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
 
 CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
 {
-    // TODO: This should, at the very least, stop the retries.
-    // I don't know if we can stop the avahi object, but we can at least stop the callbacks using a flag
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return MdnsAvahi::GetInstance().StopBrowse(browseIdentifier);
 }
 
 CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
