@@ -59,8 +59,8 @@ public:
              ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
              bool aResetConditionCommandSupported);
 
-    ~Instance() = default;
-
+    ~Instance() override;
+    
     // Not copyable or movable
     Instance(const Instance &) = delete;
     Instance & operator=(const Instance &) = delete;

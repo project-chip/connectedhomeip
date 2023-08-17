@@ -56,6 +56,12 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClus
     mDelegate->SetInstance(this);
 };
 
+Instance::~Instance()
+{
+    InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
+    unregisterAttributeAccessOverride(this);
+}
+
 CHIP_ERROR Instance::Init()
 {
     ChipLogDetail(Zcl, "ResourceMonitoring: Init");
