@@ -451,7 +451,7 @@ tests:
 
           Verify "SecurityPolicy attribute has the following value" on the TH(Chip-tool) Log:
           RotationTime is of the type uint16
-          Flags is of the type uint8
+          Flags is of the type uint16
 
           [1649825860.866762][3472:3477] CHIP:DMG:        SuppressResponse = true,
           [1649825860.866826][3472:3477] CHIP:DMG:        InteractionModelRevision = 1
