@@ -88,7 +88,7 @@ Status HepaFilterMonitoringDelegate::PostResetCondition()
 void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
 {
     VerifyOrDie(gActivatedCarbonFilterInstance == nullptr);
-    
+
     gActivatedCarbonFilterDelegate = new ActivatedCarbonFilterMonitoringDelegate;
     gActivatedCarbonFilterInstance = new ResourceMonitoring::Instance(
         gActivatedCarbonFilterDelegate, endpoint, ActivatedCarbonFilterMonitoring::Id,
@@ -98,7 +98,7 @@ void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId 
 void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
 {
     VerifyOrDie(gHepaFilterInstance == nullptr);
-    
+
     gHepaFilterDelegate = new HepaFilterMonitoringDelegate;
     gHepaFilterInstance = new ResourceMonitoring::Instance(gHepaFilterDelegate, endpoint, HepaFilterMonitoring::Id,
                                                            static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),

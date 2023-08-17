@@ -60,7 +60,7 @@ public:
              bool aResetConditionCommandSupported);
 
     ~Instance() override;
-    
+
     // Not copyable or movable
     Instance(const Instance &) = delete;
     Instance & operator=(const Instance &) = delete;
