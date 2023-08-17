@@ -9,6 +9,10 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+const EndpointId RvcRunModeEndpoint = 1;
+const EndpointId RvcCleanModeEndpoint = 1;
+const EndpointId RvcOperationalStateEndpoint = 1;
+
 class RvcDevice
 {
 private:
@@ -21,15 +25,17 @@ private:
     RvcOperationalState::RvcOperationalStateDelegate mOperationalStateDelegate;
     OperationalState::Instance mOperationalStateInstance;
 
+
 public:
     RvcDevice() :
         mRunModeDelegate(),
-        mRunModeInstance(&mRunModeDelegate, 0x1, RvcRunMode::Id, chip::to_underlying(RvcRunMode::Feature::kOnOff)),
+        mRunModeInstance(&mRunModeDelegate, RvcRunModeEndpoint, RvcRunMode::Id, chip::to_underlying(RvcRunMode::Feature::kOnOff)),
         mCleanModeDelegate(),
-        mCleanModeInstance(&mCleanModeDelegate, 0x1, RvcCleanMode::Id, chip::to_underlying(RvcCleanMode::Feature::kOnOff)),
-        mOperationalStateDelegate(), mOperationalStateInstance(&mOperationalStateDelegate, 0x01, RvcOperationalState::Id)
+        mCleanModeInstance(&mCleanModeDelegate, RvcCleanModeEndpoint, RvcCleanMode::Id, chip::to_underlying(RvcCleanMode::Feature::kOnOff)),
+        mOperationalStateDelegate(),
+        mOperationalStateInstance(&mOperationalStateDelegate, RvcOperationalStateEndpoint, RvcOperationalState::Id)
     {
-        // set start-up modes and state
+        // set the current-mode at start-up
         mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
         // Assume that the device is not docked.
         mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));

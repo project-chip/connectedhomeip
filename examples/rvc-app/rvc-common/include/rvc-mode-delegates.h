@@ -42,9 +42,11 @@ const uint8_t ModeMapping  = 2;
 class RvcRunModeDelegate : public ModeBase::Delegate
 {
 private:
+
     using ModeTagStructType               = detail::Structs::ModeTagStruct::Type;
     ModeTagStructType ModeTagsIdle[1]     = { { .value = to_underlying(ModeTag::kIdle) } };
     ModeTagStructType ModeTagsCleaning[1] = { { .value = to_underlying(ModeTag::kCleaning) } };
+    ModeTagStructType ModeTagsMapping[1] = { {.mfgCode = MakeOptional(TestVendor1), .value = 0x8001} };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Idle"),
@@ -56,7 +58,7 @@ private:
         detail::Structs::ModeOptionStruct::Type{
             .label    = CharSpan::fromCharString("Mapping"),
             .mode     = ModeMapping,
-            .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsIdle) }, // todo set to no mode tags
+            .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsMapping) },
     };
 
     CHIP_ERROR Init() override;
