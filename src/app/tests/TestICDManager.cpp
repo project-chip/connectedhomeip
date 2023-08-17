@@ -105,12 +105,20 @@ public:
      */
     static void AdvanceClockAndRunEventLoop(uint32_t time_ms)
     {
-        LayerSocketsLoop & layer = static_cast<LayerSocketsLoop &>(DeviceLayer::SystemLayer());
         gMockClock.AdvanceMonotonic(System::Clock::Timeout(time_ms));
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+        LayerSocketsLoop & layer = static_cast<LayerSocketsLoop &>(DeviceLayer::SystemLayer());
 
         layer.PrepareEvents();
         layer.WaitForEvents();
         layer.HandleEvents();
+#else
+        LayerImplFreeRTOS & layer = static_cast<LayerImplFreeRTOS &>(DeviceLayer::SystemLayer());
+        if (layer.IsInitialized())
+        {
+            layer.HandlePlatformTimer();
+        }
+#endif
     }
 
     static void TestICDModeIntervals(nlTestSuite * aSuite, void * aContext)
@@ -132,9 +140,8 @@ public:
         // Kick an active Threshold just before the end of the Active interval and validate that the active mode is extended.
         AdvanceClockAndRunEventLoop(IcdManagementServer::GetInstance().GetActiveModeInterval() - 1);
         ctx->mICDManager.UpdateOperationState(ICDManager::OperationalState::ActiveMode);
-
         AdvanceClockAndRunEventLoop(IcdManagementServer::GetInstance().GetActiveModeThreshold() / 2);
-        ctx->mICDManager.UpdateOperationState(ICDManager::OperationalState::ActiveMode);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
         AdvanceClockAndRunEventLoop(IcdManagementServer::GetInstance().GetActiveModeThreshold());
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
 
@@ -150,7 +157,7 @@ public:
         ctx->mICDManager.SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kCommissioningWindowOpen, true);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
         // Advance time so active mode interval expires.
-        AdvanceClockAndRunEventLoop(IcdManagementServer::GetInstance().GetActiveModeInterval());
+        AdvanceClockAndRunEventLoop(IcdManagementServer::GetInstance().GetActiveModeInterval() + 1);
         // Requirement flag still set. We stay in active mode
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
@@ -169,7 +176,7 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // Advance time again, The activemode interval is completed.
-        AdvanceClockAndRunEventLoop(IcdManagementServer::GetInstance().GetActiveModeInterval());
+        AdvanceClockAndRunEventLoop(IcdManagementServer::GetInstance().GetActiveModeInterval() + 1);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
 
         // Set two requirements
@@ -177,7 +184,7 @@ public:
         ctx->mICDManager.SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kAwaitingMsgAck, true);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
         // advance time so the active mode interval expires.
-        AdvanceClockAndRunEventLoop(IcdManagementServer::GetInstance().GetActiveModeInterval());
+        AdvanceClockAndRunEventLoop(IcdManagementServer::GetInstance().GetActiveModeInterval() + 1);
         // A requirement flag is still set. We stay in active mode.
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
