@@ -29,6 +29,7 @@ declare_args() {
   use_smu2_static = false
   use_smu2_dynamic = false
   use_hw_sha256 = false
+  use_hw_aes = false
 
   # icd configuration flags
   chip_enable_icd_subscription_handle = false
@@ -328,6 +329,12 @@ template("k32w1_sdk") {
       ]
     }
 
+    if (use_hw_aes) {
+      defines += [
+        "USE_HW_AES",
+      ]
+    }
+
     if (defined(invoker.defines)) {
       defines += invoker.defines
     }
@@ -487,6 +494,7 @@ template("k32w1_sdk") {
       "${k32w1_sdk_root}/middleware/secure-subsystem/src/sscp/fsl_sss_sscp.c",
       "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_init.c",
       "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_aes.c",
+      "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_ccm.c",
       "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_sha256.c",
       "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_hmac_sha256.c",
       "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_ecdh.c",

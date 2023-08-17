@@ -80,6 +80,12 @@ source_set("libopenthread-k32w1") {
         "${openthread_nxp_root}/src/k32w1/k32w1/sha256_sss.cpp",
       ]
     }
+
+    if (use_hw_aes) {
+      sources += [
+        "${openthread_nxp_root}/src/k32w1/k32w1/aes_sss.cpp",
+      ]
+    }
   }
 
   if (chip_with_ot_cli == 1) {

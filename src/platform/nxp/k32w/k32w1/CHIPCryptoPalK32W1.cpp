@@ -142,19 +142,30 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     {
         VerifyOrExit(aad != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     }
+#if defined(USE_HW_AES)
+    if (!aad_length)
+    {
+#endif
+        // Size of key is expressed in bits, hence the multiplication by 8.
+        result = mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, key.As<Symmetric128BitsKeyByteArray>(), sizeof(Symmetric128BitsKeyByteArray) * 8);
+        VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    // Size of key is expressed in bits, hence the multiplication by 8.
-    result = mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, key.As<Symmetric128BitsKeyByteArray>(),
-                                sizeof(Symmetric128BitsKeyByteArray) * 8);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    // Encrypt
-    result = mbedtls_ccm_encrypt_and_tag(&context, plaintext_length, Uint8::to_const_uchar(nonce), nonce_length,
-                                         Uint8::to_const_uchar(aad), aad_length, Uint8::to_const_uchar(plaintext),
-                                         Uint8::to_uchar(ciphertext), Uint8::to_uchar(tag), tag_length);
-    _log_mbedTLS_error(result);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
+        // Encrypt
+        result = mbedtls_ccm_encrypt_and_tag(&context, plaintext_length, Uint8::to_const_uchar(nonce), nonce_length,
+                                             Uint8::to_const_uchar(aad), aad_length, Uint8::to_const_uchar(plaintext),
+                                             Uint8::to_uchar(ciphertext), Uint8::to_uchar(tag), tag_length);
+        _log_mbedTLS_error(result);
+        VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+#if defined(USE_HW_AES)
+    }
+    else
+    {
+        // Encrypt
+        result = AES_128_CCM(Uint8::to_const_uchar(plaintext), plaintext_length, Uint8::to_const_uchar(aad), aad_length,
+                    Uint8::to_const_uchar(nonce), nonce_length, key.As<Symmetric128BitsKeyByteArray>(), ciphertext, tag, tag_length, gSecLib_CCM_Encrypt_c);
+        VerifyOrExit(result == kStatus_Success, error = CHIP_ERROR_INTERNAL);
+    }
+#endif
 exit:
     mbedtls_ccm_free(&context);
     return error;
@@ -180,19 +191,30 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, co
     {
         VerifyOrExit(aad != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     }
+#if defined(USE_HW_AES)
+    if (!aad_len)
+    {
+#endif
+        // Size of key is expressed in bits, hence the multiplication by 8.
+        result = mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, key.As<Symmetric128BitsKeyByteArray>(), sizeof(Symmetric128BitsKeyByteArray) * 8);
+        VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    // Size of key is expressed in bits, hence the multiplication by 8.
-    result = mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, key.As<Symmetric128BitsKeyByteArray>(),
-                                sizeof(Symmetric128BitsKeyByteArray) * 8);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    // Decrypt
-    result = mbedtls_ccm_auth_decrypt(&context, ciphertext_len, Uint8::to_const_uchar(nonce), nonce_length,
-                                      Uint8::to_const_uchar(aad), aad_len, Uint8::to_const_uchar(ciphertext),
-                                      Uint8::to_uchar(plaintext), Uint8::to_const_uchar(tag), tag_length);
-    _log_mbedTLS_error(result);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
+        // Decrypt
+        result = mbedtls_ccm_auth_decrypt(&context, ciphertext_len, Uint8::to_const_uchar(nonce), nonce_length,
+                                          Uint8::to_const_uchar(aad), aad_len, Uint8::to_const_uchar(ciphertext),
+                                          Uint8::to_uchar(plaintext), Uint8::to_const_uchar(tag), tag_length);
+        _log_mbedTLS_error(result);
+        VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+#if defined(USE_HW_AES)
+    }
+    else
+    {
+        // Decrypt
+        result = AES_128_CCM(Uint8::to_const_uchar(ciphertext), ciphertext_len, Uint8::to_const_uchar(aad), aad_len,
+                    Uint8::to_const_uchar(nonce), nonce_length, key.As<Symmetric128BitsKeyByteArray>(), plaintext, (uint8_t*)tag, tag_length, gSecLib_CCM_Decrypt_c);
+        VerifyOrExit(result == kStatus_Success, error = CHIP_ERROR_INTERNAL);
+    }
+#endif
 exit:
     mbedtls_ccm_free(&context);
     return error;
