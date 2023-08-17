@@ -39,8 +39,8 @@ constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Resou
 static ActivatedCarbonFilterMonitoringDelegate * gActivatedCarbonFilterDelegate = nullptr;
 static ResourceMonitoring::Instance * gActivatedCarbonFilterInstance            = nullptr;
 
-static HepaFilterMonitoringDelegate * gHepaFilterDelegate                       = nullptr;
-static ResourceMonitoring::Instance * gHepaFilterInstance                       = nullptr;
+static HepaFilterMonitoringDelegate * gHepaFilterDelegate = nullptr;
+static ResourceMonitoring::Instance * gHepaFilterInstance = nullptr;
 
 static ImmutableReplacementProductListManager sReplacementProductListManager;
 

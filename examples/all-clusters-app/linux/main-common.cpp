@@ -23,8 +23,8 @@
 #include "laundry-washer-controls-delegate-impl.h"
 #include "laundry-washer-mode.h"
 #include "operational-state-delegate-impl.h"
-#include "rvc-modes.h"
 #include "resource-monitoring-delegates.h"
+#include "rvc-modes.h"
 #include "tcc-mode.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>

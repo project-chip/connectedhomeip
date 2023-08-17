@@ -36,14 +36,13 @@ namespace app {
 namespace Clusters {
 namespace ResourceMonitoring {
 
-//forward declarations
+// forward declarations
 class Delegate;
 
 class Instance : public CommandHandlerInterface, public AttributeAccessInterface
 {
 
 public:
-
     /**
      * Creates a resource monitoring cluster instance. The Init() method needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
@@ -66,7 +65,7 @@ public:
     Instance(const Instance &) = delete;
     Instance & operator=(const Instance &) = delete;
     Instance(Instance &&)                  = delete;
-    Instance & operator=(Instance &&)      = delete;
+    Instance & operator=(Instance &&) = delete;
 
     /**
      * Initialise the Resource Monitoring cluster.
@@ -108,7 +107,6 @@ public:
 
     EndpointId GetEndpointId() const { return mEndpointId; }
     ClusterId getClusterId() const { return mClusterId; }
-
 
 private:
     Delegate * mDelegate;
