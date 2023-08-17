@@ -9,8 +9,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-const EndpointId RvcRunModeEndpoint = 1;
-const EndpointId RvcCleanModeEndpoint = 1;
+const EndpointId RvcRunModeEndpoint          = 1;
+const EndpointId RvcCleanModeEndpoint        = 1;
 const EndpointId RvcOperationalStateEndpoint = 1;
 
 class RvcDevice
@@ -25,13 +25,12 @@ private:
     RvcOperationalState::RvcOperationalStateDelegate mOperationalStateDelegate;
     OperationalState::Instance mOperationalStateInstance;
 
-
 public:
     RvcDevice() :
         mRunModeDelegate(),
         mRunModeInstance(&mRunModeDelegate, RvcRunModeEndpoint, RvcRunMode::Id, chip::to_underlying(RvcRunMode::Feature::kOnOff)),
-        mCleanModeDelegate(),
-        mCleanModeInstance(&mCleanModeDelegate, RvcCleanModeEndpoint, RvcCleanMode::Id, chip::to_underlying(RvcCleanMode::Feature::kOnOff)),
+        mCleanModeDelegate(), mCleanModeInstance(&mCleanModeDelegate, RvcCleanModeEndpoint, RvcCleanMode::Id,
+                                                 chip::to_underlying(RvcCleanMode::Feature::kOnOff)),
         mOperationalStateDelegate(),
         mOperationalStateInstance(&mOperationalStateDelegate, RvcOperationalStateEndpoint, RvcOperationalState::Id)
     {
