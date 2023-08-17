@@ -66,8 +66,10 @@ CHIP_ERROR LayerImplSelect::Init()
     mHandleSelectThread = PTHREAD_NULL;
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
     // Create an event to allow an arbitrary thread to wake the thread in the select loop.
     ReturnErrorOnFailure(mWakeEvent.Open(*this));
+#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
 
     VerifyOrReturnError(mLayerState.SetInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
@@ -113,13 +115,18 @@ void LayerImplSelect::Shutdown()
     mTimerPool.ReleaseAll();
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
 
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
     mWakeEvent.Close(*this);
+#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
 
     mLayerState.ResetFromShuttingDown(); // Return to uninitialized state to permit re-initialization.
 }
 
 void LayerImplSelect::Signal()
 {
+#if CHIP_SYSTEM_CONFIG_USE_LIBEV
+    ChipLogError(DeviceLayer, "Signal() should not be called in CHIP_SYSTEM_CONFIG_USE_LIBEV builds (might be ok in tests)");
+#else
     /*
      * Wake up the I/O thread by writing a single byte to the wake pipe.
      *
@@ -143,6 +150,7 @@ void LayerImplSelect::Signal()
 
         ChipLogError(chipSystemLayer, "System wake event notify failed: %" CHIP_ERROR_FORMAT, status.Format());
     }
+#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
 }
 
 CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
@@ -274,7 +282,10 @@ void LayerImplSelect::CancelTimer(TimerCompleteCallback onComplete, void * appSt
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
 
     mTimerPool.Release(timer);
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
+    // LIBEV has no I/O wakeup thread, so must not call Signal()
     Signal();
+#endif
 }
 
 CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
