@@ -99,14 +99,12 @@ tests:
           ./chip-tool relativehumiditymeasurement read event-list 1 1
 
             Verify " EventList " consists the list of supported events, in this cluster in RPI the value is 0 on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
-
             [1676357956.011759][8095:8097] CHIP:DMG: }
             [1676357956.011914][8095:8097] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0405 Attribute 0x0000_FFFA DataVersion: 3619476420
             [1676357956.011967][8095:8097] CHIP:TOO:   EventList: 0 entries
-                cluster: "LogCommands"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
       arguments:
           values:
               - name: "message"

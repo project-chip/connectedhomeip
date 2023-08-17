@@ -82,7 +82,7 @@ tests:
               type: list
 
     - label: "Step 7: Read the global attribute: EventList"
-      PICS: PICS_EVENT_LIST_ENABLED && BOOL.S.E00
+      PICS: BOOL.S.E00 && PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -91,7 +91,7 @@ tests:
               type: list
 
     - label: "Step 7: Read the global attribute: EventList"
-      PICS: "PICS_EVENT_LIST_ENABLED &&  !BOOL.S.E00 "
+      PICS: " !BOOL.S.E00 && PICS_EVENT_LIST_ENABLED "
       command: "readAttribute"
       attribute: "EventList"
       response:
