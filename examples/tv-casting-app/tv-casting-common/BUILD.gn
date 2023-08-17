@@ -85,6 +85,15 @@ chip_data_model("tv-casting-common") {
     "src/TargetVideoPlayerInfo.cpp",
   ]
 
+  # Add simplified casting API files here
+  sources += [
+    "core/CastingApp.cpp",
+    "core/CastingApp.h",
+    "core/Types.h",
+    "support/AppParameters.h",
+    "support/DataProvider.h",
+  ]
+
   deps = [
     "${chip_root}/examples/common/tracing:commandline",
     "${chip_root}/src/app/tests/suites/commands/interaction_model",

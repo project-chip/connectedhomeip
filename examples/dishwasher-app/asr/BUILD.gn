@@ -72,7 +72,6 @@ asr_executable("dishwasher_app") {
 
   sources = [
     "${chip_root}/examples/dishwasher-app/dishwasher-common/src/operational-state-delegate-impl.cpp",
-    "${chip_root}/examples/dishwasher-app/dishwasher-common/src/operational-state-delegates.cpp",
     "${examples_plat_dir}/CHIPDeviceManager.cpp",
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/init_Matter.cpp",

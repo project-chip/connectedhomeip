@@ -61,7 +61,8 @@
         "Test_TC_DA_1_1",
         "Test_TC_DA_1_3",
         "Test_TC_DA_1_4",
-        "Test_TC_DA_1_6"
+        "Test_TC_DA_1_6",
+        "Test_TC_DA_1_8"
     ],
     "DishwasherAlarm": [
         "Test_TC_DISHALM_1_1",
@@ -292,23 +293,13 @@
     ],
     "RVCCleanMode": [
         "Test_TC_RVCCLEANM_1_1",
-        "Test_TC_RVCCLEANM_1_2",
-        "Test_TC_RVCCLEANM_2_1",
         "Test_TC_RVCCLEANM_3_1",
-        "Test_TC_RVCCLEANM_3_2",
         "Test_TC_RVCCLEANM_3_3"
     ],
-    "RVCOperationalState": [
-        "Test_TC_RVCOPSTATE_2_1",
-        "Test_TC_RVCOPSTATE_2_2",
-        "Test_TC_RVCOPSTATE_2_3"
-    ],
+    "RVCOperationalState": ["Test_TC_RVCOPSTATE_2_2"],
     "RVCRunMode": [
         "Test_TC_RVCRUNM_1_1",
-        "Test_TC_RVCRUNM_1_2",
-        "Test_TC_RVCRUNM_2_1",
         "Test_TC_RVCRUNM_3_1",
-        "Test_TC_RVCRUNM_3_2",
         "Test_TC_RVCRUNM_3_3"
     ],
     "TemperatureControlledCabinetMode": [
