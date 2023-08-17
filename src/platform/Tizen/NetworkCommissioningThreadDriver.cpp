@@ -155,7 +155,7 @@ void TizenThreadDriver::ScanNetworks(ThreadDriver::ScanCallback * callback)
 size_t TizenThreadDriver::ThreadNetworkIterator::Count()
 {
     size_t count = driver->mStagingNetwork.IsCommissioned() ? 1 : 0;
-    ChipLogProgress(NetworkProvisioning, "%s, Count: %zu", __func__, count);
+    ChipLogProgress(NetworkProvisioning, "%s, Count: %u", __func__, count);
     return count;
 }
 
