@@ -184,7 +184,12 @@ CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallba
     ev_timer_init(&timer->mLibEvTimer, &LayerImplSelect::HandleLibEvTimer, 1, 0);
     timer->mLibEvTimer.data = timer;
     auto t                  = Clock::Milliseconds64(delay).count();
-    ev_timer_set(&timer->mLibEvTimer, static_cast<double>(t) / 1E3, 0.);
+    // Note: libev uses the time when events started processing as the "now" reference for relative timers,
+    //   for efficiency reasons. This point in time is represented by ev_now().
+    //   The real time is represented by ev_time().
+    //   As some chip code relies on timers to fire NEVER even only a bit early, we must increase the
+    //   relative value passed to ev_timer_set().
+    ev_timer_set(&timer->mLibEvTimer, (static_cast<double>(t) / 1E3) + ev_time() - ev_now(mLibEvLoopP), 0.);
     (void) mTimerList.Add(timer);
     ev_timer_start(mLibEvLoopP, &timer->mLibEvTimer);
     return CHIP_NO_ERROR;
