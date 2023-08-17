@@ -42,9 +42,7 @@
 #endif
 
 #ifdef SIWX_917
-extern "C" {
-int32_t wfx_wifi_rsi_init(void);
-}
+#include "wfx_rsi.h"
 #endif /* SIWX_917 */
 
 using namespace ::chip;
