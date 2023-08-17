@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Setup
         run: |
-          gh run list -R project-chip/connectedhomeip -b master -s failure --json displayTitle,workflowName > runlist.json
+          gh run list -R project-chip/connectedhomeip -b master -s failure --json displayTitle,workflowName > run_list.json
           pip install pandas
         env:
           GH_TOKEN: ${{ github.token }}
@@ -40,6 +40,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: workflow-fail-summary
-          path: runlist.json
+          path: |
+            recent_fails.csv
+            recent_fails_frequency.csv
           retention-days: 5
         
