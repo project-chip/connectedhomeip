@@ -15,7 +15,7 @@
 
 import optparse
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 
 def utc_time_in_matter_epoch_s():
