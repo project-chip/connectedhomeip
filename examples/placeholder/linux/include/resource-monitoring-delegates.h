@@ -36,7 +36,7 @@ private:
     chip::Protocols::InteractionModel::Status PostResetCondition() override;
 
 public:
-  ~ActivatedCarbonFilterMonitoringDelegate() override = default;
+    ~ActivatedCarbonFilterMonitoringDelegate() override = default;
 };
 
 } // namespace ActivatedCarbonFilterMonitoring

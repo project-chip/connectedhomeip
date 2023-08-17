@@ -36,7 +36,6 @@ constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Resou
                                                      static_cast<uint32_t>(ResourceMonitoring::Feature::kWarning) |
                                                      static_cast<uint32_t>(ResourceMonitoring::Feature::kReplacementProductList) };
 
-
 static ActivatedCarbonFilterMonitoringDelegate * gActivatedCarbonFilterDelegate = nullptr;
 static ResourceMonitoring::Instance * gActivatedCarbonFilterInstance            = nullptr;
 
