@@ -351,7 +351,11 @@ bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(app::CommandHandler * com
         status = GroupAdd(fabricIndex, endpointId, groupId, groupName);
     }
 
-    commandObj->AddStatus(commandPath, status);
+    CHIP_ERROR sendErr = commandObj->AddStatus(commandPath, status);
+    if (CHIP_NO_ERROR != sendErr)
+    {
+        ChipLogDetail(Zcl, "Groups: failed to send %s: %" CHIP_ERROR_FORMAT, "status_response", sendErr.Format());
+    }
     return true;
 }
 

@@ -177,6 +177,11 @@
     ],
     "PowerSourceConfiguration": ["Test_TC_PSCFG_1_1", "Test_TC_PSCFG_2_1"],
     "RelativeHumidityMeasurement": ["Test_TC_RH_1_1", "Test_TC_RH_2_1"],
+    "RoboticVacuumCleaner": [
+        "Test_TC_RVCCLEANM_1_1",
+        "Test_TC_RVCRUNM_1_1",
+        "Test_TC_RVCOPSTATE_1_1"
+    ],
     "SecureChannel": [],
     "SmokeCOAlarm": [
         "Test_TC_SMOKECO_1_1",

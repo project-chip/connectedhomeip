@@ -152,41 +152,38 @@ tests:
 
     - label: "Step 7a: TH reads EventList from DUT"
       PICS:
-          "PICS_EVENT_LIST_ENABLED &&  !DGWIFI.S.E00 && !DGWIFI.S.E01 &&
-          !DGWIFI.S.E02 "
+          " !DGWIFI.S.E00 && !DGWIFI.S.E01 && !DGWIFI.S.E02 &&
+          PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "EventList"
       response:
           value: []
           constraints:
               type: list
-
     - label:
           "Step 7b: TH reads optional attribute (Disconnection) in EventList
           from DUT"
-      PICS: PICS_EVENT_LIST_ENABLED && DGWIFI.S.E00
+      PICS: DGWIFI.S.E00 && PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
           constraints:
               type: list
               contains: [0]
-
     - label:
           "Step 7c: TH reads optional attribute (AssociationFailure) in
           EventList from DUT"
-      PICS: PICS_EVENT_LIST_ENABLED && DGWIFI.S.E01
+      PICS: DGWIFI.S.E01 && PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
           constraints:
               type: list
               contains: [1]
-
     - label:
           "Step 7d: TH reads optional attribute (ConnectionStatus) in EventList
           from DUT"
-      PICS: PICS_EVENT_LIST_ENABLED && DGWIFI.S.E02
+      PICS: DGWIFI.S.E02 && PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:

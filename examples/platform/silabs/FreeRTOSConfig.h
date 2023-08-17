@@ -107,11 +107,15 @@ extern "C" {
 
 #include <stdint.h>
 
+#ifdef SIWX_917
+extern uint32_t SystemCoreClock;
+#else // For EFR32
 #include "RTE_Components.h"
 #include CMSIS_device_header
 
 #include "em_assert.h"
 #include "em_device.h"
+#endif
 
 #if defined(SL_COMPONENT_CATALOG_PRESENT)
 #include "sl_component_catalog.h"
