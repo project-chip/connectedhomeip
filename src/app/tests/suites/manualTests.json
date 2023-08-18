@@ -61,7 +61,8 @@
         "Test_TC_DA_1_1",
         "Test_TC_DA_1_3",
         "Test_TC_DA_1_4",
-        "Test_TC_DA_1_6"
+        "Test_TC_DA_1_6",
+        "Test_TC_DA_1_8"
     ],
     "DishwasherMode": [
         "Test_TC_DISHM_1_1",

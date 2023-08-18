@@ -70,7 +70,7 @@ struct ValidationContext
                                                        validated certificate. */
     BitFlags<KeyPurposeFlags> mRequiredKeyPurposes; /**< Extended Key usage extensions that should be present
                                                        in the validated certificate. */
-    uint8_t mRequiredCertType;                      /**< Required certificate type. */
+    CertType mRequiredCertType;                     /**< Required certificate type. */
 
     CertificateValidityPolicy * mValidityPolicy =
         nullptr; /**< Optional application policy to apply for certificate validity period evaluation. */

@@ -95,6 +95,7 @@ void ReportSchedulerImpl::OnSubscriptionReportSent(ReadHandler * aReadHandler)
 
     Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
 
+    node->SetCanBeSynced(false);
     node->SetIntervalTimeStamps(aReadHandler, now);
     Milliseconds32 newTimeout;
     CalculateNextReportTimeout(newTimeout, node, now);

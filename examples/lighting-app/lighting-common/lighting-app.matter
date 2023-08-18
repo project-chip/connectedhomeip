@@ -152,6 +152,9 @@ server cluster Groups = 4 {
 server cluster Scenes = 5 {
   bitmap Feature : BITMAP32 {
     kSceneNames = 0x1;
+    kExplicit = 0x2;
+    kTableSize = 0x4;
+    kFabricScenes = 0x8;
   }
 
   bitmap ScenesCopyMode : BITMAP8 {
