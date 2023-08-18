@@ -29,7 +29,7 @@ from mobly import asserts
 # --int-arg PIXIT_ENDPOINT:<endpoint>
 
 
-class TC_DISHM_3_2(MatterBaseTest):
+class TC_DISHM_3_3(MatterBaseTest):
 
     async def read_mod_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.DishwasherMode
@@ -50,13 +50,9 @@ class TC_DISHM_3_2(MatterBaseTest):
         asserts.assert_equal(ret[0].Status, Status.Success, "Writing to OnOff failed")
 
     @async_test_body
-    async def test_TC_DISHM_3_2(self):
+    async def test_TC_DISHM_3_3(self):
 
-        asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
-                            "PIXIT_ENDPOINT must be included on the command line in "
-                            "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
-
-        self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
+        self.endpoint = self.user_params.get("endpoint", 1)
 
         asserts.assert_true(self.check_pics("DISHM.S.A0000"), "DISHM.S.A0000 must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.A0001"), "DISHM.S.A0001 must be supported")

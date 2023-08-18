@@ -41,9 +41,6 @@ class TC_DISHM_2_1(MatterBaseTest):
     @async_test_body
     async def test_TC_DISHM_2_1(self):
 
-        asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
-                            "PIXIT_ENDPOINT must be included on the command line in "
-                            "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
         asserts.assert_true('PIXIT.DISHM.MODE_CHANGE_OK' in self.matter_test_config.global_test_params,
                             "PIXIT.DISHM.MODE_CHANGE_OK must be included on the command line in "
                             "the --int-arg flag as PIXIT.DISHM.MODE_CHANGE_OK:<mode id>")
@@ -51,14 +48,15 @@ class TC_DISHM_2_1(MatterBaseTest):
                             "PIXIT.DISHM.MODE_CHANGE_FAIL must be included on the command line in "
                             "the --int-arg flag as PIXIT.DISHM.MODE_CHANGE_FAIL:<mode id>")
 
-        self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
-        self.modeok = self.matter_test_config.global_test_params['PIXIT_MODEOK']
-        self.can_test_mode_failure = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_FAI']
+        self.endpoint = self.user_params.get("endpoint", 1)
+        self.modeok = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_OK']
+        self.can_test_mode_failure = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_FAIL']
 
         asserts.assert_true(self.check_pics("DISHM.S.A0000"), "DISHM.S.A0000 must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.A0001"), "DISHM.S.A0001 must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.C00.Rsp"), "DISHM.S.C00.Rsp must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.C01.Tx"), "DISHM.S.C01.Tx must be supported")
+        asserts.assert_true(self.check_pics("DISHM.S.M.CAN_TEST_MODE_FAILURE"), "DISHM.S.M.CAN_TEST_MODE_FAILURE must be supported")
 
         attributes = Clusters.DishwasherMode.Attributes
 

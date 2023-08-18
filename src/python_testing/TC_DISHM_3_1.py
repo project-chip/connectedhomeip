@@ -56,7 +56,7 @@ class TC_DISHM_3_1(MatterBaseTest):
                             "Unexpected return type for OnOff")
 
     @async_test_body
-    async def test_TC_DISHM_3_2(self):
+    async def test_TC_DISHM_3_1(self):
 
         asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
                             "PIXIT_ENDPOINT must be included on the command line in "
@@ -95,7 +95,7 @@ class TC_DISHM_3_1(MatterBaseTest):
 
         logging.info("CurrentMode: %s" % (old_current_mode_dut))
 
-        if old_current_mode_dut == on_mode_th:
+        if old_current_mode_dut == on_mode_dut:
 
             self.print_step(4, "Read SupportedModes attribute")
             supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
@@ -107,7 +107,7 @@ class TC_DISHM_3_1(MatterBaseTest):
             new_mode_th = None
 
             for m in supported_modes:
-                if m.mode != on_mode_th:
+                if m.mode != on_mode_dut:
                     new_mode_th = m.mode
                     break
 
