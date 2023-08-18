@@ -63,6 +63,15 @@ public:
     class ReadHandlerNode : public TimerContext
     {
     public:
+        enum class ReadHandlerNodeFlags : uint8_t
+        {
+            // Flag to indicate if the engine run is already scheduled so the scheduler can ignore
+            // it when calculating the next run time
+            EngineRunScheduled = (1 << 0),
+            // Flag to allow the read handler to be synced with other handlers that have an earlier max timestamp
+            CanBeSynced = (1 << 1),
+        };
+
         ReadHandlerNode(ReadHandler * aReadHandler, ReportScheduler * aScheduler, const Timestamp & now) : mScheduler(aScheduler)
         {
             VerifyOrDie(aReadHandler != nullptr);
@@ -80,11 +89,16 @@ public:
         bool IsReportableNow(const Timestamp & now) const
         {
             return (mReadHandler->CanStartReporting() &&
-                    (now >= mMinTimestamp && (mReadHandler->IsDirty() || now >= mMaxTimestamp || now >= mSyncTimestamp)));
+                    (now >= mMinTimestamp && (mReadHandler->IsDirty() || now >= mMaxTimestamp || CanBeSynced())));
         }
 
-        bool IsEngineRunScheduled() const { return mEngineRunScheduled; }
-        void SetEngineRunScheduled(bool aEngineRunScheduled) { mEngineRunScheduled = aEngineRunScheduled; }
+        bool IsEngineRunScheduled() const { return mFlags.Has(ReadHandlerNodeFlags::EngineRunScheduled); }
+        void SetEngineRunScheduled(bool aEngineRunScheduled)
+        {
+            mFlags.Set(ReadHandlerNodeFlags::EngineRunScheduled, aEngineRunScheduled);
+        }
+        bool CanBeSynced() const { return mFlags.Has(ReadHandlerNodeFlags::CanBeSynced); }
+        void SetCanBeSynced(bool aCanBeSynced) { mFlags.Set(ReadHandlerNodeFlags::CanBeSynced, aCanBeSynced); }
 
         /// @brief Set the interval timestamps for the node based on the read handler reporting intervals
         /// @param aReadHandler read handler to get the intervals from
@@ -94,9 +108,8 @@ public:
         {
             uint16_t minInterval, maxInterval;
             aReadHandler->GetReportingIntervals(minInterval, maxInterval);
-            mMinTimestamp  = now + System::Clock::Seconds16(minInterval);
-            mMaxTimestamp  = now + System::Clock::Seconds16(maxInterval);
-            mSyncTimestamp = mMaxTimestamp;
+            mMinTimestamp = now + System::Clock::Seconds16(minInterval);
+            mMaxTimestamp = now + System::Clock::Seconds16(maxInterval);
         }
 
         void TimerFired() override
@@ -105,27 +118,16 @@ public:
             SetEngineRunScheduled(true);
         }
 
-        void SetSyncTimestamp(System::Clock::Timestamp aSyncTimestamp)
-        {
-            // Prevents the sync timestamp being set to a value lower than the min timestamp to prevent it to appear as reportable
-            // on the next timeout calculation and cause the scheduler to run the engine too early
-            VerifyOrReturn(aSyncTimestamp >= mMinTimestamp);
-            mSyncTimestamp = aSyncTimestamp;
-        }
-
         System::Clock::Timestamp GetMinTimestamp() const { return mMinTimestamp; }
         System::Clock::Timestamp GetMaxTimestamp() const { return mMaxTimestamp; }
-        System::Clock::Timestamp GetSyncTimestamp() const { return mSyncTimestamp; }
 
     private:
         ReadHandler * mReadHandler;
         ReportScheduler * mScheduler;
         Timestamp mMinTimestamp;
         Timestamp mMaxTimestamp;
-        Timestamp mSyncTimestamp; // Timestamp at which the read handler will be allowed to emit a report so it can be synced with
-                                  // other handlers that have an earlier max timestamp
-        bool mEngineRunScheduled = false; // Flag to indicate if the engine run is already scheduled so the scheduler can ignore
-                                          // it when calculating the next run time
+
+        BitFlags<ReadHandlerNodeFlags> mFlags;
     };
 
     ReportScheduler(TimerDelegate * aTimerDelegate) : mTimerDelegate(aTimerDelegate) {}

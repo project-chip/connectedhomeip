@@ -925,12 +925,6 @@ bool emberAfTimeSynchronizationClusterSetTimeZoneCallback(
         }
         else
         {
-            TimeState dstState = TimeSynchronizationServer::Instance().UpdateDSTOffsetState();
-            TimeSynchronizationServer::Instance().ClearDSTOffset();
-            if (dstState == TimeState::kActive || dstState == TimeState::kChanged)
-            {
-                emitDSTStatusEvent(commandPath.mEndpointId, false);
-            }
             response.DSTOffsetRequired = true;
         }
     }
@@ -938,6 +932,17 @@ bool emberAfTimeSynchronizationClusterSetTimeZoneCallback(
     {
         response.DSTOffsetRequired = true;
     }
+
+    if (response.DSTOffsetRequired)
+    {
+        TimeState dstState = TimeSynchronizationServer::Instance().UpdateDSTOffsetState();
+        TimeSynchronizationServer::Instance().ClearDSTOffset();
+        if (dstState == TimeState::kActive || dstState == TimeState::kChanged)
+        {
+            emitDSTStatusEvent(commandPath.mEndpointId, false);
+        }
+    }
+
     commandObj->AddResponse(commandPath, response);
     return true;
 }

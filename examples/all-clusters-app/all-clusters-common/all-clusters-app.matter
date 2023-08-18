@@ -152,6 +152,9 @@ server cluster Groups = 4 {
 server cluster Scenes = 5 {
   bitmap Feature : BITMAP32 {
     kSceneNames = 0x1;
+    kExplicit = 0x2;
+    kTableSize = 0x4;
+    kFabricScenes = 0x8;
   }
 
   bitmap ScenesCopyMode : BITMAP8 {
@@ -6068,6 +6071,7 @@ server cluster FaultInjection = 4294048774 {
 
 endpoint 0 {
   device type ma_rootdevice = 22, version 1;
+  device type ma_powersource = 17, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -6089,6 +6093,10 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
@@ -6107,6 +6115,10 @@ endpoint 0 {
     callback attribute subjectsPerAccessControlEntry default = 4;
     callback attribute targetsPerAccessControlEntry default = 3;
     callback attribute accessControlEntriesPerFabric default = 4;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
@@ -6135,6 +6147,10 @@ endpoint 0 {
     callback attribute uniqueID;
     callback attribute capabilityMinima;
     callback attribute productAppearance;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
   }
@@ -6154,6 +6170,10 @@ endpoint 0 {
   server cluster LocalizationConfiguration {
     persist  attribute activeLocale default = "en-US";
     callback attribute supportedLocales;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -6164,6 +6184,7 @@ endpoint 0 {
     callback attribute supportedCalendarTypes;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -6171,6 +6192,10 @@ endpoint 0 {
 
   server cluster UnitLocalization {
     persist  attribute temperatureUnit default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0x1;
     ram      attribute clusterRevision default = 1;
   }
@@ -6183,6 +6208,10 @@ endpoint 0 {
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
     callback attribute endpointList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 2;
   }
@@ -6193,6 +6222,10 @@ endpoint 0 {
     callback attribute regulatoryConfig default = 0;
     callback attribute locationCapability default = 0;
     callback attribute supportsConcurrentConnection default = 1;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -6206,6 +6239,10 @@ endpoint 0 {
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
   }
@@ -6231,6 +6268,7 @@ endpoint 0 {
     callback attribute testEventTriggersEnabled;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -6378,6 +6416,10 @@ endpoint 0 {
     callback attribute windowStatus default = 0;
     callback attribute adminFabricIndex default = 1;
     callback attribute adminVendorId default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -6389,6 +6431,10 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -6398,6 +6444,10 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -6445,6 +6495,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
+  device type ma_powersource = 17, version 1;
   device type ma_onofflight = 256, version 1;
 
   binding cluster OnOff;
@@ -6452,12 +6503,20 @@ endpoint 1 {
   server cluster Identify {
     ram      attribute identifyTime default = 0x0000;
     ram      attribute identifyType default = 0x0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
   }
 
   server cluster Groups {
     ram      attribute nameSupport;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
   }
@@ -6471,6 +6530,10 @@ endpoint 1 {
     ram      attribute lastConfiguredBy;
     ram      attribute sceneTableSize;
     callback attribute remainingCapacity;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 5;
   }
@@ -6481,6 +6544,10 @@ endpoint 1 {
     ram      attribute onTime default = 0x0000;
     ram      attribute offWaitTime default = 0x0000;
     persist  attribute startUpOnOff default = 0xFF;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0x0001;
     ram      attribute clusterRevision default = 5;
   }
@@ -6524,6 +6591,10 @@ endpoint 1 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
@@ -6551,6 +6622,10 @@ endpoint 1 {
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
     callback attribute endpointList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 2;
   }
@@ -7455,13 +7530,45 @@ endpoint 1 {
   }
 }
 endpoint 2 {
+  device type ma_powersource = 17, version 1;
   device type ma_onofflight = 256, version 1;
 
 
-  server cluster Groups {
-    ram      attribute nameSupport;
+  server cluster Identify {
+    ram      attribute identifyTime default = 0x0000;
+    ram      attribute identifyType default = 0x00;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster Groups {
+    ram      attribute nameSupport;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster Scenes {
+    callback attribute sceneCount default = 0x00;
+    ram      attribute currentScene default = 0x00;
+    ram      attribute currentGroup default = 0x0000;
+    ram      attribute sceneValid default = 0x00;
+    ram      attribute nameSupport;
+    ram      attribute sceneTableSize;
+    callback attribute remainingCapacity;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster OnOff {
@@ -7470,6 +7577,10 @@ endpoint 2 {
     ram      attribute onTime default = 0;
     ram      attribute offWaitTime default = 0;
     ram      attribute startUpOnOff;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0x0000;
     ram      attribute clusterRevision default = 5;
   }
@@ -7479,6 +7590,10 @@ endpoint 2 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
@@ -7491,6 +7606,10 @@ endpoint 2 {
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
     callback attribute endpointList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 2;
   }

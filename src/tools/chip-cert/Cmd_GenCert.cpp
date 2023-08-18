@@ -297,7 +297,7 @@ OptionSet *gCmdOptionSets[] =
 // clang-format on
 
 ToolChipDN gSubjectDN;
-uint8_t gCertType                           = kCertType_NotSpecified;
+CertType gCertType                          = CertType::kNotSpecified;
 int gPathLengthConstraint                   = kPathLength_NotSpecified;
 bool gSelfSign                              = false;
 const char * gCACertFileNameOrStr           = nullptr;
@@ -326,24 +326,24 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         {
             if (*arg == 'n')
             {
-                gCertType = kCertType_Node;
+                gCertType = CertType::kNode;
             }
             else if (*arg == 'f')
             {
-                gCertType = kCertType_FirmwareSigning;
+                gCertType = CertType::kFirmwareSigning;
             }
             else if (*arg == 'c')
             {
-                gCertType = kCertType_ICA;
+                gCertType = CertType::kICA;
             }
             else if (*arg == 'r')
             {
-                gCertType = kCertType_Root;
+                gCertType = CertType::kRoot;
                 gSelfSign = true;
             }
         }
 
-        if (gCertType == kCertType_NotSpecified)
+        if (gCertType == CertType::kNotSpecified)
         {
             PrintArgError("%s: Invalid value specified for the certificate type: %s\n", progName, arg);
             return false;
@@ -359,7 +359,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
 
         switch (gCertType)
         {
-        case kCertType_Node:
+        case CertType::kNode:
             if (gCertConfig.IsSubjectNodeIdValid() && !chip::IsOperationalNodeId(chip64bitAttr))
             {
                 PrintArgError("%s: Invalid value specified for chip node-id attribute: %s\n", progName, arg);
@@ -381,10 +381,10 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
                 }
             }
             break;
-        case kCertType_FirmwareSigning:
+        case CertType::kFirmwareSigning:
             err = gSubjectDN.AddAttribute_MatterFirmwareSigningId(chip64bitAttr);
             break;
-        case kCertType_ICA:
+        case CertType::kICA:
             if (gCertConfig.IsSubjectMatterIdPresent())
             {
                 err = gSubjectDN.AddAttribute_MatterICACId(chip64bitAttr);
@@ -394,7 +394,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
                 }
             }
             break;
-        case kCertType_Root:
+        case CertType::kRoot:
             if (gCertConfig.IsSubjectMatterIdPresent())
             {
                 err = gSubjectDN.AddAttribute_MatterRCACId(chip64bitAttr);
@@ -987,9 +987,9 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
 
 bool Cmd_GenCert(int argc, char * argv[])
 {
-    CHIP_ERROR err   = CHIP_NO_ERROR;
-    bool res         = true;
-    uint8_t certType = kCertType_NotSpecified;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    bool res          = true;
+    CertType certType = CertType::kNotSpecified;
     std::unique_ptr<X509, void (*)(X509 *)> newCert(X509_new(), &X509_free);
     std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> newKey(EVP_PKEY_new(), &EVP_PKEY_free);
     std::unique_ptr<X509, void (*)(X509 *)> caCert(nullptr, &X509_free);
@@ -1109,7 +1109,7 @@ bool Cmd_GenCert(int argc, char * argv[])
     }
 
     if (gPathLengthConstraint != kPathLength_NotSpecified &&
-        (gCertType == kCertType_Node || gCertType == kCertType_FirmwareSigning))
+        (gCertType == CertType::kNode || gCertType == CertType::kFirmwareSigning))
     {
         fprintf(stderr, "Path length constraint shouldn't be specified for the leaf certificate.\n");
         ExitNow(res = false);
