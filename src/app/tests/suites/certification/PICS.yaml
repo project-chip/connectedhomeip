@@ -8774,7 +8774,7 @@ PICS:
     - label:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: DISHM.S.C01.Tx
-    
+
     #
     #Operational State
     #
