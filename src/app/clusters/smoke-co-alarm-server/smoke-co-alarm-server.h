@@ -47,27 +47,16 @@ public:
     using SensitivityEnum        = chip::app::Clusters::SmokeCoAlarm::SensitivityEnum;
 
     /**
-     * For all the functions below, the return value is true on success, false on failure
-     */
-
-    /**
-     * @brief Updates the expressed state with new value
-     *
-     * @note If the value of ExpressedState is not Normal, the attribute corresponding to the value should not be Normal.
-     *
-     * @param endpointId ID of the endpoint
-     * @param newExpressedState new expressed state
-     * @return true on success, false on failure
-     */
-    bool SetExpressedState(chip::EndpointId endpointId, ExpressedStateEnum newExpressedState);
-
-    /**
      * @brief Set the highest level of Expressed State according to priorityOrder
      * @param endpointId ID of the endpoint
      * @param priorityOrder Priority order of expressed state from highest to lowest
      */
     void SetExpressedStateByPriority(chip::EndpointId endpointId,
                                      const std::array<ExpressedStateEnum, kPriorityOrderLength> & priorityOrder);
+
+    /**
+     * For all the functions below, the return value is true on success, false on failure
+     */
 
     bool SetSmokeState(chip::EndpointId endpointId, AlarmStateEnum newSmokeState);
     bool SetCOState(chip::EndpointId endpointId, AlarmStateEnum newCOState);
@@ -103,14 +92,22 @@ public:
 
 private:
     /**
+     * @brief Updates the expressed state with new value
+     *
+     * @note If the value of ExpressedState is not Normal, the attribute corresponding to the value should not be Normal.
+     *
+     * @param endpointId ID of the endpoint
+     * @param newExpressedState new expressed state
+     */
+    void SetExpressedState(chip::EndpointId endpointId, ExpressedStateEnum newExpressedState);
+
+    /**
      * @brief Common handler for SelfTestRequest commands
      *
      * @param commandObj    original command context
      * @param commandPath   original command path
-     * @return true         if successful
-     * @return false        if error happened
      */
-    bool HandleRemoteSelfTestRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
+    void HandleRemoteSelfTestRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
 
     /**
      * @brief Send generic event
@@ -170,8 +167,5 @@ private:
  * @note The application must set the ExpressedState to "Testing"
  *
  * @param endpointId endpoint for which SelfTestRequest command is called
- *
- * @retval true on success
- * @retval false if error happened (err should be set to appropriate error code)
  */
-bool emberAfPluginSmokeCoAlarmSelfTestRequestCommand(chip::EndpointId endpointId);
+void emberAfPluginSmokeCoAlarmSelfTestRequestCommand(chip::EndpointId endpointId);
