@@ -32,4 +32,10 @@ CHIP_ERROR JsonToTlv(const std::string & jsonString, MutableByteSpan & tlv);
  */
 CHIP_ERROR JsonToTlv(const std::string & jsonString, TLV::TLVWriter & writer);
 
+/*
+ * Given a uint64_t tagNumber, and convert it a tlv tag. when tagNumber is less than UINT8_MAX, tag is ContextTag, when tagNumber is
+ * less than uint32_t, tag is
+ */
+CHIP_ERROR ConvertTlvTag(const uint64_t tagNumber, TLV::Tag & tag);
+
 } // namespace chip
