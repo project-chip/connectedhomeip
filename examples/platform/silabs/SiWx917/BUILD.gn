@@ -274,8 +274,9 @@ source_set("siwx917-common") {
 
   # AWS SDK OTA
   if (aws_sdk_ota) {
-        public_deps +=
-        [ "${silabs_common_plat_dir}/DIC/matter_abs_interface:silabs-aws-sdk-ota" ]
+    public_deps += [
+      "${silabs_common_plat_dir}/DIC/matter_abs_interface:silabs-aws-sdk-ota",
+    ]
   }
 
   # Attestation Credentials
