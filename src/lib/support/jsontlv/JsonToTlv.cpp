@@ -179,7 +179,7 @@ bool CompareByTag(const ElementContext & a, const ElementContext & b)
     return IsContextTag(a.tag);
 }
 
-CHIP_ERROR InternalConvertTlvTag(const uint64_t tagNumber, TLV::Tag & tag, const uint32_t profileId=kTemporaryImplicitProfileId)
+CHIP_ERROR InternalConvertTlvTag(const uint64_t tagNumber, TLV::Tag & tag, const uint32_t profileId = kTemporaryImplicitProfileId)
 {
     if (tagNumber <= UINT8_MAX)
     {
