@@ -43,5 +43,7 @@
     "Air Purifier": 45,
     "Air Quality Sensor": 44,
     "Robotic Vacuum Cleaner": 116,
-    "Room Air Conditioner": 114
+    "Room Air Conditioner": 114,
+    "Refrigerator": 112,
+    "Temperature Controlled Cabinet": 113
 }
