@@ -252,6 +252,9 @@ template("efr32_sdk") {
         assert(chip_enable_wifi_ipv4, "enable chip_enable_wifi_ipv4")
         defines += [ "DIC_ENABLE=1" ]
       }
+      if (aws_sdk_ota) {
+        defines += [ "ENABLE_AWS_OTA_FEAT=1" ]
+      }
       if (chip_enable_wifi_ipv4) {
         defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4=1" ]
       }
