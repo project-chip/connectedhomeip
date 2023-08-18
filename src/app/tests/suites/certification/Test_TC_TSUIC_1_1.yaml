@@ -79,8 +79,8 @@ tests:
               contains: [2]
 
     - label:
-          "Step 4: Check the optional attribute(ScheduleProgrammingVisibility) is excluded from
-          AttributeList when TSUIC.S.A0002 is not set"
+          "Step 4: Check the optional attribute(ScheduleProgrammingVisibility)
+          is excluded from AttributeList when TSUIC.S.A0002 is not set"
       command: "readAttribute"
       attribute: "AttributeList"
       PICS: " !TSUIC.S.A0002 "
