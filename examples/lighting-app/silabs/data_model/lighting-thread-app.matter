@@ -1106,7 +1106,6 @@ server cluster PowerSource = 47 {
   readonly attribute int32u wiredNominalVoltage = 7;
   readonly attribute int32u wiredMaximumCurrent = 8;
   readonly attribute boolean wiredPresent = 9;
-  readonly attribute WiredFaultEnum activeWiredFaults[] = 10;
   readonly attribute endpoint_no endpointList[] = 31;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2529,13 +2528,12 @@ endpoint 1 {
     ram      attribute wiredNominalVoltage default = 5000;
     ram      attribute wiredMaximumCurrent default = 1000;
     ram      attribute wiredPresent default = 1;
-    callback attribute activeWiredFaults;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 2;
   }
 
