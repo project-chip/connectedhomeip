@@ -92,6 +92,27 @@ void SmokeCoAlarmServer::SetExpressedStateByPriority(EndpointId endpointId,
     SetExpressedState(endpointId, ExpressedStateEnum::kNormal);
 }
 
+bool SmokeCoAlarmServer::RequestSelfTest(EndpointId endpointId)
+{
+    ExpressedStateEnum expressedState;
+    VerifyOrReturnValue(GetExpressedState(endpointId, expressedState), false);
+
+    // If the value is busy then return busy
+    if (expressedState == ExpressedStateEnum::kSmokeAlarm || expressedState == ExpressedStateEnum::kCOAlarm ||
+        expressedState == ExpressedStateEnum::kTesting || expressedState == ExpressedStateEnum::kInterconnectSmoke ||
+        expressedState == ExpressedStateEnum::kInterconnectCO)
+    {
+        return false;
+    }
+
+    VerifyOrReturnValue(SetTestInProgress(endpointId, true), false);
+    SetExpressedState(endpointId, ExpressedStateEnum::kTesting);
+
+    emberAfPluginSmokeCoAlarmSelfTestRequestCommand(endpointId);
+
+    return true;
+}
+
 bool SmokeCoAlarmServer::SetSmokeState(EndpointId endpointId, AlarmStateEnum newSmokeState)
 {
     AlarmStateEnum alarmState;

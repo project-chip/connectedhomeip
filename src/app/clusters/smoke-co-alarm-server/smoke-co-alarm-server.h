@@ -55,6 +55,13 @@ public:
                                      const std::array<ExpressedStateEnum, kPriorityOrderLength> & priorityOrder);
 
     /**
+     * @brief Set the highest level of Expressed State according to priorityOrder
+     * @param endpointId ID of the endpoint
+     * @return true on success, false on failure
+     */
+    bool RequestSelfTest(chip::EndpointId endpointId);
+
+    /**
      * For all the functions below, the return value is true on success, false on failure
      */
 
