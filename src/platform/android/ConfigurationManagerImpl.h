@@ -43,6 +43,8 @@ public:
     CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override;
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType) override;
+    CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize) override;
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.
