@@ -140,7 +140,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::ButtonActionEventHandler(AppEvent * aEvent)
 {
-    bool success = AlarmMgr().ManualSelfTesting();
+    bool success = SmokeCoAlarmServer::Instance().RequestSelfTest(1);
     if (!success)
     {
         SILABS_LOG("Manual self-test failed");
