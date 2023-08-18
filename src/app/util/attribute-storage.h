@@ -202,12 +202,25 @@ const EmberAfCluster * emberAfGetClusterByIndex(chip::EndpointId endpoint, uint8
 chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::EndpointId endpoint, CHIP_ERROR & err);
 
 //
+// Retrieve the tag list associated with a specific endpoint.
+//
+chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> emberAfTagListFromEndpoint(chip::EndpointId endpoint, CHIP_ERROR & err);
+
+//
 // Over-ride the device type list current associated with an endpoint with a user-provided list. The buffers backing
 // that list have to live as long as the endpoint is enabled.
 //
 // NOTE: It is the application's responsibility to free the existing list that is being replaced if needed.
 //
 CHIP_ERROR emberAfSetDeviceTypeList(chip::EndpointId endpoint, chip::Span<const EmberAfDeviceType> deviceTypeList);
+
+//
+// Over-ride the tag list current associated with an endpoint with a user-provided list. The buffers backing
+// that list have to live as long as the endpoint is enabled.
+//
+// NOTE: It is the application's responsibility to free the existing list that is being replaced if needed.
+//
+CHIP_ERROR emberAfSetTagList(chip::EndpointId endpoint, chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList);
 
 // Register a dynamic endpoint. This involves registering descriptors that describe
 // the composition of the endpoint (encapsulated in the 'ep' argument) as well as providing

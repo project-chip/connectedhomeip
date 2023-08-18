@@ -46,6 +46,7 @@ public:
 private:
     static constexpr uint16_t ClusterRevision = 1;
 
+    CHIP_ERROR ReadTagAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadClientServerAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder, bool server);
@@ -53,6 +54,25 @@ private:
 };
 
 constexpr uint16_t DescriptorAttrAccess::ClusterRevision;
+
+CHIP_ERROR DescriptorAttrAccess::ReadTagAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    CHIP_ERROR err = aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
+        CHIP_ERROR err2;
+
+        auto tagList = emberAfTagListFromEndpoint(endpoint, err2);
+        ReturnErrorOnFailure(err2);
+
+        for (auto & tagStruct : tagList)
+        {
+            ReturnErrorOnFailure(encoder.Encode(tagStruct));
+        }
+
+        return CHIP_NO_ERROR;
+    });
+
+    return err;
+}
 
 CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
@@ -189,6 +209,9 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     }
     case PartsList::Id: {
         return ReadPartsAttribute(aPath.mEndpointId, aEncoder);
+    }
+    case TagList::Id: {
+        return ReadTagAttribute(aPath.mEndpointId, aEncoder);
     }
     case ClusterRevision::Id: {
         return ReadClusterRevision(aPath.mEndpointId, aEncoder);

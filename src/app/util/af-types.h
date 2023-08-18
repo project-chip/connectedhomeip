@@ -40,6 +40,7 @@
 #include <messaging/ExchangeContext.h>
 
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
 
 /**
  * @brief Type for the cluster mask
@@ -221,6 +222,11 @@ struct EmberAfDefinedEndpoint
      * Root endpoint id for composed device type.
      */
     chip::EndpointId parentEndpointId = chip::kInvalidEndpointId;
+
+    /**
+     * Span pointing to a list of tag
+     */
+    chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList;
 };
 
 // Cluster specific types
