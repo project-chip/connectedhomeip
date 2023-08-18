@@ -21,6 +21,9 @@ config:
     nodeId: 0x12344321
     cluster: "Door Lock"
     endpoint: 1
+    requirePINIsTrue:
+        type: BOOLEAN
+        defaultValue: false
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -152,12 +155,60 @@ tests:
       command: "readAttribute"
       attribute: "RequirePINforRemoteOperation"
       response:
-          value: false
+          saveAs: requirePINIsTrue
+          constraints:
+              type: boolean
+              minValue: 0
+              maxValue: 1
+
+    - label:
+          "Step 2a: TH verifies the RequirePINforRemoteOperation attribute value
+          is now False on the DUT"
+      PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033.Write
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: requirePINIsTrue
+              - name: "Value2"
+                value: false
+      response:
+          - values:
+                - name: "Equals"
+                  value: true
+
+    - label: "Step 2b: Compute RequirePINforRemoteOperation"
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: requirePINIsTrue
+              - name: "Value2"
+                value: false
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: requirePINIsFalse
+                  constraints:
+                      type: boolean
+                      minValue: 0
+                      maxValue: 1
 
     - label: "Step 3: TH sends Ubolt Door Command to the DUT without PINCode"
+      runIf: requirePINIsFalse
       PICS: DRLK.S.C27.Rsp
       command: "UnboltDoor"
       timedInteractionTimeoutMs: 1000
+
+    - label: "Step 3: TH sends Ubolt Door Command to the DUT without PINCode"
+      runIf: requirePINIsTrue
+      PICS: DRLK.S.C27.Rsp
+      command: "UnboltDoor"
+      timedInteractionTimeoutMs: 1000
+      response:
+          error: FAILURE
 
     - label: "Step 4: TH sends Ubolt Door Command to the DUT with PINCode"
       PICS: DRLK.S.C27.Rsp
@@ -195,19 +246,49 @@ tests:
       command: "readAttribute"
       attribute: "RequirePINforRemoteOperation"
       response:
-          value: true
-
-    - label: "Step 7: TH sends Ubolt Door Command to the DUT with valid PINCode"
-      PICS: DRLK.S.C27.Rsp
-      command: "UnboltDoor"
-      timedInteractionTimeoutMs: 1000
-      arguments:
-          values:
-              - name: "PINCode"
-                value: "123456"
+          saveAs: requirePINIsTrue
+          constraints:
+              type: boolean
+              minValue: 0
+              maxValue: 1
 
     - label:
-          "Step 8: TH sends Unbolt Door Command to the DUT with Invalid PINCode"
+          "Step 6a: TH verifies the RequirePINforRemoteOperation attribute value
+          is now True on the DUT"
+      PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033.Write
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: requirePINIsTrue
+              - name: "Value2"
+                value: true
+      response:
+          - values:
+                - name: "Equals"
+                  value: true
+
+    - label: "Step 6b: Compute RequirePINforRemoteOperation"
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: requirePINIsTrue
+              - name: "Value2"
+                value: false
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: requirePINIsFalse
+                  constraints:
+                      type: boolean
+                      minValue: 0
+                      maxValue: 1
+
+    - label:
+          "Step 7: TH sends Unbolt Door Command to the DUT with Invalid PINCode"
       PICS: DRLK.S.C27.Rsp
       command: "UnboltDoor"
       timedInteractionTimeoutMs: 1000
@@ -218,12 +299,28 @@ tests:
       response:
           error: FAILURE
 
-    - label: "Step 9: TH sends Unbolt Door Command to the DUT without PINCode"
+    - label: "Step 8: TH sends Unbolt Door Command to the DUT without PINCode"
+      runIf: requirePINIsTrue
       PICS: DRLK.S.C27.Rsp
       command: "UnboltDoor"
       timedInteractionTimeoutMs: 1000
       response:
           error: FAILURE
+
+    - label: "Step 8: TH sends Unbolt Door Command to the DUT without PINCode"
+      runIf: requirePINIsFalse
+      PICS: DRLK.S.C27.Rsp
+      command: "UnboltDoor"
+      timedInteractionTimeoutMs: 1000
+
+    - label: "Step 9: TH sends Ubolt Door Command to the DUT with valid PINCode"
+      PICS: DRLK.S.C27.Rsp
+      command: "UnboltDoor"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "123456"
 
     - label:
           "Step 10: TH writes WrongCodeEntryLimit attribute value as 3 on the

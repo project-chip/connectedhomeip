@@ -107,11 +107,15 @@ extern "C" {
 
 #include <stdint.h>
 
+#ifdef SIWX_917
+extern uint32_t SystemCoreClock;
+#else // For EFR32
 #include "RTE_Components.h"
 #include CMSIS_device_header
 
 #include "em_assert.h"
 #include "em_device.h"
+#endif
 
 #if defined(SL_COMPONENT_CATALOG_PRESENT)
 #include "sl_component_catalog.h"
@@ -209,7 +213,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #ifndef configTOTAL_HEAP_SIZE
 #ifdef SL_WIFI
 #ifdef DIC_ENABLE
-#define configTOTAL_HEAP_SIZE ((size_t)(56 * 1024))
+#define configTOTAL_HEAP_SIZE ((size_t)(68 * 1024))
 #else
 #define configTOTAL_HEAP_SIZE ((size_t)(34 * 1024))
 #endif // DIC

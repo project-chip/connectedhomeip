@@ -81,8 +81,14 @@ public final class InvokeElement {
   }
 
   @Nullable
-  public JSONObject getJson() {
+  public JSONObject getJsonObject() {
     return json;
+  }
+
+  @Nullable
+  public String getJsonString() {
+    if (json == null) return null;
+    return json.toString();
   }
 
   // check whether the current InvokeElement has same path as others.

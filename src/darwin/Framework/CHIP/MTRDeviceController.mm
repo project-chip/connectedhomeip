@@ -163,11 +163,17 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 {
     // Invalidate our MTRDevice instances before we shut down our secure
     // sessions and whatnot, so they don't start trying to resubscribe when we
-    // do the secure session shutdowns.
-    for (MTRDevice * device in [self.nodeIDToDeviceMap allValues]) {
+    // do the secure session shutdowns.  Since we don't want to hold the lock
+    // while calling out into arbitrary invalidation code, snapshot the list of
+    // devices before we start invalidating.
+    os_unfair_lock_lock(&_deviceMapLock);
+    NSArray<MTRDevice *> * devices = [self.nodeIDToDeviceMap allValues];
+    [self.nodeIDToDeviceMap removeAllObjects];
+    os_unfair_lock_unlock(&_deviceMapLock);
+
+    for (MTRDevice * device in devices) {
         [device invalidate];
     }
-    [self.nodeIDToDeviceMap removeAllObjects];
     [self stopBrowseForCommissionables];
 
     [_factory controllerShuttingDown:self];

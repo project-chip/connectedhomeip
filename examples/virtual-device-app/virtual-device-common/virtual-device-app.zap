@@ -33,7 +33,33 @@
   ],
   "endpointTypes": [
     {
+      "id": 1,
       "name": "MA-rootdevice",
+      "deviceTypeRef": {
+        "id": 2,
+        "code": 22,
+        "profileId": 259,
+        "label": "MA-rootdevice",
+        "name": "MA-rootdevice"
+      },
+      "deviceTypes": [
+        {
+          "id": 2,
+          "code": 22,
+          "profileId": 259,
+          "label": "MA-rootdevice",
+          "name": "MA-rootdevice"
+        }
+      ],
+      "deviceTypeRefs": [
+        2
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        22
+      ],
       "deviceTypeName": "MA-rootdevice",
       "deviceTypeCode": 22,
       "deviceTypeProfileId": 259,
@@ -7003,7 +7029,33 @@
       ]
     },
     {
+      "id": 2,
       "name": "MA-videoplayer",
+      "deviceTypeRef": {
+        "id": 8,
+        "code": 256,
+        "profileId": 259,
+        "label": "MA-onofflight",
+        "name": "MA-onofflight"
+      },
+      "deviceTypes": [
+        {
+          "id": 8,
+          "code": 256,
+          "profileId": 259,
+          "label": "MA-onofflight",
+          "name": "MA-onofflight"
+        }
+      ],
+      "deviceTypeRefs": [
+        8
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        256
+      ],
       "deviceTypeName": "MA-onofflight",
       "deviceTypeCode": 256,
       "deviceTypeProfileId": 259,
@@ -12017,11 +12069,43 @@
               "outgoing": 0
             },
             {
+              "name": "MoveHue",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 0
+            },
+            {
+              "name": "StepHue",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 0
+            },
+            {
               "name": "MoveToSaturation",
               "code": 3,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "MoveSaturation",
+              "code": 4,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 0
+            },
+            {
+              "name": "StepSaturation",
+              "code": 5,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
               "outgoing": 0
             },
             {
@@ -12046,6 +12130,14 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "MoveColorTemperature",
+              "code": 75,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
               "outgoing": 0
             }
           ],
@@ -12090,7 +12182,7 @@
           "mfgCode": null,
           "define": "COLOR_CONTROL_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "attributes": [
             {
               "name": "CurrentHue",
@@ -12948,6 +13040,22 @@
               "type": "array",
               "included": 1,
               "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "EventList",
+              "code": 65530,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -15623,18 +15731,14 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 22
+      "networkId": 0
     },
     {
       "endpointTypeName": "MA-videoplayer",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 256
+      "networkId": 0
     }
   ],
   "log": []

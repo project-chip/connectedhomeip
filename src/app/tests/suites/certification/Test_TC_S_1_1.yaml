@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 123.1.1. [TC-S-1.1] Global attributes with server as DUT
 
@@ -60,8 +59,10 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Step 4a: Read AttributeList (global attribute 65531)"
-      PICS: PICS_EVENT_LIST_ENABLED && S.S.A0005
+    - label:
+          "Step 4: Read AttributeList (global attribute 65531) if S.S.A0005 is
+          true"
+      PICS: S.S.A0005 && PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -85,8 +86,10 @@ tests:
                       65533,
                   ]
 
-    - label: "Step 4a: Read AttributeList (global attribute 65531)"
-      PICS: "!PICS_EVENT_LIST_ENABLED && S.S.A0005"
+    - label:
+          "Step 4: Read AttributeList (global attribute 65531) if S.S.A0005 is
+          true"
+      PICS: S.S.A0005 && !PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -95,8 +98,10 @@ tests:
               contains:
                   [0, 1, 2, 3, 4, 5, 6, 7, 65528, 65529, 65531, 65532, 65533]
 
-    - label: "Step 4b: Read AttributeList (global attribute 65531)"
-      PICS: PICS_EVENT_LIST_ENABLED && (!S.S.A0005)
+    - label:
+          "Step 4: Read AttributeList (global attribute 65531) if S.S.A0005 is
+          false"
+      PICS: " !S.S.A0005 && PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -119,8 +124,10 @@ tests:
                       65533,
                   ]
 
-    - label: "Step 4b: Read AttributeList (global attribute 65531)"
-      PICS: "!PICS_EVENT_LIST_ENABLED && (!S.S.A0005)"
+    - label:
+          "Step 4: Read AttributeList (global attribute 65531) if S.S.A0005 is
+          false"
+      PICS: " !S.S.A0005 && !PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
