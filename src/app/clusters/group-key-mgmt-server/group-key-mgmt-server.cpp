@@ -639,7 +639,7 @@ bool emberAfGroupKeyManagementClusterKeySetRemoveCallback(
     CHIP_ERROR err          = provider->RemoveKeySet(fabricIndex, commandData.groupKeySetID);
 
     Status status = Status::Success;
-    if (CHIP_ERROR_KEY_NOT_FOUND == err)
+    if (CHIP_ERROR_NOT_FOUND == err)
     {
         status = Status::NotFound;
     }
