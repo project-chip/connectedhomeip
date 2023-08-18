@@ -33,10 +33,10 @@
   ],
   "endpointTypes": [
     {
-      "id": 3,
+      "id": 7,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 2,
+        "id": 55,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,7 +44,7 @@
       },
       "deviceTypes": [
         {
-          "id": 2,
+          "id": 55,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
@@ -52,7 +52,7 @@
         }
       ],
       "deviceTypeRefs": [
-        2
+        55
       ],
       "deviceVersions": [
         1
@@ -7029,10 +7029,10 @@
       ]
     },
     {
-      "id": 4,
+      "id": 8,
       "name": "MA-videoplayer",
       "deviceTypeRef": {
-        "id": 8,
+        "id": 61,
         "code": 256,
         "profileId": 259,
         "label": "MA-onofflight",
@@ -7040,7 +7040,7 @@
       },
       "deviceTypes": [
         {
-          "id": 8,
+          "id": 61,
           "code": 256,
           "profileId": 259,
           "label": "MA-onofflight",
@@ -7048,7 +7048,7 @@
         }
       ],
       "deviceTypeRefs": [
-        8
+        61
       ],
       "deviceVersions": [
         1
@@ -9433,6 +9433,22 @@
               "reportableChange": 0
             },
             {
+              "name": "EndpointList",
+              "code": 31,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
@@ -9451,6 +9467,22 @@
             {
               "name": "AcceptedCommandList",
               "code": 65529,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "EventList",
+              "code": 65530,
               "mfgCode": null,
               "side": "server",
               "type": "array",
