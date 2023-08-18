@@ -207,7 +207,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetCommissionableDeviceName(char * buf, siz
 {
     CHIP_ERROR err;
     size_t u32DeviceNameSize = 0;
-    err = ReadConfigValueStr(AndroidConfig::kConfigKey_DeviceName, buf, bufSize, u32DeviceNameSize);
+    err                      = ReadConfigValueStr(AndroidConfig::kConfigKey_DeviceName, buf, bufSize, u32DeviceNameSize);
 
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
