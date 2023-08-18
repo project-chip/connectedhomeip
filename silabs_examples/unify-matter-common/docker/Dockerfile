@@ -69,7 +69,7 @@ RUN curl https://sh.rustup.rs -sSf --output /tmp/sh.rustup.rs \
   && if [[ $ARCH == *"arm64"* ]]; then export RUST_TRIPLES="$RUST_TRIPLES aarch64-unknown-linux-gnu"; fi \
   && ./tmp/sh.rustup.rs -y --profile minimal --target ${RUST_TRIPLES} --default-toolchain ${RUST_VERSION}\
   && rm /tmp/sh.rustup.rs \
-  && /opt/cargo-home/bin/cargo install cargo2junit \
+  && /opt/cargo-home/bin/cargo install cargo2junit --locked \
   && /opt/cargo-home/bin/cargo install --version 1.41.3 cargo-deb \
   && chmod -R a+rw ${RUSTUP_HOME} ${CARGO_HOME} \
   && find ${RUSTUP_HOME} ${CARGO_HOME} -type d -exec chmod a+x {} \;
