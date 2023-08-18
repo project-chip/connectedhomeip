@@ -154,7 +154,7 @@ void AppSpecificConnectivityEventCallback(const ChipDeviceEvent * event, intptr_
         (event->InternetConnectivityChange.IPv4 == kConnectivity_Established))
     {
         SILABS_LOG("Got IPv4 Address! Starting DIC module\n");
-        if (DIC_OK != DIC_Init(dic::control::subscribeCB))
+        if (DIC_OK != dic_init(dic::control::subscribeCB))
             SILABS_LOG("Failed to initialize DIC module\n");
     }
 }

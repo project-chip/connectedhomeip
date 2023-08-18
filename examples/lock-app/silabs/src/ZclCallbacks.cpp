@@ -52,7 +52,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         ChipLogProgress(Zcl, "Door lock cluster: " ChipLogFormatMEI " state %d", ChipLogValueMEI(clusterId),
                         to_underlying(lockState));
 #ifdef DIC_ENABLE
-        DIC_SendMsg("lock/state", (const char *) (lockState == DoorLock::DlLockState::kLocked ? "lock" : "unlock"));
+        dic_sendmsg("lock/state", (const char *) (lockState == DoorLock::DlLockState::kLocked ? "lock" : "unlock"));
 #endif // DIC_ENABLE
     }
 }
