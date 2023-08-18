@@ -28,7 +28,7 @@
 
 #include "cmsis_os2.h"
 #include <platform/internal/BLEManager.h>
-#ifndef SI917
+#ifndef SIWX_917
 #include "rail.h"
 #endif
 #include <crypto/RandUtils.h>
@@ -42,7 +42,7 @@ extern "C" {
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 #include "wfx_sl_ble_init.h"
-#ifndef SI917
+#ifndef SIWX_917
 #include <rsi_driver.h>
 #endif
 #include <rsi_utils.h>

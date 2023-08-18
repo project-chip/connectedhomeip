@@ -33,24 +33,16 @@
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "task.h"
 #include "FreeRTOSConfig.h"
 
-#ifdef __cplusplus
-}
-#endif
-
 /**********************************************************
  * Defines
  *********************************************************/
 #define MAIN_TASK_STACK_SIZE (1024 * 8)
-#define MAIN_TASK_PRIORITY ( configMAX_PRIORITIES - 1 )
+#define MAIN_TASK_PRIORITY (configMAX_PRIORITIES - 1)
 
 /* wfxRsi Task will use as its stack */
 StackType_t mainTaskStack[MAIN_TASK_STACK_SIZE] = { 0 };
@@ -75,8 +67,8 @@ int main(void)
 {
     GetPlatform().Init();
 
-    main_Task = xTaskCreateStatic(application_start, "main_task", MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY,
-                                  mainTaskStack, &mainTaskBuffer);
+    main_Task = xTaskCreate(application_start, "main_task", MAIN_TASK_STACK_SIZE, NULL,
+                                  MAIN_TASK_PRIORITY, mainTaskStack, &mainTaskBuffer);
 
     SILABS_LOG("Starting scheduler");
     GetPlatform().StartScheduler();

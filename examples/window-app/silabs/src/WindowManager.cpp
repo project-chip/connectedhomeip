@@ -742,7 +742,6 @@ void WindowManager::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     }
 
     AppTask::GetAppTask().PostEvent(&event);
-
 }
 
 void WindowManager::GeneralEventHandler(AppEvent * aEvent)

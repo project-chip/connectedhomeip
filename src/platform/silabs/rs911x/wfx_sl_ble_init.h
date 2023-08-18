@@ -42,7 +42,7 @@
 #include <rsi_ble.h>
 #include <rsi_ble_apis.h>
 #include <rsi_ble_common_config.h>
-#ifndef SI917
+#ifndef SIWX_917
 #include <rsi_bootup_config.h>
 #include <rsi_driver.h>
 #include <rsi_wlan_apis.h>
