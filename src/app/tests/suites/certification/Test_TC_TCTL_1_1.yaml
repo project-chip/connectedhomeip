@@ -118,7 +118,6 @@ tests:
       verification: |
           ./chip-tool temperaturecontrol read event-list 1 1
           Verify "  EventList attribute " consists the list of supported events,  which for this cluster should be an empty list on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
-
           [1689770528.788582][9233:9235] CHIP:DMG:         InteractionModelRevision = 1
           [1689770528.788587][9233:9235] CHIP:DMG: }
           [1689770528.788671][9233:9235] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_FFFA DataVersion: 2844459846

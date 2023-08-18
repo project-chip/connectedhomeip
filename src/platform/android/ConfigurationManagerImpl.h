@@ -52,11 +52,6 @@ private:
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-    CHIP_ERROR GetWiFiStationSecurityType(Internal::WiFiAuthSecurityType & secType);
-    CHIP_ERROR UpdateWiFiStationSecurityType(Internal::WiFiAuthSecurityType secType);
-#endif
-
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 
     // ===== Members that implement the GenericConfigurationManagerImpl protected interface.
