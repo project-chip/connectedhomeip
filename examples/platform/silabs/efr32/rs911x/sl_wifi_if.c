@@ -188,8 +188,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
     xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_CONN);
     wfx_rsi.join_retries = 0;
     retryInterval        = WLAN_MIN_RETRY_TIMER_MS;
-    if (is_wifi_disconnection_event)
-        is_wifi_disconnection_event = false;
+    is_wifi_disconnection_event = false;
     callback_status = SL_STATUS_OK;
     return SL_STATUS_OK;
 }
@@ -236,10 +235,9 @@ int32_t wfx_rsi_power_save()
  *****************************************************************************************/
 int32_t wfx_wifi_rsi_init(void)
 {
-  SILABS_LOG("wfx_wifi_rsi_init #1 ");
+  SILABS_LOG("wfx_wifi_rsi_init started");
   sl_status_t status;
-  status = sl_wifi_init(&config  , default_wifi_event_handler);
-  SILABS_LOG("wfx_wifi_rsi_init #2 ");
+  status = wfx_wifi_start(&config  , default_wifi_event_handler);
   if(status != SL_STATUS_OK){
     SILABS_LOG("wfx_wifi_rsi_init failed %x", status);
     return status;
@@ -258,6 +256,12 @@ int32_t wfx_wifi_rsi_init(void)
 static int32_t wfx_rsi_init(void)
 {
     sl_status_t status;
+    status = wfx_wifi_rsi_init();
+    if(status != SL_STATUS_OK) {
+      SILABS_LOG("wfx_rsi_init failed %x", status);
+      return status;
+    }
+
     status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, (sl_mac_address_t *) &wfx_rsi.sta_mac.octet[0]);
     if (status != SL_STATUS_OK)
     {
