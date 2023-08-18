@@ -38,9 +38,9 @@ extern "C" {
 #endif
 
 #include "FreeRTOS.h"
-#include "cmsis_os2.h"
 #include "event_groups.h"
 #include "task.h"
+#include "FreeRTOSConfig.h"
 
 #ifdef __cplusplus
 }
@@ -50,27 +50,21 @@ extern "C" {
  * Defines
  *********************************************************/
 #define MAIN_TASK_STACK_SIZE (1024 * 8)
-#define MAIN_TASK_PRIORITY 56
+#define MAIN_TASK_PRIORITY ( configMAX_PRIORITIES - 1 )
 
-const osThreadAttr_t thread_attributes = {
-    .name       = "app",
-    .attr_bits  = 0,
-    .cb_mem     = 0,
-    .cb_size    = 0,
-    .stack_mem  = 0,
-    .stack_size = MAIN_TASK_STACK_SIZE,
-    .priority   = (osPriority_t) MAIN_TASK_PRIORITY,
-    .tz_module  = 0,
-    .reserved   = 0,
-};
+/* wfxRsi Task will use as its stack */
+StackType_t mainTaskStack[MAIN_TASK_STACK_SIZE] = { 0 };
+
+/* Structure that will hold the TCB of the wfxRsi Task being created. */
+StaticTask_t mainTaskBuffer;
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Credentials;
 using namespace chip::DeviceLayer::Silabs;
 
-osThreadId_t main_Task;
-void application_start(const void * unused);
+TaskHandle_t main_Task;
+void application_start(void * unused);
 volatile int apperror_cnt;
 static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
@@ -81,7 +75,8 @@ int main(void)
 {
     GetPlatform().Init();
 
-    main_Task = osThreadNew((osThreadFunc_t) application_start, NULL, &thread_attributes);
+    main_Task = xTaskCreateStatic(application_start, "main_task", MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY,
+                                  mainTaskStack, &mainTaskBuffer);
 
     SILABS_LOG("Starting scheduler");
     GetPlatform().StartScheduler();
@@ -92,7 +87,7 @@ int main(void)
     appError(CHIP_ERROR_INTERNAL);
 }
 
-void application_start(const void * unused)
+void application_start(void * unused)
 {
     if (SilabsMatterConfig::InitMatter(BLE_DEV_NAME) != CHIP_NO_ERROR)
         appError(CHIP_ERROR_INTERNAL);
@@ -113,5 +108,5 @@ void application_start(const void * unused)
     if (AppTask::GetAppTask().StartAppTask() != CHIP_NO_ERROR)
         appError(CHIP_ERROR_INTERNAL);
 
-    osThreadTerminate(main_Task);
+    vTaskDelete(main_Task);
 }
