@@ -92,27 +92,6 @@ void SmokeCoAlarmServer::SetExpressedStateByPriority(EndpointId endpointId,
     SetExpressedState(endpointId, ExpressedStateEnum::kNormal);
 }
 
-bool SmokeCoAlarmServer::RequestSelfTest(EndpointId endpointId)
-{
-    ExpressedStateEnum expressedState;
-    VerifyOrReturnValue(GetExpressedState(endpointId, expressedState), false);
-
-    // If the value is busy then return busy
-    if (expressedState == ExpressedStateEnum::kSmokeAlarm || expressedState == ExpressedStateEnum::kCOAlarm ||
-        expressedState == ExpressedStateEnum::kTesting || expressedState == ExpressedStateEnum::kInterconnectSmoke ||
-        expressedState == ExpressedStateEnum::kInterconnectCO)
-    {
-        return false;
-    }
-
-    VerifyOrReturnValue(SetTestInProgress(endpointId, true), false);
-    SetExpressedState(endpointId, ExpressedStateEnum::kTesting);
-
-    emberAfPluginSmokeCoAlarmSelfTestRequestCommand(endpointId);
-
-    return true;
-}
-
 bool SmokeCoAlarmServer::SetSmokeState(EndpointId endpointId, AlarmStateEnum newSmokeState)
 {
     AlarmStateEnum alarmState;
@@ -425,6 +404,30 @@ void SmokeCoAlarmServer::SetExpressedState(EndpointId endpointId, ExpressedState
     }
 }
 
+void SmokeCoAlarmServer::HandleRemoteSelfTestRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath)
+{
+    EndpointId endpointId = commandPath.mEndpointId;
+
+    ExpressedStateEnum expressedState;
+    VerifyOrReturn(GetExpressedState(endpointId, expressedState), commandObj->AddStatus(commandPath, Status::Failure));
+
+    // If the value is busy then return busy
+    if (expressedState == ExpressedStateEnum::kSmokeAlarm || expressedState == ExpressedStateEnum::kCOAlarm ||
+        expressedState == ExpressedStateEnum::kTesting || expressedState == ExpressedStateEnum::kInterconnectSmoke ||
+        expressedState == ExpressedStateEnum::kInterconnectCO)
+    {
+        commandObj->AddStatus(commandPath, Status::Busy);
+        return;
+    }
+
+    VerifyOrReturn(SetTestInProgress(endpointId, true), commandObj->AddStatus(commandPath, Status::Failure));
+    SetExpressedState(endpointId, ExpressedStateEnum::kTesting);
+
+    emberAfPluginSmokeCoAlarmSelfTestRequestCommand(endpointId);
+
+    commandObj->AddStatus(commandPath, Status::Success);
+}
+
 template <typename T>
 void SmokeCoAlarmServer::SendEvent(EndpointId endpointId, T & event)
 {
@@ -475,10 +478,7 @@ bool SmokeCoAlarmServer::SetAttribute(EndpointId endpointId, AttributeId attribu
 bool emberAfSmokeCoAlarmClusterSelfTestRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                        const Commands::SelfTestRequest::DecodableType & commandData)
 {
-    auto success = SmokeCoAlarmServer::Instance().RequestSelfTest(commandPath.mEndpointId);
-
-    commandObj->AddStatus(commandPath, success ? Status::Success : Status::Failure);
-
+    SmokeCoAlarmServer::Instance().HandleRemoteSelfTestRequest(commandObj, commandPath);
     return true;
 }
 

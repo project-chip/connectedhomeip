@@ -55,13 +55,6 @@ public:
                                      const std::array<ExpressedStateEnum, kPriorityOrderLength> & priorityOrder);
 
     /**
-     * @brief Set the highest level of Expressed State according to priorityOrder
-     * @param endpointId ID of the endpoint
-     * @return true on success, false on failure
-     */
-    bool RequestSelfTest(chip::EndpointId endpointId);
-
-    /**
      * For all the functions below, the return value is true on success, false on failure
      */
 
@@ -107,6 +100,14 @@ private:
      * @param newExpressedState new expressed state
      */
     void SetExpressedState(chip::EndpointId endpointId, ExpressedStateEnum newExpressedState);
+
+    /**
+     * @brief Common handler for SelfTestRequest commands
+     *
+     * @param commandObj    original command context
+     * @param commandPath   original command path
+     */
+    void HandleRemoteSelfTestRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
 
     /**
      * @brief Send generic event
