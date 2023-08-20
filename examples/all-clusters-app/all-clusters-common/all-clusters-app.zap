@@ -33,7 +33,7 @@
   ],
   "endpointTypes": [
     {
-      "id": 20,
+      "id": 24,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
         "id": 3,
@@ -2754,7 +2754,7 @@
           "mfgCode": null,
           "define": "POWER_SOURCE_CONFIGURATION_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "attributes": [
             {
               "name": "Sources",
@@ -10512,7 +10512,7 @@
       ]
     },
     {
-      "id": 17,
+      "id": 21,
       "name": "MA-onofflight",
       "deviceTypeRef": {
         "id": 8,
@@ -30401,7 +30401,7 @@
       ]
     },
     {
-      "id": 18,
+      "id": 23,
       "name": "MA-onofflight",
       "deviceTypeRef": {
         "id": 8,
@@ -34685,7 +34685,7 @@
       ]
     },
     {
-      "id": 19,
+      "id": 22,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 53,
