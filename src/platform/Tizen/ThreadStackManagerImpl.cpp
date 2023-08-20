@@ -24,10 +24,10 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
-#include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <platform/ThreadStackManager.h>
 #include <platform/Tizen/NetworkCommissioningDriver.h>
@@ -509,7 +509,7 @@ void ThreadStackManagerImpl::ThreadScanResultCb(int result, thread_network_scann
         networkScanned.channel         = channel;
         networkScanned.version         = version;
         networkScanned.extendedAddress = extAddress;
-        networkScanned.rssi            = (int8_t)rssi;
+        networkScanned.rssi            = (int8_t) rssi;
         networkScanned.lqi             = lqi;
 
         self->mScanResult->push_back(networkScanned);
