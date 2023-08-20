@@ -88,6 +88,7 @@ volatile sl_status_t callback_status = SL_STATUS_OK;
  *********************************************************************/
 int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
 {
+    sl_status_t status        = SL_STATUS_OK;
     uint8_t rssi       = 0;
     ap->security       = wfx_rsi.sec.security;
     ap->chan           = wfx_rsi.ap_chan;
