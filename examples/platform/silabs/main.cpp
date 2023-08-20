@@ -44,12 +44,6 @@
 #define MAIN_TASK_STACK_SIZE (1024 * 8)
 #define MAIN_TASK_PRIORITY (configMAX_PRIORITIES - 1)
 
-/* wfxRsi Task will use as its stack */
-StackType_t mainTaskStack[MAIN_TASK_STACK_SIZE] = { 0 };
-
-/* Structure that will hold the TCB of the wfxRsi Task being created. */
-StaticTask_t mainTaskBuffer;
-
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Credentials;
@@ -67,8 +61,8 @@ int main(void)
 {
     GetPlatform().Init();
 
-    main_Task = xTaskCreate(application_start, "main_task", MAIN_TASK_STACK_SIZE, NULL,
-                                  MAIN_TASK_PRIORITY, mainTaskStack, &mainTaskBuffer);
+    xTaskCreate(application_start, "main_task", MAIN_TASK_STACK_SIZE, NULL,
+                                  MAIN_TASK_PRIORITY, &main_Task);
 
     SILABS_LOG("Starting scheduler");
     GetPlatform().StartScheduler();
