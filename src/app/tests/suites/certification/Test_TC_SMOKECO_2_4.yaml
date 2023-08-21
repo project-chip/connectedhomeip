@@ -133,7 +133,7 @@ tests:
       PICS: SMOKECO.S.E02
       command: "readEvent"
       event: "LowBattery"
-      EVENT_NUMBER: EVENT_NUMBER + 1
+      eventNumber: EVENT_NUMBER + 1
       response:
           value: { AlarmSeverityLevel: 1 }
 
@@ -178,7 +178,7 @@ tests:
       PICS: SMOKECO.S.E02
       command: "readEvent"
       event: "LowBattery"
-      EVENT_NUMBER: EVENT_NUMBER + 2
+      eventNumber: EVENT_NUMBER + 2
       response:
           value: { AlarmSeverityLevel: 2 }
 
@@ -223,7 +223,7 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      EVENT_NUMBER: EVENT_NUMBER + 3
+      eventNumber: EVENT_NUMBER + 3
       response:
           value: {}
 
@@ -279,7 +279,7 @@ tests:
       PICS: SMOKECO.S.E03
       command: "readEvent"
       event: "HardwareFault"
-      EVENT_NUMBER: EVENT_NUMBER + 4
+      eventNumber: EVENT_NUMBER + 4
       response:
           value: {}
 
@@ -325,7 +325,7 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      EVENT_NUMBER: EVENT_NUMBER + 5
+      eventNumber: EVENT_NUMBER + 5
       response:
           value: {}
 
@@ -381,7 +381,7 @@ tests:
       PICS: SMOKECO.S.E04
       command: "readEvent"
       event: "EndOfService"
-      EVENT_NUMBER: EVENT_NUMBER + 6
+      eventNumber: EVENT_NUMBER + 6
       response:
           value: {}
 
@@ -427,7 +427,7 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      EVENT_NUMBER: EVENT_NUMBER + 7
+      eventNumber: EVENT_NUMBER + 7
       response:
           value: {}
 
@@ -499,7 +499,7 @@ tests:
       PICS: SMOKECO.S.E05
       command: "readEvent"
       event: "SelfTestComplete"
-      EVENT_NUMBER: EVENT_NUMBER + 8
+      eventNumber: EVENT_NUMBER + 8
       response:
           value: {}
 
@@ -516,7 +516,7 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      EVENT_NUMBER: EVENT_NUMBER + 9
+      eventNumber: EVENT_NUMBER + 9
       response:
           value: {}
 
@@ -561,7 +561,7 @@ tests:
       PICS: SMOKECO.S.E05
       command: "readEvent"
       event: "SelfTestComplete"
-      EVENT_NUMBER: EVENT_NUMBER + 10
+      eventNumber: EVENT_NUMBER + 10
       response:
           value: {}
 
@@ -578,6 +578,6 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      EVENT_NUMBER: EVENT_NUMBER + 11
+      eventNumber: EVENT_NUMBER + 11
       response:
           value: {}

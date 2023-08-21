@@ -160,7 +160,7 @@ tests:
       PICS: SMOKECO.S.A0008 && SMOKECO.S.E08
       command: "readEvent"
       event: "InterconnectSmokeAlarm"
-      EVENT_NUMBER: EVENT_NUMBER + 1
+      eventNumber: EVENT_NUMBER + 1
       response:
           value: { AlarmSeverityLevel: interconnectSmokeAlarmSeverityLevel }
 
@@ -215,7 +215,7 @@ tests:
       PICS: SMOKECO.S.A0008 && SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      EVENT_NUMBER: EVENT_NUMBER + 2
+      eventNumber: EVENT_NUMBER + 2
       response:
           value: {}
 
@@ -273,7 +273,7 @@ tests:
       PICS: SMOKECO.S.A0009 && SMOKECO.S.E09
       command: "readEvent"
       event: "InterconnectCOAlarm"
-      EVENT_NUMBER: EVENT_NUMBER + 3
+      eventNumber: EVENT_NUMBER + 3
       response:
           value: { AlarmSeverityLevel: interconnectCOAlarmSeverityLevel }
 
@@ -328,7 +328,7 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      EVENT_NUMBER: EVENT_NUMBER + 4
+      eventNumber: EVENT_NUMBER + 4
       response:
           value: {}
 
@@ -679,7 +679,7 @@ tests:
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && SMOKECO.S.E06
       command: "readEvent"
       event: "AlarmMuted"
-      EVENT_NUMBER: EVENT_NUMBER + 5
+      eventNumber: EVENT_NUMBER + 5
       response:
           value: {}
 
@@ -716,7 +716,7 @@ tests:
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && SMOKECO.S.E07
       command: "readEvent"
       event: "MuteEnded"
-      EVENT_NUMBER: EVENT_NUMBER + 6
+      eventNumber: EVENT_NUMBER + 6
       response:
           value: {}
 
@@ -891,7 +891,7 @@ tests:
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && SMOKECO.S.E06
       command: "readEvent"
       event: "AlarmMuted"
-      EVENT_NUMBER: EVENT_NUMBER + 7
+      eventNumber: EVENT_NUMBER + 7
       response:
           value: {}
 
@@ -928,7 +928,7 @@ tests:
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && SMOKECO.S.E07
       command: "readEvent"
       event: "MuteEnded"
-      EVENT_NUMBER: EVENT_NUMBER + 8
+      eventNumber: EVENT_NUMBER + 8
       response:
           value: {}
 
