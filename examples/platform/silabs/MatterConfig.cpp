@@ -172,7 +172,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
 // WiFi needs to be initialized after Memory Init for some reason
 #ifdef SL_WIFI
-    InitWiFi();
+    ReturnErrorOnFailure(InitWiFi());
 #endif
 
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());

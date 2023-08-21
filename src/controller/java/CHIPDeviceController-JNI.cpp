@@ -46,6 +46,8 @@
 #include <lib/support/ErrorStr.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ThreadOperationalDataset.h>
+#include <lib/support/jsontlv/JsonToTlv.h>
+#include <lib/support/jsontlv/TlvToJson.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/Protocols.h>
@@ -1864,6 +1866,8 @@ JNI_METHOD(void, write)
     auto callback                           = reinterpret_cast<WriteAttributesCallback *>(callbackHandle);
     app::WriteClient * writeClient          = nullptr;
     uint16_t convertedTimedRequestTimeoutMs = static_cast<uint16_t>(timedRequestTimeoutMs);
+    bool hasValidTlv                        = false;
+    bool hasValidJson                       = false;
 
     ChipLogDetail(Controller, "IM write() called");
 
@@ -1889,15 +1893,15 @@ JNI_METHOD(void, write)
         jmethodID hasDataVersionMethod    = nullptr;
         jmethodID getDataVersionMethod    = nullptr;
         jmethodID getTlvByteArrayMethod   = nullptr;
+        jmethodID getJsonStringMethod     = nullptr;
         jobject endpointIdObj             = nullptr;
         jobject clusterIdObj              = nullptr;
         jobject attributeIdObj            = nullptr;
         jbyteArray tlvBytesObj            = nullptr;
         bool hasDataVersion               = false;
         Optional<DataVersion> dataVersion = Optional<DataVersion>();
-        ;
-        jbyte * tlvBytesObjBytes = nullptr;
-        jsize length             = 0;
+        uint8_t * tlvBytes                = nullptr;
+        size_t length                     = 0;
         TLV::TLVReader reader;
 
         SuccessOrExit(err = JniReferences::GetInstance().GetListItem(attributeList, i, attributeItem));
@@ -1942,14 +1946,47 @@ JNI_METHOD(void, write)
 
         tlvBytesObj = static_cast<jbyteArray>(env->CallObjectMethod(attributeItem, getTlvByteArrayMethod));
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        VerifyOrExit(tlvBytesObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+        if (tlvBytesObj != nullptr)
+        {
+            jbyte * tlvBytesObjBytes = env->GetByteArrayElements(tlvBytesObj, nullptr);
+            VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+            length = static_cast<size_t>(env->GetArrayLength(tlvBytesObj));
+            VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+            tlvBytes    = reinterpret_cast<uint8_t *>(tlvBytesObjBytes);
+            hasValidTlv = true;
+        }
+        else
+        {
+            SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, attributeItem, "getJsonString", "()Ljava/lang/String;",
+                                                                        &getJsonStringMethod));
+            jstring jsonJniString = static_cast<jstring>(env->CallObjectMethod(attributeItem, getJsonStringMethod));
+            VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+            if (jsonJniString != nullptr)
+            {
+                JniUtfString jsonUtfJniString(env, jsonJniString);
+                uint8_t bufWithStruct[chip::app::kMaxSecureSduLengthBytes] = { 0 };
+                uint8_t buf[chip::app::kMaxSecureSduLengthBytes]           = { 0 };
+                TLV::TLVReader tlvReader;
+                TLV::TLVWriter tlvWrite;
+                TLV::TLVType outerContainer = TLV::kTLVType_Structure;
+                MutableByteSpan dataWithStruct{ bufWithStruct };
+                MutableByteSpan data{ buf };
+                SuccessOrExit(err = JsonToTlv(std::string(jsonUtfJniString.c_str(), jsonUtfJniString.size()), dataWithStruct));
+                tlvReader.Init(dataWithStruct);
+                SuccessOrExit(err = tlvReader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+                SuccessOrExit(err = tlvReader.EnterContainer(outerContainer));
+                SuccessOrExit(err = tlvReader.Next());
+                tlvWrite.Init(data);
+                SuccessOrExit(err = tlvWrite.CopyElement(TLV::AnonymousTag(), tlvReader));
+                SuccessOrExit(err = tlvWrite.Finalize());
+                tlvBytes     = buf;
+                length       = tlvWrite.GetLengthWritten();
+                hasValidJson = true;
+            }
+        }
+        VerifyOrExit(hasValidTlv || hasValidJson, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-        tlvBytesObjBytes = env->GetByteArrayElements(tlvBytesObj, nullptr);
-        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        length = env->GetArrayLength(tlvBytesObj);
-        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-
-        reader.Init(reinterpret_cast<const uint8_t *>(tlvBytesObjBytes), static_cast<size_t>(length));
+        reader.Init(tlvBytes, length);
         reader.Next();
         SuccessOrExit(
             err = writeClient->PutPreencodedAttribute(
@@ -1964,7 +2001,6 @@ JNI_METHOD(void, write)
     callback->mWriteClient = writeClient;
 
 exit:
-
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "JNI IM Write Error: %s", err.AsString());
@@ -2000,14 +2036,17 @@ JNI_METHOD(void, invoke)
     jmethodID getClusterIdMethod       = nullptr;
     jmethodID getCommandIdMethod       = nullptr;
     jmethodID getTlvByteArrayMethod    = nullptr;
+    jmethodID getJsonStringMethod      = nullptr;
     jobject endpointIdObj              = nullptr;
     jobject clusterIdObj               = nullptr;
     jobject commandIdObj               = nullptr;
     jbyteArray tlvBytesObj             = nullptr;
-    jbyte * tlvBytesObjBytes           = nullptr;
-    jsize length                       = 0;
     TLV::TLVReader reader;
     TLV::TLVWriter * writer                 = nullptr;
+    uint8_t * tlvBytes                      = nullptr;
+    size_t length                           = 0;
+    bool hasValidTlv                        = false;
+    bool hasValidJson                       = false;
     uint16_t convertedTimedRequestTimeoutMs = static_cast<uint16_t>(timedRequestTimeoutMs);
 
     ChipLogDetail(Controller, "IM invoke() called");
@@ -2045,12 +2084,34 @@ JNI_METHOD(void, invoke)
 
     tlvBytesObj = static_cast<jbyteArray>(env->CallObjectMethod(invokeElement, getTlvByteArrayMethod));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-    VerifyOrExit(tlvBytesObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    if (tlvBytesObj != nullptr)
+    {
+        jbyte * tlvBytesObjBytes = env->GetByteArrayElements(tlvBytesObj, nullptr);
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+        length = static_cast<size_t>(env->GetArrayLength(tlvBytesObj));
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+        tlvBytes    = reinterpret_cast<uint8_t *>(tlvBytesObjBytes);
+        hasValidTlv = true;
+    }
+    else
+    {
+        SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getJsonString", "()Ljava/lang/String;",
+                                                                    &getJsonStringMethod));
+        jstring jsonJniString = static_cast<jstring>(env->CallObjectMethod(invokeElement, getJsonStringMethod));
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+        if (jsonJniString != nullptr)
+        {
+            JniUtfString jsonUtfJniString(env, jsonJniString);
+            uint8_t buf[chip::app::kMaxSecureSduLengthBytes] = { 0 };
+            MutableByteSpan tlvEncodingLocal{ buf };
+            SuccessOrExit(err = JsonToTlv(std::string(jsonUtfJniString.c_str(), jsonUtfJniString.size()), tlvEncodingLocal));
+            tlvBytes     = tlvEncodingLocal.data();
+            length       = tlvEncodingLocal.size();
+            hasValidJson = true;
+        }
+    }
+    VerifyOrExit(hasValidTlv || hasValidJson, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    tlvBytesObjBytes = env->GetByteArrayElements(tlvBytesObj, nullptr);
-    VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-    length = env->GetArrayLength(tlvBytesObj);
-    VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
     SuccessOrExit(err = commandSender->PrepareCommand(app::CommandPathParams(static_cast<EndpointId>(endpointId), /* group id */ 0,
                                                                              static_cast<ClusterId>(clusterId),
                                                                              static_cast<CommandId>(commandId),
@@ -2059,7 +2120,7 @@ JNI_METHOD(void, invoke)
 
     writer = commandSender->GetCommandDataIBTLVWriter();
     VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    reader.Init(reinterpret_cast<const uint8_t *>(tlvBytesObjBytes), static_cast<size_t>(length));
+    reader.Init(tlvBytes, static_cast<size_t>(length));
     reader.Next();
     SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(app::CommandDataIB::Tag::kFields), reader));
     SuccessOrExit(err = commandSender->FinishCommand(convertedTimedRequestTimeoutMs != 0

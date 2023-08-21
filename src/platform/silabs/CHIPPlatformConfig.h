@@ -45,10 +45,18 @@
 #if CHIP_HAVE_CONFIG_H
 #include <crypto/CryptoBuildConfig.h>
 #endif
-#if !defined(CHIP_CONFIG_SHA256_CONTEXT_SIZE) && (CHIP_CRYPTO_PLATFORM == 1)
+#if (CHIP_CRYPTO_PLATFORM == 1)
 #include "psa/crypto.h"
+
+#if !defined(CHIP_CONFIG_SHA256_CONTEXT_SIZE)
 #define CHIP_CONFIG_SHA256_CONTEXT_SIZE (sizeof(psa_hash_operation_t))
 #endif
+
+#if !defined(CHIP_CONFIG_SHA256_CONTEXT_ALIGN)
+#define CHIP_CONFIG_SHA256_CONTEXT_ALIGN psa_hash_operation_t
+#endif
+
+#endif // CHIP_CRYPTO_PLATFORM
 
 // ==================== General Configuration Overrides ====================
 

@@ -41,6 +41,9 @@ declare_args() {
   #Disable MQTT by default
   enable_dic = false
 
+  # Disable AWS SDK OTA by default
+  aws_sdk_ota = false
+
   # Disable UART log forwarding by default
   sl_uart_log_output = false
 }
@@ -168,11 +171,6 @@ if (silabs_board == "BRD4304A") {
 } else if (silabs_board == "BRD4318A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240SD22VNA"
-
-  use_wstk_leds = false
-  use_external_flash = false
-  show_qr_code = false
-  disable_lcd = true
 } else {
   print(
       "Please provide a valid value for SILABS_BOARD env variable (currently supported BRD4304A, BRD4161A, BRD4163A, BRD4164A BRD4166A, BRD4170A, BRD4186C, BRD4187C, BRD2601B, BRD2703A, BRD4317A, BRD2704A)")
