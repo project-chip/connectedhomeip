@@ -1,1 +1,1 @@
-./src/platform/silabs/rs911x/rsi_ble_config.h
+rsi_ble_config.h
