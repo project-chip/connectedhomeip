@@ -237,7 +237,7 @@ template("siwx917_sdk") {
       defines += [ "DIC_ENABLE=1" ]
     }
 
-    libs += [ "${efr32_sdk_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a" ]
+    libs += [ "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a" ]
 
     cflags = []
     foreach(include_dir, _include_dirs) {
