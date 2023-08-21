@@ -621,27 +621,27 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     // The first byte of the public key is the uncompressed marker
     VerifyOrExit(SSS_KEY_STORE_SET_KEY(&pEcdhPubKey, Uint8::to_const_uchar(remote_public_key) + 1, keySize, coordinateBitsLen,
                                        kSSS_KeyPart_Public) == kStatus_SSS_Success,
-                 CHIP_ERROR_INTERNAL);
+                 error = CHIP_ERROR_INTERNAL);
 
     /* Shared secret */
-    VerifyOrExit(sss_sscp_key_object_init(&sharedSecret, &g_keyStore) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(sss_sscp_key_object_init(&sharedSecret, &g_keyStore) == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(sss_sscp_key_object_allocate_handle(&sharedSecret, 0u, kSSS_KeyPart_Default, kSSS_CipherType_AES, coordinateLen,
                                                      SSS_KEYPROP_OPERATION_NONE) == kStatus_SSS_Success,
-                 CHIP_ERROR_INTERNAL);
+                 error = CHIP_ERROR_INTERNAL);
     bFreeSharedSecret = true;
 
     /* Secret Key generated inside SSS */
     VerifyOrExit(sss_sscp_derive_key_context_init(&dCtx, &g_sssSession, keypair, kAlgorithm_SSS_ECDH,
                                                   kMode_SSS_ComputeSharedSecret) == kStatus_SSS_Success,
-                 CHIP_ERROR_INTERNAL);
+                 error = CHIP_ERROR_INTERNAL);
     bFreeDeriveContex = true;
 
-    VerifyOrExit(sss_sscp_asymmetric_dh_derive_key(&dCtx, &pEcdhPubKey, &sharedSecret) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(sss_sscp_asymmetric_dh_derive_key(&dCtx, &pEcdhPubKey, &sharedSecret) == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     VerifyOrExit(SSS_KEY_STORE_GET_PUBKEY(&sharedSecret, out_secret.Bytes(), &coordinateLen, &coordinateBitsLen) ==
                      kStatus_SSS_Success,
-                 CHIP_ERROR_INTERNAL);
-    SuccessOrExit(out_secret.SetLength(secret_length));
+                 error = CHIP_ERROR_INTERNAL);
+    SuccessOrExit(error = out_secret.SetLength(secret_length));
 
 exit:
     (void) SSS_KEY_OBJ_FREE(&pEcdhPubKey);
@@ -743,12 +743,12 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
 
     /* must load plain text private key inside SSS */
-    VerifyOrExit((sss_sscp_key_object_init(keypair, &g_keyStore) == kStatus_SSS_Success), CHIP_ERROR_INTERNAL);
+    VerifyOrExit((sss_sscp_key_object_init(keypair, &g_keyStore) == kStatus_SSS_Success), error = CHIP_ERROR_INTERNAL);
 
     /* Allocate key handle */
     VerifyOrExit(sss_sscp_key_object_allocate_handle(keypair, 0x0u, kSSS_KeyPart_Private, kSSS_CipherType_EC_NIST_P,
                                                      kP256_PrivateKey_Length, SSS_KEYPROP_OPERATION_ASYM) == kStatus_SSS_Success,
-                 CHIP_ERROR_INTERNAL);
+                 error = CHIP_ERROR_INTERNAL);
 
     if (SSS_KEY_STORE_SET_KEY(keypair, privkey, kP256_PrivateKey_Length, kP256_PrivateKey_Length * 8, kSSS_KeyPart_Private) !=
         kStatus_SSS_Success)

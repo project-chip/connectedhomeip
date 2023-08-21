@@ -169,11 +169,11 @@ CHIP_ERROR OTAImageProcessorImpl::SelectProcessor(ByteSpan & block)
     auto pair = mProcessorMap.find(header.tag);
     if (pair == mProcessorMap.end())
     {
-        ChipLogError(SoftwareUpdate, "There is no registered processor for tag: %" PRIu32, header.tag);
+        ChipLogError(SoftwareUpdate, "There is no registered processor for tag: %lu", header.tag);
         return CHIP_OTA_PROCESSOR_NOT_REGISTERED;
     }
 
-    ChipLogDetail(SoftwareUpdate, "Selected processor with tag: %ld", pair->first);
+    ChipLogDetail(SoftwareUpdate, "Selected processor with tag: %lu", pair->first);
     mCurrentProcessor = pair->second;
     mCurrentProcessor->SetLength(header.length);
     mCurrentProcessor->SetWasSelected(true);
@@ -186,7 +186,7 @@ CHIP_ERROR OTAImageProcessorImpl::RegisterProcessor(uint32_t tag, OTATlvProcesso
     auto pair = mProcessorMap.find(tag);
     if (pair != mProcessorMap.end())
     {
-        ChipLogError(SoftwareUpdate, "A processor for tag %" PRIu32 " is already registered.", tag);
+        ChipLogError(SoftwareUpdate, "A processor for tag %lu is already registered.", tag);
         return CHIP_OTA_PROCESSOR_ALREADY_REGISTERED;
     }
 
@@ -288,7 +288,7 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
     if (currentVersion != targetVersion)
     {
-        ChipLogError(SoftwareUpdate, "Current sw version %" PRIu32 " is different than the expected sw version = %" PRIu32,
+        ChipLogError(SoftwareUpdate, "Current sw version %lu is different than the expected sw version = %lu",
                      currentVersion, targetVersion);
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -353,7 +353,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
             error = pair.second->ApplyAction();
             if (error != CHIP_NO_ERROR)
             {
-                ChipLogError(SoftwareUpdate, "Apply action for tag %" PRIu8 " processor failed.", (uint8_t) pair.first);
+                ChipLogError(SoftwareUpdate, "Apply action for tag %d processor failed.", (uint8_t) pair.first);
                 // Revert all previously applied actions if current apply action fails.
                 // Reset image processor and requestor states.
                 imageProcessor->AbortAllProcessors();

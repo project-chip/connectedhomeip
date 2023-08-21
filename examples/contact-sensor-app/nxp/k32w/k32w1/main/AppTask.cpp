@@ -778,8 +778,7 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
 
     // write the new on/off value
     EmberAfStatus status = app::Clusters::BooleanState::Attributes::StateValue::Set(1, newValue);
-    /*EmberAfStatus status = emberAfWriteAttribute(1, app::Clusters::BooleanState::Id, ZCL_STATE_VALUE_ATTRIBUTE_ID,
-                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);*/
+
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: updating boolean status value %x", status);
@@ -798,8 +797,7 @@ void AppTask::UpdateDeviceStateInternal(intptr_t arg)
 
     /* get onoff attribute value */
     (void) app::Clusters::BooleanState::Attributes::StateValue::Get(1, &stateValueAttrValue);
-    /*(void) emberAfReadAttribute(1, app::Clusters::BooleanState::Id, ZCL_STATE_VALUE_ATTRIBUTE_ID, (uint8_t *)
-       &stateValueAttrValue, 1);*/
+
 #if !defined(chip_with_low_power) || (chip_with_low_power == 0)
     /* set the device state */
     sContactSensorLED.Set(stateValueAttrValue);

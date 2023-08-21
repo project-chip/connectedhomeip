@@ -85,25 +85,28 @@ CHIP_ERROR P256KeypairSSS::ExportBlob(P256SerializedKeypairSSS & output) const
 
 CHIP_ERROR P256KeypairSSS::ImportBlob(P256SerializedKeypairSSS & input)
 {
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
     if (false == mInitialized)
     {
-        VerifyOrExit((sss_sscp_key_object_init(&mKeyObj, &g_keyStore) == kStatus_SSS_Success), CHIP_ERROR_INTERNAL);
+        VerifyOrExit((sss_sscp_key_object_init(&mKeyObj, &g_keyStore) == kStatus_SSS_Success),
+                     error = CHIP_ERROR_INTERNAL);
 
         /* Allocate key handle */
         VerifyOrExit(
             (sss_sscp_key_object_allocate_handle(&mKeyObj, 0x0u, kSSS_KeyPart_Pair, kSSS_CipherType_EC_NIST_P,
                                                  3 * kP256_PrivateKey_Length, SSS_KEYPROP_OPERATION_ASYM) == kStatus_SSS_Success),
-            CHIP_ERROR_INTERNAL);
+            error = CHIP_ERROR_INTERNAL);
     }
 
     VerifyOrExit((sss_sscp_key_store_import_key(&g_keyStore, &mKeyObj, input.Bytes(), input.Length(), kP256_PrivateKey_Length * 8,
                                                 kSSS_blobType_ELKE_blob) == kStatus_SSS_Success),
-                 CHIP_ERROR_INTERNAL);
+                 error = CHIP_ERROR_INTERNAL);
 
     mInitialized = true;
 
 exit:
-    return CHIP_NO_ERROR;
+    return error;
 }
 
 CHIP_ERROR P256KeypairSSS::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
@@ -121,10 +124,10 @@ CHIP_ERROR P256KeypairSSS::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_
 
     VerifyOrExit((sss_sscp_asymmetric_context_init(&asyc, &g_sssSession, &mKeyObj, kAlgorithm_SSS_ECDSA_SHA256, kMode_SSS_Sign) ==
                   kStatus_SSS_Success),
-                 CHIP_ERROR_INTERNAL);
+                 error = CHIP_ERROR_INTERNAL);
     VerifyOrExit((sss_sscp_asymmetric_sign_digest(&asyc, digest, kP256_FE_Length, out_signature.Bytes(), &signatureSize) ==
                   kStatus_SSS_Success),
-                 CHIP_ERROR_INTERNAL);
+                 error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(out_signature.SetLength(kP256_ECDSA_Signature_Length_Raw) == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
 exit:
