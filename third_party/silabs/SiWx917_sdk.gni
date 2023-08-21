@@ -357,9 +357,9 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/kernel/stream_buffer.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/tasks.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/timers.c",
+      "${sdk_support_root}/matter/si91x/siwx917/BRD4325x/autogen/sl_event_handler.c",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4325x/support/hal/rsi_hal_mcu_m4.c",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4325x/support/hal/rsi_hal_mcu_platform_init.c",
-      "${sdk_support_root}/matter/si91x/siwx917/BRD4325x/autogen/sl_event_handler.c",
       "${wifi_sdk_root}/components/siwx917_soc/drivers/middleware/nvm3/src/sl_si91x_nvm3_hal_flash.c",
 
       # mbedtls
