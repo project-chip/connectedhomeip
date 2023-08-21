@@ -2,10 +2,10 @@
 
 
 ifeq ($(OS),Windows_NT)
-	POSIX_TOOL_PATH := /usr/bin/
+	POSIX_TOOL_PATH := None/
 endif
 TOOLCHAIN_DIR := 
-SDK_PATH := /git/gsdk
+SDK_PATH ?= /git/gsdk
 
 ARM_GCC_DIR_WIN = 
 ARM_GCC_DIR_OSX = 
@@ -102,8 +102,13 @@ clean:
 
 $(OUTPUT_DIR)/$(PROJECTNAME).out: $(OBJS) $(PROJ_OBJECTS) $(LIB_FILES)
 	@$(POSIX_TOOL_PATH)echo 'Linking $(OUTPUT_DIR)/$(PROJECTNAME).out'
-	@$(POSIX_TOOL_PATH)echo $(OBJS) > $(OUTPUT_DIR)/objs
-	@$(POSIX_TOOL_PATH)echo $(PROJ_OBJECTS) > $(OUTPUT_DIR)/proj_objs
+ifeq ($(UNAME_S),Darwin)
+	@echo $(OBJS) > $(OUTPUT_DIR)/objs
+	@echo $(PROJ_OBJECTS) > $(OUTPUT_DIR)/proj_objs
+else
+	$(file > $(OUTPUT_DIR)/objs,$(OBJS))
+	$(file > $(OUTPUT_DIR)/proj_objs,$(PROJ_OBJECTS))
+endif
 	$(ECHO)$(LD) @$(OUTPUT_DIR)/objs @$(OUTPUT_DIR)/proj_objs $(LIBS) $(LD_FLAGS) -o $(OUTPUT_DIR)/$(PROJECTNAME).out
 
 $(OBJ_DIR)/%.o: $(SRC)/%.s

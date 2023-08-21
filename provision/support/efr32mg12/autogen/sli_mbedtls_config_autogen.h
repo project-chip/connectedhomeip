@@ -4,7 +4,7 @@
 #define SLI_MBEDTLS_CONFIG_AUTOGEN_H
 
 
-#define MBEDTLS_MPI_MAX_SIZE    32
+#define MBEDTLS_MPI_MAX_SIZE  32
 
 
 #define MBEDTLS_AES_C
@@ -51,12 +51,8 @@
 #define MBEDTLS_PSA_CRYPTO_STORAGE_C
 
 
-#if defined(SL_TRUSTZONE_NONSECURE)
 
-#endif // #if defined(SL_TRUSTZONE_NONSECURE)
 
-#if defined(SL_TRUSTZONE_SECURE)
 
-#endif // #if defined(SL_TRUSTZONE_SECURE)
 
 #endif // SLI_MBEDTLS_CONFIG_AUTOGEN_H

@@ -1,8 +1,9 @@
 #CRC Codes for initially generated config files -- do not modify!
 SEGGER_RTT_Conf.h=-1668074135
+app_properties_config.h=-77184399
 emlib_core_debug_config.h=171843933
 nvm3_default_config.h=-1865878923
 psa_crypto_config.h=-1777265300
-sl_mbedtls_config.h=1558162130
+sl_mbedtls_config.h=-1940460892
 sl_mbedtls_device_config.h=-1083250924
 sl_memory_config.h=-995392215
