@@ -112,7 +112,7 @@ NOTE:
 **RGB LED** shows the state of the simulated contact sensor. when the LED is lit,
 the sensor is contacted, when not lit, the sensor is non-contacted.
 
-**Button SW2** can be used to start BLE adevertising. A SHORT press of the buttton 
+**Button SW2** can be used to start BLE advertising. A SHORT press of the button 
 will enable Bluetooth LE advertising for a predefined period of time. A LONG Press
 Button SW2 initiates a factory reset. After an initial period of 3 seconds, LED 2
 and RGB LED will flash in unison to signal the pending reset. After 6 seconds will
@@ -154,19 +154,19 @@ After a successful build, the `elf` and `srec` files are found in `out/debug/` -
 
 ## Flashing
 
-Two images must be written to the board: one for the host (CM33) and one for the NBU (CM3).
+Two images must be written to the board: one for the host (CM33) and one for the `NBU` (CM3).
 
-The image needed on the host side is the one generated in `out/debug/` while the one needed on the NBU side can be found in the downloaded NXP-SDK package at path -	`middleware\wireless\ieee-802.15.4\bin\k32w1\k32w1_nbu_ble_15_4_dyn_matter_$version.sb3`.
+The image needed on the host side is the one generated in `out/debug/` while the one needed on the `NBU` side can be found in the downloaded NXP-SDK package at path -	`middleware\wireless\ieee-802.15.4\bin\k32w1\k32w1_nbu_ble_15_4_dyn_matter_$version.sb3`.
 
 <a name="flashing-the-nbu-image"></a>
 
 ### Flashing the NBU image
 
-NBU image should be written only when a new NXP-SDK is released.
+`NBU` image should be written only when a new NXP-SDK is released.
 
-[K32W148 board quick start guide](https://www.nxp.com/document/guide/getting-started-with-the-k32w148-development-platform:GS-K32W148EVK) can be used for updating the NBU/radio core:
-- Section 2.4 – Get Software – install SPSDK (Secure Provisioning Command Line Tool)
-- Section 3.3 – Updating NBU for Wireless examples - use the corresponding .sb3 file found in the SDK package at path `middleware\wireless\ieee-802.15.4\bin\k32w1\`
+[K32W148 board quick start guide](https://www.nxp.com/document/guide/getting-started-with-the-k32w148-development-platform:GS-K32W148EVK) can be used for updating the `NBU/radio` core:
+- Section 2.4 – Get Software – install `SPSDK` (Secure Provisioning Command Line Tool)
+- Section 3.3 – Updating `NBU` for Wireless examples - use the corresponding `.sb3` file found in the SDK package at path `middleware\wireless\ieee-802.15.4\bin\k32w1\`
 
 <a name="flashing-the-host-image"></a>
 
@@ -249,10 +249,10 @@ Run -> Debug Configurations... -> C/C++ Application
 
 The OTA image files must be encrypted using Over The Air Programming Tool ([OTAP](https://www.nxp.com/design/microcontrollers-developer-resources/connectivity-tool-suite:CONNECTIVITY-TOOL-SUITE?#downloads)). Bootloader will load the new OTA image only if it detects that the file was encrypted with the OTAP correct keys. 
 
-.srec file is input for Over The air Programming (OTAP) application (unencrypted) and it's converted to .sb3 format (encrypted).
+`.srec` file is input for Over The air Programming (`OTAP`) application (unencrypted) and it's converted to `.sb3` format (encrypted).
 
 In OTAP application
-- select OTA protocol => OTAP Matter
+- select OTA protocol => `OTAP` Matter
 - Browse File 
 - follow default options (KW45/K32W148, Preserve NVM) 
 - image information: will update "Application Core (MCU)" - this will generate the image only for the CM33 core

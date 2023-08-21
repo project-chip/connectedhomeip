@@ -64,7 +64,7 @@ CHIP_ERROR BLEManagerImpl::InitHostController(ble_generic_cb_fp cb_fp)
     /* BLE Host Stack Init */
     VerifyOrExit(Ble_HostInitialize(cb_fp, Hcit_SendPacket) == gBleSuccess_c, err = CHIP_ERROR_INCORRECT_STATE);
 
-    /* configure tx power to use in NBU specfic to BLE */
+    /* configure tx power to use in NBU specific to BLE */
     Controller_SetTxPowerLevelDbm(mAdvertisingDefaultTxPower_c, gAdvTxChannel_c);
     Controller_SetTxPowerLevelDbm(mConnectionDefaultTxPower_c, gConnTxChannel_c);
     Controller_ConfigureInvalidPduHandling(gLlInvalidPduHandlingType_c);

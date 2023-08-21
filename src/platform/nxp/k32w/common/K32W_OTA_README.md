@@ -1,11 +1,11 @@
-# K32Wx OTA
+# K32W OTA
 
 The OTA processing is now delegated to instances of `OTATlvProcessor` derived classes.
 These instances are registered with the `OTAImageProcessorImpl` instance, which manages the selection of processors that should process the next blocks, until a full TLV block was transferred.
 
 The application is able to define its own processors, thus extending the default OTA functionality. The application can also opt to disable the default processors (application, SSBL and factory data).
 
-Please note that if an OTA image containing multiple TLVs is transferred, then the action for each TLV is applied sequentially,
+Please note that if an OTA image containing multiple TLV is transferred, then the action for each TLV is applied sequentially,
 If one of the actions fails, the remaining actions will not be applied and OTA abort is called.
 TBD: should all actions be applied only if there is no error? Or should each action be applied separately?
 
@@ -15,7 +15,7 @@ The default processors for K32W0 are already implemented in:
 * `OTAFactoryDataProcessor` for factory data update. Disabled by default, user has to specify `chip_ota_enable_factory_data_processor=1` in the build args.
 
 Some SDK OTA module flags are defined to support additional features:
-- `gOTAAllowCustomStartAddress=1` - enable EEPROM offset value. Used internally by SDK OTA module.
+- `gOTAAllowCustomStartAddress=1` - enable `EEPROM` offset value. Used internally by SDK OTA module.
 - `gOTAUseCustomOtaEntry=1` - support custom OTA entry for multi-image.
 - `gOTACustomOtaEntryMemory=1` - K32W0 uses `OTACustomStorage_ExtFlash` (1) by default.
 
@@ -53,7 +53,7 @@ This is a wrapper over `ProcessInternal`, which can return `CHIP_OTA_CHANGE_PROC
 * `ProcessInternal` should return:
     * `CHIP_NO_ERROR` if block was processed successfully.
     * `CHIP_ERROR_BUFFER_TOO_SMALL` if current block doesn't contain all necessary data.
-This can happen when a TLV's value field has a header, but it is split across two blocks.
+This can happen when a TLV value field has a header, but it is split across two blocks.
     * `CHIP_OTA_FETCH_ALREADY_SCHEDULED` if block was processed successfully and the fetching is already scheduled by the processor.
 This happens in the default application processor, because the next data fetching is scheduled through a callback (called when enough external flash was erased).
 

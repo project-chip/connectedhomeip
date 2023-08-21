@@ -154,7 +154,7 @@ CHIP_ERROR AppTask::Init()
 
     UpdateDeviceState();
 
-    /* intialize the Keyboard and button press calback */
+    /* intialize the Keyboard and button press callback */
     BUTTON_InstallCallback((button_handle_t)g_buttonHandle[0], KBD_Callback, (void*)BLE_BUTTON);
     BUTTON_InstallCallback((button_handle_t)g_buttonHandle[1], KBD_Callback, (void*)CONTACT_SENSOR_BUTTON);
 

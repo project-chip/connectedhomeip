@@ -578,7 +578,7 @@ exit:
 
     if (bFreeAsyncCtx)
     {
-        /* Need to be very carefull, if we try to free something that is not initialized with success we will get an hw fault */
+        /* Need to be very careful, if we try to free something that is not initialized with success we will get an hw fault */
         (void)sss_sscp_asymmetric_context_free(&asyc);
     }
     (void)SSS_KEY_OBJ_FREE(&ecdsaPublic);
@@ -638,7 +638,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
 exit:
     (void)SSS_KEY_OBJ_FREE(&pEcdhPubKey);
     
-    /* Need to be very carefull, if we try to free something that is not initialized with success we will get a hw fault */
+    /* Need to be very careful, if we try to free something that is not initialized with success we will get a hw fault */
     if (bFreeSharedSecret)
         (void)SSS_KEY_OBJ_FREE(&sharedSecret);
     if (bFreeDeriveContex)
