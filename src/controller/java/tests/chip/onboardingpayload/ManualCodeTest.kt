@@ -483,13 +483,13 @@ class ManualCodeTest {
     decimalString = representationWithoutCheckDigit + checkDigit
 
     outReprensation = ManualOnboardingPayloadParser.checkDecimalStringValidity(decimalString)
-    assertThat(outReprensation == representationWithoutCheckDigit)
+    assertThat(outReprensation).isEqualTo(representationWithoutCheckDigit)
 
     representationWithoutCheckDigit = "0000"
     checkDigit = Verhoeff10.computeCheckChar(representationWithoutCheckDigit)
     decimalString = representationWithoutCheckDigit + checkDigit
     outReprensation = ManualOnboardingPayloadParser.checkDecimalStringValidity(decimalString)
-    assertThat(outReprensation == representationWithoutCheckDigit)
+    assertThat(outReprensation).isEqualTo(representationWithoutCheckDigit)
   }
 
   /*
