@@ -301,7 +301,6 @@ void TimeSynchronizationServer::OnDeviceConnectedFn(Messaging::ExchangeManager &
 {
     // Connected to our trusted time source, let's read the time.
     app::AttributePathParams readPaths[2];
-    // Read all the feature maps for all the networking clusters on any endpoint to determine what is supported
     readPaths[0] = app::AttributePathParams(kRootEndpointId, app::Clusters::TimeSynchronization::Id,
                                             app::Clusters::TimeSynchronization::Attributes::UTCTime::Id);
     readPaths[1] = app::AttributePathParams(kRootEndpointId, app::Clusters::TimeSynchronization::Id,
