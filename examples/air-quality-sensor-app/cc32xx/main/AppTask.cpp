@@ -41,6 +41,8 @@
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 
+#include "AirQualitySensorAppAttrUpdateDelegate.h"
+
 #include <ti/drivers/apps/Button.h>
 #include <ti/drivers/apps/LED.h>
 
@@ -105,6 +107,8 @@ int AppTask::Init()
     Button_Params buttonParams;
 
     cc32xxLogInit();
+
+
 
     /* Initial Terminal, and print Application name */
     DisplayBanner();
@@ -186,6 +190,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     AppEvent event;
 
     sAppTask.Init();
+    
 
     while (true)
     {
