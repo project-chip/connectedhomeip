@@ -109,8 +109,7 @@ public:
 
     static void TestICDModeIntervals(nlTestSuite * aSuite, void * aContext)
     {
-        TestContext * ctx                   = static_cast<TestContext *>(aContext);
-        Clock::ClockBase * const savedClock = &SystemClock();
+        TestContext * ctx = static_cast<TestContext *>(aContext);
 
         // After the init we should be in active mode
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
@@ -129,15 +128,12 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
         AdvanceClockAndRunEventLoop(ctx, IcdManagementServer::GetInstance().GetActiveModeThreshold());
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
-
-        Clock::Internal::SetSystemClockForTesting(savedClock);
     }
 
     static void TestKeepActivemodeRequests(nlTestSuite * aSuite, void * aContext)
     {
         TestContext * ctx = static_cast<TestContext *>(aContext);
 
-        Clock::ClockBase * const savedClock = &SystemClock();
         // Setting a requirement will transition the ICD to active mode.
         ctx->mICDManager.SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kCommissioningWindowOpen, true);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
@@ -179,8 +175,6 @@ public:
         // remove the last requirement
         ctx->mICDManager.SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kAwaitingMsgAck, false);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
-
-        Clock::Internal::SetSystemClockForTesting(savedClock);
     }
 };
 
