@@ -26,9 +26,8 @@ def utc_time_in_matter_epoch_s():
 
 
 class Options:
-    def __init__(self, output, header_guard, define_name, define_val):
+    def __init__(self, output, define_name, define_val):
         self.output = output
-        self.header_guard = header_guard
         self.define_name = define_name
         self.define_val = define_val
 
@@ -40,12 +39,6 @@ def GetOptions():
                         help="Path to root of generated file directory tree.")
     cmdline_options = parser.parse_args()
 
-    # Compute header guard by replacing some chars with _ and upper-casing.
-    header_guard = cmdline_options.output.upper()
-    header_guard = \
-        header_guard.replace('/', '_').replace('\\', '_').replace('.', '_')
-    header_guard += '_'
-
     # The actual output file is inside the gen dir.
     output = os.path.join(cmdline_options.gen_dir, cmdline_options.output)
 
@@ -53,7 +46,6 @@ def GetOptions():
     build_time = utc_time_in_matter_epoch_s()
 
     return Options(output=output,
-                   header_guard=header_guard,
                    define_name=define_name,
                    define_val=str(build_time))
 
