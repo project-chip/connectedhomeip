@@ -316,6 +316,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_LAYER_TARGET_ASR=1",
         "CHIP_DEVICE_LAYER_TARGET=ASR",
       ]
+    } else if (chip_device_platform == "stm32") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_STM32=1",
+        "CHIP_DEVICE_LAYER_TARGET=stm32",
+      ]
     }
 
     if (chip_device_config_device_software_version != "") {
@@ -514,6 +519,8 @@ if (chip_device_platform != "none") {
       _platform_target = "openiotsdk"
     } else if (chip_device_platform == "asr") {
       _platform_target = "ASR"
+    } else if (chip_device_platform == "stm32") {
+      _platform_target = "stm32"
     } else {
       assert(false, "Unknown chip_device_platform: ${chip_device_platform}")
     }
