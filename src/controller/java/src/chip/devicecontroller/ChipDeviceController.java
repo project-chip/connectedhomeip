@@ -733,7 +733,8 @@ public class ChipDeviceController {
       int imTimeoutMs,
       @Nullable Long eventMin) {
     ReportCallbackJni jniCallback =
-        new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, resubscriptionAttemptCallback);
+        new ReportCallbackJni(
+            subscriptionEstablishedCallback, reportCallback, resubscriptionAttemptCallback);
     subscribe(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
