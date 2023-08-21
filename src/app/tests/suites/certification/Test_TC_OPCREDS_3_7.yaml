@@ -60,7 +60,7 @@ tests:
       cluster: "Operational Credentials"
       attribute: "Fabrics"
       response:
-          # value: [{ Label: "", NodeID: nodeId }]
+          value: [{ Label: "", NodeID: nodeId }]
           constraints:
               type: list
               contains: [TH1_Fabric_Index]
