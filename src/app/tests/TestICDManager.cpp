@@ -195,9 +195,9 @@ static const nlTest sTests[] =
 // clang-format on
 
 // clang-format off
-nlTestSuite cmSuite = 
-{ 
-    "TestICDManager", 
+nlTestSuite cmSuite =
+{
+    "TestICDManager",
     &sTests[0],
     TestContext::Initialize,
     TestContext::Finalize
