@@ -35,7 +35,7 @@
 #include "task.h"
 #include "wfx_host_events.h"
 
-#include "ble_config.h"
+#include "rsi_ble_config.h"
 
 #include "dhcp_client.h"
 #include "lwip/nd6.h"
@@ -66,7 +66,7 @@ bool is_wifi_disconnection_event = false;
 /* Declare a variable to hold connection time intervals */
 uint32_t retryInterval              = WLAN_MIN_RETRY_TIMER_MS;
 volatile bool scan_results_complete = false;
-#define WIFI_SCAN_TIMEOUT 10000       // WiFi Scan interval 
+#define WIFI_SCAN_TIMEOUT 10000 // WiFi Scan interval
 
 extern osSemaphoreId_t sl_rs_ble_init_sem;
 
@@ -88,7 +88,7 @@ volatile sl_status_t callback_status = SL_STATUS_OK;
  *********************************************************************/
 int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
 {
-    sl_status_t status        = SL_STATUS_OK;
+    sl_status_t status = SL_STATUS_OK;
     uint8_t rssi       = 0;
     ap->security       = wfx_rsi.sec.security;
     ap->chan           = wfx_rsi.ap_chan;
