@@ -55,8 +55,6 @@ def main(app: str, chip_tool: str, out_dir: str, test_case: str, manual: bool):
     # struct_cd_cert_id_mismatch - excluded because this is a DCL test not covered by cert
     exclude_cases = ['struct_cd_version_number_wrong', 'struct_cd_cert_id_mismatch']
 
-    passes = []
-
     subprocess.call(f'mkdir -p {out_dir}', shell=True)
     results = {}
     for p in os.listdir(cert_path):
