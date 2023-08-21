@@ -178,25 +178,6 @@ server cluster Descriptor = 29 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
-server cluster Binding = 30 {
-  fabric_scoped struct TargetStruct {
-    optional node_id node = 1;
-    optional group_id group = 2;
-    optional endpoint_no endpoint = 3;
-    optional cluster_id cluster = 4;
-    fabric_idx fabricIndex = 254;
-  }
-
-  attribute TargetStruct binding[] = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** The Access Control Cluster exposes a data model view of a
       Node's Access Control List (ACL), which codifies the rules used to manage
       and enforce Access Control for the Node's endpoints and their associated
@@ -349,7 +330,6 @@ server cluster BasicInformation = 40 {
   readonly attribute char_string<64> productLabel = 14;
   readonly attribute char_string<32> serialNumber = 15;
   attribute access(write: manage) boolean localConfigDisabled = 16;
-  readonly attribute boolean reachable = 17;
   readonly attribute char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -360,71 +340,230 @@ server cluster BasicInformation = 40 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing common languages, units of measurements, and numerical formatting
-      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
-      they can be configured to use a user’s preferred language, units, etc */
-server cluster LocalizationConfiguration = 43 {
-  attribute char_string<35> activeLocale = 0;
-  readonly attribute CHAR_STRING supportedLocales[] = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing preferences for how dates and times are conveyed. As such, Nodes that visually
-      or audibly convey time information need a mechanism by which they can be configured to use a
-      user’s preferred format. */
-server cluster TimeFormatLocalization = 44 {
-  enum CalendarTypeEnum : ENUM8 {
-    kBuddhist = 0;
-    kChinese = 1;
-    kCoptic = 2;
-    kEthiopian = 3;
-    kGregorian = 4;
-    kHebrew = 5;
-    kIndian = 6;
-    kIslamic = 7;
-    kJapanese = 8;
-    kKorean = 9;
-    kPersian = 10;
-    kTaiwanese = 11;
+/** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
+server cluster PowerSource = 47 {
+  enum BatApprovedChemistryEnum : ENUM16 {
+    kUnspecified = 0;
+    kAlkaline = 1;
+    kLithiumCarbonFluoride = 2;
+    kLithiumChromiumOxide = 3;
+    kLithiumCopperOxide = 4;
+    kLithiumIronDisulfide = 5;
+    kLithiumManganeseDioxide = 6;
+    kLithiumThionylChloride = 7;
+    kMagnesium = 8;
+    kMercuryOxide = 9;
+    kNickelOxyhydride = 10;
+    kSilverOxide = 11;
+    kZincAir = 12;
+    kZincCarbon = 13;
+    kZincChloride = 14;
+    kZincManganeseDioxide = 15;
+    kLeadAcid = 16;
+    kLithiumCobaltOxide = 17;
+    kLithiumIon = 18;
+    kLithiumIonPolymer = 19;
+    kLithiumIronPhosphate = 20;
+    kLithiumSulfur = 21;
+    kLithiumTitanate = 22;
+    kNickelCadmium = 23;
+    kNickelHydrogen = 24;
+    kNickelIron = 25;
+    kNickelMetalHydride = 26;
+    kNickelZinc = 27;
+    kSilverZinc = 28;
+    kSodiumIon = 29;
+    kSodiumSulfur = 30;
+    kZincBromide = 31;
+    kZincCerium = 32;
   }
 
-  enum HourFormatEnum : ENUM8 {
-    k12hr = 0;
-    k24hr = 1;
+  enum BatChargeFaultEnum : ENUM8 {
+    kUnspecified = 0;
+    kAmbientTooHot = 1;
+    kAmbientTooCold = 2;
+    kBatteryTooHot = 3;
+    kBatteryTooCold = 4;
+    kBatteryAbsent = 5;
+    kBatteryOverVoltage = 6;
+    kBatteryUnderVoltage = 7;
+    kChargerOverVoltage = 8;
+    kChargerUnderVoltage = 9;
+    kSafetyTimeout = 10;
   }
 
-  attribute HourFormatEnum hourFormat = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
+  enum BatChargeLevelEnum : ENUM8 {
+    kOK = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
 
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing preferences for the units in which values are conveyed in communication to a
-      user. As such, Nodes that visually or audibly convey measurable values to the user need a
-      mechanism by which they can be configured to use a user’s preferred unit. */
-server cluster UnitLocalization = 45 {
-  enum TempUnitEnum : ENUM8 {
-    kFahrenheit = 0;
-    kCelsius = 1;
-    kKelvin = 2;
+  enum BatChargeStateEnum : ENUM8 {
+    kUnknown = 0;
+    kIsCharging = 1;
+    kIsAtFullCharge = 2;
+    kIsNotCharging = 3;
+  }
+
+  enum BatCommonDesignationEnum : ENUM16 {
+    kUnspecified = 0;
+    kAAA = 1;
+    kAA = 2;
+    kC = 3;
+    kD = 4;
+    k4v5 = 5;
+    k6v0 = 6;
+    k9v0 = 7;
+    k12AA = 8;
+    kAAAA = 9;
+    kA = 10;
+    kB = 11;
+    kF = 12;
+    kN = 13;
+    kNo6 = 14;
+    kSubC = 15;
+    kA23 = 16;
+    kA27 = 17;
+    kBA5800 = 18;
+    kDuplex = 19;
+    k4SR44 = 20;
+    k523 = 21;
+    k531 = 22;
+    k15v0 = 23;
+    k22v5 = 24;
+    k30v0 = 25;
+    k45v0 = 26;
+    k67v5 = 27;
+    kJ = 28;
+    kCR123A = 29;
+    kCR2 = 30;
+    k2CR5 = 31;
+    kCRP2 = 32;
+    kCRV3 = 33;
+    kSR41 = 34;
+    kSR43 = 35;
+    kSR44 = 36;
+    kSR45 = 37;
+    kSR48 = 38;
+    kSR54 = 39;
+    kSR55 = 40;
+    kSR57 = 41;
+    kSR58 = 42;
+    kSR59 = 43;
+    kSR60 = 44;
+    kSR63 = 45;
+    kSR64 = 46;
+    kSR65 = 47;
+    kSR66 = 48;
+    kSR67 = 49;
+    kSR68 = 50;
+    kSR69 = 51;
+    kSR516 = 52;
+    kSR731 = 53;
+    kSR712 = 54;
+    kLR932 = 55;
+    kA5 = 56;
+    kA10 = 57;
+    kA13 = 58;
+    kA312 = 59;
+    kA675 = 60;
+    kAC41E = 61;
+    k10180 = 62;
+    k10280 = 63;
+    k10440 = 64;
+    k14250 = 65;
+    k14430 = 66;
+    k14500 = 67;
+    k14650 = 68;
+    k15270 = 69;
+    k16340 = 70;
+    kRCR123A = 71;
+    k17500 = 72;
+    k17670 = 73;
+    k18350 = 74;
+    k18500 = 75;
+    k18650 = 76;
+    k19670 = 77;
+    k25500 = 78;
+    k26650 = 79;
+    k32600 = 80;
+  }
+
+  enum BatFaultEnum : ENUM8 {
+    kUnspecified = 0;
+    kOverTemp = 1;
+    kUnderTemp = 2;
+  }
+
+  enum BatReplaceabilityEnum : ENUM8 {
+    kUnspecified = 0;
+    kNotReplaceable = 1;
+    kUserReplaceable = 2;
+    kFactoryReplaceable = 3;
+  }
+
+  enum PowerSourceStatusEnum : ENUM8 {
+    kUnspecified = 0;
+    kActive = 1;
+    kStandby = 2;
+    kUnavailable = 3;
+  }
+
+  enum WiredCurrentTypeEnum : ENUM8 {
+    kAC = 0;
+    kDC = 1;
+  }
+
+  enum WiredFaultEnum : ENUM8 {
+    kUnspecified = 0;
+    kOverVoltage = 1;
+    kUnderVoltage = 2;
   }
 
   bitmap Feature : BITMAP32 {
-    kTemperatureUnit = 0x1;
+    kWired = 0x1;
+    kBattery = 0x2;
+    kRechargeable = 0x4;
+    kReplaceable = 0x8;
   }
 
-  attribute TempUnitEnum temperatureUnit = 0;
+  struct BatChargeFaultChangeType {
+    BatChargeFaultEnum current[] = 0;
+    BatChargeFaultEnum previous[] = 1;
+  }
+
+  struct BatFaultChangeType {
+    BatFaultEnum current[] = 0;
+    BatFaultEnum previous[] = 1;
+  }
+
+  struct WiredFaultChangeType {
+    WiredFaultEnum current[] = 0;
+    WiredFaultEnum previous[] = 1;
+  }
+
+  info event WiredFaultChange = 0 {
+    WiredFaultEnum current[] = 0;
+    WiredFaultEnum previous[] = 1;
+  }
+
+  info event BatFaultChange = 1 {
+    BatFaultEnum current[] = 0;
+    BatFaultEnum previous[] = 1;
+  }
+
+  info event BatChargeFaultChange = 2 {
+    BatChargeFaultEnum current[] = 0;
+    BatChargeFaultEnum previous[] = 1;
+  }
+
+  readonly attribute PowerSourceStatusEnum status = 0;
+  readonly attribute int8u order = 1;
+  readonly attribute char_string<60> description = 2;
+  readonly attribute BatChargeLevelEnum batChargeLevel = 14;
+  readonly attribute boolean batReplacementNeeded = 15;
+  readonly attribute BatReplaceabilityEnum batReplaceability = 16;
+  readonly attribute endpoint_no endpointList[] = 31;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -637,6 +776,43 @@ server cluster NetworkCommissioning = 49 {
   command access(invoke: administer) ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
 }
 
+/** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
+server cluster DiagnosticLogs = 50 {
+  enum IntentEnum : ENUM8 {
+    kEndUserSupport = 0;
+    kNetworkDiag = 1;
+    kCrashLogs = 2;
+  }
+
+  enum StatusEnum : ENUM8 {
+    kSuccess = 0;
+    kExhausted = 1;
+    kNoLogs = 2;
+    kBusy = 3;
+    kDenied = 4;
+  }
+
+  enum TransferProtocolEnum : ENUM8 {
+    kResponsePayload = 0;
+    kBDX = 1;
+  }
+
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct RetrieveLogsRequestRequest {
+    IntentEnum intent = 0;
+    TransferProtocolEnum requestedProtocol = 1;
+    optional CHAR_STRING<32> transferFileDesignator = 2;
+  }
+
+  command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
+}
+
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster GeneralDiagnostics = 51 {
   enum BootReasonEnum : ENUM8 {
@@ -740,80 +916,6 @@ server cluster GeneralDiagnostics = 51 {
   }
 
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
-}
-
-/** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
-server cluster WiFiNetworkDiagnostics = 54 {
-  enum AssociationFailureCauseEnum : ENUM8 {
-    kUnknown = 0;
-    kAssociationFailed = 1;
-    kAuthenticationFailed = 2;
-    kSsidNotFound = 3;
-  }
-
-  enum ConnectionStatusEnum : ENUM8 {
-    kConnected = 0;
-    kNotConnected = 1;
-  }
-
-  enum SecurityTypeEnum : ENUM8 {
-    kUnspecified = 0;
-    kNone = 1;
-    kWEP = 2;
-    kWPA = 3;
-    kWPA2 = 4;
-    kWPA3 = 5;
-  }
-
-  enum WiFiVersionEnum : ENUM8 {
-    kA = 0;
-    kB = 1;
-    kG = 2;
-    kN = 3;
-    kAc = 4;
-    kAx = 5;
-    kAh = 6;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kPacketCounts = 0x1;
-    kErrorCounts = 0x2;
-  }
-
-  info event Disconnection = 0 {
-    INT16U reasonCode = 0;
-  }
-
-  info event AssociationFailure = 1 {
-    AssociationFailureCauseEnum associationFailure = 0;
-    INT16U status = 1;
-  }
-
-  info event ConnectionStatus = 2 {
-    ConnectionStatusEnum connectionStatus = 0;
-  }
-
-  readonly attribute nullable octet_string<6> bssid = 0;
-  readonly attribute nullable SecurityTypeEnum securityType = 1;
-  readonly attribute nullable WiFiVersionEnum wiFiVersion = 2;
-  readonly attribute nullable int16u channelNumber = 3;
-  readonly attribute nullable int8s rssi = 4;
-  readonly attribute nullable int32u beaconLostCount = 5;
-  readonly attribute nullable int32u beaconRxCount = 6;
-  readonly attribute nullable int32u packetMulticastRxCount = 7;
-  readonly attribute nullable int32u packetMulticastTxCount = 8;
-  readonly attribute nullable int32u packetUnicastRxCount = 9;
-  readonly attribute nullable int32u packetUnicastTxCount = 10;
-  readonly attribute nullable int64u currentMaxRate = 11;
-  readonly attribute nullable int64u overrunCount = 12;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  command ResetCounts(): DefaultSuccess = 0;
 }
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
@@ -1045,49 +1147,105 @@ server cluster GroupKeyManagement = 63 {
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 
-/** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
-server cluster OperationalState = 96 {
-  enum ErrorStateEnum : ENUM8 {
-    kNoError = 0;
-    kUnableToStartOrResume = 1;
-    kUnableToCompleteOperation = 2;
-    kCommandInvalidInState = 3;
+/** This cluster provides an interface for observing and managing the state of smoke and CO alarms. */
+server cluster SmokeCoAlarm = 92 {
+  enum AlarmStateEnum : ENUM8 {
+    kNormal = 0;
+    kWarning = 1;
+    kCritical = 2;
   }
 
-  enum OperationalStateEnum : ENUM8 {
-    kStopped = 0;
-    kRunning = 1;
-    kPaused = 2;
-    kError = 3;
+  enum ContaminationStateEnum : ENUM8 {
+    kNormal = 0;
+    kLow = 1;
+    kWarning = 2;
+    kCritical = 3;
   }
 
-  struct ErrorStateStruct {
-    enum8 errorStateID = 0;
-    optional char_string<64> errorStateLabel = 1;
-    optional char_string<64> errorStateDetails = 2;
+  enum EndOfServiceEnum : ENUM8 {
+    kNormal = 0;
+    kExpired = 1;
   }
 
-  struct OperationalStateStruct {
-    enum8 operationalStateID = 0;
-    optional char_string<64> operationalStateLabel = 1;
+  enum ExpressedStateEnum : ENUM8 {
+    kNormal = 0;
+    kSmokeAlarm = 1;
+    kCOAlarm = 2;
+    kBatteryAlert = 3;
+    kTesting = 4;
+    kHardwareFault = 5;
+    kEndOfService = 6;
+    kInterconnectSmoke = 7;
+    kInterconnectCO = 8;
   }
 
-  critical event OperationalError = 0 {
-    ErrorStateStruct errorState = 0;
+  enum MuteStateEnum : ENUM8 {
+    kNotMuted = 0;
+    kMuted = 1;
   }
 
-  info event OperationCompletion = 1 {
-    ENUM8 completionErrorCode = 0;
-    optional nullable elapsed_s totalOperationalTime = 1;
-    optional nullable elapsed_s pausedTime = 2;
+  enum SensitivityEnum : ENUM8 {
+    kHigh = 0;
+    kStandard = 1;
+    kLow = 2;
   }
 
-  readonly attribute nullable CHAR_STRING phaseList[] = 0;
-  readonly attribute nullable int8u currentPhase = 1;
-  readonly attribute nullable elapsed_s countdownTime = 2;
-  readonly attribute OperationalStateStruct operationalStateList[] = 3;
-  readonly attribute OperationalStateEnum operationalState = 4;
-  readonly attribute ErrorStateStruct operationalError = 5;
+  bitmap Feature : BITMAP32 {
+    kSmokeAlarm = 0x1;
+    kCOAlarm = 0x2;
+  }
+
+  critical event SmokeAlarm = 0 {
+    AlarmStateEnum alarmSeverityLevel = 0;
+  }
+
+  critical event COAlarm = 1 {
+    AlarmStateEnum alarmSeverityLevel = 0;
+  }
+
+  info event LowBattery = 2 {
+    AlarmStateEnum alarmSeverityLevel = 0;
+  }
+
+  info event HardwareFault = 3 {
+  }
+
+  info event EndOfService = 4 {
+  }
+
+  info event SelfTestComplete = 5 {
+  }
+
+  info event AlarmMuted = 6 {
+  }
+
+  info event MuteEnded = 7 {
+  }
+
+  critical event InterconnectSmokeAlarm = 8 {
+    AlarmStateEnum alarmSeverityLevel = 0;
+  }
+
+  critical event InterconnectCOAlarm = 9 {
+    AlarmStateEnum alarmSeverityLevel = 0;
+  }
+
+  info event AllClear = 10 {
+  }
+
+  readonly attribute ExpressedStateEnum expressedState = 0;
+  readonly attribute AlarmStateEnum smokeState = 1;
+  readonly attribute AlarmStateEnum COState = 2;
+  readonly attribute AlarmStateEnum batteryAlert = 3;
+  readonly attribute MuteStateEnum deviceMuted = 4;
+  readonly attribute boolean testInProgress = 5;
+  readonly attribute boolean hardwareFaultAlert = 6;
+  readonly attribute EndOfServiceEnum endOfServiceAlert = 7;
+  readonly attribute AlarmStateEnum interconnectSmokeAlarm = 8;
+  readonly attribute AlarmStateEnum interconnectCOAlarm = 9;
+  readonly attribute ContaminationStateEnum contaminationState = 10;
+  attribute SensitivityEnum smokeSensitivityLevel = 11;
+  readonly attribute epoch_s expiryDate = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1095,41 +1253,18 @@ server cluster OperationalState = 96 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  response struct OperationalCommandResponse = 4 {
-    ErrorStateStruct commandResponseState = 0;
-  }
-
-  command Pause(): OperationalCommandResponse = 0;
-  command Stop(): OperationalCommandResponse = 1;
-  command Start(): OperationalCommandResponse = 2;
-  command Resume(): OperationalCommandResponse = 3;
+  command SelfTestRequest(): DefaultSuccess = 0;
 }
 
 endpoint 0 {
   device type ma_rootdevice = 22, version 1;
 
 
-  server cluster Identify {
-    ram      attribute identifyTime default = 0x0000;
-    ram      attribute identifyType default = 0x00;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-  }
-
-  server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-  }
-
   server cluster Descriptor {
     callback attribute deviceTypeList;
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
-    callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
@@ -1139,11 +1274,9 @@ endpoint 0 {
     emits event AccessControlExtensionChanged;
     callback attribute acl;
     callback attribute extension;
-    callback attribute subjectsPerAccessControlEntry default = 4;
-    callback attribute targetsPerAccessControlEntry default = 3;
-    callback attribute accessControlEntriesPerFabric default = 3;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
+    callback attribute subjectsPerAccessControlEntry;
+    callback attribute targetsPerAccessControlEntry;
+    callback attribute accessControlEntriesPerFabric;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -1170,41 +1303,9 @@ endpoint 0 {
     callback attribute productLabel;
     callback attribute serialNumber;
     persist  attribute localConfigDisabled default = 0;
-    ram      attribute reachable default = 1;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
-    callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster LocalizationConfiguration {
-    persist  attribute activeLocale default = "en-US";
-    callback attribute supportedLocales default = 7;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
-    callback attribute attributeList default = 0;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster TimeFormatLocalization {
-    persist  attribute hourFormat default = 0;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
-    callback attribute attributeList default = 0;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster UnitLocalization {
-    persist  attribute temperatureUnit default = 0;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
-    callback attribute attributeList default = 0;
-    ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -1214,11 +1315,8 @@ endpoint 0 {
     callback attribute regulatoryConfig default = 0;
     callback attribute locationCapability default = 0;
     callback attribute supportsConcurrentConnection default = 1;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
-    callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0001;
   }
 
   server cluster NetworkCommissioning {
@@ -1230,17 +1328,16 @@ endpoint 0 {
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
-    callback attribute attributeList default = 0;
-    ram      attribute featureMap default = 2;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 0x0001;
+  }
+
+  server cluster DiagnosticLogs {
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster GeneralDiagnostics {
-    emits event HardwareFaultChange;
-    emits event RadioFaultChange;
-    emits event NetworkFaultChange;
     emits event BootReason;
     callback attribute networkInterfaces;
     callback attribute rebootCount default = 0x0000;
@@ -1251,43 +1348,16 @@ endpoint 0 {
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
-    callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster WiFiNetworkDiagnostics {
-    emits event Disconnection;
-    emits event AssociationFailure;
-    emits event ConnectionStatus;
-    callback attribute bssid;
-    callback attribute securityType;
-    callback attribute wiFiVersion;
-    callback attribute channelNumber default = 0x0000;
-    callback attribute rssi default = 0x00;
-    callback attribute beaconLostCount default = 0x00000000;
-    callback attribute beaconRxCount default = 0x00000000;
-    callback attribute packetMulticastRxCount default = 0x00000000;
-    callback attribute packetMulticastTxCount default = 0x00000000;
-    callback attribute packetUnicastRxCount default = 0x00000000;
-    callback attribute packetUnicastTxCount default = 0x00000000;
-    callback attribute currentMaxRate default = 0x0000000000000000;
-    callback attribute overrunCount default = 0x0000000000000000;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0001;
   }
 
   server cluster AdministratorCommissioning {
     callback attribute windowStatus default = 0;
     callback attribute adminFabricIndex default = 1;
     callback attribute adminVendorId default = 0;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
-    callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0001;
   }
 
   server cluster OperationalCredentials {
@@ -1297,11 +1367,8 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
-    callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0001;
   }
 
   server cluster GroupKeyManagement {
@@ -1314,59 +1381,73 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_dishwasher = 117, version 1;
+  device type ma_smokecoalarm = 118, version 1;
 
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0000;
+    ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x0;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
+    callback attribute generatedCommandList default = 0;
+    callback attribute acceptedCommandList default = 0;
+    callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster Groups {
     ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-  }
-
-  server cluster Descriptor {
-    callback attribute deviceTypeList;
-    callback attribute serverList;
-    callback attribute clientList;
-    callback attribute partsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 3;
   }
 
-  server cluster Binding {
-    callback attribute binding;
+  server cluster PowerSource {
+    emits event BatFaultChange;
+    ram      attribute status default = 0;
+    ram      attribute order default = 2;
+    ram      attribute description default = "B2";
+    ram      attribute batChargeLevel default = 0;
+    ram      attribute batReplacementNeeded;
+    ram      attribute batReplaceability;
+    callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 2;
   }
 
-  server cluster OperationalState {
-    emits event OperationalError;
-    emits event OperationCompletion;
-    callback attribute phaseList;
-    callback attribute currentPhase;
-    callback attribute countdownTime;
-    callback attribute operationalStateList default = 0;
-    callback attribute operationalState default = 0;
-    callback attribute operationalError default = 0;
+  server cluster SmokeCoAlarm {
+    emits event SmokeAlarm;
+    emits event COAlarm;
+    emits event LowBattery;
+    emits event HardwareFault;
+    emits event EndOfService;
+    emits event SelfTestComplete;
+    emits event AlarmMuted;
+    emits event MuteEnded;
+    emits event InterconnectSmokeAlarm;
+    emits event InterconnectCOAlarm;
+    emits event AllClear;
+    persist  attribute expressedState default = 0;
+    persist  attribute smokeState default = 0;
+    persist  attribute COState default = 0;
+    persist  attribute batteryAlert default = 0;
+    persist  attribute deviceMuted default = 0;
+    ram      attribute testInProgress default = 0;
+    persist  attribute hardwareFaultAlert default = 0;
+    persist  attribute endOfServiceAlert default = 0;
+    ram      attribute interconnectSmokeAlarm default = 0;
+    ram      attribute interconnectCOAlarm default = 0;
+    ram      attribute contaminationState default = 0;
+    ram      attribute smokeSensitivityLevel default = 1;
+    ram      attribute expiryDate default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
   }
 }
