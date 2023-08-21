@@ -33,7 +33,7 @@
   ],
   "endpointTypes": [
     {
-      "id": 24,
+      "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
         "id": 3,
@@ -10512,7 +10512,7 @@
       ]
     },
     {
-      "id": 21,
+      "id": 2,
       "name": "MA-onofflight",
       "deviceTypeRef": {
         "id": 8,
@@ -30401,7 +30401,7 @@
       ]
     },
     {
-      "id": 23,
+      "id": 3,
       "name": "MA-onofflight",
       "deviceTypeRef": {
         "id": 8,
@@ -34685,7 +34685,7 @@
       ]
     },
     {
-      "id": 22,
+      "id": 4,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 53,
