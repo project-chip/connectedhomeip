@@ -75,9 +75,12 @@ void ICDManager::Shutdown()
 
 bool ICDManager::SupportsCheckInProtocol()
 {
-    bool success;
-    uint32_t featureMap;
+    bool success        = false;
+    uint32_t featureMap = 0;
+    // Can't use attribute accessors/Attributes::FeatureMap::Get in unit tests
+#ifndef CONFIG_BUILD_FOR_HOST_UNIT_TEST
     success = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+#endif
     return success ? ((featureMap & to_underlying(Feature::kCheckInProtocolSupport)) != 0) : false;
 }
 
