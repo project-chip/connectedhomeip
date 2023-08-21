@@ -24,7 +24,7 @@ from builders.genio import GenioApp, GenioBuilder
 from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary, HostFuzzingType
 from builders.imx import IMXApp, IMXBuilder
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
-from builders.k32w import K32WBoard, K32WApp, K32WBuilder
+from builders.k32w import K32WApp, K32WBoard, K32WBuilder
 from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
