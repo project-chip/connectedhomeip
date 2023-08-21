@@ -29,7 +29,6 @@ import chip.devicecontroller.model.InvokeElement
 import chip.devicecontroller.model.NodeState
 import chip.jsontlv.putJsonString
 import chip.tlv.AnonymousTag
-import chip.tlv.ContextSpecificTag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 import com.google.chip.chiptool.ChipClient
@@ -317,7 +316,8 @@ class WildcardFragment : Fragment() {
     lateinit var writeRequest: AttributeWriteRequest
 
     if (writeValueType == "json") {
-      writeRequest = AttributeWriteRequest.newInstance(endpointId, clusterId, attributeId, writeValue, version)
+      writeRequest =
+        AttributeWriteRequest.newInstance(endpointId, clusterId, attributeId, writeValue, version)
     } else {
       val tlvWriter = TlvWriter()
       val values = writeValue.split(",")
@@ -335,11 +335,11 @@ class WildcardFragment : Fragment() {
 
       writeRequest =
         AttributeWriteRequest.newInstance(
-                endpointId,
-                clusterId,
-                attributeId,
-                tlvWriter.getEncoded(),
-                version
+          endpointId,
+          clusterId,
+          attributeId,
+          tlvWriter.getEncoded(),
+          version
         )
     }
 
@@ -357,9 +357,7 @@ class WildcardFragment : Fragment() {
     val clusterId = getChipPathIdForText(binding.clusterIdEd.text.toString())
     val commandId = getChipPathIdForText(binding.commandIdEd.text.toString())
 
-    val jsonString = invokeJson.ifEmpty {
-      "{}"
-    }
+    val jsonString = invokeJson.ifEmpty { "{}" }
     val invokeElement =
       InvokeElement.newInstance(endpointId, clusterId, commandId, null, jsonString)
     deviceController.invoke(
