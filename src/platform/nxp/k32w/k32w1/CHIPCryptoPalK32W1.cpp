@@ -636,7 +636,8 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
                  error = CHIP_ERROR_INTERNAL);
     bFreeDeriveContex = true;
 
-    VerifyOrExit(sss_sscp_asymmetric_dh_derive_key(&dCtx, &pEcdhPubKey, &sharedSecret) == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(sss_sscp_asymmetric_dh_derive_key(&dCtx, &pEcdhPubKey, &sharedSecret) == kStatus_SSS_Success,
+                 error = CHIP_ERROR_INTERNAL);
 
     VerifyOrExit(SSS_KEY_STORE_GET_PUBKEY(&sharedSecret, out_secret.Bytes(), &coordinateLen, &coordinateBitsLen) ==
                      kStatus_SSS_Success,

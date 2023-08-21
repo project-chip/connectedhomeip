@@ -288,8 +288,8 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
     if (currentVersion != targetVersion)
     {
-        ChipLogError(SoftwareUpdate, "Current sw version %lu is different than the expected sw version = %lu",
-                     currentVersion, targetVersion);
+        ChipLogError(SoftwareUpdate, "Current sw version %lu is different than the expected sw version = %lu", currentVersion,
+                     targetVersion);
         return CHIP_ERROR_INCORRECT_STATE;
     }
 

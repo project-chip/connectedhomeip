@@ -89,8 +89,7 @@ CHIP_ERROR P256KeypairSSS::ImportBlob(P256SerializedKeypairSSS & input)
 
     if (false == mInitialized)
     {
-        VerifyOrExit((sss_sscp_key_object_init(&mKeyObj, &g_keyStore) == kStatus_SSS_Success),
-                     error = CHIP_ERROR_INTERNAL);
+        VerifyOrExit((sss_sscp_key_object_init(&mKeyObj, &g_keyStore) == kStatus_SSS_Success), error = CHIP_ERROR_INTERNAL);
 
         /* Allocate key handle */
         VerifyOrExit(
