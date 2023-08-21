@@ -33,7 +33,7 @@
   ],
   "endpointTypes": [
     {
-      "id": 9,
+      "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
         "id": 2,
@@ -5536,7 +5536,7 @@
       ]
     },
     {
-      "id": 10,
+      "id": 2,
       "name": "MA-dimmablelight",
       "deviceTypeRef": {
         "id": 9,
@@ -8579,7 +8579,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -9501,7 +9501,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
