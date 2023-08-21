@@ -116,7 +116,7 @@ To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 ## Trigger event using air-quality-sensor-app event named pipe
 
 You can send a command to air-quality-sensor-app to trigger specific event via
-air-quality-sensor-app event named pipe /tmp/chip*air_quality_fifo*<PID>.
+air-quality-sensor-app event named pipe /tmp/chip_air_quality_fifo*<PID>.
 
 ### Trigger air quality change event
 
