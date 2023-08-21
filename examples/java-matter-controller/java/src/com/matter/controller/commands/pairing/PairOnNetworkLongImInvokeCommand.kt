@@ -50,16 +50,28 @@ class PairOnNetworkLongImInvokeCommand(
   private inner class InternalInvokeCallback : InvokeCallback {
     override fun onError(e: Exception) {
       logger.log(Level.INFO, "Invoke receive onError" + e.message)
-      setFailure("write failure")
+      setFailure("invoke failure")
     }
 
     override fun onResponse(element: InvokeElement?, successCode: Long) {
       logger.log(Level.INFO, "Invoke receive OnResponse on ")
       if (element != null) {
-        logger.log(Level.INFO, element.toString())
+        logger.log(Level.INFO, element.toString() + element.getJsonString())
+        val clusterId = element.getClusterId().getId()
+        if (clusterId == CLUSTER_ID_IDENTIFY) {
+          logger.log(Level.INFO, "success code is $successCode")
+          setSuccess()
+          return
+        } else if (
+          clusterId == CLUSTER_ID_TEST && element.getJsonString().equals("""{"0:UINT":2}""")
+        ) {
+          logger.log(Level.INFO, "success code is $successCode")
+          setSuccess()
+          return
+        }
       }
-      logger.log(Level.INFO, "success code is$successCode")
-      setSuccess()
+
+      setFailure("invoke failure")
     }
   }
 
@@ -76,18 +88,42 @@ class PairOnNetworkLongImInvokeCommand(
 
   override fun runCommand() {
     val number: UShort = 1u
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-    tlvWriter.put(ContextSpecificTag(0), number)
-    tlvWriter.endStructure()
+    val tlvWriter1 = TlvWriter()
+    tlvWriter1.startStructure(AnonymousTag)
+    tlvWriter1.put(ContextSpecificTag(0), number)
+    tlvWriter1.endStructure()
 
-    val element: InvokeElement =
+    val element1: InvokeElement =
       InvokeElement.newInstance(
         /* endpointId= */ 0,
         CLUSTER_ID_IDENTIFY,
         IDENTIFY_COMMAND,
-        tlvWriter.getEncoded(),
+        tlvWriter1.getEncoded(),
         null
+      )
+
+    val tlvWriter2 = TlvWriter()
+    tlvWriter2.startStructure(AnonymousTag)
+    tlvWriter2.put(ContextSpecificTag(0), number)
+    tlvWriter2.put(ContextSpecificTag(1), number)
+    tlvWriter2.endStructure()
+
+    val element2: InvokeElement =
+      InvokeElement.newInstance(
+        /* endpointId= */ 1,
+        CLUSTER_ID_TEST,
+        TEST_ADD_ARGUMENT_COMMAND,
+        tlvWriter2.getEncoded(),
+        null
+      )
+
+    val element3: InvokeElement =
+      InvokeElement.newInstance(
+        /* endpointId= */ 1,
+        CLUSTER_ID_IDENTIFY,
+        IDENTIFY_COMMAND,
+        null,
+        """{"0:UINT":1}"""
       )
 
     currentCommissioner()
@@ -104,7 +140,13 @@ class PairOnNetworkLongImInvokeCommand(
     currentCommissioner()
       .getConnectedDevicePointer(getNodeId(), InternalGetConnectedDeviceCallback())
     clear()
-    currentCommissioner().invoke(InternalInvokeCallback(), devicePointer, element, 0, 0)
+    currentCommissioner().invoke(InternalInvokeCallback(), devicePointer, element1, 0, 0)
+    waitCompleteMs(getTimeoutMillis())
+    clear()
+    currentCommissioner().invoke(InternalInvokeCallback(), devicePointer, element2, 0, 0)
+    waitCompleteMs(getTimeoutMillis())
+    clear()
+    currentCommissioner().invoke(InternalInvokeCallback(), devicePointer, element3, 0, 0)
     waitCompleteMs(getTimeoutMillis())
   }
 
@@ -114,5 +156,7 @@ class PairOnNetworkLongImInvokeCommand(
     private const val MATTER_PORT = 5540
     private const val CLUSTER_ID_IDENTIFY = 0x0003L
     private const val IDENTIFY_COMMAND = 0L
+    private const val CLUSTER_ID_TEST = 0xFFF1FC05L
+    private const val TEST_ADD_ARGUMENT_COMMAND = 0X04L
   }
 }
