@@ -18,9 +18,9 @@
 
 #pragma once
 
+#include "OtaPrivate.h"
 #include <lib/support/Span.h>
 #include <platform/nxp/k32w/common/OTATlvProcessor.h>
-#include "OtaPrivate.h"
 
 /* Posted Operations Size Info */
 #define NB_PENDING_TRANSACTIONS 12
@@ -34,8 +34,8 @@ public:
     struct Descriptor
     {
         uint32_t version;
-        char     versionString[kVersionStringSize];
-        char     buildDate[kBuildDateSize];
+        char versionString[kVersionStringSize];
+        char buildDate[kBuildDateSize];
     };
 
     CHIP_ERROR Init() override;

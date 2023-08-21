@@ -16,9 +16,8 @@
  *    limitations under the License.
  */
 
-
-#include <src/include/platform/CHIPDeviceLayer.h>
 #include <platform/nxp/k32w/common/OTAImageProcessorImpl.h>
+#include <src/include/platform/CHIPDeviceLayer.h>
 
 #include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
 
@@ -47,9 +46,9 @@ static chip::OTAFirmwareProcessor gApplicationProcessor __attribute__((section("
 static chip::OTAFirmwareProcessor gApplicationProcessor;
 #endif
 
-CHIP_ERROR ProcessDescriptor(void* descriptor)
+CHIP_ERROR ProcessDescriptor(void * descriptor)
 {
-    auto desc = static_cast<chip::OTAFirmwareProcessor::Descriptor*>(descriptor);
+    auto desc = static_cast<chip::OTAFirmwareProcessor::Descriptor *>(descriptor);
     ChipLogDetail(SoftwareUpdate, "Descriptor: %ld, %s, %s", desc->version, desc->versionString, desc->buildDate);
 
     return CHIP_NO_ERROR;
@@ -63,7 +62,7 @@ extern "C" WEAK CHIP_ERROR OtaHookInit()
 
     gApplicationProcessor.RegisterDescriptorCallback(ProcessDescriptor);
 
-    auto& imageProcessor = chip::OTAImageProcessorImpl::GetDefaultInstance();
+    auto & imageProcessor = chip::OTAImageProcessorImpl::GetDefaultInstance();
     ReturnErrorOnFailure(imageProcessor.RegisterProcessor(APPLICATION_PROCESSOR_TAG, &gApplicationProcessor));
 
 #if CONFIG_CHIP_K32W1_MAX_ENTRIES_TEST
@@ -79,9 +78,9 @@ extern "C" WEAK CHIP_ERROR OtaHookInit()
 
 extern "C" WEAK void OtaHookReset()
 {
-    //Process all idle saves
+    // Process all idle saves
     NvShutdown();
-    //Set the bootloader flags
+    // Set the bootloader flags
     OTA_SetNewImageFlag();
     ResetMCU();
 }
@@ -96,12 +95,12 @@ extern "C" WEAK void OtaHookAbort()
      This hook is called inside OTAImageProcessorImpl::HandleAbort to schedule a retry (when enabled).
     */
 #if CONFIG_CHIP_K32W1_OTA_ABORT_HOOK
-    auto& imageProcessor = chip::OTAImageProcessorImpl::GetDefaultInstance();
-    auto& providerLocation = imageProcessor.GetBackupProvider();
+    auto & imageProcessor   = chip::OTAImageProcessorImpl::GetDefaultInstance();
+    auto & providerLocation = imageProcessor.GetBackupProvider();
 
     if (providerLocation.HasValue())
     {
-        auto* requestor = chip::GetRequestorInstance();
+        auto * requestor = chip::GetRequestorInstance();
         requestor->SetCurrentProviderLocation(providerLocation.Value());
         if (requestor->GetCurrentUpdateState() == chip::OTARequestorInterface::OTAUpdateStateEnum::kIdle)
         {

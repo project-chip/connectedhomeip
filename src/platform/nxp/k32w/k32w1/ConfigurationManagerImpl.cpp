@@ -32,8 +32,8 @@
 #include <platform/nxp/k32w/k32w1/K32W1Config.h>
 
 //#include <openthread/platform/misc.h>
-#include "fsl_device_registers.h"
 #include "fsl_cmc.h"
+#include "fsl_device_registers.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -120,7 +120,7 @@ CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOp
 
 CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 {
-    bootReason     = to_underlying(BootReasonType::kUnspecified);
+    bootReason = to_underlying(BootReasonType::kUnspecified);
 
     uint32_t reason = CMC_GetSystemResetStatus(CMC0);
 

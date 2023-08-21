@@ -188,18 +188,17 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY (configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS))
 
 #ifndef configENABLE_FPU
-  #define configENABLE_FPU                        0
+#define configENABLE_FPU 0
 #endif
 #ifndef configENABLE_MPU
-  #define configENABLE_MPU                        0
+#define configENABLE_MPU 0
 #endif
 #ifndef configENABLE_TRUSTZONE
-  #define configENABLE_TRUSTZONE                  0
+#define configENABLE_TRUSTZONE 0
 #endif
 #ifndef configRUN_FREERTOS_SECURE_ONLY
-  #define configRUN_FREERTOS_SECURE_ONLY          1
+#define configRUN_FREERTOS_SECURE_ONLY 1
 #endif
-
 
 /* Definitions that map the FreeRTOS port interrupt handlers to their CMSIS
 standard names. */

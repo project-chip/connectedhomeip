@@ -15,20 +15,19 @@
  *    limitations under the License.
  */
 
-
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/OperationalKeystore.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <lib/core/TLV.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
 
-#include <lib/support/SafePointerCast.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/SafePointerCast.h>
 
 #include "K32W1PersistentStorageOpKeystore.h"
 
@@ -40,7 +39,7 @@ using namespace chip::Crypto;
 
 CHIP_ERROR P256KeypairSSS::Initialize(Crypto::ECPKeyTarget key_target)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    CHIP_ERROR error  = CHIP_NO_ERROR;
     size_t keyBitsLen = kP256_PrivateKey_Length * 8;
     size_t keySize    = SSS_ECP_KEY_SZ(kP256_PrivateKey_Length);
 
@@ -48,37 +47,40 @@ CHIP_ERROR P256KeypairSSS::Initialize(Crypto::ECPKeyTarget key_target)
 
     VerifyOrReturnError(sss_sscp_key_object_init(&mKeyObj, &g_keyStore) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    VerifyOrReturnError(sss_sscp_key_object_allocate_handle(&mKeyObj, 0x0u, kSSS_KeyPart_Pair, kSSS_CipherType_EC_NIST_P,
-                          3 * kP256_PrivateKey_Length, SSS_KEYPROP_OPERATION_KDF | SSS_KEYPROP_OPERATION_ASYM) == kStatus_SSS_Success,
-                          error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(sss_sscp_key_object_allocate_handle(
+                            &mKeyObj, 0x0u, kSSS_KeyPart_Pair, kSSS_CipherType_EC_NIST_P, 3 * kP256_PrivateKey_Length,
+                            SSS_KEYPROP_OPERATION_KDF | SSS_KEYPROP_OPERATION_ASYM) == kStatus_SSS_Success,
+                        error = CHIP_ERROR_INTERNAL);
 
     VerifyOrExit(SSS_ECP_GENERATE_KEY(&mKeyObj, keyBitsLen) == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
-    //The first byte of the public key is the uncompressed marker
+    // The first byte of the public key is the uncompressed marker
     Uint8::to_uchar(mPublicKey)[0] = 0x04;
 
     // Extract public key, write from the second byte
-    VerifyOrExit(SSS_KEY_STORE_GET_PUBKEY(&mKeyObj, Uint8::to_uchar(mPublicKey) + 1, &keySize, &keyBitsLen) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(SSS_KEY_STORE_GET_PUBKEY(&mKeyObj, Uint8::to_uchar(mPublicKey) + 1, &keySize, &keyBitsLen) == kStatus_SSS_Success,
+                 CHIP_ERROR_INTERNAL);
 
     mInitialized = true;
 
 exit:
     if (mInitialized != true)
-        (void)SSS_KEY_OBJ_FREE(&mKeyObj);
+        (void) SSS_KEY_OBJ_FREE(&mKeyObj);
 
     return error;
 }
 
 CHIP_ERROR P256KeypairSSS::ExportBlob(P256SerializedKeypairSSS & output) const
 {
-        VerifyOrReturnError(mInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
 
-        size_t keyBlobLen = output.Capacity();
-        VerifyOrReturnError(sss_sscp_key_store_export_key(&g_keyStore, &mKeyObj, output.Bytes(), &keyBlobLen,
-                                                           kSSS_blobType_ELKE_blob) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
-        output.SetLength(keyBlobLen);
+    size_t keyBlobLen = output.Capacity();
+    VerifyOrReturnError(sss_sscp_key_store_export_key(&g_keyStore, &mKeyObj, output.Bytes(), &keyBlobLen,
+                                                      kSSS_blobType_ELKE_blob) == kStatus_SSS_Success,
+                        CHIP_ERROR_INTERNAL);
+    output.SetLength(keyBlobLen);
 
-        return CHIP_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR P256KeypairSSS::ImportBlob(P256SerializedKeypairSSS & input)
@@ -88,16 +90,15 @@ CHIP_ERROR P256KeypairSSS::ImportBlob(P256SerializedKeypairSSS & input)
         VerifyOrExit((sss_sscp_key_object_init(&mKeyObj, &g_keyStore) == kStatus_SSS_Success), CHIP_ERROR_INTERNAL);
 
         /* Allocate key handle */
-        VerifyOrExit((sss_sscp_key_object_allocate_handle(&mKeyObj,
-                                                     0x0u,
-                                                     kSSS_KeyPart_Pair,
-                                                     kSSS_CipherType_EC_NIST_P,
-                                                     3 * kP256_PrivateKey_Length,
-                                                     SSS_KEYPROP_OPERATION_ASYM) == kStatus_SSS_Success), CHIP_ERROR_INTERNAL);
+        VerifyOrExit(
+            (sss_sscp_key_object_allocate_handle(&mKeyObj, 0x0u, kSSS_KeyPart_Pair, kSSS_CipherType_EC_NIST_P,
+                                                 3 * kP256_PrivateKey_Length, SSS_KEYPROP_OPERATION_ASYM) == kStatus_SSS_Success),
+            CHIP_ERROR_INTERNAL);
     }
 
     VerifyOrExit((sss_sscp_key_store_import_key(&g_keyStore, &mKeyObj, input.Bytes(), input.Length(), kP256_PrivateKey_Length * 8,
-                                                 kSSS_blobType_ELKE_blob) == kStatus_SSS_Success), CHIP_ERROR_INTERNAL);
+                                                kSSS_blobType_ELKE_blob) == kStatus_SSS_Success),
+                 CHIP_ERROR_INTERNAL);
 
     mInitialized = true;
 
@@ -118,17 +119,18 @@ CHIP_ERROR P256KeypairSSS::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_
     memset(&digest[0], 0, sizeof(digest));
     ReturnErrorOnFailure(Hash_SHA256(msg, msg_length, &digest[0]));
 
-    VerifyOrExit((sss_sscp_asymmetric_context_init(&asyc, &g_sssSession, &mKeyObj, kAlgorithm_SSS_ECDSA_SHA256, kMode_SSS_Sign) == kStatus_SSS_Success),
-                   CHIP_ERROR_INTERNAL);
-    VerifyOrExit((sss_sscp_asymmetric_sign_digest(&asyc, digest, kP256_FE_Length, out_signature.Bytes(), &signatureSize) == kStatus_SSS_Success),
-                  CHIP_ERROR_INTERNAL);
+    VerifyOrExit((sss_sscp_asymmetric_context_init(&asyc, &g_sssSession, &mKeyObj, kAlgorithm_SSS_ECDSA_SHA256, kMode_SSS_Sign) ==
+                  kStatus_SSS_Success),
+                 CHIP_ERROR_INTERNAL);
+    VerifyOrExit((sss_sscp_asymmetric_sign_digest(&asyc, digest, kP256_FE_Length, out_signature.Bytes(), &signatureSize) ==
+                  kStatus_SSS_Success),
+                 CHIP_ERROR_INTERNAL);
     VerifyOrExit(out_signature.SetLength(kP256_ECDSA_Signature_Length_Raw) == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
 exit:
-    (void)sss_sscp_asymmetric_context_free(&asyc);
+    (void) sss_sscp_asymmetric_context_free(&asyc);
     return error;
 }
-
 
 CHIP_ERROR P256KeypairSSS::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
@@ -144,7 +146,7 @@ void P256KeypairSSS::Clear()
 {
     if (mInitialized)
     {
-        (void)SSS_KEY_OBJ_FREE(&mKeyObj);
+        (void) SSS_KEY_OBJ_FREE(&mKeyObj);
         mInitialized = false;
     }
 }
@@ -175,7 +177,7 @@ bool K32W1PersistentStorageOpKeystore::HasOpKeypairForFabric(FabricIndex fabricI
 }
 
 CHIP_ERROR K32W1PersistentStorageOpKeystore::NewOpKeypairForFabric(FabricIndex fabricIndex,
-                                                                       MutableByteSpan & outCertificateSigningRequest)
+                                                                   MutableByteSpan & outCertificateSigningRequest)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
@@ -208,7 +210,7 @@ CHIP_ERROR K32W1PersistentStorageOpKeystore::NewOpKeypairForFabric(FabricIndex f
 }
 
 CHIP_ERROR K32W1PersistentStorageOpKeystore::ActivateOpKeypairForFabric(FabricIndex fabricIndex,
-                                                                            const Crypto::P256PublicKey & nocPublicKey)
+                                                                        const Crypto::P256PublicKey & nocPublicKey)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mPendingKeypair != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
@@ -232,8 +234,8 @@ CHIP_ERROR K32W1PersistentStorageOpKeystore::CommitOpKeypairForFabric(FabricInde
     uint16_t keyBlobLen = tmpKeyBlob.Capacity();
 
     mPendingKeypair->ExportBlob(tmpKeyBlob);
-    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex).KeyName(),
-                                                   tmpKeyBlob.Bytes(), keyBlobLen));
+    ReturnErrorOnFailure(
+        mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex).KeyName(), tmpKeyBlob.Bytes(), keyBlobLen));
 
     // If we got here, we succeeded and can reset the pending key: next `SignWithOpKeypair` will use the stored key.
     ResetPendingKey();
@@ -269,7 +271,7 @@ void K32W1PersistentStorageOpKeystore::RevertPendingKeypair()
 }
 
 CHIP_ERROR K32W1PersistentStorageOpKeystore::SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
-                                                                   Crypto::P256ECDSASignature & outSignature) const
+                                                               Crypto::P256ECDSASignature & outSignature) const
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 

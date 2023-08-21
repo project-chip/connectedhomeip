@@ -99,7 +99,6 @@ extern "C" void main_task(void const * argument)
         goto exit;
     }
 
-
     // Start OpenThread task
     err = ThreadStackMgrImpl().StartThreadTask();
     if (err != CHIP_NO_ERROR)

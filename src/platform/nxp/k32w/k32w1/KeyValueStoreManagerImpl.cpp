@@ -54,7 +54,8 @@ uint16_t GetStringKeyId(const char * key, uint16_t * freeId)
     for (keyId = 0; keyId < kMaxNumberOfKeys; keyId++)
     {
         nvmInternalId = chip::DeviceLayer::Internal::K32WConfigKey(nvmIdKvsKey, keyId);
-        err = chip::DeviceLayer::Internal::K32WConfig::ReadConfigValueStr(nvmInternalId , keyString, kMaxKeyValueBytes, keyStringSize);
+        err =
+            chip::DeviceLayer::Internal::K32WConfig::ReadConfigValueStr(nvmInternalId, keyString, kMaxKeyValueBytes, keyStringSize);
 
         if (err == CHIP_NO_ERROR)
         {
@@ -91,9 +92,9 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
         // This is the ID of the actual data
         nvmInternalId = chip::DeviceLayer::Internal::K32WConfigKey(nvmIdKvsValue, keyId);
         ChipLogProgress(DeviceLayer, "KVS, get the value of Matter key [%s] with NVM id: %i", key, nvmInternalId);
-        err =  chip::DeviceLayer::Internal::K32WConfig::ReadConfigValueBin(nvmInternalId, (uint8_t *) value, value_size, read_bytes);
+        err = chip::DeviceLayer::Internal::K32WConfig::ReadConfigValueBin(nvmInternalId, (uint8_t *) value, value_size, read_bytes);
 
-        //According to Get api read_bytes_size can be null
+        // According to Get api read_bytes_size can be null
         if (read_bytes_size)
         {
             *read_bytes_size = read_bytes;
@@ -101,7 +102,8 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     }
     else
     {
-        ChipLogProgress(DeviceLayer, "KVS, error in getting the value of Matter key [%s]. Key not found in persistent storage.", key);
+        ChipLogProgress(DeviceLayer, "KVS, error in getting the value of Matter key [%s]. Key not found in persistent storage.",
+                        key);
     }
 
 exit:
@@ -113,7 +115,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 {
     CHIP_ERROR err         = CHIP_ERROR_INVALID_ARGUMENT;
     bool_t putKey          = false;
-    uint8_t nvmIdKvsKey       = chip::DeviceLayer::Internal::K32WConfig::kFileId_KVSKey;
+    uint8_t nvmIdKvsKey    = chip::DeviceLayer::Internal::K32WConfig::kFileId_KVSKey;
     uint8_t nvmIdKvsValue  = chip::DeviceLayer::Internal::K32WConfig::kFileId_KVSValue;
     uint16_t nvmInternalId = 0;
     uint16_t freeKeyId;
@@ -127,7 +129,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     if (kMaxNumberOfKeys == keyId)
     {
         putKey = true;
-        keyId = freeKeyId;
+        keyId  = freeKeyId;
     }
 
     nvmInternalId = chip::DeviceLayer::Internal::K32WConfigKey(nvmIdKvsValue, keyId);
@@ -168,8 +170,8 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     CHIP_ERROR err         = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     uint8_t nvmIdKvsKey    = chip::DeviceLayer::Internal::K32WConfig::kFileId_KVSKey;
     uint8_t nvmIdKvsValue  = chip::DeviceLayer::Internal::K32WConfig::kFileId_KVSValue;
-    uint8_t keyId           = 0;
-    uint16_t nvmInternalId  = 0;
+    uint8_t keyId          = 0;
+    uint16_t nvmInternalId = 0;
 
     VerifyOrExit((key != NULL), err = CHIP_ERROR_INVALID_ARGUMENT);
 

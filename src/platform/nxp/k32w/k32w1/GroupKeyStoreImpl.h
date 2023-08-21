@@ -24,8 +24,8 @@
  */
 
 #include <core/CHIPKeyIds.h>
-#include <platform/nxp/k32w/k32w1/K32W1Config.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/nxp/k32w/k32w1/K32W1Config.h>
 
 namespace chip {
 namespace DeviceLayer {

@@ -31,9 +31,8 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #include "FreeRTOS.h"
-#include "timers.h"
 #include "fsl_component_button.h"
-
+#include "timers.h"
 
 // Application-defined error codes in the CHIP_ERROR space.
 #define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
@@ -58,8 +57,8 @@ public:
     bool IsSyncClusterToButtonAction();
     void SetSyncClusterToButtonAction(bool value);
     // Identify cluster callbacks.
-    static void OnIdentifyStart(Identify* identify);
-    static void OnIdentifyStop(Identify* identify);
+    static void OnIdentifyStart(Identify * identify);
+    static void OnIdentifyStop(Identify * identify);
 
 private:
     friend AppTask & GetAppTask(void);
@@ -73,7 +72,7 @@ private:
     void DispatchEvent(AppEvent * event);
 
     static void FunctionTimerEventHandler(void * aGenericEvent);
-    static button_status_t KBD_Callback(void *buttonHandle, button_callback_message_t *message,void *callbackParam);
+    static button_status_t KBD_Callback(void * buttonHandle, button_callback_message_t * message, void * callbackParam);
     static void HandleKeyboard(void);
     static void OTAHandler(void * aGenericEvent);
     static void BleHandler(void * aGenericEvent);
@@ -100,7 +99,7 @@ private:
 
     enum class Function : uint8_t
     {
-        kNoneSelected   = 0,
+        kNoneSelected = 0,
         kFactoryReset,
         kContact,
         kIdentify,
@@ -112,7 +111,6 @@ private:
     bool mSyncClusterToButtonAction = false;
 
     static AppTask sAppTask;
-
 };
 
 inline AppTask & GetAppTask(void)

@@ -29,7 +29,7 @@ static constexpr uint8_t category_max_len_bytes = 3;
 
 static bool isLogInitialized;
 extern "C" uint32_t otPlatAlarmMilliGetNow(void);
-extern "C" void otPlatUartSendBlocking(const uint8_t *aBuf, uint32_t len);
+extern "C" void otPlatUartSendBlocking(const uint8_t * aBuf, uint32_t len);
 
 namespace chip {
 namespace Logging {
@@ -122,7 +122,6 @@ void ENFORCE_FORMAT(1, 0) GenericLog(const char * format, va_list arg, const cha
     memcpy(formattedMsg + prefixLen + writtenLen, EOL_CHARS, EOL_CHARS_LEN);
 
     otPlatUartSendBlocking((const uint8_t *) formattedMsg, strlen(formattedMsg));
-
 
     // Let the application know that a log message has been emitted.
     chip::DeviceLayer::OnLogOutput();

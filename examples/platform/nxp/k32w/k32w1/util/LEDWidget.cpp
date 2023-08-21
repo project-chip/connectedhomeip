@@ -82,11 +82,11 @@ void LEDWidget::DoSet(bool state)
 
     if (state)
     {
-        (void)LED_TurnOnOff((led_handle_t)g_ledHandle[mGPIONum], mOnLogic);
+        (void) LED_TurnOnOff((led_handle_t) g_ledHandle[mGPIONum], mOnLogic);
     }
     else
     {
-        (void)LED_TurnOnOff((led_handle_t)g_ledHandle[mGPIONum], !mOnLogic);
+        (void) LED_TurnOnOff((led_handle_t) g_ledHandle[mGPIONum], !mOnLogic);
     }
 }
 

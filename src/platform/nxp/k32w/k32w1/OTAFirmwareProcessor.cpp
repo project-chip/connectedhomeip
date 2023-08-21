@@ -32,7 +32,7 @@ CHIP_ERROR OTAFirmwareProcessor::Init()
     ReturnErrorCodeIf(gOtaSuccess_c != OTA_SelectExternalStoragePartition(), CHIP_OTA_PROCESSOR_EXTERNAL_STORAGE);
 
     otaResult_t ota_status;
-    ota_status = OTA_ServiceInit(&mPostedOperationsStorage[0], NB_PENDING_TRANSACTIONS*TRANSACTION_SZ);
+    ota_status = OTA_ServiceInit(&mPostedOperationsStorage[0], NB_PENDING_TRANSACTIONS * TRANSACTION_SZ);
 
     ReturnErrorCodeIf(ota_status != gOtaSuccess_c, CHIP_OTA_PROCESSOR_CLIENT_INIT);
     ReturnErrorCodeIf(gOtaSuccess_c != OTA_StartImage(mLength - sizeof(Descriptor)), CHIP_OTA_PROCESSOR_START_IMAGE);
@@ -51,9 +51,9 @@ CHIP_ERROR OTAFirmwareProcessor::Clear()
 
 CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
 {
-	otaResult_t status;
-	static uint32_t ulEraseLen = 0;
-	static uint32_t ulCrtAddr = 0;
+    otaResult_t status;
+    static uint32_t ulEraseLen = 0;
+    static uint32_t ulCrtAddr  = 0;
 
     if (!mDescriptorProcessed)
     {
@@ -75,10 +75,10 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
     }
     else
     {
-    	OTAImageProcessorImpl::FetchNextData(0);
+        OTAImageProcessorImpl::FetchNextData(0);
     }
 
-    status = OTA_PushImageChunk((uint8_t*) block.data(), (uint16_t) block.size(), NULL, NULL);
+    status = OTA_PushImageChunk((uint8_t *) block.data(), (uint16_t) block.size(), NULL, NULL);
     if (gOtaSuccess_c != status)
     {
         ChipLogError(SoftwareUpdate, "Failed to write image block. Status: %d", status);
@@ -91,7 +91,7 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
 CHIP_ERROR OTAFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
 {
     ReturnErrorOnFailure(mAccumulator.Accumulate(block));
-    ReturnErrorOnFailure(mCallbackProcessDescriptor(static_cast<void*>(mAccumulator.data())));
+    ReturnErrorOnFailure(mCallbackProcessDescriptor(static_cast<void *>(mAccumulator.data())));
 
     mDescriptorProcessed = true;
     mAccumulator.Clear();

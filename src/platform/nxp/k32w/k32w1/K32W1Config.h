@@ -30,7 +30,6 @@
 #include "FreeRTOS.h"
 #include "NVM_Interface.h"
 
-
 #include "ram_storage.h"
 
 namespace chip {
@@ -54,16 +53,16 @@ class K32WConfig
 {
 public:
     // Category ids used by the CHIP Device Layer
-    static constexpr uint8_t kFileId_ChipFactory = 0x01;    /**< Category containing persistent config values set at
-                                                             * manufacturing time. Retained during factory reset. */
-    static constexpr uint8_t kFileId_ChipConfig = 0x02;     /**< Catyegory containing dynamic config values set at runtime.
-                                                             *   Cleared during factory reset. */
-    static constexpr uint8_t kFileId_ChipCounter = 0x03;    /**< Category containing dynamic counter values set at runtime.
-                                                             * Retained during factory reset. */
-    static constexpr uint8_t kFileId_KVSKey = 0x04;         /**< Category containing KVS set at runtime.
-                                                             *  Cleared during factory reset. */
-    static constexpr uint8_t kFileId_KVSValue = 0x05;       /**< Category containing KVS values set at runtime.
-                                                             *   Cleared during factory reset. */
+    static constexpr uint8_t kFileId_ChipFactory = 0x01; /**< Category containing persistent config values set at
+                                                          * manufacturing time. Retained during factory reset. */
+    static constexpr uint8_t kFileId_ChipConfig = 0x02;  /**< Catyegory containing dynamic config values set at runtime.
+                                                          *   Cleared during factory reset. */
+    static constexpr uint8_t kFileId_ChipCounter = 0x03; /**< Category containing dynamic counter values set at runtime.
+                                                          * Retained during factory reset. */
+    static constexpr uint8_t kFileId_KVSKey = 0x04;      /**< Category containing KVS set at runtime.
+                                                          *  Cleared during factory reset. */
+    static constexpr uint8_t kFileId_KVSValue = 0x05;    /**< Category containing KVS values set at runtime.
+                                                          *   Cleared during factory reset. */
 
     using Key = uint16_t;
 
@@ -138,7 +137,6 @@ public:
 private:
     static CHIP_ERROR MapRamStorageStatus(rsError rsStatus);
     static void FactoryResetConfigInternal(Key firstKey, Key lastKey);
-
 };
 
 } // namespace Internal

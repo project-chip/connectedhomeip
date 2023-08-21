@@ -35,16 +35,14 @@
 #include <lwip/tcpip.h>
 #endif
 
-#include <openthread/platform/entropy.h>
 #include "fsl_component_mem_manager.h"
 #include "fwk_platform.h"
+#include <openthread/platform/entropy.h>
 
 extern uint8_t __data_end__[], m_data0_end[];
-memAreaCfg_t data0Heap = {  .start_address = (void*)__data_end__,
-                            .end_address = (void*)m_data0_end  };
+memAreaCfg_t data0Heap = { .start_address = (void *) __data_end__, .end_address = (void *) m_data0_end };
 
-#if defined(gAppHighSystemClockFrequency_d) && (gAppHighSystemClockFrequency_d > 0) && \
-    defined(USE_SMU2_AS_SYSTEM_MEMORY)
+#if defined(gAppHighSystemClockFrequency_d) && (gAppHighSystemClockFrequency_d > 0) && defined(USE_SMU2_AS_SYSTEM_MEMORY)
 extern "C" void APP_SysInitHook(void)
 {
     // NBU has to be initialized before calling this function
@@ -58,7 +56,6 @@ namespace chip {
 namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
-
 
 CHIP_ERROR PlatformManagerImpl::InitBoardFwk(void)
 {

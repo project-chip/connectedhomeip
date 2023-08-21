@@ -27,9 +27,9 @@
 
 #include <platform/nxp/k32w/k32w1/K32W1Config.h>
 
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPEncoding.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
-#include <lib/core/CHIPConfig.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread-system.h>
@@ -39,9 +39,9 @@
 //#include "fsl_component_log.h"
 //#include "fsl_component_log_backend_debugconsole.h"
 #endif
-#include "NVM_Interface.h"
-#include "FunctionLib.h"
 #include "FreeRTOS.h"
+#include "FunctionLib.h"
+#include "NVM_Interface.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -71,15 +71,15 @@ static ChipConfigRamStruct_t *chipConfigRamStruct;
 #endif
 
 #if CHIP_PLAT_NVM_STATIC_ALLOC
-static uint8_t chipConfigRamBuffer[CHIP_CONFIG_RAM_BUFFER_SIZE] = {0};
+static uint8_t chipConfigRamBuffer[CHIP_CONFIG_RAM_BUFFER_SIZE] = { 0 };
 #endif
 
-static ramBufferDescriptor *ramDescr ;
+static ramBufferDescriptor * ramDescr;
 
 #define RAM_DESC_HEADER_SIZE (sizeof(ramDescr->ramBufferLen + ramDescr->ramBufferMaxLen))
 
 #if CHIP_PLAT_NVM_SUPPORT
-NVM_RegisterDataSet((void *)chipConfigRamBuffer, 1, sizeof(chipConfigRamBuffer), NVM_ID_CHIP_CONFIG_DATA, gNVM_MirroredInRam_c);
+NVM_RegisterDataSet((void *) chipConfigRamBuffer, 1, sizeof(chipConfigRamBuffer), NVM_ID_CHIP_CONFIG_DATA, gNVM_MirroredInRam_c);
 #endif
 
 static rsError AddToRamStorage(ramBufferDescriptor * pBuffer, uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength)
@@ -89,7 +89,7 @@ static rsError AddToRamStorage(ramBufferDescriptor * pBuffer, uint16_t aKey, con
 #if !CHIP_PLAT_NVM_STATIC_ALLOC
     uint32_t allocSize = pBuffer->ramBufferMaxLen;
 
-    if ( allocSize <= pBuffer->ramBufferLen + aValueLength )
+    if (allocSize <= pBuffer->ramBufferLen + aValueLength)
     {
         while (allocSize < pBuffer->ramBufferLen + aValueLength)
         {
@@ -100,12 +100,12 @@ static rsError AddToRamStorage(ramBufferDescriptor * pBuffer, uint16_t aKey, con
         pBuffer->ramBufferLen = allocSize;
         allocSize += RAM_DESC_HEADER_SIZE;
 
-        pBuffer = (ramBufferDescriptor *) realloc((void *)pBuffer, allocSize);
-        VerifyOrExit((NULL !=  pBuffer), err = RS_ERROR_NO_BUFS);
+        pBuffer = (ramBufferDescriptor *) realloc((void *) pBuffer, allocSize);
+        VerifyOrExit((NULL != pBuffer), err = RS_ERROR_NO_BUFS);
     }
 #endif
 
-   err = ramStorageSet(pBuffer, aKey, aValue, aValueLength);
+    err = ramStorageSet(pBuffer, aKey, aValue, aValueLength);
 
 #if !CHIP_PLAT_NVM_STATIC_ALLOC
 exit:
@@ -114,12 +114,11 @@ exit:
     return err;
 }
 
-
 CHIP_ERROR K32WConfig::Init()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err        = CHIP_NO_ERROR;
     bool bLoadDataFromNvm = true;
-    uint32_t allocSize = CHIP_CONFIG_RAM_BUFFER_SIZE;
+    uint32_t allocSize    = CHIP_CONFIG_RAM_BUFFER_SIZE;
 
     /* Initialise the Persistent Data Manager */
 #if CHIP_PLAT_NVM_SUPPORT
@@ -131,16 +130,16 @@ CHIP_ERROR K32WConfig::Init()
     ramDescr = (ramBufferDescriptor *) chipConfigRamBuffer;
 #else
     ramDescr = (ramBufferDescriptor *) malloc(allocSize);
-    VerifyOrExit((NULL !=  ramDescr), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit((NULL != ramDescr), err = CHIP_ERROR_NO_MEMORY);
 #endif
 
     ramDescr->ramBufferLen = 0;
 
-    if(bLoadDataFromNvm)
+    if (bLoadDataFromNvm)
     {
         /* Try to load the dataset in RAM */
 #if CHIP_PLAT_NVM_SUPPORT
-        NvRestoreDataSet((void *)ramDescr, 0);
+        NvRestoreDataSet((void *) ramDescr, 0);
 #endif
     }
 
@@ -241,7 +240,7 @@ CHIP_ERROR K32WConfig::WriteConfigValue(Key key, bool val)
 #if CHIP_PLAT_NVM_SUPPORT
     NvSaveOnIdle(ramDescr, false);
 #endif
-    //ChipLogProgress(DeviceLayer, "WriteConfigValue done");
+    // ChipLogProgress(DeviceLayer, "WriteConfigValue done");
 
 exit:
     return err;
@@ -259,7 +258,7 @@ CHIP_ERROR K32WConfig::WriteConfigValueSync(Key key, bool val)
 #if CHIP_PLAT_NVM_SUPPORT
     NvSyncSave(ramDescr, false);
 #endif
-    //ChipLogProgress(DeviceLayer, "WriteConfigValue done");
+    // ChipLogProgress(DeviceLayer, "WriteConfigValue done");
 
 exit:
     return err;
@@ -271,13 +270,13 @@ CHIP_ERROR K32WConfig::WriteConfigValue(Key key, uint32_t val)
     rsError status;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-    status = AddToRamStorage(ramDescr, key, (uint8_t *)&val, sizeof(uint32_t));
+    status = AddToRamStorage(ramDescr, key, (uint8_t *) &val, sizeof(uint32_t));
     SuccessOrExit(err = MapRamStorageStatus(status));
 
 #if CHIP_PLAT_NVM_SUPPORT
     NvSaveOnIdle(ramDescr, false);
 #endif
-    //ChipLogProgress(DeviceLayer, "WriteConfigValue done");
+    // ChipLogProgress(DeviceLayer, "WriteConfigValue done");
 
 exit:
     return err;
@@ -289,13 +288,13 @@ CHIP_ERROR K32WConfig::WriteConfigValue(Key key, uint64_t val)
     rsError status;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-    status = AddToRamStorage(ramDescr, key, (uint8_t *)&val, sizeof(uint64_t));
+    status = AddToRamStorage(ramDescr, key, (uint8_t *) &val, sizeof(uint64_t));
     SuccessOrExit(err = MapRamStorageStatus(status));
 
 #if CHIP_PLAT_NVM_SUPPORT
     NvSaveOnIdle(ramDescr, false);
 #endif
-    //ChipLogProgress(DeviceLayer, "WriteConfigValue done");
+    // ChipLogProgress(DeviceLayer, "WriteConfigValue done");
 
 exit:
     return err;
@@ -381,7 +380,6 @@ CHIP_ERROR K32WConfig::FactoryResetConfig(void)
     FactoryResetConfigInternal(kMinConfigKey_ChipConfig, kMaxConfigKey_ChipConfig);
     FactoryResetConfigInternal(kMinConfigKey_KVSKey, kMaxConfigKey_KVSKey);
     FactoryResetConfigInternal(kMinConfigKey_KVSValue, kMaxConfigKey_KVSValue);
-
 
 #if CHIP_PLAT_NVM_SUPPORT
     /* Save in flash now */

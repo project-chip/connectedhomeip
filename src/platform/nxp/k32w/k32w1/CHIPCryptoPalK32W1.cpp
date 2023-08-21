@@ -55,8 +55,8 @@
 
 #include <string.h>
 
-#include "sss_crypto.h"
 #include "SecLib_ecp256.h"
+#include "sss_crypto.h"
 
 namespace chip {
 namespace Crypto {
@@ -516,14 +516,16 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
 
     sss_sscp_object_t * keypair = to_keypair(&mKeypair);
 
-    VerifyOrExit((sss_sscp_asymmetric_context_init(&asyc, &g_sssSession, keypair, kAlgorithm_SSS_ECDSA_SHA256, kMode_SSS_Sign) == kStatus_SSS_Success),
-                   CHIP_ERROR_INTERNAL);
-    VerifyOrExit((sss_sscp_asymmetric_sign_digest(&asyc, digest, kP256_FE_Length, out_signature.Bytes(), &signatureSize) == kStatus_SSS_Success),
-                  CHIP_ERROR_INTERNAL);
+    VerifyOrExit((sss_sscp_asymmetric_context_init(&asyc, &g_sssSession, keypair, kAlgorithm_SSS_ECDSA_SHA256, kMode_SSS_Sign) ==
+                  kStatus_SSS_Success),
+                 CHIP_ERROR_INTERNAL);
+    VerifyOrExit((sss_sscp_asymmetric_sign_digest(&asyc, digest, kP256_FE_Length, out_signature.Bytes(), &signatureSize) ==
+                  kStatus_SSS_Success),
+                 CHIP_ERROR_INTERNAL);
     VerifyOrExit(out_signature.SetLength(kP256_ECDSA_Signature_Length_Raw) == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
 exit:
-    (void)sss_sscp_asymmetric_context_free(&asyc);
+    (void) sss_sscp_asymmetric_context_free(&asyc);
     return error;
 }
 
@@ -561,30 +563,33 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
 
     VerifyOrReturnError(sss_sscp_key_object_init(&ecdsaPublic, &g_keyStore) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    VerifyOrReturnError(sss_sscp_key_object_allocate_handle(&ecdsaPublic, 0u, kSSS_KeyPart_Public, kSSS_CipherType_EC_NIST_P, keySize,
-                                                            SSS_KEYPROP_OPERATION_ASYM) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(sss_sscp_key_object_allocate_handle(&ecdsaPublic, 0u, kSSS_KeyPart_Public, kSSS_CipherType_EC_NIST_P,
+                                                            keySize, SSS_KEYPROP_OPERATION_ASYM) == kStatus_SSS_Success,
+                        CHIP_ERROR_INTERNAL);
 
-    //The first byte of the public key is the uncompressed marker
+    // The first byte of the public key is the uncompressed marker
     VerifyOrExit(SSS_KEY_STORE_SET_KEY(&ecdsaPublic, Uint8::to_const_uchar(*this) + 1, Length() - 1, keySize * 8,
-                                        (uint32_t)kSSS_KeyPart_Public) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+                                       (uint32_t) kSSS_KeyPart_Public) == kStatus_SSS_Success,
+                 CHIP_ERROR_INTERNAL);
 
     VerifyOrExit(sss_sscp_asymmetric_context_init(&asyc, &g_sssSession, &ecdsaPublic, kAlgorithm_SSS_ECDSA_SHA256,
-                                                   kMode_SSS_Verify) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+                                                  kMode_SSS_Verify) == kStatus_SSS_Success,
+                 CHIP_ERROR_INTERNAL);
 
     bFreeAsyncCtx = true;
-    VerifyOrExit(sss_sscp_asymmetric_verify_digest(&asyc, (uint8_t *)hash, hash_length, (uint8_t *)signature.ConstBytes(),
-                                                   signature.Length()) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(sss_sscp_asymmetric_verify_digest(&asyc, (uint8_t *) hash, hash_length, (uint8_t *) signature.ConstBytes(),
+                                                   signature.Length()) == kStatus_SSS_Success,
+                 CHIP_ERROR_INTERNAL);
 exit:
 
     if (bFreeAsyncCtx)
     {
         /* Need to be very careful, if we try to free something that is not initialized with success we will get an hw fault */
-        (void)sss_sscp_asymmetric_context_free(&asyc);
+        (void) sss_sscp_asymmetric_context_free(&asyc);
     }
-    (void)SSS_KEY_OBJ_FREE(&ecdsaPublic);
+    (void) SSS_KEY_OBJ_FREE(&ecdsaPublic);
 
     return error;
-
 }
 
 CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
@@ -594,9 +599,9 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     size_t secret_length = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
 
     sss_sscp_object_t * keypair = to_keypair(&mKeypair);
-    size_t coordinateLen     = kP256_PrivateKey_Length;
-    size_t coordinateBitsLen = coordinateLen * 8;
-    size_t keySize = SSS_ECP_KEY_SZ(kP256_PrivateKey_Length);
+    size_t coordinateLen        = kP256_PrivateKey_Length;
+    size_t coordinateBitsLen    = coordinateLen * 8;
+    size_t keySize              = SSS_ECP_KEY_SZ(kP256_PrivateKey_Length);
 
     sss_sscp_derive_key_t dCtx;
     sss_sscp_object_t pEcdhPubKey;
@@ -610,39 +615,42 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     /* Remote public key */
     VerifyOrReturnError(sss_sscp_key_object_init(&pEcdhPubKey, &g_keyStore) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(sss_sscp_key_object_allocate_handle(&pEcdhPubKey, 0u, kSSS_KeyPart_Public, kSSS_CipherType_EC_NIST_P,
-                                                             keySize, SSS_KEYPROP_OPERATION_KDF) == kStatus_SSS_Success,
-                                                             CHIP_ERROR_INTERNAL);
+                                                            keySize, SSS_KEYPROP_OPERATION_KDF) == kStatus_SSS_Success,
+                        CHIP_ERROR_INTERNAL);
 
-    //The first byte of the public key is the uncompressed marker
-    VerifyOrExit(SSS_KEY_STORE_SET_KEY(&pEcdhPubKey, Uint8::to_const_uchar(remote_public_key) + 1, keySize,
-                                        coordinateBitsLen, kSSS_KeyPart_Public) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+    // The first byte of the public key is the uncompressed marker
+    VerifyOrExit(SSS_KEY_STORE_SET_KEY(&pEcdhPubKey, Uint8::to_const_uchar(remote_public_key) + 1, keySize, coordinateBitsLen,
+                                       kSSS_KeyPart_Public) == kStatus_SSS_Success,
+                 CHIP_ERROR_INTERNAL);
 
     /* Shared secret */
     VerifyOrExit(sss_sscp_key_object_init(&sharedSecret, &g_keyStore) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
-    VerifyOrExit(sss_sscp_key_object_allocate_handle(&sharedSecret, 0u, kSSS_KeyPart_Default, kSSS_CipherType_AES,
-                                                     coordinateLen, SSS_KEYPROP_OPERATION_NONE) == kStatus_SSS_Success,
-                                                     CHIP_ERROR_INTERNAL);
+    VerifyOrExit(sss_sscp_key_object_allocate_handle(&sharedSecret, 0u, kSSS_KeyPart_Default, kSSS_CipherType_AES, coordinateLen,
+                                                     SSS_KEYPROP_OPERATION_NONE) == kStatus_SSS_Success,
+                 CHIP_ERROR_INTERNAL);
     bFreeSharedSecret = true;
 
     /* Secret Key generated inside SSS */
     VerifyOrExit(sss_sscp_derive_key_context_init(&dCtx, &g_sssSession, keypair, kAlgorithm_SSS_ECDH,
-                                                    kMode_SSS_ComputeSharedSecret) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+                                                  kMode_SSS_ComputeSharedSecret) == kStatus_SSS_Success,
+                 CHIP_ERROR_INTERNAL);
     bFreeDeriveContex = true;
 
     VerifyOrExit(sss_sscp_asymmetric_dh_derive_key(&dCtx, &pEcdhPubKey, &sharedSecret) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    VerifyOrExit(SSS_KEY_STORE_GET_PUBKEY(&sharedSecret, out_secret.Bytes(), &coordinateLen, &coordinateBitsLen) == kStatus_SSS_Success,
-                                          CHIP_ERROR_INTERNAL);
+    VerifyOrExit(SSS_KEY_STORE_GET_PUBKEY(&sharedSecret, out_secret.Bytes(), &coordinateLen, &coordinateBitsLen) ==
+                     kStatus_SSS_Success,
+                 CHIP_ERROR_INTERNAL);
     SuccessOrExit(out_secret.SetLength(secret_length));
 
 exit:
-    (void)SSS_KEY_OBJ_FREE(&pEcdhPubKey);
+    (void) SSS_KEY_OBJ_FREE(&pEcdhPubKey);
 
     /* Need to be very careful, if we try to free something that is not initialized with success we will get a hw fault */
     if (bFreeSharedSecret)
-        (void)SSS_KEY_OBJ_FREE(&sharedSecret);
+        (void) SSS_KEY_OBJ_FREE(&sharedSecret);
     if (bFreeDeriveContex)
-        (void)sss_sscp_derive_key_context_free(&dCtx);
+        (void) sss_sscp_derive_key_context_free(&dCtx);
 
     return error;
 }
@@ -692,23 +700,25 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
 
     VerifyOrReturnError(sss_sscp_key_object_init(keypair, &g_keyStore) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    VerifyOrReturnError(sss_sscp_key_object_allocate_handle(keypair, 0x0u, kSSS_KeyPart_Pair, kSSS_CipherType_EC_NIST_P,
-                          3 * kP256_PrivateKey_Length, SSS_KEYPROP_OPERATION_KDF | SSS_KEYPROP_OPERATION_ASYM) == kStatus_SSS_Success,
-                          error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(sss_sscp_key_object_allocate_handle(
+                            keypair, 0x0u, kSSS_KeyPart_Pair, kSSS_CipherType_EC_NIST_P, 3 * kP256_PrivateKey_Length,
+                            SSS_KEYPROP_OPERATION_KDF | SSS_KEYPROP_OPERATION_ASYM) == kStatus_SSS_Success,
+                        error = CHIP_ERROR_INTERNAL);
 
     VerifyOrExit(SSS_ECP_GENERATE_KEY(keypair, keyBitsLen) == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
-    //The first byte of the public key is the uncompressed marker
+    // The first byte of the public key is the uncompressed marker
     Uint8::to_uchar(mPublicKey)[0] = 0x04;
 
     // Extract public key, write from the second byte
-    VerifyOrExit(SSS_KEY_STORE_GET_PUBKEY(keypair, Uint8::to_uchar(mPublicKey) + 1, &keySize, &keyBitsLen) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(SSS_KEY_STORE_GET_PUBKEY(keypair, Uint8::to_uchar(mPublicKey) + 1, &keySize, &keyBitsLen) == kStatus_SSS_Success,
+                 CHIP_ERROR_INTERNAL);
 
     mInitialized = true;
 
 exit:
     if (mInitialized != true)
-        (void)SSS_KEY_OBJ_FREE(keypair);
+        (void) SSS_KEY_OBJ_FREE(keypair);
 
     return error;
 }
@@ -725,7 +735,7 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 
     Clear();
 
-    const uint8_t * privkey = input.ConstBytes() + mPublicKey.Length();
+    const uint8_t * privkey     = input.ConstBytes() + mPublicKey.Length();
     sss_sscp_object_t * keypair = to_keypair(&mKeypair);
 
     VerifyOrExit(input.Length() == mPublicKey.Length() + kP256_PrivateKey_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -737,13 +747,13 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 
     /* Allocate key handle */
     VerifyOrExit(sss_sscp_key_object_allocate_handle(keypair, 0x0u, kSSS_KeyPart_Private, kSSS_CipherType_EC_NIST_P,
-                                                      kP256_PrivateKey_Length, SSS_KEYPROP_OPERATION_ASYM) == kStatus_SSS_Success,
-                                                      CHIP_ERROR_INTERNAL);
+                                                     kP256_PrivateKey_Length, SSS_KEYPROP_OPERATION_ASYM) == kStatus_SSS_Success,
+                 CHIP_ERROR_INTERNAL);
 
-    if(SSS_KEY_STORE_SET_KEY(keypair, privkey, kP256_PrivateKey_Length, kP256_PrivateKey_Length * 8,
-                             kSSS_KeyPart_Private) != kStatus_SSS_Success)
+    if (SSS_KEY_STORE_SET_KEY(keypair, privkey, kP256_PrivateKey_Length, kP256_PrivateKey_Length * 8, kSSS_KeyPart_Private) !=
+        kStatus_SSS_Success)
     {
-        (void)SSS_KEY_OBJ_FREE(keypair);
+        (void) SSS_KEY_OBJ_FREE(keypair);
         error = CHIP_ERROR_INTERNAL;
     }
     else
@@ -759,7 +769,7 @@ void P256Keypair::Clear()
     if (mInitialized)
     {
         sss_sscp_object_t * keypair = to_keypair(&mKeypair);
-        (void)SSS_KEY_OBJ_FREE(keypair);
+        (void) SSS_KEY_OBJ_FREE(keypair);
         mInitialized = false;
     }
 }
@@ -984,7 +994,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_le
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void * R)
 {
-	VerifyOrReturnError(ECP256_PointValid((ecp256Point_t *) R), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(ECP256_PointValid((ecp256Point_t *) R), CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
 }

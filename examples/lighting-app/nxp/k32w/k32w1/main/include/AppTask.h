@@ -28,8 +28,8 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #include "FreeRTOS.h"
-#include "timers.h"
 #include "fsl_component_button.h"
+#include "timers.h"
 
 // Application-defined error codes in the CHIP_ERROR space.
 #define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
@@ -70,7 +70,7 @@ private:
     void DispatchEvent(AppEvent * event);
 
     static void FunctionTimerEventHandler(AppEvent * aEvent);
-    static button_status_t KBD_Callback(void *buttonHandle, button_callback_message_t *message,void *callbackParam);
+    static button_status_t KBD_Callback(void * buttonHandle, button_callback_message_t * message, void * callbackParam);
     static void OTAHandler(AppEvent * aEvent);
     static void BleHandler(AppEvent * aEvent);
     static void BleStartAdvertising(intptr_t arg);
@@ -98,7 +98,7 @@ private:
 
     enum Function_t
     {
-        kFunction_NoneSelected   = 0,
+        kFunction_NoneSelected = 0,
         kFunction_FactoryReset,
         kFunctionTurnOnTurnOff,
         kFunction_Identify,

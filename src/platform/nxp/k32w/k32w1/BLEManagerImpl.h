@@ -21,14 +21,14 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include "RNG_Interface.h"
-#include "fwk_os_abs.h"
 #include "fwk_messaging.h"
+#include "fwk_os_abs.h"
 #include "fwk_platform_ble.h"
 #include "hci_transport.h"
 
 #include "ble_init.h"
-#include "controller_interface.h"
 #include "controller_api.h"
+#include "controller_interface.h"
 
 #include <src/platform/nxp/k32w/common/BLEManagerCommon.h>
 
@@ -50,7 +50,7 @@ public:
     friend BLEManager;
 
     CHIP_ERROR InitHostController(ble_generic_cb_fp cb_fp) override;
-    BLEManagerCommon* GetImplInstance() override;
+    BLEManagerCommon * GetImplInstance() override;
 
 private:
     static BLEManagerImpl sInstance;

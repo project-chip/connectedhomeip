@@ -33,9 +33,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ThreadStackManager.h>
 
-#include "openthread/platform/logging.h"
 #include "FreeRtosHooks.h"
 #include "app_config.h"
+#include "openthread/platform/logging.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -44,11 +44,9 @@ using namespace ::chip::Logging;
 
 #include <AppTask.h>
 
-
 typedef void (*InitFunc)(void);
 extern InitFunc __init_array_start;
 extern InitFunc __init_array_end;
-
 
 extern "C" void main_task(void const * argument)
 {

@@ -16,7 +16,8 @@ CHARACTERISTIC_UUID128(chipoble_tx, uuid_chipoble_tx, (gGattCharPropIndicate_c |
 VALUE_UUID128_VARLEN(value_chipoble_tx, uuid_chipoble_tx, (gPermissionFlagReadable_c), gAttMaxMtu_c - 3, gAttMaxMtu_c - 3, 0x00)
 CCCD(cccd_chipoble_tx)
 CHARACTERISTIC_UUID128(chipoble_c3, uuid_chipoble_c3, (gGattCharPropRead_c))
-VALUE_UUID128_VARLEN(value_chipoble_c3, uuid_chipoble_c3, (gPermissionFlagReadable_c), gAttMaxReadDataSize_d(gAttMaxValueLength_c), gAttMaxReadDataSize_d(gAttMaxValueLength_c), 0x00)
+VALUE_UUID128_VARLEN(value_chipoble_c3, uuid_chipoble_c3, (gPermissionFlagReadable_c), gAttMaxReadDataSize_d(gAttMaxValueLength_c),
+                     gAttMaxReadDataSize_d(gAttMaxValueLength_c), 0x00)
 
 PRIMARY_SERVICE(service_device_info, gBleSig_DeviceInformationService_d)
 CHARACTERISTIC(char_model_no, gBleSig_ModelNumberString_d, (gGattCharPropRead_c))
