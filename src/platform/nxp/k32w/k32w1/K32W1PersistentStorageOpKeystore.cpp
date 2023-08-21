@@ -57,7 +57,7 @@ CHIP_ERROR P256KeypairSSS::Initialize(Crypto::ECPKeyTarget key_target)
     //The first byte of the public key is the uncompressed marker
     Uint8::to_uchar(mPublicKey)[0] = 0x04;
 
-    // Extract public key, write from the second byte 
+    // Extract public key, write from the second byte
     VerifyOrExit(SSS_KEY_STORE_GET_PUBKEY(&mKeyObj, Uint8::to_uchar(mPublicKey) + 1, &keySize, &keyBitsLen) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     mInitialized = true;
@@ -118,9 +118,9 @@ CHIP_ERROR P256KeypairSSS::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_
     memset(&digest[0], 0, sizeof(digest));
     ReturnErrorOnFailure(Hash_SHA256(msg, msg_length, &digest[0]));
 
-    VerifyOrExit((sss_sscp_asymmetric_context_init(&asyc, &g_sssSession, &mKeyObj, kAlgorithm_SSS_ECDSA_SHA256, kMode_SSS_Sign) == kStatus_SSS_Success), 
+    VerifyOrExit((sss_sscp_asymmetric_context_init(&asyc, &g_sssSession, &mKeyObj, kAlgorithm_SSS_ECDSA_SHA256, kMode_SSS_Sign) == kStatus_SSS_Success),
                    CHIP_ERROR_INTERNAL);
-    VerifyOrExit((sss_sscp_asymmetric_sign_digest(&asyc, digest, kP256_FE_Length, out_signature.Bytes(), &signatureSize) == kStatus_SSS_Success), 
+    VerifyOrExit((sss_sscp_asymmetric_sign_digest(&asyc, digest, kP256_FE_Length, out_signature.Bytes(), &signatureSize) == kStatus_SSS_Success),
                   CHIP_ERROR_INTERNAL);
     VerifyOrExit(out_signature.SetLength(kP256_ECDSA_Signature_Length_Raw) == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
@@ -286,20 +286,20 @@ CHIP_ERROR K32W1PersistentStorageOpKeystore::SignWithOpKeypair(FabricIndex fabri
     P256SerializedKeypairSSS keyBlob;
     uint16_t keyBlobLen = keyBlob.Capacity();
     keyBlob.SetLength(keyBlobLen);
-    
+
     if (fabricIndex != mCachedFabricIndex)
     {
         error =
             mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex).KeyName(), keyBlob.Bytes(), keyBlobLen);
         keyBlob.SetLength(keyBlobLen);
-        
+
         if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
         {
             error = CHIP_ERROR_INVALID_FABRIC_INDEX;
         }
         ReturnErrorOnFailure(error);
 
-        if (nullptr == mCachedKeypair) 
+        if (nullptr == mCachedKeypair)
         {
             mCachedKeypair = Platform::New<P256KeypairSSS>();
             VerifyOrReturnError(mCachedKeypair != nullptr, CHIP_ERROR_NO_MEMORY);

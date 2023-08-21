@@ -72,7 +72,7 @@ void ContactSensorManager::HandleAction(void* aGenericEvent)
     {
         sContactSensor.mState = State::kContactClosed;
     }
-    
+
     if (sContactSensor.mCallbackStateChanged != nullptr)
     {
         sContactSensor.mCallbackStateChanged(sContactSensor.mState);

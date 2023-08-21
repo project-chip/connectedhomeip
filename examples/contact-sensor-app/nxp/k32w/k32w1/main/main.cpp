@@ -68,7 +68,7 @@ extern "C" void main_task(void const * argument)
     {
         return;
     }
-    
+
     /* Used for HW initializations */
     otSysInit(0, NULL);
 
@@ -85,7 +85,7 @@ extern "C" void main_task(void const * argument)
 
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
-    
+
     err = PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {

@@ -58,7 +58,7 @@ public:
                                                              * manufacturing time. Retained during factory reset. */
     static constexpr uint8_t kFileId_ChipConfig = 0x02;     /**< Catyegory containing dynamic config values set at runtime.
                                                              *   Cleared during factory reset. */
-    static constexpr uint8_t kFileId_ChipCounter = 0x03;    /**< Category containing dynamic counter values set at runtime. 
+    static constexpr uint8_t kFileId_ChipCounter = 0x03;    /**< Category containing dynamic counter values set at runtime.
                                                              * Retained during factory reset. */
     static constexpr uint8_t kFileId_KVSKey = 0x04;         /**< Category containing KVS set at runtime.
                                                              *  Cleared during factory reset. */

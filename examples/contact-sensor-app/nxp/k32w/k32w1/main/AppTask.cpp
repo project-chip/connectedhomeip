@@ -212,7 +212,7 @@ void AppTask::InitServer(intptr_t arg)
     static chip::K32W1PersistentStorageOpKeystore sK32W1PersistentStorageOpKeystore;
     VerifyOrDie((sK32W1PersistentStorageOpKeystore.Init(initParams.persistentStorageDelegate)) == CHIP_NO_ERROR);
     initParams.operationalKeystore = &sK32W1PersistentStorageOpKeystore;
-#endif    
+#endif
 
     // Init ZCL Data Model and start server
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;

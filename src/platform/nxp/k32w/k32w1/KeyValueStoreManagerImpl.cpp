@@ -92,7 +92,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
         nvmInternalId = chip::DeviceLayer::Internal::K32WConfigKey(nvmIdKvsValue, keyId);
         ChipLogProgress(DeviceLayer, "KVS, get the value of Matter key [%s] with NVM id: %i", key, nvmInternalId);
         err =  chip::DeviceLayer::Internal::K32WConfig::ReadConfigValueBin(nvmInternalId, (uint8_t *) value, value_size, read_bytes);
-        
+
         //According to Get api read_bytes_size can be null
         if (read_bytes_size)
         {

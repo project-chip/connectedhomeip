@@ -516,9 +516,9 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
 
     sss_sscp_object_t * keypair = to_keypair(&mKeypair);
 
-    VerifyOrExit((sss_sscp_asymmetric_context_init(&asyc, &g_sssSession, keypair, kAlgorithm_SSS_ECDSA_SHA256, kMode_SSS_Sign) == kStatus_SSS_Success), 
+    VerifyOrExit((sss_sscp_asymmetric_context_init(&asyc, &g_sssSession, keypair, kAlgorithm_SSS_ECDSA_SHA256, kMode_SSS_Sign) == kStatus_SSS_Success),
                    CHIP_ERROR_INTERNAL);
-    VerifyOrExit((sss_sscp_asymmetric_sign_digest(&asyc, digest, kP256_FE_Length, out_signature.Bytes(), &signatureSize) == kStatus_SSS_Success), 
+    VerifyOrExit((sss_sscp_asymmetric_sign_digest(&asyc, digest, kP256_FE_Length, out_signature.Bytes(), &signatureSize) == kStatus_SSS_Success),
                   CHIP_ERROR_INTERNAL);
     VerifyOrExit(out_signature.SetLength(kP256_ECDSA_Signature_Length_Raw) == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
@@ -556,14 +556,14 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
     sss_sscp_object_t ecdsaPublic;
     sss_sscp_asymmetric_t asyc;
     bool bFreeAsyncCtx = false;
-    
+
     size_t keySize = SSS_ECP_KEY_SZ(kP256_PrivateKey_Length);
-    
+
     VerifyOrReturnError(sss_sscp_key_object_init(&ecdsaPublic, &g_keyStore) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     VerifyOrReturnError(sss_sscp_key_object_allocate_handle(&ecdsaPublic, 0u, kSSS_KeyPart_Public, kSSS_CipherType_EC_NIST_P, keySize,
                                                             SSS_KEYPROP_OPERATION_ASYM) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
-    
+
     //The first byte of the public key is the uncompressed marker
     VerifyOrExit(SSS_KEY_STORE_SET_KEY(&ecdsaPublic, Uint8::to_const_uchar(*this) + 1, Length() - 1, keySize * 8,
                                         (uint32_t)kSSS_KeyPart_Public) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
@@ -610,7 +610,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     /* Remote public key */
     VerifyOrReturnError(sss_sscp_key_object_init(&pEcdhPubKey, &g_keyStore) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(sss_sscp_key_object_allocate_handle(&pEcdhPubKey, 0u, kSSS_KeyPart_Public, kSSS_CipherType_EC_NIST_P,
-                                                             keySize, SSS_KEYPROP_OPERATION_KDF) == kStatus_SSS_Success, 
+                                                             keySize, SSS_KEYPROP_OPERATION_KDF) == kStatus_SSS_Success,
                                                              CHIP_ERROR_INTERNAL);
 
     //The first byte of the public key is the uncompressed marker
@@ -634,10 +634,10 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     VerifyOrExit(SSS_KEY_STORE_GET_PUBKEY(&sharedSecret, out_secret.Bytes(), &coordinateLen, &coordinateBitsLen) == kStatus_SSS_Success,
                                           CHIP_ERROR_INTERNAL);
     SuccessOrExit(out_secret.SetLength(secret_length));
-    
+
 exit:
     (void)SSS_KEY_OBJ_FREE(&pEcdhPubKey);
-    
+
     /* Need to be very careful, if we try to free something that is not initialized with success we will get a hw fault */
     if (bFreeSharedSecret)
         (void)SSS_KEY_OBJ_FREE(&sharedSecret);
@@ -772,7 +772,7 @@ P256Keypair::~P256Keypair()
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
-    
+
     MutableByteSpan csr(out_csr, csr_length);
     CHIP_ERROR err = GenerateCertificateSigningRequest(this, csr);
     csr_length     = (CHIP_NO_ERROR == err) ? csr.size() : 0;

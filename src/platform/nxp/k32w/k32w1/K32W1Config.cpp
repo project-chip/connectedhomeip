@@ -96,10 +96,10 @@ static rsError AddToRamStorage(ramBufferDescriptor * pBuffer, uint16_t aKey, con
             /* Need to realocate the memory buffer, increase size by 512B until nvm data fits */
             allocSize += 512;
         }
-        
+
         pBuffer->ramBufferLen = allocSize;
         allocSize += RAM_DESC_HEADER_SIZE;
-        
+
         pBuffer = (ramBufferDescriptor *) realloc((void *)pBuffer, allocSize);
         VerifyOrExit((NULL !=  pBuffer), err = RS_ERROR_NO_BUFS);
     }
@@ -233,11 +233,11 @@ CHIP_ERROR K32WConfig::WriteConfigValue(Key key, bool val)
 {
     CHIP_ERROR err;
     rsError status;
-    
+
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     status = AddToRamStorage(ramDescr, key, (uint8_t *) &val, sizeof(bool));
     SuccessOrExit(err = MapRamStorageStatus(status));
-    
+
 #if CHIP_PLAT_NVM_SUPPORT
     NvSaveOnIdle(ramDescr, false);
 #endif
@@ -251,11 +251,11 @@ CHIP_ERROR K32WConfig::WriteConfigValueSync(Key key, bool val)
 {
     CHIP_ERROR err;
     rsError status;
-    
+
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     status = AddToRamStorage(ramDescr, key, (uint8_t *) &val, sizeof(bool));
     SuccessOrExit(err = MapRamStorageStatus(status));
-    
+
 #if CHIP_PLAT_NVM_SUPPORT
     NvSyncSave(ramDescr, false);
 #endif
@@ -269,11 +269,11 @@ CHIP_ERROR K32WConfig::WriteConfigValue(Key key, uint32_t val)
 {
     CHIP_ERROR err;
     rsError status;
-    
+
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     status = AddToRamStorage(ramDescr, key, (uint8_t *)&val, sizeof(uint32_t));
     SuccessOrExit(err = MapRamStorageStatus(status));
-    
+
 #if CHIP_PLAT_NVM_SUPPORT
     NvSaveOnIdle(ramDescr, false);
 #endif
@@ -287,11 +287,11 @@ CHIP_ERROR K32WConfig::WriteConfigValue(Key key, uint64_t val)
 {
     CHIP_ERROR err;
     rsError status;
-    
+
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     status = AddToRamStorage(ramDescr, key, (uint8_t *)&val, sizeof(uint64_t));
     SuccessOrExit(err = MapRamStorageStatus(status));
-    
+
 #if CHIP_PLAT_NVM_SUPPORT
     NvSaveOnIdle(ramDescr, false);
 #endif
@@ -351,7 +351,7 @@ CHIP_ERROR K32WConfig::ClearConfigValue(Key key)
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     status = ramStorageDelete(ramDescr, key, 0);
     SuccessOrExit(err = MapRamStorageStatus(status));
-    
+
 #if CHIP_PLAT_NVM_SUPPORT
     NvSaveOnIdle(ramDescr, false);
 #endif
