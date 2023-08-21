@@ -15,9 +15,9 @@
 #    limitations under the License.
 #
 
+import chip.clusters as Clusters
 from drlk_2_x_common import DRLK_COMMON
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
-import chip.clusters as Clusters
 
 # Configurable parameters:
 # - CredentialIndex: CredentialIndex to use when creating a Credential on the DUT for testing purposes
