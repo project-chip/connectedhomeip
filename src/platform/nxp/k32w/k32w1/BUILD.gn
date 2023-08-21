@@ -31,10 +31,10 @@ if (chip_crypto == "platform") {
 static_library("k32w1") {
   sources = [
     "../../../SingletonConfigurationManager.cpp",
-    "BLEManagerImpl.cpp",
-    "BLEManagerImpl.h",
     "../common/BLEManagerCommon.cpp",
     "../common/BLEManagerCommon.h",
+    "BLEManagerImpl.cpp",
+    "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "ConfigurationManagerImpl.cpp",
@@ -47,8 +47,6 @@ static_library("k32w1") {
     "DiagnosticDataProviderImpl.h",
     "K32W1Config.cpp",
     "K32W1Config.h",
-    "ram_storage.c",
-    "ram_storage.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
@@ -56,18 +54,17 @@ static_library("k32w1") {
     "PlatformManagerImpl.h",
     "SystemTimeSupport.cpp",
     "ble_function_mux.c",
+    "ram_storage.c",
+    "ram_storage.h",
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   if (chip_with_low_power != 0) {
-    sources += [ 
-      "LowPowerHooks.cpp", 
-    ]
+    sources += [ "LowPowerHooks.cpp" ]
   }
-  
-  if (chip_enable_ota_requestor) {
 
+  if (chip_enable_ota_requestor) {
     sources += [
       "../common/OTAImageProcessorImpl.cpp",
       "../common/OTAImageProcessorImpl.h",
@@ -78,17 +75,15 @@ static_library("k32w1") {
       "OTAHooks.cpp",
     ]
   }
-  
+
   if (chip_crypto == "platform") {
     sources += [
+      "CHIPCryptoPalK32W1.cpp",
       "K32W1PersistentStorageOpKeystore.cpp",
       "K32W1PersistentStorageOpKeystore.h",
-      "CHIPCryptoPalK32W1.cpp",
     ]
 
-    public_deps += [
-      "${mbedtls_root}:mbedtls",
-    ]
+    public_deps += [ "${mbedtls_root}:mbedtls" ]
   }
 
   deps = []
