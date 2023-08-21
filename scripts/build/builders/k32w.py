@@ -17,6 +17,7 @@ from enum import Enum, auto
 
 from .gn import GnBuilder
 
+
 class K32WBoard(Enum):
     K32W0 = auto()
     K32W1 = auto()
@@ -44,6 +45,7 @@ class K32WBoard(Enum):
             return ["", ".map", ".srec"]
         else:
             raise Exception('Unknown app type: %r' % self)
+
 
 class K32WApp(Enum):
     LIGHT = auto()
