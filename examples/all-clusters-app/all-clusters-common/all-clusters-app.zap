@@ -33,7 +33,7 @@
   ],
   "endpointTypes": [
     {
-      "id": 24,
+      "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
         "id": 3,
@@ -8653,7 +8653,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -9479,7 +9479,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -10512,7 +10512,7 @@
       ]
     },
     {
-      "id": 21,
+      "id": 2,
       "name": "MA-onofflight",
       "deviceTypeRef": {
         "id": 8,
@@ -21612,7 +21612,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -22486,7 +22486,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -30401,7 +30401,7 @@
       ]
     },
     {
-      "id": 23,
+      "id": 3,
       "name": "MA-onofflight",
       "deviceTypeRef": {
         "id": 8,
@@ -33616,7 +33616,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -34442,7 +34442,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -34685,7 +34685,7 @@
       ]
     },
     {
-      "id": 22,
+      "id": 4,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 53,

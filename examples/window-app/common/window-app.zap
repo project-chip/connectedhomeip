@@ -33,7 +33,7 @@
   ],
   "endpointTypes": [
     {
-      "id": 3,
+      "id": 2,
       "name": "MA-windowcovering",
       "deviceTypeRef": {
         "id": 3,
@@ -6989,7 +6989,7 @@
       ]
     },
     {
-      "id": 4,
+      "id": 1,
       "name": "MA-windowcovering",
       "deviceTypeRef": {
         "id": 31,
@@ -8551,7 +8551,7 @@
       ]
     },
     {
-      "id": 5,
+      "id": 3,
       "name": "MA-windowcovering",
       "deviceTypeRef": {
         "id": 31,
