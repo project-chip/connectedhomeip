@@ -87,6 +87,7 @@ class Arguments(BaseArguments):
     def __init__(self):
         super().__init__()
         self.version = Arguments.VERSION
+        self.option = None
         self.conn = None
         self.generate = None
         self.stop = None
@@ -112,6 +113,7 @@ class Arguments(BaseArguments):
 
     def configure(self, parser):
         super().configure(parser)
+        parser.add_argument('-o', '--option', type=str, help='[string] Generic options.')
         parser.add_argument('-j', '--jlink', type=str, help='[string] J-Link connection.')
         parser.add_argument('-g', '--generate', action='store_true', help='[boolean] Generate certificates.', default=None)
         parser.add_argument('-s', '--stop', action='store_true', help='[string] Generate JSON file and stop', default=None)
@@ -151,10 +153,10 @@ class Arguments(BaseArguments):
         parser.add_argument('-ss', '--spake2p_salt', type=str, help='[string] Provide SPAKE2+ salt')
         parser.add_argument('-si', '--spake2p_iterations', type=parseInt, help='[int] SPAKE2+ iteration count')
 
-
     def decode(self, d, args):
         c = Config()
 
+        c.option = decode(d, 'patch', args.option)
         c.jlink = decode(d, 'jlink', args.jlink)
         c.generate = decode(d, 'generate', args.generate)
         c.stop = decode(d, 'stop', args.stop)
@@ -201,6 +203,7 @@ class Arguments(BaseArguments):
 
     def encode(self):
         d = {}
+        encode(d, 'option', self.option)
         encode(d, 'jlink', self.conn.encode())
         encode(d, 'generate', self.generate)
         encode(d, 'stop', self.stop)
@@ -246,6 +249,8 @@ class Arguments(BaseArguments):
 
 
     def process(self, args):
+
+        self.option = args.option
 
         # Connection
         self.conn = ConnectionArguments()

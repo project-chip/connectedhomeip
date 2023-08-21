@@ -7,8 +7,11 @@ import pylink
 class Connection:
     DEFAULT_PORT = 19020
 
-    def __init__(self, part_number):
-        self.link = pylink.JLink()
+    def __init__(self, args, part_number):
+        if 'libjlinkarm' == args.option:
+            self.link=pylink.JLink(lib=pylink.library.Library(dllpath='/usr/local/bin/libjlinkarm.so'))
+        else:
+            self.link = pylink.JLink()
         self.part_number = part_number
 
     def open(self, conn):

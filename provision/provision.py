@@ -272,7 +272,7 @@ def main(argv):
 
     print("\n◆ Loading Generator Firmware")
     cmmd.flash(args.gen_fw or paths.gen_fw)
-    conn = Connection(info.part)
+    conn = Connection(args, info.part)
     conn.open(args.conn)
 
     # Initialize device
