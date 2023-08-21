@@ -249,3 +249,8 @@ void emberAfChannelClusterInitCallback(EndpointId endpoint)
                                                static_cast<app::Clusters::Channel::Delegate *>(&(ChefChannelManager::Instance())));
 }
 #endif // EMBER_AF_PLUGIN_CHANNEL_SERVER
+
+bool emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId)
+{
+    return true;
+}
