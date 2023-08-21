@@ -43,9 +43,20 @@ import java.util.Base64
  * @param json string representing Json encoded data to be converted into TLV format
  * @throws IllegalArgumentException if the data was invalid
  */
-fun TlvWriter.fromJsonString(json: String): ByteArray {
-  validateIsJsonObjectAndConvert(JsonParser.parseString(json), AnonymousTag)
-  return validateTlv().getEncoded()
+fun TlvWriter.fromJsonStringToByteArray(json: String): ByteArray {
+  return putJsonString(AnonymousTag, json).validateTlv().getEncoded()
+}
+
+/**
+ * Converts Json string into TLV writer object.
+ *
+ * @param tag the TLV tag to be encoded.
+ * @param json String representing Json to be converted to TLV.
+ * @throws IllegalArgumentException if the data was invalid
+ */
+fun TlvWriter.putJsonString(tag: Tag, json: String): TlvWriter {
+  validateIsJsonObjectAndConvert(JsonParser.parseString(json), tag)
+  return this
 }
 
 /**

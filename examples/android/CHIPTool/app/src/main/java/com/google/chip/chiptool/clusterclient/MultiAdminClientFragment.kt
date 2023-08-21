@@ -16,7 +16,9 @@ import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.InvokeElement
 import chip.devicecontroller.model.NodeState
+import chip.jsontlv.toAny
 import chip.tlv.AnonymousTag
+import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
@@ -209,13 +211,13 @@ class MultiAdminClientFragment : Fragment() {
     deviceController.readAttributePath(
       object : ReportCallback {
         override fun onReport(nodeState: NodeState?) {
-          val value =
+          val tlv =
             nodeState
               ?.getEndpointState(endpointId)
               ?.getClusterState(clusterId)
               ?.getAttributeState(attributeId)
-              ?.value
-              ?: "null"
+              ?.tlv
+          val value = tlv?.let { TlvReader(it).toAny() }
           Log.i(TAG, "read $attributeName: $value")
           showMessage("read $attributeName: $value")
         }

@@ -55,6 +55,37 @@ fun TlvReader.toJsonString(): String {
   }
   return getStructJson().toString()
 }
+
+/**
+ * Encodes TLV into kotlin Object. If the TLV reader is positioned TLV Structure, Object will return
+ * to json format.
+ */
+fun TlvReader.toAny(tag: Tag = AnonymousTag): Any? {
+  val element = peekElement()
+  val value = element.value
+  value.toAny()?.let {
+    skipElement()
+    return it
+  }
+  return when (value) {
+    is ArrayValue -> {
+      buildList {
+        enterArray(tag)
+        while (!isEndOfContainer()) {
+          add(toAny())
+        }
+        exitContainer()
+      }
+    }
+    is StructureValue -> {
+      skipElement()
+      getStructJson().toString()
+    }
+    else -> {
+      null
+    }
+  }
+}
 /**
  * Encodes TLV Structure into Json Object. The TLV reader should be positioned at the start of a TLV
  * Structure (StructureValue element). After this call the TLV reader is positioned at the end of

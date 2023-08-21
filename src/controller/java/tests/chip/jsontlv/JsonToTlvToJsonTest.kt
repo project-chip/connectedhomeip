@@ -37,11 +37,11 @@ class JsonToTlvToJsonTest {
     tlvEncoding: ByteArray,
     jsonExpected: String = jsonOriginal
   ) {
-    assertThat(TlvWriter().fromJsonString(jsonOriginal)).isEqualTo(tlvEncoding)
+    assertThat(TlvWriter().fromJsonStringToByteArray(jsonOriginal)).isEqualTo(tlvEncoding)
     assertThat(TlvReader(tlvEncoding).toJsonString())
       .isEqualTo(JsonParser.parseString(jsonExpected).asJsonObject.toString())
     if (jsonOriginal != jsonExpected) {
-      assertThat(TlvWriter().fromJsonString(jsonExpected)).isEqualTo(tlvEncoding)
+      assertThat(TlvWriter().fromJsonStringToByteArray(jsonExpected)).isEqualTo(tlvEncoding)
     }
   }
 
@@ -865,7 +865,7 @@ class JsonToTlvToJsonTest {
     // Throws exception because subtype encoded in the Json key (Boolean) doesn't match the
     // String
     // type of the elements in the array
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
   }
 
   @Test
@@ -884,7 +884,7 @@ class JsonToTlvToJsonTest {
     // Throws exception because subtype encoded in the Json key (Boolean) doesn't match the
     // String
     // type of the elements in the array
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
   }
 
   @Test
@@ -905,7 +905,7 @@ class JsonToTlvToJsonTest {
     // Throws exception because subtype encoded in the Json key (Float) doesn't match the
     // Structure
     // type of the elements in the array
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
   }
 
   @Test
@@ -921,7 +921,7 @@ class JsonToTlvToJsonTest {
 
     // Throws exception because subtype encoded in the Json key (UInt) doesn't match the Null
     // type of the elements in the array
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
   }
 
   @Test
@@ -937,7 +937,7 @@ class JsonToTlvToJsonTest {
       """
 
     // Throws exception because string is invalid base64 encoded value
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
   }
 
   @Test
@@ -972,7 +972,7 @@ class JsonToTlvToJsonTest {
       """
 
     // Throws exception because element within structure cannot have anonymous tag
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
   }
 
   @Test
@@ -985,7 +985,7 @@ class JsonToTlvToJsonTest {
       """
 
     // Throws exception because Json key must have valid tag field
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
   }
 
   @Test
@@ -1074,7 +1074,7 @@ class JsonToTlvToJsonTest {
       """
 
     // 4294967296 exceeds valid context specific or common profile tag value of 32-bits
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
   }
 
   @Test
@@ -1632,5 +1632,185 @@ class JsonToTlvToJsonTest {
       """
 
     checkValidConversion(json, encoding)
+  }
+
+  @Test
+  fun convertJsonString() {
+    val encoding =
+      TlvWriter()
+        .startStructure(AnonymousTag)
+        .put(ContextSpecificTag(0), 42)
+        .put(ContextSpecificTag(1), "Test array member 0".toByteArray())
+        .put(ContextSpecificTag(2), 156.398)
+        .put(ContextSpecificTag(3), 73709551615U)
+        .put(ContextSpecificTag(4), true)
+        .putNull(ContextSpecificTag(5))
+        .startStructure(ContextSpecificTag(6))
+        .put(ContextSpecificTag(1), "John")
+        .put(ContextSpecificTag(2), 34U)
+        .put(ContextSpecificTag(3), true)
+        .startArray(ContextSpecificTag(4))
+        .put(AnonymousTag, 5)
+        .put(AnonymousTag, 9)
+        .put(AnonymousTag, 10)
+        .endArray()
+        .startArray(ContextSpecificTag(5))
+        .put(AnonymousTag, "Ammy")
+        .put(AnonymousTag, "David")
+        .put(AnonymousTag, "Larry")
+        .endArray()
+        .startArray(ContextSpecificTag(6))
+        .put(AnonymousTag, true)
+        .put(AnonymousTag, false)
+        .put(AnonymousTag, true)
+        .endArray()
+        .endStructure()
+        .put(ContextSpecificTag(7), 0.0f)
+        .endStructure()
+        .validateTlv()
+        .getEncoded()
+
+    val compareJson =
+      """
+      {
+        "0:INT": 42,
+        "1:BYTES": "VGVzdCBhcnJheSBtZW1iZXIgMA==",
+        "2:DOUBLE": 156.398,
+        "3:UINT": "73709551615",
+        "4:BOOL": true,
+        "5:NULL": null,
+        "6:STRUCT": {
+          "1:STRING": "John",
+          "2:UINT": 34,
+          "3:BOOL": true,
+          "4:ARRAY-INT": [
+            5,
+            9,
+            10
+          ],
+          "5:ARRAY-STRING": [
+            "Ammy",
+            "David",
+            "Larry"
+          ],
+          "6:ARRAY-BOOL": [
+            true,
+            false,
+            true
+          ]
+        },
+        "7:FLOAT": 0.0
+      }
+      """
+    val tlvWriterJson = TlvWriter().putJsonString(AnonymousTag, compareJson)
+
+    assertThat(encoding).isEqualTo(tlvWriterJson.getEncoded())
+  }
+
+  @Test
+  fun convertNullToTlv() {
+    val value: Any? = null
+    val tlv = "14".octetsToByteArray()
+
+    val tlvReader = TlvReader(tlv)
+    val compareValue = tlvReader.toAny()
+
+    assertThat(value).isEqualTo(compareValue)
+  }
+
+  @Test
+  fun convertIntToTlv() {
+    val value = 33L
+    val tlv = "0021".octetsToByteArray()
+
+    val tlvReader = TlvReader(tlv)
+    val compareValue = tlvReader.toAny()
+
+    assertThat(value).isEqualTo(compareValue)
+  }
+
+  @Test
+  fun convertUIntToTlv() {
+    val value: ULong = 475UL
+    val tlv = "05db01".octetsToByteArray()
+
+    val tlvReader = TlvReader(tlv)
+    val compareValue = tlvReader.toAny()
+
+    assert(compareValue is ULong)
+    assert(value == compareValue)
+  }
+
+  @Test
+  fun convertBooleanToTlv() {
+    val value = false
+    val tlv = "08".octetsToByteArray()
+
+    val tlvReader = TlvReader(tlv)
+    val compareValue = tlvReader.toAny()
+
+    assertThat(value).isEqualTo(compareValue)
+  }
+
+  @Test
+  fun convertFloatToTlv() {
+    val value = 1.4f
+    val tlv = "0a3333b33f".octetsToByteArray()
+
+    val tlvReader = TlvReader(tlv)
+    val compareValue = tlvReader.toAny()
+
+    assertThat(value).isEqualTo(compareValue)
+  }
+
+  @Test
+  fun convertDoubleToTlv() {
+    val value = 3.543
+    val tlv = "0bf2d24d6210580c40".octetsToByteArray()
+
+    val tlvReader = TlvReader(tlv)
+    val compareValue = tlvReader.toAny()
+
+    assertThat(value).isEqualTo(compareValue)
+  }
+
+  @Test
+  fun convertByteArrayToTlv() {
+    val value = "0123456789aabbccddeeff".octetsToByteArray()
+    val tlv = "100b0123456789aabbccddeeff".octetsToByteArray()
+
+    val tlvReader = TlvReader(tlv)
+    val compareValue = tlvReader.toAny()
+
+    assertThat(value).isEqualTo(compareValue)
+  }
+
+  @Test
+  fun convertStringToTlv() {
+    val value = "@Hello! Matter!!! I like Matter."
+    val tlv =
+      "0c204048656c6c6f21204d61747465722121212049206c696b65204d61747465722e".octetsToByteArray()
+
+    val tlvReader = TlvReader(tlv)
+    val compareValue = tlvReader.toAny()
+
+    assertThat(value).isEqualTo(compareValue)
+  }
+
+  @Test
+  fun convertListToTlv() {
+    // Int
+    val test = listOf(1L, 3L, 5L, 7L, 9L, 2L, 4L, 6L, 8L, 10L)
+    val tlvWriter =
+      TlvWriter().apply {
+        startArray(AnonymousTag)
+        test.forEach { put(AnonymousTag, it) }
+        endArray()
+      }
+    val tlv = tlvWriter.getEncoded()
+    val tlvReaderObject = TlvReader(tlv).toAny()
+
+    assert(tlvReaderObject is List<*>)
+    assertThat(tlvReaderObject).isEqualTo(test)
   }
 }
