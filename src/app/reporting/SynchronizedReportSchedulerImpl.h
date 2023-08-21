@@ -38,7 +38,7 @@ public:
     SynchronizedReportSchedulerImpl(TimerDelegate * aTimerDelegate) : ReportSchedulerImpl(aTimerDelegate) {}
     ~SynchronizedReportSchedulerImpl() override { UnregisterAllHandlers(); }
 
-    void OnActiveModeAlmostDone() override;
+    void OnTransitionToIdle() override;
 
     bool IsReportScheduled();
 

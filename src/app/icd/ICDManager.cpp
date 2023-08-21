@@ -67,7 +67,7 @@ void ICDManager::Shutdown()
     // cancel any running timer of the icd
     DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
     DeviceLayer::SystemLayer().CancelTimer(OnActiveModeDone, this);
-    DeviceLayer::SystemLayer().CancelTimer(OnActiveModeAlmostDone, this);
+    DeviceLayer::SystemLayer().CancelTimer(OnTransitionToIdle, this);
     mICDMode          = ICDMode::SIT;
     mOperationalState = OperationalState::IdleMode;
     mStorage          = nullptr;
@@ -158,8 +158,9 @@ void ICDManager::UpdateOperationState(OperationalState state)
             mOperationalState           = OperationalState::ActiveMode;
             uint32_t activeModeInterval = IcdManagementServer::GetInstance().GetActiveModeInterval();
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeInterval), OnActiveModeDone, this);
-            DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeInterval - ICD_ACTIVE_TIME_JITTER_MS),
-                                                  OnActiveModeAlmostDone, this);
+            uint32_t activeModeJitterInterval =
+                (activeModeInterval >= ICD_ACTIVE_TIME_JITTER_MS) ? activeModeInterval - ICD_ACTIVE_TIME_JITTER_MS : 0;
+            DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeJitterInterval), OnTransitionToIdle, this);
 
             CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(GetFastPollingInterval());
             if (err != CHIP_NO_ERROR)
@@ -173,8 +174,14 @@ void ICDManager::UpdateOperationState(OperationalState state)
         {
             uint16_t activeModeThreshold = IcdManagementServer::GetInstance().GetActiveModeThreshold();
             DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Timeout(activeModeThreshold), OnActiveModeDone, this);
-            DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Timeout(activeModeThreshold - ICD_ACTIVE_TIME_JITTER_MS),
-                                                     OnActiveModeAlmostDone, this);
+            uint16_t activeModeJitterThreshold =
+                (activeModeThreshold >= ICD_ACTIVE_TIME_JITTER_MS) ? activeModeThreshold - ICD_ACTIVE_TIME_JITTER_MS : 0;
+            if (!mTransitionToIdleCalled)
+            {
+                mTransitionToIdleCalled = true;
+                DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Timeout(activeModeJitterThreshold), OnTransitionToIdle,
+                                                         this);
+            }
         }
     }
 }
@@ -200,6 +207,10 @@ void ICDManager::OnIdleModeDone(System::Layer * aLayer, void * appState)
 {
     ICDManager * pIcdManager = reinterpret_cast<ICDManager *>(appState);
     pIcdManager->UpdateOperationState(OperationalState::ActiveMode);
+
+    // We only reset this flag when idle mode is complete to avoid re-triggering the check when an event brings us back to active,
+    // which could cause a loop.
+    pIcdManager->mTransitionToIdleCalled = false;
 }
 
 void ICDManager::OnActiveModeDone(System::Layer * aLayer, void * appState)
@@ -213,13 +224,13 @@ void ICDManager::OnActiveModeDone(System::Layer * aLayer, void * appState)
     }
 }
 
-void ICDManager::OnActiveModeAlmostDone(System::Layer * aLayer, void * appState)
+void ICDManager::OnTransitionToIdle(System::Layer * aLayer, void * appState)
 {
     ICDManager * pIcdManager = reinterpret_cast<ICDManager *>(appState);
 
-    // OnActiveModeAlmostDone will trigger a report message if reporting is needed, which should extend the active mode until the
+    // OnTransitionToIdle will trigger a report message if reporting is needed, which should extend the active mode until the
     // ack for the report is received.
-    pIcdManager->mStateObserver->OnActiveModeAlmostDone();
+    pIcdManager->mStateObserver->OnTransitionToIdle();
 }
 
 } // namespace app

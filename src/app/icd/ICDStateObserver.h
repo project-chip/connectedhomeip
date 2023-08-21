@@ -31,8 +31,8 @@ class ICDStateObserver
 {
 public:
     virtual ~ICDStateObserver() {}
-    virtual void OnEnterActiveMode()      = 0;
-    virtual void OnActiveModeAlmostDone() = 0;
+    virtual void OnEnterActiveMode()  = 0;
+    virtual void OnTransitionToIdle() = 0;
 };
 
 } // namespace app

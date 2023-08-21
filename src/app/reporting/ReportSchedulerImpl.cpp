@@ -37,7 +37,7 @@ ReportSchedulerImpl::ReportSchedulerImpl(TimerDelegate * aTimerDelegate) : Repor
     VerifyOrDie(nullptr != mTimerDelegate);
 }
 
-void ReportSchedulerImpl::OnActiveModeAlmostDone() {}
+void ReportSchedulerImpl::OnTransitionToIdle() {}
 
 /// @brief Method that triggers a report emission on each ReadHandler that is not blocked on its min interval.
 ///        Each read handler that is not blocked is immediately marked dirty so that it will report as soon as possible.
