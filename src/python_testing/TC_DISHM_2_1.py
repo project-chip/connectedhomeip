@@ -56,7 +56,7 @@ class TC_DISHM_2_1(MatterBaseTest):
         asserts.assert_true(self.check_pics("DISHM.S.A0001"), "DISHM.S.A0001 must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.C00.Rsp"), "DISHM.S.C00.Rsp must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.C01.Tx"), "DISHM.S.C01.Tx must be supported")
-        
+
         attributes = Clusters.DishwasherMode.Attributes
 
         self.print_step(1, "Commissioning, already done")

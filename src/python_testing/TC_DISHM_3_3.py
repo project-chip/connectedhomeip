@@ -61,7 +61,7 @@ class TC_DISHM_3_3(MatterBaseTest):
         if not self.check_pics("DISHM.S.A0002") and self.check_pics("DISHM.S.A0003"):
             logging.info("Test skipped because PICS DISHM.S.A0002 (StartupMode) and/or DISHM.S.A0003 (OnMode) is not set")
             return
-    
+
         attributes = Clusters.DishwasherMode.Attributes
 
         from enum import Enum
