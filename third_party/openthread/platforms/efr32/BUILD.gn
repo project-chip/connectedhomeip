@@ -32,6 +32,7 @@ config("openthread_efr32_config") {
     "${chip_root}/examples/platform/efr32",
     "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}",
     "${sl_ot_efr32_root}",
+    "${sl_ot_platform_abstraction}/include",
   ]
 
   # temporarily disable check until gsdk pulls in a more recent version of openthread
