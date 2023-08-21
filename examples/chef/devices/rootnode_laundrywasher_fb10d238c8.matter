@@ -178,25 +178,6 @@ server cluster Descriptor = 29 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
-server cluster Binding = 30 {
-  fabric_scoped struct TargetStruct {
-    optional node_id node = 1;
-    optional group_id group = 2;
-    optional endpoint_no endpoint = 3;
-    optional cluster_id cluster = 4;
-    fabric_idx fabricIndex = 254;
-  }
-
-  attribute TargetStruct binding[] = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** The Access Control Cluster exposes a data model view of a
       Node's Access Control List (ACL), which codifies the rules used to manage
       and enforce Access Control for the Node's endpoints and their associated
@@ -1084,7 +1065,6 @@ server cluster OperationalState = 96 {
 
   readonly attribute nullable CHAR_STRING phaseList[] = 0;
   readonly attribute nullable int8u currentPhase = 1;
-  readonly attribute nullable elapsed_s countdownTime = 2;
   readonly attribute OperationalStateStruct operationalStateList[] = 3;
   readonly attribute OperationalStateEnum operationalState = 4;
   readonly attribute ErrorStateStruct operationalError = 5;
@@ -1102,7 +1082,6 @@ server cluster OperationalState = 96 {
   command Pause(): OperationalCommandResponse = 0;
   command Stop(): OperationalCommandResponse = 1;
   command Start(): OperationalCommandResponse = 2;
-  command Resume(): OperationalCommandResponse = 3;
 }
 
 endpoint 0 {
@@ -1314,24 +1293,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_dishwasher = 117, version 1;
+  device type ma_laundry_washer = 115, version 1;
 
-
-  server cluster Identify {
-    ram      attribute identifyTime default = 0x0000;
-    ram      attribute identifyType default = 0x0;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-  }
-
-  server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-  }
 
   server cluster Descriptor {
     callback attribute deviceTypeList;
@@ -1345,21 +1308,11 @@ endpoint 1 {
     callback attribute clusterRevision default = 1;
   }
 
-  server cluster Binding {
-    callback attribute binding;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
   server cluster OperationalState {
     emits event OperationalError;
     emits event OperationCompletion;
     callback attribute phaseList;
     callback attribute currentPhase;
-    callback attribute countdownTime;
     callback attribute operationalStateList default = 0;
     callback attribute operationalState default = 0;
     callback attribute operationalError default = 0;

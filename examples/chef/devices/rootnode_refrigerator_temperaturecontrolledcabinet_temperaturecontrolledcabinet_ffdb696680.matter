@@ -178,25 +178,6 @@ server cluster Descriptor = 29 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
-server cluster Binding = 30 {
-  fabric_scoped struct TargetStruct {
-    optional node_id node = 1;
-    optional group_id group = 2;
-    optional endpoint_no endpoint = 3;
-    optional cluster_id cluster = 4;
-    fabric_idx fabricIndex = 254;
-  }
-
-  attribute TargetStruct binding[] = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** The Access Control Cluster exposes a data model view of a
       Node's Access Control List (ACL), which codifies the rules used to manage
       and enforce Access Control for the Node's endpoints and their associated
@@ -1045,49 +1026,16 @@ server cluster GroupKeyManagement = 63 {
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 
-/** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
-server cluster OperationalState = 96 {
-  enum ErrorStateEnum : ENUM8 {
-    kNoError = 0;
-    kUnableToStartOrResume = 1;
-    kUnableToCompleteOperation = 2;
-    kCommandInvalidInState = 3;
+/** Attributes and commands for configuring the temperature control, and reporting temperature. */
+server cluster TemperatureControl = 86 {
+  bitmap Feature : BITMAP32 {
+    kTemperatureNumber = 0x1;
+    kTemperatureLevel = 0x2;
+    kTemperatureStep = 0x4;
   }
 
-  enum OperationalStateEnum : ENUM8 {
-    kStopped = 0;
-    kRunning = 1;
-    kPaused = 2;
-    kError = 3;
-  }
-
-  struct ErrorStateStruct {
-    enum8 errorStateID = 0;
-    optional char_string<64> errorStateLabel = 1;
-    optional char_string<64> errorStateDetails = 2;
-  }
-
-  struct OperationalStateStruct {
-    enum8 operationalStateID = 0;
-    optional char_string<64> operationalStateLabel = 1;
-  }
-
-  critical event OperationalError = 0 {
-    ErrorStateStruct errorState = 0;
-  }
-
-  info event OperationCompletion = 1 {
-    ENUM8 completionErrorCode = 0;
-    optional nullable elapsed_s totalOperationalTime = 1;
-    optional nullable elapsed_s pausedTime = 2;
-  }
-
-  readonly attribute nullable CHAR_STRING phaseList[] = 0;
-  readonly attribute nullable int8u currentPhase = 1;
-  readonly attribute nullable elapsed_s countdownTime = 2;
-  readonly attribute OperationalStateStruct operationalStateList[] = 3;
-  readonly attribute OperationalStateEnum operationalState = 4;
-  readonly attribute ErrorStateStruct operationalError = 5;
+  readonly attribute int8u selectedTemperatureLevel = 4;
+  readonly attribute char_string supportedTemperatureLevels[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1095,14 +1043,12 @@ server cluster OperationalState = 96 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  response struct OperationalCommandResponse = 4 {
-    ErrorStateStruct commandResponseState = 0;
+  request struct SetTemperatureRequest {
+    optional temperature targetTemperature = 0;
+    optional INT8U targetTemperatureLevel = 1;
   }
 
-  command Pause(): OperationalCommandResponse = 0;
-  command Stop(): OperationalCommandResponse = 1;
-  command Start(): OperationalCommandResponse = 2;
-  command Resume(): OperationalCommandResponse = 3;
+  command SetTemperature(SetTemperatureRequest): DefaultSuccess = 0;
 }
 
 endpoint 0 {
@@ -1314,24 +1260,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_dishwasher = 117, version 1;
+  device type ma_refrigerator = 112, version 1;
 
-
-  server cluster Identify {
-    ram      attribute identifyTime default = 0x0000;
-    ram      attribute identifyType default = 0x0;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-  }
-
-  server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-  }
 
   server cluster Descriptor {
     callback attribute deviceTypeList;
@@ -1344,9 +1274,16 @@ endpoint 1 {
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
+}
+endpoint 2 {
+  device type ma_temperature_controlled_cabinet = 113, version 1;
 
-  server cluster Binding {
-    callback attribute binding;
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -1354,19 +1291,39 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster OperationalState {
-    emits event OperationalError;
-    emits event OperationCompletion;
-    callback attribute phaseList;
-    callback attribute currentPhase;
-    callback attribute countdownTime;
-    callback attribute operationalStateList default = 0;
-    callback attribute operationalState default = 0;
-    callback attribute operationalError default = 0;
+  server cluster TemperatureControl {
+    ram      attribute selectedTemperatureLevel;
+    callback attribute supportedTemperatureLevels;
+    callback attribute generatedCommandList default = 0;
+    callback attribute acceptedCommandList default = 0;
+    callback attribute attributeList default = 0;
+    ram      attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 1;
+  }
+}
+endpoint 3 {
+  device type ma_temperature_controlled_cabinet = 113, version 1;
+
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster TemperatureControl {
+    ram      attribute selectedTemperatureLevel;
+    callback attribute supportedTemperatureLevels;
+    callback attribute generatedCommandList default = 0;
+    callback attribute acceptedCommandList default = 0;
+    callback attribute attributeList default = 0;
+    ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
   }
 }
