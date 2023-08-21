@@ -26,8 +26,8 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include "cmsis_os2.h"
 #include <platform/internal/BLEManager.h>
-
 #ifndef SIWX_917
 #include "rail.h"
 #endif
@@ -42,7 +42,9 @@ extern "C" {
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 #include "wfx_sl_ble_init.h"
+#ifndef SIWX_917
 #include <rsi_driver.h>
+#endif
 #include <rsi_utils.h>
 #include <stdbool.h>
 #ifdef __cplusplus
@@ -63,8 +65,9 @@ extern "C" {
 extern sl_wfx_msg_t event_msg;
 
 StaticTask_t rsiBLETaskStruct;
-rsi_semaphore_handle_t sl_rs_ble_init_sem;
-rsi_semaphore_handle_t sl_ble_event_sem;
+
+osSemaphoreId_t sl_ble_event_sem;
+osSemaphoreId_t sl_rs_ble_init_sem;
 
 /* wfxRsi Task will use as its stack */
 StackType_t wfxBLETaskStack[WFX_RSI_TASK_SZ] = { 0 };
@@ -103,7 +106,7 @@ void sl_ble_event_handling_task(void)
     int32_t event_id;
 
     //! This semaphore is waiting for wifi module initialization.
-    rsi_semaphore_wait(&sl_rs_ble_init_sem, 0);
+    osSemaphoreAcquire(sl_rs_ble_init_sem, osWaitForever);
 
     // This function initialize BLE and start BLE advertisement.
     sl_ble_init();
@@ -111,11 +114,14 @@ void sl_ble_event_handling_task(void)
     // Application event map
     while (1)
     {
-        //! This semaphore is waiting for next ble event task
-        rsi_semaphore_wait(&sl_ble_event_sem, 0);
-
         // checking for events list
         event_id = rsi_ble_app_get_event();
+        if (event_id == -1)
+        {
+            //! This semaphore is waiting for next ble event task
+            osSemaphoreAcquire(sl_ble_event_sem, osWaitForever);
+            continue;
+        }
         switch (event_id)
         {
         case RSI_BLE_CONN_EVENT: {
@@ -221,8 +227,9 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
-    rsi_semaphore_create(&sl_rs_ble_init_sem, 0);
-    rsi_semaphore_create(&sl_ble_event_sem, 0);
+
+    sl_rs_ble_init_sem = osSemaphoreNew(1, 0, NULL);
+    sl_ble_event_sem   = osSemaphoreNew(1, 0, NULL);
 
     wfx_rsi.ble_task = xTaskCreateStatic((TaskFunction_t) sl_ble_event_handling_task, "rsi_ble", WFX_RSI_TASK_SZ, NULL, 1,
                                          wfxBLETaskStack, &rsiBLETaskStruct);
