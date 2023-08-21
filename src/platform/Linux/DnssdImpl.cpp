@@ -638,9 +638,9 @@ CHIP_ERROR MdnsAvahi::StopBrowse(intptr_t browseIdentifier)
     {
         return CHIP_ERROR_NOT_FOUND;
     }
+    // Any running timers here will check mStopped before rescheduling. Leave the timer running
+    // so we don't race on deletion of the browse context.
     browseContext->mStopped.store(true);
-    // If there was a timer started already, let's stop it
-    DeviceLayer::SystemLayer().CancelTimer(BrowseRetryCallback, browseContext);
     return CHIP_NO_ERROR;
 }
 
@@ -691,6 +691,7 @@ void MdnsAvahi::BrowseRetryCallback(chip::System::Layer * aLayer, void * appStat
     // Don't schedule anything new if we've stopped.
     if (context->mStopped.load())
     {
+        chip::Platform::Delete(context);
         return;
     }
     AvahiServiceBrowser * newBrowser =
@@ -741,11 +742,6 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
     case AVAHI_BROWSER_ALL_FOR_NOW: {
         ChipLogProgress(DeviceLayer, "Avahi browse: all for now");
         bool needRetries = context->mBrowseRetries++ < kMaxBrowseRetries && !context->mStopped.load();
-        if (needRetries)
-        {
-            DeviceLayer::SystemLayer().StartTimer(context->mNextRetryDelay, BrowseRetryCallback, context);
-            context->mNextRetryDelay *= 2;
-        }
         // If we were already asked to stop, no need to send a callback - no one is listening.
         if (!context->mStopped.load())
         {
@@ -753,8 +749,16 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
                                CHIP_NO_ERROR);
         }
         avahi_service_browser_free(browser);
-        if (!needRetries)
+        if (needRetries)
         {
+            context->mNextRetryDelay *= 2;
+            // Hand the ownership of the context over to the timer. It will either schedule a new browse on the context,
+            // triggering this function, or it will delete and not reschedule (if stopped).
+            DeviceLayer::SystemLayer().StartTimer(context->mNextRetryDelay / 2, BrowseRetryCallback, context);
+        }
+        else
+        {
+            // We didn't schedule a timer, so we're responsible for deleting the context
             chip::Platform::Delete(context);
         }
         break;
