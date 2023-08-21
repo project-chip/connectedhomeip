@@ -34,9 +34,9 @@
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #include "FreeRTOS.h"
+#include "FreeRTOSConfig.h"
 #include "event_groups.h"
 #include "task.h"
-#include "FreeRTOSConfig.h"
 
 /**********************************************************
  * Defines
@@ -61,8 +61,7 @@ int main(void)
 {
     GetPlatform().Init();
 
-    xTaskCreate(application_start, "main_task", MAIN_TASK_STACK_SIZE, NULL,
-                                  MAIN_TASK_PRIORITY, &main_Task);
+    xTaskCreate(application_start, "main_task", MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, &main_Task);
 
     SILABS_LOG("Starting scheduler");
     GetPlatform().StartScheduler();
