@@ -46,6 +46,8 @@ public interface ConfigurationManager {
   String kConfigKey_Spake2pIterationCount = "iteration-count";
   String kConfigKey_Spake2pSalt = "salt";
   String kConfigKey_Spake2pVerifier = "verifier";
+  String kConfigKey_DeviceTypeId = "device-type-id";
+  String kConfigKey_DeviceName = "device-name";
 
   // Keys stored in the Chip-config namespace
   String kConfigKey_ServiceConfig = "service-config";
