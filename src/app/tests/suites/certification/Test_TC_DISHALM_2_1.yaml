@@ -37,7 +37,7 @@ tests:
       attribute: "Mask"
       response:
           constraints:
-              contiains: int32u
+              type: bitmap32
 
     - label: "3. TH reads from the DUT the Latch attribute"
       PICS: DISHALM.S.A0001
@@ -45,7 +45,7 @@ tests:
       attribute: "Latch"
       response:
           constraints:
-              contains: int32u
+              type: bitmap32
 
     - label: "4. TH reads from the DUT the State attribute"
       PICS: DISHALM.S.A0002
@@ -53,7 +53,7 @@ tests:
       attribute: "State"
       response:
           constraints:
-              contains: int32u
+              type: bitmap32
 
     - label: "5. TH reads from the DUT the Supported attribute"
       PICS: DISHALM.S.A0003
@@ -61,4 +61,4 @@ tests:
       attribute: "Supported"
       response:
           constraints:
-              contains: int32u
+              type: bitmap32
