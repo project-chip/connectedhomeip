@@ -29,6 +29,7 @@ import chip.clusters as Clusters
 # - AutoRelockTime: Value used to configure DUT for testing purposes.
 #     defaults to 60 seconds. Add `--int-arg auto_relock_time:<value>` to command line to override
 
+
 class TC_DRLK_2_2(MatterBaseTest, DRLK_COMMON):
     def setup_class(self):
         return super().setup_class()
@@ -41,6 +42,7 @@ class TC_DRLK_2_2(MatterBaseTest, DRLK_COMMON):
     @async_test_body
     async def test_TC_DRLK_2_2(self):
         await self.run_drlk_test_2_2()
+
 
 if __name__ == "__main__":
     default_matter_test_main()
