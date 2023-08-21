@@ -16,7 +16,6 @@
 #
 
 import logging
-import random
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
@@ -52,10 +51,13 @@ class TC_DISHM_3_2(MatterBaseTest):
 
         asserts.assert_true(self.check_pics("DISHM.S.A0000"), "DISHM.S.A0000 must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.A0001"), "DISHM.S.A0001 must be supported")
-        asserts.assert_true(self.check_pics("DISHM.S.A0002"), "DISHM.S.A0002 must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.C00.Rsp"), "DISHM.S.C00.Rsp must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.C01.Tx"), "DISHM.S.C01.Tx must be supported")
 
+        if not self.check_pics("DISHM.S.A0002"):
+            logging.info("Test skipped because PICS DISHM.S.A0002 (StartupMode) is not set")
+            return
+    
         attributes = Clusters.DishwasherMode.Attributes
 
         from enum import Enum
@@ -72,20 +74,8 @@ class TC_DISHM_3_2(MatterBaseTest):
         startup_mode_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.StartUpMode)
 
         logging.info("StartUpMode: %s" % (startup_mode_dut))
-        if startup_mode_dut == NullValue:
-            self.print_step(2, "Read SupportedModes attribute")
-            supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
-            logging.info("SupportedModes: %s" % (supported_modes))
-
-            asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least two entries!")
-
-            modes = [m.mode for m in supported_modes]
-            startup_mode_dut = random.choice(modes)
-
-            self.print_step(2, "Write the value %s to StartUpMode" % (startup_mode_dut))
-
-            await self.write_start_up_mode(newMode=startup_mode_dut)
+        asserts.assert_false(startup_mode_dut == NullValue, "Startup mode value should be an integer value")
 
         self.print_step(3, "Read CurrentMode attribute")
 

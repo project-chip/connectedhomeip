@@ -16,7 +16,6 @@
 #
 
 import logging
-import random
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
@@ -56,10 +55,13 @@ class TC_DISHM_3_3(MatterBaseTest):
 
         asserts.assert_true(self.check_pics("DISHM.S.A0000"), "DISHM.S.A0000 must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.A0001"), "DISHM.S.A0001 must be supported")
-        asserts.assert_true(self.check_pics("DISHM.S.A0002"), "DISHM.S.A0002 must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.C00.Rsp"), "DISHM.S.C00.Rsp must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.C01.Tx"), "DISHM.S.C01.Tx must be supported")
 
+        if not self.check_pics("DISHM.S.A0002") and self.check_pics("DISHM.S.A0003"):
+            logging.info("Test skipped because PICS DISHM.S.A0002 (StartupMode) and/or DISHM.S.A0003 (OnMode) is not set")
+            return
+    
         attributes = Clusters.DishwasherMode.Attributes
 
         from enum import Enum
@@ -76,20 +78,8 @@ class TC_DISHM_3_3(MatterBaseTest):
         startup_mode_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.StartUpMode)
 
         logging.info("StartUpMode: %s" % (startup_mode_dut))
-        if startup_mode_dut == NullValue:
-            self.print_step(3, "Read SupportedModes attribute")
-            supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
-            logging.info("SupportedModes: %s" % (supported_modes))
-
-            asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least two entries!")
-
-            modes = [m.mode for m in supported_modes]
-            startup_mode_dut = random.choice(modes)
-
-            self.print_step(4, "Write the value %s to StartUpMode" % (startup_mode_dut))
-
-            await self.write_start_up_mode(newMode=startup_mode_dut)
+        asserts.assert_false(startup_mode_dut == NullValue, "Startup mode value should be an integer value")
 
         self.print_step(3, "Read OnMode attribute")
 
@@ -97,24 +87,9 @@ class TC_DISHM_3_3(MatterBaseTest):
 
         logging.info("OnMode: %s" % (old_on_mode_dut))
 
-        if old_on_mode_dut == NullValue:
-            self.print_step(4, "Read SupportedModes attribute")
-            supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
+        asserts.assert_false(old_on_mode_dut == NullValue, "On mode value should be an integer value")
 
-            logging.info("SupportedModes: %s" % (supported_modes))
-
-            asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least two entries!")
-
-            supported_modes_dut = [m.mode for m in supported_modes]
-            new_old_on_mode_dut = random.choice(supported_modes_dut)
-
-            self.print_step(5, "Write the value %s to OnMode" % (new_old_on_mode_dut))
-
-            await self.write_on_mode(newMode=new_old_on_mode_dut)
-        else:
-            new_old_on_mode_dut = old_on_mode_dut
-
-        if new_old_on_mode_dut == startup_mode_dut:
+        if old_on_mode_dut == startup_mode_dut:
 
             self.print_step(4, "Read SupportedModes attribute")
             supported_modes_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)

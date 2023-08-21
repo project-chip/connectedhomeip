@@ -16,7 +16,6 @@
 #
 
 import logging
-import random
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
@@ -58,18 +57,17 @@ class TC_DISHM_3_1(MatterBaseTest):
     @async_test_body
     async def test_TC_DISHM_3_1(self):
 
-        asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
-                            "PIXIT_ENDPOINT must be included on the command line in "
-                            "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
-
-        self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
+        self.endpoint = self.user_params.get("endpoint", 1)
 
         asserts.assert_true(self.check_pics("DISHM.S.A0000"), "DISHM.S.A0000 must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.A0001"), "DISHM.S.A0001 must be supported")
-        asserts.assert_true(self.check_pics("DISHM.S.A0002"), "DISHM.S.A0002 must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.C00.Rsp"), "DISHM.S.C00.Rsp must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.C01.Tx"), "DISHM.S.C01.Tx must be supported")
 
+        if not self.check_pics("DISHM.S.A0003"):
+            logging.info("Test skipped because PICS DISHM.S.A0003 (OnMode) is not set")
+            return
+        
         attributes = Clusters.DishwasherMode.Attributes
 
         from enum import Enum
