@@ -31,8 +31,7 @@ jobs:
         with:
           cache: 'pip'
       - run: pip install pandas
-        #GH_TOKEN: ${{ github.token }}
-      - name: Run Summarization Script
+      - name: Run Summarization Script #GH_TOKEN: ${{ github.token }}
         run: python scripts/tools/summarize_fail.py
       - name: Upload Logs
         uses: actions/upload-artifact@v3
