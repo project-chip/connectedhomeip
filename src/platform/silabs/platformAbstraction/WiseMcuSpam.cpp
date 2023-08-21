@@ -20,6 +20,10 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
+#if SILABS_LOG_ENABLED
+#include "silabs_utils.h"
+#endif
+
 // TODO add includes ?
 extern "C" void RSI_Board_LED_Set(int, bool);
 extern "C" void RSI_Board_LED_Toggle(int);
