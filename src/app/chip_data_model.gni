@@ -42,6 +42,7 @@ template("chip_data_model") {
     # Allow building ota-requestor-app with a non-spec-compliant floor
     # (i.e. smaller than 2 minutes) for action delays.
     non_spec_compliant_ota_action_delay_floor = -1
+    time_sync_enable_tsc_feature = 1
   }
 
   if (defined(invoker.idl)) {
@@ -198,6 +199,10 @@ template("chip_data_model") {
       deps = []
     }
 
+    if (!defined(cflags)) {
+      cflags = []
+    }
+
     foreach(cluster, _cluster_sources) {
       if (cluster == "door-lock-server") {
         sources += [
@@ -257,6 +262,8 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/DefaultTimeSyncDelegate.cpp",
           "${_app_root}/clusters/${cluster}/TimeSyncDataProvider.cpp",
         ]
+        cflags +=
+            [ "-DTIME_SYNC_ENABLE_TSC_FEATURE=${time_sync_enable_tsc_feature}" ]
       } else if (cluster == "scenes-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
@@ -316,10 +323,6 @@ template("chip_data_model") {
 
     if (is_server) {
       public_deps += [ "${chip_root}/src/app/server" ]
-    }
-
-    if (!defined(cflags)) {
-      cflags = []
     }
 
     cflags += [ "-Wconversion" ]
