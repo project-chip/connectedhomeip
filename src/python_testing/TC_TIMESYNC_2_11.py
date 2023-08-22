@@ -51,7 +51,7 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
             asserts.fail("Did not receive DSTStatus event")
             pass
 
-     # To set the ceiling for the subcription, set --int-arg PIXIT.TIMESYNC.CEILING:<value>
+    # To set the ceiling for the subcription, set --int-arg PIXIT.TIMESYNC.CEILING:<value>
     @async_test_body
     async def test_TC_TIMESYNC_2_11(self):
 
