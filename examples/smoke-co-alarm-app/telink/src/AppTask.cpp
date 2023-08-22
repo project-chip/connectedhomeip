@@ -50,7 +50,13 @@ CHIP_ERROR AppTask::Init(void)
 
 void AppTask::SelfTestHandler(AppEvent * aEvent)
 {
-    AlarmMgr().StartSelfTesting();
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    bool success = SmokeCoAlarmServer::Instance().RequestSelfTest(1);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    if (!success)
+    {
+        LOG_ERR("Manual self-test failed");
+    }
 }
 
 void AppTask::SelfTestEventHandler(AppEvent * aEvent)

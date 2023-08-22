@@ -22,6 +22,10 @@ config:
     cluster: "Door Lock"
     endpoint: 1
 
+    WaitAfterLockAandUnlockDoor:
+        type: int16u
+        defaultValue: 5000
+
 tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -63,6 +67,15 @@ tests:
       command: "LockDoor"
       timedInteractionTimeoutMs: 1000
 
+    - label: "Wait after Lock Door"
+      PICS: DRLK.S.C00.Rsp
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: WaitAfterLockAandUnlockDoor
+
     - label: "Step 1d: TH reads LockState attribute from DUT"
       PICS: DRLK.S.A0000
       command: "readAttribute"
@@ -74,6 +87,15 @@ tests:
       PICS: DRLK.S.C01.Rsp
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
+
+    - label: "Wait after Unlock Door"
+      PICS: DRLK.S.C00.Rsp
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: WaitAfterLockAandUnlockDoor
 
     - label: "Step 1e: TH reads LockState attribute from DUT"
       PICS: DRLK.S.A0000
@@ -615,29 +637,13 @@ tests:
     - label:
           "Step 18b: TH writes Credential RulesSupport attribute as bit 0 is set
           to 1"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F08 && DRLK.S.A001b
-      verification: |
-          ./chip-tool doorlock write-by-id 27 1 1 1
-
-          Verify "DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
-
-          [1653636825.034667][3467:3472] CHIP:DMG:
-          [1653636825.034712][3467:3472] CHIP:DMG:                        StatusIB =
-          [1653636825.034758][3467:3472] CHIP:DMG:                        {
-          [1653636825.034804][3467:3472] CHIP:DMG:                                status = 0x88 (UNSUPPORTED_WRITE),
-          [1653636825.034851][3467:3472] CHIP:DMG:                        },
-          [1653636825.034896][3467:3472] CHIP:DMG:
-          [1653636825.034933][3467:3472] CHIP:DMG:                },
-          [1653636825.034977][3467:3472] CHIP:DMG:
-          [1653636825.035013][3467:3472] CHIP:DMG:        ],
-      cluster: "LogCommands"
-      command: "UserPrompt"
+      PICS: DRLK.S.F08 && DRLK.S.A001b
+      command: "writeAttribute"
+      attribute: "CredentialRulesSupport"
       arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+          value: 1
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "Step 18c: TH reads Credential RulesSupport attribute from DUT"
       PICS: DRLK.S.F08 && DRLK.S.A001b
@@ -659,30 +665,30 @@ tests:
               maxLength: 3
 
     - label: "Step 19b: TH writes Language attribute as fr"
-      PICS: DRLK.S.A0021.Write
+      PICS: DRLK.S.A0021 && DRLK.S.A0021.Write
       command: "writeAttribute"
       attribute: "Language"
       arguments:
           value: "fr"
 
     - label: "Step 19b: TH writes Language attribute as fr"
-      PICS: " !DRLK.S.A0021.Write "
+      PICS: DRLK.S.A0021 && !DRLK.S.A0021.Write
       command: "writeAttribute"
       attribute: "Language"
       arguments:
           value: "fr"
       response:
-          error: UNSUPPORTED_WRITE]
+          error: UNSUPPORTED_WRITE
 
     - label: "Step 19c: TH reads Language attribute from DUT"
-      PICS: DRLK.S.A0021.Write
+      PICS: DRLK.S.A0021 && DRLK.S.A0021.Write
       command: "readAttribute"
       attribute: "Language"
       response:
           value: "fr"
 
     - label: "Step 19c: TH reads Language attribute from DUT"
-      PICS: " !DRLK.S.A0021.Write "
+      PICS: DRLK.S.A0021 && !DRLK.S.A0021.Write
       command: "readAttribute"
       attribute: "Language"
       response:
@@ -1097,7 +1103,7 @@ tests:
     - label:
           "Step 30b: TH reads LocalProgrammingFeatures attribute from DUT.
           DRLK.S.A0028(EnableLocalProgramming) is True."
-      PICS: DRLK.S.A002c && DRLK.S.A0028.ReadOnly
+      PICS: DRLK.S.A002c && DRLK.S.A0028
       command: "readAttribute"
       attribute: "LocalProgrammingFeatures"
       response:
@@ -1108,7 +1114,7 @@ tests:
     - label:
           "Step 30b: TH reads LocalProgrammingFeatures attribute from DUT.
           DRLK.S.A0028(EnableLocalProgramming) is False."
-      PICS: DRLK.S.A002c && !DRLK.S.A0028.ReadOnly
+      PICS: DRLK.S.A002c && !DRLK.S.A0028
       command: "readAttribute"
       attribute: "LocalProgrammingFeatures"
       response:
@@ -1119,214 +1125,89 @@ tests:
     - label:
           "Step 30c: TH writes to LocalProgrammingFeatures to disable all the
           features (Change all bits to 0)"
-      PICS:
-          DRLK.S.A002c && DRLK.S.A0028.ReadOnly && DRLK.S.A002c.Write &&
-          PICS_SKIP_SAMPLE_APP
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock write-by-id 44 0 1 1
-
-          Verify "  LocalProgrammingFeatures" on the TH(Chip-tool) Log:
-
-          [1658987893.199449][2822:2827] CHIP:DMG:                        StatusIB =
-          [1658987893.199501][2822:2827] CHIP:DMG:                        {
-          [1658987893.199548][2822:2827] CHIP:DMG:                                status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1658987893.199598][2822:2827] CHIP:DMG:                        },
-          [1658987893.199643][2822:2827] CHIP:DMG:
-          [1658987893.199683][2822:2827] CHIP:DMG:                },
-          [1658987893.199726][2822:2827] CHIP:DMG:
-          [1658987893.199761][2822:2827] CHIP:DMG:        ],
-          [1658987893.199803][2822:2827] CHIP:DMG:
-          [1658987893.199839][2822:2827] CHIP:DMG:        InteractionModelRevision = 1
-          [1658987893.199873][2822:2827] CHIP:DMG: }
-          [1658987893.199968][2822:2827] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1658987893.200012][2822:2827] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-      cluster: "LogCommands"
-      command: "UserPrompt"
+      PICS: DRLK.S.A002c.Write && DRLK.S.A0028
+      command: "writeAttribute"
+      attribute: "LocalProgrammingFeatures"
       arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+          value: 0
+
+    - label:
+          "Step 30c: TH reads LocalProgrammingFeatures attribute from DUT.
+          DRLK.S.A0028(EnableLocalProgramming) is False."
+      PICS: DRLK.S.A002c.Write && DRLK.S.A0028
+      command: "readAttribute"
+      attribute: "LocalProgrammingFeatures"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksClear: [0x1, 0x2, 0x4, 0x8]
 
     - label: "Step 30d: TH sets the EnableLocalProgramming attribute to False"
-      PICS:
-          DRLK.S.A002c && DRLK.S.A0028.Write && DRLK.S.A002c.Write &&
-          PICS_SKIP_SAMPLE_APP
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock write enable-local-programming 0 1 1
-
-          Verify " EnableLocalProgramming" on the TH(Chip-tool) Log:
-
-          [1658988052.124227][2834:2839] CHIP:DMG:                        StatusIB =
-          [1658988052.124259][2834:2839] CHIP:DMG:                        {
-          [1658988052.124292][2834:2839] CHIP:DMG:                                status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1658988052.124323][2834:2839] CHIP:DMG:                        },
-          [1658988052.124353][2834:2839] CHIP:DMG:
-          [1658988052.124381][2834:2839] CHIP:DMG:                },
-          [1658988052.124410][2834:2839] CHIP:DMG:
-          [1658988052.124433][2834:2839] CHIP:DMG:        ],
-          [1658988052.124462][2834:2839] CHIP:DMG:
-          [1658988052.124486][2834:2839] CHIP:DMG:        InteractionModelRevision = 1
-          [1658988052.124509][2834:2839] CHIP:DMG: }
-          [1658988052.124577][2834:2839] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1658988052.124608][2834:2839] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock read local-programming-features 1 1
-
-          Verify "  LocalProgrammingFeatures" on the TH(Chip-tool) Log:
-
-          [1658987637.292491][2794:2799] CHIP:DMG:                                StatusIB =
-          [1658987637.292530][2794:2799] CHIP:DMG:                                {
-          [1658987637.292568][2794:2799] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1658987637.292605][2794:2799] CHIP:DMG:                                },
-          [1658987637.292642][2794:2799] CHIP:DMG:
-          [1658987637.292675][2794:2799] CHIP:DMG:                        },
-          [1658987637.292713][2794:2799] CHIP:DMG:
-          [1658987637.292741][2794:2799] CHIP:DMG:                },
-          [1658987637.292774][2794:2799] CHIP:DMG:
-          [1658987637.292798][2794:2799] CHIP:DMG:        ],
-          [1658987637.292828][2794:2799] CHIP:DMG:
-          [1658987637.292852][2794:2799] CHIP:DMG:        SuppressResponse = true,
-          [1658987637.292878][2794:2799] CHIP:DMG:        InteractionModelRevision = 1
-          [1658987637.292901][2794:2799] CHIP:DMG: }
-          [1658987637.293006][2794:2799] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)"
-      cluster: "LogCommands"
-      command: "UserPrompt"
+      PICS: DRLK.S.A002c
+      command: "writeAttribute"
+      attribute: "EnableLocalProgramming"
       arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+          value: false
+
+    - label:
+          "Step 30d: Verify that all the 4 bits in the LocalProgrammingFeatures
+          is set to 0."
+      PICS: DRLK.S.A002c
+      command: "readAttribute"
+      attribute: "LocalProgrammingFeatures"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksClear: [0x1, 0x2, 0x4, 0x8]
 
     - label: "Step 30e: TH sets the EnableLocalProgramming attribute to True"
-      PICS:
-          DRLK.S.A002c && DRLK.S.A0028.Write && DRLK.S.A002c.Write &&
-          PICS_SKIP_SAMPLE_APP
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock write enable-local-programming 1 1 1
-
-          Verify " EnableLocalProgramming" on the TH(Chip-tool) Log:
-
-          [1658988136.125747][2845:2850] CHIP:DMG:                        StatusIB =
-          [1658988136.125781][2845:2850] CHIP:DMG:                        {
-          [1658988136.125814][2845:2850] CHIP:DMG:                                status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1658988136.125847][2845:2850] CHIP:DMG:                        },
-          [1658988136.125879][2845:2850] CHIP:DMG:
-          [1658988136.125908][2845:2850] CHIP:DMG:                },
-          [1658988136.125941][2845:2850] CHIP:DMG:
-          [1658988136.125966][2845:2850] CHIP:DMG:        ],
-          [1658988136.125997][2845:2850] CHIP:DMG:
-          [1658988136.126022][2845:2850] CHIP:DMG:        InteractionModelRevision = 1
-          [1658988136.126072][2845:2850] CHIP:DMG: }
-          [1658988136.126149][2845:2850] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1658988136.126183][2845:2850] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock read local-programming-features 1 1
-
-          Verify "  LocalProgrammingFeatures" on the TH(Chip-tool) Log:
-
-          [1658987637.292491][2794:2799] CHIP:DMG:                                StatusIB =
-          [1658987637.292530][2794:2799] CHIP:DMG:                                {
-          [1658987637.292568][2794:2799] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1658987637.292605][2794:2799] CHIP:DMG:                                },
-          [1658987637.292642][2794:2799] CHIP:DMG:
-          [1658987637.292675][2794:2799] CHIP:DMG:                        },
-          [1658987637.292713][2794:2799] CHIP:DMG:
-          [1658987637.292741][2794:2799] CHIP:DMG:                },
-          [1658987637.292774][2794:2799] CHIP:DMG:
-          [1658987637.292798][2794:2799] CHIP:DMG:        ],
-          [1658987637.292828][2794:2799] CHIP:DMG:
-          [1658987637.292852][2794:2799] CHIP:DMG:        SuppressResponse = true,
-          [1658987637.292878][2794:2799] CHIP:DMG:        InteractionModelRevision = 1
-          [1658987637.292901][2794:2799] CHIP:DMG: }
-          [1658987637.293006][2794:2799] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)"
-      cluster: "LogCommands"
-      command: "UserPrompt"
+      PICS: DRLK.S.A0028.Write
+      command: "writeAttribute"
+      attribute: "EnableLocalProgramming"
       arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+          value: true
+
+    - label:
+          "Step 30e: Verify that all the 4 bits in the LocalProgrammingFeatures
+          is set to 1."
+      PICS: DRLK.S.A0028.Write
+      command: "readAttribute"
+      attribute: "LocalProgrammingFeatures"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksSet: [0x1, 0x2, 0x4, 0x8]
 
     - label:
           "Step 30f: TH sends a write message to change any one of the bits of
           the LocalProgrammingFeatures."
-      PICS: DRLK.S.A002c && DRLK.S.A002c.Write && PICS_SKIP_SAMPLE_APP
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock write-by-id 44 2 1 1
-
-          Verify "  DUT sends SUCCESS response" on the TH(Chip-tool) Log:
-
-          [1658988308.728071][2866:2871] CHIP:DMG:                        StatusIB =
-          [1658988308.728110][2866:2871] CHIP:DMG:                        {
-          [1658988308.728152][2866:2871] CHIP:DMG:                                status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1658988308.728191][2866:2871] CHIP:DMG:                        },
-          [1658988308.728229][2866:2871] CHIP:DMG:
-          [1658988308.728263][2866:2871] CHIP:DMG:                },
-          [1658988308.728299][2866:2871] CHIP:DMG:
-          [1658988308.728328][2866:2871] CHIP:DMG:        ],
-          [1658988308.728364][2866:2871] CHIP:DMG:
-          [1658988308.728394][2866:2871] CHIP:DMG:        InteractionModelRevision = 1
-          [1658988308.728423][2866:2871] CHIP:DMG: }
-          [1658988308.728500][2866:2871] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1658988308.728539][2866:2871] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-      cluster: "LogCommands"
-      command: "UserPrompt"
+      PICS: DRLK.S.A002c && DRLK.S.A002c.Write
+      command: "writeAttribute"
+      attribute: "LocalProgrammingFeatures"
       arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+          value: 2
+
+    - label:
+          "Step 30f: Verify that the correct bit has been changed by doing a
+          Read on LocalProgrammingFeatures attribute.."
+      PICS: DRLK.S.A0028.Write
+      command: "readAttribute"
+      attribute: "LocalProgrammingFeatures"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksSet: [0x2]
 
     - label:
           "Step 30g: TH sends a write message to change any one of the bits of
           the LocalProgrammingFeatures."
-      PICS: DRLK.S.A002c && DRLK.S.A002c.ReadOnly && PICS_SKIP_SAMPLE_APP
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock write-by-id 44 3 1 1
-
-          Verify " DUT sends an UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
-
-          [1658988387.295252][2874:2879] CHIP:DMG:                        StatusIB =
-          [1658988387.295294][2874:2879] CHIP:DMG:                        {
-          [1658988387.295336][2874:2879] CHIP:DMG:                                status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1658988387.295378][2874:2879] CHIP:DMG:                        },
-          [1658988387.295419][2874:2879] CHIP:DMG:
-          [1658988387.295456][2874:2879] CHIP:DMG:                },
-          [1658988387.295499][2874:2879] CHIP:DMG:
-          [1658988387.295530][2874:2879] CHIP:DMG:        ],
-          [1658988387.295569][2874:2879] CHIP:DMG:
-          [1658988387.295601][2874:2879] CHIP:DMG:        InteractionModelRevision = 1
-          [1658988387.295632][2874:2879] CHIP:DMG: }
-          [1658988387.295719][2874:2879] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1658988387.295760][2874:2879] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-      cluster: "LogCommands"
-      command: "UserPrompt"
+      PICS: DRLK.S.A002c && DRLK.S.A002c.ReadOnly
+      command: "writeAttribute"
+      attribute: "LocalProgrammingFeatures"
       arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+          value: 2
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label:
           "Step 31a: TH reads WrongCodeEntry Limit attribute from DUT TH saves

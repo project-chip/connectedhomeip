@@ -96,4 +96,4 @@
 #define OPENTHREAD_CONFIG_TMF_NETDATA_SERVICE_ENABLE 1
 
 // Use the TI-supplied default platform configuration for remainder
-#include "openthread-core-cc13xx_cc26xx-config.h"
+#include "openthread-core-cc13xx_cc26xx-config-matter.h"

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,7 +28,9 @@
 #include <lib/support/ErrorStr.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
+#include <lib/support/jsontlv/JsonToTlv.h>
 #include <lib/support/jsontlv/TlvJson.h>
+#include <lib/support/jsontlv/TlvToJson.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <type_traits>
@@ -488,15 +490,12 @@ CHIP_ERROR InvokeCallback::CreateInvokeElement(const app::ConcreteCommandPath & 
         TLV::TLVReader readerForJavaTLV;
         TLV::TLVReader readerForJson;
         readerForJavaTLV.Init(*apData);
-        readerForJson.Init(*apData);
 
         // Create TLV byte array to pass to Java layer
         size_t bufferLen                  = readerForJavaTLV.GetRemainingLength() + readerForJavaTLV.GetLengthRead();
         std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(new uint8_t[bufferLen]);
         uint32_t size                     = 0;
-        // The TLVReader's read head is not pointing to the first element in the container, instead of the container itself, use
-        // a TLVWriter to get a TLV with a normalized TLV buffer (Wrapped with an anonymous tag, no extra "end of container" tag
-        // at the end.)
+
         TLV::TLVWriter writer;
         writer.Init(buffer.get(), bufferLen);
         err = writer.CopyElement(TLV::AnonymousTag(), readerForJavaTLV);
@@ -505,11 +504,13 @@ CHIP_ERROR InvokeCallback::CreateInvokeElement(const app::ConcreteCommandPath & 
         chip::ByteArray jniByteArray(env, reinterpret_cast<jbyte *>(buffer.get()), size);
 
         // Convert TLV to JSON
-        Json::Value json;
+        std::string json;
+        readerForJson.Init(buffer.get(), size);
+        err = readerForJson.Next();
+        ReturnErrorOnFailure(err);
         err = TlvToJson(readerForJson, json);
         ReturnErrorOnFailure(err);
-
-        UtfString jsonString(env, JsonToString(json).c_str());
+        UtfString jsonString(env, json.c_str());
         outObj = env->CallStaticObjectMethod(invokeElementCls, invokeElementCtor, static_cast<jint>(aPath.mEndpointId),
                                              static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mCommandId),
                                              jniByteArray.jniValue(), jsonString.jniValue());
@@ -614,6 +615,7 @@ void ReportCallback::ReportError(jobject attributePath, jobject eventPath, const
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
+    ChipLogError(Controller, "ReportCallback::ReportError is called with %u", errorCode);
     jthrowable exception;
     err = AndroidControllerExceptions::GetInstance().CreateAndroidControllerException(env, message, errorCode, exception);
     VerifyOrReturn(
@@ -722,7 +724,7 @@ void WriteAttributesCallback::ReportError(jobject attributePath, const char * me
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    ChipLogError(Controller, "WriteAttributesCallback ReportError is called");
+    ChipLogError(Controller, "WriteAttributesCallback::ReportError is called with %u", errorCode);
     jthrowable exception;
     err = AndroidControllerExceptions::GetInstance().CreateAndroidControllerException(env, message, errorCode, exception);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -825,7 +827,7 @@ void InvokeCallback::ReportError(const char * message, ChipError::StorageType er
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    ChipLogError(Controller, "InvokeCallback ReportError is called");
+    ChipLogError(Controller, "InvokeCallback::ReportError is called with %u", errorCode);
     jthrowable exception;
     err = AndroidControllerExceptions::GetInstance().CreateAndroidControllerException(env, message, errorCode, exception);
     VerifyOrReturn(
