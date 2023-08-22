@@ -141,8 +141,8 @@ tests:
 
     - label: "Step 5a: Read the global attribute: EventList "
       PICS:
-          "PICS_EVENT_LIST_ENABLED &&  !SWTCH.S.F00 && !SWTCH.S.F01 &&
-          !SWTCH.S.F02 && !SWTCH.S.F03 && !SWTCH.S.F04 "
+          "!SWTCH.S.F00 && !SWTCH.S.F01 && !SWTCH.S.F02 && !SWTCH.S.F03 &&
+          !SWTCH.S.F04 "
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -172,8 +172,8 @@ tests:
           "Step 5d: Read EventList if SWTCH.S.F01(MS) & SWTCH.S.F02(MSR) &
           !SWTCH.S.F03(MSL) & !SWTCH.S.F04(MSM)"
       PICS:
-          PICS_EVENT_LIST_ENABLED && SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
-          && !SWTCH.S.F04
+          " PICS_EVENT_LIST_ENABLED && SWTCH.S.F01 && SWTCH.S.F02 &&
+          !SWTCH.S.F03 && !SWTCH.S.F04 "
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -185,8 +185,8 @@ tests:
           "Step 5e: Read EventList if SWTCH.S.F01(MS) & SWTCH.S.F02(MSR) &
           SWTCH.S.F03(MSL) & !SWTCH.S.F04(MSM)"
       PICS:
-          PICS_EVENT_LIST_ENABLED && SWTCH.S.F01 && SWTCH.S.F02 && SWTCH.S.F03
-          && !SWTCH.S.F04
+          " PICS_EVENT_LIST_ENABLED && SWTCH.S.F01 && SWTCH.S.F02 && SWTCH.S.F03
+          && !SWTCH.S.F04 "
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -198,8 +198,8 @@ tests:
           "Step 5f: Read EventList if SWTCH.S.F01(MS) & SWTCH.S.F02(MSR) &
           !SWTCH.S.F03(MSL) & SWTCH.S.F04(MSM) "
       PICS:
-          PICS_EVENT_LIST_ENABLED && SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
-          && SWTCH.S.F04
+          " PICS_EVENT_LIST_ENABLED && SWTCH.S.F01 && SWTCH.S.F02 &&
+          !SWTCH.S.F03 && SWTCH.S.F04 "
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -211,8 +211,8 @@ tests:
           "Step 5g: Read EventList if SWTCH.S.F01(MS) & SWTCH.S.F02(MSR) &
           SWTCH.S.F03(MSL) & SWTCH.S.F04(MSM) "
       PICS:
-          PICS_EVENT_LIST_ENABLED && SWTCH.S.F01 && SWTCH.S.F02 && SWTCH.S.F03
-          && SWTCH.S.F04
+          " PICS_EVENT_LIST_ENABLED && SWTCH.S.F01 && SWTCH.S.F02 && SWTCH.S.F03
+          && SWTCH.S.F04 "
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -224,9 +224,9 @@ tests:
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
+          value: []
           constraints:
               type: list
-              contains: []
 
     - label: "Step 7: Read the global attribute: GeneratedCommandList"
       command: "readAttribute"

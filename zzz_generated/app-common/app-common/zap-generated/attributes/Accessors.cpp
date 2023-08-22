@@ -7869,37 +7869,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 namespace AirQuality {
 namespace Attributes {
 
-namespace AirQuality {
-
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::AirQuality::AirQualityEnum * value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::AirQuality::AirQualityEnum>;
-    Traits::StorageType temp;
-    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::AirQuality::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    *value = Traits::StorageToWorking(temp);
-    return status;
-}
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::AirQuality::AirQualityEnum value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::AirQuality::AirQualityEnum>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::AirQuality::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
-}
-
-} // namespace AirQuality
-
 namespace FeatureMap {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)

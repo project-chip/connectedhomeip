@@ -115,7 +115,7 @@
     "ServerDirectories": {
         "ACCESS_CONTROL_CLUSTER": ["access-control-server"],
         "ACCOUNT_LOGIN_CLUSTER": ["account-login-server"],
-        "ACTIONS_CLUSTER": [],
+        "ACTIONS_CLUSTER": ["air-quality-server"],
         "ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER": [
             "resource-monitoring-server"
         ],

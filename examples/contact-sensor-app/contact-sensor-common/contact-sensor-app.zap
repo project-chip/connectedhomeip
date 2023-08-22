@@ -33,7 +33,33 @@
   ],
   "endpointTypes": [
     {
+      "id": 1,
       "name": "MA-rootdevice",
+      "deviceTypeRef": {
+        "id": 2,
+        "code": 22,
+        "profileId": 259,
+        "label": "MA-rootdevice",
+        "name": "MA-rootdevice"
+      },
+      "deviceTypes": [
+        {
+          "id": 2,
+          "code": 22,
+          "profileId": 259,
+          "label": "MA-rootdevice",
+          "name": "MA-rootdevice"
+        }
+      ],
+      "deviceTypeRefs": [
+        2
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        22
+      ],
       "deviceTypeName": "MA-rootdevice",
       "deviceTypeCode": 22,
       "deviceTypeProfileId": 259,
@@ -5385,7 +5411,33 @@
       ]
     },
     {
+      "id": 2,
       "name": "MA-dimmablelight",
+      "deviceTypeRef": {
+        "id": 21,
+        "code": 21,
+        "profileId": 259,
+        "label": "MA-contactsensor",
+        "name": "MA-contactsensor"
+      },
+      "deviceTypes": [
+        {
+          "id": 21,
+          "code": 21,
+          "profileId": 259,
+          "label": "MA-contactsensor",
+          "name": "MA-contactsensor"
+        }
+      ],
+      "deviceTypeRefs": [
+        21
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        21
+      ],
       "deviceTypeName": "MA-contactsensor",
       "deviceTypeCode": 21,
       "deviceTypeProfileId": 259,
@@ -7717,7 +7769,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -8639,7 +8691,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -8772,18 +8824,14 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 22
+      "networkId": 0
     },
     {
       "endpointTypeName": "MA-dimmablelight",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 21
+      "networkId": 0
     }
   ],
   "log": []

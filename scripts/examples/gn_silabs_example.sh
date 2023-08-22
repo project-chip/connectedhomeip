@@ -272,7 +272,7 @@ else
     fi
 
     # 917 exception. TODO find a more generic way
-    if [ "$SILABS_BOARD" == "BRD4325B" ]; then
+    if [ "$SILABS_BOARD" == "BRD4325B" ] || [ "$SILABS_BOARD" == "BRD4325C" ]; then
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
         optArgs+="chip_device_platform =\"SiWx917\" "

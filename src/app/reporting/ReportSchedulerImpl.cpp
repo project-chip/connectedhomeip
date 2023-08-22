@@ -43,7 +43,7 @@ void ReportSchedulerImpl::OnEnterActiveMode()
 {
 #if ICD_REPORT_ON_ENTER_ACTIVE_MODE
     Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
-    mNodesPool.ForEachActiveObject([now, this](ReadHandlerNode * node) {
+    mNodesPool.ForEachActiveObject([now](ReadHandlerNode * node) {
         if (now >= node->GetMinTimestamp())
         {
             this->HandlerForceDirtyState(node->GetReadHandler());
@@ -62,9 +62,12 @@ void ReportSchedulerImpl::OnSubscriptionEstablished(ReadHandler * aReadHandler)
     ReadHandlerNode * newNode = FindReadHandlerNode(aReadHandler);
     // Handler must not be registered yet; it's just being constructed.
     VerifyOrDie(nullptr == newNode);
+
+    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+
     // The NodePool is the same size as the ReadHandler pool from the IM Engine, so we don't need a check for size here since if a
     // ReadHandler was created, space should be available.
-    newNode = mNodesPool.CreateObject(aReadHandler, mTimerDelegate, this);
+    newNode = mNodesPool.CreateObject(aReadHandler, this, now);
 
     ChipLogProgress(DataManagement,
                     "Registered a ReadHandler that will schedule a report between system Timestamp: %" PRIu64
@@ -77,19 +80,26 @@ void ReportSchedulerImpl::OnBecameReportable(ReadHandler * aReadHandler)
 {
     ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
     VerifyOrReturn(nullptr != node);
+
+    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+
     Milliseconds32 newTimeout;
-    CalculateNextReportTimeout(newTimeout, node);
-    ScheduleReport(newTimeout, node);
+    CalculateNextReportTimeout(newTimeout, node, now);
+    ScheduleReport(newTimeout, node, now);
 }
 
 void ReportSchedulerImpl::OnSubscriptionReportSent(ReadHandler * aReadHandler)
 {
     ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
     VerifyOrReturn(nullptr != node);
-    node->SetIntervalTimeStamps(aReadHandler);
+
+    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+
+    node->SetCanBeSynced(false);
+    node->SetIntervalTimeStamps(aReadHandler, now);
     Milliseconds32 newTimeout;
-    CalculateNextReportTimeout(newTimeout, node);
-    ScheduleReport(newTimeout, node);
+    CalculateNextReportTimeout(newTimeout, node, now);
+    ScheduleReport(newTimeout, node, now);
     node->SetEngineRunScheduled(false);
 }
 
@@ -105,7 +115,7 @@ void ReportSchedulerImpl::OnReadHandlerDestroyed(ReadHandler * aReadHandler)
     mNodesPool.ReleaseObject(removeNode);
 }
 
-CHIP_ERROR ReportSchedulerImpl::ScheduleReport(Timeout timeout, ReadHandlerNode * node)
+CHIP_ERROR ReportSchedulerImpl::ScheduleReport(Timeout timeout, ReadHandlerNode * node, const Timestamp & now)
 {
     // Cancel Report if it is currently scheduled
     mTimerDelegate->CancelTimer(node);
@@ -141,13 +151,12 @@ bool ReportSchedulerImpl::IsReportScheduled(ReadHandler * aReadHandler)
     return mTimerDelegate->IsTimerActive(node);
 }
 
-CHIP_ERROR ReportSchedulerImpl::CalculateNextReportTimeout(Timeout & timeout, ReadHandlerNode * aNode)
+CHIP_ERROR ReportSchedulerImpl::CalculateNextReportTimeout(Timeout & timeout, ReadHandlerNode * aNode, const Timestamp & now)
 {
     VerifyOrReturnError(nullptr != FindReadHandlerNode(aNode->GetReadHandler()), CHIP_ERROR_INVALID_ARGUMENT);
-    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
 
     // If the handler is reportable now, just schedule a report immediately
-    if (aNode->IsReportableNow())
+    if (aNode->IsReportableNow(now))
     {
         // If the handler is reportable now, just schedule a report immediately
         timeout = Milliseconds32(0);

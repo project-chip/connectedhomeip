@@ -1994,7 +1994,7 @@ endpoint 2 {
   }
 
   server cluster AirQuality {
-    ram      attribute airQuality default = 0;
+    callback attribute airQuality default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
