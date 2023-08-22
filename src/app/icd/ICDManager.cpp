@@ -229,8 +229,8 @@ void ICDManager::OnTransitionToIdle(System::Layer * aLayer, void * appState)
 
     // OnTransitionToIdle will trigger a report message if reporting is needed, which should extend the active mode until the
     // ack for the report is received.
-    pIcdManager->mStateObserver->OnTransitionToIdle();
     pIcdManager->mTransitionToIdleCalled = true;
+    pIcdManager->mStateObserver->OnTransitionToIdle();
 }
 
 } // namespace app
