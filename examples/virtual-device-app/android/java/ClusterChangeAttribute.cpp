@@ -17,6 +17,7 @@
  */
 
 #include "ColorControlManager.h"
+#include "DoorLockManager.h"
 #include "OnOffManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -89,6 +90,19 @@ static void ColorControlClusterAttributeChangeCallback(const app::ConcreteAttrib
     }
 }
 
+static void DoorLockClusterAttributeChangeCallback(const app::ConcreteAttributePath & attributePath, uint16_t size, uint8_t * value)
+{
+    if (attributePath.mAttributeId == DoorLock::Attributes::LockState::Id)
+    {
+        uint8_t lockState = *value;
+
+        ChipLogProgress(Zcl, "Received lock state command endpoint %d value = %d", static_cast<int>(attributePath.mEndpointId),
+                        lockState);
+
+        DoorLockManager().PostLockStateChanged(attributePath.mEndpointId, lockState);
+    }
+}
+
 void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
@@ -102,6 +116,9 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
         break;
     case ColorControl::Id:
         ColorControlClusterAttributeChangeCallback(attributePath, size, value);
+        break;
+    case DoorLock::Id:
+        DoorLockClusterAttributeChangeCallback(attributePath, size, value);
         break;
 
     default:
