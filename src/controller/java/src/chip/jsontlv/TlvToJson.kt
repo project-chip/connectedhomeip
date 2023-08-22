@@ -71,7 +71,8 @@ fun TlvReader.toAny(tag: Tag = AnonymousTag): Any? {
     is ArrayValue -> {
       buildList {
         enterArray(tag)
-        while (!isEndOfContainer()) {
+        // TODO: to be added isLastElement()
+        while (!isEndOfTlv() && !isEndOfContainer()) {
           add(toAny())
         }
         exitContainer()

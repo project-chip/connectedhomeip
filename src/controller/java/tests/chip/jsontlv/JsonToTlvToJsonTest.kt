@@ -37,11 +37,11 @@ class JsonToTlvToJsonTest {
     tlvEncoding: ByteArray,
     jsonExpected: String = jsonOriginal
   ) {
-    assertThat(TlvWriter().fromJsonStringToByteArray(jsonOriginal)).isEqualTo(tlvEncoding)
+    assertThat(TlvWriter().fromJsonString(jsonOriginal)).isEqualTo(tlvEncoding)
     assertThat(TlvReader(tlvEncoding).toJsonString())
       .isEqualTo(JsonParser.parseString(jsonExpected).asJsonObject.toString())
     if (jsonOriginal != jsonExpected) {
-      assertThat(TlvWriter().fromJsonStringToByteArray(jsonExpected)).isEqualTo(tlvEncoding)
+      assertThat(TlvWriter().fromJsonString(jsonExpected)).isEqualTo(tlvEncoding)
     }
   }
 
@@ -865,7 +865,7 @@ class JsonToTlvToJsonTest {
     // Throws exception because subtype encoded in the Json key (Boolean) doesn't match the
     // String
     // type of the elements in the array
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
   }
 
   @Test
@@ -884,7 +884,7 @@ class JsonToTlvToJsonTest {
     // Throws exception because subtype encoded in the Json key (Boolean) doesn't match the
     // String
     // type of the elements in the array
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
   }
 
   @Test
@@ -905,7 +905,7 @@ class JsonToTlvToJsonTest {
     // Throws exception because subtype encoded in the Json key (Float) doesn't match the
     // Structure
     // type of the elements in the array
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
   }
 
   @Test
@@ -921,7 +921,7 @@ class JsonToTlvToJsonTest {
 
     // Throws exception because subtype encoded in the Json key (UInt) doesn't match the Null
     // type of the elements in the array
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
   }
 
   @Test
@@ -937,7 +937,7 @@ class JsonToTlvToJsonTest {
       """
 
     // Throws exception because string is invalid base64 encoded value
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
   }
 
   @Test
@@ -972,7 +972,7 @@ class JsonToTlvToJsonTest {
       """
 
     // Throws exception because element within structure cannot have anonymous tag
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
   }
 
   @Test
@@ -985,7 +985,7 @@ class JsonToTlvToJsonTest {
       """
 
     // Throws exception because Json key must have valid tag field
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
   }
 
   @Test
@@ -1074,7 +1074,7 @@ class JsonToTlvToJsonTest {
       """
 
     // 4294967296 exceeds valid context specific or common profile tag value of 32-bits
-    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonStringToByteArray(json) }
+    assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
   }
 
   @Test
