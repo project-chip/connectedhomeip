@@ -33,7 +33,33 @@
   ],
   "endpointTypes": [
     {
+      "id": 2,
       "name": "MA-rootdevice",
+      "deviceTypeRef": {
+        "id": 2,
+        "code": 22,
+        "profileId": 259,
+        "label": "MA-rootdevice",
+        "name": "MA-rootdevice"
+      },
+      "deviceTypes": [
+        {
+          "id": 2,
+          "code": 22,
+          "profileId": 259,
+          "label": "MA-rootdevice",
+          "name": "MA-rootdevice"
+        }
+      ],
+      "deviceTypeRefs": [
+        2
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        22
+      ],
       "deviceTypeName": "MA-rootdevice",
       "deviceTypeCode": 22,
       "deviceTypeProfileId": 259,
@@ -5394,7 +5420,33 @@
       ]
     },
     {
+      "id": 1,
       "name": "Anonymous Endpoint Type",
+      "deviceTypeRef": {
+        "id": 10,
+        "code": 268,
+        "profileId": 259,
+        "label": "MA-colortemperaturelight",
+        "name": "MA-colortemperaturelight"
+      },
+      "deviceTypes": [
+        {
+          "id": 10,
+          "code": 268,
+          "profileId": 259,
+          "label": "MA-colortemperaturelight",
+          "name": "MA-colortemperaturelight"
+        }
+      ],
+      "deviceTypeRefs": [
+        10
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        268
+      ],
       "deviceTypeName": "MA-colortemperaturelight",
       "deviceTypeCode": 268,
       "deviceTypeProfileId": 259,
@@ -7345,7 +7397,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -8283,7 +8335,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -8300,18 +8352,14 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 22
+      "networkId": 0
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 268
+      "networkId": 0
     }
   ],
   "log": []
