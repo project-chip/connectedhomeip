@@ -40,8 +40,8 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr ClusterId clusterId = app::Clusters::{{asUpperCamelCase parent.name}}::Id;
-        constexpr CommandId commandId = app::Commands::{{asUpperCamelCase name}}::Id;
+        constexpr ClusterId clusterId = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Id;
+        constexpr CommandId commandId = chip::app::Commands::{{asUpperCamelCase name}}::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
@@ -49,12 +49,16 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr ClusterId clusterId = app::Clusters::{{asUpperCamelCase parent.name}}::Id;
-        constexpr CommandId commandId = app::Commands::{{asUpperCamelCase name}}::Id;
+        constexpr ClusterId clusterId = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Id;
+        constexpr CommandId commandId = chip::app::Commands::{{asUpperCamelCase name}}::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandIdcommandId, app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type mRequest;
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type mRequest;
     {{#zcl_command_arguments}}
     {{#if_chip_complex}}
     TypedComplexArgument<{{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}> mComplex_{{asUpperCamelCase label}};
