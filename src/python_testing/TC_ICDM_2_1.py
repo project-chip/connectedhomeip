@@ -14,12 +14,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
-import ipaddress
-from datetime import timedelta
-
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -78,15 +73,15 @@ class TC_ICDM_2_1(MatterBaseTest):
         if (self.check_pics("ICDM.S.A0003")):
             self.print_step(2, "Read RegisteredClients Attribute")
 
-            registeredClients = await self.read_icdm_attribute_expect_success(endpoint=endpoint,
-                                                                              attribute=attributes.RegisteredClients)
+            await self.read_icdm_attribute_expect_success(endpoint=endpoint,
+                                                          attribute=attributes.RegisteredClients)
 
         # ICDCounter attribute test
         if (self.check_pics("ICDM.S.A0003")):
             self.print_step(2, "Read ICDCounter Attribute")
 
-            icdCounter = await self.read_icdm_attribute_expect_success(endpoint=endpoint,
-                                                                       attribute=attributes.ICDCounter)
+            await self.read_icdm_attribute_expect_success(endpoint=endpoint,
+                                                          attribute=attributes.ICDCounter)
 
         # ClientsSupportedPerFabric attribute test
         if (self.check_pics("ICDM.S.A0003")):
