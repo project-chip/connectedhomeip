@@ -41,7 +41,7 @@
 /**********************************************************
  * Defines
  *********************************************************/
-#define MAIN_TASK_STACK_SIZE (1024 * 8)
+#define MAIN_TASK_STACK_SIZE (1024 * 1)
 #define MAIN_TASK_PRIORITY (configMAX_PRIORITIES - 1)
 
 using namespace ::chip;
