@@ -37,6 +37,7 @@ class TestICDStateObserver : public app::ICDStateObserver
 {
 public:
     void OnEnterActiveMode() {}
+    void OnTransitionToIdle() {}
 };
 
 TestICDStateObserver mICDStateObserver;
