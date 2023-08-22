@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 202.2.4. [TC-OPSTATE-2.4] Mandatory Events with DUT as Server
 
@@ -20,38 +19,66 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "Operational State"
+    endpoint: 1
 
 tests:
     - label: "Step 1: Commission DUT to TH"
-      verification: |
-
-      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Step 2: Set up a subscription to the OperationalError event"
       PICS: OPSTATE.S.E00
-      verification: |
-          ./chip-tool operationalstate subscribe operational-error 5 15 1 1
-      disabled: true
+      command: "subscribeEvent"
+      event: "OperationalError"
+      minInterval: 100
+      maxInterval: 5000
 
     - label:
           "Step 3: At the DUT take the vendor defined action to generate an
           OperationalError event"
-      PICS: OPSTATE.S.E00
+      PICS: OPSTATE.S.E00 && PICS_SKIP_SAMPLE_APP
       verification: |
           After the subscription interval via the TH (chip-tool) verify:
           - reception of an OperationalError Event
           - ErrorStateID is a defined error
           - If the ErrorStateID is manufacturer specific, inclusion of an ErrorStateLabel, not present otherwise
           - Optionally an ErrorStateDetails
-      disabled: true
+
+
+          [1690441161.341433][11672:11674] CHIP:DMG: }
+          [1690441161.341507][11672:11674] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0005 DataVersion: 1440746021
+          [1690441161.341540][11672:11674] CHIP:TOO:   OperationalError: {
+          [1690441161.341548][11672:11674] CHIP:TOO:     ErrorStateID: 0
+          [1690441161.341556][11672:11674] CHIP:TOO:    }
+          [1690441161.341582][11672:11674] CHIP:DMG: MoveToState ReadClient[0x7f9a3400fb20]: Moving to [AwaitingSu]
+          [1690441161.342062][11672:11674] CHIP:DMG: SubscribeResponse is received
+          [1690441161.342078][11672:11674] CHIP:DMG: SubscribeResponseMessage =
+          [1690441161.342085][11672:11674] CHIP:DMG: {
+          [1690441161.342092][11672:11674] CHIP:DMG:         SubscriptionId = 0xea3239a3,
+          [1690441161.342099][11672:11674] CHIP:DMG:         MaxInterval = 0xf,
+          [1690441161.342106][11672:11674] CHIP:DMG:         InteractionModelRevision = 1
+          [1690441161.342111][11672:11674] CHIP:DMG: }
+          [1690441161.342120][11672:11674] CHIP:DMG: Subscription established with SubscriptionID = 0xea3239a3 MinInterval = 5s MaxInterval = 15s Peer = 01:0000000000000001
+          [1690441161.342131][11672:11674] CHIP:DMG: MoveToState ReadClient[0x7f9a3400fb20]: Moving to [Subscripti]
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 4: TH reads from the DUT the OperationalState attribute"
-      PICS: OPSTATE.S.A0004
-      verification: |
-          ./chip-tool operationalstate read operational-state 1 1
-
-          Via the TH (chip-tool), verify:
-          - the response has an OperationalStateID field that is set to 0x03 (Error)
-      disabled: true
+      PICS: OPSTATE.S.A0004 && PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "OperationalState"
+      response:
+          error: 0x03
+          constraints:
+              type: enum8

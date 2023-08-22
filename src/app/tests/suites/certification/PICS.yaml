@@ -3611,6 +3611,42 @@ PICS:
       id: GRPKEY.S.F00
 
     #
+    #server attributes
+    #
+    - label: "Does the device implement the GroupKeyMap attribute?"
+      id: GRPKEY.S.A0000
+
+    - label: "Does the device implement the GroupTable attribute?"
+      id: GRPKEY.S.A0001
+
+    - label: "Does the device implement the MaxGroupsPerFabric attribute?"
+      id: GRPKEY.S.A0002
+
+    - label: "Does the device implement the MaxGroupKeysPerFabric attribute?"
+      id: GRPKEY.S.A0003
+
+    #
+    # server commandsGenerated
+    #
+    - label: "Does the device implement the KeySetWrite command}?"
+      id: GRPKEY.S.C00.Rsp
+
+    - label: "Does the device implement the KeySetRead command}?"
+      id: GRPKEY.S.C01.Rsp
+
+    - label: "Does the device implement the KeySetReadResponse command}?"
+      id: GRPKEY.S.C02.Rsp
+
+    - label: "Does the device implement the KeySetRemove command}?"
+      id: GRPKEY.S.C03.Rsp
+
+    - label: "Does the device implement the KeySetReadAllIndices command}?"
+      id: GRPKEY.S.C04.Rsp
+
+    - label: "Does the device implement the KeySetReadAllIndicesResponse command}?"
+      id: GRPKEY.S.C05.Rsp
+
+    #
     # client / attributes
     #
     - label:
@@ -8935,6 +8971,9 @@ PICS:
           state"
       id: PIXIT.LWM.CAN_TEST_MODE_FAILURE
 
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: LWM.S.M.CAN_TEST_MODE_FAILURE
+
     #
     # server / features
     #
@@ -9102,6 +9141,9 @@ PICS:
           "Can the Temperature attribute changed by physical control at the
           device?"
       id: TCC.M.ManuallyControlledTemperature
+
+    - label: "Does the device support the INVALID_IN_MODE response"
+      id: TCTL.S.M.SupportsInvalidInMode
 
     #Commands received
     - label:
