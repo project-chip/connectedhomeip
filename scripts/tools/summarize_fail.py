@@ -13,5 +13,5 @@ frequency = df["Workflow"].value_counts(normalize=True).mul(100).astype(str) + "
 print(frequency.to_string())
 frequency.to_csv("recent_fails_frequency.csv")
 print()
-for run in df["ID"].tolist():
-  print(run)
+for failId in df["ID"].tolist():
+  subprocess.run(f"gh run view {failId} --log-failed", shell=True)
