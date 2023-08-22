@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import subprocess
 
@@ -13,5 +14,6 @@ frequency = df["Workflow"].value_counts(normalize=True).mul(100).astype(str).res
 print(frequency.to_string())
 frequency.to_csv("recent_fails_frequency.csv")
 print()
+os.makedirs("fail_logs")
 for failId in df["ID"].tolist():
-  subprocess.run(f"gh run view -R project-chip/connectedhomeip {failId} --log-failed", shell=True)
+  subprocess.run(f"gh run view -R project-chip/connectedhomeip {failId} --log-failed > fail_logs/{failId}", shell=True)
