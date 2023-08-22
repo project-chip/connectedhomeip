@@ -301,6 +301,11 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/SmokeCOTestEventTriggerDelegate.cpp",
           "${_app_root}/clusters/${cluster}/SmokeCOTestEventTriggerDelegate.h",
         ]
+      } else if (cluster == "air-quality-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+        ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }
