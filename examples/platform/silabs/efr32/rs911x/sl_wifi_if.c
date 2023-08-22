@@ -237,7 +237,7 @@ int32_t wfx_wifi_rsi_init(void)
 {
   SILABS_LOG("wfx_wifi_rsi_init started");
   sl_status_t status;
-  status = wfx_wifi_start(&config  , default_wifi_event_handler);
+  status = sl_wifi_init(&config  , default_wifi_event_handler);
   if(status != SL_STATUS_OK){
     SILABS_LOG("wfx_wifi_rsi_init failed %x", status);
     return status;

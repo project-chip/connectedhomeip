@@ -94,6 +94,7 @@ uint32_t gOverrunCount = 0;
  ******************************************************************************/
 static void low_level_init(struct netif * netif)
 {
+    SILABS_LOG("%s: started", __func__);
     /* set netif MAC hardware address length */
     netif->hwaddr_len = ETH_HWADDR_LEN;
 
@@ -114,6 +115,7 @@ static void low_level_init(struct netif * netif)
 
     /* Accept broadcast address and ARP traffic */
     netif->flags |= NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP | NETIF_FLAG_IGMP;
+    SILABS_LOG("%s: end", __func__);
 
 #if LWIP_IPV6_MLD
     netif->flags |= NETIF_FLAG_MLD6;
@@ -437,12 +439,13 @@ sl_status_t sl_si91x_host_process_data_frame(sl_wifi_interface_t interface, sl_w
     sl_si91x_packet_t * rsi_pkt;
     packet  = sl_si91x_host_get_buffer_data(buffer, 0, NULL);
     rsi_pkt = (sl_si91x_packet_t *) packet;
-
+    SILABS_LOG("=============================rsi_pkt======================================");
     /* get the network interface for STATION interface,
      * and forward the received frame buffer to LWIP
      */
     if ((ifp = wfx_get_netif(SL_WFX_STA_INTERFACE)) != (struct netif *) 0)
     {
+        SILABS_LOG("::::::::::::::::::::::::::: rsi_pkt->length : %d ", rsi_pkt->length);
         low_level_input(ifp, rsi_pkt->data, rsi_pkt->length);
     }
     return SL_STATUS_OK;
