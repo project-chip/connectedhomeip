@@ -624,6 +624,9 @@ class Scenes(Cluster):
     class Bitmaps:
         class Feature(IntFlag):
             kSceneNames = 0x1
+            kExplicit = 0x2
+            kTableSize = 0x4
+            kFabricScenes = 0x8
 
         class ScenesCopyMode(IntFlag):
             kCopyAllScenes = 0x1
@@ -2802,6 +2805,10 @@ class Descriptor(Cluster):
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
+
+    class Bitmaps:
+        class Feature(IntFlag):
+            kTagList = 0x1
 
     class Structs:
         @dataclass

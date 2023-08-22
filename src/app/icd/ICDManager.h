@@ -26,6 +26,10 @@
 namespace chip {
 namespace app {
 
+// Forward declaration of TestICDManager to allow it to be friend with ICDManager
+// Used in unit tests
+class TestICDManager;
+
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
  */
@@ -67,6 +71,8 @@ public:
     static System::Clock::Milliseconds32 GetFastPollingInterval() { return kFastPollingInterval; }
 
 protected:
+    friend class TestICDManager;
+
     static void OnIdleModeDone(System::Layer * aLayer, void * appState);
     static void OnActiveModeDone(System::Layer * aLayer, void * appState);
 

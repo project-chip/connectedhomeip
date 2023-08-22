@@ -67,6 +67,9 @@ chip::EndpointId kInvalidTestEndpointId = 3;
 chip::DataVersion kTestDataVersion1     = 3;
 chip::DataVersion kTestDataVersion2     = 5;
 
+// Number of items in the list for MockAttributeId(4).
+constexpr int kMockAttribute4ListLength = 6;
+
 static chip::System::Clock::Internal::MockClock gMockClock;
 static chip::System::Clock::ClockBase * gRealClock;
 
@@ -1214,7 +1217,8 @@ void TestReadInteraction::TestReadChunking(nlTestSuite * apSuite, void * apConte
     NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
 
     chip::app::AttributePathParams attributePathParams[1];
-    // Mock Attribute 4 is a big attribute, with 6 large OCTET_STRING
+    // Mock Attribute 4 is a big attribute, with kMockAttribute4ListLength large
+    // OCTET_STRING elements.
     attributePathParams[0].mEndpointId  = Test::kMockEndpoint3;
     attributePathParams[0].mClusterId   = Test::MockClusterId(2);
     attributePathParams[0].mAttributeId = Test::MockAttributeId(4);
@@ -1234,8 +1238,10 @@ void TestReadInteraction::TestReadChunking(nlTestSuite * apSuite, void * apConte
 
         ctx.DrainAndServiceIO();
 
-        // We get one chunk with 3 array elements, and then one chunk per element.
-        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 4);
+        // We get one chunk with 4 array elements, and then one chunk per
+        // element, and the total size of the array is
+        // kMockAttribute4ListLength.
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1 + (kMockAttribute4ListLength - 4));
         NL_TEST_ASSERT(apSuite, delegate.mNumArrayItems == 6);
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
@@ -1309,8 +1315,8 @@ void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void 
                     !aPath.IsListItemOperation())
                 {
                     mGotStartOfSecondReport = true;
-                    // Wait for an actual data chunk.
-                    return;
+                    // We always have data chunks, so go ahead to mark things
+                    // dirty as needed.
                 }
 
                 if (!mGotStartOfSecondReport)
@@ -1380,13 +1386,16 @@ void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void 
 
         ctx.DrainAndServiceIO();
 
-        // We should receive another (3 + 1) = 4 attribute reports represeting 6
-        // array items, since the underlying path iterator should be reset to
-        // the beginning of the cluster it is currently iterating.
+        // Our list has length kMockAttribute4ListLength.  Since the underlying
+        // path iterator should be reset to the beginning of the cluster it is
+        // currently iterating, we expect to get another value for our
+        // attribute.  The way the packet boundaries happen to fall, that value
+        // will encode 4 items in the first IB and then one IB per item.
+        const int expectedIBs = 1 + (kMockAttribute4ListLength - 4);
         ChipLogError(DataManagement, "OLD: %d\n", currentAttributeResponsesWhenSetDirty);
         ChipLogError(DataManagement, "NEW: %d\n", delegate.mNumAttributeResponse);
-        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == currentAttributeResponsesWhenSetDirty + 4);
-        NL_TEST_ASSERT(apSuite, delegate.mNumArrayItems == currentArrayItemsWhenSetDirty + 6);
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == currentAttributeResponsesWhenSetDirty + expectedIBs);
+        NL_TEST_ASSERT(apSuite, delegate.mNumArrayItems == currentArrayItemsWhenSetDirty + kMockAttribute4ListLength);
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         // By now we should have closed all exchanges and sent all pending acks, so
@@ -2225,7 +2234,7 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
                        reportScheduler->GetMinTimestampForHandler(delegate.mpReadHandler) <
                            System::SystemClock().GetMonotonicTimestamp());
         NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsDirty());
-        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsReportable());
+        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->ShouldStartReporting());
 
         // And the non-urgent one should not have changed state either, since
         // it's waiting for the max-interval.
@@ -2236,7 +2245,7 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
                        reportScheduler->GetMaxTimestampForHandler(nonUrgentDelegate.mpReadHandler) >
                            System::SystemClock().GetMonotonicTimestamp());
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
-        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsReportable());
+        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->ShouldStartReporting());
 
         // There should be no reporting run scheduled.  This is very important;
         // otherwise we can get a false-positive pass below because the run was
@@ -2248,12 +2257,12 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
 
         // Urgent read handler should now be dirty, and reportable.
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsReportable());
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->ShouldStartReporting());
         NL_TEST_ASSERT(apSuite, reportScheduler->IsReadHandlerReportable(delegate.mpReadHandler));
 
         // Non-urgent read handler should not be reportable.
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
-        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsReportable());
+        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->ShouldStartReporting());
 
         // Still no reporting should have happened.
         NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
@@ -2341,7 +2350,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
         // paths, for a total of 58 attributes.
         //
         // Attribute 0xFFFC::0xFFF1'FC02::0xFFF1'0004 (kMockEndpoint3::MockClusterId(2)::MockAttributeId(4))
-        // is a list of 6 elements of size 256 bytes each, which cannot fit in a single
+        // is a list of kMockAttribute4ListLength elements of size 256 bytes each, which cannot fit in a single
         // packet, so gets list chunking applied to it.
         //
         // Because delegate.mNumAttributeResponse counts AttributeDataIB instances, not attributes,
@@ -2350,21 +2359,16 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
         // in the response, there will be one AttributeDataIB for the start of the list (which will include
         // some number of 256-byte elements), then one AttributeDataIB for each of the remaining elements.
         //
-        // When EventList is enabled, for the first report for the list attribute we receive two
-        // of its items in the initial list, then 4 additional items.  For the second report we
-        // receive 3 items in the initial list followed by 3 additional items.
-        //
-        // Thus we should receive 29*2 + 4 + 3 = 65 attribute data in total.
-        constexpr size_t kExpectedAttributeResponse = 65;
+        // When EventList is enabled, for the first report for the list attribute we receive three
+        // of its items in the initial list, then the remaining items.  For the second report we
+        // receive 2 items in the initial list followed by the remaining items.
+        constexpr size_t kExpectedAttributeResponse = 29 * 2 + (kMockAttribute4ListLength - 3) + (kMockAttribute4ListLength - 2);
 #else
         // When EventList is not enabled, the packet boundaries shift and for the first
-        // report for the list attribute we receive two of its items in the initial list,
-        // then 4 additional items.  For the second report we receive 0 items in
-        // the initial list followed by 6 additional items.
-        //
-        // Thus we should receive 29*2 + 4 + 6 = 68 attribute data when the eventlist
-        // attribute is not available.
-        constexpr size_t kExpectedAttributeResponse = 68;
+        // report for the list attribute we receive four of its items in the initial list,
+        // then additional items.  For the second report we receive 4 items in
+        // the initial list followed by additional items.
+        constexpr size_t kExpectedAttributeResponse = 29 * 2 + (kMockAttribute4ListLength - 4) + (kMockAttribute4ListLength - 4);
 #endif
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == kExpectedAttributeResponse);
         NL_TEST_ASSERT(apSuite, delegate.mNumArrayItems == 12);
@@ -3460,9 +3464,10 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReport(nlTestSuite * ap
             gMockClock.AdvanceMonotonic(System::Clock::Milliseconds32(10));
         }
     }
-    // Two chunked reports carry 4 attributeDataIB: 1 with a list of 3 items,
-    // and then one per remaining item.
-    NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 4);
+    // We get one chunk with 4 array elements, and then one chunk per
+    // element, and the total size of the array is
+    // kMockAttribute4ListLength.
+    NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1 + (kMockAttribute4ListLength - 4));
     NL_TEST_ASSERT(apSuite, delegate.mNumArrayItems == 6);
 
     NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);

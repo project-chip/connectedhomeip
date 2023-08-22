@@ -45,9 +45,18 @@ android {
 
 dependencies {
 
+    implementation(project(":core:common"))
+    implementation(project(":core:domain"))
+    implementation(project(":core:model"))
+    implementation(project(":core:ui"))
+
     implementation(Deps.AndroidX.core)
     implementation(Deps.AndroidX.appcompat)
     implementation(Deps.AndroidX.fragment)
+    implementation(Deps.AndroidX.Lifecycle.viewmodel)
+    implementation(Deps.AndroidX.Lifecycle.livedata)
+
+    implementation(Deps.Kotlin.serialization)
 
     implementation(Deps.Navigation.fragment)
     implementation(Deps.Navigation.ui)

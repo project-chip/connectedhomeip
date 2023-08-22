@@ -56,7 +56,6 @@ public:
     static constexpr const char * kConfigKey_HardwareVersion             = ("hardware-ver");
     static constexpr const char * kConfigKey_LastUsedEpochKeyId          = ("last-ek-id");
     static constexpr const char * kConfigKey_FailSafeArmed               = ("fail-safe-armed");
-    static constexpr const char * kConfigKey_WiFiStationSecType          = ("sta-sec-type");
     static constexpr const char * kConfigKey_OperationalDeviceId         = ("op-device-id");
     static constexpr const char * kConfigKey_OperationalDeviceCert       = ("op-device-cert");
     static constexpr const char * kConfigKey_OperationalDeviceICACerts   = ("op-device-ca-certs");

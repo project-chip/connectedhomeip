@@ -15,7 +15,7 @@
             android:fitsSystemWindows="true"
             app:elevation="0dp"
             app:expanded="false"
-            app:layout_behavior="com.matter.virtual.device.app.core.common.ui.DisableAppBarLayoutBehavior">
+            app:layout_behavior="com.matter.virtual.device.app.core.ui.DisableAppBarLayoutBehavior">
 
             <com.google.android.material.appbar.CollapsingToolbarLayout
                 android:id="@+id/toolbar_layout"
