@@ -28,5 +28,5 @@
       {{~/if~}}
     {{~/if~}}
   {{/unless}} {{asLowerCamelCase name~}}
-  {{~#if isArray~}} [] {{~/if}} = {{code~}}
+  {{~#if isArray~}} [] {{~/if}} = {{asMEI manufacturerCode code~}}
   ;
