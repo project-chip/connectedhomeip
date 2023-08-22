@@ -9,9 +9,9 @@ print(df.to_string(index=False))
 df.to_csv("recent_fails.csv", index=False)
 print()
 print("Percentage Frequency:")
-frequency = df["Workflow"].value_counts(normalize=True).mul(100).astype(str).reset_index(name="Percentage") + "%"
+frequency = df["Workflow"].value_counts(normalize=True).mul(100).astype(str).reset_index(name="Percentage")
 print(frequency.to_string())
 frequency.to_csv("recent_fails_frequency.csv")
 print()
 for failId in df["ID"].tolist():
-  subprocess.run(f"gh run view {failId} --log-failed", shell=True)
+  subprocess.run(f"gh run view -R project-chip/connectedhomeip {failId} --log-failed", shell=True)
