@@ -33,6 +33,7 @@
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <lib/support/CHIPMem.h>
 #include <new>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -58,6 +59,8 @@ AllClustersCommandDelegate sAllClustersCommandDelegate;
 Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
 
 Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type gTagList[] = { {.namespaceID = 3, .tag = 3}, {.namespaceID = 4, .tag = 5} };
 } // namespace
 
 #ifdef EMBER_AF_PLUGIN_DISHWASHER_ALARM_SERVER
@@ -185,6 +188,8 @@ void ApplicationInit()
     MatterDishwasherAlarmServerInit();
 #endif
     Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+
+    emberAfSetTagList(1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gTagList));
 }
 
 void ApplicationShutdown()
