@@ -656,7 +656,7 @@ def main() -> int:
 
         shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
 
-        if (options.build_target == "esp32") or (options.build_target == "nrfconnect") or (options.build_target == "ameba") or (options.build_target == "telink"):
+        if options.build_target in "esp32 nrfconnect ameba telink".split():
             with open("project_include.cmake", "w") as f:
                 f.write(textwrap.dedent(f"""\
                         set(CONFIG_DEVICE_VENDOR_ID {options.vid})
