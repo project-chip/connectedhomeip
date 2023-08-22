@@ -34,10 +34,13 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
         except queue.Empty:
             asserts.fail("Did not receive MissingTrustedTimeSouce event")
 
+    # To set the ceiling for the subcription, set --int-arg PIXIT.TIMESYNC.CEILING:<value>
     @async_test_body
     async def test_TC_TIMESYNC_2_13(self):
 
         self.endpoint = 0
+
+        ceiling = self.matter_test_config.global_test_params.get('PIXIT.TIMESYNC.CEILING', 3)
 
         self.print_step(0, "Commissioning, already done")
 
@@ -68,14 +71,14 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
         self.q = queue.Queue()
         cb = SimpleEventCallback("MissingTrustedTimeSource", event.cluster_id, event.event_id, self.q)
         urgent = 1
-        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
+        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, ceiling])
         subscription.SetEventUpdateCallback(callback=cb)
 
         self.print_step(6, "TH1 removes the TH2 fabric")
         await self.send_single_cmd(cmd=Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=th2_fabric_idx))
 
-        self.print_step(7, "TH1 waits for the MissingTrustedTimeSource event with a timeout of 5 seconds")
-        self.wait_for_trusted_time_souce_event(5)
+        self.print_step(7, "TH1 waits for the MissingTrustedTimeSource event with a timeout of PIXIT.TIMESYNC.CEILING + 2 seconds")
+        self.wait_for_trusted_time_souce_event(ceiling + 2)
 
         self.print_step(8, "TH1 sends a SetTrusteTimeSource command")
         tts = Clusters.TimeSynchronization.Structs.FabricScopedTrustedTimeSourceStruct(
@@ -88,8 +91,8 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
         self.print_step(10, "TH1 sends the SetTrustedTimeSource command with TrustedTimeSource set to NULL")
         await self.send_single_cmd(cmd=Clusters.TimeSynchronization.Commands.SetTrustedTimeSource(NullValue))
 
-        self.print_step(11, "TH1 waits for the MissingTrustedTimeSource event with a timeout of 5 seconds")
-        self.wait_for_trusted_time_souce_event(5)
+        self.print_step(11, "TH1 waits for the MissingTrustedTimeSource event with a timeout of PIXIT.TIMESYNC.CEILING + 2 seconds")
+        self.wait_for_trusted_time_souce_event(ceiling + 2)
 
 
 if __name__ == "__main__":

@@ -51,10 +51,13 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
             asserts.fail("Did not receive DSTStatus event")
             pass
 
+     # To set the ceiling for the subcription, set --int-arg PIXIT.TIMESYNC.CEILING:<value>
     @async_test_body
     async def test_TC_TIMESYNC_2_11(self):
 
         self.endpoint = 0
+
+        ceiling = self.matter_test_config.global_test_params.get('PIXIT.TIMESYNC.CEILING', 3)
 
         self.print_step(0, "Commissioning, already done")
         time_cluster = Clusters.Objects.TimeSynchronization
@@ -79,7 +82,7 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
         self.q = queue.Queue()
         cb = SimpleEventCallback("DSTStatus", event.cluster_id, event.event_id, self.q)
         urgent = 1
-        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
+        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, ceiling])
         subscription.SetEventUpdateCallback(callback=cb)
 
         self.print_step(4, "TH reads the DSTOffsetListMaxSize")
@@ -105,8 +108,8 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
         self.print_step(7, "TH reads LocalTime")
         await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
 
-        self.print_step(8, "TH waits for DSTStatus event until th_utc + 5s")
-        self.wait_for_dst_status(th_utc, 5, True)
+        self.print_step(8, "TH waits for DSTStatus event until th_utc + PIXIT.TIMESYNC.CEILING + 2s")
+        self.wait_for_dst_status(th_utc, ceiling + 2, True)
 
         self.print_step(9, "TH waits until th_utc + 15s")
         time.sleep(get_wait_seconds_from_set_time(th_utc, 15))
@@ -114,8 +117,8 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
         self.print_step(10, "TH reads LocalTime")
         await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
 
-        self.print_step(11, "TH waits for DSTStatus event until th_utc + 20s")
-        self.wait_for_dst_status(th_utc, 20, False)
+        self.print_step(11, "TH waits for DSTStatus event until th_utc + 15s + PIXIT.TIMESYNC.CEILING + 2s")
+        self.wait_for_dst_status(th_utc, 15 + ceiling + 2, False)
 
         self.print_step(12, "If dst_list_size > 1, TH waits until th_utc + 30s")
         if dst_list_size > 1:
@@ -125,9 +128,9 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
         if dst_list_size > 1:
             await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
 
-        self.print_step(14, "If dst_list_size > 1, TH waits for a DSTStatus event until th_utc + 35s")
+        self.print_step(14, "If dst_list_size > 1, TH waits for a DSTStatus event until th_utc + 30 + ceiling + 2s")
         if dst_list_size > 1:
-            self.wait_for_dst_status(th_utc, 35, True)
+            self.wait_for_dst_status(th_utc, 30 + ceiling + 2, True)
 
         self.print_step(15, "If dst_list_size > 1, TH waits until th_utc + 45s")
         if dst_list_size > 1:
@@ -137,9 +140,9 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
         if dst_list_size > 1:
             await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
 
-        self.print_step(17, "If dst_list_size > 1, TH waits for a DSTStatus event until th_utc + 50s")
+        self.print_step(17, "If dst_list_size > 1, TH waits for a DSTStatus event until th_utc + 45 + PIXIT.TIMESYNC.CEILING + 2s")
         if dst_list_size > 1:
-            self.wait_for_dst_status(th_utc, 50, False)
+            self.wait_for_dst_status(th_utc, 45 + ceiling + 2, False)
 
         self.print_step(18, "Set time zone back to 0")
         tz = [tz_struct(offset=0, validAt=0)]

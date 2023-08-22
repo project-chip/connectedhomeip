@@ -45,10 +45,13 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
     async def send_set_utc_cmd(self, utc: uint) -> None:
         await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetUTCTime(UTCTime=utc, granularity=Clusters.Objects.TimeSynchronization.Enums.GranularityEnum.kMillisecondsGranularity))
 
+    # To set the ceiling for the subcription, set --int-arg PIXIT.TIMESYNC.CEILING:<value>
     @async_test_body
     async def test_TC_TIMESYNC_2_10(self):
 
         self.endpoint = 0
+
+        ceiling = self.matter_test_config.global_test_params.get('PIXIT.TIMESYNC.CEILING', 3)
 
         self.print_step(0, "Commissioning, already done")
         time_cluster = Clusters.Objects.TimeSynchronization
@@ -68,7 +71,7 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
         ret = await self.send_set_time_zone_cmd(tz)
         asserts.assert_true(ret.DSTOffsetRequired, "DSTOffsetRequired not set to true")
 
-        self.print_step(3, "Send SetDSTOffset command")
+        self.print_step(ceiling, "Send SetDSTOffset command")
         dst = [dst_struct(offset=3600, validStarting=0, validUntil=NullValue)]
         await self.send_set_dst_cmd(dst)
 
@@ -77,7 +80,7 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
         q = queue.Queue()
         cb = SimpleEventCallback("DSTTableEmpty", event.cluster_id, event.event_id, q)
         urgent = 1
-        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
+        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, ceiling])
         subscription.SetEventUpdateCallback(callback=cb)
 
         self.print_step(5, "Send SetTimeZone command")
@@ -87,7 +90,7 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
 
         self.print_step(6, "Wait for DSTTableEmpty event")
         try:
-            q.get(block=True, timeout=5)
+            q.get(block=True, timeout=ceiling + 2)
         except queue.Empty:
             asserts.fail("Did not receive DSTTableEmpy event")
 
@@ -105,7 +108,7 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
                                                        attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
 
         self.print_step(10, "Wait for DSTTableEmpty event")
-        timeout = get_wait_seconds_from_set_time(th_utc, 20)
+        timeout = get_wait_seconds_from_set_time(th_utc, 15 + ceiling + 2)
         try:
             q.get(block=True, timeout=timeout)
         except queue.Empty:
