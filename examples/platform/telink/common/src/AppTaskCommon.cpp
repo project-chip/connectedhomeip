@@ -157,7 +157,7 @@ class AppFabricTableDelegate : public FabricTable::Delegate
     {
         if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
         {
-            bool isBasicCommissioningMode = 
+            bool isBasicCommissioningMode =
                     chip::Server::GetInstance().GetCommissioningWindowManager().GetCommissioningMode() ==
                     Dnssd::CommissioningMode::kEnabledBasic;
             ChipLogProgress(DeviceLayer, "Performing erasing of settings partition");
