@@ -170,8 +170,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Identify::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Identify::Commands::Identify::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -180,7 +180,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Identify::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Identify::Commands::Identify::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -207,8 +208,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Identify::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Identify::Commands::TriggerEffect::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -217,7 +218,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Identify::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Identify::Commands::TriggerEffect::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -267,8 +269,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Groups::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Groups::Commands::AddGroup::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -277,7 +279,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Groups::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Groups::Commands::AddGroup::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -303,8 +306,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Groups::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Groups::Commands::ViewGroup::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -313,7 +316,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Groups::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Groups::Commands::ViewGroup::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -340,8 +344,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Groups::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Groups::Commands::GetGroupMembership::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -350,7 +354,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Groups::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Groups::Commands::GetGroupMembership::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -377,8 +382,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Groups::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Groups::Commands::RemoveGroup::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -387,7 +392,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Groups::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Groups::Commands::RemoveGroup::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -412,8 +418,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Groups::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Groups::Commands::RemoveAllGroups::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -422,7 +428,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Groups::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Groups::Commands::RemoveAllGroups::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -450,8 +457,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Groups::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Groups::Commands::AddGroupIfIdentifying::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -460,7 +467,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Groups::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Groups::Commands::AddGroupIfIdentifying::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -525,8 +533,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Scenes::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Scenes::Commands::AddScene::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -535,7 +543,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Scenes::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Scenes::Commands::AddScene::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -564,8 +573,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Scenes::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Scenes::Commands::ViewScene::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -574,7 +583,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Scenes::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Scenes::Commands::ViewScene::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -601,8 +611,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Scenes::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Scenes::Commands::RemoveScene::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -611,7 +621,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Scenes::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Scenes::Commands::RemoveScene::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -637,8 +648,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Scenes::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Scenes::Commands::RemoveAllScenes::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -647,7 +658,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Scenes::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Scenes::Commands::RemoveAllScenes::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -674,8 +686,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Scenes::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Scenes::Commands::StoreScene::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -684,7 +696,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Scenes::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Scenes::Commands::StoreScene::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -712,8 +725,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Scenes::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Scenes::Commands::RecallScene::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -722,7 +735,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Scenes::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Scenes::Commands::RecallScene::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -749,8 +763,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Scenes::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Scenes::Commands::GetSceneMembership::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -759,7 +773,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Scenes::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Scenes::Commands::GetSceneMembership::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -790,8 +805,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Scenes::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Scenes::Commands::EnhancedAddScene::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -800,7 +815,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Scenes::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Scenes::Commands::EnhancedAddScene::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -829,8 +845,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Scenes::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Scenes::Commands::EnhancedViewScene::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -839,7 +855,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Scenes::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Scenes::Commands::EnhancedViewScene::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -869,8 +886,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Scenes::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Scenes::Commands::CopyScene::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -879,7 +896,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Scenes::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Scenes::Commands::CopyScene::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -931,8 +949,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OnOff::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OnOff::Commands::Off::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -941,7 +959,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OnOff::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OnOff::Commands::Off::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -966,8 +985,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OnOff::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OnOff::Commands::On::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -976,7 +995,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OnOff::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OnOff::Commands::On::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1001,8 +1021,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OnOff::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OnOff::Commands::Toggle::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -1011,7 +1031,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OnOff::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OnOff::Commands::Toggle::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1038,8 +1059,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OnOff::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OnOff::Commands::OffWithEffect::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -1048,7 +1069,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OnOff::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OnOff::Commands::OffWithEffect::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1074,8 +1096,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OnOff::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -1084,7 +1106,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OnOff::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1112,8 +1135,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OnOff::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -1122,7 +1145,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OnOff::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1208,8 +1232,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LevelControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -1218,7 +1242,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LevelControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1247,8 +1272,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LevelControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LevelControl::Commands::Move::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -1257,7 +1282,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LevelControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LevelControl::Commands::Move::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1287,8 +1313,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LevelControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LevelControl::Commands::Step::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -1297,7 +1323,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LevelControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LevelControl::Commands::Step::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1324,8 +1351,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LevelControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LevelControl::Commands::Stop::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -1334,7 +1361,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LevelControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LevelControl::Commands::Stop::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1364,8 +1392,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LevelControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -1374,7 +1402,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LevelControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1403,8 +1432,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LevelControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -1413,7 +1442,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LevelControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1443,8 +1473,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LevelControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -1453,7 +1483,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LevelControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1480,8 +1511,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LevelControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -1490,7 +1521,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LevelControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1517,8 +1549,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LevelControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LevelControl::Commands::MoveToClosestFrequency::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -1527,7 +1559,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LevelControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LevelControl::Commands::MoveToClosestFrequency::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1689,8 +1722,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::InstantAction::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -1699,7 +1732,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::InstantAction::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1728,8 +1762,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::InstantActionWithTransition::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -1738,7 +1772,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::InstantActionWithTransition::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1765,8 +1800,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::StartAction::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -1775,7 +1810,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::StartAction::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1804,8 +1840,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::StartActionWithDuration::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -1814,7 +1850,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::StartActionWithDuration::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1841,8 +1878,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::StopAction::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -1851,7 +1888,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::StopAction::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1878,8 +1916,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::PauseAction::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -1888,7 +1926,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::PauseAction::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1917,8 +1956,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::PauseActionWithDuration::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -1927,7 +1966,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::PauseActionWithDuration::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1954,8 +1994,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::ResumeAction::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -1964,7 +2004,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::ResumeAction::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -1991,8 +2032,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::EnableAction::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -2001,7 +2042,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::EnableAction::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -2030,8 +2072,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::EnableActionWithDuration::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -2040,7 +2082,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::EnableActionWithDuration::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -2067,8 +2110,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::DisableAction::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -2077,7 +2120,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::DisableAction::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -2106,8 +2150,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::DisableActionWithDuration::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -2116,7 +2160,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Actions::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Actions::Commands::DisableActionWithDuration::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -2184,8 +2229,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::BasicInformation::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::BasicInformation::Commands::MfgSpecificPing::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -2194,7 +2239,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::BasicInformation::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::BasicInformation::Commands::MfgSpecificPing::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -2247,8 +2293,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OtaSoftwareUpdateProvider::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -2257,7 +2303,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OtaSoftwareUpdateProvider::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -2287,8 +2334,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OtaSoftwareUpdateProvider::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -2297,7 +2344,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OtaSoftwareUpdateProvider::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -2325,8 +2373,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OtaSoftwareUpdateProvider::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -2335,7 +2383,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OtaSoftwareUpdateProvider::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -2390,8 +2439,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OtaSoftwareUpdateRequestor::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -2400,7 +2449,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OtaSoftwareUpdateRequestor::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -2574,8 +2624,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::GeneralCommissioning::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -2584,7 +2634,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::GeneralCommissioning::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -2613,8 +2664,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::GeneralCommissioning::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -2623,7 +2674,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::GeneralCommissioning::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -2649,8 +2701,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::GeneralCommissioning::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -2659,7 +2711,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::GeneralCommissioning::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -2717,8 +2770,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkCommissioning::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworks::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -2727,7 +2780,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkCommissioning::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworks::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -2756,8 +2810,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkCommissioning::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -2766,7 +2820,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkCommissioning::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -2794,8 +2849,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkCommissioning::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -2804,7 +2859,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkCommissioning::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -2832,8 +2888,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkCommissioning::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -2842,7 +2898,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkCommissioning::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -2870,8 +2927,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkCommissioning::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetwork::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -2880,7 +2937,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkCommissioning::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetwork::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -2909,8 +2967,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkCommissioning::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::NetworkCommissioning::Commands::ReorderNetwork::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -2919,7 +2977,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkCommissioning::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::NetworkCommissioning::Commands::ReorderNetwork::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -2965,8 +3024,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DiagnosticLogs::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -2975,7 +3034,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DiagnosticLogs::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -3033,8 +3093,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::GeneralDiagnostics::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::GeneralDiagnostics::Commands::TestEventTrigger::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -3043,7 +3103,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::GeneralDiagnostics::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::GeneralDiagnostics::Commands::TestEventTrigger::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -3091,8 +3152,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::SoftwareDiagnostics::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -3101,7 +3162,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::SoftwareDiagnostics::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -3209,8 +3271,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ThreadNetworkDiagnostics::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -3219,7 +3281,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ThreadNetworkDiagnostics::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -3278,8 +3341,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WiFiNetworkDiagnostics::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::WiFiNetworkDiagnostics::Commands::ResetCounts::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -3288,7 +3351,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WiFiNetworkDiagnostics::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::WiFiNetworkDiagnostics::Commands::ResetCounts::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -3340,8 +3404,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::EthernetNetworkDiagnostics::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -3350,7 +3414,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::EthernetNetworkDiagnostics::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -3417,8 +3482,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::TimeSynchronization::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::TimeSynchronization::Commands::SetUTCTime::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -3427,7 +3492,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::TimeSynchronization::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::TimeSynchronization::Commands::SetUTCTime::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -3454,8 +3520,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::TimeSynchronization::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::TimeSynchronization::Commands::SetTrustedTimeSource::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -3464,7 +3530,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::TimeSynchronization::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::TimeSynchronization::Commands::SetTrustedTimeSource::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -3494,8 +3561,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::TimeSynchronization::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::TimeSynchronization::Commands::SetTimeZone::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -3504,7 +3571,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::TimeSynchronization::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::TimeSynchronization::Commands::SetTimeZone::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -3533,8 +3601,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::TimeSynchronization::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::TimeSynchronization::Commands::SetDSTOffset::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -3543,7 +3611,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::TimeSynchronization::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::TimeSynchronization::Commands::SetDSTOffset::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -3572,8 +3641,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::TimeSynchronization::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::TimeSynchronization::Commands::SetDefaultNTP::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -3582,7 +3651,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::TimeSynchronization::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::TimeSynchronization::Commands::SetDefaultNTP::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -3698,8 +3768,8 @@ public:
         constexpr chip::CommandId commandId =
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -3709,7 +3779,8 @@ public:
         constexpr chip::CommandId commandId =
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -3737,8 +3808,8 @@ public:
         constexpr chip::CommandId commandId =
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -3748,7 +3819,8 @@ public:
         constexpr chip::CommandId commandId =
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -3774,8 +3846,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::AdministratorCommissioning::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -3784,7 +3856,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::AdministratorCommissioning::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -3841,8 +3914,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::AttestationRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -3851,7 +3924,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::AttestationRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -3878,8 +3952,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -3888,7 +3962,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -3915,8 +3990,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::CSRRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -3925,7 +4000,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::CSRRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -3955,8 +4031,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::AddNOC::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -3965,7 +4041,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::AddNOC::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -3992,8 +4069,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::UpdateNOC::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -4002,7 +4079,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::UpdateNOC::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -4029,8 +4107,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -4039,7 +4117,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -4066,8 +4145,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -4076,7 +4155,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -4103,8 +4183,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -4113,7 +4193,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -4164,8 +4245,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::GroupKeyManagement::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -4174,7 +4255,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::GroupKeyManagement::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -4201,8 +4283,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::GroupKeyManagement::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -4211,7 +4293,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::GroupKeyManagement::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -4238,8 +4321,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::GroupKeyManagement::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -4248,7 +4331,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::GroupKeyManagement::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -4274,8 +4358,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::GroupKeyManagement::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -4284,7 +4368,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::GroupKeyManagement::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -4438,8 +4523,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::IcdManagement::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::IcdManagement::Commands::RegisterClient::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -4448,7 +4533,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::IcdManagement::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::IcdManagement::Commands::RegisterClient::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -4476,8 +4562,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::IcdManagement::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::IcdManagement::Commands::UnregisterClient::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -4486,7 +4572,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::IcdManagement::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::IcdManagement::Commands::UnregisterClient::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -4512,8 +4599,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::IcdManagement::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::IcdManagement::Commands::StayActiveRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -4522,7 +4609,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::IcdManagement::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::IcdManagement::Commands::StayActiveRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -4571,8 +4659,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ModeSelect::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -4581,7 +4669,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ModeSelect::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -4629,8 +4718,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LaundryWasherMode::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToMode::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -4639,7 +4728,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LaundryWasherMode::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToMode::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -4688,8 +4778,8 @@ public:
         constexpr chip::CommandId commandId =
             chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToMode::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -4699,7 +4789,8 @@ public:
         constexpr chip::CommandId commandId =
             chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToMode::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -4766,8 +4857,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::RvcRunMode::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::RvcRunMode::Commands::ChangeToMode::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -4776,7 +4867,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::RvcRunMode::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::RvcRunMode::Commands::ChangeToMode::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -4823,8 +4915,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::RvcCleanMode::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::RvcCleanMode::Commands::ChangeToMode::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -4833,7 +4925,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::RvcCleanMode::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::RvcCleanMode::Commands::ChangeToMode::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -4884,8 +4977,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::TemperatureControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::TemperatureControl::Commands::SetTemperature::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -4894,7 +4987,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::TemperatureControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::TemperatureControl::Commands::SetTemperature::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -4961,8 +5055,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DishwasherMode::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DishwasherMode::Commands::ChangeToMode::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -4971,7 +5065,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DishwasherMode::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DishwasherMode::Commands::ChangeToMode::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -5055,8 +5150,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::SmokeCoAlarm::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::SmokeCoAlarm::Commands::SelfTestRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -5065,7 +5160,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::SmokeCoAlarm::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::SmokeCoAlarm::Commands::SelfTestRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -5114,8 +5210,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DishwasherAlarm::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DishwasherAlarm::Commands::Reset::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -5124,7 +5220,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DishwasherAlarm::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DishwasherAlarm::Commands::Reset::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -5151,8 +5248,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DishwasherAlarm::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DishwasherAlarm::Commands::ModifyEnabledAlarms::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -5161,7 +5258,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DishwasherAlarm::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DishwasherAlarm::Commands::ModifyEnabledAlarms::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -5214,8 +5312,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalState::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalState::Commands::Pause::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -5224,7 +5322,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalState::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalState::Commands::Pause::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -5249,8 +5348,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalState::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalState::Commands::Stop::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -5259,7 +5358,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalState::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalState::Commands::Stop::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -5284,8 +5384,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalState::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalState::Commands::Start::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -5294,7 +5394,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalState::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalState::Commands::Start::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -5319,8 +5420,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalState::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalState::Commands::Resume::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -5329,7 +5430,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalState::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::OperationalState::Commands::Resume::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -5382,8 +5484,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::RvcOperationalState::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::RvcOperationalState::Commands::Pause::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -5392,7 +5494,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::RvcOperationalState::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::RvcOperationalState::Commands::Pause::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -5417,8 +5520,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::RvcOperationalState::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::RvcOperationalState::Commands::Stop::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -5427,7 +5530,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::RvcOperationalState::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::RvcOperationalState::Commands::Stop::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -5452,8 +5556,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::RvcOperationalState::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::RvcOperationalState::Commands::Start::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -5462,7 +5566,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::RvcOperationalState::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::RvcOperationalState::Commands::Start::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -5487,8 +5592,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::RvcOperationalState::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::RvcOperationalState::Commands::Resume::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -5497,7 +5602,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::RvcOperationalState::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::RvcOperationalState::Commands::Resume::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -5546,8 +5652,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::HepaFilterMonitoring::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::HepaFilterMonitoring::Commands::ResetCondition::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -5556,7 +5662,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::HepaFilterMonitoring::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::HepaFilterMonitoring::Commands::ResetCondition::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -5605,8 +5712,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ActivatedCarbonFilterMonitoring::Commands::ResetCondition::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -5615,7 +5722,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ActivatedCarbonFilterMonitoring::Commands::ResetCondition::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -5717,8 +5825,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::LockDoor::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -5727,7 +5835,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::LockDoor::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -5753,8 +5862,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::UnlockDoor::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -5763,7 +5872,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::UnlockDoor::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -5791,8 +5901,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -5801,7 +5911,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -5834,8 +5945,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -5844,7 +5955,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -5872,8 +5984,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -5882,7 +5994,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -5910,8 +6023,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -5920,7 +6033,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -5950,8 +6064,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -5960,7 +6074,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -5988,8 +6103,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -5998,7 +6113,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -6026,8 +6142,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -6036,7 +6152,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -6066,8 +6183,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -6076,7 +6193,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -6103,8 +6221,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -6113,7 +6231,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -6140,8 +6259,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -6150,7 +6269,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -6182,8 +6302,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::SetUser::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -6192,7 +6312,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::SetUser::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -6218,8 +6339,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::GetUser::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -6228,7 +6349,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::GetUser::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -6254,8 +6376,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::ClearUser::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -6264,7 +6386,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::ClearUser::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -6296,8 +6419,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::SetCredential::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -6306,7 +6429,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::SetCredential::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -6334,8 +6458,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -6344,7 +6468,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -6372,8 +6497,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::ClearCredential::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -6382,7 +6507,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::ClearCredential::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -6410,8 +6536,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::UnboltDoor::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -6420,7 +6546,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::UnboltDoor::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -6490,8 +6617,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WindowCovering::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -6500,7 +6627,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WindowCovering::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -6525,8 +6653,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WindowCovering::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -6535,7 +6663,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WindowCovering::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -6560,8 +6689,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WindowCovering::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::WindowCovering::Commands::StopMotion::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -6570,7 +6699,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WindowCovering::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::WindowCovering::Commands::StopMotion::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -6597,8 +6727,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WindowCovering::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::WindowCovering::Commands::GoToLiftValue::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -6607,7 +6737,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WindowCovering::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::WindowCovering::Commands::GoToLiftValue::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -6634,8 +6765,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WindowCovering::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -6644,7 +6775,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WindowCovering::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -6671,8 +6803,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WindowCovering::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::WindowCovering::Commands::GoToTiltValue::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -6681,7 +6813,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WindowCovering::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::WindowCovering::Commands::GoToTiltValue::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -6708,8 +6841,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WindowCovering::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -6718,7 +6851,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::WindowCovering::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -6773,8 +6907,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::BarrierControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::BarrierControl::Commands::BarrierControlGoToPercent::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -6783,7 +6917,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::BarrierControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::BarrierControl::Commands::BarrierControlGoToPercent::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -6809,8 +6944,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::BarrierControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::BarrierControl::Commands::BarrierControlStop::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -6819,7 +6954,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::BarrierControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::BarrierControl::Commands::BarrierControlStop::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -6972,8 +7108,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -6982,7 +7118,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7012,8 +7149,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7022,7 +7159,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7053,8 +7191,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::GetWeeklySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7063,7 +7201,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::GetWeeklySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7089,8 +7228,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7099,7 +7238,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7156,8 +7296,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::FanControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::FanControl::Commands::Step::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7166,7 +7306,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::FanControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::FanControl::Commands::Step::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7302,8 +7443,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::MoveToHue::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7312,7 +7453,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::MoveToHue::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7341,8 +7483,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::MoveHue::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7351,7 +7493,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::MoveHue::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7381,8 +7524,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::StepHue::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7391,7 +7534,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::StepHue::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7421,8 +7565,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7431,7 +7575,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7460,8 +7605,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7470,7 +7615,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7500,8 +7646,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::StepSaturation::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7510,7 +7656,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::StepSaturation::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7541,8 +7688,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7551,7 +7698,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7581,8 +7729,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::MoveToColor::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7591,7 +7739,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::MoveToColor::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7620,8 +7769,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::MoveColor::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7630,7 +7779,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::MoveColor::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7660,8 +7810,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::StepColor::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7670,7 +7820,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::StepColor::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7700,8 +7851,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7710,7 +7861,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7741,8 +7893,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7751,7 +7903,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7781,8 +7934,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7791,7 +7944,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7822,8 +7976,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7832,7 +7986,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7863,8 +8018,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7873,7 +8028,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7905,8 +8061,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7915,7 +8071,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7942,8 +8099,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::StopMoveStep::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7952,7 +8109,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::StopMoveStep::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -7984,8 +8142,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -7994,7 +8152,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -8027,8 +8186,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -8037,7 +8196,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ColorControl::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -8536,8 +8696,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Channel::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Channel::Commands::ChangeChannel::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -8546,7 +8706,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Channel::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Channel::Commands::ChangeChannel::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -8574,8 +8735,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Channel::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Channel::Commands::ChangeChannelByNumber::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -8584,7 +8745,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Channel::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Channel::Commands::ChangeChannelByNumber::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -8610,8 +8772,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Channel::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Channel::Commands::SkipChannel::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -8620,7 +8782,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Channel::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::Channel::Commands::SkipChannel::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -8667,8 +8830,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::TargetNavigator::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -8677,7 +8840,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::TargetNavigator::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -8736,8 +8900,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::Play::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -8746,7 +8910,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::Play::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -8771,8 +8936,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::Pause::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -8781,7 +8946,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::Pause::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -8806,8 +8972,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::Stop::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -8816,7 +8982,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::Stop::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -8841,8 +9008,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::StartOver::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -8851,7 +9018,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::StartOver::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -8876,8 +9044,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::Previous::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -8886,7 +9054,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::Previous::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -8911,8 +9080,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::Next::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -8921,7 +9090,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::Next::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -8946,8 +9116,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::Rewind::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -8956,7 +9126,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::Rewind::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -8981,8 +9152,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::FastForward::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -8991,7 +9162,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::FastForward::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -9017,8 +9189,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::SkipForward::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -9027,7 +9199,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::SkipForward::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -9053,8 +9226,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::SkipBackward::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -9063,7 +9236,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::SkipBackward::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -9089,8 +9263,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::Seek::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -9099,7 +9273,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaPlayback::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaPlayback::Commands::Seek::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -9147,8 +9322,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaInput::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaInput::Commands::SelectInput::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -9157,7 +9332,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaInput::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaInput::Commands::SelectInput::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -9182,8 +9358,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaInput::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -9192,7 +9368,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaInput::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -9217,8 +9394,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaInput::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaInput::Commands::HideInputStatus::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -9227,7 +9404,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaInput::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaInput::Commands::HideInputStatus::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -9254,8 +9432,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaInput::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaInput::Commands::RenameInput::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -9264,7 +9442,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaInput::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::MediaInput::Commands::RenameInput::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -9306,8 +9485,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LowPower::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LowPower::Commands::Sleep::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -9316,7 +9495,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::LowPower::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::LowPower::Commands::Sleep::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -9359,8 +9539,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::KeypadInput::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::KeypadInput::Commands::SendKey::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -9369,7 +9549,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::KeypadInput::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::KeypadInput::Commands::SendKey::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -9418,8 +9599,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ContentLauncher::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -9428,7 +9609,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ContentLauncher::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -9458,8 +9640,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ContentLauncher::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -9468,7 +9650,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ContentLauncher::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -9516,8 +9699,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::AudioOutput::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::AudioOutput::Commands::SelectOutput::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -9526,7 +9709,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::AudioOutput::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::AudioOutput::Commands::SelectOutput::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -9553,8 +9737,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::AudioOutput::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::AudioOutput::Commands::RenameOutput::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -9563,7 +9747,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::AudioOutput::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::AudioOutput::Commands::RenameOutput::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -9612,8 +9797,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ApplicationLauncher::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -9622,7 +9807,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ApplicationLauncher::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -9651,8 +9837,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ApplicationLauncher::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -9661,7 +9847,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ApplicationLauncher::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -9690,8 +9877,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ApplicationLauncher::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -9700,7 +9887,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ApplicationLauncher::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -9771,8 +9959,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::AccountLogin::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -9781,7 +9969,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::AccountLogin::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -9808,8 +9997,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::AccountLogin::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::AccountLogin::Commands::Login::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -9818,7 +10007,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::AccountLogin::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::AccountLogin::Commands::Login::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -9843,8 +10033,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::AccountLogin::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::AccountLogin::Commands::Logout::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -9853,7 +10043,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::AccountLogin::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::AccountLogin::Commands::Logout::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10025,8 +10216,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ElectricalMeasurement::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoCommand::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10035,7 +10226,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ElectricalMeasurement::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoCommand::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10065,8 +10257,8 @@ public:
         constexpr chip::CommandId commandId =
             chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileCommand::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10076,7 +10268,8 @@ public:
         constexpr chip::CommandId commandId =
             chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileCommand::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10223,8 +10416,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::Test::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10233,7 +10426,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::Test::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10258,8 +10452,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestNotHandled::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10268,7 +10462,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestNotHandled::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10293,8 +10488,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestSpecific::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10303,7 +10498,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestSpecific::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10329,8 +10525,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestUnknownCommand::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10339,7 +10535,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestUnknownCommand::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10367,8 +10564,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestAddArguments::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10377,7 +10574,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestAddArguments::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10404,8 +10602,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10414,7 +10612,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10447,8 +10646,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10457,7 +10656,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10490,8 +10690,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestStructArgumentRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10500,7 +10700,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestStructArgumentRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10528,8 +10729,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestNestedStructArgumentRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10538,7 +10739,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestNestedStructArgumentRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10566,8 +10768,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestListStructArgumentRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10576,7 +10778,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestListStructArgumentRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10605,8 +10808,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestListInt8UArgumentRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10615,7 +10818,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestListInt8UArgumentRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10643,8 +10847,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestNestedStructListArgumentRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10653,7 +10857,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestNestedStructListArgumentRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10682,8 +10887,8 @@ public:
         constexpr chip::CommandId commandId =
             chip::app::Clusters::UnitTesting::Commands::TestListNestedStructListArgumentRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10693,7 +10898,8 @@ public:
         constexpr chip::CommandId commandId =
             chip::app::Clusters::UnitTesting::Commands::TestListNestedStructListArgumentRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10722,8 +10928,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10732,7 +10938,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10761,8 +10968,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestEnumsRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10771,7 +10978,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestEnumsRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10798,8 +11006,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10808,7 +11016,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10849,8 +11058,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10859,7 +11068,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10900,8 +11110,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::SimpleStructEchoRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10910,7 +11120,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::SimpleStructEchoRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10937,8 +11148,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TimedInvokeRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10947,7 +11158,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TimedInvokeRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -10974,8 +11186,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestSimpleOptionalArgumentRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -10984,7 +11196,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestSimpleOptionalArgumentRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -11013,8 +11226,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -11023,7 +11236,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -11050,8 +11264,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -11060,7 +11274,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventRequest::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -11108,8 +11323,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::FaultInjection::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::FaultInjection::Commands::FailAtFault::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -11118,7 +11333,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::FaultInjection::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::FaultInjection::Commands::FailAtFault::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
@@ -11147,8 +11363,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::FaultInjection::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::FaultInjection::Commands::FailRandomlyAtFault::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08lX) on endpoint %u", clusterId, commandId,
-                        endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
         return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
@@ -11157,7 +11373,8 @@ public:
         constexpr chip::ClusterId clusterId = chip::app::Clusters::FaultInjection::Id;
         constexpr chip::CommandId commandId = chip::app::Clusters::FaultInjection::Commands::FailRandomlyAtFault::Id;
 
-        ChipLogProgress(chipTool, "Sending cluster (0x%08lX) command (0x%08X) on Group %u", clusterId, commandId, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
