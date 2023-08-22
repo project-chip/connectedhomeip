@@ -468,9 +468,7 @@ public class ChipDeviceController {
     return getCompressedFabricId(deviceControllerPtr);
   }
 
-  /**
-   * Get device Controller's Node ID.
-   */
+  /** Get device Controller's Node ID. */
   public long getControllerNodeId() {
     return getControllerNodeId(deviceControllerPtr);
   }
