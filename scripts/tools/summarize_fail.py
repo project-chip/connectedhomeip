@@ -1,7 +1,7 @@
 import pandas as pd
 import subprocess
 
-subprocess.run("gh run list -R project-chip/connectedhomeip -b master -s failure --json displayTitle,workflowName > run_list.json")
+subprocess.run("gh")
 df = pd.read_json("run_list.json")
 df.columns = ["Pull Request", "Workflow"]
 print("Recent Failures:")
