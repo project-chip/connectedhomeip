@@ -202,7 +202,7 @@ CHIP_ERROR Browse(void * context, DnssdBrowseCallback callback, uint32_t interfa
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Browse(DnssdBrowseDelegate * delegate, uint32_t interfaceId, const char * type, DnssdServiceProtocol protocol)
+CHIP_ERROR Browse(BrowseDelegate * delegate, uint32_t interfaceId, const char * type, DnssdServiceProtocol protocol)
 {
     auto sdCtx = chip::Platform::New<BrowseWithDelegateContext>(delegate, protocol);
     VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);
@@ -299,8 +299,9 @@ static CHIP_ERROR Resolve(void * context, DnssdResolveCallback callback, uint32_
     return Resolve(sdCtx, interfaceId, addressType, type, name);
 }
 
-static CHIP_ERROR Resolve(CommissioningResolveDelegate * delegate, uint32_t interfaceId, chip::Inet::IPAddressType addressType,
-                          const char * type, const char * name)
+template <typename T>
+static CHIP_ERROR Resolve(T * delegate, uint32_t interfaceId, chip::Inet::IPAddressType addressType, const char * type,
+                          const char * name)
 {
     auto counterHolder = GetCounterHolder(name);
     auto sdCtx         = chip::Platform::New<ResolveContext>(delegate, addressType, name, std::move(counterHolder));
@@ -414,7 +415,7 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
 }
 
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                           chip::Inet::InterfaceId interface, DnssdBrowseDelegate * delegate)
+                           chip::Inet::InterfaceId interface, BrowseDelegate * delegate)
 {
     VerifyOrReturnError(type != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -425,7 +426,7 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
     return Browse(delegate, interfaceId, regtype.c_str(), protocol);
 }
 
-CHIP_ERROR ChipDnssdStopBrowse(DnssdBrowseDelegate * delegate)
+CHIP_ERROR ChipDnssdStopBrowse(BrowseDelegate * delegate)
 {
     auto existingCtx = MdnsContexts::GetInstance().GetExistingBrowseForDelegate(delegate);
     if (existingCtx == nullptr)
@@ -448,6 +449,16 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inte
 }
 
 CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, CommissioningResolveDelegate * delegate)
+{
+    VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsSupportedProtocol(service->mProtocol), CHIP_ERROR_INVALID_ARGUMENT);
+
+    auto regtype     = GetFullType(service);
+    auto interfaceId = GetInterfaceId(interface);
+    return Resolve(delegate, interfaceId, service->mAddressType, regtype.c_str(), service->mName);
+}
+
+CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, OperationalResolveDelegate * delegate)
 {
     VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSupportedProtocol(service->mProtocol), CHIP_ERROR_INVALID_ARGUMENT);

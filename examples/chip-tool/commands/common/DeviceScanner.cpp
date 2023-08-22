@@ -18,39 +18,67 @@
 
 #include "DeviceScanner.h"
 
+#include <lib/dnssd/ServiceNaming.h> // For MakeInstanceName
+
 using namespace chip;
 using namespace chip::Dnssd;
 
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
 #if CONFIG_NETWORK_LAYER_BLE
 using namespace chip::Ble;
 constexpr const char * kBleKey = "BLE";
 #endif // CONFIG_NETWORK_LAYER_BLE
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 
-CHIP_ERROR DeviceScanner::Start()
+CHIP_ERROR DeviceScanner::StartInternal()
 {
+    VerifyOrReturnError(mIsBrowsing == false, CHIP_ERROR_INCORRECT_STATE);
+
     mDiscoveredResults.clear();
 
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
 #if CONFIG_NETWORK_LAYER_BLE
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().StartBleScan(this));
 #endif // CONFIG_NETWORK_LAYER_BLE
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 
-    ReturnErrorOnFailure(chip::Dnssd::Resolver::Instance().Init(DeviceLayer::UDPEndPointManager()));
+    ReturnLogErrorOnFailure(mDNSResolver.Init(chip::DeviceLayer::UDPEndPointManager()));
+    mDNSResolver.SetBrowseDelegate(this);
+    mDNSResolver.SetCommissioningDelegate(this);
+    mDNSResolver.SetOperationalDelegate(this);
 
-    char serviceName[kMaxCommissionableServiceNameSize];
-    auto filter = DiscoveryFilterType::kNone;
-    ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionableNode));
+    return CHIP_NO_ERROR;
+}
 
-    return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny,
-                           Inet::InterfaceId::Null(), this);
+CHIP_ERROR DeviceScanner::StartCommissionableDiscovery()
+{
+    ReturnErrorOnFailure(StartInternal());
+    ReturnErrorOnFailure(mDNSResolver.StartBrowse());
+    mIsBrowsing = true;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceScanner::StartOperationalDiscovery(chip::Optional<uint64_t> compressedFabricIdFilter)
+{
+    ReturnErrorOnFailure(StartInternal());
+    ReturnErrorOnFailure(mDNSResolver.StartBrowse(compressedFabricIdFilter));
+    mIsBrowsing = true;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceScanner::Stop()
 {
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
 #if CONFIG_NETWORK_LAYER_BLE
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().StopBleScan());
 #endif // CONFIG_NETWORK_LAYER_BLE
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 
-    return ChipDnssdStopBrowse(this);
+    ReturnErrorOnFailure(mDNSResolver.StopBrowse());
+    mDNSResolver.Shutdown();
+
+    mIsBrowsing = false;
+    return CHIP_NO_ERROR;
 }
 
 void DeviceScanner::OnNodeDiscovered(const DiscoveredNodeData & nodeData)
@@ -79,37 +107,72 @@ void DeviceScanner::OnNodeDiscovered(const DiscoveredNodeData & nodeData)
     nodeData.LogDetail();
 }
 
-void DeviceScanner::OnBrowseAdd(chip::Dnssd::DnssdService service)
+void DeviceScanner::OnOperationalNodeResolved(const ResolvedNodeData & nodeData)
 {
-    ChipLogProgress(chipTool, "OnBrowseAdd: %s", service.mName);
-    LogErrorOnFailure(ChipDnssdResolve(&service, service.mInterface, this));
+    auto & operationalData = nodeData.operationalData;
+    ChipLogProgress(chipTool, "OnOperationalNodeResolved peerId: " ChipLogFormatX64 ":" ChipLogFormatX64,
+                    ChipLogValueX64(operationalData.peerId.GetCompressedFabricId()),
+                    ChipLogValueX64(operationalData.peerId.GetNodeId()));
+    mDNSResolver.NodeIdResolutionNoLongerNeeded(operationalData.peerId);
 
-    auto & instanceData  = mDiscoveredResults[service.mName];
-    auto & interfaceData = instanceData[service.mInterface.GetPlatformInterface()];
+    auto & resolutionData = nodeData.resolutionData;
+
+    char instanceName[Common::kInstanceNameMaxLength + 1];
+    ReturnOnFailure(MakeInstanceName(instanceName, sizeof(instanceName), operationalData.peerId));
+    auto & instanceData  = mDiscoveredResults[instanceName];
+    auto & interfaceData = instanceData[resolutionData.interfaceId.GetPlatformInterface()];
+
+    for (size_t i = 0; i < resolutionData.numIPs; i++)
+    {
+        DeviceScannerResult result;
+        result.isOperational = true;
+        interfaceData.push_back(result);
+    }
+}
+
+void DeviceScanner::OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error)
+{
+    mDNSResolver.NodeIdResolutionNoLongerNeeded(peerId);
+
+    char instanceName[Common::kInstanceNameMaxLength + 1];
+    ReturnOnFailure(MakeInstanceName(instanceName, sizeof(instanceName), peerId));
+    mDiscoveredResults.erase(instanceName);
+}
+
+void DeviceScanner::OnBrowseAdd(const NodeBrowseData & nodeData)
+{
+    ChipLogError(chipTool, "OnBrowseAdd: %s", nodeData.mName);
+    auto error = mDNSResolver.ResolveNode(nodeData);
+    LogErrorOnFailure(error);
+    ReturnOnFailure(error);
+
+    auto & instanceData  = mDiscoveredResults[nodeData.mName];
+    auto & interfaceData = instanceData[nodeData.mInterfaceId.GetPlatformInterface()];
     (void) interfaceData;
 }
 
-void DeviceScanner::OnBrowseRemove(chip::Dnssd::DnssdService service)
+void DeviceScanner::OnBrowseRemove(const NodeBrowseData & nodeData)
 {
-    ChipLogProgress(chipTool, "OnBrowseRemove: %s", service.mName);
-    auto & instanceData  = mDiscoveredResults[service.mName];
-    auto & interfaceData = instanceData[service.mInterface.GetPlatformInterface()];
+    ChipLogError(chipTool, "OnBrowseRemove: %s", nodeData.mName);
+
+    auto & instanceData  = mDiscoveredResults[nodeData.mName];
+    auto & interfaceData = instanceData[nodeData.mInterfaceId.GetPlatformInterface()];
 
     // Check if the interface data has been resolved already, otherwise, just inform the
     // back end that we may not need it anymore.
     if (interfaceData.size() == 0)
     {
-        ChipDnssdResolveNoLongerNeeded(service.mName);
+        mDNSResolver.NodeNameResolutionNoLongerNeeded(nodeData.mName);
     }
 
     // Delete the interface placeholder.
-    instanceData.erase(service.mInterface.GetPlatformInterface());
+    instanceData.erase(nodeData.mInterfaceId.GetPlatformInterface());
 
     // If there is nothing else to resolve for the given instance name, just remove it
     // too.
     if (instanceData.size() == 0)
     {
-        mDiscoveredResults.erase(service.mName);
+        mDiscoveredResults.erase(nodeData.mName);
     }
 }
 
@@ -123,12 +186,13 @@ void DeviceScanner::OnBrowseStop(CHIP_ERROR error)
         {
             if (interface.second.size() == 0)
             {
-                ChipDnssdResolveNoLongerNeeded(instance.first.c_str());
+                mDNSResolver.NodeNameResolutionNoLongerNeeded(instance.first.c_str());
             }
         }
     }
 }
 
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
 #if CONFIG_NETWORK_LAYER_BLE
 void DeviceScanner::OnBleScanAdd(BLE_CONNECTION_OBJECT connObj, const ChipBLEDeviceIdentificationInfo & info)
 {
@@ -168,6 +232,7 @@ void DeviceScanner::OnBleScanRemove(BLE_CONNECTION_OBJECT connObj)
     }
 }
 #endif // CONFIG_NETWORK_LAYER_BLE
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 
 CHIP_ERROR DeviceScanner::Get(uint16_t index, RendezvousParameters & params)
 {
@@ -226,6 +291,12 @@ void DeviceScanner::Log() const
         {
             for (auto & result : interface.second)
             {
+                // TODO This is not pretty. Instead of having a single list, it should likely be 2 lists. One for commissionable
+                //      nodes and one for operational nodes.
+                if (result.isOperational)
+                {
+                    continue;
+                }
                 char addr[Transport::PeerAddress::kMaxToStringSize];
                 result.mParams.GetPeerAddress().ToString(addr);
 

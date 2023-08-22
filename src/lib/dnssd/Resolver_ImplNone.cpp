@@ -32,6 +32,7 @@ public:
     void Shutdown() override {}
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override {}
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override {}
+    void SetBrowseDelegate(BrowseDelegate * delegate) override {}
 
     CHIP_ERROR ResolveNodeId(const PeerId & peerId) override
     {
@@ -51,6 +52,14 @@ public:
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    CHIP_ERROR StartBrowse(Optional<uint64_t> compressedFabricIdFilter) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StartBrowse() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StopBrowse() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR ResolveNode(const NodeBrowseData & nodeData) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    void NodeNameResolutionNoLongerNeeded(const char * name) override
+    {
+        ChipLogError(Discovery, "Failed to stop resolving node name: dnssd resolving not available");
     }
 };
 
@@ -94,6 +103,26 @@ CHIP_ERROR ResolverProxy::ReconfirmRecord(const char * hostname, Inet::IPAddress
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
+
+CHIP_ERROR ResolverProxy::StartBrowse(Optional<uint64_t> compressedFabricIdFilter)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+CHIP_ERROR ResolverProxy::StartBrowse()
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+CHIP_ERROR ResolverProxy::StopBrowse()
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ResolverProxy::ResolveNode(const NodeBrowseData & nodeData)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+void ResolverProxy::NodeNameResolutionNoLongerNeeded(const char * name) {}
 
 } // namespace Dnssd
 } // namespace chip

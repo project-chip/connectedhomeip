@@ -41,3 +41,27 @@ private:
     chip::NodeId mNodeId;
     uint64_t mFabricId;
 };
+
+class DiscoverStopCommand : public CHIPCommand
+{
+public:
+    DiscoverStopCommand(CredentialIssuerCommands * credIssuerCommands) :
+        CHIPCommand("stop", credIssuerCommands, "Stop browsing for commissionable/operational nodes over the network.")
+    {}
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override;
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(1); }
+};
+
+class DiscoverListCommand : public CHIPCommand
+{
+public:
+    DiscoverListCommand(CredentialIssuerCommands * credIssuerCommands) :
+        CHIPCommand("list", credIssuerCommands, "List commissionable/operationals nodes discovered over the network.")
+    {}
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override;
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(1); }
+};

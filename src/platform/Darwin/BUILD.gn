@@ -59,15 +59,8 @@ static_library("Darwin") {
     "ConnectivityManagerImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
-    "DnssdContexts.cpp",
-    "DnssdHostNameRegistrar.cpp",
-    "DnssdImpl.cpp",
-    "DnssdImpl.h",
-    "DnssdType.cpp",
     "InetPlatformConfig.h",
     "LoggingImpl.cpp",
-    "MdnsError.cpp",
-    "MdnsError.h",
     "NetworkCommissioningDriver.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
@@ -76,6 +69,18 @@ static_library("Darwin") {
     "SystemPlatformConfig.h",
     "SystemTimeSupport.cpp",
   ]
+
+  if (chip_mdns == "platform") {
+    sources += [
+      "DnssdContexts.cpp",
+      "DnssdHostNameRegistrar.cpp",
+      "DnssdImpl.cpp",
+      "DnssdImpl.h",
+      "DnssdType.cpp",
+      "MdnsError.cpp",
+      "MdnsError.h",
+    ]
+  }
 
   if (chip_enable_wifi) {
     sources += [

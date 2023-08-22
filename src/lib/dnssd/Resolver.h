@@ -35,6 +35,21 @@
 namespace chip {
 namespace Dnssd {
 
+enum class DnssdServiceProtocol : uint8_t
+{
+    kDnssdProtocolUdp = 0,
+    kDnssdProtocolTcp,
+    kDnssdProtocolUnknown = 255,
+};
+
+/// Node browsing data common to both operational and commissionable browse discovery
+struct NodeBrowseData
+{
+    char mName[Common::kInstanceNameMaxLength + 1] = {};
+    Inet::InterfaceId mInterfaceId;
+    DnssdServiceProtocol protocol;
+};
+
 /// Node resolution data common to both operational and commissionable discovery
 struct CommonResolutionData
 {
@@ -295,6 +310,39 @@ enum class DiscoveryType
     kCommissionerNode
 };
 
+/**
+ * A delegate that can be notified of node additions/removals as a mdns browse proceeds.
+ */
+class BrowseDelegate
+{
+public:
+    virtual ~BrowseDelegate() {}
+
+    /**
+     * @brief
+     *   Called when an operational/commissionable node is discovered on the network.
+     *
+     * @param[in] nodeData The node data
+     */
+    virtual void OnBrowseAdd(const NodeBrowseData & nodeData) = 0;
+
+    /**
+     * @brief
+     *   Called when an operational/commissionable node is removed from the network.
+     *
+     * @param[in] nodeData The node data
+     */
+    virtual void OnBrowseRemove(const NodeBrowseData & nodeData) = 0;
+
+    /**
+     * @brief
+     *   Called when the browse stops.
+     *
+     * @param error Error cause, if any
+     */
+    virtual void OnBrowseStop(CHIP_ERROR error) = 0;
+};
+
 /// Callbacks for resolving operational node resolution
 class OperationalResolveDelegate
 {
@@ -372,6 +420,11 @@ public:
     virtual void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) = 0;
 
     /**
+     * If nullptr is passed, the previously registered delegate is unregistered.
+     */
+    virtual void SetBrowseDelegate(BrowseDelegate * delegate){};
+
+    /**
      * Requests resolution of the given operational node service.
      *
      * This will trigger a DNSSD query.
@@ -438,6 +491,67 @@ public:
      * because establishing a connection to it has failed).
      */
     virtual CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) = 0;
+
+    /**
+     * @brief Start Browsing for operational devices.
+     *
+     * This will start periodical browsing of devices. When a new operational node is
+     * found the delegate set with SetBrowseDelegate is called. The mDNS queryies
+     * will continue until StopBrowse is called.
+     */
+    virtual CHIP_ERROR StartBrowse(Optional<uint64_t> compressedFabricIdFilter) = 0;
+
+    /**
+     * @brief Start Browsing for commissionable devices.
+     *
+     * This will start periodical browsing of devices. When a new commissionable node is
+     * found the delegate set with SetBrowseDelegate is called. The mDNS queryies
+     * will continue until StopBrowse is called.
+     */
+    virtual CHIP_ERROR StartBrowse() = 0;
+
+    /**
+     * @brief Stop browsing for devices.
+     */
+    virtual CHIP_ERROR StopBrowse() = 0;
+
+    /**
+     * Requests resolution of the given node data.
+     *
+     * This will trigger a DNSSD query.
+     *
+     * When the operation succeeds or fails, and a resolver delegate has been registered,
+     * the result of the operation is passed to the delegate's `OnOperationalNodeResolved`, `OnNodeDiscovered` or
+     * `OnOperationalNodeResolutionFailed` method, respectively.
+     *
+     * Multiple calls to ResolveNode may be coalesced by the implementation
+     * and lead to just one call to
+     * OnOperationalNodeResolved/OnNodeDiscovered/OnOperationalNodeResolutionFailed, as long as
+     * the later calls cause the underlying querying mechanism to re-query as if
+     * there were no coalescing.
+     *
+     * A single call to ResolveNode may lead to multiple calls to
+     * OnOperationalNodeResolved with different IP addresses.
+     *
+     * @see NodeNameResolutionNoLongerNeeded.
+     */
+    virtual CHIP_ERROR ResolveNode(const NodeBrowseData & nodeData) = 0;
+
+    /*
+     * Notify the resolver that one of the consumers that called ResolveNode
+     * successfully no longer needs the resolution result (e.g. because it got
+     * the result via OnOperationalNodeResolved/OnNodeDiscovered, or got an via
+     * OnOperationalNodeResolutionFailed, or no longer cares about future
+     * updates).
+     *
+     * There must be a NodeNameResolutionNoLongerNeeded call that matches every
+     * successful ResolveNode call.  In particular, implementations of
+     * OnOperationalNodeResolved,OnNodeDiscovered and OnOperationalNodeResolutionFailed must call
+     * NodeNameResolutionNoLongerNeeded once for each prior successful call to
+     * ResolveNode for the relevant name that has not yet had a matching
+     * NodeNameResolutionNoLongerNeeded call made.
+     */
+    virtual void NodeNameResolutionNoLongerNeeded(const char * name) = 0;
 
     /**
      * Provides the system-wide implementation of the service resolver

@@ -99,7 +99,7 @@ public:
      * Return a pointer to an existing BrowserWithDelegateContext for the given
      * delegate, if any.  Returns nullptr if there are none.
      */
-    BrowseWithDelegateContext * GetExistingBrowseForDelegate(DnssdBrowseDelegate * delegate);
+    BrowseWithDelegateContext * GetExistingBrowseForDelegate(BrowseDelegate * delegate);
 
     /**
      * Remove context from the list, if it's present in the list.  Return
@@ -195,7 +195,7 @@ struct BrowseContext : public BrowseHandler
 
 struct BrowseWithDelegateContext : public BrowseHandler
 {
-    BrowseWithDelegateContext(DnssdBrowseDelegate * delegate, DnssdServiceProtocol cbContextProtocol);
+    BrowseWithDelegateContext(BrowseDelegate * delegate, DnssdServiceProtocol cbContextProtocol);
 
     void DispatchFailure(const char * errorStr, CHIP_ERROR err) override;
     void DispatchSuccess() override;
@@ -204,7 +204,7 @@ struct BrowseWithDelegateContext : public BrowseHandler
     void OnBrowseAdd(const char * name, const char * type, const char * domain, uint32_t interfaceId) override;
     void OnBrowseRemove(const char * name, const char * type, const char * domain, uint32_t interfaceId) override;
 
-    bool Matches(DnssdBrowseDelegate * otherDelegate) const { return context == otherDelegate; }
+    bool Matches(BrowseDelegate * otherDelegate) const { return context == otherDelegate; }
 };
 
 struct InterfaceInfo
@@ -226,6 +226,7 @@ struct ResolveContext : public GenericContext
     DnssdResolveCallback callback;
     std::map<uint32_t, InterfaceInfo> interfaces;
     DNSServiceProtocol protocol;
+    DnssdServiceProtocol protocolType;
     std::string instanceName;
     std::shared_ptr<uint32_t> consumerCounter;
     BrowseContext * const browseThatCausedResolve; // Can be null
@@ -235,6 +236,8 @@ struct ResolveContext : public GenericContext
                    const char * instanceNameToResolve, BrowseContext * browseCausingResolve,
                    std::shared_ptr<uint32_t> && consumerCounterToUse);
     ResolveContext(CommissioningResolveDelegate * delegate, chip::Inet::IPAddressType cbAddressType,
+                   const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse);
+    ResolveContext(OperationalResolveDelegate * delegate, chip::Inet::IPAddressType cbAddressType,
                    const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse);
     virtual ~ResolveContext();
 

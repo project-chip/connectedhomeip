@@ -33,10 +33,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/dnssd/Constants.h>
+#include <lib/dnssd/ResolverProxy.h>
 #include <lib/dnssd/ServiceNaming.h>
 #include <system/TimeSource.h>
-
-#include "DnssdBrowseDelegate.h"
 
 namespace chip {
 namespace Dnssd {
@@ -48,13 +47,6 @@ static constexpr size_t kDnssdTypeMaxSize =
 static constexpr uint8_t kDnssdTypeAndProtocolMaxSize     = kDnssdTypeMaxSize + kDnssdProtocolTextMaxSize + 1; // <type>.<protocol>
 static constexpr uint16_t kDnssdTextMaxSize               = 64;
 static constexpr uint8_t kDnssdFullTypeAndProtocolMaxSize = Common::kSubTypeMaxLength + /* '.' */ 1 + kDnssdTypeAndProtocolMaxSize;
-
-enum class DnssdServiceProtocol : uint8_t
-{
-    kDnssdProtocolUdp = 0,
-    kDnssdProtocolTcp,
-    kDnssdProtocolUnknown = 255,
-};
 
 struct TextEntry
 {
@@ -82,6 +74,7 @@ struct DnssdService
     uint32_t mTtlSeconds = 120;
 
     void ToDiscoveredNodeData(const Span<Inet::IPAddress> & addresses, DiscoveredNodeData & nodeData);
+    CHIP_ERROR ToResolvedNodeData(const Span<Inet::IPAddress> & addresses, ResolvedNodeData & nodeData);
 };
 
 /**
@@ -250,13 +243,13 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier);
  *
  */
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                           chip::Inet::InterfaceId interface, DnssdBrowseDelegate * delegate);
+                           chip::Inet::InterfaceId interface, BrowseDelegate * delegate);
 
 /**
  * Stop an ongoing browse, if supported by this backend.  If successful, this
  * will call the OnBrowseStop method of the delegate.
  */
-CHIP_ERROR ChipDnssdStopBrowse(DnssdBrowseDelegate * delegate);
+CHIP_ERROR ChipDnssdStopBrowse(BrowseDelegate * delegate);
 #endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 
 /**
@@ -277,7 +270,7 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
 /**
- * This function resolves the services published by mDNS
+ * This function resolves the commissionable services published by mDNS
  *
  * @param[in] browseResult  The service entry returned by @ref ChipDnssdBrowse
  * @param[in] interface     The interface to send queries.
@@ -290,6 +283,20 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId
  */
 CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId interface,
                             CommissioningResolveDelegate * delegate);
+
+/**
+ * This function resolves the operational services published by mDNS
+ *
+ * @param[in] browseResult  The service entry returned by @ref ChipDnssdBrowse
+ * @param[in] interface     The interface to send queries.
+ * @param[in] delegate      The delegate to notify when a service is resolved.
+ *
+ * @retval CHIP_NO_ERROR                The resolve succeeds.
+ * @retval CHIP_ERROR_INVALID_ARGUMENT  The name, type or delegate is nullptr.
+ * @retval Error code                   The resolve fails.
+ *
+ */
+CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId interface, OperationalResolveDelegate * delegate);
 #endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 
 /**
