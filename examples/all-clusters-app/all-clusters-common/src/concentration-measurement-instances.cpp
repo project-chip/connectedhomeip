@@ -21,219 +21,197 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ConcentrationMeasurement;
 
-static const BitMask<Feature, uint32_t> gConcentrationMeasurementAllFeatures(Feature::kNumericMeasurement,
-                                                                             Feature::kLevelIndication, Feature::kMediumLevel,
-                                                                             Feature::kCriticalLevel, Feature::kPeakMeasurement,
-                                                                             Feature::kAverageMeasurement);
+static Instance gCarbonDioxideConcentrationMeasurementServer =
+    CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
+        EndpointId(1), CarbonDioxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
-static Instance * gCarbonDioxideConcentrationMeasurementServer                 = nullptr;
-static Instance * gCarbonMonoxideConcentrationMeasurementServer                = nullptr;
-static Instance * gNitrogenDioxideConcentrationMeasurementServer               = nullptr;
-static Instance * gPm1ConcentrationMeasurementServer                           = nullptr;
-static Instance * gPm10ConcentrationMeasurementServer                          = nullptr;
-static Instance * gPm25ConcentrationMeasurementServer                          = nullptr;
-static Instance * gRadonConcentrationMeasurementServer                         = nullptr;
-static Instance * gTotalVolatileOrganicCompoundsConcentrationMeasurementServer = nullptr;
-static Instance * gOzoneConcentrationMeasurementServer                         = nullptr;
-static Instance * gFormaldehydeConcentrationMeasurementServer                  = nullptr;
+static Instance gCarbonMonoxideConcentrationMeasurementServer =
+    CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
+        EndpointId(1), CarbonMonoxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
-void emberAfCarbonDioxideConcentrationMeasurementClusterInitCallback(chip::EndpointId endpoint)
+static Instance gNitrogenDioxideConcentrationMeasurementServer =
+    CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
+        EndpointId(1), NitrogenDioxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+
+static Instance gPm1ConcentrationMeasurementServer =
+    CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
+        EndpointId(1), Pm1ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+
+static Instance gPm10ConcentrationMeasurementServer =
+    CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
+        EndpointId(1), Pm10ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+
+static Instance gPm25ConcentrationMeasurementServer =
+    CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
+        EndpointId(1), Pm25ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+
+static Instance gRadonConcentrationMeasurementServer =
+    CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
+        EndpointId(1), RadonConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+
+static Instance gTotalVolatileOrganicCompoundsConcentrationMeasurementServer =
+    CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
+        EndpointId(1), TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, MeasurementMediumEnum::kAir,
+        MeasurementUnitEnum::kPpm);
+
+static Instance gOzoneConcentrationMeasurementServer =
+    CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
+        EndpointId(1), OzoneConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+
+static Instance gFormaldehydeConcentrationMeasurementServer =
+    CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
+        EndpointId(1), FormaldehydeConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+
+void emberAfCarbonDioxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    if (gCarbonDioxideConcentrationMeasurementServer == nullptr)
-    {
+    gCarbonDioxideConcentrationMeasurementServer.Init();
 
-        gCarbonDioxideConcentrationMeasurementServer =
-            new Instance(endpoint, CarbonDioxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir,
-                         MeasurementUnitEnum::kPpm, gConcentrationMeasurementAllFeatures.Raw());
-
-        gCarbonDioxideConcentrationMeasurementServer->SetMinMeasuredValue(DataModel::Nullable<float>(0.0));
-        gCarbonDioxideConcentrationMeasurementServer->SetMaxMeasuredValue(DataModel::Nullable<float>(1000.0));
-        gCarbonDioxideConcentrationMeasurementServer->SetMeasuredValue(DataModel::Nullable<float>(1.0));
-        gCarbonDioxideConcentrationMeasurementServer->SetPeakMeasuredValue(DataModel::Nullable<float>(1.0));
-        gCarbonDioxideConcentrationMeasurementServer->SetPeakMeasuredValueWindow(320);
-        gCarbonDioxideConcentrationMeasurementServer->SetAverageMeasuredValue(DataModel::Nullable<float>(1.0));
-        gCarbonDioxideConcentrationMeasurementServer->SetAverageMeasuredValueWindow(320);
-        gCarbonDioxideConcentrationMeasurementServer->SetUncertainty(0.0);
-        gCarbonDioxideConcentrationMeasurementServer->SetLevel(LevelValueEnum::kLow);
-    }
+    gCarbonDioxideConcentrationMeasurementServer.SetMinMeasuredValue(MakeNullable(0.0f));
+    gCarbonDioxideConcentrationMeasurementServer.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gCarbonDioxideConcentrationMeasurementServer.SetMeasuredValue(MakeNullable(2.0f));
+    gCarbonDioxideConcentrationMeasurementServer.SetPeakMeasuredValue(MakeNullable(1.0f));
+    gCarbonDioxideConcentrationMeasurementServer.SetPeakMeasuredValueWindow(320);
+    gCarbonDioxideConcentrationMeasurementServer.SetAverageMeasuredValue(MakeNullable(1.0f));
+    gCarbonDioxideConcentrationMeasurementServer.SetAverageMeasuredValueWindow(320);
+    gCarbonDioxideConcentrationMeasurementServer.SetUncertainty(0.0f);
+    gCarbonDioxideConcentrationMeasurementServer.SetLevelValue(LevelValueEnum::kLow);
 }
 
-void emberAfCarbonMonoxideConcentrationMeasurementClusterInitCallback(chip::EndpointId endpoint)
+void emberAfCarbonMonoxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    if (gCarbonMonoxideConcentrationMeasurementServer == nullptr)
-    {
-        gCarbonMonoxideConcentrationMeasurementServer =
-            new Instance(endpoint, CarbonMonoxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir,
-                         MeasurementUnitEnum::kPpm, gConcentrationMeasurementAllFeatures.Raw());
+    gCarbonMonoxideConcentrationMeasurementServer.Init();
 
-        gCarbonMonoxideConcentrationMeasurementServer->SetMinMeasuredValue(DataModel::Nullable<float>(0.0));
-        gCarbonMonoxideConcentrationMeasurementServer->SetMaxMeasuredValue(DataModel::Nullable<float>(1000.0));
-        gCarbonMonoxideConcentrationMeasurementServer->SetMeasuredValue(DataModel::Nullable<float>(1.0));
-        gCarbonMonoxideConcentrationMeasurementServer->SetPeakMeasuredValue(DataModel::Nullable<float>(1.0));
-        gCarbonMonoxideConcentrationMeasurementServer->SetPeakMeasuredValueWindow(320);
-        gCarbonMonoxideConcentrationMeasurementServer->SetAverageMeasuredValue(DataModel::Nullable<float>(1.0));
-        gCarbonMonoxideConcentrationMeasurementServer->SetAverageMeasuredValueWindow(320);
-        gCarbonMonoxideConcentrationMeasurementServer->SetUncertainty(0.0);
-        gCarbonMonoxideConcentrationMeasurementServer->SetLevel(LevelValueEnum::kLow);
-    }
+    gCarbonMonoxideConcentrationMeasurementServer.SetMinMeasuredValue(MakeNullable(0.0f));
+    gCarbonMonoxideConcentrationMeasurementServer.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gCarbonMonoxideConcentrationMeasurementServer.SetMeasuredValue(MakeNullable(1.0f));
+    gCarbonMonoxideConcentrationMeasurementServer.SetPeakMeasuredValue(MakeNullable(1.0f));
+    gCarbonMonoxideConcentrationMeasurementServer.SetPeakMeasuredValueWindow(320);
+    gCarbonMonoxideConcentrationMeasurementServer.SetAverageMeasuredValue(MakeNullable(1.0f));
+    gCarbonMonoxideConcentrationMeasurementServer.SetAverageMeasuredValueWindow(320);
+    gCarbonMonoxideConcentrationMeasurementServer.SetUncertainty(0.0f);
+    gCarbonMonoxideConcentrationMeasurementServer.SetLevelValue(LevelValueEnum::kLow);
 }
 
-void emberAfNitrogenDioxideConcentrationMeasurementClusterInitCallback(chip::EndpointId endpoint)
+void emberAfNitrogenDioxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    if (gNitrogenDioxideConcentrationMeasurementServer == nullptr)
-    {
-        gNitrogenDioxideConcentrationMeasurementServer =
-            new Instance(endpoint, NitrogenDioxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir,
-                         MeasurementUnitEnum::kPpm, gConcentrationMeasurementAllFeatures.Raw());
+    gNitrogenDioxideConcentrationMeasurementServer.Init();
 
-        gNitrogenDioxideConcentrationMeasurementServer->SetMinMeasuredValue(DataModel::Nullable<float>(0.0));
-        gNitrogenDioxideConcentrationMeasurementServer->SetMaxMeasuredValue(DataModel::Nullable<float>(1000.0));
-        gNitrogenDioxideConcentrationMeasurementServer->SetMeasuredValue(DataModel::Nullable<float>(1.0));
-        gNitrogenDioxideConcentrationMeasurementServer->SetPeakMeasuredValue(DataModel::Nullable<float>(1.0));
-        gNitrogenDioxideConcentrationMeasurementServer->SetPeakMeasuredValueWindow(320);
-        gNitrogenDioxideConcentrationMeasurementServer->SetAverageMeasuredValue(DataModel::Nullable<float>(1.0));
-        gNitrogenDioxideConcentrationMeasurementServer->SetAverageMeasuredValueWindow(320);
-        gNitrogenDioxideConcentrationMeasurementServer->SetUncertainty(0.0);
-        gNitrogenDioxideConcentrationMeasurementServer->SetLevel(LevelValueEnum::kLow);
-    }
+    gNitrogenDioxideConcentrationMeasurementServer.SetMinMeasuredValue(MakeNullable(0.0f));
+    gNitrogenDioxideConcentrationMeasurementServer.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gNitrogenDioxideConcentrationMeasurementServer.SetMeasuredValue(MakeNullable(1.0f));
+    gNitrogenDioxideConcentrationMeasurementServer.SetPeakMeasuredValue(MakeNullable(1.0f));
+    gNitrogenDioxideConcentrationMeasurementServer.SetPeakMeasuredValueWindow(320);
+    gNitrogenDioxideConcentrationMeasurementServer.SetAverageMeasuredValue(MakeNullable(1.0f));
+    gNitrogenDioxideConcentrationMeasurementServer.SetAverageMeasuredValueWindow(320);
+    gNitrogenDioxideConcentrationMeasurementServer.SetUncertainty(0.0f);
+    gNitrogenDioxideConcentrationMeasurementServer.SetLevelValue(LevelValueEnum::kLow);
 }
 
-void emberAfPm1ConcentrationMeasurementClusterInitCallback(chip::EndpointId endpoint)
+void emberAfPm1ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    if (gPm1ConcentrationMeasurementServer == nullptr)
-    {
-        gPm1ConcentrationMeasurementServer = new Instance(endpoint, Pm1ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir,
-                                                          MeasurementUnitEnum::kPpm, gConcentrationMeasurementAllFeatures.Raw());
+    gPm1ConcentrationMeasurementServer.Init();
 
-        gPm1ConcentrationMeasurementServer->SetMinMeasuredValue(DataModel::Nullable<float>(0.0));
-        gPm1ConcentrationMeasurementServer->SetMaxMeasuredValue(DataModel::Nullable<float>(1000.0));
-        gPm1ConcentrationMeasurementServer->SetMeasuredValue(DataModel::Nullable<float>(1.0));
-        gPm1ConcentrationMeasurementServer->SetPeakMeasuredValue(DataModel::Nullable<float>(1.0));
-        gPm1ConcentrationMeasurementServer->SetPeakMeasuredValueWindow(320);
-        gPm1ConcentrationMeasurementServer->SetAverageMeasuredValue(DataModel::Nullable<float>(1.0));
-        gPm1ConcentrationMeasurementServer->SetAverageMeasuredValueWindow(320);
-        gPm1ConcentrationMeasurementServer->SetUncertainty(0.0);
-        gPm1ConcentrationMeasurementServer->SetLevel(LevelValueEnum::kLow);
-    }
+    gPm1ConcentrationMeasurementServer.SetMinMeasuredValue(MakeNullable(0.0f));
+    gPm1ConcentrationMeasurementServer.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gPm1ConcentrationMeasurementServer.SetMeasuredValue(MakeNullable(1.0f));
+    gPm1ConcentrationMeasurementServer.SetPeakMeasuredValue(MakeNullable(1.0f));
+    gPm1ConcentrationMeasurementServer.SetPeakMeasuredValueWindow(320);
+    gPm1ConcentrationMeasurementServer.SetAverageMeasuredValue(MakeNullable(1.0f));
+    gPm1ConcentrationMeasurementServer.SetAverageMeasuredValueWindow(320);
+    gPm1ConcentrationMeasurementServer.SetUncertainty(0.0f);
+    gPm1ConcentrationMeasurementServer.SetLevelValue(LevelValueEnum::kLow);
 }
 
-void emberAfPm10ConcentrationMeasurementClusterInitCallback(chip::EndpointId endpoint)
+void emberAfPm10ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    if (gPm10ConcentrationMeasurementServer == nullptr)
-    {
-        gPm10ConcentrationMeasurementServer = new Instance(endpoint, Pm10ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir,
-                                                           MeasurementUnitEnum::kPpm, gConcentrationMeasurementAllFeatures.Raw());
+    gPm10ConcentrationMeasurementServer.Init();
 
-        gPm10ConcentrationMeasurementServer->SetMinMeasuredValue(DataModel::Nullable<float>(0.0));
-        gPm10ConcentrationMeasurementServer->SetMaxMeasuredValue(DataModel::Nullable<float>(1000.0));
-        gPm10ConcentrationMeasurementServer->SetMeasuredValue(DataModel::Nullable<float>(1.0));
-        gPm10ConcentrationMeasurementServer->SetPeakMeasuredValue(DataModel::Nullable<float>(1.0));
-        gPm10ConcentrationMeasurementServer->SetPeakMeasuredValueWindow(320);
-        gPm10ConcentrationMeasurementServer->SetAverageMeasuredValue(DataModel::Nullable<float>(1.0));
-        gPm10ConcentrationMeasurementServer->SetAverageMeasuredValueWindow(320);
-        gPm10ConcentrationMeasurementServer->SetUncertainty(0.0);
-        gPm10ConcentrationMeasurementServer->SetLevel(LevelValueEnum::kLow);
-    }
+    gPm10ConcentrationMeasurementServer.SetMinMeasuredValue(MakeNullable(0.0f));
+    gPm10ConcentrationMeasurementServer.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gPm10ConcentrationMeasurementServer.SetMeasuredValue(MakeNullable(1.0f));
+    gPm10ConcentrationMeasurementServer.SetPeakMeasuredValue(MakeNullable(1.0f));
+    gPm10ConcentrationMeasurementServer.SetPeakMeasuredValueWindow(320);
+    gPm10ConcentrationMeasurementServer.SetAverageMeasuredValue(MakeNullable(1.0f));
+    gPm10ConcentrationMeasurementServer.SetAverageMeasuredValueWindow(320);
+    gPm10ConcentrationMeasurementServer.SetUncertainty(0.0f);
+    gPm10ConcentrationMeasurementServer.SetLevelValue(LevelValueEnum::kLow);
 }
 
-void emberAfPm25ConcentrationMeasurementClusterInitCallback(chip::EndpointId endpoint)
+void emberAfPm25ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    if (gPm25ConcentrationMeasurementServer == nullptr)
-    {
-        gPm25ConcentrationMeasurementServer = new Instance(endpoint, Pm25ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir,
-                                                           MeasurementUnitEnum::kPpm, gConcentrationMeasurementAllFeatures.Raw());
+    gPm25ConcentrationMeasurementServer.Init();
 
-        gPm25ConcentrationMeasurementServer->SetMinMeasuredValue(DataModel::Nullable<float>(0.0));
-        gPm25ConcentrationMeasurementServer->SetMaxMeasuredValue(DataModel::Nullable<float>(1000.0));
-        gPm25ConcentrationMeasurementServer->SetMeasuredValue(DataModel::Nullable<float>(1.0));
-        gPm25ConcentrationMeasurementServer->SetPeakMeasuredValue(DataModel::Nullable<float>(1.0));
-        gPm25ConcentrationMeasurementServer->SetPeakMeasuredValueWindow(320);
-        gPm25ConcentrationMeasurementServer->SetAverageMeasuredValue(DataModel::Nullable<float>(1.0));
-        gPm25ConcentrationMeasurementServer->SetAverageMeasuredValueWindow(320);
-        gPm25ConcentrationMeasurementServer->SetUncertainty(0.0);
-        gPm25ConcentrationMeasurementServer->SetLevel(LevelValueEnum::kLow);
-    }
+    gPm25ConcentrationMeasurementServer.SetMinMeasuredValue(MakeNullable(0.0f));
+    gPm25ConcentrationMeasurementServer.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gPm25ConcentrationMeasurementServer.SetMeasuredValue(MakeNullable(1.0f));
+    gPm25ConcentrationMeasurementServer.SetPeakMeasuredValue(MakeNullable(1.0f));
+    gPm25ConcentrationMeasurementServer.SetPeakMeasuredValueWindow(320);
+    gPm25ConcentrationMeasurementServer.SetAverageMeasuredValue(MakeNullable(1.0f));
+    gPm25ConcentrationMeasurementServer.SetAverageMeasuredValueWindow(320);
+    gPm25ConcentrationMeasurementServer.SetUncertainty(0.0f);
+    gPm25ConcentrationMeasurementServer.SetLevelValue(LevelValueEnum::kLow);
 }
 
-void emberAfRadonConcentrationMeasurementClusterInitCallback(chip::EndpointId endpoint)
+void emberAfRadonConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    if (gRadonConcentrationMeasurementServer == nullptr)
-    {
-        gRadonConcentrationMeasurementServer =
-            new Instance(endpoint, RadonConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm,
-                         gConcentrationMeasurementAllFeatures.Raw());
+    gRadonConcentrationMeasurementServer.Init();
 
-        gRadonConcentrationMeasurementServer->SetMinMeasuredValue(DataModel::Nullable<float>(0.0));
-        gRadonConcentrationMeasurementServer->SetMaxMeasuredValue(DataModel::Nullable<float>(1000.0));
-        gRadonConcentrationMeasurementServer->SetMeasuredValue(DataModel::Nullable<float>(1.0));
-        gRadonConcentrationMeasurementServer->SetPeakMeasuredValue(DataModel::Nullable<float>(1.0));
-        gRadonConcentrationMeasurementServer->SetPeakMeasuredValueWindow(320);
-        gRadonConcentrationMeasurementServer->SetAverageMeasuredValue(DataModel::Nullable<float>(1.0));
-        gRadonConcentrationMeasurementServer->SetAverageMeasuredValueWindow(320);
-        gRadonConcentrationMeasurementServer->SetUncertainty(0.0);
-        gRadonConcentrationMeasurementServer->SetLevel(LevelValueEnum::kLow);
-    }
+    gRadonConcentrationMeasurementServer.SetMinMeasuredValue(MakeNullable(0.0f));
+    gRadonConcentrationMeasurementServer.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gRadonConcentrationMeasurementServer.SetMeasuredValue(MakeNullable(1.0f));
+    gRadonConcentrationMeasurementServer.SetPeakMeasuredValue(MakeNullable(1.0f));
+    gRadonConcentrationMeasurementServer.SetPeakMeasuredValueWindow(320);
+    gRadonConcentrationMeasurementServer.SetAverageMeasuredValue(MakeNullable(1.0f));
+    gRadonConcentrationMeasurementServer.SetAverageMeasuredValueWindow(320);
+    gRadonConcentrationMeasurementServer.SetUncertainty(0.0f);
+    gRadonConcentrationMeasurementServer.SetLevelValue(LevelValueEnum::kLow);
 }
 
-void emberAfTotalVolatileOrganicCompoundsConcentrationMeasurementClusterInitCallback(chip::EndpointId endpoint)
+void emberAfTotalVolatileOrganicCompoundsConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    if (gTotalVolatileOrganicCompoundsConcentrationMeasurementServer == nullptr)
-    {
-        gTotalVolatileOrganicCompoundsConcentrationMeasurementServer =
-            new Instance(endpoint, TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, MeasurementMediumEnum::kAir,
-                         MeasurementUnitEnum::kPpm, gConcentrationMeasurementAllFeatures.Raw());
+    gTotalVolatileOrganicCompoundsConcentrationMeasurementServer.Init();
 
-        gTotalVolatileOrganicCompoundsConcentrationMeasurementServer->SetMinMeasuredValue(DataModel::Nullable<float>(0.0));
-        gTotalVolatileOrganicCompoundsConcentrationMeasurementServer->SetMaxMeasuredValue(DataModel::Nullable<float>(1000.0));
-        gTotalVolatileOrganicCompoundsConcentrationMeasurementServer->SetMeasuredValue(DataModel::Nullable<float>(1.0));
-        gTotalVolatileOrganicCompoundsConcentrationMeasurementServer->SetPeakMeasuredValue(DataModel::Nullable<float>(1.0));
-        gTotalVolatileOrganicCompoundsConcentrationMeasurementServer->SetPeakMeasuredValueWindow(320);
-        gTotalVolatileOrganicCompoundsConcentrationMeasurementServer->SetAverageMeasuredValue(DataModel::Nullable<float>(1.0));
-        gTotalVolatileOrganicCompoundsConcentrationMeasurementServer->SetAverageMeasuredValueWindow(320);
-        gTotalVolatileOrganicCompoundsConcentrationMeasurementServer->SetUncertainty(0.0);
-        gTotalVolatileOrganicCompoundsConcentrationMeasurementServer->SetLevel(LevelValueEnum::kLow);
-    }
+    gTotalVolatileOrganicCompoundsConcentrationMeasurementServer.SetMinMeasuredValue(MakeNullable(0.0f));
+    gTotalVolatileOrganicCompoundsConcentrationMeasurementServer.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gTotalVolatileOrganicCompoundsConcentrationMeasurementServer.SetMeasuredValue(MakeNullable(1.0f));
+    gTotalVolatileOrganicCompoundsConcentrationMeasurementServer.SetPeakMeasuredValue(MakeNullable(1.0f));
+    gTotalVolatileOrganicCompoundsConcentrationMeasurementServer.SetPeakMeasuredValueWindow(320);
+    gTotalVolatileOrganicCompoundsConcentrationMeasurementServer.SetAverageMeasuredValue(MakeNullable(1.0f));
+    gTotalVolatileOrganicCompoundsConcentrationMeasurementServer.SetAverageMeasuredValueWindow(320);
+    gTotalVolatileOrganicCompoundsConcentrationMeasurementServer.SetUncertainty(0.0f);
+    gTotalVolatileOrganicCompoundsConcentrationMeasurementServer.SetLevelValue(LevelValueEnum::kLow);
 }
 
-void emberAfOzoneConcentrationMeasurementClusterInitCallback(chip::EndpointId endpoint)
+void emberAfOzoneConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    if (gOzoneConcentrationMeasurementServer == nullptr)
-    {
-        gOzoneConcentrationMeasurementServer =
-            new Instance(endpoint, OzoneConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm,
-                         gConcentrationMeasurementAllFeatures.Raw());
+    gOzoneConcentrationMeasurementServer.Init();
 
-        gOzoneConcentrationMeasurementServer->SetMinMeasuredValue(DataModel::Nullable<float>(0.0));
-        gOzoneConcentrationMeasurementServer->SetMaxMeasuredValue(DataModel::Nullable<float>(1000.0));
-        gOzoneConcentrationMeasurementServer->SetMeasuredValue(DataModel::Nullable<float>(1.0));
-        gOzoneConcentrationMeasurementServer->SetPeakMeasuredValue(DataModel::Nullable<float>(1.0));
-        gOzoneConcentrationMeasurementServer->SetPeakMeasuredValueWindow(320);
-        gOzoneConcentrationMeasurementServer->SetAverageMeasuredValue(DataModel::Nullable<float>(1.0));
-        gOzoneConcentrationMeasurementServer->SetAverageMeasuredValueWindow(320);
-        gOzoneConcentrationMeasurementServer->SetUncertainty(0.0);
-        gOzoneConcentrationMeasurementServer->SetLevel(LevelValueEnum::kLow);
-    }
+    gOzoneConcentrationMeasurementServer.SetMinMeasuredValue(MakeNullable(0.0f));
+    gOzoneConcentrationMeasurementServer.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gOzoneConcentrationMeasurementServer.SetMeasuredValue(MakeNullable(1.0f));
+    gOzoneConcentrationMeasurementServer.SetPeakMeasuredValue(MakeNullable(1.0f));
+    gOzoneConcentrationMeasurementServer.SetPeakMeasuredValueWindow(320);
+    gOzoneConcentrationMeasurementServer.SetAverageMeasuredValue(MakeNullable(1.0f));
+    gOzoneConcentrationMeasurementServer.SetAverageMeasuredValueWindow(320);
+    gOzoneConcentrationMeasurementServer.SetUncertainty(0.0f);
+    gOzoneConcentrationMeasurementServer.SetLevelValue(LevelValueEnum::kLow);
 }
 
-void emberAfFormaldehydeConcentrationMeasurementClusterInitCallback(chip::EndpointId endpoint)
+void emberAfFormaldehydeConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    if (gFormaldehydeConcentrationMeasurementServer == nullptr)
-    {
-        gFormaldehydeConcentrationMeasurementServer =
-            new Instance(endpoint, FormaldehydeConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm,
-                         gConcentrationMeasurementAllFeatures.Raw());
+    gFormaldehydeConcentrationMeasurementServer.Init();
 
-        gFormaldehydeConcentrationMeasurementServer->SetMinMeasuredValue(DataModel::Nullable<float>(0.0));
-        gFormaldehydeConcentrationMeasurementServer->SetMaxMeasuredValue(DataModel::Nullable<float>(1000.0));
-        gFormaldehydeConcentrationMeasurementServer->SetMeasuredValue(DataModel::Nullable<float>(1.0));
-        gFormaldehydeConcentrationMeasurementServer->SetPeakMeasuredValue(DataModel::Nullable<float>(1.0));
-        gFormaldehydeConcentrationMeasurementServer->SetPeakMeasuredValueWindow(320);
-        gFormaldehydeConcentrationMeasurementServer->SetAverageMeasuredValue(DataModel::Nullable<float>(1.0));
-        gFormaldehydeConcentrationMeasurementServer->SetAverageMeasuredValueWindow(320);
-        gFormaldehydeConcentrationMeasurementServer->SetUncertainty(0.0);
-        gFormaldehydeConcentrationMeasurementServer->SetLevel(LevelValueEnum::kLow);
-    }
+    gFormaldehydeConcentrationMeasurementServer.SetMinMeasuredValue(MakeNullable(0.0f));
+    gFormaldehydeConcentrationMeasurementServer.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gFormaldehydeConcentrationMeasurementServer.SetMeasuredValue(MakeNullable(1.0f));
+    gFormaldehydeConcentrationMeasurementServer.SetPeakMeasuredValue(MakeNullable(1.0f));
+    gFormaldehydeConcentrationMeasurementServer.SetPeakMeasuredValueWindow(320);
+    gFormaldehydeConcentrationMeasurementServer.SetAverageMeasuredValue(MakeNullable(1.0f));
+    gFormaldehydeConcentrationMeasurementServer.SetAverageMeasuredValueWindow(320);
+    gFormaldehydeConcentrationMeasurementServer.SetUncertainty(0.0f);
+    gFormaldehydeConcentrationMeasurementServer.SetLevelValue(LevelValueEnum::kLow);
 }
