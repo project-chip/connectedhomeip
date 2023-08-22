@@ -1019,7 +1019,10 @@ class ChipDeviceControllerBase():
                     event = pathTuple[1]
                 else:
                     raise ValueError("Unsupported Attribute Path")
-                urgent = pathTuple[-1]
+                if len(pathTuple) > 2:
+                    urgent = pathTuple[-1]
+                else:
+                    urgent = 0
         return ClusterAttribute.EventPath(
             EndpointId=endpoint, Cluster=cluster, Event=event, Urgent=urgent)
 
