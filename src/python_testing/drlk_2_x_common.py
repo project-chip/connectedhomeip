@@ -73,6 +73,11 @@ class DRLK_COMMON:
         await self.send_single_cmd(cmd=Clusters.Objects.DoorLock.Commands.ClearCredential(credential=credential),
                                    endpoint=self.endpoint,
                                    timedRequestTimeoutMs=1000)
+        ret = await self.send_single_cmd(cmd=Clusters.Objects.DoorLock.Commands.GetCredentialStatus(credential=self.createdCredential),
+                                         endpoint=self.endpoint)
+        asserts.assert_true(type_matches(ret, Clusters.Objects.DoorLock.Commands.GetCredentialStatusResponse),
+                            "Unexpected return type for GetCredentialStatus")
+        asserts.assert_false(ret.credentialExists, "Error clearing Credential (credentialExists==True)")
 
     async def cleanup_users_and_credentials(self):
         self.print_step("Cleanup", "Clear created User and Credential on the DUT")
