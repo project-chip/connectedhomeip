@@ -6911,9 +6911,8 @@ void CHIPUnitTestingClusterTestEmitTestFabricScopedEventResponseCallback::Callba
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, value);
 }
-CHIPChefTestClusterClusterTestAddArgumentsResponseCallback::CHIPChefTestClusterClusterTestAddArgumentsResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPChefTestClusterClusterTestAddArgumentsResponseCallbackType>(CallbackFn, this)
+CHIPSampleMeiClusterAddArgumentsResponseCallback::CHIPSampleMeiClusterAddArgumentsResponseCallback(jobject javaCallback) :
+    Callback::Callback<CHIPSampleMeiClusterAddArgumentsResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -6929,7 +6928,7 @@ CHIPChefTestClusterClusterTestAddArgumentsResponseCallback::CHIPChefTestClusterC
     }
 }
 
-CHIPChefTestClusterClusterTestAddArgumentsResponseCallback::~CHIPChefTestClusterClusterTestAddArgumentsResponseCallback()
+CHIPSampleMeiClusterAddArgumentsResponseCallback::~CHIPSampleMeiClusterAddArgumentsResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -6940,8 +6939,8 @@ CHIPChefTestClusterClusterTestAddArgumentsResponseCallback::~CHIPChefTestCluster
     env->DeleteGlobalRef(javaCallbackRef);
 };
 
-void CHIPChefTestClusterClusterTestAddArgumentsResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::ChefTestCluster::Commands::TestAddArgumentsResponse::DecodableType & dataResponse)
+void CHIPSampleMeiClusterAddArgumentsResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType & dataResponse)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6951,10 +6950,9 @@ void CHIPChefTestClusterClusterTestAddArgumentsResponseCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
-    std::unique_ptr<CHIPChefTestClusterClusterTestAddArgumentsResponseCallback,
-                    void (*)(CHIPChefTestClusterClusterTestAddArgumentsResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPChefTestClusterClusterTestAddArgumentsResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPChefTestClusterClusterTestAddArgumentsResponseCallback>);
+    std::unique_ptr<CHIPSampleMeiClusterAddArgumentsResponseCallback, void (*)(CHIPSampleMeiClusterAddArgumentsResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPSampleMeiClusterAddArgumentsResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPSampleMeiClusterAddArgumentsResponseCallback>);
     VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
 
     javaCallbackRef = cppCallback->javaCallbackRef;

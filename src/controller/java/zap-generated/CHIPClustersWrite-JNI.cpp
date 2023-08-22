@@ -13989,12 +13989,12 @@ JNI_METHOD(void, UnitTestingCluster, writeWriteOnlyInt8uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, ChefTestClusterCluster, writeAttribute1Attribute)
+JNI_METHOD(void, SampleMeiCluster, writeFlipFlopAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::ChefTestCluster::Attributes::Attribute1::TypeInfo;
+    using TypeInfo = chip::app::Clusters::SampleMei::Attributes::FlipFlop::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -14015,8 +14015,8 @@ JNI_METHOD(void, ChefTestClusterCluster, writeAttribute1Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err                      = CHIP_NO_ERROR;
-    ChefTestClusterCluster * cppCluster = reinterpret_cast<ChefTestClusterCluster *>(clusterPtr);
+    CHIP_ERROR err                = CHIP_NO_ERROR;
+    SampleMeiCluster * cppCluster = reinterpret_cast<SampleMeiCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));

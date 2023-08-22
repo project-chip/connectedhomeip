@@ -17342,6 +17342,87 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readSampleMeiClusterInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readSampleMeiClusterAttribute1CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSampleMeiClusterAttribute1AttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SampleMeiClusterCluster) cluster).readAttribute1Attribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readSampleMeiClusterAttribute1CommandParams
+        );
+        result.put("readAttribute1Attribute", readSampleMeiClusterAttribute1AttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSampleMeiClusterGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSampleMeiClusterGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SampleMeiClusterCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.SampleMeiClusterCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedSampleMeiClusterClusterGeneratedCommandListAttributeCallback(),
+          readSampleMeiClusterGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readSampleMeiClusterGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSampleMeiClusterAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSampleMeiClusterAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SampleMeiClusterCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.SampleMeiClusterCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedSampleMeiClusterClusterAcceptedCommandListAttributeCallback(),
+          readSampleMeiClusterAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readSampleMeiClusterAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSampleMeiClusterEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSampleMeiClusterEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SampleMeiClusterCluster) cluster).readEventListAttribute(
+              (ChipClusters.SampleMeiClusterCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedSampleMeiClusterClusterEventListAttributeCallback(),
+          readSampleMeiClusterEventListCommandParams
+        );
+        result.put("readEventListAttribute", readSampleMeiClusterEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSampleMeiClusterAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSampleMeiClusterAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SampleMeiClusterCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.SampleMeiClusterCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedSampleMeiClusterClusterAttributeListAttributeCallback(),
+          readSampleMeiClusterAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readSampleMeiClusterAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSampleMeiClusterFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSampleMeiClusterFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SampleMeiClusterCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readSampleMeiClusterFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readSampleMeiClusterFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSampleMeiClusterClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSampleMeiClusterClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SampleMeiClusterCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readSampleMeiClusterClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readSampleMeiClusterClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     @SuppressWarnings("serial")
     public Map<String, Map<String, InteractionInfo>> getReadAttributeMap() {
 
@@ -17442,7 +17523,8 @@ public class ClusterReadMapping {
             put("accountLogin", readAccountLoginInteractionInfo());
             put("electricalMeasurement", readElectricalMeasurementInteractionInfo());
             put("unitTesting", readUnitTestingInteractionInfo());
-            put("faultInjection", readFaultInjectionInteractionInfo());}};
+            put("faultInjection", readFaultInjectionInteractionInfo());
+            put("sampleMeiCluster", readSampleMeiClusterInteractionInfo());}};
     }
 }
 

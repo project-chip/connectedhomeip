@@ -25542,10 +25542,10 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {} // namespace Events
 
 } // namespace FaultInjection
-namespace ChefTestCluster {
+namespace SampleMei {
 
 namespace Commands {
-namespace Test {
+namespace Ping {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     TLV::TLVType outer;
@@ -25577,8 +25577,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace Test.
-namespace TestAddArgumentsResponse {
+} // namespace Ping.
+namespace AddArgumentsResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     TLV::TLVType outer;
@@ -25614,8 +25614,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace TestAddArgumentsResponse.
-namespace TestAddArguments {
+} // namespace AddArgumentsResponse.
+namespace AddArguments {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     TLV::TLVType outer;
@@ -25655,7 +25655,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace TestAddArguments.
+} // namespace AddArguments.
 } // namespace Commands
 
 namespace Attributes {
@@ -25663,8 +25663,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::Attribute1::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, attribute1));
+    case Attributes::FlipFlop::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, flipFlop));
         break;
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
@@ -25694,7 +25694,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace ChefTestCluster
+} // namespace SampleMei
 
 } // namespace Clusters
 
@@ -26194,7 +26194,7 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
-    case Clusters::ChefTestCluster::Id: {
+    case Clusters::SampleMei::Id: {
         switch (aCommand)
         {
         default:

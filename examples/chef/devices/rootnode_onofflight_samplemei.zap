@@ -33,7 +33,7 @@
   ],
   "endpointTypes": [
     {
-      "id": 4,
+      "id": 5,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
         "id": 2,
@@ -5420,7 +5420,7 @@
       ]
     },
     {
-      "id": 3,
+      "id": 6,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 8,
@@ -7522,20 +7522,28 @@
           ]
         },
         {
-          "name": "Chef Test Cluster",
+          "name": "Sample MEI",
           "code": 4294048800,
           "mfgCode": null,
-          "define": "CHEF_TEST_CLUSTER",
+          "define": "SAMPLE_MEI_CLUSTER",
           "side": "client",
           "enabled": 0,
           "commands": [
             {
-              "name": "Test",
+              "name": "Ping",
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
+            },
+            {
+              "name": "AddArguments",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -7574,15 +7582,25 @@
           ]
         },
         {
-          "name": "Chef Test Cluster",
+          "name": "Sample MEI",
           "code": 4294048800,
           "mfgCode": null,
-          "define": "CHEF_TEST_CLUSTER",
+          "define": "SAMPLE_MEI_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "commands": [
+            {
+              "name": "AddArgumentsResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            }
+          ],
           "attributes": [
             {
-              "name": "attribute1",
+              "name": "FlipFlop",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -7604,7 +7622,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -7620,7 +7638,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -7636,7 +7654,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -7652,7 +7670,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",

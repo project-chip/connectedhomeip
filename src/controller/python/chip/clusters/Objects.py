@@ -40613,14 +40613,14 @@ class FaultInjection(Cluster):
 
 
 @dataclass
-class ChefTestCluster(Cluster):
+class SampleMei(Cluster):
     id: typing.ClassVar[int] = 0xFFF1FC20
 
     @ChipUtility.classproperty
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="attribute1", Tag=0x00000000, Type=bool),
+                ClusterObjectFieldDescriptor(Label="flipFlop", Tag=0x00000000, Type=bool),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -40629,7 +40629,7 @@ class ChefTestCluster(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    attribute1: 'bool' = None
+    flipFlop: 'bool' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -40639,7 +40639,7 @@ class ChefTestCluster(Cluster):
 
     class Commands:
         @dataclass
-        class Test(ClusterCommand):
+        class Ping(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC20
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
@@ -40652,7 +40652,7 @@ class ChefTestCluster(Cluster):
                     ])
 
         @dataclass
-        class TestAddArgumentsResponse(ClusterCommand):
+        class AddArgumentsResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC20
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
@@ -40668,11 +40668,11 @@ class ChefTestCluster(Cluster):
             returnValue: 'uint' = 0
 
         @dataclass
-        class TestAddArguments(ClusterCommand):
+        class AddArguments(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC20
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'TestAddArgumentsResponse'
+            response_type: typing.ClassVar[str] = 'AddArgumentsResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -40687,7 +40687,7 @@ class ChefTestCluster(Cluster):
 
     class Attributes:
         @dataclass
-        class Attribute1(ClusterAttributeDescriptor):
+        class FlipFlop(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0xFFF1FC20

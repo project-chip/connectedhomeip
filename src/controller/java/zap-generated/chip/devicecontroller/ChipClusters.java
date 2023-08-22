@@ -39563,44 +39563,44 @@ public class ChipClusters {
 , int minInterval, int maxInterval);
   }
 
-  public static class ChefTestClusterCluster extends BaseChipCluster {
+  public static class SampleMeiCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 4294048800L;
 
-    public ChefTestClusterCluster(long devicePtr, int endpointId) {
+    public SampleMeiCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void test(DefaultClusterCallback callback
+    public void ping(DefaultClusterCallback callback
       ) {
-      test(chipClusterPtr, callback, null);
+      ping(chipClusterPtr, callback, null);
     }
 
-    public void test(DefaultClusterCallback callback
+    public void ping(DefaultClusterCallback callback
       
       , int timedInvokeTimeoutMs) {
-      test(chipClusterPtr, callback, timedInvokeTimeoutMs);
+      ping(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
 
-    public void testAddArguments(TestAddArgumentsResponseCallback callback
+    public void addArguments(AddArgumentsResponseCallback callback
       , Integer arg1, Integer arg2) {
-      testAddArguments(chipClusterPtr, callback, arg1, arg2, null);
+      addArguments(chipClusterPtr, callback, arg1, arg2, null);
     }
 
-    public void testAddArguments(TestAddArgumentsResponseCallback callback
+    public void addArguments(AddArgumentsResponseCallback callback
       , Integer arg1, Integer arg2
       , int timedInvokeTimeoutMs) {
-      testAddArguments(chipClusterPtr, callback, arg1, arg2, timedInvokeTimeoutMs);
+      addArguments(chipClusterPtr, callback, arg1, arg2, timedInvokeTimeoutMs);
     }
-    private native void test(long chipClusterPtr, DefaultClusterCallback Callback
+    private native void ping(long chipClusterPtr, DefaultClusterCallback Callback
       
       , @Nullable Integer timedInvokeTimeoutMs);
-    private native void testAddArguments(long chipClusterPtr, TestAddArgumentsResponseCallback Callback
+    private native void addArguments(long chipClusterPtr, AddArgumentsResponseCallback Callback
       , Integer arg1, Integer arg2
       , @Nullable Integer timedInvokeTimeoutMs);
-    public interface TestAddArgumentsResponseCallback {
+    public interface AddArgumentsResponseCallback {
       void onSuccess(Integer returnValue);
 
       void onError(Exception error);
@@ -39628,23 +39628,23 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
 
-    public void readAttribute1Attribute(
+    public void readFlipFlopAttribute(
       BooleanAttributeCallback callback
     ) {
-      readAttribute1Attribute(chipClusterPtr, callback);
+      readFlipFlopAttribute(chipClusterPtr, callback);
     }
-    public void writeAttribute1Attribute(DefaultClusterCallback callback, Boolean value) {
-      writeAttribute1Attribute(chipClusterPtr, callback, value, null);
+    public void writeFlipFlopAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeFlipFlopAttribute(chipClusterPtr, callback, value, null);
     }
 
-    public void writeAttribute1Attribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
-      writeAttribute1Attribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    public void writeFlipFlopAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      writeFlipFlopAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
-    public void subscribeAttribute1Attribute(
+    public void subscribeFlipFlopAttribute(
         BooleanAttributeCallback callback
 ,
       int minInterval, int maxInterval) {
-      subscribeAttribute1Attribute(chipClusterPtr, callback, minInterval, maxInterval);
+      subscribeFlipFlopAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -39719,12 +39719,12 @@ public class ChipClusters {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    private native void readAttribute1Attribute(long chipClusterPtr,
+    private native void readFlipFlopAttribute(long chipClusterPtr,
         BooleanAttributeCallback callback
     );
 
-    private native void writeAttribute1Attribute(long chipClusterPtr, DefaultClusterCallback callback, Boolean value, @Nullable Integer timedWriteTimeoutMs);
-    private native void subscribeAttribute1Attribute(long chipClusterPtr,
+    private native void writeFlipFlopAttribute(long chipClusterPtr, DefaultClusterCallback callback, Boolean value, @Nullable Integer timedWriteTimeoutMs);
+    private native void subscribeFlipFlopAttribute(long chipClusterPtr,
         BooleanAttributeCallback callback
 , int minInterval, int maxInterval);
 

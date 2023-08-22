@@ -4107,7 +4107,7 @@ enum class FaultType : uint8_t
 };
 } // namespace FaultInjection
 
-namespace ChefTestCluster {} // namespace ChefTestCluster
+namespace SampleMei {} // namespace SampleMei
 
 } // namespace Clusters
 } // namespace app

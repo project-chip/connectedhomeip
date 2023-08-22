@@ -15,37 +15,40 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <domain name="General"/>
+  <domain name="CHIP"/>
 
   <cluster>
     <domain>General</domain>
-    <name>Chef Test Cluster</name>
+    <name>Sample MEI</name>
     <code>0xFFF1FC20</code>
-    <define>CHEF_TEST_CLUSTER</define>
-    <description>The Chef Test Cluster showcases manufacturer extensions</description>
+    <define>SAMPLE_MEI_CLUSTER</define>
+    <description>The Sample MEI cluster showcases a cluster manufacturer extensions</description>
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="ATTRIBUTE1" type="BOOLEAN" writable="true" default="false" optional="false">attribute1</attribute>
+    <!-- A simple boolean attribute that flips or flops -->
+    <attribute side="server" code="0x0000" define="FLIP_FLOP" type="BOOLEAN" writable="true" default="false" optional="false">FlipFlop</attribute>
 
     <!-- Commands -->
     <!-- Test Command -->
-    <command source="client" code="0x00" name="Test" optional="false">
+    <command source="client" code="0x00" name="Ping" optional="false">
       <description>
-        Simple command without any parameters and without a specific response
+        Simple command without any parameters and without a response.
       </description>
     </command>
 
     <!-- TestAddArguments Command -->
-    <command source="server" code="0x01" name="TestAddArgumentsResponse" optional="true" disableDefaultResponse="true">
+    <command source="server" code="0x01" name="AddArgumentsResponse" optional="true" disableDefaultResponse="true">
       <description>
-        Response for TestAddArguments that returns the sum.
+        Response for AddArguments that returns the sum.
       </description>
       <arg name="returnValue" type="INT8U"/>
     </command>
 
-    <command source="client" code="0x02" name="TestAddArguments" response="TestAddArgumentsResponse" optional="true">
+    <command source="client" code="0x02" name="AddArguments" response="AddArgumentsResponse" optional="true">
       <description>
-        Command that takes two arguments and returns their sum.
+        Command that takes two uint8 arguments and returns their sum.
       </description>
       <arg name="arg1" type="INT8U"/>
       <arg name="arg2" type="INT8U"/>

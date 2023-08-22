@@ -23,8 +23,8 @@
 #include <app/ConcreteAttributePath.h>
 #include <lib/shell/Engine.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <app/clusters/sample-mei-server/sample-mei-server.h>
 
-#include "../common/chef-test-cluster-server.h"
 
 using namespace chip;
 using namespace chip::Shell;
@@ -54,8 +54,8 @@ int main(int argc, char * argv[])
 #if CHIP_SHELL_ENABLE_CMD_SERVER
     cmd_app_server_init();
 #endif
-    app::Clusters::ChefTestCluster::ChefTestClusterServer chefTestClusterServer(1 /* endpoint */);
-    chefTestClusterServer.Init();
+    app::Clusters::SampleMei::SampleMeiServer sampleMeiServer(1 /* endpoint */);
+    sampleMeiServer.Init();
 
     ChipLinuxAppMainLoop();
 

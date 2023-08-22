@@ -34954,12 +34954,12 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         }
         break;
     }
-    case app::Clusters::ChefTestCluster::Id: {
-        using namespace app::Clusters::ChefTestCluster;
+    case app::Clusters::SampleMei::Id: {
+        using namespace app::Clusters::SampleMei;
         switch (aPath.mAttributeId)
         {
-        case Attributes::Attribute1::Id: {
-            using TypeInfo = Attributes::Attribute1::TypeInfo;
+        case Attributes::FlipFlop::Id: {
+            using TypeInfo = Attributes::FlipFlop::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

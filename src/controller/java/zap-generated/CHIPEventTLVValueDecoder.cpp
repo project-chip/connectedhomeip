@@ -5045,8 +5045,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::ChefTestCluster::Id: {
-        using namespace app::Clusters::ChefTestCluster;
+    case app::Clusters::SampleMei::Id: {
+        using namespace app::Clusters::SampleMei;
         switch (aPath.mEventId)
         {
         default:

@@ -809,13 +809,13 @@ void emberAfUnitTestingClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfFaultInjectionClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Chef Test Cluster Cluster Init
+/** @brief Sample MEI Cluster Init
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfChefTestClusterClusterInitCallback(chip::EndpointId endpoint);
+void emberAfSampleMeiClusterInitCallback(chip::EndpointId endpoint);
 
 // Cluster Server/Client Init Functions
 
@@ -8313,42 +8313,42 @@ void emberAfFaultInjectionClusterServerTickCallback(chip::EndpointId endpoint);
 void emberAfFaultInjectionClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// Chef Test Cluster Cluster
+// Sample MEI Cluster
 //
 
-/** @brief Chef Test Cluster Cluster Server Init
+/** @brief Sample MEI Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfChefTestClusterClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfSampleMeiClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief Chef Test Cluster Cluster Server Shutdown
+/** @brief Sample MEI Cluster Server Shutdown
  *
  * Server Shutdown
  *
  * @param endpoint    Endpoint that is being shutdown
  */
-void MatterChefTestClusterClusterServerShutdownCallback(chip::EndpointId endpoint);
+void MatterSampleMeiClusterServerShutdownCallback(chip::EndpointId endpoint);
 
-/** @brief Chef Test Cluster Cluster Client Init
+/** @brief Sample MEI Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfChefTestClusterClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfSampleMeiClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief Chef Test Cluster Cluster Server Attribute Changed
+/** @brief Sample MEI Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
  * @param attributePath Concrete attribute path that changed
  */
-void MatterChefTestClusterClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+void MatterSampleMeiClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief Chef Test Cluster Cluster Server Pre Attribute Changed
+/** @brief Sample MEI Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -8358,10 +8358,10 @@ void MatterChefTestClusterClusterServerAttributeChangedCallback(const chip::app:
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-MatterChefTestClusterClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                              EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+MatterSampleMeiClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                        EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Chef Test Cluster Cluster Client Pre Attribute Changed
+/** @brief Sample MEI Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -8371,24 +8371,24 @@ MatterChefTestClusterClusterServerPreAttributeChangedCallback(const chip::app::C
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-MatterChefTestClusterClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                              EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+MatterSampleMeiClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                        EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Chef Test Cluster Cluster Server Tick
+/** @brief Sample MEI Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfChefTestClusterClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfSampleMeiClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief Chef Test Cluster Cluster Client Tick
+/** @brief Sample MEI Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfChefTestClusterClusterClientTickCallback(chip::EndpointId endpoint);
+void emberAfSampleMeiClusterClientTickCallback(chip::EndpointId endpoint);
 
 // Cluster Commands Callback
 
@@ -9505,14 +9505,13 @@ bool emberAfFaultInjectionClusterFailRandomlyAtFaultCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::FaultInjection::Commands::FailRandomlyAtFault::DecodableType & commandData);
 /**
- * @brief Chef Test Cluster Cluster Test Command callback (from client)
+ * @brief Sample MEI Cluster Ping Command callback (from client)
  */
-bool emberAfChefTestClusterClusterTestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ChefTestCluster::Commands::Test::DecodableType & commandData);
+bool emberAfSampleMeiClusterPingCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                         const chip::app::Clusters::SampleMei::Commands::Ping::DecodableType & commandData);
 /**
- * @brief Chef Test Cluster Cluster TestAddArguments Command callback (from client)
+ * @brief Sample MEI Cluster AddArguments Command callback (from client)
  */
-bool emberAfChefTestClusterClusterTestAddArgumentsCallback(
+bool emberAfSampleMeiClusterAddArgumentsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ChefTestCluster::Commands::TestAddArguments::DecodableType & commandData);
+    const chip::app::Clusters::SampleMei::Commands::AddArguments::DecodableType & commandData);

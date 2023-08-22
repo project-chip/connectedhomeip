@@ -7058,3 +7058,28 @@ client cluster FaultInjection = 4294048774 {
   command access(invoke: manage) FailRandomlyAtFault(FailRandomlyAtFaultRequest): DefaultSuccess = 1;
 }
 
+/** The Sample MEI cluster showcases a cluster manufacturer extensions */
+client cluster SampleMei = 4294048800 {
+  attribute boolean flipFlop = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct AddArgumentsResponse = 1 {
+    INT8U returnValue = 0;
+  }
+
+  request struct AddArgumentsRequest {
+    INT8U arg1 = 0;
+    INT8U arg2 = 1;
+  }
+
+  /** Simple command without any parameters and without a response. */
+  command Ping(): DefaultSuccess = 0;
+  /** Command that takes two uint8 arguments and returns their sum. */
+  command AddArguments(AddArgumentsRequest): AddArgumentsResponse = 2;
+}
+

@@ -1329,15 +1329,27 @@ server cluster FixedLabel = 64 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** The Chef Test Cluster showcases manufacturer extensions */
-server cluster ChefTestCluster = 4294048800 {
-  attribute boolean attribute1 = 0;
+/** The Sample MEI cluster showcases a cluster manufacturer extensions */
+server cluster SampleMei = 4294048800 {
+  attribute boolean flipFlop = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct AddArgumentsRequest {
+    INT8U arg1 = 0;
+    INT8U arg2 = 1;
+  }
+
+  response struct AddArgumentsResponse = 1 {
+    INT8U returnValue = 0;
+  }
+
+  command Ping(): DefaultSuccess = 0;
+  command AddArguments(AddArgumentsRequest): AddArgumentsResponse = 2;
 }
 
 endpoint 0 {
@@ -1571,8 +1583,8 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster ChefTestCluster {
-    ram      attribute attribute1 default = false;
+  server cluster SampleMei {
+    ram      attribute flipFlop default = false;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;

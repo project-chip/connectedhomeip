@@ -131,7 +131,7 @@
 | ElectricalMeasurement                                               | 0x0B04 |
 | UnitTesting                                                         | 0xFFF1FC05|
 | FaultInjection                                                      | 0xFFF1FC06|
-| ChefTestCluster                                                     | 0xFFF1FC20|
+| SampleMei                                                           | 0xFFF1FC20|
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
@@ -11385,14 +11385,14 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster ChefTestCluster                                             | 0xFFF1FC20|
+| Cluster SampleMei                                                   | 0xFFF1FC20|
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * Test                                                              |   0x00 |
-| * TestAddArguments                                                  |   0x02 |
+| * Ping                                                              |   0x00 |
+| * AddArguments                                                      |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * Attribute1                                                        | 0x0000 |
+| * FlipFlop                                                          | 0x0000 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -11404,12 +11404,12 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*
- * Command Test
+ * Command Ping
  */
-class ChefTestClusterTest : public ClusterCommand
+class SampleMeiPing : public ClusterCommand
 {
 public:
-    ChefTestClusterTest(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("test", credsIssuerConfig)
+    SampleMeiPing(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("ping", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
@@ -11429,17 +11429,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::ChefTestCluster::Commands::Test::Type mRequest;
+    chip::app::Clusters::SampleMei::Commands::Ping::Type mRequest;
 };
 
 /*
- * Command TestAddArguments
+ * Command AddArguments
  */
-class ChefTestClusterTestAddArguments : public ClusterCommand
+class SampleMeiAddArguments : public ClusterCommand
 {
 public:
-    ChefTestClusterTestAddArguments(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("test-add-arguments", credsIssuerConfig)
+    SampleMeiAddArguments(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("add-arguments", credsIssuerConfig)
     {
         AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
         AddArgument("Arg2", 0, UINT8_MAX, &mRequest.arg2);
@@ -11461,7 +11460,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::ChefTestCluster::Commands::TestAddArguments::Type mRequest;
+    chip::app::Clusters::SampleMei::Commands::AddArguments::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -21441,24 +21440,24 @@ void registerClusterFaultInjection(Commands & commands, CredentialIssuerCommands
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
-void registerClusterChefTestCluster(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterSampleMei(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::ChefTestCluster;
+    using namespace chip::app::Clusters::SampleMei;
 
-    const char * clusterName = "ChefTestCluster";
+    const char * clusterName = "SampleMei";
 
     commands_list clusterCommands = {
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),              //
-        make_unique<ChefTestClusterTest>(credsIssuerConfig),             //
-        make_unique<ChefTestClusterTestAddArguments>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),    //
+        make_unique<SampleMeiPing>(credsIssuerConfig),         //
+        make_unique<SampleMeiAddArguments>(credsIssuerConfig), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "attribute1", Attributes::Attribute1::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "flip-flop", Attributes::FlipFlop::Id, credsIssuerConfig),                          //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -21466,7 +21465,7 @@ void registerClusterChefTestCluster(Commands & commands, CredentialIssuerCommand
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttribute<bool>>(Id, "attribute1", 0, 1, Attributes::Attribute1::Id, WriteCommandType::kWrite,
+        make_unique<WriteAttribute<bool>>(Id, "flip-flop", 0, 1, Attributes::FlipFlop::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -21482,7 +21481,7 @@ void registerClusterChefTestCluster(Commands & commands, CredentialIssuerCommand
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "attribute1", Attributes::Attribute1::Id, credsIssuerConfig),                       //
+        make_unique<SubscribeAttribute>(Id, "flip-flop", Attributes::FlipFlop::Id, credsIssuerConfig),                          //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -21620,5 +21619,5 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterElectricalMeasurement(commands, credsIssuerConfig);
     registerClusterUnitTesting(commands, credsIssuerConfig);
     registerClusterFaultInjection(commands, credsIssuerConfig);
-    registerClusterChefTestCluster(commands, credsIssuerConfig);
+    registerClusterSampleMei(commands, credsIssuerConfig);
 }

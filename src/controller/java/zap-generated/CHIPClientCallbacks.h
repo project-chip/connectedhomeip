@@ -1001,11 +1001,11 @@ typedef void (*FaultInjectionEventListListAttributeCallback)(void * context,
                                                              const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*FaultInjectionAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ChefTestClusterGeneratedCommandListListAttributeCallback)(
+typedef void (*SampleMeiGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ChefTestClusterAcceptedCommandListListAttributeCallback)(
+typedef void (*SampleMeiAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ChefTestClusterEventListListAttributeCallback)(void * context,
-                                                              const chip::app::DataModel::DecodableList<chip::EventId> & data);
-typedef void (*ChefTestClusterAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*SampleMeiEventListListAttributeCallback)(void * context,
+                                                        const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*SampleMeiAttributeListListAttributeCallback)(void * context,
+                                                            const chip::app::DataModel::DecodableList<chip::AttributeId> & data);

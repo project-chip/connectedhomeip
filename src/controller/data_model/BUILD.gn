@@ -218,6 +218,8 @@ if (current_os == "android" || matter_enable_java_compilation) {
       "jni/RvcCleanModeClient-ReadImpl.cpp",
       "jni/RvcRunModeClient-InvokeSubscribeImpl.cpp",
       "jni/RvcRunModeClient-ReadImpl.cpp",
+      "jni/SampleMeiClient-InvokeSubscribeImpl.cpp",
+      "jni/SampleMeiClient-ReadImpl.cpp",
       "jni/ScenesClient-InvokeSubscribeImpl.cpp",
       "jni/ScenesClient-ReadImpl.cpp",
       "jni/SmokeCoAlarmClient-InvokeSubscribeImpl.cpp",

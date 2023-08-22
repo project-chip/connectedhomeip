@@ -1479,23 +1479,23 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace FaultInjection
 
-namespace ChefTestCluster {
+namespace SampleMei {
 namespace Commands {
 
-namespace Test {
+namespace Ping {
 static constexpr CommandId Id = 0x00000000;
-} // namespace Test
+} // namespace Ping
 
-namespace TestAddArgumentsResponse {
+namespace AddArgumentsResponse {
 static constexpr CommandId Id = 0x00000001;
-} // namespace TestAddArgumentsResponse
+} // namespace AddArgumentsResponse
 
-namespace TestAddArguments {
+namespace AddArguments {
 static constexpr CommandId Id = 0x00000002;
-} // namespace TestAddArguments
+} // namespace AddArguments
 
 } // namespace Commands
-} // namespace ChefTestCluster
+} // namespace SampleMei
 
 } // namespace Clusters
 } // namespace app

@@ -1,5 +1,5 @@
-#ifndef SRC_APP_CLUSTERS_CHEF_TEST_CLUSTER_SERVER_CHEF_TEST_CLUSTER_SERVER_H_
-#define SRC_APP_CLUSTERS_CHEF_TEST_CLUSTER_SERVER_CHEF_TEST_CLUSTER_SERVER_H_
+#ifndef SRC_APP_CLUSTERS_SAMPLE_MEI_CLUSTER_SERVER_SERVER_H_
+#define SRC_APP_CLUSTERS_SAMPLE_MEI_CLUSTER_SERVER_SERVER_H_
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
@@ -13,12 +13,12 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace ChefTestCluster {
+namespace SampleMei {
 
-class ChefTestClusterServer : public CommandHandlerInterface, public AttributeAccessInterface
+class SampleMeiServer : public CommandHandlerInterface, public AttributeAccessInterface
 {
 public:
-    ChefTestClusterServer(EndpointId aEndpointId) :
+    SampleMeiServer(EndpointId aEndpointId) :
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id),
         AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id)
     {}
@@ -35,9 +35,9 @@ public:
 private:
     bool attribute1;
 };
-} // namespace ChefTestCluster
+} // namespace SampleMei
 } // namespace Clusters
 } // namespace app
 } // namespace chip
 
-#endif // SRC_APP_CLUSTERS_CHEF_TEST_CLUSTER_SERVER_CHEF_TEST_CLUSTER_SERVER_H_
+#endif // SRC_APP_CLUSTERS_SAMPLE_MEI_CLUSTER_SERVER_SERVER_H_

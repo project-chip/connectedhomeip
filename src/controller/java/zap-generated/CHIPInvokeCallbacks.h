@@ -990,16 +990,16 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPChefTestClusterClusterTestAddArgumentsResponseCallback
-    : public Callback::Callback<CHIPChefTestClusterClusterTestAddArgumentsResponseCallbackType>
+class CHIPSampleMeiClusterAddArgumentsResponseCallback
+    : public Callback::Callback<CHIPSampleMeiClusterAddArgumentsResponseCallbackType>
 {
 public:
-    CHIPChefTestClusterClusterTestAddArgumentsResponseCallback(jobject javaCallback);
+    CHIPSampleMeiClusterAddArgumentsResponseCallback(jobject javaCallback);
 
-    ~CHIPChefTestClusterClusterTestAddArgumentsResponseCallback();
+    ~CHIPSampleMeiClusterAddArgumentsResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::ChefTestCluster::Commands::TestAddArgumentsResponse::DecodableType & data);
+                           const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

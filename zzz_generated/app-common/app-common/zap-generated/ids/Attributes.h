@@ -6857,12 +6857,12 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace FaultInjection
 
-namespace ChefTestCluster {
+namespace SampleMei {
 namespace Attributes {
 
-namespace Attribute1 {
+namespace FlipFlop {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace Attribute1
+} // namespace FlipFlop
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -6889,7 +6889,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace ChefTestCluster
+} // namespace SampleMei
 
 } // namespace Clusters
 } // namespace app

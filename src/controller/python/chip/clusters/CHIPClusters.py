@@ -12100,19 +12100,19 @@ class ChipClusters:
             },
         },
     }
-    _CHEF_TEST_CLUSTER_CLUSTER_INFO = {
-        "clusterName": "ChefTestCluster",
+    _SAMPLE_MEI_CLUSTER_INFO = {
+        "clusterName": "SampleMei",
         "clusterId": 0xFFF1FC20,
         "commands": {
             0x00000000: {
                 "commandId": 0x00000000,
-                "commandName": "Test",
+                "commandName": "Ping",
                 "args": {
                 },
             },
             0x00000002: {
                 "commandId": 0x00000002,
-                "commandName": "TestAddArguments",
+                "commandName": "AddArguments",
                 "args": {
                     "arg1": "int",
                     "arg2": "int",
@@ -12121,7 +12121,7 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "Attribute1",
+                "attributeName": "FlipFlop",
                 "attributeId": 0x00000000,
                 "type": "bool",
                 "reportable": True,
@@ -12264,7 +12264,7 @@ class ChipClusters:
         0x00000B04: _ELECTRICAL_MEASUREMENT_CLUSTER_INFO,
         0xFFF1FC05: _UNIT_TESTING_CLUSTER_INFO,
         0xFFF1FC06: _FAULT_INJECTION_CLUSTER_INFO,
-        0xFFF1FC20: _CHEF_TEST_CLUSTER_CLUSTER_INFO,
+        0xFFF1FC20: _SAMPLE_MEI_CLUSTER_INFO,
     }
 
     _CLUSTER_NAME_DICT = {
@@ -12365,7 +12365,7 @@ class ChipClusters:
         "ElectricalMeasurement": _ELECTRICAL_MEASUREMENT_CLUSTER_INFO,
         "UnitTesting": _UNIT_TESTING_CLUSTER_INFO,
         "FaultInjection": _FAULT_INJECTION_CLUSTER_INFO,
-        "ChefTestCluster": _CHEF_TEST_CLUSTER_CLUSTER_INFO,
+        "SampleMei": _SAMPLE_MEI_CLUSTER_INFO,
     }
 
     def __init__(self, chipstack):

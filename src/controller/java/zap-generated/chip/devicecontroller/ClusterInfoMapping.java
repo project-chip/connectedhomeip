@@ -15087,7 +15087,7 @@ public class ClusterInfoMapping {
         }
       }
 
-      public static class DelegatedChefTestClusterClusterTestAddArgumentsResponseCallback implements ChipClusters.ChefTestClusterCluster.TestAddArgumentsResponseCallback, DelegatedClusterCallback {
+      public static class DelegatedSampleMeiClusterAddArgumentsResponseCallback implements ChipClusters.SampleMeiCluster.AddArgumentsResponseCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
         public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -15108,7 +15108,7 @@ public class ClusterInfoMapping {
         }
       }
 
-      public static class DelegatedChefTestClusterClusterGeneratedCommandListAttributeCallback implements ChipClusters.ChefTestClusterCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+      public static class DelegatedSampleMeiClusterGeneratedCommandListAttributeCallback implements ChipClusters.SampleMeiCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
         public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -15127,7 +15127,7 @@ public class ClusterInfoMapping {
           callback.onFailure(ex);
         }
       }
-      public static class DelegatedChefTestClusterClusterAcceptedCommandListAttributeCallback implements ChipClusters.ChefTestClusterCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+      public static class DelegatedSampleMeiClusterAcceptedCommandListAttributeCallback implements ChipClusters.SampleMeiCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
         public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -15146,7 +15146,7 @@ public class ClusterInfoMapping {
           callback.onFailure(ex);
         }
       }
-      public static class DelegatedChefTestClusterClusterEventListAttributeCallback implements ChipClusters.ChefTestClusterCluster.EventListAttributeCallback, DelegatedClusterCallback {
+      public static class DelegatedSampleMeiClusterEventListAttributeCallback implements ChipClusters.SampleMeiCluster.EventListAttributeCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
         public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -15165,7 +15165,7 @@ public class ClusterInfoMapping {
           callback.onFailure(ex);
         }
       }
-      public static class DelegatedChefTestClusterClusterAttributeListAttributeCallback implements ChipClusters.ChefTestClusterCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+      public static class DelegatedSampleMeiClusterAttributeListAttributeCallback implements ChipClusters.SampleMeiCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
         public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -15490,9 +15490,9 @@ public class ClusterInfoMapping {
       ClusterInfo faultInjectionClusterInfo = new ClusterInfo(
         (ptr, endpointId) -> new ChipClusters.FaultInjectionCluster(ptr, endpointId), new HashMap<>());
       clusterMap.put("faultInjection", faultInjectionClusterInfo);
-      ClusterInfo chefTestClusterClusterInfo = new ClusterInfo(
-        (ptr, endpointId) -> new ChipClusters.ChefTestClusterCluster(ptr, endpointId), new HashMap<>());
-      clusterMap.put("chefTestCluster", chefTestClusterClusterInfo);
+      ClusterInfo sampleMeiClusterInfo = new ClusterInfo(
+        (ptr, endpointId) -> new ChipClusters.SampleMeiCluster(ptr, endpointId), new HashMap<>());
+      clusterMap.put("sampleMei", sampleMeiClusterInfo);
     return clusterMap;
  }
 
@@ -15594,7 +15594,7 @@ public class ClusterInfoMapping {
       destination.get("electricalMeasurement").combineCommands(source.get("electricalMeasurement"));
       destination.get("unitTesting").combineCommands(source.get("unitTesting"));
       destination.get("faultInjection").combineCommands(source.get("faultInjection"));
-      destination.get("chefTestCluster").combineCommands(source.get("chefTestCluster"));
+      destination.get("sampleMei").combineCommands(source.get("sampleMei"));
  }
 
  @SuppressWarnings("unchecked")
@@ -20425,30 +20425,30 @@ public class ClusterInfoMapping {
        );
        faultInjectionClusterInteractionInfoMap.put("failRandomlyAtFault", faultInjectionfailRandomlyAtFaultInteractionInfo);
      commandMap.put("faultInjection", faultInjectionClusterInteractionInfoMap);
-     Map<String, InteractionInfo> chefTestClusterClusterInteractionInfoMap = new LinkedHashMap<>();
-     Map<String, CommandParameterInfo> chefTestClustertestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-       InteractionInfo chefTestClustertestInteractionInfo = new InteractionInfo(
+     Map<String, InteractionInfo> sampleMeiClusterInteractionInfoMap = new LinkedHashMap<>();
+     Map<String, CommandParameterInfo> sampleMeipingCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       InteractionInfo sampleMeipingInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
-           ((ChipClusters.ChefTestClusterCluster) cluster)
-           .test((DefaultClusterCallback) callback
+           ((ChipClusters.SampleMeiCluster) cluster)
+           .ping((DefaultClusterCallback) callback
            
            );
          },
          () -> new DelegatedDefaultClusterCallback(),
-           chefTestClustertestCommandParams
+           sampleMeipingCommandParams
        );
-       chefTestClusterClusterInteractionInfoMap.put("test", chefTestClustertestInteractionInfo);
-     Map<String, CommandParameterInfo> chefTestClustertestAddArgumentsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-       CommandParameterInfo chefTestClustertestAddArgumentsarg1CommandParameterInfo = new CommandParameterInfo("arg1", Integer.class, Integer.class);
-       chefTestClustertestAddArgumentsCommandParams.put("arg1",chefTestClustertestAddArgumentsarg1CommandParameterInfo);
+       sampleMeiClusterInteractionInfoMap.put("ping", sampleMeipingInteractionInfo);
+     Map<String, CommandParameterInfo> sampleMeiaddArgumentsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       CommandParameterInfo sampleMeiaddArgumentsarg1CommandParameterInfo = new CommandParameterInfo("arg1", Integer.class, Integer.class);
+       sampleMeiaddArgumentsCommandParams.put("arg1",sampleMeiaddArgumentsarg1CommandParameterInfo);
       
-       CommandParameterInfo chefTestClustertestAddArgumentsarg2CommandParameterInfo = new CommandParameterInfo("arg2", Integer.class, Integer.class);
-       chefTestClustertestAddArgumentsCommandParams.put("arg2",chefTestClustertestAddArgumentsarg2CommandParameterInfo);
+       CommandParameterInfo sampleMeiaddArgumentsarg2CommandParameterInfo = new CommandParameterInfo("arg2", Integer.class, Integer.class);
+       sampleMeiaddArgumentsCommandParams.put("arg2",sampleMeiaddArgumentsarg2CommandParameterInfo);
      
-       InteractionInfo chefTestClustertestAddArgumentsInteractionInfo = new InteractionInfo(
+       InteractionInfo sampleMeiaddArgumentsInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
-           ((ChipClusters.ChefTestClusterCluster) cluster)
-           .testAddArguments((ChipClusters.ChefTestClusterCluster.TestAddArgumentsResponseCallback) callback
+           ((ChipClusters.SampleMeiCluster) cluster)
+           .addArguments((ChipClusters.SampleMeiCluster.AddArgumentsResponseCallback) callback
            , (Integer)
            commandArguments.get("arg1")
            , (Integer)
@@ -20456,11 +20456,11 @@ public class ClusterInfoMapping {
            
            );
          },
-         () -> new DelegatedChefTestClusterClusterTestAddArgumentsResponseCallback(),
-           chefTestClustertestAddArgumentsCommandParams
+         () -> new DelegatedSampleMeiClusterAddArgumentsResponseCallback(),
+           sampleMeiaddArgumentsCommandParams
        );
-       chefTestClusterClusterInteractionInfoMap.put("testAddArguments", chefTestClustertestAddArgumentsInteractionInfo);
-     commandMap.put("chefTestCluster", chefTestClusterClusterInteractionInfoMap);
+       sampleMeiClusterInteractionInfoMap.put("addArguments", sampleMeiaddArgumentsInteractionInfo);
+     commandMap.put("sampleMei", sampleMeiClusterInteractionInfoMap);
      return commandMap;
   }
 
