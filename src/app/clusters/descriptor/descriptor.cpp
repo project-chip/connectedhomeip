@@ -44,7 +44,7 @@ public:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
-    static constexpr uint16_t ClusterRevision = 1;
+    static constexpr uint16_t ClusterRevision = 2;
 
     CHIP_ERROR ReadTagAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
