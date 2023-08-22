@@ -18,6 +18,7 @@
 
 #include "AllClustersCommandDelegate.h"
 #include "WindowCoveringManager.h"
+#include "air-quality-instance.h"
 #include "dishwasher-mode.h"
 #include "include/tv-callbacks.h"
 #include "laundry-washer-controls-delegate-impl.h"
@@ -196,6 +197,7 @@ void ApplicationShutdown()
     Clusters::RvcRunMode::Shutdown();
     Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Shutdown();
 
+    Clusters::AirQuality::Shutdown();
     Clusters::OperationalState::Shutdown();
     Clusters::RvcOperationalState::Shutdown();
 
