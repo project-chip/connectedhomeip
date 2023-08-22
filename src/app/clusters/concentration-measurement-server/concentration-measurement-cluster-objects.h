@@ -96,145 +96,145 @@ namespace Attributes {
 
 namespace MeasuredValue {
 static constexpr AttributeId Id = 0x00000000;
-struct TypeInfo
-{
-    using Type             = DataModel::Nullable<float>;
-    using DecodableType    = DataModel::Nullable<float>;
-    using DecodableArgType = const DataModel::Nullable<float> &;
+// struct TypeInfo
+// {
+//     using Type             = DataModel::Nullable<float>;
+//     using DecodableType    = DataModel::Nullable<float>;
+//     using DecodableArgType = const DataModel::Nullable<float> &;
 
-    static constexpr AttributeId GetAttributeId() { return Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
+//     static constexpr AttributeId GetAttributeId() { return Id; }
+//     static constexpr bool MustUseTimedWrite() { return false; }
+// };
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
 static constexpr AttributeId Id = 0x00000001;
-struct TypeInfo
-{
-    using Type             = DataModel::Nullable<float>;
-    using DecodableType    = DataModel::Nullable<float>;
-    using DecodableArgType = const DataModel::Nullable<float> &;
+// struct TypeInfo
+// {
+//     using Type             = DataModel::Nullable<float>;
+//     using DecodableType    = DataModel::Nullable<float>;
+//     using DecodableArgType = const DataModel::Nullable<float> &;
 
-    static constexpr AttributeId GetAttributeId() { return Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
+//     static constexpr AttributeId GetAttributeId() { return Id; }
+//     static constexpr bool MustUseTimedWrite() { return false; }
+// };
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
 static constexpr AttributeId Id = 0x00000002;
-struct TypeInfo
-{
-    using Type             = DataModel::Nullable<float>;
-    using DecodableType    = DataModel::Nullable<float>;
-    using DecodableArgType = const DataModel::Nullable<float> &;
+// struct TypeInfo
+// {
+//     using Type             = DataModel::Nullable<float>;
+//     using DecodableType    = DataModel::Nullable<float>;
+//     using DecodableArgType = const DataModel::Nullable<float> &;
 
-    static constexpr AttributeId GetAttributeId() { return Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
+//     static constexpr AttributeId GetAttributeId() { return Id; }
+//     static constexpr bool MustUseTimedWrite() { return false; }
+// };
 } // namespace MaxMeasuredValue
 
 namespace PeakMeasuredValue {
 static constexpr AttributeId Id = 0x00000003;
-struct TypeInfo
-{
-    using Type             = DataModel::Nullable<float>;
-    using DecodableType    = DataModel::Nullable<float>;
-    using DecodableArgType = const DataModel::Nullable<float> &;
+// struct TypeInfo
+// {
+//     using Type             = DataModel::Nullable<float>;
+//     using DecodableType    = DataModel::Nullable<float>;
+//     using DecodableArgType = const DataModel::Nullable<float> &;
 
-    static constexpr AttributeId GetAttributeId() { return Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
+//     static constexpr AttributeId GetAttributeId() { return Id; }
+//     static constexpr bool MustUseTimedWrite() { return false; }
+// };
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
 static constexpr AttributeId Id = 0x00000004;
-struct TypeInfo
-{
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+// struct TypeInfo
+// {
+//     using Type             = uint32_t;
+//     using DecodableType    = uint32_t;
+//     using DecodableArgType = uint32_t;
 
-    static constexpr AttributeId GetAttributeId() { return Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
+//     static constexpr AttributeId GetAttributeId() { return Id; }
+//     static constexpr bool MustUseTimedWrite() { return false; }
+// };
 } // namespace PeakMeasuredValueWindow
 
 namespace AverageMeasuredValue {
 static constexpr AttributeId Id = 0x00000005;
-struct TypeInfo
-{
-    using Type             = DataModel::Nullable<float>;
-    using DecodableType    = DataModel::Nullable<float>;
-    using DecodableArgType = const DataModel::Nullable<float> &;
+// struct TypeInfo
+// {
+//     using Type             = DataModel::Nullable<float>;
+//     using DecodableType    = DataModel::Nullable<float>;
+//     using DecodableArgType = const DataModel::Nullable<float> &;
 
-    static constexpr AttributeId GetAttributeId() { return Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
+//     static constexpr AttributeId GetAttributeId() { return Id; }
+//     static constexpr bool MustUseTimedWrite() { return false; }
+// };
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
 static constexpr AttributeId Id = 0x00000006;
-struct TypeInfo
-{
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+// struct TypeInfo
+// {
+//     using Type             = uint32_t;
+//     using DecodableType    = uint32_t;
+//     using DecodableArgType = uint32_t;
 
-    static constexpr AttributeId GetAttributeId() { return Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
+//     static constexpr AttributeId GetAttributeId() { return Id; }
+//     static constexpr bool MustUseTimedWrite() { return false; }
+// };
 } // namespace AverageMeasuredValueWindow
 
 namespace Uncertainty {
 static constexpr AttributeId Id = 0x00000007;
-struct TypeInfo
-{
-    using Type             = float;
-    using DecodableType    = float;
-    using DecodableArgType = float;
+// struct TypeInfo
+// {
+//     using Type             = float;
+//     using DecodableType    = float;
+//     using DecodableArgType = float;
 
-    static constexpr AttributeId GetAttributeId() { return Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
+//     static constexpr AttributeId GetAttributeId() { return Id; }
+//     static constexpr bool MustUseTimedWrite() { return false; }
+// };
 } // namespace Uncertainty
 
 namespace MeasurementUnit {
 static constexpr AttributeId Id = 0x00000008;
-struct TypeInfo
-{
-    using Type             = MeasurementUnitEnum;
-    using DecodableType    = MeasurementUnitEnum;
-    using DecodableArgType = MeasurementUnitEnum;
+// struct TypeInfo
+// {
+//     using Type             = MeasurementUnitEnum;
+//     using DecodableType    = MeasurementUnitEnum;
+//     using DecodableArgType = MeasurementUnitEnum;
 
-    static constexpr AttributeId GetAttributeId() { return Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
+//     static constexpr AttributeId GetAttributeId() { return Id; }
+//     static constexpr bool MustUseTimedWrite() { return false; }
+// };
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 static constexpr AttributeId Id = 0x00000009;
-struct TypeInfo
-{
-    using Type             = MeasurementMediumEnum;
-    using DecodableType    = MeasurementMediumEnum;
-    using DecodableArgType = MeasurementMediumEnum;
+// struct TypeInfo
+// {
+//     using Type             = MeasurementMediumEnum;
+//     using DecodableType    = MeasurementMediumEnum;
+//     using DecodableArgType = MeasurementMediumEnum;
 
-    static constexpr AttributeId GetAttributeId() { return Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
+//     static constexpr AttributeId GetAttributeId() { return Id; }
+//     static constexpr bool MustUseTimedWrite() { return false; }
+// };
 } // namespace MeasurementMedium
 
 namespace LevelValue {
 static constexpr AttributeId Id = 0x0000000A;
-struct TypeInfo
-{
-    using Type             = LevelValueEnum;
-    using DecodableType    = LevelValueEnum;
-    using DecodableArgType = LevelValueEnum;
+// struct TypeInfo
+// {
+//     using Type             = LevelValueEnum;
+//     using DecodableType    = LevelValueEnum;
+//     using DecodableArgType = LevelValueEnum;
 
-    static constexpr AttributeId GetAttributeId() { return Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
+//     static constexpr AttributeId GetAttributeId() { return Id; }
+//     static constexpr bool MustUseTimedWrite() { return false; }
+// };
 } // namespace LevelValue
 
 namespace GeneratedCommandList {
