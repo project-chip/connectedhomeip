@@ -54,7 +54,7 @@ declare_args() {
   sl_ot_active_interval_ms = 200  # 200ms Active Intervals
 
   # ICD Matter Configuration flags
-  sl_idle_mode_interval_ms = 600000  # 10min Idle Mode Interval
+  sl_idle_mode_interval_s = 600  # 10min Idle Mode Interval
   sl_active_mode_interval_ms = 1000  # 1s Active Mode Interval
   sl_active_mode_threshold_ms = 500  # 500ms Active Mode Threshold
   sl_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
@@ -354,7 +354,7 @@ template("efr32_sdk") {
         "SL_ICD_ENABLED=1",
         "SL_ACTIVE_MODE_THRESHOLD=${sl_active_mode_threshold_ms}",
         "SL_ACTIVE_MODE_INTERVAL=${sl_active_mode_interval_ms}",
-        "SL_IDLE_MODE_INTERVAL=${sl_idle_mode_interval_ms}",
+        "SL_IDLE_MODE_INTERVAL=${sl_idle_mode_interval_s}",
         "SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${sl_icd_supported_clients_per_fabric}",
       ]
 
