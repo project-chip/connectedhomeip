@@ -33,7 +33,7 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 private:
-    bool attribute1;
+    bool flipflop;
 };
 } // namespace SampleMei
 } // namespace Clusters

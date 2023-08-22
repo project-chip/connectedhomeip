@@ -5180,6 +5180,36 @@ static BOOL AttributeIsSpecifiedInElectricalMeasurementCluster(AttributeId aAttr
     }
     }
 }
+static BOOL AttributeIsSpecifiedInSampleMEICluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::SampleMei;
+    switch (aAttributeId) {
+    case Attributes::FlipFlop::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::UnitTesting;
@@ -5428,36 +5458,6 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::WriteOnlyInt8u::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInSampleMEICluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::SampleMei;
-    switch (aAttributeId) {
-    case Attributes::FlipFlop::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5763,11 +5763,11 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::ElectricalMeasurement::Id: {
         return AttributeIsSpecifiedInElectricalMeasurementCluster(aAttributeId);
     }
-    case Clusters::UnitTesting::Id: {
-        return AttributeIsSpecifiedInUnitTestingCluster(aAttributeId);
-    }
     case Clusters::SampleMei::Id: {
         return AttributeIsSpecifiedInSampleMEICluster(aAttributeId);
+    }
+    case Clusters::UnitTesting::Id: {
+        return AttributeIsSpecifiedInUnitTestingCluster(aAttributeId);
     }
     default: {
         return NO;

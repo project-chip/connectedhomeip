@@ -398,6 +398,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRSampleMEIClusterAddArgumentsResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTRUnitTestingClusterTestSpecificResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
@@ -479,13 +486,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
     (const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType &)decodableStruct;
-
-@end
-
-@interface MTRSampleMEIClusterAddArgumentsResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType &)decodableStruct;
 
 @end
 

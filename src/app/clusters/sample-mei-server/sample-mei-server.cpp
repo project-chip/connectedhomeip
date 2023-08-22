@@ -28,27 +28,26 @@ namespace SampleMei {
 
 CHIP_ERROR SampleMeiServer::Init()
 {
-    ChipLogProgress(Zcl,">>>>> Sample Mei Test Init");
+    ChipLogProgress(Zcl,"Sample Mei Init");
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
-    attribute1 = true;
+    flipflop = true;
     return CHIP_NO_ERROR;
 }
 
 void SampleMeiServer::InvokeCommand(HandlerContext & ctxt)
 {
-    ChipLogProgress(Zcl,">>>>> Invoke");
     switch (ctxt.mRequestPath.mCommandId)
     {
     case Commands::Ping::Id:
         HandleCommand<Commands::Ping::DecodableType>(ctxt, [this](HandlerContext & ctx, const auto & req) {
-            ChipLogProgress(Zcl,">>>>> Ping Command");
+            ChipLogProgress(Zcl,"Ping Command");
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
         });
         return;
     case Commands::AddArguments::Id:
         HandleCommand<Commands::AddArguments::DecodableType>(ctxt, [this](HandlerContext & ctx, const auto & req) {
-            ChipLogProgress(Zcl,">>>>> AddArgumentsCommand");
+            ChipLogProgress(Zcl,"AddArgumentsCommand");
             if (req.arg1 > UINT8_MAX - req.arg2)
             {
                 ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
@@ -69,7 +68,7 @@ CHIP_ERROR SampleMeiServer::Read(const ConcreteReadAttributePath & aPath, Attrib
     switch (aPath.mAttributeId)
     {
     case Attributes::FlipFlop::Id:
-        return aEncoder.Encode(attribute1);
+        return aEncoder.Encode(flipflop);
 
     default:
         return CHIP_NO_ERROR;
@@ -83,7 +82,7 @@ CHIP_ERROR SampleMeiServer::Write(const ConcreteDataAttributePath & aPath, Attri
     case Attributes::FlipFlop::Id:
         bool value;
         ReturnErrorOnFailure(aDecoder.Decode(value));
-        attribute1 = value;
+        flipflop = value;
         return CHIP_NO_ERROR;
     default:
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -127,3 +126,5 @@ bool emberAfSampleMeiClusterAddArgumentsCallback(CommandHandler * commandObj, co
 }
 
 void MatterSampleMeiPluginServerInitCallback() {}
+
+void emberAfSampleMeiClusterServerInitCallback(chip::EndpointId endpoint) {}

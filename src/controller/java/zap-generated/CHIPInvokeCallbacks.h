@@ -810,6 +810,21 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPSampleMeiClusterAddArgumentsResponseCallback
+    : public Callback::Callback<CHIPSampleMeiClusterAddArgumentsResponseCallbackType>
+{
+public:
+    CHIPSampleMeiClusterAddArgumentsResponseCallback(jobject javaCallback);
+
+    ~CHIPSampleMeiClusterAddArgumentsResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPUnitTestingClusterTestSpecificResponseCallback
     : public Callback::Callback<CHIPUnitTestingClusterTestSpecificResponseCallbackType>
 {
@@ -985,21 +1000,6 @@ public:
     static void
     CallbackFn(void * context,
                const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPSampleMeiClusterAddArgumentsResponseCallback
-    : public Callback::Callback<CHIPSampleMeiClusterAddArgumentsResponseCallbackType>
-{
-public:
-    CHIPSampleMeiClusterAddArgumentsResponseCallback(jobject javaCallback);
-
-    ~CHIPSampleMeiClusterAddArgumentsResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
