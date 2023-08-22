@@ -24,6 +24,8 @@
 #include <type_traits>
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
 #include <commands/clusters/ClusterCommand.h>
 #include <commands/clusters/ComplexArgument.h>
 #include <commands/clusters/ReportCommand.h>
