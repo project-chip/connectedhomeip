@@ -50,7 +50,7 @@ tests:
           constraints:
               type: int32u
               minValue: 300
-              maxValue: IdleModeIntervalValue
+              maxValue: (IdleModeIntervalValue * 1000)
 
     - label: "Step 4: TH reads from the DUT the ActiveModeThreshold attribute"
       PICS: ICDM.S.A0002
