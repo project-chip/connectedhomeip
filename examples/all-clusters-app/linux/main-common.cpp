@@ -60,7 +60,8 @@ Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
 
 Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type gTagList[] = { {.namespaceID = 3, .tag = 3}, {.namespaceID = 4, .tag = 5} };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type gTagList[] = { { .namespaceID = 3, .tag = 3 },
+                                                                            { .namespaceID = 4, .tag = 5 } };
 } // namespace
 
 #ifdef EMBER_AF_PLUGIN_DISHWASHER_ALARM_SERVER
