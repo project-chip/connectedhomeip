@@ -39,8 +39,8 @@ tests:
           saveAs: IdleModeIntervalValue
           constraints:
               type: int32u
-              minValue: 500
-              maxValue: 64800000
+              minValue: 1
+              maxValue: 64800
 
     - label: "Step 3: TH reads from the DUT the ActiveModeInterval attribute"
       PICS: ICDM.S.A0001

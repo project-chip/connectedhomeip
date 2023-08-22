@@ -66,9 +66,9 @@ private:
     IcdManagementServer() = default;
 
     static IcdManagementServer mInstance;
-    uint32_t mIdleInterval           = CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL;
-    uint32_t mActiveInterval         = CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL;
-    uint16_t mActiveThreshold        = CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD;
+    uint32_t mIdleInterval           = CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL;    // in seconds
+    uint32_t mActiveInterval         = CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL;  // in milliseconds
+    uint16_t mActiveThreshold        = CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD; // in milliseconds
     uint32_t mIcdCounter             = 0;
     uint16_t mFabricClientsSupported = CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC;
 };
