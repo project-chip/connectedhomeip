@@ -469,6 +469,13 @@ public class ChipDeviceController {
   }
 
   /**
+   * Get device Controller's Node ID.
+   */
+  public long getControllerNodeId() {
+    return getControllerNodeId(deviceControllerPtr);
+  }
+
+  /**
    * Returns the compressed fabric ID based on the given root certificate and node operational
    * credentials.
    *
@@ -1160,6 +1167,8 @@ public class ChipDeviceController {
   private native NetworkLocation getNetworkLocation(long deviceControllerPtr, long deviceId);
 
   private native long getCompressedFabricId(long deviceControllerPtr);
+
+  private native long getControllerNodeId(long deviceControllerPtr);
 
   private native void discoverCommissionableNodes(long deviceControllerPtr);
 
