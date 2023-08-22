@@ -1405,6 +1405,15 @@ JNI_METHOD(jlong, getCompressedFabricId)(JNIEnv * env, jobject self, jlong handl
     return wrapper->Controller()->GetCompressedFabricId();
 }
 
+JNI_METHOD(jlong, getControllerNodeId)(JNIEnv * env, jobject self, jlong handle)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    return wrapper->Controller()->GetNodeId();
+}
+
 JNI_METHOD(void, discoverCommissionableNodes)(JNIEnv * env, jobject self, jlong handle)
 {
     chip::DeviceLayer::StackLock lock;
