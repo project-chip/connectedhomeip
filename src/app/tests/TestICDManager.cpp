@@ -127,7 +127,7 @@ public:
         ctx->mICDManager.UpdateOperationState(ICDManager::OperationalState::ActiveMode);
         AdvanceClockAndRunEventLoop(ctx, IcdManagementServer::GetInstance().GetActiveModeThreshold() / 2);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
-        AdvanceClockAndRunEventLoop(ctx, IcdManagementServer::GetInstance().GetActiveModeThreshold());
+        AdvanceClockAndRunEventLoop(ctx, (IcdManagementServer::GetInstance().GetActiveModeThreshold() / 2) + 1);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
     }
 
@@ -158,7 +158,7 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // Advance time again, The activemode interval is completed.
-        AdvanceClockAndRunEventLoop(ctx, IcdManagementServer::GetInstance().GetActiveModeInterval() + 1);
+        AdvanceClockAndRunEventLoop(ctx, (IcdManagementServer::GetInstance().GetActiveModeInterval() / 2) + 1);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
 
         // Set two requirements
@@ -177,6 +177,82 @@ public:
         ctx->mICDManager.SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kAwaitingMsgAck, false);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
     }
+
+    static void TestIdleTransition(nlTestSuite * aSuite, void * aContext)
+    {
+        TestContext * ctx = static_cast<TestContext *>(aContext);
+
+        /// TEST 1: Test that the Transition to Idle is called before going back to Idle Mode
+        // Advance time so that we begin the test at the beginning of the active mode interval
+        while (ctx->mICDManager.mOperationalState != ICDManager::OperationalState::ActiveMode)
+        {
+            AdvanceClockAndRunEventLoop(ctx, 1);
+        }
+        // Confirm we are in Active Mode
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mTransitionToIdleCalled == false);
+        // Advance time enough to trigger OnTransitionToIdle before going back to Idle Mode
+        uint32_t timeToAdvance = (IcdManagementServer::GetInstance().GetActiveModeInterval() - ICD_ACTIVE_TIME_JITTER_MS) + 1;
+
+        AdvanceClockAndRunEventLoop(ctx, timeToAdvance);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mTransitionToIdleCalled == true);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mTransitionToIdleCalled == true);
+        // Confirm that we are still in Active Mode
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+        // Advance the clock enough the rest of the way to trigger the transition back to Idle Mode
+        timeToAdvance = ICD_ACTIVE_TIME_JITTER_MS + 1;
+
+        AdvanceClockAndRunEventLoop(ctx, timeToAdvance);
+        // Confirm we are back in Idle Mode
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        /// TEST 2: Test that extending the Active Mode interval will cause the call to OnTransitionToIdle to be postponed.
+        while (ctx->mICDManager.mOperationalState != ICDManager::OperationalState::ActiveMode)
+        {
+            AdvanceClockAndRunEventLoop(ctx, 1);
+        }
+        // Confirm we are in Active Mode
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mTransitionToIdleCalled == false);
+        // Advance time until we are close to the OnTransitionToIdle call
+        timeToAdvance = (IcdManagementServer::GetInstance().GetActiveModeInterval() - ICD_ACTIVE_TIME_JITTER_MS) - 1;
+
+        AdvanceClockAndRunEventLoop(ctx, timeToAdvance);
+        // Extend the Active Mode interval by active mode threshold
+        ctx->mICDManager.UpdateOperationState(ICDManager::OperationalState::ActiveMode);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mTransitionToIdleCalled == false);
+
+        // Advance time to pass the point of emission without the extension
+        AdvanceClockAndRunEventLoop(ctx, IcdManagementServer::GetInstance().GetActiveModeThreshold() / 2);
+        // Confirm we are still in Active Mode and that a OnTransitionToIdle wasn't called
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mTransitionToIdleCalled == false);
+
+        AdvanceClockAndRunEventLoop(ctx, (IcdManagementServer::GetInstance().GetActiveModeThreshold() / 2) + 1);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mTransitionToIdleCalled == true);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        /// TEST 3: Test that extending the Active Mode interval after the OnTransitionToIdle call point will not cause another call
+        while (ctx->mICDManager.mOperationalState != ICDManager::OperationalState::ActiveMode)
+        {
+            AdvanceClockAndRunEventLoop(ctx, 1);
+        }
+        // Confirm we are in Active Mode
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mTransitionToIdleCalled == false);
+
+        // Advance time enough to trigger emission of a report
+        timeToAdvance = (IcdManagementServer::GetInstance().GetActiveModeInterval() - ICD_ACTIVE_TIME_JITTER_MS) + 1;
+        AdvanceClockAndRunEventLoop(ctx, timeToAdvance);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mTransitionToIdleCalled == true);
+        // Extend the Active Mode interval by active mode threshold
+        ctx->mICDManager.UpdateOperationState(ICDManager::OperationalState::ActiveMode);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mTransitionToIdleCalled == true);
+
+        // Advance time to pass the point of emission with the extension
+        AdvanceClockAndRunEventLoop(ctx, IcdManagementServer::GetInstance().GetActiveModeThreshold() + 1);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+    }
 };
 
 } // namespace app
@@ -191,6 +267,7 @@ static const nlTest sTests[] =
 {
     NL_TEST_DEF("TestICDModeIntervals",         TestICDManager::TestICDModeIntervals),
     NL_TEST_DEF("TestKeepActivemodeRequests",   TestICDManager::TestKeepActivemodeRequests),
+    NL_TEST_DEF("TestIdleTransition",           TestICDManager::TestIdleTransition),
     NL_TEST_SENTINEL()
 };
 // clang-format on

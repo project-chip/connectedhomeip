@@ -16,12 +16,16 @@
  */
 #pragma once
 
-#ifndef ICD_SLEEP_TIME_JITTER_MS
-#define ICD_SLEEP_TIME_JITTER_MS (CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL * 0.75)
+// Threshold where it becomes valuable to emit a report before entering idle mode
+#ifndef ICD_REPORT_BEFORE_IDLE_THRESHOLD_MS
+#define ICD_REPORT_BEFORE_IDLE_THRESHOLD_MS (CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL * 0.75)
 #endif
 
+// Time before the end of active mode when to check if a report should be emitted, this aims to provide enough time to emit the
+// report befor ethe active period is over. If it is physically impossible to check and emit the report before the end of the active
+// mode, this can be left at 0.
 #ifndef ICD_ACTIVE_TIME_JITTER_MS
-#define ICD_ACTIVE_TIME_JITTER_MS 300
+#define ICD_ACTIVE_TIME_JITTER_MS 100
 #endif
 
 namespace chip {
