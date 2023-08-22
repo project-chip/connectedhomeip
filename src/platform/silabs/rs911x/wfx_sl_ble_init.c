@@ -22,8 +22,8 @@
  */
 #include "wfx_sl_ble_init.h"
 #include "ble_config.h"
-#include "silabs_utils.h"
 #include "cmsis_os2.h"
+#include "silabs_utils.h"
 // Global Variables
 rsi_ble_t att_list;
 sl_wfx_msg_t event_msg;
