@@ -167,15 +167,19 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
 void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 {
+    DeviceLayer::OtaState otaState = DeviceLayer::kOtaDownloadFailed;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
-    if (imageProcessor == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
-        return;
-    }
+    VerifyOrReturn(imageProcessor, ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
 
 #if CONFIG_ENABLE_ENCRYPTED_OTA
-    imageProcessor->DecryptEnd();
+    if (CHIP_NO_ERROR != imageProcessor->DecryptEnd())
+    {
+        ChipLogError(SoftwareUpdate, "Failed to end pre encrypted OTA");
+        esp_ota_abort(imageProcessor->mOTAUpdateHandle);
+        imageProcessor->ReleaseBlock();
+        PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
+        return;
+    }
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
     esp_err_t err = esp_ota_end(imageProcessor->mOTAUpdateHandle);
@@ -189,12 +193,15 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         {
             ESP_LOGE(TAG, "esp_ota_end failed (%s)!", esp_err_to_name(err));
         }
-        PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
-        return;
     }
+    else
+    {
+        ChipLogProgress(SoftwareUpdate, "OTA image downloaded to offset 0x%" PRIx32, imageProcessor->mOTAUpdatePartition->address);
+        otaState = DeviceLayer::kOtaDownloadComplete;
+    }
+
     imageProcessor->ReleaseBlock();
-    ChipLogProgress(SoftwareUpdate, "OTA image downloaded to offset 0x%" PRIx32, imageProcessor->mOTAUpdatePartition->address);
-    PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadComplete);
+    PostOTAStateChangeEvent(otaState);
 }
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)
@@ -380,9 +387,9 @@ CHIP_ERROR OTAImageProcessorImpl::DecryptStart()
     return CHIP_NO_ERROR;
 }
 
-void OTAImageProcessorImpl::DecryptEnd()
+CHIP_ERROR OTAImageProcessorImpl::DecryptEnd()
 {
-    VerifyOrReturn(mEncryptedOTAEnabled);
+    VerifyOrReturnError(mEncryptedOTAEnabled, CHIP_ERROR_INCORRECT_STATE);
 
     esp_err_t err = esp_encrypted_img_decrypt_end(mOTADecryptionHandle);
     if (err != ESP_OK)
@@ -390,6 +397,7 @@ void OTAImageProcessorImpl::DecryptEnd()
         ChipLogError(SoftwareUpdate, "Failed to end pre encrypted OTA esp_err:%d", err);
     }
     mOTADecryptionHandle = nullptr;
+    return ESP32Utils::MapError(err);
 }
 
 void OTAImageProcessorImpl::DecryptAbort()

@@ -68,7 +68,7 @@ private:
 
 #if CONFIG_ENABLE_ENCRYPTED_OTA
     CHIP_ERROR DecryptStart();
-    void DecryptEnd();
+    CHIP_ERROR DecryptEnd();
     void DecryptAbort();
 
     // This API decrypts the blockToDecrypt, dynamically allocates the memory for storing the
