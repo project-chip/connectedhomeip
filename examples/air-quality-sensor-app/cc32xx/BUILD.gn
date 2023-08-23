@@ -52,7 +52,8 @@ source_set("air_quality_sensor_app_sdk") {
   configs += [ ":sdk_posix_config" ]
 
   sources = [
-    "${chip_root}/src/platform/cc32xx/Logging.cpp",
+    #"${chip_root}/src/platform/cc32xx/Logging.cpp",
+    "${project_dir}/main/Logging.cpp",
     "${project_dir}/main/cc32xxWifiInit.c",
     "${project_dir}/main/main.cpp",
     "${ti_simplelink_sdk_root}/examples/rtos/common/ifmod/lwip_if.c",
@@ -86,8 +87,9 @@ ti_simplelink_executable("air_quality_sensor_app") {
     "${project_dir}/main/AppTask.cpp",
     "${project_dir}/main/CHIPDeviceManager.cpp",
 # This causes redefinitions of excpetion handler, alread defined in libstdc++_nano.a. Maybe a complier version issue.
-#    "${project_dir}/main/CXXExceptionStubs.cpp",
+ #   "${project_dir}/main/CXXExceptionStubs.cpp",
     "${project_dir}/main/DeviceCallbacks.cpp",
+    "${project_dir}/main/UartHelper.c",
     "${project_dir}/main/AirQualitySensorAppAttrUpdateDelegate.cpp"
   ]
 

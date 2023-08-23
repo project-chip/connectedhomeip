@@ -96,7 +96,7 @@ int32_t UartGetJsonStruct(char *pBuffer, int32_t BufLen)
     char cChar = '\0';
     int16_t depth = 0;
     int32_t buffIdx = 0; 
-    unint8_t complete = 0;
+    uint8_t complete = 0;
     while (1) 
     {
         cChar = getch();

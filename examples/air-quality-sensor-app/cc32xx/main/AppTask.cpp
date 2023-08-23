@@ -211,7 +211,8 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::AirQualityTaskMain(void * pvParameter)
 {
-    AirQualitySensorAppAttrUpdateDelegate::AirQualitySensorAppAttrUpdateDelegate();
+    AirQualitySensorAppAttrUpdateDelegate runDelegate;
+    //this function should never return
 }
 
 void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask events)

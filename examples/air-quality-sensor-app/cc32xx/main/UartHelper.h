@@ -7,6 +7,7 @@ extern "C"
 #endif
 
 // TI-Driver includes
+#include <stdint.h>
 #include <ti/drivers/UART2.h>
 #include "ti_drivers_config.h"
 

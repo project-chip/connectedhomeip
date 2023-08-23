@@ -20,7 +20,8 @@ ti_simplelink_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 ti_simplelink_sysconfig_target =
     get_label_info(":sysconfig", "label_no_toolchain")
 
-ti_simplelink_board = "CC3235SF_LAUNCHXL"
+#ti_simplelink_board = "CC3235SF_LAUNCHXL"
+ti_simplelink_board = "CC3220SF_LAUNCHXL"
 
 # use -Os instead of -Og
 #is_debug = false
