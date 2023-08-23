@@ -14,6 +14,8 @@
 #include <commands/clusters/ReportCommandBridge.h>
 #include <commands/clusters/WriteAttributeCommandBridge.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
 
 {{> clusters_header}}
 
