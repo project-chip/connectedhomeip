@@ -602,6 +602,8 @@ def BuildBouffalolabTarget():
                    board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22"),
         TargetPart('BL706-ETH',
                    board=BouffalolabBoard.BL706_ETH, module_type="BL706C-22"),
+        TargetPart('BL706-WIFI',
+                   board=BouffalolabBoard.BL706_WIFI, module_type="BL706C-22"),
         TargetPart('BL704L-DVK', board=BouffalolabBoard.BL704L_DVK, module_type="BL704L"),
     ])
 
