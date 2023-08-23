@@ -2004,16 +2004,16 @@ endpoint 2 {
   }
 
   server cluster CarbonMonoxideConcentrationMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
-    ram      attribute peakMeasuredValue;
-    ram      attribute peakMeasuredValueWindow default = 1;
-    ram      attribute averageMeasuredValue;
-    ram      attribute averageMeasuredValueWindow default = 1;
-    ram      attribute measurementUnit default = 0;
-    ram      attribute measurementMedium default = 0;
-    ram      attribute levelValue default = 0;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow default = 1;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow default = 1;
+    callback attribute measurementUnit default = 0;
+    callback attribute measurementMedium default = 0;
+    callback attribute levelValue default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2023,16 +2023,16 @@ endpoint 2 {
   }
 
   server cluster CarbonDioxideConcentrationMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
-    ram      attribute peakMeasuredValue;
-    ram      attribute peakMeasuredValueWindow default = 1;
-    ram      attribute averageMeasuredValue;
-    ram      attribute averageMeasuredValueWindow default = 1;
-    ram      attribute measurementUnit default = 0;
-    ram      attribute measurementMedium default = 0;
-    ram      attribute levelValue default = 0;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow default = 1;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow default = 1;
+    callback attribute measurementUnit default = 0;
+    callback attribute measurementMedium default = 0;
+    callback attribute levelValue default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2042,16 +2042,16 @@ endpoint 2 {
   }
 
   server cluster NitrogenDioxideConcentrationMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
-    ram      attribute peakMeasuredValue;
-    ram      attribute peakMeasuredValueWindow default = 1;
-    ram      attribute averageMeasuredValue;
-    ram      attribute averageMeasuredValueWindow default = 1;
-    ram      attribute measurementUnit default = 0;
-    ram      attribute measurementMedium default = 0;
-    ram      attribute levelValue default = 0;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow default = 1;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow default = 1;
+    callback attribute measurementUnit default = 0;
+    callback attribute measurementMedium default = 0;
+    callback attribute levelValue default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2061,16 +2061,16 @@ endpoint 2 {
   }
 
   server cluster OzoneConcentrationMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
-    ram      attribute peakMeasuredValue;
-    ram      attribute peakMeasuredValueWindow default = 1;
-    ram      attribute averageMeasuredValue;
-    ram      attribute averageMeasuredValueWindow default = 1;
-    ram      attribute measurementUnit default = 0;
-    ram      attribute measurementMedium default = 0;
-    ram      attribute levelValue default = 0;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow default = 1;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow default = 1;
+    callback attribute measurementUnit default = 0;
+    callback attribute measurementMedium default = 0;
+    callback attribute levelValue default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2080,16 +2080,16 @@ endpoint 2 {
   }
 
   server cluster Pm25ConcentrationMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
-    ram      attribute peakMeasuredValue;
-    ram      attribute peakMeasuredValueWindow default = 1;
-    ram      attribute averageMeasuredValue;
-    ram      attribute averageMeasuredValueWindow default = 1;
-    ram      attribute measurementUnit default = 0;
-    ram      attribute measurementMedium default = 0;
-    ram      attribute levelValue default = 0;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow default = 1;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow default = 1;
+    callback attribute measurementUnit default = 0;
+    callback attribute measurementMedium default = 0;
+    callback attribute levelValue default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2099,16 +2099,16 @@ endpoint 2 {
   }
 
   server cluster FormaldehydeConcentrationMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
-    ram      attribute peakMeasuredValue;
-    ram      attribute peakMeasuredValueWindow default = 1;
-    ram      attribute averageMeasuredValue;
-    ram      attribute averageMeasuredValueWindow default = 1;
-    ram      attribute measurementUnit default = 0;
-    ram      attribute measurementMedium default = 0;
-    ram      attribute levelValue default = 0;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow default = 1;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow default = 1;
+    callback attribute measurementUnit default = 0;
+    callback attribute measurementMedium default = 0;
+    callback attribute levelValue default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2118,16 +2118,16 @@ endpoint 2 {
   }
 
   server cluster Pm1ConcentrationMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
-    ram      attribute peakMeasuredValue;
-    ram      attribute peakMeasuredValueWindow default = 1;
-    ram      attribute averageMeasuredValue;
-    ram      attribute averageMeasuredValueWindow default = 1;
-    ram      attribute measurementUnit default = 0;
-    ram      attribute measurementMedium default = 0;
-    ram      attribute levelValue default = 0;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow default = 1;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow default = 1;
+    callback attribute measurementUnit default = 0;
+    callback attribute measurementMedium default = 0;
+    callback attribute levelValue default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2137,16 +2137,16 @@ endpoint 2 {
   }
 
   server cluster Pm10ConcentrationMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
-    ram      attribute peakMeasuredValue;
-    ram      attribute peakMeasuredValueWindow default = 1;
-    ram      attribute averageMeasuredValue;
-    ram      attribute averageMeasuredValueWindow default = 1;
-    ram      attribute measurementUnit default = 0;
-    ram      attribute measurementMedium default = 0;
-    ram      attribute levelValue default = 0;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow default = 1;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow default = 1;
+    callback attribute measurementUnit default = 0;
+    callback attribute measurementMedium default = 0;
+    callback attribute levelValue default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2156,16 +2156,16 @@ endpoint 2 {
   }
 
   server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
-    ram      attribute peakMeasuredValue;
-    ram      attribute peakMeasuredValueWindow default = 1;
-    ram      attribute averageMeasuredValue;
-    ram      attribute averageMeasuredValueWindow default = 1;
-    ram      attribute measurementUnit default = 0;
-    ram      attribute measurementMedium default = 0;
-    ram      attribute levelValue default = 0;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow default = 1;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow default = 1;
+    callback attribute measurementUnit default = 0;
+    callback attribute measurementMedium default = 0;
+    callback attribute levelValue default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2175,16 +2175,16 @@ endpoint 2 {
   }
 
   server cluster RadonConcentrationMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
-    ram      attribute peakMeasuredValue;
-    ram      attribute peakMeasuredValueWindow default = 1;
-    ram      attribute averageMeasuredValue;
-    ram      attribute averageMeasuredValueWindow default = 1;
-    ram      attribute measurementUnit default = 0;
-    ram      attribute measurementMedium default = 0;
-    ram      attribute levelValue default = 0;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow default = 1;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow default = 1;
+    callback attribute measurementUnit default = 0;
+    callback attribute measurementMedium default = 0;
+    callback attribute levelValue default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
