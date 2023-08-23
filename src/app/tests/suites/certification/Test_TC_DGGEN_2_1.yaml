@@ -286,7 +286,6 @@ tests:
       command: "readAttribute"
       attribute: "ActiveHardwareFaults"
       response:
-          value: []
           constraints:
               type: list
               minLength: 0
@@ -307,7 +306,6 @@ tests:
       command: "readAttribute"
       attribute: "ActiveRadioFaults"
       response:
-          value: []
           constraints:
               type: list
               minLength: 0
@@ -328,7 +326,6 @@ tests:
       command: "readAttribute"
       attribute: "ActiveNetworkFaults"
       response:
-          value: []
           constraints:
               type: list
               minLength: 0

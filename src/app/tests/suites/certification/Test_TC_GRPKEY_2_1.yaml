@@ -80,15 +80,15 @@ tests:
                         EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime0: 1,
                         EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
-                        EpochStartTime1: 18446744073709551613,
+                        EpochStartTime1: "18446744073709551613",
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
-                        EpochStartTime2: 18446744073709551614,
+                        EpochStartTime2: "18446744073709551614",
                     }
 
     - label:
           "Step 5: TH sends AddGroup Command to DUT on PIXIT.G.ENDPOINT with the
           the following settings GroupID: 0x0103 GroupName: 'Test Group'"
-      PICS: GRPKEY.S.C00.Rsp
+      PICS: G.S.C00.Rsp
       endpoint: Groups.Endpoint
       cluster: "Groups"
       command: "AddGroup"
@@ -136,7 +136,7 @@ tests:
     - label:
           "Step 7b: TH attempts to write to the GroupTable attribute from
           GroupKeyManagement cluster on DUT"
-      PICS: GRPKEY.S.A0001 && G.S.F00
+      PICS: GRPKEY.S.A0001 && !G.S.F00
       command: "writeAttribute"
       attribute: "GroupTable"
       arguments:
