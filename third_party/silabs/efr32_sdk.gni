@@ -21,10 +21,8 @@ import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("silabs_board.gni")
 
-if (use_rs9116) {
+if (use_rs9116 || use_SiWx917) {
   wifi_sapi_root = "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
-} else {
-  wifi_sapi_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
 }
 
 declare_args() {
