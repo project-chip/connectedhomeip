@@ -33,7 +33,7 @@
   ],
   "endpointTypes": [
     {
-      "id": 77,
+      "id": 10,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
         "id": 2,
@@ -5420,16 +5420,23 @@
       ]
     },
     {
-      "id": 78,
+      "id": 9,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
-        "id": 44,
-        "code": 118,
+        "id": 3,
+        "code": 17,
         "profileId": 259,
-        "label": "MA-smokecoalarm",
-        "name": "MA-smokecoalarm"
+        "label": "MA-powersource",
+        "name": "MA-powersource"
       },
       "deviceTypes": [
+        {
+          "id": 3,
+          "code": 17,
+          "profileId": 259,
+          "label": "MA-powersource",
+          "name": "MA-powersource"
+        },
         {
           "id": 44,
           "code": 118,
@@ -5439,16 +5446,19 @@
         }
       ],
       "deviceTypeRefs": [
+        3,
         44
       ],
       "deviceVersions": [
+        1,
         1
       ],
       "deviceIdentifiers": [
+        17,
         118
       ],
-      "deviceTypeName": "MA-smokecoalarm",
-      "deviceTypeCode": 118,
+      "deviceTypeName": "MA-powersource",
+      "deviceTypeCode": 17,
       "deviceTypeProfileId": 259,
       "clusters": [
         {
@@ -5530,7 +5540,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0",
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -5546,7 +5556,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0",
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -5589,7 +5599,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "array",
-              "included": 0,
+              "included": 1,
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
@@ -7021,7 +7031,7 @@
           "mfgCode": null,
           "define": "DESCRIPTOR_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "attributes": [
             {
               "name": "DeviceTypeList",
@@ -7050,7 +7060,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -7066,7 +7076,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
-              "reportable": 1,
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -7082,6 +7092,22 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "TagList",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 0,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -7125,7 +7151,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "array",
-              "included": 0,
+              "included": 1,
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
@@ -7949,7 +7975,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "array",
-              "included": 0,
+              "included": 1,
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
@@ -8324,7 +8350,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "array",
-              "included": 0,
+              "included": 1,
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
