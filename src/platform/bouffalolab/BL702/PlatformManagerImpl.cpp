@@ -24,6 +24,9 @@
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 #include <lwip/tcpip.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <platform/bouffalolab/BL702/WiFiInterface.h>
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread_port.h>
@@ -60,7 +63,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    wifiInterface_init();
+#elif CHIP_DEVICE_CONFIG_ENABLE_THREAD
     otRadio_opt_t opt;
     opt.byte            = 0;
     opt.bf.isCoexEnable = true;

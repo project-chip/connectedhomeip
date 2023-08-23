@@ -53,7 +53,7 @@ void ARM_USART_SignalEvent(uint32_t event)
     case ARM_USART_EVENT_RECEIVE_COMPLETE:
 #ifdef ENABLE_CHIP_SHELL
         chip::NotifyShellProcessFromISR();
-#endif;
+#endif
     case ARM_USART_EVENT_TRANSFER_COMPLETE:
     case ARM_USART_EVENT_TX_COMPLETE:
     case ARM_USART_EVENT_TX_UNDERFLOW:

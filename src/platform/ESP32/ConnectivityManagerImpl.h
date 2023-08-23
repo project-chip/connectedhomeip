@@ -167,6 +167,12 @@ private:
     void OnStationIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+    void OnEthernetIPv4AddressAvailable(const ip_event_got_ip_t & got_ip);
+    void OnEthernetIPv4AddressLost(void);
+    void OnEthernetIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+
     // ===== Members for internal use by the following friends.
 
     friend ConnectivityManager & ConnectivityMgr(void);

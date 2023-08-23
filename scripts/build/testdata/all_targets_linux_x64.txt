@@ -1,7 +1,7 @@
 ameba-amebad-{all-clusters,all-clusters-minimal,light,light-switch,pigweed}
 asr-{asr582x,asr595x,asr550x}-{all-clusters,all-clusters-minimal,lighting,light-switch,lock,bridge,temperature-measurement,thermostat,ota-requestor,dishwasher}[-ota][-shell][-no_logging][-factory][-rotating_id][-rio]
 android-{arm,arm64,x86,x64,androidstudio-arm,androidstudio-arm64,androidstudio-x86,androidstudio-x64}-{chip-tool,chip-test,tv-server,tv-casting-app,java-matter-controller,virtual-device-app}[-no-debug]
-bouffalolab-{bl602-iot-matter-v1,bl602-night-light,xt-zb6-devkit,bl706-night-light,bl706-eth,bl704l-dvk}-light[-shell][-115200][-rpc][-cdc][-resetcnt][-rotating_device_id]
+bouffalolab-{bl602-iot-matter-v1,bl602-night-light,xt-zb6-devkit,bl706-night-light,bl706-eth,bl706-wifi,bl704l-dvk}-light[-shell][-115200][-rpc][-cdc][-resetcnt][-rotating_device_id]
 cc32xx-lock
 ti-cc13x2x7_26x2x7-{lighting,lock,pump,pump-controller}[-mtd]
 ti-cc13x4_26x4-{all-clusters,lighting,lock,pump,pump-controller}[-mtd][-ftd]
