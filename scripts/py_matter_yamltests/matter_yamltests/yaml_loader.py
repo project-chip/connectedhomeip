@@ -111,6 +111,7 @@ class YamlLoader:
             'dataVersion': (list, int, str),  # Can be a variable
             'busyWaitMs': int,
             'wait': str,
+            'keepSubscriptions': bool,
         }
 
         self.__check(content, schema)
