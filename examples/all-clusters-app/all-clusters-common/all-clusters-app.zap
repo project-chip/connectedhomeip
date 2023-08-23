@@ -18,25 +18,25 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
+      "path": "../../../src/app/zap-templates/app-templates.json",
+      "type": "gen-templates-json",
+      "version": "chip-v1"
+    },
+    {
+      "pathRelativity": "relativeToZap",
       "path": "../../../src/app/zap-templates/zcl/zcl-with-test-extensions.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
       "description": "Matter SDK ZCL data with some extensions"
-    },
-    {
-      "pathRelativity": "relativeToZap",
-      "path": "../../../src/app/zap-templates/app-templates.json",
-      "type": "gen-templates-json",
-      "version": "chip-v1"
     }
   ],
   "endpointTypes": [
     {
-      "id": 1,
+      "id": 4,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 3,
+        "id": 56,
         "code": 17,
         "profileId": 259,
         "label": "MA-powersource",
@@ -44,14 +44,14 @@
       },
       "deviceTypes": [
         {
-          "id": 3,
+          "id": 56,
           "code": 17,
           "profileId": 259,
           "label": "MA-powersource",
           "name": "MA-powersource"
         },
         {
-          "id": 2,
+          "id": 55,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
@@ -59,8 +59,8 @@
         }
       ],
       "deviceTypeRefs": [
-        3,
-        2
+        56,
+        55
       ],
       "deviceVersions": [
         1,
@@ -10512,10 +10512,10 @@
       ]
     },
     {
-      "id": 2,
+      "id": 7,
       "name": "MA-onofflight",
       "deviceTypeRef": {
-        "id": 8,
+        "id": 61,
         "code": 256,
         "profileId": 259,
         "label": "MA-onofflight",
@@ -10523,14 +10523,14 @@
       },
       "deviceTypes": [
         {
-          "id": 8,
+          "id": 61,
           "code": 256,
           "profileId": 259,
           "label": "MA-onofflight",
           "name": "MA-onofflight"
         },
         {
-          "id": 3,
+          "id": 56,
           "code": 17,
           "profileId": 259,
           "label": "MA-powersource",
@@ -10538,8 +10538,8 @@
         }
       ],
       "deviceTypeRefs": [
-        8,
-        3
+        61,
+        56
       ],
       "deviceVersions": [
         1,
@@ -16867,7 +16867,7 @@
               "side": "server",
               "type": "AirQualityEnum",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
@@ -21528,7 +21528,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "2",
+              "defaultValue": "4",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -30613,10 +30613,10 @@
       ]
     },
     {
-      "id": 3,
+      "id": 5,
       "name": "MA-onofflight",
       "deviceTypeRef": {
-        "id": 8,
+        "id": 61,
         "code": 256,
         "profileId": 259,
         "label": "MA-onofflight",
@@ -30624,14 +30624,14 @@
       },
       "deviceTypes": [
         {
-          "id": 8,
+          "id": 61,
           "code": 256,
           "profileId": 259,
           "label": "MA-onofflight",
           "name": "MA-onofflight"
         },
         {
-          "id": 3,
+          "id": 56,
           "code": 17,
           "profileId": 259,
           "label": "MA-powersource",
@@ -30639,8 +30639,8 @@
         }
       ],
       "deviceTypeRefs": [
-        8,
-        3
+        61,
+        56
       ],
       "deviceVersions": [
         1,
@@ -34897,10 +34897,10 @@
       ]
     },
     {
-      "id": 4,
+      "id": 6,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
-        "id": 53,
+        "id": 106,
         "code": 61442,
         "profileId": 259,
         "label": "MA-secondary-network-commissioning",
@@ -34908,7 +34908,7 @@
       },
       "deviceTypes": [
         {
-          "id": 53,
+          "id": 106,
           "code": 61442,
           "profileId": 259,
           "label": "MA-secondary-network-commissioning",
@@ -34916,7 +34916,7 @@
         }
       ],
       "deviceTypeRefs": [
-        53
+        106
       ],
       "deviceVersions": [
         1
