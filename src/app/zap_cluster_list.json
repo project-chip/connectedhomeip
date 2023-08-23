@@ -136,8 +136,12 @@
         "BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER": [
             "bridged-device-basic-information-server"
         ],
-        "CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
-        "CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
+        "CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
+            "concentration-measurement-server"
+        ],
+        "CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
+            "concentration-measurement-server"
+        ],
         "CHANNEL_CLUSTER": ["channel-server"],
         "COLOR_CONTROL_CLUSTER": ["color-control-server"],
         "COMMISSIONING_CLUSTER": [],
@@ -156,7 +160,9 @@
         "FAULT_INJECTION_CLUSTER": ["fault-injection-server"],
         "FIXED_LABEL_CLUSTER": ["fixed-label-server"],
         "FLOW_MEASUREMENT_CLUSTER": [],
-        "FORMALDEHYDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
+        "FORMALDEHYDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
+            "concentration-measurement-server"
+        ],
         "GENERAL_COMMISSIONING_CLUSTER": ["general-commissioning-server"],
         "GENERAL_DIAGNOSTICS_CLUSTER": ["general-diagnostics-server"],
         "GROUPS_CLUSTER": ["groups-server"],
@@ -177,7 +183,9 @@
         "MEDIA_PLAYBACK_CLUSTER": ["media-playback-server"],
         "MODE_SELECT_CLUSTER": ["mode-select-server"],
         "NETWORK_COMMISSIONING_CLUSTER": ["network-commissioning"],
-        "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
+        "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
+            "concentration-measurement-server"
+        ],
         "OCCUPANCY_SENSING_CLUSTER": ["occupancy-sensor-server"],
         "ON_OFF_CLUSTER": ["on-off-server"],
         "ON_OFF_SWITCH_CONFIGURATION_CLUSTER": [],
@@ -187,10 +195,18 @@
         "OTA_BOOTLOAD_CLUSTER": [],
         "OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER": ["ota-provider"],
         "OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER": ["ota-requestor"],
-        "OZONE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
-        "PM10_CONCENTRATION_MEASUREMENT_CLUSTER": [],
-        "PM1_CONCENTRATION_MEASUREMENT_CLUSTER": [],
-        "PM2_5_CONCENTRATION_MEASUREMENT_CLUSTER": [],
+        "OZONE_CONCENTRATION_MEASUREMENT_CLUSTER": [
+            "concentration-measurement-server"
+        ],
+        "PM10_CONCENTRATION_MEASUREMENT_CLUSTER": [
+            "concentration-measurement-server"
+        ],
+        "PM1_CONCENTRATION_MEASUREMENT_CLUSTER": [
+            "concentration-measurement-server"
+        ],
+        "PM2_5_CONCENTRATION_MEASUREMENT_CLUSTER": [
+            "concentration-measurement-server"
+        ],
         "POLL_CONTROL_CLUSTER": [],
         "POWER_CONFIG_CLUSTER": [],
         "POWER_PROFILE_CLUSTER": [],
@@ -206,7 +222,9 @@
             "pump-configuration-and-control-server"
         ],
         "PWM_CLUSTER": [],
-        "RADON_CONCENTRATION_MEASUREMENT_CLUSTER": [],
+        "RADON_CONCENTRATION_MEASUREMENT_CLUSTER": [
+            "concentration-measurement-server"
+        ],
         "REFRIGERATOR_ALARM_CLUSTER": ["refrigerator-alarm-server"],
         "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER": [
             "mode-base-server"
@@ -231,7 +249,9 @@
         "TIME_CLUSTER": [],
         "TIME_FORMAT_LOCALIZATION_CLUSTER": ["time-format-localization-server"],
         "TIME_SYNCHRONIZATION_CLUSTER": ["time-synchronization-server"],
-        "TVOC_CONCENTRATION_MEASUREMENT_CLUSTER": [],
+        "TVOC_CONCENTRATION_MEASUREMENT_CLUSTER": [
+            "concentration-measurement-server"
+        ],
         "UNIT_LOCALIZATION_CLUSTER": [],
         "UNIT_TESTING_CLUSTER": ["test-cluster-server"],
         "USER_LABEL_CLUSTER": ["user-label-server"],
