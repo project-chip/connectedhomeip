@@ -127,14 +127,8 @@ static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId,
 class DefaultLevelControlSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
 public:
-    enum LevelControlEFS : uint8_t
-    {
-        kLevel = 0,
-        kFrequency,
-    };
-
     // As per spec, 2 attributes are scenable in the level control cluster
-    static constexpr uint8_t scenableAttributeCount = 2;
+    static constexpr uint8_t kLevelMaxScenableAttributes = 2;
 
     DefaultLevelControlSceneHandler() = default;
     ~DefaultLevelControlSceneHandler() override {}
@@ -143,10 +137,9 @@ public:
     // endpoint
     virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) override
     {
-        ClusterId * buffer = clusterBuffer.data();
         if (emberAfContainsServer(endpoint, LevelControl::Id) && clusterBuffer.size() >= 1)
         {
-            buffer[0] = LevelControl::Id;
+            clusterBuffer[0] = LevelControl::Id;
             clusterBuffer.reduce_size(1);
         }
         else
@@ -172,27 +165,26 @@ public:
 
         app::DataModel::Nullable<uint8_t> level;
         VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == Attributes::CurrentLevel::Get(endpoint, level), CHIP_ERROR_READ_FAILED);
-        uint16_t frequency;
-        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == Attributes::CurrentFrequency::Get(endpoint, &frequency),
-                            CHIP_ERROR_READ_FAILED);
 
-        AttributeValuePair pairs[scenableAttributeCount];
+        AttributeValuePair pairs[kLevelMaxScenableAttributes];
 
-        // Check for nullable
-        if (!level.IsNull())
+        uint8_t maxLevel;
+        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == Attributes::MaxLevel::Get(endpoint, &maxLevel), CHIP_ERROR_READ_FAILED);
+
+        pairs[0].attributeID    = Attributes::CurrentLevel::Id;
+        pairs[0].attributeValue = (!level.IsNull()) ? level.Value() : maxLevel + 1;
+        size_t attributeCount   = 1;
+        if (LevelControlHasFeature(endpoint, LevelControl::Feature::kFrequency))
         {
-            pairs[0].attributeID    = Attributes::CurrentLevel::Id;
-            pairs[0].attributeValue = level.Value();
+            uint16_t frequency;
+            VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == Attributes::CurrentFrequency::Get(endpoint, &frequency),
+                                CHIP_ERROR_READ_FAILED);
             pairs[1].attributeID    = Attributes::CurrentFrequency::Id;
             pairs[1].attributeValue = frequency;
-        }
-        else
-        {
-            pairs[0].attributeID    = Attributes::CurrentFrequency::Id;
-            pairs[0].attributeValue = frequency;
+            attributeCount          = 2;
         }
 
-        app::DataModel::List<AttributeValuePair> attributeValueList(pairs);
+        app::DataModel::List<AttributeValuePair> attributeValueList(pairs, attributeCount);
 
         return EncodeAttributeValueList(attributeValueList, serializedBytes);
     }
@@ -212,7 +204,7 @@ public:
 
         size_t attributeCount = 0;
         ReturnErrorOnFailure(attributeValueList.ComputeSize(&attributeCount));
-        VerifyOrReturnError(attributeCount <= scenableAttributeCount, CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(attributeCount <= kLevelMaxScenableAttributes, CHIP_ERROR_BUFFER_TOO_SMALL);
 
         auto pair_iterator = attributeValueList.begin();
 
