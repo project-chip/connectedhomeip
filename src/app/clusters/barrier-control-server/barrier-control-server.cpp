@@ -286,10 +286,7 @@ void emberAfBarrierControlClusterServerTickCallback(EndpointId endpoint)
 
 static void sendDefaultResponse(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, Status status)
 {
-    if (commandObj->AddStatus(commandPath, status) != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(Zcl, "Failed to send default response");
-    }
+    commandObj->AddStatus(commandPath, status);
 }
 
 bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(

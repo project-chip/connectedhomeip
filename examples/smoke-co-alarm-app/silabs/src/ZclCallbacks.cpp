@@ -23,14 +23,13 @@
 #include "AppConfig.h"
 #include "SmokeCoAlarmManager.h"
 
-#include "SilabsTestEventTriggerDelegate.h"
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-using namespace ::chip;
-using namespace ::chip::app::Clusters;
+using namespace chip;
+using namespace chip::app::Clusters;
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
@@ -62,12 +61,7 @@ void emberAfSmokeCoAlarmClusterInitCallback(EndpointId endpoint)
     // TODO: implement any additional Cluster Server init actions
 }
 
-bool emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId)
+void emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId)
 {
-    return AlarmMgr().OnSelfTesting();
-}
-
-bool emberAfHandleEventTrigger(uint64_t eventTrigger)
-{
-    return AlarmMgr().OnEventTriggerHandle(eventTrigger);
+    AlarmMgr().SelfTestingEventHandler();
 }
