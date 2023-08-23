@@ -84,12 +84,12 @@ tests:
       response:
           constraints:
               type: list
-              contains: [0, 3, 5, 6, 7]
+              contains: [0, 3, 5, 6, 7, 65528, 65529, 65531, 65532, 65533]
 
     - label:
           "Step 4b: TH reads from the DUT the AttributeList
           attribute(SmokeState)"
-      PICS: SMOKECO.S.A0001
+      PICS: SMOKECO.S.A0001 && SMOKECO.S.F00
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -99,7 +99,7 @@ tests:
 
     - label:
           "Step 4c: TH reads from the DUT the AttributeList attribute(COState)"
-      PICS: SMOKECO.S.A0002
+      PICS: SMOKECO.S.A0002 && SMOKECO.S.F01
       command: "readAttribute"
       attribute: "AttributeList"
       response:

@@ -326,7 +326,7 @@ tests:
               type: enum8
 
     - label: "Step 22: TH reads AllClear event from DUT"
-      PICS: SMOKECO.S.E0a
+      PICS: SMOKECO.S.A0009 && SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
       EVENT_NUMBER: EVENT_NUMBER + 4
@@ -776,7 +776,7 @@ tests:
                 value: 60000
 
     - label: "Step 55b: TH reads DeviceMuted attribute from DUT"
-      PICS: SMOKECO.S.A0004
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F00
       command: "readAttribute"
       attribute: "DeviceMuted"
       response:
@@ -803,7 +803,7 @@ tests:
     - label:
           "Step 57: TH waits for a report of SmokeState attribute from DUT with
           a timeout of 300 seconds"
-      PICS: SMOKECO.S.A0004 && SMOKECO.S.A0001 && SMOKECO.S.F00
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && SMOKECO.S.A0001
       command: "waitForReport"
       attribute: "SmokeState"
       timeout: 300
@@ -988,7 +988,7 @@ tests:
                 value: 60000
 
     - label: "Step 71b: TH reads DeviceMuted attribute from DUT"
-      PICS: SMOKECO.S.A0004
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F01
       command: "readAttribute"
       attribute: "DeviceMuted"
       response:
