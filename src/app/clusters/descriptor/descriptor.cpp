@@ -20,6 +20,7 @@
  * @brief Implementation for the Descriptor Server Cluster
  ***************************************************************************/
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -31,6 +32,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::Descriptor;
 using namespace chip::app::Clusters::Descriptor::Attributes;
 
 namespace {
@@ -51,25 +53,38 @@ private:
     CHIP_ERROR ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadClientServerAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder, bool server);
     CHIP_ERROR ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    bool HasFeature(EndpointId endpoint, Feature feature);
 };
 
 constexpr uint16_t DescriptorAttrAccess::ClusterRevision;
 
+bool DescriptorAttrAccess::HasFeature(EndpointId endpoint, Feature feature)
+{
+    bool success;
+    uint32_t featureMap;
+    success = (FeatureMap::Get(endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+
+    return success ? ((featureMap & to_underlying(feature)) != 0) : false;
+}
+
 CHIP_ERROR DescriptorAttrAccess::ReadTagAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err = aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
-        CHIP_ERROR err2;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (HasFeature(endpoint, Feature::kTagList)) {
+        err = aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
+            CHIP_ERROR err2;
 
-        auto tagList = emberAfTagListFromEndpoint(endpoint, err2);
-        ReturnErrorOnFailure(err2);
+            auto tagList = emberAfTagListFromEndpoint(endpoint, err2);
+            ReturnErrorOnFailure(err2);
 
-        for (auto & tagStruct : tagList)
-        {
-            ReturnErrorOnFailure(encoder.Encode(tagStruct));
-        }
+            for (auto & tagStruct : tagList)
+            {
+                ReturnErrorOnFailure(encoder.Encode(tagStruct));
+            }
 
-        return CHIP_NO_ERROR;
-    });
+            return CHIP_NO_ERROR;
+        });
+    }
 
     return err;
 }
