@@ -98,6 +98,12 @@ tests:
                 value: 0x0103
               - name: GroupName
                 value: "Test Group"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0103
 
     - label:
           "Step 6: TH reads GroupTable attribute from GroupKeyManagement cluster
@@ -109,6 +115,7 @@ tests:
           value:
               [
                   {
+                      FabricIndex: 1,
                       GroupId: 0x0103,
                       Endpoints: [Groups.Endpoint],
                       GroupName: "Test Group",
@@ -125,6 +132,7 @@ tests:
           value:
               [
                   {
+                      FabricIndex: 1,
                       GroupId: 0x0104,
                       Endpoints: [Groups.Endpoint],
                       GroupName: "Test Group2",
@@ -141,7 +149,14 @@ tests:
       attribute: "GroupTable"
       arguments:
           value:
-              [{ GroupId: 0x0104, Endpoints: [Groups.Endpoint], GroupName: "" }]
+              [
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0104,
+                      Endpoints: [Groups.Endpoint],
+                      GroupName: "",
+                  },
+              ]
       response:
           error: UNSUPPORTED_WRITE
 
