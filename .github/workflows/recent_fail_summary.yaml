@@ -39,6 +39,6 @@ jobs:
           path: |
             recent_fails.csv
             recent_fails_frequency.csv
-            fail_logs
+            recent_fails_logs
           retention-days: 5
         
