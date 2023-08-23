@@ -614,11 +614,6 @@ CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-void ThreadStackManagerImpl::_SetRouterPromotion(bool val)
-{
-    // Set Router Promotion is not supported on linux
-}
-
 CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextCallScan(ThreadStackManagerImpl * self)
 {
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
