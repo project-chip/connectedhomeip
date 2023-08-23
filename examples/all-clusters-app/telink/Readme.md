@@ -29,7 +29,8 @@ creating your own application.
     $ source ./scripts/activate.sh
     ```
 
-4. In the example dir run (replace _<build_target>_ with your board name, for example, `tlsr9518adk80d` or `tlsr9528a`):
+4. In the example dir run (replace _<build_target>_ with your board name, for
+   example, `tlsr9518adk80d` or `tlsr9528a`):
 
     ```bash
     $ west build -b <build_target>

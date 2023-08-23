@@ -156,11 +156,15 @@ int main(void)
     }
 
 #ifdef CONFIG_BOOTLOADER_MCUBOOT
-    if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT) {
+    if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
+    {
         int img_confirmation = boot_write_img_confirmed();
-        if (img_confirmation) {
+        if (img_confirmation)
+        {
             LOG_ERR("Image not confirmed %d. Will be reverted!", img_confirmation);
-        } else {
+        }
+        else
+        {
             LOG_INF("Image confirmed");
         }
     }

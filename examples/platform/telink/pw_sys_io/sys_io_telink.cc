@@ -25,13 +25,13 @@
 #ifdef CONFIG_USB_DEVICE_STACK
 #include <zephyr/usb/usb_device.h>
 
-
 static bool output_enable = false;
 
-static void usb_dc_status_change(enum usb_dc_status_code cb_status, const uint8_t *param)
+static void usb_dc_status_change(enum usb_dc_status_code cb_status, const uint8_t * param)
 {
-    (void)param;
-    if (cb_status == USB_DC_CONFIGURED) {
+    (void) param;
+    if (cb_status == USB_DC_CONFIGURED)
+    {
         output_enable = true;
     }
 }
@@ -43,7 +43,7 @@ extern "C" void pw_sys_io_Init()
 
 #ifdef CONFIG_USB_DEVICE_STACK
     output_enable = false;
-    (void)usb_enable(usb_dc_status_change);
+    (void) usb_enable(usb_dc_status_change);
 #endif
 
     err = console_init();
