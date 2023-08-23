@@ -158,22 +158,22 @@ tests:
           Via the TH (chip-tool), Verify the type is present and valid for each EndpointListStruct in the following log.
 
           [1658474608.888833][20775:20780] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 2082192894
-          [1658474608.888887][20775:20780] CHIP:TOO: EndpointLists: 2 entries 
-          [1658474608.888949][20775:20780] CHIP:TOO: [1]: { 
-          [1658474608.888968][20775:20780] CHIP:TOO: EndpointListID: 57345 
-          [1658474608.888985][20775:20780] CHIP:TOO: Name: Room 1 
-          [1658474608.889001][20775:20780] CHIP:TOO: Type: 1 
-          [1658474608.889020][20775:20780] CHIP:TOO: Endpoints: 2 entries 
-          [1658474608.889040][20775:20780] CHIP:TOO: [1]: 9 
-          [1658474608.889056][20775:20780] CHIP:TOO: [2]: 10 
-          [1658474608.889072][20775:20780] CHIP:TOO: } 
-          [1658474608.889099][20775:20780] CHIP:TOO: [2]: { 
-          [1658474608.889114][20775:20780] CHIP:TOO: EndpointListID: 57346 
-          [1658474608.889128][20775:20780] CHIP:TOO: Name: Room 2 
-          [1658474608.889142][20775:20780] CHIP:TOO: Type: 1 
-          [1658474608.889159][20775:20780] CHIP:TOO: Endpoints: 2 entries 
-          [1658474608.889175][20775:20780] CHIP:TOO: [1]: 11 
-          [1658474608.889191][20775:20780] CHIP:TOO: [2]: 12 
+          [1658474608.888887][20775:20780] CHIP:TOO: EndpointLists: 2 entries
+          [1658474608.888949][20775:20780] CHIP:TOO: [1]: {
+          [1658474608.888968][20775:20780] CHIP:TOO: EndpointListID: 57345
+          [1658474608.888985][20775:20780] CHIP:TOO: Name: Room 1
+          [1658474608.889001][20775:20780] CHIP:TOO: Type: 1
+          [1658474608.889020][20775:20780] CHIP:TOO: Endpoints: 2 entries
+          [1658474608.889040][20775:20780] CHIP:TOO: [1]: 9
+          [1658474608.889056][20775:20780] CHIP:TOO: [2]: 10
+          [1658474608.889072][20775:20780] CHIP:TOO: }
+          [1658474608.889099][20775:20780] CHIP:TOO: [2]: {
+          [1658474608.889114][20775:20780] CHIP:TOO: EndpointListID: 57346
+          [1658474608.889128][20775:20780] CHIP:TOO: Name: Room 2
+          [1658474608.889142][20775:20780] CHIP:TOO: Type: 1
+          [1658474608.889159][20775:20780] CHIP:TOO: Endpoints: 2 entries
+          [1658474608.889175][20775:20780] CHIP:TOO: [1]: 11
+          [1658474608.889191][20775:20780] CHIP:TOO: [2]: 12
           [1658474608.889205][20775:20780] CHIP:TOO: }
       disabled: true
 
@@ -184,22 +184,22 @@ tests:
           Via the TH (chip-tool), Verify the EndPointListIDs of all EndpointListStruct  are unique and  no duplicates in the following log
 
           [1658474608.888833][20775:20780] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 2082192894
-          [1658474608.888887][20775:20780] CHIP:TOO: EndpointLists: 2 entries 
-          [1658474608.888949][20775:20780] CHIP:TOO: [1]: { 
-          [1658474608.888968][20775:20780] CHIP:TOO: EndpointListID: 57345 
-          [1658474608.888985][20775:20780] CHIP:TOO: Name: Room 1 
-          [1658474608.889001][20775:20780] CHIP:TOO: Type: 1 
-          [1658474608.889020][20775:20780] CHIP:TOO: Endpoints: 2 entries 
-          [1658474608.889040][20775:20780] CHIP:TOO: [1]: 9 
-          [1658474608.889056][20775:20780] CHIP:TOO: [2]: 10 
-          [1658474608.889072][20775:20780] CHIP:TOO: } 
-          [1658474608.889099][20775:20780] CHIP:TOO: [2]: { 
-          [1658474608.889114][20775:20780] CHIP:TOO: EndpointListID: 57346 
-          [1658474608.889128][20775:20780] CHIP:TOO: Name: Room 2 
-          [1658474608.889142][20775:20780] CHIP:TOO: Type: 1 
-          [1658474608.889159][20775:20780] CHIP:TOO: Endpoints: 2 entries 
+          [1658474608.888887][20775:20780] CHIP:TOO: EndpointLists: 2 entries
+          [1658474608.888949][20775:20780] CHIP:TOO: [1]: {
+          [1658474608.888968][20775:20780] CHIP:TOO: EndpointListID: 57345
+          [1658474608.888985][20775:20780] CHIP:TOO: Name: Room 1
+          [1658474608.889001][20775:20780] CHIP:TOO: Type: 1
+          [1658474608.889020][20775:20780] CHIP:TOO: Endpoints: 2 entries
+          [1658474608.889040][20775:20780] CHIP:TOO: [1]: 9
+          [1658474608.889056][20775:20780] CHIP:TOO: [2]: 10
+          [1658474608.889072][20775:20780] CHIP:TOO: }
+          [1658474608.889099][20775:20780] CHIP:TOO: [2]: {
+          [1658474608.889114][20775:20780] CHIP:TOO: EndpointListID: 57346
+          [1658474608.889128][20775:20780] CHIP:TOO: Name: Room 2
+          [1658474608.889142][20775:20780] CHIP:TOO: Type: 1
+          [1658474608.889159][20775:20780] CHIP:TOO: Endpoints: 2 entries
           [1658474608.889175][20775:20780] CHIP:TOO: [1]: 11
-          [1658474608.889191][20775:20780] CHIP:TOO: [2]: 12 
+          [1658474608.889191][20775:20780] CHIP:TOO: [2]: 12
           [1658474608.889205][20775:20780] CHIP:TOO: }
       disabled: true
 
@@ -209,25 +209,25 @@ tests:
           means"
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
-          Via the TH (chip-tool), Verify the information matches, Name and Type against the name/type of each group of endpoints provided 
+          Via the TH (chip-tool), Verify the information matches, Name and Type against the name/type of each group of endpoints provided
 
           [1658474608.888833][20775:20780] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 2082192894
-          [1658474608.888887][20775:20780] CHIP:TOO: EndpointLists: 2 entries 
-          [1658474608.888949][20775:20780] CHIP:TOO: [1]: { 
-          [1658474608.888968][20775:20780] CHIP:TOO: EndpointListID: 57345 
-          [1658474608.888985][20775:20780] CHIP:TOO: Name: Room 1 
-          [1658474608.889001][20775:20780] CHIP:TOO: Type: 1 
-          [1658474608.889020][20775:20780] CHIP:TOO: Endpoints: 2 entries 
-          [1658474608.889040][20775:20780] CHIP:TOO: [1]: 9 
-          [1658474608.889056][20775:20780] CHIP:TOO: [2]: 10 
-          [1658474608.889072][20775:20780] CHIP:TOO: } 
-          [1658474608.889099][20775:20780] CHIP:TOO: [2]: { 
-          [1658474608.889114][20775:20780] CHIP:TOO: EndpointListID: 57346 
-          [1658474608.889128][20775:20780] CHIP:TOO: Name: Room 2 
-          [1658474608.889142][20775:20780] CHIP:TOO: Type: 1 
-          [1658474608.889159][20775:20780] CHIP:TOO: Endpoints: 2 entries 
-          [1658474608.889175][20775:20780] CHIP:TOO: [1]: 11 
-          [1658474608.889191][20775:20780] CHIP:TOO: [2]: 12 
+          [1658474608.888887][20775:20780] CHIP:TOO: EndpointLists: 2 entries
+          [1658474608.888949][20775:20780] CHIP:TOO: [1]: {
+          [1658474608.888968][20775:20780] CHIP:TOO: EndpointListID: 57345
+          [1658474608.888985][20775:20780] CHIP:TOO: Name: Room 1
+          [1658474608.889001][20775:20780] CHIP:TOO: Type: 1
+          [1658474608.889020][20775:20780] CHIP:TOO: Endpoints: 2 entries
+          [1658474608.889040][20775:20780] CHIP:TOO: [1]: 9
+          [1658474608.889056][20775:20780] CHIP:TOO: [2]: 10
+          [1658474608.889072][20775:20780] CHIP:TOO: }
+          [1658474608.889099][20775:20780] CHIP:TOO: [2]: {
+          [1658474608.889114][20775:20780] CHIP:TOO: EndpointListID: 57346
+          [1658474608.889128][20775:20780] CHIP:TOO: Name: Room 2
+          [1658474608.889142][20775:20780] CHIP:TOO: Type: 1
+          [1658474608.889159][20775:20780] CHIP:TOO: Endpoints: 2 entries
+          [1658474608.889175][20775:20780] CHIP:TOO: [1]: 11
+          [1658474608.889191][20775:20780] CHIP:TOO: [2]: 12
           [1658474608.889205][20775:20780] CHIP:TOO: }
       disabled: true
 
@@ -426,7 +426,7 @@ tests:
 
           Via the TH (chip-tool), Verify SetupURL attribute that contains string value.
 
-          this is an optional attribute and it is implemented in RPI, it may vary based on DUT implementation. 
+          this is an optional attribute and it is implemented in RPI, it may vary based on DUT implementation.
 
           [1658473627.759830][18059:18064] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0002 DataVersion: 3292516604
           [1658473627.759880][18059:18064] CHIP:TOO:   SetupURL: https://example.com

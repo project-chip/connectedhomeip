@@ -53,7 +53,7 @@ tests:
       verification: |
           ./chip-tool dishwasheralarm read latch 1 1
            On TH(chip-tool), Verify that the DUT response contains a 32-bit and Save the value returned in the response as LatchResponse.
-           
+
            [1689842371.478172][2614:2616] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_005D Attribute 0x0000_0001 DataVersion: 3155962179
            [1689842371.478244][2614:2616] CHIP:TOO: Latch: 3
            [1689842371.478410][2614:2616] CHIP:EM: <<< [E:35394i S:46214 M:140335917 (Ack:184279491)] (S) Msg TX to 1:0000000000000001 [C4B0] --- Type 0000:10 (SecureChannel:StandaloneAck)
@@ -102,7 +102,7 @@ tests:
           After a few seconds, TH reads from the DUT the State attribute by sending below mentioned command
           dishwasheralarm read state 1 1
            On TH(chip-tool), Verify that the DUT response contains a 32-bit value with bit 4 set to 1.
-           
+
            [1689842479.694724][2624:2626] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_005D Attribute 0x0000_0002 DataVersion: 3155962179
            [1689842479.694781][2624:2626] CHIP:TOO: State: 2
            [1689842479.694921][2624:2626] CHIP:EM: <<< [E:40120i S:46763 M:178458342 (Ack:246107556)] (S) Msg TX to 1:0000000000000001 [C4B0] --- Type 0000:10 (SecureChannel:StandaloneAck)
@@ -149,7 +149,7 @@ tests:
       PICS: DISHALM.S.A0002
       verification: |
           After a few seconds, TH reads from the DUT the State attribute by sending below mentioned command
-           
+
           dishwasheralarm read state 1 1
            On TH(chip-tool), Verify that the DUT response contains a 32-bit value with Bit 4 of response SHALL be 0 if bit 4 if DISHALM.S.A0001(Latch) is 0
           Bit 4 of response SHALL be 1 if bit 4 if DISHALM.S.A0001(Latch) is 1.
@@ -166,7 +166,7 @@ tests:
           dishwasheralarm reset  1 1 1
           Verify the success response on TH(chip-tool)
           [1690974433.649056][3934:3936] CHIP:DMG:         ],
-          [1690974433.649084][3934:3936] CHIP:DMG:         
+          [1690974433.649084][3934:3936] CHIP:DMG:
           [1690974433.649106][3934:3936] CHIP:DMG:         InteractionModelRevision = 1
           [1690974433.649129][3934:3936] CHIP:DMG: },
           [1690974433.649187][3934:3936] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_005D Command=0x0000_0000 Status=0x0
@@ -211,7 +211,7 @@ tests:
 
           dishwasheralarm read state 1 1
            On TH(chip-tool), Verify that the DUT response contains a 32-bit value with bit 4 set to 0.
-           
+
            [1689842479.694724][2624:2626] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_005D Attribute 0x0000_0002 DataVersion: 3155962179
            [1689842479.694781][2624:2626] CHIP:TOO: State: 0
            [1689842479.694921][2624:2626] CHIP:EM: <<< [E:40120i S:46763 M:178458342 (Ack:246107556)] (S) Msg TX to 1:0000000000000001 [C4B0] --- Type 0000:10 (SecureChannel:StandaloneAck)

@@ -122,7 +122,7 @@ tests:
           [1690188912.259778][16011:16013] CHIP:DMG:                         {
           [1690188912.259790][16011:16013] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1690188912.259800][16011:16013] CHIP:DMG:                         },
-          [1690188912.259813][16011:16013] CHIP:DMG:                         
+          [1690188912.259813][16011:16013] CHIP:DMG:
 
           ./chip-tool dishwashermode read start-up-mode 1 1
 

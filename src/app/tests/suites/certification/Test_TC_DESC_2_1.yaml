@@ -126,7 +126,7 @@ tests:
     - label: "Step 2: TH reads 'ServerList' attribute."
       PICS: DESC.S.A0001
       verification: |
-          For all the Endpoint id’s listed in step 1a run the following steps. For all the server list entries listed in the output - Convert them to Hex values. For example 29 is 0x001D. Verify that these are also present in the device_type.json. Every server cluster listed in the JSON should correspond to a number here in the output. 
+          For all the Endpoint id’s listed in step 1a run the following steps. For all the server list entries listed in the output - Convert them to Hex values. For example 29 is 0x001D. Verify that these are also present in the device_type.json. Every server cluster listed in the JSON should correspond to a number here in the output.
 
           ./chip-tool descriptor read server-list 1 1
 
@@ -208,7 +208,7 @@ tests:
     - label: "Step 3: TH reads 'ClientList' attribute"
       PICS: DESC.S.A0002
       verification: |
-          For all the Endpoint id’s listed in step 1a run the following steps. For all the client list entries listed in the output - Convert them to Hex values. For example 29 is 0x001D. Verify that these are also present in the device_type.json. Every server cluster listed in the JSON should correspond to a number here in the output. 
+          For all the Endpoint id’s listed in step 1a run the following steps. For all the client list entries listed in the output - Convert them to Hex values. For example 29 is 0x001D. Verify that these are also present in the device_type.json. Every server cluster listed in the JSON should correspond to a number here in the output.
 
           ./chip-tool descriptor read client-list 1 1
 

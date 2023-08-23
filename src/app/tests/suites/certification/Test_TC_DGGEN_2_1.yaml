@@ -44,11 +44,11 @@ tests:
           ./chip-tool generaldiagnostics read network-interfaces 1 0
           On TH(chip-tool), Verify that The NetworkInterfaces attribute SHALL be a list of NetworkInterface structs, i.e The read data type( NetworkInterface struct) must match the value listed below
               • Name(interface name)
-              • IsOperational (indicates the node is operational in the fabric) 
-              • OffPremiseServicesReachableIPv4(Ability to reach off-premise services it uses by utilizing IPv4, if not NULL) 
-              • OffPremiseServicesReachableIPv6(Ability to reach off-premise services it uses by utilizing IPv6, if not NULL) 
+              • IsOperational (indicates the node is operational in the fabric)
+              • OffPremiseServicesReachableIPv4(Ability to reach off-premise services it uses by utilizing IPv4, if not NULL)
+              • OffPremiseServicesReachableIPv6(Ability to reach off-premise services it uses by utilizing IPv6, if not NULL)
               • HardwareAddress(MAC-layer address for a 802.3 or IEEE 802.11-2020 network interface, or 802.15.4)
-              •  IPv4Addresses and IPv6Addresses (a list of the unicast IPv6 addresses that are GUA and ULA) 
+              •  IPv4Addresses and IPv6Addresses (a list of the unicast IPv6 addresses that are GUA and ULA)
               • Type(Interface types).
 
           Below is the example value which is observed in the RPI platform the value may be differ based on the dut implementation.
@@ -65,7 +65,7 @@ tests:
           [1685950177.430145][36103:36105] CHIP:TOO:       IPv4Addresses: 1 entries
           [1685950177.430158][36103:36105] CHIP:TOO:         [1]: AC110001
           [1685950177.430168][36103:36105] CHIP:TOO:       IPv6Addresses: 1 entries
-          [1685950177.430177][36103:36105] CHIP:TOO:         [1]: 
+          [1685950177.430177][36103:36105] CHIP:TOO:         [1]:
           [1685950177.430186][36103:36105] CHIP:TOO:       Type: 0
           [1685950177.430194][36103:36105] CHIP:TOO:      }
           [1685950177.430221][36103:36105] CHIP:TOO:     [2]: {

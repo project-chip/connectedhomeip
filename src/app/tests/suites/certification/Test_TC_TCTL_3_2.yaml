@@ -51,7 +51,7 @@ tests:
           ./chip-tool temperaturecontrol read min-temperature 1 1
           On TH(chip-tool), Verify that the DUT response contains a temperature with value less than TCTL.S.A0002(MaxTemperature).
 
-          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true, 
+          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true,
           [1689770673.417845][9280:9282] CHIP:DMG:         InteractionModelRevision = 1
           [1689770673.417851][9280:9282] CHIP:DMG: }
           [1689770673.417920][9280:9282] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0001 DataVersion: 2844459846
@@ -66,7 +66,7 @@ tests:
 
           On TH(chip-tool), Verify that the DUT response contains a temperature with value greater than TCTL.S.A0001(MinTemperature).
 
-          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true, 
+          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true,
           [1689770673.417845][9280:9282] CHIP:DMG:         InteractionModelRevision = 1
           [1689770673.417851][9280:9282] CHIP:DMG: }
           [1689770673.417920][9280:9282] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0002 DataVersion: 2844459846
@@ -84,7 +84,7 @@ tests:
           [1692260094.059761][13707:13710] CHIP:DMG: ICR moving to [ResponseRe]
           [1692260094.059828][13707:13710] CHIP:DMG: InvokeResponseMessage =
           [1692260094.059862][13707:13710] CHIP:DMG: {
-          [1692260094.059895][13707:13710] CHIP:DMG:         suppressResponse = false, 
+          [1692260094.059895][13707:13710] CHIP:DMG:         suppressResponse = false,
           [1692260094.059929][13707:13710] CHIP:DMG:         InvokeResponseIBs =
           [1692260094.059971][13707:13710] CHIP:DMG:         [
           [1692260094.060005][13707:13710] CHIP:DMG:                 InvokeResponseIB =
@@ -97,18 +97,18 @@ tests:
           [1692260094.060310][13707:13710] CHIP:DMG:                                         ClusterId = 0x56,
           [1692260094.060356][13707:13710] CHIP:DMG:                                         CommandId = 0x0,
           [1692260094.060402][13707:13710] CHIP:DMG:                                 },
-          [1692260094.060452][13707:13710] CHIP:DMG:                                 
+          [1692260094.060452][13707:13710] CHIP:DMG:
           [1692260094.060493][13707:13710] CHIP:DMG:                                 StatusIB =
           [1692260094.060539][13707:13710] CHIP:DMG:                                 {
           [1692260094.060584][13707:13710] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1692260094.060629][13707:13710] CHIP:DMG:                                 },
-          [1692260094.060674][13707:13710] CHIP:DMG:                                 
+          [1692260094.060674][13707:13710] CHIP:DMG:
           [1692260094.060712][13707:13710] CHIP:DMG:                         },
-          [1692260094.060756][13707:13710] CHIP:DMG:                         
+          [1692260094.060756][13707:13710] CHIP:DMG:
           [1692260094.060792][13707:13710] CHIP:DMG:                 },
-          [1692260094.060834][13707:13710] CHIP:DMG:                 
+          [1692260094.060834][13707:13710] CHIP:DMG:
           [1692260094.060867][13707:13710] CHIP:DMG:         ],
-          [1692260094.060909][13707:13710] CHIP:DMG:         
+          [1692260094.060909][13707:13710] CHIP:DMG:
           [1692260094.060942][13707:13710] CHIP:DMG:         InteractionModelRevision = 10
           [1692260094.060975][13707:13710] CHIP:DMG: },
           [1692260094.061064][13707:13710] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0056 Command=0x0000_0000 Status=0x85
@@ -122,7 +122,7 @@ tests:
       verification: |
           ./chip-tool temperaturecontrol read temperature-setpoint 1 1
           On TH(chip-tool), Verify that the DUT response contains a temperatureValue and the value is the same setTemp value written in step 5
-          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true, 
+          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true,
           [1689770673.417845][9280:9282] CHIP:DMG:         InteractionModelRevision = 1
           [1689770673.417851][9280:9282] CHIP:DMG: }
           [1689770673.417920][9280:9282] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0000 DataVersion: 2844459846
@@ -139,7 +139,7 @@ tests:
           [1692260094.059761][13707:13710] CHIP:DMG: ICR moving to [ResponseRe]
           [1692260094.059828][13707:13710] CHIP:DMG: InvokeResponseMessage =
           [1692260094.059862][13707:13710] CHIP:DMG: {
-          [1692260094.059895][13707:13710] CHIP:DMG:         suppressResponse = false, 
+          [1692260094.059895][13707:13710] CHIP:DMG:         suppressResponse = false,
           [1692260094.059929][13707:13710] CHIP:DMG:         InvokeResponseIBs =
           [1692260094.059971][13707:13710] CHIP:DMG:         [
           [1692260094.060005][13707:13710] CHIP:DMG:                 InvokeResponseIB =
@@ -152,18 +152,18 @@ tests:
           [1692260094.060310][13707:13710] CHIP:DMG:                                         ClusterId = 0x56,
           [1692260094.060356][13707:13710] CHIP:DMG:                                         CommandId = 0x0,
           [1692260094.060402][13707:13710] CHIP:DMG:                                 },
-          [1692260094.060452][13707:13710] CHIP:DMG:                                 
+          [1692260094.060452][13707:13710] CHIP:DMG:
           [1692260094.060493][13707:13710] CHIP:DMG:                                 StatusIB =
           [1692260094.060539][13707:13710] CHIP:DMG:                                 {
           [1692260094.060584][13707:13710] CHIP:DMG:                                         status = 0x87 (CONSTRAINT_ERROR),
           [1692260094.060629][13707:13710] CHIP:DMG:                                 },
-          [1692260094.060674][13707:13710] CHIP:DMG:                                 
+          [1692260094.060674][13707:13710] CHIP:DMG:
           [1692260094.060712][13707:13710] CHIP:DMG:                         },
-          [1692260094.060756][13707:13710] CHIP:DMG:                         
+          [1692260094.060756][13707:13710] CHIP:DMG:
           [1692260094.060792][13707:13710] CHIP:DMG:                 },
-          [1692260094.060834][13707:13710] CHIP:DMG:                 
+          [1692260094.060834][13707:13710] CHIP:DMG:
           [1692260094.060867][13707:13710] CHIP:DMG:         ],
-          [1692260094.060909][13707:13710] CHIP:DMG:         
+          [1692260094.060909][13707:13710] CHIP:DMG:
           [1692260094.060942][13707:13710] CHIP:DMG:         InteractionModelRevision = 10
           [1692260094.060975][13707:13710] CHIP:DMG: },
           [1692260094.061064][13707:13710] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0056 Command=0x0000_0000 Status=0x85
@@ -177,7 +177,7 @@ tests:
       verification: |
           ./chip-tool temperaturecontrol read temperature-setpoint 1 1
           On TH(chip-tool), Verify that the DUT response contains a temperatureValue and the value is the same setTemp value written in step 5
-          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true, 
+          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true,
           [1689770673.417845][9280:9282] CHIP:DMG:         InteractionModelRevision = 1
           [1689770673.417851][9280:9282] CHIP:DMG: }
           [1689770673.417920][9280:9282] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0000 DataVersion: 2844459846
@@ -204,7 +204,7 @@ tests:
           [1692260094.059761][13707:13710] CHIP:DMG: ICR moving to [ResponseRe]
           [1692260094.059828][13707:13710] CHIP:DMG: InvokeResponseMessage =
           [1692260094.059862][13707:13710] CHIP:DMG: {
-          [1692260094.059895][13707:13710] CHIP:DMG:         suppressResponse = false, 
+          [1692260094.059895][13707:13710] CHIP:DMG:         suppressResponse = false,
           [1692260094.059929][13707:13710] CHIP:DMG:         InvokeResponseIBs =
           [1692260094.059971][13707:13710] CHIP:DMG:         [
           [1692260094.060005][13707:13710] CHIP:DMG:                 InvokeResponseIB =
@@ -217,18 +217,18 @@ tests:
           [1692260094.060310][13707:13710] CHIP:DMG:                                         ClusterId = 0x56,
           [1692260094.060356][13707:13710] CHIP:DMG:                                         CommandId = 0x0,
           [1692260094.060402][13707:13710] CHIP:DMG:                                 },
-          [1692260094.060452][13707:13710] CHIP:DMG:                                 
+          [1692260094.060452][13707:13710] CHIP:DMG:
           [1692260094.060493][13707:13710] CHIP:DMG:                                 StatusIB =
           [1692260094.060539][13707:13710] CHIP:DMG:                                 {
           [1692260094.060584][13707:13710] CHIP:DMG:                                         status = 0x03(INVALID_IN_MODE)
           [1692260094.060629][13707:13710] CHIP:DMG:                                 },
-          [1692260094.060674][13707:13710] CHIP:DMG:                                 
+          [1692260094.060674][13707:13710] CHIP:DMG:
           [1692260094.060712][13707:13710] CHIP:DMG:                         },
-          [1692260094.060756][13707:13710] CHIP:DMG:                         
+          [1692260094.060756][13707:13710] CHIP:DMG:
           [1692260094.060792][13707:13710] CHIP:DMG:                 },
-          [1692260094.060834][13707:13710] CHIP:DMG:                 
+          [1692260094.060834][13707:13710] CHIP:DMG:
           [1692260094.060867][13707:13710] CHIP:DMG:         ],
-          [1692260094.060909][13707:13710] CHIP:DMG:         
+          [1692260094.060909][13707:13710] CHIP:DMG:
           [1692260094.060942][13707:13710] CHIP:DMG:         InteractionModelRevision = 10
           [1692260094.060975][13707:13710] CHIP:DMG: },
           [1692260094.061064][13707:13710] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0056 Command=0x0000_0000 Status=0x85
@@ -242,7 +242,7 @@ tests:
       verification: |
           ./chip-tool temperaturecontrol read temperature-setpoint 1 1
           On TH(chip-tool), Verify that the DUT response contains a temperatureValue and the value is the same setTemp value written in step 5
-          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true, 
+          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true,
           [1689770673.417845][9280:9282] CHIP:DMG:         InteractionModelRevision = 1
           [1689770673.417851][9280:9282] CHIP:DMG: }
           [1689770673.417920][9280:9282] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0000 DataVersion: 2844459846

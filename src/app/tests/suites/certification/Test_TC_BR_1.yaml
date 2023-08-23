@@ -265,7 +265,7 @@ tests:
           endpoint found in step 1c"
       PICS: MCORE.BRIDGE
       verification: |
-          Read PartsList attribute of the Descriptor cluster on endpoint found in step 1c 
+          Read PartsList attribute of the Descriptor cluster on endpoint found in step 1c
 
           ./chip-tool  descriptor read parts-list 1 1
 

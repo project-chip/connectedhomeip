@@ -102,7 +102,7 @@ tests:
       verification: |
           ./chip-tool refrigeratoralarm read attribute-list 1 1
 
-          Verify " AttributeList " value consists the list of mandatory attributes (0, 2, 3, 65533, 65532, 65531, 65529, 65528)on the TH(Chip-tool) Log: 
+          Verify " AttributeList " value consists the list of mandatory attributes (0, 2, 3, 65533, 65532, 65531, 65529, 65528)on the TH(Chip-tool) Log:
 
           [1689677267.384744][18335:18337] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0057 Attribute 0x0000_FFFB DataVersion: 1517282962
           [1689677267.384781][18335:18337] CHIP:TOO:   AttributeList: 9 entries

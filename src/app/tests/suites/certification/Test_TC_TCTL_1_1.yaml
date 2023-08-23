@@ -146,7 +146,7 @@ tests:
       verification: |
           ./chip-tool temperaturecontrol read attribute-list 1 1
 
-          Verify " AttributeList " value consists the list of mandatory attributes (65533, 65532, 65531, 65529, 65528) and it may include the optional attributes(0, 1, 2,3,4 and 5) on the TH(Chip-tool) Log: 
+          Verify " AttributeList " value consists the list of mandatory attributes (65533, 65532, 65531, 65529, 65528) and it may include the optional attributes(0, 1, 2,3,4 and 5) on the TH(Chip-tool) Log:
 
           [1689770447.604182][9210:9212] CHIP:DMG:         InteractionModelRevision = 1
           [1689770447.604188][9210:9212] CHIP:DMG: }

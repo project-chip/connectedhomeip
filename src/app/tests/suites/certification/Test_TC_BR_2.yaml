@@ -1055,7 +1055,7 @@ tests:
 
 
 
-          ./chip-tool descriptor read device-type-list 1 0 
+          ./chip-tool descriptor read device-type-list 1 0
 
           Via the TH (chip-tool), Verify that DeviceTypeList has not changed compared to step 1a
 

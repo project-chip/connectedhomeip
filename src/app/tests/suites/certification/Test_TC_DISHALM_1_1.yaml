@@ -40,7 +40,7 @@ tests:
       verification: |
           ./chip-tool dishwasheralarm read cluster-revision 1 1
            Verify the "ClusterRevision" value is of unit16 and reflects the highest revision number 1 on the TH(Chip-tool) and below is the sample log provided for the raspi platform:
-           
+
            [1688447208.697823][4176:4178] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_005D Attribute 0x0000_FFFD DataVersion: 1386394810
            [1688447208.701428][4176:4178] CHIP:TOO: ClusterRevision: 1
            [1688447208.701860][4176:4178] CHIP:EM: <<< [E:62008i S:18101 M:251225540 (Ack:117573954)] (S) Msg TX to 1:0000000000000001 [5AF3] --- Type 0000:10 (SecureChannel:StandaloneAck)
@@ -50,7 +50,7 @@ tests:
       verification: |
           ./chip-tool dishwasheralarm read feature-map 1 1
            On TH(chip-tool), verify that DUT responds the Featuremap value as 1 and below is the sample log provided for the raspi platform:
-           
+
            [1689841072.440418][2534:2536] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_005D Attribute 0x0000_FFFC DataVersion: 3155962179
            [1689841072.440498][2534:2536] CHIP:TOO: FeatureMap: 1
            [1689841072.440655][2534:2536] CHIP:EM: <<< [E:51712i S:9959 M:43369330 (Ack:105494463)] (S) Msg TX to 1:0000000000000001 [C4B0] --- Type 0000:10 (SecureChannel:StandaloneAck)
@@ -59,7 +59,7 @@ tests:
     - label: "Step 4: TH reads from the DUT the AttributeList attribute."
       verification: |
           ./chip-tool dishwasheralarm read attribute-list 1 1
-           Verify " AttributeList " value consists the list of mandatory attributes (0, 2, 3, 65533, 65532, 65531, 65529, 65528) and optional attributes(1) on the TH(Chip-tool) Log: 
+           Verify " AttributeList " value consists the list of mandatory attributes (0, 2, 3, 65533, 65532, 65531, 65529, 65528) and optional attributes(1) on the TH(Chip-tool) Log:
            Below is the sample log provided for the raspi platform:
           [1692613019.157928][10524:10526] CHIP:DMG: }
           [1692613019.158276][10524:10526] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_005D Attribute 0x0000_FFFB DataVersion: 2220437053
@@ -82,7 +82,7 @@ tests:
           ./chip-tool dishwasheralarm read event-list 1 1
            Verify " EventList attribute " consists the list may contain optional events(1) on the TH(Chip-tool) Log:
            Below is the sample log provided for the raspi platform:
-           
+
            [1689677416.105596][18367:18369] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_005D Attribute 0x0000_FFFA DataVersion: 1517282962
            [1689677416.105625][18367:18369] CHIP:TOO: EventList: 1 entries
            [1689677416.105635][18367:18369] CHIP:TOO: [1]: 0
@@ -95,7 +95,7 @@ tests:
       verification: |
           ./chip-tool dishwasheralarm read accepted-command-list 1 1
            Verify " AcceptedCommandList " consists the list of supported events, which for this cluster should be an empty list on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
-           
+
            [1689841406.078608][2570:2572] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_005D Attribute 0x0000_FFF9 DataVersion: 3155962179
            [1689841406.078674][2570:2572] CHIP:TOO: AcceptedCommandList: 2 entries
            [1689841406.078701][2570:2572] CHIP:TOO: [1]: 0
@@ -107,7 +107,7 @@ tests:
       verification: |
           ./chip-tool dishwasheralarm read generated-command-list 1 1
            Verify " GeneratedCommandList " consists the list of supported events, which for this cluster should be an empty list on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
-           
+
            [1688447564.178537][4220:4222] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0057 Attribute 0x0000_FFF8 DataVersion: 1795162772
            [1688447564.178684][4220:4222] CHIP:TOO: GeneratedCommandList: 0 entries
            [1688447564.178984][4220:4222] CHIP:EM: <<< [E:5540i S:25125 M:256711779 (Ack:197472718)] (S) Msg TX to 1:0000000000000001 [10DB] --- Type 0000:10 (SecureChannel:StandaloneAck)

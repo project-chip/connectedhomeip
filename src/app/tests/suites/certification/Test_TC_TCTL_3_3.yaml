@@ -52,7 +52,7 @@ tests:
       verification: |
           ./chip-tool temperaturecontrol read supported-temperature-levels 1 1
           On TH(chip-tool), Verify that the DUT response contains a list of up to 32 strings with each string length not exceeding 16 characters.
-          [1689770716.974439][9291:9293] CHIP:DMG:         SuppressResponse = true, 
+          [1689770716.974439][9291:9293] CHIP:DMG:         SuppressResponse = true,
           [1689770716.974446][9291:9293] CHIP:DMG:         InteractionModelRevision = 1
           [1689770716.974451][9291:9293] CHIP:DMG: }
           [1689770716.974558][9291:9293] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0005 DataVersion: 2844459846
@@ -73,7 +73,7 @@ tests:
           ./chip-tool temperaturecontrol set-temperature 1 1 --TargetTemperatureLevel 1
           On TH(chip-tool), Verify that the DUT response contains SUCCESS
           [1692265679.055214][13978:13980] CHIP:DMG:         ],
-          [1692265679.055279][13978:13980] CHIP:DMG:         
+          [1692265679.055279][13978:13980] CHIP:DMG:
           [1692265679.055306][13978:13980] CHIP:DMG:         InteractionModelRevision = 10
           [1692265679.055329][13978:13980] CHIP:DMG: },
           [1692265679.055422][13978:13980] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0056 Command=0x0000_0000 Status=0x0
@@ -111,8 +111,8 @@ tests:
       PICS: TCTL.S.M.SupportsInvalidInMode && TCTL.S.C00.Rsp
       verification: |
           ./chip-tool temperaturecontrol set-temperature 1 1 --TargetTemperatureLevel 3
-          On TH(chip-tool), Verify that the DUT response contains CONSTRAINT_ERROR 
-          [1692265766.674998][13994:13996] CHIP:DMG:         
+          On TH(chip-tool), Verify that the DUT response contains CONSTRAINT_ERROR
+          [1692265766.674998][13994:13996] CHIP:DMG:
           [1692265766.675028][13994:13996] CHIP:DMG:         InteractionModelRevision = 10
           [1692265766.675058][13994:13996] CHIP:DMG: },
           [1692265766.675136][13994:13996] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0056 Command=0x0000_0000 Status=0x87
@@ -130,7 +130,7 @@ tests:
       verification: |
           ./chip-tool temperaturecontrol read selected-temperature-level 1 1
           On TH(chip-tool), Verify that the DUT response contains a temperatureValue and the value is the same setLevel value written in step 4
-          [1692265822.762570][14005:14007] CHIP:DMG:         SuppressResponse = true, 
+          [1692265822.762570][14005:14007] CHIP:DMG:         SuppressResponse = true,
           [1692265822.762602][14005:14007] CHIP:DMG:         InteractionModelRevision = 10
           [1692265822.762631][14005:14007] CHIP:DMG: }
           [1692265822.762811][14005:14007] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0004 DataVersion: 3892542639

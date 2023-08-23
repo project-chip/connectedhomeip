@@ -131,7 +131,7 @@ tests:
 
           ./chip-tool laundrywashermode read start-up-mode 1 1
 
-          On TH(chip-tool), Verify StartUpMode attribute value is 0 and below is the sample log provided for the raspi platform, 
+          On TH(chip-tool), Verify StartUpMode attribute value is 0 and below is the sample log provided for the raspi platform,
 
           [1692165008.700475][2609:2611] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0051 Attribute 0x0000_0002 DataVersion: 1273636449
           [1692165008.700550][2609:2611] CHIP:TOO:   StartUpMode: 0
@@ -154,7 +154,7 @@ tests:
 
           ./chip-tool laundrywashermode read on-mode 1 1
 
-          On TH(chip-tool), Verify that OnMode attribute value is an integer 
+          On TH(chip-tool), Verify that OnMode attribute value is an integer
           - Save the value as on_mode_dut and below is the sample log provided for the raspi platform, here OnMode value is 0
 
           NOTE: If startup_mode_dut is equal to old_on_mode_dut proceed to step 6. Else proceed to step 8.
