@@ -292,12 +292,10 @@ public:
 #ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         if (!(LevelControlWithOnOffFeaturePresent(endpoint) &&
               Scenes::ScenesServer::Instance().IsHandlerRegistered(endpoint, LevelControlServer::GetSceneHandler())))
+#endif
         {
             OnOffServer::Instance().scheduleTimerCallbackMs(sceneEventControl(endpoint), timeMs);
         }
-#else
-        OnOffServer::Instance().scheduleTimerCallbackMs(sceneEventControl(endpoint), timeMs);
-#endif
 
         return CHIP_NO_ERROR;
     }
