@@ -150,13 +150,16 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     else if (name == "ModeChange")
     {
         using chip::app::DataModel::MakeNullable;
-        std::string device = self->mJsonValue["Device"].asString();
-        std::string type = self->mJsonValue["Type"].asString();
-        Json::Value jsonMode            = self->mJsonValue["Mode"];
+        std::string device   = self->mJsonValue["Device"].asString();
+        std::string type     = self->mJsonValue["Type"].asString();
+        Json::Value jsonMode = self->mJsonValue["Mode"];
         DataModel::Nullable<uint8_t> mode;
-        if (!jsonMode.isNull()) {
+        if (!jsonMode.isNull())
+        {
             mode = MakeNullable(static_cast<uint8_t>(jsonMode.asUInt()));
-        } else {
+        }
+        else
+        {
             mode.SetNull();
         }
         self->OnModeChangeHandler(device, type, mode);
@@ -365,30 +368,47 @@ void AllClustersAppCommandHandler::OnSwitchMultiPressCompleteHandler(uint8_t pre
 void AllClustersAppCommandHandler::OnModeChangeHandler(std::string device, std::string type, DataModel::Nullable<uint8_t> mode)
 {
     ModeBase::Instance * modeInstance = nullptr;
-    if (device == "DishWasher") {
+    if (device == "DishWasher")
+    {
         modeInstance = DishwasherMode::Instance();
-    } else if (device == "LaundryWasher") {
+    }
+    else if (device == "LaundryWasher")
+    {
         modeInstance = LaundryWasherMode::Instance();
-    } else if (device == "RvcClean") {
+    }
+    else if (device == "RvcClean")
+    {
         modeInstance = RvcCleanMode::Instance();
-    } else if (device == "RvcRun") {
+    }
+    else if (device == "RvcRun")
+    {
         modeInstance = RvcRunMode::Instance();
-    } else {
+    }
+    else
+    {
         ChipLogDetail(NotSpecified, "Invalid device type : %s", device.c_str());
         return;
     }
 
-    if (type == "Current") {
-        if (mode.IsNull()) {
+    if (type == "Current")
+    {
+        if (mode.IsNull())
+        {
             ChipLogDetail(NotSpecified, "Invalid value : null");
             return;
         }
         modeInstance->UpdateCurrentMode(mode.Value());
-    } else if (type == "StartUp") {
+    }
+    else if (type == "StartUp")
+    {
         modeInstance->UpdateStartUpMode(mode);
-    } else if (type == "On") {
+    }
+    else if (type == "On")
+    {
         modeInstance->UpdateOnMode(mode);
-    } else {
+    }
+    else
+    {
         ChipLogDetail(NotSpecified, "Invalid mode type : %s", type.c_str());
         return;
     }
