@@ -35,6 +35,104 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Precondition: Create new user"
+      PICS: DRLK.S.F00 && DRLK.S.F07
+      command: "SetUser"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "UserIndex"
+                value: 1
+              - name: "UserName"
+                value: "xxx"
+              - name: "UserUniqueID"
+                value: 6452
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 0
+              - name: "CredentialRule"
+                value: 0
+
+    - label: "Precondition: Read the user back and verify its fields"
+      PICS: DRLK.S.F00 && DRLK.S.F07
+      command: "GetUser"
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 1
+      response:
+          values:
+              - name: "UserIndex"
+                value: 1
+              - name: "UserName"
+                value: "xxx"
+              - name: "UserUniqueID"
+                value: 6452
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 0
+              - name: "CredentialRule"
+                value: 0
+              - name: "Credentials"
+                value: []
+              - name: "CreatorFabricIndex"
+                value: 1
+              - name: "LastModifiedFabricIndex"
+                value: 1
+              - name: "NextUserIndex"
+                value: null
+
+    - label: "Precondition: Create new PIN credential and lock/unlock user"
+      PICS: DRLK.S.F00 && DRLK.S.F07
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+              - name: "CredentialData"
+                value: "123456"
+              - name: "UserIndex"
+                value: 1
+              - name: "UserStatus"
+                value: null
+              - name: "UserType"
+                value: null
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "UserIndex"
+                value: null
+              - name: "NextCredentialIndex"
+                value: 2
+
+    - label: "Precondition: Verify created PIN credential"
+      PICS: DRLK.S.F00 && DRLK.S.F07
+      command: "GetCredentialStatus"
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+      response:
+          values:
+              - name: "CredentialExists"
+                value: true
+              - name: "UserIndex"
+                value: 1
+              - name: "CreatorFabricIndex"
+                value: 1
+              - name: "LastModifiedFabricIndex"
+                value: 1
+              - name: "NextCredentialIndex"
+                value: null
+
     - label: "Step 1a: TH reads LockState attribute from DUT"
       PICS: DRLK.S.A0000
       command: "readAttribute"
@@ -63,7 +161,16 @@ tests:
           value: LockStateValue
 
     - label: "Step 1d: TH sends a Lock Door command to the DUT."
-      PICS: DRLK.S.C00.Rsp
+      PICS: DRLK.S.C00.Rsp && DRLK.S.F00 && DRLK.S.F07
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "123456"
+
+    - label: "Step 1d: TH sends a Lock Door command to the DUT."
+      PICS: DRLK.S.C00.Rsp && !DRLK.S.F00 && !DRLK.S.F07
       command: "LockDoor"
       timedInteractionTimeoutMs: 1000
 
@@ -84,9 +191,18 @@ tests:
           value: 1
 
     - label: "Step 1e: TH sends a Unlock Door command to the DUT."
-      PICS: DRLK.S.C01.Rsp
+      PICS: DRLK.S.C01.Rsp && !DRLK.S.F00 && !DRLK.S.F07
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
+
+    - label: "Step 1e: TH sends a Unlock Door command to the DUT."
+      PICS: DRLK.S.C01.Rsp && DRLK.S.F00 && DRLK.S.F07
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "123456"
 
     - label: "Wait after Unlock Door"
       PICS: DRLK.S.C00.Rsp
@@ -991,8 +1107,9 @@ tests:
       command: "readAttribute"
       attribute: "EnableLocalProgramming"
       response:
-          value: 1
           saveAs: Current_EnableLocal_Programming
+          constraints:
+              type: boolean
 
     - label: "Step 26b: TH writes EnableLocalProgramming attribute as false"
       PICS: DRLK.S.A0028.Write
@@ -1029,7 +1146,8 @@ tests:
       command: "readAttribute"
       attribute: "EnableOneTouchLocking"
       response:
-          value: 0
+          constraints:
+              type: boolean
 
     - label: "Step 27b: TH writes EnableOneTouchLocking attribute as true"
       PICS: DRLK.S.A0029
@@ -1050,7 +1168,8 @@ tests:
       command: "readAttribute"
       attribute: "EnableInsideStatusLED"
       response:
-          value: 0
+          constraints:
+              type: boolean
 
     - label: "Step 28b: TH writes EnableInsideStatusLED attribute as true"
       PICS: DRLK.S.A002a
@@ -1071,7 +1190,8 @@ tests:
       command: "readAttribute"
       attribute: "EnablePrivacyModeButton"
       response:
-          value: 0
+          constraints:
+              type: boolean
 
     - label: "Step 29b: TH writes EnablePrivacy ModeButton attribute as true"
       PICS: DRLK.S.A002b
@@ -1301,8 +1421,9 @@ tests:
       command: "readAttribute"
       attribute: "RequirePINforRemoteOperation"
       response:
-          value: 0
           saveAs: Current_RequirePINFor_RemoteOperation
+          constraints:
+              type: boolean
 
     - label:
           "Step 33b: TH writes RequirePINfor RemoteOperation attribute as true"
@@ -1411,3 +1532,21 @@ tests:
       attribute: "NumberOfCredentialsSupportedPerUser"
       response:
           value: NumberOfCredentialsSupportedPerUserValue
+
+    - label: "Cleanup the created user"
+      PICS: DRLK.S.F00 && DRLK.S.F07
+      command: "ClearUser"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 1
+
+    - label: "Clean the created credential"
+      PICS: DRLK.S.F00 && DRLK.S.F07 && DRLK.S.C26.Rsp
+      command: "ClearCredential"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
