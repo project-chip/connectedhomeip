@@ -15,5 +15,5 @@ print(frequency.to_string(index=False))
 frequency.to_csv("recent_fails_frequency.csv")
 print()
 for failId in df["ID"].tolist():
-  os.makedirs(f"fail_logs/{failId}") # Resolve this to actual run name later
-  subprocess.run(f"gh run view -R project-chip/connectedhomeip {failId} --log-failed > fail_logs/{failId}/raw_output.txt", shell=True)
+    os.makedirs(f"fail_logs/{failId}")  # Resolve this to actual run name later
+    subprocess.run(f"gh run view -R project-chip/connectedhomeip {failId} --log-failed > fail_logs/{failId}/raw_output.txt", shell=True)
