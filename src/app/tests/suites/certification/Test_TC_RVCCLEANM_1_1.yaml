@@ -126,9 +126,10 @@ tests:
           ./chip-tool  rvccleanmode read attribute-list 1 1
 
           Verify the "AttributeList " should include the mandatory attributes (values 0, 1),
-          - global attributes  (value 65533, 65532, 65531, 65530, 65529 and 65528) and
-          - list may include optional attribute(value 0x0002), if MOD.S.A0002(StartUpMode) supports,
-          - list contains feature dependent attribute (values 0x0003), if MOD.S.F00(DEPONOFF) is true  on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+          - Global attributes  (value 65533, 65532, 65531, 65530, 65529 and 65528) and
+          - List may include optional attribute(value 0x0002), if RVCCLEANM.S.A0002(StartUpMode)
+           supports, 
+          - List contains feature dependent attribute (values 0x0003), if RVCCLEANM.S.F00(DEPONOFF) is true  on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
 
           [1690182240.730688][14970:14972] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0055 Attribute 0x0000_FFFB DataVersion: 3145953005
           [1690182240.730708][14970:14972] CHIP:TOO:   AttributeList: 10 entries
@@ -252,7 +253,7 @@ tests:
       verification: |
           ./chip-tool  rvccleanmode read generated-command-list 1 1
 
-          Verify "GeneratedCommandList" contains a list of mandatory commands (value 1)  on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+          Verify " GeneratedCommandList" contains a list of mandatory commands (value 1)  on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
 
           [1690182346.463002][14993:14995] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0055 Attribute 0x0000_FFF8 DataVersion: 3145953005
           [1690182346.463028][14993:14995] CHIP:TOO:   GeneratedCommandList: 1 entries

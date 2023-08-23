@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ tests:
           Here the command to enter interactive mode:-- ./chip-tool interactive start
       disabled: true
 
-    - label: "Step 0a: TH reads from the DUT the IdleModeInterval attribute."
+    - label: "Step 0a: "
       PICS: " !ICDM.S "
       verification: |
           When the ICDM feature is not supported or enabled, the SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT is set to 60 minutes.
@@ -73,7 +73,7 @@ tests:
       verification: |
           Please run the following command on the TH to test the subscription feature and verify that the value of MaxIntervalCeiling is set correctly(set the value greater than SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT)
 
-           onoff subscribe on-off  100  600 1 1 --keepSubscriptions true
+           onoff subscribe on-off  100 600 1 1 --keepSubscriptions true
 
            On the TH( chip-tool), verify a report data message is received and verify it contains the following data :
           1. Verify Report Data Message Received:
@@ -172,7 +172,7 @@ tests:
           [[Attribute = Attribute, Cluster = ClusterID, Endpoint = EndpointID
           ]]."
       verification: |
-          Please send the below mentioned command to configure TH2 without access to a specific cluster, we send the ACL command, allowing access only to the Level Control cluster (cluster ID: 8); any attempts to subscribe to or use commands from other clusters will result in a status of 'INVALID_ACTION
+          To ensure that TH1 and TH2 are on the same fabric and that TH1 grants access to TH2, Please send the below mentioned command, it will configure TH2 without access to a specific cluster, we send the ACL command, allowing access only to the Level Control cluster (cluster ID: 8); any attempts to subscribe to or use commands from other clusters will result in a status of 'INVALID_ACTION
 
           accesscontrol write acl '[{"privilege":5, "authMode":2, "subjects":[112233], "targets":null, "fabricIndex": 1},{"privilege":3, "authMode":2, "subjects":[4], "targets":[{"cluster":8, "endpoint":null, "deviceType":null}]}]' 1 0
 
@@ -266,7 +266,7 @@ tests:
           to subscribe to all attributes for which it does not have access.
           AttributePath = [[Cluster = ClusterID, Endpoint = EndpointID ]]."
       verification: |
-          Please send the below mentioned command to configure TH2 without access to a specific cluster on Specific endpoint, we send the ACL command, allowing access only to the Level Control cluster (cluster ID: 8) on endpoint 1 ; any attempts to subscribe to or use commands from other clusters will result in a status of 'INVALID_ACTION
+          To ensure that TH1 and TH2 are on the same fabric and that TH1 grants access to TH2, Please send the below mentioned command, it will  configure TH2 without access to a specific cluster on Specific endpoint, we send the ACL command, allowing access only to the Level Control cluster (cluster ID: 8) on endpoint 1 ; any attempts to subscribe to or use commands from other clusters will result in a status of 'INVALID_ACTION
 
           accesscontrol write acl '[{"privilege":5, "authMode":2, "subjects":[112233], "targets":null, "fabricIndex": 1},{"privilege":3, "authMode":2, "subjects":[4], "targets":[{"cluster":8, "endpoint":1, "deviceType":null}]}]' 1 0
 
@@ -359,7 +359,7 @@ tests:
           clusters on a specific Endpoint for which it does not have access.
           AttributePath = [[ Endpoint = EndpointID ]]."
       verification: |
-          Please send the below mentioned command to configure TH2 without access to a specific endpoint, we send the ACL command, allowing access only to the endpoint 1 ; any attempts to subscribe to or use commands from other clusters will result in a status of 'INVALID_ACTION
+          To ensure that TH1 and TH2 are on the same fabric and that TH1 grants access to TH2, Please send the below mentioned command, it will configure TH2 without access to a specific endpoint, we send the ACL command, allowing access only to the endpoint 1 ; any attempts to subscribe to or use commands from other clusters will result in a status of 'INVALID_ACTION
 
            accesscontrol write acl '[{"privilege":5, "authMode":2, "subjects":[112233], "targets":null, "fabricIndex": 1},{"privilege":3, "authMode":2, "subjects":[4], "targets":[{"cluster":null, "endpoint":1, "deviceType":null}]}]' 1 0
 
@@ -595,8 +595,7 @@ tests:
 
     - label:
           "Step 9: TH sends a subscription request action for an attribute and
-          set the MinIntervalFloor value to be greater than MaxIntervalCeiling.
-          +"
+          set the MinIntervalFloor value to be greater than MaxIntervalCeiling."
       verification: |
           Please send the following command from TH (the subscription requester) to DUT (the device under test) to activate the subscription for the "on-time" attribute, setting the MinIntervalFloor value to be greater than MaxIntervalCeiling:
 
@@ -616,7 +615,7 @@ tests:
     - label:
           "Step 10: TH sends a subscription request to subscribe to a specific
           global attribute from all clusters on all endpoints. AttributePath =
-          [[Attribute = Global Attribute]]. +"
+          [[Attribute = Global Attribute]]."
       verification: |
           any subscribe-by-id 0xFFFFFFFF 0xFFFD  10 300 1 0xFFFF --keepSubscriptions true
 

@@ -66,7 +66,7 @@ tests:
               maxValue: 254
 
     - label:
-          "Step 5: TH sends a ChangeToMode command to the DUT with NewMode set
+          "Step 4: TH sends a ChangeToMode command to the DUT with NewMode set
           to new_mode_th"
       PICS: LWM.S.C00.Rsp
       command: "ChangeToMode"

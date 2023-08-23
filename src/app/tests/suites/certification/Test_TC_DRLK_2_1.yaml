@@ -840,7 +840,7 @@ tests:
       verification: |
           ./chip-tool doorlock write-by-id 38 0 1 1
 
-          Verify " DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the UNSUPPORTED_WRITE response for Supported OperatingModes attribute write functionality.
 
           [1653637108.039160][3522:3527] CHIP:DMG:                        StatusIB =
           [1653637108.039205][3522:3527] CHIP:DMG:                        {
@@ -957,7 +957,7 @@ tests:
 
           ./chip-tool doorlock write-by-id 39 1 1 1
 
-          Verify "DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the UNSUPPORTED_WRITE response for Default ConfigurationRegister attribute write functionality.
 
           [1653637348.333879][3570:3575] CHIP:DMG:                        StatusIB =
           [1653637348.333920][3570:3575] CHIP:DMG:                        {
