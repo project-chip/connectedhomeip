@@ -97,6 +97,15 @@ int AppTask::StartAppTask()
         while (true)
             ;
     }
+
+    // Start App task.
+    if (xTaskCreate(AirQualityTaskMain, "AIR-APP", APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, APP_TASK_PRIORITY, &sAppTaskHandle) !=
+        pdPASS)
+    {
+        PLAT_LOG("Failed to create app task");
+        while (true)
+            ;
+    }
     return ret;
 }
 
@@ -107,8 +116,6 @@ int AppTask::Init()
     Button_Params buttonParams;
 
     cc32xxLogInit();
-
-
 
     /* Initial Terminal, and print Application name */
     DisplayBanner();
@@ -200,6 +207,11 @@ void AppTask::AppTaskMain(void * pvParameter)
             sAppTask.DispatchEvent(&event);
         }
     }
+}
+
+void AppTask::AirQualityTaskMain(void * pvParameter)
+{
+    AirQualitySensorAppAttrUpdateDelegate::AirQualitySensorAppAttrUpdateDelegate();
 }
 
 void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask events)
