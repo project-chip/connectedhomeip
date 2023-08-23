@@ -5,7 +5,8 @@ from slugify import slugify
 import subprocess
 
 def process_fail(id, pr, workflow, start_time):
-    output_path = f"logs/{slugify(pr)}/{slugify(workflow)}/{slugify(start_time)}"
+    output_path = f"recent_fails_logs/{slugify(pr)}/{slugify(workflow)}/{slugify(start_time)}"
+    os.makedirs(output_path)
     subprocess.run(f"gh run view -R project-chip/connectedhomeip {id} --log-failed > {output_path}/fail_logs.txt", shell=True)
 
 def main():
