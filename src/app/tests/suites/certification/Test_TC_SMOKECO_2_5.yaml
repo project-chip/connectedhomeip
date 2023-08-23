@@ -766,14 +766,14 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_DEVICE_MUTED
 
-    - label: "Step 55a: TH waits 60 Seconds"
+    - label: "Step 55a: TH waits 5 Seconds"
       PICS: "!PICS_SDK_CI_ONLY"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 60000
+                value: 5000
 
     - label: "Step 55b: TH reads DeviceMuted attribute from DUT"
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F00
@@ -978,14 +978,14 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_DEVICE_MUTED
 
-    - label: "Step 71a: TH waits 60 Seconds"
+    - label: "Step 71a: TH waits 5 Seconds"
       PICS: "!PICS_SDK_CI_ONLY"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 60000
+                value: 5000
 
     - label: "Step 71b: TH reads DeviceMuted attribute from DUT"
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F01
