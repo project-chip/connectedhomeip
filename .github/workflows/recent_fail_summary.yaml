@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: pip install pandas
+      - run: pip install pandas python-slugify
       - name: Run Summarization Script
         run: python scripts/tools/summarize_fail.py
         env:
