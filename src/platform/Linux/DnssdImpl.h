@@ -20,6 +20,7 @@
 #include <sys/select.h>
 #include <unistd.h>
 
+#include <atomic>
 #include <chrono>
 #include <map>
 #include <memory>
@@ -109,7 +110,8 @@ public:
     CHIP_ERROR PublishService(const DnssdService & service, DnssdPublishCallback callback, void * context);
     CHIP_ERROR StopPublish();
     CHIP_ERROR Browse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                      chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context);
+                      chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context, intptr_t * browseIdentifier);
+    CHIP_ERROR StopBrowse(intptr_t browseIdentifier);
     CHIP_ERROR Resolve(const char * name, const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
                        chip::Inet::IPAddressType transportType, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
                        void * context);
@@ -126,6 +128,11 @@ private:
         void * mContext;
         Inet::IPAddressType mAddressType;
         std::vector<DnssdService> mServices;
+        size_t mBrowseRetries;
+        AvahiIfIndex mInterface;
+        std::string mProtocol;
+        chip::System::Clock::Timeout mNextRetryDelay = chip::System::Clock::Seconds16(1);
+        std::atomic_bool mStopped{ false };
     };
 
     struct ResolveContext
@@ -153,6 +160,7 @@ private:
     static void HandleBrowse(AvahiServiceBrowser * broswer, AvahiIfIndex interface, AvahiProtocol protocol, AvahiBrowserEvent event,
                              const char * name, const char * type, const char * domain, AvahiLookupResultFlags flags,
                              void * userdata);
+    static void BrowseRetryCallback(chip::System::Layer * aLayer, void * appState);
     static void HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex interface, AvahiProtocol protocol,
                               AvahiResolverEvent event, const char * name, const char * type, const char * domain,
                               const char * host_name, const AvahiAddress * address, uint16_t port, AvahiStringList * txt,
@@ -165,6 +173,7 @@ private:
     AvahiClient * mClient;
     std::map<std::string, AvahiEntryGroup *> mPublishedGroups;
     Poller mPoller;
+    static constexpr size_t kMaxBrowseRetries = 4;
 };
 
 } // namespace Dnssd

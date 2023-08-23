@@ -148,10 +148,18 @@ static void TestCommissionerDUTVectors(nlTestSuite * inSuite, void * inContext)
         example_dac_verifier->VerifyAttestationInformation(info, &attestationInformationVerificationCallback);
 
         bool isSuccessCase = dacProvider.IsSuccessCase();
-        // The DefaultDACVerifier doesn't currently check validity of CD elements values.
+        // The following test vectors are success conditions for an SDK commissioner for the following reasons:
+        // struct_cd_device_type_id_mismatch - requires DCL access, which the SDK does not have and is not required
+        // struct_cd_security_info_wrong - while devices are required to set this to 0, commissioners are required to ignore it
+        //                                 (see 6.3.1)
+        //                                 hence this is marked as a failure for devices, but should be a success case for
+        //                                 commissioners
+        // struct_cd_security_level_wrong - as with security info, commissioners are required to ignore this value (see 6.3.1)
+        // struct_cd_version_number_wrong - this value is not meant to be interpreted by commissioners, so errors here should be
+        //                                  ignored (6.3.1)
+        // struct_cd_cert_id_mismatch - requires DCL access, which the SDK does not have and is not required.
         if (strstr(entry->d_name, "struct_cd_device_type_id_mismatch") || strstr(entry->d_name, "struct_cd_security_info_wrong") ||
-            strstr(entry->d_name, "struct_cd_cert_type_wrong") || strstr(entry->d_name, "struct_cd_security_level_wrong") ||
-            strstr(entry->d_name, "struct_cd_version_number_wrong") || strstr(entry->d_name, "struct_cd_format_version_2") ||
+            strstr(entry->d_name, "struct_cd_security_level_wrong") || strstr(entry->d_name, "struct_cd_version_number_wrong") ||
             strstr(entry->d_name, "struct_cd_cert_id_mismatch"))
         {
             isSuccessCase = true;

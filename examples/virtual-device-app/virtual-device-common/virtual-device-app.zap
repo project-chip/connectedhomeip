@@ -33,10 +33,10 @@
   ],
   "endpointTypes": [
     {
-      "id": 1,
+      "id": 7,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 2,
+        "id": 55,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,7 +44,7 @@
       },
       "deviceTypes": [
         {
-          "id": 2,
+          "id": 55,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
@@ -52,7 +52,7 @@
         }
       ],
       "deviceTypeRefs": [
-        2
+        55
       ],
       "deviceVersions": [
         1
@@ -5960,7 +5960,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -6786,7 +6786,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -7029,10 +7029,10 @@
       ]
     },
     {
-      "id": 2,
+      "id": 8,
       "name": "MA-videoplayer",
       "deviceTypeRef": {
-        "id": 8,
+        "id": 61,
         "code": 256,
         "profileId": 259,
         "label": "MA-onofflight",
@@ -7040,7 +7040,7 @@
       },
       "deviceTypes": [
         {
-          "id": 8,
+          "id": 61,
           "code": 256,
           "profileId": 259,
           "label": "MA-onofflight",
@@ -7048,7 +7048,7 @@
         }
       ],
       "deviceTypeRefs": [
-        8
+        61
       ],
       "deviceVersions": [
         1
@@ -8934,7 +8934,7 @@
           "mfgCode": null,
           "define": "POWER_SOURCE_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "attributes": [
             {
               "name": "Status",
@@ -9433,6 +9433,22 @@
               "reportableChange": 0
             },
             {
+              "name": "EndpointList",
+              "code": 31,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
@@ -9451,6 +9467,22 @@
             {
               "name": "AcceptedCommandList",
               "code": 65529,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "EventList",
+              "code": 65530,
               "mfgCode": null,
               "side": "server",
               "type": "array",
@@ -9506,7 +9538,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "2",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -9798,7 +9830,7 @@
           "mfgCode": null,
           "define": "DOOR_LOCK_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "GetWeekDayScheduleResponse",
@@ -10273,6 +10305,36 @@
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
+            }
+          ],
+          "events": [
+            {
+              "name": "DoorLockAlarm",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "LockOperation",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "LockOperationError",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "LockUserChange",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
             }
           ]
         },
@@ -12168,7 +12230,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -13055,7 +13117,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -13106,7 +13168,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

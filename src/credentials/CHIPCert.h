@@ -101,17 +101,17 @@ enum
  *
  * @note Cert type is an API data type only; it should never be sent over-the-wire.
  */
-enum
+enum class CertType : uint8_t
 {
-    kCertType_NotSpecified    = 0x00, /**< The certificate's type has not been specified. */
-    kCertType_Root            = 0x01, /**< A CHIP Root certificate. */
-    kCertType_ICA             = 0x02, /**< A CHIP Intermediate CA certificate. */
-    kCertType_Node            = 0x03, /**< A CHIP node certificate. */
-    kCertType_FirmwareSigning = 0x04, /**< A CHIP firmware signing certificate. Note that CHIP doesn't
-                                           specify how firmware images are signed and implementation of
-                                           firmware image signing is manufacturer-specific. The CHIP
-                                           certificate format supports encoding of firmware signing
-                                           certificates if chosen by the manufacturer to use them. */
+    kNotSpecified    = 0x00, /**< The certificate's type has not been specified. */
+    kRoot            = 0x01, /**< A CHIP Root certificate. */
+    kICA             = 0x02, /**< A CHIP Intermediate CA certificate. */
+    kNode            = 0x03, /**< A CHIP node certificate. */
+    kFirmwareSigning = 0x04, /**< A CHIP firmware signing certificate. Note that CHIP doesn't
+                                  specify how firmware images are signed and implementation of
+                                  firmware image signing is manufacturer-specific. The CHIP
+                                  certificate format supports encoding of firmware signing
+                                  certificates if chosen by the manufacturer to use them. */
 };
 
 /** X.509 Certificate Key Purpose Flags
@@ -334,7 +334,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR GetCertType(uint8_t & certType) const;
+    CHIP_ERROR GetCertType(CertType & certType) const;
 
     /**
      * @brief Retrieve the ID of a CHIP certificate.

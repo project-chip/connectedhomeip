@@ -152,6 +152,9 @@ server cluster Groups = 4 {
 server cluster Scenes = 5 {
   bitmap Feature : BITMAP32 {
     kSceneNames = 0x1;
+    kExplicit = 0x2;
+    kTableSize = 0x4;
+    kFabricScenes = 0x8;
   }
 
   bitmap ScenesCopyMode : BITMAP8 {
@@ -1046,6 +1049,17 @@ server cluster UnitLocalization = 45 {
   }
 
   attribute TempUnitEnum temperatureUnit = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** This cluster is used to describe the configuration and capabilities of a Device's power system. */
+server cluster PowerSourceConfiguration = 46 {
+  readonly attribute INT8U sources[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2587,6 +2601,32 @@ server cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
   }
 
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+}
+
+/** This cluster supports remotely monitoring and controling the different typs of functionality available to a washing device, such as a washing machine. */
+server cluster LaundryWasherControls = 83 {
+  enum NumberOfRinsesEnum : ENUM8 {
+    kNone = 0;
+    kNormal = 1;
+    kExtra = 2;
+    kMax = 3;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kSpin = 0x1;
+    kRinse = 0x2;
+  }
+
+  readonly attribute CHAR_STRING spinSpeeds[] = 0;
+  attribute nullable int8u spinSpeedCurrent = 1;
+  attribute NumberOfRinsesEnum numberOfRinses = 2;
+  readonly attribute NumberOfRinsesEnum supportedRinses[] = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
@@ -6197,6 +6237,12 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
+  server cluster PowerSourceConfiguration {
+    callback attribute sources;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
   server cluster PowerSource {
     ram      attribute status default = 0;
     ram      attribute order default = 3;
@@ -6693,6 +6739,19 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 
+  server cluster LaundryWasherControls {
+    callback attribute spinSpeeds;
+    ram      attribute spinSpeedCurrent;
+    ram      attribute numberOfRinses;
+    callback attribute supportedRinses;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
   server cluster RvcRunMode {
     callback attribute supportedModes;
     callback attribute currentMode;
@@ -6752,7 +6811,7 @@ endpoint 1 {
   }
 
   server cluster AirQuality {
-    ram      attribute airQuality default = 0;
+    callback attribute airQuality default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -7070,7 +7129,7 @@ endpoint 1 {
     ram      attribute coupleColorTempToLevelMinMireds;
     persist  attribute startUpColorTemperatureMireds;
     ram      attribute featureMap default = 0x1F;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
   }
 
   server cluster BallastConfiguration {

@@ -21,7 +21,9 @@
 #include "JNIDACProvider.h"
 
 #include "ColorControlManager.h"
+#include "DoorLockManager.h"
 #include "OnOffManager.h"
+#include "PowerSourceManager.h"
 #include "credentials/DeviceAttestationCredsProvider.h"
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/server/Dnssd.h>
@@ -165,4 +167,68 @@ JNI_METHOD(jboolean, setOnOff)(JNIEnv *, jobject, jint endpoint, jboolean value)
 JNI_METHOD(void, setColorControlManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
 {
     ColorControlManager::NewManager(endpoint, manager);
+}
+
+/*
+ * Door Lock Manager
+ */
+JNI_METHOD(void, setDoorLockManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
+{
+    DoorLockManager::NewManager(endpoint, manager);
+}
+
+JNI_METHOD(jboolean, setLockType)(JNIEnv *, jobject, jint endpoint, jint value)
+{
+    return DeviceLayer::SystemLayer().ScheduleLambda([endpoint, value] { DoorLockManager::SetLockType(endpoint, value); }) ==
+        CHIP_NO_ERROR;
+}
+
+JNI_METHOD(jboolean, setLockState)(JNIEnv *, jobject, jint endpoint, jint value)
+{
+    return DeviceLayer::SystemLayer().ScheduleLambda([endpoint, value] { DoorLockManager::SetLockState(endpoint, value); }) ==
+        CHIP_NO_ERROR;
+}
+
+JNI_METHOD(jboolean, setActuatorEnabled)(JNIEnv *, jobject, jint endpoint, jboolean value)
+{
+    return DeviceLayer::SystemLayer().ScheduleLambda([endpoint, value] { DoorLockManager::SetActuatorEnabled(endpoint, value); }) ==
+        CHIP_NO_ERROR;
+}
+
+JNI_METHOD(jboolean, setAutoRelockTime)(JNIEnv *, jobject, jint endpoint, jint value)
+{
+    return DeviceLayer::SystemLayer().ScheduleLambda([endpoint, value] { DoorLockManager::SetAutoRelockTime(endpoint, value); }) ==
+        CHIP_NO_ERROR;
+}
+
+JNI_METHOD(jboolean, setOperatingMode)(JNIEnv *, jobject, jint endpoint, jint value)
+{
+    return DeviceLayer::SystemLayer().ScheduleLambda([endpoint, value] { DoorLockManager::SetOperatingMode(endpoint, value); }) ==
+        CHIP_NO_ERROR;
+}
+
+JNI_METHOD(jboolean, setSupportedOperatingModes)(JNIEnv *, jobject, jint endpoint, jint value)
+{
+    return DeviceLayer::SystemLayer().ScheduleLambda(
+               [endpoint, value] { DoorLockManager::SetSupportedOperatingModes(endpoint, value); }) == CHIP_NO_ERROR;
+}
+
+JNI_METHOD(jboolean, sendLockAlarmEvent)(JNIEnv *, jobject, jint endpoint)
+{
+    return DeviceLayer::SystemLayer().ScheduleLambda([endpoint] { DoorLockManager::SendLockAlarmEvent(endpoint); }) ==
+        CHIP_NO_ERROR;
+}
+
+/*
+ * Power Source Manager
+ */
+JNI_METHOD(void, setPowerSourceManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
+{
+    PowerSourceManager::NewManager(endpoint, manager);
+}
+
+JNI_METHOD(jboolean, setBatPercentRemaining)(JNIEnv *, jobject, jint endpoint, jint value)
+{
+    return DeviceLayer::SystemLayer().ScheduleLambda(
+               [endpoint, value] { PowerSourceManager::SetBatPercentRemaining(endpoint, value); }) == CHIP_NO_ERROR;
 }

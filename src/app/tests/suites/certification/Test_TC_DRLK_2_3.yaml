@@ -36,6 +36,7 @@ tests:
                 value: nodeId
 
     - label: "Precondition: Create new user"
+      PICS: DRLK.S.F00 && DRLK.S.F07
       command: "SetUser"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -56,6 +57,7 @@ tests:
                 value: 0
 
     - label: "Precondition: Read the user back and verify its fields"
+      PICS: DRLK.S.F00 && DRLK.S.F07
       command: "GetUser"
       arguments:
           values:
@@ -85,6 +87,7 @@ tests:
                 value: null
 
     - label: "Precondition: Create new PIN credential and lock/unlock user"
+      PICS: DRLK.S.F00 && DRLK.S.F07
       command: "SetCredential"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -111,6 +114,7 @@ tests:
                 value: 2
 
     - label: "Precondition: Verify created PIN credential"
+      PICS: DRLK.S.F00 && DRLK.S.F07
       command: "GetCredentialStatus"
       arguments:
           values:
@@ -295,7 +299,7 @@ tests:
     - label:
           "Step 7: TH sends the unlock Door command to the DUT with invalid
           PINCode"
-      PICS: DRLK.S.C01.Rsp && DRLK.S.A0033
+      PICS: DRLK.S.F00 && DRLK.S.C01.Rsp && DRLK.S.A0033
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -308,7 +312,7 @@ tests:
     - label:
           "Step 8: TH sends the unlock Door command to the DUT without PINCode"
       runIf: requirePINIsTrue
-      PICS: DRLK.S.C01.Rsp && DRLK.S.A0033
+      PICS: DRLK.S.F00 && DRLK.S.C01.Rsp && DRLK.S.A0033
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
       response:
@@ -317,7 +321,7 @@ tests:
     - label:
           "Step 8: TH sends the unlock Door command to the DUT without PINCode"
       runIf: requirePINIsFalse
-      PICS: DRLK.S.C01.Rsp && DRLK.S.A0033
+      PICS: DRLK.S.F00 && DRLK.S.C01.Rsp && DRLK.S.A0033
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
 
@@ -375,7 +379,7 @@ tests:
     - label:
           "Step 12a: TH sends the unlock Door command to the DUT with invalid
           PINCode"
-      PICS: DRLK.S.C01.Rsp
+      PICS: DRLK.S.F00 && DRLK.S.C01.Rsp
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -388,7 +392,7 @@ tests:
     - label:
           "Step 12b: TH sends the unlock Door command to the DUT with invalid
           PINCode"
-      PICS: DRLK.S.C01.Rsp
+      PICS: DRLK.S.F00 && DRLK.S.C01.Rsp
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -401,20 +405,7 @@ tests:
     - label:
           "Step 12c: TH sends the unlock Door command to the DUT with invalid
           PINCode"
-      PICS: DRLK.S.C01.Rsp
-      command: "UnlockDoor"
-      timedInteractionTimeoutMs: 1000
-      arguments:
-          values:
-              - name: "PINCode"
-                value: "1234568"
-      response:
-          error: FAILURE
-
-    - label:
-          "Step 12d: TH sends the unlock Door command to the DUT with invalid
-          PINCode"
-      PICS: DRLK.S.C01.Rsp
+      PICS: DRLK.S.F00 && DRLK.S.C01.Rsp
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -435,7 +426,7 @@ tests:
     - label:
           "Step 14: TH sends the unlock Door command to the DUT with valid
           PINCode"
-      PICS: DRLK.S.C01.Rsp
+      PICS: DRLK.S.F00 && DRLK.S.C01.Rsp
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -545,6 +536,7 @@ tests:
           value: 1
 
     - label: "Cleanup the created user"
+      PICS: DRLK.S.F00 && DRLK.S.F07
       command: "ClearUser"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -553,7 +545,7 @@ tests:
                 value: 1
 
     - label: "Clean the created credential"
-      PICS: DRLK.S.C26.Rsp
+      PICS: DRLK.S.F00 && DRLK.S.F07 && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 1000
       arguments:
