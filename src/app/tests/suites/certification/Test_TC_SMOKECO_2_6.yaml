@@ -62,7 +62,7 @@ config:
         defaultValue: 1
     HIEST_PRI_ALARM_2:
         type: int8u
-        defaultValue: 2
+        defaultValue: 7
     HIEST_PRI_ALARM_3:
         type: int8u
         defaultValue: 7
