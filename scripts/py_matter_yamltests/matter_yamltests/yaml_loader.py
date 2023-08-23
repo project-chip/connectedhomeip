@@ -97,6 +97,7 @@ class YamlLoader:
             'command': str,
             'event': str,
             'eventNumber': (int, str),  # Can be a variable.
+            'isLastEventNumber': bool,  # Can be a variable.
             'disabled': bool,
             'fabricFiltered': bool,
             'verification': str,

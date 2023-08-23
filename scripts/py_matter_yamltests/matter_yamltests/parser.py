@@ -207,6 +207,7 @@ class _TestStepWithPlaceholders:
         self.busy_wait_ms = _value_or_none(test, 'busyWaitMs')
         self.wait_for = _value_or_none(test, 'wait')
         self.event_number = _value_or_none(test, 'eventNumber')
+        self.is_last_event_number = _value_or_none(test, 'isLastEventNumber')
         self.run_if = _value_or_none(test, 'runIf')
         self.save_response_as = _value_or_none(test, 'saveResponseAs')
 
@@ -578,6 +579,8 @@ class TestStep:
                 self._test.run_if)
             self._test.event_number = self._config_variable_substitution(
                 self._test.event_number)
+            self._test.is_last_event_number = self._config_variable_substitution(
+                self._test.is_last_event_number)
             self._test.cluster = self._config_variable_substitution(
                 self._test.cluster)
             self._test.command = self._config_variable_substitution(
@@ -682,6 +685,14 @@ class TestStep:
     @property
     def event_number(self):
         return self._test.event_number
+
+    @event_number.setter
+    def event_number(self, value):
+        self._test.event_number = value
+
+    @property
+    def is_last_event_number(self):
+        return self._test.is_last_event_number
 
     @property
     def pics(self):

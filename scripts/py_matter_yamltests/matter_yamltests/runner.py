@@ -14,6 +14,7 @@
 #    limitations under the License.
 
 import asyncio
+import re
 import time
 from abc import ABC, abstractmethod
 from asyncio import CancelledError
@@ -125,6 +126,10 @@ class TestRunner(TestRunnerBase):
     """
     TestRunner is a default runner implementation.
     """
+
+    pattern = re.compile(r'EventNumber = (0x[0-9a-f]+)')
+    last_event_number = 0
+
     async def start(self):
         return
 
@@ -175,6 +180,9 @@ class TestRunner(TestRunnerBase):
 
             test_duration = 0
             for idx, request in enumerate(parser.tests):
+                if request.is_last_event_number:
+                    request.event_number = self.last_event_number
+
                 if not request.is_pics_enabled:
                     hooks.step_skipped(request.label, request.pics)
                     continue
@@ -194,6 +202,15 @@ class TestRunner(TestRunnerBase):
                     responses, logs = config.adapter.decode(encoded_response)
                 duration = round((time.time() - start) * 1000, 2)
                 test_duration += duration
+
+                # TODO: To get the event number, the method could be improved
+                for log in reversed(logs):
+                    match = self.pattern.search(log.message)
+                    if match:
+                        received_event_number = int(match.group(1), 16) + 1
+                        if self.last_event_number < received_event_number:
+                            self.last_event_number = received_event_number
+                        break
 
                 logger = request.post_process_response(responses)
 
