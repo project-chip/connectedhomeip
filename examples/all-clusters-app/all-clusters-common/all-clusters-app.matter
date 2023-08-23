@@ -7064,7 +7064,7 @@ endpoint 1 {
     ram      attribute windSetting default = 0x00;
     ram      attribute airflowDirection default = 0;
     ram      attribute featureMap default = 0x3F;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 4;
   }
 
   server cluster ThermostatUserInterfaceConfiguration {
