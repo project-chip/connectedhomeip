@@ -168,7 +168,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 {
     DeviceLayer::OtaState otaState = DeviceLayer::kOtaDownloadFailed;
-    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    auto * imageProcessor          = reinterpret_cast<OTAImageProcessorImpl *>(context);
     VerifyOrReturn(imageProcessor, ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
 
 #if CONFIG_ENABLE_ENCRYPTED_OTA
