@@ -115,6 +115,9 @@ inline std::optional<chip::BitMask<Scenes::Feature>> from_json(const nlohmann::j
 {
     chip::BitMask<Scenes::Feature> r;
     r.SetField(Scenes::Feature::kSceneNames, obj.value("SceneNames", false));
+    r.SetField(Scenes::Feature::kExplicit, obj.value("Explicit", false));
+    r.SetField(Scenes::Feature::kTableSize, obj.value("TableSize", false));
+    r.SetField(Scenes::Feature::kFabricScenes, obj.value("FabricScenes", false));
     return r;
 }
 template <>

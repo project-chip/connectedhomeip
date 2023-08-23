@@ -131,6 +131,9 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Scenes::F
     using namespace chip::app::Clusters::Scenes;
     nlohmann::json obj;
     obj["SceneNames"] = static_cast<bool>(value.GetField(Feature::kSceneNames));
+    obj["Explicit"] = static_cast<bool>(value.GetField(Feature::kExplicit));
+    obj["TableSize"] = static_cast<bool>(value.GetField(Feature::kTableSize));
+    obj["FabricScenes"] = static_cast<bool>(value.GetField(Feature::kFabricScenes));
     return obj;
 }
 template <>
