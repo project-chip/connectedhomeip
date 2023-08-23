@@ -70,7 +70,8 @@ bool DescriptorAttrAccess::HasFeature(EndpointId endpoint, Feature feature)
 CHIP_ERROR DescriptorAttrAccess::ReadTagAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    if (HasFeature(endpoint, Feature::kTagList)) {
+    if (HasFeature(endpoint, Feature::kTagList))
+    {
         err = aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
             CHIP_ERROR err2;
 
