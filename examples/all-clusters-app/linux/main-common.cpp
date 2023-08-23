@@ -61,9 +61,11 @@ Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
 
 Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 
-//Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type gTagList[] = { { .namespaceID = 7, .tag = 0 }, //Common Number Namespace: 7, tag 0 (Zero)
-                                                                            { .namespaceID = 8, .tag = 2 } }; //Common Position Namespace: 8, tag: 2 (Top)
+// Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type gTagList[] = {
+    { .namespaceID = 7, .tag = 0 }, // Common Number Namespace: 7, tag 0 (Zero)
+    { .namespaceID = 8, .tag = 2 }
+}; // Common Position Namespace: 8, tag: 2 (Top)
 } // namespace
 
 #ifdef EMBER_AF_PLUGIN_DISHWASHER_ALARM_SERVER
