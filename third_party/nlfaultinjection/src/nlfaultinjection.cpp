@@ -25,8 +25,8 @@
 #define __STDC_LIMIT_MACROS
 #endif
 #include <stdint.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <nlassert.h>
 
@@ -38,20 +38,18 @@ namespace FaultInjection {
 
 static void Die(void) __attribute__((noreturn));
 
-static GlobalContext *sGlobalContext = NULL;
+static GlobalContext * sGlobalContext = NULL;
 
 /**
  * The callback function that implements the deterministic
  * injection feature (see FailAtFault).
  */
-static bool DeterministicCbFn(Identifier aId,
-                              Record *aRecord,
-                              void *aContext)
+static bool DeterministicCbFn(Identifier aId, Record * aRecord, void * aContext)
 {
     bool retval = false;
 
-    (void)aId;
-    (void)aContext;
+    (void) aId;
+    (void) aContext;
 
     if (aRecord->mNumCallsToSkip)
     {
@@ -76,14 +74,12 @@ static Callback sDeterministicCb = { DeterministicCbFn, NULL, NULL };
  * The callback function that implements the random
  * injection feature (see FailRandomlyAtFault).
  */
-static bool RandomCbFn(Identifier aId,
-                       Record *aRecord,
-                       void *aContext)
+static bool RandomCbFn(Identifier aId, Record * aRecord, void * aContext)
 {
     bool retval = false;
 
-    (void)aId;
-    (void)aContext;
+    (void) aId;
+    (void) aContext;
 
     if (aRecord->mPercentage > 0)
     {
@@ -108,7 +104,7 @@ static Callback sRandomCb = { RandomCbFn, NULL, &sDeterministicCb };
 /**
  * Alias for the address of the first default callback.
  */
-static const Callback *sEndOfCustomCallbacks = &sRandomCb;
+static const Callback * sEndOfCustomCallbacks = &sRandomCb;
 
 /**
  * Initialize the Manager instance.
@@ -123,23 +119,20 @@ static const Callback *sEndOfCustomCallbacks = &sRandomCb;
  * @return      -EINVAL if the inputs are not valid.
  *              0 otherwise.
  */
-int32_t Manager::Init(size_t inNumFaults,
-                      Record *inFaultArray,
-                      Name inManagerName,
-                      const Name *inFaultNames)
+int32_t Manager::Init(size_t inNumFaults, Record * inFaultArray, Name inManagerName, const Name * inFaultNames)
 {
     int32_t err = 0;
     Identifier i;
 
     nlEXPECT_ACTION((inNumFaults > 0 && inFaultArray && inManagerName && inFaultNames), exit, err = -EINVAL);
 
-    mName = inManagerName;
-    mNumFaults = inNumFaults;
+    mName         = inManagerName;
+    mNumFaults    = inNumFaults;
     mFaultRecords = inFaultArray;
-    mFaultNames = inFaultNames;
-    mLock = NULL;
-    mUnlock = NULL;
-    mLockContext = NULL;
+    mFaultNames   = inFaultNames;
+    mLock         = NULL;
+    mUnlock       = NULL;
+    mLockContext  = NULL;
 
     // Link all callback lists to the two default callbacks.
     for (i = 0; i < mNumFaults; i++)
@@ -161,20 +154,17 @@ exit:
  * @return      -EINVAL if the inputs are not valid.
  *              0 otherwise.
  */
-int32_t Manager::FailRandomlyAtFault(Identifier inId,
-                                     uint8_t inPercentage)
+int32_t Manager::FailRandomlyAtFault(Identifier inId, uint8_t inPercentage)
 {
     int32_t err = 0;
 
-    nlEXPECT_ACTION((inId < mNumFaults && inPercentage <= 100),
-                    exit,
-                    err = -EINVAL);
+    nlEXPECT_ACTION((inId < mNumFaults && inPercentage <= 100), exit, err = -EINVAL);
 
     Lock();
 
     mFaultRecords[inId].mNumCallsToSkip = 0;
     mFaultRecords[inId].mNumCallsToFail = 0;
-    mFaultRecords[inId].mPercentage = inPercentage;
+    mFaultRecords[inId].mPercentage     = inPercentage;
 
     Unlock();
 
@@ -195,10 +185,7 @@ exit:
  * @return      -EINVAL if the inputs are not valid.
  *              0 otherwise.
  */
-int32_t Manager::FailAtFault(Identifier inId,
-                             uint32_t inNumCallsToSkip,
-                             uint32_t inNumCallsToFail,
-                             bool inTakeMutex)
+int32_t Manager::FailAtFault(Identifier inId, uint32_t inNumCallsToSkip, uint32_t inNumCallsToFail, bool inTakeMutex)
 {
     int32_t err = 0;
 
@@ -211,7 +198,7 @@ int32_t Manager::FailAtFault(Identifier inId,
 
     mFaultRecords[inId].mNumCallsToSkip = static_cast<uint16_t>(inNumCallsToSkip);
     mFaultRecords[inId].mNumCallsToFail = static_cast<uint16_t>(inNumCallsToFail);
-    mFaultRecords[inId].mPercentage = 0;
+    mFaultRecords[inId].mPercentage     = 0;
 
     if (inTakeMutex)
     {
@@ -225,9 +212,7 @@ exit:
 /**
  * @overload int32_t FailAtFault(Identifier inId, uint32_t inNumCallsToSkip, uint32_t inNumCallsToFail, bool inTakeMutex)
  */
-int32_t Manager::FailAtFault(Identifier inId,
-                             uint32_t inNumCallsToSkip,
-                             uint32_t inNumCallsToFail)
+int32_t Manager::FailAtFault(Identifier inId, uint32_t inNumCallsToSkip, uint32_t inNumCallsToFail)
 {
     return FailAtFault(inId, inNumCallsToSkip, inNumCallsToFail, kMutexTake);
 }
@@ -275,17 +260,14 @@ exit:
  * @return      -EINVAL if the inputs are not valid.
  *              0 otherwise.
  */
-int32_t Manager::StoreArgsAtFault(Identifier inId, uint16_t inNumArgs, int32_t *inArgs)
+int32_t Manager::StoreArgsAtFault(Identifier inId, uint16_t inNumArgs, int32_t * inArgs)
 {
     int32_t err = 0;
     size_t i;
 
-    nlEXPECT_ACTION(inId < mNumFaults &&
-                    mFaultRecords[inId].mArguments != NULL &&
-                    mFaultRecords[inId].mLengthOfArguments >= inNumArgs &&
-                    inNumArgs <= UINT8_MAX,
-                    exit,
-                    err = -EINVAL);
+    nlEXPECT_ACTION(inId < mNumFaults && mFaultRecords[inId].mArguments != NULL &&
+                        mFaultRecords[inId].mLengthOfArguments >= inNumArgs && inNumArgs <= UINT8_MAX,
+                    exit, err = -EINVAL);
 
     Lock();
 
@@ -313,8 +295,7 @@ exit:
  * @return      -EINVAL if the inputs are not valid.
  *              0 otherwise.
  */
-int32_t Manager::InsertCallbackAtFault(Identifier inId,
-                                       Callback *inCallBack)
+int32_t Manager::InsertCallbackAtFault(Identifier inId, Callback * inCallBack)
 {
     int32_t err = 0;
 
@@ -328,7 +309,7 @@ int32_t Manager::InsertCallbackAtFault(Identifier inId,
     // Insert the callback at the beginning of the list.
     // Remember that all lists end into the two default (deterministic
     // and random) callbacks!
-    inCallBack->mNext = mFaultRecords[inId].mCallbackList;
+    inCallBack->mNext                 = mFaultRecords[inId].mCallbackList;
     mFaultRecords[inId].mCallbackList = inCallBack;
 
     Unlock();
@@ -348,12 +329,10 @@ exit:
  * @return      -EINVAL if the inputs are not valid.
  *              0 otherwise.
  */
-int32_t Manager::RemoveCallbackAtFault(Identifier inId,
-                                       Callback *inCallBack,
-                                       bool inTakeMutex)
+int32_t Manager::RemoveCallbackAtFault(Identifier inId, Callback * inCallBack, bool inTakeMutex)
 {
-    int32_t err = 0;
-    Callback **cb = NULL;
+    int32_t err    = 0;
+    Callback ** cb = NULL;
 
     nlEXPECT_ACTION((inId < mNumFaults) && (inCallBack != NULL), exit, err = -EINVAL);
 
@@ -386,8 +365,7 @@ exit:
 /**
  * @overload int32_t Manager::RemoveCallbackAtFault(Identifier inId, Callback *inCallBack, bool inTakeMutex)
  */
-int32_t Manager::RemoveCallbackAtFault(Identifier inId,
-                                       Callback *inCallBack)
+int32_t Manager::RemoveCallbackAtFault(Identifier inId, Callback * inCallBack)
 {
     return RemoveCallbackAtFault(inId, inCallBack, kMutexTake);
 }
@@ -408,10 +386,10 @@ int32_t Manager::RemoveCallbackAtFault(Identifier inId,
  */
 bool Manager::CheckFault(Identifier inId, bool inTakeMutex)
 {
-    bool retval = false;
-    Callback *cb = NULL;
-    Callback *next = NULL;
-    bool reboot = false;
+    bool retval     = false;
+    Callback * cb   = NULL;
+    Callback * next = NULL;
+    bool reboot     = false;
 
     nlEXPECT(inId < mNumFaults, exit);
 
@@ -491,7 +469,7 @@ bool Manager::CheckFault(Identifier inId)
  *
  * @return    true if the fault should be injected; false otherwise.
  */
-bool Manager::CheckFault(Identifier inId, uint16_t &outNumArgs, int32_t *&outArgs, bool inTakeMutex)
+bool Manager::CheckFault(Identifier inId, uint16_t & outNumArgs, int32_t *& outArgs, bool inTakeMutex)
 {
     bool retval = false;
 
@@ -504,7 +482,7 @@ bool Manager::CheckFault(Identifier inId, uint16_t &outNumArgs, int32_t *&outArg
     if (retval)
     {
         outNumArgs = mFaultRecords[inId].mNumArguments;
-        outArgs = mFaultRecords[inId].mArguments;
+        outArgs    = mFaultRecords[inId].mArguments;
     }
 
     if (inTakeMutex)
@@ -518,7 +496,7 @@ bool Manager::CheckFault(Identifier inId, uint16_t &outNumArgs, int32_t *&outArg
 /**
  * @overload bool CheckFault(Identifier inId, uint16_t &outNumArgs, int32_t *&outArgs, bool inTakeMutex)
  */
-bool Manager::CheckFault(Identifier inId, uint16_t &outNumArgs, int32_t *&outArgs)
+bool Manager::CheckFault(Identifier inId, uint16_t & outNumArgs, int32_t *& outArgs)
 {
     return CheckFault(inId, outNumArgs, outArgs, kMutexTake);
 }
@@ -553,27 +531,25 @@ void Manager::ResetFaultCounters(void)
  */
 int32_t Manager::ResetFaultConfigurations(Identifier inId)
 {
-    Callback *cb;
+    Callback * cb;
     int32_t err = 0;
 
-    nlEXPECT_ACTION((inId < mNumFaults),
-                    exit,
-                    err = -EINVAL);
+    nlEXPECT_ACTION((inId < mNumFaults), exit, err = -EINVAL);
 
     Lock();
 
     mFaultRecords[inId].mNumCallsToSkip = 0;
     mFaultRecords[inId].mNumCallsToFail = 0;
-    mFaultRecords[inId].mPercentage = 0;
-    mFaultRecords[inId].mReboot = 0;
-    mFaultRecords[inId].mNumArguments = 0;
+    mFaultRecords[inId].mPercentage     = 0;
+    mFaultRecords[inId].mReboot         = 0;
+    mFaultRecords[inId].mNumArguments   = 0;
 
     cb = mFaultRecords[inId].mCallbackList;
     // All callback handling code in this module is based on the assumption
     // that custom callbacks are inserted at the beginning of the list
     while (cb != sEndOfCustomCallbacks && cb != NULL)
     {
-        (void)RemoveCallbackAtFault(inId, cb, kMutexDoNotTake);
+        (void) RemoveCallbackAtFault(inId, cb, kMutexDoNotTake);
         cb = mFaultRecords[inId].mCallbackList;
     }
 
@@ -591,7 +567,7 @@ exit:
  */
 int32_t Manager::ResetFaultConfigurations(void)
 {
-    int32_t err = 0;
+    int32_t err   = 0;
     Identifier id = 0;
 
     for (id = 0; id < mNumFaults; id++)
@@ -633,7 +609,7 @@ void Manager::Unlock(void)
  *
  * @param[in] inGlobalContext   Pointer to the GlobalContext provided by the application
  */
-void SetGlobalContext(GlobalContext *inGlobalContext)
+void SetGlobalContext(GlobalContext * inGlobalContext)
 {
     sGlobalContext = inGlobalContext;
 }
@@ -651,9 +627,9 @@ void SetGlobalContext(GlobalContext *inGlobalContext)
  * @return              true in case of success; false if the string does not
  *                      contain an integer.
  */
-static bool ParseInt(const char *str, int32_t *num)
+static bool ParseInt(const char * str, int32_t * num)
 {
-    char *endptr = NULL;
+    char * endptr = NULL;
     long tmp;
     bool retval = true;
 
@@ -680,9 +656,9 @@ static bool ParseInt(const char *str, int32_t *num)
  * @return              true in case of success; false if the string does not
  *                      contain an unsigned integer.
  */
-static bool ParseUInt(const char *str, uint32_t *num)
+static bool ParseUInt(const char * str, uint32_t * num)
 {
-    bool retval = true;
+    bool retval    = true;
     int32_t tmpint = 0;
 
     retval = ParseInt(str, &tmpint);
@@ -719,10 +695,10 @@ static bool ParseUInt(const char *str, uint32_t *num)
  *
  * @return      true  if the string can be parsed completely; false otherwise
  */
-bool ParseFaultInjectionStr(char *aFaultInjectionStr, const GetManagerFn *inArray, size_t inArraySize)
+bool ParseFaultInjectionStr(char * aFaultInjectionStr, const GetManagerFn * inArray, size_t inArraySize)
 {
     ManagerTable table = { inArray, inArraySize };
-    size_t numTables = 1;
+    size_t numTables   = 1;
 
     return ParseFaultInjectionStr(aFaultInjectionStr, &table, numTables);
 }
@@ -745,21 +721,21 @@ bool ParseFaultInjectionStr(char *aFaultInjectionStr, const GetManagerFn *inArra
  *
  * @return      true  if the string can be parsed completely; false otherwise
  */
-bool ParseFaultInjectionStr(char *aFaultInjectionStr, const ManagerTable *inTables, size_t inNumTables)
+bool ParseFaultInjectionStr(char * aFaultInjectionStr, const ManagerTable * inTables, size_t inNumTables)
 {
-    char *tok1 = NULL;
-    char *savePtr1 = NULL;
-    char *tok2 = NULL;
-    char *savePtr2 = NULL;
-    char *outerString = aFaultInjectionStr;
-    size_t i = 0;
+    char * tok1                      = NULL;
+    char * savePtr1                  = NULL;
+    char * tok2                      = NULL;
+    char * savePtr2                  = NULL;
+    char * outerString               = aFaultInjectionStr;
+    size_t i                         = 0;
     nl::FaultInjection::Identifier j = 0;
-    int err = 0;
-    bool retval = false;
+    int err                          = 0;
+    bool retval                      = false;
     int32_t args[kMaxFaultArgs];
     uint16_t numArgs = 0;
 
-    nl::FaultInjection::Manager *mgr = NULL;
+    nl::FaultInjection::Manager * mgr      = NULL;
     nl::FaultInjection::Identifier faultId = 0;
 
     memset(args, 0, sizeof(args));
@@ -768,23 +744,23 @@ bool ParseFaultInjectionStr(char *aFaultInjectionStr, const ManagerTable *inTabl
     {
         uint32_t numTimesToFail = 0;
         uint32_t numTimesToSkip = 0;
-        uint32_t percentage = 0;
-        bool gotPercentage = false;
-        bool gotReboot = false;
-        bool gotArguments = false;
-        const Name *faultNames = NULL;
+        uint32_t percentage     = 0;
+        bool gotPercentage      = false;
+        bool gotReboot          = false;
+        bool gotArguments       = false;
+        const Name * faultNames = NULL;
 
         outerString = NULL;
 
         tok2 = strtok_r(tok1, "_", &savePtr2);
         nlEXPECT(tok2 != NULL, exit);
 
-		// this is the module
-		for (i = 0; i < inNumTables; i++)
+        // this is the module
+        for (i = 0; i < inNumTables; i++)
         {
             for (j = 0; j < inTables[i].mNumItems; j++)
             {
-                nl::FaultInjection::Manager &tmpMgr = inTables[i].mArray[j]();
+                nl::FaultInjection::Manager & tmpMgr = inTables[i].mArray[j]();
                 if (!strcmp(tok2, tmpMgr.GetName()))
                 {
                     mgr = &tmpMgr;
@@ -799,14 +775,14 @@ bool ParseFaultInjectionStr(char *aFaultInjectionStr, const ManagerTable *inTabl
 
         // this is the fault name
         faultNames = mgr->GetFaultNames();
-		for (j = 0; j < mgr->GetNumFaults(); j++)
-		{
-			if (!strcmp(tok2, faultNames[j]))
-			{
-				faultId = j;
-				break;
-			}
-		}
+        for (j = 0; j < mgr->GetNumFaults(); j++)
+        {
+            if (!strcmp(tok2, faultNames[j]))
+            {
+                faultId = j;
+                break;
+            }
+        }
 
         nlEXPECT(j != mgr->GetNumFaults(), exit);
 
@@ -814,34 +790,33 @@ bool ParseFaultInjectionStr(char *aFaultInjectionStr, const ManagerTable *inTabl
         {
             switch (tok2[0])
             {
-                case 'a':
-                    {
-                        int32_t tmp = 0;
-                        nlEXPECT(numArgs < kMaxFaultArgs, exit);
+            case 'a': {
+                int32_t tmp = 0;
+                nlEXPECT(numArgs < kMaxFaultArgs, exit);
 
-                        gotArguments = true;
+                gotArguments = true;
 
-                        nlEXPECT(ParseInt(&(tok2[1]), &tmp), exit);
-                        args[numArgs++] = tmp;
-                    }
-                    break;
-                case 'f':
-                    nlEXPECT(ParseUInt(&(tok2[1]), &numTimesToFail), exit);
-                    break;
-                case 's':
-                    nlEXPECT(ParseUInt(&(tok2[1]), &numTimesToSkip), exit);
-                    break;
-                case 'p':
-                    gotPercentage = true;
-                    nlEXPECT(ParseUInt(&(tok2[1]), &percentage), exit);
-                    nlEXPECT(percentage <= 100, exit);
-                    break;
-                case 'r':
-                    gotReboot = true;
-                    break;
-                default:
-                    goto exit;
-                    break;
+                nlEXPECT(ParseInt(&(tok2[1]), &tmp), exit);
+                args[numArgs++] = tmp;
+            }
+            break;
+            case 'f':
+                nlEXPECT(ParseUInt(&(tok2[1]), &numTimesToFail), exit);
+                break;
+            case 's':
+                nlEXPECT(ParseUInt(&(tok2[1]), &numTimesToSkip), exit);
+                break;
+            case 'p':
+                gotPercentage = true;
+                nlEXPECT(ParseUInt(&(tok2[1]), &percentage), exit);
+                nlEXPECT(percentage <= 100, exit);
+                break;
+            case 'r':
+                gotReboot = true;
+                break;
+            default:
+                goto exit;
+                break;
             }
         }
 
@@ -886,7 +861,7 @@ static void Die(void)
 #pragma GCC diagnostic ignored "-Warray-bounds"
 #endif
     while (true)
-        *((volatile long *)1) = 0;
+        *((volatile long *) 1) = 0;
 #if defined(__GNUC__) && (__GNUC__ >= 12)
 #pragma GCC diagnostic pop
 #endif

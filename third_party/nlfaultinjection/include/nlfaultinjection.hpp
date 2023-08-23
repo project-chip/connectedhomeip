@@ -27,9 +27,9 @@
 #ifndef FAULT_INJECTION_H_
 #define FAULT_INJECTION_H_
 
+#include <errno.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <errno.h>
 
 namespace nl {
 
@@ -40,9 +40,10 @@ typedef struct _Callback Callback;
 
 typedef uint32_t Identifier;
 
-typedef const char *Name;
+typedef const char * Name;
 
-enum {
+enum
+{
     kMaxFaultArgs = 8 /**< The max number of arguments that can be stored in a fault */
 };
 
@@ -64,7 +65,7 @@ enum {
  * @return      true if the fault is to be triggered. false if this callback does not want to
  *              force the fault to be triggered.
  */
-typedef bool (*CallbackFn)(Identifier aId, Record *aFaultRecord, void *aContext);
+typedef bool (*CallbackFn)(Identifier aId, Record * aFaultRecord, void * aContext);
 
 /**
  * A linked-list node to hold a callback function to be attached to a fault ID.
@@ -72,9 +73,9 @@ typedef bool (*CallbackFn)(Identifier aId, Record *aFaultRecord, void *aContext)
  */
 struct _Callback
 {
-    CallbackFn mCallBackFn;   /**< Callback function pointer */
-    void      *mContext;      /**< Pointer for the application to store a context for mCallbackFn */
-    Callback  *mNext;         /**< Linked list next pointer */
+    CallbackFn mCallBackFn; /**< Callback function pointer */
+    void * mContext;        /**< Pointer for the application to store a context for mCallbackFn */
+    Callback * mNext;       /**< Linked list next pointer */
 };
 
 /**
@@ -84,32 +85,31 @@ struct _Callback
  */
 struct _Record
 {
-    uint16_t  mNumCallsToSkip;    /**< The number of times this fault should not trigger before it
-                                       starts failing */
-    uint16_t  mNumCallsToFail;    /**< The number of times this fault should fail, before disabling
-                                       itself */
-    uint8_t   mPercentage;        /**< A number between 0 and 100 that indicates the percentage of
-                                       times the fault should be triggered */
-    uint8_t   mReboot;            /**< This fault should reboot the system */
+    uint16_t mNumCallsToSkip; /**< The number of times this fault should not trigger before it
+                                   starts failing */
+    uint16_t mNumCallsToFail; /**< The number of times this fault should fail, before disabling
+                                   itself */
+    uint8_t mPercentage;      /**< A number between 0 and 100 that indicates the percentage of
+                                   times the fault should be triggered */
+    uint8_t mReboot;          /**< This fault should reboot the system */
 
-    uint8_t   mLengthOfArguments; /**< The length of the array pointed to by mArguments */
+    uint8_t mLengthOfArguments; /**< The length of the array pointed to by mArguments */
 
-    uint8_t   mNumArguments;      /**< The number of items currently stored in the array pointed to by mArguments */
+    uint8_t mNumArguments; /**< The number of items currently stored in the array pointed to by mArguments */
 
-    Callback *mCallbackList;      /**< A list of callbacks */
+    Callback * mCallbackList; /**< A list of callbacks */
 
-    uint32_t  mNumTimesChecked;   /**< The number of times the fault location was executed */
+    uint32_t mNumTimesChecked; /**< The number of times the fault location was executed */
 
-
-    int32_t  *mArguments;         /**< A pointer to an array of integers to store extra arguments; this array is meant to
-                                       be populated by either of the following:
-                                       - the ParseFaultInjectionStr, so the values are available at the fault injection site
-                                         and when the fault is injected.
-                                       - the logic around the fault injection site, to save useful values that can then
-                                         be logged by a callback installed by the application, and so made available for use
-                                         in subsequent test runs as arguments to the injected code.
-                                         For example, the values can be exact arguments to be passed in, or ranges to be
-                                         iterated on (like the length of a byte array to be fuzzed). */
+    int32_t * mArguments; /**< A pointer to an array of integers to store extra arguments; this array is meant to
+                               be populated by either of the following:
+                               - the ParseFaultInjectionStr, so the values are available at the fault injection site
+                                 and when the fault is injected.
+                               - the logic around the fault injection site, to save useful values that can then
+                                 be logged by a callback installed by the application, and so made available for use
+                                 in subsequent test runs as arguments to the injected code.
+                                 For example, the values can be exact arguments to be passed in, or ranges to be
+                                 iterated on (like the length of a byte array to be fuzzed). */
 };
 
 /**
@@ -119,45 +119,36 @@ struct _Record
 class Manager
 {
 public:
-
     static const bool kMutexDoNotTake = false;
-    static const bool kMutexTake = true;
+    static const bool kMutexTake      = true;
 
-    int32_t Init(size_t inNumFaults, Record *inFaultArray, Name inManagerName, const Name *inFaultNames);
+    int32_t Init(size_t inNumFaults, Record * inFaultArray, Name inManagerName, const Name * inFaultNames);
 
     int32_t FailRandomlyAtFault(Identifier inId, uint8_t inPercentage = 10);
 
-    int32_t FailAtFault(Identifier inId,
-                        uint32_t inNumCallsToSkip,
-                        uint32_t inNumCallsToFail);
-    int32_t FailAtFault(Identifier inId,
-                        uint32_t inNumCallsToSkip,
-                        uint32_t inNumCallsToFail,
-                        bool inTakeMutex);
+    int32_t FailAtFault(Identifier inId, uint32_t inNumCallsToSkip, uint32_t inNumCallsToFail);
+    int32_t FailAtFault(Identifier inId, uint32_t inNumCallsToSkip, uint32_t inNumCallsToFail, bool inTakeMutex);
 
     int32_t RebootAtFault(Identifier inId);
 
-    int32_t StoreArgsAtFault(Identifier inId, uint16_t inNumArgs, int32_t *inArgs);
+    int32_t StoreArgsAtFault(Identifier inId, uint16_t inNumArgs, int32_t * inArgs);
 
-    int32_t InsertCallbackAtFault(Identifier inId, Callback *inCallBack);
+    int32_t InsertCallbackAtFault(Identifier inId, Callback * inCallBack);
 
-    int32_t RemoveCallbackAtFault(Identifier inId, Callback *inCallBack);
-    int32_t RemoveCallbackAtFault(Identifier inId, Callback *inCallBack, bool inTakeMutex);
+    int32_t RemoveCallbackAtFault(Identifier inId, Callback * inCallBack);
+    int32_t RemoveCallbackAtFault(Identifier inId, Callback * inCallBack, bool inTakeMutex);
 
     bool CheckFault(Identifier inId);
     bool CheckFault(Identifier inId, bool inTakeMutex);
-    bool CheckFault(Identifier inId, uint16_t &outNumArgs, int32_t *&outArgs);
-    bool CheckFault(Identifier inId, uint16_t &outNumArgs, int32_t *&outArgs, bool inTakeMutex);
+    bool CheckFault(Identifier inId, uint16_t & outNumArgs, int32_t *& outArgs);
+    bool CheckFault(Identifier inId, uint16_t & outNumArgs, int32_t *& outArgs, bool inTakeMutex);
 
     /**
      * Get the number of fault IDs defined by the Manager.
      *
      * @return  the number of fault IDs defined by the Manager.
      */
-    size_t GetNumFaults(void) const
-    {
-        return mNumFaults;
-    }
+    size_t GetNumFaults(void) const { return mNumFaults; }
 
     /**
      * Get the name of the Manager. Every Manager object is initialized with a name,
@@ -165,10 +156,7 @@ public:
      *
      * @return  The Manager's name, as a pointer to a const null-terminated string.
      */
-    Name GetName(void) const
-    {
-        return mName;
-    }
+    Name GetName(void) const { return mName; }
 
     /**
      * Get a pointer to the array of fault names.
@@ -176,15 +164,9 @@ public:
      * @return  A pointer to a const char pointer. The array length
      *          is the number of faults defined by the Manager; see GetNumFaults.
      */
-    const Name *GetFaultNames(void) const
-    {
-        return mFaultNames;
-    }
+    const Name * GetFaultNames(void) const { return mFaultNames; }
 
-    const Record *GetFaultRecords(void) const
-    {
-        return mFaultRecords;
-    }
+    const Record * GetFaultRecords(void) const { return mFaultRecords; }
 
     void ResetFaultCounters(void);
 
@@ -194,7 +176,7 @@ public:
     /**
      * Pointer to a function to be called when entering or exiting a critical section
      */
-    typedef void (*LockCbFn)(void *inLockContext);
+    typedef void (*LockCbFn)(void * inLockContext);
 
     /**
      * On multithreaded systems, the Manager's data structures need to be protected with
@@ -214,10 +196,10 @@ public:
      * @param[in] inLockContext     a void pointer to the mutex context, which is passed to the
      *                              callbacks
      */
-    void SetLockCallbacks(LockCbFn inLock, LockCbFn inUnlock, void *inLockContext)
+    void SetLockCallbacks(LockCbFn inLock, LockCbFn inUnlock, void * inLockContext)
     {
-        mLock = inLock;
-        mUnlock = inUnlock;
+        mLock        = inLock;
+        mUnlock      = inUnlock;
         mLockContext = inLockContext;
     }
 
@@ -226,14 +208,13 @@ public:
     void Unlock(void);
 
 private:
-
-    size_t  mNumFaults;
-    Record *mFaultRecords;
+    size_t mNumFaults;
+    Record * mFaultRecords;
     Name mName;
-    const Name *mFaultNames;
+    const Name * mFaultNames;
     LockCbFn mLock;
     LockCbFn mUnlock;
-    void *mLockContext;
+    void * mLockContext;
 };
 
 /**
@@ -242,7 +223,7 @@ private:
  * it can be added to an array of GetManagerFn instances and passed to
  * ParseFaultInjectionStr.
  */
-typedef Manager &(*GetManagerFn)(void);
+typedef Manager & (*GetManagerFn)(void);
 
 /**
  * A callback for the application to implement support for restarting
@@ -254,13 +235,14 @@ typedef void (*RebootCallbackFn)(void);
  * A callback to inform the application that a Manager has decided to inject a fault.
  * The main use of this type of callback is to print a log statement.
  */
-typedef void (*PostInjectionCallbackFn)(Manager *aManager, Identifier aId, Record *aFaultRecord);
+typedef void (*PostInjectionCallbackFn)(Manager * aManager, Identifier aId, Record * aFaultRecord);
 
 /**
  * A table of callbacks used by all managers.
  */
-typedef struct _GlobalCallbackTable {
-    RebootCallbackFn        mRebootCb;        /**< See RebootCallbackFn */
+typedef struct _GlobalCallbackTable
+{
+    RebootCallbackFn mRebootCb;               /**< See RebootCallbackFn */
     PostInjectionCallbackFn mPostInjectionCb; /**< See PostInjectionCallbackFn */
 } GlobalCallbackTable;
 
@@ -268,24 +250,26 @@ typedef struct _GlobalCallbackTable {
  * A structure to hold global state that is used
  * by all Managers.
  */
-typedef struct _GlobalContext {
-    GlobalCallbackTable mCbTable;             /**< A table of callbacks */
+typedef struct _GlobalContext
+{
+    GlobalCallbackTable mCbTable; /**< A table of callbacks */
 } GlobalContext;
 
-void SetGlobalContext(GlobalContext *inGlobalContext);
+void SetGlobalContext(GlobalContext * inGlobalContext);
 
-bool ParseFaultInjectionStr(char *inStr, const GetManagerFn *inArray, size_t inArraySize);
+bool ParseFaultInjectionStr(char * inStr, const GetManagerFn * inArray, size_t inArraySize);
 
 /**
  * A structure to store an array of GetManagerFn arrays, used by ParseFaultInjectionStr.
  * The main purpose of this is to pass a collection of static tables owned of GetManagerFn owned
  * by separate modules to ParseFaultInjectionStr.
  */
-typedef struct _ManagerTable {
-    const GetManagerFn *mArray;               /**< A pointer to an array of GetManagerFn */
-    size_t mNumItems;                         /**< The length of mArray */
+typedef struct _ManagerTable
+{
+    const GetManagerFn * mArray; /**< A pointer to an array of GetManagerFn */
+    size_t mNumItems;            /**< The length of mArray */
 } ManagerTable;
-bool ParseFaultInjectionStr(char *inStr, const ManagerTable *inTables, size_t inNumTables);
+bool ParseFaultInjectionStr(char * inStr, const ManagerTable * inTables, size_t inNumTables);
 
 } // namespace FaultInjection
 
@@ -306,12 +290,13 @@ bool ParseFaultInjectionStr(char *inStr, const ManagerTable *inTables, size_t in
  *                            - two or more statements, separated by ";"
  *                            - a whole C++ block, enclosed in "{}"
  */
-#define nlFAULT_INJECT( aManager, aId, aStatements ) \
-    do { \
-        if ((aManager).CheckFault(aId)) \
-        { \
-            aStatements; \
-        } \
+#define nlFAULT_INJECT(aManager, aId, aStatements)                                                                                 \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if ((aManager).CheckFault(aId))                                                                                            \
+        {                                                                                                                          \
+            aStatements;                                                                                                           \
+        }                                                                                                                          \
     } while (0)
 
 /**
@@ -336,20 +321,23 @@ bool ParseFaultInjectionStr(char *inStr, const ManagerTable *inTables, size_t in
  * @param[in] aUnprotectedStatements    C++ code to be executed if the fault is to be injected,
  *                        outside of the Manager's mutex
  */
-#define nlFAULT_INJECT_WITH_ARGS( aManager, aId, aProtectedStatements, aUnprotectedStatements ) \
-    do { \
-        uint16_t numFaultArgs = 0; \
-        int32_t *faultArgs = NULL; \
-        \
-        (aManager).Lock(); \
-        if ((aManager).CheckFault(aId, numFaultArgs, faultArgs, nl::FaultInjection::Manager::kMutexDoNotTake)) \
-        { \
-            aProtectedStatements; \
-            (aManager).Unlock(); \
-            aUnprotectedStatements; \
-        } else { \
-            (aManager).Unlock(); \
-        } \
+#define nlFAULT_INJECT_WITH_ARGS(aManager, aId, aProtectedStatements, aUnprotectedStatements)                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        uint16_t numFaultArgs = 0;                                                                                                 \
+        int32_t * faultArgs   = NULL;                                                                                              \
+                                                                                                                                   \
+        (aManager).Lock();                                                                                                         \
+        if ((aManager).CheckFault(aId, numFaultArgs, faultArgs, nl::FaultInjection::Manager::kMutexDoNotTake))                     \
+        {                                                                                                                          \
+            aProtectedStatements;                                                                                                  \
+            (aManager).Unlock();                                                                                                   \
+            aUnprotectedStatements;                                                                                                \
+        }                                                                                                                          \
+        else                                                                                                                       \
+        {                                                                                                                          \
+            (aManager).Unlock();                                                                                                   \
+        }                                                                                                                          \
     } while (0)
 
 #endif // FAULT_INJECTION_H_

@@ -1,8 +1,9 @@
 ## Content
+
 The files here originate from https://github.com/nestlabs/nlfaultinjection.git
 
-The reason for a stand-alone/reduced copy is the requirement to
-patch the `Die` function for gcc12+ to avoid a `-Warray-bounds` error.
+The reason for a stand-alone/reduced copy is the requirement to patch the `Die`
+function for gcc12+ to avoid a `-Warray-bounds` error.
 
 ## License
 
