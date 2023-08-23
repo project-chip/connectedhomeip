@@ -12,6 +12,7 @@ def process_fail(id, pr, workflow, start_time):
     logging.info("Gathering raw fail logs.")
     subprocess.run(f"gh run view -R project-chip/connectedhomeip {id} --log-failed > {output_path}/fail_logs.txt", shell=True)
 
+
 def main():
     logging.info("Gathering recent fails information into run_list.json.")
     subprocess.run("gh run list -R project-chip/connectedhomeip -b master -s failure --json databaseId,displayTitle,workflowName,startedAt > run_list.json", shell=True)
@@ -34,5 +35,7 @@ def main():
     logging.info("Conducting fail information parsing.")
     df.apply(lambda row: process_fail(row["ID"], row["Pull Request"], row["Workflow"], row["Start Time"]), axis=1)
 
+
 if __name__ == "__main__":
     main()
+
