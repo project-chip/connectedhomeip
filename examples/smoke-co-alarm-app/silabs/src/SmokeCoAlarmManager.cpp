@@ -21,24 +21,25 @@
 #include "AppTask.h"
 #include <FreeRTOS.h>
 
+#include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerDelegate.h>
 #include <lib/support/TypeTraits.h>
 
 using namespace chip;
-using namespace ::chip::app::Clusters::SmokeCoAlarm;
-using namespace ::chip::DeviceLayer;
+using namespace chip::app::Clusters::SmokeCoAlarm;
+using namespace chip::DeviceLayer;
 
 SmokeCoAlarmManager SmokeCoAlarmManager::sAlarm;
 
 TimerHandle_t sAlarmTimer;
 
+static std::array<ExpressedStateEnum, SmokeCoAlarmServer::kPriorityOrderLength> sPriorityOrder = {
+    ExpressedStateEnum::kSmokeAlarm,     ExpressedStateEnum::kInterconnectSmoke, ExpressedStateEnum::kCOAlarm,
+    ExpressedStateEnum::kInterconnectCO, ExpressedStateEnum::kHardwareFault,     ExpressedStateEnum::kTesting,
+    ExpressedStateEnum::kEndOfService,   ExpressedStateEnum::kBatteryAlert
+};
+
 CHIP_ERROR SmokeCoAlarmManager::Init()
 {
-    mExpressedStatePriority = {
-        ExpressedStateEnum::kTesting,       ExpressedStateEnum::kEndOfService,      ExpressedStateEnum::kSmokeAlarm,
-        ExpressedStateEnum::kCOAlarm,       ExpressedStateEnum::kInterconnectSmoke, ExpressedStateEnum::kInterconnectCO,
-        ExpressedStateEnum::kHardwareFault, ExpressedStateEnum::kBatteryAlert,      ExpressedStateEnum::kNormal
-    };
-
     // Create FreeRTOS sw timer for alarm timer.
     sAlarmTimer = xTimerCreate("alarmTmr",       // Just a text name, not used by the RTOS kernel
                                pdMS_TO_TICKS(1), // == default timer period
@@ -55,47 +56,7 @@ CHIP_ERROR SmokeCoAlarmManager::Init()
 
     // read current State on endpoint one
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    ExpressedStateEnum currentExpressedState;
-    bool success = SmokeCoAlarmServer::Instance().GetExpressedState(1, currentExpressedState);
-    if (success)
-    {
-        mExpressedStateMask |= (1 << to_underlying(currentExpressedState));
-    }
-
-    AlarmStateEnum currentSmokeState;
-    success = SmokeCoAlarmServer::Instance().GetSmokeState(1, currentSmokeState);
-    if (success && (currentSmokeState != AlarmStateEnum::kNormal))
-    {
-        mExpressedStateMask |= (1 << to_underlying(ExpressedStateEnum::kSmokeAlarm));
-    }
-
-    AlarmStateEnum currentCOState;
-    success = SmokeCoAlarmServer::Instance().GetCOState(1, currentCOState);
-    if (success && (currentCOState != AlarmStateEnum::kNormal))
-    {
-        mExpressedStateMask |= (1 << to_underlying(ExpressedStateEnum::kCOAlarm));
-    }
-
-    AlarmStateEnum currentBatteryAlert;
-    success = SmokeCoAlarmServer::Instance().GetBatteryAlert(1, currentBatteryAlert);
-    if (success && (currentBatteryAlert != AlarmStateEnum::kNormal))
-    {
-        mExpressedStateMask |= (1 << to_underlying(ExpressedStateEnum::kBatteryAlert));
-    }
-
-    bool currentHardwareFaultAlert;
-    success = SmokeCoAlarmServer::Instance().GetHardwareFaultAlert(1, currentHardwareFaultAlert);
-    if (success && (currentHardwareFaultAlert != false))
-    {
-        mExpressedStateMask |= (1 << to_underlying(ExpressedStateEnum::kHardwareFault));
-    }
-
-    EndOfServiceEnum currentEndOfServiceAlert;
-    success = SmokeCoAlarmServer::Instance().GetEndOfServiceAlert(1, currentEndOfServiceAlert);
-    if (success && (currentEndOfServiceAlert != EndOfServiceEnum::kNormal))
-    {
-        mExpressedStateMask |= (1 << to_underlying(ExpressedStateEnum::kEndOfService));
-    }
+    SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     mEndSelfTesting = false;
@@ -148,18 +109,8 @@ void SmokeCoAlarmManager::TimerEventHandler(TimerHandle_t xTimer)
     AppTask::GetAppTask().PostEvent(&event);
 }
 
-void SmokeCoAlarmManager::SelfTestingEventHandler(AppEvent * aEvent)
+void SmokeCoAlarmManager::SelfTestingEventHandler()
 {
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    bool success = SmokeCoAlarmServer::Instance().SetTestInProgress(1, true);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-    if (!success)
-    {
-        SILABS_LOG("Start self-testing failed");
-        return;
-    }
-
     SILABS_LOG("Start self-testing!");
 
     AlarmMgr().mEndSelfTesting = true;
@@ -171,194 +122,140 @@ void SmokeCoAlarmManager::EndSelfTestingEventHandler(AppEvent * aEvent)
     AlarmMgr().mEndSelfTesting = false;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    bool success = SmokeCoAlarmServer::Instance().SetTestInProgress(1, false);
-    if (success)
-    {
-        AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kTesting, false);
-        SILABS_LOG("End self-testing!");
-    }
+    SmokeCoAlarmServer::Instance().SetTestInProgress(1, false);
+    SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    SILABS_LOG("End self-testing!");
 }
 
-bool SmokeCoAlarmManager::OnSelfTesting()
+bool emberAfHandleEventTrigger(uint64_t eventTrigger)
 {
-    AppEvent event;
-    event.Handler = SelfTestingEventHandler;
-    AppTask::GetAppTask().PostEvent(&event);
+    SmokeCOTrigger trigger = static_cast<SmokeCOTrigger>(eventTrigger);
 
-    return true;
-}
-
-bool SmokeCoAlarmManager::ManualSelfTesting()
-{
-    bool success = false;
-
-    if ((mExpressedStateMask & 0b110010110) == 0)
+    switch (trigger)
     {
-        chip::DeviceLayer::PlatformMgr().LockChipStack();
-        success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kTesting, true);
-        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-        if (success)
-        {
-            success = OnSelfTesting();
-        }
-    }
-
-    return success;
-}
-
-bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
-{
-    bool isValidCommand = true;
-
-    switch (eventTrigger)
-    {
-    case kTriggeredEvent_WarningSmokeAlarm:
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetSmokeState(1, AlarmStateEnum::kWarning), true);
-        AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kSmokeAlarm, true);
-        break;
-
-    case kTriggeredEvent_CriticalSmokeAlarm:
+    case SmokeCOTrigger::kForceSmokeCritical:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force smoke (critical)");
         VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetSmokeState(1, AlarmStateEnum::kCritical), true);
-        AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kSmokeAlarm, true);
+        SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
-
-    case kTriggeredEvent_SmokeAlarmClear:
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetSmokeState(1, AlarmStateEnum::kNormal), true);
-        AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kSmokeAlarm, false);
+    case SmokeCOTrigger::kForceSmokeWarning:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force smoke (warning)");
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetSmokeState(1, AlarmStateEnum::kWarning), true);
+        SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
-
-    case kTriggeredEvent_WarningCOAlarm:
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetCOState(1, AlarmStateEnum::kWarning), true);
-        AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kCOAlarm, true);
-        break;
-
-    case kTriggeredEvent_CriticalCOAlarm:
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetCOState(1, AlarmStateEnum::kCritical), true);
-        AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kCOAlarm, true);
-        break;
-
-    case kTriggeredEvent_COAlarmClear:
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetCOState(1, AlarmStateEnum::kNormal), true);
-        AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kCOAlarm, false);
-        break;
-
-    case kTriggeredEvent_WarningBatteryAlert:
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kWarning), true);
-        AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kBatteryAlert, true);
-        break;
-
-    case kTriggeredEvent_CriticalBatteryAlert:
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kCritical), true);
-        AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kBatteryAlert, true);
-        break;
-
-    case kTriggeredEvent_BatteryAlertClear:
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kNormal), true);
-        AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kBatteryAlert, false);
-        break;
-
-    case kTriggeredEvent_HardwareFaultAlert:
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetHardwareFaultAlert(1, true), true);
-        AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kHardwareFault, true);
-        break;
-
-    case kTriggeredEvent_HardwareFaultAlertClear:
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetHardwareFaultAlert(1, false), true);
-        AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kHardwareFault, false);
-        break;
-
-    case kTriggeredEvent_EndofServiceAlert:
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetEndOfServiceAlert(1, EndOfServiceEnum::kExpired), true);
-        AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kEndOfService, true);
-        break;
-
-    case kTriggeredEvent_EndofServiceAlertClear:
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetEndOfServiceAlert(1, EndOfServiceEnum::kNormal), true);
-        AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kEndOfService, false);
-        break;
-
-    case kTriggeredEvent_DeviceMute:
-        SmokeCoAlarmServer::Instance().SetDeviceMuted(1, MuteStateEnum::kMuted);
-        break;
-
-    case kTriggeredEvent_DeviceMuteClear:
-        SmokeCoAlarmServer::Instance().SetDeviceMuted(1, MuteStateEnum::kNotMuted);
-        break;
-
-    case kTriggeredEvent_InterconnectSmokeAlarm:
+    case SmokeCOTrigger::kForceSmokeInterconnect:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force smoke interconnect (warning)");
         VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetInterconnectSmokeAlarm(1, AlarmStateEnum::kWarning), true);
-        AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kInterconnectSmoke, true);
+        SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
-
-    case kTriggeredEvent_InterconnectSmokeAlarmClear:
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetInterconnectSmokeAlarm(1, AlarmStateEnum::kNormal), true);
-        AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kInterconnectSmoke, false);
+    case SmokeCOTrigger::kForceCOCritical:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force CO (critical)");
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetCOState(1, AlarmStateEnum::kCritical), true);
+        SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
-
-    case kTriggeredEvent_InterconnectCOAlarm:
+    case SmokeCOTrigger::kForceCOWarning:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force CO (warning)");
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetCOState(1, AlarmStateEnum::kWarning), true);
+        SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
+        break;
+    case SmokeCOTrigger::kForceCOInterconnect:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force CO (warning)");
         VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetInterconnectCOAlarm(1, AlarmStateEnum::kWarning), true);
-        AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kInterconnectCO, true);
+        SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
-
-    case kTriggeredEvent_InterconnectCOAlarmClear:
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetInterconnectCOAlarm(1, AlarmStateEnum::kNormal), true);
-        AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kInterconnectCO, false);
+    case SmokeCOTrigger::kForceSmokeContaminationHigh:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force smoke contamination (critical)");
+        SmokeCoAlarmServer::Instance().SetContaminationState(1, ContaminationStateEnum::kCritical);
         break;
-
-    case kTriggeredEvent_ContaminationStateHigh:
-        SmokeCoAlarmServer::Instance().SetContaminationState(1, ContaminationStateEnum::kWarning);
-        break;
-
-    case kTriggeredEvent_ContaminationStateLow:
+    case SmokeCOTrigger::kForceSmokeContaminationLow:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force smoke contamination (warning)");
         SmokeCoAlarmServer::Instance().SetContaminationState(1, ContaminationStateEnum::kLow);
         break;
-
-    case kTriggeredEvent_ContaminationStateClear:
-        SmokeCoAlarmServer::Instance().SetContaminationState(1, ContaminationStateEnum::kNormal);
-        break;
-
-    case kTriggeredEvent_SensitivityLevelHigh:
+    case SmokeCOTrigger::kForceSmokeSensitivityHigh:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force smoke sensistivity (high)");
         SmokeCoAlarmServer::Instance().SetSmokeSensitivityLevel(1, SensitivityEnum::kHigh);
         break;
-
-    case kTriggeredEvent_SensitivityLevelLow:
+    case SmokeCOTrigger::kForceSmokeSensitivityLow:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force smoke sensitivity (low)");
         SmokeCoAlarmServer::Instance().SetSmokeSensitivityLevel(1, SensitivityEnum::kLow);
         break;
-
-    case kTriggeredEvent_SensitivityLevelClear:
+    case SmokeCOTrigger::kForceMalfunction:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force malfunction");
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetHardwareFaultAlert(1, true), true);
+        SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
+        break;
+    case SmokeCOTrigger::kForceLowBatteryWarning:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force low battery (warning)");
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kWarning), true);
+        SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
+        break;
+    case SmokeCOTrigger::kForceLowBatteryCritical:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force low battery (critical)");
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kCritical), true);
+        SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
+        break;
+    case SmokeCOTrigger::kForceEndOfLife:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force end-of-life");
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetEndOfServiceAlert(1, EndOfServiceEnum::kExpired), true);
+        SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
+        break;
+    case SmokeCOTrigger::kForceSilence:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force silence");
+        SmokeCoAlarmServer::Instance().SetDeviceMuted(1, MuteStateEnum::kMuted);
+        break;
+    case SmokeCOTrigger::kClearSmoke:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Clear smoke");
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetSmokeState(1, AlarmStateEnum::kNormal), true);
+        SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
+        break;
+    case SmokeCOTrigger::kClearCO:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Clear CO");
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetCOState(1, AlarmStateEnum::kNormal), true);
+        SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
+        break;
+    case SmokeCOTrigger::kClearSmokeInterconnect:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Clear smoke interconnect");
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetInterconnectSmokeAlarm(1, AlarmStateEnum::kNormal), true);
+        SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
+        break;
+    case SmokeCOTrigger::kClearCOInterconnect:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Clear CO interconnect");
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetInterconnectCOAlarm(1, AlarmStateEnum::kNormal), true);
+        SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
+        break;
+    case SmokeCOTrigger::kClearMalfunction:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Clear malfunction");
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetHardwareFaultAlert(1, false), true);
+        SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
+        break;
+    case SmokeCOTrigger::kClearEndOfLife:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Clear end-of-life");
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetEndOfServiceAlert(1, EndOfServiceEnum::kNormal), true);
+        SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
+        break;
+    case SmokeCOTrigger::kClearSilence:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Clear silence");
+        SmokeCoAlarmServer::Instance().SetDeviceMuted(1, MuteStateEnum::kNotMuted);
+        break;
+    case SmokeCOTrigger::kClearBatteryLevelLow:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Clear low battery");
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kNormal), true);
+        SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
+        break;
+    case SmokeCOTrigger::kClearContamination:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force SmokeContamination (warning)");
+        SmokeCoAlarmServer::Instance().SetContaminationState(1, ContaminationStateEnum::kNormal);
+        break;
+    case SmokeCOTrigger::kClearSensitivity:
+        ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Clear Smoke Sensitivity");
         SmokeCoAlarmServer::Instance().SetSmokeSensitivityLevel(1, SensitivityEnum::kStandard);
         break;
-
     default:
-        isValidCommand = false;
+
+        return false;
     }
 
-    return isValidCommand;
-}
-
-bool SmokeCoAlarmManager::SetExpressedState(EndpointId endpointId, ExpressedStateEnum expressedState, bool isSet)
-{
-    bool success = false;
-
-    if (isSet)
-    {
-        mExpressedStateMask |= (1 << to_underlying(expressedState));
-    }
-    else
-    {
-        mExpressedStateMask &= ~(1 << to_underlying(expressedState));
-    }
-
-    for (auto it : mExpressedStatePriority)
-    {
-        if (mExpressedStateMask & (1 << to_underlying(it)))
-        {
-            success = SmokeCoAlarmServer::Instance().SetExpressedState(endpointId, it);
-            break;
-        }
-    }
-
-    return success;
+    return true;
 }

@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/att-storage.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
+#include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
@@ -286,6 +287,9 @@ void AllClustersAppCommandHandler::OnSwitchLongPressedHandler(uint8_t newPositio
     ChipLogDetail(NotSpecified, "The new position when the momentary switch has been pressed for a long time:%d", newPosition);
 
     Clusters::SwitchServer::Instance().OnLongPress(endpoint, newPosition);
+
+    // Long press to trigger smokeco self-test
+    SmokeCoAlarmServer::Instance().RequestSelfTest(endpoint);
 }
 
 void AllClustersAppCommandHandler::OnSwitchShortReleasedHandler(uint8_t previousPosition)
