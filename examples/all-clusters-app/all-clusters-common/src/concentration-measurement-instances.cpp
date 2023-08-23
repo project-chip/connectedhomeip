@@ -25,193 +25,193 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ConcentrationMeasurement;
 
-static Instance gCarbonDioxideConcentrationMeasurementServer =
+static Instance gCarbonDioxideConcentrationMeasurementInstance =
     CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
         EndpointId(1), CarbonDioxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
-static Instance gCarbonMonoxideConcentrationMeasurementServer =
+static Instance gCarbonMonoxideConcentrationMeasurementInstance =
     CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
         EndpointId(1), CarbonMonoxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
-static Instance gNitrogenDioxideConcentrationMeasurementServer =
+static Instance gNitrogenDioxideConcentrationMeasurementInstance =
     CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
         EndpointId(1), NitrogenDioxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
-static Instance gPm1ConcentrationMeasurementServer =
+static Instance gPm1ConcentrationMeasurementInstance =
     CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
         EndpointId(1), Pm1ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
-static Instance gPm10ConcentrationMeasurementServer =
+static Instance gPm10ConcentrationMeasurementInstance =
     CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
         EndpointId(1), Pm10ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
-static Instance gPm25ConcentrationMeasurementServer =
+static Instance gPm25ConcentrationMeasurementInstance =
     CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
         EndpointId(1), Pm25ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
-static Instance gRadonConcentrationMeasurementServer =
+static Instance gRadonConcentrationMeasurementInstance =
     CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
         EndpointId(1), RadonConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
-static Instance gTotalVolatileOrganicCompoundsConcentrationMeasurementServer =
+static Instance gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance =
     CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
         EndpointId(1), TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, MeasurementMediumEnum::kAir,
         MeasurementUnitEnum::kPpm);
 
-static Instance gOzoneConcentrationMeasurementServer =
+static Instance gOzoneConcentrationMeasurementInstance =
     CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
         EndpointId(1), OzoneConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
-static Instance gFormaldehydeConcentrationMeasurementServer =
+static Instance gFormaldehydeConcentrationMeasurementInstance =
     CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
         EndpointId(1), FormaldehydeConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
 void emberAfCarbonDioxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gCarbonDioxideConcentrationMeasurementServer.Init();
+    gCarbonDioxideConcentrationMeasurementInstance.Init();
 
-    gCarbonDioxideConcentrationMeasurementServer.SetMinMeasuredValue(MakeNullable(0.0f));
-    gCarbonDioxideConcentrationMeasurementServer.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    gCarbonDioxideConcentrationMeasurementServer.SetMeasuredValue(MakeNullable(2.0f));
-    gCarbonDioxideConcentrationMeasurementServer.SetPeakMeasuredValue(MakeNullable(1.0f));
-    gCarbonDioxideConcentrationMeasurementServer.SetPeakMeasuredValueWindow(320);
-    gCarbonDioxideConcentrationMeasurementServer.SetAverageMeasuredValue(MakeNullable(1.0f));
-    gCarbonDioxideConcentrationMeasurementServer.SetAverageMeasuredValueWindow(320);
-    gCarbonDioxideConcentrationMeasurementServer.SetUncertainty(0.0f);
-    gCarbonDioxideConcentrationMeasurementServer.SetLevelValue(LevelValueEnum::kLow);
+    gCarbonDioxideConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    gCarbonDioxideConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gCarbonDioxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(2.0f));
+    gCarbonDioxideConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    gCarbonDioxideConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
+    gCarbonDioxideConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    gCarbonDioxideConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
+    gCarbonDioxideConcentrationMeasurementInstance.SetUncertainty(0.0f);
+    gCarbonDioxideConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 }
 
 void emberAfCarbonMonoxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gCarbonMonoxideConcentrationMeasurementServer.Init();
+    gCarbonMonoxideConcentrationMeasurementInstance.Init();
 
-    gCarbonMonoxideConcentrationMeasurementServer.SetMinMeasuredValue(MakeNullable(0.0f));
-    gCarbonMonoxideConcentrationMeasurementServer.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    gCarbonMonoxideConcentrationMeasurementServer.SetMeasuredValue(MakeNullable(1.0f));
-    gCarbonMonoxideConcentrationMeasurementServer.SetPeakMeasuredValue(MakeNullable(1.0f));
-    gCarbonMonoxideConcentrationMeasurementServer.SetPeakMeasuredValueWindow(320);
-    gCarbonMonoxideConcentrationMeasurementServer.SetAverageMeasuredValue(MakeNullable(1.0f));
-    gCarbonMonoxideConcentrationMeasurementServer.SetAverageMeasuredValueWindow(320);
-    gCarbonMonoxideConcentrationMeasurementServer.SetUncertainty(0.0f);
-    gCarbonMonoxideConcentrationMeasurementServer.SetLevelValue(LevelValueEnum::kLow);
+    gCarbonMonoxideConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    gCarbonMonoxideConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gCarbonMonoxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(1.0f));
+    gCarbonMonoxideConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    gCarbonMonoxideConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
+    gCarbonMonoxideConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    gCarbonMonoxideConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
+    gCarbonMonoxideConcentrationMeasurementInstance.SetUncertainty(0.0f);
+    gCarbonMonoxideConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 }
 
 void emberAfNitrogenDioxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gNitrogenDioxideConcentrationMeasurementServer.Init();
+    gNitrogenDioxideConcentrationMeasurementInstance.Init();
 
-    gNitrogenDioxideConcentrationMeasurementServer.SetMinMeasuredValue(MakeNullable(0.0f));
-    gNitrogenDioxideConcentrationMeasurementServer.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    gNitrogenDioxideConcentrationMeasurementServer.SetMeasuredValue(MakeNullable(1.0f));
-    gNitrogenDioxideConcentrationMeasurementServer.SetPeakMeasuredValue(MakeNullable(1.0f));
-    gNitrogenDioxideConcentrationMeasurementServer.SetPeakMeasuredValueWindow(320);
-    gNitrogenDioxideConcentrationMeasurementServer.SetAverageMeasuredValue(MakeNullable(1.0f));
-    gNitrogenDioxideConcentrationMeasurementServer.SetAverageMeasuredValueWindow(320);
-    gNitrogenDioxideConcentrationMeasurementServer.SetUncertainty(0.0f);
-    gNitrogenDioxideConcentrationMeasurementServer.SetLevelValue(LevelValueEnum::kLow);
+    gNitrogenDioxideConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    gNitrogenDioxideConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gNitrogenDioxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(1.0f));
+    gNitrogenDioxideConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    gNitrogenDioxideConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
+    gNitrogenDioxideConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    gNitrogenDioxideConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
+    gNitrogenDioxideConcentrationMeasurementInstance.SetUncertainty(0.0f);
+    gNitrogenDioxideConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 }
 
 void emberAfPm1ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gPm1ConcentrationMeasurementServer.Init();
+    gPm1ConcentrationMeasurementInstance.Init();
 
-    gPm1ConcentrationMeasurementServer.SetMinMeasuredValue(MakeNullable(0.0f));
-    gPm1ConcentrationMeasurementServer.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    gPm1ConcentrationMeasurementServer.SetMeasuredValue(MakeNullable(1.0f));
-    gPm1ConcentrationMeasurementServer.SetPeakMeasuredValue(MakeNullable(1.0f));
-    gPm1ConcentrationMeasurementServer.SetPeakMeasuredValueWindow(320);
-    gPm1ConcentrationMeasurementServer.SetAverageMeasuredValue(MakeNullable(1.0f));
-    gPm1ConcentrationMeasurementServer.SetAverageMeasuredValueWindow(320);
-    gPm1ConcentrationMeasurementServer.SetUncertainty(0.0f);
-    gPm1ConcentrationMeasurementServer.SetLevelValue(LevelValueEnum::kLow);
+    gPm1ConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    gPm1ConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gPm1ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(1.0f));
+    gPm1ConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    gPm1ConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
+    gPm1ConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    gPm1ConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
+    gPm1ConcentrationMeasurementInstance.SetUncertainty(0.0f);
+    gPm1ConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 }
 
 void emberAfPm10ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gPm10ConcentrationMeasurementServer.Init();
+    gPm10ConcentrationMeasurementInstance.Init();
 
-    gPm10ConcentrationMeasurementServer.SetMinMeasuredValue(MakeNullable(0.0f));
-    gPm10ConcentrationMeasurementServer.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    gPm10ConcentrationMeasurementServer.SetMeasuredValue(MakeNullable(1.0f));
-    gPm10ConcentrationMeasurementServer.SetPeakMeasuredValue(MakeNullable(1.0f));
-    gPm10ConcentrationMeasurementServer.SetPeakMeasuredValueWindow(320);
-    gPm10ConcentrationMeasurementServer.SetAverageMeasuredValue(MakeNullable(1.0f));
-    gPm10ConcentrationMeasurementServer.SetAverageMeasuredValueWindow(320);
-    gPm10ConcentrationMeasurementServer.SetUncertainty(0.0f);
-    gPm10ConcentrationMeasurementServer.SetLevelValue(LevelValueEnum::kLow);
+    gPm10ConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    gPm10ConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gPm10ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(1.0f));
+    gPm10ConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    gPm10ConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
+    gPm10ConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    gPm10ConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
+    gPm10ConcentrationMeasurementInstance.SetUncertainty(0.0f);
+    gPm10ConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 }
 
 void emberAfPm25ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gPm25ConcentrationMeasurementServer.Init();
+    gPm25ConcentrationMeasurementInstance.Init();
 
-    gPm25ConcentrationMeasurementServer.SetMinMeasuredValue(MakeNullable(0.0f));
-    gPm25ConcentrationMeasurementServer.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    gPm25ConcentrationMeasurementServer.SetMeasuredValue(MakeNullable(1.0f));
-    gPm25ConcentrationMeasurementServer.SetPeakMeasuredValue(MakeNullable(1.0f));
-    gPm25ConcentrationMeasurementServer.SetPeakMeasuredValueWindow(320);
-    gPm25ConcentrationMeasurementServer.SetAverageMeasuredValue(MakeNullable(1.0f));
-    gPm25ConcentrationMeasurementServer.SetAverageMeasuredValueWindow(320);
-    gPm25ConcentrationMeasurementServer.SetUncertainty(0.0f);
-    gPm25ConcentrationMeasurementServer.SetLevelValue(LevelValueEnum::kLow);
+    gPm25ConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    gPm25ConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gPm25ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(1.0f));
+    gPm25ConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    gPm25ConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
+    gPm25ConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    gPm25ConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
+    gPm25ConcentrationMeasurementInstance.SetUncertainty(0.0f);
+    gPm25ConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 }
 
 void emberAfRadonConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gRadonConcentrationMeasurementServer.Init();
+    gRadonConcentrationMeasurementInstance.Init();
 
-    gRadonConcentrationMeasurementServer.SetMinMeasuredValue(MakeNullable(0.0f));
-    gRadonConcentrationMeasurementServer.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    gRadonConcentrationMeasurementServer.SetMeasuredValue(MakeNullable(1.0f));
-    gRadonConcentrationMeasurementServer.SetPeakMeasuredValue(MakeNullable(1.0f));
-    gRadonConcentrationMeasurementServer.SetPeakMeasuredValueWindow(320);
-    gRadonConcentrationMeasurementServer.SetAverageMeasuredValue(MakeNullable(1.0f));
-    gRadonConcentrationMeasurementServer.SetAverageMeasuredValueWindow(320);
-    gRadonConcentrationMeasurementServer.SetUncertainty(0.0f);
-    gRadonConcentrationMeasurementServer.SetLevelValue(LevelValueEnum::kLow);
+    gRadonConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    gRadonConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gRadonConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(1.0f));
+    gRadonConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    gRadonConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
+    gRadonConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    gRadonConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
+    gRadonConcentrationMeasurementInstance.SetUncertainty(0.0f);
+    gRadonConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 }
 
 void emberAfTotalVolatileOrganicCompoundsConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gTotalVolatileOrganicCompoundsConcentrationMeasurementServer.Init();
+    gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance.Init();
 
-    gTotalVolatileOrganicCompoundsConcentrationMeasurementServer.SetMinMeasuredValue(MakeNullable(0.0f));
-    gTotalVolatileOrganicCompoundsConcentrationMeasurementServer.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    gTotalVolatileOrganicCompoundsConcentrationMeasurementServer.SetMeasuredValue(MakeNullable(1.0f));
-    gTotalVolatileOrganicCompoundsConcentrationMeasurementServer.SetPeakMeasuredValue(MakeNullable(1.0f));
-    gTotalVolatileOrganicCompoundsConcentrationMeasurementServer.SetPeakMeasuredValueWindow(320);
-    gTotalVolatileOrganicCompoundsConcentrationMeasurementServer.SetAverageMeasuredValue(MakeNullable(1.0f));
-    gTotalVolatileOrganicCompoundsConcentrationMeasurementServer.SetAverageMeasuredValueWindow(320);
-    gTotalVolatileOrganicCompoundsConcentrationMeasurementServer.SetUncertainty(0.0f);
-    gTotalVolatileOrganicCompoundsConcentrationMeasurementServer.SetLevelValue(LevelValueEnum::kLow);
+    gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(1.0f));
+    gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
+    gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
+    gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetUncertainty(0.0f);
+    gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 }
 
 void emberAfOzoneConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gOzoneConcentrationMeasurementServer.Init();
+    gOzoneConcentrationMeasurementInstance.Init();
 
-    gOzoneConcentrationMeasurementServer.SetMinMeasuredValue(MakeNullable(0.0f));
-    gOzoneConcentrationMeasurementServer.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    gOzoneConcentrationMeasurementServer.SetMeasuredValue(MakeNullable(1.0f));
-    gOzoneConcentrationMeasurementServer.SetPeakMeasuredValue(MakeNullable(1.0f));
-    gOzoneConcentrationMeasurementServer.SetPeakMeasuredValueWindow(320);
-    gOzoneConcentrationMeasurementServer.SetAverageMeasuredValue(MakeNullable(1.0f));
-    gOzoneConcentrationMeasurementServer.SetAverageMeasuredValueWindow(320);
-    gOzoneConcentrationMeasurementServer.SetUncertainty(0.0f);
-    gOzoneConcentrationMeasurementServer.SetLevelValue(LevelValueEnum::kLow);
+    gOzoneConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    gOzoneConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gOzoneConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(1.0f));
+    gOzoneConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    gOzoneConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
+    gOzoneConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    gOzoneConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
+    gOzoneConcentrationMeasurementInstance.SetUncertainty(0.0f);
+    gOzoneConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 }
 
 void emberAfFormaldehydeConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gFormaldehydeConcentrationMeasurementServer.Init();
+    gFormaldehydeConcentrationMeasurementInstance.Init();
 
-    gFormaldehydeConcentrationMeasurementServer.SetMinMeasuredValue(MakeNullable(0.0f));
-    gFormaldehydeConcentrationMeasurementServer.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    gFormaldehydeConcentrationMeasurementServer.SetMeasuredValue(MakeNullable(1.0f));
-    gFormaldehydeConcentrationMeasurementServer.SetPeakMeasuredValue(MakeNullable(1.0f));
-    gFormaldehydeConcentrationMeasurementServer.SetPeakMeasuredValueWindow(320);
-    gFormaldehydeConcentrationMeasurementServer.SetAverageMeasuredValue(MakeNullable(1.0f));
-    gFormaldehydeConcentrationMeasurementServer.SetAverageMeasuredValueWindow(320);
-    gFormaldehydeConcentrationMeasurementServer.SetUncertainty(0.0f);
-    gFormaldehydeConcentrationMeasurementServer.SetLevelValue(LevelValueEnum::kLow);
+    gFormaldehydeConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    gFormaldehydeConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gFormaldehydeConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(1.0f));
+    gFormaldehydeConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    gFormaldehydeConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
+    gFormaldehydeConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    gFormaldehydeConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
+    gFormaldehydeConcentrationMeasurementInstance.SetUncertainty(0.0f);
+    gFormaldehydeConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 }
