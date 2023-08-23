@@ -40,8 +40,6 @@ template("bl_iot_sdk") {
 
       "CFG_CHIP_BL602",
 
-      "MBEDTLS_CONFIG_FILE=\"bl602-chip-mbedtls-config.h\"",
-
       #dump backtrace
       "CONF_ENABLE_FRAME_PTR=1",
       "CONF_ENABLE_FUNC_BACKTRACE_ELF=out/bl602-light/chip-bl602-lighting-example.out",
@@ -522,7 +520,7 @@ template("bl_iot_sdk") {
     ]
   }
 
-  config("${sdk_target_name}_ble_config") {
+  config("${sdk_target_name}_config_ble") {
     include_dirs = [
       "${bl_iot_sdk_root}/components/network/ble/blecontroller/ble_inc",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/include",
@@ -613,7 +611,7 @@ template("bl_iot_sdk") {
     public_configs = [
       ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_hosal",
-      ":${sdk_target_name}_ble_config",
+      ":${sdk_target_name}_config_ble",
     ]
 
     cflags_c = [

@@ -18,10 +18,13 @@
 #pragma once
 
 #include <platform/NetworkCommissioning.h>
+#include <pkg_protocol.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
+
+void NetworkEventHandler(const ChipDeviceEvent * event, intptr_t arg);
 
 namespace {
 constexpr uint8_t kMaxWiFiNetworks                  = 1;
@@ -49,9 +52,9 @@ public:
     void Release() override {}
 
 private:
+    const size_t mSize;
+    const WiFiScanResponse * mpScanResults;
     size_t mIternum = 0;
-    size_t mSize;
-    WiFiScanResponse * mpScanResults;
 };
 
 class BLWiFiDriver final : public WiFiDriver
@@ -73,9 +76,9 @@ public:
 
     struct WiFiNetwork
     {
-        char ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength + 1];
+        char ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength];
         uint8_t ssidLen = 0;
-        char credentials[DeviceLayer::Internal::kMaxWiFiKeyLength + 1];
+        char credentials[DeviceLayer::Internal::kMaxWiFiKeyLength];
         uint8_t credentialsLen = 0;
     };
 
@@ -100,10 +103,11 @@ public:
     Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
                               uint8_t & outNetworkIndex) override;
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
+
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
     void OnConnectWiFiNetwork(bool isConnected);
-    void OnScanWiFiNetworkDone(void * arg);
-    void OnNetworkStatusChange();
+    void OnScanWiFiNetworkDone(void *opaque = NULL);
+    void OnNetworkStatusChange(void);
 
     CHIP_ERROR SetLastDisconnectReason(const ChipDeviceEvent * event);
     int32_t GetLastDisconnectReason();
@@ -116,7 +120,6 @@ public:
 
 private:
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
-    CHIP_ERROR StartScanWiFiNetworks(ByteSpan ssid);
 
     WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;
@@ -124,7 +127,8 @@ private:
     ConnectCallback * mpConnectCallback;
     NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
     int32_t mLastDisconnectedReason;
-    char mScanSSID[chip::DeviceLayer::Internal::kMaxWiFiSSIDLength + 1];
+
+    char mScanSSID[chip::DeviceLayer::Internal::kMaxWiFiSSIDLength];
     bool mScanSpecific = false;
 };
 

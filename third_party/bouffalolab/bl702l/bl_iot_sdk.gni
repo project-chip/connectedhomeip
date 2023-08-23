@@ -407,7 +407,7 @@ template("bl_iot_sdk") {
     ]
   }
 
-  config("${sdk_target_name}_ble_config") {
+  config("${sdk_target_name}_config_ble") {
     include_dirs = [
       "${bl_iot_sdk_root}/components/network/ble/btblecontroller/btble_inc",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/include",
@@ -518,7 +518,7 @@ template("bl_iot_sdk") {
     ]
     public_configs = [
       ":${sdk_target_name}_config",
-      ":${sdk_target_name}_ble_config",
+      ":${sdk_target_name}_config_ble",
     ]
 
     cflags_c = [
@@ -564,7 +564,6 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_diag.c",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_entropy.c",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_linkmetric.c",
-      "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_logging.c",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_misc.c",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_radio.c",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_settings.c",

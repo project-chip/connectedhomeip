@@ -86,7 +86,7 @@ declare_args() {
   if (chip_device_platform == "linux" || chip_device_platform == "esp32" ||
       chip_device_platform == "mbed" || chip_device_platform == "psoc6" ||
       chip_device_platform == "ameba" || chip_device_platform == "webos" ||
-      chip_device_platform == "cc32xx" || chip_device_platform == "bl602" ||
+      chip_device_platform == "cc32xx" || 
       chip_device_platform == "mw320" || chip_device_platform == "beken" ||
       chip_device_platform == "mt793x" || chip_device_platform == "asr" ||
       chip_device_platform == "openiotsdk") {
@@ -114,14 +114,6 @@ declare_args() {
 declare_args() {
   # Enable subscription resumption after timeout - separate configuration for power use measurement
   chip_subscription_timeout_resumption = chip_persist_subscriptions
-}
-
-if (chip_device_platform == "bl702" || chip_device_platform == "bl702l") {
-  if (chip_enable_openthread) {
-    chip_mdns = "platform"
-  } else {
-    chip_mdns = "minimal"
-  }
 }
 
 _chip_device_layer = "none"

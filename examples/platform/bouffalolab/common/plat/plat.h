@@ -24,8 +24,18 @@
 #define EXT_DISCOVERY_TIMEOUT_SECS 20
 
 #ifdef __cplusplus
+
 #include <lib/core/CHIPError.h>
 void appError(CHIP_ERROR error);
+
+extern "C" void platform_port_init(void);
 #else
+
 void appError(int err);
+void platform_port_init(void);
+
+#endif
+
+#if ENABLE_OPENTHREAD_BORDER_ROUTER && CONFIG_ENABLE_CHIP_SHELL
+extern void cli_otc_init(void);
 #endif

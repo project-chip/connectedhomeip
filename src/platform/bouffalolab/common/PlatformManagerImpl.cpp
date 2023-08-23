@@ -50,5 +50,21 @@ void PlatformManagerImpl::_Shutdown()
 
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
+
+CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
+{
+    if (mChipEventQueue == NULL)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+    BaseType_t status = xQueueSend(mChipEventQueue, event, 0);
+    if (status != pdTRUE)
+    {
+        ChipLogError(DeviceLayer, "Failed to post event to CHIP Platform event queue");
+        return CHIP_ERROR(chip::ChipError::Range::kOS, status);
+    }
+
+    return CHIP_NO_ERROR;
+}
 } // namespace DeviceLayer
 } // namespace chip

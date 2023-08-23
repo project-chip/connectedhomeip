@@ -22,6 +22,9 @@
 extern "C" {
 #include <hal_sys.h>
 #include <hosal_ota.h>
+#endif
+
+void hal_reboot (void);
 }
 
 using namespace chip::System;

@@ -21,9 +21,7 @@
 
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
-extern "C" {
-#include <bl_sys.h>
-}
+extern "C" void hal_reboot (void);
 
 namespace chip {
 namespace DeviceLayer {
@@ -207,7 +205,8 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
-    bl_sys_reset_por();
+
+    hal_reboot();
 }
 
 ConfigurationManager & ConfigurationMgrImpl()

@@ -8,7 +8,7 @@
 
 #include <hosal_pwm.h>
 
-#include "board.h"
+#include "mboard.h"
 #include "demo_pwm.h"
 
 #define PWM_FREQ 1000
@@ -49,7 +49,7 @@ hosal_pwm_dev_t rgb_pwm[] = {
 #endif
 };
 
-void demo_hosal_pwm_init(void)
+void demo_pwm_init(void)
 {
     /* init pwm with given settings */
     for (uint32_t i = 0; i < MAX_PWM_CHANNEL; i++)
@@ -58,7 +58,7 @@ void demo_hosal_pwm_init(void)
     }
 }
 
-void demo_hosal_pwm_start(void)
+void demo_pwm_start(void)
 {
     /* start pwm */
     for (uint32_t i = 0; i < MAX_PWM_CHANNEL; i++)
@@ -67,7 +67,7 @@ void demo_hosal_pwm_start(void)
     }
 }
 
-void demo_hosal_pwm_change_param(hosal_pwm_config_t * para)
+void demo_pwm_change_param(hosal_pwm_config_t * para)
 {
     /* change pwm param */
     for (uint32_t i = 0; i < MAX_PWM_CHANNEL; i++)
@@ -80,7 +80,7 @@ void demo_hosal_pwm_change_param(hosal_pwm_config_t * para)
     }
 }
 
-void demo_hosal_pwm_stop(void)
+void demo_pwm_stop(void)
 {
     for (uint32_t i = 0; i < MAX_PWM_CHANNEL; i++)
     {
@@ -101,7 +101,7 @@ void set_level(uint8_t currLevel)
     para.duty_cycle = currLevel * PWM_DUTY_CYCLE / 254;
     para.freq       = PWM_FREQ;
 
-    demo_hosal_pwm_change_param(&para);
+    demo_pwm_change_param(&para);
 }
 
 void set_color_red(uint8_t currLevel)
@@ -186,7 +186,7 @@ void set_color(uint8_t currLevel, uint8_t currHue, uint8_t currSat)
     para[2].duty_cycle = green * PWM_DUTY_CYCLE / 254;
     para[2].freq       = PWM_FREQ;
 
-    demo_hosal_pwm_change_param(para);
+    demo_pwm_change_param(para);
 #else
     set_level(currLevel);
 #endif

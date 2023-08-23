@@ -45,14 +45,16 @@
 #include <LEDWidget.h>
 #include <plat.h>
 
+#include <easyflash.h>
+
 extern "C" {
 #include "board.h"
 #include <bl_gpio.h>
-#include <easyflash.h>
 #include <hal_gpio.h>
 #include <hosal_gpio.h>
 }
 
+#include "mboard.h"
 #include "AppTask.h"
 
 using namespace ::chip;
@@ -134,7 +136,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     app_event_t appEvent;
     bool onoff = false;
 
-#ifndef BL706_ETHERNET
+#if !(BL702_ENABLE && CHIP_DEVICE_CONFIG_ENABLE_ETHERNET)
     sLightLED.Init();
 #endif
 
@@ -212,6 +214,13 @@ void AppTask::AppTaskMain(void * pvParameter)
                 }
             }
 
+#ifdef BOOT_PIN_RESET
+            if (APP_EVENT_BTN_LONG & appEvent) 
+            {
+                /** Turn off light to indicate button long press for factory reset is confirmed */
+                sLightLED.SetOnoff(false);
+            }
+#endif
             if (APP_EVENT_IDENTIFY_MASK & appEvent)
             {
                 IdentifyHandleOp(appEvent);
@@ -271,7 +280,6 @@ void AppTask::LightingUpdate(app_event_t status)
                 {
                     if (v.IsNull())
                     {
-                        // Just pick something.
                         v.SetNonNull(254);
                     }
 #if defined(BL706_NIGHT_LIGHT) || defined(BL602_NIGHT_LIGHT)
@@ -330,7 +338,11 @@ void AppTask::TimerEventHandler(app_event_t event)
     if (GetAppTask().mButtonPressedTime)
     {
 #ifdef BOOT_PIN_RESET
-        if (System::SystemClock().GetMonotonicMilliseconds64().count() - GetAppTask().mButtonPressedTime >= APP_BUTTON_PRESS_SHORT)
+        if (System::SystemClock().GetMonotonicMilliseconds64().count() - GetAppTask().mButtonPressedTime > APP_BUTTON_PRESS_LONG) 
+        {
+            GetAppTask().PostEvent(APP_EVENT_BTN_LONG);
+        }
+        else if (System::SystemClock().GetMonotonicMilliseconds64().count() - GetAppTask().mButtonPressedTime >= APP_BUTTON_PRESS_SHORT)
         {
 #if defined(BL602_NIGHT_LIGHT) || defined(BL706_NIGHT_LIGHT)
             /** change color to indicate to wait factory reset confirm */
@@ -403,7 +415,8 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
 }
 
 #ifdef BOOT_PIN_RESET
-hosal_gpio_dev_t gpio_key = { .port = BOOT_PIN_RESET, .config = INPUT_HIGH_IMPEDANCE, .priv = NULL };
+static hosal_gpio_dev_t gpio_key = { .port = BOOT_PIN_RESET, .config = INPUT_HIGH_IMPEDANCE, .priv = NULL };
+
 
 void AppTask::ButtonInit(void)
 {
@@ -416,16 +429,19 @@ void AppTask::ButtonInit(void)
 bool AppTask::ButtonPressed(void)
 {
     uint8_t val = 1;
+
     hosal_gpio_input_get(&gpio_key, &val);
+
     return val == 1;
 }
 
 void AppTask::ButtonEventHandler(void * arg)
 {
     uint32_t presstime;
+
     if (ButtonPressed())
     {
-#ifdef BL702L_ENABLE
+#if BL702L_ENABLE
         bl_set_gpio_intmod(gpio_key.port, HOSAL_IRQ_TRIG_NEG_LEVEL);
 #else
         bl_set_gpio_intmod(gpio_key.port, 1, HOSAL_IRQ_TRIG_NEG_LEVEL);
@@ -436,11 +452,12 @@ void AppTask::ButtonEventHandler(void * arg)
     }
     else
     {
-#ifdef BL702L_ENABLE
+#if BL702L_ENABLE
         bl_set_gpio_intmod(gpio_key.port, HOSAL_IRQ_TRIG_POS_PULSE);
 #else
         bl_set_gpio_intmod(gpio_key.port, 1, HOSAL_IRQ_TRIG_POS_PULSE);
 #endif
+
         if (GetAppTask().mButtonPressedTime)
         {
             presstime = System::SystemClock().GetMonotonicMilliseconds64().count() - GetAppTask().mButtonPressedTime;

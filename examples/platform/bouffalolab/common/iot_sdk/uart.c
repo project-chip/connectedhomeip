@@ -19,7 +19,7 @@
 #include <FreeRTOS.h>
 #include <semphr.h>
 
-#include <board.h>
+#include <mboard.h>
 
 #ifdef CFG_USB_CDC_ENABLE
 #include <aos/kernel.h>
@@ -122,6 +122,45 @@ void aosUartRxCallback(int fd, void * param)
     {
         xSemaphoreGiveFromISR(chipUart_var.sema, &xHigherPriorityTaskWoken);
     }
+}
+
+static int uartTxCallback(void * p_arg)
+{
+
+    return 0;
+}
+
+static int uartRxCallback(void * p_arg)
+{
+    uint32_t len                        = 0;
+    BaseType_t xHigherPriorityTaskWoken = 1;
+
+    if (chipUart_var.head >= chipUart_var.tail)
+    {
+        if (chipUart_var.head < MAX_BUFFER_SIZE)
+        {
+            //len = hosal_uart_receive(&uart_stdio, chipUart_var.rxbuf + chipUart_var.head, MAX_BUFFER_SIZE - chipUart_var.head);
+            chipUart_var.head = (chipUart_var.head + len) % MAX_BUFFER_SIZE;
+        }
+
+        if (0 == chipUart_var.head)
+        {
+            //len = hosal_uart_receive(&uart_stdio, chipUart_var.rxbuf, chipUart_var.tail - 1);
+            chipUart_var.head += len;
+        }
+    }
+    else
+    {
+        chipUart_var.head +=
+            //hosal_uart_receive(&uart_stdio, chipUart_var.rxbuf + chipUart_var.head, chipUart_var.tail - chipUart_var.head - 1);
+    }
+
+    if (chipUart_var.head != chipUart_var.tail)
+    {
+        xSemaphoreGiveFromISR(chipUart_var.sema, &xHigherPriorityTaskWoken);
+    }
+
+    return 0;
 }
 #endif
 

@@ -208,8 +208,6 @@ SECTIONS
     KEEP(*sdk_lwip.*.c.o(.bss.*))
     KEEP(*lwip.*.c.o(.bss.*))
 
-
-
     . = ALIGN(16);
     KEEP(*stack_main.o(.bss.*))
     

@@ -138,13 +138,12 @@ class Flasher(firmware_utils.Flasher):
 
         return boot_image_guess
 
-    def get_dts_file(self, config_path, xtal_value):
+    def get_dts_file(self, config_path, xtal_value, chip_name):
 
         for root, dirs, files in os.walk(config_path, topdown=False):
             for name in files:
                 if name.find(xtal_value) >= 0:
                     return os.path.join(config_path, name)
-
         return None
 
     def verify(self):
@@ -249,7 +248,7 @@ class Flasher(firmware_utils.Flasher):
         print(dts_path, xtal_value)
         if not dts_path and xtal_value:
             chip_config_path = os.path.join(tool_path, "chips", chip_name, "device_tree")
-            dts_path = self.get_dts_file(chip_config_path, xtal_value)
+            dts_path = self.get_dts_file(chip_config_path, xtal_value, chip_name)
             arguments.append("--dts")
             arguments.append(dts_path)
 
