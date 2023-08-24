@@ -48,7 +48,7 @@ CHIP_ERROR AmebaUtils::StartWiFi(void)
     {
         ChipLogError(DeviceLayer, "StartWiFi(): Does not support RTW_MODE_AP, change to RTW_MODE_STA_AP");
         error = matter_wifi_set_mode(RTW_MODE_STA_AP);
-        err = MapError(error, AmebaErrorType::kWiFiError);
+        err   = MapError(error, AmebaErrorType::kWiFiError);
 
         if (err != CHIP_NO_ERROR)
         {
@@ -61,7 +61,7 @@ CHIP_ERROR AmebaUtils::StartWiFi(void)
     {
         ChipLogError(DeviceLayer, "StartWiFi() setting Wi-Fi interface");
         error = matter_wifi_set_mode(RTW_MODE_STA);
-        err = MapError(error, AmebaErrorType::kWiFiError);
+        err   = MapError(error, AmebaErrorType::kWiFiError);
 
         if (err != CHIP_NO_ERROR)
         {
@@ -77,10 +77,9 @@ bool AmebaUtils::IsStationInterfaceUp(void)
 {
     /* Station mode will only be setup in Interface 0 in both station only and concurrent mode
      * Thus, only check Interface 0 for station mode
-    */
+     */
     return matter_wifi_is_up(RTW_STA_INTERFACE);
 }
-
 
 CHIP_ERROR AmebaUtils::IsStationEnabled(bool & staEnabled)
 {
@@ -97,7 +96,7 @@ bool AmebaUtils::IsStationProvisioned(void)
 CHIP_ERROR AmebaUtils::IsStationIPLinked(bool & linked)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    linked      = (matter_wifi_is_ready_to_transceive(RTW_STA_INTERFACE) == RTW_SUCCESS) ? 1 : 0;
+    linked         = (matter_wifi_is_ready_to_transceive(RTW_STA_INTERFACE) == RTW_SUCCESS) ? 1 : 0;
     return err;
 }
 
@@ -106,7 +105,6 @@ bool AmebaUtils::IsStationOpenSecurity(void)
     bool is_open_security = (matter_wifi_is_open_security()) ? 1 : 0;
     return is_open_security;
 }
-
 
 CHIP_ERROR AmebaUtils::IsStationConnected(bool & connected)
 {

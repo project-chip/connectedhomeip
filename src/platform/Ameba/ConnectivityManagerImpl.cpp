@@ -162,7 +162,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         ChipLogProgress(DeviceLayer, "WiFiDHCPCompleted");
         const bool hadIPv4Conn = mFlags.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
         const bool hadIPv6Conn = mFlags.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
-        if(!(hadIPv4Conn || hadIPv6Conn))
+        if (!(hadIPv4Conn || hadIPv6Conn))
         {
             ChipLogProgress(DeviceLayer, "WiFiDHCPCompleted: UpdateInternetConnectivityState\n");
             UpdateInternetConnectivityState();
@@ -809,9 +809,9 @@ void ConnectivityManagerImpl::RtkWiFiStationConnectedHandler(char * buf, int buf
 {
     bool stationConnected;
     Internal::AmebaUtils::IsStationConnected(stationConnected);
-    if(Internal::AmebaUtils::IsStationOpenSecurity())
+    if (Internal::AmebaUtils::IsStationOpenSecurity())
     {
-        //continue
+        // continue
     }
     else if (!stationConnected)
     {
