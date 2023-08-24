@@ -108,7 +108,7 @@ extern "C" {
 #include <stdint.h>
 
 #ifdef SIWX_917
-#include "RS1xxxx_9117.h"
+#include "si91x_device.h"
 extern uint32_t SystemCoreClock;
 #else // For EFR32
 #include "RTE_Components.h"
