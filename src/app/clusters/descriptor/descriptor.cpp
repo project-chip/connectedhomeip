@@ -53,41 +53,41 @@ private:
     CHIP_ERROR ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadClientServerAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder, bool server);
     CHIP_ERROR ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-    bool HasFeature(EndpointId endpoint, Feature feature);
+    CHIP_ERROR ReadFeatureMap(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 };
 
 constexpr uint16_t DescriptorAttrAccess::ClusterRevision;
 
-bool DescriptorAttrAccess::HasFeature(EndpointId endpoint, Feature feature)
+CHIP_ERROR DescriptorAttrAccess::ReadFeatureMap(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    bool success;
-    uint32_t featureMap;
-    success = (FeatureMap::Get(endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+    Clusters::Descriptor::Structs::SemanticTagStruct::Type tag;
+    size_t index   = 0;
+    BitFlags<Feature> featureFlags;
 
-    return success ? ((featureMap & to_underlying(feature)) != 0) : false;
+    if (GetTagListFromEndpointAtIndex(endpoint, index, tag) == CHIP_NO_ERROR)
+    {
+        featureFlags.Set(Feature::kTagList);
+    }
+    return aEncoder.Encode(featureFlags);
 }
 
 CHIP_ERROR DescriptorAttrAccess::ReadTagAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (HasFeature(endpoint, Feature::kTagList))
-    {
-        err = aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
-            CHIP_ERROR err2;
-
-            auto tagList = GetTagListFromEndpoint(endpoint, err2);
-            ReturnErrorOnFailure(err2);
-
-            for (auto & tagStruct : tagList)
-            {
-                ReturnErrorOnFailure(encoder.Encode(tagStruct));
-            }
-
+    return aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
+        Clusters::Descriptor::Structs::SemanticTagStruct::Type tag;
+        size_t index   = 0;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        while ((err = GetTagListFromEndpointAtIndex(endpoint, index, tag)) == CHIP_NO_ERROR)
+        {
+            ReturnErrorOnFailure(encoder.Encode(tag));
+            index++;
+        }
+        if (err == CHIP_ERROR_NOT_FOUND || err == CHIP_ERROR_INVALID_ARGUMENT)
+        {
             return CHIP_NO_ERROR;
-        });
-    }
-
-    return err;
+        }
+        return err;
+    });
 }
 
 CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
@@ -231,6 +231,9 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     }
     case ClusterRevision::Id: {
         return ReadClusterRevision(aPath.mEndpointId, aEncoder);
+    }
+    case FeatureMap::Id: {
+        return ReadFeatureMap(aPath.mEndpointId, aEncoder);
     }
     default: {
         break;
