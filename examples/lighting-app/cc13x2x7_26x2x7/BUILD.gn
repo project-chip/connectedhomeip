@@ -34,7 +34,6 @@ ti_simplelink_sdk("sdk") {
 }
 
 ti_sysconfig("sysconfig") {
-
   outputs = [
     "ti_radio_config.c",
     "ti_radio_config.h",
@@ -46,15 +45,11 @@ ti_sysconfig("sysconfig") {
     "ti_dmm_application_policy.h",
   ]
 
-  if(chip_enable_ota_requestor)
-  {
+  if (chip_enable_ota_requestor) {
     sources = [ "${project_dir}/chip_ota.syscfg" ]
-  }
-  else
-  {
+  } else {
     sources = [ "${project_dir}/chip.syscfg" ]
-    outputs +=
-    [
+    outputs += [
       "ti_devices_config.c",
       "ti_devices_config.h",
     ]
