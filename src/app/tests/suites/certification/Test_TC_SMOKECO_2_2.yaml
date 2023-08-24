@@ -53,8 +53,8 @@ tests:
       PICS: SMOKECO.S.A0001
       command: "subscribeAttribute"
       attribute: "SmokeState"
-      minInterval: 3
-      maxInterval: 30
+      minInterval: 1
+      maxInterval: 900
       response:
           value: 0
           constraints:

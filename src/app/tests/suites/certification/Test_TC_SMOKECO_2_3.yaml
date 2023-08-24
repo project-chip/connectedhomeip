@@ -52,8 +52,8 @@ tests:
       PICS: SMOKECO.S.A0002
       command: "subscribeAttribute"
       attribute: "COState"
-      minInterval: 3
-      maxInterval: 30
+      minInterval: 1
+      maxInterval: 900
       response:
           value: 0
           constraints:

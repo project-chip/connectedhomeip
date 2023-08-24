@@ -95,8 +95,8 @@ tests:
       PICS: SMOKECO.S.A0003
       command: "subscribeAttribute"
       attribute: "BatteryAlert"
-      minInterval: 3
-      maxInterval: 30
+      minInterval: 1
+      maxInterval: 900
       response:
           value: 0
           constraints:
@@ -107,8 +107,8 @@ tests:
       PICS: SMOKECO.S.A0008
       command: "subscribeAttribute"
       attribute: "InterconnectSmokeAlarm"
-      minInterval: 3
-      maxInterval: 30
+      minInterval: 1
+      maxInterval: 900
       keepSubscriptions: true
       response:
           value: 0
@@ -119,8 +119,8 @@ tests:
       PICS: SMOKECO.S.A0009
       command: "subscribeAttribute"
       attribute: "InterconnectCOAlarm"
-      minInterval: 3
-      maxInterval: 30
+      minInterval: 1
+      maxInterval: 900
       keepSubscriptions: true
       response:
           value: 0
@@ -131,8 +131,8 @@ tests:
       PICS: SMOKECO.S.A0002
       command: "subscribeAttribute"
       attribute: "COState"
-      minInterval: 3
-      maxInterval: 30
+      minInterval: 1
+      maxInterval: 900
       keepSubscriptions: true
       response:
           value: 0
@@ -143,8 +143,8 @@ tests:
       PICS: SMOKECO.S.A0001
       command: "subscribeAttribute"
       attribute: "SmokeState"
-      minInterval: 3
-      maxInterval: 30
+      minInterval: 1
+      maxInterval: 900
       keepSubscriptions: true
       response:
           value: 0
