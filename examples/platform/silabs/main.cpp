@@ -41,7 +41,7 @@
 /**********************************************************
  * Defines
  *********************************************************/
-#ifdef SIWX_917
+#ifdef SL_WIFI
 #define MAIN_TASK_STACK_SIZE (1024 * 8)
 #else
 #define MAIN_TASK_STACK_SIZE (1024)
