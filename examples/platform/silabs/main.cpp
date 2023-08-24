@@ -41,11 +41,8 @@
 /**********************************************************
  * Defines
  *********************************************************/
-#ifdef SIWX_917
-#define MAIN_TASK_STACK_SIZE (1024 * 8)
-#else
-#define MAIN_TASK_STACK_SIZE (1024)
-#endif
+
+#define MAIN_TASK_STACK_SIZE (1024 * 5)
 #define MAIN_TASK_PRIORITY (configMAX_PRIORITIES - 1)
 
 using namespace ::chip;

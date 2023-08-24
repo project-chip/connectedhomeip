@@ -156,6 +156,7 @@ private:
     static void RtkWiFiStationConnectedHandler(char * buf, int buf_len, int flags, void * userdata);
     static void RtkWiFiStationDisconnectedHandler(char * buf, int buf_len, int flags, void * userdata);
     static void RtkWiFiScanCompletedHandler(void);
+    static void RtkWiFiDHCPCompletedHandler(char * buf, int buf_len, int flags, void * userdata);
     void DHCPProcess(void);
     static void DHCPProcessThread(void * param);
     static int conn_callback_dispatcher(void * object);
