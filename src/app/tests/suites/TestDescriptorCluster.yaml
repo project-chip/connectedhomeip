@@ -90,7 +90,10 @@ tests:
       attribute: "TagList"
       response:
           value:
-              [{ MfgCode: null, NamespaceID: 7, Tag: 0 }, { MfgCode: null, NamespaceID: 8, Tag: 2 }]
+              [
+                  { MfgCode: null, NamespaceID: 7, Tag: 0 },
+                  { MfgCode: null, NamespaceID: 8, Tag: 2 },
+              ]
 
     - label: "Read feature map Attribute"
       command: "readAttribute"
