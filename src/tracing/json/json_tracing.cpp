@@ -19,6 +19,7 @@
 #include <tracing/json/json_tracing.h>
 
 #include <lib/address_resolve/TracingStructs.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/StringBuilder.h>
 #include <transport/TracingStructs.h>
@@ -54,7 +55,7 @@ using chip::StringBuilder;
 
 using namespace chip::Decoders;
 
-using PayloadDecoderType = chip::Decoders::PayloadDecoder<64, 256>;
+using PayloadDecoderType = chip::Decoders::PayloadDecoder<64, 2048>;
 
 /// Figures out a unique name within a json object.
 ///
@@ -226,15 +227,16 @@ void DecodePayloadData(::Json::Value & value, chip::ByteSpan payload, Protocols:
 
 #if MATTER_LOG_JSON_DECODE_FULL
 
-    PayloadDecoderType decoder(PayloadDecoderInitParams()
-                                   .SetProtocolDecodeTree(chip::TLVMeta::protocols_meta)
-                                   .SetClusterDecodeTree(chip::TLVMeta::clusters_meta)
-                                   .SetProtocol(protocolId)
-                                   .SetMessageType(messageType));
+    // As PayloadDecoder contains string buffers, allocate it over heap
+    auto decoder = chip::Platform::MakeUnique<PayloadDecoderType>(PayloadDecoderInitParams()
+                                                                      .SetProtocolDecodeTree(chip::TLVMeta::protocols_meta)
+                                                                      .SetClusterDecodeTree(chip::TLVMeta::clusters_meta)
+                                                                      .SetProtocol(protocolId)
+                                                                      .SetMessageType(messageType));
 
-    decoder.StartDecoding(payload);
+    decoder->StartDecoding(payload);
 
-    value["decoded"] = GetPayload(decoder);
+    value["decoded"] = GetPayload(*decoder);
 #endif // MATTER_LOG_JSON_DECODE_FULL
 }
 
