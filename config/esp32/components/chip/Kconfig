@@ -194,7 +194,7 @@ menu "CHIP Core"
             help
                 CHIP SDK performs LwIP core locking before calling an LwIP API.
                 To make the calls thread safe we have to enable LWIP_TCPIP_CORE_LOCKING.
-                Here, we are also enabling LWIP_CHECK_THREAD_SAFETY which will asser when
+                Here, we are also enabling LWIP_CHECK_THREAD_SAFETY which will assert when
                 LwIP code gets called from any other context or without holding the LwIP lock.
 
     endmenu # "Networking Options"
