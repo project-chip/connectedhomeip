@@ -33,7 +33,7 @@
   ],
   "endpointTypes": [
     {
-      "id": 17,
+      "id": 4,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
         "id": 56,
@@ -1048,7 +1048,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "2",
+              "defaultValue": "1",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -10512,7 +10512,7 @@
       ]
     },
     {
-      "id": 18,
+      "id": 7,
       "name": "MA-onofflight",
       "deviceTypeRef": {
         "id": 61,
@@ -12403,7 +12403,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "array",
-              "included": 1,
+              "included": 0,
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
@@ -12487,7 +12487,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "0",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -12503,7 +12503,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "2",
+              "defaultValue": "1",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -16867,7 +16867,7 @@
               "side": "server",
               "type": "AirQualityEnum",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
@@ -21528,7 +21528,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "2",
+              "defaultValue": "4",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -30613,7 +30613,7 @@
       ]
     },
     {
-      "id": 19,
+      "id": 5,
       "name": "MA-onofflight",
       "deviceTypeRef": {
         "id": 61,
@@ -32164,7 +32164,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "2",
+              "defaultValue": "1",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -34897,7 +34897,7 @@
       ]
     },
     {
-      "id": 20,
+      "id": 6,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 106,
@@ -35052,7 +35052,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "2",
+              "defaultValue": "1",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
