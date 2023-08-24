@@ -217,10 +217,7 @@ Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(const
         {
             return Status::Success;
         }
-        else
-        {
-            return Status::ConstraintError;
-        }
+        return Status::ConstraintError;
     }
     case Attributes::NumberOfRinses::Id: {
         uint8_t supportedRinseIdx = 0;
