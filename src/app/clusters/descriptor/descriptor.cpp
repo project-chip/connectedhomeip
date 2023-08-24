@@ -75,7 +75,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadTagAttribute(EndpointId endpoint, Attribute
         err = aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
             CHIP_ERROR err2;
 
-            auto tagList = emberAfTagListFromEndpoint(endpoint, err2);
+            auto tagList = GetTagListFromEndpoint(endpoint, err2);
             ReturnErrorOnFailure(err2);
 
             for (auto & tagStruct : tagList)

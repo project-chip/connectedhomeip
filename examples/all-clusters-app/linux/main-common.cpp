@@ -62,10 +62,16 @@ Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
 Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
+// Common Number Namespace: 7, tag 0 (Zero)
+constexpr const uint8_t CommonNumNamespace = 7;
+constexpr const uint8_t TagNumZero = 0;
+// Common Position Namespace: 8, tag: 2 (Top)
+constexpr const uint8_t CommonPositionNamespace = 8;
+constexpr const uint8_t TagNumTop = 2;
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type gTagList[] = {
-    { .namespaceID = 7, .tag = 0 }, // Common Number Namespace: 7, tag 0 (Zero)
-    { .namespaceID = 8, .tag = 2 }
-}; // Common Position Namespace: 8, tag: 2 (Top)
+    { .namespaceID = CommonNumNamespace, .tag = TagNumZero },
+    { .namespaceID = CommonPositionNamespace, .tag = TagNumTop }
+};
 } // namespace
 
 #ifdef EMBER_AF_PLUGIN_DISHWASHER_ALARM_SERVER
@@ -194,7 +200,7 @@ void ApplicationInit()
 #endif
     Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 
-    emberAfSetTagList(1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gTagList));
+    SetTagList(/* endpoint= */1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gTagList));
 }
 
 void ApplicationShutdown()
