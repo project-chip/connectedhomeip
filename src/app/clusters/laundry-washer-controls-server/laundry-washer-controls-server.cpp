@@ -211,7 +211,8 @@ Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(const
         }
         char buffer[LaundryWasherControlsServer::kMaxSpinSpeedLength];
         MutableCharSpan spinSpeed(buffer);
-        auto err = delegate->GetSpinSpeedAtIndex((*value), spinSpeed);
+        uint8_t spinSpeedIndex = *value;
+        auto err = delegate->GetSpinSpeedAtIndex(spinSpeedIndex, spinSpeed);
         if (err == CHIP_NO_ERROR)
         {
             return Status::Success;
@@ -222,10 +223,11 @@ Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(const
         }
     }
     case Attributes::NumberOfRinses::Id: {
-        for (uint8_t i = 0; true; i++)
+        uint8_t supportedRinseIdx = 0;
+        while (true)
         {
             NumberOfRinsesEnum supportedRinse;
-            auto err = delegate->GetSupportedRinseAtIndex(i, supportedRinse);
+            auto err = delegate->GetSupportedRinseAtIndex(supportedRinseIdx, supportedRinse);
             if (err != CHIP_NO_ERROR)
             {
                 // Can't find the attribute to be written in the supported list (CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
@@ -237,6 +239,7 @@ Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(const
                 // The written attribute is one of the supported item
                 return Status::Success;
             }
+            supportedRinseIdx++;
         }
     }
     }
