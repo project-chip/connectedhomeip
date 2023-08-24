@@ -115,6 +115,11 @@ tests:
               minValue: 0
               maxValue: 65535
 
+    - label: "Step 3b: Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
+
     - label: "Step 3b: Reboot target device(DUT)"
       verification: |
           Did the DUT successfully reboot?
@@ -126,6 +131,11 @@ tests:
                 value: "Please reboot the DUT and enter 'y' after DUT starts"
               - name: "expectedValue"
                 value: "y"
+
+    - label: "Step 3c: Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
 
     - label: "Step 3c: Reboot target device(DUT)"
       verification: |
@@ -156,13 +166,10 @@ tests:
       response:
           value: RebootCountValue + 2
 
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+    - label: "Step 3e: Reset Devices to factory defaults"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
 
     - label: "Step 3e: Reset Devices to factory defaults"
       verification: |
@@ -175,6 +182,14 @@ tests:
                 value: "Factory Reset the DUT and enter 'y' after success"
               - name: "expectedValue"
                 value: "y"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     #Issue: https://github.com/project-chip/connectedhomeip/issues/28797
     - label:
@@ -199,6 +214,11 @@ tests:
                 value: "Factory Reset the DUT and enter 'y' after success"
               - name: "expectedValue"
                 value: "y"
+
+    - label: "Step 4a: Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
 
     - label: "Step 4a:Reboot target device(DUT)"
       verification: |
@@ -241,6 +261,11 @@ tests:
               type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFE
+
+    - label: "Step 6a: Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
 
     - label: "Step 6a:Reboot target device(DUT)"
       verification: |
