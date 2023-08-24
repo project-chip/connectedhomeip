@@ -180,7 +180,7 @@ class TestRunner(TestRunnerBase):
 
             test_duration = 0
             for idx, request in enumerate(parser.tests):
-                if request.is_event and request.is_last_event_number:
+                if request.is_event and request.event_number == 'newEventsOnly':
                     request.event_number = self.last_event_number + 1
 
                 if not request.is_pics_enabled:

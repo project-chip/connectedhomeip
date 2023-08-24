@@ -123,7 +123,7 @@ tests:
       PICS: SMOKECO.S.E00
       command: "readEvent"
       event: "SmokeAlarm"
-      isLastEventNumber: true
+      eventNumber: "newEventsOnly"
       response:
           value: { AlarmSeverityLevel: 1 }
 
@@ -203,7 +203,7 @@ tests:
       PICS: SMOKECO.S.E00
       command: "readEvent"
       event: "SmokeAlarm"
-      isLastEventNumber: true
+      eventNumber: "newEventsOnly"
       response:
           value: { AlarmSeverityLevel: 2 }
 
@@ -248,6 +248,6 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      isLastEventNumber: true
+      eventNumber: "newEventsOnly"
       response:
           value: {}
