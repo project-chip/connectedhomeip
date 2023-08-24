@@ -70,8 +70,10 @@ constexpr size_t kMAX_Point_Length           = kP256_Point_Length;
 constexpr size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
 
 // Max CSR length should be relatively small since it's a single P256 key and
-// no metadata is expected to be honored by the CA.
-constexpr size_t kMAX_CSR_Length = 255;
+// no metadata is expected to be honored by the CA. This size is an implementation
+// compromise and is not spec-mandated. It is sufficiently large for a PKCS#10
+// CSR that contains approximately 150 bytes of ASN.1 extensions.
+constexpr size_t kMAX_CSR_Length = 400;
 
 constexpr size_t CHIP_CRYPTO_HASH_LEN_BYTES = kSHA256_Hash_Length;
 
