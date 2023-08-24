@@ -371,7 +371,7 @@ __LOG_LEVELS__ = {
     "--file-exclude-regex",
     # NOTE: if trying '/third_party/' note that a lot of sources are routed through
     # paths like `../../examples/chip-tool/third_party/connectedhomeip/src/`
-    default="/(repo|zzz_generated|nlfaultinjection)/",
+    default="/(repo|zzz_generated)/",
     help="Regular expression to apply to the file paths for running. Skip overrides includes.",
 )
 @click.option(
