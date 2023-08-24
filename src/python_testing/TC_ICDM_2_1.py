@@ -21,7 +21,7 @@ from mobly import asserts
 
 class TC_ICDM_2_1(MatterBaseTest):
     async def read_icdm_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.IcdManagement 
+        cluster = Clusters.Objects.IcdManagement
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     @async_test_body
