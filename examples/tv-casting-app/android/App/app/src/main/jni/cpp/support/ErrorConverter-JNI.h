@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2023 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,41 +14,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-#include "core/CastingApp.h"
-#include "support/AppParameters.h"
+#include <lib/core/CHIPError.h>
 
-#include <cstdint>
-#include <memory>
+#include <jni.h>
 
 namespace matter {
 namespace casting {
-
-namespace memory {
-
-template <typename T>
-using Weak = std::weak_ptr<T>;
-
-template <typename T>
-using Strong = std::shared_ptr<T>;
-
-} // namespace memory
-
-namespace core {
-
-class CastingApp;
-
-}; // namespace core
-
 namespace support {
 
-class AppParameters;
-class ByteSpanDataProvider;
-class ServerInitParamsProvider;
+jobject createJMatterError(CHIP_ERROR inErr);
 
-} // namespace support
-
+}; // namespace support
 }; // namespace casting
 }; // namespace matter
