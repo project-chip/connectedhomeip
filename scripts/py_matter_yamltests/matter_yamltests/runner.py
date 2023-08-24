@@ -124,9 +124,11 @@ class TestRunnerBase(ABC):
 class TestRunner(TestRunnerBase):
     """
     TestRunner is a default runner implementation.
+
+    last_event_number: The latest event number value after the readEvent command.
     """
 
-    last_event_number = 0
+    last_event_number: int = 0
 
     async def start(self):
         return
@@ -202,9 +204,11 @@ class TestRunner(TestRunnerBase):
                 test_duration += duration
 
                 if request.is_event:
-                    received_event_number = responses[-1].get('eventNumber')
-                    if received_event_number and self.last_event_number < received_event_number:
-                        self.last_event_number = received_event_number
+                    last_event = responses[-1]
+                    if isinstance(last_event, dict):
+                        received_event_number = last_event.get('eventNumber')
+                        if isinstance(received_event_number, int) and self.last_event_number < received_event_number:
+                            self.last_event_number = received_event_number
 
                 logger = request.post_process_response(responses)
 
