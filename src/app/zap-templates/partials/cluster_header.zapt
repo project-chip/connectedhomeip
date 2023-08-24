@@ -1,5 +1,10 @@
 {{pad '/*' 78 '-'}}*\
-{{pad (concat "| Cluster " (asUpperCamelCase name)) 70 ' '}}{{pad (concat "| " (asHex code 4)) 9 ' '}}|
+{{pad (concat "| Cluster " (asUpperCamelCase name)) 70 ' '~}}
+  {{~#if manufacturerCode}}
+    {{~pad (concat "| " (asMEI manufacturerCode code)) ' '}}
+  {{~else}}
+    {{~pad (concat "| " (asHex code 4)) ' '}}
+  {{~/if}} |
 {{pad "|" 79 '-'}}|
 {{pad "| Commands: " 70 ' '}}{{pad "| " 9 ' '}}|
 {{#zcl_commands_source_client}}
