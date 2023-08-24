@@ -210,7 +210,8 @@ chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::Endp
  * @param index The index of the tag, with 0 representing the first tag.
  * @param tag  The SemanticTagStruct is filled.
  */
-CHIP_ERROR GetTagListFromEndpointAtIndex(chip::EndpointId endpoint, size_t index, chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & tag);
+CHIP_ERROR GetTagListFromEndpointAtIndex(chip::EndpointId endpoint, size_t index,
+                                         chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & tag);
 
 //
 // Over-ride the device type list current associated with an endpoint with a user-provided list. The buffers backing
@@ -227,7 +228,7 @@ CHIP_ERROR emberAfSetDeviceTypeList(chip::EndpointId endpoint, chip::Span<const 
 // NOTE: It is the application's responsibility to free the existing list that is being replaced if needed.
 //
 CHIP_ERROR SetTagList(chip::EndpointId endpoint,
-                             chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList);
+                      chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList);
 
 // Register a dynamic endpoint. This involves registering descriptors that describe
 // the composition of the endpoint (encapsulated in the 'ep' argument) as well as providing

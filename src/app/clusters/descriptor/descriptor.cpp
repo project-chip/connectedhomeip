@@ -61,7 +61,7 @@ constexpr uint16_t DescriptorAttrAccess::ClusterRevision;
 CHIP_ERROR DescriptorAttrAccess::ReadFeatureMap(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     Clusters::Descriptor::Structs::SemanticTagStruct::Type tag;
-    size_t index   = 0;
+    size_t index = 0;
     BitFlags<Feature> featureFlags;
 
     if (GetTagListFromEndpointAtIndex(endpoint, index, tag) == CHIP_NO_ERROR)
