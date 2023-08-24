@@ -212,7 +212,7 @@ Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(const
         char buffer[LaundryWasherControlsServer::kMaxSpinSpeedLength];
         MutableCharSpan spinSpeed(buffer);
         uint8_t spinSpeedIndex = *value;
-        auto err = delegate->GetSpinSpeedAtIndex(spinSpeedIndex, spinSpeed);
+        auto err               = delegate->GetSpinSpeedAtIndex(spinSpeedIndex, spinSpeed);
         if (err == CHIP_NO_ERROR)
         {
             return Status::Success;
