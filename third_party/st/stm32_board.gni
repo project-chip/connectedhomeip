@@ -18,8 +18,9 @@ declare_args() {
 }
 
 if (stm32_board == "") {
-  stm32_board = getenv("STM32_BOARD")
+   stm32_board = "STM32WB5MM-DK"
 }
+
 
 assert(stm32_board != "", "stm32_board must be specified")
 
