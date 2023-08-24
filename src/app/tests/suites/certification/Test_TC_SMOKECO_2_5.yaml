@@ -797,8 +797,15 @@ tests:
           constraints:
               type: enum8
 
+    - label: "Step 56a: TH subscribes to SmokeState attribute from DUT"
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && SMOKECO.S.A0001
+      command: "subscribeAttribute"
+      attribute: "SmokeState"
+      minInterval: 1
+      maxInterval: 900
+
     - label:
-          "Step 56: TH sends TestEventTrigger command to General Diagnostics
+          "Step 56b: TH sends TestEventTrigger command to General Diagnostics
           Cluster on Endpoint 0 with EnableKey field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Smoke Alarm Test Event Clear"
@@ -1022,8 +1029,15 @@ tests:
           constraints:
               type: enum8
 
+    - label: "Step 72a: TH subscribes to COState attribute from DUT"
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && SMOKECO.S.A0002
+      command: "subscribeAttribute"
+      attribute: "COState"
+      minInterval: 1
+      maxInterval: 900
+
     - label:
-          "Step 72: TH sends TestEventTrigger command to General Diagnostics
+          "Step 72b: TH sends TestEventTrigger command to General Diagnostics
           Cluster on Endpoint 0 with EnableKey field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER for CO Alarm Test Event Clear"
