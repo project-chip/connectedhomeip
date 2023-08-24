@@ -201,7 +201,6 @@ class TestRunner(TestRunnerBase):
                 duration = round((time.time() - start) * 1000, 2)
                 test_duration += duration
 
-
                 if request.is_event:
                     received_event_number = responses[-1].get('eventNumber')
                     if received_event_number and self.last_event_number < received_event_number:
