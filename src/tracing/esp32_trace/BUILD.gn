@@ -1,4 +1,5 @@
-# Copyright (c) 2022 Project CHIP Authors
+#
+#Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,18 +16,12 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-static_library("commissioner") {
-  output_name = "libCommissionerCommands"
+config("tracing") {
+  include_dirs = [ "include" ]
+}
 
-  sources = [
-    "CommissionerCommands.cpp",
-    "CommissionerCommands.h",
-  ]
-
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
-    "${chip_root}/src/controller",
-    "${chip_root}/src/lib/support",
-  ]
+source_set("esp32_trace") {
+  public = [ "include/matter/tracing/macros_impl.h" ]
+  sources = [ "include/matter/tracing/macros_impl.cpp" ]
+  public_configs = [ ":tracing" ]
 }

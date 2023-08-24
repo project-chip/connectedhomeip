@@ -1,6 +1,11 @@
 /** {{description}} */
 {{#if generateClientCluster}}client {{else}}server {{/if~}}
-cluster {{asUpperCamelCase name}} = {{code}} {
+cluster {{asUpperCamelCase name}} = {{!}}
+     {{~#if manufacturerCode}}
+        {{~asMEI manufacturerCode code~}}
+     {{else}}
+        {{~code~}}
+     {{/if}} {
   {{#zcl_enums}}
   enum {{asUpperCamelCase name preserveAcronyms=true}} : ENUM{{multiply size 8}} {
     {{#zcl_enum_items}}
@@ -29,7 +34,12 @@ cluster {{asUpperCamelCase name}} = {{code}} {
         {{operation}}: {{role}}
       {{~#last}}) {{/last~}}
   {{~/chip_access_elements~}}
-  {{asUpperCamelCase name preserveAcronyms=true}} = {{code}} {
+  {{asUpperCamelCase name preserveAcronyms=true}} = {{!}}
+    {{~#if manufacturerCode}}
+       {{~asMEI manufacturerCode code~}}
+    {{else}}
+       {{~code~}}
+    {{/if}} {
     {{#zcl_event_fields}}
     {{>idl_structure_member label=name}}
 

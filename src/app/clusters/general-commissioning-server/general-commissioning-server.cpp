@@ -50,11 +50,7 @@ using Transport::Session;
     {                                                                                                                              \
         if (!::chip::ChipError::IsSuccess(expr))                                                                                   \
         {                                                                                                                          \
-            CHIP_ERROR statusErr = commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::code);                  \
-            if (statusErr != CHIP_NO_ERROR)                                                                                        \
-            {                                                                                                                      \
-                ChipLogError(Zcl, "%s: %" CHIP_ERROR_FORMAT, #expr, statusErr.Format());                                           \
-            }                                                                                                                      \
+            commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::code, #expr);                                  \
             return true;                                                                                                           \
         }                                                                                                                          \
     } while (false)

@@ -55,7 +55,7 @@ jobs:
         run: |
           ./scripts/run_in_build_env.sh \
             "./scripts/build/build_examples.py \
-              --target bouffalolab-bl602-iot-matter-v1-light \
+              --target bouffalolab-bl602-night-light-light \
               --target bouffalolab-bl602-iot-matter-v1-light-115200-rpc \
               build \
               --copy-artifacts-to out/artifacts \
@@ -64,7 +64,7 @@ jobs:
         run: |
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
               bl602 bl602 lighting-app \
-              out/artifacts/bouffalolab-bl602-iot-matter-v1-light/chip-bl602-lighting-example.out \
+              out/artifacts/bouffalolab-bl602-night-light-light/chip-bl602-lighting-example.out \
               /tmp/bloat_reports/
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
               bl602 bl602+rpc lighting-app \
@@ -77,7 +77,9 @@ jobs:
         run: |
           ./scripts/run_in_build_env.sh \
             "./scripts/build/build_examples.py \
-              --target bouffalolab-xt-zb6-devkit-light \
+              --target bouffalolab-bl706-night-light-light \
+              --target bouffalolab-bl706-eth-light \
+              --target bouffalolab-bl706-wifi-light \
               --target bouffalolab-xt-zb6-devkit-light-115200-rpc \
               build \
               --copy-artifacts-to out/artifacts \
@@ -86,7 +88,15 @@ jobs:
         run: |
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
               bl702 bl702 lighting-app \
-              out/artifacts/bouffalolab-xt-zb6-devkit-light/chip-bl702-lighting-example.out \
+              out/artifacts/bouffalolab-bl706-night-light-light/chip-bl702-lighting-example.out \
+              /tmp/bloat_reports/
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+              bl702 bl706-eth lighting-app \
+              out/artifacts/bouffalolab-bl706-eth-light/chip-bl702-lighting-example.out \
+              /tmp/bloat_reports/
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+              bl702 bl706-wifi lighting-app \
+              out/artifacts/bouffalolab-bl706-wifi-light/chip-bl702-lighting-example.out \
               /tmp/bloat_reports/
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
               bl702 bl702+rpc lighting-app \
