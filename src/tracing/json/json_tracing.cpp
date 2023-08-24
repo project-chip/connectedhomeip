@@ -227,7 +227,7 @@ void DecodePayloadData(::Json::Value & value, chip::ByteSpan payload, Protocols:
 
 #if MATTER_LOG_JSON_DECODE_FULL
 
-    // As PayloadDecoder contains string buffers, allocate it over heap
+    // As PayloadDecoder is quite large (large strings buffers), we place it in heap
     auto decoder = chip::Platform::MakeUnique<PayloadDecoderType>(PayloadDecoderInitParams()
                                                                       .SetProtocolDecodeTree(chip::TLVMeta::protocols_meta)
                                                                       .SetClusterDecodeTree(chip::TLVMeta::clusters_meta)
