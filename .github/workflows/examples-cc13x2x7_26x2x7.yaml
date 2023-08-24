@@ -117,7 +117,7 @@ jobs:
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cc13x4_26x4 LP_EM_CC1354P10_6 lighting-app \
-                    out/artifacts/ti-cc13x4_26x4-lighting/chip-LP_EM_CC1354P10_6-lighting-example.out \
+                    out/artifacts/ti-cc13x4_26x4-lighting-mtd/chip-LP_EM_CC1354P10_6-lighting-example.out \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
