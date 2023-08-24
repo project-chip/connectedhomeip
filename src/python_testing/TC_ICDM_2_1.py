@@ -21,7 +21,7 @@ from mobly import asserts
 
 class TC_ICDM_2_1(MatterBaseTest):
     async def read_icdm_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.ICDManagement
+        cluster = Clusters.Objects.IcdManagement 
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     @async_test_body
@@ -30,7 +30,7 @@ class TC_ICDM_2_1(MatterBaseTest):
         endpoint = self.user_params.get("endpoint", 0)
 
         self.print_step(1, "Commissioning, already done")
-        attributes = Clusters.ICDManagement.Attributes
+        attributes = Clusters.IcdManagement.Attributes
         idleModeInterval = 0
 
         # Idle Mode Interval attribute test
