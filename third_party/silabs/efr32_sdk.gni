@@ -692,11 +692,11 @@ template("efr32_sdk") {
     if (enable_dic) {
       sources += [
         "${chip_root}/third_party/silabs/mqtt/stack/mqtt.c",
-        "${efr32_sdk_root}/util/third_party/mbedtls/library/rsa_alt_helpers.c",
-        "${efr32_sdk_root}/util/third_party/mbedtls/library/rsa.c",
+        "${efr32_sdk_root}/util/third_party/mbedtls/library/ctr_drbg.c",
         "${efr32_sdk_root}/util/third_party/mbedtls/library/entropy.c",
         "${efr32_sdk_root}/util/third_party/mbedtls/library/entropy_poll.c",
-        "${efr32_sdk_root}/util/third_party/mbedtls/library/ctr_drbg.c",
+        "${efr32_sdk_root}/util/third_party/mbedtls/library/rsa.c",
+        "${efr32_sdk_root}/util/third_party/mbedtls/library/rsa_alt_helpers.c",
       ]
     }
 
