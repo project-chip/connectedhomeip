@@ -81,9 +81,6 @@ config:
     TTEST_EVENT_TRIGGER_SENSITIVITY_LEVEL_CLEAR:
         type: int64u
         defaultValue: "0xffffffff000000a8"
-    EVENT_NUMBER:
-        type: int64u
-        defaultValue: 0
 
 tests:
     - label: "Step 1: Commission DUT to TH"
@@ -114,6 +111,11 @@ tests:
           value: 0
           constraints:
               type: enum8
+
+    - label: "TH gets last event number from DUT"
+      PICS: SMOKECO.S.E0a
+      command: "readEvent"
+      event: "AllClear"
 
     - label:
           "Step 4: TH reads TestEventTriggersEnabled attribute from General
@@ -161,7 +163,7 @@ tests:
       PICS: SMOKECO.S.A0008 && SMOKECO.S.E08
       command: "readEvent"
       event: "InterconnectSmokeAlarm"
-      EVENT_NUMBER: EVENT_NUMBER + 1
+      eventNumber: "newEventsOnly"
       response:
           value: { AlarmSeverityLevel: interconnectSmokeAlarmSeverityLevel }
 
@@ -216,7 +218,7 @@ tests:
       PICS: SMOKECO.S.A0008 && SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      EVENT_NUMBER: EVENT_NUMBER + 2
+      eventNumber: "newEventsOnly"
       response:
           value: {}
 
@@ -274,7 +276,7 @@ tests:
       PICS: SMOKECO.S.A0009 && SMOKECO.S.E09
       command: "readEvent"
       event: "InterconnectCOAlarm"
-      EVENT_NUMBER: EVENT_NUMBER + 3
+      eventNumber: "newEventsOnly"
       response:
           value: { AlarmSeverityLevel: interconnectCOAlarmSeverityLevel }
 
@@ -329,7 +331,7 @@ tests:
       PICS: SMOKECO.S.A0009 && SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      EVENT_NUMBER: EVENT_NUMBER + 4
+      eventNumber: "newEventsOnly"
       response:
           value: {}
 
@@ -687,7 +689,7 @@ tests:
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && SMOKECO.S.E06
       command: "readEvent"
       event: "AlarmMuted"
-      EVENT_NUMBER: EVENT_NUMBER + 5
+      eventNumber: "newEventsOnly"
       response:
           value: {}
 
@@ -724,7 +726,7 @@ tests:
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && SMOKECO.S.E07
       command: "readEvent"
       event: "MuteEnded"
-      EVENT_NUMBER: EVENT_NUMBER + 6
+      eventNumber: "newEventsOnly"
       response:
           value: {}
 
@@ -919,7 +921,7 @@ tests:
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && SMOKECO.S.E06
       command: "readEvent"
       event: "AlarmMuted"
-      EVENT_NUMBER: EVENT_NUMBER + 7
+      eventNumber: "newEventsOnly"
       response:
           value: {}
 
@@ -956,7 +958,7 @@ tests:
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && SMOKECO.S.E07
       command: "readEvent"
       event: "MuteEnded"
-      EVENT_NUMBER: EVENT_NUMBER + 8
+      eventNumber: "newEventsOnly"
       response:
           value: {}
 

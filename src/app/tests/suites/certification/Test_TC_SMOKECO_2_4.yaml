@@ -48,9 +48,6 @@ config:
     TEST_EVENT_TRIGGER_END_OF_SERVICE_ALERT_CLEAR:
         type: int64u
         defaultValue: "0xffffffff000000aa"
-    EVENT_NUMBER:
-        type: int64u
-        defaultValue: 0
 
 tests:
     - label: "Step 1: Commission DUT to TH"
@@ -80,6 +77,11 @@ tests:
           value: 0
           constraints:
               type: enum8
+
+    - label: "TH gets last event number from DUT"
+      PICS: SMOKECO.S.E0a
+      command: "readEvent"
+      event: "AllClear"
 
     - label:
           "Step 4: TH reads TestEventTriggersEnabled attribute from General
@@ -133,7 +135,7 @@ tests:
       PICS: SMOKECO.S.E02
       command: "readEvent"
       event: "LowBattery"
-      EVENT_NUMBER: EVENT_NUMBER + 1
+      eventNumber: "newEventsOnly"
       response:
           value: { AlarmSeverityLevel: 1 }
 
@@ -178,7 +180,7 @@ tests:
       PICS: SMOKECO.S.E02
       command: "readEvent"
       event: "LowBattery"
-      EVENT_NUMBER: EVENT_NUMBER + 2
+      eventNumber: "newEventsOnly"
       response:
           value: { AlarmSeverityLevel: 2 }
 
@@ -223,7 +225,7 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      EVENT_NUMBER: EVENT_NUMBER + 3
+      eventNumber: "newEventsOnly"
       response:
           value: {}
 
@@ -279,7 +281,7 @@ tests:
       PICS: SMOKECO.S.E03
       command: "readEvent"
       event: "HardwareFault"
-      EVENT_NUMBER: EVENT_NUMBER + 4
+      eventNumber: "newEventsOnly"
       response:
           value: {}
 
@@ -325,7 +327,7 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      EVENT_NUMBER: EVENT_NUMBER + 5
+      eventNumber: "newEventsOnly"
       response:
           value: {}
 
@@ -381,7 +383,7 @@ tests:
       PICS: SMOKECO.S.E04
       command: "readEvent"
       event: "EndOfService"
-      EVENT_NUMBER: EVENT_NUMBER + 6
+      eventNumber: "newEventsOnly"
       response:
           value: {}
 
@@ -427,7 +429,7 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      EVENT_NUMBER: EVENT_NUMBER + 7
+      eventNumber: "newEventsOnly"
       response:
           value: {}
 
@@ -499,7 +501,7 @@ tests:
       PICS: SMOKECO.S.E05
       command: "readEvent"
       event: "SelfTestComplete"
-      EVENT_NUMBER: EVENT_NUMBER + 8
+      eventNumber: "newEventsOnly"
       response:
           value: {}
 
@@ -516,7 +518,7 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      EVENT_NUMBER: EVENT_NUMBER + 9
+      eventNumber: "newEventsOnly"
       response:
           value: {}
 
@@ -561,7 +563,7 @@ tests:
       PICS: SMOKECO.S.E05
       command: "readEvent"
       event: "SelfTestComplete"
-      EVENT_NUMBER: EVENT_NUMBER + 10
+      eventNumber: "newEventsOnly"
       response:
           value: {}
 
@@ -578,6 +580,6 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      EVENT_NUMBER: EVENT_NUMBER + 11
+      eventNumber: "newEventsOnly"
       response:
           value: {}
