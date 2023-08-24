@@ -14,7 +14,7 @@ struct bridge_endpoint {
   - descriptor
 }
 
-class unify_node_state_monitor {
+class unify_node_state_monitor #Beige {
   onNodeAdded()
   onNodeDeleted()
   onNodeStateChanged()
@@ -26,7 +26,6 @@ class device_type_translator {
 
 class matter_app_interface {
   register_dynamic_endpoint()
-  enable_dynamic_endpoint()
   registerAttributeAccessOverride()
   RegisterCommandHandler()
 }
@@ -42,7 +41,7 @@ class unify_matter_bridge {
   LinuxAppMain()
 }
 
-class uic_mqtt_interface {
+class uic_mqtt_interface #Beige {
   publish(topic, message)
   subscribe(topic, callback)
 }
