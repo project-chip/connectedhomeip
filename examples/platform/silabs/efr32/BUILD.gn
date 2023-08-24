@@ -133,11 +133,6 @@ source_set("efr-matter-shell") {
 
 config("attestation-credentials-config") {
   include_dirs = [ "${chip_root}" ]
-
-  defines = [
-    # Set to 1 to enable EFR32 attestation credentials
-    "SILABS_ATTESTATION_CREDENTIALS",
-  ]
 }
 
 source_set("efr32-attestation-credentials") {
@@ -310,9 +305,7 @@ source_set("efr32-common") {
   }
 
   # Attestation Credentials
-  if (chip_build_platform_attestation_credentials_provider) {
-    public_deps += [ ":efr32-attestation-credentials" ]
-  }
+  public_deps += [ ":efr32-attestation-credentials" ]
 
   # Factory Data Provider
   if (use_efr32_factory_data_provider) {
