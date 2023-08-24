@@ -157,6 +157,81 @@ def check_non_empty_list_of_ints_in_range(min_value: int, max_value: int, max_si
     return check_list_of_ints_in_range(min_value, max_value, min_size=1, max_size=max_size, allow_null=allow_null)
 
 
+def separate_endpoint_types(endpoint_dict: dict[int, Any]) -> tuple[list[int], list[int]]:
+    """Returns a tuple containing the list of flat endpoints and a list of tree endpoints"""
+    flat = []
+    tree = []
+    for endpoint_id, endpoint in endpoint_dict.items():
+        if endpoint_id == 0:
+            continue
+        aggregator_id = 0x000e
+        device_types = [d.deviceType for d in endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
+        if aggregator_id in device_types:
+            flat.append(endpoint_id)
+        else:
+            tree.append(endpoint_id)
+    return (flat, tree)
+
+
+def get_all_children(endpoint_id, endpoint_dict: dict[int, Any]):
+    """Returns all the children (include subchildren) of the given endpoint
+       This assumes we've already checked that there are no cycles, so we can do the dumb things and just trace the tree
+    """
+    children = []
+
+    def add_children(endpoint_id, children):
+        immediate_children = endpoint_dict[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
+        if len(immediate_children) == 0:
+            return
+        children.extend(immediate_children)
+        for child in immediate_children:
+            add_children(child, children)
+
+    add_children(endpoint_id, children)
+    return children
+
+
+def find_tree_roots(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) -> set[int]:
+    """Returns a set of all the endpoints in tree_endpoints that are roots for a tree (not include singletons)"""
+    tree_roots = []
+
+    def find_tree_root(current_id):
+        for endpoint_id, endpoint in endpoint_dict.items():
+            if endpoint_id not in tree_endpoints:
+                continue
+            if current_id in endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
+                # this is not the root, move up
+                return find_tree_root(endpoint_id)
+        return current_id
+
+    for endpoint_id in tree_endpoints:
+        root = find_tree_root(endpoint_id)
+        if root != endpoint_id:
+            tree_roots.append(root)
+    return set(tree_roots)
+
+
+def parts_list_cycles(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) -> list[int]:
+    """Returns a list of all the endpoints in the tree_endpoints list that contain cycles"""
+    def parts_list_cycle_detect(visited: set, current_id: int) -> bool:
+        if current_id in visited:
+            return True
+        visited.add(current_id)
+        for child in endpoint_dict[current_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
+            child_has_cycles = parts_list_cycle_detect(visited, child)
+            if child_has_cycles:
+                return True
+        return False
+
+    cycles = []
+    # This is quick enough that we can do all the endpoints wihtout searching for the roots
+    for endpoint_id in tree_endpoints:
+        visited = set()
+        if parts_list_cycle_detect(visited, endpoint_id):
+            cycles.append(endpoint_id)
+    return cycles
+
+
 class TC_DeviceBasicComposition(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
@@ -425,8 +500,66 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         asserts.skip(
             "TODO: Make a test that verifies each endpoint has valid set of device types, and that the device type conformance is respected for each")
 
-    def test_topology_is_valid(self):
-        asserts.skip("TODO: Make a test that verifies each endpoint only lists direct descendants, except Root Node and Aggregator endpoints that list all their descendants")
+    def test_TC_SM_1_2(self):
+        self.print_step(1, "Wildcard read of device - already done")
+
+        self.print_step(2, "Verify the Descriptor cluster PartsList on endpoint 0 exactly lists all the other (non-0) endpoints on the DUT")
+        parts_list_0 = self.endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
+        cluster_id = Clusters.Descriptor.id
+        attribute_id = Clusters.Descriptor.Attributes.PartsList.attribute_id
+        location = AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=attribute_id)
+        if len(self.endpoints.keys()) != len(set(self.endpoints.keys())):
+            self.record_error(self.get_test_name(), location=location,
+                              problem='duplicate endpoint ids found in the returned data', spec_location="PartsList Attribute")
+            self.fail_current_test()
+
+        if len(parts_list_0) != len(set(parts_list_0)):
+            self.record_error(self.get_test_name(), location=location,
+                              problem='Duplicate endpoint ids found in the parts list on ep0', spec_location="PartsList Attribute")
+            self.fail_current_test()
+
+        expected_parts = set(self.endpoints.keys())
+        expected_parts.remove(0)
+        if set(parts_list_0) != expected_parts:
+            self.record_error(self.get_test_name(), location=location,
+                              problem='EP0 Descriptor parts list does not match the set of returned endpoints', spec_location="PartsList Attribute")
+            self.fail_current_test()
+
+        self.print_step(
+            3, "For each endpoint on the DUT (including EP 0), verify the PartsList in the Descriptor cluster on that endpoint does not include itself")
+        for endpoint_id, endpoint in self.endpoints.items():
+            if endpoint_id in endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+                self.record_error(self.get_test_name(), location=location,
+                                  problem=f"Endpoint {endpoint_id} parts list includes itself", spec_location="PartsList Attribute")
+                self.fail_current_test()
+
+        self.print_step(4, "Separate endpoints into flat and tree style")
+        flat, tree = separate_endpoint_types(self.endpoints)
+
+        self.print_step(5, "Check for cycles in the tree endpoints")
+        cycles = parts_list_cycles(tree, self.endpoints)
+        if len(cycles) != 0:
+            for id in cycles:
+                location = AttributePathLocation(endpoint_id=id, cluster_id=cluster_id, attribute_id=attribute_id)
+                self.record_error(self.get_test_name(), location=location,
+                                  problem=f"Endpoint {id} parts list includes a cycle", spec_location="PartsList Attribute")
+            self.fail_current_test()
+
+        self.print_step(6, "Check flat lists include all sub ids")
+        ok = True
+        for endpoint_id in flat:
+            # ensure that every sub-id in the parts list is included in the parent
+            sub_children = []
+            for child in self.endpoints[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
+                sub_children.extend(get_all_children(child))
+            if not all(item in sub_children for item in self.endpoints[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]):
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+                self.record_error(self.get_test_name(), location=location,
+                                  problem='Flat parts list does not include all the sub-parts', spec_location='Endpoint composition')
+                ok = False
+        if not ok:
+            self.fail_current_test()
 
     def test_TC_PS_3_1(self):
         BRIDGED_NODE_DEVICE_TYPE_ID = 0x13

@@ -25,6 +25,7 @@ from chip.tlv import uint
 from matter_testing_support import (MatterBaseTest, async_test_body, compare_time, default_matter_test_main,
                                     get_wait_seconds_from_set_time, parse_pics, type_matches, utc_time_in_matter_epoch)
 from mobly import asserts, signals
+from TC_DeviceBasicComposition import find_tree_roots, get_all_children, parts_list_cycles, separate_endpoint_types
 
 
 def get_raw_type_list():
@@ -199,6 +200,117 @@ class TestMatterTestingSupport(MatterBaseTest):
         asserts.assert_equal(secs, 4)
         secs = get_wait_seconds_from_set_time(th_utc, 15)
         asserts.assert_equal(secs, 14)
+
+    def create_example_topology(self):
+        """Creates a limited example of a wildcard read that contains only the descriptor cluster parts list and device types"""
+        def create_endpoint(parts_list: list[uint], device_types: list[uint]):
+            endpoint = {}
+            device_types_structs = []
+            for device_type in device_types:
+                device_types_structs.append(Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=device_type, revision=1))
+            endpoint[Clusters.Descriptor] = {Clusters.Descriptor.Attributes.PartsList: parts_list,
+                                             Clusters.Descriptor.Attributes.DeviceTypeList: device_types_structs}
+            return endpoint
+
+        endpoints = {}
+        # Root node is 0
+        # We have two trees in the root node and two trees in the aggregator
+        # 2 - 1
+        #   - 3 - 4
+        #       - 5 - 9
+        # 6 - 7
+        #   - 8
+        # 10
+        # 11 (aggregator - all remaining are under it)
+        # 13 - 12
+        #    - 14 - 15
+        #         - 16
+        # 17 - 18
+        #    - 19
+        # 20
+        # 21
+        endpoints[0] = create_endpoint([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21], [22])
+        endpoints[1] = create_endpoint([], [1])  # Just using a random device id, as long as it's not the aggregator it's fine
+        endpoints[2] = create_endpoint([1, 3], [1])
+        endpoints[3] = create_endpoint([4, 5], [1])
+        endpoints[4] = create_endpoint([], [1])
+        endpoints[5] = create_endpoint([9], [1])
+        endpoints[6] = create_endpoint([7, 8], [1])
+        endpoints[7] = create_endpoint([], [1])
+        endpoints[8] = create_endpoint([], [1])
+        endpoints[9] = create_endpoint([], [1])
+        endpoints[10] = create_endpoint([], [1])
+        endpoints[11] = create_endpoint([12, 13, 14, 15, 16, 17, 18, 19, 20, 21], [0xe])  # aggregator device type
+        endpoints[12] = create_endpoint([], [1])
+        endpoints[13] = create_endpoint([12, 14], [1])
+        endpoints[14] = create_endpoint([15, 16], [1])
+        endpoints[15] = create_endpoint([], [1])
+        endpoints[16] = create_endpoint([], [1])
+        endpoints[17] = create_endpoint([18, 19], [1])
+        endpoints[18] = create_endpoint([], [1])
+        endpoints[19] = create_endpoint([], [1])
+        endpoints[20] = create_endpoint([], [1])
+        endpoints[21] = create_endpoint([], [1])
+
+        return endpoints
+
+    def test_cycle_detection_and_splitting(self):
+        # Example topology has no cycles
+        endpoints = self.create_example_topology()
+        flat, tree = separate_endpoint_types(endpoints)
+        asserts.assert_equal(len(flat), len(set(flat)), "Duplicate endpoints found in flat list")
+        asserts.assert_equal(len(tree), len(set(tree)), "Duplicate endpoints found in tree list")
+        asserts.assert_equal(set(flat), {11}, "Aggregator node not found in list")
+        asserts.assert_equal(set(tree), {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21})
+
+        cycles = parts_list_cycles(tree, endpoints)
+        asserts.assert_equal(len(cycles), 0, "Found cycles in the example tree")
+
+        # Add in several cycles and make sure we detect them all
+        # ep 10 refers back to itself (0 level cycle) on 10
+        endpoints[10][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(10)
+        cycles = parts_list_cycles(tree, endpoints)
+        asserts.assert_equal(cycles, [10])
+        endpoints[10][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].remove(10)
+        print(endpoints[10])
+
+        # ep 4 refers back to 3 (1 level cycle) on 3 (will include 2, 3 and 4 in the cycles list)
+        endpoints[4][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(3)
+        cycles = parts_list_cycles(tree, endpoints)
+        asserts.assert_equal(cycles, [2, 3, 4])
+        endpoints[4][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].remove(3)
+
+        # ep 16 refers back to 13 (2 level cycle) on 13 (will include 13, 14 and 16 in cycles)
+        endpoints[16][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(13)
+        cycles = parts_list_cycles(tree, endpoints)
+        asserts.assert_equal(cycles, [13, 14, 16])
+        endpoints[16][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].remove(13)
+
+        # ep 9 refers back to 2 (3 level cycle) on 2 (includes 2, 3, 5, and 9)
+        endpoints[9][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(2)
+        cycles = parts_list_cycles(tree, endpoints)
+        asserts.assert_equal(cycles, [2, 3, 5, 9])
+        endpoints[9][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].remove(2)
+
+        # make sure we get them all
+        endpoints[10][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(10)
+        endpoints[4][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(3)
+        endpoints[16][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(13)
+        endpoints[9][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(2)
+        cycles = parts_list_cycles(tree, endpoints)
+        asserts.assert_equal(cycles, [2, 3, 4, 5, 9, 10, 13, 14, 16])
+
+    def test_get_all_children(self):
+        endpoints = self.create_example_topology()
+        asserts.assert_equal(get_all_children(2, endpoints), [1, 3, 4, 5, 9], "Child list for ep2 is incorrect")
+        asserts.assert_equal(get_all_children(6, endpoints), [7, 8], "Child list for ep6 is incorrect")
+        asserts.assert_equal(get_all_children(13, endpoints), [12, 14, 15, 16], "Child list for ep13 is incorrect")
+        asserts.assert_equal(get_all_children(17, endpoints), [18, 19], "Child list for ep17 is incorrect")
+
+    def test_get_tree_roots(self):
+        endpoints = self.create_example_topology()
+        _, tree = separate_endpoint_types(endpoints)
+        asserts.assert_equal(find_tree_roots(tree, endpoints), {2, 6, 13, 17}, "Incorrect tree root list")
 
 
 if __name__ == "__main__":
