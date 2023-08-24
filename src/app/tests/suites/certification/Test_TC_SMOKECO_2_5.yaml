@@ -615,7 +615,6 @@ tests:
       attribute: "SmokeState"
       minInterval: 1
       maxInterval: 900
-      keepSubscriptions: true
       response:
           value: 0
           constraints:
@@ -649,8 +648,15 @@ tests:
           constraints:
               type: enum8
 
+    - label: "Step 46a: TH subscribes to DeviceMuted attribute from DUT"
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F00
+      command: "subscribeAttribute"
+      attribute: "DeviceMuted"
+      minInterval: 1
+      maxInterval: 900
+
     - label:
-          "Step 46: TH sends TestEventTrigger command to General Diagnostics
+          "Step 46n: TH sends TestEventTrigger command to General Diagnostics
           Cluster on Endpoint 0 with EnableKey field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event"
@@ -722,8 +728,15 @@ tests:
       response:
           value: {}
 
+    - label: "Step 52a: TH subscribes to SmokeState attribute from DUT"
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && SMOKECO.S.A0001
+      command: "subscribeAttribute"
+      attribute: "SmokeState"
+      minInterval: 1
+      maxInterval: 900
+
     - label:
-          "Step 52: TH sends TestEventTrigger command to General Diagnostics
+          "Step 52b: TH sends TestEventTrigger command to General Diagnostics
           Cluster on Endpoint 0 with EnableKey field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Critical Smoke Alarm Test Event"
@@ -827,7 +840,6 @@ tests:
       attribute: "COState"
       minInterval: 1
       maxInterval: 900
-      keepSubscriptions: true
       response:
           value: 0
           constraints:
@@ -861,8 +873,15 @@ tests:
           constraints:
               type: enum8
 
+    - label: "Step 62a: TH subscribes to DeviceMuted attribute from DUT"
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F01
+      command: "subscribeAttribute"
+      attribute: "DeviceMuted"
+      minInterval: 1
+      maxInterval: 900
+
     - label:
-          "Step 62: TH sends TestEventTrigger command to General Diagnostics
+          "Step 62b: TH sends TestEventTrigger command to General Diagnostics
           Cluster on Endpoint 0 with EnableKey field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event"
@@ -934,8 +953,15 @@ tests:
       response:
           value: {}
 
+    - label: "Step 68a: TH subscribes to COState attribute from DUT"
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && SMOKECO.S.A0002
+      command: "subscribeAttribute"
+      attribute: "COState"
+      minInterval: 1
+      maxInterval: 900
+
     - label:
-          "Step 68: TH sends TestEventTrigger command to General Diagnostics
+          "Step 68b: TH sends TestEventTrigger command to General Diagnostics
           Cluster on Endpoint 0 with EnableKey field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Critical CO Alarm Test Event"
