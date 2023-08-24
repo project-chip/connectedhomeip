@@ -45,39 +45,6 @@ constexpr uint8_t kSeqTag             = 0x30u;
 constexpr size_t kMinSequenceOverhead = 1 /* tag */ + 1 /* length */ + 1 /* actual data or second length byte*/;
 
 /**
- * @brief Utility to read a length field after a tag in a DER-encoded stream.
- * @param[in] reader Reader instance from which the input will be read
- * @param[out] length Length of the following element read from the stream
- * @return CHIP_ERROR_INVALID_ARGUMENT or CHIP_ERROR_BUFFER_TOO_SMALL on error, CHIP_NO_ERROR otherwise
- */
-CHIP_ERROR ReadDerLength(Reader & reader, uint8_t & length)
-{
-    length = 0;
-
-    uint8_t cur_byte = 0;
-    ReturnErrorOnFailure(reader.Read8(&cur_byte).StatusCode());
-
-    if ((cur_byte & (1u << 7)) == 0)
-    {
-        // 7 bit length, the rest of the byte is the length.
-        length = cur_byte & 0x7Fu;
-        return CHIP_NO_ERROR;
-    }
-
-    // Did not early return: > 7 bit length, the number of bytes of the length is provided next.
-    uint8_t length_bytes = cur_byte & 0x7Fu;
-
-    if ((length_bytes > 1) || !reader.HasAtLeast(length_bytes))
-    {
-        // We only support lengths of 0..255 over 2 bytes
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    // Next byte has length 0..255.
-    return reader.Read8(&length).StatusCode();
-}
-
-/**
  * @brief Utility to convert DER-encoded INTEGER into a raw integer buffer in big-endian order
  *        with leading zeroes if the output buffer is larger than needed.
  * @param[in] reader Reader instance from which the input will be read
@@ -94,8 +61,8 @@ CHIP_ERROR ReadDerUnsignedIntegerIntoRaw(Reader & reader, MutableByteSpan raw_in
     VerifyOrReturnError(cur_byte == kIntegerTag, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Read the length
-    uint8_t integer_len = 0;
-    ReturnErrorOnFailure(ReadDerLength(reader, integer_len));
+    size_t integer_len = 0;
+    ReturnErrorOnFailure(chip::Crypto::ReadDerLength(reader, integer_len));
 
     // Clear the destination buffer, so we can blit the unsigned value into place
     memset(raw_integer_out.data(), 0, raw_integer_out.size());
@@ -580,6 +547,55 @@ CHIP_ERROR Spake2pVerifier::ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan &
                                 pbkdf2IterCount, ws_len, ws);
 }
 
+CHIP_ERROR ReadDerLength(Reader & reader, size_t & length)
+{
+    length = 0;
+
+    uint8_t cur_byte = 0;
+    ReturnErrorOnFailure(reader.Read8(&cur_byte).StatusCode());
+
+    if ((cur_byte & (1u << 7)) == 0)
+    {
+        // 7 bit length, the rest of the byte is the length.
+        length = cur_byte & 0x7Fu;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+
+    // Did not early return: > 7 bit length, the number of bytes of the length is provided next.
+    uint8_t length_bytes = cur_byte & 0x7Fu;
+    VerifyOrReturnError((length_bytes >= 1) && (length_bytes <= sizeof(size_t)), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(reader.HasAtLeast(length_bytes), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    for (uint8_t i = 0; i < length_bytes; i++)
+    {
+        uint8_t cur_length_byte = 0;
+        err       = reader.Read8(&cur_length_byte).StatusCode();
+        if (err != CHIP_NO_ERROR)
+            break;
+
+        // Cannot have zero padding on multi-bytes lengths in DER, so first
+        // byte must always be > 0.
+        if ((i == 0) && (cur_length_byte == 0))
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        length <<= 8;
+        length |= cur_length_byte;
+    }
+
+    // Single-byte long length cannot be < 128: DER always encodes on smallest size
+    // possible, so length zero should have been a single byte short length.
+    if ((length_bytes == 1) && (length < 128))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ConvertIntegerRawToDerWithoutTag(const ByteSpan & raw_integer, MutableByteSpan & out_der_integer)
 {
     return ConvertIntegerRawToDerInternal(raw_integer, out_der_integer, /* include_tag_and_length = */ false);
@@ -672,7 +688,7 @@ CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const ByteSpan & asn1
     VerifyOrReturnError(tag == kSeqTag, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Read length of sequence
-    uint8_t tag_len = 0;
+    size_t tag_len = 0;
     ReturnErrorOnFailure(ReadDerLength(reader, tag_len));
 
     // Length of sequence must match what is left of signature
@@ -1102,12 +1118,12 @@ CHIP_ERROR VerifyCertificateSigningRequestFormat(const uint8_t * csr, size_t csr
     ReturnErrorOnFailure(reader.Read8(&seq_header).StatusCode());
     VerifyOrReturnError(seq_header == kSeqTag, CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
-    uint8_t seq_length = 0;
+    size_t seq_length = 0;
     VerifyOrReturnError(ReadDerLength(reader, seq_length) == CHIP_NO_ERROR, CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
     // Ensure that outer length matches sequence length + tag overhead, otherwise
     // we have trailing garbage
-    size_t header_overhead = (seq_length <= 127) ? 2 : 3;
+    size_t header_overhead = (seq_length <= 127) ? 2 : ((seq_length <= 255) ? 3 : 4);
     VerifyOrReturnError(csr_length == (seq_length + header_overhead), CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
     return CHIP_NO_ERROR;

@@ -31,6 +31,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/Optional.h>
+#include <lib/support/BufferReader.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafePointerCast.h>
 #include <lib/support/Span.h>
@@ -70,8 +71,10 @@ constexpr size_t kMAX_Point_Length           = kP256_Point_Length;
 constexpr size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
 
 // Max CSR length should be relatively small since it's a single P256 key and
-// no metadata is expected to be honored by the CA.
-constexpr size_t kMAX_CSR_Length = 255;
+// no metadata is expected to be honored by the CA. This size is an implementation
+// compromise and is not spec-mandated. It is sufficiently large for a PKCS#10
+// CSR that contains approximately 150 bytes of ASN.1 extensions.
+constexpr size_t kMAX_CSR_Length = 400;
 
 constexpr size_t CHIP_CRYPTO_HASH_LEN_BYTES = kSHA256_Hash_Length;
 
@@ -638,6 +641,14 @@ CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const ByteSpan & raw_
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  */
 CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const ByteSpan & asn1_sig, MutableByteSpan & out_raw_sig);
+
+/**
+ * @brief Utility to read a length field after a tag in a DER-encoded stream.
+ * @param[in] reader Reader instance from which the input will be read
+ * @param[out] length Length of the following element read from the stream
+ * @return CHIP_ERROR_INVALID_ARGUMENT or CHIP_ERROR_BUFFER_TOO_SMALL on error, CHIP_NO_ERROR otherwise
+ */
+CHIP_ERROR ReadDerLength(chip::Encoding::LittleEndian::Reader & reader, size_t & length);
 
 /**
  * @brief Utility to emit a DER-encoded INTEGER given a raw unsigned large integer
