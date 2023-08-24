@@ -688,6 +688,10 @@ class TestStep:
     def event_number(self):
         return self._test.event_number
 
+    @event_number.setter
+    def event_number(self, value):
+        self._test.event_number = value
+
     @property
     def pics(self):
         return self._test.pics

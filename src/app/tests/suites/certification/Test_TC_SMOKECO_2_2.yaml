@@ -36,9 +36,6 @@ config:
     TEST_EVENT_TRIGGER_SMOKE_ALARM_CLEAR:
         type: int64u
         defaultValue: "0xffffffff000000a0"
-    EVENT_NUMBER:
-        type: int64u
-        defaultValue: 0
 
 tests:
     - label: "Step 1: Commission DUT to TH"
@@ -68,6 +65,11 @@ tests:
           value: 0
           constraints:
               type: enum8
+
+    - label: "TH gets last event number from DUT"
+      PICS: SMOKECO.S.E0a
+      command: "readEvent"
+      event: "AllClear"
 
     - label:
           "Step 4: TH reads TestEventTriggersEnabled attribute from General
@@ -121,7 +123,7 @@ tests:
       PICS: SMOKECO.S.E00
       command: "readEvent"
       event: "SmokeAlarm"
-      EVENT_NUMBER: EVENT_NUMBER + 1
+      eventNumber: "newEventsOnly"
       response:
           value: { AlarmSeverityLevel: 1 }
 
@@ -201,7 +203,7 @@ tests:
       PICS: SMOKECO.S.E00
       command: "readEvent"
       event: "SmokeAlarm"
-      EVENT_NUMBER: EVENT_NUMBER + 2
+      eventNumber: "newEventsOnly"
       response:
           value: { AlarmSeverityLevel: 2 }
 
@@ -246,6 +248,6 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      EVENT_NUMBER: EVENT_NUMBER + 3
+      eventNumber: "newEventsOnly"
       response:
           value: {}
