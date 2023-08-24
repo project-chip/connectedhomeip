@@ -106,6 +106,7 @@ class YamlLoader:
             'saveResponseAs': str,
             'minInterval': int,
             'maxInterval': int,
+            'keepSubscriptions': bool,
             'timeout': int,
             'timedInteractionTimeoutMs': int,
             'dataVersion': (list, int, str),  # Can be a variable
