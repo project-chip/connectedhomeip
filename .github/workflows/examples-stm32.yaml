@@ -60,10 +60,7 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                       --enable-flashbundle \
-                       --target stm32-STM32WB5MM-DK-light \
-                       build \
-                       --copy-artifacts-to out/artifacts \  
+                       --target stm32-STM32WB5MM-DK-light build \
                      "
         
             - name: Uploading Size Reports

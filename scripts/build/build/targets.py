@@ -560,6 +560,7 @@ def BuildQorvoTarget():
 
     return target
 
+
 def BuildStm32Target():
     target = BuildTarget('stm32', stm32Builder)
 
@@ -574,7 +575,8 @@ def BuildStm32Target():
     ])
 
     return target
-    
+
+
 def BuildTizenTarget():
     target = BuildTarget('tizen', TizenBuilder)
 

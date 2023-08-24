@@ -55,6 +55,7 @@ STM32_OPTIONS = {
     },
 }
 
+
 class Flasher(firmware_utils.Flasher):
     """Manage STM32 flashing."""
 
@@ -83,7 +84,8 @@ class Flasher(firmware_utils.Flasher):
         """Flash image."""
         return self.run_tool(
             'stm32cubeprogrammer',
-            ['--connect', 'port={port}', '-c', 'port=SWD', '--write', image, '--format', 'bin', '--start-address', '0x8000000'],
+            ['--connect', 'port={port}', '-c', 'port=SWD', '--write', image, '--format', 'bin', '--start-address',
+             '0x8000000'],
             name='Flash')
 
     def reset(self):
@@ -116,6 +118,7 @@ class Flasher(firmware_utils.Flasher):
                 return self
 
         return self
+
 
 if __name__ == '__main__':
     sys.exit(Flasher().flash_command(sys.argv))
