@@ -56,7 +56,7 @@ class TC_DISHM_3_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_DISHM_3_1(self):
-
+        # Adding endpoint here to avoid definition in command line
         self.endpoint = self.user_params.get("endpoint", 1)
 
         asserts.assert_true(self.check_pics("DISHM.S.A0000"), "DISHM.S.A0000 must be supported")
