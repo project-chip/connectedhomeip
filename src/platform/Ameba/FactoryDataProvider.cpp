@@ -668,14 +668,14 @@ CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & un
 CHIP_ERROR FactoryDataProvider::GetProductFinish(ProductFinishEnum * finish)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    *finish = ProductFinishEnum::kFabric;
+    *finish = ProductFinishEnum::kOther;
     return err;
 }
 
 CHIP_ERROR FactoryDataProvider::GetProductPrimaryColor(ColorEnum * primaryColor)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    *primaryColor = ColorEnum::kPurple;  
+    *primaryColor = ColorEnum::kBlack;  
     return err;
 }
 
