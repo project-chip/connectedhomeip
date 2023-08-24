@@ -179,9 +179,9 @@ public:
             uint16_t frequency;
             VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == Attributes::CurrentFrequency::Get(endpoint, &frequency),
                                 CHIP_ERROR_READ_FAILED);
-            pairs[1].attributeID    = Attributes::CurrentFrequency::Id;
-            pairs[1].attributeValue = frequency;
-            attributeCount          = 2;
+            pairs[attributeCount].attributeID    = Attributes::CurrentFrequency::Id;
+            pairs[attributeCount].attributeValue = frequency;
+            attributeCount++;
         }
 
         app::DataModel::List<AttributeValuePair> attributeValueList(pairs, attributeCount);
