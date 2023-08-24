@@ -15,3 +15,7 @@ dependencies:
         version: "2.0.3"
         rules:
             - if: "idf_version >=4.4"
+
+    espressif/esp_insights:
+        version: "1.0.1"
+        require: public
