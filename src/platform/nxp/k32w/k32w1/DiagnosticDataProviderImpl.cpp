@@ -65,8 +65,16 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
-    // TODO: update once MML API supports the feature
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    currentHeapHighWatermark = static_cast<uint64_t>(MinimalHeapSize_c - MEM_GetFreeHeapSizeLowWaterMark());
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
+{
+    MEM_ResetFreeHeapSizeLowWaterMark();
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
