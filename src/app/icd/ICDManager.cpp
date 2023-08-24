@@ -129,7 +129,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
     {
         mOperationalState         = OperationalState::IdleMode;
         uint32_t idleModeInterval = IcdManagementServer::GetInstance().GetIdleModeInterval();
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(idleModeInterval), OnIdleModeDone, this);
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(idleModeInterval), OnIdleModeDone, this);
 
         System::Clock::Milliseconds32 slowPollInterval = GetSlowPollingInterval();
 
