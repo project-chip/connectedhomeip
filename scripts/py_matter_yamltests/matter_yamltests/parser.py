@@ -16,6 +16,7 @@
 import copy
 from dataclasses import dataclass, field
 from enum import Enum, auto
+from typing import Optional
 
 from . import fixes
 from .constraints import get_constraints, is_typed_constraint
@@ -698,6 +699,21 @@ class TestStep:
     def pics(self):
         return self._test.pics
 
+    def _get_last_event_number(self, responses) -> Optional[int]:
+        if not self.is_event:
+            return None
+
+        last_event = responses[-1]
+        if not isinstance(last_event, dict):
+            return None
+
+        received_event_number = last_event.get('eventNumber')
+        if not isinstance(received_event_number, int):
+            return None
+
+        return received_event_number
+
+
     def post_process_response(self, received_responses):
         result = PostProcessResponseResult()
 
@@ -709,6 +725,14 @@ class TestStep:
 
         if self._test.save_response_as:
             self._runtime_config_variable_storage[self._test.save_response_as] = received_responses
+
+        if self.is_event:
+            last_event_number = self._get_last_event_number(received_responses)
+            if last_event_number:
+                if 'LastReceivedEventNumber' not in self._runtime_config_variable_storage:
+                    self._runtime_config_variable_storage['LastReceivedEventNumber'] = last_event_number
+                elif self._runtime_config_variable_storage['LastReceivedEventNumber'] < last_event_number:
+                    self._runtime_config_variable_storage['LastReceivedEventNumber'] = last_event_number
 
         if self.wait_for is not None:
             self._response_cluster_wait_validation(received_responses, result)
