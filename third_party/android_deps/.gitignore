@@ -1,5 +1,0 @@
-.gradle/
-.settings/
-buildSrc/.gradle/
-buildSrc/build/
-artifacts/
