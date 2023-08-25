@@ -22,7 +22,7 @@
 #endif
 
 // Time before the end of active mode when to check if a report should be emitted, this aims to provide enough time to emit the
-// report befor ethe active period is over. If it is physically impossible to check and emit the report before the end of the active
+// report before the active period is over. If it is physically impossible to check and emit the report before the end of the active
 // mode, this can be left at 0.
 #ifndef ICD_ACTIVE_TIME_JITTER_MS
 #define ICD_ACTIVE_TIME_JITTER_MS 100
