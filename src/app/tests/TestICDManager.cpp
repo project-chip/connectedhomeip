@@ -37,6 +37,7 @@ class TestICDStateObserver : public app::ICDStateObserver
 {
 public:
     void OnEnterActiveMode() {}
+    void OnTransitionToIdle() {}
 };
 
 TestICDStateObserver mICDStateObserver;
@@ -116,7 +117,7 @@ public:
         AdvanceClockAndRunEventLoop(ctx, IcdManagementServer::GetInstance().GetActiveModeInterval() + 1);
         // Active mode interval expired, ICDManager transitioned to the IdleMode.
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
-        AdvanceClockAndRunEventLoop(ctx, IcdManagementServer::GetInstance().GetIdleModeInterval() + 1);
+        AdvanceClockAndRunEventLoop(ctx, (IcdManagementServer::GetInstance().GetIdleModeInterval() * 1000) + 1);
         // Idle mode interval expired, ICDManager transitioned to the ActiveMode.
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 

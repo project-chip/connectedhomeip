@@ -42,7 +42,7 @@ limitations under the License.
         <!-- Current cluster version -->
         <globalAttribute side="either" code="0xFFFD" value="1"/>
 
-        <attribute side="server" code="0x00" define="IDLE_MODE_INTERVAL" type="INT32U" min="500" max="64800000" default="500" writable="false" optional="false" isNullable="false">IdleModeInterval</attribute>
+        <attribute side="server" code="0x00" define="IDLE_MODE_INTERVAL" type="INT32U" min="1" max="64800" default="1" writable="false" optional="false" isNullable="false">IdleModeInterval</attribute>
         <attribute side="server" code="0x01" define="ACTIVE_MODE_INTERVAL" type="INT32U" min="300" default="300" writable="false" optional="false" isNullable="false">ActiveModeInterval</attribute>
         <attribute side="server" code="0x02" define="ACTIVE_MODE_THRESHOLD" type="INT16U" min="300" default="300" writable="false" optional="false" isNullable="false">ActiveModeThreshold</attribute>
         <attribute side="server" code="0x03" define="REGISTERED_CLIENTS" type="ARRAY" entryType="MonitoringRegistrationStruct" writable="false" optional="true" isNullable="false">

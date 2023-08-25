@@ -25,11 +25,7 @@
 #include <MatterConfig.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
-#ifdef SILABS_ATTESTATION_CREDENTIALS
 #include <examples/platform/silabs/SilabsDeviceAttestationCreds.h>
-#else
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#endif
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
@@ -41,7 +37,8 @@
 /**********************************************************
  * Defines
  *********************************************************/
-#define MAIN_TASK_STACK_SIZE (1024 * 8)
+
+#define MAIN_TASK_STACK_SIZE (1024 * 5)
 #define MAIN_TASK_PRIORITY (configMAX_PRIORITIES - 1)
 
 using namespace ::chip;
@@ -82,11 +79,7 @@ void application_start(void * unused)
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     // Initialize device attestation config
-#ifdef SILABS_ATTESTATION_CREDENTIALS
     SetDeviceAttestationCredentialsProvider(Credentials::Silabs::GetSilabsDacProvider());
-#else
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-#endif
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     SILABS_LOG("Starting App Task");

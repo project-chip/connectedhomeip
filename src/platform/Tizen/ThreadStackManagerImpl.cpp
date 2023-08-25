@@ -491,11 +491,6 @@ CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-void ThreadStackManagerImpl::_SetRouterPromotion(bool val)
-{
-    // Set Router Promotion is not supported on Tizen
-}
-
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
 {
     ChipLogError(DeviceLayer, "Not implemented");

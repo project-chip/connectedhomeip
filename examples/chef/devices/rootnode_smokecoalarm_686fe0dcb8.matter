@@ -1381,6 +1381,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
+  device type ma_powersource = 17, version 1;
   device type ma_smokecoalarm = 118, version 1;
 
 
@@ -1389,6 +1390,7 @@ endpoint 1 {
     ram      attribute identifyType default = 0x0;
     callback attribute generatedCommandList default = 0;
     callback attribute acceptedCommandList default = 0;
+    callback attribute eventList;
     callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
@@ -1403,6 +1405,19 @@ endpoint 1 {
     ram      attribute clusterRevision default = 3;
   }
 
+  server cluster Descriptor {
+    callback attribute deviceTypeList default = 0;
+    callback attribute serverList default = 0;
+    callback attribute clientList default = 0;
+    callback attribute partsList default = 0;
+    callback attribute generatedCommandList default = 0;
+    callback attribute acceptedCommandList default = 0;
+    callback attribute eventList;
+    callback attribute attributeList default = 0;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
   server cluster PowerSource {
     emits event BatFaultChange;
     ram      attribute status default = 0;
@@ -1414,6 +1429,7 @@ endpoint 1 {
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 2;
@@ -1446,6 +1462,7 @@ endpoint 1 {
     ram      attribute expiryDate default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
