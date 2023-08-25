@@ -47,7 +47,7 @@ def main():
     frequency.to_csv("recent_workflow_fails_frequency.csv")
 
     logging.info("Conducting fail information parsing.")
-    root_causes = df.apply(lambda row: process_fail(row["ID"], row["Pull Request"], row["Start Time"], row["Workflow"]), axis=1)
+    root_causes = df.apply(lambda row: process_fail(row["ID"], row["Pull Request"], row["Start Time"], row["Workflow"]), axis=1, result_type="expand")
     print("Likely Root Cause of Recent Fails:")
     print(root_causes.to_string(index=False))
 
