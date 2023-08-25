@@ -337,14 +337,31 @@ tests:
           constraints:
               type: enum8
 
+    # TODO: Since TH was unable to accept the test parameters, it was changed to manual operation.
     - label: "Step 19: TH reads ExpressedState attribute from DUT"
-      PICS: SMOKECO.S.A0000
-      command: "readAttribute"
-      attribute: "ExpressedState"
-      response:
-          value: HIEST_PRI_ALARM
-          constraints:
-              type: enum8
+    #   PICS: SMOKECO.S.A0000
+    #   command: "readAttribute"
+    #   attribute: "ExpressedState"
+    #   response:
+    #       value: HIEST_PRI_ALARM
+    #       constraints:
+    #           type: enum8
+      verification: |
+          ./chip-tool smokecoalarm read expressed-state 1 1
+
+          On TH(chip-tool)  Logs, Verify that "expressed-state" attribute value is the expected HIEST_PRI_ALARM.
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0000 DataVersion: 152533340
+          [TOO]   ExpressedState: 0
+      cluster: "LogCommands"
+      PICS: PICS_USER_PROMPT && SMOKECO.S.A0000
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Step 20: TH sends TestEventTrigger command to General Diagnostics
@@ -374,14 +391,31 @@ tests:
           constraints:
               type: enum8
 
+    # TODO: Since TH was unable to accept the test parameters, it was changed to manual operation.
     - label: "Step 22: TH reads ExpressedState attribute from DUT"
-      PICS: SMOKECO.S.A0000
-      command: "readAttribute"
-      attribute: "ExpressedState"
-      response:
-          value: HIEST_PRI_ALARM_2
-          constraints:
-              type: enum8
+    #   PICS: SMOKECO.S.A0000
+    #   command: "readAttribute"
+    #   attribute: "ExpressedState"
+    #   response:
+    #       value: HIEST_PRI_ALARM_2
+    #       constraints:
+    #           type: enum8
+      verification: |
+          ./chip-tool smokecoalarm read expressed-state 1 1
+
+          On TH(chip-tool)  Logs, Verify that "expressed-state" attribute value is the expected HIEST_PRI_ALARM.
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0000 DataVersion: 152533340
+          [TOO]   ExpressedState: 0
+      cluster: "LogCommands"
+      PICS: PICS_USER_PROMPT && SMOKECO.S.A0000
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 23a: TH subscribes to COState attribute from DUT"
       PICS: SMOKECO.S.A0002
@@ -418,14 +452,31 @@ tests:
           constraints:
               type: enum8
 
+    # TODO: Since TH was unable to accept the test parameters, it was changed to manual operation.
     - label: "Step 25: TH reads ExpressedState attribute from DUT"
-      PICS: SMOKECO.S.A0000
-      command: "readAttribute"
-      attribute: "ExpressedState"
-      response:
-          value: HIEST_PRI_ALARM_3
-          constraints:
-              type: enum8
+    #   PICS: SMOKECO.S.A0000
+    #   command: "readAttribute"
+    #   attribute: "ExpressedState"
+    #   response:
+    #       value: HIEST_PRI_ALARM_3
+    #       constraints:
+    #           type: enum8
+      verification: |
+          ./chip-tool smokecoalarm read expressed-state 1 1
+
+          On TH(chip-tool)  Logs, Verify that "expressed-state" attribute value is the expected HIEST_PRI_ALARM.
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0000 DataVersion: 152533340
+          [TOO]   ExpressedState: 0
+      cluster: "LogCommands"
+      PICS: PICS_USER_PROMPT && SMOKECO.S.A0000
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 26a: TH subscribes to InterconnectCOAlarm attribute from DUT"
       PICS: SMOKECO.S.A0009
@@ -463,14 +514,31 @@ tests:
           constraints:
               type: enum8
 
+    # TODO: Since TH was unable to accept the test parameters, it was changed to manual operation.
     - label: "Step 28: TH reads ExpressedState attribute from DUT"
-      PICS: SMOKECO.S.A0000
-      command: "readAttribute"
-      attribute: "ExpressedState"
-      response:
-          value: HIEST_PRI_ALARM_4
-          constraints:
-              type: enum8
+    #   PICS: SMOKECO.S.A0000
+    #   command: "readAttribute"
+    #   attribute: "ExpressedState"
+    #   response:
+    #       value: HIEST_PRI_ALARM_4
+    #       constraints:
+    #           type: enum8
+      verification: |
+          ./chip-tool smokecoalarm read expressed-state 1 1
+
+          On TH(chip-tool)  Logs, Verify that "expressed-state" attribute value is the expected HIEST_PRI_ALARM.
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0000 DataVersion: 152533340
+          [TOO]   ExpressedState: 0
+      cluster: "LogCommands"
+      PICS: PICS_USER_PROMPT && SMOKECO.S.A0000
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Step 29a: TH subscribes to InterconnectSmokeAlarm attribute from DUT"
@@ -509,14 +577,31 @@ tests:
           constraints:
               type: enum8
 
+    # TODO: Since TH was unable to accept the test parameters, it was changed to manual operation.
     - label: "Step 31: TH reads ExpressedState attribute from DUT"
-      PICS: SMOKECO.S.A0000
-      command: "readAttribute"
-      attribute: "ExpressedState"
-      response:
-          value: HIEST_PRI_ALARM_5
-          constraints:
-              type: enum8
+    #   PICS: SMOKECO.S.A0000
+    #   command: "readAttribute"
+    #   attribute: "ExpressedState"
+    #   response:
+    #       value: HIEST_PRI_ALARM_5
+    #       constraints:
+    #           type: enum8
+      verification: |
+          ./chip-tool smokecoalarm read expressed-state 1 1
+
+          On TH(chip-tool)  Logs, Verify that "expressed-state" attribute value is the expected HIEST_PRI_ALARM.
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0000 DataVersion: 152533340
+          [TOO]   ExpressedState: 0
+      cluster: "LogCommands"
+      PICS: PICS_USER_PROMPT && SMOKECO.S.A0000
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 32a: TH subscribes to BatteryAlert attribute from DUT"
       PICS: SMOKECO.S.A0003
