@@ -21,6 +21,7 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -63,6 +64,8 @@ public:
 
     // ===== Members functions that are platform-specific
     CHIP_ERROR GetEnableKey(MutableByteSpan & enableKey);
+
+
 };
 
 } // namespace DeviceLayer

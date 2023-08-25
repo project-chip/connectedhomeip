@@ -1,20 +1,20 @@
 /**
- ******************************************************************************
+  ******************************************************************************
  * @file    matter_config.h
  * @author  MCD Application Team
  * @brief   config file for mbedtls
- ******************************************************************************
- * @attention
- *
- * Copyright (c) 2019-2021 STMicroelectronics.
- * All rights reserved.
- *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- *
- ******************************************************************************
- */
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2019-2021 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
 
 #pragma once
 
@@ -126,7 +126,7 @@ extern "C" {
 #define MBEDTLS_THREADING_ALT
 #define MBEDTLS_THREADING_C
 #define MBEDTLS_MEMORY_BUFFER_ALLOC_C
-#define MBEDTLS_PKCS5_C
+#define  MBEDTLS_PKCS5_C
 
 #define MBEDTLS_ERROR_C 1
 

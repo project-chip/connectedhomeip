@@ -49,7 +49,7 @@ public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
     CHIP_ERROR InitLwIPCoreLock(void);
-    // static void HandleESPSystemEvent(void * arg, esp_event_base_t eventBase, int32_t eventId, void * eventData);
+   // static void HandleESPSystemEvent(void * arg, esp_event_base_t eventBase, int32_t eventId, void * eventData);
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.

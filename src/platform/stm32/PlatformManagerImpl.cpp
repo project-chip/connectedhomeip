@@ -23,30 +23,32 @@
  */
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <platform/CommissionableDataProvider.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 #include <platform/stm32/DiagnosticDataProviderImpl.h>
+#include <platform/CommissionableDataProvider.h>
+
 
 namespace chip {
 namespace DeviceLayer {
 
+
 PlatformManagerImpl PlatformManagerImpl::sInstance;
-extern "C" int mbedtls_hardware_poll(void * data, unsigned char * output, size_t len, size_t * olen);
+extern "C" int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t *olen);
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     System::Clock::InitClock_RealTime();
     chip::Crypto::add_entropy_source(mbedtls_hardware_poll, NULL, 16);
-    ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack());
-    return CHIP_NO_ERROR;
+	ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack());
+	return CHIP_NO_ERROR;
 }
 
 void PlatformManagerImpl::_RunEventLoop(void)
 {
-    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_RunEventLoop();
+	Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_RunEventLoop();
 }
 
 CHIP_ERROR PlatformManagerImpl::_Shutdown()
@@ -57,19 +59,19 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
 CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
 
-    return CHIP_NO_ERROR;
+	return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
 
-    return CHIP_NO_ERROR;
+	return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
 
-    return CHIP_NO_ERROR;
+	return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PlatformManagerImpl::_GetTotalOperationalHours(uint32_t & totalOperationalHours)

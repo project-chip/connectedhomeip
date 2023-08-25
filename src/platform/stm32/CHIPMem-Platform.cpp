@@ -45,8 +45,8 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "cmsis_os.h"
-#include "mbedtls/platform.h"
 #include "task.h"
+#include "mbedtls/platform.h"
 
 #include <atomic>
 #include <cstdio>
@@ -72,78 +72,74 @@ using namespace std;
 // Define the new operator for C++ to use the freeRTOS memory management
 // functions.
 //
-void * operator new(size_t size)
-{
-    void * p;
+void* operator new(size_t size) {
+	void *p;
 #ifdef USE_FREERTOS
-    if (uxTaskGetNumberOfTasks())
-        p = pvPortMalloc(size);
-    else
-        p = malloc(size);
+if(uxTaskGetNumberOfTasks())
+p=pvPortMalloc(size);
+else
+p=malloc(size);
 
 #else
-    p = malloc(size);
+	p = malloc(size);
 
 #endif
 #ifdef __EXCEPTIONS
-    if (p == 0)                 // did pvPortMalloc succeed?
-        throw std::bad_alloc(); // ANSI/ISO compliant behavior
+	if (p == 0) // did pvPortMalloc succeed?
+		throw std::bad_alloc(); // ANSI/ISO compliant behavior
 #endif
-    return p;
+	return p;
 }
 
 //
 // Define the delete operator for C++ to use the freeRTOS memory
 // functions.
 //
-void operator delete(void * p)
-{
+void operator delete(void *p) {
 #ifdef USE_FREERTOS
-    if (uxTaskGetNumberOfTasks())
-        vPortFree(p);
-    else
-        free(p);
+if(uxTaskGetNumberOfTasks())
+vPortFree( p );
+else
+free( p );
 #else
-    free(p);
+	free(p);
 #endif
-    p = NULL;
+	p = NULL;
 }
 
-void * operator new[](size_t size)
-{
-    void * p;
+void* operator new[](size_t size) {
+	void *p;
 #ifdef USE_FREERTOS
-    if (uxTaskGetNumberOfTasks())
-        p = pvPortMalloc(size);
-    else
-        p = malloc(size);
+if(uxTaskGetNumberOfTasks())
+p=pvPortMalloc(size);
+else
+p=malloc(size);
 
 #else
-    p = malloc(size);
+	p = malloc(size);
 
 #endif
 #ifdef __EXCEPTIONS
-    if (p == 0)                 // did pvPortMalloc succeed?
-        throw std::bad_alloc(); // ANSI/ISO compliant behavior
+	if (p == 0) // did pvPortMalloc succeed?
+		throw std::bad_alloc(); // ANSI/ISO compliant behavior
 #endif
-    return p;
+	return p;
 }
 
 //
 // Define the delete operator for C++ to use the freeRTOS memory
 // functions. THIS IS NOT OPTIONAL!
 //
-void operator delete[](void * p)
-{
+void operator delete[](void *p) {
 #ifdef USE_FREERTOS
-    if (uxTaskGetNumberOfTasks())
-        vPortFree(p);
-    else
-        free(p);
+if(uxTaskGetNumberOfTasks())
+vPortFree( p );
+else
+free( p );
 #else
-    free(p);
+	free(p);
 #endif
-    p = NULL;
+	p = NULL;
 }
 
 namespace chip {
@@ -157,7 +153,7 @@ static void VerifyInitialized(const char * func)
 {
     if (!memoryInitialized)
     {
-        ChipLogError(DeviceLayer, "ABORT: chip::Platform::%s() called before chip::Platform::MemoryInit()\n", func);
+    	ChipLogError(DeviceLayer, "ABORT: chip::Platform::%s() called before chip::Platform::MemoryInit()\n", func);
         abort();
     }
 }
@@ -166,7 +162,7 @@ CHIP_ERROR MemoryAllocatorInit(void * buf, size_t bufSize)
 {
     if (memoryInitialized++ > 0)
     {
-        ChipLogError(DeviceLayer, "ABORT: chip::Platform::MemoryInit() called twice.\n");
+    	ChipLogError(DeviceLayer, "ABORT: chip::Platform::MemoryInit() called twice.\n");
         abort();
     }
 
@@ -177,10 +173,11 @@ void MemoryAllocatorShutdown()
 {
     if (--memoryInitialized < 0)
     {
-        ChipLogError(DeviceLayer, "ABORT: chip::Platform::MemoryShutdown() called twice.\n");
+    	ChipLogError(DeviceLayer, "ABORT: chip::Platform::MemoryShutdown() called twice.\n");
         abort();
     }
 }
+
 
 void * MemoryAlloc(size_t size)
 {

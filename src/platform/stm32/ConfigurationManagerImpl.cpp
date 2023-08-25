@@ -72,8 +72,8 @@ void ConfigurationManagerImpl::InitiateFactoryReset()
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
                                                                uint32_t & value)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    ChipLogDetail(DataManagement, "ST => ReadPersistedStorageValue");
+    CHIP_ERROR err  = CHIP_NO_ERROR;
+    ChipLogDetail( DataManagement, "ST => ReadPersistedStorageValue");
 
     err = ReadConfigValue(persistedStorageKey, value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
@@ -90,7 +90,7 @@ CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform
                                                                 uint32_t value)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ChipLogDetail(DataManagement, "ST => WritePersistedStorageValue");
+    ChipLogDetail( DataManagement, "ST => WritePersistedStorageValue");
     err = WriteConfigValue(persistedStorageKey, value);
     SuccessOrExit(err);
 exit:
@@ -157,7 +157,10 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
     STM32Config::RunConfigUnitTest();
 }
 
-void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg) {}
+void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
+{
+
+}
 
 ConfigurationManager & ConfigurationMgrImpl()
 {

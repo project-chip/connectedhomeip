@@ -25,6 +25,8 @@
 
 #pragma once
 
+
+
 // ==================== General Platform Adaptations ====================
 
 #define CHIP_CONFIG_ABORT() abort()
@@ -39,6 +41,7 @@
 
 #define CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY 0x01
 #define CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER <lib/address_resolve/AddressResolve_DefaultImpl.h>
+
 
 #if CHIP_ENABLE_OPENTHREAD
 #define CHIP_DEVICE_CONFIG_THREAD_FTD 0 // 0 = MTD
@@ -57,8 +60,9 @@
 
 // ========== Platform-specific Configuration Overrides =========
 
-#define CHIP_DEVICE_CONFIG_CHIP_TASK_NAME "STM32WB TASK"
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_NAME  "STM32WB TASK"
 #define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE (8 * 1024)
+
 
 /**
  * CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY
@@ -92,6 +96,7 @@
 // disabled for Locks and Barrier Access Devices.
 #define CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART 0
 #define CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART 0
+
 
 /**
  * CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME
@@ -147,3 +152,4 @@
 
 #define CHIP_CONFIG_MEMORY_MGMT_PLATFORM 1
 #define CHIP_CONFIG_MEMORY_MGMT_MALLOC 0
+
