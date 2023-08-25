@@ -25,7 +25,8 @@ from chip.tlv import uint
 from matter_testing_support import (MatterBaseTest, async_test_body, compare_time, default_matter_test_main,
                                     get_wait_seconds_from_set_time, parse_pics, type_matches, utc_time_in_matter_epoch)
 from mobly import asserts, signals
-from TC_DeviceBasicComposition import create_device_type_lists, find_tag_list_problems, find_tree_roots, get_all_children, parts_list_cycles, separate_endpoint_types, TagProblem
+from TC_DeviceBasicComposition import (TagProblem, create_device_type_lists, find_tag_list_problems, find_tree_roots,
+                                       get_all_children, parts_list_cycles, separate_endpoint_types)
 
 
 def get_raw_type_list():
