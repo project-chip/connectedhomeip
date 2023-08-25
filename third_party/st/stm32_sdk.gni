@@ -30,6 +30,8 @@ declare_args() {
   use_external_flash = false
   
   stm32_sdk_root = "${chip_root}/third_party/st"
+
+  stm32_ic_family = "STM32WB5MM-DK"
 }
 
 if (stm32_family == "stm32wb5") {
@@ -58,6 +60,10 @@ template("stm32_sdk") {
     if (invoker.use_stm32_wpan) {
       use_stm32_wpan = true
     }
+  }
+
+  if(defined(invoker.stm32_target_ic)){
+   stm_target_ic = invoker.stm32_target_ic
   }
 
   sdk_target_name = target_name
