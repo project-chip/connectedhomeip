@@ -302,10 +302,10 @@ class TestMatterTestingSupport(MatterBaseTest):
 
     def test_get_all_children(self):
         endpoints = self.create_example_topology()
-        asserts.assert_equal(get_all_children(2, endpoints), [1, 3, 4, 5, 9], "Child list for ep2 is incorrect")
-        asserts.assert_equal(get_all_children(6, endpoints), [7, 8], "Child list for ep6 is incorrect")
-        asserts.assert_equal(get_all_children(13, endpoints), [12, 14, 15, 16], "Child list for ep13 is incorrect")
-        asserts.assert_equal(get_all_children(17, endpoints), [18, 19], "Child list for ep17 is incorrect")
+        asserts.assert_equal(get_all_children(2, endpoints), {1, 3, 4, 5, 9}, "Child list for ep2 is incorrect")
+        asserts.assert_equal(get_all_children(6, endpoints), {7, 8}, "Child list for ep6 is incorrect")
+        asserts.assert_equal(get_all_children(13, endpoints), {12, 14, 15, 16}, "Child list for ep13 is incorrect")
+        asserts.assert_equal(get_all_children(17, endpoints), {18, 19}, "Child list for ep17 is incorrect")
 
     def test_get_tree_roots(self):
         endpoints = self.create_example_topology()

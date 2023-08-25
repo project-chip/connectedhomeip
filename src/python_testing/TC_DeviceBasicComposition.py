@@ -173,17 +173,17 @@ def separate_endpoint_types(endpoint_dict: dict[int, Any]) -> tuple[list[int], l
     return (flat, tree)
 
 
-def get_all_children(endpoint_id, endpoint_dict: dict[int, Any]):
+def get_all_children(endpoint_id, endpoint_dict: dict[int, Any]) -> set[int]:
     """Returns all the children (include subchildren) of the given endpoint
        This assumes we've already checked that there are no cycles, so we can do the dumb things and just trace the tree
     """
-    children = []
+    children = set()
 
     def add_children(endpoint_id, children):
         immediate_children = endpoint_dict[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
-        if len(immediate_children) == 0:
+        if not immediate_children:
             return
-        children.extend(immediate_children)
+        children.update(set(immediate_children))
         for child in immediate_children:
             add_children(child, children)
 
@@ -193,7 +193,7 @@ def get_all_children(endpoint_id, endpoint_dict: dict[int, Any]):
 
 def find_tree_roots(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) -> set[int]:
     """Returns a set of all the endpoints in tree_endpoints that are roots for a tree (not include singletons)"""
-    tree_roots = []
+    tree_roots = set()
 
     def find_tree_root(current_id):
         for endpoint_id, endpoint in endpoint_dict.items():
@@ -207,8 +207,8 @@ def find_tree_roots(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) ->
     for endpoint_id in tree_endpoints:
         root = find_tree_root(endpoint_id)
         if root != endpoint_id:
-            tree_roots.append(root)
-    return set(tree_roots)
+            tree_roots.add(root)
+    return tree_roots
 
 
 def parts_list_cycles(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) -> list[int]:
@@ -552,7 +552,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
             # ensure that every sub-id in the parts list is included in the parent
             sub_children = []
             for child in self.endpoints[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
-                sub_children.extend(get_all_children(child))
+                sub_children.update(get_all_children(child))
             if not all(item in sub_children for item in self.endpoints[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]):
                 location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                 self.record_error(self.get_test_name(), location=location,
