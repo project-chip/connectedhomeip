@@ -711,14 +711,19 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
             networkScanned.channel         = channel;
             networkScanned.version         = version;
             networkScanned.extendedAddress = 0;
-            if (rssi > std::numeric_limits<int8_t>::max()) {
-                networkScanned.rssi            = std::numeric_limits<int8_t>::max();
-            } else if (rssi < std::numeric_limits<int8_t>::min()) {
-                networkScanned.rssi            = std::numeric_limits<int8_t>::min();
-            } else {
+            if (rssi > std::numeric_limits<int8_t>::max())
+            {
+                networkScanned.rssi = std::numeric_limits<int8_t>::max();
+            }
+            else if (rssi < std::numeric_limits<int8_t>::min())
+            {
+                networkScanned.rssi = std::numeric_limits<int8_t>::min();
+            }
+            else
+            {
                 networkScanned.rssi = static_cast<int8_t>(rssi);
             }
-            networkScanned.lqi             = lqi;
+            networkScanned.lqi = lqi;
 
             scanResult->push_back(networkScanned);
         }
