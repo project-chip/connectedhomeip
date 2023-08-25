@@ -26,6 +26,7 @@ from pprint import pprint
 from typing import Any, Callable, Optional
 
 import chip.clusters as Clusters
+import chip.clusters.ClusterObjects
 import chip.tlv
 from chip.clusters.Attribute import ValueDecodeFailure
 from matter_testing_support import AttributePathLocation, MatterBaseTest, async_test_body, default_matter_test_main
@@ -337,6 +338,36 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                                           problem=f"Failed validation of value on {location.as_string(self.cluster_mapper)}: {str(e)}", spec_location="Global Elements")
                         success = False
                         continue
+
+        # Validate there are attributes in the global range that are not in the required list
+        allowed_globals = [a.id for a in ATTRIBUTES_TO_CHECK]
+        # also allow event list because it's not disallowed
+        allowed_globals.append(0xFFFA)
+        global_range_min = 0x0000_F000
+        mei_range_min = 0x0001_0000
+        for endpoint_id, endpoint in self.endpoints_tlv.items():
+            for cluster_id, cluster in endpoint.items():
+                globals = [a for a in cluster.keys() if a >= global_range_min and a < mei_range_min]
+                unexpected_globals = list(set(globals) - set(allowed_globals))
+                for unexpected in unexpected_globals:
+                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=unexpected)
+                    self.record_error(self.get_test_name(), location=location,
+                                      problem=f"Unexpected global attribute {unexpected} in cluster {cluster_id}", spec_location="Global elements")
+                    success = False
+
+        # validate that all the returned attributes in the standard clusters contain only known attribute ids
+        for endpoint_id, endpoint in self.endpoints_tlv.items():
+            for cluster_id, cluster in endpoint.items():
+                if cluster_id not in chip.clusters.ClusterObjects.ALL_ATTRIBUTES:
+                    continue
+                standard_attributes = [a for a in cluster.keys() if a < global_range_min]
+                allowed_standard_attributes = chip.clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]
+                unexpected_standard_attributes = list(set(standard_attributes) - set(allowed_standard_attributes))
+                for unexpected in unexpected_standard_attributes:
+                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=unexpected)
+                    self.record_error(self.get_test_name(), location=location,
+                                      problem=f"Unexpected standard attribute {unexpected} in cluster {cluster_id}", spec_location=f"Cluster {cluster_id}")
+                    success = False
 
         # Validate presence of claimed attributes
         if success:
