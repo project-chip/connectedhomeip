@@ -4,7 +4,7 @@ import pandas as pd
 from slugify import slugify
 import subprocess
 
-def process_fail(id, pr, workflow, start_time):
+def process_fail(id, pr, start_time, workflow):
     logging.info("Building output file structure.")
     output_path = f"recent_fails_logs/{slugify(pr)}/{slugify(workflow)}/{slugify(start_time)}"
     os.makedirs(output_path)
@@ -15,13 +15,13 @@ def process_fail(id, pr, workflow, start_time):
 
 def main():
     logging.info("Gathering recent fails information into run_list.json.")
-    subprocess.run("gh run list -R project-chip/connectedhomeip -b master -s failure --json databaseId,displayTitle,workflowName,startedAt > run_list.json", shell=True)
+    subprocess.run("gh run list -R project-chip/connectedhomeip -b master -s failure --json databaseId,displayTitle,startedAt,workflowName > run_list.json", shell=True)
 
     logging.info("Reading run_list.json into a DataFrame.")
     df = pd.read_json("run_list.json")
 
     logging.info("Listing recent fails.")
-    df.columns = ["ID", "Pull Request", "Workflow", "Start Time"]
+    df.columns = ["ID", "Pull Request", "Start Time", "Workflow"]
     print("Recent Fails:")
     print(df.to_string(index=False))
     df.to_csv("recent_fails.csv", index=False)
@@ -33,7 +33,7 @@ def main():
     frequency.to_csv("recent_workflow_fails_frequency.csv")
 
     logging.info("Conducting fail information parsing.")
-    df.apply(lambda row: process_fail(row["ID"], row["Pull Request"], row["Workflow"], row["Start Time"]), axis=1)
+    df.apply(lambda row: process_fail(row["ID"], row["Pull Request"], row["Start Time"], row["Workflow"]), axis=1)
 
 
 if __name__ == "__main__":
