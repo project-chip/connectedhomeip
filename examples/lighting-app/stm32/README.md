@@ -1,4 +1,4 @@
-# Matter STM32 Lighting Example
+# Matter STM32 Lighting Example over thread
 
 This example demonstrates the Matter Lighting application on stm32 platform.
 

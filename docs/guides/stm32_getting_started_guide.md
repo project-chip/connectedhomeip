@@ -1,7 +1,7 @@
 # STM32 Getting Started Guide
 
-The stm32 platform is a [Matter](https://github.com/project-chip/connectedhomeip)
-platform that uses stm32 FreeRTOS SDK.
+The stm32 platform used [Matter](https://github.com/project-chip/connectedhomeip)
+sdk with FreeRTOS.
 
 ---
 

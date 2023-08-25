@@ -1276,6 +1276,7 @@ StatusCode
 stderr
 stdout
 sterm
+STMicroelectronics
 stm
 STM
 STLINK
@@ -1347,7 +1348,7 @@ TestUint
 TestUpdateValue
 testws
 texinfo
-textboxes
+textbooks
 TFT
 ThermostatUserInterfaceConfiguration
 ThIsIsNoTMyReAlGiThUbToKeNSoDoNoTtRy
@@ -1355,6 +1356,7 @@ ThreadNetworkDiagnostics
 threadOperationalDataset
 ThreadStackManager
 ThreadStackManagerImpl
+thread
 ths
 Thunderboard
 timedInteractionTimeoutMs
