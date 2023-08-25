@@ -453,7 +453,9 @@ tests:
           constraints:
               type: enum8
 
-    - label: "Step 37: Start manually DUT self-test"
+    - label:
+          "Step 37: At the start of the next step, please manually initiate the
+          DUT self-test"
       cluster: "LogCommands"
       PICS: PICS_USER_PROMPT && SMOKECO.M.ManuallyControlledTest
       command: "UserPrompt"
