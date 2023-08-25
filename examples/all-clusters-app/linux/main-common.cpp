@@ -75,10 +75,10 @@ constexpr const uint8_t kNamespacePosition = 8;
 constexpr const uint8_t kTagPositionLeft = 0;
 // Common Position Namespace: 8, tag: 1 (Right)
 constexpr const uint8_t kTagPositionRight = 1;
-// Common Position Namespace: 8, tag: 3 (Buttom)
-constexpr const uint8_t kTagPositionButtom                                 = 3;
+// Common Position Namespace: 8, tag: 3 (Bottom)
+constexpr const uint8_t kTagPositionBottom                                 = 3;
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp0TagList[] = {
-    { .namespaceID = kNamespaceCommon, .tag = kTagCommonZero }, { .namespaceID = kNamespacePosition, .tag = kTagPositionButtom }
+    { .namespaceID = kNamespaceCommon, .tag = kTagCommonZero }, { .namespaceID = kNamespacePosition, .tag = kTagPositionBottom }
 };
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp1TagList[] = {
     { .namespaceID = kNamespaceCommon, .tag = kTagCommonOne }, { .namespaceID = kNamespacePosition, .tag = kTagPositionLeft }
