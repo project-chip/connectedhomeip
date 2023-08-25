@@ -61,6 +61,8 @@ public class InitializationExample {
   /**
    * DACProvider implementation for the Device Attestation Credentials required at the time of
    * commissioning
+   *
+   * <p>Using the DACProviderStub which provides dummy values for demonstration only
    */
   private static final DACProvider dacProvider = new DACProviderStub();
 
