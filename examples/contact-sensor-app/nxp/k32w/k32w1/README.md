@@ -266,12 +266,12 @@ Run -> Debug Configurations... -> C/C++ Application
 The OTA image files must be encrypted using Over The Air Programming Tool
 ([OTAP](https://www.nxp.com/design/microcontrollers-developer-resources/connectivity-tool-suite:CONNECTIVITY-TOOL-SUITE?#downloads)).
 Bootloader will load the new OTA image only if it detects that the file was
-encrypted with the OTAP correct keys.
+encrypted with the `OTAP` correct keys.
 
 `.srec` file is input for Over The air Programming (`OTAP`) application
 (unencrypted) and it's converted to `.sb3` format (encrypted).
 
-In OTAP application
+In `OTAP` application
 
 -   select OTA protocol => `OTAP` Matter
 -   Browse File

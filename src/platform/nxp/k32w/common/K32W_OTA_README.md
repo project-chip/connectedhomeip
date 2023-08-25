@@ -67,7 +67,7 @@ Some details regarding the interface:
 -   `ExitAction` is optional and should be implemented by the processors that
     want to execute an action after all data has been transferred, but before
     `HandleApply` is called. It's called before the new processor selection
-    takes place. This is useful in the context of multiple TLVs transferred in a
+    takes place. This is useful in the context of multiple TLV transferred in a
     single OTA process.
 -   `Process` is the public API used inside `OTAImageProcessorImpl` for data
     processing. This is a wrapper over `ProcessInternal`, which can return
