@@ -342,7 +342,8 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         # Validate there are attributes in the global range that are not in the required list
         allowed_globals = [a.id for a in ATTRIBUTES_TO_CHECK]
         # also allow event list because it's not disallowed
-        allowed_globals.append(0xFFFA)
+        event_list_id = 0xFFFA
+        allowed_globals.append(event_list_id)
         global_range_min = 0x0000_F000
         mei_range_min = 0x0001_0000
         for endpoint_id, endpoint in self.endpoints_tlv.items():
