@@ -20,6 +20,7 @@ import("${chip_root}/examples/platform/stm32/args.gni")
 # ARM architecture flags will be set based on stm32_family.
 arm_platform_config = "${stm32_sdk_build_root}/stm32_arm.gni"
 chip_device_platform = "stm32"
+
 # add board protector for stm32wb
 chip_with_lwip = false
 mbedtls_target = "${stm32_sdk_build_root}:mbedtls"
@@ -28,6 +29,7 @@ mbedtls_target = "${stm32_sdk_build_root}:mbedtls"
 chip_monolithic_tests = false
 chip_system_config_provide_statistics = false
 chip_config_memory_management = "platform"
+
 # FREERTOS CONFIG
 chip_stack_lock_tracking = "fatal"
 

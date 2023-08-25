@@ -1,4 +1,3 @@
-
 # Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,40 +31,39 @@ if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
 }
 
-
 static_library("stm32") {
-if (stm32_board == "STM32WB5MM-DK"){
-  sources = [
-    "../logging/impl/stdio/Logging.cpp",
-    "../FreeRTOS/SystemTimeSupport.cpp",
-    "../SingletonConfigurationManager.cpp",
-    "BLEManagerImpl.cpp",
-    "BLEManagerImpl.h",
-    "BlePlatformConfig.h",
-    "CHIPDevicePlatformEvent.h",
-    "CHIPMem-Platform.cpp",
-    "CHIPDevicePlatformConfig.h",
-    "CHIPPlatformConfig.h",
-    "ConfigurationManagerImpl.cpp",
-    "ConfigurationManagerImpl.h",
-    "DiagnosticDataProviderImpl.cpp",
-    "DiagnosticDataProviderImpl.h",
-    "FactoryDataProvider.cpp",
-    "FactoryDataProvider.h",
-    "InetPlatformConfig.h",
-    "KeyValueStoreManagerImpl.cpp",
-    "KeyValueStoreManagerImpl.h",
-    "PlatformManagerImpl.cpp",
-    "PlatformManagerImpl.h",
-    "STM32Config.cpp",
-    "STM32Config.h",
-    "STM32FreeRtosHooks.cpp",
-    "STM32FreeRtosHooks.h",
-    "SystemPlatformConfig.h",
-  ]
+  if (stm32_board == "STM32WB5MM-DK") {
+    sources = [
+      "../FreeRTOS/SystemTimeSupport.cpp",
+      "../SingletonConfigurationManager.cpp",
+      "../logging/impl/stdio/Logging.cpp",
+      "BLEManagerImpl.cpp",
+      "BLEManagerImpl.h",
+      "BlePlatformConfig.h",
+      "CHIPDevicePlatformConfig.h",
+      "CHIPDevicePlatformEvent.h",
+      "CHIPMem-Platform.cpp",
+      "CHIPPlatformConfig.h",
+      "ConfigurationManagerImpl.cpp",
+      "ConfigurationManagerImpl.h",
+      "DiagnosticDataProviderImpl.cpp",
+      "DiagnosticDataProviderImpl.h",
+      "FactoryDataProvider.cpp",
+      "FactoryDataProvider.h",
+      "InetPlatformConfig.h",
+      "KeyValueStoreManagerImpl.cpp",
+      "KeyValueStoreManagerImpl.h",
+      "PlatformManagerImpl.cpp",
+      "PlatformManagerImpl.h",
+      "STM32Config.cpp",
+      "STM32Config.h",
+      "STM32FreeRtosHooks.cpp",
+      "STM32FreeRtosHooks.h",
+      "SystemPlatformConfig.h",
+    ]
   }
 
-  deps = ["${chip_root}/src/setup_payload"]
+  deps = [ "${chip_root}/src/setup_payload" ]
   public = [ "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h" ]
   public_deps = [
     "${chip_root}/src/crypto",
@@ -74,27 +72,26 @@ if (stm32_board == "STM32WB5MM-DK"){
 
   if (chip_enable_openthread) {
     sources += [
-      "../OpenThread/OpenThreadUtils.cpp",
       "../OpenThread/DnssdImpl.cpp",
       "../OpenThread/OpenThreadDnssdImpl.cpp",
-      "ThreadStackManagerImpl.h",
+      "../OpenThread/OpenThreadUtils.cpp",
       "ConnectivityManagerImpl.cpp",
       "ConnectivityManagerImpl.h",
       "ThreadStackManagerImpl.cpp",
+      "ThreadStackManagerImpl.h",
     ]
 
     import("//build_overrides/stm32_sdk.gni")
     import("${stm32_sdk_build_root}/stm32_sdk.gni")
-    public_deps += ["${stm32_sdk_build_root}:stm32_sdk"  ]
-    
+    public_deps += [ "${stm32_sdk_build_root}:stm32_sdk" ]
+
     deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
 
     public_configs = [
       "${chip_root}/src/lib/address_resolve:default_address_resolve_config",
     ]
-
   }
-  
+
   # Set the compiler flags
   cflags = [
     "-Wno-error=unused-parameter",
@@ -105,8 +102,7 @@ if (stm32_board == "STM32WB5MM-DK"){
 
   # Add platform crypto implementation
   if (chip_crypto == "platform") {
-    sources += [
-    ]
+    sources += []
 
     public_deps += [
       "${chip_root}/src/crypto",

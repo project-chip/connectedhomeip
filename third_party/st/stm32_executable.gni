@@ -68,9 +68,8 @@ template("stm32_executable") {
 
   group(target_name) {
     deps = [
-      ":$flash_target_name",
       ":$bin_target_name",
+      ":$flash_target_name",
     ]
   }
-
 }

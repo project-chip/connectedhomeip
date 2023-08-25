@@ -180,7 +180,7 @@ source_set("system_config_header") {
         public_deps += [ "${cyw30739_sdk_build_root}:cyw30739_sdk" ]
       }
       if (chip_device_platform == "stm32") {
-        public_deps += ["${stm32_sdk_build_root}:stm32_sdk" ]
+        public_deps += [ "${stm32_sdk_build_root}:stm32_sdk" ]
       }
 
       # Add platform here as needed.

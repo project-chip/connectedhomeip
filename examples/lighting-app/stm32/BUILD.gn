@@ -21,7 +21,6 @@ import("${chip_root}/src/platform/device.gni")
 import("${stm32_sdk_build_root}/stm32_executable.gni")
 import("${stm32_sdk_build_root}/stm32_sdk.gni")
 
-
 assert(current_os == "freertos")
 
 stm32_project_dir = "${chip_root}/examples/lighting-app/stm32"
@@ -44,7 +43,6 @@ declare_args() {
 
   # OTA timeout in seconds
   OTA_periodic_query_timeout = 86400
-
 }
 
 # Sanity check
@@ -55,7 +53,6 @@ if (stm32_board == "STM32WB5MM-DK") {
   chip_enable_openthread = true
 }
 
-
 stm32_sdk("sdk") {
   if (stm32_board == "STM32WB5MM-DK") {
     sources = [
@@ -65,19 +62,18 @@ stm32_sdk("sdk") {
     ]
   }
 
-    
   include_dirs = [
     "${chip_root}/src/platform/stm32",
     "${examples_plat_dir}",
     "${chip_root}/src/lib",
   ]
 
-  if (stm32_board == "STM32WB5MM-DK") { 
-    include_dirs += [ 
+  if (stm32_board == "STM32WB5MM-DK") {
+    include_dirs += [
       "${stm32_project_dir}/include/STM32WB5",
       "${examples_plat_dir}/config_files/STM32WB5",
       "${chip_root}/src/include",
-    ] 
+    ]
   }
 
   defines = [
@@ -90,28 +86,27 @@ stm32_sdk("sdk") {
 }
 
 stm32_executable("lighting_app") {
-if (stm32_board == "STM32WB5MM-DK") {
-  output_name = "chip-stm32-lighting-example.elf"
-  include_dirs = [
-    "${chip_root}/examples/platform/stm32/config_files/STM32WB5/",
-    "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK/Inc",
-    "${chip_root}/src/include/",
+  if (stm32_board == "STM32WB5MM-DK") {
+    output_name = "chip-stm32-lighting-example.elf"
+    include_dirs = [
+      "${chip_root}/examples/platform/stm32/config_files/STM32WB5/",
+      "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK/Inc",
+      "${chip_root}/src/include/",
     ]
-  defines = []
+    defines = []
 
-  sources = [
-    "src/STM32WB5/AppTask.cpp",
-    "src/STM32WB5/LightingManager.cpp",
-    "src/STM32WB5/ZclCallbacks.cpp",
-    "${stm32_board_src}/Src/app_entry.cpp",
-    "${stm32_board_src}/Src/main.cpp",
-    "${stm32_board_src}/STM32_WPAN/App/app_ble.c",
-    "${stm32_board_src}/STM32_WPAN/App/app_matter.c",
-    "${stm32_board_src}/STM32_WPAN/App/app_thread.c",
-    "${stm32_board_src}/STM32_WPAN/App/custom_stm.c",
-    
-  ]
-}
+    sources = [
+      "${stm32_board_src}/STM32_WPAN/App/app_ble.c",
+      "${stm32_board_src}/STM32_WPAN/App/app_matter.c",
+      "${stm32_board_src}/STM32_WPAN/App/app_thread.c",
+      "${stm32_board_src}/STM32_WPAN/App/custom_stm.c",
+      "${stm32_board_src}/Src/app_entry.cpp",
+      "${stm32_board_src}/Src/main.cpp",
+      "src/STM32WB5/AppTask.cpp",
+      "src/STM32WB5/LightingManager.cpp",
+      "src/STM32WB5/ZclCallbacks.cpp",
+    ]
+  }
 
   # Add the startup file to the target
   sources += [ "${examples_plat_dir}/startup_files/startup_${stm32_mcu}.s" ]
@@ -143,12 +138,12 @@ if (stm32_board == "STM32WB5MM-DK") {
   }
 
   ldscript = "${examples_plat_dir}/ldscripts/${stm32_mcu}_FLASH.ld"
-  
 
   inputs = [ ldscript ]
 
   ldflags = [
     "-T" + rebase_path(ldscript, root_build_dir),
+
     # other linker flags ...
     "-static",
     "-Wl,--cref",
@@ -166,7 +161,6 @@ if (stm32_board == "STM32WB5MM-DK") {
       "-fstack-usage",
     ]
   }
-
 
   output_dir = root_out_dir
 }

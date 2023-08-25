@@ -14,7 +14,6 @@
 
 import("//build_overrides/chip.gni")
 
-
 chip_ble_project_config_include = "<CHIPProjectConfig.h>"
 chip_device_project_config_include = "<CHIPProjectConfig.h>"
 chip_project_config_include = "<CHIPProjectConfig.h>"

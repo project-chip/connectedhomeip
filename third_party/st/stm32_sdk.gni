@@ -14,21 +14,21 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/stm32_sdk.gni")
-import("//build_overrides/mbedtls.gni")
 import("//build_overrides/freertos.gni")
+import("//build_overrides/mbedtls.gni")
+import("//build_overrides/stm32_sdk.gni")
 
-import("stm32_board.gni")
-import("${mbedtls_root}/mbedtls.gni")
 import("${freertos_root}/freertos.gni")
+import("${mbedtls_root}/mbedtls.gni")
+import("stm32_board.gni")
+
 #import("${lwip_root}/lwip.gni")
 
 declare_args() {
-  
   kvs_max_entries = 75
 
   use_external_flash = false
-  
+
   stm32_sdk_root = "${chip_root}/third_party/st"
 
   stm32_ic_family = "STM32WB5MM-DK"
@@ -38,7 +38,6 @@ if (stm32_family == "stm32wb5") {
   use_stm32_wpan = true
 }
 
-  
 assert(stm32_sdk_root != "", "ST SDK root must be specified")
 
 #
@@ -62,14 +61,18 @@ template("stm32_sdk") {
     }
   }
 
-  if(defined(invoker.stm32_target_ic)){
-   stm_target_ic = invoker.stm32_target_ic
+  if (defined(invoker.stm32_target_ic)) {
+    stm_target_ic = invoker.stm32_target_ic
   }
 
   sdk_target_name = target_name
 
-  slist_stm32_board = read_file("${stm32_sdk_root}/FAMILY/BOARD/${stm32_board}_sdk.gn_helper", "scope")
-  slist_stm32_family = read_file("${stm32_sdk_root}/FAMILY/${stm32_family}_sdk.gn_helper", "scope")
+  slist_stm32_board =
+      read_file("${stm32_sdk_root}/FAMILY/BOARD/${stm32_board}_sdk.gn_helper",
+                "scope")
+  slist_stm32_family =
+      read_file("${stm32_sdk_root}/FAMILY/${stm32_family}_sdk.gn_helper",
+                "scope")
 
   config("${sdk_target_name}_config") {
     include_dirs = []
@@ -79,7 +82,7 @@ template("stm32_sdk") {
     }
 
     libs = [
-        #  add any common .o/.a library here
+      #  add any common .o/.a library here
     ]
 
     # Treat these includes as system includes, so warnings in them are not fatal.
@@ -99,9 +102,7 @@ template("stm32_sdk") {
     # To fix this, these files are also manually depended upon in the source set
     # declared in stm32_mbedtls_config further down this file.
     if (stm32_family == "stm32wb5") {
-      defines += [
-        "MBEDTLS_USER_CONFIG_FILE=<examples/platform/stm32/config_files/STM32WB5/matter_config.h>",
-      ]
+      defines += [ "MBEDTLS_USER_CONFIG_FILE=<examples/platform/stm32/config_files/STM32WB5/matter_config.h>" ]
     }
 
     if (defined(invoker.enable_sleepy_device)) {
@@ -131,7 +132,7 @@ template("stm32_sdk") {
       "-Wno-maybe-uninitialized",
       "-Wno-shadow",
     ]
-    
+
     cflags += slist_stm32_board.FLAGS
     cflags += slist_stm32_family.FLAGS
 
@@ -147,8 +148,8 @@ template("stm32_sdk") {
     # edited.
     if (stm32_family == "stm32wb5") {
       sources = [
-        "${chip_root}/examples/platform/stm32/config_files/STM32WB5/matter_config.h",
         "${chip_root}/examples/platform/stm32/config_files/STM32WB5/FreeRTOSConfig.h",
+        "${chip_root}/examples/platform/stm32/config_files/STM32WB5/matter_config.h",
       ]
     }
 
@@ -156,13 +157,11 @@ template("stm32_sdk") {
   }
 
   source_set(sdk_target_name) {
-
     if (defined(invoker.enable_sleepy_device)) {
     }
 
     sources = slist_stm32_family.SOURCES
     sources += slist_stm32_board.SOURCES
-
 
     if ((defined(invoker.show_qr_code) && invoker.show_qr_code) ||
         (defined(invoker.disable_lcd) && !invoker.disable_lcd)) {
@@ -172,9 +171,7 @@ template("stm32_sdk") {
       ]
     }
 
-    public_deps = [
-      ":stm32_mbedtls_config",
-    ]
+    public_deps = [ ":stm32_mbedtls_config" ]
 
     if (defined(invoker.sources)) {
       sources += invoker.sources
@@ -183,4 +180,3 @@ template("stm32_sdk") {
     public_configs = [ ":${sdk_target_name}_config" ]
   }
 }
-

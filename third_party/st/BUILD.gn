@@ -30,13 +30,13 @@ group("stm32_sdk") {
 }
 
 config("stm32_mbedtls_config") {
-if (stm32_family == "stm32wb5") {
+  if (stm32_family == "stm32wb5") {
     defines = [ "MBEDTLS_USER_CONFIG_FILE=<examples/platform/stm32/config_files/STM32WB5/matter_config.h>" ]
- 
+
     include_dirs = [
       chip_root,
       "${chip_root}/examples/platform/stm32/config_files/STM32WB5/",
-     ]
+    ]
   }
 }
 mbedtls_target("mbedtls") {

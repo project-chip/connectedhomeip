@@ -22,7 +22,8 @@ stm32_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 optimize_debug_level = "s"
 
 chip_enable_ota_requestor = false
-chip_project_config_include_dirs = ["${chip_root}/examples/lighting-app/stm32/include/STM32WB5"]
+chip_project_config_include_dirs =
+    [ "${chip_root}/examples/lighting-app/stm32/include/STM32WB5" ]
 chip_enable_openthread = true
 chip_enable_ble = true
 chip_config_enable_arg_parser = false
