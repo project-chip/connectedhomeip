@@ -15,13 +15,14 @@ def process_fail(id, pr, start_time, workflow):
     subprocess.run(f"gh run view -R project-chip/connectedhomeip {id} --log-failed > {output_path}/fail_log.txt", shell=True)
 
     logging.info("Collecting info on likely cause of failure.")  # Eventually turn this into a catalog of error messages per workflow
+    root_cause = "Unknown cause"
     with open(f"{output_path}/fail_log.txt") as fail_log_file:
         fail_log = fail_log_file.read()
         match workflow:
             case "CodeQL":
                 if "(eventual cause: IOException \"No space left on device\")" in fail_log:
-                    return "Ran out of space"
-    return "Unknown cause"
+                    root_cause = "Ran out of space"
+    return [pr, workflow, root_cause]
 
 
 def main():
@@ -35,18 +36,20 @@ def main():
     df.columns = ["ID", "Pull Request", "Start Time", "Workflow"]
     print("Recent Fails:")
     print(df.to_string(index=False))
+    print()
     df.to_csv("recent_fails.csv", index=False)
 
     logging.info("Listing frequency of recent fails by workflow.")
     frequency = df["Workflow"].value_counts(normalize=True).mul(100).astype(str).reset_index(name="Percentage")  # Reformat this from "50.0" to "50%"
     print("Percentage Frequency of Fails by Workflow:")
     print(frequency.to_string(index=False))
+    print()
     frequency.to_csv("recent_workflow_fails_frequency.csv")
 
     logging.info("Conducting fail information parsing.")
-    root_cause = df.apply(lambda row: process_fail(row["ID"], row["Pull Request"], row["Start Time"], row["Workflow"]), axis=1)
+    root_causes = df.apply(lambda row: process_fail(row["ID"], row["Pull Request"], row["Start Time"], row["Workflow"]), axis=1)
     print("Likely Root Cause of Recent Fails:")
-    print(root_cause.to_string(index=False))
+    print(root_causes.to_string(index=False))
 
 
 if __name__ == "__main__":
