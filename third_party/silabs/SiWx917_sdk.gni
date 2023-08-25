@@ -237,6 +237,10 @@ template("siwx917_sdk") {
       defines += [ "DIC_ENABLE=1" ]
     }
 
+    if (aws_sdk_ota) {
+      defines += [ "ENABLE_AWS_OTA_FEAT=1" ]
+    }
+
     libs += [ "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a" ]
 
     cflags = []

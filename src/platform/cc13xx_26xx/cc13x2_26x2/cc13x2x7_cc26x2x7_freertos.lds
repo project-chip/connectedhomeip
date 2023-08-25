@@ -1,114 +1,47 @@
 /*
- * Copyright (c) 2020, Texas Instruments Incorporated
- * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2020 Texas Instruments Incorporated
  *
- * *  Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- * *  Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
- * *  Neither the name of Texas Instruments Incorporated nor the names of
- *    its contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-/*
- *  ======== CC26X2R1_LAUNCHXL_FREERTOS.lds ========
- *  Default Linker script for the Texas Instruments CC26X2R1
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
+/**
+ * @file
+ * Linkerscript for Matter executable with space reserved for the TI BIM.
+ */
 
- FLASH_ROM_BUILD  = 2;
- FLASH_BASE = 0x00000000    ;
- GPRAM_BASE = 0x11000000    ;
- RAM_BASE   = 0x20000000    ;
- ROM_BASE   = 0x10000000    ;
-
- FLASH_SIZE = 0x00058000    ;
- GPRAM_SIZE = 0x00002000    ;
- RAM_SIZE   = 0x00014000    ;
- ROM_SIZE   = 0x00040000    ;
-
- RTOS_RAM_SIZE           = 0x0000012C;
- RESERVED_RAM_SIZE_ROM_1 = 0x00000B08;
- RESERVED_RAM_SIZE_ROM_2 = 0x00000EB3;
-
- PAGE_SIZE        =          0x2000;
-RTOS_RAM_SIZE = 0x0000012C;
-RESERVED_RAM_SIZE_ROM_2 = 0x00000EB3;
-
-
- RESERVED_RAM_SIZE_AT_START = (RTOS_RAM_SIZE + RESERVED_RAM_SIZE_ROM_2);
- RESERVED_RAM_SIZE_AT_END  = 0;
-
-
- RAM_START   =   (RAM_BASE + RESERVED_RAM_SIZE_AT_START);
-
-
- RAM_END   =   (RAM_BASE + RAM_SIZE - RESERVED_RAM_SIZE_AT_END - 1);
-
-
-/* For ROM 2 devices, the following section needs to be allocated and reserved */
- RTOS_RAM_START = RAM_BASE;
- RTOS_RAM_END  = (RAM_BASE + RTOS_RAM_SIZE - 1);
-
- FLASH_START       =         FLASH_BASE;
- WORD_SIZE        =          4;
-
- FLASH_MEM_ALIGN    =      WORD_SIZE;
-
- PAGE_MASK       =           0xFFFFE000;
-
- NUM_RESERVED_FLASH_PAGES =  1;
- RESERVED_FLASH_SIZE    =    (NUM_RESERVED_FLASH_PAGES * PAGE_SIZE);
-
-  FLASH_END          =      (FLASH_BASE + FLASH_SIZE - RESERVED_FLASH_SIZE - 1);
-
-  FLASH_LAST_PAGE_START   =   (FLASH_SIZE - PAGE_SIZE);
-
-/*
-__STACK_TOP = __stack + __STACK_SIZE;
-
-
-__UNUSED_SRAM_start__ = RAM_BASE;
-__UNUSED_SRAM_end__ = RAM_BASE + RAM_SIZE;
-
-__UNUSED_FLASH_start__ = FLASH_BASE;
-__UNUSED_FLASH_end__ = FLASH_BASE + FLASH_SIZE;
-*/
+STACKSIZE = 0x800;
+RESERVED_RAM_SIZE_BLE_ROM = 0x00000FDF;
 
 
 MEMORY
 {
-    FLASH (RX)      : ORIGIN = FLASH_START, LENGTH = (FLASH_END - FLASH_START + 1)
-    /*
-     * Customer Configuration Area and Bootloader Backdoor configuration in
-     * flash, 40 bytes
+    /* last page removed for BIM, CCFG is supplied by that project */
+     FLASH (RX)      : ORIGIN = 0x00000000, LENGTH = 0x000affa8 
+    FLASH_CCFG (RX) : ORIGIN = 0x000affa8, LENGTH = 0x00000058
+    /*FLASH (RX)      : ORIGIN = 0x00000000, LENGTH = 0x000ae000 */
+    /* BLE ROM reserves RAM at the beginning of the ram image, size RESERVED_RAM_SIZE_BLE_ROM */
+    /* SRAM (RWX)      : ORIGIN = 0x20000000, LENGTH = 0x00024000 */
+    SRAM (RWX)      : ORIGIN = 0x20000FDF, LENGTH = 0x00023021
+    GPRAM (RWX)     : ORIGIN = 0x11000000, LENGTH = 0x00002000
+    /* Explicitly placed off target for the storage of logging data.
+     * The data placed here is NOT loaded onto the target device.
+     * This is part of 1 GB of external memory from 0x60000000 - 0x9FFFFFFF.
+     * ARM memory map can be found here:
+     * https://developer.arm.com/documentation/ddi0337/e/memory-map/about-the-memory-map
      */
-   /* FLASH_CCFG (RX) : ORIGIN = FLASH_LAST_PAGE_START, LENGTH = PAGE_SIZE */
-    FLASH_CCFG (RX) : ORIGIN = 0x00057fa8, LENGTH = 0x00000058
-
-
-    RTOS_SRAM (RWX) : ORIGIN = RTOS_RAM_START, LENGTH = (RTOS_RAM_END - RTOS_RAM_START + 1)
-    SRAM (RWX)      : ORIGIN = 0x20000000 + RESERVED_RAM_SIZE_ROM_2 + RTOS_RAM_SIZE, LENGTH = (RAM_END - RAM_START + 1)
-  /*  GPRAM (RWX)     : ORIGIN = 0x11000000, LENGTH = 0x00002000 */
+    LOG_DATA (R) : ORIGIN = 0x90000000, LENGTH = 0x40000
 }
 
 REGION_ALIAS("REGION_TEXT", FLASH);
@@ -116,33 +49,24 @@ REGION_ALIAS("REGION_BSS", SRAM);
 REGION_ALIAS("REGION_DATA", SRAM);
 REGION_ALIAS("REGION_STACK", SRAM);
 REGION_ALIAS("REGION_HEAP", SRAM);
+REGION_ALIAS("REGION_LOG", LOG_DATA);
 REGION_ALIAS("REGION_ARM_EXIDX", FLASH);
 REGION_ALIAS("REGION_ARM_EXTAB", FLASH);
 
 SECTIONS {
-
+    /* interrupt vectors shifted to accomodate BIM header */
     PROVIDE (_intvecs_base_address =
-        DEFINED(_intvecs_base_address) ? _intvecs_base_address : 0x0);
+        DEFINED(_intvecs_base_address) ? _intvecs_base_address : 0x00);
 
     .resetVecs (_intvecs_base_address) : AT (_intvecs_base_address) {
         KEEP (*(.resetVecs))
     } > REGION_TEXT
 
     PROVIDE (_vtable_base_address =
-        DEFINED(_vtable_base_address) ? _vtable_base_address : 0x20000000 + RESERVED_RAM_SIZE_ROM_2 + RTOS_RAM_SIZE);
+        DEFINED(_vtable_base_address) ? _vtable_base_address : 0x20000000 + RESERVED_RAM_SIZE_BLE_ROM);
 
     .ramVecs (_vtable_base_address) (NOLOAD) : {
         KEEP (*(.ramVecs))
-    } > REGION_DATA
-
-    /* if a ROM-only symbol is present, then ROM is being used.
-     * Reserve memory for surgically placed module states.
-     */
-    _rom_data_start = 0x20000100;
-    _rom_data_size = DEFINED(ROM_DATA_SIZE) ? 12 : DEFINED(ROM_DATA_SIZE_NO_OAD) ? 0x108 : 0;
-
-    .rom_data_reserve (_rom_data_start): {
-        . += _rom_data_size;
     } > REGION_DATA
 
     /*
@@ -301,9 +225,10 @@ SECTIONS {
         *(.ARM.extab* .gnu.linkonce.armextab.*)
     } > REGION_ARM_EXTAB AT> REGION_ARM_EXTAB
 
+    /* End of executable code/data, NVS is not part of the OTA image */
+    PROVIDE (_flash_end_address = .);
 
-
-    .nvs (0x52000) (NOLOAD) : AT (0x52000) ALIGN(0x2000) {
+    .nvs (0xAA000) (NOLOAD) : AT (0xAA000) ALIGN(0x2000) {
         *(.nvs)
     } > REGION_TEXT
 
@@ -334,12 +259,15 @@ SECTIONS {
     .stack (NOLOAD) : ALIGN(0x8) {
         _stack = .;
         __stack = .;
-        KEEP(*(.stack)).
-        += 0x800;
+        KEEP(*(.stack))
+        . += STACKSIZE;
         _stack_end = .;
         __stack_end = .;
     } > REGION_STACK AT> REGION_STACK
 
+    .log_data (COPY) : {
+        KEEP (*(.log_data))
+    } > REGION_LOG
 }
 
 ENTRY(resetISR)
