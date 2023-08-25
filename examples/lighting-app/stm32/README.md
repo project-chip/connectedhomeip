@@ -44,9 +44,7 @@ After successful commissioning, use `chip-tool` to control the board
 
 ## Indicate current state of lightbulb
 
-The LCD screen displays "BLE connected" when the BLE rendezvous started.
-The LCD screen displays "Network Join" when the board joins thread network.
-The LCD screen displays "LED ON" + the light level when the controller enable the light ON and the line is erased when the controller disable the light.
-
-
-
+The LCD screen displays "BLE connected" when the BLE rendezvous started. The LCD
+screen displays "Network Join" when the board joins thread network. The LCD
+screen displays "LED ON" + the light level when the controller enable the light
+ON and the line is erased when the controller disable the light.

@@ -1,7 +1,7 @@
 # STM32 Getting Started Guide
 
-The stm32 platform uses [Matter](https://github.com/project-chip/connectedhomeip)
-sdk with FreeRTOS.
+The stm32 platform uses
+[Matter](https://github.com/project-chip/connectedhomeip) sdk with FreeRTOS.
 
 ---
 
@@ -18,12 +18,13 @@ sdk with FreeRTOS.
 
 The stm32 platform is supported on:
 
--  [STM32WB5MM-DK](https://www.st.com/en/evaluation-tools/stm32wb5mm-dk.html)
+-   [STM32WB5MM-DK](https://www.st.com/en/evaluation-tools/stm32wb5mm-dk.html)
 
 ## Matter Example Applications
 
 Sample Matter applications are provided for the stm32 platform. They can be used
-to speed up development. You can find them in the samples with `/stm32` subfolder.
+to speed up development. You can find them in the samples with `/stm32`
+subfolder.
 
 ## Building the Example Application
 
@@ -34,7 +35,7 @@ to speed up development. You can find them in the samples with `/stm32` subfolde
     ```
      apt-get install stlink-tools
     ```
-  
+
 -   Building the Application
 
     If the lighting example is to be built:
@@ -48,15 +49,17 @@ to speed up development. You can find them in the samples with `/stm32` subfolde
     `--target` when build the examples.
 
 -   After building the application, `ST-LINK` tool is used to flash it to the
-    board.
-    Before flashing the application, you will need to flash the fuse and the co processor binary.
-    The co processor binary  and fuse  are available [here](https://github.com/stm32-hotspot/stm32wb-matter-device-over-thread/tree/main/Projects/STM32WB_Copro_Wireless_Binaries/STM32WB5x)
-    Dynamic Concurrent Mode BLE Thread for Matter (Supports Full BLE Stack 5.2 certified and Minimal Thread Device ready v1.3)
- 
-    ```
-     sudo st-flash  write chip-stm32-lighting-example.bin 0x08000000 
+    board. Before flashing the application, you will need to flash the fuse and
+    the co processor binary. The co processor binary and fuse are available
+    [here](https://github.com/stm32-hotspot/stm32wb-matter-device-over-thread/tree/main/Projects/STM32WB_Copro_Wireless_Binaries/STM32WB5x)
+    Dynamic Concurrent Mode BLE Thread for Matter (Supports Full BLE Stack 5.2
+    certified and Minimal Thread Device ready v1.3)
 
     ```
+     sudo st-flash  write chip-stm32-lighting-example.bin 0x08000000
+
+    ```
+
 ## Commissioning
 
 There is one commissioning modes supported by stm32 platform:
@@ -73,14 +76,15 @@ There is one commissioning modes supported by stm32 platform:
     ```
     ./chip-tool pairing ble-thread <node_id> <hex:xxx> <pin_code> <discriminator>
     ```
+
 ### Bluetooth LE advertising
 
 In this example, to commission the device onto a Matter network, it must be
-discoverable over Bluetooth LE. After powering up the device, the device will advertise
-automatically for 30 seconds. After this delay, you will need to reset the device to start
-the commissioning procedure.
+discoverable over Bluetooth LE. After powering up the device, the device will
+advertise automatically for 30 seconds. After this delay, you will need to reset
+the device to start the commissioning procedure.
 
-### Bluetooth LE rendezvous    
+### Bluetooth LE rendezvous
 
 In Matter, the commissioning procedure is done over Bluetooth LE between a
 Matter device and the Matter controller(, where the controller has the
@@ -88,13 +92,12 @@ commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information
 from the Matter device. The data payload is encoded within a QR code, printed to
-the UART console. 
+the UART console.
 
-### Thread provisioning    
+### Thread provisioning
 
 The provisioning operation, which is the Last part of the rendezvous procedure,
-involves sending the Thread network credentials from the Matter
-controller to the Matter device. As a result, the device joins the Thread network
-via a OpenThread border Router (OTBR) and can communicate with other devices in the network.
- 
-
+involves sending the Thread network credentials from the Matter controller to
+the Matter device. As a result, the device joins the Thread network via a
+OpenThread border Router (OTBR) and can communicate with other devices in the
+network.
