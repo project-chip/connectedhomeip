@@ -174,7 +174,7 @@ client cluster IMProtocol = 0xFFFF0001 {
     boolean keep_subscriptions = 0;
     int16u min_minterval_floor = 1;
     int16u max_minterval_ceiling = 2;
-    optional AttributePathIB attribute_requests = 3;
+    optional AttributePathIB attribute_requests[] = 3;
     optional EventPathIB event_requests = 4;
     optional EventFilterIB event_filters = 5;
     // NOTE: 6 is missing here ...
