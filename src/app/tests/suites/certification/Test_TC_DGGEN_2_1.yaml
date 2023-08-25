@@ -21,6 +21,7 @@ config:
     nodeId: 0x12344321
     cluster: "General Diagnostics"
     endpoint: 0
+    timeout: 11500
 
     TEST_EVENT_ENABLE_KEY:
         type: octet_string
@@ -109,10 +110,10 @@ tests:
       command: "readAttribute"
       attribute: "RebootCount"
       response:
-          saveAs: RebootCountValue
+          saveAs: boot_count1
           constraints:
               type: int16u
-              minValue: 0
+              minValue: 1
               maxValue: 65535
 
     - label: "Step 3b: Reboot target device"
@@ -121,23 +122,7 @@ tests:
       command: "Reboot"
 
     - label: "Step 3b: Reboot target device(DUT)"
-      verification: |
-          Did the DUT successfully reboot?
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Please reboot the DUT and enter 'y' after DUT starts"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Step 3c: Reboot target device"
-      PICS: PICS_SDK_CI_ONLY
-      cluster: "SystemCommands"
-      command: "Reboot"
-
-    - label: "Step 3c: Reboot target device(DUT)"
+      PICS: PICS_USER_PROMPT
       verification: |
           Did the DUT successfully reboot?
       cluster: "LogCommands"
@@ -158,20 +143,262 @@ tests:
                 value: nodeId
 
     - label:
-          "Step 3d: TH reads a RebootCount attribute value from DUT. verify the
-          count is increased with value 2."
+          "Step 3b: TH reads a RebootCount attribute value from DUT. Store the
+          value in boot_count2."
       PICS: DGGEN.S.A0001
       command: "readAttribute"
       attribute: "RebootCount"
       response:
-          value: RebootCountValue + 2
+          constraints:
+              type: int16u
+              minValue: boot_count1 + 1
+              maxValue: 65535
 
-    - label: "Step 3e: Reset Devices to factory defaults"
+    - label:
+          "Step 4a: TH reads the Uptime attribute value of DUT. Store the value
+          in uptime1"
+      PICS: DGGEN.S.A0002
+      command: "readAttribute"
+      attribute: "UpTime"
+      response:
+          saveAs: uptime1
+          constraints:
+              type: int64u
+
+    - label: "Wait 10 seconds"
+      PICS: DGGEN.S.A0002
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label:
+          "Step 4b: TH reads a Uptime attribute value of DUT. Store the value in
+          uptime2. Verify that uptime2 is greater than uptime1."
+      PICS: DGGEN.S.A0002
+      command: "readAttribute"
+      attribute: "UpTime"
+      response:
+          saveAs: uptime2
+          constraints:
+              type: int64u
+              minValue: uptime1
+
+    - label: "Step 4c: Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Step 4c:Reboot target device(DUT)"
+      PICS: PICS_USER_PROMPT
+      verification: |
+          Did the DUT successfully reboot?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 4c: TH reads a Uptime attribute value of DUT. Store the value in
+          uptime3. Verify that uptime3 is lesser than uptime2."
+      PICS: DGGEN.S.A0003
+      command: "readAttribute"
+      attribute: "UpTime"
+      response:
+          saveAs: uptime3
+          constraints:
+              type: int64u
+              maxValue: uptime2
+
+    - label: "Step 5a: Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Step 5a: Reboot target device(DUT)"
+      PICS: PICS_USER_PROMPT
+      verification: |
+          Did the DUT successfully reboot?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 5b: TH reads BootReason attribute value from DUT."
+      PICS: DGGEN.S.A0004
+      command: "readAttribute"
+      attribute: "BootReason"
+      response:
+          value: 1
+          constraints:
+              minValue: 0
+              maxValue: 6
+
+    - label: "Step 6a: TH subscribes to ActiveHardwareFaults attribute from DUT"
+      PICS: SMOKECO.S.A0005
+      command: "subscribeAttribute"
+      attribute: "ActiveHardwareFaults"
+      minInterval: 10
+      maxInterval: 1000
+      response:
+          constraints:
+              type: list
+
+    - label: "Step 6b: TH reads ActiveHardwareFaults attribute value from DUT."
+      PICS: DGGEN.S.A0005
+      command: "readAttribute"
+      attribute: "ActiveHardwareFaults"
+      response:
+          constraints:
+              type: list
+              minLength: 0
+              maxLength: 11
+
+    - label: "Step 7a: TH subscribes to ActiveRadioFaults attribute from DUT"
+      PICS: DGGEN.S.A0006
+      command: "subscribeAttribute"
+      attribute: "ActiveRadioFaults"
+      minInterval: 10
+      maxInterval: 1000
+      response:
+          constraints:
+              type: list
+
+    - label: "Step 7b: TH reads ActiveRadioFaults attribute value from DUT."
+      PICS: DGGEN.S.A0006
+      command: "readAttribute"
+      attribute: "ActiveRadioFaults"
+      response:
+          constraints:
+              type: list
+              minLength: 0
+              maxLength: 7
+
+    - label: "Step 8a: TH subscribes to ActiveNetworkFaults attribute from DUT"
+      PICS: DGGEN.S.A0007
+      command: "subscribeAttribute"
+      attribute: "ActiveNetworkFaults"
+      minInterval: 100
+      maxInterval: 1000
+      response:
+          constraints:
+              type: list
+
+    - label: "Step 8b: TH reads ActiveNetworkFaults attribute value from DUT."
+      PICS: DGGEN.S.A0007
+      command: "readAttribute"
+      attribute: "ActiveNetworkFaults"
+      response:
+          constraints:
+              type: list
+              minLength: 0
+              maxLength: 4
+
+    - label: "Step 9a: TH reads TestEventTriggersEnabled attribute value"
+      PICS: DGGEN.S.A0008
+      cluster: "General Diagnostics"
+      command: "readAttribute"
+      attribute: "TestEventTriggersEnabled"
+      response:
+          saveAs: TestEventTriggersEnabledValue
+
+    - label:
+          "Step 9b: Verify ff this TestEventTriggersEnabled attribute value is
+          set to True"
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: true
+              - name: "Value2"
+                value: TestEventTriggersEnabledValue
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsExpectedValue
+
+    - label:
+          "Step 9c: When configured TRUE, Node has been configured with one or
+          more test event triggers by virtue of the internally programmed non
+          zero EnableKey value"
+      runIf: IsExpectedValue
+      PICS: DGGEN.S.C00.Rsp
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_ENABLE_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_KEY
+
+    - label:
+          "Step 10a: TH reads the TotalOperationalHours attribute from the DUT.
+          Store the value in operational_hours1."
+      PICS: DGGEN.S.A0003
+      command: "readAttribute"
+      attribute: "TotalOperationalHours"
+      response:
+          saveAs: operational_hours1
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFE
+
+    - label: "Wait for 2 hours and 5 minutes."
+      PICS: DGGEN.S.A0003
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 7500000
+
+    - label:
+          "Step 10a: TH reads the TotalOperationalHours attribute from the DUT.
+          Verify that operational_hours2 is greater than operational_hours1."
+      PICS: DGGEN.S.A0003
+      command: "readAttribute"
+      attribute: "TotalOperationalHours"
+      response:
+          constraints:
+              type: int32u
+              minValue: operational_hours1
+              maxValue: 0xFFFFFFFE
+
+    - label: "Step 10b: Reset Devices to factory defaults"
       PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       command: "FactoryReset"
 
-    - label: "Step 3e: Reset Devices to factory defaults"
+    - label: "Step 10b: Reset Devices to factory defaults"
+      PICS: PICS_USER_PROMPT
       verification: |
           Reset Devices to factory defaults
       cluster: "LogCommands"
@@ -191,67 +418,9 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Issue: https://github.com/project-chip/connectedhomeip/issues/28797
     - label:
-          "Step 3f: Verify RebootCount attribute upon the factory reset, the
-          count shall be set to 0."
-      PICS: DGGEN.S.A0001 && PICS_SKIP_SAMPLE_APP
-      verification: |
-          ./chip-tool generaldiagnostics read reboot-count 1 0
-
-          On TH(chip-tool), Verify that RebootCount attribute data type must be UINT16
-
-          Below is the example value which is observed in the RPI platform the value may be differ based on the dut implementation.
-
-          [1673505969.137962][1675:1677] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0001 DataVersion: 208803234
-          [1673505969.138103][1675:1677] CHIP:TOO:   RebootCount: 1
-          [1673505969.138333][1675:1677] CHIP:EM: <<< [E:32075i M:235270836 (Ack:41789559)] (S) Msg TX to 1:0000000000000001 [E5A9] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Factory Reset the DUT and enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Step 4a: Reboot target device"
-      PICS: PICS_SDK_CI_ONLY
-      cluster: "SystemCommands"
-      command: "Reboot"
-
-    - label: "Step 4a:Reboot target device(DUT)"
-      verification: |
-          Did the DUT successfully reboot?
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Please reboot the DUT and enter 'y' after DUT starts"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
-
-    - label:
-          "Step 4b: DUT reboots and TH reads a UpTime attribute value of DUT
-          since some arbitrary start time of DUT rebooting."
-      PICS: DGGEN.S.A0002
-      command: "readAttribute"
-      attribute: "UpTime"
-      response:
-          constraints:
-              type: int64u
-
-    - label:
-          "Step 5a: TH reads a TotalOperationalHours attribute value from DUT."
+          "Step 10b: TH reads the TotalOperationalHours attribute from the DUT.
+          Verify that the value of 'TotalOperationalHours' is 0."
       PICS: DGGEN.S.A0003
       command: "readAttribute"
       attribute: "TotalOperationalHours"
@@ -259,15 +428,34 @@ tests:
           value: 0
           constraints:
               type: int32u
-              minValue: 0x0
-              maxValue: 0xFFFFFFFE
 
-    - label: "Step 6a: Reboot target device"
+    - label: "Wait for 1 hour 5 minutes."
+      PICS: DGGEN.S.A0003
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 3900000
+
+    - label:
+          "Step 10c: TH reads the TotalOperationalHours attribute from the DUT.
+          Verify that the value of 'TotalOperationalHours' is 1."
+      PICS: DGGEN.S.A0003
+      command: "readAttribute"
+      attribute: "TotalOperationalHours"
+      response:
+          value: 1
+          constraints:
+              type: int32u
+
+    - label: "Step 10d: Reboot target device"
       PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       command: "Reboot"
 
-    - label: "Step 6a:Reboot target device(DUT)"
+    - label: "Step 10d: Reboot target device(DUT)"
+      PICS: PICS_USER_PROMPT
       verification: |
           Did the DUT successfully reboot?
       cluster: "LogCommands"
@@ -287,109 +475,13 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 6b: TH reads BootReason attribute value from DUT."
-      PICS: DGGEN.S.A0004
-      command: "readAttribute"
-      attribute: "BootReason"
-      response:
-          constraints:
-              minValue: 0
-              maxValue: 6
-
-    - label: "Step 7a: TH subscribes to ActiveHardwareFaults attribute from DUT"
-      PICS: SMOKECO.S.A0005
-      command: "subscribeAttribute"
-      attribute: "ActiveHardwareFaults"
-      minInterval: 10
-      maxInterval: 1000
-      response:
-          constraints:
-              type: list
-
-    - label: "Step 7b: TH reads ActiveHardwareFaults attribute value from DUT."
-      PICS: DGGEN.S.A0005
-      command: "readAttribute"
-      attribute: "ActiveHardwareFaults"
-      response:
-          constraints:
-              type: list
-              minLength: 0
-              maxLength: 11
-
-    - label: "Step 8a: TH subscribes to ActiveRadioFaults attribute from DUT"
-      PICS: DGGEN.S.A0006
-      command: "subscribeAttribute"
-      attribute: "ActiveRadioFaults"
-      minInterval: 10
-      maxInterval: 1000
-      response:
-          constraints:
-              type: list
-
-    - label: "Step 8b: TH reads ActiveRadioFaults attribute value from DUT."
-      PICS: DGGEN.S.A0006
-      command: "readAttribute"
-      attribute: "ActiveRadioFaults"
-      response:
-          constraints:
-              type: list
-              minLength: 0
-              maxLength: 7
-
-    - label: "Step 9a: TH subscribes to ActiveNetworkFaults attribute from DUT"
-      PICS: DGGEN.S.A0007
-      command: "subscribeAttribute"
-      attribute: "ActiveNetworkFaults"
-      minInterval: 100
-      maxInterval: 1000
-      response:
-          constraints:
-              type: list
-
-    - label: "Step 9b: TH reads ActiveNetworkFaults attribute value from DUT."
-      PICS: DGGEN.S.A0007
-      command: "readAttribute"
-      attribute: "ActiveNetworkFaults"
-      response:
-          constraints:
-              type: list
-              minLength: 0
-              maxLength: 4
-
-    - label: "Step 10a: TH reads TestEventTriggersEnabled attribute value"
-      PICS: DGGEN.S.A0008
-      cluster: "General Diagnostics"
-      command: "readAttribute"
-      attribute: "TestEventTriggersEnabled"
-      response:
-          saveAs: TestEventTriggersEnabledValue
-
     - label:
-          "Step 10b: Verify ff this TestEventTriggersEnabled attribute value is
-          set to True"
-      cluster: "EqualityCommands"
-      command: "UnsignedNumberEquals"
-      arguments:
-          values:
-              - name: "Value1"
-                value: true
-              - name: "Value2"
-                value: TestEventTriggersEnabledValue
+          "Step 10c: TH reads the TotalOperationalHours attribute from the DUT.
+          Verify that the value of 'TotalOperationalHours' is 1."
+      PICS: DGGEN.S.A0003
+      command: "readAttribute"
+      attribute: "TotalOperationalHours"
       response:
-          - values:
-                - name: "Equals"
-                  saveAs: IsExpectedValue
-
-    - label:
-          "Step 10c: When configured TRUE, Node has been configured with one or
-          more test event triggers by virtue of the internally programmed non
-          zero EnableKey value"
-      runIf: IsExpectedValue
-      PICS: DGGEN.S.C00.Rsp
-      command: "TestEventTrigger"
-      arguments:
-          values:
-              - name: "EnableKey"
-                value: TEST_EVENT_ENABLE_KEY
-              - name: "EventTrigger"
-                value: TEST_EVENT_TRIGGER_KEY
+          value: 1
+          constraints:
+              type: int32u

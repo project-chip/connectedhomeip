@@ -595,15 +595,15 @@ G.S=1
 G.S.F00=1
 G.S.A0000=0
 G.S.C00.Rsp=1
-G.S.C01.Rsp=0
-G.S.C02.Rsp=0
-G.S.C03.Rsp=0
+G.S.C01.Rsp=1
+G.S.C02.Rsp=1
+G.S.C03.Rsp=1
 G.S.C04.Rsp=0
 G.S.C05.Rsp=0
-G.S.C00.Tx=0
-G.S.C01.Tx=0
-G.S.C02.Tx=0
-G.S.C03.Tx=0
+G.S.C00.Tx=1
+G.S.C01.Tx=1
+G.S.C02.Tx=1
+G.S.C03.Tx=1
 
 G.C=1
 G.C.A0000=0
@@ -2245,7 +2245,6 @@ AIRQUAL.S.F01=1
 AIRQUAL.S.F02=1
 AIRQUAL.S.F03=1
 AIRQUAL.S.A0000=1
-PICS_USER_PROMPT=0
 AIRQUAL.M.AirQualityChange=0
 
 # Concentration Measurement

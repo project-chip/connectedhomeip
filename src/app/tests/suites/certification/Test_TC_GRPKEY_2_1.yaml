@@ -26,7 +26,7 @@ config:
     Groups.Endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
