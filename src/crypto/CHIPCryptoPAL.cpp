@@ -571,7 +571,7 @@ CHIP_ERROR ReadDerLength(Reader & reader, size_t & length)
     for (uint8_t i = 0; i < length_bytes; i++)
     {
         uint8_t cur_length_byte = 0;
-        err       = reader.Read8(&cur_length_byte).StatusCode();
+        err                     = reader.Read8(&cur_length_byte).StatusCode();
         if (err != CHIP_NO_ERROR)
             break;
 
