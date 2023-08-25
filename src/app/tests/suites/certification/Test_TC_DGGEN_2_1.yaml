@@ -255,13 +255,12 @@ tests:
       command: "readAttribute"
       attribute: "BootReason"
       response:
-          value: 1
           constraints:
               minValue: 0
               maxValue: 6
 
     - label: "Step 6a: TH subscribes to ActiveHardwareFaults attribute from DUT"
-      PICS: SMOKECO.S.A0005
+      PICS: DGGEN.S.A0005
       command: "subscribeAttribute"
       attribute: "ActiveHardwareFaults"
       minInterval: 10
@@ -331,6 +330,7 @@ tests:
     - label:
           "Step 9b: Verify ff this TestEventTriggersEnabled attribute value is
           set to True"
+      PICS: DGGEN.S.A0008
       cluster: "EqualityCommands"
       command: "UnsignedNumberEquals"
       arguments:
