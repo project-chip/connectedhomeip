@@ -246,7 +246,7 @@ tests:
     - label: "Step 5: TH reads from the DUT the 'TagList' attribute."
       PICS: DESC.S.A0004
       verification: |
-          ./chip-tool descriptor read  parts-list 1 0
+          ./chip-tool descriptor read tag-list 1 0
 
           Verify that the DUT response contains a TagList and SHALL contain at least one element:
 
