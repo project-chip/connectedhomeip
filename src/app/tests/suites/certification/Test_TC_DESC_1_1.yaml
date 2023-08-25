@@ -45,9 +45,9 @@ tests:
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 0
           constraints:
               type: bitmap32
+              hasMasksSet: [0x1]
 
     - label: "Step 4a: Read the global attribute: AttributeList"
       PICS: PICS_EVENT_LIST_ENABLED

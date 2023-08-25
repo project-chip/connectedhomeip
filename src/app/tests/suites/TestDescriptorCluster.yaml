@@ -92,3 +92,21 @@ tests:
           value: 2
           constraints:
               type: int16u
+
+    - label: "Read attribute Tag list"
+      command: "readAttribute"
+      attribute: "TagList"
+      response:
+          value:
+              [
+                  { MfgCode: null, NamespaceID: 7, Tag: 0 },
+                  { MfgCode: null, NamespaceID: 8, Tag: 3 },
+              ]
+
+    - label: "Read feature map Attribute"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
