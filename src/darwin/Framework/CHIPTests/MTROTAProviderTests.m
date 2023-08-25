@@ -52,7 +52,9 @@ static const uint64_t kDeviceId3 = 0x12341236;
 // NOTE: These onboarding payloads are for the chip-ota-requestor-app, not chip-all-clusters-app
 static NSString * kOnboardingPayload1 = @"MT:-24J0SO527K10648G00"; // Discriminator: 1111
 static NSString * kOnboardingPayload2 = @"MT:-24J0AFN00L10648G00"; // Discriminator: 1112
+#ifdef ENABLE_REAL_OTA_UPDATE_TESTS
 static NSString * kOnboardingPayload3 = @"MT:-24J0IRV01L10648G00"; // Discriminator: 1113
+#endif // ENABLE_REAL_OTA_UPDATE_TESTS
 
 static const uint16_t kLocalPort = 5541;
 static const uint16_t kTestVendorId = 0xFFF1u;
