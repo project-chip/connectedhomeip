@@ -4,6 +4,19 @@ import pandas as pd
 from slugify import slugify
 import subprocess
 
+error_catalog = {
+    "CodeQL": {
+        "(eventual cause: IOException \"No space left on device\")": {
+            "short": "Ran out of space",
+            "detail: "IOException due to running out of space"
+        },
+        "Check that the disk containing the database directory has ample free space.": {
+            "short": "Ran out of space",
+            "detail: "Fatal internal error likely due to running out of space"
+        }
+    }
+}
+
 def process_fail(id, pr, start_time, workflow):
     logging.info("Processing failure in {pr}, workflow {workflow} that started at {start_time}.")
     
@@ -18,11 +31,11 @@ def process_fail(id, pr, start_time, workflow):
     root_cause = "Unknown cause"
     with open(f"{output_path}/fail_log.txt") as fail_log_file:
         fail_log = fail_log_file.read()
-        match workflow:
-            case "CodeQL":
-                if "(eventual cause: IOException \"No space left on device\")" in fail_log or
-                "Check that the disk containing the database directory has ample free space." in fail_log:
-                    root_cause = "Ran out of space"
+        if workflow in error_catalog:
+            for error_message in error_catalog[workflow]:
+                if error_message in fail_log:
+                    root_cause = error_catalog[workflow][error_message]["short"]
+                    break
     return [pr, workflow, root_cause]
 
 
