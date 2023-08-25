@@ -246,5 +246,20 @@ tests:
     - label: "Step 5: TH reads from the DUT the 'TagList' attribute."
       PICS: DESC.S.A0004
       verification: |
-          SDK has to implement the Taglist attribute
+          ./chip-tool descriptor read tag-list 1 0
+
+          Verify that the DUT response contains a TagList and SHALL contain at least one element:
+
+          [1692930031.171338][161314:161316] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0004 DataVersion: 3040764429
+          [1692930031.171357][161314:161316] CHIP:TOO:   TagList: 2 entries
+          [1692930031.171384][161314:161316] CHIP:TOO:     [1]: {
+          [1692930031.171389][161314:161316] CHIP:TOO:       MfgCode: null
+          [1692930031.171392][161314:161316] CHIP:TOO:       NamespaceID: 7
+          [1692930031.171394][161314:161316] CHIP:TOO:       Tag: 0
+          [1692930031.171396][161314:161316] CHIP:TOO:      }
+          [1692930031.171399][161314:161316] CHIP:TOO:     [2]: {
+          [1692930031.171410][161314:161316] CHIP:TOO:       MfgCode: null
+          [1692930031.171413][161314:161316] CHIP:TOO:       NamespaceID: 8
+          [1692930031.171425][161314:161316] CHIP:TOO:       Tag: 3
+          [1692930031.171427][161314:161316] CHIP:TOO:      }
       disabled: true

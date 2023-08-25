@@ -21,6 +21,7 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/jsontlv/TlvJson.h>
 
+constexpr const char * kEventNumberKey    = "eventNumber";
 constexpr const char * kDataVersionKey    = "dataVersion";
 constexpr const char * kClusterIdKey      = "clusterId";
 constexpr const char * kEndpointIdKey     = "endpointId";
@@ -129,9 +130,10 @@ CHIP_ERROR LogEventAsJSON(const chip::app::EventHeader & header, chip::TLV::TLVR
     VerifyOrReturnError(gDelegate != nullptr, CHIP_NO_ERROR);
 
     Json::Value value;
-    value[kClusterIdKey]  = header.mPath.mClusterId;
-    value[kEndpointIdKey] = header.mPath.mEndpointId;
-    value[kEventIdKey]    = header.mPath.mEventId;
+    value[kClusterIdKey]   = header.mPath.mClusterId;
+    value[kEndpointIdKey]  = header.mPath.mEndpointId;
+    value[kEventIdKey]     = header.mPath.mEventId;
+    value[kEventNumberKey] = header.mEventNumber;
 
     chip::TLV::TLVReader reader;
     reader.Init(*data);
