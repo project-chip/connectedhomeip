@@ -2432,10 +2432,12 @@ static void TestVIDPID_StringExtraction(nlTestSuite * inSuite, void * inContext)
     const char * sTestCNAttribute11 = "ACME Matter Devel DAC 5CDA9899 Mvid:FFF1 Mpid:B1";
     const char * sTestCNAttribute12 = "ACME Matter Devel DAC 5CDA9899 Mpid: Mvid:FFF1";
 
-    // Common Name (CN) VID/PID encoding error cases (more examples):
+    // Common Name (CN) VID/PID encoding more cases (more examples):
     const char * sTestCNAttribute13 = "Mpid:987Mvid:FFF10x";
-    const char * sTestCNAttribute14 = "MpidMvid:FFF10 Matter Test Mpid:FE67";
+    const char * sTestCNAttribute14 = "MpidMvid:FFF10 Matter Test Mpid:FE67"; // Valid, even if there is run-in.
     const char * sTestCNAttribute15 = "Matter Devel Mpid:Mvid:Fff1";
+    // Even though "Mpid:" appears thrice, only the value with correct hex afterwards is taken
+    const char * sTestCNAttribute16 = "Mpid:Mvid:FFF1 Mpid:12cd Matter Test Mpid:FE67";
 
     struct TestCase
     {
@@ -2476,50 +2478,64 @@ static void TestVIDPID_StringExtraction(nlTestSuite * inSuite, void * inContext)
         { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute07), strlen(sTestCNAttribute07)), true, true, chip::VendorId::TestVendor1, 0x00B1, CHIP_NO_ERROR },
         { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute08), strlen(sTestCNAttribute08)), true, true, chip::VendorId::TestVendor1, 0x00B1, CHIP_NO_ERROR },
         // Common Name (CN) VID/PID encoding error cases:
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute09), strlen(sTestCNAttribute09)), false, true, chip::VendorId::NotSpecified, 0x00B1, CHIP_NO_ERROR },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute10), strlen(sTestCNAttribute10)), false, true, chip::VendorId::NotSpecified, 0x00B1, CHIP_NO_ERROR },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute11), strlen(sTestCNAttribute11)), true, false, chip::VendorId::TestVendor1, 0, CHIP_NO_ERROR },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute12), strlen(sTestCNAttribute12)), true, false, chip::VendorId::TestVendor1, 0, CHIP_NO_ERROR },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute13), strlen(sTestCNAttribute13)), true, false, chip::VendorId::TestVendor1, 0, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute09), strlen(sTestCNAttribute09)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute10), strlen(sTestCNAttribute10)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute11), strlen(sTestCNAttribute11)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute12), strlen(sTestCNAttribute12)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        // Common Name (CN) VID/PID encoding additional cases:
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute13), strlen(sTestCNAttribute13)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
         { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute14), strlen(sTestCNAttribute14)), true, true, chip::VendorId::TestVendor1, 0xFE67, CHIP_NO_ERROR },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute15), strlen(sTestCNAttribute15)), false, false, chip::VendorId::NotSpecified, 0, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute15), strlen(sTestCNAttribute15)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute16), strlen(sTestCNAttribute16)), true, true, chip::VendorId::TestVendor1, 0xFE67, CHIP_NO_ERROR },
         // Other input combinations:
         { DNAttrType::kUnspecified, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute15), strlen(sTestCNAttribute15)), false, false, chip::VendorId::NotSpecified, 0, CHIP_NO_ERROR },
         { DNAttrType::kCommonName, ByteSpan(nullptr, 0), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_INVALID_ARGUMENT },
     };
     // clang-format on
 
+    int caseIdx = 0;
     for (const auto & testCase : kTestCases)
     {
         AttestationCertVidPid vidpid;
         AttestationCertVidPid vidpidFromCN;
         AttestationCertVidPid vidpidToCheck;
         CHIP_ERROR result = ExtractVIDPIDFromAttributeString(testCase.attrType, testCase.attr, vidpid, vidpidFromCN);
+        ChipLogProgress(Crypto, "Checking VID/PID DN case %d. Expected: %" CHIP_ERROR_FORMAT , caseIdx, testCase.expectedResult.Format());
+
+        if (result != testCase.expectedResult) {
+            ChipLogError(Crypto, "Actual result: %" CHIP_ERROR_FORMAT, result.Format());
+        }
         NL_TEST_ASSERT(inSuite, result == testCase.expectedResult);
 
-        if (testCase.attrType == DNAttrType::kMatterVID || testCase.attrType == DNAttrType::kMatterPID)
+        // Only do assertions on output params in case of success since otherwise
+        // many of the output params are intermediate outputs.
+        if (result == CHIP_NO_ERROR)
         {
-            NL_TEST_ASSERT(inSuite, !vidpidFromCN.Initialized());
-            vidpidToCheck = vidpid;
-        }
-        else if (testCase.attrType == DNAttrType::kCommonName)
-        {
-            NL_TEST_ASSERT(inSuite, !vidpid.Initialized());
-            vidpidToCheck = vidpidFromCN;
-        }
+            if (testCase.attrType == DNAttrType::kMatterVID || testCase.attrType == DNAttrType::kMatterPID)
+            {
+                NL_TEST_ASSERT(inSuite, !vidpidFromCN.Initialized());
+                vidpidToCheck = vidpid;
+            }
+            else if (testCase.attrType == DNAttrType::kCommonName)
+            {
+                NL_TEST_ASSERT(inSuite, !vidpid.Initialized());
+                vidpidToCheck = vidpidFromCN;
+            }
 
-        NL_TEST_ASSERT(inSuite, vidpidToCheck.mVendorId.HasValue() == testCase.expectedVidPresent);
-        NL_TEST_ASSERT(inSuite, vidpidToCheck.mProductId.HasValue() == testCase.expectedPidPresent);
+            NL_TEST_ASSERT(inSuite, vidpidToCheck.mVendorId.HasValue() == testCase.expectedVidPresent);
+            NL_TEST_ASSERT(inSuite, vidpidToCheck.mProductId.HasValue() == testCase.expectedPidPresent);
 
-        if (testCase.expectedVidPresent)
-        {
-            NL_TEST_ASSERT(inSuite, vidpidToCheck.mVendorId.Value() == testCase.expectedVid);
-        }
+            if (testCase.expectedVidPresent)
+            {
+                NL_TEST_ASSERT(inSuite, vidpidToCheck.mVendorId.Value() == testCase.expectedVid);
+            }
 
-        if (testCase.expectedPidPresent)
-        {
-            NL_TEST_ASSERT(inSuite, vidpidToCheck.mProductId.Value() == testCase.expectedPid);
+            if (testCase.expectedPidPresent)
+            {
+                NL_TEST_ASSERT(inSuite, vidpidToCheck.mProductId.Value() == testCase.expectedPid);
+            }
         }
+        ++caseIdx;
     }
 }
 
