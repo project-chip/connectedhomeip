@@ -49,7 +49,7 @@ tests:
       verification: |
           TH reads from the DUT the IdleModeInterval attribute by sending below mentioned command
 
-           icdmanagement read idle-mode-interval 1
+           icdmanagement read idle-mode-interval 1 0
           Please note down the value of IdleModeInterval as SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT for use in the next step validations.
 
 
@@ -57,7 +57,7 @@ tests:
           [1690475024.398282][5675:5677] CHIP:DMG:         InteractionModelRevision = 1
           [1690475024.398285][5675:5677] CHIP:DMG: }
           [1690475024.398735][5675:5677] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0000 DataVersion: 4216223957
-          [1690475024.398921][5675:5677] CHIP:TOO:   IdleModeInterval: 500
+          [1690475024.398921][5675:5677] CHIP:TOO:   IdleModeInterval: 1
           [1690475024.399202][5675:5677] CHIP:EM: <<< [E:28320i S:44238 M:28503816 (Ack:266918637)] (S) Msg TX to 1:0000000000000001 [3C19] --- Type 0000:10 (SecureChannel:StandaloneAck)
           [1690475024.399208][5675:5677] CHIP:IN: (S) Sending msg 28503816 on secure session with LSID: 44238
           [1690475024.399217][5675:5677] CHIP:EM: Flushed pending ack for MessageCounter:266918637 on exchange 28320i
