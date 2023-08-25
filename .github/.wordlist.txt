@@ -1276,6 +1276,9 @@ StatusCode
 stderr
 stdout
 sterm
+stm
+STM
+STLINK
 storagepath
 str
 strcpy
@@ -1476,6 +1479,8 @@ WakeOnLan
 WantedBy
 watchdogTimeout
 watchOS
+Wb
+wb
 webpage
 wg
 wget
