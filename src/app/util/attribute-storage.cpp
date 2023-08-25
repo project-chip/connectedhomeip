@@ -1093,12 +1093,7 @@ CHIP_ERROR GetTagListFromEndpointAtIndex(EndpointId endpoint, size_t index,
 {
     uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
 
-    if (endpointIndex == 0xFFFF)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    if (index >= emAfEndpoints[endpointIndex].tagList.size())
+    if (endpointIndex == 0xFFFF || index >= emAfEndpoints[endpointIndex].tagList.size())
     {
         return CHIP_ERROR_NOT_FOUND;
     }

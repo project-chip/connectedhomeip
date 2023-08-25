@@ -82,7 +82,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadTagAttribute(EndpointId endpoint, Attribute
             ReturnErrorOnFailure(encoder.Encode(tag));
             index++;
         }
-        if (err == CHIP_ERROR_NOT_FOUND || err == CHIP_ERROR_INVALID_ARGUMENT)
+        if (err == CHIP_ERROR_NOT_FOUND)
         {
             return CHIP_NO_ERROR;
         }

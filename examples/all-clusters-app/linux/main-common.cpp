@@ -63,13 +63,13 @@ Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupporte
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
 // Common Number Namespace: 7, tag 0 (Zero)
-constexpr const uint8_t CommonNumNamespace = 7;
-constexpr const uint8_t TagNumZero         = 0;
+constexpr const uint8_t kNamespaceCommon = 7;
+constexpr const uint8_t kTagCommonZero    = 0;
 // Common Position Namespace: 8, tag: 2 (Top)
-constexpr const uint8_t CommonPositionNamespace                         = 8;
-constexpr const uint8_t TagNumTop                                       = 2;
+constexpr const uint8_t kNamespacePosition                              = 8;
+constexpr const uint8_t kTagPositionTop                                 = 2;
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type gTagList[] = {
-    { .namespaceID = CommonNumNamespace, .tag = TagNumZero }, { .namespaceID = CommonPositionNamespace, .tag = TagNumTop }
+    { .namespaceID = kNamespaceCommon, .tag = kTagCommonZero }, { .namespaceID = kNamespacePosition, .tag = kTagPositionTop }
 };
 } // namespace
 

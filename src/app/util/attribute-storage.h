@@ -205,7 +205,7 @@ chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::Endp
  * Get the tag list of endpoint.
  * Fills in the provided SemanticTagStruct with tag at index `index` if there is one,
  * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of tag,
- * or returns CHIP_ERROR_INVALID_ARGUMENT if the endpoint is invalid.
+ * or returns CHIP_ERROR_NOT_FOUND if the endpoint is invalid.
  * @param endpoint The target endpoint.
  * @param index The index of the tag, with 0 representing the first tag.
  * @param tag  The SemanticTagStruct is filled.
