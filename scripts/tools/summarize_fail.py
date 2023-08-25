@@ -20,8 +20,8 @@ def process_fail(id, pr, start_time, workflow):
         fail_log = fail_log_file.read()
         match workflow:
             case "CodeQL":
-                if "(eventual cause: IOException \"No space left on device\")" in fail_log
-                or "Check that the disk containing the database directory has ample free space." in fail_log:
+                if "(eventual cause: IOException \"No space left on device\")" in fail_log or
+                "Check that the disk containing the database directory has ample free space." in fail_log:
                     root_cause = "Ran out of space"
     return [pr, workflow, root_cause]
 
