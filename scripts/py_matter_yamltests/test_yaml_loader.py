@@ -69,7 +69,7 @@ class TestYamlLoader(unittest.TestCase):
         self.assertEqual(filename, '')
         self.assertEqual(name, '')
         self.assertEqual(pics, None)
-        self.assertEqual(config, {})
+        self.assertEqual(config, {'LastReceivedEventNumber': 0})
         self.assertEqual(tests, [])
 
     def test_empty_file(self):
@@ -81,7 +81,7 @@ class TestYamlLoader(unittest.TestCase):
         self.assertEqual(name, '')
         self.assertEqual(name, '')
         self.assertEqual(pics, None)
-        self.assertEqual(config, {})
+        self.assertEqual(config, {'LastReceivedEventNumber': 0})
         self.assertEqual(tests, [])
 
     def test_key_unknown(self):
@@ -151,7 +151,7 @@ class TestYamlLoader(unittest.TestCase):
         '''
 
         _, _, _, config, _ = load(content)
-        self.assertEqual(config, {'name': 'value', 'name2': 'value2'})
+        self.assertEqual(config, {'LastReceivedEventNumber': 0, 'name': 'value', 'name2': 'value2'})
 
     def test_key_config_wrong_values(self):
         load = YamlLoader().load
