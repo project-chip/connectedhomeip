@@ -73,7 +73,7 @@ public final class ClusterState {
             String key = iterator.next();
             if (combinedObject.has(key)) {
               Log.e(TAG, "Conflicting attribute tag Id is found: " + key);
-              return;
+              continue;
             }
             try {
               Object value = attributes.get(key);
