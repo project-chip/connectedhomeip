@@ -369,6 +369,8 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                                       problem=f"Unexpected standard attribute {unexpected} in cluster {cluster_id}", spec_location=f"Cluster {cluster_id}")
                     success = False
 
+        # TODO: maybe while we're at it, we should check that the command list doesn't contain unexpected commands.
+
         # Validate presence of claimed attributes
         if success:
             # TODO: Also check the reverse: that each attribute appears in the AttributeList.
