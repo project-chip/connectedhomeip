@@ -1476,10 +1476,10 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 /**
  * @def CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL
  *
- * @brief Default value for the ICD Management cluster IdleModeInterval attribute, in milliseconds
+ * @brief Default value for the ICD Management cluster IdleModeInterval attribute, in seconds
  */
 #ifndef CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL
-#define CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL 2000
+#define CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL 2
 #endif
 
 /**

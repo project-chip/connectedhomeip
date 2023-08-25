@@ -182,6 +182,8 @@ void PrettyPrintCurrentValue(const TLVReader & reader, chip::StringBuilderBase &
             out.AddFormat(" | 0x%08" PRIX64, value);
         }
     }
+
+    out.AddMarkerIfOverflow();
 }
 
 } // namespace
