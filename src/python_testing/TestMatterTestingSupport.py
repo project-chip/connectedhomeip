@@ -527,6 +527,16 @@ class TestMatterTestingSupport(MatterBaseTest):
         problems = find_tag_list_problems(roots, device_types, simple)
         asserts.assert_equal(len(problems), 0, "Unexpected problems found in list")
 
+        # One tag list is a subset of the other - this should pass
+        tag1 = Clusters.Descriptor.Structs.SemanticTagStruct(tag=1)
+        tag2 = Clusters.Descriptor.Structs.SemanticTagStruct(tag=2)
+        tag3 = Clusters.Descriptor.Structs.SemanticTagStruct(tag=3)
+
+        simple[2][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [tag1, tag2]
+        simple[3][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [tag1, tag2, tag3]
+        problems = find_tag_list_problems(roots, device_types, simple)
+        asserts.assert_equal(len(problems), 0, "Unexpected problems found in list")
+
 
 if __name__ == "__main__":
     default_matter_test_main()

@@ -289,6 +289,7 @@ def find_tag_list_problems(roots: list[int], device_types: dict[int, dict[int, s
                 for other in endpoints:
                     if other == endpoint:
                         continue
+                    # The OTHER endpoint is missing a tag list attribute - ignore this here, we'll catch that when we assess this endpoint as the primary
                     if Clusters.Descriptor.Attributes.TagList not in endpoint_dict[other][Clusters.Descriptor]:
                         continue
 
