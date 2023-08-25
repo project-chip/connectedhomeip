@@ -8,11 +8,11 @@ error_catalog = {
     "CodeQL": {
         "(eventual cause: IOException \"No space left on device\")": {
             "short": "Ran out of space",
-            "detail: "IOException due to running out of space"
+            "detail": "IOException due to running out of space"
         },
         "Check that the disk containing the database directory has ample free space.": {
             "short": "Ran out of space",
-            "detail: "Fatal internal error likely due to running out of space"
+            "detail": "Fatal internal error likely due to running out of space"
         }
     }
 }
