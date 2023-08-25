@@ -6,13 +6,13 @@ import subprocess
 
 error_catalog = {
     "CodeQL": {
-        "(eventual cause: IOException \"No space left on device\")": {
+        "No space left on device": {
             "short": "Ran out of space",
-            "detail": "IOException due to running out of space"
+            "detail": "Exception with signature \"No space left on device\""
         },
         "Check that the disk containing the database directory has ample free space.": {
             "short": "Ran out of space",
-            "detail": "Fatal internal error likely due to running out of space"
+            "detail": "Fatal internal error with message indicating that disk space most likely ran out"
         }
     }
 }
