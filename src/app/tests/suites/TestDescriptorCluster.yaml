@@ -84,3 +84,12 @@ tests:
       attribute: "PartsList"
       response:
           value: [1, 2]
+
+    - label: "Read attribute ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 2
+          constraints:
+              type: int16u
+
