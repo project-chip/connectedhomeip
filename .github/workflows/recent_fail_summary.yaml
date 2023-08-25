@@ -37,6 +37,7 @@ jobs:
         with:
           name: workflow-fail-summary
           path: |
+            run_list.json
             recent_fails.csv
             recent_fails_frequency.csv
             recent_fails_logs
