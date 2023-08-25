@@ -198,10 +198,7 @@ Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(const
                                                                            uint8_t * value)
 {
     Delegate * delegate = GetDelegate(attributePath.mEndpointId);
-    if (delegate == nullptr)
-    {
-        return Status::Success;
-    }
+    VerifyOrDie((delegate != nullptr) && "Washer Controls implementation requires a registered delegate for validation.");
     switch (attributePath.mAttributeId)
     {
     case Attributes::SpinSpeedCurrent::Id: {
