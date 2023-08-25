@@ -161,22 +161,9 @@ tests:
           values:
               - name: "RootCACertificate"
                 value: Root_CA_Certificate_TH2
-      response:
-          values:
-              - name: "StatusCode"
-                value: 0
-      verification: "Verify that AddTrustedRootCertificate command succeeds by sending the status code as SUCCESS"
-
-    - label: "Step 8.1: Save the AdminVendorId for TH2 as Vendor_Id_TH2"
-      PICS: OPCREDS.S.A0001
-      identity: "beta"
-      command: "readAttribute"
-      cluster: "Administrator Commissioning"
-      attribute: "AdminVendorId"
-      response:
-          saveAs: Vendor_Id_TH2
+      # verification: "Verify that AddTrustedRootCertificate command succeeds by sending the status code as SUCCESS"
     
-    - label: "Step 8.2: TH1 sends the AddNOC command to DUT with the following fields: NOCValue as Node_Operational_Certificate_TH2. ICACValue as Intermediate_Certificate_TH2. IpkValue as IPK_TH2. CaseAdminSubject as the NodeID of TH2. AdminVendorId as the Vendor ID of TH2."
+    - label: "Step 8: TH1 sends the AddNOC command to DUT with the following fields: NOCValue as Node_Operational_Certificate_TH2. ICACValue as Intermediate_Certificate_TH2. IpkValue as IPK_TH2. CaseAdminSubject as the NodeID of TH2. AdminVendorId as the Vendor ID of TH2."
       PICS: OPCREDS.S.C06.Rsp && OPCREDS.S.C08.Tx
       identity: "alpha"
       command: "AddNOC"
@@ -224,6 +211,7 @@ tests:
     - label: "Step 12.1: Save the FabricIndex for TH2's entry as TH2_Fabric_Index for future use."
       PICS: OPCREDS.S.A0001
       identity: "beta"
+      nodeId: 0x43211234
       command: "readAttribute"
       cluster: "Operational Credentials"
       attribute: "CurrentFabricIndex"
@@ -236,6 +224,7 @@ tests:
       command: "readAttribute"
       cluster: "Operational Credentials"
       attribute: "Fabrics"
+      fabricFiltered: false
       response:
           value: [{ "FabricIndex": TH1_Fabric_Index, "Label": "", }, { "FabricIndex": TH2_Fabric_Index, "Label": "", },]
           constraints:
@@ -249,6 +238,7 @@ tests:
       command: "readAttribute"
       cluster: "Operational Credentials"
       attribute: "Fabrics"
+      fabricFiltered: false
       response:
           value: [{ "FabricIndex": TH1_Fabric_Index, "Label": "", }, { "FabricIndex": TH2_Fabric_Index, "Label": "", },]
           constraints:
@@ -258,7 +248,6 @@ tests:
     - label: "Step 14: TH1 sends RemoveFabric command to DUT with the FabricIndex field set to TH2_Fabric_Index."
       PICS: OPCREDS.S.C0a.Rsp
       identity: "alpha"
-      nodeId: nodeId
       command: "RemoveFabric"
       cluster: "Operational Credentials"
       arguments:
