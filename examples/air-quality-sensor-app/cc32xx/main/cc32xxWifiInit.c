@@ -61,7 +61,7 @@
 int CHIP_IF_init();
 
 /* Application Version and Naming*/
-#define APPLICATION_NAME "CC32XX-MATTER:: E-LOCK"
+#define APPLICATION_NAME "CC32XX-MATTER:: AIR-QUALITY"
 #define APPLICATION_VERSION "01.00.00.00"
 
 /* USER's defines */

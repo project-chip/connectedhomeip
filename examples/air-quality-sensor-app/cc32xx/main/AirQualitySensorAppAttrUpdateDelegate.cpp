@@ -50,6 +50,7 @@ AirQualitySensorAppAttrUpdateDelegate::AirQualitySensorAppAttrUpdateDelegate(voi
 
 void AirQualitySensorAppAttrUpdateDelegate::OnEventCommandReceived(const char * json)
 {
+    ChipLogError(NotSpecified, "Received: %s", json);
     auto handler = AirQualitySensorAttrUpdateHandler::FromJSON(json);
     if (nullptr == handler)
     {
