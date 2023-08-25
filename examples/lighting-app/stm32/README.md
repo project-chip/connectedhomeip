@@ -4,7 +4,7 @@ This example demonstrates the Matter Lighting application on stm32 platform.
 
 ---
 
--   [Matter stm32 Lighting Example](#matter-stm32-lighting-example)
+-   [Matter STM32 Lighting Example over thread](#matter-stm32-lighting-example-over-thread)
     -   [Building and Commissioning](#building-and-commissioning)
     -   [Cluster Control](#cluster-control)
     -   [Indicate current state of lightbulb](#indicate-current-state-of-lightbulb)

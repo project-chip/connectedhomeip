@@ -480,7 +480,7 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t) {
         UpdateLCD();
         if (sFabricNeedSaved) {
             APP_DBG("Start timer to save nvm after commissioning finish");
-            // timer is used to avoid to much trafic on m0 side after the end of a commissioning
+            // timer is used to avoid to much traffic on m0 side after the end of a commissioning
             xTimerStart(DelayNvmTimer, 0);
             sFabricNeedSaved = false;
         }

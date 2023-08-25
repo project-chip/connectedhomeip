@@ -10,8 +10,7 @@ sdk with FreeRTOS.
     -   [Matter Example Applications](#matter-example-applications)
     -   [Building the Example Application](#building-the-example-application)
     -   [Commissioning](#commissioning)
-        -   [BLE-Thread mode](#ble-thread-mode)
-    -   [Factory](#factory)
+    -   [BLE-Thread mode](#ble-thread-mode)
 
 ---
 
