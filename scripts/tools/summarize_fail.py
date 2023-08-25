@@ -5,12 +5,23 @@ from slugify import slugify
 import subprocess
 
 def process_fail(id, pr, start_time, workflow):
+    logging.info("Processing failure in {pr}, workflow {workflow} that started at {start_time}.")
+    
     logging.info("Building output file structure.")
     output_path = f"recent_fails_logs/{slugify(pr)}/{slugify(workflow)}/{slugify(start_time)}"
     os.makedirs(output_path)
 
     logging.info("Gathering raw fail logs.")
-    subprocess.run(f"gh run view -R project-chip/connectedhomeip {id} --log-failed > {output_path}/fail_logs.txt", shell=True)
+    subprocess.run(f"gh run view -R project-chip/connectedhomeip {id} --log-failed > {output_path}/fail_log.txt", shell=True)
+
+    logging.info("Collecting info on likely cause of failure.")  # Eventually turn this into a catalog of error messages per workflow
+    with open(f"{output_path}/fail_log.txt") as fail_log_file:
+        fail_log = fail_log_file.read()
+        match workflow:
+            case "CodeQL":
+                if "(eventual cause: IOException \"No space left on device\")" in fail_log:
+                    return "Ran out of space"
+    return "Unknown cause"
 
 
 def main():
@@ -33,7 +44,9 @@ def main():
     frequency.to_csv("recent_workflow_fails_frequency.csv")
 
     logging.info("Conducting fail information parsing.")
-    df.apply(lambda row: process_fail(row["ID"], row["Pull Request"], row["Start Time"], row["Workflow"]), axis=1)
+    root_cause = df.apply(lambda row: process_fail(row["ID"], row["Pull Request"], row["Start Time"], row["Workflow"]), axis=1)
+    print("Likely Root Cause of Recent Fails:")
+    print(root_cause.to_string(index=False))
 
 
 if __name__ == "__main__":
