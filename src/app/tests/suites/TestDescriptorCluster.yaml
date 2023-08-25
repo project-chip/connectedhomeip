@@ -85,6 +85,14 @@ tests:
       response:
           value: [1, 2]
 
+    - label: "Read attribute ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 2
+          constraints:
+              type: int16u
+
     - label: "Read attribute Tag list"
       command: "readAttribute"
       attribute: "TagList"
@@ -92,7 +100,7 @@ tests:
           value:
               [
                   { MfgCode: null, NamespaceID: 7, Tag: 0 },
-                  { MfgCode: null, NamespaceID: 8, Tag: 2 },
+                  { MfgCode: null, NamespaceID: 8, Tag: 3 },
               ]
 
     - label: "Read feature map Attribute"

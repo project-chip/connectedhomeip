@@ -62,14 +62,29 @@ Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
 Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
+constexpr const uint8_t kNamespaceCommon  = 7;
 // Common Number Namespace: 7, tag 0 (Zero)
-constexpr const uint8_t kNamespaceCommon = 7;
 constexpr const uint8_t kTagCommonZero    = 0;
-// Common Position Namespace: 8, tag: 2 (Top)
+// Common Number Namespace: 7, tag 1 (One)
+constexpr const uint8_t kTagCommonOne     = 1;
+// Common Number Namespace: 7, tag 2 (Two)
+constexpr const uint8_t kTagCommonTwo     = 2;
+
 constexpr const uint8_t kNamespacePosition                              = 8;
-constexpr const uint8_t kTagPositionTop                                 = 2;
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type gTagList[] = {
-    { .namespaceID = kNamespaceCommon, .tag = kTagCommonZero }, { .namespaceID = kNamespacePosition, .tag = kTagPositionTop }
+// Common Position Namespace: 8, tag: 0 (Left)
+constexpr const uint8_t kTagPositionLeft                                = 0;
+// Common Position Namespace: 8, tag: 1 (Right)
+constexpr const uint8_t kTagPositionRight                               = 1;
+// Common Position Namespace: 8, tag: 3 (Buttom)
+constexpr const uint8_t kTagPositionButtom                              = 3;
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp0TagList[] = {
+    { .namespaceID = kNamespaceCommon, .tag = kTagCommonZero }, { .namespaceID = kNamespacePosition, .tag = kTagPositionButtom }
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp1TagList[] = {
+    { .namespaceID = kNamespaceCommon, .tag = kTagCommonOne }, { .namespaceID = kNamespacePosition, .tag = kTagPositionLeft }
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp2TagList[] = {
+    { .namespaceID = kNamespaceCommon, .tag = kTagCommonTwo }, { .namespaceID = kNamespacePosition, .tag = kTagPositionRight }
 };
 } // namespace
 
@@ -199,7 +214,9 @@ void ApplicationInit()
 #endif
     Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 
-    SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gTagList));
+    SetTagList(/* endpoint= */ 0, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));
+    SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));
+    SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp2TagList));
 }
 
 void ApplicationShutdown()
