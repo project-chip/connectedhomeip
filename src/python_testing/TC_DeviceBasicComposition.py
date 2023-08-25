@@ -17,6 +17,7 @@
 
 import base64
 import copy
+import functools
 import json
 import logging
 import pathlib
@@ -248,13 +249,25 @@ def create_device_type_lists(roots: list[int], endpoint_dict: dict[int, Any]) ->
     for root in roots:
         tree_device_types = defaultdict(set)
         eps = get_all_children(root, endpoint_dict)
-        eps.append(root)
+        eps.add(root)
         for ep in eps:
             for d in endpoint_dict[ep][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]:
                 tree_device_types[d.deviceType].add(ep)
         device_types[root] = tree_device_types
 
     return device_types
+
+
+def cmp_tag_list(a: Clusters.Descriptor.Structs.SemanticTagStruct, b: Clusters.Descriptor.Structs.SemanticTagStruct):
+    if a.mfgCode != b.mfgCode:
+        return -1 if a.mfgCode < b.mfgCode else 1
+    if a.namespaceID != b.namespaceID:
+        return -1 if a.namespaceID < b.namespaceID else 1
+    if a.tag != b.tag:
+        return -1 if a.tag < b.tag else 1
+    if a.label != b.label:
+        return -1 if a.label < b.label else 1
+    return 0
 
 
 def find_tag_list_problems(roots: list[int], device_types: dict[int, dict[int, set[int]]], endpoint_dict: dict[int, Any]) -> dict[int, TagProblem]:
@@ -278,7 +291,8 @@ def find_tag_list_problems(roots: list[int], device_types: dict[int, dict[int, s
                         continue
                     if Clusters.Descriptor.Attributes.TagList not in endpoint_dict[other][Clusters.Descriptor]:
                         continue
-                    if endpoint_dict[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] == endpoint_dict[other][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList]:
+
+                    if sorted(endpoint_dict[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList], key=functools.cmp_to_key(cmp_tag_list)) == sorted(endpoint_dict[other][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList], key=functools.cmp_to_key(cmp_tag_list)):
                         duplicate_tags.add(other)
                 if len(duplicate_tags) != 0:
                     duplicate_tags.add(endpoint)
