@@ -92,4 +92,3 @@ tests:
           value: 2
           constraints:
               type: int16u
-
