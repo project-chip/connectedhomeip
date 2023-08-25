@@ -30,10 +30,11 @@ from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder, OpenIotSdkCryptoBackend
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
+from builders.stm32 import stm32App, stm32Board, stm32Builder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.ti import TIApp, TIBoard, TIBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
-from builders.stm32 import stm32App, stm32Board, stm32Builder
+
 from .target import BuildTarget, TargetPart
 
 
