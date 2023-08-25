@@ -112,7 +112,7 @@ typedef struct _tSecurityParams {
 
 /**
  * global context
- * contains the variables common to all 
+ * contains the variables common to all
  * services
  */
 typedef struct _tBLEProfileGlobalContext {
@@ -223,7 +223,7 @@ MATTER_App_Notification_evt_t handleNotification;
 #define SIZE_TAB_CONN_INT            2
 float tab_conn_interval[SIZE_TAB_CONN_INT] = { 50, 1000 }; /* ms */
 uint8_t index_con_int, mutex;
-#endif 
+#endif
 
 /**
  * Advertising Data
@@ -242,7 +242,7 @@ static void Ble_Tl_Init(void);
 static void Ble_Hci_Gap_Gatt_Init(void);
 static const uint8_t* BleGetBdAddress(void);
 static void Switch_OFF_GPIO(void);
-#if(L2CAP_REQUEST_NEW_CONN_PARAM != 0)  
+#if(L2CAP_REQUEST_NEW_CONN_PARAM != 0)
 static void BLE_SVC_L2CAP_Conn_Update(uint16_t Connection_Handle);
 #endif
 static void HciUserEvtProcess(void *argument);
@@ -319,9 +319,9 @@ void APP_BLE_Init_Dyn_1(void) {
 	 * Initialization of ADV - Ad Manufacturer Element - Support OTA Bit Mask
 	 */
 
-#if(RADIO_ACTIVITY_EVENT != 0)  
+#if(RADIO_ACTIVITY_EVENT != 0)
 	aci_hal_set_radio_activity_mask(0x0006);
-#endif  
+#endif
 
 #if (L2CAP_REQUEST_NEW_CONN_PARAM != 0 )
 	index_con_int = 0;
@@ -466,13 +466,13 @@ APP_BLE_ConnStatus_t APP_BLE_Get_Server_Connection_Status(void) {
 
 
 void APP_BLE_Key_Button2_Action(void) {
-#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0 )    
+#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0 )
 	if (BleApplicationContext.Device_Connection_Status != APP_BLE_FAST_ADV && BleApplicationContext.Device_Connection_Status != APP_BLE_IDLE) {
 		BLE_SVC_L2CAP_Conn_Update(BleApplicationContext.BleApplicationContext_legacy.connectionHandle);
 
 	}
 	return;
-#endif    
+#endif
 }
 
 void APP_BLE_Key_Button3_Action(void) {
@@ -773,7 +773,7 @@ static void Switch_OFF_GPIO() {
 	/* USER CODE END Switch_OFF_GPIO */
 }
 
-#if(L2CAP_REQUEST_NEW_CONN_PARAM != 0)  
+#if(L2CAP_REQUEST_NEW_CONN_PARAM != 0)
 void BLE_SVC_L2CAP_Conn_Update(uint16_t Connection_Handle) {
 	/* USER CODE BEGIN BLE_SVC_L2CAP_Conn_Update_1 */
 

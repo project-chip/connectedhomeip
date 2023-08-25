@@ -194,4 +194,3 @@
 #endif
 
 #endif /*__BLE_DBG_CONF_H */
-

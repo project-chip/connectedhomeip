@@ -130,4 +130,3 @@ void APP_THREAD_CleanCallbacks(void);
 #endif
 
 #endif /* APP_THREAD_H */
-

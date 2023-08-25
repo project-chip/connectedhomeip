@@ -57,10 +57,9 @@ extern "C" {
 #define UTIL_SEQ_CONF_TASK_NBR                  (32)
 #define UTIL_SEQ_CONF_PRIO_NBR                  (2)
 #define UTIL_SEQ_MEMSET8( dest, value, size )   UTILS_MEMSET8( dest, value, size )
-  
+
 #ifdef __cplusplus
 }
 #endif
 
 #endif /*UTILITIES_CONF_H */
-

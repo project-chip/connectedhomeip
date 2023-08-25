@@ -50,7 +50,7 @@
  * This enumeration represents log regions.
  *
  */
-typedef enum 
+typedef enum
 {
   APPLI_LOG_REGION_GENERAL                    = 1U,  /* General                 */
   APPLI_LOG_REGION_OPENTHREAD_API             = 2U,  /* OpenThread API          */
@@ -64,4 +64,3 @@ typedef uint8_t appliLogLevel_t;
 void logApplication(appliLogLevel_t aLogLevel, appliLogRegion_t aLogRegion, const char *aFormat, ...);
 
 #endif  /* STM_LOGGING_H_ */
-

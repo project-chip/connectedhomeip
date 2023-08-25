@@ -114,4 +114,3 @@ void LightingManager::Set(bool aOn) {
 
 void LightingManager::UpdateLight() {
 }
-

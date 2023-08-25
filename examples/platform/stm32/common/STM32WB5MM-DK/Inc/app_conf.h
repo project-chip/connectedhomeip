@@ -36,7 +36,7 @@ extern "C" {
 /**
  *
  * Define Tx Power
- */   
+ */
 #define CFG_TX_POWER                      (0x18) /**< 0dbm */
 
 /**
@@ -221,7 +221,7 @@ extern "C" {
 
 /**
 * AD Element - Group B Feature
-*/ 
+*/
 /* LSB - First Byte */
 #define CFG_FEATURE_THREAD_SWITCH               (0x40)
 
@@ -544,7 +544,7 @@ typedef enum
  * Note : Refer to utilities_conf.h file in order to details
  *        the level of traces : CFG_DEBUG_TRACE_FULL or CFG_DEBUG_TRACE_LIGHT
  *****************************************************************************/
- 
+
  /**
  * When set to 1, the traces are enabled in the BLE services
  */
@@ -662,5 +662,3 @@ typedef enum
 #endif
 
 #endif /* APP_CONF_H */
-
-

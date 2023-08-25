@@ -120,4 +120,3 @@ void NM_FullErase(void);
 #endif
 
 #endif /*FLASH_NVM_H */
-
