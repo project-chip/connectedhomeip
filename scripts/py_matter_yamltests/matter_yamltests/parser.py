@@ -713,7 +713,6 @@ class TestStep:
 
         return received_event_number
 
-
     def post_process_response(self, received_responses):
         result = PostProcessResponseResult()
 
