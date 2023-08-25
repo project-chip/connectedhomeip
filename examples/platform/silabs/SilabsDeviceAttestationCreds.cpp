@@ -100,6 +100,9 @@ public:
         if (SilabsConfig::ConfigValueExists(SilabsConfig::kConfigKey_Creds_KeyId))
         {
             // Provisioned DAC key
+#ifdef SIWX_917
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+#else
             uint32_t key_id       = SILABS_CREDENTIALS_DAC_KEY_ID;
             uint8_t signature[64] = { 0 };
             size_t signature_size = sizeof(signature);
@@ -114,6 +117,7 @@ public:
             VerifyOrReturnError(!err, CHIP_ERROR_INTERNAL);
 
             return CopySpanToMutableSpan(ByteSpan(signature, signature_size), out_span);
+#endif
         }
         else
         {
