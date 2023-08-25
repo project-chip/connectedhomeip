@@ -173,6 +173,7 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_DGGEN_2_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_DGGEN_2_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_LWM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_G_2_4.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
     }
 
 
