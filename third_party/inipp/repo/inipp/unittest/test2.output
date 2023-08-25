@@ -1,0 +1,51 @@
+>>> ERRORS <<<
+>>> GENERATE <<<
+[section0]
+a=hello
+b=world
+test=${a} ${b} ${c}
+
+[section1]
+var1=val1
+var2=val2
+var3=val3
+var4=val4
+var5=val5
+
+[section2]
+b=monkey
+x=${section0:test}
+y=${var1}
+z=${x} + ${y} + ${section0:a} + ${b}
+
+[section3]
+a=wot
+b=yz
+c=tis
+d=${section0:test}
+
+>>> INTERPOLATE <<<
+[section0]
+a=hello
+b=world
+test=hello world ${c}
+
+[section1]
+var1=val1
+var2=val2
+var3=val3
+var4=val4
+var5=val5
+
+[section2]
+b=monkey
+x=hello world ${c}
+y=${var1}
+z=hello world ${c} + ${var1} + hello + monkey
+
+[section3]
+a=wot
+b=yz
+c=tis
+d=hello world ${c}
+

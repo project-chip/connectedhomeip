@@ -1,0 +1,15 @@
+version: 1.0.{build}
+build_script:
+  - msbuild inipp.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - nuget pack nuget/IniPP.nuspec
+test_script:
+  - vstest.console /logger:Appveyor /Platform:x64 x64\Debug\unittest.dll
+artifacts:
+  - path: '*.nupkg'
+deploy:
+  provider: NuGet
+  api_key:
+    secure: AcLNa0DwCGKnLLFXN23NHZHcl1Xten7fgacP//Cp+5CkwgDLUMN5res8TEx3kkbM
+  artifact: /.*\.nupkg/
+  on:
+    appveyor_repo_tag: true

@@ -1,0 +1,102 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${build_root}/config/arm.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
+
+declare_args() {
+  # Size of SEGGER RTT up buffer.
+  segger_rtt_buffer_size_up = -1
+
+  # Size of SEGGER RTT down buffer.
+  segger_rtt_buffer_size_down = -1
+
+  # Number of SEGGER RTT up buffers.
+  segger_rtt_max_num_up_buffers = -1
+
+  # Number of SEGGER RTT down buffer.
+  segger_rtt_max_num_down_buffers = -1
+
+  # Default mode of SEGGER RTT.
+  segger_rtt_mode_default = -1
+}
+
+_rtt_asm = ""
+if (current_cpu == "arm") {
+  if (arm_arch == "armv7-m" || arm_arch == "armv7e-m") {
+    _rtt_asm = "SEGGER_RTT_ASM_ARMv7M.S"
+  }
+}
+
+declare_args() {
+  # Use assembly routines for Segger RTT.
+  rtt_use_asm = _rtt_asm != ""
+}
+
+buildconfig_header("rtt_buildconfig") {
+  header = "SEGGER_RTT_BuildConfig.h"
+  header_dir = "RTT"
+
+  defines = [ "RTT_USE_ASM=${rtt_use_asm}" ]
+
+  if (segger_rtt_buffer_size_up != -1) {
+    defines += [ "BUFFER_SIZE_UP=${segger_rtt_buffer_size_up}" ]
+  }
+  if (segger_rtt_buffer_size_down != -1) {
+    defines += [ "BUFFER_SIZE_DOWN=${segger_rtt_buffer_size_down}" ]
+  }
+  if (segger_rtt_max_num_up_buffers != -1) {
+    defines +=
+        [ "SEGGER_RTT_MAX_NUM_UP_BUFFERS=${segger_rtt_max_num_up_buffers}" ]
+  }
+  if (segger_rtt_max_num_down_buffers != -1) {
+    defines +=
+        [ "SEGGER_RTT_MAX_NUM_DOWN_BUFFERS=${segger_rtt_max_num_down_buffers}" ]
+  }
+  if (segger_rtt_mode_default != -1) {
+    defines += [ "SEGGER_RTT_MODE_DEFAULT=${segger_rtt_mode_default}" ]
+  }
+}
+
+config("rtt_config") {
+  include_dirs = [
+    ".",
+    "${root_gen_dir}/include/RTT",
+  ]
+}
+
+source_set("RTT") {
+  sources = [
+    "SEGGER_RTT.c",
+    "SEGGER_RTT.h",
+    "SEGGER_RTT_Conf.h",
+  ]
+
+  if (rtt_use_asm) {
+    sources += [ _rtt_asm ]
+  }
+
+  public_deps = [ ":rtt_buildconfig" ]
+
+  public_configs = [ ":rtt_config" ]
+}
+
+source_set("printf") {
+  sources = [ "SEGGER_RTT_printf.c" ]
+
+  public_deps = [ ":RTT" ]
+}
