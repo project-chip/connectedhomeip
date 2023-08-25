@@ -32,6 +32,8 @@ void RSI_Board_LED_Set(int, bool);
 void RSI_Board_LED_Toggle(int);
 void RSI_Wakeupsw_config(void);
 void RSI_Wakeupsw_config_gpio0(void);
+void sl_system_init(void);
+void soc_pll_config(void);
 }
 
 #if SILABS_LOG_ENABLED
@@ -48,11 +50,15 @@ SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 CHIP_ERROR SilabsPlatform::Init(void)
 {
     mButtonCallback = nullptr;
+
+    sl_system_init();
+
+    // Configuration the clock rate
+    soc_pll_config();
+
+    // BTN0 and BTN1 init
     RSI_Wakeupsw_config();
-
     RSI_Wakeupsw_config_gpio0();
-
-    sl_platform_init(); // platform initialization for wifi-sdk 3.0
 
 #if SILABS_LOG_ENABLED
     silabsInitLog();

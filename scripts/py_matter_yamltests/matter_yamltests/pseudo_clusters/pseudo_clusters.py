@@ -31,6 +31,10 @@ class PseudoClusters:
     def supports(self, request) -> bool:
         return False if self.__get_command(request) is None else True
 
+    def is_manual_step(self, request):
+        return (request.cluster == LogCommands().name and
+                request.command == "UserPrompt")
+
     def add(self, cluster: PseudoCluster):
         self.clusters.append(cluster)
 

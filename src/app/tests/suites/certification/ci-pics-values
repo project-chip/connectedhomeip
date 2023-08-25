@@ -2098,7 +2098,6 @@ BRBINFO.C.E02=1
 BRBINFO.C.E03=1
 
 # Interaction Data Model
-ICDM.S=1
 MCORE.IDM.C=1
 MCORE.IDM.C.InvokeRequest=1
 MCORE.IDM.C.ReadRequest=1
@@ -2591,6 +2590,9 @@ FAN.S.A000B=1
 FAN.S.C00.Rsp=1
 
 #ICD Management
+
+#Server
+ICDM.S=1
 
 #Server Attribute
 ICDM.S.A0000=1

@@ -102,7 +102,7 @@ public class ChipClusters {
 
   {{#zcl_clusters}}
   public static class {{asUpperCamelCase name}}Cluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = {{code}}L;
+    public static final long CLUSTER_ID = {{asMEI manufacturerCode code}}L;
 
     public {{asUpperCamelCase name}}Cluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);

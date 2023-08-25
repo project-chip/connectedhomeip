@@ -186,6 +186,17 @@ menu "CHIP Core"
             help
                 Enable this option to use LwIP default IPv6 route hook for Route Information Option(RIO) feature.
 
+        config ENABLE_LWIP_THREAD_SAFETY
+            bool "Enable LwIP Thread safety options"
+            default y
+            select LWIP_TCPIP_CORE_LOCKING
+            select LWIP_CHECK_THREAD_SAFETY
+            help
+                CHIP SDK performs LwIP core locking before calling an LwIP API.
+                To make the calls thread safe we have to enable LWIP_TCPIP_CORE_LOCKING.
+                Here, we are also enabling LWIP_CHECK_THREAD_SAFETY which will assert when
+                LwIP code gets called from any other context or without holding the LwIP lock.
+
     endmenu # "Networking Options"
 
     menu "System Options"
@@ -797,6 +808,15 @@ menu "CHIP Device Layer"
                 If DAC is being read from secure cert and SOC supports ECDSA signing using on-chip peripheral
                 then this option gets enabled.
                 Also, please disable ESP_SECURE_CERT_DS_PERIPHERAL from the menuconfig when this option is disabled
+
+       config ENABLE_ESP_INSIGHTS_TRACE
+           bool "Enable Matter ESP Insights"
+           depends on ESP_INSIGHTS_ENABLED
+           default y
+           help
+               ESP Insights is a remote diagnostics solution to monitor the health of ESP devices in the field.
+               Enabling the above option will enable the esp32 specific tracing functionality and report the
+               diagnostic information to the insights cloud.
 
     endmenu
 
