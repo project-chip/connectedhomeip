@@ -82,10 +82,11 @@ CHIP_ERROR RotatingDeviceIdUniqueIdProviderJNI::GetJavaByteByMethod(jmethodID me
 MutableByteSpan * RotatingDeviceIdUniqueIdProviderJNI::Get()
 {
     ChipLogProgress(AppServer, "RotatingDeviceIdUniqueIdProviderJNI.Get() called");
-    CHIP_ERROR err = GetJavaByteByMethod(mGetMethod, rotatingDeviceIdUniqueIdSpan);
+    mRotatingDeviceIdUniqueIdSpan = MutableByteSpan(mRotatingDeviceIdUniqueId);
+    CHIP_ERROR err                = GetJavaByteByMethod(mGetMethod, mRotatingDeviceIdUniqueIdSpan);
     VerifyOrReturnValue(err != CHIP_NO_ERROR, nullptr,
                         ChipLogError(AppServer, "Error calling GetJavaByteByMethod %" CHIP_ERROR_FORMAT, err.Format()));
-    return &rotatingDeviceIdUniqueIdSpan;
+    return &mRotatingDeviceIdUniqueIdSpan;
 }
 
 }; // namespace support

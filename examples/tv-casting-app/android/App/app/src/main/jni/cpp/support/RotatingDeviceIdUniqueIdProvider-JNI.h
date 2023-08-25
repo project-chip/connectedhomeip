@@ -35,8 +35,8 @@ private:
     jobject mJNIProviderObject = nullptr;
     jmethodID mGetMethod       = nullptr;
 
-    chip::MutableByteSpan rotatingDeviceIdUniqueIdSpan;
-    uint8_t rotatingDeviceIdUniqueId[chip::DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
+    chip::MutableByteSpan mRotatingDeviceIdUniqueIdSpan;
+    uint8_t mRotatingDeviceIdUniqueId[chip::DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
 };
 
 }; // namespace support
