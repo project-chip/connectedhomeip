@@ -37,7 +37,6 @@
 #ifndef MQTT_OPTS_H
 #define MQTT_OPTS_H
 
-//#include "lwip/opt.h"
 
 #ifdef	__cplusplus
 extern "C" {
@@ -59,7 +58,7 @@ extern "C" {
  * If one wants to avoid fragmented incoming publish, set length to max incoming topic length + max payload length + 8
  */
 
-#define MQTT_VAR_HEADER_BUFFER_LEN 128
+#define MQTT_VAR_HEADER_BUFFER_LEN 1500
 
 /**
  * Maximum number of pending subscribe, unsubscribe and publish requests to server .

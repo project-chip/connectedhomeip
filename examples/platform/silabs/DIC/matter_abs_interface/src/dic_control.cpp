@@ -25,6 +25,12 @@
 #include <zap-generated/gen_config.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 
+#ifdef ENABLE_AWS_OTA_FEAT
+extern "C"{
+   extern void aws_ota_init(void);
+}
+#endif
+
 #ifdef ZCL_USING_ON_OFF_CLUSTER_SERVER
 #include  <app/clusters/on-off-server/on-off-server.h>
 #endif //ZCL_USING_ON_OFF_CLUSTER_SERVER
@@ -138,7 +144,16 @@ namespace dic {
  * *** This function has no return for proof of concept sake,
  *     but error codes should be returned as many thing could happen here ***
  */
-void dic_incoming_data_cb(void* arg, const char* topic, const uint8_t* data, uint16_t len, uint8_t flags)
+
+#ifdef ENABLE_AWS_OTA_FEAT
+void aws_ota_init_task(void* parameters)
+{
+    ( void ) parameters;
+    aws_ota_init();
+}
+#endif
+
+void dic_incoming_data_cb(void* arg, const char* topic, uint16_t topic_len, const uint8_t* data, uint16_t len, uint8_t flags)
 {
     const struct mqtt_connect_client_info_t* client_info = (const struct mqtt_connect_client_info_t*)arg;
     (void)client_info;
@@ -160,6 +175,24 @@ void dic_incoming_data_cb(void* arg, const char* topic, const uint8_t* data, uin
     _value = std::stoi(value);
     }
     SILABS_LOG("_value=%d",_value);
+
+#ifdef ENABLE_AWS_OTA_FEAT
+    if(strcmp(cmd, "ota")==0)
+    {
+        static TaskHandle_t AWS_OTA = NULL;
+        if(AWS_OTA == NULL)
+        {   
+            if ((pdPASS != xTaskCreate(aws_ota_init_task, "AWS_OTA", AWS_OTA_TASK_STACK_SIZE, NULL, AWS_OTA_TASK_PRIORITY, &AWS_OTA)) ||
+                !AWS_OTA)
+            {   
+                SILABS_LOG("Failed to create AWS OTA Task");
+                return;
+            }
+            SILABS_LOG("Task creation successfull for AWS OTA thread");
+        }
+        return;
+    }
+#endif
 
 #ifdef ZCL_USING_ON_OFF_CLUSTER_SERVER
     cmdIndex = GetCommandStringIndex(OnOffMqttControlCmd,COUNT_OF(OnOffMqttControlCmd),_cmd);
@@ -198,7 +231,7 @@ if (cmdIndex != kStringNotFound) {
 }
 
 void SubscribeMQTT(intptr_t context){
-    dic_mqtt_subscribe(dic_incoming_data_cb, MQTT_SUBSCRIBE_TOPIC, 0);
+    dic_mqtt_subscribe(NULL, NULL, dic_incoming_data_cb, MQTT_SUBSCRIBE_TOPIC, MQTT_QOS_0);
 }
 
 void subscribeCB(void){

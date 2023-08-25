@@ -201,7 +201,7 @@ enum {
  * @param flags MQTT_DATA_FLAG_LAST set when this call contains the last part of data from publish message
  *
  */
-typedef void (*mqtt_incoming_data_cb_t)(void *arg, const char *topic, const uint8_t *data, uint16_t len, uint8_t flags);
+typedef void (*mqtt_incoming_data_cb_t)(void *arg, const char *topic, uint16_t topic_len, const uint8_t *data, uint16_t len, uint8_t flags);
 
 
 /**

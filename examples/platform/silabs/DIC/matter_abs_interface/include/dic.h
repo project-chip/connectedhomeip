@@ -20,9 +20,11 @@
 
 #ifndef __DIC_H
 #define __DIC_H
-
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "mqtt.h"
 #include "stdint.h"
-
 typedef enum {
 	DIC_OK = 0,
 	DIC_ERR_INVAL,
@@ -41,12 +43,38 @@ typedef struct {
 
 typedef void (* dic_subscribe_cb)(void);
 
-dic_err_t DIC_Init(dic_subscribe_cb subs_cb);
+dic_err_t dic_init(dic_subscribe_cb subs_cb);
 
-typedef void (*dic_incoming_data_cb_t)(void *arg,const char *topic, const uint8_t *data, uint16_t len, uint8_t flags);
+dic_err_t dic_mqtt_subscribe(mqtt_client_t *client, mqtt_incoming_publish_cb_t publish_cb, mqtt_incoming_data_cb_t data_cb, const char * topic, uint8_t qos);
 
-dic_err_t dic_mqtt_subscribe(dic_incoming_data_cb_t data_cb, const char * topic, uint8_t qos);
+dic_err_t dic_sendmsg(const char *subject, const char *content);
 
-dic_err_t DIC_SendMsg(const char *subject, const char *content);
 
+#ifdef ENABLE_AWS_OTA_FEAT
+
+#define AWS_OTA_TASK_STACK_SIZE 1024
+#define AWS_OTA_TASK_PRIORITY 1
+
+typedef void (*callback_t)(const char * sub_topic, uint16_t top_len, const void *pload, uint16_t pLoadLength);
+struct sub_cb_info{
+  char *sub_topic;
+  callback_t cb;
+};
+
+int dic_init_status(void);
+
+dic_err_t dic_aws_ota_publish(const char * const topic, const char * message, uint32_t message_len, uint8_t qos);
+
+dic_err_t dic_aws_ota_unsubscribe(const char * topic);
+
+dic_err_t dic_aws_ota_subscribe(const char * topic, uint8_t qos, callback_t subscribe_cb);
+
+dic_err_t dic_aws_ota_process();
+
+dic_err_t dic_aws_ota_close();
+#endif
+
+#ifdef __cplusplus
+}
+#endif
 #endif //__DIC_H
