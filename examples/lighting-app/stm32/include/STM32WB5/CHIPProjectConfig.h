@@ -150,7 +150,7 @@
  *
  * Show detail log in terminal
  */
-#define CHIP_DETAIL_LOGGING 1
+#define CHIP_DETAIL_LOGGING 0
 
 /**
  * CHIP_ERROR_LOGGING
