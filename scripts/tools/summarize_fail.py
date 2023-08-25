@@ -5,7 +5,6 @@ from slugify import slugify
 import subprocess
 
 def process_fail(id, pr, workflow, start_time):
-    print(f"{id}   {pr}   {workflow}   {start_time}")
     logging.info("Building output file structure.")
     output_path = f"recent_fails_logs/{slugify(pr)}/{slugify(workflow)}/{slugify(start_time)}"
     os.makedirs(output_path)
