@@ -450,7 +450,8 @@ void JsonBackend::OutputValue(::Json::Value & value)
         chip::StringSplitter splitter(data_string.c_str(), '\n');
 
         chip::CharSpan line;
-        while (splitter.Next(line)) {
+        while (splitter.Next(line))
+        {
             ChipLogProgress(Automation, "%.*s", static_cast<int>(line.size()), line.data());
         }
     }
