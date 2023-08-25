@@ -339,13 +339,13 @@ tests:
 
     # TODO: Since TH was unable to accept the test parameters, it was changed to manual operation.
     - label: "Step 19: TH reads ExpressedState attribute from DUT"
-    #   PICS: SMOKECO.S.A0000
-    #   command: "readAttribute"
-    #   attribute: "ExpressedState"
-    #   response:
-    #       value: HIEST_PRI_ALARM
-    #       constraints:
-    #           type: enum8
+      #   PICS: SMOKECO.S.A0000
+      #   command: "readAttribute"
+      #   attribute: "ExpressedState"
+      #   response:
+      #       value: HIEST_PRI_ALARM
+      #       constraints:
+      #           type: enum8
       verification: |
           ./chip-tool smokecoalarm read expressed-state 1 1
 
@@ -393,13 +393,13 @@ tests:
 
     # TODO: Since TH was unable to accept the test parameters, it was changed to manual operation.
     - label: "Step 22: TH reads ExpressedState attribute from DUT"
-    #   PICS: SMOKECO.S.A0000
-    #   command: "readAttribute"
-    #   attribute: "ExpressedState"
-    #   response:
-    #       value: HIEST_PRI_ALARM_2
-    #       constraints:
-    #           type: enum8
+      #   PICS: SMOKECO.S.A0000
+      #   command: "readAttribute"
+      #   attribute: "ExpressedState"
+      #   response:
+      #       value: HIEST_PRI_ALARM_2
+      #       constraints:
+      #           type: enum8
       verification: |
           ./chip-tool smokecoalarm read expressed-state 1 1
 
@@ -454,13 +454,13 @@ tests:
 
     # TODO: Since TH was unable to accept the test parameters, it was changed to manual operation.
     - label: "Step 25: TH reads ExpressedState attribute from DUT"
-    #   PICS: SMOKECO.S.A0000
-    #   command: "readAttribute"
-    #   attribute: "ExpressedState"
-    #   response:
-    #       value: HIEST_PRI_ALARM_3
-    #       constraints:
-    #           type: enum8
+      #   PICS: SMOKECO.S.A0000
+      #   command: "readAttribute"
+      #   attribute: "ExpressedState"
+      #   response:
+      #       value: HIEST_PRI_ALARM_3
+      #       constraints:
+      #           type: enum8
       verification: |
           ./chip-tool smokecoalarm read expressed-state 1 1
 
@@ -516,13 +516,13 @@ tests:
 
     # TODO: Since TH was unable to accept the test parameters, it was changed to manual operation.
     - label: "Step 28: TH reads ExpressedState attribute from DUT"
-    #   PICS: SMOKECO.S.A0000
-    #   command: "readAttribute"
-    #   attribute: "ExpressedState"
-    #   response:
-    #       value: HIEST_PRI_ALARM_4
-    #       constraints:
-    #           type: enum8
+      #   PICS: SMOKECO.S.A0000
+      #   command: "readAttribute"
+      #   attribute: "ExpressedState"
+      #   response:
+      #       value: HIEST_PRI_ALARM_4
+      #       constraints:
+      #           type: enum8
       verification: |
           ./chip-tool smokecoalarm read expressed-state 1 1
 
@@ -579,13 +579,13 @@ tests:
 
     # TODO: Since TH was unable to accept the test parameters, it was changed to manual operation.
     - label: "Step 31: TH reads ExpressedState attribute from DUT"
-    #   PICS: SMOKECO.S.A0000
-    #   command: "readAttribute"
-    #   attribute: "ExpressedState"
-    #   response:
-    #       value: HIEST_PRI_ALARM_5
-    #       constraints:
-    #           type: enum8
+      #   PICS: SMOKECO.S.A0000
+      #   command: "readAttribute"
+      #   attribute: "ExpressedState"
+      #   response:
+      #       value: HIEST_PRI_ALARM_5
+      #       constraints:
+      #           type: enum8
       verification: |
           ./chip-tool smokecoalarm read expressed-state 1 1
 
