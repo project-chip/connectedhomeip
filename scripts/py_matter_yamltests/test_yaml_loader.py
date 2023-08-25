@@ -151,7 +151,8 @@ class TestYamlLoader(unittest.TestCase):
         '''
 
         _, _, _, config, _ = load(content)
-        self.assertEqual(config, {'LastReceivedEventNumber': 0, 'name': 'value', 'name2': 'value2'})
+        self.assertEqual(
+            config, {'LastReceivedEventNumber': 0, 'name': 'value', 'name2': 'value2'})
 
     def test_key_config_wrong_values(self):
         load = YamlLoader().load
