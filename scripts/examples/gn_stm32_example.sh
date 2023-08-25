@@ -191,8 +191,8 @@ else
     #print stats
     arm-none-eabi-size "$BUILD_DIR"/*.elf
 
-    arm-none-eabi-objcopy -O binary "$BUILD_DIR"/*.elf ""$BUILD_DIR"/*.elf.bin"
+    arm-none-eabi-objcopy -O binary "$BUILD_DIR"/*.elf """$BUILD_DIR/*.elf.bin"
 
     set +x
-    echo_green "Finished building target: "$BUILD_DIR"/*.elf"
+    echo_green "Finished building target: ""$BUILD_DIR/*.elf"
 fi
