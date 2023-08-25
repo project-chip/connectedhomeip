@@ -83,6 +83,8 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <globalAttribute side="either" code="0xFFFD" value="4"/>
+
     <attribute side="server" code="0x0000" define="FAN_MODE" type="FanModeEnum" min="0" max="6" writable="true" default="0" optional="false">FanMode</attribute>
     <attribute side="server" code="0x0001" define="FAN_MODE_SEQUENCE" type="FanModeSequenceEnum" min="0" max="5" writable="true" default="2" optional="false">FanModeSequence</attribute>
     <attribute side="server" code="0x0002" define="PERCENT_SETTING" type="Percent" min="0" max="100" writable="true" default="0" isNullable="true" optional="false">PercentSetting</attribute>
