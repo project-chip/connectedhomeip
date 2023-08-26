@@ -302,9 +302,9 @@ tests:
           "Step 11: TH sends ArmFailSafe command to the DUT with
           ExpiryLengthSeconds set to 900"
       verification: |
-          ./chip-tool generalcommissioning arm-fail-safe 90 1 1 0
+          ./chip-tool generalcommissioning arm-fail-safe 900 1 1 0
 
-          Via the TH (chip-tool),  Verify the DUT sends ArmFailSafe with timeout as 90 secs to the TH.
+          Via the TH (chip-tool),  Verify the DUT sends ArmFailSafe with timeout as 900 secs to the TH.
 
           [1657288428.409103][2382:2388] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1657288428.409191][2382:2388] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001

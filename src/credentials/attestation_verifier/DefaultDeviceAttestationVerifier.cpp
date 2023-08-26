@@ -505,6 +505,14 @@ AttestationVerificationResult DefaultDACVerifier::ValidateCertificateDeclaration
         // TODO: validate contents based on DCL
     }
 
+    // Verify the cd elements are as required by the spec
+    // security_level, security_information are meant to be ignored. version_number is not meant to be interpreted by the
+    // commissioners.
+    if (cdContent.formatVersion != 1 || cdContent.certificationType >= chip::to_underlying(CertificationType::kReserved))
+    {
+        return AttestationVerificationResult::kAttestationElementsMalformed;
+    }
+
     // The vendor_id field in the Certification Declaration SHALL match the VendorID attribute found in the Basic Information
     // cluster
     VerifyOrReturnError(cdContent.vendorId == deviceInfo.vendorId,

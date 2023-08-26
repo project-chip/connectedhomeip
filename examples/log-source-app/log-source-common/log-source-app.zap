@@ -1,5 +1,5 @@
 {
-  "featureLevel": 96,
+  "featureLevel": 97,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -33,7 +33,33 @@
   ],
   "endpointTypes": [
     {
+      "id": 1,
       "name": "Anonymous Endpoint Type",
+      "deviceTypeRef": {
+        "id": 52,
+        "code": 0,
+        "profileId": 259,
+        "label": "MA-all-clusters-app",
+        "name": "MA-all-clusters-app"
+      },
+      "deviceTypes": [
+        {
+          "id": 52,
+          "code": 0,
+          "profileId": 259,
+          "label": "MA-all-clusters-app",
+          "name": "MA-all-clusters-app"
+        }
+      ],
+      "deviceTypeRefs": [
+        52
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        0
+      ],
       "deviceTypeName": "MA-all-clusters-app",
       "deviceTypeCode": 0,
       "deviceTypeProfileId": 259,
@@ -2580,7 +2606,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -3406,7 +3432,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -3523,9 +3549,8 @@
       "endpointTypeIndex": 0,
       "profileId": 598,
       "endpointId": 0,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": null
+      "networkId": 0
     }
-  ]
+  ],
+  "log": []
 }

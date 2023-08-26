@@ -19,6 +19,10 @@ import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
 
+declare_args() {
+  chip_enable_smoke_co_trigger = false
+}
+
 config("app-main-config") {
   include_dirs = [ "." ]
 }
@@ -27,6 +31,10 @@ source_set("ota-test-event-trigger") {
   sources = [
     "${chip_root}/src/app/clusters/ota-requestor/OTATestEventTriggerDelegate.h",
   ]
+}
+
+source_set("smco-test-event-trigger") {
+  sources = [ "${chip_root}/src/app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerDelegate.h" ]
 }
 
 source_set("app-main") {
@@ -51,6 +59,7 @@ source_set("app-main") {
   ]
 
   public_deps = [
+    ":smco-test-event-trigger",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:force_stdio",
   ]
@@ -83,6 +92,10 @@ source_set("app-main") {
       "${chip_root}/examples/common/tracing:commandline",
       "${chip_root}/src/tracing",
     ]
+  }
+
+  if (chip_enable_smoke_co_trigger) {
+    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER=1" ]
   }
 
   public_configs = [ ":app-main-config" ]

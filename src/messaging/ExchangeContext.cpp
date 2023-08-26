@@ -156,7 +156,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     bool reliableTransmissionRequested =
         GetSessionHandle()->RequireMRP() && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck) && !IsGroupExchangeContext();
 
-    bool startedResponseTimer = false;
+    bool currentMessageExpectResponse = false;
     // If a response message is expected...
     if (sendFlags.Has(SendMessageFlags::kExpectResponse) && !IsGroupExchangeContext())
     {
@@ -178,7 +178,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
                 SetResponseExpected(false);
                 return err;
             }
-            startedResponseTimer = true;
+            currentMessageExpectResponse = true;
         }
     }
 
@@ -222,9 +222,9 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 #endif
         if (err != CHIP_NO_ERROR)
         {
-            // We should only cancel the response timer if the ExchangeContext fails to send the message that starts the response
-            // timer.
-            if (startedResponseTimer)
+            // We should only cancel the response timer if the ExchangeContext fails to send the message that expects a
+            // response.
+            if (currentMessageExpectResponse)
             {
                 CancelResponseTimer();
                 SetResponseExpected(false);
@@ -243,7 +243,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 #if CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
             DeviceLayer::ChipDeviceEvent event;
             event.Type                       = DeviceLayer::DeviceEventType::kChipMsgSentEvent;
-            event.MessageSent.ExpectResponse = IsResponseExpected();
+            event.MessageSent.ExpectResponse = currentMessageExpectResponse;
             CHIP_ERROR status                = DeviceLayer::PlatformMgr().PostEvent(&event);
             if (status != CHIP_NO_ERROR)
             {

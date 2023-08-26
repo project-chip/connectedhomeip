@@ -114,12 +114,12 @@ if [ "$#" == "0" ]; then
         siwx917_commissionable_data
             Build with the commissionable data given in DeviceConfig.h (only for SiWx917)
         Presets
-        --sed
-            enable sleepy end device, set thread mtd
+        --icd
+            enable ICD features, set thread mtd
             For minimum consumption, add --low-power
         --low-power
             disables all power consuming features for the most power efficient build
-            This flag is to be used with --sed
+            This flag is to be used with --icd
         --wifi <wf200 | rs9116>
             build wifi example variant for given exansion board
         --additional_data_advertising
@@ -181,7 +181,7 @@ else
                 shift
                 shift
                 ;;
-            --sed)
+            --icd)
                 optArgs+="chip_enable_icd_server=true chip_openthread_ftd=false "
                 shift
                 ;;
@@ -272,7 +272,7 @@ else
     fi
 
     # 917 exception. TODO find a more generic way
-    if [ "$SILABS_BOARD" == "BRD4325B" ]; then
+    if [ "$SILABS_BOARD" == "BRD4325B" ] || [ "$SILABS_BOARD" == "BRD4325C" ]; then
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
         optArgs+="chip_device_platform =\"SiWx917\" "

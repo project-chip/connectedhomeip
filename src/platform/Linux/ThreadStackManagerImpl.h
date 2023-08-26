@@ -22,13 +22,20 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <lib/support/ThreadOperationalDataset.h>
-#include <platform/Linux/GlibTypeDeleter.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/openthread/introspect.h>
 #include <platform/NetworkCommissioning.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
 namespace chip {
+
+template <>
+struct GAutoPtrDeleter<OpenthreadIoOpenthreadBorderRouter>
+{
+    using deleter = GObjectDeleter;
+};
+
 namespace DeviceLayer {
 
 class ThreadStackManagerImpl : public ThreadStackManager
@@ -111,8 +118,6 @@ public:
 
     CHIP_ERROR _JoinerStart();
 
-    void _SetRouterPromotion(bool val);
-
     void _ResetThreadNetworkDiagnosticsCounts();
 
     CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
@@ -148,7 +153,7 @@ private:
         uint8_t lqi;
     };
 
-    std::unique_ptr<OpenthreadIoOpenthreadBorderRouter, GObjectDeleter> mProxy;
+    GAutoPtr<OpenthreadIoOpenthreadBorderRouter> mProxy;
 
     static CHIP_ERROR GLibMatterContextInitThreadStack(ThreadStackManagerImpl * self);
     static CHIP_ERROR GLibMatterContextCallAttach(ThreadStackManagerImpl * self);

@@ -223,9 +223,6 @@ CHIP_ERROR ESPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen,
     memset(&wifiConfig, 0, sizeof(wifiConfig));
     memcpy(wifiConfig.sta.ssid, ssid, std::min(ssidLen, static_cast<uint8_t>(sizeof(wifiConfig.sta.ssid))));
     memcpy(wifiConfig.sta.password, key, std::min(keyLen, static_cast<uint8_t>(sizeof(wifiConfig.sta.password))));
-#if CONFIG_WIFI_POWER_SAVE_MAX
-    wifiConfig.sta..listen_interval = CONFIG_WIFI_PS_LISTEN_INTERVAL;
-#endif
 
     // Configure the ESP WiFi interface.
     esp_err_t err = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
