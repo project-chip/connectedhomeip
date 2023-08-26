@@ -1423,7 +1423,7 @@ void TestCSR_Verify(nlTestSuite * inSuite, void * inContext)
 
 void TestCSR_GenDirect(nlTestSuite * inSuite, void * inContext)
 {
-    uint8_t csrBuf[kMAX_CSR_Length];
+    uint8_t csrBuf[kMIN_CSR_Buffer_Size];
     ClearSecretData(csrBuf);
     MutableByteSpan csrSpan(csrBuf);
 
@@ -1432,7 +1432,7 @@ void TestCSR_GenDirect(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     // Validate case of buffer too small
-    uint8_t csrBufTooSmall[kMAX_CSR_Length - 1];
+    uint8_t csrBufTooSmall[kMIN_CSR_Buffer_Size - 1];
     MutableByteSpan csrSpanTooSmall(csrBufTooSmall);
     NL_TEST_ASSERT(inSuite, GenerateCertificateSigningRequest(&keypair, csrSpanTooSmall) == CHIP_ERROR_BUFFER_TOO_SMALL);
 
@@ -1468,7 +1468,7 @@ void TestCSR_GenDirect(nlTestSuite * inSuite, void * inContext)
 static void TestCSR_GenByKeypair(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
-    uint8_t csr[kMAX_CSR_Length];
+    uint8_t csr[kMIN_CSR_Buffer_Size];
     size_t length = sizeof(csr);
 
     Test_P256Keypair keypair;

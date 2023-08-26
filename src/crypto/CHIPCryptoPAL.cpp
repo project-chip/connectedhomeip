@@ -1001,7 +1001,7 @@ exit:
 CHIP_ERROR GenerateCertificateSigningRequest(const P256Keypair * keypair, MutableByteSpan & csr_span)
 {
     VerifyOrReturnError(keypair != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(csr_span.size() >= kMAX_CSR_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(csr_span.size() >= kMIN_CSR_Buffer_Size, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // First pass: Generate the CertificatioRequestInformation inner
     // encoding one time, to sign it, before re-generating it within the
@@ -1108,8 +1108,10 @@ exit:
 
 CHIP_ERROR VerifyCertificateSigningRequestFormat(const uint8_t * csr, size_t csr_length)
 {
-    // Ensure we have enough size to validate header
-    VerifyOrReturnError((csr_length >= 16) && (csr_length <= kMAX_CSR_Length), CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+    // Ensure we have enough size to validate header, and that our assumptions are met
+    // for some tag computations below. A csr_length > 65535 would never be seen in
+    // practice.
+    VerifyOrReturnError((csr_length >= 16) && (csr_length <= 65535), CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
     Reader reader(csr, csr_length);
 
@@ -1120,7 +1122,6 @@ CHIP_ERROR VerifyCertificateSigningRequestFormat(const uint8_t * csr, size_t csr
 
     size_t seq_length = 0;
     VerifyOrReturnError(ReadDerLength(reader, seq_length) == CHIP_NO_ERROR, CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
-
     // Ensure that outer length matches sequence length + tag overhead, otherwise
     // we have trailing garbage
     size_t header_overhead = (seq_length <= 127) ? 2 : ((seq_length <= 255) ? 3 : 4);

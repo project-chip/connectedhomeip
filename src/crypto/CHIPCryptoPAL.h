@@ -70,11 +70,12 @@ constexpr size_t kMAX_FE_Length              = kP256_FE_Length;
 constexpr size_t kMAX_Point_Length           = kP256_Point_Length;
 constexpr size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
 
-// Max CSR length should be relatively small since it's a single P256 key and
-// no metadata is expected to be honored by the CA. This size is an implementation
-// compromise and is not spec-mandated. It is sufficiently large for a PKCS#10
-// CSR that contains approximately 150 bytes of ASN.1 extensions.
-constexpr size_t kMAX_CSR_Length = 400;
+// Minimum required CSR length buffer length is relatively small since it's a single
+// P256 key and no metadata/extensions are expected to be honored by the CA.
+constexpr size_t kMIN_CSR_Buffer_Size = 255;
+
+[[deprecated("This constant is no longer used by common code and should be replaced by kMIN_CSR_Buffer_Size. Checks that a CSR is <= kMAX_CSR_Buffer_size must be updated. This remains to keep valid buffers working from previous public API usage.")]]
+constexpr size_t kMAX_CSR_Buffer_Size = 255;
 
 constexpr size_t CHIP_CRYPTO_HASH_LEN_BYTES = kSHA256_Hash_Length;
 
@@ -753,8 +754,9 @@ CHIP_ERROR AES_CTR_crypt(const uint8_t * input, size_t input_length, const Aes12
  * be configured to ignore CSR requested subject.
  *
  * @param keypair The key pair for which a CSR should be generated. Must not be null.
- * @param csr_span Span to hold the resulting CSR. Must be at least kMAX_CSR_Length.  Otherwise returns CHIP_ERROR_BUFFER_TOO_SMALL.
- *                 It will get resized to actual size needed on success.
+ * @param csr_span Span to hold the resulting CSR. Must be at least kMIN_CSR_Buffer_Size.
+ *                 Otherwise returns CHIP_ERROR_BUFFER_TOO_SMALL. It will get resized to
+ *                 actual size needed on success.
 
  * @return Returns a CHIP_ERROR from P256Keypair or ASN.1 backend on error, CHIP_NO_ERROR otherwise
  **/
