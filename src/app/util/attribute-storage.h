@@ -211,7 +211,7 @@ chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::Endp
  * @param tag  The SemanticTagStruct is filled.
  */
 CHIP_ERROR GetSematicTagForEndpointAtIndex(chip::EndpointId endpoint, size_t index,
-                                         chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & tag);
+                                           chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & tag);
 
 //
 // Override the device type list current associated with an endpoint with a user-provided list. The buffers backing
