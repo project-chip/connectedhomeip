@@ -575,7 +575,7 @@ CHIP_ERROR ReadDerLength(Reader & reader, size_t & length)
         if (err != CHIP_NO_ERROR)
             break;
 
-        // Cannot have zero padding on multi-bytes lengths in DER, so first
+        // Cannot have zero padding on multi-byte lengths in DER, so first
         // byte must always be > 0.
         if ((i == 0) && (cur_length_byte == 0))
         {
