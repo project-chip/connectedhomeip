@@ -1868,7 +1868,7 @@ exit:
 // Convert Json to Tlv, and remove the outer structure
 CHIP_ERROR ConvertJsonToTlvWithoutStruct(const std::string & json, MutableByteSpan & data, size_t & writtenLength)
 {
-    uint8_t buf[chip::app::kMaxSecureSduLengthBytes]           = { 0 };
+    uint8_t buf[chip::app::kMaxSecureSduLengthBytes] = { 0 };
     TLV::TLVReader tlvReader;
     TLV::TLVType outerContainer = TLV::kTLVType_Structure;
     MutableByteSpan dataWithStruct{ buf };
@@ -1882,7 +1882,7 @@ CHIP_ERROR ConvertJsonToTlvWithoutStruct(const std::string & json, MutableByteSp
     tlvWrite.Init(data);
     ReturnErrorOnFailure(tlvWrite.CopyElement(TLV::AnonymousTag(), tlvReader));
     ReturnErrorOnFailure(tlvWrite.Finalize());
-    writtenLength       = tlvWrite.GetLengthWritten();
+    writtenLength = tlvWrite.GetLengthWritten();
     return CHIP_NO_ERROR;
 }
 
@@ -1994,7 +1994,7 @@ JNI_METHOD(void, write)
             VerifyOrExit(jsonJniString != nullptr, err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
             JniUtfString jsonUtfJniString(env, jsonJniString);
             std::string jsonString = std::string(jsonUtfJniString.c_str(), jsonUtfJniString.size());
-            MutableByteSpan dataWithStruct { tlvBytes };
+            MutableByteSpan dataWithStruct{ tlvBytes };
             SuccessOrExit(err = ConvertJsonToTlvWithoutStruct(jsonString, dataWithStruct, length));
             hasValidJson = true;
         }
@@ -2060,11 +2060,11 @@ JNI_METHOD(void, invoke)
     jobject commandIdObj               = nullptr;
     jbyteArray tlvBytesObj             = nullptr;
     TLV::TLVReader reader;
-    TLV::TLVWriter * writer                 = nullptr;
-    size_t length                           = 0;
-    bool hasValidTlv                        = false;
-    bool hasValidJson                       = false;
-    uint16_t convertedTimedRequestTimeoutMs = static_cast<uint16_t>(timedRequestTimeoutMs);
+    TLV::TLVWriter * writer                               = nullptr;
+    size_t length                                         = 0;
+    bool hasValidTlv                                      = false;
+    bool hasValidJson                                     = false;
+    uint16_t convertedTimedRequestTimeoutMs               = static_cast<uint16_t>(timedRequestTimeoutMs);
     uint8_t tlvBytes[chip::app::kMaxSecureSduLengthBytes] = { 0 };
     MutableByteSpan tlvEncodingLocal{ tlvBytes };
 
