@@ -157,13 +157,11 @@ def check_non_empty_list_of_ints_in_range(min_value: int, max_value: int, max_si
     return check_list_of_ints_in_range(min_value, max_value, min_size=1, max_size=max_size, allow_null=allow_null)
 
 
-def check_no_duplicates() -> Callable:
-    def check_no_duplicates_checker(obj: Any):
-        if not isinstance(obj, list):
-            raise ValueError(f"Value {str(obj)} is not a list, but a list was expected (decoded type: {type(obj)})")
-        if len(set(obj)) != len(obj):
-            raise ValueError(f"Value {str(obj)} contains duplicate values")
-    return check_no_duplicates_checker
+def check_no_duplicates(obj: Any) -> None:
+    if not isinstance(obj, list):
+        raise ValueError(f"Value {str(obj)} is not a list, but a list was expected (decoded type: {type(obj)})")
+    if len(set(obj)) != len(obj):
+        raise ValueError(f"Value {str(obj)} contains duplicate values")
 
 
 class TC_DeviceBasicComposition(MatterBaseTest):
@@ -310,13 +308,13 @@ class TC_DeviceBasicComposition(MatterBaseTest):
             RequiredMandatoryAttribute(id=0xFFFD, name="ClusterRevision", validators=[check_int_in_range(1, 0xFFFF)]),
             RequiredMandatoryAttribute(id=0xFFFC, name="FeatureMap", validators=[check_int_in_range(0, 0xFFFF_FFFF)]),
             RequiredMandatoryAttribute(id=0xFFFB, name="AttributeList",
-                                       validators=[check_non_empty_list_of_ints_in_range(0, 0xFFFF_FFFF), check_no_duplicates()]),
+                                       validators=[check_non_empty_list_of_ints_in_range(0, 0xFFFF_FFFF), check_no_duplicates]),
             # TODO: Check for EventList
             # RequiredMandatoryAttribute(id=0xFFFA, name="EventList", validator=check_list_of_ints_in_range(0, 0xFFFF_FFFF)),
             RequiredMandatoryAttribute(id=0xFFF9, name="AcceptedCommandList",
-                                       validators=[check_list_of_ints_in_range(0, 0xFFFF_FFFF), check_no_duplicates()]),
+                                       validators=[check_list_of_ints_in_range(0, 0xFFFF_FFFF), check_no_duplicates]),
             RequiredMandatoryAttribute(id=0xFFF8, name="GeneratedCommandList",
-                                       validators=[check_list_of_ints_in_range(0, 0xFFFF_FFFF), check_no_duplicates()]),
+                                       validators=[check_list_of_ints_in_range(0, 0xFFFF_FFFF), check_no_duplicates]),
         ]
 
         self.print_step(3, "Validate all reported attributes match AttributeList")
