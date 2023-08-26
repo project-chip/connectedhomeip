@@ -2500,9 +2500,11 @@ static void TestVIDPID_StringExtraction(nlTestSuite * inSuite, void * inContext)
         AttestationCertVidPid vidpidFromCN;
         AttestationCertVidPid vidpidToCheck;
         CHIP_ERROR result = ExtractVIDPIDFromAttributeString(testCase.attrType, testCase.attr, vidpid, vidpidFromCN);
-        ChipLogProgress(Crypto, "Checking VID/PID DN case %d. Expected: %" CHIP_ERROR_FORMAT , caseIdx, testCase.expectedResult.Format());
+        ChipLogProgress(Crypto, "Checking VID/PID DN case %d. Expected: %" CHIP_ERROR_FORMAT, caseIdx,
+                        testCase.expectedResult.Format());
 
-        if (result != testCase.expectedResult) {
+        if (result != testCase.expectedResult)
+        {
             ChipLogError(Crypto, "Actual result: %" CHIP_ERROR_FORMAT, result.Format());
         }
         NL_TEST_ASSERT(inSuite, result == testCase.expectedResult);
