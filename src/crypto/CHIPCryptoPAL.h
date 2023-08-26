@@ -74,8 +74,9 @@ constexpr size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
 // P256 key and no metadata/extensions are expected to be honored by the CA.
 constexpr size_t kMIN_CSR_Buffer_Size = 255;
 
-[[deprecated("This constant is no longer used by common code and should be replaced by kMIN_CSR_Buffer_Size. Checks that a CSR is <= kMAX_CSR_Buffer_size must be updated. This remains to keep valid buffers working from previous public API usage.")]]
-constexpr size_t kMAX_CSR_Buffer_Size = 255;
+[[deprecated("This constant is no longer used by common code and should be replaced by kMIN_CSR_Buffer_Size. Checks that a CSR is "
+             "<= kMAX_CSR_Buffer_size must be updated. This remains to keep valid buffers working from previous public API "
+             "usage.")]] constexpr size_t kMAX_CSR_Buffer_Size = 255;
 
 constexpr size_t CHIP_CRYPTO_HASH_LEN_BYTES = kSHA256_Hash_Length;
 
