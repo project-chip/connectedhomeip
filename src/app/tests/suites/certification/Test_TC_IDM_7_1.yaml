@@ -79,7 +79,7 @@ tests:
           [1684320859.182560][136393:136395] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3947588722
           [1684320859.182569][136393:136395] CHIP:TOO:   Location: XX
           [1684320859.182595][136393:136395] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3947588722
-          [1684320859.182601][136393:136395] CHIP:TOO:   NodeLabel: 
+          [1684320859.182601][136393:136395] CHIP:TOO:   NodeLabel:
           [1684320859.182621][136393:136395] CHIP:DMG: MoveToState ReadClient[0x7fb5100169f0]: Moving to [AwaitingSu]
           [1684320859.182662][136393:136395] CHIP:EM: <<< [E:41656i S:42488 M:180349702 (Ack:108041995)] (S) Msg TX to 1:0000000000000001 [E777] --- Type 0001:01 (IM:StatusResponse)
           [1684320859.182673][136393:136395] CHIP:IN: (S) Sending msg 180349702 on secure session with LSID: 42488
@@ -105,7 +105,7 @@ tests:
           [1684320880.235048][136396:136398] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3947588722
           [1684320880.235053][136396:136398] CHIP:TOO:   Location: XX
           [1684320880.235068][136396:136398] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3947588722
-          [1684320880.235072][136396:136398] CHIP:TOO:   NodeLabel: 
+          [1684320880.235072][136396:136398] CHIP:TOO:   NodeLabel:
           [1684320880.235083][136396:136398] CHIP:DMG: MoveToState ReadClient[0x7f6a00018ac0]: Moving to [AwaitingSu]
           [1684320880.235100][136396:136398] CHIP:EM: <<< [E:35582i S:50848 M:252532041 (Ack:201846712)] (S) Msg TX to 2:0000000000000002 [8559] --- Type 0001:01 (IM:StatusResponse)
           [1684320880.235106][136396:136398] CHIP:IN: (S) Sending msg 252532041 on secure session with LSID: 50848
@@ -129,7 +129,7 @@ tests:
           [1684320897.144902][136409:136411] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3947588722
           [1684320897.144910][136409:136411] CHIP:TOO:   Location: XX
           [1684320897.144930][136409:136411] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3947588722
-          [1684320897.144936][136409:136411] CHIP:TOO:   NodeLabel: 
+          [1684320897.144936][136409:136411] CHIP:TOO:   NodeLabel:
           [1684320897.144950][136409:136411] CHIP:DMG: MoveToState ReadClient[0x7f53dc017580]: Moving to [AwaitingSu]
           [1684320897.144985][136409:136411] CHIP:EM: <<< [E:42344i S:52489 M:199100307 (Ack:174085421)] (S) Msg TX to 3:0000000000000003 [5371] --- Type 0001:01 (IM:StatusResponse)
           [1684320897.144994][136409:136411] CHIP:IN: (S) Sending msg 199100307 on secure session with LSID: 52489
@@ -152,7 +152,7 @@ tests:
           [1684320914.060033][136403:136405] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3947588722
           [1684320914.060043][136403:136405] CHIP:TOO:   Location: XX
           [1684320914.060069][136403:136405] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3947588722
-          [1684320914.060076][136403:136405] CHIP:TOO:   NodeLabel: 
+          [1684320914.060076][136403:136405] CHIP:TOO:   NodeLabel:
           [1684320914.060096][136403:136405] CHIP:DMG: MoveToState ReadClient[0x7ff4cc00adb0]: Moving to [AwaitingSu]
           [1684320914.060153][136403:136405] CHIP:EM: <<< [E:28542i S:21311 M:202084349 (Ack:249111933)] (S) Msg TX to 4:0000000000000004 [8451] --- Type 0001:01 (IM:StatusResponse)
           [1684320914.060168][136403:136405] CHIP:IN: (S) Sending msg 202084349 on secure session with LSID: 21311
@@ -175,7 +175,7 @@ tests:
           [1684320928.187968][136414:136416] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3947588722
           [1684320928.187977][136414:136416] CHIP:TOO:   Location: XX
           [1684320928.188002][136414:136416] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3947588722
-          [1684320928.188009][136414:136416] CHIP:TOO:   NodeLabel: 
+          [1684320928.188009][136414:136416] CHIP:TOO:   NodeLabel:
           [1684320928.188029][136414:136416] CHIP:DMG: MoveToState ReadClient[0x7f58a4013ed0]: Moving to [AwaitingSu]
           [1684320928.188078][136414:136416] CHIP:EM: <<< [E:5169i S:40695 M:166660998 (Ack:81061545)] (S) Msg TX to 5:0000000000000005 [D311] --- Type 0001:01 (IM:StatusResponse)
           [1684320928.188091][136414:136416] CHIP:IN: (S) Sending msg 166660998 on secure session with LSID: 40695
@@ -195,7 +195,7 @@ tests:
 
           once all the subscription is active, on the first reference device enter below mentioned commands to change the attribute values in RD1
 
-          basicinformation write node-label '"newnode"' 1 0 
+          basicinformation write node-label '"newnode"' 1 0
           [1684320946.180177][136393:136395] CHIP:DMG: WriteResponseMessage =
           [1684320946.180180][136393:136395] CHIP:DMG: {
           [1684320946.180183][136393:136395] CHIP:DMG:         AttributeStatusIBs =
@@ -208,16 +208,16 @@ tests:
           [1684320946.180210][136393:136395] CHIP:DMG:                                 Cluster = 0x28,
           [1684320946.180213][136393:136395] CHIP:DMG:                                 Attribute = 0x0000_0005,
           [1684320946.180216][136393:136395] CHIP:DMG:                         }
-          [1684320946.180220][136393:136395] CHIP:DMG:                                 
+          [1684320946.180220][136393:136395] CHIP:DMG:
           [1684320946.180223][136393:136395] CHIP:DMG:                         StatusIB =
           [1684320946.180227][136393:136395] CHIP:DMG:                         {
           [1684320946.180230][136393:136395] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1684320946.180232][136393:136395] CHIP:DMG:                         },
-          [1684320946.180235][136393:136395] CHIP:DMG:                         
+          [1684320946.180235][136393:136395] CHIP:DMG:
           [1684320946.180238][136393:136395] CHIP:DMG:                 },
-          [1684320946.180242][136393:136395] CHIP:DMG:                 
+          [1684320946.180242][136393:136395] CHIP:DMG:
           [1684320946.180244][136393:136395] CHIP:DMG:         ],
-          [1684320946.180248][136393:136395] CHIP:DMG:         
+          [1684320946.180248][136393:136395] CHIP:DMG:
           [1684320946.180250][136393:136395] CHIP:DMG:         InteractionModelRevision = 1
           [1684320946.180253][136393:136395] CHIP:DMG: }
           [1684320946.180267][136393:136395] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -235,16 +235,16 @@ tests:
           [1684320950.120188][136393:136395] CHIP:DMG:                                 Cluster = 0x28,
           [1684320950.120192][136393:136395] CHIP:DMG:                                 Attribute = 0x0000_0006,
           [1684320950.120196][136393:136395] CHIP:DMG:                         }
-          [1684320950.120201][136393:136395] CHIP:DMG:                                 
+          [1684320950.120201][136393:136395] CHIP:DMG:
           [1684320950.120204][136393:136395] CHIP:DMG:                         StatusIB =
           [1684320950.120208][136393:136395] CHIP:DMG:                         {
           [1684320950.120212][136393:136395] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1684320950.120215][136393:136395] CHIP:DMG:                         },
-          [1684320950.120218][136393:136395] CHIP:DMG:                         
+          [1684320950.120218][136393:136395] CHIP:DMG:
           [1684320950.120221][136393:136395] CHIP:DMG:                 },
-          [1684320950.120225][136393:136395] CHIP:DMG:                 
+          [1684320950.120225][136393:136395] CHIP:DMG:
           [1684320950.120228][136393:136395] CHIP:DMG:         ],
-          [1684320950.120233][136393:136395] CHIP:DMG:         
+          [1684320950.120233][136393:136395] CHIP:DMG:
           [1684320950.120236][136393:136395] CHIP:DMG:         InteractionModelRevision = 1
           [1684320950.120238][136393:136395] CHIP:DMG: }
           [1684320950.120257][136393:136395] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -263,16 +263,16 @@ tests:
           [1684320954.914507][136393:136395] CHIP:DMG:                                 Cluster = 0x28,
           [1684320954.914512][136393:136395] CHIP:DMG:                                 Attribute = 0x0000_0010,
           [1684320954.914514][136393:136395] CHIP:DMG:                         }
-          [1684320954.914519][136393:136395] CHIP:DMG:                                 
+          [1684320954.914519][136393:136395] CHIP:DMG:
           [1684320954.914524][136393:136395] CHIP:DMG:                         StatusIB =
           [1684320954.914530][136393:136395] CHIP:DMG:                         {
           [1684320954.914533][136393:136395] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1684320954.914538][136393:136395] CHIP:DMG:                         },
-          [1684320954.914542][136393:136395] CHIP:DMG:                         
+          [1684320954.914542][136393:136395] CHIP:DMG:
           [1684320954.914545][136393:136395] CHIP:DMG:                 },
-          [1684320954.914549][136393:136395] CHIP:DMG:                 
+          [1684320954.914549][136393:136395] CHIP:DMG:
           [1684320954.914555][136393:136395] CHIP:DMG:         ],
-          [1684320954.914561][136393:136395] CHIP:DMG:         
+          [1684320954.914561][136393:136395] CHIP:DMG:
           [1684320954.914564][136393:136395] CHIP:DMG:         InteractionModelRevision = 1
           [1684320954.914569][136393:136395] CHIP:DMG: }
 
@@ -367,7 +367,7 @@ tests:
           [1692947895.938821][3660:3662] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3887771962
           [1692947895.938880][3660:3662] CHIP:TOO:   Location: XX
           [1692947895.938958][3660:3662] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3887771962
-          [1692947895.938992][3660:3662] CHIP:TOO:   NodeLabel: 
+          [1692947895.938992][3660:3662] CHIP:TOO:   NodeLabel:
           [1692947895.939046][3660:3662] CHIP:DMG: MoveToState ReadClient[0xaaab1353f000]: Moving to [AwaitingSu]
           [1692947895.939291][3660:3662] CHIP:EM: <<< [E:14761i S:58740 M:219359653 (Ack:56803011)] (S) Msg TX to 1:0000000000000001 [3E67] --- Type 0001:01 (IM:StatusResponse)
           [1692947895.939345][3660:3662] CHIP:IN: (S) Sending msg 219359653 on secure session with LSID: 58740
@@ -393,7 +393,7 @@ tests:
           [1692947905.050348][3664:3666] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3887771962
           [1692947905.050394][3664:3666] CHIP:TOO:   Location: XX
           [1692947905.050477][3664:3666] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3887771962
-          [1692947905.050507][3664:3666] CHIP:TOO:   NodeLabel: 
+          [1692947905.050507][3664:3666] CHIP:TOO:   NodeLabel:
           [1692947905.050567][3664:3666] CHIP:DMG: MoveToState ReadClient[0xffff9c01c7e0]: Moving to [AwaitingSu]
           [1692947905.050737][3664:3666] CHIP:EM: <<< [E:21944i S:55100 M:11845939 (Ack:24916694)] (S) Msg TX to 2:0000000000000002 [74F2] --- Type 0001:01 (IM:StatusResponse)
           [1692947905.050784][3664:3666] CHIP:IN: (S) Sending msg 11845939 on secure session with LSID: 55100
@@ -420,7 +420,7 @@ tests:
           [1692947914.490344][3667:3669] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3887771962
           [1692947914.490373][3667:3669] CHIP:TOO:   Location: XX
           [1692947914.490430][3667:3669] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3887771962
-          [1692947914.490454][3667:3669] CHIP:TOO:   NodeLabel: 
+          [1692947914.490454][3667:3669] CHIP:TOO:   NodeLabel:
           [1692947914.490495][3667:3669] CHIP:DMG: MoveToState ReadClient[0xaaaafcb72000]: Moving to [AwaitingSu]
           [1692947914.490639][3667:3669] CHIP:EM: <<< [E:55121i S:1001 M:174934504 (Ack:146433685)] (S) Msg TX to 3:0000000000000003 [CACB] --- Type 0001:01 (IM:StatusResponse)
           [1692947914.490680][3667:3669] CHIP:IN: (S) Sending msg 174934504 on secure session with LSID: 1001
@@ -450,7 +450,7 @@ tests:
           [1692947922.587488][3670:3672] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3887771962
           [1692947922.587561][3670:3672] CHIP:TOO:   Location: XX
           [1692947922.587643][3670:3672] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3887771962
-          [1692947922.587682][3670:3672] CHIP:TOO:   NodeLabel: 
+          [1692947922.587682][3670:3672] CHIP:TOO:   NodeLabel:
           [1692947922.587738][3670:3672] CHIP:DMG: MoveToState ReadClient[0xaaaaf8a11000]: Moving to [AwaitingSu]
           [1692947922.587934][3670:3672] CHIP:EM: <<< [E:4602i S:44011 M:43975317 (Ack:79148204)] (S) Msg TX to 4:0000000000000004 [FF58] --- Type 0001:01 (IM:StatusResponse)
           [1692947922.587980][3670:3672] CHIP:IN: (S) Sending msg 43975317 on secure session with LSID: 44011
@@ -479,7 +479,7 @@ tests:
           [1692947931.880186][3673:3675] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3887771962
           [1692947931.880217][3673:3675] CHIP:TOO:   Location: XX
           [1692947931.880277][3673:3675] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3887771962
-          [1692947931.880303][3673:3675] CHIP:TOO:   NodeLabel: 
+          [1692947931.880303][3673:3675] CHIP:TOO:   NodeLabel:
           [1692947931.880345][3673:3675] CHIP:DMG: MoveToState ReadClient[0xaaaac479e000]: Moving to [AwaitingSu]
           [1692947931.880521][3673:3675] CHIP:EM: <<< [E:53665i S:45655 M:227315674 (Ack:12948537)] (S) Msg TX to 5:0000000000000005 [B2A3] --- Type 0001:01 (IM:StatusResponse)
           [1692947931.880570][3673:3675] CHIP:IN: (S) Sending msg 227315674 on secure session with LSID: 45655
@@ -549,7 +549,7 @@ tests:
           [1684322787.342246][136396:136398] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3947588725
           [1684322787.342255][136396:136398] CHIP:TOO:   Location: XX
           [1684322787.342282][136396:136398] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3947588725
-          [1684322787.342289][136396:136398] CHIP:TOO:   NodeLabel: 
+          [1684322787.342289][136396:136398] CHIP:TOO:   NodeLabel:
           [1684322787.342308][136396:136398] CHIP:DMG: MoveToState ReadClient[0x7f6a0001a460]: Moving to [AwaitingSu]
           [1684322787.342351][136396:136398] CHIP:EM: <<< [E:35584i S:50848 M:252532050 (Ack:201846722)] (S) Msg TX to 2:0000000000000002 [8559] --- Type 0001:01 (IM:StatusResponse)
           [1684322787.342363][136396:136398] CHIP:IN: (S) Sending msg 252532050 on secure session with LSID: 50848
@@ -576,7 +576,7 @@ tests:
           [1684322803.467499][136409:136411] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3947588725
           [1684322803.467502][136409:136411] CHIP:TOO:   Location: XX
           [1684322803.467511][136409:136411] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3947588725
-          [1684322803.467513][136409:136411] CHIP:TOO:   NodeLabel: 
+          [1684322803.467513][136409:136411] CHIP:TOO:   NodeLabel:
           [1684322803.467520][136409:136411] CHIP:DMG: MoveToState ReadClient[0x7f53dc01bb90]: Moving to [AwaitingSu]
           [1684322803.467531][136409:136411] CHIP:EM: <<< [E:42346i S:52489 M:199100316 (Ack:174085431)] (S) Msg TX to 3:0000000000000003 [5371] --- Type 0001:01 (IM:StatusResponse)
           [1684322803.467535][136409:136411] CHIP:IN: (S) Sending msg 199100316 on secure session with LSID: 52489
@@ -602,7 +602,7 @@ tests:
           [1684322837.225940][136403:136405] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3947588725
           [1684322837.225943][136403:136405] CHIP:TOO:   Location: XX
           [1684322837.225952][136403:136405] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3947588725
-          [1684322837.225955][136403:136405] CHIP:TOO:   NodeLabel: 
+          [1684322837.225955][136403:136405] CHIP:TOO:   NodeLabel:
           [1684322837.225961][136403:136405] CHIP:DMG: MoveToState ReadClient[0x7ff4cc019c70]: Moving to [AwaitingSu]
           [1684322837.225980][136403:136405] CHIP:EM: <<< [E:28544i S:21311 M:202084358 (Ack:249111943)] (S) Msg TX to 4:0000000000000004 [8451] --- Type 0001:01 (IM:StatusResponse)
           [1684322837.225984][136403:136405] CHIP:IN: (S) Sending msg 202084358 on secure session with LSID: 21311
@@ -628,7 +628,7 @@ tests:
           [1684322852.957537][136414:136416] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3947588725
           [1684322852.957541][136414:136416] CHIP:TOO:   Location: XX
           [1684322852.957552][136414:136416] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3947588725
-          [1684322852.957556][136414:136416] CHIP:TOO:   NodeLabel: 
+          [1684322852.957556][136414:136416] CHIP:TOO:   NodeLabel:
           [1684322852.957564][136414:136416] CHIP:DMG: MoveToState ReadClient[0x7f58a400e880]: Moving to [AwaitingSu]
           [1684322852.957585][136414:136416] CHIP:EM: <<< [E:5171i S:40695 M:166661007 (Ack:81061555)] (S) Msg TX to 5:0000000000000005 [D311] --- Type 0001:01 (IM:StatusResponse)
           [1684322852.957590][136414:136416] CHIP:IN: (S) Sending msg 166661007 on secure session with LSID: 40695
@@ -708,7 +708,7 @@ tests:
           [1684323009.937274][136393:136395] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3947588725
           [1684323009.937279][136393:136395] CHIP:TOO:   Location: XX
           [1684323009.937293][136393:136395] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3947588725
-          [1684323009.937298][136393:136395] CHIP:TOO:   NodeLabel: 
+          [1684323009.937298][136393:136395] CHIP:TOO:   NodeLabel:
           [1684323009.937308][136393:136395] CHIP:DMG: MoveToState ReadClient[0x7fb510002110]: Moving to [AwaitingSu]
           [1684323009.937334][136393:136395] CHIP:EM: <<< [E:41663i S:42488 M:180349725 (Ack:108042016)] (S) Msg TX to 1:0000000000000001 [E777] --- Type 0001:01 (IM:StatusResponse)
           [1684323009.937339][136393:136395] CHIP:IN: (S) Sending msg 180349725 on secure session with LSID: 42488
@@ -733,7 +733,7 @@ tests:
           [1684323023.679503][136396:136398] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3947588725
           [1684323023.679508][136396:136398] CHIP:TOO:   Location: xx
           [1684323023.679521][136396:136398] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3947588725
-          [1684323023.679525][136396:136398] CHIP:TOO:   NodeLabel: 
+          [1684323023.679525][136396:136398] CHIP:TOO:   NodeLabel:
           [1684323023.679535][136396:136398] CHIP:DMG: MoveToState ReadClient[0x7f6a0000a890]: Moving to [AwaitingSu]
           [1684323023.679556][136396:136398] CHIP:EM: <<< [E:35585i S:50848 M:252532054 (Ack:201846726)] (S) Msg TX to 2:0000000000000002 [8559] --- Type 0001:01 (IM:StatusResponse)
           [1684323023.679563][136396:136398] CHIP:IN: (S) Sending msg 252532054 on secure session with LSID: 50848
@@ -759,7 +759,7 @@ tests:
           [1684323039.115943][136409:136411] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3947588725
           [1684323039.115949][136409:136411] CHIP:TOO:   Location: XX
           [1684323039.115977][136409:136411] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3947588725
-          [1684323039.115981][136409:136411] CHIP:TOO:   NodeLabel: 
+          [1684323039.115981][136409:136411] CHIP:TOO:   NodeLabel:
           [1684323039.116000][136409:136411] CHIP:DMG: MoveToState ReadClient[0x7f53dc016c20]: Moving to [AwaitingSu]
           [1684323039.116030][136409:136411] CHIP:EM: <<< [E:42347i S:52489 M:199100320 (Ack:174085435)] (S) Msg TX to 3:0000000000000003 [5371] --- Type 0001:01 (IM:StatusResponse)
           [1684323039.116039][136409:136411] CHIP:IN: (S) Sending msg 199100320 on secure session with LSID: 52489
@@ -785,7 +785,7 @@ tests:
           [1684323055.304206][136403:136405] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3947588725
           [1684323055.304216][136403:136405] CHIP:TOO:   Location: XX
           [1684323055.304243][136403:136405] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3947588725
-          [1684323055.304250][136403:136405] CHIP:TOO:   NodeLabel: 
+          [1684323055.304250][136403:136405] CHIP:TOO:   NodeLabel:
           [1684323055.304274][136403:136405] CHIP:DMG: MoveToState ReadClient[0x7ff4cc010a60]: Moving to [AwaitingSu]
           [1684323055.304312][136403:136405] CHIP:EM: <<< [E:28545i S:21311 M:202084362 (Ack:249111947)] (S) Msg TX to 4:0000000000000004 [8451] --- Type 0001:01 (IM:StatusResponse)
           [1684323055.304324][136403:136405] CHIP:IN: (S) Sending msg 202084362 on secure session with LSID: 21311
@@ -810,7 +810,7 @@ tests:
           [1684323072.765318][136414:136416] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3947588725
           [1684323072.765327][136414:136416] CHIP:TOO:   Location: XX
           [1684323072.765352][136414:136416] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3947588725
-          [1684323072.765359][136414:136416] CHIP:TOO:   NodeLabel: 
+          [1684323072.765359][136414:136416] CHIP:TOO:   NodeLabel:
           [1684323072.765379][136414:136416] CHIP:DMG: MoveToState ReadClient[0x7f58a4014ee0]: Moving to [AwaitingSu]
           [1684323072.765426][136414:136416] CHIP:EM: <<< [E:5172i S:40695 M:166661011 (Ack:81061559)] (S) Msg TX to 5:0000000000000005 [D311] --- Type 0001:01 (IM:StatusResponse)
           [1684323072.765439][136414:136416] CHIP:IN: (S) Sending msg 166661011 on secure session with LSID: 40695
