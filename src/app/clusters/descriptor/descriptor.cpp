@@ -63,7 +63,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadFeatureMap(EndpointId endpoint, AttributeVa
     size_t index = 0;
     BitFlags<Feature> featureFlags;
 
-    if (GetSematicTagForEndpointAtIndex(endpoint, index, tag) == CHIP_NO_ERROR)
+    if (GetSemanticTagForEndpointAtIndex(endpoint, index, tag) == CHIP_NO_ERROR)
     {
         featureFlags.Set(Feature::kTagList);
     }
