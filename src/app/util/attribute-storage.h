@@ -210,7 +210,7 @@ chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::Endp
  * @param index The index of the tag, with 0 representing the first tag.
  * @param tag  The SemanticTagStruct is filled.
  */
-CHIP_ERROR GetSematicTagForEndpointAtIndex(chip::EndpointId endpoint, size_t index,
+CHIP_ERROR GetSemanticTagForEndpointAtIndex(chip::EndpointId endpoint, size_t index,
                                            chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & tag);
 
 //
