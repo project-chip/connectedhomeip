@@ -41,8 +41,8 @@ NS_ASSUME_NONNULL_BEGIN
 // MTRDeviceControllerStartupParamsInternal.
 @property (nonatomic, copy, nullable) MTRCertificateDERBytes operationalCertificate;
 
-// UUID, so that we always have one.
-@property (nonatomic, strong, readonly) NSUUID * UUID;
+// uniqueIdentifier, so that we always have one.
+@property (nonatomic, strong, readonly) NSUUID * uniqueIdentifier;
 
 // Init method that just copies the values of all our ivars.
 - (instancetype)initWithParams:(MTRDeviceControllerStartupParams *)params;
@@ -52,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
                    storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
-                                   UUID:(NSUUID *)UUID
+                       uniqueIdentifier:(NSUUID *)uniqueIdentifier
                                     ipk:(NSData *)ipk
                                vendorID:(NSNumber *)vendorID
                      operationalKeypair:(id<MTRKeypair>)operationalKeypair
@@ -75,7 +75,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, readonly) id<MTRDeviceControllerStorageDelegate> storageDelegate;
 @property (nonatomic, strong, readonly) dispatch_queue_t storageDelegateQueue;
-@property (nonatomic, strong, readonly) NSUUID * UUID;
+@property (nonatomic, strong, readonly) NSUUID * uniqueIdentifier;
 
 @end
 

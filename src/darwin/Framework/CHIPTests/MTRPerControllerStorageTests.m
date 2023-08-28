@@ -92,7 +92,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
                             securityLevel:(MTRStorageSecurityLevel)securityLevel
                               sharingType:(MTRStorageSharingType)sharingType
 {
-    XCTAssertEqualObjects(_controllerID, controller.UUID);
+    XCTAssertEqualObjects(_controllerID, controller.uniqueIdentifier);
 
     __auto_type * data = self.storage[key];
     if (data == nil) {
@@ -113,7 +113,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
      securityLevel:(MTRStorageSecurityLevel)securityLevel
        sharingType:(MTRStorageSharingType)sharingType
 {
-    XCTAssertEqualObjects(_controllerID, controller.UUID);
+    XCTAssertEqualObjects(_controllerID, controller.uniqueIdentifier);
 
     __auto_type * archiver = [[NSKeyedArchiver alloc] initRequiringSecureCoding:YES];
     XCTAssertNotNil(archiver);
@@ -132,7 +132,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
         securityLevel:(MTRStorageSecurityLevel)securityLevel
           sharingType:(MTRStorageSharingType)sharingType
 {
-    XCTAssertEqualObjects(_controllerID, controller.UUID);
+    XCTAssertEqualObjects(_controllerID, controller.uniqueIdentifier);
     self.storage[key] = nil;
     return YES;
 }
@@ -351,7 +351,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * params =
         [[MTRDeviceControllerExternalCertificateStartupParameters alloc] initWithStorageDelegate:storage
                                                                             storageDelegateQueue:_storageQueue
-                                                                                            UUID:storage.controllerID
+                                                                                uniqueIdentifier:storage.controllerID
                                                                                              ipk:rootKeys.ipk
                                                                                         vendorID:@(kTestVendorId)
                                                                               operationalKeypair:operationalKeys
@@ -548,7 +548,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
     XCTAssertEqualObjects(controller.controllerNodeID, nodeID1);
 
-    // Try to bring up another controller with the same UUID (but a different
+    // Try to bring up another controller with the same uniqueIdentifier (but a different
     // node identity).  This should fail, since our controller is still running.
     NSNumber * nodeID2 = @(789);
     MTRDeviceController * otherController = [self startControllerWithRootKeys:rootKeys

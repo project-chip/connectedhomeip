@@ -91,7 +91,7 @@ NS_ASSUME_NONNULL_BEGIN
                           queue:(dispatch_queue_t)queue
                 storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
            storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
-                           UUID:(NSUUID *)UUID;
+               uniqueIdentifier:(NSUUID *)uniqueIdentifier;
 
 /**
  * Check whether this controller is running on the given fabric, as represented

@@ -83,7 +83,7 @@ static CHIP_ERROR ExtractNodeIDFromNOC(MTRCertificateDERBytes noc, NSNumber * __
     _nocSigner = nocSigner;
     _fabricID = [fabricID copy];
     _ipk = [ipk copy];
-    _UUID = [NSUUID UUID];
+    _uniqueIdentifier = [NSUUID UUID];
 
     return self;
 }
@@ -112,7 +112,7 @@ static CHIP_ERROR ExtractNodeIDFromNOC(MTRCertificateDERBytes noc, NSNumber * __
     _intermediateCertificate = [intermediateCertificate copy];
     _rootCertificate = [rootCertificate copy];
     _ipk = [ipk copy];
-    _UUID = [NSUUID UUID];
+    _uniqueIdentifier = [NSUUID UUID];
 
     return self;
 }
@@ -135,7 +135,7 @@ static CHIP_ERROR ExtractNodeIDFromNOC(MTRCertificateDERBytes noc, NSNumber * __
     _operationalKeypair = params.operationalKeypair;
     _operationalCertificateIssuer = params.operationalCertificateIssuer;
     _operationalCertificateIssuerQueue = params.operationalCertificateIssuerQueue;
-    _UUID = params.UUID;
+    _uniqueIdentifier = params.uniqueIdentifier;
 
     return self;
 }
@@ -172,7 +172,7 @@ static CHIP_ERROR ExtractNodeIDFromNOC(MTRCertificateDERBytes noc, NSNumber * __
     _operationalKeypair = params.operationalKeypair;
     _operationalCertificateIssuer = params.operationalCertificateIssuer;
     _operationalCertificateIssuerQueue = params.operationalCertificateIssuerQueue;
-    _UUID = params.UUID;
+    _uniqueIdentifier = params.uniqueIdentifier;
 
     return self;
 }
@@ -244,7 +244,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 @implementation MTRDeviceControllerStartupParameters
 - (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
                    storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
-                                   UUID:(NSUUID *)UUID
+                       uniqueIdentifier:(NSUUID *)uniqueIdentifier
                                     ipk:(NSData *)ipk
                                vendorID:(NSNumber *)vendorID
                      operationalKeypair:(id<MTRKeypair>)operationalKeypair
@@ -267,7 +267,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     _operationalCertificateIssuerQueue = nil;
     _storageDelegate = storageDelegate;
     _storageDelegateQueue = storageDelegateQueue;
-    _UUID = UUID;
+    _uniqueIdentifier = uniqueIdentifier;
 
     return self;
 }
@@ -283,7 +283,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 @implementation MTRDeviceControllerExternalCertificateStartupParameters
 - (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
                    storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
-                                   UUID:(NSUUID *)UUID
+                       uniqueIdentifier:(NSUUID *)uniqueIdentifier
                                     ipk:(NSData *)ipk
                                vendorID:(NSNumber *)vendorID
                      operationalKeypair:(id<MTRKeypair>)operationalKeypair
@@ -293,7 +293,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 {
     return [super initWithStorageDelegate:storageDelegate
                      storageDelegateQueue:storageDelegateQueue
-                                     UUID:UUID
+                         uniqueIdentifier:uniqueIdentifier
                                       ipk:ipk
                                  vendorID:vendorID
                        operationalKeypair:operationalKeypair

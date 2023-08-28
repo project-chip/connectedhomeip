@@ -644,17 +644,17 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
     id<MTRDeviceControllerStorageDelegate> storageDelegate;
     dispatch_queue_t storageDelegateQueue;
-    NSUUID * uuid;
+    NSUUID * uniqueIdentifier;
     if ([startupParams isKindOfClass:[MTRDeviceControllerStartupParameters class]]) {
         MTRDeviceControllerStartupParameters * params = startupParams;
         storageDelegate = params.storageDelegate;
         storageDelegateQueue = params.storageDelegateQueue;
-        uuid = params.UUID;
+        uniqueIdentifier = params.uniqueIdentifier;
     } else {
         MTRDeviceControllerStartupParams * params = startupParams;
         storageDelegate = nil;
         storageDelegateQueue = nil;
-        uuid = params.UUID;
+        uniqueIdentifier = params.uniqueIdentifier;
     }
 
     if (_usingPerControllerStorage && storageDelegate == nil) {
@@ -675,7 +675,9 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
     // Create the controller, so we start the event loop, since we plan to do
     // our fabric table operations there.
-    auto * controller = [self _createController:storageDelegate storageDelegateQueue:storageDelegateQueue UUID:uuid];
+    auto * controller = [self _createController:storageDelegate
+                           storageDelegateQueue:storageDelegateQueue
+                               uniqueIdentifier:uniqueIdentifier];
     if (controller == nil) {
         if (error != nil) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY];
@@ -704,12 +706,12 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
             return;
         }
 
-        // Check that we are not trying to start a controller with a UUID that
+        // Check that we are not trying to start a controller with a uniqueIdentifier that
         // matches a running controller.
         auto * controllersCopy = [self getRunningControllers];
         for (MTRDeviceController * existing in controllersCopy) {
-            if (existing != controller && [existing.UUID compare:params.UUID] == NSOrderedSame) {
-                MTR_LOG_ERROR("Already have running controller with UUID %@", existing.UUID);
+            if (existing != controller && [existing.uniqueIdentifier compare:params.uniqueIdentifier] == NSOrderedSame) {
+                MTR_LOG_ERROR("Already have running controller with uniqueIdentifier %@", existing.uniqueIdentifier);
                 fabricError = CHIP_ERROR_INVALID_ARGUMENT;
                 params = nil;
                 return;
@@ -901,7 +903,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
 - (MTRDeviceController * _Nullable)_createController:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
                                 storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
-                                                UUID:(NSUUID *)UUID
+                                    uniqueIdentifier:(NSUUID *)uniqueIdentifier
 {
     [self _assertCurrentQueueIsNotMatterQueue];
 
@@ -909,7 +911,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
                                                                               queue:_chipWorkQueue
                                                                     storageDelegate:storageDelegate
                                                                storageDelegateQueue:storageDelegateQueue
-                                                                               UUID:UUID];
+                                                                   uniqueIdentifier:uniqueIdentifier];
     if (controller == nil) {
         MTR_LOG_ERROR("Failed to init controller");
         return nil;

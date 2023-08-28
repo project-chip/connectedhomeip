@@ -43,26 +43,6 @@ public:
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
 
 private:
-    static bool IsGlobalKey(NSString * key);
-
-    /**
-     * Checks for a key that is scoped to a specific fabric index.
-     */
-    static bool IsIndexSpecificKey(NSString * key);
-
-    /**
-     * Extracts the fabric index from an index-specific key.  Fails if the key
-     * is not index-specific or if a numeric FabricIndex could not be extracted
-     * from it.
-     */
-    static CHIP_ERROR ExtractIndexFromKey(NSString * key, chip::FabricIndex * index);
-
-    /**
-     * Extracts the "index-specific" part of an index-specific key (i.e. the
-     * part after "f/index/").
-     */
-    static CHIP_ERROR ExtractIndexSpecificKey(NSString * key, NSString * _Nullable __autoreleasing * _Nonnull extractedKey);
-
     /**
      * Methods for reading/writing/deleting things.  The index-specific ones
      * will have the "f/index/" bit already stripped of from the front of the key.
@@ -77,30 +57,11 @@ private:
     CHIP_ERROR DeleteIndexSpecificValue(chip::FabricIndex index, NSString * key);
 
     /**
-     * Method to test whether a global key should be stored in memory only, as
-     * opposed to being passed on to the actual storage related to controllers.
-     */
-    static bool IsMemoryOnlyGlobalKey(NSString * key);
-
-    /**
-     * Method to test whether an index-specific key should be stored in memory only, as
-     * opposed to being passed on to the actual storage related to controllers.
-     * The key string will ahve the "f/index/" bit already stripped off the
-     * front of the key.
-     */
-    static bool IsMemoryOnlyIndexSpecificKey(NSString * key);
-
-    /**
      * Methods for modifying our in-memory store for fully qualified keys.
      */
     NSData * _Nullable GetInMemoryValue(NSString * key);
     CHIP_ERROR SetInMemoryValue(NSString * key, NSData * data);
     CHIP_ERROR DeleteInMemoryValue(NSString * key);
-
-    /**
-     * Method to convert an index-specific key into a fully qualified key.
-     */
-    static NSString * FullyQualifiedKey(chip::FabricIndex index, NSString * key);
 
     MTRDeviceControllerFactory * mFactory;
     NSMutableDictionary<NSString *, NSData *> * mInMemoryStore;

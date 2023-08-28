@@ -62,7 +62,7 @@ MTR_NEWLY_AVAILABLE
  *                             for the rules about what work is allowed to be
  *                             done on this queue.
  *
- * @param UUID The unique id to assign to the controller.
+ * @param uniqueIdentifier The unique id to assign to the controller.
  *
  * @param vendorID The vendor ID (allocated by the Connectivity Standards Alliance) for
  *                 this controller. Must not be the "standard" vendor id (0).
@@ -76,7 +76,7 @@ MTR_NEWLY_AVAILABLE
  */
 - (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
                    storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
-                                   UUID:(NSUUID *)UUID
+                       uniqueIdentifier:(NSUUID *)uniqueIdentifier
                                     ipk:(NSData *)ipk
                                vendorID:(NSNumber *)vendorID
                      operationalKeypair:(id<MTRKeypair>)operationalKeypair

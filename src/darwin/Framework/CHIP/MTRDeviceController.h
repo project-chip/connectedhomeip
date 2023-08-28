@@ -50,7 +50,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 /**
  * The ID assigned to this controller at creation time.
  */
-@property (readonly, nonatomic) NSUUID * UUID MTR_NEWLY_AVAILABLE;
+@property (readonly, nonatomic) NSUUID * uniqueIdentifier MTR_NEWLY_AVAILABLE;
 
 /**
  * Return the Node ID assigned to the controller.  Will return nil if the
