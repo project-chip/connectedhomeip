@@ -45,48 +45,17 @@ import java.util.Base64
  *
  * @throws IllegalArgumentException if the data was invalid
  */
-fun TlvReader.toJsonString(): String {
+fun TlvReader.toJsonString(tag: Tag = AnonymousTag): String {
   val element = nextElement()
   require(element.value is StructureValue) {
     "The top level element must be a structure. The actual value is ${element.value}"
   }
-  require(element.tag is AnonymousTag) {
+  require(element.tag == tag) {
     "The top level TLV Structure MUST have anonymous tag. The actual tag is ${element.tag}"
   }
   return getStructJson().toString()
 }
 
-/**
- * Encodes TLV into kotlin Object. If the TLV reader is positioned TLV Structure, Object will return
- * to json format.
- */
-fun TlvReader.toAny(tag: Tag = AnonymousTag): Any? {
-  val element = peekElement()
-  val value = element.value
-  value.toAny()?.let {
-    skipElement()
-    return it
-  }
-  return when (value) {
-    is ArrayValue -> {
-      buildList {
-        enterArray(tag)
-        // TODO: to be added isLastElement()
-        while (!isEndOfTlv() && !isEndOfContainer()) {
-          add(toAny())
-        }
-        exitContainer()
-      }
-    }
-    is StructureValue -> {
-      skipElement()
-      getStructJson().toString()
-    }
-    else -> {
-      null
-    }
-  }
-}
 /**
  * Encodes TLV Structure into Json Object. The TLV reader should be positioned at the start of a TLV
  * Structure (StructureValue element). After this call the TLV reader is positioned at the end of

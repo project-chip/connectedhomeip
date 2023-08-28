@@ -22,7 +22,6 @@ import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.InvokeElement
 import chip.devicecontroller.model.NodeState
-import chip.jsontlv.toAny
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.TlvReader
@@ -31,6 +30,7 @@ import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.OnOffClientFragmentBinding
+import com.google.chip.chiptool.util.toAny
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale

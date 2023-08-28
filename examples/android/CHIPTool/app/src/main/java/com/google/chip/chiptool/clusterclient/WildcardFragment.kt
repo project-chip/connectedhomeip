@@ -34,6 +34,7 @@ import chip.tlv.TlvWriter
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.WildcardFragmentBinding
+import com.google.chip.chiptool.util.toAny
 import java.lang.StringBuilder
 import java.util.Optional
 import kotlin.coroutines.resume
@@ -219,7 +220,8 @@ class WildcardFragment : Fragment() {
         stringBuilder.append("\t${ChipIdLookup.clusterIdToName(clusterId)}Cluster: {\n")
         clusterState.attributeStates.forEach { (attributeId, attributeState) ->
           val attributeName = ChipIdLookup.attributeIdToName(clusterId, attributeId)
-          stringBuilder.append("\t\t$attributeName: ${attributeState.value}\n")
+          val tlv = attributeState.tlv
+          stringBuilder.append("\t\t$attributeName: ${TlvReader(tlv).toAny()}\n")
         }
         clusterState.eventStates.forEach { (eventId, events) ->
           for (event in events) {
@@ -229,7 +231,8 @@ class WildcardFragment : Fragment() {
             stringBuilder.append("\t\ttimestampValue: ${event.timestampValue}\n")
 
             val eventName = ChipIdLookup.eventIdToName(clusterId, eventId)
-            stringBuilder.append("\t\t$eventName: ${event.value}\n")
+            val tlv = event.tlv
+            stringBuilder.append("\t\t$eventName: ${TlvReader(tlv).toAny()}\n")
           }
         }
         stringBuilder.append("\t}\n")
