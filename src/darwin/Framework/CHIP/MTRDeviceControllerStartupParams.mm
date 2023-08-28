@@ -601,6 +601,8 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     _allowMultipleControllersPerFabric = YES;
     _storageDelegate = params.storageDelegate;
     _storageDelegateQueue = params.storageDelegateQueue;
+    _productAttestationAuthorityCertificates = params.productAttestationAuthorityCertificates;
+    _certificationDeclarationCertificates = params.certificationDeclarationCertificates;
 
     return self;
 }
