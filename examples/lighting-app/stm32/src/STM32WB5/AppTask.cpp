@@ -508,4 +508,3 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t) {
         break;
     }
 }
-
