@@ -1,4 +1,4 @@
-// Unify bridge components
+// Unify Matter Protocol Controller components
 
 // Chip components
 #include <AppMain.h>
@@ -20,7 +20,7 @@ using namespace chip;
 
 int Initialize(void * context)
 {
-    const char * __argv__[] = { "matter_bridge", nullptr };
+    const char * __argv__[] = { "matter_protocol_controller", nullptr };
     int __argc__            = sizeof(__argv__) / sizeof(const char *) - 1;
 
     // Makes sure our required state folders exists

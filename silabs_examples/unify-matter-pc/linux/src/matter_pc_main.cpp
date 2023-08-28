@@ -100,7 +100,7 @@ static uic_fixt_setup_step_t uic_fixt_setup_steps_list[] = { { &mpc_config_fixt_
                                                              { &mpc_application_monitoring_init, "MPC ApplicationMonitoring" },
                                                              { &mpc_datastore_fixt_setup, "Datastore" },
                                                              { &attribute_store_init, "Attribute store" },
-                                                             { &mpc_cli_init, "Matter Bridge Command Line Interface" },
+                                                             { &mpc_cli_init, "Matter Protocol Controller Command Line Interface" },
                                                              { &mpc_attribute_resolver_init, "MPC attribute resolver" },
                                                              /**
                                                               * Initializes the ZCL/DotDot specialization of the Attribute Store.
@@ -146,7 +146,7 @@ int main(int argc, char ** argv)
     mpc_on_off_cluster_mapper_init();
 
     // Set up configuration and args for Matter and matter application initialization
-    const char * __argv__[] = { "matter_bridge", nullptr };
+    const char * __argv__[] = { "matter_protocol_controller", nullptr };
     int __argc__            = sizeof(__argv__) / sizeof(const char *) - 1;
 
     auto & opt = LinuxDeviceOptions::GetInstance();

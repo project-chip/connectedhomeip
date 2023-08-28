@@ -1,4 +1,4 @@
-# Building the Unify Matter Bridge
+# Building the Unify Matter Protocol Controller
 
 This build guide cross-compiles for arm64 architecture to be run on Unify's
 reference platform - a Raspberry Pi 4 (RPi4) with the 64-bit version of Debian
@@ -33,7 +33,7 @@ dev-machine:~$ docker run -it -v $PWD:/matter -v $PWD/../uic-matter:/uic unify-m
 
 ## Build libunify
 
-The Unify Matter Bridge depends on the libunify library from the Unify project.
+The Unify Matter Protocol Controller depends on the libunify library from the Unify project.
 
 This library must first be compiled for the target system, by changing directory
 to the `/uic` folder and running the following:
@@ -64,7 +64,7 @@ root@docker:/uic$ export UCL_XML_PATH=$PWD/stage/share/uic/ucl
 
 Once you have all the necessary submodules, source the Matter environment with
 the following command. This loads a number of build tools and makes sure the
-correct toolchains and compilers are used for compiling the Unify Matter Bridge.
+correct toolchains and compilers are used for compiling the Unify Matter Protocol Controller.
 
 ## Check Out Submodules
 
@@ -114,7 +114,7 @@ After building, the chip-tool binary is located at
 ## Unit Testing
 
 Unit testing is always a good idea for quality software. Documentation on
-writing unit tests for the Matter Unify Bridge is in the
+writing unit tests for the Matter Unify Protocol Controller is in the
 [README.md](linux/src/tests/README.md) in the `linux/src/tests` folder.
 
 ## Troubleshooting
@@ -126,7 +126,7 @@ writing unit tests for the Matter Unify Bridge is in the
    described above in [Build libunify](#build-libunify) you will get errors such
    as `G_STATIC_ASSERT(sizeof (unsigned long long) == sizeof (guint64));`
 3. If you are compiling unit tests, do not try to compile the Unify Matter
-   Bridge at the same time. This will not work as when compiling unit tests you
+   Protocol Controller at the same time. This will not work as when compiling unit tests you
    are also compiling unit tests for all other sub-components.
 4. If you encounter errors linking to `libunify`, try redoing the
    [`libunify` compile steps](#build-libunify).

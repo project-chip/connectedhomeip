@@ -1,6 +1,6 @@
 # Unify Matter PC User's Guide
 
-The Unify Matter PC is a Unify Protocol that enables interaction between
+The Unify Matter PC is a Unify Protocol Controller that enables interaction between
 Unify network and a Matter fabric. For a more thorough description see the
 [Unify Matter PC Overview](../../silabs_examples/unify-matter-pc/readme_overview.md).
 
@@ -45,7 +45,7 @@ configuration options. A full list of command-line parameters is provided in the
     this with the '`--mpc.interface`' argument, as such:
 
     ```bash
-    ./unify-matter-pc --mpc.interface eth0
+    uic-mpc --mpc.interface eth0
     ```
 
 -   #### Key-Value store (KVS)
@@ -58,20 +58,20 @@ configuration options. A full list of command-line parameters is provided in the
     been commissioned.
 
     ```bash
-    ./unify-matter-pc --mpc.kvs ./mpc.kvs
+    uic-mpc --mpc.kvs ./mpc.kvs
     ```
 
 -   ### Unify DataStore 
 
     The Matter PC uses a sql database for persisting attribute store contents.
     Make sure to have read/write access to the default path '`/var/lib/uic-mpc/mpc.db`'
-    or provide a path to where writinf this data is allowed. If this file is deleted 
+    or provide a path to where writing this data is allowed. If this file is deleted 
     before start-up, all the information about previously discovered Matter device 
     during past run will be lost. However, if the KVS is not deleted MPC is still part 
     of a fabric and it will try and rediscover matter devices in the fabric.
 
     ```bash
-    ./unify-matter-pc --mpc.datastore_file ./mpc.db
+    uic-mpc --mpc.datastore_file ./mpc.db
     ```
     
 -   #### MQTT Host
@@ -80,10 +80,10 @@ configuration options. A full list of command-line parameters is provided in the
     [Unify Host SDK's Getting Started Guide](https://siliconlabs.github.io/UnifySDK/doc/getting_started.html),
     your MQTT Broker should now be running on '`localhost`'. If you have decided
     to run the MQTT broker on a different host, you can tell the Unify Matter
-    Bridge to connect to a different host.
+    Protocol Controller to connect to a different host.
 
     ```bash
-    ./unify-matter-pc --mqtt.host 10.0.0.42
+    uic-mpc --mqtt.host 10.0.0.42
     ```
 
 -   #### Vendor and Product ID
@@ -92,7 +92,7 @@ configuration options. A full list of command-line parameters is provided in the
     need to set a specific VID and PID for the Matter PC.
 
     ```bash
-    ./unify-matter-pc --mpc.vendor fff1 --mpc.product 8001
+    uic-mpc --mpc.vendor fff1 --mpc.product 8001
     ```
 
 ### Starting the Matter PC
@@ -101,7 +101,7 @@ Once the configuration parameters are set it is time to start the UMPC
 application. UMPC can be run in either standalone mode or service mode (if installed from debian package).
 - Standalone
   ```bash
-  ./unify-matter-pc --interface eth0 --kvs ./mpc.kvs --mqtt.host localhost --mqtt.port 1337
+  uic-mpc --mpc.interface eth0 --mpc.kvs ./mpc.kvs --mqtt.host localhost --mqtt.port 1337
   ```
 - Service Mode
   To run in service mode the configuration parameter are set in `/etc/uic/uic.cfg` as needed and then start `uic-mpc.service`.
@@ -123,7 +123,7 @@ The Unify Matter PC uses the "On Network" commissioning method. For now,
 there is no Bluetooth commissioning support.
 
 The commissioning procedure requires use of a pairing code. This pairing code is
-written to the console when running the Matter Bridge. Look for something
+written to the console when running the Matter Protocol Controller. Look for something
 similar to '`MT:-24J029Q00KA0648G00`', used as the pairing code in the following
 example. This code can be used when commissioning with the CLI commissioning
 tool `chip-tool`. 
@@ -186,7 +186,7 @@ Using _--help_ displays the following text.
 
 ```text
 
-Usage: ./unify-matter-pc [Options]
+Usage: uic-mpc [Options]
 
 Options:
   --conf arg (=/etc/uic/uic.cfg)        Config file in YAML format. UIC_CONF

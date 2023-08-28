@@ -14,7 +14,7 @@
 /**
  * @file
  *  A collection of mocks and pseudo application context that help testing each
- *  bridge functionality locally.
+ *  protocol controller functionality locally.
  *
  */
 
