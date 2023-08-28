@@ -28,6 +28,8 @@
 #include "stm32_lcd.h"
 #include "stm32_lpm.h"
 #include "stm32wb5mm_dk_lcd.h"
+
+#include "stm_logging.h"
 #if HIGHWATERMARK
 #include "memory_buffer_alloc.h"
 #endif
