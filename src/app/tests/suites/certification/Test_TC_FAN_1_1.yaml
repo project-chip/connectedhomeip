@@ -51,8 +51,8 @@ tests:
               type: bitmap32
 
     - label:
-          "Step 3b: Given FAN.S.F00(SPD) ensure featuremap has the correct
-          bit set"
+          "Step 3b: Given FAN.S.F00(SPD) ensure featuremap has the correct bit
+          set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: FAN.S.F00
@@ -62,8 +62,8 @@ tests:
               hasMasksSet: [0x1]
 
     - label:
-          "Step 3c: Given FAN.S.F01(AUT) ensure featuremap has the correct
-          bit set"
+          "Step 3c: Given FAN.S.F01(AUT) ensure featuremap has the correct bit
+          set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: FAN.S.F01
@@ -73,8 +73,8 @@ tests:
               hasMasksSet: [0x2]
 
     - label:
-          "Step 3d: Given FAN.S.F02(RCK) ensure featuremap has the correct
-          bit set"
+          "Step 3d: Given FAN.S.F02(RCK) ensure featuremap has the correct bit
+          set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: FAN.S.F02
@@ -84,8 +84,8 @@ tests:
               hasMasksSet: [0x4]
 
     - label:
-          "Step 3e: Given FAN.S.F03(WND) ensure featuremap has the correct
-          bit set"
+          "Step 3e: Given FAN.S.F03(WND) ensure featuremap has the correct bit
+          set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: FAN.S.F03
@@ -95,8 +95,8 @@ tests:
               hasMasksSet: [0x8]
 
     - label:
-          "Step 3f: Given FAN.S.F04(STEP) ensure featuremap has the correct
-          bit set"
+          "Step 3f: Given FAN.S.F04(STEP) ensure featuremap has the correct bit
+          set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: FAN.S.F04
@@ -106,8 +106,8 @@ tests:
               hasMasksSet: [0x10]
 
     - label:
-          "Step 3g: Given FAN.S.F05(DIR) ensure featuremap has the correct
-          bit set"
+          "Step 3g: Given FAN.S.F05(DIR) ensure featuremap has the correct bit
+          set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: FAN.S.F05
