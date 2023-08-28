@@ -106,7 +106,7 @@ tests:
           [1657186324.711048][10820:10825] CHIP:CTL: Manual pairing code: [36253605617]
           [1657186324.711108][10820:10825] CHIP:CTL: SetupQRCode: [MT:-24J0IRV01A7TB7E700]
 
-          Commission TH2(Chiptool) to DUT: 
+          Commission TH2(Chiptool) to DUT:
           [1657186359.584672][3509:3514] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
           [1657186359.584743][3509:3514] CHIP:TOO: Device commissioning completed with success
       cluster: "LogCommands"
