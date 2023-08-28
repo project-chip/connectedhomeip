@@ -54,9 +54,6 @@ class YamlLoader:
                 config = content.get('config', {})
                 tests = content.get('tests', [])
 
-        # some defaults for global variables
-        config['LastReceivedEventNumber'] = 0
-
         return (filename, name, pics, config, tests)
 
     def __check_content(self, content):
