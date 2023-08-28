@@ -160,7 +160,6 @@ style:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/MultiAdminClientFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterInteractionFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/AddressCommissioningFragment.kt"
-            - "**/src/controller/java/src/chip/jsontlv/TlvToJson.kt"
             - "**/src/controller/java/src/chip/onboardingpayload/QRCodeOnboardingPayloadParser.kt"
     ExplicitItLambdaParameter:
         excludes:
