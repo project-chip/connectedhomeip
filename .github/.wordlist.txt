@@ -1276,10 +1276,9 @@ StatusCode
 stderr
 stdout
 sterm
-STMicroelectronics
+stmicroelectronics
 stm
-STM
-STLINK
+stlink
 storagepath
 str
 strcpy
@@ -1481,8 +1480,6 @@ WakeOnLan
 WantedBy
 watchdogTimeout
 watchOS
-Wb
-wb
 webpage
 wg
 wget

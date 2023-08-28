@@ -31,7 +31,8 @@ SOURCES = [
   "${stm32_board_src}/Src/stm32wbxx_it.c",
   "${stm32_board_src}/Src/stm_logging.c",
   "${stm32_board_src}/Src/syscalls.c",
-  "${stm32_board_src}/Src/system_stm32wbxx.c",  
+  "${stm32_board_src}/Src/system_stm32wbxx.c",
+  "${stm32_board_src}/Src/otp.c", 
   "${stm32_board_src}/STM32_WPAN/Target/hw_ipcc.c",
 
   "${chip_root}/examples/platform/stm32/config_files/STM32WB5/matter_config.h",

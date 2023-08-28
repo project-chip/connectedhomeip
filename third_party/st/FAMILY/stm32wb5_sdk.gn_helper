@@ -98,7 +98,6 @@ SOURCES = [
   "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/thread.c",
   "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/udp.c",
   "${stm32_wpan_sdk}/utilities/dbg_trace.c",
-  "${stm32_wpan_sdk}/utilities/otp.c",
   "${stm32_wpan_sdk}/utilities/stm_list.c",
   "${stm32_wpan_sdk}/utilities/stm_queue.c",
 
