@@ -737,14 +737,14 @@ class TestStep:
         if self.is_event:
             last_event_number = self._get_last_event_number(received_responses)
             if last_event_number:
-               if 'LastReceivedEventNumber' in self._runtime_config_variable_storage:
-                   if self._runtime_config_variable_storage['LastReceivedEventNumber'] > last_event_number:
-                       logging.warning(
-                           "Received an older event than expected: received %r < %r",
-                           last_event_number,
-                           self._runtime_config_variable_storage['LastReceivedEventNumber']
-                       )
-               self._runtime_config_variable_storage['LastReceivedEventNumber'] = last_event_number
+                if 'LastReceivedEventNumber' in self._runtime_config_variable_storage:
+                    if self._runtime_config_variable_storage['LastReceivedEventNumber'] > last_event_number:
+                        logging.warning(
+                            "Received an older event than expected: received %r < %r",
+                            last_event_number,
+                            self._runtime_config_variable_storage['LastReceivedEventNumber']
+                        )
+                self._runtime_config_variable_storage['LastReceivedEventNumber'] = last_event_number
 
         if self.wait_for is not None:
             self._response_cluster_wait_validation(received_responses, result)
@@ -1199,7 +1199,8 @@ class TestParser:
         self.__apply_legacy_config_if_missing(config, 'timeout', 90)
 
         # These values are default runtime values (non-legacy)
-        self.__apply_legacy_config_if_missing(config, 'LastReceivedEventNumber', 0)
+        self.__apply_legacy_config_if_missing(
+            config, 'LastReceivedEventNumber', 0)
 
     def __apply_legacy_config_if_missing(self, config, key, value):
         if key not in config:
