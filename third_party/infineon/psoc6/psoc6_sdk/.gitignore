@@ -22,7 +22,6 @@ libs/
 GeneratedSource/
 
 # ModusToolbox build system output
-build/
 Debug/
 Release/
 *_build/
