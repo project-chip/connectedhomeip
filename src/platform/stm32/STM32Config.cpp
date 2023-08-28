@@ -50,7 +50,7 @@ CHIP_ERROR STM32Config::ReadConfigValueStr(Key key, char *buf, size_t bufSize,
 CHIP_ERROR STM32Config::ReadConfigValueBin(Key key, uint8_t *buf,
 		size_t bufSize, size_t &outLen) {
 
-	return CHIP_NO_ERROR;
+	return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template CHIP_ERROR STM32Config::ReadConfigValue(Key key, bool &val);
@@ -94,7 +94,7 @@ bool STM32Config::ConfigValueExists(Key key) {
 
 CHIP_ERROR STM32Config::FactoryResetConfig(void) {
 
-	return CHIP_NO_ERROR;
+	return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 void STM32Config::RunConfigUnitTest(void) {

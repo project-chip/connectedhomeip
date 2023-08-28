@@ -45,7 +45,7 @@ CHIP_ERROR FactoryDataProvider::SetSetupPasscode(uint32_t setupPasscode) {
 }
 
 CHIP_ERROR FactoryDataProvider::SetSetupDiscriminator(uint16_t setupDiscriminator) {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 // TODO: This should be moved to a method of P256Keypair
