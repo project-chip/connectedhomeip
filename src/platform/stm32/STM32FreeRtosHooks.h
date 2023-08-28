@@ -21,7 +21,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-void freertos_mbedtls_init( void );
+void freertos_mbedtls_init(void);
 #ifdef __cplusplus
 }
 #endif

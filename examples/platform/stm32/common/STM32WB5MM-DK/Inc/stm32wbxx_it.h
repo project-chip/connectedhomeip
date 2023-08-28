@@ -1,21 +1,20 @@
 /**
-  ******************************************************************************
-  * @file    stm32wbxx_it.h
-  * @author  MCD Application Team
-  * @brief   This file contains the headers of the interrupt handlers.
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2019-2021 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
-
+ ******************************************************************************
+ * @file    stm32wbxx_it.h
+ * @author  MCD Application Team
+ * @brief   This file contains the headers of the interrupt handlers.
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2019-2021 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __STM32WBxx_IT_H
@@ -47,7 +46,7 @@ void EXTI0_IRQHandler(void);
 void EXTI1_IRQHandler(void);
 void USART1_IRQHandler(void);
 void DMA2_Channel4_IRQHandler(void);
-void CFG_HW_USART1_DMA_TX_IRQHandler( void );
+void CFG_HW_USART1_DMA_TX_IRQHandler(void);
 void RTC_WKUP_IRQHandler(void);
 void LPUART1_IRQHandler(void);
 void DMA1_Channel4_IRQHandler(void);
