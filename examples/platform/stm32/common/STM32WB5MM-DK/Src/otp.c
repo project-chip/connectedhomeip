@@ -48,5 +48,3 @@ uint8_t * OTP_Read( uint8_t id )
 
   return p_id ;
 }
-
-

@@ -61,5 +61,3 @@ extern "C" {
 #endif
 
 #endif /*__OTP_H */
-
-
