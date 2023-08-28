@@ -56,10 +56,6 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target ti-cc13x2x7_26x2x7-lock-mtd \
-                      --target ti-cc13x2x7_26x2x7-pump-mtd \
-                      --target ti-cc13x2x7_26x2x7-lighting-mtd \
-                      --target ti-cc13x2x7_26x2x7-pump-controller-mtd \
                       --target ti-cc13x4_26x4-lighting-ftd \
                       --target ti-cc13x4_26x4-lighting-mtd \
                       --target ti-cc13x4_26x4-lock-ftd \
@@ -71,24 +67,6 @@ jobs:
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
-            - name: Get lock MTD size stats
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    cc13x2_26x2 LP_CC2652R7 lock-mtd \
-                    out/artifacts/ti-cc13x2x7_26x2x7-lock-mtd/chip-LP_CC2652R7-lock-example.out \
-                    /tmp/bloat_reports/
-            - name: Get Pump MTD size stats
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    cc13x2_26x2 LP_CC2652R7 pump-app \
-                    out/artifacts/ti-cc13x2x7_26x2x7-pump-mtd/chip-LP_CC2652R7-pump-example.out \
-                    /tmp/bloat_reports/
-            - name: Get Pump Controller MTD size stats
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    cc13x2_26x2 LP_CC2652R7 pump-controller-app \
-                    out/artifacts/ti-cc13x2x7_26x2x7-pump-controller-mtd/chip-LP_CC2652R7-pump-controller-example.out \
-                    /tmp/bloat_reports/
             - name: Get lock FTD size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
