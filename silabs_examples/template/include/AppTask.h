@@ -50,7 +50,7 @@ public:
 
     static void AppTaskMain(void * pvParameter);
 
-    void ButtonEventHandler(uint8_t button, uint8_t btnAction);
+    static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
 private:
     friend AppTask & GetAppTask(void);

@@ -50,7 +50,7 @@ public:
     CHIP_ERROR StartAppTask();
 
 
-    void ButtonEventHandler(uint8_t button, uint8_t btnAction);
+    static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
     void PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction);
     void PostLightControlActionRequest(int32_t aActor, LightingManager::Action_t aAction, uint8_t value);

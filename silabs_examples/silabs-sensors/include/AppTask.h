@@ -80,7 +80,7 @@ public:
      * @param btnAction button action - SL_SIMPLE_BUTTON_PRESSED,
      *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
      */
-    void ButtonEventHandler(uint8_t button, uint8_t btnAction);
+    static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 #endif
     // void PostSensorActionRequest(int32_t aActor, LightingManager::Action_t aAction);
 

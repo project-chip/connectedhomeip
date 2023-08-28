@@ -38,7 +38,7 @@
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
-#if defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
+#if (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917))
 #define ONOFF_LED 1
 #else
 #define ONOFF_LED 0
@@ -65,6 +65,8 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
+
 #ifdef DISPLAY_ENABLED
     GetLCD().Init((uint8_t *) "onoffPlug-App");
 #endif
