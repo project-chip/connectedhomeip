@@ -76,7 +76,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadTagListAttribute(EndpointId endpoint, Attri
         Clusters::Descriptor::Structs::SemanticTagStruct::Type tag;
         size_t index   = 0;
         CHIP_ERROR err = CHIP_NO_ERROR;
-        while ((err = GetSematicTagForEndpointAtIndex(endpoint, index, tag)) == CHIP_NO_ERROR)
+        while ((err = GetSemanticTagForEndpointAtIndex(endpoint, index, tag)) == CHIP_NO_ERROR)
         {
             ReturnErrorOnFailure(encoder.Encode(tag));
             index++;
