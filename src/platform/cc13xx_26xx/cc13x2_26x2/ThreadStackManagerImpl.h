@@ -95,6 +95,8 @@ public:
     void _SendProcMessage(procQueueMsg & procMsg);
     void _ProcMessage(otInstance * aInstance);
     void GetExtAddress(otExtAddress & aExtAddr);
+    CHIP_ERROR GetBufferInfo(void);
+
 
 private:
     // ===== Methods that implement the ThreadStackManager abstract interface.
@@ -114,6 +116,7 @@ private:
 
     ThreadStackManagerImpl() = default;
     QueueHandle_t procQueue;
+    QueueHandle_t procQueue_radio;
 };
 
 /**

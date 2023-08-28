@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020 Texas Instruments Incorporated
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -94,6 +95,8 @@ public:
     void _SendProcMessage(procQueueMsg & procMsg);
     void _ProcMessage(otInstance * aInstance);
     void GetExtAddress(otExtAddress & aExtAddr);
+    CHIP_ERROR GetBufferInfo(void);
+
 
 private:
     // ===== Methods that implement the ThreadStackManager abstract interface.
@@ -113,6 +116,7 @@ private:
 
     ThreadStackManagerImpl() = default;
     QueueHandle_t procQueue;
+    QueueHandle_t procQueue_radio;
 };
 
 /**

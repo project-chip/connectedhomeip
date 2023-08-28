@@ -230,6 +230,7 @@ template("ti_simplelink_sdk") {
     cflags = [ "-Wno-sign-compare" ]
 
     sources = [
+      "${ti_simplelink_sdk_root}/source/ti/drivers/sha2/SHA2CC26X2.c",
       "${ti_simplelink_sdk_root}/kernel/freertos/dpl/AppHooks_freertos.c",
       "${ti_simplelink_sdk_root}/kernel/freertos/dpl/DebugP_freertos.c",
       "${ti_simplelink_sdk_root}/kernel/freertos/dpl/MutexP_freertos.c",
