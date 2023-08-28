@@ -117,6 +117,12 @@ if (silabs_board == "BRD4304A") {
   disable_lcd = true
   show_qr_code = false
   wifi_soc = true
+} else if (silabs_board == "BRD4338A") {
+  silabs_family = "SiWx917-common"
+  silabs_mcu = "SiWG917M111MGTBA"
+  disable_lcd = true
+  show_qr_code = false
+  wifi_soc = true
 } else if (silabs_board == "BRD4180A") {
   assert(
       false,

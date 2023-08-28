@@ -179,6 +179,17 @@ template("siwx917_sdk") {
         "SL_BOARD_REV=\"A01\"",
       ]
     }
+    if (silabs_board == "BRD4338A") {
+      defines += [
+        "BRD4338A",
+        "CHIP_917B0 = 1",
+        "SL_BOARD_NAME=\"BRD4338A\"",
+        "COMMON_FLASH_EN=1",
+        "EXECUTION_FROM_RAM",
+        "SL_BOARD_REV=\"A01\"",
+        "SI917_RADIO_BOARD_V2=1",
+      ]
+    }
 
     if (chip_build_libshell) {
       defines += [ "ENABLE_CHIP_SHELL" ]
@@ -407,7 +418,7 @@ template("siwx917_sdk") {
       ]
     }
 
-    if (silabs_board == "BRD4325C") {
+    if ((silabs_board == "BRD4325C") || (silabs_board == "BRD4338A")) {
       sources += [
         "${sdk_support_root}/matter/si91x/siwx917/BRD4325x/support/src/startup_common_RS1xxxx.c",
         "${wifi_sdk_root}/components/siwx917_soc/drivers/middleware/nvm3/src/sl_si91x_common_flash_intf.c",
