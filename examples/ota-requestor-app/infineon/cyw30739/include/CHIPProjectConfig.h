@@ -58,6 +58,4 @@
 #define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
 
 // -------------------- Test Configuration --------------------
-#define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 1
-
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
