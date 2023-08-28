@@ -27,9 +27,9 @@ sl_status_t mpc_attribute_resolver_init()
                                                               .send      = &mpc_attribute_resolver_send,
                                                               // .abort     = &attribute_resolver_abort_pending_resolution,
                                                               // Minimal timespan before retrying a get
-                                                              .get_retry_timeout = 3000,
+                                                              .get_retry_timeout = 6000,
                                                               // Number of times to retry sending a get
-                                                              .get_retry_count = 5 };
+                                                              .get_retry_count = 10 };
     init_status |= attribute_resolver_init(attribute_resolver_config);
 
     // MPC resolver rule init
