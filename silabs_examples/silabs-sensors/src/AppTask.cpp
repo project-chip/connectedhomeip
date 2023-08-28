@@ -35,6 +35,7 @@
 #include <lib/support/CodeUtils.h>
 
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #if defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
 #define SENSOR_LED 1

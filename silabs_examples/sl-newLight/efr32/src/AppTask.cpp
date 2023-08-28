@@ -38,6 +38,7 @@
 #include <lib/support/CodeUtils.h>
 
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #define LIGHT_LED 1
 #define APP_FUNCTION_BUTTON 0

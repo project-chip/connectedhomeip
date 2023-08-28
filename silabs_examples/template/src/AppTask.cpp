@@ -35,6 +35,7 @@
 #include <lib/support/CodeUtils.h>
 
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #define APP_FUNCTION_BUTTON 0
