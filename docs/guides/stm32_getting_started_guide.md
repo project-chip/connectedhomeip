@@ -30,7 +30,7 @@ subfolder.
 
 -   [Set Up Matter Environment](./BUILDING.md)
 
--   Setup STLINK tools
+-   Set up STLINK tools
 
     ```
      apt-get install stlink-tools
