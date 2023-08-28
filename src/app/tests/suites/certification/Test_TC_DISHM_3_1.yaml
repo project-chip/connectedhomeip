@@ -24,26 +24,64 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Note"
-      verification: |
-          To execute this test case set onmode to any integer value because as default it value has null.
-
-          ./chip-tool dishwashermode write on-mode 0 1 1
-
-          On TH(chip-tool) log, Verify DUT responds with a SUCCESS (value 0x00) status response and below is the sample log provided for the raspi platform:
-
-
-          [1690188722.057858][15975:15977] CHIP:DMG:                         StatusIB =
-          [1690188722.057862][15975:15977] CHIP:DMG:                         {
-          [1690188722.057865][15975:15977] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1690188722.057867][15975:15977] CHIP:DMG:                         },
-      disabled: true
-
     - label: "Precondition"
       verification: |
           1 Dishwasher Mode and OnOff clusters are available on the same endpoint
 
           2 The OnMode attribute is set to a non-NULL value from the mode values indicated by the SupportedModes attribute.
+
+          Read the SupportedModes attribute,  select a value from SupportedModes and save the value as OnMode_value
+
+          ./chip-tool dishwashermode read supported-modes 1 1
+
+          On TH(chip-tool) log, Verify the list of  SupportedModes and below is the sample log provided for the raspi platform:
+
+          [1692170674.471882][3058:3061] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0000 DataVersion: 2502960191
+          [1692170674.472010][3058:3061] CHIP:TOO:   SupportedModes: 3 entries
+          [1692170674.472081][3058:3061] CHIP:TOO:     [1]: {
+          [1692170674.472110][3058:3061] CHIP:TOO:       Label: Normal
+          [1692170674.472135][3058:3061] CHIP:TOO:       Mode: 0
+          [1692170674.472163][3058:3061] CHIP:TOO:       ModeTags: 1 entries
+          [1692170674.472223][3058:3061] CHIP:TOO:         [1]: {
+          [1692170674.472252][3058:3061] CHIP:TOO:           Value: 16384
+          [1692170674.472288][3058:3061] CHIP:TOO:          }
+          [1692170674.472314][3058:3061] CHIP:TOO:      }
+          [1692170674.472385][3058:3061] CHIP:TOO:     [2]: {
+          [1692170674.472411][3058:3061] CHIP:TOO:       Label: Heavy
+          [1692170674.472435][3058:3061] CHIP:TOO:       Mode: 1
+          [1692170674.472475][3058:3061] CHIP:TOO:       ModeTags: 2 entries
+          [1692170674.472506][3058:3061] CHIP:TOO:         [1]: {
+          [1692170674.472542][3058:3061] CHIP:TOO:           Value: 7
+          [1692170674.472567][3058:3061] CHIP:TOO:          }
+          [1692170674.472595][3058:3061] CHIP:TOO:         [2]: {
+          [1692170674.472632][3058:3061] CHIP:TOO:           Value: 16385
+          [1692170674.472658][3058:3061] CHIP:TOO:          }
+          [1692170674.472683][3058:3061] CHIP:TOO:      }
+          [1692170674.472730][3058:3061] CHIP:TOO:     [3]: {
+          [1692170674.472755][3058:3061] CHIP:TOO:       Label: Light
+          [1692170674.472778][3058:3061] CHIP:TOO:       Mode: 2
+          [1692170674.472820][3058:3061] CHIP:TOO:       ModeTags: 3 entries
+          [1692170674.472851][3058:3061] CHIP:TOO:         [1]: {
+          [1692170674.472886][3058:3061] CHIP:TOO:           Value: 16386
+          [1692170674.472910][3058:3061] CHIP:TOO:          }
+          [1692170674.472938][3058:3061] CHIP:TOO:         [2]: {
+          [1692170674.472973][3058:3061] CHIP:TOO:           Value: 8
+          [1692170674.472996][3058:3061] CHIP:TOO:          }
+          [1692170674.473024][3058:3061] CHIP:TOO:         [3]: {
+          [1692170674.473048][3058:3061] CHIP:TOO:           Value: 2
+          [1692170674.473071][3058:3061] CHIP:TOO:          }
+          [1692170674.473095][3058:3061] CHIP:TOO:      }
+
+          Set the OnMode attribute value to OnMode_value
+
+          ./chip-tool dishwashermode write on-mode 0 1 1
+
+          On TH(chip-tool) log, Verify DUT responds with a SUCCESS (value 0x00) status response and below is the sample log provided for the raspi platform:
+
+          [1692170913.264454][3071:3073] CHIP:DMG:                         StatusIB =
+          [1692170913.264489][3071:3073] CHIP:DMG:                         {
+          [1692170913.264522][3071:3073] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1692170913.264557][3071:3073] CHIP:DMG:                         },
       disabled: true
 
     - label:
@@ -58,7 +96,7 @@ tests:
       verification: |
           ./chip-tool dishwashermode read on-mode 1 1
 
-          On TH(chip-tool), Verify that OnMode attribute value is an integer or Null
+          On TH(chip-tool), Verify that OnMode attribute value is an Integer
           Save the value as on_mode_dut and below is the sample log provided for the raspi platform, here OnMode value is 0
 
           [1690188734.934221][15978:15980] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0003 DataVersion: 74242734

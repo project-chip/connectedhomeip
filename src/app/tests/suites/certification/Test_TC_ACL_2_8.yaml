@@ -98,16 +98,16 @@ tests:
 
           ./chip-tool  pairing open-commissioning-window 1 1 400 2000 3841
 
+          Commission TH2(Chiptool) to DUT using manualcode generated in TH1 using open commission window
+
+          ./chip-tool pairing code 2 36253605617 --commissioner-name beta --commissioner-nodeid 223344
+
           [1657186324.710951][10820:10825] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
           [1657186324.710980][10820:10825] CHIP:CTL: Successfully opened pairing window On TH(Chiptool)e device
           [1657186324.711048][10820:10825] CHIP:CTL: Manual pairing code: [36253605617]
           [1657186324.711108][10820:10825] CHIP:CTL: SetupQRCode: [MT:-24J0IRV01A7TB7E700]
 
-
-          Commission TH2(Chiptool) to DUT using manualcode generated in TH1 using open commission window
-
-          ./chip-tool pairing code 2 36253605617 --commissioner-name beta --commissioner-nodeid 223344
-
+          Commission TH2(Chiptool) to DUT:
           [1657186359.584672][3509:3514] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
           [1657186359.584743][3509:3514] CHIP:TOO: Device commissioning completed with success
       cluster: "LogCommands"
