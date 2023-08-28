@@ -45,17 +45,16 @@ import java.util.Base64
  *
  * @throws IllegalArgumentException if the data was invalid
  */
-fun TlvReader.toJsonString(tag: Tag = AnonymousTag): String {
+fun TlvReader.toJsonString(): String {
   val element = nextElement()
   require(element.value is StructureValue) {
     "The top level element must be a structure. The actual value is ${element.value}"
   }
-  require(element.tag == tag) {
+  require(element.tag is AnonymousTag) {
     "The top level TLV Structure MUST have anonymous tag. The actual tag is ${element.tag}"
   }
   return getStructJson().toString()
 }
-
 /**
  * Encodes TLV Structure into Json Object. The TLV reader should be positioned at the start of a TLV
  * Structure (StructureValue element). After this call the TLV reader is positioned at the end of
