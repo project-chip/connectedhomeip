@@ -132,6 +132,10 @@ if(CHIP_CODEGEN_PREGEN_DIR)
     chip_gn_arg_append("chip_code_pre_generated_directory"  "\"${CHIP_CODEGEN_PREGEN_DIR}\"")
 endif()
 
+if(CONFIG_ENABLE_ICD_SERVER)
+    chip_gn_arg_append("chip_enable_icd_server"               "true")
+endif()
+
 if(CONFIG_ENABLE_PW_RPC)
     string(APPEND chip_gn_args "import(\"//build_overrides/pigweed.gni\")\n")
     chip_gn_arg_append("remove_default_configs"             "[\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:toolchain_cpp_standard\"]")
@@ -256,6 +260,10 @@ if (CONFIG_SEC_CERT_DAC_PROVIDER)
     chip_gn_arg_append("chip_use_secure_cert_dac_provider"                 "true")
 endif()
 
+if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
+    chip_gn_arg_append("matter_enable_esp_insights_trace"                    "true")
+endif()
+
 if (CONFIG_USE_ESP32_ECDSA_PERIPHERAL)
     chip_gn_arg_append("chip_use_esp32_ecdsa_peripheral" "true")
 endif()
@@ -363,6 +371,10 @@ target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CHIP_ROOT}/config/esp32/${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}/../../"
 )
 
+if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
+    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
+endif()
+
 idf_component_get_property(mbedtls_lib mbedtls COMPONENT_LIB)
 
 idf_build_get_property(idf_target IDF_TARGET)
@@ -416,6 +428,11 @@ list(APPEND chip_libraries $<TARGET_FILE:${main_lib}>)
 if (CONFIG_SEC_CERT_DAC_PROVIDER)
     idf_component_get_property(esp32_secure_cert_mgr_lib espressif__esp_secure_cert_mgr COMPONENT_LIB)
     list(APPEND chip_libraries $<TARGET_FILE:${esp32_secure_cert_mgr_lib}>)
+endif()
+
+if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
+    idf_component_get_property(esp_insights_lib espressif__esp_insights COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${esp_insights_lib}>)
 endif()
 
 idf_component_get_property(lwip_lib lwip COMPONENT_LIB)

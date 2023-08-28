@@ -61,7 +61,7 @@ void emberAfSmokeCoAlarmClusterInitCallback(EndpointId endpoint)
     // TODO: implement any additional Cluster Server init actions
 }
 
-bool emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId)
+void emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId)
 {
-    return AlarmMgr().StartSelfTesting();
+    AlarmMgr().StartSelfTesting();
 }

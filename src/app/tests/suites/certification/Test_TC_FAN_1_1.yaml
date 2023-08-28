@@ -31,7 +31,6 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Issue : https://github.com/project-chip/connectedhomeip/issues/27320
     - label: "Step 2: Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"

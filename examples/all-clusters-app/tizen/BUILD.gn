@@ -25,6 +25,7 @@ source_set("chip-all-clusters-common") {
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-instances.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
@@ -34,6 +35,7 @@ source_set("chip-all-clusters-common") {
 
   deps = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common",
+    "${chip_root}/examples/platform/tizen:app-main",
     "${chip_root}/src/lib/shell:shell_core",
   ]
 

@@ -58,7 +58,6 @@ import("${silabs_common_plat_dir}/args.gni")
 # Sanity check
 assert(chip_enable_wifi)
 
-wisemcu_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
 silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
 config("chip_examples_project_config") {
@@ -83,42 +82,11 @@ config("chip_examples_project_config") {
   ]
 }
 
-if (enable_dic) {
-  config("efr32_dic_config") {
-    include_dirs = [
-      "${chip_root}/third_party/silabs/mqtt/stack",
-      "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/include",
-      "${chip_root}/examples/platform/silabs/DIC/matter_abs_interface/include",
-    ]
-  }
-
-  source_set("efr32-dic") {
-    sources = [
-      "${chip_root}/examples/platform/silabs/DIC/matter_abs_interface/src/dic.c",
-      "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/MQTT_transport.c",
-      "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/altcp.c",
-      "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/altcp_alloc.c",
-      "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/altcp_tcp.c",
-      "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/altcp_tls_mbedtls.c",
-      "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/altcp_tls_mbedtls_mem.c",
-    ]
-    public_deps = [
-      "${chip_root}/src/inet",
-      "${chip_root}/src/lwip",
-    ]
-    public_configs = [ ":efr32_dic_config" ]
-  }
-}
-
 source_set("siwx917-matter-shell") {
   if (chip_build_libshell) {
     defines = [ "ENABLE_CHIP_SHELL" ]
 
-    sources = [
-      "${silabs_common_plat_dir}/matter_shell.cpp",
-      "${wisemcu_sdk_root}/platforms/si91x/drivers/cmsis_driver/UDMA.c",
-      "${wisemcu_sdk_root}/platforms/si91x/drivers/cmsis_driver/USART.c",
-    ]
+    sources = [ "${silabs_common_plat_dir}/matter_shell.cpp" ]
     include_dirs = [
       ".",
       "${silabs_common_plat_dir}",
@@ -134,11 +102,6 @@ source_set("siwx917-matter-shell") {
 
 config("attestation-credentials-config") {
   include_dirs = [ "${chip_root}" ]
-
-  defines = [
-    # Set to 1 to enable SI917 attestation credentials
-    "SILABS_ATTESTATION_CREDENTIALS",
-  ]
 }
 
 source_set("siwx917-attestation-credentials") {
@@ -183,9 +146,10 @@ config("siwx917-common-config") {
     defines += [ "QR_CODE_ENABLED" ]
   }
 
-  if (chip_enable_ota_requestor) {
-    defines += [ "SILABS_OTA_ENABLED" ]
-  }
+  # TODO: Renable once ota is supported
+  # if (chip_enable_ota_requestor) {
+  #   defines += [ "SILABS_OTA_ENABLED" ]
+  # }
 
   if (enable_heap_monitoring) {
     defines += [ "HEAP_MONITORING" ]
@@ -258,7 +222,7 @@ source_set("siwx917-common") {
     "${wifi_sdk_dir}/ethernetif.cpp",
     "${wifi_sdk_dir}/lwip_netif.cpp",
     "${wifi_sdk_dir}/wfx_notify.cpp",
-    "SiWx917/rsi_if.c",
+    "SiWx917/sl_wifi_if.c",
     "SiWx917/wfx_rsi_host.c",
   ]
 
@@ -292,10 +256,21 @@ source_set("siwx917-common") {
     deps += [ ":siwx917-matter-shell" ]
   }
 
-  # Attestation Credentials
-  if (chip_build_platform_attestation_credentials_provider) {
-    deps += [ ":siwx917-attestation-credentials" ]
+  # DIC
+  if (enable_dic) {
+    public_deps +=
+        [ "${silabs_common_plat_dir}/DIC/matter_abs_interface:silabs-dic" ]
   }
+
+  # AWS SDK OTA
+  if (aws_sdk_ota) {
+    public_deps += [
+      "${silabs_common_plat_dir}/DIC/matter_abs_interface:silabs-aws-sdk-ota",
+    ]
+  }
+
+  # Attestation Credentials
+  deps += [ ":siwx917-attestation-credentials" ]
 
   # Factory Data Provider
   if (use_efr32_factory_data_provider) {

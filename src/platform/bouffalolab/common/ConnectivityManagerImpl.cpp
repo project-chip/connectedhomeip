@@ -98,10 +98,10 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
     size_t ssidLen = 0;
     size_t pskLen  = 0;
 
-    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kBLConfigKey_wifissid, (void *) ssid, 64, &ssidLen, 0);
+    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiSSID, (void *) ssid, 64, &ssidLen, 0);
     SuccessOrExit(err);
 
-    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kBLConfigKey_wifipassword, (void *) psk, 64, &pskLen, 0);
+    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiPassword, (void *) psk, 64, &pskLen, 0);
     SuccessOrExit(err);
 
     return (ssidLen != 0);
@@ -148,10 +148,10 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = PersistedStorage::KeyValueStoreMgr().Delete(BLConfig::kBLConfigKey_wifissid);
+    err = PersistedStorage::KeyValueStoreMgr().Delete(BLConfig::kConfigKey_WiFiSSID);
     SuccessOrExit(err);
 
-    err = PersistedStorage::KeyValueStoreMgr().Delete(BLConfig::kBLConfigKey_wifipassword);
+    err = PersistedStorage::KeyValueStoreMgr().Delete(BLConfig::kConfigKey_WiFiPassword);
     SuccessOrExit(err);
 
 exit:
@@ -170,9 +170,8 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectProvisionedWiFiNetwork(void)
     size_t ssidLen = 0;
     size_t pskLen  = 0;
 
-    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kBLConfigKey_wifissid, (void *) ssid, 64, &ssidLen, 0));
-    ReturnErrorOnFailure(
-        PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kBLConfigKey_wifipassword, (void *) psk, 64, &pskLen, 0));
+    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiSSID, (void *) ssid, 64, &ssidLen, 0));
+    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiPassword, (void *) psk, 64, &pskLen, 0));
 
     NetworkCommissioning::BLWiFiDriver::GetInstance().ConnectWiFiNetwork(ssid, ssidLen, psk, pskLen);
 

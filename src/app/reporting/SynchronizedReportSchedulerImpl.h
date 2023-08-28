@@ -38,20 +38,22 @@ public:
     SynchronizedReportSchedulerImpl(TimerDelegate * aTimerDelegate) : ReportSchedulerImpl(aTimerDelegate) {}
     ~SynchronizedReportSchedulerImpl() override { UnregisterAllHandlers(); }
 
+    void OnTransitionToIdle() override;
+
     bool IsReportScheduled();
 
     void TimerFired() override;
 
 protected:
-    CHIP_ERROR ScheduleReport(System::Clock::Timeout timeout, ReadHandlerNode * node) override;
+    CHIP_ERROR ScheduleReport(System::Clock::Timeout timeout, ReadHandlerNode * node, const Timestamp & now) override;
     void CancelReport();
 
 private:
     friend class chip::app::reporting::TestReportScheduler;
 
-    CHIP_ERROR FindNextMinInterval();
-    CHIP_ERROR FindNextMaxInterval();
-    CHIP_ERROR CalculateNextReportTimeout(Timeout & timeout, ReadHandlerNode * aReadHandlerNode) override;
+    CHIP_ERROR FindNextMinInterval(const Timestamp & now);
+    CHIP_ERROR FindNextMaxInterval(const Timestamp & now);
+    CHIP_ERROR CalculateNextReportTimeout(Timeout & timeout, ReadHandlerNode * aReadHandlerNode, const Timestamp & now) override;
 
     Timestamp mNextMaxTimestamp = Milliseconds64(0);
     Timestamp mNextMinTimestamp = Milliseconds64(0);

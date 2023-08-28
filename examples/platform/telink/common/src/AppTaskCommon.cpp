@@ -157,6 +157,8 @@ class AppFabricTableDelegate : public FabricTable::Delegate
     {
         if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
         {
+            bool isBasicCommissioningMode = chip::Server::GetInstance().GetCommissioningWindowManager().GetCommissioningMode() ==
+                Dnssd::CommissioningMode::kEnabledBasic;
             ChipLogProgress(DeviceLayer, "Performing erasing of settings partition");
 
 #ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_NVS
@@ -168,9 +170,12 @@ class AppFabricTableDelegate : public FabricTable::Delegate
                 status = nvs_clear(static_cast<nvs_fs *>(storage));
             }
 
-            if (!status)
+            if (!isBasicCommissioningMode)
             {
-                status = nvs_mount(static_cast<nvs_fs *>(storage));
+                if (!status)
+                {
+                    status = nvs_mount(static_cast<nvs_fs *>(storage));
+                }
             }
 
             if (status)
@@ -187,6 +192,10 @@ class AppFabricTableDelegate : public FabricTable::Delegate
 
             ConnectivityMgr().ErasePersistentInfo();
 #endif
+            if (isBasicCommissioningMode)
+            {
+                PlatformMgr().Shutdown();
+            }
         }
     }
 };

@@ -102,7 +102,7 @@ public class ChipClusters {
 
   {{#zcl_clusters}}
   public static class {{asUpperCamelCase name}}Cluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = {{code}}L;
+    public static final long CLUSTER_ID = {{asMEI manufacturerCode code}}L;
 
     public {{asUpperCamelCase name}}Cluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -181,8 +181,20 @@ public class ChipClusters {
       {{asUpperCamelCase name}}AttributeCallback callback
     {{/if_basic_attribute}}
     ) {
-      read{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback);
+      read{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback{{#if_is_fabric_scoped_struct type}}, true{{/if_is_fabric_scoped_struct}});
     }
+  {{#if_is_fabric_scoped_struct type}}
+    public void read{{asUpperCamelCase name}}AttributeWithFabricFilter(
+    {{#if_basic_attribute type ../id}}
+      {{as_underlying_java_zcl_type type ../id boolean="Boolean"}}AttributeCallback callback
+    {{else}}
+      {{asUpperCamelCase name}}AttributeCallback callback
+    {{/if_basic_attribute}},
+      boolean isFabricFiltered
+    ) {
+      read{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback, isFabricFiltered);
+    }
+  {{/if_is_fabric_scoped_struct}}
   {{#if isWritableAttribute}}
     {{#unless mustUseTimedWrite}}
     public void write{{asUpperCamelCase name}}Attribute(DefaultClusterCallback callback, {{asJavaType type chipType parent.name}} value) {
@@ -218,6 +230,9 @@ public class ChipClusters {
       {{else}}
         {{asUpperCamelCase name}}AttributeCallback callback
       {{/if_basic_attribute}}
+      {{#if_is_fabric_scoped_struct type}}
+      , boolean isFabricFiltered
+      {{/if_is_fabric_scoped_struct}}
     );
   {{#if isWritableAttribute}}
 

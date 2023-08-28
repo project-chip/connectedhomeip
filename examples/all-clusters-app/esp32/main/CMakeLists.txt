@@ -21,7 +21,7 @@ set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}/include"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/nlfaultinjection/repo/include"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/nlfaultinjection/include"
 )
 set(SRC_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}"
@@ -96,6 +96,7 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/temperature-control-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/time-synchronization-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/dishwasher-alarm-server"
+		      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/laundry-washer-controls-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/src"
 )
 
@@ -124,6 +125,11 @@ set(SRC_DIRS_LIST  "${SRC_DIRS_LIST}"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed/esp32"
 )
 endif (CONFIG_ENABLE_PW_RPC)
+
+if (CONFIG_ENABLE_ICD_SERVER)
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/icd")
+    list(APPEND SRC_DIRS_LIST "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/icd")
+endif()
 
 set(PRIV_REQUIRES_LIST chip QRCode bt app_update nvs_flash spi_flash openthread)
 

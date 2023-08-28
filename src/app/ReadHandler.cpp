@@ -45,7 +45,7 @@ using Status = Protocols::InteractionModel::Status;
 uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    return static_cast<uint16_t>(IcdManagementServer::GetInstance().GetIdleModeInterval() / 1000);
+    return static_cast<uint16_t>(IcdManagementServer::GetInstance().GetIdleModeInterval());
 #else
     return kSubscriptionMaxIntervalPublisherLimit;
 #endif
@@ -79,7 +79,6 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
 
     VerifyOrDie(observer != nullptr);
     mObserver = observer;
-    mObserver->OnReadHandlerCreated(this);
 }
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
@@ -92,7 +91,6 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer) :
 
     VerifyOrDie(observer != nullptr);
     mObserver = observer;
-    mObserver->OnReadHandlerCreated(this);
 }
 
 void ReadHandler::ResumeSubscription(CASESessionManager & caseSessionManager,
@@ -235,6 +233,7 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
                 {
                     appCallback->OnSubscriptionEstablished(*this);
                 }
+                mObserver->OnSubscriptionEstablished(this);
             }
         }
         else
@@ -246,10 +245,10 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
             return CHIP_NO_ERROR;
         }
 
-        MoveToState(HandlerState::GeneratingReports);
+        MoveToState(HandlerState::CanStartReporting);
         break;
 
-    case HandlerState::GeneratingReports:
+    case HandlerState::CanStartReporting:
     case HandlerState::Idle:
     default:
         err = CHIP_ERROR_INCORRECT_STATE;
@@ -262,7 +261,7 @@ exit:
 
 CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aStatus)
 {
-    VerifyOrReturnLogError(mState == HandlerState::GeneratingReports, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mState == HandlerState::CanStartReporting, CHIP_ERROR_INCORRECT_STATE);
     if (IsPriming() || IsChunkedReport())
     {
         mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
@@ -286,7 +285,7 @@ CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aSt
 
 CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, bool aMoreChunks)
 {
-    VerifyOrReturnLogError(mState == HandlerState::GeneratingReports, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mState == HandlerState::CanStartReporting, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrDie(!IsAwaitingReportResponse()); // Should not be reportable!
     if (IsPriming() || IsChunkedReport())
     {
@@ -335,7 +334,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
         // Priming reports are handled when we send a SubscribeResponse.
         if (IsType(InteractionType::Subscribe) && !IsPriming() && !IsChunkedReport())
         {
-            mObserver->OnSubscriptionAction(this);
+            mObserver->OnSubscriptionReportSent(this);
         }
     }
     if (!aMoreChunks)
@@ -456,7 +455,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     ReturnErrorOnFailure(readRequestParser.GetIsFabricFiltered(&isFabricFiltered));
     SetStateFlag(ReadHandlerFlags::FabricFiltered, isFabricFiltered);
     ReturnErrorOnFailure(readRequestParser.ExitContainer());
-    MoveToState(HandlerState::GeneratingReports);
+    MoveToState(HandlerState::CanStartReporting);
 
     mExchangeCtx->WillSendMessage();
 
@@ -574,8 +573,8 @@ const char * ReadHandler::GetStateStr() const
         return "Idle";
     case HandlerState::AwaitingDestruction:
         return "AwaitingDestruction";
-    case HandlerState::GeneratingReports:
-        return "GeneratingReports";
+    case HandlerState::CanStartReporting:
+        return "CanStartReporting";
 
     case HandlerState::AwaitingReportResponse:
         return "AwaitingReportResponse";
@@ -603,10 +602,17 @@ void ReadHandler::MoveToState(const HandlerState aTargetState)
     // If we just unblocked sending reports, let's go ahead and schedule the reporting
     // engine to run to kick that off.
     //
-    if (aTargetState == HandlerState::GeneratingReports)
+    if (aTargetState == HandlerState::CanStartReporting)
     {
-        // mObserver will take care of scheduling the report as soon as allowed
-        mObserver->OnBecameReportable(this);
+        if (ShouldReportUnscheduled())
+        {
+            InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+        }
+        else
+        {
+            // If we became reportable, the scheduler will schedule a run as soon as allowed
+            mObserver->OnBecameReportable(this);
+        }
     }
 }
 
@@ -646,8 +652,6 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
 
     ReturnErrorOnFailure(writer.Finalize(&packet));
     VerifyOrReturnLogError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
-
-    mObserver->OnSubscriptionAction(this);
 
     ClearStateFlag(ReadHandlerFlags::PrimingReports);
     return mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeResponse, std::move(packet));
@@ -785,7 +789,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     SetStateFlag(ReadHandlerFlags::FabricFiltered, isFabricFiltered);
     ReturnErrorOnFailure(Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(&mSubscriptionId), sizeof(mSubscriptionId)));
     ReturnErrorOnFailure(subscribeRequestParser.ExitContainer());
-    MoveToState(HandlerState::GeneratingReports);
+    MoveToState(HandlerState::CanStartReporting);
 
     mExchangeCtx->WillSendMessage();
 
@@ -872,11 +876,11 @@ void ReadHandler::ForceDirtyState()
 
 void ReadHandler::SetStateFlag(ReadHandlerFlags aFlag, bool aValue)
 {
-    bool oldReportable = IsReportable();
+    bool oldReportable = ShouldStartReporting();
     mFlags.Set(aFlag, aValue);
 
     // If we became reportable, schedule a reporting run.
-    if (!oldReportable && IsReportable())
+    if (!oldReportable && ShouldStartReporting())
     {
         // If we became reportable, the scheduler will schedule a run as soon as allowed
         mObserver->OnBecameReportable(this);
@@ -895,7 +899,7 @@ void ReadHandler::HandleDeviceConnected(void * context, Messaging::ExchangeManag
 
     _this->mSessionHandle.Grab(sessionHandle);
 
-    _this->MoveToState(HandlerState::GeneratingReports);
+    _this->MoveToState(HandlerState::CanStartReporting);
 
     ObjectList<AttributePathParams> * attributePath = _this->mpAttributePathList;
     while (attributePath)

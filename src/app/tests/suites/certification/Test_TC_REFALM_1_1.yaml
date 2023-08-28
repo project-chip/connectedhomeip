@@ -80,7 +80,6 @@ tests:
           ./chip-tool refrigeratoralarm read event-list 1 1
           Verify " EventList attribute " consists the list may contain optional events(1)  on the TH(Chip-tool) Log:
           Below is the sample log provided for the raspi platform:
-
           [1689677416.105596][18367:18369] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0057 Attribute 0x0000_FFFA DataVersion: 1517282962
           [1689677416.105625][18367:18369] CHIP:TOO:   EventList: 1 entries
           [1689677416.105635][18367:18369] CHIP:TOO:     [1]: 0

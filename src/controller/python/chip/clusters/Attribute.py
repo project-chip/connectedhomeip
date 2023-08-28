@@ -173,6 +173,7 @@ class EventPath:
 
     def __init__(self, EndpointId: int = None, Cluster=None, Event=None, ClusterId=None, EventId=None, Urgent=None):
         self.EndpointId = EndpointId
+        self.Urgent = Urgent
         if Cluster is not None:
             # Wildcard read for a specific cluster
             if (Event is not None) or (ClusterId is not None) or (EventId is not None):
@@ -189,7 +190,6 @@ class EventPath:
             return
         self.ClusterId = ClusterId
         self.EventId = EventId
-        self.Urgent = Urgent
 
     def __str__(self) -> str:
         return f"{self.EndpointId}/{self.ClusterId}/{self.EventId}/{self.Urgent}"

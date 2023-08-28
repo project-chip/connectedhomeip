@@ -135,25 +135,16 @@ def _GetInDevelopmentTests() -> Set[str]:
         "Test_TC_PSCFG_1_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
         "Test_TC_PSCFG_2_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
         "Test_TC_PSCFG_2_2.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
-        "Test_TC_SMOKECO_2_6.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
-                                             # TestEventTriggersEnabled is true, which it's not in CI. Also, test
-                                             # has wrong key for eventNumber: because using the right key leads to
-                                             # codegen that does not compile.
         "Test_TC_SMOKECO_2_2.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
-                                             # TestEventTriggersEnabled is true, which it's not in CI. Also, test
-                                             # has wrong key for eventNumber: because using the right key leads to
-                                             # codegen that does not compile.
+                                             # TestEventTriggersEnabled is true, which it's not in CI.
         "Test_TC_SMOKECO_2_3.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
-                                             # TestEventTriggersEnabled is true, which it's not in CI. Also, test
-                                             # has wrong key for eventNumber: because using the right key leads to
-                                             # codegen that does not compile.
+                                             # TestEventTriggersEnabled is true, which it's not in CI.
         "Test_TC_SMOKECO_2_4.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
-                                             # TestEventTriggersEnabled is true, which it's not in CI. Also, test
-                                             # has wrong key for eventNumber: because using the right key leads to
-                                             # codegen that does not compile.
-        "Test_TC_SMOKECO_2_5.yaml",          # chip-repl does not support local timeout (07/20/2023) and test uses unknown
-                                             # keepSubscriptions key in the YAML. Also, test has wrong key for eventNumber:
-                                             # because using the right key leads to codegen that does not compile.
+                                             # TestEventTriggersEnabled is true, which it's not in CI.
+        "Test_TC_SMOKECO_2_5.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
+                                             # TestEventTriggersEnabled is true, which it's not in CI.
+        "Test_TC_SMOKECO_2_6.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
+                                             # TestEventTriggersEnabled is true, which it's not in CI.
     }
 
 
@@ -171,6 +162,9 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_ACE_1_6.yaml",    # Test fails only in chip-repl: Refer--> https://github.com/project-chip/connectedhomeip/pull/27910#issuecomment-1632485584
         "Test_TC_IDM_1_2.yaml",              # chip-repl does not support AnyCommands (19/07/2023)
         "TestGroupKeyManagementCluster.yaml",  # chip-repl does not support EqualityCommands (2023-08-04)
+        "Test_TC_S_2_2.yaml",              # chip-repl does not support scenes cluster commands
+        "Test_TC_S_2_3.yaml",              # chip-repl does not support scenes cluster commands
+        "Test_TC_S_2_4.yaml",              # chip-repl does not support scenes cluster commands
     }
 
 

@@ -52,6 +52,7 @@ java-jni:
 
 java-class:
     inputs/several_clusters.matter:
+        java/chip/devicecontroller/cluster/structs/SecondClusterFabricDescriptorStruct.kt: outputs/several_clusters/java/SecondClusterFabricDescriptorStruct.kt
         java/chip/devicecontroller/ClusterWriteMapping.java: outputs/several_clusters/java/ClusterWriteMapping.java
         java/chip/devicecontroller/ClusterReadMapping.java: outputs/several_clusters/java/ClusterReadMapping.java
         java/chip/devicecontroller/ClusterIDMapping.java: outputs/several_clusters/java/ClusterIDMapping.java

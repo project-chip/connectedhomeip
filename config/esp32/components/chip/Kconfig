@@ -186,6 +186,17 @@ menu "CHIP Core"
             help
                 Enable this option to use LwIP default IPv6 route hook for Route Information Option(RIO) feature.
 
+        config ENABLE_LWIP_THREAD_SAFETY
+            bool "Enable LwIP Thread safety options"
+            default y
+            select LWIP_TCPIP_CORE_LOCKING
+            select LWIP_CHECK_THREAD_SAFETY
+            help
+                CHIP SDK performs LwIP core locking before calling an LwIP API.
+                To make the calls thread safe we have to enable LWIP_TCPIP_CORE_LOCKING.
+                Here, we are also enabling LWIP_CHECK_THREAD_SAFETY which will assert when
+                LwIP code gets called from any other context or without holding the LwIP lock.
+
     endmenu # "Networking Options"
 
     menu "System Options"
@@ -291,6 +302,31 @@ menu "CHIP Device Layer"
             default n
             help
                 Enables or Disables the support for Commissionable Device Type.
+
+        config ENABLE_ICD_SERVER
+            bool "Enable ICD server"
+            depends on OPENTHREAD_MTD
+            default n
+            help
+                Enables or Disables ICD server
+
+        config ICD_SLOW_POLL_INTERVAL
+            int "ICD Slow Polling Interval"
+            depends on ENABLE_ICD_SERVER
+            default 5000
+            help
+                The value defines the fastest frequency at which the device will typically receive
+                messages in Idle Mode. The Slow Polling interval MAY be the same as the Idle Mode
+                Interval.
+
+        config ICD_FAST_POLL_INTERVAL
+            int "ICD Fast Polling Interval"
+            depends on ENABLE_ICD_SERVER
+            default 200
+            help
+                Fast Polling defines the fastest frequency at which the device can receive messages
+                in Active Mode. The Fast Polling interval SHALL be smaller than the Active Mode
+                Interval.
 
         config ENABLE_BG_EVENT_PROCESSING
             bool "Enable Background event processing"
@@ -434,39 +470,6 @@ menu "CHIP Device Layer"
             help
                 The amount of time (in milliseconds) to wait for Internet connectivity to be established on
                 the device's WiFi station interface during a Network Provisioning TestConnectivity operation.
-
-        choice WIFI_POWER_SAVE_MODE
-            prompt "WiFi power-saving mode"
-            default WIFI_POWER_SAVE_MIN
-            depends on ENABLE_WIFI_STATION && !ENABLE_WIFI_AP
-            help
-                The Modem-sleep mode which refers to the legacy power-saving mode in the IEEE 802.11 protocol.
-
-            config WIFI_POWER_SAVE_MIN
-                bool "Minimal power-saving mode"
-                help
-                    In minimum power-saving mode, station wakes up every DTIM to receive beacon.
-
-            config WIFI_POWER_SAVE_MAX
-                bool "Maximum power-saving mode"
-                help
-                    In maximum power-saving mode, station wakes up in every listen interval to receive beacon.
-                    Listen interval can be configured by calling API 'esp_wifi_set_config()' before connecting
-                    to AP.
-
-            config WIFI_POWER_SAVE_NONE
-                bool "No power-saving"
-                help
-                    No power save
-
-        endchoice
-
-        config WIFI_PS_LISTEN_INTERVAL
-            int "Listen interval for maximum power-saving mode"
-            depends on WIFI_POWER_SAVE_MAX
-            default 3
-            help
-                Interval for station to listen to beacon from AP. The unit of listen interval is one beacon interval.
 
     endmenu
 
@@ -805,6 +808,15 @@ menu "CHIP Device Layer"
                 If DAC is being read from secure cert and SOC supports ECDSA signing using on-chip peripheral
                 then this option gets enabled.
                 Also, please disable ESP_SECURE_CERT_DS_PERIPHERAL from the menuconfig when this option is disabled
+
+       config ENABLE_ESP_INSIGHTS_TRACE
+           bool "Enable Matter ESP Insights"
+           depends on ESP_INSIGHTS_ENABLED
+           default y
+           help
+               ESP Insights is a remote diagnostics solution to monitor the health of ESP devices in the field.
+               Enabling the above option will enable the esp32 specific tracing functionality and report the
+               diagnostic information to the insights cloud.
 
     endmenu
 

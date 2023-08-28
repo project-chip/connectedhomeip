@@ -25,9 +25,8 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 
-#if defined(ENABLE_WSTK_LEDS) && defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
+#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
 #include "LEDWidget.h"
-#include "sl_simple_led_instances.h"
 #endif // ENABLE_WSTK_LEDS
 
 #ifdef DISPLAY_ENABLED
@@ -61,6 +60,11 @@
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 #endif // SL_WIFI
 
+#ifdef DIC_ENABLE
+#include "dic.h"
+#include "dic_control.h"
+#endif // DIC_ENABLE
+
 /**********************************************************
  * Defines and Constants
  *********************************************************/
@@ -74,7 +78,7 @@
 #define APP_EVENT_QUEUE_SIZE 10
 #define EXAMPLE_VENDOR_ID 0xcafe
 
-#if defined(ENABLE_WSTK_LEDS) && defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
+#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
 #define SYSTEM_STATE_LED 0
 #endif // ENABLE_WSTK_LEDS
 #define APP_FUNCTION_BUTTON 0
@@ -96,7 +100,7 @@ TimerHandle_t sLightTimer;
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
-#if defined(ENABLE_WSTK_LEDS) && defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
+#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
 LEDWidget sStatusLED;
 #endif // ENABLE_WSTK_LEDS
 
@@ -139,6 +143,22 @@ Identify gIdentify = {
 
 #endif // EMBER_AF_PLUGIN_IDENTIFY_SERVER
 } // namespace
+
+#ifdef DIC_ENABLE
+namespace {
+void AppSpecificConnectivityEventCallback(const ChipDeviceEvent * event, intptr_t arg)
+{
+    SILABS_LOG("AppSpecificConnectivityEventCallback: call back for IPV4");
+    if ((event->Type == DeviceEventType::kInternetConnectivityChange) &&
+        (event->InternetConnectivityChange.IPv4 == kConnectivity_Established))
+    {
+        SILABS_LOG("Got IPv4 Address! Starting DIC module\n");
+        if (DIC_OK != dic_init(dic::control::subscribeCB))
+            SILABS_LOG("Failed to initialize DIC module\n");
+    }
+}
+} // namespace
+#endif // DIC_ENABLE
 
 /**********************************************************
  * AppTask Definitions
@@ -215,31 +235,18 @@ CHIP_ERROR BaseApplication::Init()
     SILABS_LOG("Current Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
     SILABS_LOG("Current Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
 
-#if defined(ENABLE_WSTK_LEDS) && defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
+#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
     LEDWidget::InitGpio();
     sStatusLED.Init(SYSTEM_STATE_LED);
 #endif // ENABLE_WSTK_LEDS
 
+#ifdef DIC_ENABLE
+    chip::DeviceLayer::PlatformMgr().AddEventHandler(AppSpecificConnectivityEventCallback, reinterpret_cast<intptr_t>(nullptr));
+#endif // DIC_ENABLE
+
     ConfigurationMgr().LogDeviceConfig();
 
-    // Create buffer for QR code that can fit max size and null terminator.
-    char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
-    chip::MutableCharSpan QRCode(qrCodeBuffer);
-
-    if (Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(QRCode) == CHIP_NO_ERROR)
-    {
-        // Print setup info on LCD if available
-#ifdef QR_CODE_ENABLED
-        slLCD.SetQRCode((uint8_t *) QRCode.data(), QRCode.size());
-        slLCD.ShowQRCode(true, true);
-#else
-        PrintQrCodeURL(QRCode);
-#endif // QR_CODE_ENABLED
-    }
-    else
-    {
-        SILABS_LOG("Getting QR code failed!");
-    }
+    OutputQrCode(true /*refreshLCD at init*/);
 
     PlatformMgr().AddEventHandler(OnPlatformEvent, 0);
 #ifdef SL_WIFI
@@ -284,7 +291,7 @@ void BaseApplication::FunctionEventHandler(AppEvent * aEvent)
 
         mFunction = kFunction_FactoryReset;
 
-#if defined(ENABLE_WSTK_LEDS) && defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
+#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
         // Turn off all LEDs before starting blink to make sure blink is
         // co-ordinated.
         sStatusLED.Set(false);
@@ -307,7 +314,7 @@ void BaseApplication::FunctionEventHandler(AppEvent * aEvent)
 bool BaseApplication::ActivateStatusLedPatterns()
 {
     bool isPatternSet = false;
-#if defined(ENABLE_WSTK_LEDS) && defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
+#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
 #ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
     if (gIdentify.mActive)
     {
@@ -409,7 +416,7 @@ void BaseApplication::LightEventHandler()
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-#if defined(ENABLE_WSTK_LEDS) && defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
+#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
     // Update the status LED if factory reset has not been initiated.
     //
     // If system has "full connectivity", keep the LED On constantly.
@@ -457,6 +464,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             CancelFunctionTimer();
             mFunction = kFunction_NoneSelected;
 
+            OutputQrCode(false);
 #ifdef QR_CODE_ENABLED
             // TOGGLE QRCode/LCD demo UI
             slLCD.ToggleQRCode();
@@ -547,7 +555,7 @@ void BaseApplication::StartStatusLEDTimer()
 
 void BaseApplication::StopStatusLEDTimer()
 {
-#if defined(ENABLE_WSTK_LEDS) && defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
+#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
     sStatusLED.Set(false);
 #endif // ENABLE_WSTK_LEDS
 
@@ -698,5 +706,32 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
     if (event->Type == DeviceEventType::kServiceProvisioningChange)
     {
         sIsProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
+    }
+}
+
+void BaseApplication::OutputQrCode(bool refreshLCD)
+{
+    (void) refreshLCD; // could be unused
+
+    // Create buffer for the Qr code setup payload that can fit max size and null terminator.
+    char setupPayloadBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
+    chip::MutableCharSpan setupPayload(setupPayloadBuffer);
+
+    if (Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(setupPayload) == CHIP_NO_ERROR)
+    {
+        // Print setup info on LCD if available
+#ifdef QR_CODE_ENABLED
+        if (refreshLCD)
+        {
+            slLCD.SetQRCode((uint8_t *) setupPayload.data(), setupPayload.size());
+            slLCD.ShowQRCode(true, true);
+        }
+#endif // QR_CODE_ENABLED
+
+        PrintQrCodeURL(setupPayload);
+    }
+    else
+    {
+        SILABS_LOG("Getting QR code failed!");
     }
 }

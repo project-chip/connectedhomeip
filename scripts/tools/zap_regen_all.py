@@ -19,11 +19,14 @@ import argparse
 import logging
 import multiprocessing
 import os
+import os.path
 import shutil
 import subprocess
 import sys
 import tempfile
 import time
+import traceback
+import urllib.request
 from dataclasses import dataclass
 from enum import Flag, auto
 from pathlib import Path
@@ -270,10 +273,42 @@ class JinjaCodegenTarget():
         self.command = ["./scripts/codegen.py", "--output-dir", output_directory,
                         "--generator", generator, idl_path]
 
+    def formatKotlinFiles(self, paths):
+        try:
+            logging.info("Prettifying %d kotlin files:", len(paths))
+            for name in paths:
+                logging.info("    %s" % name)
+
+            VERSION = "0.44"
+            JAR_NAME = f"ktfmt-{VERSION}-jar-with-dependencies.jar"
+            jar_url = f"https://repo1.maven.org/maven2/com/facebook/ktfmt/{VERSION}/{JAR_NAME}"
+
+            with tempfile.TemporaryDirectory(prefix='ktfmt') as tmpdir:
+                path, http_message = urllib.request.urlretrieve(jar_url, Path(tmpdir).joinpath(JAR_NAME).as_posix())
+                subprocess.check_call(['java', '-jar', path, '--google-style'] + paths)
+        except Exception:
+            traceback.print_exc()
+
+    def codeFormat(self):
+        outputs = subprocess.check_output(["./scripts/codegen.py", "--name-only", "--generator",
+                                           self.generator, "--log-level", "fatal", self.idl_path]).decode("utf8").split("\n")
+        outputs = [os.path.join(self.output_directory, name) for name in outputs if name]
+
+        # Split output files by extension,
+        name_dict = {}
+        for name in outputs:
+            _, extension = os.path.splitext(name)
+            name_dict[extension] = name_dict.get(extension, []) + [name]
+
+        if '.kt' in name_dict:
+            self.formatKotlinFiles(name_dict['.kt'])
+
     def generate(self) -> TargetRunStats:
         generate_start = time.time()
 
         subprocess.check_call(self.command)
+
+        self.codeFormat()
 
         generate_end = time.time()
 
@@ -303,7 +338,7 @@ def setupArgumentsParser():
         description='Generate content from ZAP files')
     parser.add_argument('--type', action='append', choices=__TARGET_TYPES__.keys(),
                         help='Choose which content type to generate (default: all)')
-    parser.add_argument('--tests', default='all', choices=['all', 'chip-tool', 'darwin-framework-tool', 'app1', 'app2'],
+    parser.add_argument('--tests', default='all', choices=['all', 'darwin-framework-tool', 'app1', 'app2'],
                         help='When generating tests only target, Choose which tests to generate (default: all)')
     parser.add_argument('--dry-run', default=False, action='store_true',
                         help="Don't do any generation, just log what targets would be generated (default: False)")
@@ -404,10 +439,6 @@ def getCodegenTemplates():
 def getTestsTemplatesTargets(test_target):
     zap_input = ZapInput.FromPropertiesJson('src/app/zap-templates/zcl/zcl.json')
     templates = {
-        'chip-tool': {
-            'template': 'examples/chip-tool/templates/tests/templates.json',
-            'output_dir': 'zzz_generated/chip-tool/zap-generated'
-        },
         'darwin-framework-tool': {
             'template': 'examples/darwin-framework-tool/templates/tests/templates.json',
             'output_dir': 'zzz_generated/darwin-framework-tool/zap-generated'
