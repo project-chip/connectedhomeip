@@ -712,7 +712,7 @@ class TestStep:
         for response in responses:
             if not isinstance(response, dict):
                 continue
-            received_event_number = response_event.get('eventNumber')
+            received_event_number = response.get('eventNumber')
 
             if not isinstance(received_event_number, int):
                 continue
