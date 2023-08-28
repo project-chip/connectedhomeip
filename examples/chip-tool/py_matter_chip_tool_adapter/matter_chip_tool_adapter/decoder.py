@@ -133,7 +133,7 @@ class MatterLog:
         base64_message = log["message"].encode('utf-8')
         decoded_message_bytes = base64.b64decode(base64_message)
         # TODO We do assume utf-8 encoding is used, it may not be true though.
-        self.message = decoded_message_bytes.decode('utf-8')
+        self.message = decoded_message_bytes.decode('utf-8', 'replace')
 
     def decode_logs(logs):
         return list(map(MatterLog, logs))
