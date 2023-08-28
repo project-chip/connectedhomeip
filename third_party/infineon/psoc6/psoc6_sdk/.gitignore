@@ -22,10 +22,10 @@ libs/
 GeneratedSource/
 
 # ModusToolbox build system output
-#build/
-#Debug/
-#Release/
-#*_build/
+build/
+Debug/
+Release/
+*_build/
 
 # Visual Studio Code
 openocd.tcl
@@ -82,7 +82,7 @@ Backup*
 # Compiled Binaries
 *.bin
 *.elf
-#*.hex
+*.hex
 *.map
 
 # Trash files
