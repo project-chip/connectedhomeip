@@ -207,6 +207,12 @@ class TestRunnerHooks():
         """
         pass
 
+    async def step_manual(self):
+        """
+        This method is called when the step is executed manually.
+        """
+        pass
+
 
 class WebSocketRunnerHooks():
     def connecting(self, url: str):

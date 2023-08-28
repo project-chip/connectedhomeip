@@ -17,11 +17,12 @@ import chip.devicecontroller.ReportCallback
 import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.NodeState
+import chip.tlv.AnonymousTag
+import chip.tlv.TlvReader
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.SensorClientFragmentBinding
 import com.google.chip.chiptool.util.DeviceIdUtil
-import com.google.chip.chiptool.util.TlvParseUtil
 import com.jjoe64.graphview.LabelFormatter
 import com.jjoe64.graphview.Viewport
 import com.jjoe64.graphview.series.DataPoint
@@ -224,7 +225,7 @@ class SensorClientFragment : Fragment() {
         // TODO : Need to be implement poj-to-tlv
         val value =
           try {
-            TlvParseUtil.decodeInt(tlv)
+            TlvReader(tlv).getInt(AnonymousTag)
           } catch (ex: Exception) {
             showMessage(R.string.sensor_client_read_error_text, "value is null")
             return
