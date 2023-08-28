@@ -25,7 +25,7 @@ GeneratedSource/
 build/
 Debug/
 Release/
-#*_build/
+*_build/
 
 # Visual Studio Code
 openocd.tcl
