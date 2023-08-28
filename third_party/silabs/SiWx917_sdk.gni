@@ -44,7 +44,6 @@ template("siwx917_sdk") {
 
     # Treat these includes as system includes, so warnings in them are not fatal.
     _include_dirs = [
-      "${chip_root}",
       "${chip_root}/examples/platform/silabs/SiWx917/SiWx917",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4325x/support/hal",
       "${efr32_sdk_root}/platform/emdrv/nvm3/inc",
@@ -236,6 +235,10 @@ template("siwx917_sdk") {
 
     if (enable_dic) {
       defines += [ "DIC_ENABLE=1" ]
+    }
+
+    if (aws_sdk_ota) {
+      defines += [ "ENABLE_AWS_OTA_FEAT=1" ]
     }
 
     libs += [ "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a" ]
