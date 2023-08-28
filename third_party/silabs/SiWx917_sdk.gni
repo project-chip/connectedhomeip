@@ -44,6 +44,7 @@ template("siwx917_sdk") {
 
     # Treat these includes as system includes, so warnings in them are not fatal.
     _include_dirs = [
+      "${chip_root}",
       "${chip_root}/examples/platform/silabs/SiWx917/SiWx917",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4325x/support/hal",
       "${efr32_sdk_root}/platform/emdrv/nvm3/inc",
