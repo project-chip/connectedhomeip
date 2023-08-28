@@ -22,9 +22,10 @@ libs/
 GeneratedSource/
 
 # ModusToolbox build system output
+build/
 Debug/
 Release/
-*_build/
+#*_build/
 
 # Visual Studio Code
 openocd.tcl
