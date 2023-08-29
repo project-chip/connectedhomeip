@@ -86,7 +86,6 @@ mbedtls_target("mbedtls") {
     ]
   }
 
-
   public_configs = [ ":ti_simplelink_mbedtls_config" ]
 
   public_deps = [ ti_simplelink_sysconfig_target ]
