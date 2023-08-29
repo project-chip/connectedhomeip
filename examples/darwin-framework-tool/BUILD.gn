@@ -182,6 +182,8 @@ executable("darwin-framework-tool") {
     "commands/delay/Commands.h",
     "commands/delay/SleepCommand.h",
     "commands/delay/SleepCommand.mm",
+    "commands/delay/WaitForCommissioneeCommand.h",
+    "commands/delay/WaitForCommissioneeCommand.mm",
     "commands/discover/Commands.h",
     "commands/discover/DiscoverCommissionablesCommand.h",
     "commands/discover/DiscoverCommissionablesCommand.mm",
