@@ -57,7 +57,7 @@ tests:
       verification: |
           ./chip-tool  rvcrunmode read on-mode 1 1
 
-          On TH(chip-tool), Verify that OnMode attribute value is an integer or Null
+          On TH(chip-tool), Verify that OnMode attribute value is an integer
           Save the value as on_mode_dut and below is the sample log provided for the raspi platform, here OnMode value is 0
 
           [1690265382.010747][30073:30075] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0054 Attribute 0x0000_0003 DataVersion: 172461204
@@ -72,7 +72,7 @@ tests:
           On TH(chip-tool), Verify that CurrentMode attribute is an integer.
           Save the value as old_current_mode_dut and below is the sample log provided for the raspi platform, Here CurrentMode value is 0
 
-          NOTE: If startup_mode_dut is equal to old_current_mode_dut proceed to step 4. Else proceed to step 6.
+          NOTE: If on_mode_dut is equal to old_current_mode_dut proceed to step 4. Else proceed to step 6.
 
           [1690179152.516820][6454:6456] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0054 Attribute 0x0000_0001 DataVersion: 2795852718
           [1690179152.516952][6454:6456] CHIP:TOO:   CurrentMode: 0
@@ -86,7 +86,7 @@ tests:
           On TH(chip-tool) log, Verify DUT response contains a list of ModeOptionsStruct entries
           - Verify that the list has two or more entries
           - Save the Mode field values as supported_modes_dut
-          - Select a value from supported_modes_dut different from on_mode_dut. Save the value as new_mode_th, below is the sample log provided for the raspi platform:
+          - Select a value from supported_modes_dut different from on_mode_dut. Save the value as new_mode_th. below is the sample log provided for the raspi platform:
 
           [1690179211.761627][6462:6464] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0054 Attribute 0x0000_0000 DataVersion: 2795852718
           [1690179211.761873][6462:6464] CHIP:TOO:   SupportedModes: 3 entries
@@ -162,7 +162,7 @@ tests:
       verification: |
           ./chip-tool  rvcrunmode read current-mode 1 1
 
-          On TH(chip-tool), Verify that CurrentMode attribute value is an integer value and equal to  on_mode_dut,  below is the sample log provided for the raspi platform, here CurrentMode attribute value is 0
+          On TH(chip-tool), Verify that CurrentMode attribute value is an integer and equal to  on_mode_dut,  below is the sample log provided for the raspi platform, here CurrentMode attribute value is 0
 
           [1690179336.313000][6489:6491] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0054 Attribute 0x0000_0001 DataVersion: 2795852720
           [1690179336.313132][6489:6491] CHIP:TOO:   CurrentMode: 0
