@@ -27,10 +27,8 @@ private:
 
 public:
     RvcDevice() :
-        mRunModeDelegate(),
-        mRunModeInstance(&mRunModeDelegate, RvcRunModeEndpoint, RvcRunMode::Id, 0),
-        mCleanModeDelegate(), mCleanModeInstance(&mCleanModeDelegate, RvcCleanModeEndpoint, RvcCleanMode::Id, 0),
-        mOperationalStateDelegate(),
+        mRunModeDelegate(), mRunModeInstance(&mRunModeDelegate, RvcRunModeEndpoint, RvcRunMode::Id, 0), mCleanModeDelegate(),
+        mCleanModeInstance(&mCleanModeDelegate, RvcCleanModeEndpoint, RvcCleanMode::Id, 0), mOperationalStateDelegate(),
         mOperationalStateInstance(&mOperationalStateDelegate, RvcOperationalStateEndpoint, RvcOperationalState::Id)
     {
         // set the current-mode at start-up
