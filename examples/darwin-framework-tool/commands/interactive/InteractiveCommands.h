@@ -25,24 +25,55 @@
 
 #include "InteractiveCommands.h"
 
+#include <websocket-server/WebSocketServer.h>
+
 class Commands;
 
-class InteractiveStartCommand : public CHIPCommandBridge
+class InteractiveCommand : public CHIPCommandBridge
 {
 public:
-    InteractiveStartCommand(Commands * commandsHandler) : CHIPCommandBridge("start"), mHandler(commandsHandler)
+    InteractiveCommand(const char * name, Commands * commandsHandler) : CHIPCommandBridge(name), mHandler(commandsHandler)
     {
         AddArgument(
             "additional-prompt", &mAdditionalPrompt,
             "Force printing of an additional prompt that can then be detected by something trying to script interactive mode");
     }
 
-    CHIP_ERROR RunCommand() override;
-
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(0); }
 
-private:
     bool ParseCommand(char * command);
-    Commands * mHandler = nullptr;
+
+protected:
     chip::Optional<char *> mAdditionalPrompt;
+
+private:
+    Commands * mHandler = nullptr;
+};
+
+class InteractiveStartCommand : public InteractiveCommand
+{
+public:
+    InteractiveStartCommand(Commands * commandsHandler) : InteractiveCommand("start", commandsHandler) {}
+
+    /////////// CHIPCommandBridge Interface /////////
+    CHIP_ERROR RunCommand() override;
+};
+
+class InteractiveServerCommand : public InteractiveCommand, public WebSocketServerDelegate
+{
+public:
+    InteractiveServerCommand(Commands * commandsHandler) : InteractiveCommand("server", commandsHandler)
+    {
+        AddArgument("port", 0, UINT16_MAX, &mPort, "Port the websocket will listen to. Defaults to 9002.");
+    }
+
+    /////////// CHIPCommandBridge Interface /////////
+    CHIP_ERROR RunCommand() override;
+
+    /////////// WebSocketServerDelegate Interface /////////
+    bool OnWebSocketMessageReceived(char * msg) override;
+
+private:
+    WebSocketServer mWebSocketServer;
+    chip::Optional<uint16_t> mPort;
 };

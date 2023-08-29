@@ -138,7 +138,27 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     return CHIP_NO_ERROR;
 }
 
-bool InteractiveStartCommand::ParseCommand(char * command)
+CHIP_ERROR InteractiveServerCommand::RunCommand()
+{
+    read_history(kInteractiveModeHistoryFilePath);
+
+    // Logs needs to be redirected in order to refresh the screen appropriately when something
+    // is dumped to stdout while the user is typing a command.
+    chip::Logging::SetLogRedirectCallback(LoggingCallback);
+
+    ReturnErrorOnFailure(mWebSocketServer.Run(mPort, this));
+
+    SetCommandExitStatus(CHIP_NO_ERROR);
+    return CHIP_NO_ERROR;
+}
+
+bool InteractiveServerCommand::OnWebSocketMessageReceived(char * msg)
+{
+    auto shouldStop = ParseCommand(msg);
+    return shouldStop;
+}
+
+bool InteractiveCommand::ParseCommand(char * command)
 {
     if (strcmp(command, kInteractiveModeStopCommand) == 0) {
         ExecuteDeferredCleanups();

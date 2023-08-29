@@ -21,26 +21,22 @@ from typing import List
 
 import click
 from paths_finder import PathsFinder
-from runner import CONTEXT_SETTINGS, chiptool
+from runner import CONTEXT_SETTINGS, darwinframeworktool
 from tests_tool import send_raw_command, send_yaml_command
 
 _DEFAULT_EXTENSIONS_DIR = 'scripts/tests/yaml/extensions'
 _DEFAULT_PICS_FILE = 'src/app/tests/suites/certification/ci-pics-values'
 
 
-def chiptool_runner_options(f):
+def darwinframeworktool_runner_options(f):
     f = click.option('--server_path', type=click.Path(exists=True), default=None,
                      help='Path to an websocket server to run at launch.')(f)
-    f = click.option('--server_name', type=str, default='chip-tool',
+    f = click.option('--server_name', type=str, default='darwin-framework-tool',
                      help='Name of a websocket server to run at launch.')(f)
     f = click.option('--server_arguments', type=str, default='interactive server',
                      help='Optional arguments to pass to the websocket server at launch.')(f)
     f = click.option('--show_adapter_logs', type=bool, default=False, show_default=True,
                      help='Show additional logs provided by the adapter.')(f)
-    f = click.option('--trace_file', type=click.Path(), default=None,
-                     help='Optional file path to save the tracing output to.')(f)
-    f = click.option('--trace_decode', type=bool, default=True,
-                     help='Decode the tracing ouput to a human readable format.')(f)
     f = click.option('--delay-in-ms', '--delayInMs', type=int, default=0, show_default=True,
                      help='Add a delay between each test suite steps.')(f)
     f = click.option('--continueOnFailure', type=bool, default=False, show_default=True,
@@ -53,20 +49,7 @@ def chiptool_runner_options(f):
 
 
 CONTEXT_SETTINGS['ignore_unknown_options'] = True
-CONTEXT_SETTINGS['default_map']['chiptool']['use_test_harness_log_format'] = True
-
-
-def maybe_update_server_arguments(ctx):
-    if ctx.params['trace_file']:
-        ctx.params['server_arguments'] += ' --trace_file {}'.format(ctx.params['trace_file'])
-
-    if ctx.params['trace_decode']:
-        ctx.params['server_arguments'] += ' --trace_decode 1'
-
-    del ctx.params['trace_file']
-    del ctx.params['trace_decode']
-
-    return ctx.params['server_arguments']
+CONTEXT_SETTINGS['default_map']['darwinframeworktool']['use_test_harness_log_format'] = True
 
 
 def maybe_update_stop_on_error(ctx):
@@ -78,16 +61,16 @@ def maybe_update_stop_on_error(ctx):
 
 @click.command(context_settings=CONTEXT_SETTINGS)
 @click.argument('commands', nargs=-1)
-@chiptool_runner_options
+@darwinframeworktool_runner_options
 @click.pass_context
-def chiptool_py(ctx, commands: List[str], server_path: str, server_name: str, server_arguments: str, show_adapter_logs: bool, trace_file: str, trace_decode: bool, delay_in_ms: int, continueonfailure: bool, pics: str, additional_pseudo_clusters_directory: str):
+def darwinframeworktool_py(ctx, commands: List[str], server_path: str, server_name: str, server_arguments: str, show_adapter_logs: bool, delay_in_ms: int, continueonfailure: bool, pics: str, additional_pseudo_clusters_directory: str):
     success = False
 
-    server_arguments = maybe_update_server_arguments(ctx)
+    server_arguments = ctx.params['server_arguments']
     maybe_update_stop_on_error(ctx)
 
     if len(commands) > 1 and commands[0] == 'tests':
-        success = send_yaml_command(chiptool, commands[1], server_path, server_arguments, show_adapter_logs, pics,
+        success = send_yaml_command(darwinframeworktool, commands[1], server_path, server_arguments, show_adapter_logs, pics,
                                     additional_pseudo_clusters_directory, commands[2:])
     else:
         if server_path is None and server_name:
@@ -99,4 +82,4 @@ def chiptool_py(ctx, commands: List[str], server_path: str, server_name: str, se
 
 
 if __name__ == '__main__':
-    chiptool_py()
+    darwinframeworktool_py()
