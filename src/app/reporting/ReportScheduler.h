@@ -89,7 +89,8 @@ public:
         bool IsReportableNow(const Timestamp & now) const
         {
             return (mReadHandler->CanStartReporting() &&
-                    (now >= mMinTimestamp && (mReadHandler->IsDirty() || now >= mMaxTimestamp || CanBeSynced())));
+                    ((now >= mMinTimestamp && (mReadHandler->IsDirty() || now >= mMaxTimestamp || CanBeSynced())) ||
+                     IsEngineRunScheduled()));
         }
 
         bool IsEngineRunScheduled() const { return mFlags.Has(ReadHandlerNodeFlags::EngineRunScheduled); }
@@ -114,8 +115,8 @@ public:
 
         void TimerFired() override
         {
-            mScheduler->ReportTimerCallback();
             SetEngineRunScheduled(true);
+            mScheduler->ReportTimerCallback();
         }
 
         System::Clock::Timestamp GetMinTimestamp() const { return mMinTimestamp; }
