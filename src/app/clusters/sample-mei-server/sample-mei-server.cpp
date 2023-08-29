@@ -78,13 +78,13 @@ void SampleMeiServer::InvokeCommand(HandlerContext & ctxt)
     switch (ctxt.mRequestPath.mCommandId)
     {
     case Commands::Ping::Id:
-        HandleCommand<Commands::Ping::DecodableType>(ctxt, [this, endpoint](HandlerContext & ctx, const auto & req) {
+        HandleCommand<Commands::Ping::DecodableType>(ctxt, [endpoint](HandlerContext & ctx, const auto & req) {
             ChipLogProgress(Zcl,"Ping Command on endpoint %d", endpoint);
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
         });
         return;
     case Commands::AddArguments::Id:
-        HandleCommand<Commands::AddArguments::DecodableType>(ctxt, [this, endpoint](HandlerContext & ctx, const auto & req) {
+        HandleCommand<Commands::AddArguments::DecodableType>(ctxt, [endpoint](HandlerContext & ctx, const auto & req) {
             ChipLogProgress(Zcl,"AddArgumentsCommand on endpoint %d", endpoint);
             if (req.arg1 > UINT8_MAX - req.arg2)
             {
