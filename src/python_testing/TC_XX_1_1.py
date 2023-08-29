@@ -16,7 +16,7 @@
 #
 
 import logging
-from matter_testing_support import MatterBaseTest, default_matter_test_main, async_test_body
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
