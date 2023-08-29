@@ -230,7 +230,6 @@ template("ti_simplelink_sdk") {
     cflags = [ "-Wno-sign-compare" ]
 
     sources = [
-      "${ti_simplelink_sdk_root}/source/ti/drivers/sha2/SHA2CC26X2.c",
       "${ti_simplelink_sdk_root}/kernel/freertos/dpl/AppHooks_freertos.c",
       "${ti_simplelink_sdk_root}/kernel/freertos/dpl/DebugP_freertos.c",
       "${ti_simplelink_sdk_root}/kernel/freertos/dpl/MutexP_freertos.c",
@@ -243,6 +242,7 @@ template("ti_simplelink_sdk") {
     if (ti_simplelink_device_family == "cc13x2_26x2" ||
         ti_simplelink_device_family == "cc13x2x7_26x2x7") {
       sources += [
+        "${ti_simplelink_sdk_root}/source/ti/drivers/sha2/SHA2CC26X2.c",
         "${ti_simplelink_sdk_root}/kernel/freertos/dpl/ClockPCC26X2_freertos.c",
         "${ti_simplelink_sdk_root}/kernel/freertos/dpl/HwiPCC26X2_freertos.c",
         "${ti_simplelink_sdk_root}/kernel/freertos/dpl/PowerCC26X2_freertos.c",
@@ -251,6 +251,7 @@ template("ti_simplelink_sdk") {
       ]
     } else if (ti_simplelink_device_family == "cc13x4_26x4") {
       sources += [
+        "${ti_simplelink_sdk_root}/source/ti/drivers/sha2/SHA2CC26X2.c",
         "${ti_simplelink_sdk_root}/kernel/freertos/dpl/ClockPCC26X2_freertos.c",
         "${ti_simplelink_sdk_root}/kernel/freertos/dpl/HwiPCC26X2_freertos.c",
         "${ti_simplelink_sdk_root}/kernel/freertos/dpl/PowerCC26X2_freertos.c",
