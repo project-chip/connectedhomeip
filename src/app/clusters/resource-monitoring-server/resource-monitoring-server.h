@@ -152,18 +152,23 @@ private:
 
 class Delegate
 {
-protected:
-    Instance * mInstance = nullptr;
+friend class Instance;
 
-public:
-    Delegate()          = default;
-    virtual ~Delegate() = default;
+private:
+    Instance * mInstance = nullptr;
 
     /**
      * This method is used by the SDK to set the instance pointer. This is done during the instantiation of an Instance object.
      * @param aInstance A pointer to the Instance object related to this delegate object.
      */
     void SetInstance(Instance * aInstance) { mInstance = aInstance; }
+
+protected: 
+    Instance* GetInstance() { return mInstance; }
+
+public:
+    Delegate()          = default;
+    virtual ~Delegate() = default;
 
     // The following methods should be overridden by the SDK user to implement the business logic of their application
 

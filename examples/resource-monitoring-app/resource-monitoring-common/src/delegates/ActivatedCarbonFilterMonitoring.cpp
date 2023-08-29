@@ -51,7 +51,7 @@ CHIP_ERROR ActivatedCarbonFilterMonitoringDelegate::Init()
 {
     ChipLogDetail(Zcl, "ActivatedCarbonFilterMonitoringDelegate::Init()");
 
-    mInstance->SetReplacementProductListManagerInstance(&sActivatedCarbonFilterReplacementProductListManager);
+    GetInstance()->SetReplacementProductListManagerInstance(&sActivatedCarbonFilterReplacementProductListManager);
 
     return CHIP_NO_ERROR;
 }

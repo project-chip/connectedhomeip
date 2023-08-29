@@ -41,7 +41,7 @@ CHIP_ERROR HepaFilterMonitoringDelegate::Init()
 {
     ChipLogDetail(Zcl, "HepaFilterMonitoringDelegate::Init()");
 
-    mInstance->SetReplacementProductListManagerInstance(&sHepaFilterReplacementProductListManager);
+    GetInstance()->SetReplacementProductListManagerInstance(&sHepaFilterReplacementProductListManager);
 
     return CHIP_NO_ERROR;
 }

@@ -48,7 +48,7 @@ static ImmutableReplacementProductListManager sReplacementProductListManager;
 CHIP_ERROR ActivatedCarbonFilterMonitoringDelegate::Init()
 {
     ChipLogDetail(Zcl, "ActivatedCarbonFilterMonitoringDelegate::Init()");
-    mInstance->SetReplacementProductListManagerInstance(&sReplacementProductListManager);
+    GetInstance()->SetReplacementProductListManagerInstance(&sReplacementProductListManager);
     return CHIP_NO_ERROR;
 }
 
@@ -82,7 +82,7 @@ void ActivatedCarbonFilterMonitoring::Shutdown()
 CHIP_ERROR HepaFilterMonitoringDelegate::Init()
 {
     ChipLogDetail(Zcl, "HepaFilterMonitoringDelegate::Init()");
-    mInstance->SetReplacementProductListManagerInstance(&sReplacementProductListManager);
+    GetInstance()->SetReplacementProductListManagerInstance(&sReplacementProductListManager);
     return CHIP_NO_ERROR;
 }
 
