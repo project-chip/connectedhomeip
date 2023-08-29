@@ -209,13 +209,14 @@ CHIP_ERROR Find16BitUpperCaseHexAfterPrefix(const ByteSpan & buffer, const char 
         cursor += prefix_span.size();
         remaining -= prefix_span.size();
 
-        if (remaining < HEX_ENCODED_LENGTH(sizeof(uint16_t)))
+        constexpr size_t expected_hex_len = HEX_ENCODED_LENGTH(sizeof(uint16_t));
+        if (remaining < expected_hex_len)
         {
             // We can't possibly match the hex values if not enough bytes left.
             break;
         }
 
-        char hex_buf[4];
+        char hex_buf[expected_hex_len];
         memcpy(&hex_buf[0], cursor, sizeof(hex_buf));
 
         if (Encoding::UppercaseHexToUint16(&hex_buf[0], sizeof(hex_buf), out_hex_value) != 0)
