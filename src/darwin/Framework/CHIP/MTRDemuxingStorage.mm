@@ -362,6 +362,7 @@ CHIP_ERROR MTRDemuxingStorage::SetGlobalValue(NSString * key, NSData * data)
 CHIP_ERROR MTRDemuxingStorage::SetIndexSpecificValue(FabricIndex index, NSString * key, NSData * data)
 {
     if ([key isEqualToString:@"n"]) {
+        // Index-scoped "n" is NOC.
         auto * controller = [mFactory runningControllerForFabricIndex:index];
         if (controller == nil) {
             return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
@@ -408,6 +409,8 @@ CHIP_ERROR MTRDemuxingStorage::SetInMemoryValue(NSString * key, NSData * data)
 CHIP_ERROR MTRDemuxingStorage::DeleteInMemoryValue(NSString * key)
 {
     BOOL present = (mInMemoryStore[key] != nil);
-    [mInMemoryStore removeObjectForKey:key];
+    if (present) {
+        [mInMemoryStore removeObjectForKey:key];
+    }
     return present ? CHIP_NO_ERROR : CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
 }

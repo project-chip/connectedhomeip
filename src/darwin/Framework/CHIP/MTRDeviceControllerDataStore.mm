@@ -19,7 +19,7 @@
 
 // TODO: FIXME: Figure out whether these are good key strings.
 static NSString * sResumptionNodeListKey = @"caseResumptionNodeList";
-static NSString * sLastUsedNOCKey = @"sLastUsedControllerNOC";
+static NSString * sLastUsedNOCKey = @"lastUsedControllerNOC";
 
 static NSString * ResumptionByNodeIDKey(NSNumber * nodeID)
 {
@@ -33,8 +33,8 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
 }
 
 @implementation MTRDeviceControllerDataStore {
-    id<MTRDeviceControllerStorageDelegate> _delegate;
-    dispatch_queue_t _delegateQueue;
+    id<MTRDeviceControllerStorageDelegate> _storageDelegate;
+    dispatch_queue_t _storageDelegateQueue;
     MTRDeviceController * _controller;
     // Array of nodes with resumption info, oldest-stored first.
     NSMutableArray<NSNumber *> * _nodesWithResumptionInfo;
@@ -49,15 +49,15 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
     }
 
     _controller = controller;
-    _delegate = storageDelegate;
-    _delegateQueue = storageDelegateQueue;
+    _storageDelegate = storageDelegate;
+    _storageDelegateQueue = storageDelegateQueue;
 
     __block id resumptionNodeList;
-    dispatch_sync(_delegateQueue, ^{
-        resumptionNodeList = [_delegate controller:_controller
-                                       valueForKey:sResumptionNodeListKey
-                                     securityLevel:MTRStorageSecurityLevelSecure
-                                       sharingType:MTRStorageSharingTypeSameIdentityAllowed];
+    dispatch_sync(_storageDelegateQueue, ^{
+        resumptionNodeList = [_storageDelegate controller:_controller
+                                              valueForKey:sResumptionNodeListKey
+                                            securityLevel:MTRStorageSecurityLevelSecure
+                                              sharingType:MTRStorageSharingTypeSameIdentityAllowed];
     });
     if (resumptionNodeList != nil) {
         if (![resumptionNodeList isKindOfClass:[NSMutableArray class]]) {
@@ -84,35 +84,35 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
 - (void)storeResumptionInfo:(MTRCASESessionResumptionInfo *)resumptionInfo
 {
     auto * oldInfo = [self findResumptionInfoByNodeID:resumptionInfo.nodeID];
-    dispatch_sync(_delegateQueue, ^{
+    dispatch_sync(_storageDelegateQueue, ^{
         if (oldInfo != nil) {
             // Remove old resumption id key.  No need to do that for the
             // node id, because we are about to overwrite it.
-            [_delegate controller:_controller
-                removeValueForKey:ResumptionByResumptionIDKey(oldInfo.resumptionID)
-                    securityLevel:MTRStorageSecurityLevelSecure
-                      sharingType:MTRStorageSharingTypeSameIdentityAllowed];
+            [_storageDelegate controller:_controller
+                       removeValueForKey:ResumptionByResumptionIDKey(oldInfo.resumptionID)
+                           securityLevel:MTRStorageSecurityLevelSecure
+                             sharingType:MTRStorageSharingTypeSameIdentityAllowed];
             [_nodesWithResumptionInfo removeObject:resumptionInfo.nodeID];
         }
 
-        [_delegate controller:_controller
-                   storeValue:resumptionInfo
-                       forKey:ResumptionByNodeIDKey(resumptionInfo.nodeID)
-                securityLevel:MTRStorageSecurityLevelSecure
-                  sharingType:MTRStorageSharingTypeSameIdentityAllowed];
-        [_delegate controller:_controller
-                   storeValue:resumptionInfo
-                       forKey:ResumptionByResumptionIDKey(resumptionInfo.resumptionID)
-                securityLevel:MTRStorageSecurityLevelSecure
-                  sharingType:MTRStorageSharingTypeSameIdentityAllowed];
+        [_storageDelegate controller:_controller
+                          storeValue:resumptionInfo
+                              forKey:ResumptionByNodeIDKey(resumptionInfo.nodeID)
+                       securityLevel:MTRStorageSecurityLevelSecure
+                         sharingType:MTRStorageSharingTypeSameIdentityAllowed];
+        [_storageDelegate controller:_controller
+                          storeValue:resumptionInfo
+                              forKey:ResumptionByResumptionIDKey(resumptionInfo.resumptionID)
+                       securityLevel:MTRStorageSecurityLevelSecure
+                         sharingType:MTRStorageSharingTypeSameIdentityAllowed];
 
         // Update our resumption info node list.
         [_nodesWithResumptionInfo addObject:resumptionInfo.nodeID];
-        [_delegate controller:_controller
-                   storeValue:_nodesWithResumptionInfo
-                       forKey:sResumptionNodeListKey
-                securityLevel:MTRStorageSecurityLevelSecure
-                  sharingType:MTRStorageSharingTypeSameIdentityAllowed];
+        [_storageDelegate controller:_controller
+                          storeValue:_nodesWithResumptionInfo
+                              forKey:sResumptionNodeListKey
+                       securityLevel:MTRStorageSecurityLevelSecure
+                         sharingType:MTRStorageSharingTypeSameIdentityAllowed];
     });
 }
 
@@ -123,15 +123,15 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
     for (NSNumber * nodeID in _nodesWithResumptionInfo) {
         auto * oldInfo = [self findResumptionInfoByNodeID:nodeID];
         if (oldInfo != nil) {
-            dispatch_sync(_delegateQueue, ^{
-                [_delegate controller:_controller
-                    removeValueForKey:ResumptionByResumptionIDKey(oldInfo.resumptionID)
-                        securityLevel:MTRStorageSecurityLevelSecure
-                          sharingType:MTRStorageSharingTypeSameIdentityAllowed];
-                [_delegate controller:_controller
-                    removeValueForKey:ResumptionByNodeIDKey(oldInfo.nodeID)
-                        securityLevel:MTRStorageSecurityLevelSecure
-                          sharingType:MTRStorageSharingTypeSameIdentityAllowed];
+            dispatch_sync(_storageDelegateQueue, ^{
+                [_storageDelegate controller:_controller
+                           removeValueForKey:ResumptionByResumptionIDKey(oldInfo.resumptionID)
+                               securityLevel:MTRStorageSecurityLevelSecure
+                                 sharingType:MTRStorageSharingTypeSameIdentityAllowed];
+                [_storageDelegate controller:_controller
+                           removeValueForKey:ResumptionByNodeIDKey(oldInfo.nodeID)
+                               securityLevel:MTRStorageSecurityLevelSecure
+                                 sharingType:MTRStorageSharingTypeSameIdentityAllowed];
             });
         }
     }
@@ -142,12 +142,12 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
 - (CHIP_ERROR)storeLastUsedNOC:(MTRCertificateTLVBytes)noc
 {
     __block BOOL ok;
-    dispatch_sync(_delegateQueue, ^{
-        ok = [_delegate controller:_controller
-                        storeValue:noc
-                            forKey:sLastUsedNOCKey
-                     securityLevel:MTRStorageSecurityLevelSecure
-                       sharingType:MTRStorageSharingTypeSameIdentityRequired];
+    dispatch_sync(_storageDelegateQueue, ^{
+        ok = [_storageDelegate controller:_controller
+                               storeValue:noc
+                                   forKey:sLastUsedNOCKey
+                            securityLevel:MTRStorageSecurityLevelSecure
+                              sharingType:MTRStorageSharingTypeSameIdentityRequired];
     });
     return ok ? CHIP_NO_ERROR : CHIP_ERROR_PERSISTED_STORAGE_FAILED;
 }
@@ -155,11 +155,11 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
 - (MTRCertificateTLVBytes _Nullable)fetchLastUsedNOC
 {
     __block id data;
-    dispatch_sync(_delegateQueue, ^{
-        data = [_delegate controller:_controller
-                         valueForKey:sLastUsedNOCKey
-                       securityLevel:MTRStorageSecurityLevelSecure
-                         sharingType:MTRStorageSharingTypeSameIdentityRequired];
+    dispatch_sync(_storageDelegateQueue, ^{
+        data = [_storageDelegate controller:_controller
+                                valueForKey:sLastUsedNOCKey
+                              securityLevel:MTRStorageSecurityLevelSecure
+                                sharingType:MTRStorageSharingTypeSameIdentityRequired];
     });
 
     if (data == nil) {
@@ -176,11 +176,11 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
 - (nullable MTRCASESessionResumptionInfo *)_findResumptionInfoWithKey:(NSString *)key
 {
     __block id resumptionInfo;
-    dispatch_sync(_delegateQueue, ^{
-        resumptionInfo = [_delegate controller:_controller
-                                   valueForKey:key
-                                 securityLevel:MTRStorageSecurityLevelSecure
-                                   sharingType:MTRStorageSharingTypeSameIdentityAllowed];
+    dispatch_sync(_storageDelegateQueue, ^{
+        resumptionInfo = [_storageDelegate controller:_controller
+                                          valueForKey:key
+                                        securityLevel:MTRStorageSecurityLevelSecure
+                                          sharingType:MTRStorageSharingTypeSameIdentityAllowed];
     });
 
     if (resumptionInfo == nil) {

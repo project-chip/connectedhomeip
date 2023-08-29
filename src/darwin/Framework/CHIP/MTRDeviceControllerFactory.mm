@@ -100,7 +100,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 // the Matter queue.  The way this lock is used assumes that:
 //
 // 1) The only mutating accesses to the controllers array and the ivars happen
-//    when the current queue is not the Matter queue or when in a block that was
+//    when the current queue is not the Matter queue or in a block that was
 //    sync-dispatched to the Matter queue.  This is a good assumption, because
 //    the implementations of the functions that mutate these do sync dispatch to
 //    the Matter queue, which would deadlock if they were called when that queue
@@ -110,7 +110,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 //    outside.
 //
 // These assumptions mean that if we are in a block that was sync-dispatched to
-// the Matter queue, that block cannot race with either the MAtter queue nor the
+// the Matter queue, that block cannot race with either the Matter queue nor the
 // non-Matter queue.  Similarly, if we are in a situation where the Matter queue
 // has been shut down, any accesses to the variables cannot race anything else.
 //

@@ -40,9 +40,9 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 /*
  * Storage used to store persistent information for the fabrics the
  * controllers ends up interacting with.  This is only used if "initWithStorage"
- * is used to initialize the MTRDeviceControllerFactoryParams.  If init is used,
- * called.  If "init" is used, this property will contain a dummy storage that
- * will not be used for anything.
+ * is used to initialize the MTRDeviceControllerFactoryParams.  If "init" is
+ * used, this property will contain a dummy storage that will not be used for
+ * anything.
  */
 @property (nonatomic, strong, readonly) id<MTRStorage> storage;
 
