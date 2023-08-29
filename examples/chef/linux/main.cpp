@@ -54,8 +54,6 @@ int main(int argc, char * argv[])
 #if CHIP_SHELL_ENABLE_CMD_SERVER
     cmd_app_server_init();
 #endif
-    app::Clusters::SampleMei::SampleMeiServer sampleMeiServer(1 /* endpoint */);
-    sampleMeiServer.Init();
 
     ChipLinuxAppMainLoop();
 

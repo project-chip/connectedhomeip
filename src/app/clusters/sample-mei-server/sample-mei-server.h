@@ -7,34 +7,74 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
+#include <lib/support/Span.h>
+#include <platform/CHIPDeviceConfig.h>
 
-#include <vector>
+#ifdef ZCL_USING_SAMPLE_MEI_CLUSTER_SERVER
+#define SAMPLE_MEI_NUM_SUPPORTED_ENDPOINTS                                                                                       \
+(EMBER_AF_SAMPLE_MEI_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+#else
+#define SAMPLE_MEI_NUM_SUPPORTED_ENDPOINTS CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
+#endif /* ZCL_USING_SAMPLE_MEI_CLUSTER_SERVER */
+static constexpr size_t kNumSupportedEndpoints = SAMPLE_MEI_NUM_SUPPORTED_ENDPOINTS;
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace SampleMei {
 
-class SampleMeiServer : public CommandHandlerInterface, public AttributeAccessInterface
+// *****************************************************************************
+// SampleMeiContent has the stateful attributes of the cluster: its endpoint
+// and attributes
+
+class SampleMeiContent
 {
 public:
-    SampleMeiServer(EndpointId aEndpointId) :
-        CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id),
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id)
-    {}
+    EndpointId endpoint;
 
-    CHIP_ERROR Init();
+    // Attribute List
+    bool flipflop; /* Attributes::FlipFlop::Id */
 
-    // CommandHandlerInterface
-    void InvokeCommand(HandlerContext & ctx) override;
+    SampleMeiContent(EndpointId endpoint);
+    SampleMeiContent();
+};
 
-    // AttributeAccessInterface
+// *****************************************************************************
+// SampleMeiServer implements both Attributes and Commands
+
+class SampleMeiServer : public AttributeAccessInterface, public CommandHandlerInterface
+{
+public:
+    // Register on all endpoints.
+    SampleMeiServer() : AttributeAccessInterface(Optional<EndpointId>::Missing(), SampleMei::Id),
+                        CommandHandlerInterface(Optional<EndpointId>(), Id) {}
+    static SampleMeiServer & Instance();
+    void Shutdown();
+
+    // Attributes
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
+    // Commands
+    void InvokeCommand(HandlerContext & ctx) override;
+
+    // Attribute storage
+#if SAMPLE_MEI_NUM_SUPPORTED_ENDPOINTS > 0
+    SampleMeiContent content[kNumSupportedEndpoints];
+#else
+    SampleMeiContent* content = nullptr;
+#endif
+
+    size_t GetNumSupportedEndpoints() const;
+    CHIP_ERROR RegisterEndpoint(EndpointId endpointId);
+    CHIP_ERROR UnregisterEndpoint(EndpointId endpointId);
+
 private:
-    bool flipflop;
+    // both return std::numeric_limits<size_t>::max() for not found
+    size_t EndpointIndex(EndpointId endpointId) const;
+    size_t NextEmptyIndex() const;
 };
+
 } // namespace SampleMei
 } // namespace Clusters
 } // namespace app
