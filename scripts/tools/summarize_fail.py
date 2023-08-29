@@ -1,8 +1,9 @@
 import logging
 import os
+import subprocess
+
 import pandas as pd
 from slugify import slugify
-import subprocess
 
 error_catalog = {
     "CodeQL": {
