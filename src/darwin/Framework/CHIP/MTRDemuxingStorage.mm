@@ -122,7 +122,7 @@ static bool IsMemoryOnlyGlobalKey(NSString * key)
 
     if ([key isEqualToString:@"g/lkgt"]) {
         // Store Last Known Good Time in memory only.  We never need this in
-        // general, because we can always provide wall-clock time.
+        // general, because we can always provide the wall-clock time.
         return true;
     }
 
@@ -165,7 +165,7 @@ static bool IsMemoryOnlyGlobalKey(NSString * key)
 /**
  * Method to test whether an index-specific key should be stored in memory only, as
  * opposed to being passed on to the actual storage related to controllers.
- * The key string will ahve the "f/index/" bit already stripped off the
+ * The key string will have the "f/index/" bit already stripped off the
  * front of the key.
  */
 static bool IsMemoryOnlyIndexSpecificKey(NSString * key)
