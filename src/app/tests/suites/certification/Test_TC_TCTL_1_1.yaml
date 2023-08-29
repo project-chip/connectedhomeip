@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 178.1.1. [TC-TCTL-1.1] Global attributes with DUT as Server
 
@@ -20,50 +19,135 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "Temperature Control"
+    endpoint: 1
 
 tests:
-    - label:
-          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
-          test)."
-      verification: |
-
-      disabled: true
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Step 2: TH reads from the DUT the ClusterRevision attribute"
-      verification: |
-          ./chip-tool temperaturecontrol read cluster-revision 1 1
-          Verify the "ClusterRevision" value is of unit16 and reflects the highest revision number 1 on the TH(Chip-tool) and below is the sample log provided for the raspi platform:
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
 
-          [1689770372.878629][9188:9190] CHIP:DMG: }
-          [1689770372.878690][9188:9190] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_FFFD DataVersion: 2844459846
-          [1689770372.878714][9188:9190] CHIP:TOO:   ClusterRevision: 1
-          [1689770372.878763][9188:9190] CHIP:EM: <<< [E:16332i S:45296 M:45197941 (Ack:243112600)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1689770372.878774][9188:9190] CHIP:IN: (S) Sending msg 45197941 on secure session with LSID: 45296
-          [1689770372.878797][9188:9190] CHIP:EM: Flushed pending ack for MessageCounter:243112600 on exchange 16332i
-      disabled: true
+    - label: "Step 3a: TH reads from the DUT the FeatureMap attribute"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: "!TCTL.S.F00 && !TCTL.S.F01 && !TCTL.S.F02"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
 
-    - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
-      verification: |
-          ./chip-tool temperaturecontrol read feature-map 1 1
-          On TH(chip-tool), verify that DUT responds the  Featuremap value as 2 and below is the sample log provided for the raspi platform:
+    - label:
+          "Step 3b: TH reads from the DUT the FeatureMap attribute. bit 0: SHALL
+          be 1 if and only if TCTL.S.F00(TN) & !TCTL.S.F01(TL)"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: TCTL.S.F00 && !TCTL.S.F01
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
 
-          [1689770405.503132][9196:9198] CHIP:DMG:         InteractionModelRevision = 1
-          [1689770405.503140][9196:9198] CHIP:DMG: }
-          [1689770405.503215][9196:9198] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_FFFC DataVersion: 2844459846
-          [1689770405.503248][9196:9198] CHIP:TOO:   FeatureMap: 2
-          [1689770405.503310][9196:9198] CHIP:EM: <<< [E:40699i S:20178 M:144688303 (Ack:177462983)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1689770405.503325][9196:9198] CHIP:IN: (S) Sending msg 144688303 on secure session with LSID: 20178
-          [1689770405.503372][9196:9198] CHIP:EM: Flushed pending ack for MessageCounter:177462983 on exchange 40699i
-      disabled: true
+    - label:
+          "Step 3c: TH reads from the DUT the FeatureMap attribute. bit 1: SHALL
+          be 1 if and only if TCTL.S.F01(TL) & !TCTL.S.F00(TN)"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: TCTL.S.F01 && !TCTL.S.F00
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
 
-    - label: "Step 4: TH reads from the DUT the AttributeList attribute."
+    - label:
+          "Step 3d: TH reads from the DUT the FeatureMap attribute. bit 2: SHALL
+          be 1 if and only if TCTL.S.F02(A_STEP) & TCTL.S.F00(TN)"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: TCTL.S.F02 && !TCTL.S.F00
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x4]
+
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65528, 65529, 65531, 65532, 65533]
+
+    - label:
+          "Step 4b: TH reads from the DUT the AttributeList attribute. 0x0000,
+          0x0001, 0x0002: SHALL be included if and only if TCTL.S.F00(TN)"
+      PICS: TCTL.S.F00
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2]
+
+    - label:
+          "Step 4c: TH reads from the DUT the AttributeList attribute. 0x0003:
+          SHALL be included if and only if TCTL.S.F02(A_STEP)"
+      PICS: TCTL.S.F02
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
+    - label:
+          "Step 4d: TH reads from the DUT the AttributeList attribute. 0x0004 &
+          0x0005: SHALL be included if and only if TCTL.S.F01(TL)"
+      PICS: TCTL.S.F01
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [4, 5]
+
+    - label:
+          "Step 4e: TH reads AttributeList attribute from DUT 1.The list SHALL
+          NOT contain any additional values in the standard or scoped range:
+          (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE) 2.The list
+          MAY contain values in the Manufacturer Extensible Identifier (MEI)
+          range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed MEI
+          range (0x0001 - 0xFFF1), these values SHALL be ignored 3.The list
+          SHALL NOT contain any values in the Test Vendor or invalid range:
+          (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 -
+          0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
+          allowed MEI range (0x0001 - 0xFFF1)"
       verification: |
           ./chip-tool temperaturecontrol read attribute-list 1 1
 
           Verify " AttributeList " value consists the list of mandatory attributes (65533, 65532, 65531, 65529, 65528) and it may include the optional attributes(0, 1, 2,3,4 and 5) on the TH(Chip-tool) Log:
-          Below is the sample log provided for the raspi platform:
+
           [1689770447.604182][9210:9212] CHIP:DMG:         InteractionModelRevision = 1
           [1689770447.604188][9210:9212] CHIP:DMG: }
           [1689770447.604313][9210:9212] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_FFFB DataVersion: 2844459846
@@ -80,14 +164,38 @@ tests:
           [1689770447.604489][9210:9212] CHIP:IN: (S) Sending msg 231380196 on secure session with LSID: 24852
           [1689770447.604514][9210:9212] CHIP:EM: Flushed pending ack for MessageCounter:110557130 on exchange 34971i
           [1689770447.604623][9210:9210] CHIP:CTL: Shutting down the commissioner
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Step 5: TH reads from the DUT the AcceptedCommandList attribute."
+    - label: "Step 5a: TH reads from the DUT the AcceptedCommandList attribute."
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label:
+          "Step 5b: TH reads AcceptedCommandList attribute from DUT 1.The list
+          SHALL NOT contain any additional values in the standard or scoped
+          range: (0x0000_0000 - 0x0000_00FF) 2. The list MAY contain values in
+          the Manufacturer Extensible Identifier (MEI) range: (0xXXXX_0000 -
+          0xXXXX_00FF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1),
+          these values SHALL be ignored 3.The list SHALL NOT contain any values
+          in the Test Vendor or invalid range: (0x0000_0100 - 0x0000_FFFF),
+          (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where
+          XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
       verification: |
           ./chip-tool temperaturecontrol read accepted-command-list 1 1
 
           Verify " AcceptedCommandList " consists the list of all mandatory commands(0)  on the TH(Chip-tool) Log:
-          Below is the sample log provided for the raspi platform:
 
           [1689770504.251374][9226:9228] CHIP:DMG:         InteractionModelRevision = 1
           [1689770504.251377][9226:9228] CHIP:DMG: }
@@ -97,13 +205,39 @@ tests:
           [1689770504.251446][9226:9228] CHIP:EM: <<< [E:6933i S:52597 M:176057927 (Ack:264727649)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
           [1689770504.251450][9226:9228] CHIP:IN: (S) Sending msg 176057927 on secure session with LSID: 52597
           [1689770504.251461][9226:9228] CHIP:EM: Flushed pending ack for MessageCounter:264727649 on exchange 6933i
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Step 6: TH reads from the DUT the GeneratedCommandList attribute."
+    - label:
+          "Step 6a: TH reads from the DUT the GeneratedCommandList attribute."
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: []
+
+    - label:
+          "Step 6b: TH reads GeneratedCommandList attribute from DUT.The list
+          SHALL NOT contain any additional values in the standard or scoped
+          range: (0x0000_0000 - 0x0000_00FF) 2. The list MAY contain values in
+          the Manufacturer Extensible Identifier (MEI) range: (0xXXXX_0000 -
+          0xXXXX_00FF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1),
+          these values SHALL be ignored 3.The list SHALL NOT contain any values
+          in the Test Vendor or invalid range: (0x0000_0100 - 0x0000_FFFF),
+          (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where
+          XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
       verification: |
           ./chip-tool temperaturecontrol read generated-command-list 1 1
-          Verify "  GeneratedCommandList " consists the list of supported events,  which for this cluster should be an empty list on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
 
+          Verify "  GeneratedCommandList " consists the list of supported events,  which for this cluster should be an empty list on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
 
           [1689770475.939806][9215:9217] CHIP:DMG:         InteractionModelRevision = 1
           [1689770475.939807][9215:9217] CHIP:DMG: }
@@ -112,12 +246,40 @@ tests:
           [1689770475.939868][9215:9217] CHIP:EM: <<< [E:56043i S:30992 M:36313621 (Ack:205412119)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
           [1689770475.939872][9215:9217] CHIP:IN: (S) Sending msg 36313621 on secure session with LSID: 30992
           [1689770475.939880][9215:9217] CHIP:EM: Flushed pending ack for MessageCounter:205412119 on exchange 56043i
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Step 7: TH reads from the DUT the EventList attribute."
+    - label: "Step 7a: Read the global attribute: EventList"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label:
+          "Step 7b: TH reads EventList attribute from DUT. 1.The list SHALL NOT
+          contain any additional values in the standard or scoped range:
+          (0x0000_0000 - 0x0000_00FF). 2.The list MAY contain values in the
+          Manufacturer Extensible Identifier (MEI) range: (0xXXXX_0000 -
+          0xXXXX_00FF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1),
+          these values SHALL be ignored. 3.The list SHALL NOT contain any values
+          in the Test Vendor or invalid range: (0x0000_0100 - 0x0000_FFFF),
+          (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where
+          XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
       verification: |
           ./chip-tool temperaturecontrol read event-list 1 1
+
           Verify "  EventList attribute " consists the list of supported events,  which for this cluster should be an empty list on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+
           [1689770528.788582][9233:9235] CHIP:DMG:         InteractionModelRevision = 1
           [1689770528.788587][9233:9235] CHIP:DMG: }
           [1689770528.788671][9233:9235] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_FFFA DataVersion: 2844459846
@@ -127,4 +289,12 @@ tests:
           [1689770528.788826][9233:9235] CHIP:EM: Flushed pending ack for MessageCounter:64478273 on exchange 60387i
           [1689770528.788927][9233:9233] CHIP:CTL: Shutting down the commissioner
           [1689770528.788948][9233:9233] CHIP:CTL: Stopping commissioning discovery over DNS-SD
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

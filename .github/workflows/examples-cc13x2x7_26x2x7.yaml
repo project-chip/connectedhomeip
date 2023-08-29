@@ -33,10 +33,7 @@ jobs:
             BUILD_TYPE: gn_cc26x2x7
 
         runs-on: ubuntu-latest
-        # This CI is disabled because running out of flash and a solution was not found in time, see https://github.com/project-chip/connectedhomeip/pull/26186
-        # An issue was opened at https://github.com/project-chip/connectedhomeip/issues/26957
-        # TODO : Enable this once we have a way to run without out of flash failure or remove platform if it cannot support the SDK
-        if: github.actor != 'restyled-io[bot]' && false
+        if: github.actor != 'restyled-io[bot]'
 
         container:
             image: ghcr.io/project-chip/chip-build-ti:1
@@ -59,11 +56,8 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target ti-cc13x2x7_26x2x7-lock-mtd \
-                      --target ti-cc13x2x7_26x2x7-pump-mtd \
-                      --target ti-cc13x2x7_26x2x7-lighting \
-                      --target ti-cc13x2x7_26x2x7-pump-controller-mtd \
-                      --target ti-cc13x4_26x4-lighting \
+                      --target ti-cc13x4_26x4-lighting-ftd \
+                      --target ti-cc13x4_26x4-lighting-mtd \
                       --target ti-cc13x4_26x4-lock-ftd \
                       --target ti-cc13x4_26x4-lock-mtd \
                       --target ti-cc13x4_26x4-pump-mtd \
@@ -73,24 +67,6 @@ jobs:
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
-            - name: Get lock MTD size stats
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    cc13x2_26x2 LP_CC2652R7 lock-mtd \
-                    out/artifacts/ti-cc13x2x7_26x2x7-lock-mtd/chip-LP_CC2652R7-lock-example.out \
-                    /tmp/bloat_reports/
-            - name: Get Pump App size stats
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    cc13x2_26x2 LP_CC2652R7 pump-app \
-                    out/artifacts/ti-cc13x2x7_26x2x7-pump-mtd/chip-LP_CC2652R7-pump-example.out \
-                    /tmp/bloat_reports/
-            - name: Get Pump Controller App size stats
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    cc13x2_26x2 LP_CC2652R7 pump-controller-app \
-                    out/artifacts/ti-cc13x2x7_26x2x7-pump-controller-mtd/chip-LP_CC2652R7-pump-controller-example.out \
-                    /tmp/bloat_reports/
             - name: Get lock FTD size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -109,17 +85,17 @@ jobs:
                     cc13x4_26x4 LP_EM_CC1354P10_6 pump-app \
                     out/artifacts/ti-cc13x4_26x4-pump-mtd/chip-LP_EM_CC1354P10_6-pump-example.out \
                     /tmp/bloat_reports/
-            - name: Get Pump Controller App size stats
+            - name: Get Pump Controller MTD size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cc13x4_26x4 LP_EM_CC1354P10_6 pump-controller-app \
                     out/artifacts/ti-cc13x4_26x4-pump-controller-mtd/chip-LP_EM_CC1354P10_6-pump-controller-example.out \
                     /tmp/bloat_reports/
-            - name: Get Lighting App size stats
+            - name: Get Lighting FTD size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cc13x4_26x4 LP_EM_CC1354P10_6 lighting-app \
-                    out/artifacts/ti-cc13x4_26x4-lighting/chip-LP_EM_CC1354P10_6-lighting-example.out \
+                    out/artifacts/ti-cc13x4_26x4-lighting-mtd/chip-LP_EM_CC1354P10_6-lighting-example.out \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports

@@ -233,7 +233,7 @@ tests:
           should send the report data with the modified attribute value. Modify
           the attribute multiple times (3 times) before the MaxInterval time
           specified during the subscription activation."
-      PICS: MCORE.IDM.S.Attribute.DataType_Bool
+      PICS: MCORE.IDM.S.Attribute_W.DataType_Bool
       verification: |
           basicinformation subscribe local-config-disabled 100 200 1 0 --keepSubscriptions true
 
@@ -316,7 +316,7 @@ tests:
           should send the report data with the modified attribute value Modify
           the attribute multiple times (3 times) before the MaxInterval time
           specified during the subscription activation."
-      PICS: MCORE.IDM.S.Attribute.DataType_String
+      PICS: MCORE.IDM.S.Attribute_W.DataType_String
       verification: |
           basicinformation subscribe node-label 10 100 1 0 --keepSubscriptions true
 
@@ -398,7 +398,7 @@ tests:
           the DUT. DUT should send the report data with the modified attribute
           value. Modify the attribute multiple times (3 times) before the
           MaxInterval time specified during the subscription activation."
-      PICS: MCORE.IDM.S.Attribute.DataType_UnsignedInteger
+      PICS: MCORE.IDM.S.Attribute_W.DataType_UnsignedInteger
       verification: |
           any subscribe-by-id 0x0008 0x0010 10 100  1 1  --keepSubscriptions true
 
@@ -481,7 +481,7 @@ tests:
           DUT. DUT should send the report data with the modified attribute
           value. Modify the attribute multiple times (3 times)before the
           MaxInterval time specified during the subscription activation."
-      PICS: MCORE.IDM.S.Attribute.DataType_SignedInteger
+      PICS: MCORE.IDM.S.Attribute_W.DataType_SignedInteger
       verification: |
           Subscribe to an attribute of type signed integer to the Harness
 
@@ -495,7 +495,7 @@ tests:
           DUT. DUT should send the report data with the modified attribute
           value. Modify the attribute multiple times (3 times) before the
           MaxInterval time specified during the subscription activation."
-      PICS: MCORE.IDM.S.Attribute.DataType_FloatingPoint
+      PICS: MCORE.IDM.S.Attribute_W.DataType_FloatingPoint
       verification: |
           Subscribe to an attribute of type floating point to the Harness
 
@@ -509,7 +509,7 @@ tests:
           should send the report data with the modified attribute value. Modify
           the attribute multiple times (3 times) before the MaxInterval time
           specified during the subscription activation."
-      PICS: MCORE.IDM.S.Attribute.DataType_List
+      PICS: MCORE.IDM.S.Attribute_W.DataType_List
       verification: |
           userlabel subscribe label-list 100 500 1 0 --keepSubscriptions true
 

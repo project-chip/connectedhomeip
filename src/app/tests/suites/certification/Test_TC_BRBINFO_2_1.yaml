@@ -11,9 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 130.2.1. [TC-BRBINFO-2.1] Attributes [DUT-Server]
+name: 142.2.1. [TC-BRBINFO-2.1] Attributes [DUT-Server]
 
 PICS:
     - BRBINFO.S
@@ -23,6 +22,8 @@ config:
     cluster: "Bridged Device Basic Information"
     endpoint: 3
 
+    BRBINFO.ClusterId: 0x0039
+
 tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -31,6 +32,22 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
+
+    - label:
+          "Step 2: TH reads attribute ID 0 from the DUT (matches in ID to
+          DataModelRevision in the parent cluster, but is absent on the
+          BridgedDeviceBasicInformation cluster)."
+      PICS: BRBINFO.S
+      cluster: "AnyCommands"
+      command: "ReadById"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: BRBINFO.ClusterId
+              - name: "AttributeId"
+                value: 0x0000
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
 
     - label: "Step 5: TH reads VendorName from the DUT."
       PICS: BRBINFO.S.A0001
@@ -123,6 +140,22 @@ tests:
       response:
           value: ProductNameValue
 
+    - label:
+          "Step 14: TH reads attribute ID 4 from the DUT (matches in ID to
+          ProductID in the parent cluster, but is absent on the
+          BridgedDeviceBasicInformation cluster)."
+      PICS: BRBINFO.S
+      cluster: "AnyCommands"
+      command: "ReadById"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: BRBINFO.ClusterId
+              - name: "AttributeId"
+                value: 0x0004
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
     - label: "Step 17: TH reads NodeLabel from the DUT"
       PICS: BRBINFO.S.A0005
       command: "readAttribute"
@@ -179,6 +212,22 @@ tests:
                 value: "Please enter 'y' after success"
               - name: "expectedValue"
                 value: "y"
+
+    - label:
+          "Step 20: TH reads attribute ID 6 from the DUT (matches in ID to
+          Location in the parent cluster, but is absent on the
+          BridgedDeviceBasicInformation cluster)."
+      PICS: BRBINFO.S
+      cluster: "AnyCommands"
+      command: "ReadById"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: BRBINFO.ClusterId
+              - name: "AttributeId"
+                value: 0x0006
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
 
     - label: "Step 21: TH reads HardwareVersion from the DUT"
       PICS: BRBINFO.S.A0007
@@ -456,6 +505,22 @@ tests:
       response:
           value: SerialNumberValue
 
+    - label:
+          "Step 48: TH reads attribute ID 0x0010 from the DUT (matches in ID to
+          LocalConfigDisabled in the parent cluster, but is absent on the
+          BridgedDeviceBasicInformation cluster)."
+      PICS: BRBINFO.S
+      cluster: "AnyCommands"
+      command: "ReadById"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: BRBINFO.ClusterId
+              - name: "AttributeId"
+                value: 0x0010
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
     - label: "Step 51: TH reads Reachable from the DUT."
       PICS: BRBINFO.S.A0011
       command: "readAttribute"
@@ -510,6 +575,22 @@ tests:
       attribute: "UniqueID"
       response:
           value: UniqueIDValue
+
+    - label:
+          "Step 56: TH reads attribute ID 0x0013 from the DUT (matches in ID to
+          CapabilityMinima in the parent cluster, but is absent on the
+          BridgedDeviceBasicInformation cluster)."
+      PICS: BRBINFO.S
+      cluster: "AnyCommands"
+      command: "ReadById"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: BRBINFO.ClusterId
+              - name: "AttributeId"
+                value: 0x0013
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
 
     - label: "Step 59: TH reads ProductAppearance from the DUT."
       PICS: BRBINFO.S.A0014
