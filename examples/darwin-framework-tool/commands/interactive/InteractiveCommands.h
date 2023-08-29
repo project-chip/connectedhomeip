@@ -21,6 +21,7 @@
 #import <Matter/Matter.h>
 
 #include "../common/CHIPCommandBridge.h"
+#include "../common/RemoteDataModelLogger.h"
 #include "commands/common/Commands.h"
 
 #include "InteractiveCommands.h"
@@ -41,7 +42,7 @@ public:
 
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(0); }
 
-    bool ParseCommand(char * command);
+    bool ParseCommand(char * command, int * status);
 
 protected:
     chip::Optional<char *> mAdditionalPrompt;
@@ -59,7 +60,7 @@ public:
     CHIP_ERROR RunCommand() override;
 };
 
-class InteractiveServerCommand : public InteractiveCommand, public WebSocketServerDelegate
+class InteractiveServerCommand : public InteractiveCommand, public WebSocketServerDelegate, public RemoteDataModelLoggerDelegate
 {
 public:
     InteractiveServerCommand(Commands * commandsHandler) : InteractiveCommand("server", commandsHandler)
@@ -72,6 +73,9 @@ public:
 
     /////////// WebSocketServerDelegate Interface /////////
     bool OnWebSocketMessageReceived(char * msg) override;
+
+    /////////// RemoteDataModelLoggerDelegate interface /////////
+    CHIP_ERROR LogJSON(const char * json) override;
 
 private:
     WebSocketServer mWebSocketServer;
