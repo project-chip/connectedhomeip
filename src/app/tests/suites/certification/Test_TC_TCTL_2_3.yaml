@@ -27,6 +27,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          While verifying below test case we will get 0 and null value for few attributes, as per spec 0 and null value is default for those attributes.
+      disabled: true
+
     - label: "Step 1: Commission DUT to TH"
       verification: |
 

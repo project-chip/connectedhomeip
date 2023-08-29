@@ -62,13 +62,10 @@ if (chip_enable_wifi) {
   assert(use_rs9116 || use_wf200 || use_SiWx917)
   import("${chip_root}/src/platform/silabs/wifi_args.gni")
 
-  if (use_rs9116) {
+  if (use_rs9116 || use_SiWx917) {
     wiseconnect_sdk_root =
         "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
     import("rs911x/rs911x.gni")
-  } else if (use_SiWx917) {
-    wisemcu_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
-    import("rs911x/rs9117.gni")
   }
   if (use_wf200) {
     import("wf200/wf200.gni")
@@ -133,11 +130,6 @@ source_set("efr-matter-shell") {
 
 config("attestation-credentials-config") {
   include_dirs = [ "${chip_root}" ]
-
-  defines = [
-    # Set to 1 to enable EFR32 attestation credentials
-    "SILABS_ATTESTATION_CREDENTIALS",
-  ]
 }
 
 source_set("efr32-attestation-credentials") {
@@ -230,6 +222,7 @@ source_set("efr32-common") {
   public_configs = [
     ":efr32-common-config",
     "${efr32_sdk_build_root}:silabs_config",
+    ":chip_examples_project_config",
   ]
 
   # DIC
@@ -310,9 +303,7 @@ source_set("efr32-common") {
   }
 
   # Attestation Credentials
-  if (chip_build_platform_attestation_credentials_provider) {
-    public_deps += [ ":efr32-attestation-credentials" ]
-  }
+  public_deps += [ ":efr32-attestation-credentials" ]
 
   # Factory Data Provider
   if (use_efr32_factory_data_provider) {

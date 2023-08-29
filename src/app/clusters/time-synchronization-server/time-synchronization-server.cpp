@@ -807,7 +807,8 @@ CHIP_ERROR TimeSynchronizationServer::GetLocalTime(EndpointId ep, DataModel::Nul
     {
         return CHIP_ERROR_INVALID_TIME;
     }
-    VerifyOrReturnError(TimeState::kInvalid != UpdateDSTOffsetState(), CHIP_ERROR_INVALID_TIME);
+    TimeState newState = UpdateDSTOffsetState();
+    VerifyOrReturnError(TimeState::kInvalid != newState, CHIP_ERROR_INVALID_TIME);
     ReturnErrorOnFailure(System::SystemClock().GetClock_RealTime(utcTime));
     VerifyOrReturnError(UnixEpochToChipEpochMicro(utcTime.count(), chipEpochTime), CHIP_ERROR_INVALID_TIME);
     if (TimeState::kChanged == UpdateTimeZoneState())
@@ -829,6 +830,10 @@ CHIP_ERROR TimeSynchronizationServer::GetLocalTime(EndpointId ep, DataModel::Nul
 
     uint64_t localTimeSec = static_cast<uint64_t>(static_cast<int64_t>(chipEpochTime) + timeZoneOffset + dstOffset);
     localTime.SetNonNull((localTimeSec * chip::kMicrosecondsPerSecond) + usRemainder);
+    if (newState == TimeState::kChanged)
+    {
+        emitDSTStatusEvent(0, dstOffset != 0);
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -910,8 +915,12 @@ TimeState TimeSynchronizationServer::UpdateDSTOffsetState()
             VerifyOrReturnValue(ClearDSTOffset() == CHIP_NO_ERROR, TimeState::kInvalid);
             return TimeState::kInvalid;
         }
+        int32_t previousOffset         = dstList[activeDstIndex].offset;
         dstList[activeDstIndex].offset = 0; // not using dst and last DST item in the list is not active yet
-        return TimeState::kStopped;
+        // TODO: This enum mixes state and transitions in a way that's very confusing. This should return either an active, an
+        // inactive or an invalid and the caller should make the judgement about whether that has changed OR this function should
+        // just return a bool indicating whether a change happened
+        return previousOffset == 0 ? TimeState::kStopped : TimeState::kChanged;
     }
     if (activeDstIndex > 0)
     {
