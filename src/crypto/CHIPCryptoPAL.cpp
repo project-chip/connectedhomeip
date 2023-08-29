@@ -29,6 +29,7 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <stdint.h>
 #include <string.h>
 
 using chip::ByteSpan;
@@ -38,6 +39,8 @@ using chip::Encoding::LittleEndian::Reader;
 
 using namespace chip::ASN1;
 
+namespace chip {
+namespace Crypto {
 namespace {
 
 constexpr uint8_t kIntegerTag         = 0x02u;
@@ -192,10 +195,76 @@ CHIP_ERROR ConvertIntegerRawToDerInternal(const ByteSpan & raw_integer, MutableB
     return CHIP_NO_ERROR;
 }
 
-} // namespace
+/**
+ * @brief Find a 4 uppercase hex digit hex value after a prefix string. Used to implement
+ *        fallback CN VID/PID encoding for PAA/PAI/DAC.
+ *
+ * @param[in] buffer - buffer in which to find the substring.
+ * @param[in] prefix - prefix to match, which must be followed by 4 uppercase hex characters
+ * @param[out] out_hex_value - on CHIP_NO_ERROR return, this will be the 16-bit hex value decoded.
+ * @return CHIP_NO_ERROR on success, CHIP_ERROR_NOT_FOUND if not detected and
+ *         CHIP_ERROR_WRONG_CERT_DN if we saw the prefix but no valid hex string.
+ */
+CHIP_ERROR Find16BitUpperCaseHexAfterPrefix(const ByteSpan & buffer, const char * prefix, uint16_t & out_hex_value)
+{
+    chip::CharSpan prefix_span = chip::CharSpan::fromCharString(prefix);
 
-namespace chip {
-namespace Crypto {
+    bool found_prefix_at_least_once = false;
+
+    // Scan string from left to right, to find the desired full matching substring.
+    //
+    // IMPORTANT NOTE: We are trying to find the equivalent of prefix + [0-9A-F]{4}.
+    // The appearance of the full prefix, but not followed by the hex value, must
+    // be detected, as it is illegal if there isn't a valid prefix within the string.
+    // This is why we first check for the prefix and then maybe check for the hex
+    // value, rather than doing a single check of making sure there is enough space
+    // for both.
+    for (size_t start_idx = 0; start_idx < buffer.size(); start_idx++)
+    {
+        const uint8_t * cursor = buffer.data() + start_idx;
+        size_t remaining       = buffer.size() - start_idx;
+
+        if (remaining < prefix_span.size())
+        {
+            // We can't possibly match prefix if not enough bytes left.
+            break;
+        }
+
+        // Try to match the prefix at current position.
+        if (memcmp(cursor, prefix_span.data(), prefix_span.size()) != 0)
+        {
+            // Did not find prefix, move to next position.
+            continue;
+        }
+
+        // Otherwise, found prefix, skip to possible hex value.
+        found_prefix_at_least_once = true;
+        cursor += prefix_span.size();
+        remaining -= prefix_span.size();
+
+        constexpr size_t expected_hex_len = HEX_ENCODED_LENGTH(sizeof(uint16_t));
+        if (remaining < expected_hex_len)
+        {
+            // We can't possibly match the hex values if not enough bytes left.
+            break;
+        }
+
+        char hex_buf[expected_hex_len];
+        memcpy(&hex_buf[0], cursor, sizeof(hex_buf));
+
+        if (Encoding::UppercaseHexToUint16(&hex_buf[0], sizeof(hex_buf), out_hex_value) != 0)
+        {
+            // Found first full valid match, return success, out_hex_value already updated.
+            return CHIP_NO_ERROR;
+        }
+
+        // Otherwise, did not find what we were looking for, try next position until exhausted.
+    }
+
+    return found_prefix_at_least_once ? CHIP_ERROR_WRONG_CERT_DN : CHIP_ERROR_NOT_FOUND;
+}
+
+} // namespace
 
 #ifdef ENABLE_HSM_HKDF
 using HKDF_sha_crypto = HKDF_shaHSM;
@@ -873,41 +942,39 @@ CHIP_ERROR ExtractVIDPIDFromAttributeString(DNAttrType attrType, const ByteSpan 
     // Otherwise, it is a CommonName attribute.
     else if (!vidpidFromCNAttr.Initialized())
     {
-        char cnAttr[kMax_CommonNameAttr_Length + 1];
-        if (attr.size() <= chip::Crypto::kMax_CommonNameAttr_Length)
+        ByteSpan attr_source_span{ attr };
+        if (attr_source_span.size() > chip::Crypto::kMax_CommonNameAttr_Length)
         {
-            memcpy(cnAttr, attr.data(), attr.size());
-            cnAttr[attr.size()] = 0;
+            attr_source_span.reduce_size(chip::Crypto::kMax_CommonNameAttr_Length);
+        }
 
-            char * vid = strstr(cnAttr, kVIDPrefixForCNEncoding);
-            if (vid != nullptr)
-            {
-                vid += strlen(kVIDPrefixForCNEncoding);
-                if (cnAttr + attr.size() >= vid + kVIDandPIDHexLength)
-                {
-                    uint16_t matterAttr;
-                    if (Encoding::UppercaseHexToUint16(vid, kVIDandPIDHexLength, matterAttr) == sizeof(matterAttr))
-                    {
-                        vidpidFromCNAttr.mVendorId.SetValue(static_cast<VendorId>(matterAttr));
-                    }
-                }
-            }
+        // Try to find a valid Vendor ID encoded in fallback method.
+        uint16_t vid   = 0;
+        CHIP_ERROR err = Find16BitUpperCaseHexAfterPrefix(attr_source_span, kVIDPrefixForCNEncoding, vid);
+        if (err == CHIP_NO_ERROR)
+        {
+            vidpidFromCNAttr.mVendorId.SetValue(static_cast<VendorId>(vid));
+        }
+        else if (err != CHIP_ERROR_NOT_FOUND)
+        {
+            // This indicates a bad/ambiguous format.
+            return err;
+        }
 
-            char * pid = strstr(cnAttr, kPIDPrefixForCNEncoding);
-            if (pid != nullptr)
-            {
-                pid += strlen(kPIDPrefixForCNEncoding);
-                if (cnAttr + attr.size() >= pid + kVIDandPIDHexLength)
-                {
-                    uint16_t matterAttr;
-                    if (Encoding::UppercaseHexToUint16(pid, kVIDandPIDHexLength, matterAttr) == sizeof(matterAttr))
-                    {
-                        vidpidFromCNAttr.mProductId.SetValue(matterAttr);
-                    }
-                }
-            }
+        // Try to find a valid Product ID encoded in fallback method.
+        uint16_t pid = 0;
+        err          = Find16BitUpperCaseHexAfterPrefix(attr_source_span, kPIDPrefixForCNEncoding, pid);
+        if (err == CHIP_NO_ERROR)
+        {
+            vidpidFromCNAttr.mProductId.SetValue(pid);
+        }
+        else if (err != CHIP_ERROR_NOT_FOUND)
+        {
+            // This indicates a bad/ambiguous format.
+            return err;
         }
     }
+
     return CHIP_NO_ERROR;
 }
 

@@ -84,10 +84,16 @@ Reader & Reader::ReadBytes(uint8_t * dest, size_t size)
 }
 
 // Explicit Read instantiations for the data types we want to support.
-template void Reader::RawRead(uint8_t *);
-template void Reader::RawRead(uint16_t *);
-template void Reader::RawRead(uint32_t *);
-template void Reader::RawRead(uint64_t *);
+template void Reader::RawReadLowLevelBeCareful(char *);
+template void Reader::RawReadLowLevelBeCareful(bool *);
+template void Reader::RawReadLowLevelBeCareful(int8_t *);
+template void Reader::RawReadLowLevelBeCareful(int16_t *);
+template void Reader::RawReadLowLevelBeCareful(int32_t *);
+template void Reader::RawReadLowLevelBeCareful(int64_t *);
+template void Reader::RawReadLowLevelBeCareful(uint8_t *);
+template void Reader::RawReadLowLevelBeCareful(uint16_t *);
+template void Reader::RawReadLowLevelBeCareful(uint32_t *);
+template void Reader::RawReadLowLevelBeCareful(uint64_t *);
 
 } // namespace LittleEndian
 } // namespace Encoding

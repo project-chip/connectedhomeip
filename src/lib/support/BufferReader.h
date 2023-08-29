@@ -91,6 +91,47 @@ public:
     CHIP_ERROR StatusCode() const { return mStatus; }
 
     /**
+     * @return false if the reader is in error, true if the reader is OK.
+     */
+    bool IsSuccess() const { return StatusCode() == CHIP_NO_ERROR; }
+
+    /**
+     * Read a bool, assuming single byte storage.
+     *
+     * @param [out] dest Where the 8-bit integer goes.
+     *
+     * @note The read can put the reader in a failed-status state if there are
+     *       not enough octets available.  Callers must either continue to do
+     *       more reads on the return value or check its status to see whether
+     *       the sequence of reads that has been performed succeeded.
+     */
+    CHECK_RETURN_VALUE
+    Reader & ReadBool(bool * dest)
+    {
+        static_assert(sizeof(bool) == 1, "Expect single-byte bools");
+        RawReadLowLevelBeCareful(dest);
+        return *this;
+    }
+
+    /**
+     * Read a char, assuming single byte storage.
+     *
+     * @param [out] dest Where the char just read should be placed.
+     *
+     * @note The read can put the reader in a failed-status state if there are
+     *       not enough octets available.  Callers must either continue to do
+     *       more reads on the return value or check its status to see whether
+     *       the sequence of reads that has been performed succeeded.
+     */
+    CHECK_RETURN_VALUE
+    Reader & ReadChar(char * dest)
+    {
+        static_assert(sizeof(char) == 1, "Expect single-byte chars");
+        RawReadLowLevelBeCareful(dest);
+        return *this;
+    }
+
+    /**
      * Read a single 8-bit unsigned integer.
      *
      * @param [out] dest Where the 8-bit integer goes.

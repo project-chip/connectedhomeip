@@ -633,8 +633,9 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
  * be configured to ignore CSR requested subject.
  *
  * @param keypair The key pair for which a CSR should be generated. Must not be null.
- * @param csr_span Span to hold the resulting CSR. Must be at least kMAX_CSR_Length.  Otherwise returns CHIP_ERROR_BUFFER_TOO_SMALL.
- *                 It will get resized to actual size needed on success.
+ * @param csr_span Span to hold the resulting CSR. Must have size at least kMIN_CSR_Buffer_Size.
+ *                 Otherwise returns CHIP_ERROR_BUFFER_TOO_SMALL. It will get resized to
+ *                 actual size needed on success.
 
  * @return Returns a CHIP_ERROR from P256Keypair or ASN.1 backend on error, CHIP_NO_ERROR otherwise
  **/
