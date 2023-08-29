@@ -30,7 +30,7 @@
         "Test_TC_ACL_2_8",
         "Test_TC_ACL_2_9",
         "Test_TC_ACL_2_10",
-        "Disabled due to GetCommissionerRootCertificate command not supported",
+        "Disabled due to GetCommissionerRootCertificate command not being supported",
         "Test_TC_OPCREDS_3_7",
         "DL_LockUnlock",
         "Disabled due to Events verification not supported",
