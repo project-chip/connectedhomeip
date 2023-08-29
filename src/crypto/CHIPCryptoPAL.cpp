@@ -181,8 +181,8 @@ CHIP_ERROR Find16BitUpperCaseHexAfterPrefix(const ByteSpan & buffer, const char 
     // Scan string from left to right, to find the desired full matching substring.
     for (size_t start_idx = 0; start_idx < buffer.size(); start_idx++)
     {
-        const uint8_t *cursor = buffer.data() + start_idx;
-        size_t remaining = buffer.size() - start_idx;
+        const uint8_t * cursor = buffer.data() + start_idx;
+        size_t remaining       = buffer.size() - start_idx;
 
         if (remaining < prefix_span.size())
         {
@@ -195,7 +195,9 @@ CHIP_ERROR Find16BitUpperCaseHexAfterPrefix(const ByteSpan & buffer, const char 
         {
             // Did not find prefix, move to next position.
             continue;
-        } else {
+        }
+        else
+        {
             // Found prefix, skip to possible hex value.
             found_prefix_at_least_once = true;
             cursor += prefix_span.size();
