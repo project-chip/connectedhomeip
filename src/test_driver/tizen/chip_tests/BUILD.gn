@@ -17,35 +17,33 @@ import("//build_overrides/tizen.gni")
 
 import("${tizen_sdk_build_root}/tizen_sdk.gni")
 
-tizen_qemu_mkisofs("lighting-app-runner") {
+tizen_qemu_mkisofs("chip-tests-runner") {
   runner = "runner.sh"
 
-  # Build applications used in the test.
-  deps = [
-    "${chip_root}/examples/chip-tool:chip-tool",
-    "${chip_root}/examples/lighting-app/tizen:chip-lighting-app:tpk",
-  ]
+  # Build CHIP unit tests.
+  deps = [ "${chip_root}/src:tests" ]
 
-  # Use artifacts created by the dependencies.
-  assets = [
-    rebase_path("${root_out_dir}/chip-tool"),
-    rebase_path(
-        "${root_out_dir}/org.tizen.matter.example.lighting/out/org.tizen.matter.example.lighting-1.0.0.tpk"),
-  ]
+  # Bundle all created unit tests.
+  # TODO (arkq): Collect all unit tests in a way that we could add all targets
+  #              to the assets list. Right now QEMU runner dependencies are not
+  #              tracked properly. Changes to the unit tests will not trigger
+  #              rebuild of the ISO image, so the test will be run with old
+  #              binaries.
+  assets_non_tracked = [ rebase_path("${root_build_dir}/tests") ]
 }
 
-tizen_qemu_run("lighting-app") {
+tizen_qemu_run("chip-tests") {
   # Enable network support, so Tizen can obtain current date/time from the
   # network. Correct date/time is required for the commissioning process -
   # attestation will fail otherwise.
   virtio_net = true
 
-  deps = [ ":lighting-app-runner" ]
-  mkisofs_outputs = get_target_outputs(":lighting-app-runner")
+  deps = [ ":chip-tests-runner" ]
+  mkisofs_outputs = get_target_outputs(":chip-tests-runner")
   iso_image = rebase_path(mkisofs_outputs[0])
 }
 
 group("check") {
-  deps = [ ":lighting-app" ]
+  deps = [ ":chip-tests" ]
   testonly = true
 }
