@@ -28,9 +28,8 @@ private:
 public:
     RvcDevice() :
         mRunModeDelegate(),
-        mRunModeInstance(&mRunModeDelegate, RvcRunModeEndpoint, RvcRunMode::Id, chip::to_underlying(RvcRunMode::Feature::kOnOff)),
-        mCleanModeDelegate(), mCleanModeInstance(&mCleanModeDelegate, RvcCleanModeEndpoint, RvcCleanMode::Id,
-                                                 chip::to_underlying(RvcCleanMode::Feature::kOnOff)),
+        mRunModeInstance(&mRunModeDelegate, RvcRunModeEndpoint, RvcRunMode::Id, 0),
+        mCleanModeDelegate(), mCleanModeInstance(&mCleanModeDelegate, RvcCleanModeEndpoint, RvcCleanMode::Id, 0),
         mOperationalStateDelegate(),
         mOperationalStateInstance(&mOperationalStateDelegate, RvcOperationalStateEndpoint, RvcOperationalState::Id)
     {
