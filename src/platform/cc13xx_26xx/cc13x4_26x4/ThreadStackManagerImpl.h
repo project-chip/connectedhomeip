@@ -96,7 +96,6 @@ public:
     void GetExtAddress(otExtAddress & aExtAddr);
     CHIP_ERROR GetBufferInfo(void);
 
-
 private:
     // ===== Methods that implement the ThreadStackManager abstract interface.
 
