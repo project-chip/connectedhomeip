@@ -179,6 +179,13 @@ CHIP_ERROR Find16BitUpperCaseHexAfterPrefix(const ByteSpan & buffer, const char 
     bool found_prefix_at_least_once = false;
 
     // Scan string from left to right, to find the desired full matching substring.
+    //
+    // IMPORTANT NOTE: We are trying to find the equivalent of prefix + [0-9A-F]{4}.
+    // The appearance of the full prefix, but not followed by the hex value, must
+    // be detected, as it is illegal if there isn't a valid prefix within the string.
+    // This is why we first check for the prefix and then maybe check for the hex
+    // value, rather than doing a single check of making sure there is enough space
+    // for both.
     for (size_t start_idx = 0; start_idx < buffer.size(); start_idx++)
     {
         const uint8_t * cursor = buffer.data() + start_idx;
@@ -196,13 +203,11 @@ CHIP_ERROR Find16BitUpperCaseHexAfterPrefix(const ByteSpan & buffer, const char 
             // Did not find prefix, move to next position.
             continue;
         }
-        else
-        {
-            // Found prefix, skip to possible hex value.
-            found_prefix_at_least_once = true;
-            cursor += prefix_span.size();
-            remaining -= prefix_span.size();
-        }
+
+        // Otherwise, found prefix, skip to possible hex value.
+        found_prefix_at_least_once = true;
+        cursor += prefix_span.size();
+        remaining -= prefix_span.size();
 
         if (remaining < HEX_ENCODED_LENGTH(sizeof(uint16_t)))
         {
