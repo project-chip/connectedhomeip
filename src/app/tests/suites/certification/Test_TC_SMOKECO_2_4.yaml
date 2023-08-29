@@ -135,7 +135,7 @@ tests:
       PICS: SMOKECO.S.E02
       command: "readEvent"
       event: "LowBattery"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: { AlarmSeverityLevel: 1 }
 
@@ -180,7 +180,7 @@ tests:
       PICS: SMOKECO.S.E02
       command: "readEvent"
       event: "LowBattery"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: { AlarmSeverityLevel: 2 }
 
@@ -225,7 +225,7 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 
@@ -281,7 +281,7 @@ tests:
       PICS: SMOKECO.S.E03
       command: "readEvent"
       event: "HardwareFault"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 
@@ -327,7 +327,7 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 
@@ -383,7 +383,7 @@ tests:
       PICS: SMOKECO.S.E04
       command: "readEvent"
       event: "EndOfService"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 
@@ -429,7 +429,7 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 
@@ -503,7 +503,7 @@ tests:
       PICS: SMOKECO.S.E05
       command: "readEvent"
       event: "SelfTestComplete"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 
@@ -520,7 +520,7 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 
@@ -565,7 +565,7 @@ tests:
       PICS: SMOKECO.S.E05
       command: "readEvent"
       event: "SelfTestComplete"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 
@@ -582,6 +582,6 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}

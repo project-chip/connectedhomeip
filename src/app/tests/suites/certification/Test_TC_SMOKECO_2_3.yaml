@@ -122,7 +122,7 @@ tests:
       PICS: SMOKECO.S.E01
       command: "readEvent"
       event: "COAlarm"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: { AlarmSeverityLevel: 1 }
 
@@ -202,7 +202,7 @@ tests:
       PICS: SMOKECO.S.E01
       command: "readEvent"
       event: "COAlarm"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: { AlarmSeverityLevel: 2 }
 
@@ -247,6 +247,6 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
