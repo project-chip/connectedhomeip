@@ -164,6 +164,12 @@ static CHIP_ERROR ExtractNodeIDFromNOC(MTRCertificateDERBytes noc, NSNumber * __
 
     _ipk = params.ipk;
     _vendorID = params.vendorID;
+    // Note: Since we have an operationalCertificate, we do not need a nodeID as
+    // part of our params; it will not be used.  Don't even initialize it, to
+    // avoid confusion about that.
+    //
+    // We don't really use the fabricID for anything either, but we promise to
+    // have a non-nil one, which is why we set it above.
     _nodeID = nil;
     _caseAuthenticatedTags = nil;
     _rootCertificate = params.rootCertificate;

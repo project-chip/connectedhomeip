@@ -650,11 +650,14 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         storageDelegate = params.storageDelegate;
         storageDelegateQueue = params.storageDelegateQueue;
         uniqueIdentifier = params.uniqueIdentifier;
-    } else {
+    } else if ([startupParams isKindOfClass:[MTRDeviceControllerStartupParams class]]) {
         MTRDeviceControllerStartupParams * params = startupParams;
         storageDelegate = nil;
         storageDelegateQueue = nil;
         uniqueIdentifier = params.uniqueIdentifier;
+    } else {
+        MTR_LOG_ERROR("Unknown kind of startup params: %@", startupParams);
+        return nil;
     }
 
     if (_usingPerControllerStorage && storageDelegate == nil) {

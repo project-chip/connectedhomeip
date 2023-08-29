@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ typedef NS_ENUM(NSUInteger, MTRStorageSharingType) {
  *    it is to get its controllerID.
  *
  * 2) The delegate method calls will happen on the queue that was provided along
- *    with the gelegate.  All Matter work will be blocked until the method
+ *    with the delegate.  All Matter work will be blocked until the method
  *    completes, and these calls may themselves block other Matter API calls
  *    from completing.  Attempting to call any Matter API on the queue used for
  *    this delegate, apart from de-serializing and serializing the items being
