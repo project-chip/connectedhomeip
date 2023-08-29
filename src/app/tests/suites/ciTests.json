@@ -277,7 +277,8 @@
         "TestTimeSynchronization",
         "TestOperationalState",
         "TestRVCOperationalState",
-        "TestDishwasherAlarm"
+        "TestDishwasherAlarm",
+        "Test_AddNewFabricFromExistingFabric"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": ["Test_TC_DGSW_1_1"],
