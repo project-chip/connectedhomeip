@@ -1,7 +1,7 @@
 {
     "device0": {
         "type": "CHIP-00",
-        "base_image": "project-chip/chip-cirque-device-base",
+        "base_image": "@default",
         "capability": ["Thread", "Interactive", "Mount"],
         "mount_pairs": [["{chip_repo}", "{chip_repo}"]],
         "rcp_mode": true

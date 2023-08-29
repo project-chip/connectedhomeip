@@ -179,6 +179,15 @@ CHIP_ERROR AppTask::Init()
         return System::MapErrorZephyr(ret);
     }
 
+#ifdef CONFIG_CHIP_OTA_REQUESTOR
+    /* OTA image confirmation must be done before the factory data init. */
+    err = OtaConfirmNewImage();
+    if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+#endif
+
     // Initialize Timers
     k_timer_init(&sFunctionTimer, AppTask::FunctionTimerTimeoutCallback, nullptr);
     k_timer_init(&sDimmerPressKeyTimer, AppTask::FunctionTimerTimeoutCallback, nullptr);

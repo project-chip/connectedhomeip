@@ -138,7 +138,7 @@ struct GenericOperationalError : public app::Clusters::detail::Structs::ErrorSta
         }
     }
 
-    bool IsEqual(const Structs::ErrorStateStruct::Type & rhs)
+    bool IsEqual(const Structs::ErrorStateStruct::Type & rhs) const
     {
         if (errorStateID != rhs.errorStateID)
         {
