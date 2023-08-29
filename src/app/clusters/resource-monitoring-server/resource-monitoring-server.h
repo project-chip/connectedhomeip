@@ -106,7 +106,7 @@ public:
     DataModel::Nullable<uint32_t> GetLastChangedTime() const;
 
     EndpointId GetEndpointId() const { return mEndpointId; }
-    ClusterId getClusterId() const { return mClusterId; }
+    ClusterId GetClusterId() const { return mClusterId; }
 
 private:
     Delegate * mDelegate;

@@ -365,7 +365,7 @@ Status Delegate::OnResetCondition()
         return status;
     }
     // Handle the reset of the condition attribute, if supported
-    if (emberAfContainsAttribute(mInstance->GetEndpointId(), mInstance->getClusterId(), Attributes::Condition::Id))
+    if (emberAfContainsAttribute(mInstance->GetEndpointId(), mInstance->GetClusterId(), Attributes::Condition::Id))
     {
         if (mInstance->GetDegradationDirection() == DegradationDirectionEnum::kDown)
         {
@@ -381,7 +381,7 @@ Status Delegate::OnResetCondition()
     mInstance->UpdateChangeIndication(ChangeIndicationEnum::kOk);
 
     // Handle the reset of the LastChangedTime attribute, if supported
-    if (emberAfContainsAttribute(mInstance->GetEndpointId(), mInstance->getClusterId(), Attributes::LastChangedTime::Id))
+    if (emberAfContainsAttribute(mInstance->GetEndpointId(), mInstance->GetClusterId(), Attributes::LastChangedTime::Id))
     {
         System::Clock::Milliseconds64 currentUnixTimeMS;
         System::Clock::ClockImpl clock;
