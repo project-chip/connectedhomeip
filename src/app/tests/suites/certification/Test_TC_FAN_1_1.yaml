@@ -188,7 +188,7 @@ tests:
               type: list
 
     - label:
-          "Step 6: Read the optional command (ResetCondition) in
+          "Step 6: Read the optional command (Step) in
           AcceptedCommandList"
       PICS: FAN.S.C00.Rsp
       command: "readAttribute"
