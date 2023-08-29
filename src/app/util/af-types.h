@@ -23,6 +23,8 @@
  * @{
  */
 
+#include <platform/CHIPDeviceConfig.h> // For CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
+
 #include <stdbool.h> // For bool
 #include <stddef.h>  // For NULL.
 #include <stdint.h>  // For various uint*_t types
