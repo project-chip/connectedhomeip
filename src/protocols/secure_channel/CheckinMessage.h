@@ -68,15 +68,15 @@ public:
     static CHIP_ERROR ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & key, ByteSpan & payload, CounterType & counter,
                                                  MutableByteSpan & appData);
 
-    static inline size_t GetCheckinPayloadSize(uint16_t & appDataSize) { return appDataSize + sMinPayloadSize; }
+    static inline size_t GetCheckinPayloadSize(size_t appDataSize) { return appDataSize + sMinPayloadSize; }
 
     /**
      * @brief Get the App Data Size
      *
      * @param payload   The undecrypted payload
-     * @return uint16_t size in byte of the application data from the payload
+     * @return size_t size in byte of the application data from the payload
      */
-    static uint16_t GetAppDataSize(ByteSpan & payload);
+    static size_t GetAppDataSize(ByteSpan & payload);
 
     static constexpr uint16_t sMinPayloadSize =
         CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES + sizeof(CounterType) + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;

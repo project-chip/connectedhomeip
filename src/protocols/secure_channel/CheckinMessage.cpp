@@ -69,7 +69,7 @@ CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & 
     VerifyOrReturnError(payload.size() <= (sMinPayloadSize + sMaxAppDataSize), CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ERROR err       = CHIP_NO_ERROR;
-    uint16_t appDataSize = GetAppDataSize(payload);
+    size_t appDataSize = GetAppDataSize(payload);
 
     // To prevent workbuffer usage, appData size needs to be large enough to hold both the appData and the counter
     VerifyOrReturnError(appData.size() >= sizeof(CounterType) + appDataSize, CHIP_ERROR_INVALID_ARGUMENT);
@@ -92,9 +92,9 @@ CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & 
     return err;
 }
 
-uint16_t CheckinMessage::GetAppDataSize(ByteSpan & payload)
+size_t CheckinMessage::GetAppDataSize(ByteSpan & payload)
 {
-    return (payload.size() <= sMinPayloadSize) ? 0 : static_cast<uint16_t>(payload.size() - sMinPayloadSize);
+    return (payload.size() <= sMinPayloadSize) ? 0 : payload.size() - sMinPayloadSize;
 }
 
 } // namespace SecureChannel
