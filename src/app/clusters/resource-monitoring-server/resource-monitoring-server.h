@@ -163,7 +163,7 @@ private:
      */
     void SetInstance(Instance * aInstance) { mInstance = aInstance; }
 
-protected: 
+protected:
     Instance* GetInstance() { return mInstance; }
 
 public:
