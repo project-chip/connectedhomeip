@@ -38,4 +38,4 @@ tests:
       attribute: "AirflowDirection"
       response:
           constraints:
-              type: enum8
+              type: AirflowDirectionEnum
