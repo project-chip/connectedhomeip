@@ -123,6 +123,137 @@ static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId,
                                chip::Optional<chip::BitMask<LevelControlOptions>> optionsMask,
                                chip::Optional<chip::BitMask<LevelControlOptions>> optionsOverride);
 
+#ifdef EMBER_AF_PLUGIN_SCENES
+class DefaultLevelControlSceneHandler : public scenes::DefaultSceneHandlerImpl
+{
+public:
+    // As per spec, 2 attributes are scenable in the level control cluster
+    static constexpr uint8_t kLevelMaxScenableAttributes = 2;
+
+    DefaultLevelControlSceneHandler() = default;
+    ~DefaultLevelControlSceneHandler() override {}
+
+    // Default function for LevelControl cluster, only puts the LevelControl cluster ID in the span if supported on the caller
+    // endpoint
+    virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) override
+    {
+        if (emberAfContainsServer(endpoint, LevelControl::Id) && clusterBuffer.size() >= 1)
+        {
+            clusterBuffer[0] = LevelControl::Id;
+            clusterBuffer.reduce_size(1);
+        }
+        else
+        {
+            clusterBuffer.reduce_size(0);
+        }
+    }
+
+    // Default function for LevelControl cluster, only checks if LevelControl is enabled on the endpoint
+    bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override
+    {
+        return (cluster == LevelControl::Id) && (emberAfContainsServer(endpoint, LevelControl::Id));
+    }
+
+    /// @brief Serialize the Cluster's EFS value
+    /// @param endpoint target endpoint
+    /// @param cluster  target cluster
+    /// @param serializedBytes data to serialize into EFS
+    /// @return CHIP_NO_ERROR if successfully serialized the data, CHIP_ERROR_INVALID_ARGUMENT otherwise
+    CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) override
+    {
+        using AttributeValuePair = Scenes::Structs::AttributeValuePair::Type;
+
+        app::DataModel::Nullable<uint8_t> level;
+        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == Attributes::CurrentLevel::Get(endpoint, level), CHIP_ERROR_READ_FAILED);
+
+        AttributeValuePair pairs[kLevelMaxScenableAttributes];
+
+        uint8_t maxLevel;
+        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == Attributes::MaxLevel::Get(endpoint, &maxLevel), CHIP_ERROR_READ_FAILED);
+
+        pairs[0].attributeID    = Attributes::CurrentLevel::Id;
+        pairs[0].attributeValue = (!level.IsNull()) ? level.Value() : maxLevel + 1;
+        size_t attributeCount   = 1;
+        if (LevelControlHasFeature(endpoint, LevelControl::Feature::kFrequency))
+        {
+            uint16_t frequency;
+            VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == Attributes::CurrentFrequency::Get(endpoint, &frequency),
+                                CHIP_ERROR_READ_FAILED);
+            pairs[attributeCount].attributeID    = Attributes::CurrentFrequency::Id;
+            pairs[attributeCount].attributeValue = frequency;
+            attributeCount++;
+        }
+
+        app::DataModel::List<AttributeValuePair> attributeValueList(pairs, attributeCount);
+
+        return EncodeAttributeValueList(attributeValueList, serializedBytes);
+    }
+
+    /// @brief Default EFS interaction when applying scene to the OnOff Cluster
+    /// @param endpoint target endpoint
+    /// @param cluster  target cluster
+    /// @param serializedBytes Data from nvm
+    /// @param timeMs transition time in ms
+    /// @return CHIP_NO_ERROR if value as expected, CHIP_ERROR_INVALID_ARGUMENT otherwise
+    CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
+                          scenes::TransitionTimeMs timeMs) override
+    {
+        app::DataModel::DecodableList<Scenes::Structs::AttributeValuePair::DecodableType> attributeValueList;
+
+        ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
+
+        size_t attributeCount = 0;
+        ReturnErrorOnFailure(attributeValueList.ComputeSize(&attributeCount));
+        VerifyOrReturnError(attributeCount <= kLevelMaxScenableAttributes, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+        auto pair_iterator = attributeValueList.begin();
+
+        // The level control cluster should have a maximum of 2 attributes
+        uint8_t level = 0;
+        // TODO : Uncomment when frequency is supported by the level control cluster
+        // uint16_t frequency;
+        while (pair_iterator.Next())
+        {
+            auto & decodePair = pair_iterator.GetValue();
+
+            // If attribute ID was encoded, checks which attribute from LC cluster is there
+            switch (decodePair.attributeID)
+            {
+            case Attributes::CurrentLevel::Id:
+                level = static_cast<uint8_t>(decodePair.attributeValue);
+                break;
+            case Attributes::CurrentFrequency::Id:
+                // TODO : Uncomment when frequency is supported by the level control cluster
+                // frequency = static_cast<uint16_t>(decodePair.attributeValue);
+                break;
+            default:
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+        }
+        ReturnErrorOnFailure(pair_iterator.GetStatus());
+
+        // TODO : Implement action on frequency when frequency not provisional anymore
+        // if(LevelControlHasFeature(endpoint, LevelControl::Feature::kFrequency)){}
+        Status status;
+        CommandId command = LevelControlHasFeature(endpoint, LevelControl::Feature::kOnOff) ? Commands::MoveToLevelWithOnOff::Id
+                                                                                            : Commands::MoveToLevel::Id;
+
+        status = moveToLevelHandler(
+            endpoint, command, level, app::DataModel::MakeNullable<uint16_t>(static_cast<uint16_t>(timeMs / 100)),
+            chip::Optional<BitMask<LevelControlOptions>>(), chip::Optional<BitMask<LevelControlOptions>>(), INVALID_STORED_LEVEL);
+
+        if (status != Status::Success)
+        {
+            return CHIP_ERROR_READ_FAILED;
+        }
+
+        return CHIP_NO_ERROR;
+    }
+};
+static DefaultLevelControlSceneHandler sLevelControlSceneHandler;
+
+#endif // EMBER_AF_PLUGIN_SCENES
+
 #if !defined(IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS) && defined(EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP)
 static void reallyUpdateCoupledColorTemp(EndpointId endpoint);
 #define updateCoupledColorTemp(endpoint) reallyUpdateCoupledColorTemp(endpoint)
@@ -446,7 +577,7 @@ static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId,
     }
 
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS
-    // By default, we return true to continue supporting backwards compatibility.
+       // By default, we return true to continue supporting backwards compatibility.
     return true;
 }
 
@@ -482,6 +613,16 @@ Status MoveToLevel(EndpointId endpointId, const Commands::MoveToLevel::Decodable
                               Optional<BitMask<LevelControlOptions>>(optionsOverride),
                               INVALID_STORED_LEVEL); // Don't revert to the stored level
 }
+
+chip::scenes::SceneHandler * GetSceneHandler()
+{
+#ifdef EMBER_AF_PLUGIN_SCENES
+    return &sLevelControlSceneHandler;
+#else
+    return nullptr;
+#endif // EMBER_AF_PLUGIN_SCENES
+}
+
 } // namespace LevelControlServer
 
 bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(app::CommandHandler * commandObj,
@@ -1303,6 +1444,11 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
             Attributes::CurrentLevel::Set(endpoint, state->maxLevel);
         }
     }
+
+#ifdef EMBER_AF_PLUGIN_SCENES
+    // Registers Scene handlers for the level control cluster on the server
+    app::Clusters::Scenes::ScenesServer::Instance().RegisterSceneHandler(endpoint, LevelControlServer::GetSceneHandler());
+#endif
 
     emberAfPluginLevelControlClusterServerPostInitCallback(endpoint);
 }

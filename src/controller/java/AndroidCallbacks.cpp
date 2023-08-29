@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,7 +28,8 @@
 #include <lib/support/ErrorStr.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <lib/support/jsontlv/TlvJson.h>
+#include <lib/support/jsontlv/JsonToTlv.h>
+#include <lib/support/jsontlv/TlvToJson.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <type_traits>
@@ -38,6 +39,8 @@ namespace Controller {
 
 static const int MILLIS_SINCE_BOOT  = 0;
 static const int MILLIS_SINCE_EPOCH = 1;
+// Add the bytes for attribute tag(1:control + 8:tag + 8:length) and structure(1:struct + 1:close container)
+static const int EXTRA_SPACE_FOR_ATTRIBUTE_TAG = 19;
 
 GetConnectedDeviceCallback::GetConnectedDeviceCallback(jobject wrapperCallback, jobject javaCallback) :
     mOnSuccess(OnDeviceConnectedFn, this), mOnFailure(OnDeviceConnectionFailureFn, this)
@@ -222,6 +225,32 @@ void ReportCallback::OnReportEnd()
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
+// Convert TLV blob to Json with structure, the element's tag is replaced with the actual attributeId.
+CHIP_ERROR ConvertReportTlvToJson(const uint32_t id, TLV::TLVReader & data, std::string & json)
+{
+    TLV::TLVWriter writer;
+    TLV::TLVReader readerForJavaTLV;
+    uint32_t size    = 0;
+    size_t bufferLen = readerForJavaTLV.GetTotalLength() + EXTRA_SPACE_FOR_ATTRIBUTE_TAG;
+    readerForJavaTLV.Init(data);
+    std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(new uint8_t[bufferLen]);
+    writer.Init(buffer.get(), bufferLen);
+    TLV::TLVType outer;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer));
+    TLV::Tag tag;
+    ReturnErrorOnFailure(ConvertTlvTag(id, tag));
+    ReturnErrorOnFailure(writer.CopyElement(tag, readerForJavaTLV));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    size = writer.GetLengthWritten();
+
+    TLV::TLVReader readerForJson;
+    readerForJson.Init(buffer.get(), size);
+    ReturnErrorOnFailure(readerForJson.Next());
+    // Convert TLV to JSON
+    return TlvToJson(readerForJson, json);
+}
+
 void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                                      const app::StatusIB & aStatus)
 {
@@ -250,9 +279,7 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     }
 
     TLV::TLVReader readerForJavaTLV;
-    TLV::TLVReader readerForJson;
     readerForJavaTLV.Init(*apData);
-    readerForJson.Init(*apData);
 
     jobject value = nullptr;
 #if USE_JAVA_TLV_ENCODE_DECODE
@@ -274,6 +301,7 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     size_t bufferLen                  = readerForJavaTLV.GetRemainingLength() + readerForJavaTLV.GetLengthRead();
     std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(new uint8_t[bufferLen]);
     uint32_t size                     = 0;
+
     // The TLVReader's read head is not pointing to the first element in the container, instead of the container itself, use
     // a TLVWriter to get a TLV with a normalized TLV buffer (Wrapped with an anonymous tag, no extra "end of container" tag
     // at the end.)
@@ -285,11 +313,10 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     chip::ByteArray jniByteArray(env, reinterpret_cast<jbyte *>(buffer.get()), size);
 
     // Convert TLV to JSON
-    Json::Value json;
-    err = TlvToJson(readerForJson, json);
+    std::string json;
+    err = ConvertReportTlvToJson(static_cast<uint32_t>(aPath.mAttributeId), *apData, json);
     VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(attributePathObj, nullptr, err));
-
-    UtfString jsonString(env, JsonToString(json).c_str());
+    UtfString jsonString(env, json.c_str());
 
     // Create AttributeState object
     jclass attributeStateCls;
@@ -364,9 +391,7 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     }
 
     TLV::TLVReader readerForJavaTLV;
-    TLV::TLVReader readerForJson;
     readerForJavaTLV.Init(*apData);
-    readerForJson.Init(*apData);
 
     jlong eventNumber    = static_cast<jlong>(aEventHeader.mEventNumber);
     jint priorityLevel   = static_cast<jint>(aEventHeader.mPriorityLevel);
@@ -418,11 +443,10 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     chip::ByteArray jniByteArray(env, reinterpret_cast<jbyte *>(buffer.get()), size);
 
     // Convert TLV to JSON
-    Json::Value json;
-    err = TlvToJson(readerForJson, json);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(nullptr, eventPathObj, err));
-
-    UtfString jsonString(env, JsonToString(json).c_str());
+    std::string json;
+    err = ConvertReportTlvToJson(static_cast<uint32_t>(aEventHeader.mPath.mEventId), *apData, json);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(eventPathObj, nullptr, err));
+    UtfString jsonString(env, json.c_str());
 
     // Create EventState object
     jclass eventStateCls;
@@ -488,15 +512,13 @@ CHIP_ERROR InvokeCallback::CreateInvokeElement(const app::ConcreteCommandPath & 
         TLV::TLVReader readerForJavaTLV;
         TLV::TLVReader readerForJson;
         readerForJavaTLV.Init(*apData);
-        readerForJson.Init(*apData);
 
         // Create TLV byte array to pass to Java layer
-        size_t bufferLen                  = readerForJavaTLV.GetRemainingLength() + readerForJavaTLV.GetLengthRead();
+        size_t bufferLen = readerForJavaTLV.GetRemainingLength() + readerForJavaTLV.GetLengthRead();
+        ;
         std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(new uint8_t[bufferLen]);
         uint32_t size                     = 0;
-        // The TLVReader's read head is not pointing to the first element in the container, instead of the container itself, use
-        // a TLVWriter to get a TLV with a normalized TLV buffer (Wrapped with an anonymous tag, no extra "end of container" tag
-        // at the end.)
+
         TLV::TLVWriter writer;
         writer.Init(buffer.get(), bufferLen);
         err = writer.CopyElement(TLV::AnonymousTag(), readerForJavaTLV);
@@ -505,11 +527,13 @@ CHIP_ERROR InvokeCallback::CreateInvokeElement(const app::ConcreteCommandPath & 
         chip::ByteArray jniByteArray(env, reinterpret_cast<jbyte *>(buffer.get()), size);
 
         // Convert TLV to JSON
-        Json::Value json;
+        std::string json;
+        readerForJson.Init(buffer.get(), size);
+        err = readerForJson.Next();
+        ReturnErrorOnFailure(err);
         err = TlvToJson(readerForJson, json);
         ReturnErrorOnFailure(err);
-
-        UtfString jsonString(env, JsonToString(json).c_str());
+        UtfString jsonString(env, json.c_str());
         outObj = env->CallStaticObjectMethod(invokeElementCls, invokeElementCtor, static_cast<jint>(aPath.mEndpointId),
                                              static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mCommandId),
                                              jniByteArray.jniValue(), jsonString.jniValue());
@@ -614,6 +638,7 @@ void ReportCallback::ReportError(jobject attributePath, jobject eventPath, const
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
+    ChipLogError(Controller, "ReportCallback::ReportError is called with %u", errorCode);
     jthrowable exception;
     err = AndroidControllerExceptions::GetInstance().CreateAndroidControllerException(env, message, errorCode, exception);
     VerifyOrReturn(
@@ -722,7 +747,7 @@ void WriteAttributesCallback::ReportError(jobject attributePath, const char * me
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    ChipLogError(Controller, "WriteAttributesCallback ReportError is called");
+    ChipLogError(Controller, "WriteAttributesCallback::ReportError is called with %u", errorCode);
     jthrowable exception;
     err = AndroidControllerExceptions::GetInstance().CreateAndroidControllerException(env, message, errorCode, exception);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -825,7 +850,7 @@ void InvokeCallback::ReportError(const char * message, ChipError::StorageType er
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    ChipLogError(Controller, "InvokeCallback ReportError is called");
+    ChipLogError(Controller, "InvokeCallback::ReportError is called with %u", errorCode);
     jthrowable exception;
     err = AndroidControllerExceptions::GetInstance().CreateAndroidControllerException(env, message, errorCode, exception);
     VerifyOrReturn(

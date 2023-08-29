@@ -69,6 +69,8 @@ public:
     ~DishwasherModeDelegate() override = default;
 };
 
+ModeBase::Instance * Instance();
+
 void Shutdown();
 
 } // namespace DishwasherMode

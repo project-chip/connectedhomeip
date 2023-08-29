@@ -19,8 +19,10 @@
 #include <tracing/json/json_tracing.h>
 
 #include <lib/address_resolve/TracingStructs.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/StringBuilder.h>
+#include <lib/support/StringSplitter.h>
 #include <transport/TracingStructs.h>
 
 #include <log_json/log_json_build_config.h>
@@ -54,7 +56,7 @@ using chip::StringBuilder;
 
 using namespace chip::Decoders;
 
-using PayloadDecoderType = chip::Decoders::PayloadDecoder<64, 256>;
+using PayloadDecoderType = chip::Decoders::PayloadDecoder<64, 2048>;
 
 /// Figures out a unique name within a json object.
 ///
@@ -226,15 +228,16 @@ void DecodePayloadData(::Json::Value & value, chip::ByteSpan payload, Protocols:
 
 #if MATTER_LOG_JSON_DECODE_FULL
 
-    PayloadDecoderType decoder(PayloadDecoderInitParams()
-                                   .SetProtocolDecodeTree(chip::TLVMeta::protocols_meta)
-                                   .SetClusterDecodeTree(chip::TLVMeta::clusters_meta)
-                                   .SetProtocol(protocolId)
-                                   .SetMessageType(messageType));
+    // As PayloadDecoder is quite large (large strings buffers), we place it in heap
+    auto decoder = chip::Platform::MakeUnique<PayloadDecoderType>(PayloadDecoderInitParams()
+                                                                      .SetProtocolDecodeTree(chip::TLVMeta::protocols_meta)
+                                                                      .SetClusterDecodeTree(chip::TLVMeta::clusters_meta)
+                                                                      .SetProtocol(protocolId)
+                                                                      .SetMessageType(messageType));
 
-    decoder.StartDecoding(payload);
+    decoder->StartDecoding(payload);
 
-    value["decoded"] = GetPayload(decoder);
+    value["decoded"] = GetPayload(*decoder);
 #endif // MATTER_LOG_JSON_DECODE_FULL
 }
 
@@ -442,7 +445,15 @@ void JsonBackend::OutputValue(::Json::Value & value)
     {
         std::stringstream output;
         writer->write(value, &output);
-        ChipLogProgress(Automation, "%s", output.str().c_str());
+        // For pretty-printing, output each log line individually.
+        std::string data_string = output.str();
+        chip::StringSplitter splitter(data_string.c_str(), '\n');
+
+        chip::CharSpan line;
+        while (splitter.Next(line))
+        {
+            ChipLogProgress(Automation, "%.*s", static_cast<int>(line.size()), line.data());
+        }
     }
 }
 

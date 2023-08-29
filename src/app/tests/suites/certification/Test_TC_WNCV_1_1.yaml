@@ -35,7 +35,6 @@ tests:
     ### Attribute[0xFFFD]: ClusterRevision =======================================
     - label:
           "Step 2: TH reads from the DUT the (0xFFFD) ClusterRevision attribute"
-      PICS: WNCV.S.Afffd
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -47,8 +46,8 @@ tests:
 
     - label: "Step 3a: TH reads from the DUT the (0xFFFC) FeatureMap attribute"
       PICS:
-          " WNCV.S.Afffc && !WNCV.S.F00 && !WNCV.S.F01 && !WNCV.S.F02 &&
-          !WNCV.S.F03 && !WNCV.S.F04 "
+          "!WNCV.S.F00 && !WNCV.S.F01 && !WNCV.S.F02 && !WNCV.S.F03 &&
+          !WNCV.S.F04 "
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -113,7 +112,7 @@ tests:
 
     - label:
           "Step 4a: TH reads from the DUT the (0xFFFB) AttributeList attribute"
-      PICS: PICS_EVENT_LIST_ENABLED && WNCV.S.Afffb
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -124,7 +123,7 @@ tests:
 
     - label:
           "Step 4a: TH reads from the DUT the (0xFFFB) AttributeList attribute"
-      PICS: "!PICS_EVENT_LIST_ENABLED && WNCV.S.Afffb"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -134,7 +133,7 @@ tests:
 
     - label:
           "Step 4b: TH reads optional attribute(SafetyStatus) in AttributeList"
-      PICS: WNCV.S.Afffb && WNCV.S.A001a
+      PICS: WNCV.S.A001a
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -145,7 +144,7 @@ tests:
     - label:
           "Step 4c: Read the Feature dependent(WNCV.S.F00 & WNCV.S.F02 &
           WNCV.S.F03) attribute in AttributeList"
-      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.F03 && WNCV.S.Afffb
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.F03
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -156,7 +155,7 @@ tests:
     - label:
           "Step 4d: Read the Feature dependent(WNCV.S.F00 & WNCV.S.F02 )
           attribute in AttributeList"
-      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.Afffb
+      PICS: WNCV.S.F00 && WNCV.S.F02
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -167,7 +166,7 @@ tests:
     - label:
           "Step 4e: Read the Feature dependent(WNCV.S.F01 & WNCV.S.F04 &
           WNCV.S.F03) attribute in AttributeList"
-      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.F03 && WNCV.S.Afffb
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.F03
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -178,7 +177,7 @@ tests:
     - label:
           "Step 4f: Read the Feature dependent(WNCV.S.F01 & WNCV.S.F04 )
           attribute in AttributeList"
-      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.Afffb
+      PICS: WNCV.S.F01 && WNCV.S.F04
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -198,7 +197,6 @@ tests:
     - label:
           "Step 6a: TH reads from the DUT the (0xFFF9) AcceptedCommandList
           attribute"
-      PICS: WNCV.S.Afff9
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -209,7 +207,7 @@ tests:
     - label:
           "Step 6b: TH reads Feature dependent(WNCV.S.F00 & WNCV.S.F02) command
           in AcceptedCommandList"
-      PICS: WNCV.S.Afff9 && WNCV.S.F00 && WNCV.S.F02
+      PICS: WNCV.S.F00 && WNCV.S.F02
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -220,7 +218,7 @@ tests:
     - label:
           "Step 6c: TH reads Feature dependent(WNCV.S.F01 & WNCV.S.F03) command
           in AcceptedCommandList"
-      PICS: WNCV.S.Afff9 && WNCV.S.F01 && WNCV.S.F03
+      PICS: WNCV.S.F01 && WNCV.S.F03
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -231,7 +229,7 @@ tests:
     - label:
           "Step 6d: TH reads Feature dependent(WNCV.S.F01 & WNCV.S.F04) command
           in AcceptedCommandList"
-      PICS: WNCV.S.Afff9 && WNCV.S.F01 && WNCV.S.F04
+      PICS: WNCV.S.F01 && WNCV.S.F04
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -242,7 +240,6 @@ tests:
     - label:
           "Step 7: TH reads from the DUT the (0xFFF8) GeneratedCommandList
           attribute"
-      PICS: WNCV.S.Afff8
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

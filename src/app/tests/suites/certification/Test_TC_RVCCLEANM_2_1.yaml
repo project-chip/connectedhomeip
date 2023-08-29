@@ -74,7 +74,7 @@ tests:
     - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
       PICS: RVCCLEANM.S.A0001
       verification: |
-          ./chip-tool rvccleanmode read current-mode 1 1
+          ./chip-tool  rvccleanmode read current-mode 1 1
 
           Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer  value,
           - Save the value as old_current_mode_dut
@@ -102,7 +102,7 @@ tests:
     - label:
           "Step 5: Manually put the device in a state from which it will FAIL to
           transition to PIXIT.RVCCLEANM.MODE_CHANGE_FAIL"
-      PICS: PIXIT.RVCCLEANM.CAN_TEST_MODE_FAILURE
+      PICS: RVCCLEANM.S.M.CAN_TEST_MODE_FAILURE
       verification: |
           Manual operation required
       disabled: true
@@ -122,9 +122,9 @@ tests:
     - label:
           "Step 7: TH sends a ChangeToMode command to the DUT with NewMode set
           to PIXIT.RVCCLEANM.MODE_CHANGE_FAIL"
-      PICS: PIXIT.RVCCLEANM.CAN_TEST_MODE_FAILURE && RVCCLEANM.S.C00.Rsp
+      PICS: RVCCLEANM.S.M.CAN_TEST_MODE_FAILURE && RVCCLEANM.S.C00.Rsp
       verification: |
-          First change the mode to cleaning after that try to change the mode to any other modes (Vaccum, Deep clean, Wash )
+          First change the mode to cleaning after that try to change the mode to any other modes (Deep clean, Wash )
 
           ./chip-tool  rvcrunmode  change-to-mode 1 1 1
 
@@ -137,7 +137,7 @@ tests:
 
           ./chip-tool  rvccleanmode  change-to-mode 2 1 1
 
-          Verify on TH(chip-tool) log, DUT responds contains a ChangeToModeResponse command with a GenericFailure(0x02)  status response and StatusText field has a length between 1 and 64, below is the sample log provided for the raspi platform:
+          Verify on TH(chip-tool) log, DUT responds contains a ChangeToModeResponse command with a CleaningInProgress(0X40)  status response and StatusText field has a length between 1 to 64, below is the sample log provided for the raspi platform:
 
           [1690262155.519185][28202:28204] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0055 Command 0x0000_0001
           [1690262155.519202][28202:28204] CHIP:TOO:   ChangeToModeResponse: {

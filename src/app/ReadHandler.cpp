@@ -45,7 +45,7 @@ using Status = Protocols::InteractionModel::Status;
 uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    return static_cast<uint16_t>(IcdManagementServer::GetInstance().GetIdleModeInterval() / 1000);
+    return static_cast<uint16_t>(IcdManagementServer::GetInstance().GetIdleModeInterval());
 #else
     return kSubscriptionMaxIntervalPublisherLimit;
 #endif
@@ -898,6 +898,16 @@ void ReadHandler::HandleDeviceConnected(void * context, Messaging::ExchangeManag
     ReadHandler * const _this = static_cast<ReadHandler *>(context);
 
     _this->mSessionHandle.Grab(sessionHandle);
+
+    _this->SetStateFlag(ReadHandlerFlags::ActiveSubscription);
+
+    auto * appCallback = _this->mManagementCallback.GetAppCallback();
+    if (appCallback)
+    {
+        appCallback->OnSubscriptionEstablished(*_this);
+    }
+    // Notify the observer that a subscription has been resumed
+    _this->mObserver->OnSubscriptionEstablished(_this);
 
     _this->MoveToState(HandlerState::CanStartReporting);
 

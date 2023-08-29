@@ -24,9 +24,9 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Precondition"
+    - label: "Preconditions"
       verification: |
-          This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
+          !RVCCLEANM.S.F00(DEPONOFF) | OnOff cluster’s StartUpOnOff attribute is NULL | StartUpOnOff is 0 | OnMode is NULL
       disabled: true
 
     - label:

@@ -53,11 +53,31 @@ public class DeviceApp {
   // called after Matter server is initiated
   public native void postServerInit(int deviceTypeId);
 
+  public native void setDACProvider(DACProvider provider);
+
   public native void setOnOffManager(int endpoint, OnOffManager manager);
 
   public native boolean setOnOff(int endpoint, boolean value);
 
-  public native void setDACProvider(DACProvider provider);
+  public native void setDoorLockManager(int endpoint, DoorLockManager manager);
+
+  public native boolean setLockType(int endpoint, int value);
+
+  public native boolean setLockState(int endpoint, int value);
+
+  public native boolean setActuatorEnabled(int endpoint, boolean value);
+
+  public native boolean setAutoRelockTime(int endpoint, int value);
+
+  public native boolean setOperatingMode(int endpoint, int value);
+
+  public native boolean setSupportedOperatingModes(int endpoint, int value);
+
+  public native boolean sendLockAlarmEvent(int endpoint);
+
+  public native void setPowerSourceManager(int endpoint, PowerSourceManager manager);
+
+  public native boolean setBatPercentRemaining(int endpoint, int value);
 
   static {
     System.loadLibrary("DeviceApp");

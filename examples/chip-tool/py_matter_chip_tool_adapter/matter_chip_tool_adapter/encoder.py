@@ -284,6 +284,8 @@ class Encoder:
             arguments, request.min_interval, "min-interval")
         arguments = self.__maybe_add(
             arguments, request.max_interval, "max-interval")
+        arguments = self.__maybe_add(
+            arguments, request.keep_subscriptions, "keepSubscriptions")
         arguments = self.__maybe_add(arguments, request.timed_interaction_timeout_ms,
                                      "timedInteractionTimeoutMs")
         arguments = self.__maybe_add(

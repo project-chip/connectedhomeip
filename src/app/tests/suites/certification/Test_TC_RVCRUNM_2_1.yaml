@@ -19,7 +19,7 @@ PICS:
     - RVCRUNM.S
 
 config:
-    nodeId: 0x12344321
+    nodeId: "0x12344321"
     cluster: "Basic Information"
     endpoint: 0
 
@@ -99,7 +99,7 @@ tests:
     - label:
           "Step 5: Manually put the device in a state from which it will FAIL to
           transition to PIXIT.RVCRUNM.MODE_CHANGE_FAIL"
-      PICS: PIXIT.RVCRUNM.CAN_TEST_MODE_FAILURE
+      PICS: RVCRUNM.S.M.CAN_TEST_MODE_FAILURE
       verification: |
           Manual operation required
       disabled: true
@@ -119,11 +119,11 @@ tests:
     - label:
           "Step 7: TH sends a ChangeToMode command to the DUT with NewMode set
           to PIXIT.RVCRUNM.MODE_CHANGE_FAIL"
-      PICS: PIXIT.RVCRUNM.CAN_TEST_MODE_FAILURE && RVCRUNM.S.C00.Rsp
+      PICS: RVCRUNM.S.M.CAN_TEST_MODE_FAILURE && RVCRUNM.S.C00.Rsp
       verification: |
           ./chip-tool  rvcrunmode  change-to-mode 2 1 1
 
-          Verify on TH(chip-tool) log, DUT responds contains a ChangeToModeResponse command with a GenericFailure(0x02)  status response and StatusText field has a length between 1 and 64, below is the sample log provided for the raspi platform:
+          Verify on TH(chip-tool) log, DUT responds contains a ChangeToModeResponse command with a GenericFailure(0x02)  status response and StatusText field has a length between 1 to 64, below is the sample log provided for the raspi platform:
 
           [1690178461.944185][6368:6370] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0054 Command 0x0000_0001
           [1690178461.944369][6368:6370] CHIP:TOO:   ChangeToModeResponse: {
