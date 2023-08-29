@@ -545,6 +545,12 @@ enum class HourFormatEnum : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kCalendarFormat = 0x1,
+};
 } // namespace TimeFormatLocalization
 
 namespace UnitLocalization {
