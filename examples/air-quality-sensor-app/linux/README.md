@@ -116,14 +116,14 @@ To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 ## Trigger event using air-quality-sensor-app event named pipe
 
 You can send a command to air-quality-sensor-app to trigger specific event via
-air-quality-sensor-app event named pipe /tmp/chip_air_quality_fifo-<PID>.
+air-quality-sensor-app event named pipe /tmp/chip_air_quality_fifo\*<PID>.
 
 ### Trigger air quality change event
 
 Generate event `AirQuality`, to change the air quality value.
 
 ```
-$ echo '{"Name":"AirQuality","NewValue":3}' > /tmp/chip_air_quality_fifo-<PID>
+$ echo '{"Name":"AirQuality","NewValue":3}' > /tmp/chip_air_quality_fifo_<PID>
 ```
 
 ### Trigger Temperature change event
@@ -131,7 +131,7 @@ $ echo '{"Name":"AirQuality","NewValue":3}' > /tmp/chip_air_quality_fifo-<PID>
 Generate event `TemperatureMeasurement`, to change the temperate value.
 
 ```
-$ echo '{"Name":"TemperatureMeasurement","NewValue":18}' > /tmp/chip_air_quality_fifo-<PID>
+$ echo '{"Name":"TemperatureMeasurement","NewValue":18}' > /tmp/chip_air_quality_fifo_<PID>
 ```
 
 ### Trigger Humidity change event
@@ -139,7 +139,7 @@ $ echo '{"Name":"TemperatureMeasurement","NewValue":18}' > /tmp/chip_air_quality
 Generate event `RelativeHumidityMeasurement`, to change the temperate value.
 
 ```
-$ echo '{"Name":"RelativeHumidityMeasurement","NewValue":60}' > /tmp/chip_air_quality_fifo-<PID>
+$ echo '{"Name":"RelativeHumidityMeasurement","NewValue":60}' > /tmp/chip_air_quality_fifo_<PID>
 ```
 
 ### Trigger concentration change event
@@ -150,5 +150,5 @@ clusters.
 Generate event `CarbonDioxideConcentrationMeasurement`, to change the CO2 value.
 
 ```
-$ echo '{"Name":"CarbonDioxideConcentrationMeasurement","NewValue":400}' > /tmp/chip_air_quality_fifo-<PID>
+$ echo '{"Name":"CarbonDioxideConcentrationMeasurement","NewValue":400}' > /tmp/chip_air_quality_fifo_<PID>
 ```

@@ -44,13 +44,26 @@ void SynchronizedReportSchedulerImpl::OnReadHandlerDestroyed(ReadHandler * aRead
     }
 }
 
+void SynchronizedReportSchedulerImpl::OnTransitionToIdle()
+{
+    Timestamp now               = mTimerDelegate->GetCurrentMonotonicTimestamp();
+    uint32_t targetIdleInterval = static_cast<uint32_t>(ICD_SLEEP_TIME_JITTER_MS);
+    VerifyOrReturn(now >= mTestNextReportTimestamp);
+    if (((mTestNextReportTimestamp - now) < Seconds16(targetIdleInterval)) && (now > mNextMinTimestamp))
+    {
+        // If the next report is due in less than the idle mode interval and we are past the min interval, we can just send it now
+        CancelReport();
+        TimerFired();
+    }
+}
+
 CHIP_ERROR SynchronizedReportSchedulerImpl::ScheduleReport(Timeout timeout, ReadHandlerNode * node, const Timestamp & now)
 {
     // Cancel Report if it is currently scheduled
     mTimerDelegate->CancelTimer(this);
     if (timeout == Milliseconds32(0))
     {
-        ReportTimerCallback();
+        TimerFired();
         return CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(mTimerDelegate->StartTimer(this, timeout));
@@ -160,18 +173,6 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::CalculateNextReportTimeout(Timeout &
         timeout = mNextMaxTimestamp - now;
     }
 
-    // Updates the synching time of each handler
-    mNodesPool.ForEachActiveObject([now, timeout](ReadHandlerNode * node) {
-        // Prevent modifying the sync if the handler is currently reportable, sync's purpose is to allow handler to become
-        // reportable earlier than their max interval
-        if (!node->IsReportableNow(now))
-        {
-            node->SetSyncTimestamp(Milliseconds64(now + timeout));
-        }
-
-        return Loop::Continue;
-    });
-
     return CHIP_NO_ERROR;
 }
 
@@ -184,11 +185,16 @@ void SynchronizedReportSchedulerImpl::TimerFired()
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 
     mNodesPool.ForEachActiveObject([now](ReadHandlerNode * node) {
+        if (node->GetMinTimestamp() <= now)
+        {
+            node->SetCanBeSynced(true);
+        }
+
         if (node->IsReportableNow(now))
         {
             node->SetEngineRunScheduled(true);
-            ChipLogProgress(DataManagement, "Handler: %p with min: %" PRIu64 " and max: %" PRIu64 " and sync: %" PRIu64, (node),
-                            node->GetMinTimestamp().count(), node->GetMaxTimestamp().count(), node->GetSyncTimestamp().count());
+            ChipLogProgress(DataManagement, "Handler: %p with min: %" PRIu64 " and max: %" PRIu64 "", (node),
+                            node->GetMinTimestamp().count(), node->GetMaxTimestamp().count());
         }
 
         return Loop::Continue;

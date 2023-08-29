@@ -553,27 +553,27 @@ void ScenesServer::RecallScene(FabricIndex aFabricIx, EndpointId aEndpointId, Gr
     }
 }
 
-bool ScenesServer::IsHandlerRegistered(scenes::SceneHandler * handler)
+bool ScenesServer::IsHandlerRegistered(EndpointId aEndpointId, scenes::SceneHandler * handler)
 {
-    SceneTable * sceneTable = scenes::GetSceneTableImpl();
+    SceneTable * sceneTable = scenes::GetSceneTableImpl(aEndpointId);
     return sceneTable->mHandlerList.Contains(handler);
 }
 
-void ScenesServer::RegisterSceneHandler(scenes::SceneHandler * handler)
+void ScenesServer::RegisterSceneHandler(EndpointId aEndpointId, scenes::SceneHandler * handler)
 {
-    SceneTable * sceneTable = scenes::GetSceneTableImpl();
+    SceneTable * sceneTable = scenes::GetSceneTableImpl(aEndpointId);
 
-    if (!IsHandlerRegistered(handler))
+    if (!IsHandlerRegistered(aEndpointId, handler))
     {
         sceneTable->RegisterHandler(handler);
     }
 }
 
-void ScenesServer::UnregisterSceneHandler(scenes::SceneHandler * handler)
+void ScenesServer::UnregisterSceneHandler(EndpointId aEndpointId, scenes::SceneHandler * handler)
 {
-    SceneTable * sceneTable = scenes::GetSceneTableImpl();
+    SceneTable * sceneTable = scenes::GetSceneTableImpl(aEndpointId);
 
-    if (IsHandlerRegistered(handler))
+    if (IsHandlerRegistered(aEndpointId, handler))
     {
         sceneTable->UnregisterHandler(handler);
     }

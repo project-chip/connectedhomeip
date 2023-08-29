@@ -120,7 +120,6 @@ protected:
     void _ResetThreadNetworkDiagnosticsCounts(void);
     CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
     CHIP_ERROR _GetPollPeriod(uint32_t & buf);
-    void _SetRouterPromotion(bool val);
     void _OnWoBLEAdvertisingStart(void);
     void _OnWoBLEAdvertisingStop(void);
 

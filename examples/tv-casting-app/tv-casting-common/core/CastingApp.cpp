@@ -118,7 +118,7 @@ CHIP_ERROR CastingApp::Stop()
     // Shutdown the Matter server
     chip::Server::GetInstance().Shutdown();
 
-    mState = NOT_RUNNING; // CastingApp started successfully, set state to RUNNING
+    mState = NOT_RUNNING; // CastingApp stopped successfully, set state to NOT_RUNNING
 
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }

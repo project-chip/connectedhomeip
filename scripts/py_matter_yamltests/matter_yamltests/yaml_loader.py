@@ -106,6 +106,7 @@ class YamlLoader:
             'saveResponseAs': str,
             'minInterval': int,
             'maxInterval': int,
+            'keepSubscriptions': bool,
             'timeout': int,
             'timedInteractionTimeoutMs': int,
             'dataVersion': (list, int, str),  # Can be a variable
@@ -265,7 +266,9 @@ class YamlLoader:
 
     def __rule_argument_value_is_only_when_writing_attributes(self, content):
         if 'arguments' in content:
-            command = content.get('command')
+            operation = content.get('command')
+            if not operation:
+                operation = content.get('wait')
             arguments = content.get('arguments')
-            if 'value' in arguments and command != 'writeAttribute':
+            if 'value' in arguments and operation != 'writeAttribute':
                 raise TestStepArgumentsValueError(content)
