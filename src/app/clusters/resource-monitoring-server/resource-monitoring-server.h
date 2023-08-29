@@ -152,7 +152,7 @@ private:
 
 class Delegate
 {
-friend class Instance;
+    friend class Instance;
 
 private:
     Instance * mInstance = nullptr;
@@ -164,7 +164,7 @@ private:
     void SetInstance(Instance * aInstance) { mInstance = aInstance; }
 
 protected:
-    Instance* GetInstance() { return mInstance; }
+    Instance * GetInstance() { return mInstance; }
 
 public:
     Delegate()          = default;
