@@ -14,6 +14,22 @@ error_catalog = {
             "short": "Ran out of space",
             "detail": "Fatal internal error with message indicating that disk space most likely ran out"
         }
+    },
+    "Build example": {
+        "Could not find a version that satisfies the requirement": {
+            "short": "Requirements issue",
+            "detail": "Unable to install a requirements in Python requirements.txt"
+        },
+        "No module named": {
+            "short": "Missing module",
+            "detail": "Expected module was missing"
+        }
+    },
+    "Full builds": {
+        "No space left on device": {
+            "short": "Ran out of space",
+            "detail": "Exception with signature \"No space left on device\""
+        }
     }
 }
 
@@ -31,7 +47,7 @@ def process_fail(id, pr, start_time, workflow):
     root_cause = "Unknown cause"
     with open(f"{output_path}/fail_log.txt") as fail_log_file:
         fail_log = fail_log_file.read()
-        if workflow in error_catalog:
+        if workflow.split(" - ")[0] in error_catalog:
             for error_message in error_catalog[workflow]:
                 if error_message in fail_log:
                     root_cause = error_catalog[workflow][error_message]["short"]
