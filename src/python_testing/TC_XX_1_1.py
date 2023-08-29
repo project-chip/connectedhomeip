@@ -15,8 +15,8 @@
 #    limitations under the License.
 #
 
-from matter_testing_support import MatterBaseTest, default_matter_test_main, async_test_body
 import logging
+from matter_testing_support import MatterBaseTest, default_matter_test_main, async_test_body
 from mobly import asserts
 
 
@@ -101,7 +101,7 @@ def is_command_id_in_valid_range(command_id):
 class TC_XX_1_1(MatterBaseTest):
     @async_test_body
     async def test_xx_1_1(self):
-        
+
         dev_ctrl = self.default_controller
 
         self.print_step(1, "Perform a wildcard read of attributes on all endpoints")
