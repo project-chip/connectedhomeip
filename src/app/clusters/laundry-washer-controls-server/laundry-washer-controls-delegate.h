@@ -35,20 +35,19 @@ public:
     virtual ~Delegate() = default;
 
     /**
-     * Get the list of supported spin_speed list.
-     * Fills in the provided spin_speed at index `index` if there is one,
-     * or returns CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the list of spin_speed.
-     * @param index The index of the spin_speed, with 0 representing the first one.
-     * @param spinSpeed  The spin speed is filled.
+     * Get the spin speed string at the given index in the list.
+     * @param index The index of the spin speed, with 0 representing the first one.
+     * @param spinSpeed The MutableCharSpan to copy the string data into.  On success, the callee must update
+     *        the length to the length of the copied data.
+     * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the list of spin speeds.
      */
     virtual CHIP_ERROR GetSpinSpeedAtIndex(size_t index, MutableCharSpan & spinSpeed) = 0;
 
     /**
-     * Get the list of supported rinses list.
-     * Fills in the provided rinses  at index `index` if there is one,
-     * or returns CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the list of rinses.
+     * Get the supported rinses value at the given index in the list.
      * @param index The index of the supported rinses with 0 representing the first one.
-     * @param supportedRinse  The supported rinse is filled.
+     * @param supportedRinse The supported rinse at the given index
+     * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the list of supported rinses.
      */
     virtual CHIP_ERROR GetSupportedRinseAtIndex(size_t index, NumberOfRinsesEnum & supportedRinse) = 0;
 };

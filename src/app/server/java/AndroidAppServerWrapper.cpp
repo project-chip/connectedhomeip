@@ -80,3 +80,8 @@ void ChipAndroidAppShutdown(void)
     chip::Server::GetInstance().Shutdown();
     chip::Platform::MemoryShutdown();
 }
+
+void ChipAndroidAppReset(void)
+{
+    chip::Server::GetInstance().ScheduleFactoryReset();
+}

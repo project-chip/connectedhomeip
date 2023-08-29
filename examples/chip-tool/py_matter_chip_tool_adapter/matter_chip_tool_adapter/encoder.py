@@ -22,7 +22,9 @@ _ANY_COMMANDS_LIST = [
     'SubscribeById',
     'ReadEventById',
     'SubscribeEventById',
+    'ReadNone',
     'ReadAll',
+    'SubscribeNone',
     'SubscribeAll',
 ]
 
@@ -79,6 +81,9 @@ _ALIASES = {
                     'EventId': 'event-id',
                 },
             },
+            'ReadNone': {
+                'alias': 'read-none',
+            },
             'ReadAll': {
                 'alias': 'read-all',
                 'arguments': {
@@ -86,6 +91,9 @@ _ALIASES = {
                     'AttributeId': 'attribute-ids',
                     'EventId': 'event-ids',
                 },
+            },
+            'SubscribeNone': {
+                'alias': 'subscribe-none',
             },
             'SubscribeAll': {
                 'alias': 'subscribe-all',
@@ -99,6 +107,14 @@ _ALIASES = {
     },
     'AnyCommands': {
         'alias': 'any',
+        'commands': {
+            'ReadNone': {
+                'has_endpoint': False,
+            },
+            'SubscribeNone': {
+                'has_endpoint': False,
+            }
+        }
     },
     'CommissionerCommands': {
         'alias': 'pairing',
@@ -268,6 +284,8 @@ class Encoder:
             arguments, request.min_interval, "min-interval")
         arguments = self.__maybe_add(
             arguments, request.max_interval, "max-interval")
+        arguments = self.__maybe_add(
+            arguments, request.keep_subscriptions, "keepSubscriptions")
         arguments = self.__maybe_add(arguments, request.timed_interaction_timeout_ms,
                                      "timedInteractionTimeoutMs")
         arguments = self.__maybe_add(

@@ -46,6 +46,8 @@
 #include <lib/support/ErrorStr.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ThreadOperationalDataset.h>
+#include <lib/support/jsontlv/JsonToTlv.h>
+#include <lib/support/jsontlv/TlvToJson.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/Protocols.h>
@@ -340,20 +342,21 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     SuccessOrExit(err);
 
     {
-        uint64_t fabricId                  = env->CallLongMethod(controllerParams, getFabricId);
-        uint16_t listenPort                = env->CallIntMethod(controllerParams, getUdpListenPort);
-        uint16_t controllerVendorId        = env->CallIntMethod(controllerParams, getControllerVendorId);
+        uint64_t fabricId                  = static_cast<uint64_t>(env->CallLongMethod(controllerParams, getFabricId));
+        uint16_t listenPort                = static_cast<uint16_t>(env->CallIntMethod(controllerParams, getUdpListenPort));
+        uint16_t controllerVendorId        = static_cast<uint16_t>(env->CallIntMethod(controllerParams, getControllerVendorId));
         jobject keypairDelegate            = env->CallObjectMethod(controllerParams, getKeypairDelegate);
         jbyteArray rootCertificate         = (jbyteArray) env->CallObjectMethod(controllerParams, getRootCertificate);
         jbyteArray intermediateCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getIntermediateCertificate);
         jbyteArray operationalCertificate  = (jbyteArray) env->CallObjectMethod(controllerParams, getOperationalCertificate);
         jbyteArray ipk                     = (jbyteArray) env->CallObjectMethod(controllerParams, getIpk);
-        uint16_t failsafeTimerSeconds      = env->CallIntMethod(controllerParams, getFailsafeTimerSeconds);
-        uint16_t caseFailsafeTimerSeconds  = env->CallIntMethod(controllerParams, getCASEFailsafeTimerSeconds);
+        uint16_t failsafeTimerSeconds      = static_cast<uint16_t>(env->CallIntMethod(controllerParams, getFailsafeTimerSeconds));
+        uint16_t caseFailsafeTimerSeconds =
+            static_cast<uint16_t>(env->CallIntMethod(controllerParams, getCASEFailsafeTimerSeconds));
         bool attemptNetworkScanWiFi        = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanWiFi);
         bool attemptNetworkScanThread      = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanThread);
         bool skipCommissioningComplete     = env->CallBooleanMethod(controllerParams, getSkipCommissioningComplete);
-        uint64_t adminSubject              = env->CallLongMethod(controllerParams, getAdminSubject);
+        uint64_t adminSubject              = static_cast<uint64_t>(env->CallLongMethod(controllerParams, getAdminSubject));
         jobject countryCodeOptional        = env->CallObjectMethod(controllerParams, getCountryCode);
         jobject regulatoryLocationOptional = env->CallObjectMethod(controllerParams, getRegulatoryLocation);
 
@@ -630,9 +633,9 @@ JNI_METHOD(void, pairDeviceWithAddress)
 
     RendezvousParameters rendezvousParams =
         RendezvousParameters()
-            .SetDiscriminator(discriminator)
+            .SetDiscriminator(static_cast<uint16_t>(discriminator))
             .SetSetupPINCode(static_cast<uint32_t>(pinCode))
-            .SetPeerAddress(Transport::PeerAddress::UDP(const_cast<char *>(addrJniString.c_str()), port));
+            .SetPeerAddress(Transport::PeerAddress::UDP(const_cast<char *>(addrJniString.c_str()), static_cast<uint16_t>(port)));
 
     CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
     if (csrNonce != nullptr)
@@ -748,7 +751,7 @@ JNI_METHOD(void, establishPaseConnectionByAddress)
     RendezvousParameters rendezvousParams =
         RendezvousParameters()
             .SetSetupPINCode(static_cast<uint32_t>(pinCode))
-            .SetPeerAddress(Transport::PeerAddress::UDP(const_cast<char *>(addrJniString.c_str()), port));
+            .SetPeerAddress(Transport::PeerAddress::UDP(const_cast<char *>(addrJniString.c_str()), static_cast<uint16_t>(port)));
 
     err = wrapper->Controller()->EstablishPASEConnection(deviceId, rendezvousParams);
 
@@ -871,7 +874,7 @@ CHIP_ERROR GetEpochTime(JNIEnv * env, jobject calendar, uint32_t & epochTime)
     universalTime.Year = static_cast<uint16_t>(env->CallIntMethod(calendar, getMethod, yearID));
     // The first month of the year in the Gregorian and Julian calendars is JANUARY which is 0. See detailed in
     // https://docs.oracle.com/javase/8/docs/api/java/util/Calendar.html#MONTH
-    universalTime.Month  = static_cast<uint8_t>(env->CallIntMethod(calendar, getMethod, monthID)) + 1;
+    universalTime.Month  = static_cast<uint8_t>(static_cast<uint8_t>(env->CallIntMethod(calendar, getMethod, monthID)) + 1u);
     universalTime.Day    = static_cast<uint8_t>(env->CallIntMethod(calendar, getMethod, dayID));
     universalTime.Hour   = static_cast<uint8_t>(env->CallIntMethod(calendar, getMethod, hourID));
     universalTime.Minute = static_cast<uint8_t>(env->CallIntMethod(calendar, getMethod, minuteID));
@@ -1402,6 +1405,15 @@ JNI_METHOD(jlong, getCompressedFabricId)(JNIEnv * env, jobject self, jlong handl
     return wrapper->Controller()->GetCompressedFabricId();
 }
 
+JNI_METHOD(jlong, getControllerNodeId)(JNIEnv * env, jobject self, jlong handle)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    return wrapper->Controller()->GetNodeId();
+}
+
 JNI_METHOD(void, discoverCommissionableNodes)(JNIEnv * env, jobject self, jlong handle)
 {
     chip::DeviceLayer::StackLock lock;
@@ -1505,7 +1517,7 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
     chip::SetupPayload setupPayload;
     err = AutoCommissioningWindowOpener::OpenCommissioningWindow(
         wrapper->Controller(), chipDevice->GetDeviceId(), System::Clock::Seconds16(duration), static_cast<uint32_t>(iteration),
-        discriminator, pinCode, NullOptional, setupPayload);
+        static_cast<uint16_t>(discriminator), pinCode, NullOptional, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -1571,7 +1583,7 @@ JNI_METHOD(jboolean, openPairingWindowWithPINCallback)
     chip::SetupPayload setupPayload;
     err = AndroidCommissioningWindowOpener::OpenCommissioningWindow(
         wrapper->Controller(), chipDevice->GetDeviceId(), System::Clock::Seconds16(duration), static_cast<uint32_t>(iteration),
-        discriminator, pinCode, NullOptional, jcallback, setupPayload);
+        static_cast<uint16_t>(discriminator), pinCode, NullOptional, jcallback, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -1699,11 +1711,12 @@ JNI_METHOD(void, subscribe)
     }
     app::ReadPrepareParams params(device->GetSecureSession().Value());
 
-    params.mMinIntervalFloorSeconds   = minInterval;
-    params.mMaxIntervalCeilingSeconds = maxInterval;
+    uint16_t aImTimeoutMs             = static_cast<uint16_t>(imTimeoutMs);
+    params.mMinIntervalFloorSeconds   = static_cast<uint16_t>(minInterval);
+    params.mMaxIntervalCeilingSeconds = static_cast<uint16_t>(maxInterval);
     params.mKeepSubscriptions         = (keepSubscriptions != JNI_FALSE);
     params.mIsFabricFiltered          = (isFabricFiltered != JNI_FALSE);
-    params.mTimeout                   = imTimeoutMs != 0 ? System::Clock::Milliseconds32(imTimeoutMs) : System::Clock::kZero;
+    params.mTimeout                   = aImTimeoutMs != 0 ? System::Clock::Milliseconds32(aImTimeoutMs) : System::Clock::kZero;
 
     if (attributePathList != nullptr)
     {
@@ -1852,15 +1865,46 @@ exit:
     }
 }
 
+// Convert Json to Tlv, and remove the outer structure
+CHIP_ERROR ConvertJsonToTlvWithoutStruct(const std::string & json, MutableByteSpan & data)
+{
+    Platform::ScopedMemoryBufferWithSize<uint8_t> buf;
+    VerifyOrReturnError(buf.Calloc(data.size()), CHIP_ERROR_NO_MEMORY);
+    MutableByteSpan dataWithStruct(buf.Get(), buf.AllocatedSize());
+    ReturnErrorOnFailure(JsonToTlv(json, dataWithStruct));
+    TLV::TLVReader tlvReader;
+    TLV::TLVType outerContainer = TLV::kTLVType_Structure;
+    tlvReader.Init(dataWithStruct);
+    ReturnErrorOnFailure(tlvReader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+    ReturnErrorOnFailure(tlvReader.EnterContainer(outerContainer));
+    ReturnErrorOnFailure(tlvReader.Next());
+
+    TLV::TLVWriter tlvWrite;
+    tlvWrite.Init(data);
+    ReturnErrorOnFailure(tlvWrite.CopyElement(TLV::AnonymousTag(), tlvReader));
+    ReturnErrorOnFailure(tlvWrite.Finalize());
+    data.reduce_size(tlvWrite.GetLengthWritten());
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PutPreencodedWriteAttribute(app::WriteClient & writeClient, app::ConcreteDataAttributePath & path, const ByteSpan & data)
+{
+    TLV::TLVReader reader;
+    reader.Init(data);
+    ReturnErrorOnFailure(reader.Next());
+    return writeClient.PutPreencodedAttribute(path, reader);
+}
+
 JNI_METHOD(void, write)
 (JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList, jint timedRequestTimeoutMs,
  jint imTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    jint listSize  = 0;
-    auto callback  = reinterpret_cast<WriteAttributesCallback *>(callbackHandle);
-    app::WriteClient * writeClient;
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    jint listSize                           = 0;
+    auto callback                           = reinterpret_cast<WriteAttributesCallback *>(callbackHandle);
+    app::WriteClient * writeClient          = nullptr;
+    uint16_t convertedTimedRequestTimeoutMs = static_cast<uint16_t>(timedRequestTimeoutMs);
 
     ChipLogDetail(Controller, "IM write() called");
 
@@ -1870,9 +1914,9 @@ JNI_METHOD(void, write)
     VerifyOrExit(attributeList != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     SuccessOrExit(err = JniReferences::GetInstance().GetListSize(attributeList, listSize));
 
-    writeClient = Platform::New<app::WriteClient>(device->GetExchangeManager(), callback->GetChunkedWriteCallback(),
-                                                  timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs)
-                                                                             : Optional<uint16_t>::Missing());
+    writeClient = Platform::New<app::WriteClient>(
+        device->GetExchangeManager(), callback->GetChunkedWriteCallback(),
+        convertedTimedRequestTimeoutMs != 0 ? Optional<uint16_t>(convertedTimedRequestTimeoutMs) : Optional<uint16_t>::Missing());
 
     for (uint8_t i = 0; i < listSize; i++)
     {
@@ -1886,16 +1930,13 @@ JNI_METHOD(void, write)
         jmethodID hasDataVersionMethod    = nullptr;
         jmethodID getDataVersionMethod    = nullptr;
         jmethodID getTlvByteArrayMethod   = nullptr;
+        jmethodID getJsonStringMethod     = nullptr;
         jobject endpointIdObj             = nullptr;
         jobject clusterIdObj              = nullptr;
         jobject attributeIdObj            = nullptr;
         jbyteArray tlvBytesObj            = nullptr;
         bool hasDataVersion               = false;
         Optional<DataVersion> dataVersion = Optional<DataVersion>();
-        ;
-        jbyte * tlvBytesObjBytes = nullptr;
-        jsize length             = 0;
-        TLV::TLVReader reader;
 
         SuccessOrExit(err = JniReferences::GetInstance().GetListItem(attributeList, i, attributeItem));
         SuccessOrExit(err = JniReferences::GetInstance().FindMethod(
@@ -1939,20 +1980,34 @@ JNI_METHOD(void, write)
 
         tlvBytesObj = static_cast<jbyteArray>(env->CallObjectMethod(attributeItem, getTlvByteArrayMethod));
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        VerifyOrExit(tlvBytesObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+        app::ConcreteDataAttributePath path(static_cast<EndpointId>(endpointId), static_cast<ClusterId>(clusterId),
+                                            static_cast<AttributeId>(attributeId), dataVersion);
+        if (tlvBytesObj != nullptr)
+        {
+            JniByteArray tlvByteArray(env, tlvBytesObj);
+            SuccessOrExit(err = PutPreencodedWriteAttribute(*writeClient, path, tlvByteArray.byteSpan()));
+        }
+        else
+        {
+            SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, attributeItem, "getJsonString", "()Ljava/lang/String;",
+                                                                        &getJsonStringMethod));
+            jstring jsonJniString = static_cast<jstring>(env->CallObjectMethod(attributeItem, getJsonStringMethod));
+            VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+            VerifyOrExit(jsonJniString != nullptr, err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+            JniUtfString jsonUtfJniString(env, jsonJniString);
+            std::string jsonString = std::string(jsonUtfJniString.c_str(), jsonUtfJniString.size());
 
-        tlvBytesObjBytes = env->GetByteArrayElements(tlvBytesObj, nullptr);
-        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        length = env->GetArrayLength(tlvBytesObj);
-        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-
-        reader.Init(reinterpret_cast<const uint8_t *>(tlvBytesObjBytes), static_cast<size_t>(length));
-        reader.Next();
-        SuccessOrExit(
-            err = writeClient->PutPreencodedAttribute(
-                chip::app::ConcreteDataAttributePath(static_cast<EndpointId>(endpointId), static_cast<ClusterId>(clusterId),
-                                                     static_cast<AttributeId>(attributeId), dataVersion),
-                reader));
+            // Context: Chunk write is supported in sdk, oversized list could be chunked in multiple message. When transforming
+            // JSON to TLV, we need know the actual size for tlv blob when handling JsonToTlv
+            // TODO: Implement memory auto-grow to get the actual size needed for tlv blob when transforming tlv to json.
+            // Workaround: Allocate memory using json string's size, which is large enough to hold the corresponding tlv blob
+            Platform::ScopedMemoryBufferWithSize<uint8_t> tlvBytes;
+            size_t length = jsonUtfJniString.size();
+            VerifyOrExit(tlvBytes.Calloc(length), err = CHIP_ERROR_NO_MEMORY);
+            MutableByteSpan data(tlvBytes.Get(), tlvBytes.AllocatedSize());
+            SuccessOrExit(err = ConvertJsonToTlvWithoutStruct(jsonString, data));
+            SuccessOrExit(err = PutPreencodedWriteAttribute(*writeClient, path, data));
+        }
     }
 
     err = writeClient->SendWriteRequest(device->GetSecureSession().Value(),
@@ -1961,7 +2016,6 @@ JNI_METHOD(void, write)
     callback->mWriteClient = writeClient;
 
 exit:
-
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "JNI IM Write Error: %s", err.AsString());
@@ -1982,30 +2036,40 @@ exit:
     }
 }
 
+CHIP_ERROR PutPreencodedInvokeRequest(app::CommandSender & commandSender, app::CommandPathParams & path, const ByteSpan & data)
+{
+    // PrepareCommand does nott create the struct container with kFields and copycontainer below sets the
+    // kFields container already
+    ReturnErrorOnFailure(commandSender.PrepareCommand(path, false /* aStartDataStruct */));
+    TLV::TLVWriter * writer = commandSender.GetCommandDataIBTLVWriter();
+    VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    TLV::TLVReader reader;
+    reader.Init(data);
+    ReturnErrorOnFailure(reader.Next());
+    return writer->CopyContainer(TLV::ContextTag(app::CommandDataIB::Tag::kFields), reader);
+}
+
 JNI_METHOD(void, invoke)
 (JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement, jint timedRequestTimeoutMs,
  jint imTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    auto callback  = reinterpret_cast<InvokeCallback *>(callbackHandle);
-    app::CommandSender * commandSender;
-    uint32_t endpointId             = 0;
-    uint32_t clusterId              = 0;
-    uint32_t commandId              = 0;
-    jmethodID getEndpointIdMethod   = nullptr;
-    jmethodID getClusterIdMethod    = nullptr;
-    jmethodID getCommandIdMethod    = nullptr;
-    jmethodID getTlvByteArrayMethod = nullptr;
-    jobject endpointIdObj           = nullptr;
-    jobject clusterIdObj            = nullptr;
-    jobject commandIdObj            = nullptr;
-    jbyteArray tlvBytesObj          = nullptr;
-    jbyte * tlvBytesObjBytes        = nullptr;
-    jsize length                    = 0;
-    TLV::TLVReader reader;
-    TLV::TLVWriter * writer = nullptr;
-
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    auto callback                           = reinterpret_cast<InvokeCallback *>(callbackHandle);
+    app::CommandSender * commandSender      = nullptr;
+    uint32_t endpointId                     = 0;
+    uint32_t clusterId                      = 0;
+    uint32_t commandId                      = 0;
+    jmethodID getEndpointIdMethod           = nullptr;
+    jmethodID getClusterIdMethod            = nullptr;
+    jmethodID getCommandIdMethod            = nullptr;
+    jmethodID getTlvByteArrayMethod         = nullptr;
+    jmethodID getJsonStringMethod           = nullptr;
+    jobject endpointIdObj                   = nullptr;
+    jobject clusterIdObj                    = nullptr;
+    jobject commandIdObj                    = nullptr;
+    jbyteArray tlvBytesObj                  = nullptr;
+    uint16_t convertedTimedRequestTimeoutMs = static_cast<uint16_t>(timedRequestTimeoutMs);
     ChipLogDetail(Controller, "IM invoke() called");
 
     DeviceProxy * device = reinterpret_cast<DeviceProxy *>(devicePtr);
@@ -2041,27 +2105,32 @@ JNI_METHOD(void, invoke)
 
     tlvBytesObj = static_cast<jbyteArray>(env->CallObjectMethod(invokeElement, getTlvByteArrayMethod));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-    VerifyOrExit(tlvBytesObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    tlvBytesObjBytes = env->GetByteArrayElements(tlvBytesObj, nullptr);
-    VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-    length = env->GetArrayLength(tlvBytesObj);
-    VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-    SuccessOrExit(err = commandSender->PrepareCommand(app::CommandPathParams(static_cast<EndpointId>(endpointId), /* group id */ 0,
-                                                                             static_cast<ClusterId>(clusterId),
-                                                                             static_cast<CommandId>(commandId),
-                                                                             app::CommandPathFlags::kEndpointIdValid),
-                                                      false));
-
-    writer = commandSender->GetCommandDataIBTLVWriter();
-    VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    reader.Init(reinterpret_cast<const uint8_t *>(tlvBytesObjBytes), static_cast<size_t>(length));
-    reader.Next();
-    SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(app::CommandDataIB::Tag::kFields), reader));
-
-    SuccessOrExit(err = commandSender->FinishCommand(timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs)
-                                                                                : Optional<uint16_t>::Missing()));
-
+    {
+        app::CommandPathParams path(static_cast<EndpointId>(endpointId), /* group id */ 0, static_cast<ClusterId>(clusterId),
+                                    static_cast<CommandId>(commandId), app::CommandPathFlags::kEndpointIdValid);
+        if (tlvBytesObj != nullptr)
+        {
+            JniByteArray tlvBytesObjBytes(env, tlvBytesObj);
+            SuccessOrExit(err = PutPreencodedInvokeRequest(*commandSender, path, tlvBytesObjBytes.byteSpan()));
+        }
+        else
+        {
+            SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getJsonString", "()Ljava/lang/String;",
+                                                                        &getJsonStringMethod));
+            jstring jsonJniString = static_cast<jstring>(env->CallObjectMethod(invokeElement, getJsonStringMethod));
+            VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+            VerifyOrExit(jsonJniString != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+            JniUtfString jsonUtfJniString(env, jsonJniString);
+            // The invoke does not support chunk, kMaxSecureSduLengthBytes should be enough for command json blob
+            uint8_t tlvBytes[chip::app::kMaxSecureSduLengthBytes] = { 0 };
+            MutableByteSpan tlvEncodingLocal{ tlvBytes };
+            SuccessOrExit(err = JsonToTlv(std::string(jsonUtfJniString.c_str(), jsonUtfJniString.size()), tlvEncodingLocal));
+            SuccessOrExit(err = PutPreencodedInvokeRequest(*commandSender, path, tlvEncodingLocal));
+        }
+    }
+    SuccessOrExit(err = commandSender->FinishCommand(convertedTimedRequestTimeoutMs != 0
+                                                         ? Optional<uint16_t>(convertedTimedRequestTimeoutMs)
+                                                         : Optional<uint16_t>::Missing()));
     SuccessOrExit(err =
                       commandSender->SendCommandRequest(device->GetSecureSession().Value(),
                                                         imTimeoutMs != 0 ? MakeOptional(System::Clock::Milliseconds32(imTimeoutMs))
@@ -2070,7 +2139,6 @@ JNI_METHOD(void, invoke)
     callback->mCommandSender = commandSender;
 
 exit:
-
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "JNI IM Invoke Error: %s", err.AsString());

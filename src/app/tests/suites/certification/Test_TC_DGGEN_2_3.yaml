@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 88.2.3. [TC-DGGEN-2.3] Command Received [DUT as Server]
 
@@ -20,53 +19,73 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
+    cluster: "General Diagnostics"
     endpoint: 0
 
+    PIXIT.DGGEN.ENABLEKEY:
+        type: octet_string
+        defaultValue: "hex:00112233445566778899aabbccddeeff"
+
 tests:
-    - label: "Step 1: Commission DUT to TH"
-      verification: |
-          execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
-           ./chip-all-clusters-app
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-          Once DUT reach the  commissionable state pls send below mentioned command on TH. Pls use equivalent command on the respective DUT
-           ./chip-tool pairing onnetwork 1 20202021
-          Verify the commissioning completed with success on TH1(chip-tool) from DUT
-          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
-      disabled: true
+    - label:
+          "Step 2: TH reads TestEventTriggersEnabled attribute from General
+          Diagnostics Cluster"
+      command: "readAttribute"
+      attribute: "TestEventTriggersEnabled"
+      response:
+          saveAs: TestEventTriggersEnabledvalue
+          constraints:
+              type: boolean
 
-    - label: "Step 2: TH reads TestEventTriggersEnabled attribute value"
-      verification: |
-          ./chip-tool generaldiagnostics read test-event-triggers-enabled 1 0
-          Verify that the TestEventTriggersEnabled value is of bool type. If this value is set to True, then proceed with step 3, otherwise skip step 3 On TH(chip-tool)
-          [1668678839.754134][146642:146644] CHIP:DMG: }
-          [1668678839.754234][146642:146644] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0008 DataVersion: 3696371826
-          [1668678839.754256][146642:146644] CHIP:TOO:   TestEventTriggersEnabled: FALSE
-          [1668678839.754325][146642:146644] CHIP:EM: <<< [E:58663i M:49131747 (Ack:74795807)] (S) Msg TX to 1:0000000000000001 [DE69] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      disabled: true
+    - label:
+          "If this value is set to True, then proceed with step 3, otherwise
+          skip step 3."
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: true
+              - name: "Value2"
+                value: TestEventTriggersEnabledvalue
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsExpectedValue
 
     - label:
           "Step 3: Invoke the TestEventTrigger command with EnableKey field set
           to PIXIT.DGGEN.ENABLEKEY and EventTrigger field set to 0."
+      runIf: IsExpectedValue
       PICS: DGGEN.S.C00.Rsp
-      verification: |
-          Based on Spec, EnableKey value is to be provided by  manufacturer
-          below mentioned the example command to verify
-           ./chip-tool generaldiagnostics  test-event-trigger  <EnableKey>  0 1 0
-      disabled: true
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: PIXIT.DGGEN.ENABLEKEY
+              - name: "EventTrigger"
+                value: 0
+      response:
+          error: INVALID_COMMAND
 
     - label:
-          "Step 4: Invoke the TestEventTrigger command with EnableKey field set
-          to 16 bytes of all zeroes and EventTrigger field set to 0."
+          "Invoke the TestEventTrigger command with EnableKey field set to
+          PIXIT.DGGEN.ENABLEKEY and EventTrigger field set to 0."
       PICS: DGGEN.S.C00.Rsp
-      verification: |
-          ./chip-tool generaldiagnostics  test-event-trigger hex:0000000000000000  0 1 0
-
-          Verify that DUT responds with CONSTRAINT_ERROR On TH(chip-tool)
-
-          [1659426470.994413][4451:4456] CHIP:DMG:         InteractionModelRevision = 1
-          [1659426470.994442][4451:4456] CHIP:DMG: },
-          [1659426470.994513][4451:4456] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0033 Command=0x0000_0000 Status=0x87
-          [1659426470.994553][4451:4456] CHIP:TOO: Error: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
-          [1659426470.994618][4451:4456] CHIP:DMG: ICR moving to [AwaitingDe]
-      disabled: true
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: "hex:0000000000000000"
+              - name: "EventTrigger"
+                value: 0
+      response:
+          error: CONSTRAINT_ERROR

@@ -45,7 +45,7 @@ using Status = Protocols::InteractionModel::Status;
 uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    return static_cast<uint16_t>(IcdManagementServer::GetInstance().GetIdleModeInterval() / 1000);
+    return static_cast<uint16_t>(IcdManagementServer::GetInstance().GetIdleModeInterval());
 #else
     return kSubscriptionMaxIntervalPublisherLimit;
 #endif
@@ -79,7 +79,6 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
 
     VerifyOrDie(observer != nullptr);
     mObserver = observer;
-    mObserver->OnReadHandlerCreated(this);
 }
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
@@ -92,7 +91,6 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer) :
 
     VerifyOrDie(observer != nullptr);
     mObserver = observer;
-    mObserver->OnReadHandlerCreated(this);
 }
 
 void ReadHandler::ResumeSubscription(CASESessionManager & caseSessionManager,
@@ -235,6 +233,7 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
                 {
                     appCallback->OnSubscriptionEstablished(*this);
                 }
+                mObserver->OnSubscriptionEstablished(this);
             }
         }
         else
@@ -246,10 +245,10 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
             return CHIP_NO_ERROR;
         }
 
-        MoveToState(HandlerState::GeneratingReports);
+        MoveToState(HandlerState::CanStartReporting);
         break;
 
-    case HandlerState::GeneratingReports:
+    case HandlerState::CanStartReporting:
     case HandlerState::Idle:
     default:
         err = CHIP_ERROR_INCORRECT_STATE;
@@ -262,7 +261,7 @@ exit:
 
 CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aStatus)
 {
-    VerifyOrReturnLogError(mState == HandlerState::GeneratingReports, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mState == HandlerState::CanStartReporting, CHIP_ERROR_INCORRECT_STATE);
     if (IsPriming() || IsChunkedReport())
     {
         mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
@@ -286,7 +285,7 @@ CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aSt
 
 CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, bool aMoreChunks)
 {
-    VerifyOrReturnLogError(mState == HandlerState::GeneratingReports, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mState == HandlerState::CanStartReporting, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrDie(!IsAwaitingReportResponse()); // Should not be reportable!
     if (IsPriming() || IsChunkedReport())
     {
@@ -335,7 +334,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
         // Priming reports are handled when we send a SubscribeResponse.
         if (IsType(InteractionType::Subscribe) && !IsPriming() && !IsChunkedReport())
         {
-            mObserver->OnSubscriptionAction(this);
+            mObserver->OnSubscriptionReportSent(this);
         }
     }
     if (!aMoreChunks)
@@ -456,7 +455,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     ReturnErrorOnFailure(readRequestParser.GetIsFabricFiltered(&isFabricFiltered));
     SetStateFlag(ReadHandlerFlags::FabricFiltered, isFabricFiltered);
     ReturnErrorOnFailure(readRequestParser.ExitContainer());
-    MoveToState(HandlerState::GeneratingReports);
+    MoveToState(HandlerState::CanStartReporting);
 
     mExchangeCtx->WillSendMessage();
 
@@ -574,8 +573,8 @@ const char * ReadHandler::GetStateStr() const
         return "Idle";
     case HandlerState::AwaitingDestruction:
         return "AwaitingDestruction";
-    case HandlerState::GeneratingReports:
-        return "GeneratingReports";
+    case HandlerState::CanStartReporting:
+        return "CanStartReporting";
 
     case HandlerState::AwaitingReportResponse:
         return "AwaitingReportResponse";
@@ -603,10 +602,17 @@ void ReadHandler::MoveToState(const HandlerState aTargetState)
     // If we just unblocked sending reports, let's go ahead and schedule the reporting
     // engine to run to kick that off.
     //
-    if (aTargetState == HandlerState::GeneratingReports)
+    if (aTargetState == HandlerState::CanStartReporting)
     {
-        // mObserver will take care of scheduling the report as soon as allowed
-        mObserver->OnBecameReportable(this);
+        if (ShouldReportUnscheduled())
+        {
+            InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+        }
+        else
+        {
+            // If we became reportable, the scheduler will schedule a run as soon as allowed
+            mObserver->OnBecameReportable(this);
+        }
     }
 }
 
@@ -646,8 +652,6 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
 
     ReturnErrorOnFailure(writer.Finalize(&packet));
     VerifyOrReturnLogError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
-
-    mObserver->OnSubscriptionAction(this);
 
     ClearStateFlag(ReadHandlerFlags::PrimingReports);
     return mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeResponse, std::move(packet));
@@ -713,6 +717,57 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     ReturnErrorOnFailure(subscribeRequestParser.GetMaxIntervalCeilingSeconds(&mMaxInterval));
     VerifyOrReturnError(mMinIntervalFloorSeconds <= mMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+
+    // Default behavior for ICDs where the wanted MaxInterval for a subscription is the IdleModeInterval
+    // defined in the ICD Management Cluster.
+    // Behavior can be changed with the OnSubscriptionRequested function defined in the application callbacks
+
+    // Default Behavior Steps :
+    // If MinInterval > IdleModeInterval, try to set the MaxInterval to the first interval of IdleModeIntervals above the
+    // MinInterval.
+    // If the next interval is greater than the MaxIntervalCeiling, use the MaxIntervalCeiling.
+    // Otherwise, use IdleModeInterval as MaxInterval
+
+    // GetPublisherSelectedIntervalLimit() returns the IdleModeInterval if the device is an ICD
+    uint32_t decidedMaxInterval = GetPublisherSelectedIntervalLimit();
+
+    // Check if the PublisherSelectedIntervalLimit is 0. If so, set decidedMaxInterval to MaxIntervalCeiling
+    if (decidedMaxInterval == 0)
+    {
+        decidedMaxInterval = mMaxInterval;
+    }
+
+    // If requestedMinInterval is greater than the IdleTimeInterval, select next active up time as max interval
+    if (mMinIntervalFloorSeconds > decidedMaxInterval)
+    {
+        uint16_t ratio = mMinIntervalFloorSeconds / static_cast<uint16_t>(decidedMaxInterval);
+        if (mMinIntervalFloorSeconds % decidedMaxInterval)
+        {
+            ratio++;
+        }
+
+        decidedMaxInterval *= ratio;
+    }
+
+    // Verify that decidedMaxInterval is an acceptable value (overflow)
+    if (decidedMaxInterval > System::Clock::Seconds16::max().count())
+    {
+        decidedMaxInterval = System::Clock::Seconds16::max().count();
+    }
+
+    // Verify that the decidedMaxInterval respects MAX(GetPublisherSelectedIntervalLimit(), MaxIntervalCeiling)
+    uint16_t maximumMaxInterval = std::max(GetPublisherSelectedIntervalLimit(), mMaxInterval);
+    if (decidedMaxInterval > maximumMaxInterval)
+    {
+        decidedMaxInterval = maximumMaxInterval;
+    }
+
+    // Set max interval of the subscription
+    mMaxInterval = static_cast<uint16_t>(decidedMaxInterval);
+
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
     //
     // Notify the application (if requested) of the impending subscription and check whether we should still proceed to set it up.
     // This also provides the application an opportunity to modify the negotiated min/max intervals set above.
@@ -734,7 +789,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     SetStateFlag(ReadHandlerFlags::FabricFiltered, isFabricFiltered);
     ReturnErrorOnFailure(Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(&mSubscriptionId), sizeof(mSubscriptionId)));
     ReturnErrorOnFailure(subscribeRequestParser.ExitContainer());
-    MoveToState(HandlerState::GeneratingReports);
+    MoveToState(HandlerState::CanStartReporting);
 
     mExchangeCtx->WillSendMessage();
 
@@ -821,11 +876,11 @@ void ReadHandler::ForceDirtyState()
 
 void ReadHandler::SetStateFlag(ReadHandlerFlags aFlag, bool aValue)
 {
-    bool oldReportable = IsReportable();
+    bool oldReportable = ShouldStartReporting();
     mFlags.Set(aFlag, aValue);
 
     // If we became reportable, schedule a reporting run.
-    if (!oldReportable && IsReportable())
+    if (!oldReportable && ShouldStartReporting())
     {
         // If we became reportable, the scheduler will schedule a run as soon as allowed
         mObserver->OnBecameReportable(this);
@@ -844,7 +899,17 @@ void ReadHandler::HandleDeviceConnected(void * context, Messaging::ExchangeManag
 
     _this->mSessionHandle.Grab(sessionHandle);
 
-    _this->MoveToState(HandlerState::GeneratingReports);
+    _this->SetStateFlag(ReadHandlerFlags::ActiveSubscription);
+
+    auto * appCallback = _this->mManagementCallback.GetAppCallback();
+    if (appCallback)
+    {
+        appCallback->OnSubscriptionEstablished(*_this);
+    }
+    // Notify the observer that a subscription has been resumed
+    _this->mObserver->OnSubscriptionEstablished(_this);
+
+    _this->MoveToState(HandlerState::CanStartReporting);
 
     ObjectList<AttributePathParams> * attributePath = _this->mpAttributePathList;
     while (attributePath)

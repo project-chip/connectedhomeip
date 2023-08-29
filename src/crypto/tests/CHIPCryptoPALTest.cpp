@@ -40,6 +40,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/UnitTestExtendedAssertions.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 
@@ -604,6 +605,138 @@ static void TestRawIntegerToDerInvalidCases(nlTestSuite * inSuite, void * inCont
         {
             ChipLogError(Crypto, "Failed TestRawIntegerToDerInvalidCases sub-case %d", case_idx);
             NL_TEST_ASSERT(inSuite, v.expected_status == status);
+        }
+        ++case_idx;
+    }
+}
+
+static void TestReadDerLengthValidCases(nlTestSuite * inSuite, void * inContext)
+{
+    const uint8_t short_zero_length[] = { 0x00 };
+    ByteSpan short_zero_length_buf(short_zero_length);
+
+    const uint8_t short_length[] = { 0x15 };
+    ByteSpan short_length_buf(short_length);
+
+    const uint8_t single_byte_length[] = { 0x81, 0x80 };
+    ByteSpan single_byte_length_buf(single_byte_length);
+
+    const uint8_t single_byte_length_large[] = { 0x81, 0xFF };
+    ByteSpan single_byte_length_large_buf(single_byte_length_large);
+
+    const uint8_t two_byte_length[] = { 0x82, 0xFF, 0x01 };
+    ByteSpan two_byte_length_buf(two_byte_length);
+
+    const uint8_t three_byte_length[] = { 0x83, 0xFF, 0x00, 0xAA };
+    ByteSpan three_byte_length_buf(three_byte_length);
+
+    const uint8_t four_byte_length[] = { 0x84, 0x01, 0x02, 0x03, 0x04 };
+    ByteSpan four_byte_length_buf(four_byte_length);
+
+    const uint8_t four_byte_length_large[] = { 0x84, 0xFF, 0xFF, 0xFF, 0xFF };
+    ByteSpan four_byte_length_large_buf(four_byte_length_large);
+
+    uint8_t max_byte_length_large[1 + sizeof(size_t)];
+    ByteSpan max_byte_length_large_buf(max_byte_length_large);
+
+    // We build a DER length value of SIZE_MAX programmatically.
+    max_byte_length_large[0] = 0x80 | sizeof(size_t);
+    memset(&max_byte_length_large[1], 0xFF, sizeof(size_t));
+
+    struct SuccessCase
+    {
+        const ByteSpan & input_buf;
+        const size_t expected_length;
+    };
+
+    const SuccessCase cases[] = {
+        { .input_buf = short_zero_length_buf, .expected_length = static_cast<size_t>(0x00) },
+        { .input_buf = short_length_buf, .expected_length = static_cast<size_t>(0x15) },
+        { .input_buf = single_byte_length_buf, .expected_length = static_cast<size_t>(0x80) },
+        { .input_buf = single_byte_length_large_buf, .expected_length = static_cast<size_t>(0xFF) },
+        { .input_buf = two_byte_length_buf, .expected_length = static_cast<size_t>(0xFF01) },
+        { .input_buf = three_byte_length_buf, .expected_length = static_cast<size_t>(0xFF00AAUL) },
+        { .input_buf = four_byte_length_buf, .expected_length = static_cast<size_t>(0x01020304UL) },
+        { .input_buf = four_byte_length_large_buf, .expected_length = static_cast<size_t>(0xFFFFFFFFUL) },
+        { .input_buf = max_byte_length_large_buf, .expected_length = SIZE_MAX },
+    };
+
+    int case_idx = 0;
+    for (const SuccessCase & v : cases)
+    {
+        size_t output_length = SIZE_MAX - 1;
+        chip::Encoding::LittleEndian::Reader input_reader{ v.input_buf };
+        CHIP_ERROR status = ReadDerLength(input_reader, output_length);
+        if ((status != CHIP_NO_ERROR) || (v.expected_length != output_length))
+        {
+            ChipLogError(Crypto, "Failed TestReadDerLengthValidCases sub-case %d", case_idx);
+            NL_TEST_ASSERT_EQUALS(inSuite, output_length, v.expected_length);
+            NL_TEST_ASSERT_SUCCESS(inSuite, status);
+        }
+        ++case_idx;
+    }
+}
+
+static void TestReadDerLengthInvalidCases(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t placeholder[1];
+
+    ByteSpan bad_buffer_nullptr(nullptr, sizeof(placeholder));
+    ByteSpan bad_buffer_empty(placeholder, 0);
+
+    const uint8_t zero_multi_byte_length[] = { 0x80 };
+    ByteSpan zero_multi_byte_length_buf(zero_multi_byte_length);
+
+    const uint8_t single_byte_length_zero[] = { 0x81, 0x00 };
+    ByteSpan single_byte_length_zero_buf(single_byte_length_zero);
+
+    const uint8_t single_byte_length_too_small[] = { 0x81, 0x7F };
+    ByteSpan single_byte_length_too_small_buf(single_byte_length_too_small);
+
+    const uint8_t multiple_byte_length_zero_padded[] = { 0x82, 0x00, 0xFF };
+    ByteSpan multiple_byte_length_zero_padded_buf(multiple_byte_length_zero_padded);
+
+    const uint8_t multiple_byte_length_insufficient_bytes[] = { 0x84, 0xFF, 0xAA, 0x01 };
+    ByteSpan multiple_byte_length_insufficient_bytes_buf(multiple_byte_length_insufficient_bytes);
+
+    const uint8_t multiple_byte_length_insufficient_bytes2[] = { 0x83 };
+    ByteSpan multiple_byte_length_insufficient_bytes2_buf(multiple_byte_length_insufficient_bytes2);
+
+    uint8_t max_byte_length_large_insufficient_bytes[1 + sizeof(size_t) - 1];
+    ByteSpan max_byte_length_large_insufficient_bytes_buf(max_byte_length_large_insufficient_bytes);
+
+    // We build a DER length value of SIZE_MAX programmatically, with one byte too few.
+    max_byte_length_large_insufficient_bytes[0] = 0x80 | sizeof(size_t);
+    memset(&max_byte_length_large_insufficient_bytes[1], 0xFF, sizeof(max_byte_length_large_insufficient_bytes) - 1);
+
+    struct ErrorCase
+    {
+        const ByteSpan & input_buf;
+        CHIP_ERROR expected_status;
+    };
+
+    const ErrorCase error_cases[] = {
+        { .input_buf = bad_buffer_nullptr, .expected_status = CHIP_ERROR_BUFFER_TOO_SMALL },
+        { .input_buf = bad_buffer_empty, .expected_status = CHIP_ERROR_BUFFER_TOO_SMALL },
+        { .input_buf = zero_multi_byte_length_buf, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
+        { .input_buf = single_byte_length_zero_buf, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
+        { .input_buf = single_byte_length_too_small_buf, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
+        { .input_buf = multiple_byte_length_zero_padded_buf, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
+        { .input_buf = multiple_byte_length_insufficient_bytes_buf, .expected_status = CHIP_ERROR_BUFFER_TOO_SMALL },
+        { .input_buf = multiple_byte_length_insufficient_bytes2_buf, .expected_status = CHIP_ERROR_BUFFER_TOO_SMALL },
+        { .input_buf = max_byte_length_large_insufficient_bytes_buf, .expected_status = CHIP_ERROR_BUFFER_TOO_SMALL },
+    };
+
+    int case_idx = 0;
+    for (const ErrorCase & v : error_cases)
+    {
+        size_t output_length = SIZE_MAX;
+        chip::Encoding::LittleEndian::Reader input_reader{ v.input_buf };
+        CHIP_ERROR status = ReadDerLength(input_reader, output_length);
+        if (status != v.expected_status)
+        {
+            ChipLogError(Crypto, "Failed TestReadDerLengthInvalidCases sub-case %d", case_idx);
+            NL_TEST_ASSERT_EQUALS(inSuite, v.expected_status, status);
         }
         ++case_idx;
     }
@@ -1290,7 +1423,7 @@ void TestCSR_Verify(nlTestSuite * inSuite, void * inContext)
 
 void TestCSR_GenDirect(nlTestSuite * inSuite, void * inContext)
 {
-    uint8_t csrBuf[kMAX_CSR_Length];
+    uint8_t csrBuf[kMIN_CSR_Buffer_Size];
     ClearSecretData(csrBuf);
     MutableByteSpan csrSpan(csrBuf);
 
@@ -1299,7 +1432,7 @@ void TestCSR_GenDirect(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     // Validate case of buffer too small
-    uint8_t csrBufTooSmall[kMAX_CSR_Length - 1];
+    uint8_t csrBufTooSmall[kMIN_CSR_Buffer_Size - 1];
     MutableByteSpan csrSpanTooSmall(csrBufTooSmall);
     NL_TEST_ASSERT(inSuite, GenerateCertificateSigningRequest(&keypair, csrSpanTooSmall) == CHIP_ERROR_BUFFER_TOO_SMALL);
 
@@ -1335,7 +1468,7 @@ void TestCSR_GenDirect(nlTestSuite * inSuite, void * inContext)
 static void TestCSR_GenByKeypair(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
-    uint8_t csr[kMAX_CSR_Length];
+    uint8_t csr[kMIN_CSR_Buffer_Size];
     size_t length = sizeof(csr);
 
     Test_P256Keypair keypair;
@@ -2122,21 +2255,32 @@ static void TestCDPExtension_x509Extraction(nlTestSuite * inSuite, void * inCont
 
     constexpr const char * exampleHttpURI  = "http://example.com/crl.pem";
     constexpr const char * exampleHttpsURI = "https://example.com/crl.pem";
+    CharSpan httpSpan                      = CharSpan::fromCharString(exampleHttpURI);
+    CharSpan httpsSpan                     = CharSpan::fromCharString(exampleHttpsURI);
 
     // clang-format off
     static CDPTestCase sCDPTestCases[] = {
-        // Cert                                                Expected Error               Expected Output
-        // ===============================================================================================
-        {  ByteSpan(),                                         CHIP_ERROR_INVALID_ARGUMENT, CharSpan() },
-        {  sTestCert_PAA_FFF1_Cert,                            CHIP_ERROR_NOT_FOUND,        CharSpan() },
-        {  sTestCert_PAI_FFF2_8001_Cert,                       CHIP_ERROR_NOT_FOUND,        CharSpan() },
-        {  sTestCert_DAC_FFF2_8003_0019_FB_Cert,               CHIP_ERROR_NOT_FOUND,        CharSpan() },
-        {  sTestCert_DAC_FFF1_8000_0000_CDP_Cert,              CHIP_NO_ERROR,               CharSpan::fromCharString(exampleHttpURI) },
-        {  sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_Cert,        CHIP_NO_ERROR,               CharSpan::fromCharString(exampleHttpsURI) },
-        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert,            CHIP_ERROR_NOT_FOUND,        CharSpan() },
-        {  sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_Cert,        CHIP_ERROR_NOT_FOUND,        CharSpan() },
-        {  sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_Cert, CHIP_ERROR_NOT_FOUND,        CharSpan() },
-        {  sTestCert_DAC_FFF1_8000_0000_CDP_Long_Cert,         CHIP_ERROR_BUFFER_TOO_SMALL, CharSpan() },
+        // Cert                                                             Expected Error               Expected Output
+        // ==============================================================================================================
+        {  ByteSpan(),                                                      CHIP_ERROR_INVALID_ARGUMENT, CharSpan() },
+        {  sTestCert_PAA_FFF1_Cert,                                         CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_PAI_FFF2_8001_Cert,                                    CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF2_8003_0019_FB_Cert,                            CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Cert,                           CHIP_NO_ERROR,               httpSpan   },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_Cert,                     CHIP_NO_ERROR,               httpsSpan  },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_Cert,                     CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_Cert,                      CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert,                         CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_Cert,              CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Long_Cert,                      CHIP_ERROR_BUFFER_TOO_SMALL, CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_Cert,         CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_Cert,    CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_Cert,  CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_Cert,      CHIP_NO_ERROR,               httpsSpan  },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_Cert,           CHIP_NO_ERROR,               httpsSpan  },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_Cert,          CHIP_NO_ERROR,               httpsSpan  },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Cert,      CHIP_NO_ERROR,               httpsSpan  },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_Cert, CHIP_ERROR_BUFFER_TOO_SMALL, CharSpan() },
     };
     // clang-format on
 
@@ -2146,10 +2290,69 @@ static void TestCDPExtension_x509Extraction(nlTestSuite * inSuite, void * inCont
         MutableCharSpan cdp(cdpBuf);
         err = ExtractCRLDistributionPointURIFromX509Cert(testCase.Cert, cdp);
         NL_TEST_ASSERT(inSuite, err == testCase.mExpectedError);
-        if (err == CHIP_NO_ERROR)
+        if (testCase.mExpectedError == CHIP_NO_ERROR)
         {
             NL_TEST_ASSERT(inSuite, cdp.size() == testCase.mExpectedResult.size());
             NL_TEST_ASSERT(inSuite, cdp.data_equal(testCase.mExpectedResult));
+        }
+    }
+}
+
+static void TestCDPCRLIssuerExtension_x509Extraction(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace TestCerts;
+
+    HeapChecker heapChecker(inSuite);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    struct CDPTestCase
+    {
+        ByteSpan Cert;
+        CHIP_ERROR mExpectedError;
+        ByteSpan mCRLIssuerCert;
+    };
+
+    // clang-format off
+    static CDPTestCase sCDPTestCases[] = {
+        // Cert                                                             Expected Error               Expected CRL Issuer Cert
+        // =======================================================================================================================
+        {  ByteSpan(),                                                      CHIP_ERROR_INVALID_ARGUMENT, ByteSpan() },
+        {  sTestCert_PAA_FFF1_Cert,                                         CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_PAI_FFF2_8001_Cert,                                    CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF2_8003_0019_FB_Cert,                            CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Cert,                           CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_Cert,                     CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_Cert,                     CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_Cert,                      CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert,                         CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_Cert,              CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Long_Cert,                      CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_Cert,         CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_Cert,    CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_Cert,  CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_Cert,      CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_Cert,           CHIP_NO_ERROR,               sTestCert_PAA_FFF1_Cert },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_Cert,          CHIP_NO_ERROR,               sTestCert_PAA_NoVID_Cert },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Cert,      CHIP_NO_ERROR,               sTestCert_PAI_FFF2_8004_FB_Cert },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_Cert, CHIP_NO_ERROR,               sTestCert_PAI_FFF2_8004_FB_Cert },
+    };
+    // clang-format on
+
+    for (auto & testCase : sCDPTestCases)
+    {
+        uint8_t crlIssuerBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
+        MutableByteSpan crlIssuer(crlIssuerBuf);
+        err = ExtractCDPExtensionCRLIssuerFromX509Cert(testCase.Cert, crlIssuer);
+        NL_TEST_ASSERT(inSuite, err == testCase.mExpectedError);
+        if (testCase.mExpectedError == CHIP_NO_ERROR)
+        {
+            uint8_t crlIssuerSubjectBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
+            MutableByteSpan crlIssuerSubject(crlIssuerSubjectBuf);
+
+            err = ExtractSubjectFromX509Cert(testCase.mCRLIssuerCert, crlIssuerSubject);
+            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+            NL_TEST_ASSERT(inSuite, crlIssuer.data_equal(crlIssuerSubject));
         }
     }
 }
@@ -2711,6 +2914,8 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test decrypting AES-CCM-128 invalid nonce", TestAES_CCM_128DecryptInvalidNonceLen),
     NL_TEST_DEF("Test encrypt/decrypt AES-CTR-128 test vectors", TestAES_CTR_128CryptTestVectors),
     NL_TEST_DEF("Test ASN.1 signature conversion routines", TestAsn1Conversions),
+    NL_TEST_DEF("Test reading a length from ASN.1 DER stream success cases", TestReadDerLengthValidCases),
+    NL_TEST_DEF("Test reading a length from ASN.1 DER stream error cases", TestReadDerLengthInvalidCases),
     NL_TEST_DEF("Test Integer to ASN.1 DER conversion", TestRawIntegerToDerValidCases),
     NL_TEST_DEF("Test Integer to ASN.1 DER conversion error cases", TestRawIntegerToDerInvalidCases),
     NL_TEST_DEF("Test ECDSA signing and validation message using SHA256", TestECDSA_Signing_SHA256_Msg),
@@ -2752,6 +2957,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Subject Key Id Extraction from x509 Certificate", TestSKID_x509Extraction),
     NL_TEST_DEF("Test Authority Key Id Extraction from x509 Certificate", TestAKID_x509Extraction),
     NL_TEST_DEF("Test CRL Distribution Point Extension Extraction from x509 Certificate", TestCDPExtension_x509Extraction),
+    NL_TEST_DEF("Test CDP Extension CRL Issuer Extraction from x509 Certificate", TestCDPCRLIssuerExtension_x509Extraction),
     NL_TEST_DEF("Test Serial Number Extraction from x509 Certificate", TestSerialNumber_x509Extraction),
     NL_TEST_DEF("Test Subject Extraction from x509 Certificate", TestSubject_x509Extraction),
     NL_TEST_DEF("Test Issuer Extraction from x509 Certificate", TestIssuer_x509Extraction),

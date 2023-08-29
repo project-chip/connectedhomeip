@@ -22,8 +22,8 @@ import java.util.Objects;
 
 /** An event path that should be used for requests. */
 public class ChipEventPath {
-  private ChipPathId endpointId, clusterId, eventId;
-  private boolean isUrgent;
+  private final ChipPathId endpointId, clusterId, eventId;
+  private final boolean isUrgent;
 
   private ChipEventPath(
       ChipPathId endpointId, ChipPathId clusterId, ChipPathId eventId, boolean isUrgent) {

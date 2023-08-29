@@ -14,25 +14,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "FactoryDataProvider.h"
-#include "CHIPDevicePlatformConfig.h"
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
+
+#include <platform/CHIPDeviceConfig.h>
 
 #if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE
 #include <matter_factory_data.h>
 #else
-#include <platform/CHIPDeviceConfig.h>
 extern "C" {
 #include <utils_base64.h>
 }
 #endif
-#include <platform/CHIPDeviceConfig.h>
-extern "C" {
-#include <utils_base64.h>
-}
-#include <platform/bouffalolab/common/FactoryDataProvider.h>
+
+#include "FactoryDataProvider.h"
 
 namespace chip {
 namespace DeviceLayer {

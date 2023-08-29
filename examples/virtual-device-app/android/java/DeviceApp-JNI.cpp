@@ -20,11 +20,15 @@
 #include "AppImpl.h"
 #include "JNIDACProvider.h"
 
+#include "ColorControlManager.h"
+#include "DoorLockManager.h"
 #include "OnOffManager.h"
+#include "PowerSourceManager.h"
 #include "credentials/DeviceAttestationCredsProvider.h"
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/server/Dnssd.h>
 #include <app/server/java/AndroidAppServerWrapper.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
@@ -58,14 +62,14 @@ void DeviceAppJNI::InitializeWithObjects(jobject app)
     jclass managerClass = env->GetObjectClass(mDeviceAppObject);
     VerifyOrReturn(managerClass != nullptr, ChipLogError(Zcl, "Failed to get DeviceAppJNI Java class"));
 
-    mPostClusterInitMethod = env->GetMethodID(managerClass, "postClusterInit", "(II)V");
+    mPostClusterInitMethod = env->GetMethodID(managerClass, "postClusterInit", "(JI)V");
     if (mPostClusterInitMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access DeviceApp 'postClusterInit' method");
         env->ExceptionClear();
     }
 
-    mPostEventMethod = env->GetMethodID(managerClass, "postEvent", "(I)V");
+    mPostEventMethod = env->GetMethodID(managerClass, "postEvent", "(J)V");
     if (mPostEventMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access DeviceApp 'postEvent' method");
@@ -80,7 +84,7 @@ void DeviceAppJNI::PostClusterInit(int clusterId, int endpoint)
     VerifyOrReturn(mDeviceAppObject != nullptr, ChipLogError(Zcl, "DeviceAppJNI::mDeviceAppObject null"));
     VerifyOrReturn(mPostClusterInitMethod != nullptr, ChipLogError(Zcl, "DeviceAppJNI::mPostClusterInitMethod null"));
 
-    env->CallVoidMethod(mDeviceAppObject, mPostClusterInitMethod, static_cast<jint>(clusterId), static_cast<jint>(endpoint));
+    env->CallVoidMethod(mDeviceAppObject, mPostClusterInitMethod, static_cast<jlong>(clusterId), static_cast<jint>(endpoint));
     if (env->ExceptionCheck())
     {
         ChipLogError(Zcl, "Failed to call DeviceAppJNI 'postClusterInit' method");
@@ -95,7 +99,7 @@ void DeviceAppJNI::PostEvent(int event)
     VerifyOrReturn(mDeviceAppObject != nullptr, ChipLogError(Zcl, "DeviceAppJNI::mDeviceAppObject null"));
     VerifyOrReturn(mPostEventMethod != nullptr, ChipLogError(Zcl, "DeviceAppJNI::mPostEventMethod null"));
 
-    env->CallVoidMethod(mDeviceAppObject, mPostEventMethod, static_cast<jint>(event));
+    env->CallVoidMethod(mDeviceAppObject, mPostEventMethod, static_cast<jlong>(event));
     if (env->ExceptionCheck())
     {
         ChipLogError(Zcl, "Failed to call DeviceAppJNI 'postEventMethod' method");
@@ -139,8 +143,7 @@ JNI_METHOD(void, setDACProvider)(JNIEnv *, jobject, jobject provider)
 {
     if (!chip::Credentials::IsDeviceAttestationCredentialsProviderSet())
     {
-        JNIDACProvider * p = new JNIDACProvider(provider);
-        chip::Credentials::SetDeviceAttestationCredentialsProvider(p);
+        chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
     }
 }
 
@@ -156,4 +159,76 @@ JNI_METHOD(jboolean, setOnOff)(JNIEnv *, jobject, jint endpoint, jboolean value)
 {
     return DeviceLayer::SystemLayer().ScheduleLambda([endpoint, value] { OnOffManager::SetOnOff(endpoint, value); }) ==
         CHIP_NO_ERROR;
+}
+
+/*
+ * Color Control Manager
+ */
+JNI_METHOD(void, setColorControlManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
+{
+    ColorControlManager::NewManager(endpoint, manager);
+}
+
+/*
+ * Door Lock Manager
+ */
+JNI_METHOD(void, setDoorLockManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
+{
+    DoorLockManager::NewManager(endpoint, manager);
+}
+
+JNI_METHOD(jboolean, setLockType)(JNIEnv *, jobject, jint endpoint, jint value)
+{
+    return DeviceLayer::SystemLayer().ScheduleLambda([endpoint, value] { DoorLockManager::SetLockType(endpoint, value); }) ==
+        CHIP_NO_ERROR;
+}
+
+JNI_METHOD(jboolean, setLockState)(JNIEnv *, jobject, jint endpoint, jint value)
+{
+    return DeviceLayer::SystemLayer().ScheduleLambda([endpoint, value] { DoorLockManager::SetLockState(endpoint, value); }) ==
+        CHIP_NO_ERROR;
+}
+
+JNI_METHOD(jboolean, setActuatorEnabled)(JNIEnv *, jobject, jint endpoint, jboolean value)
+{
+    return DeviceLayer::SystemLayer().ScheduleLambda([endpoint, value] { DoorLockManager::SetActuatorEnabled(endpoint, value); }) ==
+        CHIP_NO_ERROR;
+}
+
+JNI_METHOD(jboolean, setAutoRelockTime)(JNIEnv *, jobject, jint endpoint, jint value)
+{
+    return DeviceLayer::SystemLayer().ScheduleLambda([endpoint, value] { DoorLockManager::SetAutoRelockTime(endpoint, value); }) ==
+        CHIP_NO_ERROR;
+}
+
+JNI_METHOD(jboolean, setOperatingMode)(JNIEnv *, jobject, jint endpoint, jint value)
+{
+    return DeviceLayer::SystemLayer().ScheduleLambda([endpoint, value] { DoorLockManager::SetOperatingMode(endpoint, value); }) ==
+        CHIP_NO_ERROR;
+}
+
+JNI_METHOD(jboolean, setSupportedOperatingModes)(JNIEnv *, jobject, jint endpoint, jint value)
+{
+    return DeviceLayer::SystemLayer().ScheduleLambda(
+               [endpoint, value] { DoorLockManager::SetSupportedOperatingModes(endpoint, value); }) == CHIP_NO_ERROR;
+}
+
+JNI_METHOD(jboolean, sendLockAlarmEvent)(JNIEnv *, jobject, jint endpoint)
+{
+    return DeviceLayer::SystemLayer().ScheduleLambda([endpoint] { DoorLockManager::SendLockAlarmEvent(endpoint); }) ==
+        CHIP_NO_ERROR;
+}
+
+/*
+ * Power Source Manager
+ */
+JNI_METHOD(void, setPowerSourceManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
+{
+    PowerSourceManager::NewManager(endpoint, manager);
+}
+
+JNI_METHOD(jboolean, setBatPercentRemaining)(JNIEnv *, jobject, jint endpoint, jint value)
+{
+    return DeviceLayer::SystemLayer().ScheduleLambda(
+               [endpoint, value] { PowerSourceManager::SetBatPercentRemaining(endpoint, value); }) == CHIP_NO_ERROR;
 }

@@ -47,7 +47,7 @@ template("bl_iot_sdk") {
       "CONF_ENABLE_FUNC_BACKTRACE_ELF=out/bl602-light/chip-bl602-lighting-example.out",
     ]
 
-    include_dirs = [ "${chip_root}/third_party/mbedtls/repo/include" ]
+    include_dirs = []
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
     }

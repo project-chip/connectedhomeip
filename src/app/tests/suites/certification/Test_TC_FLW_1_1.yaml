@@ -32,7 +32,6 @@ tests:
                 value: nodeId
 
     - label: "Step 2: Read the global attribute: ClusterRevision"
-      PICS: FLW.S.Afffd
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -41,7 +40,6 @@ tests:
               type: int16u
 
     - label: "Step 3: Read the global attribute: FeatureMap"
-      PICS: FLW.S.Afffc
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -50,7 +48,7 @@ tests:
               type: bitmap32
 
     - label: "Step 4a: Read the global attribute: AttributeList"
-      PICS: FLW.S.Afffb
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -58,8 +56,17 @@ tests:
               type: list
               contains: [0, 1, 2, 65528, 65529, 65530, 65531, 65532, 65533]
 
+    - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 65528, 65529, 65531, 65532, 65533]
+
     - label: "Step 4b: Read the optional attribute(Tolerance) in AttributeList"
-      PICS: FLW.S.A0003 && FLW.S.Afffb
+      PICS: FLW.S.A0003
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -99,7 +106,7 @@ tests:
           [1676283744.634854][6703:6705] CHIP:EM: <<< [E:1353i M:55876299 (Ack:134302507)] (S) Msg TX to 1:00000000
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && FLW.S.Afffb
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
@@ -108,24 +115,26 @@ tests:
                 value: "y"
 
     - label:
-          "Step 5: TH reads EventList attribute from DUT. 1.The list MAY contain
-          values in the Manufacturer Extensible Identifier (MEI) range:
-          (0xXXXX_0000 - 0xXXXX_00FF), where XXXX is the allowed MEI range
-          (0x0001 - 0xFFF1), these values SHALL be ignored. 2.The list SHALL NOT
-          contain any values in the Test Vendor or invalid range: (0x0000_0100 -
-          0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 -
-          0xFFFF_FFFF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
+          "Step 5: TH reads from the DUT the EventList attribute. 1.The list
+          SHALL NOT contain any additional values in the standard or scoped
+          range: (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE) 2.
+          The list MAY contain values in the Manufacturer Extensible Identifier
+          (MEI) range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed
+          MEI range (0x0001 - 0xFFF1), these values SHALL be ignored. 3. The
+          list SHALL NOT contain any values in the Test Vendor or invalid range:
+          (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 -
+          0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
+          allowed MEI range (0x0001 - 0xFFF1)"
       verification: |
           ./chip-tool flowmeasurement read event-list 1 1
 
           Verify "EventList " consists the list of supported events, Also verify that the DUT response with an empty list (0 entries) if there is no events on the TH(Chip-tool) Log:
-
           [1676363157.137814][9032:9034] CHIP:DMG: }
           [1676363157.137855][9032:9034] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_FFFA DataVersion: 2916521407
           [1676363157.137868][9032:9034] CHIP:TOO:   EventList: 0 entries
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && FLW.S.Afffa
+      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
       arguments:
           values:
               - name: "message"
@@ -133,6 +142,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
+    # List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
     - label:
           "Step 6: TH reads AcceptedCommandList attribute from DUT. 1.The list
           SHALL NOT contain any additional values in the standard or scoped
@@ -153,7 +163,7 @@ tests:
           [1676360099.159185][8526:8528] CHIP:TOO:   AcceptedCommandList: 0 entries
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && FLW.S.Afff9
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
@@ -161,6 +171,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
+    # List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
     - label:
           "Step 7: TH reads GeneratedCommandList attribute from DUT. 1.The list
           MAY contain values in the Manufacturer Extensible Identifier (MEI)
@@ -180,7 +191,7 @@ tests:
           [1676360138.548281][8539:8541] CHIP:TOO:   GeneratedCommandList: 0 entries
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && FLW.S.Afff8
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"

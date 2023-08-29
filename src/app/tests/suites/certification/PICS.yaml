@@ -27,6 +27,11 @@ PICS:
     - label: "Run steps in SDK and CI only"
       id: PICS_SDK_CI_ONLY
 
+    - label:
+          "EventList attribute enabled (default to false while EventList is
+          provisional)"
+      id: PICS_EVENT_LIST_ENABLED
+
     #
     # Base Details
     #
@@ -331,6 +336,11 @@ PICS:
           "Does commissionee provide a Firmware Information field in the
           AttestationResponse?"
       id: MCORE.DA.ATTESTELEMENT_FW_INFO
+    #
+    #IDM
+    #
+    - label: "Does the device implement the ICD Management cluster as a server?"
+      id: ICDM.S
 
     - label: "Is the device a Server"
       id: MCORE.IDM.S
@@ -700,26 +710,6 @@ PICS:
     - label: "Does the device implement the Access Control Cluster as a client?"
       id: ACL.C
 
-    #ACL -- Global Attributes
-    - label: "Does the device implement the ClusterRevision(ACL) attribute?"
-      id: ACL.S.Afffd
-
-    - label: "Does the device implement the FeatureMap(ACL) attribute?"
-      id: ACL.S.Afffc
-
-    - label: "Does the device implement the AttributeList(ACL) attribute?"
-      id: ACL.S.Afffb
-
-    - label: "Does the device implement the EventList(ACL) attribute?"
-      id: ACL.S.Afffa
-
-    - label: "Does the device implement the AcceptedCommandList(ACL) attribute?"
-      id: ACL.S.Afff9
-
-    - label:
-          "Does the device implement the GeneratedCommandList(ACL) attribute?"
-      id: ACL.S.Afff8
-
     #
     # server / attributes
     #
@@ -870,27 +860,6 @@ PICS:
     - label: "Does the device implement the Binding Cluster as a client?"
       id: BIND.C
 
-    #BIND -- Global Attributes
-    - label: "Does the device implement the ClusterRevision(BIND) attribute?"
-      id: BIND.S.Afffd
-
-    - label: "Does the device implement the FeatureMap(BIND) attribute?"
-      id: BIND.S.Afffc
-
-    - label: "Does the device implement the AttributeList(BIND) attribute?"
-      id: BIND.S.Afffb
-
-    - label: "Does the device implement the EventList(BIND) attribute?"
-      id: BIND.S.Afffa
-
-    - label:
-          "Does the device implement the AcceptedCommandList(BIND) attribute?"
-      id: BIND.S.Afff9
-
-    - label:
-          "Does the device implement the GeneratedCommandList(BIND) attribute?"
-      id: BIND.S.Afff8
-
     #
     # server / attributes
     #
@@ -949,27 +918,6 @@ PICS:
           "Does the device implement the Bridged Device Basic Information
           Cluster as a client?"
       id: BRBINFO.C
-
-    #BINFO -- Global Attributes
-    - label: "Does the device implement the ClusterRevision(BINFO) attribute?"
-      id: BINFO.S.Afffd
-
-    - label: "Does the device implement the FeatureMap(BINFO) attribute?"
-      id: BINFO.S.Afffc
-
-    - label: "Does the device implement the AttributeList(BINFO) attribute?"
-      id: BINFO.S.Afffb
-
-    - label: "Does the device implement the EventList(BINFO) attribute?"
-      id: BINFO.S.Afffa
-
-    - label:
-          "Does the device implement the AcceptedCommandList(BINFO) attribute?"
-      id: BINFO.S.Afff9
-
-    - label:
-          "Does the device implement the GeneratedCommandList(BINFO) attribute?"
-      id: BINFO.S.Afff8
 
     #
     # server / attributes
@@ -1826,8 +1774,25 @@ PICS:
     - label:
           "Can the Dishwasher Alarm attribute changed by physical control at the
           device?"
-      id: DISHALM.M.ManuallyControlled
+      id: DISHALM.S.M.ManuallyControlled
 
+    - label: "Does the device support the Inflow alarm?"
+      id: DISHALM.S.M.InflowAlarmSupported
+
+    - label: "Does the device support the Drain alarm?"
+      id: DISHALM.S.M.DrainAlarmSupported
+
+    - label: "Does the device support the Door alarm?"
+      id: DISHALM.S.M.DoorAlarmSupported
+
+    - label: "Does the device support the TempLow alarm?"
+      id: DISHALM.S.M.TempLowAlarmSupported
+
+    - label: "Does the device support the TempHigh alarm?"
+      id: DISHALM.S.M.TempHighAlarmSupported
+
+    - label: "Does the device support the WaterLevel alarm?"
+      id: DISHALM.S.M.WaterLevelAlarmSupported
     #
     # server / Commands received
     #
@@ -1842,6 +1807,20 @@ PICS:
     - label: "Does the device implement the DISHM cluster as a server?"
       id: DISHM.S
 
+    - label: "IDoes the DUT support testing the failed ChangeToMode command?"
+      id: DISHM.S.M.CAN_TEST_MODE_FAILURE
+
+    # PIXIT
+
+    - label:
+          "Id of mode the device will fail to transition to, given its current
+          state"
+      id: PIXIT.DISHM.MODE_CHANGE_FAIL
+
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.DISHM.MODE_CHANGE_OK
     #
     # server / features
     #
@@ -1885,27 +1864,6 @@ PICS:
     - label: "Does the device implement the Descriptor cluster as a client?"
       id: DESC.C
 
-    #DESC -- Global Attributes
-    - label: "Does the device implement the ClusterRevision(DESC) attribute?"
-      id: DESC.S.Afffd
-
-    - label: "Does the device implement the FeatureMap(DESC) attribute?"
-      id: DESC.S.Afffc
-
-    - label: "Does the device implement the AttributeList(DESC) attribute?"
-      id: DESC.S.Afffb
-
-    - label: "Does the device implement the EventList(DESC) attribute?"
-      id: DESC.S.Afffa
-
-    - label:
-          "Does the device implement the AcceptedCommandList(DESC) attribute?"
-      id: DESC.S.Afff9
-
-    - label:
-          "Does the device implement the GeneratedCommandList(DESC) attribute?"
-      id: DESC.S.Afff8
-
     #
     # server / attributes
     #
@@ -1920,6 +1878,9 @@ PICS:
 
     - label: "Does the DUT(server) support the PARTSLIST attribute?"
       id: DESC.S.A0003
+
+    - label: "Does the DUT(server) support the TAGLIST attribute?"
+      id: DESC.S.A0004
 
     #
     # client / attributes
@@ -1972,27 +1933,6 @@ PICS:
           "Does the device implement the NetworkCommissioning Cluster cluster as
           a client?"
       id: CNET.C
-
-    #CNET -- Global Attributes
-    - label: "Does the device implement the ClusterRevision(CNET) attribute?"
-      id: CNET.S.Afffd
-
-    - label: "Does the device implement the FeatureMap(CNET) attribute?"
-      id: CNET.S.Afffc
-
-    - label: "Does the device implement the AttributeList(CNET) attribute?"
-      id: CNET.S.Afffb
-
-    - label: "Does the device implement the EventList(CNET) attribute?"
-      id: CNET.S.Afffa
-
-    - label:
-          "Does the device implement the AcceptedCommandList(CNET) attribute?"
-      id: CNET.S.Afff9
-
-    - label:
-          "Does the device implement the GeneratedCommandList(CNET) attribute?"
-      id: CNET.S.Afff8
 
     #
     # server / attributes
@@ -2104,28 +2044,6 @@ PICS:
 
     - label: "Does the DUT(Server) support LastConnectErrorValue attribute?"
       id: CNET.S.A0007
-
-    #OPCREDS -- Global Attributes
-    - label: "Does the device implement the ClusterRevision(OPCREDS) attribute?"
-      id: OPCREDS.S.Afffd
-
-    - label: "Does the device implement the FeatureMap(OPCREDS) attribute?"
-      id: OPCREDS.S.Afffc
-
-    - label: "Does the device implement the AttributeList(OPCREDS) attribute?"
-      id: OPCREDS.S.Afffb
-
-    - label: "Does the device implement the EventList(OPCREDS) attribute?"
-      id: OPCREDS.S.Afffa
-
-    - label:
-          "Does the device implement the AcceptedCommandList(OPCREDS) attribute?"
-      id: OPCREDS.S.Afff9
-
-    - label:
-          "Does the device implement the GeneratedCommandList(OPCREDS)
-          attribute?"
-      id: OPCREDS.S.Afff8
 
     #
     # server / commandsReceived
@@ -2550,27 +2468,6 @@ PICS:
           "Does the device implement the Diagnostic Logs cluster as a client?"
       id: DLOG.C
 
-    #DLOG -- Global Attributes
-    - label: "Does the device implement the ClusterRevision(DLOG) attribute?"
-      id: DLOG.S.Afffd
-
-    - label: "Does the device implement the FeatureMap(DLOG) attribute?"
-      id: DLOG.S.Afffc
-
-    - label: "Does the device implement the AttributeList(DLOG) attribute?"
-      id: DLOG.S.Afffb
-
-    - label: "Does the device implement the EventList(DLOG) attribute?"
-      id: DLOG.S.Afffa
-
-    - label:
-          "Does the device implement the AcceptedCommandList(DLOG) attribute?"
-      id: DLOG.S.Afff9
-
-    - label:
-          "Does the device implement the GeneratedCommandList(DLOG) attribute?"
-      id: DLOG.S.Afff8
-
     #
     # server / commandsReceived
     #
@@ -2991,7 +2888,7 @@ PICS:
       id: DRLK.S.Simulate.NotFullyLocked
 
     - label: "Does the DUT(server) detect a LockJammed State?"
-      id: DRLK.S.DetectLockJammed
+      id: DRLK.S.M.DetectLockJammed
 
     #
     # client / attributes
@@ -3348,27 +3245,6 @@ PICS:
           a client?"
       id: DGETH.C
 
-    #DGETH -- Global Attributes
-    - label: "Does the device implement the ClusterRevision(DGETH) attribute?"
-      id: DGETH.S.Afffd
-
-    - label: "Does the device implement the FeatureMap(DGETH) attribute?"
-      id: DGETH.S.Afffc
-
-    - label: "Does the device implement the AttributeList(DGETH) attribute?"
-      id: DGETH.S.Afffb
-
-    - label: "Does the device implement the EventList(DGETH) attribute?"
-      id: DGETH.S.Afffa
-
-    - label:
-          "Does the device implement the AcceptedCommandList(DGETH) attribute?"
-      id: DGETH.S.Afff9
-
-    - label:
-          "Does the device implement the GeneratedCommandList(DGETH) attribute?"
-      id: DGETH.S.Afff8
-
     #
     # server / attributes
     #
@@ -3479,27 +3355,6 @@ PICS:
     - label: "Does the device implement the Fixed Label cluster as a client?"
       id: FLABEL.C
 
-    #FLABEL -- Global Attributes
-    - label: "Does the device implement the ClusterRevision(FLABEL) attribute?"
-      id: FLABEL.S.Afffd
-
-    - label: "Does the device implement the FeatureMap(FLABEL) attribute?"
-      id: FLABEL.S.Afffc
-
-    - label: "Does the device implement the AttributeList(FLABEL) attribute?"
-      id: FLABEL.S.Afffb
-
-    - label: "Does the device implement the EventList(FLABEL) attribute?"
-      id: FLABEL.S.Afffa
-
-    - label:
-          "Does the device implement the AcceptedCommandList(FLABEL) attribute?"
-      id: FLABEL.S.Afff9
-
-    - label:
-          "Does the device implement the GeneratedCommandList(FLABEL) attribute?"
-      id: FLABEL.S.Afff8
-
     #
     # server / attributes
     #
@@ -3522,26 +3377,6 @@ PICS:
     - label:
           "Does the device implement the Flow Measurement cluster as a client?"
       id: FLW.C
-
-    #FLW -- Global Attributes
-    - label: "Does the device implement the ClusterRevision(FLW) attribute?"
-      id: FLW.S.Afffd
-
-    - label: "Does the device implement the FeatureMap(FLW) attribute?"
-      id: FLW.S.Afffc
-
-    - label: "Does the device implement the AttributeList(FLW) attribute?"
-      id: FLW.S.Afffb
-
-    - label: "Does the device implement the EventList(FLW) attribute?"
-      id: FLW.S.Afffa
-
-    - label: "Does the device implement the AcceptedCommandList(FLW) attribute?"
-      id: FLW.S.Afff9
-
-    - label:
-          "Does the device implement the GeneratedCommandList(FLW) attribute?"
-      id: FLW.S.Afff8
 
     #
     # server / attributes
@@ -3657,27 +3492,6 @@ PICS:
           "Does the device implement the General Diagnostics cluster as a
           client?"
       id: DGGEN.C
-
-    #DGGEN -- Global Attributes
-    - label: "Does the device implement the ClusterRevision(DGGEN) attribute?"
-      id: DGGEN.S.Afffd
-
-    - label: "Does the device implement the FeatureMap(DGGEN) attribute?"
-      id: DGGEN.S.Afffc
-
-    - label: "Does the device implement the AttributeList(DGGEN) attribute?"
-      id: DGGEN.S.Afffb
-
-    - label: "Does the device implement the EventList(DGGEN) attribute?"
-      id: DGGEN.S.Afffa
-
-    - label:
-          "Does the device implement the AcceptedCommandList(DGGEN) attribute?"
-      id: DGGEN.S.Afff9
-
-    - label:
-          "Does the device implement the GeneratedCommandList(DGGEN) attribute?"
-      id: DGGEN.S.Afff8
 
     #
     # server / attributes
@@ -3821,6 +3635,43 @@ PICS:
           "Does the DUT(Server) support Group Key Management CacheAndSync
           feature?"
       id: GRPKEY.S.F00
+
+    #
+    #server attributes
+    #
+    - label: "Does the device implement the GroupKeyMap attribute?"
+      id: GRPKEY.S.A0000
+
+    - label: "Does the device implement the GroupTable attribute?"
+      id: GRPKEY.S.A0001
+
+    - label: "Does the device implement the MaxGroupsPerFabric attribute?"
+      id: GRPKEY.S.A0002
+
+    - label: "Does the device implement the MaxGroupKeysPerFabric attribute?"
+      id: GRPKEY.S.A0003
+
+    #
+    # server commandsGenerated
+    #
+    - label: "Does the device implement the KeySetWrite command}?"
+      id: GRPKEY.S.C00.Rsp
+
+    - label: "Does the device implement the KeySetRead command}?"
+      id: GRPKEY.S.C01.Rsp
+
+    - label: "Does the device implement the KeySetReadResponse command}?"
+      id: GRPKEY.S.C02.Rsp
+
+    - label: "Does the device implement the KeySetRemove command}?"
+      id: GRPKEY.S.C03.Rsp
+
+    - label: "Does the device implement the KeySetReadAllIndices command}?"
+      id: GRPKEY.S.C04.Rsp
+
+    - label:
+          "Does the device implement the KeySetReadAllIndicesResponse command}?"
+      id: GRPKEY.S.C05.Rsp
 
     #
     # client / attributes
@@ -5542,26 +5393,6 @@ PICS:
           client?"
       id: PRS.C
 
-    #PRS -- Global Attributes
-    - label: "Does the device implement the ClusterRevision(PRS) attribute?"
-      id: PRS.S.Afffd
-
-    - label: "Does the device implement the FeatureMap(PRS) attribute?"
-      id: PRS.S.Afffc
-
-    - label: "Does the device implement the AttributeList(PRS) attribute?"
-      id: PRS.S.Afffb
-
-    - label: "Does the device implement the EventList(PRS) attribute?"
-      id: PRS.S.Afffa
-
-    - label: "Does the device implement the AcceptedCommandList(PRS) attribute?"
-      id: PRS.S.Afff9
-
-    - label:
-          "Does the device implement the GeneratedCommandList(PRS) attribute?"
-      id: PRS.S.Afff8
-
     #
     # server / attributes
     #
@@ -5631,26 +5462,6 @@ PICS:
           "Does the device implement the Pump Configuration and Control cluster
           as a client?"
       id: PCC.C
-
-    #PCC -- Global Attributes
-    - label: "Does the device implement the ClusterRevision(PCC) attribute?"
-      id: PCC.S.Afffd
-
-    - label: "Does the device implement the FeatureMap(PCC) attribute?"
-      id: PCC.S.Afffc
-
-    - label: "Does the device implement the AttributeList(PCC) attribute?"
-      id: PCC.S.Afffb
-
-    - label: "Does the device implement the EventList(PCC) attribute?"
-      id: PCC.S.Afffa
-
-    - label: "Does the device implement the AcceptedCommandList(PCC) attribute?"
-      id: PCC.S.Afff9
-
-    - label:
-          "Does the device implement the GeneratedCommandList(PCC) attribute?"
-      id: PCC.S.Afff8
 
     #
     # server / attributes
@@ -5941,6 +5752,15 @@ PICS:
     - label: "Does the device implement the Scene Names feature?"
       id: S.S.F00
 
+    - label: "Does the device implement the Scene Explicit feature?"
+      id: S.S.F01
+
+    - label: "Does the device implement the Scene TableSize feature?"
+      id: S.S.F02
+
+    - label: "Does the device implement the Scene FabricScenes feature?"
+      id: S.S.F03
+
     #
     # server / manually
     #
@@ -5982,6 +5802,11 @@ PICS:
 
     - label: "Does the device implement sending the CopyScene command?"
       id: S.C.C42.Tx
+
+    - label:
+          "Does the device process the TransitionTime parameter of the
+          RecallScene command?"
+      id: PICS_SC_RECALL_SCENE_TRANSITION_TIME
 
     #
     # client / manually
@@ -6121,27 +5946,6 @@ PICS:
           "Does the device implement the Software Diagnostics cluster as a
           client?"
       id: DGSW.C
-
-    #DGSW -- Global Attributes
-    - label: "Does the device implement the ClusterRevision(DGSW) attribute?"
-      id: DGSW.S.Afffd
-
-    - label: "Does the device implement the FeatureMap(DGSW) attribute?"
-      id: DGSW.S.Afffc
-
-    - label: "Does the device implement the AttributeList(DGSW) attribute?"
-      id: DGSW.S.Afffb
-
-    - label: "Does the device implement the EventList(DGSW) attribute?"
-      id: DGSW.S.Afffa
-
-    - label:
-          "Does the device implement the AcceptedCommandList(DGSW) attribute?"
-      id: DGSW.S.Afff9
-
-    - label:
-          "Does the device implement the GeneratedCommandList(DGSW) attribute?"
-      id: DGSW.S.Afff8
 
     #
     # server / attributes
@@ -6557,6 +6361,9 @@ PICS:
 
     - label: "Supports a System Mode of Auto"
       id: TSTAT.S.F05
+
+    - label: "Supports a local temperature not exposed"
+      id: TSTAT.S.F06
 
     #
     # server / manually
@@ -7267,29 +7074,6 @@ PICS:
     - label: "Does the device implement the SupportedCalendarTypes attribute ?"
       id: LTIME.S.A0002
 
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList attribute
-          ?"
-      id: LTIME.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute
-          ?"
-      id: LTIME.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: LTIME.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: LTIME.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: LTIME.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: LTIME.S.Afffd
-
     - label: "Does the DUT (Server) support 12 Hr Hour Format ?"
       id: LTIME.S.A0000.12HR
 
@@ -7363,29 +7147,6 @@ PICS:
     - label: "Does the device support the TemperatureUnit attribute ?"
       id: LUNIT.S.A0000
 
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList attribute
-          ?"
-      id: LUNIT.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute
-          ?"
-      id: LUNIT.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: LUNIT.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: LUNIT.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: LUNIT.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: LUNIT.S.Afffd
-
     #
     # server / features
     #
@@ -7448,27 +7209,6 @@ PICS:
 
     - label: "Does the device implement the User Label cluster as a client?"
       id: ULABEL.C
-
-    #ULABEL -- Global Attributes
-    - label: "Does the device implement the ClusterRevision(ULABEL) attribute?"
-      id: ULABEL.S.Afffd
-
-    - label: "Does the device implement the FeatureMap(ULABEL) attribute?"
-      id: ULABEL.S.Afffc
-
-    - label: "Does the device implement the AttributeList(ULABEL) attribute?"
-      id: ULABEL.S.Afffb
-
-    - label: "Does the device implement the EventList(ULABEL) attribute?"
-      id: ULABEL.S.Afffa
-
-    - label:
-          "Does the device implement the AcceptedCommandList(ULABEL) attribute?"
-      id: ULABEL.S.Afff9
-
-    - label:
-          "Does the device implement the GeneratedCommandList(ULABEL) attribute?"
-      id: ULABEL.S.Afff8
 
     #
     # server / attributes
@@ -7777,29 +7517,6 @@ PICS:
 
     - label: "Does the device implement the SafetyStatus attribute ?"
       id: WNCV.S.A001a
-
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList attribute
-          ?"
-      id: WNCV.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute
-          ?"
-      id: WNCV.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: WNCV.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: WNCV.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: WNCV.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: WNCV.S.Afffd
 
     - label:
           "Does the device support scene via the TargetPositionLiftPercent100ths
@@ -8238,28 +7955,6 @@ PICS:
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: CDOCONC.S.A000a
 
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList
-          attribute?"
-      id: CDOCONC.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
-      id: CDOCONC.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: CDOCONC.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: CDOCONC.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: CDOCONC.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: CDOCONC.S.Afffd
-
     # Carbon Monoxide Concentration Measurement Cluster Test Plan
     - label:
           "Does the device implement the Carbon Monoxide Concentration
@@ -8333,28 +8028,6 @@ PICS:
 
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: CMOCONC.S.A000a
-
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList
-          attribute?"
-      id: CMOCONC.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
-      id: CMOCONC.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: CMOCONC.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: CMOCONC.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: CMOCONC.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: CMOCONC.S.Afffd
 
     # Nitrogen Dioxide Concentration Measurement Cluster Test Plan
     - label:
@@ -8430,28 +8103,6 @@ PICS:
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: NDOCONC.S.A000a
 
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList
-          attribute?"
-      id: NDOCONC.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
-      id: NDOCONC.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: NDOCONC.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: NDOCONC.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: NDOCONC.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: NDOCONC.S.Afffd
-
     # Ozone Concentration Measurement Cluster Test Plan
     - label:
           "Does the device implement the Ozone Concentration Measurement Cluster
@@ -8525,28 +8176,6 @@ PICS:
 
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: OZCONC.S.A000a
-
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList
-          attribute?"
-      id: OZCONC.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
-      id: OZCONC.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: OZCONC.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: OZCONC.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: OZCONC.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: OZCONC.S.Afffd
 
     # PM2.5 Concentration Measurement Cluster Test Plan
     - label:
@@ -8622,28 +8251,6 @@ PICS:
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: PMICONC.S.A000a
 
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList
-          attribute?"
-      id: PMICONC.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
-      id: PMICONC.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: PMICONC.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: PMICONC.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: PMICONC.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: PMICONC.S.Afffd
-
     # Formaldehyde Concentration Measurement Cluster Test Plan
     - label:
           "Does the device implement the Formaldehyde Concentration Measurement
@@ -8717,28 +8324,6 @@ PICS:
 
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: FLDCONC.S.A000a
-
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList
-          attribute?"
-      id: FLDCONC.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
-      id: FLDCONC.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: FLDCONC.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: FLDCONC.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: FLDCONC.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: FLDCONC.S.Afffd
 
     # PM1 Concentration Measurement Cluster Test Plan
     - label:
@@ -8814,28 +8399,6 @@ PICS:
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: PMHCONC.S.A000a
 
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList
-          attribute?"
-      id: PMHCONC.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
-      id: PMHCONC.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: PMHCONC.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: PMHCONC.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: PMHCONC.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: PMHCONC.S.Afffd
-
     # PM10 Concentration Measurement Cluster Test Plan
     - label:
           "Does the device implement the PM10 Concentration Measurement Cluster
@@ -8909,28 +8472,6 @@ PICS:
 
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: PMKCONC.S.A000a
-
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList
-          attribute?"
-      id: PMKCONC.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
-      id: PMKCONC.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: PMKCONC.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: PMKCONC.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: PMKCONC.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: PMKCONC.S.Afffd
 
     # Total Volatile Organic Compounds Concentration Measurement Cluster Test Plan
     - label:
@@ -9006,28 +8547,6 @@ PICS:
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: TVOCCONC.S.A000a
 
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList
-          attribute?"
-      id: TVOCCONC.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
-      id: TVOCCONC.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: TVOCCONC.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: TVOCCONC.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: TVOCCONC.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: TVOCCONC.S.Afffd
-
     # Radon Concentration Measurement Cluster Test Plan
     - label:
           "Does the device implement the Radon Concentration Measurement Cluster
@@ -9101,28 +8620,6 @@ PICS:
 
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: RNCONC.S.A000a
-
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList
-          attribute?"
-      id: RNCONC.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
-      id: RNCONC.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: RNCONC.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: RNCONC.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: RNCONC.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: RNCONC.S.Afffd
 
     ##  Fan control
 
@@ -9269,43 +8766,6 @@ PICS:
       id: ICDM.C.C00.Rsp
 
     #
-    #RVC Clean Mode Select
-    #
-    #Feature
-    - label:
-          "Does the device support depending on an On/Off cluster implemented on
-          the same DUT?"
-      id: RVCCLEANMS.S.F00
-
-    - label: "Does the device support the extended status feature?"
-      id: RVCCLEANMS.S.F01
-
-    - label:
-          "Does the device implementation deprecate the ChangeToMode command?"
-      id: RVCCLEANMS.S.F02
-
-    #Server Attributes
-    - label: "Does the device implement the StartUpMode attribute?"
-      id: RVCCLEANMS.S.A0004
-
-    - label: "Does the device implement the OnMode attribute?"
-      id: RVCCLEANMS.S.A0005
-
-    #Server Commands recived
-    - label: "Does the device implement receiving the ChangeToMode command?"
-      id: RVCCLEANMS.S.C00.Rsp
-
-    - label:
-          "Does the device implement receiving the ChangeToModeWithStatus
-          command?"
-      id: RVCCLEANMS.S.C01.Rsp
-
-    #server commands generated
-    - label:
-          "Does the device implement sending the ChangeToModeResponse command?"
-      id: RVCCLEANMS.S.C03.Tx
-
-    #
     #Operational State
     #
     - label:
@@ -9315,6 +8775,38 @@ PICS:
     - label:
           "Does the device implement the Operational State cluster as a client?"
       id: OPSTATE.C
+
+    # ManuallyControlled
+
+    - label: "Does the DUT support testing the Stopped(0x00) operational state"
+      id: OPSTATE.S.M.ST_STOPPED
+
+    - label: "Does the DUT support testing the Running(0x01) operational state"
+      id: OPSTATE.S.M.ST_RUNNING
+
+    - label: "Does the DUT support testing the Paused(0x02) operational state"
+      id: OPSTATE.S.M.ST_PAUSED
+
+    - label: "Does the DUT support testing the Error(0x03) operational state?"
+      id: OPSTATE.S.M.ST_ERROR
+
+    - label: "Does the DUT support testing the NoError(0x00) error state?"
+      id: OPSTATE.S.M.ERR_NO_ERROR
+
+    - label:
+          "Does the DUT support testing the UnableToStartOrResume(0x01) error
+          state?"
+      id: OPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME
+
+    - label:
+          "Does the DUT support testing the UnableToCompleteOperation(0x02)
+          error state?"
+      id: OPSTATE.S.M.ERR_UNABLE_TO_COMPLETE_OPERATION
+
+    - label:
+          "Does the DUT support testing the CommandInvalidInState(0x03) error
+          state?"
+      id: OPSTATE.S.M.ERR_COMMAND_INVALID_IN_STATE
 
     #Server Attributes
     - label: "Does the device implement the PhaseList attribute?"
@@ -9501,6 +8993,19 @@ PICS:
     - label: "Does the device implement the LWM cluster as a server?"
       id: LWM.S
 
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: LWM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label:
+          "Id of mode the device will fail to transition to, given its current
+          state"
+      id: PIXIT.LWM.MODE_CHANGE_FAIL
+
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.LWM.MODE_CHANGE_OK
+
     #
     # server / features
     #
@@ -9550,9 +9055,6 @@ PICS:
           the same endpoint?"
       id: RVCCLEANM.S.F00
 
-    - label: "Does the device read the global attribute: EventList from the DUT"
-      id: RVCCLEANM.S.Afffa
-
     #
     # server / attributes
     #
@@ -9581,11 +9083,36 @@ PICS:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: RVCCLEANM.S.C01.Tx
 
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: RVCCLEANM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label:
+          "Id of mode the device will fail to transition to, given its current
+          state"
+      id: PIXIT.RVCCLEANM.MODE_CHANGE_FAIL
+
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.RVCCLEANM.MODE_CHANGE_OK
     #
     #Temperature Controlled Cabinet Mode Cluster
     #
     - label: "Does the device implement the TCCM cluster as a server?"
       id: TCCM.S
+
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: TCCM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.TCCM.MODE_CHANGE_OK
+
+    - label:
+          "Id of mode the device will fail to transition to, given its current
+          state"
+      id: PIXIT.TCCM.MODE_CHANGE_FAIL
 
     #Features
     - label:
@@ -9662,6 +9189,9 @@ PICS:
           device?"
       id: TCC.M.ManuallyControlledTemperature
 
+    - label: "Does the device support the INVALID_IN_MODE response"
+      id: TCTL.S.M.SupportsInvalidInMode
+
     #Commands received
     - label:
           "Does the device implement receiving the SetTemperatureCommand
@@ -9720,14 +9250,24 @@ PICS:
     - label: "Does the device implement the RVCRUNM cluster as a server?"
       id: RVCRUNM.S
 
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: RVCRUNM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label:
+          "Id of mode the device will fail to transition to, given its current
+          state"
+      id: PIXIT.RVCRUNM.MODE_CHANGE_FAIL
+
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.RVCRUNM.MODE_CHANGE_OK
+
     #Features
     - label:
           "Does the device support depending on an On/Off cluster implemented on
           the same endpoint?"
       id: RVCRUNM.S.F00
-
-    - label: "Does the device read the global attribute: EventList from the DUT"
-      id: RVCRUNM.S.Afffa
 
     #Attributes
     - label: "Does the device implement the SupportedModes attribute?"
@@ -9799,6 +9339,82 @@ PICS:
           "Does the device implement the RVC Operational State cluster as a
           client?"
       id: RVCOPSTATE.C
+
+    # ManuallyControlled
+
+    - label: "Does the DUT support testing the Stopped(0x00) operational state?"
+      id: RVCOPSTATE.S.M.ST_STOPPED
+
+    - label: "Does the DUT support testing the Running(0x01) operational state?"
+      id: RVCOPSTATE.S.M.ST_RUNNING
+
+    - label: "Does the DUT support testing the Paused(0x02) operational state?"
+      id: RVCOPSTATE.S.M.ST_PAUSED
+
+    - label: "Does the DUT support testing the Error(0x03) operational state?"
+      id: RVCOPSTATE.S.M.ST_ERROR
+
+    - label:
+          "Does the DUT support testing the SeekingCharger(0x40) operational
+          state?"
+      id: RVCOPSTATE.S.M.ST_SEEKING_CHARGER
+
+    - label:
+          "Does the DUT support testing the Charging(0x41) operational state?"
+      id: RVCOPSTATE.S.M.ST_CHARGING
+
+    - label: "Does the DUT support testing the Docked(0x42) operational state?"
+      id: RVCOPSTATE.S.M.ST_DOCKED
+
+    - label: "Does the DUT support testing the NoError(0x00) error state?"
+      id: RVCOPSTATE.S.M.ERR_NO_ERROR
+
+    - label:
+          "Does the DUT support testing the UnableToStartOrResume(0x01) error
+          state?"
+      id: RVCOPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME
+
+    - label:
+          "Does the DUT support testing the UnableToCompleteOperation(0x02)
+          error state?"
+      id: RVCOPSTATE.S.M.ERR_UNABLE_TO_COMPLETE_OPERATION
+
+    - label:
+          "Does the DUT support testing the CommandInvalidInState(0x03) error
+          state?"
+      id: RVCOPSTATE.S.M.ERR_COMMAND_INVALID_IN_STATE
+
+    - label:
+          "Does the DUT support testing the FailedToFindChargingDock(0x40) error
+          state?"
+      id: RVCOPSTATE.S.M.ERR_FAILED_TO_FIND_CHARGING_DOCK
+
+    - label: "Does the DUT support testing the Stuck(0x41) error state?"
+      id: RVCOPSTATE.S.M.ERR_STUCK
+
+    - label:
+          "Does the DUT support testing the DustBinMissing(0x42) error state?"
+      id: RVCOPSTATE.S.M.ERR_DUST_BIN_MISSING
+
+    - label: "Does the DUT support testing the DustBinFull(0x43) error state?"
+      id: RVCOPSTATE.S.M.ERR_DUST_BIN_FULL
+
+    - label:
+          "Does the DUT support testing the WaterTankEmpty(0x44) error state?"
+      id: RVCOPSTATE.S.M.ERR_WATER_TANK_EMPTY
+
+    - label:
+          "Does the DUT support testing the WaterTankMissing(0x45) error state?"
+      id: RVCOPSTATE.S.M.ERR_WATER_TANK_MISSING
+
+    - label:
+          "Does the DUT support testing the WaterTankLidOpen(0x46) error state?"
+      id: RVCOPSTATE.S.M.ERR_WATER_TANK_LID_OPEN
+
+    - label:
+          "Does the DUT support testing the MopCleaningPadMissing(0x47) error
+          state?"
+      id: RVCOPSTATE.S.M.ERR_MOP_CLEANING_PAD_MISSING
 
     #Attributes
     - label: "Does the device implement the PhaseList attribute?"

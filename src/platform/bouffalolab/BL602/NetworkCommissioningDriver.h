@@ -22,7 +22,7 @@
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
-// #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
 namespace {
 constexpr uint8_t kMaxWiFiNetworks                  = 1;
 constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
@@ -134,7 +134,6 @@ private:
     NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
     int32_t mLastDisconnectedReason;
 };
-// #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 } // namespace NetworkCommissioning
 } // namespace DeviceLayer

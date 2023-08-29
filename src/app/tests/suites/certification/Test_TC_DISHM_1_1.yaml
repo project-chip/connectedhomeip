@@ -33,70 +33,75 @@ tests:
 
     - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
       verification: |
-          ./chip-tool dishwashermodeselect read cluster-revision 1 1
+          ./chip-tool dishwashermode read cluster-revision 1 1
 
-          Verify the "ClusterRevision" value is of unit16 and reflects the highest revision number 2 on the TH(chip-tool) and below is the sample log provided for the raspi platform:
+          Verify the "ClusterRevision" value is of unit16 and reflects the highest revision number 1 on the TH(Chip-tool) and below is the sample log provided for the raspi platform:
 
-          [1645775623.658997][3277:3282] CHIP:TOO: ClusterRevision: 1
+          [1690365584.246794][27436:27438] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFFD DataVersion: 1130015440
+          [1690365584.246860][27436:27438] CHIP:TOO:   ClusterRevision: 1
       disabled: true
 
     - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
       verification: |
-          ./chip-tool dishwashermodeselect read feature-map 1 1
+          ./chip-tool dishwashermode read feature-map 1 1
 
-          On the TH(chip-tool) Log, Verify featureMap value is 1, This value changes depending on DUT implementing the features and below is the sample log provided for the raspi platform:
+          On the TH(Chip-tool) Log, Verify featureMap value is 1 If DISHM.S.F00(DEPONOFF) is true, Otherwise 0,  and below is the sample log provided for the raspi platform:
 
-          [1649052001.646939][8355:8360] CHIP:TOO: FeatureMap: 1
+          [1690365613.351850][27441:27443] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFFC DataVersion: 1130015440
+          [1690365613.351911][27441:27443] CHIP:TOO:   FeatureMap: 1
       disabled: true
 
     - label: "Step 4: TH reads from the DUT the AttributeList attribute."
       verification: |
-          ./chip-tool dishwashermodeselect read attribute-list 1 1
+          ./chip-tool dishwashermode read attribute-list 1 1
 
-          Verify the "AttributeList " should include the mandatory attributes (values 0, 2, 3),
-          global attributes (value 65533, 65532, 65531, 65530, 65529 and 65528) and
-          list may include optional attribute(value 0x0004), if MOD.S.A0004(StartUpMode) supports,
-          list contains feature dependent attribute (values 0x0005), if MOD.S.F00(DEPONOFF) is true on the TH(chip-tool) Log and below is the sample log provided for the raspi platform:
+          Verify the "AttributeList " should include the mandatory attributes (values 0, 1),
+          - Global attributes  (value 65533, 65532, 65531, 65530, 65529 and 65528) and
+          - List may include optional attribute(value 0x0002), if DISHM.S.A0002(StartUpMode) supports,
+          - List contains feature dependent attribute (values 0x0003), if DISHM.S.F00(DEPONOFF) is true  on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
 
-          [1676288620.483812][4014:4016] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_FFFB DataVersion: 2649295313
-          [1676288620.483850][4014:4016] CHIP:TOO: AttributeList: 13 entries
-          [1676288620.483861][4014:4016] CHIP:TOO: [1]: 0
-          [1676288620.483870][4014:4016] CHIP:TOO: [2]: 1
-          [1676288620.483878][4014:4016] CHIP:TOO: [3]: 65528
-          [1676288620.483886][4014:4016] CHIP:TOO: [4]: 65529
-          [1676288620.483892][4014:4016] CHIP:TOO: [5]: 65530
-          [1676288620.483899][4014:4016] CHIP:TOO: [6]: 65531
-          [1676288620.483906][4014:4016] CHIP:TOO: [7]: 4293984257
-          [1676288620.483915][4014:4016] CHIP:TOO: [8]: 2
-          [1676288620.483922][4014:4016] CHIP:TOO: [9]: 3
-          [1676288620.483929][4014:4016] CHIP:TOO: [10]: 4
-          [1676288620.483934][4014:4016] CHIP:TOO: [11]: 5
-          [1676288620.483941][4014:4016] CHIP:TOO: [12]: 65532
-          [1676288620.483947][4014:4016] CHIP:TOO: [13]: 65533
-          [1676288620.484034][4014:4016] CHIP:EM: <<< [E:29816i M:167554497 (Ack:41020138)] (S) Msg TX to 1:000000000
-
-
-          *NOTE* : This sample attribute list reflects the currently implemented attributes on the all-clusters-app.
+          [1689930814.439457][300741:300743] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFFB DataVersion: 2031856391
+          [1689930814.439500][300741:300743] CHIP:TOO:   AttributeList: 10 entries
+          [1689930814.439520][300741:300743] CHIP:TOO:     [1]: 0
+          [1689930814.439538][300741:300743] CHIP:TOO:     [2]: 1
+          [1689930814.439565][300741:300743] CHIP:TOO:     [3]: 2
+          [1689930814.439584][300741:300743] CHIP:TOO:     [4]: 3
+          [1689930814.439599][300741:300743] CHIP:TOO:     [5]: 65528
+          [1689930814.439602][300741:300743] CHIP:TOO:     [6]: 65529
+          [1689930814.439604][300741:300743] CHIP:TOO:     [7]: 65530
+          [1689930814.439616][300741:300743] CHIP:TOO:     [8]: 65531
+          [1689930814.439619][300741:300743] CHIP:TOO:     [9]: 65532
+          [1689930814.439621][300741:300743] CHIP:TOO:     [10]: 65533
       disabled: true
 
-    - label: "Step 5: TH reads from the DUT the AcceptedCommandList attribute."
+    - label: "Step 5: TH reads from the DUT the EventList attribute."
       verification: |
-          ./chip-tool dishwashermodeselect read accepted-command-list 1 1
+          ./chip-tool dishwashermode read event-list 1 1
 
-          Verify the "AcceptedCommandList" contains feature dependent commands
-          if !MOD.S.F02(DEPCTM) feature supports list includes(value 0x0000) and
-          if MOD.S.F01(EXT) feature supports list includes(value 0x0001) on the TH (chip-tool) and below is the sample log provided for the raspi platform:
+          Verify "EventList" contains a list of supported events, for this cluster the list is emty(0 entries) on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
 
-          [1650274602.826352][8965:8970] CHIP:TOO: AcceptedCommandList: 1 entries
-          [1650274602.826442][8965:8970] CHIP:TOO: [1]: 0
+          [1689996691.141081][359868:359870] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFFA DataVersion: 1427220838
+          [1689996691.141341][359868:359870] CHIP:TOO:   EventList: 0 entries
       disabled: true
 
-    - label: "Step 6: TH reads from the DUT the GeneratedCommandList attribute."
+    - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
       verification: |
-          ./chip-tool dishwashermodeselect read generated-command-list 1 1
+          ./chip-tool dishwashermode read accepted-command-list 1 1
 
-          Verify "GeneratedCommandList" contains feature dependent commands
-          if MOD.S.F01(EXT) feature supports list includes(value 0x0002), otherwise value is 0 on the TH(chip-tool) Log and below is the sample log provided for the raspi platform:
+          Verify the "AcceptedCommandList" contains a list of mandatory commands (value 0) on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
-          [1650274662.075309][8972:8977] CHIP:TOO: GeneratedCommandList: 0 entries
+          [1690365651.143190][27451:27453] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFF9 DataVersion: 1130015440
+          [1690365651.143256][27451:27453] CHIP:TOO:   AcceptedCommandList: 1 entries
+          [1690365651.143284][27451:27453] CHIP:TOO:     [1]: 0
+      disabled: true
+
+    - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute."
+      verification: |
+          ./chip-tool dishwashermode read generated-command-list 1 1
+
+          Verify " GeneratedCommandList" contains a list of mandatory commands (value 1)  on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+
+          [1689997224.280302][360025:360027] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFF8 DataVersion: 1427220838
+          [1689997224.280330][360025:360027] CHIP:TOO:   GeneratedCommandList: 1 entries
+          [1689997224.280346][360025:360027] CHIP:TOO:     [1]: 1
       disabled: true

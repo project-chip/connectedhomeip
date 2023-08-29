@@ -23,7 +23,9 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/server/Server.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/nrfconnect/OTAImageProcessorImpl.h>
+#include <zephyr/dfu/mcuboot.h>
 #endif
 
 using namespace chip;
@@ -63,6 +65,23 @@ void InitBasicOTARequestor()
     sOTARequestorDriver.Init(&sOTARequestor, &imageProcessor);
     imageProcessor.TriggerFlashAction(ExternalFlashManager::Action::SLEEP);
 }
+
+CHIP_ERROR OtaConfirmNewImage()
+{
+    CHIP_ERROR err                         = CHIP_NO_ERROR;
+    OTAImageProcessorImpl & imageProcessor = GetOTAImageProcessor();
+    if (imageProcessor.IsFirstImageRun())
+    {
+        CHIP_ERROR err = System::MapErrorZephyr(boot_write_img_confirmed());
+        if (CHIP_NO_ERROR == err)
+        {
+            imageProcessor.SetImageConfirmed();
+        }
+    }
+    ChipLogError(SoftwareUpdate, "Failed to confirm firmware image, it will be reverted on the next boot");
+    return err;
+}
+
 #endif
 
 ExternalFlashManager & GetFlashHandler()

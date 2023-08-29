@@ -124,8 +124,16 @@ if(CONFIG_DISABLE_IPV4)
     chip_gn_arg_append("chip_inet_config_enable_ipv4"        "false")
 endif()
 
+if(CONFIG_DISABLE_READ_CLIENT)
+    chip_gn_arg_append("chip_enable_read_client"             "false")
+endif()
+
 if(CHIP_CODEGEN_PREGEN_DIR)
     chip_gn_arg_append("chip_code_pre_generated_directory"  "\"${CHIP_CODEGEN_PREGEN_DIR}\"")
+endif()
+
+if(CONFIG_ENABLE_ICD_SERVER)
+    chip_gn_arg_append("chip_enable_icd_server"               "true")
 endif()
 
 if(CONFIG_ENABLE_PW_RPC)
@@ -252,6 +260,10 @@ if (CONFIG_SEC_CERT_DAC_PROVIDER)
     chip_gn_arg_append("chip_use_secure_cert_dac_provider"                 "true")
 endif()
 
+if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
+    chip_gn_arg_append("matter_enable_esp_insights_trace"                    "true")
+endif()
+
 if (CONFIG_USE_ESP32_ECDSA_PERIPHERAL)
     chip_gn_arg_append("chip_use_esp32_ecdsa_peripheral" "true")
 endif()
@@ -359,6 +371,10 @@ target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CHIP_ROOT}/config/esp32/${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}/../../"
 )
 
+if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
+    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
+endif()
+
 idf_component_get_property(mbedtls_lib mbedtls COMPONENT_LIB)
 
 idf_build_get_property(idf_target IDF_TARGET)
@@ -414,6 +430,11 @@ if (CONFIG_SEC_CERT_DAC_PROVIDER)
     list(APPEND chip_libraries $<TARGET_FILE:${esp32_secure_cert_mgr_lib}>)
 endif()
 
+if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
+    idf_component_get_property(esp_insights_lib espressif__esp_insights COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${esp_insights_lib}>)
+endif()
+
 idf_component_get_property(lwip_lib lwip COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${lwip_lib}>)
 
@@ -462,26 +483,11 @@ foreach(phy_blob ${phy_blobs})
     list(APPEND chip_libraries "${esp_phy_dir}/lib/${target_name}/lib${phy_blob}.a")
 endforeach()
 
-idf_component_get_property(esp_event_lib esp_event COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${esp_event_lib}>)
-
-idf_component_get_property(hal_lib hal COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${hal_lib}>)
-
-idf_component_get_property(esp_system_lib esp_system COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${esp_system_lib}>)
-
-idf_component_get_property(soc_lib soc COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${soc_lib}>)
-
-idf_component_get_property(efuse_lib efuse COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${efuse_lib}>)
-
-idf_component_get_property(vfs_lib vfs COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${vfs_lib}>)
-
-idf_component_get_property(driver_lib driver COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${driver_lib}>)
+set(components_to_link esp_event hal esp_system soc efuse vfs driver esp_coex freertos)
+foreach(component ${components_to_link})
+    idf_component_get_property(lib_name ${component} COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${lib_name}>)
+endforeach()
 
 target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
                                                 ${chip_libraries}

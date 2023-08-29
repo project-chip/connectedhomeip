@@ -136,6 +136,8 @@ bouffalolab_executable("lighting_app") {
     defines += [ "BL706_NIGHT_LIGHT" ]
   } else if ("BL706-ETH" == board) {
     defines += [ "BL706_ETHERNET" ]
+  } else if ("BL706-WIFI" == board) {
+    defines += [ "BL706_WIFI" ]
   }
 
   if (defined(enable_cdc_module) && enable_cdc_module) {

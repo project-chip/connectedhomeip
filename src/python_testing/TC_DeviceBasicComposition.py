@@ -27,10 +27,7 @@ from typing import Any, Callable, Optional
 
 import chip.clusters as Clusters
 import chip.tlv
-from chip import discovery
 from chip.clusters.Attribute import ValueDecodeFailure
-from chip.exceptions import ChipStackError
-from chip.setup_payload import SetupPayload
 from matter_testing_support import AttributePathLocation, MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -160,6 +157,81 @@ def check_non_empty_list_of_ints_in_range(min_value: int, max_value: int, max_si
     return check_list_of_ints_in_range(min_value, max_value, min_size=1, max_size=max_size, allow_null=allow_null)
 
 
+def separate_endpoint_types(endpoint_dict: dict[int, Any]) -> tuple[list[int], list[int]]:
+    """Returns a tuple containing the list of flat endpoints and a list of tree endpoints"""
+    flat = []
+    tree = []
+    for endpoint_id, endpoint in endpoint_dict.items():
+        if endpoint_id == 0:
+            continue
+        aggregator_id = 0x000e
+        device_types = [d.deviceType for d in endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
+        if aggregator_id in device_types:
+            flat.append(endpoint_id)
+        else:
+            tree.append(endpoint_id)
+    return (flat, tree)
+
+
+def get_all_children(endpoint_id, endpoint_dict: dict[int, Any]) -> set[int]:
+    """Returns all the children (include subchildren) of the given endpoint
+       This assumes we've already checked that there are no cycles, so we can do the dumb things and just trace the tree
+    """
+    children = set()
+
+    def add_children(endpoint_id, children):
+        immediate_children = endpoint_dict[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
+        if not immediate_children:
+            return
+        children.update(set(immediate_children))
+        for child in immediate_children:
+            add_children(child, children)
+
+    add_children(endpoint_id, children)
+    return children
+
+
+def find_tree_roots(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) -> set[int]:
+    """Returns a set of all the endpoints in tree_endpoints that are roots for a tree (not include singletons)"""
+    tree_roots = set()
+
+    def find_tree_root(current_id):
+        for endpoint_id, endpoint in endpoint_dict.items():
+            if endpoint_id not in tree_endpoints:
+                continue
+            if current_id in endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
+                # this is not the root, move up
+                return find_tree_root(endpoint_id)
+        return current_id
+
+    for endpoint_id in tree_endpoints:
+        root = find_tree_root(endpoint_id)
+        if root != endpoint_id:
+            tree_roots.add(root)
+    return tree_roots
+
+
+def parts_list_cycles(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) -> list[int]:
+    """Returns a list of all the endpoints in the tree_endpoints list that contain cycles"""
+    def parts_list_cycle_detect(visited: set, current_id: int) -> bool:
+        if current_id in visited:
+            return True
+        visited.add(current_id)
+        for child in endpoint_dict[current_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
+            child_has_cycles = parts_list_cycle_detect(visited, child)
+            if child_has_cycles:
+                return True
+        return False
+
+    cycles = []
+    # This is quick enough that we can do all the endpoints wihtout searching for the roots
+    for endpoint_id in tree_endpoints:
+        visited = set()
+        if parts_list_cycle_detect(visited, endpoint_id):
+            cycles.append(endpoint_id)
+    return cycles
+
+
 class TC_DeviceBasicComposition(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
@@ -171,32 +243,10 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         dump_device_composition_path: Optional[str] = self.user_params.get("dump_device_composition_path", None)
 
         if do_test_over_pase:
-            if self.matter_test_config.qr_code_content is not None:
-                qr_code = self.matter_test_config.qr_code_content
-                try:
-                    setup_payload = SetupPayload().ParseQrCode(qr_code)
-                except ChipStackError:
-                    asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
-
-            elif self.matter_test_config.manual_code is not None:
-                manual_code = self.matter_test_config.manual_code
-                try:
-                    setup_payload = SetupPayload().ParseManualPairingCode(manual_code)
-                except ChipStackError:
-                    asserts.fail(
-                        f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
-            else:
-                asserts.fail("Require either --qr-code or --manual-code to proceed with PASE needed for test.")
-
-            if setup_payload.short_discriminator is not None:
-                filter_type = discovery.FilterType.SHORT_DISCRIMINATOR
-                filter_value = setup_payload.short_discriminator
-            else:
-                filter_type = discovery.FilterType.LONG_DISCRIMINATOR
-                filter_value = setup_payload.long_discriminator
+            info = self.get_setup_payload_info()
 
             commissionable_nodes = dev_ctrl.DiscoverCommissionableNodes(
-                filter_type, filter_value, stopOnFirst=True, timeoutSecond=15)
+                info.filter_type, info.filter_value, stopOnFirst=True, timeoutSecond=15)
             logging.info(f"Commissionable nodes: {commissionable_nodes}")
             # TODO: Support BLE
             if commissionable_nodes is not None and len(commissionable_nodes) > 0:
@@ -208,7 +258,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                 logging.info(f"Found instance {instance_name}, VID={vid}, PID={pid}, Address={address}")
 
                 node_id = 1
-                dev_ctrl.EstablishPASESessionIP(address, setup_payload.setup_passcode, node_id)
+                dev_ctrl.EstablishPASESessionIP(address, info.passcode, node_id)
             else:
                 asserts.fail("Failed to find the DUT according to command line arguments.")
         else:
@@ -450,8 +500,66 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         asserts.skip(
             "TODO: Make a test that verifies each endpoint has valid set of device types, and that the device type conformance is respected for each")
 
-    def test_topology_is_valid(self):
-        asserts.skip("TODO: Make a test that verifies each endpoint only lists direct descendants, except Root Node and Aggregator endpoints that list all their descendants")
+    def test_TC_SM_1_2(self):
+        self.print_step(1, "Wildcard read of device - already done")
+
+        self.print_step(2, "Verify the Descriptor cluster PartsList on endpoint 0 exactly lists all the other (non-0) endpoints on the DUT")
+        parts_list_0 = self.endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
+        cluster_id = Clusters.Descriptor.id
+        attribute_id = Clusters.Descriptor.Attributes.PartsList.attribute_id
+        location = AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=attribute_id)
+        if len(self.endpoints.keys()) != len(set(self.endpoints.keys())):
+            self.record_error(self.get_test_name(), location=location,
+                              problem='duplicate endpoint ids found in the returned data', spec_location="PartsList Attribute")
+            self.fail_current_test()
+
+        if len(parts_list_0) != len(set(parts_list_0)):
+            self.record_error(self.get_test_name(), location=location,
+                              problem='Duplicate endpoint ids found in the parts list on ep0', spec_location="PartsList Attribute")
+            self.fail_current_test()
+
+        expected_parts = set(self.endpoints.keys())
+        expected_parts.remove(0)
+        if set(parts_list_0) != expected_parts:
+            self.record_error(self.get_test_name(), location=location,
+                              problem='EP0 Descriptor parts list does not match the set of returned endpoints', spec_location="PartsList Attribute")
+            self.fail_current_test()
+
+        self.print_step(
+            3, "For each endpoint on the DUT (including EP 0), verify the PartsList in the Descriptor cluster on that endpoint does not include itself")
+        for endpoint_id, endpoint in self.endpoints.items():
+            if endpoint_id in endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+                self.record_error(self.get_test_name(), location=location,
+                                  problem=f"Endpoint {endpoint_id} parts list includes itself", spec_location="PartsList Attribute")
+                self.fail_current_test()
+
+        self.print_step(4, "Separate endpoints into flat and tree style")
+        flat, tree = separate_endpoint_types(self.endpoints)
+
+        self.print_step(5, "Check for cycles in the tree endpoints")
+        cycles = parts_list_cycles(tree, self.endpoints)
+        if len(cycles) != 0:
+            for id in cycles:
+                location = AttributePathLocation(endpoint_id=id, cluster_id=cluster_id, attribute_id=attribute_id)
+                self.record_error(self.get_test_name(), location=location,
+                                  problem=f"Endpoint {id} parts list includes a cycle", spec_location="PartsList Attribute")
+            self.fail_current_test()
+
+        self.print_step(6, "Check flat lists include all sub ids")
+        ok = True
+        for endpoint_id in flat:
+            # ensure that every sub-id in the parts list is included in the parent
+            sub_children = []
+            for child in self.endpoints[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
+                sub_children.update(get_all_children(child))
+            if not all(item in sub_children for item in self.endpoints[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]):
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+                self.record_error(self.get_test_name(), location=location,
+                                  problem='Flat parts list does not include all the sub-parts', spec_location='Endpoint composition')
+                ok = False
+        if not ok:
+            self.fail_current_test()
 
     def test_TC_PS_3_1(self):
         BRIDGED_NODE_DEVICE_TYPE_ID = 0x13
@@ -465,8 +573,20 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         for endpoint_id, endpoint in self.endpoints.items():
             if Clusters.PowerSource not in endpoint:
                 continue
+            location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+            cluster_revision = Clusters.PowerSource.Attributes.ClusterRevision
+            if cluster_revision not in endpoint[Clusters.PowerSource]:
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
+                                                 attribute_id=cluster_revision.attribute_id)
+                self.record_error(self.get_test_name(
+                ), location=location, problem=f'Did not find Cluster revision on {location.as_cluster_string(self.cluster_mapper)}', spec_location='Global attributes')
+            if endpoint[Clusters.PowerSource][cluster_revision] < 2:
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
+                                                 attribute_id=cluster_revision.attribute_id)
+                self.record_note(self.get_test_name(), location=location,
+                                 problem='Power source ClusterRevision is < 2, skipping remainder of test for this endpoint')
+                continue
             if Clusters.PowerSource.Attributes.EndpointList not in endpoint[Clusters.PowerSource]:
-                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                 self.record_error(self.get_test_name(), location=location,
                                   problem=f'Did not find {attribute_string} on {location.as_cluster_string(self.cluster_mapper)}', spec_location="EndpointList Attribute")
                 success = False

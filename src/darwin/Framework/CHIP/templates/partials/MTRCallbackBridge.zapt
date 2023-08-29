@@ -83,6 +83,7 @@ void MTR{{> @partial-block}}Bridge::OnSuccessFn(void * context
           OnFailureFn(context, err);
           return;
       }
+      SetAttestationChallengeIfNeeded(context, response);
       DispatchSuccess(context, response);
       {{else if (isStrEqual partial-type "CommandStatus")}}
       DispatchSuccess(context, nil);

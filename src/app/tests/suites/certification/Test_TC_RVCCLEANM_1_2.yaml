@@ -24,6 +24,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
+      disabled: true
+
     - label:
           "Step 1: Commission DUT to TH (can be skipped if done in a preceding
           test)."
@@ -34,75 +39,77 @@ tests:
     - label: "Step 2: TH reads from the DUT the SupportedModes attribute."
       PICS: RVCCLEANM.S.A0000
       verification: |
-          ./chip-tool rvcleanm read supported-modes 1 1
+          ./chip-tool  rvccleanmode read supported-modes 1 1
 
-          On TH(chip-tool) log, Verify SupportedModes attribute should contains atleast two ModeOptionsStruct entries with unique mode field value and label field value  below is the sample log provided for the raspi platform:
+          Verify that the DUT response contains list of ModeOptionsStruct entries.
+          - Verify that the list has at least 2 and at most 255 entries
+          - Verify that each ModeOptionsStruct entry has a unique Mode field value and Label field value
+          - If ModeOptionsStruct entry’s ModeTags field is not empty,  then Verify the values of the Value fields that are not larger than 16 bits, for each Value field: Is the semantic tag value a defined common tag value (Auto(0x0000), Quick(0x0001), Quiet(0x0002), LowNoise(0x0003), LowEnergy(0x0004), Vacation(0x0005), Min(0x0006), Max(0x0007), Night(0x0008), Day(0x0009)) or a defined derived cluster tag value (DeepClean(0x4000), Vacuum(0x4001), Mop(0x4002)) or in the MfgTags (0x8000 to 0xBFFF) range.
+          - If the Value field is in the MfgTags (0x8000 to 0xBFFF) range, the TagName field is a string with a length between 1 and 64
+          - Verify that at least one ModeOptionsStruct entry includes either the Vacuum(0x4001) mode tag or the Mop(0x4002)mode tag in the ModeTags field
+          - Save the Mode field values as supported_modes_dut on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
-          [1654595167.600241][14362:14367] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 366231602
-          [1654595167.600345][14362:14367] CHIP:TOO:   SupportedModes: 3 entries
-          [1654595167.600403][14362:14367] CHIP:TOO:     [1]: {
-          [1654595167.600430][14362:14367] CHIP:TOO:       Label: Black
-          [1654595167.600466][14362:14367] CHIP:TOO:       Mode: 0
-          [1654595167.600495][14362:14367] CHIP:TOO:       SemanticTags: 1 entries
-          [1654595167.600564][14362:14367] CHIP:TOO:         [1]: {
-          [1654595167.600589][14362:14367] CHIP:TOO:           MfgCode: 0
-          [1654595167.600612][14362:14367] CHIP:TOO:           Value: 0
-          [1654595167.600637][14362:14367] CHIP:TOO:          }
-          [1654595167.600662][14362:14367] CHIP:TOO:      }
-          [1654595167.600695][14362:14367] CHIP:TOO:     [2]: {
-          [1654595167.600719][14362:14367] CHIP:TOO:       Label: Cappuccino
-          [1654595167.600742][14362:14367] CHIP:TOO:       Mode: 4
-          [1654595167.600768][14362:14367] CHIP:TOO:       SemanticTags: 1 entries
-          [1654595167.600796][14362:14367] CHIP:TOO:         [1]: {
-          [1654595167.600820][14362:14367] CHIP:TOO:           MfgCode: 0
-          [1654595167.600842][14362:14367] CHIP:TOO:           Value: 0
-          [1654595167.600865][14362:14367] CHIP:TOO:          }
-          [1654595167.600889][14362:14367] CHIP:TOO:      }
-          [1654595167.600921][14362:14367] CHIP:TOO:     [3]: {
-          [1654595167.600945][14362:14367] CHIP:TOO:       Label: Espresso
-          [1654595167.600968][14362:14367] CHIP:TOO:       Mode: 7
-          [1654595167.600993][14362:14367] CHIP:TOO:       SemanticTags: 1 entries
-          [1654595167.601022][14362:14367] CHIP:TOO:         [1]: {
-          [1654595167.601046][14362:14367] CHIP:TOO:           MfgCode: 0
-          [1654595167.601068][14362:14367] CHIP:TOO:           Value: 0
-          [1654595167.601091][14362:14367] CHIP:TOO:          }
-          [1654595167.601115][14362:14367] CHIP:TOO:      }
+          [1690182376.583260][14996:14998] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0055 Attribute 0x0000_0000 DataVersion: 3145953005
+          [1690182376.583288][14996:14998] CHIP:TOO:   SupportedModes: 3 entries
+          [1690182376.583301][14996:14998] CHIP:TOO:     [1]: {
+          [1690182376.583304][14996:14998] CHIP:TOO:       Label: Vacuum
+          [1690182376.583307][14996:14998] CHIP:TOO:       Mode: 0
+          [1690182376.583311][14996:14998] CHIP:TOO:       ModeTags: 1 entries
+          [1690182376.583316][14996:14998] CHIP:TOO:         [1]: {
+          [1690182376.583319][14996:14998] CHIP:TOO:           Value: 16385
+          [1690182376.583322][14996:14998] CHIP:TOO:          }
+          [1690182376.583325][14996:14998] CHIP:TOO:      }
+          [1690182376.583331][14996:14998] CHIP:TOO:     [2]: {
+          [1690182376.583333][14996:14998] CHIP:TOO:       Label: Wash
+          [1690182376.583336][14996:14998] CHIP:TOO:       Mode: 1
+          [1690182376.583340][14996:14998] CHIP:TOO:       ModeTags: 1 entries
+          [1690182376.583344][14996:14998] CHIP:TOO:         [1]: {
+          [1690182376.583347][14996:14998] CHIP:TOO:           Value: 16386
+          [1690182376.583349][14996:14998] CHIP:TOO:          }
+          [1690182376.583352][14996:14998] CHIP:TOO:      }
+          [1690182376.583357][14996:14998] CHIP:TOO:     [3]: {
+          [1690182376.583360][14996:14998] CHIP:TOO:       Label: Deep clean
+          [1690182376.583362][14996:14998] CHIP:TOO:       Mode: 2
+          [1690182376.583366][14996:14998] CHIP:TOO:       ModeTags: 2 entries
+          [1690182376.583369][14996:14998] CHIP:TOO:         [1]: {
+          [1690182376.583372][14996:14998] CHIP:TOO:           Value: 7
+          [1690182376.583375][14996:14998] CHIP:TOO:          }
+          [1690182376.583378][14996:14998] CHIP:TOO:         [2]: {
+          [1690182376.583380][14996:14998] CHIP:TOO:           Value: 16384
+          [1690182376.583383][14996:14998] CHIP:TOO:          }
+          [1690182376.583385][14996:14998] CHIP:TOO:      }
       disabled: true
 
     - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
       PICS: RVCCLEANM.S.A0001
       verification: |
-          ./chip-tool rvcleanm read current-mode 1 1
+          ./chip-tool  rvccleanmode read current-mode 1 1
 
-          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer and the  value is  from supported_modes_dut  and below is the sample log provided for the raspi platform:
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer from supported_modes_dut, below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 0
 
-          [1645776767.611140][4667:4672] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469718
-
-          [1645776767.611214][4667:4672] CHIP:TOO:   CurrentMode: 0
+          [1690182411.579845][15004:15006] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0055 Attribute 0x0000_0001 DataVersion: 3145953005
+          [1690182411.579857][15004:15006] CHIP:TOO:   CurrentMode: 0
       disabled: true
 
     - label: "Step 4: TH reads from the DUT the OnMode attribute."
       PICS: RVCCLEANM.S.A0003
       verification: |
-          ./chip-tool rvcleanm read on-mode 1 1
+          ./chip-tool  rvccleanmode read on-mode 1 1
 
-          Verify on TH(chip-tool) logs, OnMode attribute value is an integer and the value is from supported_modes_dut and below is the sample log provided for the raspi platform:
+          Verify on TH(chip-tool) logs, OnMode attribute value is an integer from supported_modes_dut or Null, below is the sample log provided for the raspi platform, Here OnMode attribute value is Null
 
-
-          [1649676072.465968][10754:10759] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4277065072
-
-          [1649676072.466094][10754:10759] CHIP:TOO:   OnMode: null
+          [1690182436.721527][15012:15014] CHIP:DMG: }
+          [1690182436.721673][15012:15014] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0055 Attribute 0x0000_0003 DataVersion: 3145953005
+          [1690182436.721723][15012:15014] CHIP:TOO:   OnMode: null
       disabled: true
 
     - label: "Step 5: TH reads from the DUT the StartUpMode attribute."
       PICS: RVCCLEANM.S.A0002
       verification: |
-          ./chip-tool rvcleanm read start-up-mode 1 1
+          ./chip-tool  rvccleanmode read start-up-mode 1 1
 
-          Verify on TH(chip-tool) logs, StartUpMode attribute value is an integer and value is from supported_modes_dut,  below is the sample log provided for the raspi platform:
+          Verify on TH(chip-tool) logs, StartUpMode attribute value is an integer from supported_modes_dut or null, below is the sample log provided for the raspi platform, Here StartUpMode attribute value is Null
 
-
-          [1649677014.496348][10778:10784] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0004 DataVersion: 4277065072
-
-          [1649677014.496469][10778:10784] CHIP:TOO:   StartUpMode: 0
+          [1690182475.587786][15022:15024] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0055 Attribute 0x0000_0002 DataVersion: 3145953005
+          [1690182475.587797][15022:15024] CHIP:TOO:   StartUpMode: null
       disabled: true

@@ -83,14 +83,13 @@ LaundryWasherControlsServer & LaundryWasherControlsServer::Instance()
     return sInstance;
 }
 
-EmberAfStatus LaundryWasherControlsServer::SetSpinSpeedCurrent(EndpointId endpointId,
-                                                               DataModel::Nullable<uint8_t> newSpinSpeedCurrent)
+EmberAfStatus LaundryWasherControlsServer::SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> spinSpeedCurrent)
 {
-    DataModel::Nullable<uint8_t> spinSpeedCurrent;
-    EmberAfStatus res = SpinSpeedCurrent::Get(endpointId, spinSpeedCurrent);
-    if ((res == EMBER_ZCL_STATUS_SUCCESS) && (spinSpeedCurrent != newSpinSpeedCurrent))
+    DataModel::Nullable<uint8_t> spinSpeedCurrentNow;
+    EmberAfStatus res = SpinSpeedCurrent::Get(endpointId, spinSpeedCurrentNow);
+    if ((res == EMBER_ZCL_STATUS_SUCCESS) && (spinSpeedCurrentNow != spinSpeedCurrent))
     {
-        res = SpinSpeedCurrent::Set(endpointId, newSpinSpeedCurrent);
+        res = SpinSpeedCurrent::Set(endpointId, spinSpeedCurrent);
     }
 
     return res;
@@ -192,4 +191,51 @@ void MatterLaundryWasherControlsPluginServerInitCallback()
 {
     LaundryWasherControlsServer & laundryWasherControlsServer = LaundryWasherControlsServer::Instance();
     registerAttributeAccessOverride(&laundryWasherControlsServer);
+}
+
+Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                                           EmberAfAttributeType attributeType, uint16_t size,
+                                                                           uint8_t * value)
+{
+    Delegate * delegate = GetDelegate(attributePath.mEndpointId);
+    VerifyOrDie((delegate != nullptr) && "Washer Controls implementation requires a registered delegate for validation.");
+    switch (attributePath.mAttributeId)
+    {
+    case Attributes::SpinSpeedCurrent::Id: {
+        if (NumericAttributeTraits<uint8_t>::IsNullValue(*value))
+        {
+            return Status::Success;
+        }
+        char buffer[LaundryWasherControlsServer::kMaxSpinSpeedLength];
+        MutableCharSpan spinSpeed(buffer);
+        uint8_t spinSpeedIndex = *value;
+        auto err               = delegate->GetSpinSpeedAtIndex(spinSpeedIndex, spinSpeed);
+        if (err == CHIP_NO_ERROR)
+        {
+            return Status::Success;
+        }
+        return Status::ConstraintError;
+    }
+    case Attributes::NumberOfRinses::Id: {
+        uint8_t supportedRinseIdx = 0;
+        while (true)
+        {
+            NumberOfRinsesEnum supportedRinse;
+            auto err = delegate->GetSupportedRinseAtIndex(supportedRinseIdx, supportedRinse);
+            if (err != CHIP_NO_ERROR)
+            {
+                // Can't find the attribute to be written in the supported list (CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                // Or can't get the correct supported list
+                return Status::InvalidInState;
+            }
+            if (supportedRinse == static_cast<NumberOfRinsesEnum>(*value))
+            {
+                // The written attribute is one of the supported item
+                return Status::Success;
+            }
+            supportedRinseIdx++;
+        }
+    }
+    }
+    return Status::Success;
 }

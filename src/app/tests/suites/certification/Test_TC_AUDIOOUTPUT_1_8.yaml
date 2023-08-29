@@ -60,12 +60,22 @@ tests:
               hasMasksClear: [0x2]
 
     - label: "Step 3: Read the global attribute: AttributeList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains: [0, 1, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 3: Read the global attribute: AttributeList"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 65528, 65529, 65531, 65532, 65533]
 
     - label: "Step 4: Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
@@ -84,6 +94,7 @@ tests:
               type: list
 
     - label: "Step 6: Read the global attribute: EventList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:

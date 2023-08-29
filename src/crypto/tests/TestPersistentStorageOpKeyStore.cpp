@@ -48,7 +48,7 @@ void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 0);
 
     // Failure before Init of NewOpKeypairForFabric
-    uint8_t unusedCsrBuf[kMAX_CSR_Length];
+    uint8_t unusedCsrBuf[kMIN_CSR_Buffer_Size];
     MutableByteSpan unusedCsrSpan{ unusedCsrBuf };
     err = opKeystore.NewOpKeypairForFabric(kFabricIndex, unusedCsrSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
@@ -66,7 +66,7 @@ void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Can generate a key and get a CSR
-    uint8_t csrBuf[kMAX_CSR_Length];
+    uint8_t csrBuf[kMIN_CSR_Buffer_Size];
     MutableByteSpan csrSpan{ csrBuf };
     err = opKeystore.NewOpKeypairForFabric(kFabricIndex, csrSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -85,7 +85,7 @@ void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, opKeystore.HasPendingOpKeypair() == true);
 
     // Cannot NewOpKeypair for a different fabric if one already pending
-    uint8_t badCsrBuf[kMAX_CSR_Length];
+    uint8_t badCsrBuf[kMIN_CSR_Buffer_Size];
     MutableByteSpan badCsrSpan = MutableByteSpan{ badCsrBuf };
     err                        = opKeystore.NewOpKeypairForFabric(kBadFabricIndex, badCsrSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_FABRIC_INDEX);

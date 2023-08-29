@@ -27,11 +27,17 @@ shared_library("jni") {
     "java/AppImpl.cpp",
     "java/AppImpl.h",
     "java/ClusterChangeAttribute.cpp",
+    "java/ColorControlManager.cpp",
+    "java/ColorControlManager.h",
     "java/DeviceApp-JNI.cpp",
+    "java/DoorLockManager.cpp",
+    "java/DoorLockManager.h",
     "java/JNIDACProvider.cpp",
     "java/JNIDACProvider.h",
     "java/OnOffManager.cpp",
     "java/OnOffManager.h",
+    "java/PowerSourceManager.cpp",
+    "java/PowerSourceManager.h",
   ]
 
   deps = [
@@ -64,10 +70,15 @@ android_library("java") {
   ]
 
   sources = [
+    "java/src/com/matter/virtual/device/app/Clusters.java",
+    "java/src/com/matter/virtual/device/app/ColorControlManager.java",
     "java/src/com/matter/virtual/device/app/DACProvider.java",
     "java/src/com/matter/virtual/device/app/DeviceApp.java",
     "java/src/com/matter/virtual/device/app/DeviceAppCallback.java",
+    "java/src/com/matter/virtual/device/app/DeviceEventType.java",
+    "java/src/com/matter/virtual/device/app/DoorLockManager.java",
     "java/src/com/matter/virtual/device/app/OnOffManager.java",
+    "java/src/com/matter/virtual/device/app/PowerSourceManager.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

@@ -26,12 +26,11 @@ include(${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/cm
 
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/components"
-    "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/QRCode"
+    "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common"
 )
+
 if(${IDF_TARGET} STREQUAL "esp32")
-    list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/m5stack-tft/repo/components/tft"
-                                     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/m5stack-tft/repo/components/spidriver"
-                                     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/screen-framework")
+    list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/m5stack-tft/repo/components")
 endif()
 
 project(chip-all-clusters-app)
@@ -46,8 +45,6 @@ idf_build_set_property(COMPILE_OPTIONS "-Wno-format-nonliteral;-Wno-format-secur
 #
 # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
 idf_build_set_property(COMPILE_OPTIONS "-Wno-error=maybe-uninitialized" APPEND)
-
-idf_build_set_property(COMPILE_OPTIONS "-Wno-error=array-bounds" APPEND)
 
 flashing_script()
 
