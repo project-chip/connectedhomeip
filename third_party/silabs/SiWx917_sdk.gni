@@ -164,9 +164,7 @@ template("siwx917_sdk") {
     ]
 
     if (silabs_board == "BRD4325B") {
-      defines += [
-        "DUAL_FLASH_EN",
-      ]
+      defines += [ "DUAL_FLASH_EN" ]
     }
     if (wifi_soc_common_flash) {
       defines += [
@@ -174,7 +172,7 @@ template("siwx917_sdk") {
         "COMMON_FLASH_EN=1",
         "EXECUTION_FROM_RAM",
       ]
-      if(silabs_board == "BRD4338A") {
+      if (silabs_board == "BRD4338A") {
         defines += [ "SI917_RADIO_BOARD_V2=1" ]
       }
     }
