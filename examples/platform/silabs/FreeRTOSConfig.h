@@ -181,7 +181,12 @@ to all Cortex-M ports, and do not rely on any particular library functions. */
 #define configKERNEL_INTERRUPT_PRIORITY (255)
 /* !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
+#ifdef SIWX_917
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY 20
+#else
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY 48
+#endif // SIWX_917
+
 #define configENABLE_FPU 0
 #define configENABLE_MPU 0
 /* FreeRTOS Secure Side Only and TrustZone Security Extension */
