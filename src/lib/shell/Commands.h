@@ -57,6 +57,12 @@ void RegisterDeviceCommands();
 void RegisterOtaCommands();
 
 /**
+ * This function registers the resource usage statistics commands.
+ *
+ */
+void RegisterStatCommands();
+
+/**
  * This function registers the device onboarding codes commands.
  *
  */

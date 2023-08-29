@@ -13,7 +13,8 @@
 # limitations under the License.
 
 name: 
-  12.3.7. [TC-OPCREDS-3.7] Add Second Fabric over CASE [DUT-Server]
+  15.2.6. [TC-OPCREDS-3.7] Add Second Fabric over CASE [DUT-Server]
+
 
 PICS:
     - OPCREDS.S
