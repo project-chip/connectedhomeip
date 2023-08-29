@@ -12813,146 +12813,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRSampleMEIClusterPingParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRSampleMEIClusterPingParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRSampleMEIClusterAddArgumentsResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _returnValue = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRSampleMEIClusterAddArgumentsResponseParams alloc] init];
-
-    other.returnValue = self.returnValue;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: returnValue:%@; >", NSStringFromClass([self class]), _returnValue];
-    return descriptionString;
-}
-
-- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    using DecodableType = chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType;
-    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
-                                                                           clusterID:DecodableType::GetClusterId()
-                                                                           commandID:DecodableType::GetCommandId()
-                                                                               error:error];
-    if (buffer.IsNull()) {
-        return nil;
-    }
-
-    chip::TLV::TLVReader reader;
-    reader.Init(buffer->Start(), buffer->DataLength());
-
-    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
-    if (err == CHIP_NO_ERROR) {
-        DecodableType decodedStruct;
-        err = chip::app::DataModel::Decode(reader, decodedStruct);
-        if (err == CHIP_NO_ERROR) {
-            err = [self _setFieldsFromDecodableStruct:decodedStruct];
-            if (err == CHIP_NO_ERROR) {
-                return self;
-            }
-        }
-    }
-
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
-    return nil;
-}
-
-@end
-
-@implementation MTRSampleMEIClusterAddArgumentsResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType &)decodableStruct
-{
-    {
-        self.returnValue = [NSNumber numberWithUnsignedChar:decodableStruct.returnValue];
-    }
-    return CHIP_NO_ERROR;
-}
-@end
-@implementation MTRSampleMEIClusterAddArgumentsParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _arg1 = @(0);
-
-        _arg2 = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRSampleMEIClusterAddArgumentsParams alloc] init];
-
-    other.arg1 = self.arg1;
-    other.arg2 = self.arg2;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; >", NSStringFromClass([self class]), _arg1, _arg2];
-    return descriptionString;
-}
-
-@end
 @implementation MTRUnitTestingClusterTestParams
 - (instancetype)init
 {
@@ -15322,6 +15182,146 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams
+@end
+@implementation MTRSampleMEIClusterPingParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRSampleMEIClusterPingParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation MTRSampleMEIClusterAddArgumentsResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _returnValue = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRSampleMEIClusterAddArgumentsResponseParams alloc] init];
+
+    other.returnValue = self.returnValue;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: returnValue:%@; >", NSStringFromClass([self class]), _returnValue];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRSampleMEIClusterAddArgumentsResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType &)decodableStruct
+{
+    {
+        self.returnValue = [NSNumber numberWithUnsignedChar:decodableStruct.returnValue];
+    }
+    return CHIP_NO_ERROR;
+}
+@end
+@implementation MTRSampleMEIClusterAddArgumentsParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _arg1 = @(0);
+
+        _arg2 = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRSampleMEIClusterAddArgumentsParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.arg2 = self.arg2;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; >", NSStringFromClass([self class]), _arg1, _arg2];
+    return descriptionString;
+}
+
 @end
 
 NS_ASSUME_NONNULL_END

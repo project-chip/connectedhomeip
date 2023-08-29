@@ -9504,14 +9504,3 @@ bool emberAfFaultInjectionClusterFailAtFaultCallback(
 bool emberAfFaultInjectionClusterFailRandomlyAtFaultCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::FaultInjection::Commands::FailRandomlyAtFault::DecodableType & commandData);
-/**
- * @brief Sample MEI Cluster Ping Command callback (from client)
- */
-bool emberAfSampleMeiClusterPingCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                         const chip::app::Clusters::SampleMei::Commands::Ping::DecodableType & commandData);
-/**
- * @brief Sample MEI Cluster AddArguments Command callback (from client)
- */
-bool emberAfSampleMeiClusterAddArgumentsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::SampleMei::Commands::AddArguments::DecodableType & commandData);
