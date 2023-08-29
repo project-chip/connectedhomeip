@@ -51,7 +51,7 @@ def process_fail(id, pr, start_time, workflow):
         if workflow_category in error_catalog:
             for error_message in error_catalog[workflow_category]:
                 if error_message in fail_log:
-                    root_cause = error_catalog[workflow][error_message]["short"]
+                    root_cause = error_catalog[workflow_category][error_message]["short"]
                     break
     return [pr, workflow, root_cause]
 
