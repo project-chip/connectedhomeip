@@ -65,8 +65,6 @@ Instance::~Instance()
 CHIP_ERROR Instance::Init()
 {
     ChipLogDetail(Zcl, "ResourceMonitoring: Init");
-    // Check that the cluster ID given is a valid mode select alias cluster ID.
-    VerifyOrDie(IsValidAliasCluster());
 
     // Check if the cluster has been selected in zap
     VerifyOrDie(emberAfContainsServer(mEndpointId, mClusterId));
@@ -331,18 +329,6 @@ void Instance::LoadPersistentAttributes()
         // If we cannot find the previous LastChangedTime, we will assume it to be null.
         ChipLogDetail(Zcl, "ResourceMonitoring: Unable to load the LastChangedTime from the KVS. Assuming null");
     }
-}
-
-bool Instance::IsValidAliasCluster() const
-{
-    for (unsigned int AliasedCluster : AliasedClusters)
-    {
-        if (mClusterId == AliasedCluster)
-        {
-            return true;
-        }
-    }
-    return false;
 }
 
 void Instance::HandleResetCondition(HandlerContext & ctx,

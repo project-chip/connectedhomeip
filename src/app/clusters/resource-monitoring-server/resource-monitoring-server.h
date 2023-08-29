@@ -144,12 +144,6 @@ private:
     void LoadPersistentAttributes();
 
     /**
-     * This checks if the clusters instance is a valid ResourceMonitoring cluster based on the AliasedClusters list.
-     * @return true     if the cluster is a valid ResourceMonitoring cluster.
-     */
-    bool IsValidAliasCluster() const;
-
-    /**
      * Internal method to handle the ResetCondition command.
      */
     void HandleResetCondition(HandlerContext & ctx,
