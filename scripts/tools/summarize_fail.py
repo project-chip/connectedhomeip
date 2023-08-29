@@ -47,8 +47,9 @@ def process_fail(id, pr, start_time, workflow):
     root_cause = "Unknown cause"
     with open(f"{output_path}/fail_log.txt") as fail_log_file:
         fail_log = fail_log_file.read()
-        if workflow.split(" - ")[0] in error_catalog:
-            for error_message in error_catalog[workflow]:
+        workflow_category = workflow.split(" - ")[0]
+        if workflow_category in error_catalog:
+            for error_message in error_catalog[workflow_category]:
                 if error_message in fail_log:
                     root_cause = error_catalog[workflow][error_message]["short"]
                     break
