@@ -1,11 +1,15 @@
 
 import os
-from deb_pkg_tools.package import build_package as build_pkg
-import deb_pkg_tools.package
 import argparse
 import json
 import subprocess
 import shutil
+import sys
+
+# workaround untill we find a better solution 
+sys.path.append('/usr/local/miniconda/lib/python3.9/site-packages/')
+from deb_pkg_tools.package import build_package as build_pkg
+import deb_pkg_tools.package
 
 # content of License file to be used in packaging
 silabsCopyrights = '/******************************************************************************\n\

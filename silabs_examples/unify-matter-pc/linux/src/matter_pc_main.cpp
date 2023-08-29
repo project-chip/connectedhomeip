@@ -187,3 +187,5 @@ void ApplicationInit()
     // the Matter code has been initalized.
     mpc_nw_monitor_init();
 }
+
+void ApplicationShutdown() {}
