@@ -31,24 +31,13 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Issue : https://github.com/project-chip/connectedhomeip/issues/27320
     - label: "Step 2a: Read the global attribute: ClusterRevision"
-      verification: |
-          ./chip-tool fancontrol read cluster-revision 1 1
-
-          On TH(chip-tool), Verify the ClusterRevision attribute value as 3:
-
-          [1685097285.665923][29977:29979] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0202 Attribute 0x0000_FFFD DataVersion: 2714837972
-          [1685097285.666069][29977:29979] CHIP:TOO:   ClusterRevision: 2
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 4
+          constraints:
+              type: int16u
 
     - label: "Step 2b: Read the global attribute: FeatureMap"
       command: "readAttribute"

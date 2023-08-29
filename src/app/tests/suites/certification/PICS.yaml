@@ -1774,8 +1774,25 @@ PICS:
     - label:
           "Can the Dishwasher Alarm attribute changed by physical control at the
           device?"
-      id: DISHALM.M.ManuallyControlled
+      id: DISHALM.S.M.ManuallyControlled
 
+    - label: "Does the device support the Inflow alarm?"
+      id: DISHALM.S.M.InflowAlarmSupported
+
+    - label: "Does the device support the Drain alarm?"
+      id: DISHALM.S.M.DrainAlarmSupported
+
+    - label: "Does the device support the Door alarm?"
+      id: DISHALM.S.M.DoorAlarmSupported
+
+    - label: "Does the device support the TempLow alarm?"
+      id: DISHALM.S.M.TempLowAlarmSupported
+
+    - label: "Does the device support the TempHigh alarm?"
+      id: DISHALM.S.M.TempHighAlarmSupported
+
+    - label: "Does the device support the WaterLevel alarm?"
+      id: DISHALM.S.M.WaterLevelAlarmSupported
     #
     # server / Commands received
     #
@@ -1790,11 +1807,20 @@ PICS:
     - label: "Does the device implement the DISHM cluster as a server?"
       id: DISHM.S
 
+    - label: "IDoes the DUT support testing the failed ChangeToMode command?"
+      id: DISHM.S.M.CAN_TEST_MODE_FAILURE
+
+    # PIXIT
+
     - label:
           "Id of mode the device will fail to transition to, given its current
           state"
-      id: PIXIT.DISHM.CAN_TEST_MODE_FAILURE
+      id: PIXIT.DISHM.MODE_CHANGE_FAIL
 
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.DISHM.MODE_CHANGE_OK
     #
     # server / features
     #
@@ -2862,7 +2888,7 @@ PICS:
       id: DRLK.S.Simulate.NotFullyLocked
 
     - label: "Does the DUT(server) detect a LockJammed State?"
-      id: DRLK.S.DetectLockJammed
+      id: DRLK.S.M.DetectLockJammed
 
     #
     # client / attributes
@@ -3609,6 +3635,43 @@ PICS:
           "Does the DUT(Server) support Group Key Management CacheAndSync
           feature?"
       id: GRPKEY.S.F00
+
+    #
+    #server attributes
+    #
+    - label: "Does the device implement the GroupKeyMap attribute?"
+      id: GRPKEY.S.A0000
+
+    - label: "Does the device implement the GroupTable attribute?"
+      id: GRPKEY.S.A0001
+
+    - label: "Does the device implement the MaxGroupsPerFabric attribute?"
+      id: GRPKEY.S.A0002
+
+    - label: "Does the device implement the MaxGroupKeysPerFabric attribute?"
+      id: GRPKEY.S.A0003
+
+    #
+    # server commandsGenerated
+    #
+    - label: "Does the device implement the KeySetWrite command}?"
+      id: GRPKEY.S.C00.Rsp
+
+    - label: "Does the device implement the KeySetRead command}?"
+      id: GRPKEY.S.C01.Rsp
+
+    - label: "Does the device implement the KeySetReadResponse command}?"
+      id: GRPKEY.S.C02.Rsp
+
+    - label: "Does the device implement the KeySetRemove command}?"
+      id: GRPKEY.S.C03.Rsp
+
+    - label: "Does the device implement the KeySetReadAllIndices command}?"
+      id: GRPKEY.S.C04.Rsp
+
+    - label:
+          "Does the device implement the KeySetReadAllIndicesResponse command}?"
+      id: GRPKEY.S.C05.Rsp
 
     #
     # client / attributes
@@ -8930,10 +8993,18 @@ PICS:
     - label: "Does the device implement the LWM cluster as a server?"
       id: LWM.S
 
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: LWM.S.M.CAN_TEST_MODE_FAILURE
+
     - label:
           "Id of mode the device will fail to transition to, given its current
           state"
-      id: PIXIT.LWM.CAN_TEST_MODE_FAILURE
+      id: PIXIT.LWM.MODE_CHANGE_FAIL
+
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.LWM.MODE_CHANGE_OK
 
     #
     # server / features
@@ -9012,21 +9083,36 @@ PICS:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: RVCCLEANM.S.C01.Tx
 
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: RVCCLEANM.S.M.CAN_TEST_MODE_FAILURE
+
     - label:
           "Id of mode the device will fail to transition to, given its current
           state"
-      id: PIXIT.RVCCLEANM.CAN_TEST_MODE_FAILURE
+      id: PIXIT.RVCCLEANM.MODE_CHANGE_FAIL
 
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.RVCCLEANM.MODE_CHANGE_OK
     #
     #Temperature Controlled Cabinet Mode Cluster
     #
     - label: "Does the device implement the TCCM cluster as a server?"
       id: TCCM.S
 
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: TCCM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.TCCM.MODE_CHANGE_OK
+
     - label:
           "Id of mode the device will fail to transition to, given its current
           state"
-      id: PIXIT.TCCM.CAN_TEST_MODE_FAILURE
+      id: PIXIT.TCCM.MODE_CHANGE_FAIL
 
     #Features
     - label:
@@ -9103,6 +9189,9 @@ PICS:
           device?"
       id: TCC.M.ManuallyControlledTemperature
 
+    - label: "Does the device support the INVALID_IN_MODE response"
+      id: TCTL.S.M.SupportsInvalidInMode
+
     #Commands received
     - label:
           "Does the device implement receiving the SetTemperatureCommand
@@ -9161,10 +9250,18 @@ PICS:
     - label: "Does the device implement the RVCRUNM cluster as a server?"
       id: RVCRUNM.S
 
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: RVCRUNM.S.M.CAN_TEST_MODE_FAILURE
+
     - label:
           "Id of mode the device will fail to transition to, given its current
           state"
-      id: PIXIT.RVCRUNM.CAN_TEST_MODE_FAILURE
+      id: PIXIT.RVCRUNM.MODE_CHANGE_FAIL
+
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.RVCRUNM.MODE_CHANGE_OK
 
     #Features
     - label:

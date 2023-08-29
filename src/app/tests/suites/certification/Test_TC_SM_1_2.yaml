@@ -1,0 +1,132 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 54.1.2. [TC-SM-1.2] Device composition - Topology [DUT as Server]
+
+PICS:
+    - MCORE.IDM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: TH performs a wildcard read of all attributes on all
+          endpoints"
+      verification: |
+          TH(chip-tool) sends the wildcard read command to read all attributes and endpoints from DUT(Reference app/all-clusters-app)
+          ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF  1 0xFFFF
+      disabled: true
+
+    - label:
+          "Step 2: Verify the Descriptor cluster PartsList on endpoint 0 exactly
+          lists all the other (non-0) endpoints on the DUT - i.e. the endpoints
+          returned in step 1 (except EP 0) must be listed in the PartsList, and
+          all endpoints listed in the PartsList must be amongst the endpoint(s)
+          returned in step 1"
+      verification: |
+          On TH(chip-tool), Verify the Descriptor cluster PartsList on endpoint 0 exactly lists all the other (non-0) endpoints  in the returned report data Message
+          below is the sample log provided for the raspi platform:
+
+          [1690193538.813187][43091:43093] CHIP:TOO:     [28]: 4294048774
+          [1690193538.813213][43091:43093] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0002 DataVersion: 1390630643
+          [1690193538.813220][43091:43093] CHIP:TOO:   ClientList: 1 entries
+          [1690193538.813224][43091:43093] CHIP:TOO:     [1]: 41
+          [1690193538.813254][43091:43093] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1390630643
+          [1690193538.813262][43091:43093] CHIP:TOO:   PartsList: 2 entries
+          [1690193538.813268][43091:43093] CHIP:TOO:     [1]: 1
+          [1690193538.813276][43091:43093] CHIP:TOO:     [2]: 2
+          [1690193538.813281][43091:43093] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_FFFC DataVersion: 1390630643
+          [1690193538.813283][43091:43093] CHIP:TOO:   FeatureMap: 0
+      disabled: true
+
+    - label:
+          "Step 4: For each endpoint on the DUT (including EP 0), verify the
+          PartsList in the Descriptor cluster on that endpoint does not include
+          itself"
+      verification: |
+          On TH(chip-tool),  verify the PartsList in the Descriptor cluster on that endpoint does not include itself For each endpoint on the DUT (including EP 0)  in the returned report data Message
+          below is the sample log provided for the raspi platform:
+
+          [1690193538.813187][43091:43093] CHIP:TOO:     [28]: 4294048774
+          [1690193538.813213][43091:43093] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0002 DataVersion: 1390630643
+          [1690193538.813220][43091:43093] CHIP:TOO:   ClientList: 1 entries
+          [1690193538.813224][43091:43093] CHIP:TOO:     [1]: 41
+          [1690193538.813254][43091:43093] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1390630643
+          [1690193538.813262][43091:43093] CHIP:TOO:   PartsList: 2 entries
+          [1690193538.813268][43091:43093] CHIP:TOO:     [1]: 1
+          [1690193538.813276][43091:43093] CHIP:TOO:     [2]: 2
+          [1690193538.813281][43091:43093] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_FFFC DataVersion: 1390630643
+          [1690193538.813283][43091:43093] CHIP:TOO:   FeatureMap: 0
+
+
+          [1690193538.869392][43091:43093] CHIP:TOO:     [68]: 4294048773
+          [1690193538.869403][43091:43093] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0002 DataVersion: 2743502132
+          [1690193538.869406][43091:43093] CHIP:TOO:   ClientList: 1 entries
+          [1690193538.869408][43091:43093] CHIP:TOO:     [1]: 6
+          [1690193538.869417][43091:43093] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 2743502132
+          [1690193538.869420][43091:43093] CHIP:TOO:   PartsList: 0 entries
+          [1690193538.869423][43091:43093] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_FFFC DataVersion: 2743502132
+          [1690193538.869425][43091:43093] CHIP:TOO:   FeatureMap: 0
+          [1690193538.869433][43091:43093] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_FFFD DataVersion: 2743502132
+          [1690193538.869435][43091:43093] CHIP:TOO:   ClusterRevision: 1
+          [1690193538.869450][43091:43093] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_FFF8 DataVersion: 2743502132
+          [1690193538.869453][43091:43093] CHIP:TOO:   GeneratedCommandList: 0 entries
+          [1690193538.869462][43091:43093] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_FFF9 DataVersion: 2743502132
+          [1690193538.869464][43091:43093] CHIP:TOO:   AcceptedCommandList: 0 entries
+          [1690193538.869476][43091:43093] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_FFFA DataVersion: 2743502132
+          [1690193538.869478][43091:43093] CHIP:TOO:   EventList: 0 entries
+          [1690193538.869496][43091:43093] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_FFFB DataVersion: 2743502132
+
+
+          [1690193539.051392][43091:43093] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0002 DataVersion: 516620155
+          [1690193539.051395][43091:43093] CHIP:TOO:   ClientList: 0 entries
+          [1690193539.051410][43091:43093] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 516620155
+          [1690193539.051414][43091:43093] CHIP:TOO:   PartsList: 0 entries
+          [1690193539.051418][43091:43093] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_FFFC DataVersion: 516620155
+          [1690193539.051421][43091:43093] CHIP:TOO:   FeatureMap: 0
+          [1690193539.051435][43091:43093] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_FFFD DataVersion: 516620155
+          [1690193539.051438][43091:43093] CHIP:TOO:   ClusterRevision: 1
+          [1690193539.051459][43091:43093] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_FFF8 DataVersion: 516620155
+          [1690193539.051462][43091:43093] CHIP:TOO:   GeneratedCommandList: 0 entries
+      disabled: true
+
+    - label:
+          "Step 5: Create two empty list variables flat and tree,  For each
+          non-root endpoint on the DUT,  If the DeviceTypeList attribute in the
+          Descriptor cluster for that endpoint includes the Aggregator device
+          type(0x000e), add the endpoint id to the flat list,  Otherwise, add
+          the endpoint id to the tree list"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 6: For each endpoint e in the tree list, walk the entire
+          PartsList tree and ensure e does not appear in any descendants."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 7: For each endpoint e in the flat list: * for each endpoint id
+          sub_id present in the in the PartsList of e, ensure that every id
+          listed in the PartsList for endpoint sub_id appears in the PartsList
+          of e"
+      verification: |
+
+      disabled: true

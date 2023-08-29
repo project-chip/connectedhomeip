@@ -232,7 +232,7 @@ class TestMatterTestingSupport(MatterBaseTest):
         # 20
         # 21
         endpoints[0] = create_endpoint([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21], [22])
-        endpoints[1] = create_endpoint([], [1])  # Just using a random device ids, as long as it's not the aggregator it's fine
+        endpoints[1] = create_endpoint([], [1])  # Just using a random device id, as long as it's not the aggregator it's fine
         endpoints[2] = create_endpoint([1, 3], [1])
         endpoints[3] = create_endpoint([4, 5], [1])
         endpoints[4] = create_endpoint([], [1])

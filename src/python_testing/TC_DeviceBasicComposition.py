@@ -203,7 +203,7 @@ def get_all_children(endpoint_id, endpoint_dict: dict[int, Any]) -> set[int]:
 
 
 def find_tree_roots(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) -> set[int]:
-    """Returns a set of all the endpoints in tree_endpoints that are roots for a tree (not including singletons)"""
+    """Returns a set of all the endpoints in tree_endpoints that are roots for a tree (not include singletons)"""
     tree_roots = set()
 
     def find_tree_root(current_id):

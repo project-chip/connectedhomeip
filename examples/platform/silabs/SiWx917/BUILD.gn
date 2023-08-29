@@ -102,11 +102,6 @@ source_set("siwx917-matter-shell") {
 
 config("attestation-credentials-config") {
   include_dirs = [ "${chip_root}" ]
-
-  defines = [
-    # Set to 1 to enable SI917 attestation credentials
-    "SILABS_ATTESTATION_CREDENTIALS",
-  ]
 }
 
 source_set("siwx917-attestation-credentials") {
@@ -275,9 +270,7 @@ source_set("siwx917-common") {
   }
 
   # Attestation Credentials
-  if (chip_build_platform_attestation_credentials_provider) {
-    deps += [ ":siwx917-attestation-credentials" ]
-  }
+  deps += [ ":siwx917-attestation-credentials" ]
 
   # Factory Data Provider
   if (use_efr32_factory_data_provider) {
