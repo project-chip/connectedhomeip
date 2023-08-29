@@ -29,6 +29,7 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <stdint.h>
 #include <string.h>
 
 using chip::ByteSpan;
@@ -175,91 +176,48 @@ CHIP_ERROR Find16BitUpperCaseHexAfterPrefix(const ByteSpan & buffer, const char 
 {
     chip::CharSpan prefix_span = chip::CharSpan::fromCharString(prefix);
 
-    enum State : int
-    {
-        kFindPrefix = 0,
-        kFindHex    = 1,
-        kFoundHex   = 2,
-    };
-
-    size_t min_len_required         = prefix_span.size();
     bool found_prefix_at_least_once = false;
 
+    // Scan string from left to right, to find the desired full matching substring.
     for (size_t start_idx = 0; start_idx < buffer.size(); start_idx++)
     {
-        State state = State::kFindPrefix;
-        char hex_buf[4];
-        size_t hex_len = 0;
+        const uint8_t *cursor = buffer.data() + start_idx;
+        size_t remaining = buffer.size() - start_idx;
 
-        // Make a reader starting at the new cursor space as we traverse.
-        Reader reader{ buffer };
-        reader.Skip(start_idx);
-        if (!reader.HasAtLeast(min_len_required))
+        if (remaining < prefix_span.size())
         {
-            // We possibly can't match anymore since the prefix would not be there.
+            // We can't possibly match prefix if not enough bytes left.
             break;
         }
 
-        Reader prefix_reader{ reinterpret_cast<const uint8_t *>(prefix_span.data()), prefix_span.size() };
-
-        char current_char = '\0';
-        bool done         = false;
-        while (!done)
+        // Try to match the prefix at current position.
+        if (memcmp(cursor, prefix_span.data(), prefix_span.size()) != 0)
         {
-            if (!reader.ReadChar(&current_char).IsSuccess())
-            {
-                // Got to the end before getting all we wanted.
-                break;
-            }
-
-            switch (state)
-            {
-            case State::kFindPrefix: {
-                char prefix_char = '\0';
-                if (!prefix_reader.ReadChar(&prefix_char).IsSuccess())
-                {
-                    // Not enough chars to finish prefix.
-                    done = true;
-                    break;
-                }
-
-                if (current_char != prefix_char)
-                {
-                    // Mismatching char.
-                    done = true;
-                    break;
-                }
-
-                if (prefix_reader.Remaining() == 0)
-                {
-                    // Reached end of prefix, change to finding the hex string.
-                    state                      = State::kFindHex;
-                    found_prefix_at_least_once = true;
-                }
-                break;
-            }
-            case State::kFindHex:
-                // Accumulate the chars, and just rely on strongly typed hex conversion
-                // to validate.
-                hex_buf[hex_len++] = current_char;
-                if (hex_len == sizeof(hex_buf))
-                {
-                    if (!Encoding::UppercaseHexToUint16(&hex_buf[0], sizeof(hex_buf), out_hex_value))
-                    {
-                        // Invalid hex, we don't have a candidate.
-                        done = true;
-                        break;
-                    }
-
-                    state = State::kFoundHex;
-                    return CHIP_NO_ERROR;
-                }
-                break;
-            default:
-                done = true;
-                break;
-            }
+            // Did not find prefix, move to next position.
+            continue;
+        } else {
+            // Found prefix, skip to possible hex value.
+            found_prefix_at_least_once = true;
+            cursor += prefix_span.size();
+            remaining -= prefix_span.size();
         }
+
+        if (remaining < HEX_ENCODED_LENGTH(sizeof(uint16_t)))
+        {
+            // We can't possibly match the hex values if not enough bytes left.
+            break;
+        }
+
+        char hex_buf[4];
+        memcpy(&hex_buf[0], cursor, sizeof(hex_buf));
+
+        if (Encoding::UppercaseHexToUint16(&hex_buf[0], sizeof(hex_buf), out_hex_value) != 0)
+        {
+            // Found first full valid match, return success, out_hex_value already updated.
+            return CHIP_NO_ERROR;
+        }
+
+        // Otherwise, did not find what we were looking for, try next position until exhausted.
     }
 
     return found_prefix_at_least_once ? CHIP_ERROR_WRONG_CERT_DN : CHIP_ERROR_NOT_FOUND;
