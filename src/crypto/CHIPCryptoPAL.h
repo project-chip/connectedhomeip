@@ -755,7 +755,7 @@ CHIP_ERROR AES_CTR_crypt(const uint8_t * input, size_t input_length, const Aes12
  * be configured to ignore CSR requested subject.
  *
  * @param keypair The key pair for which a CSR should be generated. Must not be null.
- * @param csr_span Span to hold the resulting CSR. Must be at least kMIN_CSR_Buffer_Size.
+ * @param csr_span Span to hold the resulting CSR. Must have size at least kMIN_CSR_Buffer_Size.
  *                 Otherwise returns CHIP_ERROR_BUFFER_TOO_SMALL. It will get resized to
  *                 actual size needed on success.
 
