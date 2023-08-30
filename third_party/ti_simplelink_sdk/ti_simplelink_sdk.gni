@@ -108,6 +108,13 @@ template("ti_sysconfig") {
     sources = invoker.sources
     outputs = gen_outputs
 
+    if (defined(invoker.rtos)) {
+      rtos = invoker.rtos
+    }
+    else {
+      rtos = "freertos"
+    }
+
     args = [
       ti_sysconfig_root,
       "-s",
@@ -120,7 +127,7 @@ template("ti_sysconfig") {
       "--board",
       "/ti/boards/" + ti_simplelink_board,
       "--rtos",
-      "freertos",
+      rtos,
     ]
 
     foreach(source, sources) {

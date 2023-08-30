@@ -1,70 +1,68 @@
 /*
+ * Copyright (c) 2022, Texas Instruments Incorporated
+ * All rights reserved.
  *
- *    Copyright (c) 2022 Project CHIP Authors
- *    Copyright (c) 2020 Texas Instruments Incorporated
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ * *  Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ * *  Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
  *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * *  Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- * @file
- * Linkerscript for Matter executable with space reserved for MCUBoot.
- */
+STACKSIZE = 1024;
+HEAPSIZE = 16384; /* Size of heap buffer used by HeapMem */
 
-STACKSIZE = 0x2000;
+FLASH_BASE = DEFINED(DUAL_SLOT) ? 0x800 : 0x0;
 
 MEMORY
 {
-    MCUBOOT_HDR (RX) : ORIGIN = 0x00006000, LENGTH = 0x00000080
-    FLASH (RX)       : ORIGIN = 0x00006080, LENGTH = 0x000F9F80
+    FLASH (RX)      : ORIGIN = FLASH_BASE, LENGTH = 0x5800
     /*
      * Customer Configuration Area and Bootloader Backdoor configuration in
-     * flash
+     * flash, up to 1024 bytes
      */
-    /* FLASH_CCFG (RX) : ORIGIN = 0x50000000, LENGTH = 0x00000800 */
+    FLASH_CCFG (RX) : ORIGIN = 0x50000000, LENGTH = 0x00000800
     SRAM (RWX)      : ORIGIN = 0x20000000, LENGTH = 0x00040000
     GPRAM (RWX)     : ORIGIN = 0x11000000, LENGTH = 0x00002000
-    /* Explicitly placed off target for the storage of logging data.
-     * The data placed here is NOT loaded onto the target device.
-     * This is part of 1 GB of external memory from 0x60000000 - 0x9FFFFFFF.
-     * ARM memory map can be found here:
-     * https://developer.arm.com/documentation/ddi0337/e/memory-map/about-the-memory-map
-     */
-    LOG_DATA (R) : ORIGIN = 0x90000000, LENGTH = 0x40000
 }
 
+REGION_ALIAS("REGION_FLASH_START", FLASH);
 REGION_ALIAS("REGION_TEXT", FLASH);
 REGION_ALIAS("REGION_BSS", SRAM);
 REGION_ALIAS("REGION_DATA", SRAM);
 REGION_ALIAS("REGION_STACK", SRAM);
 REGION_ALIAS("REGION_HEAP", SRAM);
-REGION_ALIAS("REGION_LOG", LOG_DATA);
 REGION_ALIAS("REGION_ARM_EXIDX", FLASH);
 REGION_ALIAS("REGION_ARM_EXTAB", FLASH);
 
 SECTIONS {
-    /* interrupt vectors shifted to accomodate MCUBoot header */
-    PROVIDE (_intvecs_base_address =
-        DEFINED(_intvecs_base_address) ? _intvecs_base_address : 0x6080);
 
-    .resetVecs (_intvecs_base_address) : AT (_intvecs_base_address) {
-        KEEP (*(.resetVecs))
-    } > REGION_TEXT
+	.resetVecs : {
+		KEEP (*(.resetVecs))
+	} > REGION_FLASH_START
 
-    PROVIDE (_vtable_base_address =
-        DEFINED(_vtable_base_address) ? _vtable_base_address : 0x20000000);
-
-    .vtable (_vtable_base_address) (NOLOAD) : {
+    .ramVecs (NOLOAD) : ALIGN(1024){
         KEEP (*(.ramVecs))
     } > REGION_DATA
 
@@ -190,17 +188,19 @@ SECTIONS {
     .rodata : {
         *(.rodata)
         *(.rodata.*)
-        *(.rodata_*)
     } > REGION_TEXT AT> REGION_TEXT
 
     .data : ALIGN(4) {
+        _data = .;
         __data_load__ = LOADADDR (.data);
         __data_start__ = .;
         *(.data)
         *(.data.*)
+        _edata = .;
         . = ALIGN (4);
         __data_end__ = .;
     } > REGION_DATA AT> REGION_TEXT
+    _ldata = LOADADDR(.data);
 
     .ARM.exidx : {
         __exidx_start = .;
@@ -212,36 +212,32 @@ SECTIONS {
         *(.ARM.extab* .gnu.linkonce.armextab.*)
     } > REGION_ARM_EXTAB AT> REGION_ARM_EXTAB
 
-    /* End of executable code/data, NVS is not part of the OTA image */
-    PROVIDE (_flash_end_address = .);
-
-    /* 5 pages of NV Memory (0x800 each) at the end of Flash */
-    .nvs (0xFD800) (NOLOAD) : AT (0xFD800) ALIGN(0x800) {
+    .nvs (NOLOAD) : ALIGN(0x2000) {
         *(.nvs)
     } > REGION_TEXT
 
-    /* CCFG is supplied by the MCUBoot project */
-    /*
     .ccfg : {
         KEEP (*(.ccfg))
     } > FLASH_CCFG AT> FLASH_CCFG
-    */
 
-    .bss (NOLOAD) : {
+    .bss : {
         __bss_start__ = .;
         *(.shbss)
         *(.bss)
         *(.bss.*)
         *(COMMON)
         . = ALIGN (4);
+        _ebss = .;
         __bss_end__ = .;
     } > REGION_BSS AT> REGION_BSS
+	_bss = LOADADDR(.bss);
 
-    .heap (NOLOAD) : {
+    .heap : {
         __heap_start__ = .;
         end = __heap_start__;
         _end = end;
         __end = end;
+        . = . + HEAPSIZE;
         KEEP(*(.heap))
         __heap_end__ = .;
         __HeapLimit = __heap_end__;
@@ -254,11 +250,6 @@ SECTIONS {
         . += STACKSIZE;
         _stack_end = .;
         __stack_end = .;
+        _estack = .;
     } > REGION_STACK AT> REGION_STACK
-
-    .log_data (COPY) : {
-        KEEP (*(.log_data))
-    } > REGION_LOG
 }
-
-ENTRY(resetISR)
