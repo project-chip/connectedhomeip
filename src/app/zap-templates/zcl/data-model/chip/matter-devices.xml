@@ -1449,9 +1449,6 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="Binding" client="false" server="false" clientLocked="true" serverLocked="false">
-                <requireAttribute>BINDING</requireAttribute>
-            </include>
             <include cluster="Door Lock" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Time Synchronization" client="false" server="false" clientLocked="false" serverLocked="true"></include>
         </clusters>
