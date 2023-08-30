@@ -34,6 +34,16 @@ shared_library("jni") {
     "App/app/src/main/jni/cpp/TvCastingApp-JNI.cpp",
   ]
 
+  # add simplified casting API files here
+  sources += [
+    "App/app/src/main/jni/cpp/core/CastingApp-JNI.cpp",
+    "App/app/src/main/jni/cpp/core/CastingApp-JNI.h",
+    "App/app/src/main/jni/cpp/support/ErrorConverter-JNI.cpp",
+    "App/app/src/main/jni/cpp/support/ErrorConverter-JNI.h",
+    "App/app/src/main/jni/cpp/support/RotatingDeviceIdUniqueIdProvider-JNI.cpp",
+    "App/app/src/main/jni/cpp/support/RotatingDeviceIdUniqueIdProvider-JNI.h",
+  ]
+
   deps = [
     "${chip_root}/examples/tv-casting-app/tv-casting-common",
     "${chip_root}/src/app/server/java:jni",
@@ -81,6 +91,17 @@ android_library("java") {
     "App/app/src/main/jni/com/chip/casting/TargetNavigatorTypes.java",
     "App/app/src/main/jni/com/chip/casting/TvCastingApp.java",
     "App/app/src/main/jni/com/chip/casting/VideoPlayer.java",
+  ]
+
+  # add simplified casting API files here
+  sources += [
+    "App/app/src/main/jni/com/matter/casting/core/CastingApp.java",
+    "App/app/src/main/jni/com/matter/casting/core/CastingAppState.java",
+    "App/app/src/main/jni/com/matter/casting/support/AppParameters.java",
+    "App/app/src/main/jni/com/matter/casting/support/CommissionableData.java",
+    "App/app/src/main/jni/com/matter/casting/support/DACProvider.java",
+    "App/app/src/main/jni/com/matter/casting/support/DataProvider.java",
+    "App/app/src/main/jni/com/matter/casting/support/MatterError.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

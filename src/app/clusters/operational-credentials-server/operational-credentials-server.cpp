@@ -1038,7 +1038,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
     // Prepare NOCSRElements structure
     {
-        constexpr size_t csrLength = Crypto::kMAX_CSR_Length;
+        constexpr size_t csrLength = Crypto::kMIN_CSR_Buffer_Size;
         size_t nocsrLengthEstimate = 0;
         ByteSpan kNoVendorReserved;
         Platform::ScopedMemoryBuffer<uint8_t> csr;
@@ -1060,7 +1060,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
         err = fabricTable.AllocatePendingOperationalKey(fabricIndexForCsr, csrSpan);
 
-        if (csrSpan.size() > Crypto::kMAX_CSR_Length)
+        if (csrSpan.size() > csrLength)
         {
             err = CHIP_ERROR_INTERNAL;
         }

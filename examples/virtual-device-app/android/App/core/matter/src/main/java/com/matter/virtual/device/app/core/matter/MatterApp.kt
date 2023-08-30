@@ -10,7 +10,9 @@ import com.matter.virtual.device.app.DeviceAppCallback
 import com.matter.virtual.device.app.DeviceEventType
 import com.matter.virtual.device.app.core.common.MatterConstants
 import com.matter.virtual.device.app.core.common.MatterSettings
+import com.matter.virtual.device.app.core.matter.manager.DoorLockManagerStub
 import com.matter.virtual.device.app.core.matter.manager.OnOffManagerStub
+import com.matter.virtual.device.app.core.matter.manager.PowerSourceManagerStub
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -22,7 +24,9 @@ class MatterApp
 constructor(
   @ApplicationContext private val context: Context,
   private val deviceApp: DeviceApp,
-  private val onOffManagerStub: OnOffManagerStub
+  private val onOffManagerStub: OnOffManagerStub,
+  private val doorLockManagerStub: DoorLockManagerStub,
+  private val powerSourceManagerStub: PowerSourceManagerStub
 ) {
 
   private var androidChipPlatform: AndroidChipPlatform? = null
@@ -40,6 +44,14 @@ constructor(
             Clusters.ClusterId_OnOff -> {
               app.setOnOffManager(endpoint, onOffManagerStub)
               onOffManagerStub.initAttributeValue()
+            }
+            Clusters.ClusterId_DoorLock -> {
+              app.setDoorLockManager(endpoint, doorLockManagerStub)
+              doorLockManagerStub.initAttributeValue()
+            }
+            Clusters.ClusterId_PowerSource -> {
+              app.setPowerSourceManager(endpoint, powerSourceManagerStub)
+              powerSourceManagerStub.initAttributeValue()
             }
           }
         }
@@ -67,23 +79,16 @@ constructor(
       }
     )
 
-    val preferencesConfigurationManager = PreferencesConfigurationManager(context)
-    // Write discriminator
-    try {
-      preferencesConfigurationManager.writeConfigValueLong(
-        ConfigurationManager.kConfigNamespace_ChipFactory,
-        ConfigurationManager.kConfigKey_SetupDiscriminator,
-        matterSettings.discriminator.toLong()
-      )
-    } catch (e: AndroidChipPlatformException) {
-      e.printStackTrace()
-    }
-
     androidChipPlatform =
       AndroidChipPlatform(
         AndroidBleManager(),
         PreferencesKeyValueStoreManager(context),
-        preferencesConfigurationManager,
+        MatterPreferencesConfigurationManager(
+          context,
+          matterSettings.device.deviceTypeId,
+          context.resources.getString(matterSettings.device.deviceNameResId),
+          matterSettings.discriminator
+        ),
         NsdManagerServiceResolver(context),
         NsdManagerServiceBrowser(context),
         ChipMdnsCallbackImpl(),

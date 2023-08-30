@@ -36,8 +36,11 @@ class AmebaUtils
 public:
     static CHIP_ERROR StartWiFi(void);
     static CHIP_ERROR IsStationEnabled(bool & staEnabled);
+    static bool IsStationInterfaceUp(void);
     static bool IsStationProvisioned(void);
     static CHIP_ERROR IsStationConnected(bool & connected);
+    static CHIP_ERROR IsStationIPLinked(bool & linked);
+    static bool IsStationOpenSecurity(void);
     static CHIP_ERROR EnableStationMode(void);
     static CHIP_ERROR SetWiFiConfig(rtw_wifi_config_t * config);
     static CHIP_ERROR GetWiFiConfig(rtw_wifi_config_t * config);

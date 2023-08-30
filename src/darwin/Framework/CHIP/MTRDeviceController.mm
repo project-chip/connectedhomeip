@@ -335,7 +335,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                 }
             } else {
                 // Generate a new random keypair.
-                uint8_t csrBuffer[chip::Crypto::kMAX_CSR_Length];
+                uint8_t csrBuffer[chip::Crypto::kMIN_CSR_Buffer_Size];
                 chip::MutableByteSpan csr(csrBuffer);
                 errorCode = startupParams.fabricTable->AllocatePendingOperationalKey(startupParams.fabricIndex, csr);
                 if ([self checkForStartError:errorCode logMsg:kErrorKeyAllocation]) {

@@ -48,12 +48,9 @@ config:
     TEST_EVENT_TRIGGER_END_OF_SERVICE_ALERT_CLEAR:
         type: int64u
         defaultValue: "0xffffffff000000aa"
-    EVENT_NUMBER:
-        type: int64u
-        defaultValue: 0
 
 tests:
-    - label: "Commission DUT to TH"
+    - label: "Step 1: Commission DUT to TH"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -61,18 +58,18 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH subscribes to BatteryAlert attribute from DUT"
+    - label: "Step 2: TH subscribes to BatteryAlert attribute from DUT"
       PICS: SMOKECO.S.A0003
       command: "subscribeAttribute"
       attribute: "BatteryAlert"
-      minInterval: 3
-      maxInterval: 30
+      minInterval: 1
+      maxInterval: 900
       response:
           value: 0
           constraints:
               type: enum8
 
-    - label: "TH reads ExpressedState attribute from DUT"
+    - label: "Step 3: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -81,9 +78,14 @@ tests:
           constraints:
               type: enum8
 
+    - label: "TH gets last event number from DUT"
+      PICS: SMOKECO.S.E0a
+      command: "readEvent"
+      event: "AllClear"
+
     - label:
-          "TH reads TestEventTriggersEnabled attribute from General Diagnostics
-          Cluster"
+          "Step 4: TH reads TestEventTriggersEnabled attribute from General
+          Diagnostics Cluster"
       PICS: DGGEN.S.A0008
       cluster: "General Diagnostics"
       endpoint: 0
@@ -93,8 +95,8 @@ tests:
           value: 1
 
     - label:
-          "TH sends TestEventTrigger command to General Diagnostics Cluster on
-          Endpoint 0 with EnableKey field set to
+          "Step 5: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Warning Battery Alert Test Event"
       PICS: DGGEN.S.C00.Rsp
@@ -109,8 +111,8 @@ tests:
                 value: TEST_EVENT_TRIGGER_WARNING_BATTERY_ALERT
 
     - label:
-          "TH waits for a report of BatteryAlert attribute from DUT with a
-          timeout of 300 seconds"
+          "Step 6: TH waits for a report of BatteryAlert attribute from DUT with
+          a timeout of 300 seconds"
       PICS: SMOKECO.S.A0003
       command: "waitForReport"
       attribute: "BatteryAlert"
@@ -120,7 +122,7 @@ tests:
           constraints:
               type: enum8
 
-    - label: "TH reads ExpressedState attribute from DUT"
+    - label: "Step 7: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -129,17 +131,17 @@ tests:
           constraints:
               type: enum8
 
-    - label: "TH reads LowBattery event from DUT"
+    - label: "Step 8: TH reads LowBattery event from DUT"
       PICS: SMOKECO.S.E02
       command: "readEvent"
       event: "LowBattery"
-      EVENT_NUMBER: EVENT_NUMBER + 1
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: { AlarmSeverityLevel: 1 }
 
     - label:
-          "TH sends TestEventTrigger command to General Diagnostics Cluster on
-          Endpoint 0 with EnableKey field set to
+          "Step 9: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Critical Battery Alert Test Event"
       PICS: DGGEN.S.C00.Rsp
@@ -154,8 +156,8 @@ tests:
                 value: TEST_EVENT_TRIGGER_CRITICAL_BATTERY_ALERT
 
     - label:
-          "TH waits for a report of BatteryAlert attribute from DUT with a
-          timeout of 300 seconds"
+          "Step 10: TH waits for a report of BatteryAlert attribute from DUT
+          with a timeout of 300 seconds"
       PICS: SMOKECO.S.A0003
       command: "waitForReport"
       attribute: "BatteryAlert"
@@ -165,7 +167,7 @@ tests:
           constraints:
               type: enum8
 
-    - label: "TH reads ExpressedState attribute from DUT"
+    - label: "Step 11: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -174,17 +176,17 @@ tests:
           constraints:
               type: enum8
 
-    - label: "TH reads LowBattery event from DUT"
+    - label: "Step 12: TH reads LowBattery event from DUT"
       PICS: SMOKECO.S.E02
       command: "readEvent"
       event: "LowBattery"
-      EVENT_NUMBER: EVENT_NUMBER + 2
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: { AlarmSeverityLevel: 2 }
 
     - label:
-          "TH sends TestEventTrigger command to General Diagnostics Cluster on
-          Endpoint 0 with EnableKey field set to
+          "Step 13: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Battery Alert Test Event Clear"
       PICS: DGGEN.S.C00.Rsp
@@ -199,8 +201,8 @@ tests:
                 value: TEST_EVENT_TRIGGER_BATTERY_ALERT_CLEAR
 
     - label:
-          "TH waits for a report of BatteryAlert attribute from DUT with a
-          timeout of 300 seconds"
+          "Step 14: TH waits for a report of BatteryAlert attribute from DUT
+          with a timeout of 300 seconds"
       PICS: SMOKECO.S.A0003
       command: "waitForReport"
       attribute: "BatteryAlert"
@@ -210,7 +212,7 @@ tests:
           constraints:
               type: enum8
 
-    - label: "TH reads ExpressedState attribute from DUT"
+    - label: "Step 15: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -219,28 +221,28 @@ tests:
           constraints:
               type: enum8
 
-    - label: "TH reads AllClear event from DUT"
+    - label: "Step 16: TH reads AllClear event from DUT"
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      EVENT_NUMBER: EVENT_NUMBER + 3
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 
-    - label: "TH subscribes to HardwareFaultAlert attribute from DUT"
+    - label: "Step 17: TH subscribes to HardwareFaultAlert attribute from DUT"
       PICS: SMOKECO.S.A0006
       command: "subscribeAttribute"
       attribute: "HardwareFaultAlert"
-      minInterval: 3
-      maxInterval: 30
+      minInterval: 1
+      maxInterval: 900
       response:
           value: 0
           constraints:
               type: boolean
 
     - label:
-          "TH sends TestEventTrigger command to General Diagnostics Cluster on
-          Endpoint 0 with EnableKey field set to
+          "Step 18: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Hardware Fault Alert Test Event"
       PICS: DGGEN.S.C00.Rsp
@@ -255,8 +257,8 @@ tests:
                 value: TEST_EVENT_TRIGGER_HARDWARE_FAULT_ALERT
 
     - label:
-          "TH waits for a report of HardwareFaultAlert attribute from DUT with a
-          timeout of 300 seconds"
+          "Step 19: TH waits for a report of HardwareFaultAlert attribute from
+          DUT with a timeout of 300 seconds"
       PICS: SMOKECO.S.A0006
       command: "waitForReport"
       attribute: "HardwareFaultAlert"
@@ -266,7 +268,7 @@ tests:
           constraints:
               type: boolean
 
-    - label: "TH reads ExpressedState attribute from DUT"
+    - label: "Step 20: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -275,17 +277,17 @@ tests:
           constraints:
               type: enum8
 
-    - label: "TH reads HardwareFault event from DUT"
+    - label: "Step 21: TH reads HardwareFault event from DUT"
       PICS: SMOKECO.S.E03
       command: "readEvent"
       event: "HardwareFault"
-      EVENT_NUMBER: EVENT_NUMBER + 4
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 
     - label:
-          "TH sends TestEventTrigger command to General Diagnostics Cluster on
-          Endpoint 0 with EnableKey field set to
+          "Step 22: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Hardware Fault Alert Test Event
           Clear"
@@ -301,8 +303,8 @@ tests:
                 value: TEST_EVENT_TRIGGER_HARDWARE_FAULT_ALERT_CLEAR
 
     - label:
-          "TH waits for a report of HardwareFaultAlert attribute from DUT with a
-          timeout of 300 seconds"
+          "Step 23: TH waits for a report of HardwareFaultAlert attribute from
+          DUT with a timeout of 300 seconds"
       PICS: SMOKECO.S.A0006
       command: "waitForReport"
       attribute: "HardwareFaultAlert"
@@ -312,7 +314,7 @@ tests:
           constraints:
               type: boolean
 
-    - label: "TH reads ExpressedState attribute from DUT"
+    - label: "Step 24: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -321,28 +323,28 @@ tests:
           constraints:
               type: enum8
 
-    - label: "TH reads AllClear event from DUT"
+    - label: "Step 25: TH reads AllClear event from DUT"
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      EVENT_NUMBER: EVENT_NUMBER + 5
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 
-    - label: "TH subscribes to EndOfServiceAlert attribute from DUT"
+    - label: "Step 26: TH subscribes to EndOfServiceAlert attribute from DUT"
       PICS: SMOKECO.S.A0007
       command: "subscribeAttribute"
       attribute: "EndOfServiceAlert"
-      minInterval: 3
-      maxInterval: 30
+      minInterval: 1
+      maxInterval: 900
       response:
           value: 0
           constraints:
               type: enum8
 
     - label:
-          "TH sends TestEventTrigger command to General Diagnostics Cluster on
-          Endpoint 0 with EnableKey field set to
+          "Step 27: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER for End of Service Alert Test Event"
       PICS: DGGEN.S.C00.Rsp
@@ -357,8 +359,8 @@ tests:
                 value: TEST_EVENT_TRIGGER_END_OF_SERVICE_ALERT
 
     - label:
-          "TH waits for a report of EndOfServiceAlert attribute from DUT with a
-          timeout of 300 seconds"
+          "Step 28: TH waits for a report of EndOfServiceAlert attribute from
+          DUT with a timeout of 300 seconds"
       PICS: SMOKECO.S.A0007
       command: "waitForReport"
       attribute: "EndOfServiceAlert"
@@ -368,7 +370,7 @@ tests:
           constraints:
               type: enum8
 
-    - label: "TH reads ExpressedState attribute from DUT"
+    - label: "Step 29: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -377,17 +379,17 @@ tests:
           constraints:
               type: enum8
 
-    - label: "TH reads EndOfService event from DUT"
+    - label: "Step 30: TH reads EndOfService event from DUT"
       PICS: SMOKECO.S.E04
       command: "readEvent"
       event: "EndOfService"
-      EVENT_NUMBER: EVENT_NUMBER + 6
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 
     - label:
-          "TH sends TestEventTrigger command to General Diagnostics Cluster on
-          Endpoint 0 with EnableKey field set to
+          "Step 31: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER for End of Service Alert Test Event
           Clear"
@@ -403,8 +405,8 @@ tests:
                 value: TEST_EVENT_TRIGGER_END_OF_SERVICE_ALERT_CLEAR
 
     - label:
-          "TH waits for a report of EndOfServiceAlert attribute from DUT with a
-          timeout of 300 seconds"
+          "Step 32: TH waits for a report of EndOfServiceAlert attribute from
+          DUT with a timeout of 300 seconds"
       PICS: SMOKECO.S.A0007
       command: "waitForReport"
       attribute: "EndOfServiceAlert"
@@ -414,7 +416,7 @@ tests:
           constraints:
               type: enum8
 
-    - label: "TH reads ExpressedState attribute from DUT"
+    - label: "Step 33: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -423,26 +425,26 @@ tests:
           constraints:
               type: enum8
 
-    - label: "TH reads AllClear event from DUT"
+    - label: "Step 34: TH reads AllClear event from DUT"
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      EVENT_NUMBER: EVENT_NUMBER + 7
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 
-    - label: "TH subscribes to TestInProgress attribute from DUT"
+    - label: "Step 35: TH subscribes to TestInProgress attribute from DUT"
       PICS: SMOKECO.S.A0005
       command: "subscribeAttribute"
       attribute: "TestInProgress"
-      minInterval: 3
-      maxInterval: 30
+      minInterval: 1
+      maxInterval: 900
       response:
           value: 0
           constraints:
               type: boolean
 
-    - label: "TH reads ExpressedState attribute from DUT"
+    - label: "Step 36: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -451,7 +453,9 @@ tests:
           constraints:
               type: enum8
 
-    - label: "Start manually DUT self-test"
+    - label:
+          "Step 37: At the start of the next step, please manually initiate the
+          DUT self-test"
       cluster: "LogCommands"
       PICS: PICS_USER_PROMPT && SMOKECO.M.ManuallyControlledTest
       command: "UserPrompt"
@@ -463,8 +467,8 @@ tests:
                 value: "y"
 
     - label:
-          "TH waits for a report of TestInProgress attribute from DUT with a
-          timeout of 180 seconds"
+          "Step 38: TH waits for a report of TestInProgress attribute from DUT
+          with a timeout of 180 seconds"
       PICS: SMOKECO.S.A0005
       command: "waitForReport"
       attribute: "TestInProgress"
@@ -474,7 +478,7 @@ tests:
           constraints:
               type: boolean
 
-    - label: "TH reads ExpressedState attribute from DUT"
+    - label: "Step 39: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -484,8 +488,8 @@ tests:
               type: enum8
 
     - label:
-          "TH waits for a report of TestInProgress attribute from DUT with a
-          timeout of 180 seconds"
+          "Step 40: TH waits for a report of TestInProgress attribute from DUT
+          with a timeout of 180 seconds"
       PICS: SMOKECO.S.A0005
       command: "waitForReport"
       attribute: "TestInProgress"
@@ -495,15 +499,15 @@ tests:
           constraints:
               type: boolean
 
-    - label: "TH reads SelfTestComplete event from DUT"
+    - label: "Step 41: TH reads SelfTestComplete event from DUT"
       PICS: SMOKECO.S.E05
       command: "readEvent"
       event: "SelfTestComplete"
-      EVENT_NUMBER: EVENT_NUMBER + 8
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 
-    - label: "TH reads ExpressedState attribute from DUT"
+    - label: "Step 42: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -512,21 +516,21 @@ tests:
           constraints:
               type: enum8
 
-    - label: "TH reads AllClear event from DUT"
+    - label: "Step 43: TH reads AllClear event from DUT"
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      EVENT_NUMBER: EVENT_NUMBER + 9
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 
-    - label: "TH sends SelfTestRequest command to DUT"
+    - label: "Step 44: TH sends SelfTestRequest command to DUT"
       PICS: SMOKECO.S.C00.Rsp
       command: "SelfTestRequest"
 
     - label:
-          "TH waits for a report of TestInProgress attribute from DUT with a
-          timeout of 180 seconds"
+          "Step 45: TH waits for a report of TestInProgress attribute from DUT
+          with a timeout of 180 seconds"
       PICS: SMOKECO.S.A0005
       command: "waitForReport"
       attribute: "TestInProgress"
@@ -536,7 +540,7 @@ tests:
           constraints:
               type: boolean
 
-    - label: "TH reads ExpressedState attribute from DUT"
+    - label: "Step 46: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -546,8 +550,8 @@ tests:
               type: enum8
 
     - label:
-          "TH waits for a report of TestInProgress attribute from DUT with a
-          timeout of 180 seconds"
+          "Step 47: TH waits for a report of TestInProgress attribute from DUT
+          with a timeout of 180 seconds"
       PICS: SMOKECO.S.A0005
       command: "waitForReport"
       attribute: "TestInProgress"
@@ -557,15 +561,15 @@ tests:
           constraints:
               type: boolean
 
-    - label: "TH reads SelfTestComplete event from DUT"
+    - label: "Step 48: TH reads SelfTestComplete event from DUT"
       PICS: SMOKECO.S.E05
       command: "readEvent"
       event: "SelfTestComplete"
-      EVENT_NUMBER: EVENT_NUMBER + 10
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 
-    - label: "TH reads ExpressedState attribute from DUT"
+    - label: "Step 49: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -574,10 +578,10 @@ tests:
           constraints:
               type: enum8
 
-    - label: "TH reads AllClear event from DUT"
+    - label: "Step 50: TH reads AllClear event from DUT"
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      EVENT_NUMBER: EVENT_NUMBER + 11
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}

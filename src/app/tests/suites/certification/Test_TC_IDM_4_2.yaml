@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,46 +38,44 @@ tests:
           Here the command to enter interactive mode:-- ./chip-tool interactive start
       disabled: true
 
-    - label: "Step 0a: TH reads from the DUT the IdleModeInterval attribute."
+    - label: "Step 0a: "
       PICS: " !ICDM.S "
       verification: |
           When the ICDM feature is not supported or enabled, the SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT is set to 60 minutes.
       disabled: true
 
-    - label: "Step 0b: TH reads from the DUT the IdleModeInterval attribute."
+    - label: "Step 0b: CR1 reads from the DUT the IdleModeInterval attribute."
       PICS: ICDM.S
       verification: |
-          TH reads from the DUT the IdleModeInterval attribute by sending below mentioned command
+          CR1 reads from the DUT the IdleModeInterval attribute by sending below mentioned command
 
-           icdmanagement read idle-mode-interval 1
+          icdmanagement read idle-mode-interval 1 0
+
           Please note down the value of IdleModeInterval as SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT for use in the next step validations.
 
-
-          [1690475024.398278][5675:5677] CHIP:DMG:         SuppressResponse = true,
-          [1690475024.398282][5675:5677] CHIP:DMG:         InteractionModelRevision = 1
-          [1690475024.398285][5675:5677] CHIP:DMG: }
-          [1690475024.398735][5675:5677] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0000 DataVersion: 4216223957
-          [1690475024.398921][5675:5677] CHIP:TOO:   IdleModeInterval: 500
-          [1690475024.399202][5675:5677] CHIP:EM: <<< [E:28320i S:44238 M:28503816 (Ack:266918637)] (S) Msg TX to 1:0000000000000001 [3C19] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1690475024.399208][5675:5677] CHIP:IN: (S) Sending msg 28503816 on secure session with LSID: 44238
-          [1690475024.399217][5675:5677] CHIP:EM: Flushed pending ack for MessageCounter:266918637 on exchange 28320i
+          [1692870543.225457][7160:7162] CHIP:DMG:         SuppressResponse = true,
+          [1692870543.225495][7160:7162] CHIP:DMG:         InteractionModelRevision = 10
+          [1692870543.225528][7160:7162] CHIP:DMG: }
+          [1692870543.225723][7160:7162] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0000 DataVersion: 4022467249
+          [1692870543.225795][7160:7162] CHIP:TOO:   IdleModeInterval: 2000
+          [1692870543.225992][7160:7162] CHIP:EM: <<< [E:52837i S:57653 M:52559591 (Ack:263018291)] (S) Msg TX to 1:0000000000000001 [853D] --- Type 0000:10 (SecureChannel:StandaloneAck)
       disabled: true
 
     - label:
-          "Step 1: TH sends a subscription message to the DUT with
+          "Step 1: CR1 sends a subscription message to the DUT with
           MaxIntervalCeiling set to a value greater than
           SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT. DUT sends a report data
-          action to the TH. TH sends a success status response to the DUT. DUT
-          sends a Subscribe Response Message to the TH to activate the
+          action to the TH. CR1 sends a success status response to the DUT. DUT
+          sends a Subscribe Response Message to the CR1 to activate the
           subscription."
       verification: |
           Please run the following command on the TH to test the subscription feature and verify that the value of MaxIntervalCeiling is set correctly(set the value greater than SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT)
 
-           onoff subscribe on-off  100  600 1 1 --keepSubscriptions true
+           onoff subscribe on-off  100 600 1 1 --keepSubscriptions true
 
-           On the TH( chip-tool), verify a report data message is received and verify it contains the following data :
+           On the CR1( chip-tool), verify a report data message is received and verify it contains the following data :
           1. Verify Report Data Message Received:
-              Check if a report data message is received on the TH.
+              Check if a report data message is received on the CR1.
 
           2. Verify Report Data Contents:
               Confirm that the received report data message contains the data of the attribute/event that was previously requested.
@@ -115,11 +113,11 @@ tests:
       disabled: true
 
     - label:
-          "Step 2: TH sends a subscription message to the DUT with
+          "Step 2: CR1 sends a subscription message to the DUT with
           MaxIntervalCeiling set to a value less than
           SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT. DUT sends a report data
-          action to the TH. TH sends a success status response to the DUT. DUT
-          sends a Subscribe Response Message to the TH to activate the
+          action to the CR1. CR1 sends a success status response to the DUT. DUT
+          sends a Subscribe Response Message to the CR1 to activate the
           subscription."
       verification: |
           Please run the following command on the TH to test the subscription feature and verify that the value of MaxIntervalCeiling is set correctly( set the value less than SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT)
@@ -127,9 +125,9 @@ tests:
 
           basicinformation subscribe location 10 400 1 0 --keepSubscriptions true
 
-          On the TH(chip-tool), verify a report data message is received and verify it contains the following data :
+          On the CR1(chip-tool), verify a report data message is received and verify it contains the following data :
           1. Verify Report Data Message Received:
-                 Check if a report data message is received on the TH (target hardware).
+                 Check if a report data message is received on the CR1 (target hardware).
 
           2. Verify Report Data Contents:
                 Confirm that the received report data message contains the data of the attribute/event that was previously requested.
@@ -166,13 +164,13 @@ tests:
       disabled: true
 
     - label:
-          "Step 3: Setup TH2 such that it does not have access to a specific
-          cluster. TH2 sends a subscription message to subscribe to an attribute
+          "Step 3: Setup CR2 such that it does not have access to a specific
+          cluster. CR2 sends a subscription message to subscribe to an attribute
           on that cluster for which it does not have access. AttributePath =
           [[Attribute = Attribute, Cluster = ClusterID, Endpoint = EndpointID
           ]]."
       verification: |
-          Please send the below mentioned command to configure TH2 without access to a specific cluster, we send the ACL command, allowing access only to the Level Control cluster (cluster ID: 8); any attempts to subscribe to or use commands from other clusters will result in a status of 'INVALID_ACTION
+          To ensure that CR1 and CR2 are on the same fabric and that CR1 grants access to CR2, Please send the below mentioned command, it will configure TH2 without access to a specific cluster, we send the ACL command, allowing access only to the Level Control cluster (cluster ID: 8); any attempts to subscribe to or use commands from other clusters will result in a status of 'INVALID_ACTION
 
           accesscontrol write acl '[{"privilege":5, "authMode":2, "subjects":[112233], "targets":null, "fabricIndex": 1},{"privilege":3, "authMode":2, "subjects":[4], "targets":[{"cluster":8, "endpoint":null, "deviceType":null}]}]' 1 0
 
@@ -240,7 +238,7 @@ tests:
           [1689933254.566916][48781:48783] CHIP:EM: <<< [E:6316i S:13964 M:156974240 (Ack:46397313)] (S) Msg TX to 1:0000000000000001 [B15F] --- Type 0000:10 (SecureChannel:StandaloneAck)
           [1689933254.566922][48781:48783] CHIP:IN: (S) Sending msg 156974240 on secure session with LSID: 13964
 
-          If TH2 attempts to subscribe to an attribute on a cluster (ClusterID) for which it does not have access, the AttributePath used for the subscription would be in the form [[Attribute = AttributeName, Cluster = ClusterID, Endpoint = EndpointID]], but this action will be denied, and TH2 will not be able to access the attribute due to the restricted access.
+          If CR2 attempts to subscribe to an attribute on a cluster (ClusterID) for which it does not have access, the AttributePath used for the subscription would be in the form [[Attribute = AttributeName, Cluster = ClusterID, Endpoint = EndpointID]], but this action will be denied, and CR2 will not be able to access the attribute due to the restricted access.
 
           below provided the  example command used to subscribe location attribute from basicinformation cluster from node id(4) that have access to the “levelcontrol” cluster
 
@@ -261,12 +259,12 @@ tests:
       disabled: true
 
     - label:
-          "Step 4: Setup TH2 such that it does not have access to all attributes
-          on a specific cluster and endpoint. TH2 sends a subscription request
+          "Step 4: Setup CR2 such that it does not have access to all attributes
+          on a specific cluster and endpoint. CR2 sends a subscription request
           to subscribe to all attributes for which it does not have access.
           AttributePath = [[Cluster = ClusterID, Endpoint = EndpointID ]]."
       verification: |
-          Please send the below mentioned command to configure TH2 without access to a specific cluster on Specific endpoint, we send the ACL command, allowing access only to the Level Control cluster (cluster ID: 8) on endpoint 1 ; any attempts to subscribe to or use commands from other clusters will result in a status of 'INVALID_ACTION
+          To ensure that CR1 and CR2 are on the same fabric and that CR1 grants access to CR2, Please send the below mentioned command, it will  configure CR2 without access to a specific cluster on Specific endpoint, we send the ACL command, allowing access only to the Level Control cluster (cluster ID: 8) on endpoint 1 ; any attempts to subscribe to or use commands from other clusters will result in a status of 'INVALID_ACTION
 
           accesscontrol write acl '[{"privilege":5, "authMode":2, "subjects":[112233], "targets":null, "fabricIndex": 1},{"privilege":3, "authMode":2, "subjects":[4], "targets":[{"cluster":8, "endpoint":1, "deviceType":null}]}]' 1 0
 
@@ -330,7 +328,7 @@ tests:
           [1687418564.590811][167960:167962] CHIP:DMG: }
           [1687418564.590882][167960:167962] CHIP:DMG: WriteClient moving to [AwaitingDe]
 
-           If TH2 attempts to subscribe to an attribute on a cluster (ClusterID) for which it does not have access, the AttributePath used for the subscription would be in the form AttributePath = [[Cluster = ClusterID, Endpoint = EndpointID ]]., but this action will be denied, and TH2 will not be able to access the attribute due to the restricted access.
+           If CR2 attempts to subscribe to an attribute on a cluster (ClusterID) for which it does not have access, the AttributePath used for the subscription would be in the form AttributePath = [[Cluster = ClusterID, Endpoint = EndpointID ]]., but this action will be denied, and CR2 will not be able to access the attribute due to the restricted access.
 
           below provided the  example command to subscribe all attributes onto endpoint 1 for  onoff cluster from node id(4) that have access to the “levelcontrol” cluster onto endpoint 1
 
@@ -354,12 +352,12 @@ tests:
       disabled: true
 
     - label:
-          "Step 5: Setup TH2 such that it does not have access to an Endpoint.
-          TH2 sends a subscription request to subscribe to all attributes on all
+          "Step 5: Setup CR2 such that it does not have access to an Endpoint.
+          CR2 sends a subscription request to subscribe to all attributes on all
           clusters on a specific Endpoint for which it does not have access.
           AttributePath = [[ Endpoint = EndpointID ]]."
       verification: |
-          Please send the below mentioned command to configure TH2 without access to a specific endpoint, we send the ACL command, allowing access only to the endpoint 1 ; any attempts to subscribe to or use commands from other clusters will result in a status of 'INVALID_ACTION
+          To ensure that CR1 and CR2 are on the same fabric and that CR1 grants access to CR2, Please send the below mentioned command, it will configure CR2 without access to a specific endpoint, we send the ACL command, allowing access only to the endpoint 1 ; any attempts to subscribe to or use commands from other clusters will result in a status of 'INVALID_ACTION
 
            accesscontrol write acl '[{"privilege":5, "authMode":2, "subjects":[112233], "targets":null, "fabricIndex": 1},{"privilege":3, "authMode":2, "subjects":[4], "targets":[{"cluster":null, "endpoint":1, "deviceType":null}]}]' 1 0
 
@@ -423,7 +421,7 @@ tests:
           [1687418943.853418][167960:167962] CHIP:DMG: }
           [1687418943.853488][167960:167962] CHIP:DMG: WriteClient moving to [AwaitingDe]
 
-           If TH2 attempts to subscribe to an attribute on a cluster (ClusterID) for which it does not have access, the AttributePath used for the subscription would be in the form AttributePath = [[ Endpoint = EndpointID ]], but this action will be denied, and TH2 will not be able to access the attribute due to the restricted access.
+           If CR2 attempts to subscribe to an attribute on a cluster (ClusterID) for which it does not have access, the AttributePath used for the subscription would be in the form AttributePath = [[ Endpoint = EndpointID ]], but this action will be denied, and CR2 will not be able to access the attribute due to the restricted access.
 
           below provided the  example command to subscribe to all attributes onto endpoint 0 for cluster 6 from a node id that have access to everything onto endpoint 1
 
@@ -445,7 +443,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 6: Setup TH2 such that it does not have access to the Node. TH2
+          "Step 6: Setup CR2 such that it does not have access to the Node. CR2
           sends a subscription request to subscribe to all attributes on all
           clusters on all endpoints on a Node for which it does not have access.
           AttributePath = [[ ]]."
@@ -455,26 +453,27 @@ tests:
       disabled: true
 
     - label:
-          "Step 7: TH sends a subscription request action for an attribute with
+          "Step 7: CR1 sends a subscription request action for an attribute with
           an empty DataVersionFilters field. DUT sends a report data action with
           the data of the attribute along with the data version. Tear down the
           subscription for that attribute. Start another subscription with the
           DataVersionFilter field set to the data version received above."
       verification: |
           Chip-Tool support required to validate this step : SDK Issue - https://github.com/project-chip/connectedhomeip/issues/28363
+
           Not Testable
       disabled: true
 
     - label:
-          "Step 8: TH sends a subscription request action for an attribute and
+          "Step 8: CR1 sends a subscription request action for an attribute and
           sets the MinIntervalFloor value to be same as MaxIntervalCeiling.
-          Activate the Subscription between TH and DUT. Modify the attribute
+          Activate the Subscription between CR1 and DUT. Modify the attribute
           which has been subscribed to on the DUT."
       verification: |
-          Please send the following command from TH (the subscription requester) to DUT (the device under test) to activate the subscription for the "on-time" attribute, setting the MinIntervalFloor and MaxIntervalCeiling values to be the same (in this case, 100 seconds):
+          Please send the following command from CR1 (the subscription requester) to DUT (the device under test) to activate the subscription for the "on-time" attribute, setting the MinIntervalFloor and MaxIntervalCeiling values to be the same (in this case, 100 seconds):
 
           onoff subscribe on-time 100 100 1 1 --keepSubscriptions true
-          On the TH(all-clusters-app) verify the  SubscribeResponse is received successfully
+          On the CR1(chip-tool) verify the  SubscribeResponse is received successfully
           [1690540281.061350][9488:9490] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_4001 DataVersion: 3310786904
           [1690540281.061363][9488:9490] CHIP:TOO:   OnTime: 0
           [1690540281.061379][9488:9490] CHIP:DMG: MoveToState ReadClient[0x7faef8013880]: Moving to [AwaitingSu]
@@ -497,7 +496,7 @@ tests:
           After activating the subscription between TH and DUT, please send the following command to modify the 'on-time' attribute value:
 
           >>> onoff write on-time 1 1 1
-          On TH(chip-tool), verify that the DUT sends a report data containing the current 'ontime' attribute value after the MinIntervalFloor time has elapsed
+          On CR1(chip-tool), verify that the DUT sends a report data containing the current 'ontime' attribute value after the MinIntervalFloor time has elapsed
 
           [1690540304.761997][9488:9488] CHIP:TOO: Command: onoff write on-time 1 1 1
           [1690540304.762298][9488:9490] CHIP:TOO: Sending command to node 0x1
@@ -594,15 +593,15 @@ tests:
       disabled: true
 
     - label:
-          "Step 9: TH sends a subscription request action for an attribute and
-          set the MinIntervalFloor value to be greater than MaxIntervalCeiling.
-          +"
+          "Step 9: CR1 sends a subscription request action for an attribute and
+          set the MinIntervalFloor value to be greater than MaxIntervalCeiling."
       verification: |
-          Please send the following command from TH (the subscription requester) to DUT (the device under test) to activate the subscription for the "on-time" attribute, setting the MinIntervalFloor value to be greater than MaxIntervalCeiling:
+          Please send the following command from CR1 (the subscription requester) to DUT (the device under test) to activate the subscription for the "on-time" attribute, setting the MinIntervalFloor value to be greater than MaxIntervalCeiling:
 
-          onoff subscribe on-time 500 100 1 1 --keepSubscriptions true
 
-          On TH (chip-tool), verify that the DUT sends an error message, confirming that the subscription is not established successfully
+           onoff subscribe on-time 500 100 1 1 --keepSubscriptions true
+
+          On CR1 (chip-tool), verify that the DUT sends an error message, confirming that the subscription is not established successfully
 
           [1661754615.089845][103654:103659] CHIP:DMG: StatusResponseMessage =
           [1661754615.089857][103654:103659] CHIP:DMG: {
@@ -614,7 +613,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 10: TH sends a subscription request to subscribe to a specific
+          "Step 10: CR1 sends a subscription request to subscribe to a specific
           global attribute from all clusters on all endpoints. AttributePath =
           [[Attribute = Global Attribute]]. +"
       verification: |
@@ -656,7 +655,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 11: TH sends a subscription request to subscribe to a global
+          "Step 11: CR1 sends a subscription request to subscribe to a global
           attribute on an endpoint on all clusters. AttributePath = [[Attribute
           = Global Attribute, Endpoint = EndpointID ]]. +"
       verification: |
@@ -745,14 +744,14 @@ tests:
       disabled: true
 
     - label:
-          "Step 12: TH sends a subscription request to the DUT with both
+          "Step 12: CR1 sends a subscription request to the DUT with both
           AttributeRequests and EventRequests as empty"
       verification: |
           Please send the following command from TH (the subscription requester) to DUT (the device under test) to activate the subscription  with both AttributeRequests and EventRequests as empty
 
           any subscribe-none 10 100 1 --keepSubscriptions 1
 
-          On TH (chip-tool), verify that the DUT sends an error message, confirming that the subscription is not established successfully
+          On CR1 (chip-tool), verify that the DUT sends an error message, confirming that the subscription is not established successfully
           [1690884829.708780][84191:84193] CHIP:EM: Rxd Ack; Removing MessageCounter:136461510 from Retrans Table on exchange 23099i
           [1690884829.708861][84191:84193] CHIP:DMG: StatusResponseMessage =
           [1690884829.708907][84191:84193] CHIP:DMG: {

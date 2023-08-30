@@ -692,6 +692,10 @@ server cluster TimeFormatLocalization = 44 {
     k24hr = 1;
   }
 
+  bitmap Feature : BITMAP32 {
+    kCalendarFormat = 0x1;
+  }
+
   attribute HourFormatEnum hourFormat = 0;
   attribute CalendarTypeEnum activeCalendarType = 1;
   readonly attribute CalendarTypeEnum supportedCalendarTypes[] = 2;
@@ -1854,7 +1858,7 @@ endpoint 1 {
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0x1f;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
   }
 }
 
