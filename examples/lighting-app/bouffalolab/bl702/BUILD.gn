@@ -25,8 +25,6 @@ import("${chip_root}/src/platform/bouffalolab/common/args.gni")
 
 import("${chip_root}/src/app/chip_data_model.gni")
 
-import("${chip_root}/src/platform/bouffalolab/common/args.gni")
-
 if (chip_enable_pw_rpc) {
   import("//build_overrides/pigweed.gni")
   import("$dir_pw_build/target_types.gni")
@@ -73,12 +71,6 @@ bl_iot_sdk("sdk") {
     "${chip_root}/src/platform/bouffalolab/common",
   ]
 
-  if (chip_enable_wifi || chip_enable_ethernet) {
-    include_dirs += [
-      "${examples_plat_dir}/bl702/lwipopts",
-    ]
-  }
-
   freertos_config = "${examples_plat_dir}/bl702/FreeRTOSConfig.h"
 
   defines = [
@@ -100,7 +92,6 @@ bl_iot_sdk("sdk") {
 
   defines += [ 
     "CHIP_DEVICE_CONFIG_ENABLE_ETHERNET=${chip_enable_ethernet}",
-    "ENABLE_OPENTHREAD_BORDER_ROUTER=${enable_openthread_border_router}" 
   ]
 
   if (enable_psram) {
@@ -206,13 +197,9 @@ bouffalolab_executable("lighting_app") {
       "${examples_plat_dir}/common/route_hook/bl_route_hook.c",
       "${examples_plat_dir}/common/route_hook/bl_route_table.c",
     ]
-
-    if (enable_openthread_border_router) {
-      defines += [ "CHIP_DEVICE_CONFIG_THREAD_FTD=1" ]
-    }
   }
 
-  if (chip_enable_openthread || enable_openthread_border_router) {
+  if (chip_enable_openthread) {
     deps += [
       "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
       "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
@@ -291,12 +278,6 @@ bouffalolab_executable("lighting_app") {
       "${chip_root}/src/lib/shell",
       "${chip_root}/examples/shell/shell_common/include",
     ]
-
-    if (enable_openthread_border_router) {
-      sources += [
-        "${examples_plat_dir}/common/shell/cli_otc.cpp",
-      ]
-    }
 
     deps += [ "${chip_root}/examples/shell/shell_common:shell_common" ]
   }

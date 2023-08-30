@@ -833,8 +833,9 @@ template("bl_iot_sdk") {
       "LWIP_IPV6_SCOPES=0",
       "PBUF_POOL_SIZE=20",
       "PBUF_POOL_BUFSIZE=1600",
-      "CONFIG_LWIP_HOOK_IP6_ROUTE_DEFAULT",
-      "CONFIG_LWIP_HOOK_ND6_GET_GW_DEFAULT",
+      "MEMP_NUM_UDP_PCB=8",
+      "LWIP_NETIF_EXT_STATUS_CALLBACK",
+      "LWIP_HOOK_FILENAME=\"bl_route_hook.h\""
     ]
   }
 

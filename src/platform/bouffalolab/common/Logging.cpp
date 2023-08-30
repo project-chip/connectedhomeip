@@ -30,6 +30,7 @@
 #include <task.h>
 #if CHIP_DEVICE_LAYER_TARGET_BL602 || CHIP_DEVICE_LAYER_TARGET_BL702 || CHIP_DEVICE_LAYER_TARGET_BL702L
 #include <utils_log.h>
+#endif
 
 namespace chip {
 namespace Logging {

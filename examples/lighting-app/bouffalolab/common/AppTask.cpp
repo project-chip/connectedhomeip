@@ -48,7 +48,6 @@
 #include <easyflash.h>
 
 extern "C" {
-#include "board.h"
 #include <bl_gpio.h>
 #include <hal_gpio.h>
 #include <hosal_gpio.h>

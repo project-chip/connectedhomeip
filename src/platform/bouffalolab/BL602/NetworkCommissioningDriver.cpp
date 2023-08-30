@@ -353,7 +353,99 @@ bool BLWiFiDriver::WiFiNetworkIterator::Next(Network & item)
             item.connected = true;
         }
     }
+    
     return true;
+}
+
+void NetworkEventHandler(const ChipDeviceEvent * event, intptr_t arg)
+{
+    if (!(DeviceEventType::IsPlatformSpecific(event->Type) && DeviceEventType::IsPublic(event->Type))) {
+        return;
+    }
+
+    switch (event->Type) {
+    case kWiFiOnInitDone:
+        break;
+    case kWiFiOnScanDone:
+        BLWiFiDriver::GetInstance().OnScanWiFiNetworkDone();
+        break;
+    case kWiFiOnConnected:
+        BLWiFiDriver::GetInstance().OnNetworkStatusChange();
+        break;
+    case kGotIpAddress:
+        ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManagerImpl::kWiFiStationState_Connected);
+        ConnectivityMgrImpl().OnConnectivityChanged(deviceInterface_getNetif());
+        break;
+    case kGotIpv6Address:
+        ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManagerImpl::kWiFiStationState_Connected);
+        ConnectivityMgrImpl().OnConnectivityChanged(deviceInterface_getNetif());
+        break;
+    case kWiFiOnDisconnected:
+        if (ConnectivityManager::kWiFiStationState_Connecting == ConnectivityMgrImpl().GetWiFiStationState())
+        {
+            ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManager::kWiFiStationState_Connecting_Failed);
+        }
+        break;
+    default:
+        ChipLogProgress(DeviceLayer, "Undefined network commission event type %x.\r\n", event->Type);
+        break;
+    }
+}
+
+static wifi_conf_t conf = {
+    .country_code = "CN",
+};
+
+extern "C" void wifi_event_handler(uint32_t code)
+{
+    ChipDeviceEvent event;
+
+    memset(&event, 0, sizeof(ChipDeviceEvent));
+
+    switch (code) {
+        case CODE_WIFI_ON_INIT_DONE: 
+            wifi_mgmr_start_background(&conf);
+            break;
+        case CODE_WIFI_ON_SCAN_DONE:
+            event.Type                                 = kWiFiOnScanDone;
+            PlatformMgr().PostEventOrDie(&event);
+            break;
+        case CODE_WIFI_ON_CONNECTED:
+            event.Type                                 = kWiFiOnConnected;
+            PlatformMgr().PostEventOrDie(&event);
+            break;
+        case CODE_WIFI_ON_GOT_IP: 
+            event.Type                                 = kGotIpAddress;
+            PlatformMgr().PostEventOrDie(&event);
+            break;
+        case CODE_WIFI_ON_DISCONNECT: 
+            event.Type                                 = kWiFiOnDisconnected;
+            PlatformMgr().PostEventOrDie(&event);
+            break;
+        default: 
+            ChipLogProgress(DeviceLayer, "[APP] [EVT] Unknown code %lu \r\n", code);
+    }
+}
+
+extern "C" void network_netif_ext_callback(struct netif* nif, netif_nsc_reason_t reason, const netif_ext_callback_args_t* args) 
+{
+    ChipDeviceEvent event;
+
+    memset(&event, 0, sizeof(ChipDeviceEvent));
+
+    if ((LWIP_NSC_IPV6_ADDR_STATE_CHANGED & reason) && args) {
+
+        if (args->ipv6_addr_state_changed.addr_index >= LWIP_IPV6_NUM_ADDRESSES || 
+            ip6_addr_islinklocal(netif_ip6_addr(nif, args->ipv6_addr_state_changed.addr_index))) {
+            return;
+        }
+
+        if (netif_ip6_addr_state(nif, args->ipv6_addr_state_changed.addr_index) != args->ipv6_addr_state_changed.old_state &&
+            ip6_addr_ispreferred(netif_ip6_addr_state(nif, args->ipv6_addr_state_changed.addr_index))) {
+            event.Type                                 = kGotIpv6Address;
+            PlatformMgr().PostEventOrDie(&event);
+        }
+    }
 }
 
 } // namespace NetworkCommissioning

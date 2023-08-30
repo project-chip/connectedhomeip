@@ -35,7 +35,3 @@ void appError(int err);
 void platform_port_init(void);
 
 #endif
-
-#if ENABLE_OPENTHREAD_BORDER_ROUTER && CONFIG_ENABLE_CHIP_SHELL
-extern void cli_otc_init(void);
-#endif

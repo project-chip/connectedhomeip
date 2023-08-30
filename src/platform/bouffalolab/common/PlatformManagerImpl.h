@@ -60,13 +60,11 @@ private:
     friend PlatformManager & PlatformMgr(void);
     friend PlatformManagerImpl & PlatformMgrImpl(void);
     friend class Internal::BLEManagerImpl;
-
-    CHIP_ERROR _PostEvent(const ChipDeviceEvent * event);
-
 #if CHIP_DEVICE_LAYER_TARGET_BL602 && CHIP_DEVICE_CONFIG_ENABLE_WIFI
     friend void OnWiFiPlatformEvent(input_event_t * event, void * private_data);
 #endif
 
+    CHIP_ERROR _PostEvent(const ChipDeviceEvent * event);
     System::Clock::Timestamp mStartTime = System::Clock::kZero;
 
     static PlatformManagerImpl sInstance;
@@ -91,7 +89,7 @@ inline PlatformManager & PlatformMgr(void)
  * Returns the platform-specific implementation of the PlatformManager singleton object.
  *
  * Chip applications can use this to gain access to features of the PlatformManager
- * that are specific to the ESP32 platform.
+ * that are specific to the Bouffalo Lab platform.
  */
 inline PlatformManagerImpl & PlatformMgrImpl(void)
 {

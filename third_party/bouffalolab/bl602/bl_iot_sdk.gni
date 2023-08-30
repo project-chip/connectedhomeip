@@ -19,6 +19,9 @@ import("${chip_root}/src/lib/lib.gni")
 
 declare_args() {
   bl_iot_sdk_root = "${chip_root}/third_party/bouffalolab/repo"
+
+  enable_debug_frame_ptr = true
+  debug_output_file = ""
 }
 
 assert(bl_iot_sdk_root != "", "bl_iot_sdk_root must be specified")
@@ -39,10 +42,6 @@ template("bl_iot_sdk") {
       "BL602_USE_HAL_DRIVER=1",
 
       "CFG_CHIP_BL602",
-
-      #dump backtrace
-      "CONF_ENABLE_FRAME_PTR=1",
-      "CONF_ENABLE_FUNC_BACKTRACE_ELF=out/bl602-light/chip-bl602-lighting-example.out",
     ]
 
     include_dirs = []
@@ -62,6 +61,10 @@ template("bl_iot_sdk") {
       "-include",
       rebase_path("${invoker.freertos_config}", root_build_dir),
     ]
+
+    if (defined(invoker.enable_frame_ptr) && invoker.enable_frame_ptr) {
+      cflags += [ "-fno-omit-frame-pointer" ]
+    }
   }
 
   source_set("${sdk_target_name}_soc") {
@@ -150,6 +153,14 @@ template("bl_iot_sdk") {
 
   source_set("${sdk_target_name}_bl602_freertos") {
     defines = [ "portasmHANDLE_INTERRUPT=interrupt_entry" ]
+
+    if (defined(invoker.enable_frame_ptr) && invoker.enable_frame_ptr) {
+      defines += [ 
+        "CONF_ENABLE_FRAME_PTR=1",
+        "CONF_ENABLE_FUNC_BACKTRACE_ELF=${invoker.debug_output_file}",
+      ]
+    }
+
     include_dirs = [ "${bl_iot_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/portable/GCC/RISC-V/chip_specific_extensions/RV32F_float_abi_single" ]
 
     sources = [
@@ -847,9 +858,9 @@ template("bl_iot_sdk") {
       "MEMP_NUM_MLD6_GROUP=10",
       "PBUF_POOL_SIZE=20",
       "PBUF_POOL_BUFSIZE=1600",
-      "CONFIG_ENABLE_IPV6_ADDR_CALLBACK",
-      "CONFIG_LWIP_HOOK_IP6_ROUTE_DEFAULT",
-      "CONFIG_LWIP_HOOK_ND6_GET_GW_DEFAULT",
+      "MEMP_NUM_UDP_PCB=8",
+      "LWIP_NETIF_EXT_STATUS_CALLBACK",
+      "LWIP_HOOK_FILENAME=\"bl_route_hook.h\""
     ]
   }
 

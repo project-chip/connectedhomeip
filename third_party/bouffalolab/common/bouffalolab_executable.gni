@@ -46,11 +46,6 @@ template("bouffalolab_executable") {
       "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_4M.toml" 
     ]
   }
-  else if (defined(invoker.enable_openthread_border_router) && invoker.enable_openthread_border_router) {
-    flashing_script_inputs += [
-      "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_2M_noOTA.toml"
-    ]
-  }
   else {
     flashing_script_inputs += [
       "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_2M.toml"

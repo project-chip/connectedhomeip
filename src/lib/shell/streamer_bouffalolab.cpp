@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      Source implementation of an input / output stream for bl702 targets.
+ *      Source implementation of an input / output stream for Bouffalo Lab targets.
  */
 
 #include <lib/shell/Engine.h>

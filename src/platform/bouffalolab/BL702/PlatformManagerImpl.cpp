@@ -28,18 +28,9 @@
 #include <platform/bouffalolab/BL702/wifi_mgmr_portable.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD || ENABLE_OPENTHREAD_BORDER_ROUTER
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread_port.h>
 #include <utils_list.h>
-#endif
-
-#if ENABLE_OPENTHREAD_BORDER_ROUTER
-#include <openthread/thread.h>
-
-#include <openthread/dataset.h>
-#include <openthread/dataset_ftd.h>
-#include <openthread/ip6.h>
-#include <openthread_br.h>
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET

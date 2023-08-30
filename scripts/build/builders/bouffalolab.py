@@ -53,7 +53,6 @@ class BouffalolabBoard(Enum):
     XT_ZB6_DevKit = auto()
     BL706_NIGHT_LIGHT = auto()
     BL706DK = auto()
-    BL704LDK = auto()
     BL704L_DVK = auto()
 
     def GnArgName(self):
@@ -69,8 +68,6 @@ class BouffalolabBoard(Enum):
             return 'BL706DK'
         elif self == BouffalolabBoard.BL704LDK:
             return 'BL704LDK'
-        elif self == BouffalolabBoard.BL704L_DVK:
-            return 'BL704L-DVK'
         else:
             raise_exception('Unknown board #: %r' % self)
 
@@ -113,6 +110,7 @@ class BouffalolabBuilder(GnBuilder):
 
         self.argsOpt = []
         self.chip_name = bouffalo_chip
+        self.enable_frame_ptr = enable_frame_ptr
 
         openthread_project_core_config_file = None
         toolchain = os.path.join(root, os.path.split(os.path.realpath(__file__))[0], '../../../config/bouffalolab/toolchain')
@@ -145,8 +143,6 @@ class BouffalolabBuilder(GnBuilder):
 
         elif bouffalo_chip == "bl702l":
 
-            if board == BouffalolabBoard.BL704L_DVK:
-                raise_exception('Board bl704l-dvk renames to bl704ldk.')
             if enable_ethernet or enable_wifi:
                 raise_exception('SoC %s doesn\'t support connectivity Ethernet/Wi-Fi currently.' % bouffalo_chip)
 
@@ -236,7 +232,10 @@ class BouffalolabBuilder(GnBuilder):
         logging.fatal('*' * 80)
 
     def GnBuildArgs(self):
-        return self.argsOpt
+        if self.enable_frame_ptr:
+            return self.argsOpt + ["debug_output_file=\"{}\"".format(os.path.join(self.output_dir, '%s.out' % self.app.AppNamePrefix(self.chip_name)))]
+        else:
+            return self.argsOpt
 
     def build_outputs(self):
         items = {
