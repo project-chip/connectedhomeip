@@ -31,27 +31,13 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Issue: https://github.com/project-chip/connectedhomeip/issues/26601
     - label: "Step 2: Read the global attribute: ClusterRevision"
-      verification: |
-          ./chip-tool thermostat read cluster-revision 1 1
-
-          On TH(chip-tool), verify that DUT responsds ClusterRevision attribute  value as 6
-
-          [1654082369.006076][7829:7834] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_FFFD DataVersion: 2954689426
-          [1654082369.006146][7829:7834] CHIP:TOO:   ClusterRevision: 5
-          [1654082369.006241][7829:7834] CHIP:EM: Sending Standalone Ack for MessageCounter:4310083 on exchange 63290i
-
-          This log and comment are as per the latest sdk but the vaue is wrong  https://github.com/project-chip/connectedhomeip/issues/26601
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 6
+          constraints:
+              type: int16u
 
     - label: "Step 3a: Read the global attribute: FeatureMap"
       PICS:

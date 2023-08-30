@@ -1,0 +1,220 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 54.1.1. [TC-SM-1.1] Device composition - Root Node [DUT as Server]
+
+PICS:
+    - MCORE.SM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: TH performs a wildcard read of all attributes and endpoints"
+      verification: |
+          TH(chip-tool) sends the wildcard read command to read all attributes and endpoints from DUT(Reference app/all-clusters-app)
+          ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF  1 0xFFFF
+      disabled: true
+
+    - label:
+          "Step 2: C.2.10, Verify that endpoint 0 exists in the returned data"
+      verification: |
+          On TH(chip-tool), Verify that endpoint 0 exists in the returned report data Message
+          below is the sample log provided for the raspi platform:
+
+          [1690185276.189258][40055:40057] CHIP:TOO:     [28]: 4294048774
+          [1690185276.189270][40055:40057] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0002 DataVersion: 1390630643
+          [1690185276.189273][40055:40057] CHIP:TOO:   ClientList: 1 entries
+          [1690185276.189275][40055:40057] CHIP:TOO:     [1]: 41
+          [1690185276.189286][40055:40057] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1390630643
+          [1690185276.189290][40055:40057] CHIP:TOO:   PartsList: 2 entries
+          [1690185276.189293][40055:40057] CHIP:TOO:     [1]: 1
+          [1690185276.189295][40055:40057] CHIP:TOO:     [2]: 2
+          [1690185276.189298][40055:40057] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_FFFC DataVersion: 1390630643
+          [1690185276.189300][40055:40057] CHIP:TOO:   FeatureMap: 0
+          [1690185276.189309][40055:40057] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_FFFD DataVersion: 1390630643
+          [1690185276.189311][40055:40057] CHIP:TOO:   ClusterRevision: 1
+          [1690185276.189326][40055:40057] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_FFF8 DataVersion: 1390630643
+          [1690185276.189329][40055:40057] CHIP:TOO:   GeneratedCommandList: 0 entries
+          [1690185276.189339][40055:40057] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_FFF9 DataVersion: 1390630643
+          [1690185276.189341][40055:40057] CHIP:TOO:   AcceptedCommandList: 0 entries
+          [1690185276.189353][40055:40057] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_FFFA DataVersion: 1390630643
+          [1690185276.189356][40055:40057] CHIP:TOO:   EventList: 0 entries
+          [1690185276.189374][40055:40057] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_FFFB DataVersion: 1390630643
+          [1690185276.189378][40055:40057] CHIP:TOO:   AttributeList: 10 entries
+          [1690185276.189380][40055:40057] CHIP:TOO:     [1]: 0
+          [1690185276.189382][40055:40057] CHIP:TOO:     [2]: 1
+          [1690185276.189384][40055:40057] CHIP:TOO:     [3]: 2
+          [1690185276.189386][40055:40057] CHIP:TOO:     [4]: 3
+          [1690185276.189388][40055:40057] CHIP:TOO:     [5]: 65528
+          [1690185276.189390][40055:40057] CHIP:TOO:     [6]: 65529
+          [1690185276.189392][40055:40057] CHIP:TOO:     [7]: 65530
+          [1690185276.189394][40055:40057] CHIP:TOO:     [8]: 65531
+          [1690185276.189396][40055:40057] CHIP:TOO:     [9]: 65532
+          [1690185276.189398][40055:40057] CHIP:TOO:     [10]: 65533
+          [1690185276.189408][40055:40057] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001E Attribute 0x0000_0000 DataVersion: 3752520678
+          [1690185276.189411][40055:40057] CHIP:TOO:   Binding: 0 entries
+          [1690185276.189414][40055:40057] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001E Attribute 0x0000_FFFC DataVersion: 3752520678
+          [1690185276.189416][40055:40057] CHIP:TOO:   FeatureMap: 0
+      disabled: true
+
+    - label:
+          "Step 3: C.2.10, Verify that the endpoint 0 descriptor cluster
+          DeviceTypeList includes the Root Node device type id (0x0016)"
+      verification: |
+          On TH(chip-tool), Verify that the endpoint 0 descriptor cluster DeviceTypeList includes the Root Node device type id - 0x0016(22) in the returned report data Message
+          below is the sample log provided for the raspi platform:
+          [1690191137.963592][40907:40909] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Attribute 0x0000_FFFA DataVersion: 2221012748
+          [1690191137.963595][40907:40909] CHIP:TOO:   EventList: 0 entries
+          [1690191137.963612][40907:40909] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Attribute 0x0000_FFFB DataVersion: 2221012748
+          [1690191137.963616][40907:40909] CHIP:TOO:   AttributeList: 7 entries
+          [1690191137.963619][40907:40909] CHIP:TOO:     [1]: 0
+          [1690191137.963621][40907:40909] CHIP:TOO:     [2]: 65528
+          [1690191137.963623][40907:40909] CHIP:TOO:     [3]: 65529
+          [1690191137.963625][40907:40909] CHIP:TOO:     [4]: 65530
+          [1690191137.963627][40907:40909] CHIP:TOO:     [5]: 65531
+          [1690191137.963629][40907:40909] CHIP:TOO:     [6]: 65532
+          [1690191137.963631][40907:40909] CHIP:TOO:     [7]: 65533
+          [1690191137.963649][40907:40909] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1390630643
+          [1690191137.963657][40907:40909] CHIP:TOO:   DeviceTypeList: 1 entries
+          [1690191137.963663][40907:40909] CHIP:TOO:     [1]: {
+          [1690191137.963665][40907:40909] CHIP:TOO:       DeviceType: 22
+          [1690191137.963667][40907:40909] CHIP:TOO:       Revision: 1
+          [1690191137.963669][40907:40909] CHIP:TOO:      }
+          [1690191137.963704][40907:40909] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 1390630643
+          [1690191137.963712][40907:40909] CHIP:TOO:   ServerList: 28 entries
+          [1690191137.963714][40907:40909] CHIP:TOO:     [1]: 3
+          [1690191137.963716][40907:40909] CHIP:TOO:     [2]: 4
+          [1690191137.963717][40907:40909] CHIP:TOO:     [3]: 29
+          [1690191137.963719][40907:40909] CHIP:TOO:     [4]: 30
+          [1690191137.963721][40907:40909] CHIP:TOO:     [5]: 31
+          [1690191137.963723][40907:40909] CHIP:TOO:     [6]: 40
+          [1690191137.963725][40907:40909] CHIP:TOO:     [7]: 42
+          [1690191137.963727][40907:40909] CHIP:TOO:     [8]: 43
+          [1690191137.963729][40907:40909] CHIP:TOO:     [9]: 44
+          [1690191137.963731][40907:40909] CHIP:TOO:     [10]: 45
+      disabled: true
+
+    - label:
+          "Step 4: {REF_SM_ENDPOINT}, For each of the non-root endpoints, verify
+          that the descriptor cluster DeviceTypeList does NOT include the Root
+          Node device type id (0x0016)"
+      verification: |
+          On TH(chip-tool), For each of the non-root endpoints(endpoint - 1 and endpoint 2), verify that the descriptor cluster DeviceTypeList does NOT include the Root Node device type id - 0x0016(22) in the returned report data Message
+          below is the sample log provided for the raspi platform:
+
+          [1690191138.044893][40907:40909] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_000F Attribute 0x0000_FFFB DataVersion: 4049418703
+          [1690191138.044897][40907:40909] CHIP:TOO:   AttributeList: 9 entries
+          [1690191138.044900][40907:40909] CHIP:TOO:     [1]: 81
+          [1690191138.044902][40907:40909] CHIP:TOO:     [2]: 85
+          [1690191138.044904][40907:40909] CHIP:TOO:     [3]: 111
+          [1690191138.044906][40907:40909] CHIP:TOO:     [4]: 65528
+          [1690191138.044908][40907:40909] CHIP:TOO:     [5]: 65529
+          [1690191138.044910][40907:40909] CHIP:TOO:     [6]: 65530
+          [1690191138.044912][40907:40909] CHIP:TOO:     [7]: 65531
+          [1690191138.044914][40907:40909] CHIP:TOO:     [8]: 65532
+          [1690191138.044916][40907:40909] CHIP:TOO:     [9]: 65533
+          [1690191138.044941][40907:40909] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2743502132
+          [1690191138.044945][40907:40909] CHIP:TOO:   DeviceTypeList: 1 entries
+          [1690191138.044950][40907:40909] CHIP:TOO:     [1]: {
+          [1690191138.044952][40907:40909] CHIP:TOO:       DeviceType: 256
+          [1690191138.044954][40907:40909] CHIP:TOO:       Revision: 1
+          [1690191138.044956][40907:40909] CHIP:TOO:      }
+          [1690191138.045023][40907:40909] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 2743502132
+          [1690191138.045038][40907:40909] CHIP:TOO:   ServerList: 68 entries
+          [1690191138.045040][40907:40909] CHIP:TOO:     [1]: 3
+          [1690191138.045042][40907:40909] CHIP:TOO:     [2]: 4
+
+          [1690191138.208428][40907:40909] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_0006 Attribute 0x0000_FFFB DataVersion: 1862188847
+          [1690191138.208435][40907:40909] CHIP:TOO:   AttributeList: 11 entries
+          [1690191138.208438][40907:40909] CHIP:TOO:     [1]: 0
+          [1690191138.208442][40907:40909] CHIP:TOO:     [2]: 16384
+          [1690191138.208445][40907:40909] CHIP:TOO:     [3]: 16385
+          [1690191138.208447][40907:40909] CHIP:TOO:     [4]: 16386
+          [1690191138.208450][40907:40909] CHIP:TOO:     [5]: 16387
+          [1690191138.208454][40907:40909] CHIP:TOO:     [6]: 65528
+          [1690191138.208456][40907:40909] CHIP:TOO:     [7]: 65529
+          [1690191138.208459][40907:40909] CHIP:TOO:     [8]: 65530
+          [1690191138.208462][40907:40909] CHIP:TOO:     [9]: 65531
+          [1690191138.208465][40907:40909] CHIP:TOO:     [10]: 65532
+          [1690191138.208467][40907:40909] CHIP:TOO:     [11]: 65533
+          [1690191138.208488][40907:40909] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 516620155
+          [1690191138.208494][40907:40909] CHIP:TOO:   DeviceTypeList: 1 entries
+          [1690191138.208500][40907:40909] CHIP:TOO:     [1]: {
+          [1690191138.208502][40907:40909] CHIP:TOO:       DeviceType: 256
+          [1690191138.208505][40907:40909] CHIP:TOO:       Revision: 1
+          [1690191138.208508][40907:40909] CHIP:TOO:      }
+          [1690191138.208524][40907:40909] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 516620155
+          [1690191138.208530][40907:40909] CHIP:TOO:   ServerList: 5 entries
+          [1690191138.208532][40907:40909] CHIP:TOO:     [1]: 4
+          [1690191138.208536][40907:40909] CHIP:TOO:     [2]: 6
+          [1690191138.208539][40907:40909] CHIP:TOO:     [3]: 29
+          [1690191138.208542][40907:40909] CHIP:TOO:     [4]: 47
+          [1690191138.208546][40907:40909] CHIP:TOO:     [5]: 1030
+          [1690191138.208557][40907:40909] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0002 DataVersion: 516620155
+          [1690191138.208561][40907:40909] CHIP:TOO:   ClientList: 0 entries
+      disabled: true
+
+    - label:
+          "Step 5: C.2.10, Validate all the mandatory clusters for the Root Node
+          Device Type exist on the Root Node endpoint"
+      verification: |
+          On TH(chip-tool), Validate all the mandatory clusters(Basic Information(40), Access Control(31),  Group Key Management(63) General Commissioning(48),  Administrator Commissioning(60), Node Operational Credentials(62), Localization Configuration(43), Time Format Localization(44), Unit Localization(45), General Diagnostics(51), and ICD Management(70)) for the Root Node Device Type exist on the Root Node endpoint(endpoint 0)
+
+          [1690191137.963649][40907:40909] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1390630643
+          [1690191137.963657][40907:40909] CHIP:TOO:   DeviceTypeList: 1 entries
+          [1690191137.963663][40907:40909] CHIP:TOO:     [1]: {
+          [1690191137.963665][40907:40909] CHIP:TOO:       DeviceType: 22
+          [1690191137.963667][40907:40909] CHIP:TOO:       Revision: 1
+          [1690191137.963669][40907:40909] CHIP:TOO:      }
+          [1690191137.963704][40907:40909] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 1390630643
+          [1690191137.963712][40907:40909] CHIP:TOO:   ServerList: 28 entries
+          [1690191137.963714][40907:40909] CHIP:TOO:     [1]: 3
+          [1690191137.963716][40907:40909] CHIP:TOO:     [2]: 4
+          [1690191137.963717][40907:40909] CHIP:TOO:     [3]: 29
+          [1690191137.963719][40907:40909] CHIP:TOO:     [4]: 30
+          [1690191137.963721][40907:40909] CHIP:TOO:     [5]: 31
+          [1690191137.963723][40907:40909] CHIP:TOO:     [6]: 40
+          [1690191137.963725][40907:40909] CHIP:TOO:     [7]: 42
+          [1690191137.963727][40907:40909] CHIP:TOO:     [8]: 43
+          [1690191137.963729][40907:40909] CHIP:TOO:     [9]: 44
+          [1690191137.963731][40907:40909] CHIP:TOO:     [10]: 45
+          [1690191137.963733][40907:40909] CHIP:TOO:     [11]: 47
+          [1690191137.963735][40907:40909] CHIP:TOO:     [12]: 48
+          [1690191137.963737][40907:40909] CHIP:TOO:     [13]: 49
+          [1690191137.963739][40907:40909] CHIP:TOO:     [14]: 50
+          [1690191137.963742][40907:40909] CHIP:TOO:     [15]: 51
+          [1690191137.963744][40907:40909] CHIP:TOO:     [16]: 52
+          [1690191137.963745][40907:40909] CHIP:TOO:     [17]: 53
+          [1690191137.963747][40907:40909] CHIP:TOO:     [18]: 54
+          [1690191137.963749][40907:40909] CHIP:TOO:     [19]: 55
+          [1690191137.963751][40907:40909] CHIP:TOO:     [20]: 56
+          [1690191137.963753][40907:40909] CHIP:TOO:     [21]: 60
+          [1690191137.963754][40907:40909] CHIP:TOO:     [22]: 62
+          [1690191137.963756][40907:40909] CHIP:TOO:     [23]: 63
+          [1690191137.963758][40907:40909] CHIP:TOO:     [24]: 64
+          [1690191137.963760][40907:40909] CHIP:TOO:     [25]: 65
+          [1690191137.963762][40907:40909] CHIP:TOO:     [26]: 70
+          [1690191137.963764][40907:40909] CHIP:TOO:     [27]: 1029
+          [1690191137.963766][40907:40909] CHIP:TOO:     [28]: 4294048774
+          [1690191137.963778][40907:40909] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0002 DataVersion: 1390630643
+          [1690191137.963781][40907:40909] CHIP:TOO:   ClientList: 1 entries
+          [1690191137.963783][40907:40909] CHIP:TOO:     [1]: 41
+          [1690191137.963795][40907:40909] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1390630643
+          [1690191137.963799][40907:40909] CHIP:TOO:   PartsList: 2 entries
+      disabled: true

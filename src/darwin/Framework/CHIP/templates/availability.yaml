@@ -7648,6 +7648,11 @@
           Descriptor:
               Feature:
                   - TagList
+          Scenes:
+              Feature:
+                  - Explicit
+                  - TableSize
+                  - FabricScenes
   removed:
       clusters:
           # Clusters that really should just not be exposed, even if they're in our XML.

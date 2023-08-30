@@ -26,22 +26,21 @@ config:
     endpoint: 0
 
 tests:
-    - label: "TH is commissioned with DUT"
+    - label: "Precondition"
       verification: |
+          TH is commissioned with DUT
 
-      disabled: true
+          TH reads the MaxGroupsPerFabric from Group key Management Cluster and saves it as maxgroups
 
-    - label:
-          "Pre-Conditions: TH reads the MaxGroupsPerFabric from Group key
-          Management Cluster and saves it as maxgroups"
-      verification: |
           ./chip-tool groupkeymanagement read max-groups-per-fabric 1 0
 
-          Verify the "MaxGroupsPerFabric value" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
+          Verify  for the "MaxGroupsPerFabric" value on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
 
           [1683802556.948465][41067:41069] CHIP:DMG: }
           [1683802556.948507][41067:41069] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0002 DataVersion: 1698601848
           [1683802556.948520][41067:41069] CHIP:TOO:   MaxGroupsPerFabric: 12
+
+          Note: MaxGroupsPerFabric has a value 12 on TH log. It can be any value between [min=4, max=65535].
       disabled: true
 
     - label:

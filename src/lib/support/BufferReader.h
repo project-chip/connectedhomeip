@@ -108,6 +108,25 @@ public:
     CHECK_RETURN_VALUE
     Reader & ReadBool(bool * dest)
     {
+        static_assert(sizeof(bool) == 1, "Expect single-byte bools");
+        RawReadLowLevelBeCareful(dest);
+        return *this;
+    }
+
+    /**
+     * Read a char, assuming single byte storage.
+     *
+     * @param [out] dest Where the char just read should be placed.
+     *
+     * @note The read can put the reader in a failed-status state if there are
+     *       not enough octets available.  Callers must either continue to do
+     *       more reads on the return value or check its status to see whether
+     *       the sequence of reads that has been performed succeeded.
+     */
+    CHECK_RETURN_VALUE
+    Reader & ReadChar(char * dest)
+    {
+        static_assert(sizeof(char) == 1, "Expect single-byte chars");
         RawReadLowLevelBeCareful(dest);
         return *this;
     }

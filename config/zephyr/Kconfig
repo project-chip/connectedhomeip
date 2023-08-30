@@ -282,6 +282,12 @@ config CHIP_PERSISTENT_SUBSCRIPTIONS
 	  subscriptions instead of waiting for the subscriber node to realize that
 	  the publisher is alive again.
 
+config CHIP_STATISTICS
+	bool "Resource usage statistics"
+	help
+	  Enables tracking the current and the top usage of critical resources used
+	  by the Matter stack, such as packet buffers, timers or exchange contexts.
+
 config CHIP_LIB_SHELL
 	bool "Matter shell commands"
 	default n
