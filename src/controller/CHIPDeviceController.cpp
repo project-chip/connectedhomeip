@@ -920,7 +920,7 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
 
     ChipLogProgress(Controller, "StopPairing called for node ID 0x" ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
 
-    // If we're still in the process of discovering the device, just stop the SetupCodePairer
+    // If we're still in the process of discovering the device, just stop the SetUpCodePairer
     if (mSetUpCodePairer.StopPairing(remoteDeviceId))
     {
         return CHIP_NO_ERROR;
