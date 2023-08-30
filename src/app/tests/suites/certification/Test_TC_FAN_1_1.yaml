@@ -195,3 +195,11 @@ tests:
           constraints:
               type: list
               contains: [0]
+
+    - label: "Step 7: Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
