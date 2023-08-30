@@ -68,7 +68,7 @@ CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & 
     VerifyOrReturnError(payload.size() >= sMinPayloadSize, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(payload.size() <= (sMinPayloadSize + sMaxAppDataSize), CHIP_ERROR_INVALID_ARGUMENT);
 
-    CHIP_ERROR err       = CHIP_NO_ERROR;
+    CHIP_ERROR err     = CHIP_NO_ERROR;
     size_t appDataSize = GetAppDataSize(payload);
 
     // To prevent workbuffer usage, appData size needs to be large enough to hold both the appData and the counter

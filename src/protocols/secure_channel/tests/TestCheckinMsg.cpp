@@ -98,7 +98,11 @@ void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
         // caller to make sure the key is indeed valid.
         Aes128KeyHandle emptyKeyHandle;
         err = CheckinMessage::GenerateCheckinMessagePayload(emptyKeyHandle, counter, userData, outputBuffer);
+#if CHIP_CRYPTO_PSA
+        NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR != err));
+#else
         NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
+#endif
 
         ByteSpan emptyData;
         err = CheckinMessage::GenerateCheckinMessagePayload(keyHandle, counter, emptyData, outputBuffer);
