@@ -259,7 +259,8 @@ private:
      * @param value The value to check.
      * @param minValue The minimum value.
      * @param maxValue The maximum value.
-     * @return true if the value is within the min and max constraints, or if any of the values are Null.
+     * @return true if the value is within the min and max constraints. If either of the pair of values being compared is null,
+     * that's considered to be within the constraint.
      */
     static bool CheckConstraintMinMax(DataModel::Nullable<float> value, DataModel::Nullable<float> minValue,
                                       DataModel::Nullable<float> maxValue)
@@ -387,8 +388,9 @@ public:
 
         if (oldValue != this->mMeasuredValue)
         {
-            ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::MeasuredValue::Id);
-            MatterReportingAttributeChangeCallback(path);
+            // ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::MeasuredValue::Id);
+            // MatterReportingAttributeChangeCallback(path);
+            MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::MeasuredValue::Id);
         }
 
         return CHIP_NO_ERROR;
@@ -412,8 +414,7 @@ public:
 
         if (oldValue != this->mMinMeasuredValue)
         {
-            ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::MinMeasuredValue::Id);
-            MatterReportingAttributeChangeCallback(path);
+            MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::MinMeasuredValue::Id);
         }
 
         return CHIP_NO_ERROR;
@@ -437,8 +438,7 @@ public:
 
         if (oldValue != this->mMaxMeasuredValue)
         {
-            ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::MaxMeasuredValue::Id);
-            MatterReportingAttributeChangeCallback(path);
+            MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::MaxMeasuredValue::Id);
         }
 
         return CHIP_NO_ERROR;
@@ -452,8 +452,7 @@ public:
 
         if (oldValue != this->mUncertainty)
         {
-            ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::Uncertainty::Id);
-            MatterReportingAttributeChangeCallback(path);
+            MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::Uncertainty::Id);
         }
 
         return CHIP_NO_ERROR;
@@ -472,8 +471,7 @@ public:
 
         if (oldValue != this->mPeakMeasuredValue)
         {
-            ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::PeakMeasuredValue::Id);
-            MatterReportingAttributeChangeCallback(path);
+            MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::PeakMeasuredValue::Id);
         }
 
         return CHIP_NO_ERROR;
@@ -492,8 +490,7 @@ public:
 
         if (oldValue != this->mPeakMeasuredValueWindow)
         {
-            ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::PeakMeasuredValueWindow::Id);
-            MatterReportingAttributeChangeCallback(path);
+            MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::PeakMeasuredValueWindow::Id);
         }
 
         return CHIP_NO_ERROR;
@@ -512,8 +509,7 @@ public:
 
         if (oldValue != this->mAverageMeasuredValue)
         {
-            ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::AverageMeasuredValue::Id);
-            MatterReportingAttributeChangeCallback(path);
+            MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::AverageMeasuredValue::Id);
         }
 
         return CHIP_NO_ERROR;
@@ -532,8 +528,7 @@ public:
 
         if (oldValue != this->mAverageMeasuredValueWindow)
         {
-            ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::AverageMeasuredValueWindow::Id);
-            MatterReportingAttributeChangeCallback(path);
+            MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::AverageMeasuredValueWindow::Id);
         }
 
         return CHIP_NO_ERROR;
@@ -563,8 +558,7 @@ public:
 
         if (oldValue != this->mLevel)
         {
-            ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LevelValue::Id);
-            MatterReportingAttributeChangeCallback(path);
+            MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::LevelValue::Id);
         }
 
         return CHIP_NO_ERROR;
