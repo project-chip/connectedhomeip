@@ -255,11 +255,11 @@ private:
     };
 
     /**
-     * This checks is a given value is within the min and max constraints.
+     * This checks if a given nullable float is within the min and max constraints or two other nullable floats.
      * @param value The value to check.
      * @param minValue The minimum value.
      * @param maxValue The maximum value.
-     * @return true if the value is within the min and max constraints.
+     * @return true if the value is within the min and max constraints, or if any of the values are Null.
      */
     static bool CheckConstraintMinMax(DataModel::Nullable<float> value, DataModel::Nullable<float> minValue,
                                       DataModel::Nullable<float> maxValue)
@@ -278,35 +278,37 @@ private:
     };
 
     /**
-     * This checks is a given value is greater than a given value.
+     * This checks if a given nullable float is less than or equal to another given nullable float.
      * @param value The value to check.
-     * @param valueToBeGreaterThan The value to be greater than.
-     * @return true if the value is greater than the given value.
+     * @param valueToBeLessThanOrEqualTo The value to be less than or equal to.
+     * @return true if value is less than or equal to valueToBeLessThanOrEqualTo, or if either of the values is Null.
      */
-    static bool CheckConstraintsNotLessThan(DataModel::Nullable<float> value, DataModel::Nullable<float> valueToBeGreaterThan)
+    static bool CheckConstraintsLessThanOrEqualTo(DataModel::Nullable<float> value,
+                                                  DataModel::Nullable<float> valueToBeLessThanOrEqualTo)
     {
-        if (!valueToBeGreaterThan.IsNull() && !value.IsNull() && (valueToBeGreaterThan.Value() > value.Value()))
+        if (valueToBeLessThanOrEqualTo.IsNull() || value.IsNull() || (value.Value() <= valueToBeLessThanOrEqualTo.Value()))
         {
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     };
 
     /**
-     * This checks is a given value is less than a given value.
+     * This checks if a given nullable float is greater than or equal to another given nullable float.
      * @param value The value to check.
-     * @param valueToBeLessThan The value to be less than.
-     * @return true if the value is less than the given value.
+     * @param valueToBeGreaterThanOrEqualTo The value to be greater than or equal to.
+     * @return true if value is greater than or equal to valueToBeGreaterThanOrEqualTo, or if either of the values is Null.
      */
-    static bool CheckConstraintsNotGreaterThan(DataModel::Nullable<float> value, DataModel::Nullable<float> valueToBeLessThan)
+    static bool CheckConstraintsGreaterThanOrEqualTo(DataModel::Nullable<float> value,
+                                                     DataModel::Nullable<float> valueToBeGreaterThanOrEqualTo)
     {
-        if (!valueToBeLessThan.IsNull() && !value.IsNull() && (valueToBeLessThan.Value() < value.Value()))
+        if (valueToBeGreaterThanOrEqualTo.IsNull() || value.IsNull() || (value.Value() >= valueToBeGreaterThanOrEqualTo.Value()))
         {
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     };
 
 public:
@@ -395,12 +397,12 @@ public:
     template <bool Enabled = NumericMeasurementEnabled, typename = std::enable_if_t<Enabled, CHIP_ERROR>>
     CHIP_ERROR SetMinMeasuredValue(DataModel::Nullable<float> aMinMeasuredValue)
     {
-        if (!CheckConstraintsNotGreaterThan(aMinMeasuredValue, this->mMaxMeasuredValue))
+        if (!CheckConstraintsLessThanOrEqualTo(aMinMeasuredValue, this->mMaxMeasuredValue))
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        if (!CheckConstraintsNotGreaterThan(aMinMeasuredValue, this->mMeasuredValue))
+        if (!CheckConstraintsLessThanOrEqualTo(aMinMeasuredValue, this->mMeasuredValue))
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
@@ -420,12 +422,12 @@ public:
     template <bool Enabled = NumericMeasurementEnabled, typename = std::enable_if_t<Enabled, CHIP_ERROR>>
     CHIP_ERROR SetMaxMeasuredValue(DataModel::Nullable<float> aMaxMeasuredValue)
     {
-        if (!CheckConstraintsNotLessThan(aMaxMeasuredValue, this->mMinMeasuredValue))
+        if (!CheckConstraintsGreaterThanOrEqualTo(aMaxMeasuredValue, this->mMinMeasuredValue))
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        if (!CheckConstraintsNotLessThan(aMaxMeasuredValue, this->mMeasuredValue))
+        if (!CheckConstraintsGreaterThanOrEqualTo(aMaxMeasuredValue, this->mMeasuredValue))
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
