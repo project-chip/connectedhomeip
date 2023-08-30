@@ -48,7 +48,6 @@ steps:
               --target cc13x4_26x4-lock-mtd
               --target cc13x4_26x4-pump-mtd
               --target cc13x4_26x4-pump-controller-mtd
-              --target cyw30739-cyw930739m2evb_01-ota-requestor
               --target efr32-brd4161a-light-rpc
               --target efr32-brd4161a-lock
               --target efr32-brd4161a-switch

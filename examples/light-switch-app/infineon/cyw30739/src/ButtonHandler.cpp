@@ -17,8 +17,8 @@
  */
 
 #include <ButtonHandler.h>
+#include <LEDWidget.h>
 #include <LightSwitch.h>
-#include <LightingManager.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <wiced_button_manager.h>

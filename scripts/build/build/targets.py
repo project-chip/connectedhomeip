@@ -535,7 +535,6 @@ def BuildCyw30739Target():
     target.AppendFixedTargets([
         TargetPart('light', app=Cyw30739App.LIGHT),
         TargetPart('lock', app=Cyw30739App.LOCK),
-        TargetPart('ota-requestor', app=Cyw30739App.OTA_REQUESTOR),
         TargetPart('switch', app=Cyw30739App.SWITCH),
     ])
 
