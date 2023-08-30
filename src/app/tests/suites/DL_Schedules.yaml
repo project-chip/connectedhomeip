@@ -488,7 +488,7 @@ tests:
               - name: "UserIndex"
                 value: 2
               - name: "Status"
-                value: 0x01
+                value: 0x8B
 
     #
     # Excercise SetYearDay schedules with invalid parameters
@@ -686,7 +686,7 @@ tests:
               - name: "UserIndex"
                 value: 2
               - name: "Status"
-                value: 0x01
+                value: 0x8B
 
     #
     # Excercise Set Holiday schedules with invalid parameters
