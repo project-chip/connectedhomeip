@@ -1,9 +1,9 @@
-# Running the Matter Demo over Wi-Fi on EFR32 device
+# Running the Matter Demo over Wi-Fi on an EFR32 device
 
 ## Flashing Images/Binaries on EFR32MG24 Platform using Ozone, Simplicity Studio, or Simplicity Commander
 
 > Note: If you are coming from Simplicity Studio, you may have already installed
-> the demo image in Simplicity Studio, in which case you can skip to the
+> the demo image using Simplicity Studio, in which case you can skip to the
 > next step.
 
 1.  Plug the WSTK and EFR into the laptop.
@@ -11,11 +11,14 @@
 2.  Based on the Application being built, make sure to flash proper [bootloader](../general/ARTIFACTS.md) internal or external binaries. 
 
 3.  Launch Ozone, Simplicity Studio or Simplicity Commander Standalone - this
-    will display a GUI. If you are not using Ozone, you can follow the
-    instructions to
-    [Flash a Silicon Labs Device](../general/FLASH_SILABS_DEVICE.md)
+    will display a GUI. 
+    
+    If you are using Simplicity Studio or Simplicity Commander, you can follow the general instructions for flashing a Silicon Labs device.
+    [Flash a Silicon Labs Device](../general/FLASH_SILABS_DEVICE.md). If you are using Ozone, you can follow the instructions below.
 
-4.  In 'New Project Wizard':
+## Directions for Flashing using Ozone
+
+1.  In 'New Project Wizard':
 
     1. Click the three-dots on the 'Device' tab and select 'Manufacturer' as
        '`Silicon Labs`'
@@ -25,7 +28,7 @@
     4. The 'Register set' tab will get filled automatically
     5. 'Peripherals' tab need not be changed as it is optional
 
-5.  Click 'Next' - the window that is displayed will contain:
+2.  Click 'Next' - the window that is displayed will contain:
 
     - Serial Number: Read from device
     - Target Interface: JTAG
@@ -34,9 +37,9 @@
     - There will be one product in the 'Emulators connected via USB' tab -
         select this and click 'Next'
 
-6.  Click on the 'Silicon Labs device' detected, and then click 'Next'
+3.  Click on the 'Silicon Labs device' detected, and then click 'Next'
 
-7.  You will be asked to select the image/binary to be loaded: click the
+4.  You will be asked to select the image/binary to be loaded: click the
     three-dots on that tab and navigate to '`out/rs911x_lighting/BRD41xxx`'
     through 'Browse', select the file named `chip-efr32-lighting-example.out`
     and click 'Next'. This is the image built in previous step.
@@ -45,22 +48,22 @@
     > BRD4186C or BRD4187C, in which case your image will be in a directory
     > corresponding to that board identifier.
 
-8.  Make sure the next screen has 'Initial PC' selected as 'ELF Entry Point' -
+5.  Make sure the next screen has 'Initial PC' selected as 'ELF Entry Point' -
     click 'Finish'
 
     > Ignore Diagnostics warning about 'FreeRTOS' detected - click 'Continue'
 
-9.  Select 'Download and Reset Program' in the dropdown next to the Power button
+6.  Select 'Download and Reset Program' in the dropdown next to the Power button
     on the top left of the page
 
     > The Silabs chip, EFR32MG24, will be erased and programmed
 
-10.  Run the image by clicking the 'Play' button on the top left (or press the F5
+7.  Run the image by clicking the 'Play' button on the top left (or press the F5
     key)
 
     > The output of the EFR32 can be viewed on the console of the Ozone GUI
 
-11. **[Optional]** This step is for when the device has already been flashed and
+8. **[Optional]** This step is for when the device has already been flashed and
     is being used for testing/debug purposes:
 
     > If you are restarting the device and do not need to re-flash the EFR

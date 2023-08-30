@@ -10,13 +10,12 @@ Welcome to Silicon Labs' Matter documentation!
    :maxdepth: 1
    :caption: Contents:
 
-   ./OVERVIEW.md 
-   ./NEW_FEATURES.md
+   User's Guide Overview <./OVERVIEW.md> 
+   Matter New Features <./NEW_FEATURES.md>
    ./nav_1_overview
    ./nav_2_prereq
    ./nav_4_thread
    ./nav_5_wifi
    ./unify/index
-   ./dev/vscode/index
    ./nav_3_general
    ./nav_6_faq

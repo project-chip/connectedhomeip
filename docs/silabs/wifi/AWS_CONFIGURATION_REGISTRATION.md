@@ -39,3 +39,26 @@ Once done, select `Create`.
       - Thing name must be unique as it will be used as CLIENT ID. 
   
 8. Copy the contents of [AWS_CA CERT](https://www.amazontrust.com/repository/AmazonRootCA1.pem) and create a .pem file to use as a SERVER CERTIFICATE in MQTT Explorer.
+
+## How to create AWS OTA JOB
+
+1. Go to AWS Amazon link https://aws.amazon.com/
+2. Login with Amazon Credentials.
+3. Click on Services and select `IOT Core`.
+4. On Side Bar Menu in Manage Section click on `Remote Actions` and click on `jobs`.
+5. Click on Create Job and select Job type as a `Create FreeRTOS OTA update job`.
+6. Enter a unique Job name without spaces.
+7. In `Devices to update` dropdown select your Certificates which is configured above. for example:- SQA_DIC_C2, SQA_DIC_C3, DIC_2
+8. Select `MQTT` as the protocol for file transfer.
+9. In File Section select `New/Previously/Custom` signed gbl file.
+    - If gbl file is newly created then select `Sign a new file for me`
+    - If gbl file is already uploaded to AWS then select `Choose a previously signed file`
+    - If gbl file is modified customly then select `Use my custome signed file`
+10. In `Existing code signing profile` select `dic_ota_codesign` . Refer [AWS Code Signing Certificate Creation](https://docs.aws.amazon.com/freertos/latest/userguide/ota-code-sign-cert.html) 
+11. For uploading gbl file follow above step `9`.
+12. In File upload location in S3 select S3 URL as `ota_demo`. Refer [AWS S3 bucket Creation](https://docs.aws.amazon.com/freertos/latest/userguide/dg-ota-bucket.html)
+13. In `Path name of file on device` give any file name (file.txt).
+14. Select `ota_demo` as `IAM role` and click on Next.
+15. Click on `create job`.
+
+Note: For more details, Refer [AWS OTA prerequisites](https://docs.aws.amazon.com/freertos/latest/userguide/ota-prereqs.html)

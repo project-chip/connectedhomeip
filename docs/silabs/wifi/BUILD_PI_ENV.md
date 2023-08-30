@@ -1,9 +1,4 @@
-# Using the Pre-Built Rasberry Pi "Matter Hub" Image
-
-When using a Raspberry Pi as a controller in your Matter network you have two
-options
-
-# Building Environment using Raspberry Pi 4
+# Building the Chip-Tool using Raspberry Pi 4
 
 ## To flash the Ubuntu OS onto the SD card:
 

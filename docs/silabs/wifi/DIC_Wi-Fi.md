@@ -1,7 +1,7 @@
 # Matter Wi-Fi Direct Internet Connectivity
 -  Direct Internet Connectivity (DIC) is a silabs only feature to connect matter devices to proprietary cloud solutions(AWS,GCP,APPLE ...) directly.  As such, a Matter Wi-Fi device must support connecting locally on the Matter Fabric, via IPv6, and connecting to the Internet via IPv4.
 -  Matter devices can be controlled by chip-tool or controller and the respective status of the attribute modified will be published to the cloud.
--  Remote user can install the cloud specific application to get the notifiction on the attribute status.
+-  Remote user can install the cloud specific application to get the notification on the attribute status.
 
 ## Feature Design
 ![Silicon Labs - DIC design](./images/END_to_END_FLOW.png)
@@ -28,9 +28,43 @@ To set up and configure AWS or Mosquitto for DIC support please see the followin
 
 ## End-to-End Test of DIC Light Application
 
-- User Setup (MQTT Explorer)
-    - For executing with efr32, refer to the following: [Running the Matter Demo on EFR32 hosts](RUN_DEMO.md) 
-    - For executing with SiWx917 SoC, refer to the following: [Running the Matter Demo on SiWx917 SoC](RUN_DEMO_SiWx917_SoC.md)
-- In MQTT explorer under light/state topic, state of the light will be updated. Below is the screenshot for reference
+  - Sharing status of device to cloud
+    - End-to-end command to be executed from chip-tool, refer [Running the Matter Demo on EFR32 hosts](RUN_DEMO.md)
+    - Below is the application specific attribute/s information or state shared to the cloud through Direct Internet Connectivity Solution
+       - For Lighting App, On/Off Attributes
+       - For Lock App, lock/unlock Attributes
+       - For On/off Plug App, On/Off Attributes
+    - Application status would be updated on the mqtt_explorer UI, as shown in below image.
 
 ![DIC STATUS UPDATE](./images/mqtt_explorer_4.png)
+
+ - Control of the device through cloud interface
+     - Make sure matter device is up and commissioned successfully, refer [Running the Matter Demo on EFR32 hosts](RUN_DEMO.md)
+     - For Controlling the device, set topic name and the commands to be executed in the mqtt_explorer for below applications.
+       - Lighting App
+         - Topic: command
+         - Commands:
+           - toggle
+           - on
+           - off
+       - Onoff-plug App
+         - Topic: command
+         - Commands:
+           - toggle
+           - on
+           - off
+       - Lock App
+         - Topic: command
+         - Commands:
+           - lock
+           - unlock
+    - Then click `publish` button to execute the command.
+   ![Silicon Labs - DIC design](./images/control-device-through-cloud.png)
+
+ - Download AWS OTA Image through cloud interface
+     - Make sure matter device is up and commissioned successfully, refer [Running the Matter Demo on EFR32 hosts](RUN_DEMO.md)
+     - Make sure device is connected to MQTT Server successfully.
+     - Then Create a AWS OTA Job in the AWS Website, refer [How to create AWS OTA JOB](AWS_CONFIGURATION_REGISTRATION.md)
+     - Trigger OTA Command through MQTT Explorer like below.
+     - Then click `publish` button to execute the AWS OTA command.
+   ![Silicon Labs - DIC design](./images/download-aws-ota-through-cloud.png)

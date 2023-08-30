@@ -6,18 +6,18 @@ parameters. To facilitate the transition between development and production, thi
 [Custom Part Manufacturing Service](https://www.silabs.com/services/custom-part-manufacturing-service). Most of the parameters
 are stored once during the manufacturing process, and shall not change during the lifetime of the device.
 During runtime, two interfaces are used to pull the authentication data from permanent storage:
-* [CommissionableDataProvider](https://github.com/project-chip/connectedhomeip/blob/master/src/include/platform/CommissionableDataProvider.h), implemented as [EFR32DeviceDataProvider](https://github.com/project-chip/connectedhomeip/blob/master/examples/platform/silabs/efr32/EFR32DeviceDataProvider.cpp)
-* [DeviceAttestationCredsProvider](https://github.com/project-chip/connectedhomeip/blob/master/src/credentials/DeviceAttestationCredsProvider.h), implemented as [SilabsDeviceAttestationCreds](https://github.com/project-chip/connectedhomeip/blob/master/examples/platform/silabs/SilabsDeviceAttestationCreds.h)
+* [CommissionableDataProvider](../src/include/platform/CommissionableDataProvider.h), implemented as [SilabsDeviceDataProvider](../examples/platform/silabs/SilabsDeviceDataProvider.cpp)
+* [DeviceAttestationCredsProvider](../src/credentials/DeviceAttestationCredsProvider.h), implemented as [SilabsDeviceAttestationCreds](../examples/platform/silabs/SilabsDeviceAttestationCreds.h)
 
 The provisioning script on this folder now supercedes the following tools:
-* [Credentials Example](https://stash.silabs.com/projects/WMN_TOOLS/repos/matter/browse/silabs_examples/credentials)
-* [Factory Data Provider](https://github.com/project-chip/connectedhomeip/tree/master/scripts/tools/silabs)
+* [Credentials Example](https://github.com/SiliconLabs/matter/tree/release_1.1.0-1.1/silabs_examples/credentials)
+* [Factory Data Provider](../scripts/tools/silabs/README.md)
 
 ## Provisioned Data
 
 The Commissionable Data includes Serial Number, Vendor Id, Product Id, and the Setup Payload (typicallty displayed in the QR), while the Attestation Credentials includes the Certificate Declaration (CD), the Product Attestation Intermediate (PAI) certificate, and the DAC (Device Attestation Certificate).
 
-During commissioning, Matter devices perform a Password Authenticated Key Exchange using the SPAKE2+ protocol. The SPAKE2+ verifier is pre-calculated [using an external tool](https://github.com/project-chip/connectedhomeip/tree/master/src/tools/spake2p).
+During commissioning, Matter devices perform a Password Authenticated Key Exchange using the SPAKE2+ protocol. The SPAKE2+ verifier is pre-calculated [using an external tool](../src/tools/spake2p/README.md).
 
 The passcode is used to derive a QR code, typically printed on the label, or displayed by the device itself. The QR code contains the pre-computed setup payload, which allows the commissioner to establish a session with the device. The parameters required to generate and validate the session keys are static and stored in NVM3.
 
@@ -54,7 +54,7 @@ The directory structure is as follows:
 The `provision.py` file is the main script used to load all the required data on the Matter device. This script requires:
 * [Simplicity Commander](https://community.silabs.com/s/article/simplicity-commander?language=en_US)
 * [SEGGER J-Link](https://www.segger.com/downloads/jlink/)
-* [SPAKE2+ generator](https://github.com/project-chip/connectedhomeip/tree/master/src/tools/spake2p)
+* [SPAKE2+ generator](../src/tools/spake2p/README.md)
 * [PyLink](https://pylink.readthedocs.io/en/latest/index.html)
 
 sudo pip3 install ecdsa
@@ -201,7 +201,7 @@ python ./provision.py -c config/develop.json
 ## Attestation Files
 
 The `--generate` option instructs the `provider.py` script to generate test attestation files with the given Vendor ID, and Product ID.
-These files are generated using [the chip-cert tool](https://github.com/project-chip/connectedhomeip/tree/master/src/tools/chip-cert),
+These files are generated using [the chip-cert tool](../src/tools/chip-cert/README.md),
 and stored under the `provision/temp` folder.
 
 To generate the certificates manually:
@@ -216,7 +216,7 @@ To generate the certificates manually:
 ```
 
 NOTE: The commissioning fails if the commissioner do not recognize the root certificate (PAA).
-When using [chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool),
+When using [chip-tool](../examples/chip-tool),
 you can use the `--paa-trust-store-path` to enabled the PAA certificates for testing purposes.
 
 ## Example

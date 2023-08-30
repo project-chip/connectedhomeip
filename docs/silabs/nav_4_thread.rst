@@ -4,9 +4,9 @@ Matter Over Thread
 .. toctree::
     :maxdepth: 2
 
-    ./thread/THREAD.md
-    ./thread/DEMO_OVERVIEW.md
-    ./thread/RASPI_IMG.md
-    ./thread/RCP.md
-    ./thread/BUILD_FLASH_MAD.md
-    ./thread/CHIP_TOOL.md
+    Introduction <./thread/THREAD.md>
+    Demo Overview  <./thread/DEMO_OVERVIEW.md>
+    Setting up the Matter Hub <./thread/RASPI_IMG.md>
+    Setting up the RCP <./thread/RCP.md>
+    Build, Flash Matter Device <./thread/BUILD_FLASH_MAD.md>
+    Using the Matter Hub <./thread/CHIP_TOOL.md>

@@ -1,4 +1,4 @@
-# Using the Mattertool (chip-tool)
+# Using the Matter Hub and the Mattertool (chip-tool)
 
 The following commands show how to start a new Thread network from the local
 OTBR, commission an EFR32 Matter End Device (Matter Accessory Device), and then

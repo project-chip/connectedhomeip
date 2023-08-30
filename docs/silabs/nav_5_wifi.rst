@@ -4,22 +4,12 @@ Matter Over Wi-Fi
 .. toctree::
     :maxdepth: 2
 
-    ./wifi/DEMO_OVERVIEW.md
-    ./wifi/RUN_DEMO.md
-    ./wifi/RUN_DEMO_SiWx917_SoC.md
-    ./wifi/SiWx917_Enablement_For_Ozone.md
-    ./wifi/SiWx917_SoC_FWUpdate.md
-    ./wifi/SiWx917SoC_Factory_Reset.md
-    ./wifi/using_917_NCP_with_the_Google_Ecosystem_SETUP.md
-    ./wifi/SW_SETUP.md
-    ./wifi/WIFI_SLEEPY_END_DEVICE.md
-    ./wifi/OPENSSL_CERTIFICATE_CREATION.md
-    ./wifi/MOSQUITTO_SETUP.md
-    ./wifi/MQTT_EXPLORER_SETUP.md
-    ./wifi/DIC_Wi-Fi.md
-    ./wifi/BUILD_DIC.md
-    ./wifi/BUILD_CHIP_ENV.md
-    ./wifi/BUILD_PI_ENV.md
-    ./wifi/AWS_CONFIGURATION_REGISTRATION.md
-    ./wifi/WIFI_Sleepy_Device_Power_Measurement.md
-    ./wifi/WIFI_ANDROID.md
+    Demo Overview <./wifi/DEMO_OVERVIEW.md>
+    Demo on EFR32 NCP <./wifi/RUN_DEMO.md>
+    Demo on 917 SoC <./wifi/RUN_DEMO_SiWx917_SoC.md>
+    Wi-Fi GitHub Development <./wifi/SW_SETUP.md>
+    nav_5_wifi_917
+    nav_5_wifi_dic
+    Wi-Fi Intermittently Connected Devices (ICD) <./wifi/WIFI_SLEEPY_END_DEVICE.md>
+    Wi-Fi ICD Power Measurement <./wifi/WIFI_Sleepy_Device_Power_Measurement.md>
+    Build Chip Tool on Raspi <./wifi/BUILD_PI_ENV.md>

@@ -68,7 +68,9 @@ for instructions on how to connect your Raspberry Pi to a Wi-Fi network.
 Once you have connected your Raspberry Pi to the network, you need to connect to
 your Raspberry Pi over SSH. This requires the IP address of your Raspberry Pi.
 See [Finding Your Raspberry Pi](../general/FIND_RASPI.md) for more information
-on finding the IP address and connecting to the Raspberry Pi by SSH. .
+on finding the IP address and connecting to the Raspberry Pi by SSH.
+
+> Please note that if you are using Wi-Fi to connect to your Raspberry Pi over 2.4 GHz you may have difficulty with commissioning your device. The workaround for this issue is to use either Ethernet or 5GHz to connect to your device in order to reserve the 2.4GHz channel for the Matter commissioning.
 
 #### Raspberry Pi Login Credentials
 

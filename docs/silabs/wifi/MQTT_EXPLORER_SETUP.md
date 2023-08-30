@@ -12,7 +12,10 @@
   
  ![Silicon Labs - DIC design](./images/mqtt_explorer_2.png)
 
-  - Add topics as shown (#, light/*, test_publish )
+ - Add application specific topics as shown below
+       - For Lighting app, topic to be added (light/*)
+       - For onoff plug app, topic to be added (light/*)
+       - For Lock app, topic to be added (lock/*)
   - MQTT Client ID depends on the certificate set that you will use.
   - Add the Certificate, following step 7 in [AWS installation](./AWS_CONFIGURATION_REGISTRATION.md)
 
@@ -30,7 +33,10 @@
  
  ![Silicon Labs - DIC design](./images/mqtt_explorer_2.png)
  
-  - Add topics as shown (#, light/*, test_publish )
+  - Add application specific topics as shown below
+       - For Lighting app, topic to be added (light/*)
+       - For onoff plug app, topic to be added (light/*)
+       - For Lock app, topic to be added (lock/*)
   - MQTT Client ID depends on the certificate set that you will use.
   - Add the Certificate, following step 5 in [openssl certificate create](./OPENSSL_CERTIFICATE_CREATION.md)
 

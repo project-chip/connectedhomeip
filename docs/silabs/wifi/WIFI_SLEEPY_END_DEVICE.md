@@ -1,10 +1,9 @@
-# Matter Sleepy End Devices over Wi-Fi
-
-This page explains how Matter Wi-Fi Sleepy End devices (SEDs) work and how to configure a Matter Wi-Fi SED example.
+# Matter Intermittently Connected Devices (ICD) (Formerly Sleepy End Devices)
+This page explains how Matter Wi-Fi Intermittently Connected Devices (ICDs) work and how to configure a Matter Wi-Fi ICD example.
 
 ## Overview
 
-Matter provides a Sleepy End Device (SED) operating mode to extend the battery life of a power-limited devices. This operating mode leverages native Wi-Fi functionality to enhance the power management features provided within the Matter protocol.
+Matter provides an Intermittently Connected Device (ICD) operating mode to extend the battery life of a power-limited devices. This operating mode leverages native Wi-Fi functionality to enhance the power management features provided within the Matter protocol.
 
 Wi-Fi module power saving is achieved by the Wi-Fi Station notifying the Access Point (AP) that it is entering its power save (PS) mode. Afterwards, the Wi-Fi station will shut down its RF and Wi-Fi SoC blocks to enter power saving mode.
 
@@ -32,7 +31,7 @@ In the Legacy power save mode, when the Wi-Fi station receives a beacon with its
 The AP acknowledges the PS-Poll frame and responds with a single buffered frame.
 
 In this mode, the Wi-Fi station stays active and retrieves a single buffered frame at a time. The AP also indicates that there are more buffered frames for the station using the More Data subfield.
-The Wi-Fi station continues to retrieve buffered frames using the PS-Poll frame until there are no more buffered frames and the More Data subfield is set to 0. The Wi-Fi station goes back into the sleep aterwards.
+The Wi-Fi station continues to retrieve buffered frames using the PS-Poll frame until there are no more buffered frames and the More Data subfield is set to 0. The Wi-Fi station goes back into the sleep afterwards.
 
 A Wi-Fi station can enter sleep mode after sending a Null frame to the AP with the power management (PM) bit set. From then on, the AP will store all packets destined to the Wi-Fi station in a per-device queue and sets the TIM field in the beacon frame to indicate that packets destined for the Wi-Fi station have been queued.
 
@@ -49,22 +48,22 @@ The Wi-Fi station in Power Save mode wakes up to receive the DTIM beacon and che
 
 ## Building
 
-### Enabling Sleepy Functionalities
+### Enabling ICD Functionalities
 
-To enable sleepy functionality, the `enable_sleepy_device` build argument needs to be set to true. It will enable the following macro: `CHIP_DEVICE_CONFIG_ENABLE_SED`
+To enable ICD functionality, the `chip_enable_icd_server` build argument needs to be set to true. It will enable the following macro: `CHIP_CONFIG_ENABLE_ICD_SERVER`
 
-Here is an example to build the lock-app as an SED for the EFR32MG24 + RS9116.
+Here is an example to build the lock-app as an ICD for the EFR32MG24 + RS9116.
 ```bash
-./scripts/examples/gn_efr32_example.sh examples/lock-app/silabs/efr32/ out/rs9116/lock_sleep BRD41xxx enable_sleepy_device=true disable_lcd=true use_external_flash=false chip_enable_ble_rs911x=true --wifi rs9116
+./scripts/examples/gn_silabs_example.sh examples/lock-app/silabs/ out/rs9116/lock_sleep BRD41xxx chip_enable_icd_server=true disable_lcd=true use_external_flash=false chip_enable_ble_rs911x=true --wifi rs9116
 ```
-Here is an example to build the lock-app as an SED for the EFR32MG24 + RS917 (NCP).
+Here is an example to build the lock-app as an ICD for the EFR32MG24 + RS917 (NCP).
 ```bash
-./scripts/examples/gn_efr32_example.sh examples/lock-app/silabs/efr32/ out/SiWx917/lock_sleep BRD41xxx enable_sleepy_device=true disable_lcd=true use_external_flash=false chip_enable_ble_rs911x=true --wifi SiWx917
+./scripts/examples/gn_silabs_example.sh examples/lock-app/silabs/ out/SiWx917/lock_sleep BRD41xxx chip_enable_icd_server=true disable_lcd=true use_external_flash=false chip_enable_ble_rs911x=true --wifi SiWx917
 ```
 
-Here is an example to build the lock-app as an SED for the EFR32MG24 + WF200.
+Here is an example to build the lock-app as an ICD for the EFR32MG24 + WF200.
 ```bash
-./scripts/examples/gn_efr32_example.sh examples/lock-app/silabs/efr32/ out/wf200_lock_sleep BRD41xxx enable_sleepy_device=true chip_build_libshell=false --wifi wf200
+./scripts/examples/gn_silabs_example.sh examples/lock-app/silabs/ out/wf200_lock_sleep BRD41xxx chip_enable_icd_server=true chip_build_libshell=false --wifi wf200
 ```
 
 > **Note**: The power save feature is not enabled for the RS917 SoC.
@@ -81,5 +80,5 @@ The following set of features increase power consumption.
 To achieve the most power-efficient build, add these build arguments to the build command to disable all power-consuming features.
 
 ```bash
-./scripts/examples/gn_efr32_example.sh examples/lock-app/silabs/efr32/ out/SiWx917/lock_sleep BRD41xxx enable_sleepy_device=true disable_lcd=true show_qr_code=false use_external_flash=false chip_build_libshell=false chip_enable_ble_rs911x=true --wifi SiWx917
+./scripts/examples/gn_silabs_example.sh examples/lock-app/silabs/ out/SiWx917/lock_sleep BRD41xxx chip_enable_icd_server=true disable_lcd=true show_qr_code=false use_external_flash=false chip_build_libshell=false chip_enable_ble_rs911x=true --wifi SiWx917
 ``````

@@ -150,13 +150,7 @@ Pre-Built RS9116 firmware is available in the github repository under `third_par
 Before you run the demo or development on the SiWx917 please be sure that you
 update the SiWx917 firmware.
 
-The WiseMCU Combo SDK package is only available to Alpha customers. Please contact Silicon Labs support.
-
-The WiseMCU Combo SDK package version used in this release is **A.1.0.0.0.23**.
-
-On obtaining the package, extract it, rename the folder as `wisemcu-wifi-bt-sdk` and copy it in the github repository under `third_party/silabs`.
-
-Pre-Built SiWx917 firmware is available under `third_party/silabs/wisemcu-wifi-bt-sdk/connectivity_firmware`
+Pre-Built SiWx917 firmware is available under `third_party/silabs/wifi-sdk/connectivity_firmware`
 
 1. [Setting up TeraTerm](https://docs.silabs.com/SiWx917/wiseconnect/2.0/tera-term-setup)
 2. For updating the SiWx917 NCP Firmware, refer [Updating the RS9116 Firmware](https://docs.silabs.com/rs9116/wiseconnect/2.0/update-evk-firmware). Instructions are the same for both SiWx917 and RS9116.

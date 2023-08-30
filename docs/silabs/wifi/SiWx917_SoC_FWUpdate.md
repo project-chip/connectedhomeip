@@ -1,9 +1,16 @@
-# Updating SiWx917 SoC Firmware using Tera Term
+# Updating SiWx917 SoC Connectivity Firmware
 
-> Please note that the method of updating the SiWx917 SoC firmware listed below is considered a legacy mode of operation. You may also update the SiWx917 SoC firmware using Simplicity Commander. For instructions on how to do this please consider [Running Demo on the SiWx917SoC](./RUN_DEMO_SiWx917_SoC.md)
+Download the recommended version of firmware before you start with the update process from the [Matter Artifacts page](../general/ARTIFACTS.md)
 
-## Steps to update the firmware on SiWx917 SoC radio board
+## Steps to update the firmware on SiWx917 SoC radio board using Simplicity Studio
+1. Refer to the Simplicity Studio documentation on flashing a device [Upgrading SiWx917 Connectivity firmware](http://docs.silabs.com/simplicity-studio-5-users-guide/latest/ss-5-users-guide-building-and-flashing/flashing)
+   
+   
+## Steps to update the firmware on SiWx917 SoC radio board using Simplicity Commander
+1. Refer to the Simplicity Commander documentation on flashing a device [Upgrading SiWx917 Connectivity firmware with Simplicity Commander](https://www.silabs.com/documents/public/user-guides/ug162-simplicity-commander-reference-guide.pdf)
+   
 
+## Steps to update the firmware on SiWx917 SoC radio board using Tera Term
 1. Connect power cable to radio board.
     
 2. Jumper should be connected.
@@ -26,6 +33,4 @@
 
 8. Once the image transfer is complete, type "c" to continue to check the upgrade sequence, once the upgrade is successful , Enter "1" for the Enter next command , once text "Loading..." appears type (Ctrl + \ + c) to exit from Kermit and "q" to quit and return to the terminal.
 
-9. Reset both the buttons to Off/Low state.
-
-10. Flash and run the application - [Running the Matter Demo on SiWx917 SoC](RUN_DEMO_SiWx917_SoC.md).
+9. Reset 917 SoC switch positions: Left switch should be on the **OFF/LOW**, and right switch should be on the **NORMAL** side

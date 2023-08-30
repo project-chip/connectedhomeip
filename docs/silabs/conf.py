@@ -9,8 +9,8 @@
 project = 'Matter'
 copyright = 'Copyright © 2023 Silicon Laboratories. All rights reserved.'
 author = 'Silicon Labs'
-release = '2.1.0-1.1'
-version = '2.1.0-1.1'
+release = '2.2.0-1.2-alpha.1'
+version = '2.2.0-1.2-alpha.1'
 
 
 # -- General configuration ---------------------------------------------------

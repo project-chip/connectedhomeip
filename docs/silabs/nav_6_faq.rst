@@ -4,5 +4,5 @@ FAQ
 .. toctree::
     :maxdepth: 2
 
-    ./thread/FAQ.md
-    ./wifi/FAQ.md
+    Thread FAQ <./thread/FAQ.md>
+    Wi-Fi FAQ <./wifi/FAQ.md>

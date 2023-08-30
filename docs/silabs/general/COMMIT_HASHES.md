@@ -7,19 +7,19 @@ in this release of the Silicon Labs Matter Out of Box Experience
 
 | Repo                                       | Branch | Commit Hash                              |
 | ------------------------------------------ | ------ | ---------------------------------------- |
-| https://github.com/SiliconLabs/ot-br-posix | main   | 1813352247aa60fb8993773918f1e5b4af6f3b79 |
+| https://github.com/SiliconLabs/ot-br-posix | main   | bb565ca0164981f58a2659222c30917399703a9b |
 
 ## Radio Co-Processor (RCP)
 
 | Repo                                    | Branch | Commit Hash                              |
 | --------------------------------------- | ------ | ---------------------------------------- |
-| https://github.com/SiliconLabs/ot-efr32 | main   | 7a567da02a078546eb34136c1c44170c8832dd55 |
+| https://github.com/SiliconLabs/ot-efr32 | main   | 3528d4bba47743a5367a822e350aaccb04698542 |
 
 ## Connectivity Standards Alliance (CSA) connectedhomeip (Matter)
 
 | Repo                                            | Branch | Commit Hash                              |
 | ----------------------------------------------- | ------ | ---------------------------------------- |
-| https://github.com/project-chip/connectedhomeip | v1.1-branch | 8f66f4215bc0708efc8cc73bda80620e67d8955f |
+| https://github.com/project-chip/connectedhomeip | master | 684b9d6246e5e5ef33db589af61a30e224d61ee3 |
 
 ## Matter chip-tool
 

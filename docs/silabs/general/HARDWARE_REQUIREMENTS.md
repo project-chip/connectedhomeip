@@ -139,6 +139,9 @@ The following boards are supported for the Matter over Wi-Fi demos and developme
         -   SPI Cable (included in the RS9116 kit)
         -   Jumper Cables (included in the RS9116 kit)
     -   SiWx917
+        -   SiWx917 NCP Mode / Wi-Fi Expansion Board / 2.4GHz
+            -   BRD8036A (A0 Expansion v1.0)
+            -   BRD8036A (A0 Expansion v1.1)
     -   WF200
         -   WF200 / Single Band Wi-Fi Expansion Board / 2.4GHz
             -   [SLEXP8022A](https://www.silabs.com/development-tools/wireless/wi-fi/wf200-wifi-expansion-kit)
@@ -149,16 +152,25 @@ The following boards are supported for the Matter over Wi-Fi demos and developme
 ## Matter over Wi-Fi Accessory Device Requirements for SoC mode
 
 The Silicon Labs Matter over Wi-Fi demo and development for SoC mode requires the SiWx917 SoC board that 
-supports Matter over Wi-Fi in a single-chip package - the integrated MCU is dedicated 
-for peripheral and application-related processing (Matter), while the ThreadArch® runs the
+supports Matter over Wi-Fi in a single-chip package - the integrated M4 processor is dedicated
+for peripheral and application-related processing (Matter), while the Wireless processor runs the
 wireless and networking protocol stacks. Pre-built images for the SiWx917 connectivity firmware 
 are available as per the instructions on the [Software Requirements Page](./SOFTWARE_REQUIREMENTS.md). The 
 following boards are supported for the Matter over Wi-Fi demos and development:
 
--   **Wi-Fi SoC boards**
+-   **Wi-Fi SoC boards:**
 
-    -   SiWx917 / SLWSTK6006A / Wireless Starter Kit
-        -   [SiWx917](https://www.silabs.com/wireless/wi-fi/siwx917-wireless-socs)
+-   SiWx917 / BRD4002A / Wireless Starter Kit
+-   SiWx917 SoC Mode
+    -   SiWx917 SoC / Dual Flash Radio Board / 2.4GHz
+        -   BRD4325B - A0 dual flash 1.1
+        -   BRD4325B - A0 dual flash 1.2
+    -   SiWx917 SoC / Common Flash Radio Board / 2.4GHz
+        -   BRD4325C - B0 common flash v1.2
+        -   BRD4325G - B0 Stacked Flash + External PSRAM v1.2
+
+    **Note:**
+    Refer [SiWx917 SoC](https://www.silabs.com/wireless/wi-fi/siwx917-wireless-socs) for more details
 
 
 ## Additional Matter over Wi-Fi Hardware Requirements

@@ -1,4 +1,4 @@
-# Software Setup and Preliminaries
+# Building a Wi-Fi End Device for Matter in GitHub
 
 ## Software Setup
 
@@ -71,8 +71,7 @@ you are using, select the appropriate command to build.
 
 >    **Note:**
 >    1. The build commands given below are for the following applications: `lighting-app`, `lock-app`, `light-switch-app`, `window-app`
->    2. In order to build applications other than those mentioned in # 1, (such as `thermostat-app`), substitute the appropriate application name & 
-substitute `/silabs/efr32/` with `/efr32/` after the application name.
+>    2. In order to build applications other than those mentioned in # 1, (such as `thermostat-app`), substitute the appropriate application name after the application name.
 >    3. Additional examples (such as `onoff-plug-app`) are provided in the [/examples](https://github.com/SiliconLabs/matter/blob/latest/examples/) or [/silabs_examples](https://github.com/SiliconLabs/matter/blob/latest/silabs_examples/) directory.
 >    4. In order to build applications from [/silabs_examples](https://github.com/SiliconLabs/matter/blob/latest/silabs_examples/) (such as `onoff-plug-app`), substitute `examples` with `silabs_examples`.
 >    5. To build for EFR32MG24 host processors, substitute `BRD41xxx` in the build command with the appropriate MG24 board number
@@ -90,26 +89,33 @@ $ <run_appropriate_build_command_from_below>
 Build command for EFR32MG24 + RS9116:
 
 ```shell
-$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32 out/rs911x_lighting BRD41xxx disable_lcd=true use_external_flash=false chip_enable_ble_rs911x=true --wifi rs9116 |& tee out/rs911x_lighting.log
+$ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting BRD41xxx disable_lcd=true use_external_flash=false chip_enable_ble_rs911x=true --wifi rs9116 |& tee out/rs911x_lighting.log
 ```
 
 Build command for EFR32MG24 + SiWx917:
 
 ```shell
-$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32 out/siwx917_lighting BRD41xxx disable_lcd=true use_external_flash=false chip_enable_ble_rs911x=true --wifi SiWx917 |& tee out/siwx917_lighting.log
+$ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/siwx917_lighting BRD41xxx disable_lcd=true use_external_flash=false chip_enable_ble_rs911x=true --wifi SiWx917 |& tee out/siwx917_lighting.log
 ```
 
 Build command for EFR32MG24 + WF200:
 
 ```shell
-$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32 out/wf200_lighting BRD41xxx chip_build_libshell=false --wifi wf200 |& tee out/wf200_lighting.log
+$ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/wf200_lighting BRD41xxx chip_build_libshell=false --wifi wf200 |& tee out/wf200_lighting.log
 ```
 
-Build command for SiWx917 SoC processor:
+Build command for SiWx917 SoC processor(dual flash):
 
 ```shell
-./scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/SiWx917 out/SiWx917_lighting BRD4325B |& tee out/soc_lighting.out
+./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/SiWx917_lighting BRD4325B |& tee out/soc_lighting.out
 ```
+
+Build command for SiWx917 SoC processor(common flash):
+
+```shell
+./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/SiWx917_lighting BRD4325x is_debug=false |& tee out/soc_lighting.out
+```
+
 >    **Note:**
 >    1. LED and button features are enabled for SiWx917 SoC.
 >    2. LCD and QR code features are not enabled for SiWx917 SoC.
@@ -122,7 +128,7 @@ Enable or disable the lighting application's features using the following flags.
 1.  `rs91x_wpa3_only` : Use this flag while building to enable wpa3 mode in rs91x wifi chip.
 
     ```shell
-    $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32/ out/rs911x_lighting BRD41xxx rs91x_wpa3_only=true --wifi rs9116 |& tee out/rs911x_lighting.log
+    $ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting BRD41xxx rs91x_wpa3_only=true --wifi rs9116 |& tee out/rs911x_lighting.log
     ```
 
 > **Note:** 
@@ -132,12 +138,12 @@ Enable or disable the lighting application's features using the following flags.
 2.  `segger_rtt_buffer_size_up` : Flag to get the complete logs without truncation.
 
     ```shell
-    $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32/ out/rs911x_lighting BRD41xxx segger_rtt_buffer_size_up=2068 --wifi rs9116 |& tee out/rs911x_lighting.log
+    $ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting BRD41xxx segger_rtt_buffer_size_up=2068 --wifi rs9116 |& tee out/rs911x_lighting.log
     ```
 3.  `show_qr_code=false` : Use this flag while building to disable QR code.
 
     ```shell
-    $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32/ out/rs911x_lighting BRD41xxx show_qr_code=false --wifi rs9116 |& tee out/rs911x_lighting.log
+    $ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting BRD41xxx show_qr_code=false --wifi rs9116 |& tee out/rs911x_lighting.log
     ```
 >    **Note:**
 >    1. QR code is enabled by default for all except MG24
@@ -146,7 +152,7 @@ Enable or disable the lighting application's features using the following flags.
 4. `chip_enable_wifi_ipv4` : Use this flag while building to enable IPV4 (disabled by default).
 
     ```shell
-    ./scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32/ out/rs911x_lighting BRD41xxx chip_enable_wifi_ipv4=true --wifi rs9116 |& tee out/rs911x_lighting.log
+    ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting BRD41xxx chip_enable_wifi_ipv4=true --wifi rs9116 |& tee out/rs911x_lighting.log
     ```
 
 The generated software can be found in
