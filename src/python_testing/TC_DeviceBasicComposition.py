@@ -157,6 +157,13 @@ def check_non_empty_list_of_ints_in_range(min_value: int, max_value: int, max_si
     return check_list_of_ints_in_range(min_value, max_value, min_size=1, max_size=max_size, allow_null=allow_null)
 
 
+def check_no_duplicates(obj: Any) -> None:
+    if not isinstance(obj, list):
+        raise ValueError(f"Value {str(obj)} is not a list, but a list was expected (decoded type: {type(obj)})")
+    if len(set(obj)) != len(obj):
+        raise ValueError(f"Value {str(obj)} contains duplicate values")
+
+
 def separate_endpoint_types(endpoint_dict: dict[int, Any]) -> tuple[list[int], list[int]]:
     """Returns a tuple containing the list of flat endpoints and a list of tree endpoints"""
     flat = []
@@ -368,21 +375,21 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         class RequiredMandatoryAttribute:
             id: int
             name: str
-            validator: Callable
+            validators: list[Callable]
 
         ATTRIBUTE_LIST_ID = 0xFFFB
 
         ATTRIBUTES_TO_CHECK = [
-            RequiredMandatoryAttribute(id=0xFFFD, name="ClusterRevision", validator=check_int_in_range(1, 0xFFFF)),
-            RequiredMandatoryAttribute(id=0xFFFC, name="FeatureMap", validator=check_int_in_range(0, 0xFFFF_FFFF)),
+            RequiredMandatoryAttribute(id=0xFFFD, name="ClusterRevision", validators=[check_int_in_range(1, 0xFFFF)]),
+            RequiredMandatoryAttribute(id=0xFFFC, name="FeatureMap", validators=[check_int_in_range(0, 0xFFFF_FFFF)]),
             RequiredMandatoryAttribute(id=0xFFFB, name="AttributeList",
-                                       validator=check_non_empty_list_of_ints_in_range(0, 0xFFFF_FFFF)),
+                                       validators=[check_non_empty_list_of_ints_in_range(0, 0xFFFF_FFFF), check_no_duplicates]),
             # TODO: Check for EventList
             # RequiredMandatoryAttribute(id=0xFFFA, name="EventList", validator=check_list_of_ints_in_range(0, 0xFFFF_FFFF)),
             RequiredMandatoryAttribute(id=0xFFF9, name="AcceptedCommandList",
-                                       validator=check_list_of_ints_in_range(0, 0xFFFF_FFFF)),
+                                       validators=[check_list_of_ints_in_range(0, 0xFFFF_FFFF), check_no_duplicates]),
             RequiredMandatoryAttribute(id=0xFFF8, name="GeneratedCommandList",
-                                       validator=check_list_of_ints_in_range(0, 0xFFFF_FFFF)),
+                                       validators=[check_list_of_ints_in_range(0, 0xFFFF_FFFF), check_no_duplicates]),
         ]
 
         self.print_step(3, "Validate all reported attributes match AttributeList")
@@ -404,14 +411,15 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                         success = False
                         continue
 
-                    # Validate attribute value based on the provided validator.
-                    try:
-                        req_attribute.validator(cluster[req_attribute.id])
-                    except ValueError as e:
-                        self.record_error(self.get_test_name(), location=location,
-                                          problem=f"Failed validation of value on {location.as_string(self.cluster_mapper)}: {str(e)}", spec_location="Global Elements")
-                        success = False
-                        continue
+                    # Validate attribute value based on the provided validators.
+                    for validator in req_attribute.validators:
+                        try:
+                            validator(cluster[req_attribute.id])
+                        except ValueError as e:
+                            self.record_error(self.get_test_name(), location=location,
+                                              problem=f"Failed validation of value on {location.as_string(self.cluster_mapper)}: {str(e)}", spec_location="Global Elements")
+                            success = False
+                            continue
 
         # Validate presence of claimed attributes
         if success:
