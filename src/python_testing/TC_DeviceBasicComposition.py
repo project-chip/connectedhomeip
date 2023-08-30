@@ -422,10 +422,9 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         global_range_min = 0x0000_F000
         standard_range_max = 0x000_4FFF
         mei_range_min = 0x0001_0000
-        attribute_list_id = 0xFFFB
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                globals = [a for a in cluster[attribute_list_id] if a >= global_range_min and a < mei_range_min]
+                globals = [a for a in cluster[ATTRIBUTE_LIST_ID] if a >= global_range_min and a < mei_range_min]
                 unexpected_globals = sorted(list(set(globals) - set(allowed_globals)))
                 for unexpected in unexpected_globals:
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=unexpected)
@@ -439,7 +438,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                 if cluster_id not in chip.clusters.ClusterObjects.ALL_ATTRIBUTES:
                     # Skip clusters that are not part of the standard generated corpus (e.g. MS clusters)
                     continue
-                standard_attributes = [a for a in cluster[attribute_list_id] if a <= standard_range_max]
+                standard_attributes = [a for a in cluster[ATTRIBUTE_LIST_ID] if a <= standard_range_max]
                 allowed_standard_attributes = chip.clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]
                 unexpected_standard_attributes = sorted(list(set(standard_attributes) - set(allowed_standard_attributes)))
                 for unexpected in unexpected_standard_attributes:
@@ -451,7 +450,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         # validate there are no attributes in the range between standard and global
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                bad_range_values = [a for a in cluster[attribute_list_id] if a > standard_range_max and a < global_range_min]
+                bad_range_values = [a for a in cluster[ATTRIBUTE_LIST_ID] if a > standard_range_max and a < global_range_min]
                 print(bad_range_values)
                 for bad in bad_range_values:
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=bad)
