@@ -247,12 +247,13 @@ def bundle_esp32(device_name: str) -> None:
             os.makedirs(os.path.dirname(dest_item), exist_ok=True)
             shutil.copy(src_item, dest_item)
 
+
 def bundle_telink(device_name: str) -> None:
     zephyr_exts = ["elf", "map", "bin"]
     telink_root = os.path.join(_CHEF_SCRIPT_PATH,
-                            "telink",
-                            "build",
-                            "zephyr")
+                               "telink",
+                               "build",
+                               "zephyr")
     sub_dir = os.path.join(_CD_STAGING_DIR, device_name)
     os.mkdir(sub_dir)
     for zephyr_ext in zephyr_exts:
@@ -264,6 +265,7 @@ def bundle_telink(device_name: str) -> None:
         else:
             dest_item = os.path.join(_CD_STAGING_DIR, output_base)
         shutil.copy(src_item, dest_item)
+
 
 def main() -> int:
 
