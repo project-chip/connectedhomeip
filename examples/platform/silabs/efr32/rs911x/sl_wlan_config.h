@@ -20,15 +20,11 @@
 
 #include "sl_wifi_device.h"
 #include "ble_config.h"
-//#include "rsi_wisemcu_hardware_setup.h"
-//#include "rsi_wlan_defines.h"
 
 //! Enable feature
 #define RSI_ENABLE 1
 //! Disable feature
 #define RSI_DISABLE 0
-
-//#define SI91X_LISTEN_INTERVAL   0
 
 static const sl_wifi_device_configuration_t config = {
     .boot_option = LOAD_NWP_FW,

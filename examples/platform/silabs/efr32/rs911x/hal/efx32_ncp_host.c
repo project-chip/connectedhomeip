@@ -436,7 +436,6 @@ static void gpio_interrupt(uint8_t interrupt_number)
 {
   UNUSED_PARAMETER(interrupt_number);
   sl_si91x_host_set_bus_event(NCP_HOST_BUS_RX_EVENT);
-  //  GPIO_IntClear(0xAAAA);
 }
 
 sl_status_t si91x_bootup_firmware(const uint8_t select_option)
@@ -444,7 +443,6 @@ sl_status_t si91x_bootup_firmware(const uint8_t select_option)
   uint32_t rom_version;
   uint32_t timestamp;
   sl_status_t status = SL_STATUS_FAIL;
-  //const uint8_t select_option = config->boot_option; //LOAD_NWP_FW;
   timestamp = sl_si91x_host_get_timestamp();
   do {
     if (sl_si91x_host_elapsed_time(timestamp) > SL_WIFI_BOARD_READY_WAIT_TIME) {

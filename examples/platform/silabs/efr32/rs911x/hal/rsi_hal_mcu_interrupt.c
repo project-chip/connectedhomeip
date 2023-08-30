@@ -61,10 +61,6 @@ void rsi_gpio_irq_cb(uint8_t irqnum)
         return;
 
    sl_si91x_host_set_bus_event(NCP_HOST_BUS_RX_EVENT);
-//   GPIO_IntClear(1 << SL_WFX_HOST_PINOUT_SPI_IRQ);
- //   GPIO_IntClear(0xAAAA);
-  //  if (call_back != NULL)
-  //      (*call_back)();
 }
 
 /*===================================================*/

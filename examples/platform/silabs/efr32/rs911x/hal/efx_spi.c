@@ -55,7 +55,6 @@
 #include "sl_si91x_driver.h"
 #include "cmsis_os2.h"
 #include "sl_net.h"
-//#include "sl_uart.h"
 #include "sl_board_configuration.h"
 #include "sl_wifi_types.h"
 #include "sl_si91x_types.h"
@@ -375,7 +374,6 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     {
         rx_buf = (uint8_t *)&dummy_buffer;
         tx_buf = (uint8_t *)&dummy_buffer;
-        //return RSI_ERROR_INVALID_PARAM;
     }
 
     (void) mode; // currently not used;
