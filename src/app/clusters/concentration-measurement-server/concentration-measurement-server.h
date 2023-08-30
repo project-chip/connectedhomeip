@@ -325,256 +325,200 @@ public:
         return CHIP_NO_ERROR;
     };
 
+    template <bool Enabled = NumericMeasurementEnabled, typename = std::enable_if_t<Enabled, CHIP_ERROR>>
     CHIP_ERROR SetMeasuredValue(DataModel::Nullable<float> aMeasuredValue)
     {
-        if constexpr (NumericMeasurementEnabled)
+        if (!CheckConstraintMinMax(aMeasuredValue, mMinMeasuredValue, mMaxMeasuredValue))
         {
-            if (!CheckConstraintMinMax(aMeasuredValue, mMinMeasuredValue, mMaxMeasuredValue))
-            {
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            }
-
-            DataModel::Nullable<float> oldValue = mMeasuredValue;
-            mMeasuredValue                      = aMeasuredValue;
-
-            if (oldValue != mMeasuredValue)
-            {
-                ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::MeasuredValue::Id);
-                MatterReportingAttributeChangeCallback(path);
-            }
-
-            return CHIP_NO_ERROR;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        else
+
+        DataModel::Nullable<float> oldValue = mMeasuredValue;
+        mMeasuredValue                      = aMeasuredValue;
+
+        if (oldValue != mMeasuredValue)
         {
-            return CHIP_ERROR_INCORRECT_STATE;
+            ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::MeasuredValue::Id);
+            MatterReportingAttributeChangeCallback(path);
         }
+
+        return CHIP_NO_ERROR;
     };
 
+    template <bool Enabled = NumericMeasurementEnabled, typename = std::enable_if_t<Enabled, CHIP_ERROR>>
     CHIP_ERROR SetMinMeasuredValue(DataModel::Nullable<float> aMinMeasuredValue)
     {
-        if constexpr (NumericMeasurementEnabled)
+        if (!CheckConstraintsLessThan(aMinMeasuredValue, mMaxMeasuredValue))
         {
-            if (!CheckConstraintsLessThan(aMinMeasuredValue, mMaxMeasuredValue))
-            {
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            }
-
-            if (!CheckConstraintsLessThan(aMinMeasuredValue, mMeasuredValue))
-            {
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            }
-
-            DataModel::Nullable<float> oldValue = mMinMeasuredValue;
-            mMinMeasuredValue                   = aMinMeasuredValue;
-
-            if (oldValue != mMinMeasuredValue)
-            {
-                ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::MinMeasuredValue::Id);
-                MatterReportingAttributeChangeCallback(path);
-            }
-
-            return CHIP_NO_ERROR;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        else
+
+        if (!CheckConstraintsLessThan(aMinMeasuredValue, mMeasuredValue))
         {
-            return CHIP_ERROR_INCORRECT_STATE;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
+
+        DataModel::Nullable<float> oldValue = mMinMeasuredValue;
+        mMinMeasuredValue                   = aMinMeasuredValue;
+
+        if (oldValue != mMinMeasuredValue)
+        {
+            ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::MinMeasuredValue::Id);
+            MatterReportingAttributeChangeCallback(path);
+        }
+
+        return CHIP_NO_ERROR;
     };
 
+    template <bool Enabled = NumericMeasurementEnabled, typename = std::enable_if_t<Enabled, CHIP_ERROR>>
     CHIP_ERROR SetMaxMeasuredValue(DataModel::Nullable<float> aMaxMeasuredValue)
     {
-        if constexpr (NumericMeasurementEnabled)
+        if (!CheckConstraintsGreaterThan(aMaxMeasuredValue, mMinMeasuredValue))
         {
-            if (!CheckConstraintsGreaterThan(aMaxMeasuredValue, mMinMeasuredValue))
-            {
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            }
-
-            if (!CheckConstraintsGreaterThan(aMaxMeasuredValue, mMeasuredValue))
-            {
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            }
-
-            DataModel::Nullable<float> oldValue = mMaxMeasuredValue;
-            mMaxMeasuredValue                   = aMaxMeasuredValue;
-
-            if (oldValue != mMaxMeasuredValue)
-            {
-                ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::MaxMeasuredValue::Id);
-                MatterReportingAttributeChangeCallback(path);
-            }
-
-            return CHIP_NO_ERROR;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        else
+
+        if (!CheckConstraintsGreaterThan(aMaxMeasuredValue, mMeasuredValue))
         {
-            return CHIP_ERROR_INCORRECT_STATE;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
+
+        DataModel::Nullable<float> oldValue = mMaxMeasuredValue;
+        mMaxMeasuredValue                   = aMaxMeasuredValue;
+
+        if (oldValue != mMaxMeasuredValue)
+        {
+            ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::MaxMeasuredValue::Id);
+            MatterReportingAttributeChangeCallback(path);
+        }
+
+        return CHIP_NO_ERROR;
     };
 
+    template <bool Enabled = NumericMeasurementEnabled, typename = std::enable_if_t<Enabled, CHIP_ERROR>>
     CHIP_ERROR SetUncertainty(float aUncertainty)
     {
-        if constexpr (NumericMeasurementEnabled)
-        {
-            float oldValue = mUncertainty;
-            mUncertainty   = aUncertainty;
+        float oldValue = mUncertainty;
+        mUncertainty   = aUncertainty;
 
-            if (oldValue != mUncertainty)
-            {
-                ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::Uncertainty::Id);
-                MatterReportingAttributeChangeCallback(path);
-            }
-
-            return CHIP_NO_ERROR;
-        }
-        else
+        if (oldValue != mUncertainty)
         {
-            return CHIP_ERROR_INCORRECT_STATE;
+            ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::Uncertainty::Id);
+            MatterReportingAttributeChangeCallback(path);
         }
+
+        return CHIP_NO_ERROR;
     };
 
+    template <bool Enabled = PeakMeasurementEnabled, typename = std::enable_if_t<Enabled, CHIP_ERROR>>
     CHIP_ERROR SetPeakMeasuredValue(DataModel::Nullable<float> aPeakMeasuredValue)
     {
-        if constexpr (PeakMeasurementEnabled)
+        if (!CheckConstraintMinMax(aPeakMeasuredValue, mMinMeasuredValue, mMaxMeasuredValue))
         {
-            if (!CheckConstraintMinMax(aPeakMeasuredValue, mMinMeasuredValue, mMaxMeasuredValue))
-            {
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            }
-
-            DataModel::Nullable<float> oldValue = mPeakMeasuredValue;
-            mPeakMeasuredValue                  = aPeakMeasuredValue;
-
-            if (oldValue != mPeakMeasuredValue)
-            {
-                ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::PeakMeasuredValue::Id);
-                MatterReportingAttributeChangeCallback(path);
-            }
-
-            return CHIP_NO_ERROR;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        else
+
+        DataModel::Nullable<float> oldValue = mPeakMeasuredValue;
+        mPeakMeasuredValue                  = aPeakMeasuredValue;
+
+        if (oldValue != mPeakMeasuredValue)
         {
-            return CHIP_ERROR_INCORRECT_STATE;
+            ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::PeakMeasuredValue::Id);
+            MatterReportingAttributeChangeCallback(path);
         }
+
+        return CHIP_NO_ERROR;
     };
 
+    template <bool Enabled = PeakMeasurementEnabled, typename = std::enable_if_t<Enabled, CHIP_ERROR>>
     CHIP_ERROR SetPeakMeasuredValueWindow(uint32_t aPeakMeasuredValueWindow)
     {
-        if constexpr (PeakMeasurementEnabled)
+        if (aPeakMeasuredValueWindow > WINDOW_MAX)
         {
-            if (aPeakMeasuredValueWindow > WINDOW_MAX)
-            {
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            }
-
-            uint32_t oldValue        = mPeakMeasuredValueWindow;
-            mPeakMeasuredValueWindow = aPeakMeasuredValueWindow;
-
-            if (oldValue != mPeakMeasuredValueWindow)
-            {
-                ConcreteAttributePath path =
-                    ConcreteAttributePath(mEndpointId, mClusterId, Attributes::PeakMeasuredValueWindow::Id);
-                MatterReportingAttributeChangeCallback(path);
-            }
-
-            return CHIP_NO_ERROR;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        else
+
+        uint32_t oldValue        = mPeakMeasuredValueWindow;
+        mPeakMeasuredValueWindow = aPeakMeasuredValueWindow;
+
+        if (oldValue != mPeakMeasuredValueWindow)
         {
-            return CHIP_ERROR_INCORRECT_STATE;
+            ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::PeakMeasuredValueWindow::Id);
+            MatterReportingAttributeChangeCallback(path);
         }
+
+        return CHIP_NO_ERROR;
     };
 
+    template <bool Enabled = AverageMeasurementEnabled, typename = std::enable_if_t<Enabled, CHIP_ERROR>>
     CHIP_ERROR SetAverageMeasuredValue(DataModel::Nullable<float> aAverageMeasuredValue)
     {
-        if constexpr (AverageMeasurementEnabled)
+        if (!CheckConstraintMinMax(aAverageMeasuredValue, mMinMeasuredValue, mMaxMeasuredValue))
         {
-            if (!CheckConstraintMinMax(aAverageMeasuredValue, mMinMeasuredValue, mMaxMeasuredValue))
-            {
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            }
-
-            DataModel::Nullable<float> oldValue = mAverageMeasuredValue;
-            mAverageMeasuredValue               = aAverageMeasuredValue;
-
-            if (oldValue != mAverageMeasuredValue)
-            {
-                ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::AverageMeasuredValue::Id);
-                MatterReportingAttributeChangeCallback(path);
-            }
-
-            return CHIP_NO_ERROR;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        else
+
+        DataModel::Nullable<float> oldValue = mAverageMeasuredValue;
+        mAverageMeasuredValue               = aAverageMeasuredValue;
+
+        if (oldValue != mAverageMeasuredValue)
         {
-            return CHIP_ERROR_INCORRECT_STATE;
+            ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::AverageMeasuredValue::Id);
+            MatterReportingAttributeChangeCallback(path);
         }
+
+        return CHIP_NO_ERROR;
     };
 
+    template <bool Enabled = AverageMeasurementEnabled, typename = std::enable_if_t<Enabled, CHIP_ERROR>>
     CHIP_ERROR SetAverageMeasuredValueWindow(uint32_t aAverageMeasuredValueWindow)
     {
-        if constexpr (AverageMeasurementEnabled)
+        if (aAverageMeasuredValueWindow > WINDOW_MAX)
         {
-            if (aAverageMeasuredValueWindow > WINDOW_MAX)
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        uint32_t oldValue           = mAverageMeasuredValueWindow;
+        mAverageMeasuredValueWindow = aAverageMeasuredValueWindow;
+
+        if (oldValue != mAverageMeasuredValueWindow)
+        {
+            ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::AverageMeasuredValueWindow::Id);
+            MatterReportingAttributeChangeCallback(path);
+        }
+
+        return CHIP_NO_ERROR;
+    };
+
+    template <bool Enabled = LevelIndicationEnabled, typename = std::enable_if_t<Enabled, CHIP_ERROR>>
+    CHIP_ERROR SetLevelValue(LevelValueEnum aLevel)
+    {
+        if constexpr (!MediumLevelEnabled)
+        {
+            if (aLevel == LevelValueEnum::kMedium)
             {
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
-
-            uint32_t oldValue           = mAverageMeasuredValueWindow;
-            mAverageMeasuredValueWindow = aAverageMeasuredValueWindow;
-
-            if (oldValue != mAverageMeasuredValueWindow)
-            {
-                ConcreteAttributePath path =
-                    ConcreteAttributePath(mEndpointId, mClusterId, Attributes::AverageMeasuredValueWindow::Id);
-                MatterReportingAttributeChangeCallback(path);
-            }
-
-            return CHIP_NO_ERROR;
         }
-        else
+
+        if constexpr (!CriticalLevelEnabled)
         {
-            return CHIP_ERROR_INCORRECT_STATE;
+            if (aLevel == LevelValueEnum::kCritical)
+            {
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
         }
-    };
 
-    CHIP_ERROR SetLevelValue(LevelValueEnum aLevel)
-    {
-        if constexpr (LevelIndicationEnabled)
+        LevelValueEnum oldValue = mLevel;
+        mLevel                  = aLevel;
+
+        if (oldValue != mLevel)
         {
-            if constexpr (!MediumLevelEnabled)
-            {
-                if (aLevel == LevelValueEnum::kMedium)
-                {
-                    return CHIP_ERROR_INVALID_ARGUMENT;
-                }
-            }
-
-            if constexpr (!CriticalLevelEnabled)
-            {
-                if (aLevel == LevelValueEnum::kCritical)
-                {
-                    return CHIP_ERROR_INVALID_ARGUMENT;
-                }
-            }
-
-            LevelValueEnum oldValue = mLevel;
-            mLevel                  = aLevel;
-
-            if (oldValue != mLevel)
-            {
-                ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LevelValue::Id);
-                MatterReportingAttributeChangeCallback(path);
-            }
-
-            return CHIP_NO_ERROR;
+            ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LevelValue::Id);
+            MatterReportingAttributeChangeCallback(path);
         }
-        else
-        {
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
+
+        return CHIP_NO_ERROR;
     };
 };
 
