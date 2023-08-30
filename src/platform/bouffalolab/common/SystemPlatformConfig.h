@@ -32,8 +32,3 @@ struct ChipDeviceEvent;
 
 //#define CHIP_CONFIG_SHA256_CONTEXT_SIZE sizeof(bl_sha_ctx_t)
 #define CHIP_CONFIG_SHA256_CONTEXT_SIZE ((1 + 5 + 18 + 16 + 16) * sizeof(unsigned int))
-#if CHIP_DEVICE_LAYER_TARGET_BL602
-#define CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE (48 + 24)
-#endif
-
-

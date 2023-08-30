@@ -53,7 +53,7 @@ class BouffalolabBoard(Enum):
     XT_ZB6_DevKit = auto()
     BL706_NIGHT_LIGHT = auto()
     BL706DK = auto()
-    BL704L_DVK = auto()
+    BL704LDK = auto()
 
     def GnArgName(self):
         if self == BouffalolabBoard.BL602_IoT_Matter_V1:

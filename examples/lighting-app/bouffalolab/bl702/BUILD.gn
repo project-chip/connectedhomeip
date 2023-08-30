@@ -94,6 +94,12 @@ bl_iot_sdk("sdk") {
     "CHIP_DEVICE_CONFIG_ENABLE_ETHERNET=${chip_enable_ethernet}",
   ]
 
+  if (chip_enable_ethernet) {
+    defines += [ 
+      "CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE=48",
+    ]
+  }
+
   if (enable_psram) {
     defines += [ "CFG_USE_PSRAM=1" ]
   }
@@ -108,7 +114,16 @@ bl_iot_sdk("sdk") {
 }
 
 chip_data_model("bouffalolab-lighting") {
-  zap_file = "${example_dir}/data_model/lighting-app-wifi.zap"
+
+  if (chip_enable_openthread) {
+    zap_file = "${example_dir}/data_model/lighting-app-thread.zap"
+  }
+  else if (chip_enable_wifi) {
+    zap_file = "${example_dir}/data_model/lighting-app-wifi.zap"
+  }
+  else {
+    zap_file = "${example_dir}/data_model/lighting-app-ethernet.zap"
+  }
 
   zap_pregenerated_dir = "${chip_root}/zzz_generated/lighting-app/zap-generated"
   is_server = true
