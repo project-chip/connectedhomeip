@@ -163,7 +163,7 @@ tests:
       PICS: SMOKECO.S.A0008 && SMOKECO.S.E08
       command: "readEvent"
       event: "InterconnectSmokeAlarm"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: { AlarmSeverityLevel: interconnectSmokeAlarmSeverityLevel }
 
@@ -218,7 +218,7 @@ tests:
       PICS: SMOKECO.S.A0008 && SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 
@@ -276,7 +276,7 @@ tests:
       PICS: SMOKECO.S.A0009 && SMOKECO.S.E09
       command: "readEvent"
       event: "InterconnectCOAlarm"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: { AlarmSeverityLevel: interconnectCOAlarmSeverityLevel }
 
@@ -331,7 +331,7 @@ tests:
       PICS: SMOKECO.S.A0009 && SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 
@@ -689,7 +689,7 @@ tests:
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && SMOKECO.S.E06
       command: "readEvent"
       event: "AlarmMuted"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 
@@ -726,7 +726,7 @@ tests:
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && SMOKECO.S.E07
       command: "readEvent"
       event: "MuteEnded"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 
@@ -921,7 +921,7 @@ tests:
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && SMOKECO.S.E06
       command: "readEvent"
       event: "AlarmMuted"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 
@@ -958,7 +958,7 @@ tests:
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && SMOKECO.S.E07
       command: "readEvent"
       event: "MuteEnded"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}
 

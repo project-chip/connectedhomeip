@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2a: Read the global attribute: ClusterRevision"
+    - label: "Step 2: Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -39,7 +39,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Step 2b: Read the global attribute: FeatureMap"
+    - label: "Step 3a: Read the global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS:
@@ -51,8 +51,8 @@ tests:
               type: bitmap32
 
     - label:
-          "Step 2c: Given FAN.S.F00(Condition) ensure featuremap has the correct
-          bit set"
+          "Step 3b: Given FAN.S.F00(SPD) ensure featuremap has the correct bit
+          set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: FAN.S.F00
@@ -62,8 +62,8 @@ tests:
               hasMasksSet: [0x1]
 
     - label:
-          "Step 2d: Given FAN.S.F01(Warning) ensure featuremap has the correct
-          bit set"
+          "Step 3c: Given FAN.S.F01(AUT) ensure featuremap has the correct bit
+          set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: FAN.S.F01
@@ -73,8 +73,8 @@ tests:
               hasMasksSet: [0x2]
 
     - label:
-          "Step 2e: Given FAN.S.F02(Condition) ensure featuremap has the correct
-          bit set"
+          "Step 3d: Given FAN.S.F02(RCK) ensure featuremap has the correct bit
+          set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: FAN.S.F02
@@ -84,8 +84,8 @@ tests:
               hasMasksSet: [0x4]
 
     - label:
-          "Step 2f: Given FAN.S.F03(Warning) ensure featuremap has the correct
-          bit set"
+          "Step 3e: Given FAN.S.F03(WND) ensure featuremap has the correct bit
+          set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: FAN.S.F03
@@ -95,8 +95,8 @@ tests:
               hasMasksSet: [0x8]
 
     - label:
-          "Step 2g: Given FAN.S.F04(Warning) ensure featuremap has the correct
-          bit set"
+          "Step 3f: Given FAN.S.F04(STEP) ensure featuremap has the correct bit
+          set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: FAN.S.F04
@@ -106,8 +106,8 @@ tests:
               hasMasksSet: [0x10]
 
     - label:
-          "Step 2h: Given FAN.S.F05(Warning) ensure featuremap has the correct
-          bit set"
+          "Step 3g: Given FAN.S.F05(DIR) ensure featuremap has the correct bit
+          set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: FAN.S.F05
@@ -116,7 +116,7 @@ tests:
               type: bitmap32
               hasMasksSet: [0x20]
 
-    - label: "Step 3a: Read the global attribute: AttributeList"
+    - label: "Step 4: Read the global attribute: AttributeList"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
@@ -125,7 +125,7 @@ tests:
               type: list
               contains: [0, 1, 2, 3, 65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label: "Step 3a: Read the global attribute: AttributeList"
+    - label: "Step 4: Read the global attribute: AttributeList"
       PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -135,7 +135,7 @@ tests:
               contains: [0, 1, 2, 3, 65528, 65529, 65531, 65532, 65533]
 
     - label:
-          "Step 3b: Read the feature dependent FAN.S.F00 (SPD) attribute in
+          "Step 4: Read the feature dependent FAN.S.F00 (SPD) attribute in
           AttributeList"
       PICS: FAN.S.F00
       command: "readAttribute"
@@ -146,7 +146,7 @@ tests:
               contains: [4, 5, 6]
 
     - label:
-          "Step 3c: Read the feature dependent FAN.S.F02(RCK) attribute in
+          "Step 4: Read the feature dependent FAN.S.F02(RCK) attribute in
           AttributeList"
       PICS: FAN.S.F02
       command: "readAttribute"
@@ -157,7 +157,7 @@ tests:
               contains: [7, 8]
 
     - label:
-          "Step 3d: Read the feature dependent FAN.S.F03(WND) attribute in
+          "Step 4: Read the feature dependent FAN.S.F03(WND) attribute in
           AttributeList"
       PICS: FAN.S.F03
       command: "readAttribute"
@@ -168,7 +168,7 @@ tests:
               contains: [9, 10]
 
     - label:
-          "Step 3e: Read the feature dependent FAN.S.F05(DIR) attribute in
+          "Step 4: Read the feature dependent FAN.S.F05(DIR) attribute in
           AttributeList"
       PICS: FAN.S.F05
       command: "readAttribute"
@@ -178,57 +178,7 @@ tests:
               type: list
               contains: [11]
 
-    #List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
-    - label:
-          "Step 3f: TH reads AttributeList attribute from DUT. 1.The list SHALL
-          NOT contain any additional values in the standard or scoped range:
-          (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE). 2.The
-          list MAY contain values in the Manufacturer Extensible Identifier
-          (MEI) range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed
-          MEI range (0x0001 - 0xFFF1), these values SHALL be ignored. 3.The list
-          SHALL NOT contain any values in the Test Vendor or invalid range:
-          (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 -
-          0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
-          allowed MEI range (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool fancontrol read attribute-list 1 1
-
-          Via the TH (chip-tool), verify that  theAttributeListattribute contains
-          - Mandatory entries:0x0000, 0x0001, 0x0002, 0x0003,  0xfff8, 0xfff9, 0xfffa, 0xfffb, 0xfffc & 0xfffd
-          - Based on feature support:- 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x000a, 0x000b
-          Below mentioned log is based on the RPI implementation, Value may vary on real DUT
-
-          [1686031154.064099][14930:14933] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0202 Attribute 0x0000_FFFB DataVersion: 3896103279
-          [1686031154.064331][14930:14933] CHIP:TOO:   AttributeList: 18 entries
-          [1686031154.064408][14930:14933] CHIP:TOO:     [1]: 0
-          [1686031154.064468][14930:14933] CHIP:TOO:     [2]: 1
-          [1686031154.064526][14930:14933] CHIP:TOO:     [3]: 2
-          [1686031154.064584][14930:14933] CHIP:TOO:     [4]: 3
-          [1686031154.064640][14930:14933] CHIP:TOO:     [5]: 4
-          [1686031154.064697][14930:14933] CHIP:TOO:     [6]: 5
-          [1686031154.064754][14930:14933] CHIP:TOO:     [7]: 6
-          [1686031154.064811][14930:14933] CHIP:TOO:     [8]: 7
-          [1686031154.064868][14930:14933] CHIP:TOO:     [9]: 8
-          [1686031154.064929][14930:14933] CHIP:TOO:     [10]: 9
-          [1686031154.064987][14930:14933] CHIP:TOO:     [11]: 10
-          [1686031154.065045][14930:14933] CHIP:TOO:     [12]: 11
-          [1686031154.065103][14930:14933] CHIP:TOO:     [13]: 65528
-          [1686031154.065161][14930:14933] CHIP:TOO:     [14]: 65529
-          [1686031154.065218][14930:14933] CHIP:TOO:     [15]: 65530
-          [1686031154.065275][14930:14933] CHIP:TOO:     [16]: 65531
-          [1686031154.065333][14930:14933] CHIP:TOO:     [17]: 65532
-          [1686031154.065390][14930:14933] CHIP:TOO:     [18]: 65533
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Step 4a: Read the global attribute: AcceptedCommandList"
+    - label: "Step 6: Read the global attribute: AcceptedCommandList"
       PICS: " !FAN.S.C00.Rsp "
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -237,39 +187,7 @@ tests:
           constraints:
               type: list
 
-    # List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
-    - label:
-          "Step 4b: TH reads AcceptedCommandList attribute from DUT. 1.The list
-          SHALL NOT contain any additional values in the standard or scoped
-          range: (0x0000_0000 - 0x0000_00FF). 2.The list MAY contain values in
-          the Manufacturer Extensible Identifier (MEI) range: (0xXXXX_0000 -
-          0xXXXX_00FF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1),
-          these values SHALL be ignored.3.The list SHALL NOT contain any values
-          in the Test Vendor or invalid range: (0x0000_0100 - 0x0000_FFFF),
-          (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where
-          XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool fancontrol read accepted-command-list 1 1
-
-          On TH(chip-tool), Verify the  AcceptedCommandList attribute that contains 1 entries:
-          Below mentioned log is based on the RPI implementation, Value may vary on real DUT
-
-          [1686031757.840606][14982:14984] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0202 Attribute 0x0000_FFF9 DataVersion: 3896103279
-          [1686031757.840879][14982:14984] CHIP:TOO:   AcceptedCommandList: 1 entries
-          [1686031757.840958][14982:14984] CHIP:TOO:     [1]: 0
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label:
-          "Step 5a: Read the optional command (ResetCondition) in
-          AcceptedCommandList"
+    - label: "Step 6: Read the optional command (Step) in AcceptedCommandList"
       PICS: FAN.S.C00.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -277,31 +195,3 @@ tests:
           constraints:
               type: list
               contains: [0]
-
-    # List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
-    - label:
-          "Step 5b: TH reads from the DUT the GeneratedCommandList attribute.
-          1.The list SHALL NOT contain any additional values in the standard or
-          scoped range: (0x0000_0000 - 0x0000_00FF). 2.The list MAY contain
-          values in the Manufacturer Extensible Identifier (MEI) range:
-          (0xXXXX_0000 - 0xXXXX_00FF), where XXXX is the allowed MEI range
-          (0x0001 - 0xFFF1), these values SHALL be ignored.3.The list SHALL NOT
-          contain any values in the Test Vendor or invalid range: (0x0000_0100 -
-          0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 -
-          0xFFFF_FFFF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool fancontrol read generated-command-list 1 1
-
-          On TH(chip-tool), Verify the  GeneratedCommandList attribute that contains  0 entries:
-
-          [1689587005.212317][9422:9424] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0202 Attribute 0x0000_FFF8 DataVersion: 3321937588
-          [1689587005.212457][9422:9424] CHIP:TOO:   GeneratedCommandList: 0 entries
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"

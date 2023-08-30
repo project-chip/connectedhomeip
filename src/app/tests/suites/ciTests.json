@@ -279,7 +279,8 @@
         "TestTimeSynchronization",
         "TestOperationalState",
         "TestRVCOperationalState",
-        "TestDishwasherAlarm"
+        "TestDishwasherAlarm",
+        "Test_AddNewFabricFromExistingFabric"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": ["Test_TC_DGSW_1_1"],
@@ -306,7 +307,6 @@
         "Test_TC_G_2_1"
     ],
     "Scenes": ["Test_TC_S_1_1"],
-    "RVCOperationalState": ["Test_TC_RVCOPSTATE_1_1"],
     "ResourceMonitoring": [
         "TestActivatedCarbonFilterMonitoring",
         "TestHepaFilterMonitoring",
@@ -380,10 +380,10 @@
         "PowerSourceConfiguration",
         "RefrigeratorAlarm",
         "RelativeHumidityMeasurement",
+        "RoboticVacuumCleaner",
         "SecureChannel",
         "SmokeCOAlarm",
         "Switch",
-        "RVCOperationalState",
         "TemperatureControlledCabinetMode",
         "TemperatureControl",
         "TemperatureMeasurement",
