@@ -102,7 +102,7 @@ Mac OS X
 
           ```
           cd ~/connectedhomeip
-          ./scripts/examples/gn_silabs_example.sh ./examples/lock-app/silabs/efr32/ ./out/lock_app BRD4187C
+          ./scripts/examples/gn_silabs_example.sh ./examples/lock-app/silabs/ ./out/lock_app BRD4187C
           ```
 
 -   To delete generated executable, libraries and object files use:
@@ -115,7 +115,7 @@ Mac OS X
     OR use GN/Ninja directly
 
           ```
-          $ cd ~/connectedhomeip/examples/silabs/lock-app/efr32
+          $ cd ~/connectedhomeip/examples/lock-app/silabs/
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export SILABS_BOARD=BRD4187C
@@ -126,14 +126,14 @@ Mac OS X
 -   To delete generated executable, libraries and object files use:
 
           ```
-          $ cd ~/connectedhomeip/examples/lock-app/silabs/efr32
+          $ cd ~/connectedhomeip/examples/lock-app/silabs
           $ rm -rf out/
           ```
 
 *   Build the example as Intermittently Connected Device (ICD)
 
           ```
-          $ ./scripts/examples/gn_silabs_example.sh ./examples/lock-app/silabs/efr32/ ./out/lock-app_ICD BRD4187C --icd
+          $ ./scripts/examples/gn_silabs_example.sh ./examples/lock-app/silabs/ ./out/lock-app_ICD BRD4187C --icd
           ```
 
     or use gn as previously mentioned but adding the following arguments:
@@ -145,13 +145,13 @@ Mac OS X
 *   Build the example with pigweed RCP
 
           ```
-          $ ./scripts/examples/gn_silabs_example.sh examples/lock-app/silabs/efr32/ out/lock_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
+          $ ./scripts/examples/gn_silabs_example.sh examples/lock-app/silabs/ out/lock_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
           ```
 
     or use GN/Ninja Directly
 
           ```
-          $ cd ~/connectedhomeip/examples/lock-app/silabs/efr32
+          $ cd ~/connectedhomeip/examples/lock-app/silabs
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export SILABS_BOARD=BRD4187C
@@ -171,7 +171,7 @@ arguments
 -   On the command line:
 
           ```
-          $ cd ~/connectedhomeip/examples/lock-app/silabs/efr32
+          $ cd ~/connectedhomeip/examples/lock-app/silabs
           $ python3 out/debug/matter-silabs-lock-example.flash.py
           ```
 
@@ -373,7 +373,7 @@ To track memory usage you can set `enable_heap_monitoring = true` either in the
 BUILD.gn file or pass it as a build argument to gn. This will print on the RTT
 console the RAM usage of each individual task and the number of Memory
 allocation and Free. While this is not extensive monitoring you're welcome to
-modify `examples/platform/silabs/efr32/MemMonitoring.cpp` to add your own memory
+modify `examples/platform/silabs/MemMonitoring.cpp` to add your own memory
 tracking code inside the `trackAlloc` and `trackFree` function
 
 ## OTA Software Update
@@ -393,7 +393,7 @@ features can easily be toggled on or off. Here is a short list of options :
 `chip_progress_logging, chip_detail_logging, chip_automation_logging`
 
     ```
-    $ ./scripts/examples/gn_silabs_example.sh ./examples/lock-app/silabs/efr32 ./out/lock-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/lock-app/silabs ./out/lock-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
     ```
 
 ### Debug build / release build
@@ -401,7 +401,7 @@ features can easily be toggled on or off. Here is a short list of options :
 `is_debug`
 
     ```
-    $ ./scripts/examples/gn_silabs_example.sh ./examples/lock-app/silabs/efr32 ./out/lock-app BRD4164A "is_debug=false"
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/lock-app/silabs ./out/lock-app BRD4164A "is_debug=false"
     ```
 
 ### Disabling LCD
@@ -409,7 +409,7 @@ features can easily be toggled on or off. Here is a short list of options :
 `show_qr_code`
 
     ```
-    $ ./scripts/examples/gn_silabs_example.sh ./examples/lock-app/silabs/efr32 ./out/lock-app BRD4164A "show_qr_code=false"
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/lock-app/silabs ./out/lock-app BRD4164A "show_qr_code=false"
     ```
 
 ### KVS maximum entry count
@@ -420,5 +420,5 @@ features can easily be toggled on or off. Here is a short list of options :
     Set the maximum Kvs entries that can be stored in NVM (Default 75)
     Thresholds: 30 <= kvs_max_entries <= 255
 
-    $ ./scripts/examples/gn_silabs_example.sh ./examples/lock-app/silabs/efr32 ./out/lock-app BRD4164A kvs_max_entries=50
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/lock-app/silabs ./out/lock-app BRD4164A kvs_max_entries=50
     ```

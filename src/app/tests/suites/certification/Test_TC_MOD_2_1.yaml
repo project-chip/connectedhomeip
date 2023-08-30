@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,145 +11,70 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 80.3.1. [TC-MOD-2.1] ChangeToMode verification with DUT as Server
+name: 80.2.1. [TC-MOD-2.1] ChangeToMode Verification (DUT as Server)
 
 PICS:
     - MOD.S.C00.Rsp
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "Mode Select"
+    endpoint: 1
+    #Configure newmode value
+    NewMode:
+        type: int8u
+        defaultValue: 4
 
 tests:
-    - label: "Preconditions"
-      verification: |
-          This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
-      disabled: true
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-    - label:
-          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
-          test)."
-      verification: |
-
-      disabled: true
-
-    - label: "Step 1: TH reads the SupportedModes attribute from the DUT"
+    - label: "TH reads the SupportedModes attribute from the DUT"
       PICS: MOD.S.A0002
-      verification: |
-          ./chip-tool modeselect read supported-modes 1 1
+      command: "readAttribute"
+      attribute: "SupportedModes"
+      response:
+          constraints:
+              type: list
 
-          On TH(chip-tool) log, Verify that the DUT response contains list of supported modes.
-          Save the Mode numbers for usage in steps 3 and 4 and below is the sample log provided for the raspi platform:
-
-          [1654595268.854568][14400:14405] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 366231602
-          [1654595268.854678][14400:14405] CHIP:TOO:   SupportedModes: 3 entries
-          [1654595268.854743][14400:14405] CHIP:TOO:     [1]: {
-          [1654595268.854772][14400:14405] CHIP:TOO:       Label: Black
-          [1654595268.854811][14400:14405] CHIP:TOO:       Mode: 0
-          [1654595268.854843][14400:14405] CHIP:TOO:       SemanticTags: 1 entries
-          [1654595268.854891][14400:14405] CHIP:TOO:         [1]: {
-          [1654595268.854918][14400:14405] CHIP:TOO:           MfgCode: 0
-          [1654595268.854945][14400:14405] CHIP:TOO:           Value: 0
-          [1654595268.854971][14400:14405] CHIP:TOO:          }
-          [1654595268.855000][14400:14405] CHIP:TOO:      }
-          [1654595268.855038][14400:14405] CHIP:TOO:     [2]: {
-          [1654595268.855064][14400:14405] CHIP:TOO:       Label: Cappuccino
-          [1654595268.855089][14400:14405] CHIP:TOO:       Mode: 4
-          [1654595268.855117][14400:14405] CHIP:TOO:       SemanticTags: 1 entries
-          [1654595268.855149][14400:14405] CHIP:TOO:         [1]: {
-          [1654595268.855175][14400:14405] CHIP:TOO:           MfgCode: 0
-          [1654595268.855199][14400:14405] CHIP:TOO:           Value: 0
-          [1654595268.855223][14400:14405] CHIP:TOO:          }
-          [1654595268.855249][14400:14405] CHIP:TOO:      }
-          [1654595268.855284][14400:14405] CHIP:TOO:     [3]: {
-          [1654595268.855310][14400:14405] CHIP:TOO:       Label: Espresso
-          [1654595268.855332][14400:14405] CHIP:TOO:       Mode: 7
-          [1654595268.855360][14400:14405] CHIP:TOO:       SemanticTags: 1 entries
-          [1654595268.855390][14400:14405] CHIP:TOO:         [1]: {
-          [1654595268.855416][14400:14405] CHIP:TOO:           MfgCode: 0
-          [1654595268.855440][14400:14405] CHIP:TOO:           Value: 0
-          [1654595268.855464][14400:14405] CHIP:TOO:          }
-          [1654595268.855490][14400:14405] CHIP:TOO:      }
-          [1649677252.376226][10804:10809] CHIP:TOO:       SemanticTag: 0
-          [1649677252.376252][10804:10809] CHIP:TOO:      }
-      disabled: true
-
-    - label: "Step 2: TH reads the CurrentMode attribute from the DUT"
+    - label: "TH reads the CurrentMode attribute from the DUT"
       PICS: MOD.S.A0003
-      verification: |
-          ./chip-tool modeselect read current-mode 1 1
-
-          Verify on TH(chip-tool), Current modes attribute value is an integer value.
-          - Save the mode values for usage in steps 3 and below is the sample log provided for the raspi platform
-
-          [1649678800.298128][10854:10861] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
-          [1649678800.298279][10854:10861] CHIP:TOO:   CurrentMode: 0
-      disabled: true
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          saveAs: old_current_mode_dut
 
     - label:
-          "Step 3a: TH sends a ChangeToMode command to the DUT with a integer
-          from the list in step 1, but different from the integer from step 2"
+          "TH sends a ChangeToMode command to the DUT with a integer from the
+          list in step 1, but different from the integer from step 2"
       PICS: MOD.S.C00.Rsp
-      verification: |
-          ./chip-tool modeselect change-to-mode 4 1 1
+      command: "ChangeToMode"
+      arguments:
+          values:
+              - name: "NewMode"
+                value: NewMode
 
-          Verify on TH(chip-tool) log, DUT responds with a SUCCESS (value 0x00) status response and below is the sample log provided for the raspi platform:
-
-          [1685017925.030090][16218:16220] CHIP:DMG:                         CommandStatusIB =
-          [1685017925.030093][16218:16220] CHIP:DMG:                         {
-          [1685017925.030096][16218:16220] CHIP:DMG:                                 CommandPathIB =
-          [1685017925.030099][16218:16220] CHIP:DMG:                                 {
-          [1685017925.030102][16218:16220] CHIP:DMG:                                         EndpointId = 0x1,
-          [1685017925.030106][16218:16220] CHIP:DMG:                                         ClusterId = 0x50,
-          [1685017925.030109][16218:16220] CHIP:DMG:                                         CommandId = 0x0,
-          [1685017925.030112][16218:16220] CHIP:DMG:                                 },
-          [1685017925.030117][16218:16220] CHIP:DMG:
-          [1685017925.030121][16218:16220] CHIP:DMG:                                 StatusIB =
-          [1685017925.030126][16218:16220] CHIP:DMG:                                 {
-          [1685017925.030129][16218:16220] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1685017925.030133][16218:16220] CHIP:DMG:                                 },
-          [1685017925.030138][16218:16220] CHIP:DMG:
-      disabled: true
-
-    - label: "Step 3b: TH reads the CurrentMode attribute from the DUT"
+    - label: "TH reads the CurrentMode attribute from the DUT"
       PICS: MOD.S.A0003
-      verification: |
-          ./chip-tool modeselect read current-mode 1 1
-
-          Verify on TH(chip-tool),  CurrentMode attribute value is an integer provided in step 3a, not the integer from step 2, below is the sample log provided for the raspi platform:
-
-          [1685017991.905343][16336:16338] CHIP:DMG:         ],
-          [1685017991.905348][16336:16338] CHIP:DMG:
-          [1685017991.905351][16336:16338] CHIP:DMG:         SuppressResponse = true,
-          [1685017991.905353][16336:16338] CHIP:DMG:         InteractionModelRevision = 1
-          [1685017991.905356][16336:16338] CHIP:DMG: }
-          [1685017991.905393][16336:16338] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 3673378954
-          [1685017991.905407][16336:16338] CHIP:TOO:   CurrentMode: 4
-      disabled: true
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: NewMode
 
     - label:
-          "Step 4: TH sends a ChangeToMode command to the DUT with a integer
-          that is not in the list in step 1."
+          "TH sends a ChangeToMode command to the DUT with a integer that is not
+          in the list in step 1."
       PICS: MOD.S.C00.Rsp
-      verification: |
-          ./chip-tool modeselect change-to-mode 5 1 1
-
-          Verify on TH(chip-tool) log, DUT responds with a INVALID_COMMAND (value 0x85) status response and below is the sample log provided for the raspi platform:
-
-          [1685018023.768417][16341:16343] CHIP:DMG:                                 StatusIB =
-          [1685018023.768429][16341:16343] CHIP:DMG:                                 {
-          [1685018023.768441][16341:16343] CHIP:DMG:                                         status = 0x85 (INVALID_COMMAND),
-          [1685018023.768452][16341:16343] CHIP:DMG:                                 },
-          [1685018023.768464][16341:16343] CHIP:DMG:
-          [1685018023.768474][16341:16343] CHIP:DMG:                         },
-          [1685018023.768490][16341:16343] CHIP:DMG:
-          [1685018023.768499][16341:16343] CHIP:DMG:                 },
-          [1685018023.768515][16341:16343] CHIP:DMG:
-          [1685018023.768523][16341:16343] CHIP:DMG:         ],
-          [1685018023.768540][16341:16343] CHIP:DMG:
-          [1685018023.768549][16341:16343] CHIP:DMG:         InteractionModelRevision = 1
-          [1685018023.768558][16341:16343] CHIP:DMG: },
-      disabled: true
+      command: "ChangeToMode"
+      arguments:
+          values:
+              - name: "NewMode"
+                value: 100
+      response:
+          error: INVALID_COMMAND

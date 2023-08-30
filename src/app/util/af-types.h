@@ -224,7 +224,7 @@ struct EmberAfDefinedEndpoint
     chip::EndpointId parentEndpointId = chip::kInvalidEndpointId;
 
     /**
-     * Span pointing to a list of tag. Lifetime has to outlive usage, and data is owned by callers.
+     * Span pointing to a list of tags. Lifetime has to outlive usage, and data is owned by callers.
      */
     chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList;
 };

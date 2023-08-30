@@ -38,7 +38,7 @@ def binaryPath(request, rootDir):
 
 SHELL_COMMAND_NAME = ["base64", "exit", "help", "version",
                       "config", "device", "onboardingcodes", "dns",
-                      "echo", "log", "rand"]
+                      "echo", "log", "rand", "stat"]
 
 
 def parse_config_response(response):
