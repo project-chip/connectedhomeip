@@ -298,7 +298,9 @@ tests:
                 constraints:
                     minValue: 1081
 
-    - label: "Step 12: TH sends Get Year Day Schedule Command to DUT for non-existent User"
+    - label:
+          "Step 12: TH sends Get Year Day Schedule Command to DUT for
+          non-existent User"
       PICS: DRLK.S.F0a && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
       command: "GetYearDaySchedule"
       arguments:
