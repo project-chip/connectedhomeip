@@ -231,8 +231,8 @@ CHIP_ERROR ConvertReportTlvToJson(const uint32_t id, TLV::TLVReader & data, std:
     TLV::TLVWriter writer;
     TLV::TLVReader readerForJavaTLV;
     uint32_t size    = 0;
-    size_t bufferLen = readerForJavaTLV.GetTotalLength() + EXTRA_SPACE_FOR_ATTRIBUTE_TAG;
     readerForJavaTLV.Init(data);
+    size_t bufferLen = readerForJavaTLV.GetTotalLength() + EXTRA_SPACE_FOR_ATTRIBUTE_TAG;
     std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(new uint8_t[bufferLen]);
     writer.Init(buffer.get(), bufferLen);
     TLV::TLVType outer;
