@@ -32,7 +32,11 @@ combined_hex = sys.argv[3]
 
 # merge binary executable with bim hex file
 ota_image = intelhex.IntelHex()
-ota_image.fromfile(oad_bin_file, format='bin')
+if (oad_bin_file.endswith('hex')):
+    ota_image.fromfile(oad_bin_file, format='hex')
+
+else:
+    ota_image.fromfile(oad_bin_file, format='bin')
 
 bim_hex = intelhex.IntelHex()
 bim_hex.fromfile(bim_hex_file, format='hex')
