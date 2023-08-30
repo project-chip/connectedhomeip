@@ -35,8 +35,6 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "files.associations": {
-        "*.slcc": "yaml",
-        "*.slcp": "yaml",
         "iostream": "cpp",
         "array": "cpp",
         "atomic": "cpp",
@@ -117,9 +115,7 @@
         "condition_variable": "cpp",
         "numeric": "cpp",
         "random": "cpp",
-        "thread": "cpp",
-        "sl_device_init_nvic.h": "c",
-        "rsi_wisemcu_hardware_setup.h": "c"
+        "thread": "cpp"
     },
     // Configure paths or glob patterns to exclude from file watching.
     "files.watcherExclude": {
