@@ -55,12 +55,19 @@ class TC_DISHALM_3_2(MatterBaseTest):
         endpoint = self.user_params.get("endpoint", 1)
 
         asserts.assert_true(self.check_pics("DISHALM.S.A0001"), "DISHALM.S.A0001 must be supported")
-        asserts.assert_true(self.check_pics("DISHALM.S.A0002"), "DISHALM.S.A0002 must be supported")
 
         self.print_step("1a", "Commissioning, already done")
 
         self.print_step("1b", "Set up subscription to Notify Event")
         await self.subscribe_event(endpoint=endpoint)
+
+        if self.check_pics("DISHALM.S.A0002"):
+            self.print_step("1c", "TH reads from the DUT the Latch attribute")
+            latch_response = self.read_latch_attribute(endpoint=endpoint)
+            logging.info("Latch: %s" % (latch_response))
+        else:
+            self.print_step("1d", "Optional Latch attribute not supported, set LatchResponse to 0")
+            latch_response = 0
 
         self.print_step("2a", "Operate Device to set the condition to raise the Drain alarm and wait a few seconds")
         input("Press Enter when done.\n")
@@ -88,11 +95,9 @@ class TC_DISHALM_3_2(MatterBaseTest):
 
         logging.info("Notify: %s" % (notify))
         logging.info("Notify State: %s" % (notify_state))
+        logging.info("Latch: %s" % (latch_response))
 
-        latch = self.read_latch_attribute(endpoint=endpoint)
-        logging.info("Latch: %s" % (latch))
-
-        if latch == 0:
+        if not latch_response & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kDrainError:
             asserts.assert_false(notify_state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kDrainError,
                                  "State bit 1 is not set to FALSE")
 
@@ -100,11 +105,12 @@ class TC_DISHALM_3_2(MatterBaseTest):
         state = self.read_state_attribute(endpoint=endpoint)
 
         logging.info("State: %s" % (state))
+        logging.info("Latch: %s" % (latch_response))
 
-        if latch == 0:
-            asserts.assert_false(state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kDrainError, "Bit 1 of State is not set to 0")
-        elif latch == 1:
-            asserts.assert_true(state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kDrainError, "Bit 1 of State is not set to 1")
+        if latch_response & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kDrainError:
+            asserts.assert_true(state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kDrainError, "Bit 1 of State is not set to 1 while bit 1 of Latch is 1")
+        else:
+            asserts.assert_false(state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kDrainError, "Bit 1 of State is not set to 0 while bit 1 of Latch is 0")
 
         self.print_step("3a", "Send to the DUT the Reset Command with bit 1 of Alarms set to 1")
         alarm = Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kDrainError
@@ -117,10 +123,9 @@ class TC_DISHALM_3_2(MatterBaseTest):
         logging.info("Notify: %s" % (notify))
         logging.info("Notify State: %s" % (notify_state))
 
-        latch = self.read_latch_attribute(endpoint=endpoint)
-        logging.info("Latch: %s" % (latch))
+        logging.info("Latch: %s" % (latch_response))
 
-        if latch == 1:
+        if latch_response & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kDrainError:
             asserts.assert_false(notify_state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kDrainError,
                                  "State bit 1 is not set to FALSE")
 
