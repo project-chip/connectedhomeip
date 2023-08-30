@@ -317,7 +317,7 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     err = ConvertReportTlvToJson(static_cast<uint32_t>(aPath.mAttributeId), *apData, json);
     VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(attributePathObj, nullptr, err));
     UtfString jsonString(env, json.c_str());
-
+    ChipLogError(Controller, "dump attribute data %s", json.c_str());
     // Create AttributeState object
     jclass attributeStateCls;
     err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/model/AttributeState", attributeStateCls);
@@ -447,6 +447,7 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     err = ConvertReportTlvToJson(static_cast<uint32_t>(aEventHeader.mPath.mEventId), *apData, json);
     VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(eventPathObj, nullptr, err));
     UtfString jsonString(env, json.c_str());
+    
 
     // Create EventState object
     jclass eventStateCls;

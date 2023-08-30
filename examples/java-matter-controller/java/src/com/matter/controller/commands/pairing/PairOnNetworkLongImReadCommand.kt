@@ -66,16 +66,29 @@ class PairOnNetworkLongImReadCommand(
     private fun validateResponse(nodeState: NodeState) {
       val endpointZero =
         requireNotNull(nodeState.getEndpointState(0)) { "Endpoint zero not found." }
-
+      val endpointOne =
+        requireNotNull(nodeState.getEndpointState(0)) { "Endpoint one not found." }
       val basicCluster =
         requireNotNull(endpointZero.getClusterState(CLUSTER_ID_BASIC)) {
           "Basic cluster not found."
         }
 
+      val descriptorCluster =
+      requireNotNull(endpointOne.getClusterState(CLUSTER_ID_DESCRIPTOR)) {
+        "Descriptor cluster not found."
+      }
+
       val localConfigDisabledAttribute =
         requireNotNull(basicCluster.getAttributeState(ATTR_ID_LOCAL_CONFIG_DISABLED)) {
           "No local config disabled attribute found."
         }
+
+      val serverAttribute =
+      requireNotNull(descriptorCluster.getAttributeState(ATTR_ID_SERVER_LIST)) {
+        "No server list attribute found."
+      }
+      
+      println(serverAttribute.getJson().toString());
 
       val startUpEvents =
         requireNotNull(basicCluster.getEventState(EVENT_ID_START_UP)) { "No start up event found." }
@@ -132,6 +145,11 @@ class PairOnNetworkLongImReadCommand(
     val attributePathList =
       listOf(
         ChipAttributePath.newInstance(
+          ChipPathId.forId(/* endpointId= */ 1),
+          ChipPathId.forId(CLUSTER_ID_DESCRIPTOR),
+          ChipPathId.forId(ATTR_ID_SERVER_LIST),
+        ),
+        ChipAttributePath.newInstance(
           ChipPathId.forId(/* endpointId= */ 0),
           ChipPathId.forId(CLUSTER_ID_BASIC),
           ChipPathId.forId(ATTR_ID_LOCAL_CONFIG_DISABLED),
@@ -140,7 +158,62 @@ class PairOnNetworkLongImReadCommand(
           ChipPathId.forId(/* endpointId= */ 0),
           ChipPathId.forId(CLUSTER_ID_BASIC),
           ChipPathId.forId(GLOBAL_ATTRIBUTE_LIST),
-        )
+        ),
+        ChipAttributePath.newInstance(
+          ChipPathId.forId(/* endpointId= */ 0),
+          ChipPathId.forId(CLUSTER_ID_BASIC),
+          ChipPathId.forId(GLOBAL_ATTRIBUTE_LIST),
+        ),
+        ChipAttributePath.newInstance(
+          ChipPathId.forId(/* endpointId= */ 0),
+          ChipPathId.forId(CLUSTER_ID_BASIC),
+          ChipPathId.forId(GLOBAL_ATTRIBUTE_LIST),
+        ),
+        ChipAttributePath.newInstance(
+          ChipPathId.forId(/* endpointId= */ 0),
+          ChipPathId.forId(CLUSTER_ID_BASIC),
+          ChipPathId.forId(GLOBAL_ATTRIBUTE_LIST),
+        ),
+        ChipAttributePath.newInstance(
+          ChipPathId.forId(/* endpointId= */ 0),
+          ChipPathId.forId(CLUSTER_ID_BASIC),
+          ChipPathId.forId(GLOBAL_ATTRIBUTE_LIST),
+        ),
+        ChipAttributePath.newInstance(
+          ChipPathId.forId(/* endpointId= */ 0),
+          ChipPathId.forId(CLUSTER_ID_BASIC),
+          ChipPathId.forId(GLOBAL_ATTRIBUTE_LIST),
+        ),
+        ChipAttributePath.newInstance(
+          ChipPathId.forId(/* endpointId= */ 0),
+          ChipPathId.forId(CLUSTER_ID_BASIC),
+          ChipPathId.forId(GLOBAL_ATTRIBUTE_LIST),
+        ),
+        ChipAttributePath.newInstance(
+          ChipPathId.forId(/* endpointId= */ 0),
+          ChipPathId.forId(CLUSTER_ID_BASIC),
+          ChipPathId.forId(GLOBAL_ATTRIBUTE_LIST),
+        ),
+        ChipAttributePath.newInstance(
+          ChipPathId.forId(/* endpointId= */ 0),
+          ChipPathId.forId(CLUSTER_ID_BASIC),
+          ChipPathId.forId(GLOBAL_ATTRIBUTE_LIST),
+        ),
+        ChipAttributePath.newInstance(
+          ChipPathId.forId(/* endpointId= */ 0),
+          ChipPathId.forId(CLUSTER_ID_BASIC),
+          ChipPathId.forId(GLOBAL_ATTRIBUTE_LIST),
+        ),
+        ChipAttributePath.newInstance(
+          ChipPathId.forId(/* endpointId= */ 0),
+          ChipPathId.forId(CLUSTER_ID_BASIC),
+          ChipPathId.forId(GLOBAL_ATTRIBUTE_LIST),
+        ),
+        ChipAttributePath.newInstance(
+          ChipPathId.forId(/* endpointId= */ 0),
+          ChipPathId.forId(CLUSTER_ID_BASIC),
+          ChipPathId.forId(GLOBAL_ATTRIBUTE_LIST),
+        ),
       )
 
     val eventPathList =
@@ -179,5 +252,7 @@ class PairOnNetworkLongImReadCommand(
     private const val ATTR_ID_LOCAL_CONFIG_DISABLED = 16L
     private const val EVENT_ID_START_UP = 0L
     private const val GLOBAL_ATTRIBUTE_LIST = 65531L
+    private const val CLUSTER_ID_DESCRIPTOR = 0x001dL
+    private const val ATTR_ID_SERVER_LIST = 1L
   }
 }

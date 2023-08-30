@@ -68,6 +68,7 @@ CHIP_ERROR BufferedReadCallback::GenerateListTLV(TLV::ScopedBufferTLVReader & aR
     for (const auto & packetBuffer : mBufferedList)
     {
         totalBufSize += packetBuffer->TotalLength();
+        ChipLogProgress(DataManagement, "Yunhan Debug:Coalescing");
     }
 
     //
