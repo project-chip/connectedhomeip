@@ -37,6 +37,7 @@ declare_args() {
   chip_enable_ble_rs911x = false
 
   wifi_soc = false
+  wifi_soc_common_flash = false
 
   #Disable MQTT by default
   enable_dic = false
@@ -100,11 +101,32 @@ if (silabs_board == "BRD4304A") {
   silabs_family = "efr32mg12"
   silabs_mcu = "EFR32MG12P433F1024GM68"
 } else if (silabs_board == "BRD4325B") {
-  silabs_family = "SiWx917"
-  silabs_mcu = "EFR32MG12P432F1024GL125"
+  silabs_family = "SiWx917-dual"
+  silabs_mcu = "SiWG917M111MGTBA"
   disable_lcd = true
   show_qr_code = false
   wifi_soc = true
+} else if (silabs_board == "BRD4325C") {
+  silabs_family = "SiWx917-common"
+  silabs_mcu = "SiWG917M111MGTBA"
+  disable_lcd = true
+  show_qr_code = false
+  wifi_soc = true
+  wifi_soc_common_flash = true
+} else if (silabs_board == "BRD4325G") {
+  silabs_family = "SiWx917-common"
+  silabs_mcu = "SiWG917M111MGTBA"
+  disable_lcd = true
+  show_qr_code = false
+  wifi_soc = true
+  wifi_soc_common_flash = true
+} else if (silabs_board == "BRD4338A") {
+  silabs_family = "SiWx917-common"
+  silabs_mcu = "SiWG917M111MGTBA"
+  disable_lcd = true
+  show_qr_code = false
+  wifi_soc = true
+  wifi_soc_common_flash = true
 } else if (silabs_board == "BRD4180A") {
   assert(
       false,

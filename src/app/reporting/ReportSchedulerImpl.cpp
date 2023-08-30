@@ -37,6 +37,8 @@ ReportSchedulerImpl::ReportSchedulerImpl(TimerDelegate * aTimerDelegate) : Repor
     VerifyOrDie(nullptr != mTimerDelegate);
 }
 
+void ReportSchedulerImpl::OnTransitionToIdle() {}
+
 /// @brief Method that triggers a report emission on each ReadHandler that is not blocked on its min interval.
 ///        Each read handler that is not blocked is immediately marked dirty so that it will report as soon as possible.
 void ReportSchedulerImpl::OnEnterActiveMode()
@@ -98,9 +100,10 @@ void ReportSchedulerImpl::OnSubscriptionReportSent(ReadHandler * aReadHandler)
     node->SetCanBeSynced(false);
     node->SetIntervalTimeStamps(aReadHandler, now);
     Milliseconds32 newTimeout;
+    // Reset the EngineRunScheduled flag so that the next report is scheduled correctly
+    node->SetEngineRunScheduled(false);
     CalculateNextReportTimeout(newTimeout, node, now);
     ScheduleReport(newTimeout, node, now);
-    node->SetEngineRunScheduled(false);
 }
 
 /// @brief When a ReadHandler is removed, unregister it, which will cancel any scheduled report

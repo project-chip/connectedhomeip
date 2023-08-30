@@ -25,10 +25,19 @@
 #endif
 
 // TODO add includes ?
-extern "C" void RSI_Board_LED_Set(int, bool);
-extern "C" void RSI_Board_LED_Toggle(int);
-extern "C" void RSI_Wakeupsw_config(void);
-extern "C" void RSI_Wakeupsw_config_gpio0(void);
+extern "C" {
+#include "sl_event_handler.h"
+
+void RSI_Board_LED_Set(int, bool);
+void RSI_Board_LED_Toggle(int);
+void RSI_Wakeupsw_config(void);
+void RSI_Wakeupsw_config_gpio0(void);
+#ifdef SI917_RADIO_BOARD_V2
+void RSI_Wakeupsw_config_gpio11(void);
+#endif
+void sl_system_init(void);
+void soc_pll_config(void);
+}
 
 #if SILABS_LOG_ENABLED
 #include "silabs_utils.h"
@@ -44,9 +53,20 @@ SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 CHIP_ERROR SilabsPlatform::Init(void)
 {
     mButtonCallback = nullptr;
-    RSI_Wakeupsw_config();
 
+    sl_system_init();
+
+    // Configuration the clock rate
+    soc_pll_config();
+
+    // BTN0 and BTN1 init
+    RSI_Wakeupsw_config();
+#ifdef SI917_RADIO_BOARD_V2
+    RSI_Wakeupsw_config_gpio11();
+#else
     RSI_Wakeupsw_config_gpio0();
+#endif
+
 #if SILABS_LOG_ENABLED
     silabsInitLog();
 #endif

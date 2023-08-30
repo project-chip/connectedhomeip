@@ -477,7 +477,7 @@ void DeviceCommissioner::Shutdown()
 
     ChipLogDetail(Controller, "Shutting down the commissioner");
 
-    mSetUpCodePairer.CommissionerShuttingDown();
+    mSetUpCodePairer.StopPairing();
 
     // Check to see if pairing in progress before shutting down
     CommissioneeDeviceProxy * device = mDeviceInPASEEstablishment;
@@ -916,12 +916,18 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestation(DeviceProxy * de
 CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(remoteDeviceId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
+
+    bool stopped = mSetUpCodePairer.StopPairing(remoteDeviceId);
 
     CommissioneeDeviceProxy * device = FindCommissioneeDevice(remoteDeviceId);
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
+    if (device != nullptr)
+    {
+        ReleaseCommissioneeDevice(device);
+        stopped = true;
+    }
 
-    ReleaseCommissioneeDevice(device);
-    return CHIP_NO_ERROR;
+    return (stopped) ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR;
 }
 
 CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)

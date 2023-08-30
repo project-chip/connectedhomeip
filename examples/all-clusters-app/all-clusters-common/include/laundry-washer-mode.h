@@ -74,6 +74,8 @@ public:
     ~LaundryWasherModeDelegate() override = default;
 };
 
+ModeBase::Instance * Instance();
+
 void Shutdown();
 
 } // namespace LaundryWasherMode

@@ -468,6 +468,11 @@ public class ChipDeviceController {
     return getCompressedFabricId(deviceControllerPtr);
   }
 
+  /** Get device Controller's Node ID. */
+  public long getControllerNodeId() {
+    return getControllerNodeId(deviceControllerPtr);
+  }
+
   /**
    * Returns the compressed fabric ID based on the given root certificate and node operational
    * credentials.
@@ -575,8 +580,6 @@ public class ChipDeviceController {
    * @brief Auto-Resubscribe to the given attribute path with keepSubscriptions and isFabricFiltered
    * @param SubscriptionEstablishedCallback Callback when a subscribe response has been received and
    *     processed
-   * @param ResubscriptionAttemptCallback Callback when a resubscirption haoppens, the termination
-   *     cause is provided to help inform subsequent re-subscription logic.
    * @param ReportCallback Callback when a report data has been received and processed for the given
    *     paths.
    * @param devicePtr connected device pointer
@@ -614,8 +617,6 @@ public class ChipDeviceController {
    * @brief Auto-Resubscribe to the given event path with keepSubscriptions and isFabricFiltered
    * @param SubscriptionEstablishedCallback Callback when a subscribe response has been received and
    *     processed
-   * @param ResubscriptionAttemptCallback Callback when a resubscirption haoppens, the termination
-   *     cause is provided to help inform subsequent re-subscription logic.
    * @param ReportCallback Callback when a report data has been received and processed for the given
    *     paths.
    * @param devicePtr connected device pointer
@@ -736,10 +737,9 @@ public class ChipDeviceController {
       boolean isFabricFiltered,
       int imTimeoutMs,
       @Nullable Long eventMin) {
-    // TODO: pass resubscriptionAttemptCallback to ReportCallbackJni since jni layer is not ready
-    // for auto-resubscribe
     ReportCallbackJni jniCallback =
-        new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
+        new ReportCallbackJni(
+            subscriptionEstablishedCallback, reportCallback, resubscriptionAttemptCallback);
     subscribe(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
@@ -1160,6 +1160,8 @@ public class ChipDeviceController {
   private native NetworkLocation getNetworkLocation(long deviceControllerPtr, long deviceId);
 
   private native long getCompressedFabricId(long deviceControllerPtr);
+
+  private native long getControllerNodeId(long deviceControllerPtr);
 
   private native void discoverCommissionableNodes(long deviceControllerPtr);
 

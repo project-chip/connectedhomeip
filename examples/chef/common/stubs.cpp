@@ -250,7 +250,4 @@ void emberAfChannelClusterInitCallback(EndpointId endpoint)
 }
 #endif // EMBER_AF_PLUGIN_CHANNEL_SERVER
 
-bool emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId)
-{
-    return true;
-}
+void emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId) {}

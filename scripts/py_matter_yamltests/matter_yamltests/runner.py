@@ -122,9 +122,6 @@ class TestRunnerBase(ABC):
 
 
 class TestRunner(TestRunnerBase):
-    """
-    TestRunner is a default runner implementation.
-    """
     async def start(self):
         return
 
@@ -181,6 +178,10 @@ class TestRunner(TestRunnerBase):
                 elif not config.adapter:
                     hooks.step_start(request)
                     hooks.step_unknown()
+                    continue
+                elif config.pseudo_clusters.is_manual_step(request):
+                    hooks.step_start(request)
+                    await hooks.step_manual()
                     continue
                 else:
                     hooks.step_start(request)

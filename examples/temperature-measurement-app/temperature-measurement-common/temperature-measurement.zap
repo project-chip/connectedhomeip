@@ -33,7 +33,33 @@
   ],
   "endpointTypes": [
     {
+      "id": 1,
       "name": "MA-rootdevice",
+      "deviceTypeRef": {
+        "id": 2,
+        "code": 22,
+        "profileId": 259,
+        "label": "MA-rootdevice",
+        "name": "MA-rootdevice"
+      },
+      "deviceTypes": [
+        {
+          "id": 2,
+          "code": 22,
+          "profileId": 259,
+          "label": "MA-rootdevice",
+          "name": "MA-rootdevice"
+        }
+      ],
+      "deviceTypeRefs": [
+        2
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        22
+      ],
       "deviceTypeName": "MA-rootdevice",
       "deviceTypeCode": 22,
       "deviceTypeProfileId": 259,
@@ -3314,10 +3340,36 @@
       ]
     },
     {
+      "id": 2,
       "name": "MA-tempsensor",
-      "deviceTypeName": null,
-      "deviceTypeCode": null,
-      "deviceTypeProfileId": null,
+      "deviceTypeRef": {
+        "id": 24,
+        "code": 770,
+        "profileId": 259,
+        "label": "MA-tempsensor",
+        "name": "MA-tempsensor"
+      },
+      "deviceTypes": [
+        {
+          "id": 24,
+          "code": 770,
+          "profileId": 259,
+          "label": "MA-tempsensor",
+          "name": "MA-tempsensor"
+        }
+      ],
+      "deviceTypeRefs": [
+        24
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        770
+      ],
+      "deviceTypeName": "MA-tempsensor",
+      "deviceTypeCode": 770,
+      "deviceTypeProfileId": 259,
       "clusters": [
         {
           "name": "Identify",
@@ -4194,18 +4246,14 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 22
+      "networkId": 0
     },
     {
       "endpointTypeName": "MA-tempsensor",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 770
+      "networkId": 0
     }
   ],
   "log": []

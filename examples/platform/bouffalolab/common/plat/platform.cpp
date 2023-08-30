@@ -166,10 +166,6 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 
 CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 {
-#if CONFIG_ENABLE_CHIP_SHELL || PW_RPC_ENABLED
-    uartInit();
-#endif
-
 #if PW_RPC_ENABLED
     PigweedLogger::pw_init();
 #elif CONFIG_ENABLE_CHIP_SHELL

@@ -84,12 +84,16 @@ public:
 
         /// @brief Check if the Node is reportable now, meaning its readhandler was made reportable by attribute dirtying and
         /// handler state, and minimal time interval since last report has elapsed, or the maximal time interval since last
-        /// report has elapsed
+        /// report has elapsed.
+        /// @note If a handler has been flaged as scheduled for engine run, it will be reported regardless of the timestamps. This
+        /// is done to guarantee that the reporting engine will see the handler as reportable if a timer fires, even if it fires
+        /// early.
         /// @param now current time to use for the check, user must ensure to provide a valid time for this to be reliable
         bool IsReportableNow(const Timestamp & now) const
         {
             return (mReadHandler->CanStartReporting() &&
-                    (now >= mMinTimestamp && (mReadHandler->IsDirty() || now >= mMaxTimestamp || CanBeSynced())));
+                    ((now >= mMinTimestamp && (mReadHandler->IsDirty() || now >= mMaxTimestamp || CanBeSynced())) ||
+                     IsEngineRunScheduled()));
         }
 
         bool IsEngineRunScheduled() const { return mFlags.Has(ReadHandlerNodeFlags::EngineRunScheduled); }
@@ -114,8 +118,8 @@ public:
 
         void TimerFired() override
         {
-            mScheduler->ReportTimerCallback();
             SetEngineRunScheduled(true);
+            mScheduler->ReportTimerCallback();
         }
 
         System::Clock::Timestamp GetMinTimestamp() const { return mMinTimestamp; }

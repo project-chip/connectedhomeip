@@ -12,6 +12,11 @@ dependencies:
             - if: "idf_version >=4.3"
 
     espressif/esp_encrypted_img:
-        version: "2.0.3"
+        version: "2.1.0"
+        require: public
         rules:
             - if: "idf_version >=4.4"
+
+    espressif/esp_insights:
+        version: "1.0.1"
+        require: public

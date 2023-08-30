@@ -67,7 +67,7 @@ tests:
 
     #List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
     - label:
-          "Step 4b: TTH reads AttributeList attribute from DUT. 1.The list SHALL
+          "Step 4b: TH reads AttributeList attribute from DUT. 1.The list SHALL
           NOT contain any additional values in the standard or scoped range:
           (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE) 2.The list
           MAY contain values in the Manufacturer Extensible Identifier (MEI)
