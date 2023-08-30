@@ -122,7 +122,7 @@ void AirQualitySensorAttrUpdateHandler::HandleCommand(intptr_t context)
     }
     else if (clusterName.find("Concentration") != std::string::npos)
     {
-        float newValue = static_cast<uint16_t>(self->mJsonValue["NewValue"].asFloat());
+        float newValue = static_cast<float>(self->mJsonValue["NewValue"].asFloat());
         self->OnConcetratorChangeHandler(clusterName, newValue);
     }
     else
@@ -170,5 +170,6 @@ void AirQualitySensorAttrUpdateHandler::OnConcetratorChangeHandler(std::string C
     EmberAfStatus status = setMeasuredValue(endpoint, newValue);
     VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
                    ChipLogError(NotSpecified, "Failed to %s set MeasuredValue attribute", ConcentrationName.c_str()));
-    ChipLogDetail(NotSpecified, "The new %s value: %f", ConcentrationName.c_str(), newValue);
+    //Cast newValue to int since ChipLogDetail doesnt handle Floats
+    ChipLogDetail(NotSpecified, "The new %s value: %d", ConcentrationName.c_str(), (int)newValue);
 }
