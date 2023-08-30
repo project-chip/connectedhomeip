@@ -30,7 +30,7 @@ tests:
         TH1 and TH2 are 2 clients that trust each other
       disabled: true
 
-    - label: "Wait for the alpha device to be retrieved "
+    - label: "Wait for the alpha device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
