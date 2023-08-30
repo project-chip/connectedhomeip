@@ -41,6 +41,8 @@
 #undef ENABLE_REAL_OTA_UPDATE_TESTS
 #endif
 
+#if ENABLE_OTA_TESTS
+
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint16_t kTimeoutWithUpdateInSeconds = 60;
@@ -78,15 +80,12 @@ static const uint16_t kOtaRequestorBasePort = 5542 - 1111;
 @class MTROTARequestorAppRunner;
 
 @interface MTROTAProviderTests : XCTestCase
-#if ENABLE_OTA_TESTS
 - (NSTask *)createTaskForPath:(NSString *)path;
 - (NSString *)createImageFromRawImage:(NSString *)rawImage withVersion:(NSNumber *)version;
 - (MTRDevice *)commissionDeviceWithPayload:(NSString *)payloadString nodeID:(NSNumber *)nodeID;
 - (void)registerRunningRequestor:(MTROTARequestorAppRunner *)requestor;
-#endif // ENABLE_OTA_TESTS
 @end
 
-#if ENABLE_OTA_TESTS
 static unsigned sAppRunnerIndex = 1;
 
 @interface MTROTARequestorAppRunner : NSObject
@@ -173,7 +172,6 @@ static unsigned sAppRunnerIndex = 1;
 }
 
 @end
-#endif // ENABLE_OTA_TESTS
 
 @interface MTROTAProviderTestControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, readonly) XCTestExpectation * expectation;
@@ -582,8 +580,6 @@ static BOOL sNeedsStackShutdown = YES;
     NSMutableSet<NSNumber *> * _commissionedNodeIDs;
     NSMutableSet<MTROTARequestorAppRunner *> * _runningRequestors;
 }
-
-#if ENABLE_OTA_TESTS
 
 + (void)tearDown
 {
@@ -1573,6 +1569,14 @@ static BOOL sNeedsStackShutdown = YES;
     [[self class] shutdownStack];
 }
 
-#endif // ENABLE_OTA_TESTS
-
 @end
+
+#else // ENABLE_OTA_TESTS
+
+@interface MTROTAProviderTests : XCTestCase
+@end
+
+@implementation MTROTAProviderTests
+@end
+
+#endif // ENABLE_OTA_TESTS

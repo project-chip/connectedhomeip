@@ -14,8 +14,10 @@
 #    limitations under the License.
 
 import copy
+import logging
 from dataclasses import dataclass, field
 from enum import Enum, auto
+from typing import Optional
 
 from . import fixes
 from .constraints import get_constraints, is_typed_constraint
@@ -698,6 +700,28 @@ class TestStep:
     def pics(self):
         return self._test.pics
 
+    def _get_last_event_number(self, responses) -> Optional[int]:
+        if not self.is_event:
+            return None
+
+        # find the largest event number in all responses
+        # This iterates over everything (not just last element) since some commands like
+        # `chip-tool any read-all` may return multiple replies
+        event_number = None
+
+        for response in responses:
+            if not isinstance(response, dict):
+                continue
+            received_event_number = response.get('eventNumber')
+
+            if not isinstance(received_event_number, int):
+                continue
+
+            if (event_number is None) or (event_number < received_event_number):
+                event_number = received_event_number
+
+        return event_number
+
     def post_process_response(self, received_responses):
         result = PostProcessResponseResult()
 
@@ -709,6 +733,18 @@ class TestStep:
 
         if self._test.save_response_as:
             self._runtime_config_variable_storage[self._test.save_response_as] = received_responses
+
+        if self.is_event:
+            last_event_number = self._get_last_event_number(received_responses)
+            if last_event_number:
+                if 'LastReceivedEventNumber' in self._runtime_config_variable_storage:
+                    if self._runtime_config_variable_storage['LastReceivedEventNumber'] > last_event_number:
+                        logging.warning(
+                            "Received an older event than expected: received %r < %r",
+                            last_event_number,
+                            self._runtime_config_variable_storage['LastReceivedEventNumber']
+                        )
+                self._runtime_config_variable_storage['LastReceivedEventNumber'] = last_event_number
 
         if self.wait_for is not None:
             self._response_cluster_wait_validation(received_responses, result)
@@ -1161,6 +1197,10 @@ class TestParser:
         self.__apply_legacy_config_if_missing(config, 'endpoint', '')
         self.__apply_legacy_config_if_missing(config, 'cluster', '')
         self.__apply_legacy_config_if_missing(config, 'timeout', 90)
+
+        # These values are default runtime values (non-legacy)
+        self.__apply_legacy_config_if_missing(
+            config, 'LastReceivedEventNumber', 0)
 
     def __apply_legacy_config_if_missing(self, config, key, value):
         if key not in config:
