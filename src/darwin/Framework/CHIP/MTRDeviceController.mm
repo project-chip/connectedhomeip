@@ -114,9 +114,30 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
 @implementation MTRDeviceController
 
-- (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory queue:(dispatch_queue_t)queue
+- (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
+                          queue:(dispatch_queue_t)queue
+                storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
+           storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
+               uniqueIdentifier:(NSUUID *)uniqueIdentifier
 {
     if (self = [super init]) {
+        // Make sure our storage is all set up to work as early as possible,
+        // before we start doing anything else with the controller.
+        _uniqueIdentifier = uniqueIdentifier;
+        if (storageDelegate != nil) {
+            if (storageDelegateQueue == nil) {
+                MTR_LOG_ERROR("storageDelegate provided without storageDelegateQueue");
+                return nil;
+            }
+
+            _controllerDataStore = [[MTRDeviceControllerDataStore alloc] initWithController:self
+                                                                            storageDelegate:storageDelegate
+                                                                       storageDelegateQueue:storageDelegateQueue];
+            if (_controllerDataStore == nil) {
+                return nil;
+            }
+        }
+
         _chipWorkQueue = queue;
         _factory = factory;
         _deviceMapLock = OS_UNFAIR_LOCK_INIT;
@@ -191,8 +212,11 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         // _cppCommissioner, so we're not in a state where we claim to be
         // running but are actually partially shut down.
         _cppCommissioner = nullptr;
-        _storedFabricIndex = chip::kUndefinedFabricIndex;
         commissionerToShutDown->Shutdown();
+        // Don't clear out our fabric index association until controller
+        // shutdown completes, in case it wants to write to storage as it
+        // shuts down.
+        _storedFabricIndex = chip::kUndefinedFabricIndex;
         delete commissionerToShutDown;
         if (_operationalCredentialsDelegate != nil) {
             _operationalCredentialsDelegate->SetDeviceCommissioner(nullptr);
@@ -365,6 +389,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         // bring-up.
         commissionerParams.removeFromFabricTableOnShutdown = false;
         commissionerParams.deviceAttestationVerifier = _factory.deviceAttestationVerifier;
+        commissionerParams.permitMultiControllerFabrics = startupParams.allowMultipleControllersPerFabric;
 
         auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
 
