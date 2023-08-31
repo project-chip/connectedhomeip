@@ -20,18 +20,82 @@
 #include "esp_netif.h"
 #include "esp_netif_types.h"
 #include "esp_openthread.h"
+#include "esp_openthread_cli.h"
 #include "esp_openthread_lock.h"
 #include "esp_openthread_netif_glue.h"
 #include "esp_openthread_types.h"
 #include "esp_vfs_eventfd.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "openthread/cli.h"
 #include "openthread/instance.h"
 #include "openthread/logging.h"
 #include "openthread/tasklet.h"
 
 static esp_netif_t * openthread_netif                       = NULL;
 static esp_openthread_platform_config_t * s_platform_config = NULL;
+static TaskHandle_t cli_transmit_task                       = NULL;
+static QueueHandle_t cli_transmit_task_queue                = NULL;
+
+QueueHandle_t get_cli_transmit_task_queue(void)
+{
+    return cli_transmit_task_queue;
+}
+
+static int cli_output_callback(void * context, const char * format, va_list args)
+{
+    int ret = 0;
+    char prompt_check[3];
+    vsnprintf(prompt_check, sizeof(prompt_check), format, args);
+    if (!strncmp(prompt_check, "> ", sizeof(prompt_check)) && cli_transmit_task)
+    {
+        xTaskNotifyGive(cli_transmit_task);
+    }
+    else
+    {
+        ret = vprintf(format, args);
+    }
+    return ret;
+}
+
+static void esp_openthread_matter_cli_init(void)
+{
+    otCliInit(esp_openthread_get_instance(), cli_output_callback, NULL);
+}
+
+static void cli_transmit_worker(void * context)
+{
+    cli_transmit_task_queue = xQueueCreate(8, sizeof(char **));
+    if (!cli_transmit_task_queue)
+    {
+        return;
+    }
+    char * command_line = NULL;
+    while (true)
+    {
+        if (xQueueReceive(cli_transmit_task_queue, &command_line, portMAX_DELAY) == pdTRUE)
+        {
+            if (command_line)
+            {
+                esp_openthread_cli_input(command_line);
+                free(command_line);
+            }
+            else
+            {
+                continue;
+            }
+            xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
+        }
+    }
+    vQueueDelete(cli_transmit_task_queue);
+    vTaskDelete(NULL);
+}
+
+static esp_err_t cli_command_transmit_task(void)
+{
+    xTaskCreate(cli_transmit_worker, "ocli_trans", 3072, xTaskGetCurrentTaskHandle(), 4, &cli_transmit_task);
+    return ESP_OK;
+}
 
 static esp_netif_t * init_openthread_netif(const esp_openthread_platform_config_t * config)
 {
@@ -84,6 +148,10 @@ esp_err_t openthread_init_stack(void)
     assert(s_platform_config);
     // Initialize the OpenThread stack
     ESP_ERROR_CHECK(esp_openthread_init(s_platform_config));
+#if CONFIG_OPENTHREAD_CLI
+    esp_openthread_matter_cli_init();
+    cli_command_transmit_task();
+#endif
     // Initialize the esp_netif bindings
     openthread_netif = init_openthread_netif(s_platform_config);
     free(s_platform_config);
