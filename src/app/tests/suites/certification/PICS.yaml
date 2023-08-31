@@ -2666,7 +2666,7 @@ PICS:
     #
     - label: "Does the device implement simulation of a Not Fully Locked State?"
       id: DRLK.S.M.SimulateNotFullyLocked
-    
+
     - label: "Does the device implement detection of a LockJammed State?"
       id: DRLK.S.M.DetectLockJammed
 
