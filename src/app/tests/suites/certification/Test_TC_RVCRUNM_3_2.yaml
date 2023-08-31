@@ -26,7 +26,7 @@ config:
 tests:
     - label: "Precondition"
       verification: |
-          This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
+          !RVCRUNM.S.F00(DEPONOFF) | OnOff cluster’s StartUpOnOff attribute is NULL | StartUpOnOff is 0 | OnMode is NULL
       disabled: true
 
     - label: "Note"
@@ -116,6 +116,13 @@ tests:
           [1690179737.189576][14110:14112] CHIP:DMG:                         {
           [1690179737.189592][14110:14112] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1690179737.189607][14110:14112] CHIP:DMG:                         },
+
+          ./chip-tool  rvcrunmode read start-up-mode 1 1
+
+          On TH(chip-tool), Verify that StartUpMode attribute value is 0 and below is the sample log provided for the raspi platform
+
+          [1692181154.909850][3899:3901] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0054 Attribute 0x0000_0002 DataVersion: 1431406601
+          [1692181154.909907][3899:3901] CHIP:TOO:   StartUpMode: 0
       disabled: true
 
     - label: "Step 5: TH reads from the DUT the CurrentMode attribute."

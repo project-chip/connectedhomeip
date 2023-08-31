@@ -1,0 +1,45 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Recent Fail Summary
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+concurrency:
+    group: ${{ github.workflow }}
+
+jobs:
+  list_workflows:
+    name: Summarize Recent Workflow Failures
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: pip install pandas python-slugify
+      - name: Run Summarization Script
+        run: python scripts/tools/summarize_fail.py
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Upload Logs
+        uses: actions/upload-artifact@v3
+        with:
+          name: workflow-fail-summary
+          path: |
+            run_list.json
+            recent_fails.csv
+            recent_fails_frequency.csv
+            recent_fails_logs
+          retention-days: 5
+        

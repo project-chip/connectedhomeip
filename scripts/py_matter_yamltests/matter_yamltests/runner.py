@@ -16,6 +16,7 @@
 import asyncio
 import time
 from abc import ABC, abstractmethod
+from asyncio import CancelledError
 from dataclasses import dataclass, field
 
 from .adapter import TestAdapter
@@ -121,9 +122,6 @@ class TestRunnerBase(ABC):
 
 
 class TestRunner(TestRunnerBase):
-    """
-    TestRunner is a default runner implementation.
-    """
     async def start(self):
         return
 
@@ -144,7 +142,7 @@ class TestRunner(TestRunnerBase):
                 continue
 
             result = await self._run_with_timeout(parser, runner_config)
-            if isinstance(result, Exception):
+            if isinstance(result, Exception) or isinstance(result, CancelledError):
                 raise (result)
             elif not result:
                 return False
@@ -160,7 +158,7 @@ class TestRunner(TestRunnerBase):
         try:
             await self.start()
             status = await asyncio.wait_for(self._run(parser, config), parser.timeout)
-        except Exception as exception:
+        except (Exception, CancelledError) as exception:
             status = exception
         finally:
             await self.stop()
@@ -180,6 +178,10 @@ class TestRunner(TestRunnerBase):
                 elif not config.adapter:
                     hooks.step_start(request)
                     hooks.step_unknown()
+                    continue
+                elif config.pseudo_clusters.is_manual_step(request):
+                    hooks.step_start(request)
+                    await hooks.step_manual()
                     continue
                 else:
                     hooks.step_start(request)

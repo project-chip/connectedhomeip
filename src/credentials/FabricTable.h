@@ -712,7 +712,7 @@ public:
      * @param fabricIndex - Existing FabricIndex for which a new keypair must be made available. If it
      *                      doesn't have a value, the key will be marked pending for the next available
      *                      fabric index that would apply for `AddNewFabric`.
-     * @param outputCsr - Buffer to contain the CSR. Must be at least `kMAX_CSR_Length` large.
+     * @param outputCsr - Buffer to contain the CSR. Must be at least `kMIN_CSR_Buffer_Size` large.
      *
      * @retval CHIP_NO_ERROR on success
      * @retval CHIP_ERROR_BUFFER_TOO_SMALL if `outputCsr` buffer is too small

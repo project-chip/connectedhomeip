@@ -72,6 +72,8 @@ def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: st
               help='Path to local application to use, omit to use external apps.')
 @click.option("--factoryreset", is_flag=True,
               help='Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests.')
+@click.option("--factoryreset-app-only", is_flag=True,
+              help='Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests, but not the controller config')
 @click.option("--app-args", type=str, default='',
               help='The extra arguments passed to the device. Can use placholders like {SCRIPT_BASE_NAME}')
 @click.option("--script", type=click.Path(exists=True), default=os.path.join(DEFAULT_CHIP_ROOT,
@@ -85,11 +87,11 @@ def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: st
               help='Script arguments, can use placeholders like {SCRIPT_BASE_NAME}.')
 @click.option("--script-gdb", is_flag=True,
               help='Run script through gdb')
-def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: str, script_gdb: bool):
+def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: str, script: str, script_args: str, script_gdb: bool):
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
 
-    if factoryreset:
+    if factoryreset or factoryreset_app_only:
         # Remove native app config
         retcode = subprocess.call("rm -rf /tmp/chip* /tmp/repl*", shell=True)
         if retcode != 0:
@@ -107,6 +109,7 @@ def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: 
             if retcode != 0:
                 raise Exception("Failed to remove %s for factory reset." % kvs_path_to_remove)
 
+    if factoryreset:
         # Remove Python test admin storage if provided
         storage_match = re.search(r"--storage-path (?P<storage_path>[^ ]+)", script_args)
         if storage_match:

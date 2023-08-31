@@ -49,7 +49,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 3a: TH reads the FeatureMap attribute from the DUT"
+    - label: "Step 3: TH reads the FeatureMap attribute from the DUT"
       PICS: MOD.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -58,7 +58,7 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Step 3b: TH reads the FeatureMap attribute from the DUT"
+    - label: "Step 3: TH reads the FeatureMap attribute from the DUT"
       PICS: " !MOD.S.F00 "
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -107,7 +107,7 @@ tests:
               type: list
               contains: [5]
 
-    - label: "Read the global attribute: EventList"
+    - label: "Step 5: TH reads from the DUT the EventList attribute"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
@@ -116,7 +116,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 5: Read the global attribute: AcceptedCommandList"
+    - label: "Step 6: TH reads AcceptedCommandList attribute from DUT"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -124,7 +124,7 @@ tests:
               type: list
               contains: [0]
 
-    - label: "Step 6: Read the global attribute: GeneratedCommandList"
+    - label: "Step 7: TH reads GeneratedCommandList attribute from DUT"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

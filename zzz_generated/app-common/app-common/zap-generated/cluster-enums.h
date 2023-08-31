@@ -93,7 +93,10 @@ namespace Scenes {
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kSceneNames = 0x1,
+    kSceneNames   = 0x1,
+    kExplicit     = 0x2,
+    kTableSize    = 0x4,
+    kFabricScenes = 0x8,
 };
 
 // Bitmap for ScenesCopyMode
@@ -541,6 +544,12 @@ enum class HourFormatEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kCalendarFormat = 0x1,
 };
 } // namespace TimeFormatLocalization
 

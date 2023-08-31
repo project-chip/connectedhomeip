@@ -152,6 +152,9 @@ server cluster Groups = 4 {
 server cluster Scenes = 5 {
   bitmap Feature : BITMAP32 {
     kSceneNames = 0x1;
+    kExplicit = 0x2;
+    kTableSize = 0x4;
+    kFabricScenes = 0x8;
   }
 
   bitmap ScenesCopyMode : BITMAP8 {
@@ -555,6 +558,7 @@ server cluster Descriptor = 29 {
   readonly attribute CLUSTER_ID serverList[] = 1;
   readonly attribute CLUSTER_ID clientList[] = 2;
   readonly attribute ENDPOINT_NO partsList[] = 3;
+  readonly attribute SemanticTagStruct tagList[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1019,6 +1023,10 @@ server cluster TimeFormatLocalization = 44 {
     k24hr = 1;
   }
 
+  bitmap Feature : BITMAP32 {
+    kCalendarFormat = 0x1;
+  }
+
   attribute HourFormatEnum hourFormat = 0;
   attribute CalendarTypeEnum activeCalendarType = 1;
   readonly attribute CalendarTypeEnum supportedCalendarTypes[] = 2;
@@ -1046,6 +1054,17 @@ server cluster UnitLocalization = 45 {
   }
 
   attribute TempUnitEnum temperatureUnit = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** This cluster is used to describe the configuration and capabilities of a Device's power system. */
+server cluster PowerSourceConfiguration = 46 {
+  readonly attribute INT8U sources[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2587,6 +2606,32 @@ server cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
   }
 
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+}
+
+/** This cluster supports remotely monitoring and controling the different typs of functionality available to a washing device, such as a washing machine. */
+server cluster LaundryWasherControls = 83 {
+  enum NumberOfRinsesEnum : ENUM8 {
+    kNone = 0;
+    kNormal = 1;
+    kExtra = 2;
+    kMax = 3;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kSpin = 0x1;
+    kRinse = 0x2;
+  }
+
+  readonly attribute CHAR_STRING spinSpeeds[] = 0;
+  attribute nullable int8u spinSpeedCurrent = 1;
+  attribute NumberOfRinsesEnum numberOfRinses = 2;
+  readonly attribute NumberOfRinsesEnum supportedRinses[] = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
@@ -6068,6 +6113,7 @@ server cluster FaultInjection = 4294048774 {
 
 endpoint 0 {
   device type ma_rootdevice = 22, version 1;
+  device type ma_powersource = 17, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -6089,8 +6135,13 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster Binding {
@@ -6107,6 +6158,10 @@ endpoint 0 {
     callback attribute subjectsPerAccessControlEntry default = 4;
     callback attribute targetsPerAccessControlEntry default = 3;
     callback attribute accessControlEntriesPerFabric default = 4;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
@@ -6135,6 +6190,10 @@ endpoint 0 {
     callback attribute uniqueID;
     callback attribute capabilityMinima;
     callback attribute productAppearance;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
   }
@@ -6154,6 +6213,10 @@ endpoint 0 {
   server cluster LocalizationConfiguration {
     persist  attribute activeLocale default = "en-US";
     callback attribute supportedLocales;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -6164,14 +6227,25 @@ endpoint 0 {
     callback attribute supportedCalendarTypes;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster UnitLocalization {
     persist  attribute temperatureUnit default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0x1;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster PowerSourceConfiguration {
+    callback attribute sources;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6183,6 +6257,10 @@ endpoint 0 {
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
     callback attribute endpointList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 2;
   }
@@ -6193,6 +6271,10 @@ endpoint 0 {
     callback attribute regulatoryConfig default = 0;
     callback attribute locationCapability default = 0;
     callback attribute supportsConcurrentConnection default = 1;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -6206,6 +6288,10 @@ endpoint 0 {
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
   }
@@ -6231,6 +6317,7 @@ endpoint 0 {
     callback attribute testEventTriggersEnabled;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -6378,6 +6465,10 @@ endpoint 0 {
     callback attribute windowStatus default = 0;
     callback attribute adminFabricIndex default = 1;
     callback attribute adminVendorId default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -6389,6 +6480,10 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -6398,6 +6493,10 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -6445,6 +6544,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
+  device type ma_powersource = 17, version 1;
   device type ma_onofflight = 256, version 1;
 
   binding cluster OnOff;
@@ -6452,12 +6552,20 @@ endpoint 1 {
   server cluster Identify {
     ram      attribute identifyTime default = 0x0000;
     ram      attribute identifyType default = 0x0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
   }
 
   server cluster Groups {
     ram      attribute nameSupport;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
   }
@@ -6471,6 +6579,10 @@ endpoint 1 {
     ram      attribute lastConfiguredBy;
     ram      attribute sceneTableSize;
     callback attribute remainingCapacity;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 5;
   }
@@ -6481,6 +6593,10 @@ endpoint 1 {
     ram      attribute onTime default = 0x0000;
     ram      attribute offWaitTime default = 0x0000;
     persist  attribute startUpOnOff default = 0xFF;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0x0001;
     ram      attribute clusterRevision default = 5;
   }
@@ -6524,8 +6640,13 @@ endpoint 1 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster Binding {
@@ -6551,6 +6672,10 @@ endpoint 1 {
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
     callback attribute endpointList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 2;
   }
@@ -6621,6 +6746,19 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 
+  server cluster LaundryWasherControls {
+    callback attribute spinSpeeds;
+    ram      attribute spinSpeedCurrent;
+    ram      attribute numberOfRinses;
+    callback attribute supportedRinses;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
   server cluster RvcRunMode {
     callback attribute supportedModes;
     callback attribute currentMode;
@@ -6680,7 +6818,7 @@ endpoint 1 {
   }
 
   server cluster AirQuality {
-    ram      attribute airQuality default = 0;
+    callback attribute airQuality default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -6916,7 +7054,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0023;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
   }
 
   server cluster FanControl {
@@ -6933,7 +7071,7 @@ endpoint 1 {
     ram      attribute windSetting default = 0x00;
     ram      attribute airflowDirection default = 0;
     ram      attribute featureMap default = 0x3F;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 4;
   }
 
   server cluster ThermostatUserInterfaceConfiguration {
@@ -6998,7 +7136,7 @@ endpoint 1 {
     ram      attribute coupleColorTempToLevelMinMireds;
     persist  attribute startUpColorTemperatureMireds;
     ram      attribute featureMap default = 0x1F;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
   }
 
   server cluster BallastConfiguration {
@@ -7077,17 +7215,17 @@ endpoint 1 {
   }
 
   server cluster CarbonMonoxideConcentrationMeasurement {
-    ram      attribute measuredValue default = 401;
-    ram      attribute minMeasuredValue default = 50;
-    ram      attribute maxMeasuredValue default = 1500;
-    ram      attribute peakMeasuredValue default = 511;
-    ram      attribute peakMeasuredValueWindow default = 3600;
-    ram      attribute averageMeasuredValue default = 213;
-    ram      attribute averageMeasuredValueWindow default = 3600;
-    ram      attribute uncertainty default = 10;
-    ram      attribute measurementUnit default = 1;
-    ram      attribute measurementMedium default = 0;
-    ram      attribute levelValue default = 3;
+    callback attribute measuredValue default = 401;
+    callback attribute minMeasuredValue default = 50;
+    callback attribute maxMeasuredValue default = 1500;
+    callback attribute peakMeasuredValue default = 511;
+    callback attribute peakMeasuredValueWindow default = 3600;
+    callback attribute averageMeasuredValue default = 213;
+    callback attribute averageMeasuredValueWindow default = 3600;
+    callback attribute uncertainty default = 10;
+    callback attribute measurementUnit default = 1;
+    callback attribute measurementMedium default = 0;
+    callback attribute levelValue default = 3;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -7096,17 +7234,17 @@ endpoint 1 {
   }
 
   server cluster CarbonDioxideConcentrationMeasurement {
-    ram      attribute measuredValue default = 458;
-    ram      attribute minMeasuredValue default = 300;
-    ram      attribute maxMeasuredValue default = 2000;
-    ram      attribute peakMeasuredValue default = 523;
-    ram      attribute peakMeasuredValueWindow default = 3600;
-    ram      attribute averageMeasuredValue default = 421;
-    ram      attribute averageMeasuredValueWindow default = 3600;
-    ram      attribute uncertainty default = 5;
-    ram      attribute measurementUnit default = 0;
-    ram      attribute measurementMedium default = 0;
-    ram      attribute levelValue default = 1;
+    callback attribute measuredValue default = 458;
+    callback attribute minMeasuredValue default = 300;
+    callback attribute maxMeasuredValue default = 2000;
+    callback attribute peakMeasuredValue default = 523;
+    callback attribute peakMeasuredValueWindow default = 3600;
+    callback attribute averageMeasuredValue default = 421;
+    callback attribute averageMeasuredValueWindow default = 3600;
+    callback attribute uncertainty default = 5;
+    callback attribute measurementUnit default = 0;
+    callback attribute measurementMedium default = 0;
+    callback attribute levelValue default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -7115,17 +7253,17 @@ endpoint 1 {
   }
 
   server cluster NitrogenDioxideConcentrationMeasurement {
-    ram      attribute measuredValue default = 3;
-    ram      attribute minMeasuredValue default = 1;
-    ram      attribute maxMeasuredValue default = 150;
-    ram      attribute peakMeasuredValue default = 3;
-    ram      attribute peakMeasuredValueWindow default = 120;
-    ram      attribute averageMeasuredValue default = 3;
-    ram      attribute averageMeasuredValueWindow default = 120;
-    ram      attribute uncertainty default = 1;
-    ram      attribute measurementUnit default = 1;
-    ram      attribute measurementMedium default = 0;
-    ram      attribute levelValue default = 1;
+    callback attribute measuredValue default = 3;
+    callback attribute minMeasuredValue default = 1;
+    callback attribute maxMeasuredValue default = 150;
+    callback attribute peakMeasuredValue default = 3;
+    callback attribute peakMeasuredValueWindow default = 120;
+    callback attribute averageMeasuredValue default = 3;
+    callback attribute averageMeasuredValueWindow default = 120;
+    callback attribute uncertainty default = 1;
+    callback attribute measurementUnit default = 1;
+    callback attribute measurementMedium default = 0;
+    callback attribute levelValue default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -7134,17 +7272,17 @@ endpoint 1 {
   }
 
   server cluster OzoneConcentrationMeasurement {
-    ram      attribute measuredValue default = 10;
-    ram      attribute minMeasuredValue default = 3;
-    ram      attribute maxMeasuredValue default = 300;
-    ram      attribute peakMeasuredValue default = 50;
-    ram      attribute peakMeasuredValueWindow default = 3600;
-    ram      attribute averageMeasuredValue default = 20;
-    ram      attribute averageMeasuredValueWindow default = 3600;
-    ram      attribute uncertainty default = 0;
-    ram      attribute measurementUnit default = 0;
-    ram      attribute measurementMedium default = 0;
-    ram      attribute levelValue default = 1;
+    callback attribute measuredValue default = 10;
+    callback attribute minMeasuredValue default = 3;
+    callback attribute maxMeasuredValue default = 300;
+    callback attribute peakMeasuredValue default = 50;
+    callback attribute peakMeasuredValueWindow default = 3600;
+    callback attribute averageMeasuredValue default = 20;
+    callback attribute averageMeasuredValueWindow default = 3600;
+    callback attribute uncertainty default = 0;
+    callback attribute measurementUnit default = 0;
+    callback attribute measurementMedium default = 0;
+    callback attribute levelValue default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -7153,17 +7291,17 @@ endpoint 1 {
   }
 
   server cluster Pm25ConcentrationMeasurement {
-    ram      attribute measuredValue default = 42;
-    ram      attribute minMeasuredValue default = 1;
-    ram      attribute maxMeasuredValue default = 400;
-    ram      attribute peakMeasuredValue default = 90;
-    ram      attribute peakMeasuredValueWindow default = 3600;
-    ram      attribute averageMeasuredValue default = 35;
-    ram      attribute averageMeasuredValueWindow default = 3600;
-    ram      attribute uncertainty default = 4;
-    ram      attribute measurementUnit default = 4;
-    ram      attribute measurementMedium default = 0;
-    ram      attribute levelValue default = 2;
+    callback attribute measuredValue default = 42;
+    callback attribute minMeasuredValue default = 1;
+    callback attribute maxMeasuredValue default = 400;
+    callback attribute peakMeasuredValue default = 90;
+    callback attribute peakMeasuredValueWindow default = 3600;
+    callback attribute averageMeasuredValue default = 35;
+    callback attribute averageMeasuredValueWindow default = 3600;
+    callback attribute uncertainty default = 4;
+    callback attribute measurementUnit default = 4;
+    callback attribute measurementMedium default = 0;
+    callback attribute levelValue default = 2;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -7172,17 +7310,17 @@ endpoint 1 {
   }
 
   server cluster FormaldehydeConcentrationMeasurement {
-    ram      attribute measuredValue default = 10;
-    ram      attribute minMeasuredValue default = 0;
-    ram      attribute maxMeasuredValue default = 200;
-    ram      attribute peakMeasuredValue default = 10;
-    ram      attribute peakMeasuredValueWindow default = 7200;
-    ram      attribute averageMeasuredValue default = 2;
-    ram      attribute averageMeasuredValueWindow default = 7200;
-    ram      attribute uncertainty default = 0;
-    ram      attribute measurementUnit default = 3;
-    ram      attribute measurementMedium default = 0;
-    ram      attribute levelValue default = 2;
+    callback attribute measuredValue default = 10;
+    callback attribute minMeasuredValue default = 0;
+    callback attribute maxMeasuredValue default = 200;
+    callback attribute peakMeasuredValue default = 10;
+    callback attribute peakMeasuredValueWindow default = 7200;
+    callback attribute averageMeasuredValue default = 2;
+    callback attribute averageMeasuredValueWindow default = 7200;
+    callback attribute uncertainty default = 0;
+    callback attribute measurementUnit default = 3;
+    callback attribute measurementMedium default = 0;
+    callback attribute levelValue default = 2;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -7191,17 +7329,17 @@ endpoint 1 {
   }
 
   server cluster Pm1ConcentrationMeasurement {
-    ram      attribute measuredValue default = 39;
-    ram      attribute minMeasuredValue default = 1;
-    ram      attribute maxMeasuredValue default = 400;
-    ram      attribute peakMeasuredValue default = 70;
-    ram      attribute peakMeasuredValueWindow default = 3600;
-    ram      attribute averageMeasuredValue default = 41;
-    ram      attribute averageMeasuredValueWindow default = 3600;
-    ram      attribute uncertainty default = 4;
-    ram      attribute measurementUnit default = 4;
-    ram      attribute measurementMedium default = 0;
-    ram      attribute levelValue default = 1;
+    callback attribute measuredValue default = 39;
+    callback attribute minMeasuredValue default = 1;
+    callback attribute maxMeasuredValue default = 400;
+    callback attribute peakMeasuredValue default = 70;
+    callback attribute peakMeasuredValueWindow default = 3600;
+    callback attribute averageMeasuredValue default = 41;
+    callback attribute averageMeasuredValueWindow default = 3600;
+    callback attribute uncertainty default = 4;
+    callback attribute measurementUnit default = 4;
+    callback attribute measurementMedium default = 0;
+    callback attribute levelValue default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -7210,17 +7348,17 @@ endpoint 1 {
   }
 
   server cluster Pm10ConcentrationMeasurement {
-    ram      attribute measuredValue default = 7;
-    ram      attribute minMeasuredValue default = 2;
-    ram      attribute maxMeasuredValue default = 400;
-    ram      attribute peakMeasuredValue default = 49;
-    ram      attribute peakMeasuredValueWindow default = 3600;
-    ram      attribute averageMeasuredValue default = 43;
-    ram      attribute averageMeasuredValueWindow default = 3600;
-    ram      attribute uncertainty default = 2;
-    ram      attribute measurementUnit default = 4;
-    ram      attribute measurementMedium default = 0;
-    ram      attribute levelValue default = 1;
+    callback attribute measuredValue default = 7;
+    callback attribute minMeasuredValue default = 2;
+    callback attribute maxMeasuredValue default = 400;
+    callback attribute peakMeasuredValue default = 49;
+    callback attribute peakMeasuredValueWindow default = 3600;
+    callback attribute averageMeasuredValue default = 43;
+    callback attribute averageMeasuredValueWindow default = 3600;
+    callback attribute uncertainty default = 2;
+    callback attribute measurementUnit default = 4;
+    callback attribute measurementMedium default = 0;
+    callback attribute levelValue default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -7229,17 +7367,17 @@ endpoint 1 {
   }
 
   server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement {
-    ram      attribute measuredValue default = 5;
-    ram      attribute minMeasuredValue default = 1;
-    ram      attribute maxMeasuredValue default = 100;
-    ram      attribute peakMeasuredValue default = 8;
-    ram      attribute peakMeasuredValueWindow default = 3600;
-    ram      attribute averageMeasuredValue default = 2;
-    ram      attribute averageMeasuredValueWindow default = 3600;
-    ram      attribute uncertainty default = 1;
-    ram      attribute measurementUnit default = 1;
-    ram      attribute measurementMedium default = 0;
-    ram      attribute levelValue default = 1;
+    callback attribute measuredValue default = 5;
+    callback attribute minMeasuredValue default = 1;
+    callback attribute maxMeasuredValue default = 100;
+    callback attribute peakMeasuredValue default = 8;
+    callback attribute peakMeasuredValueWindow default = 3600;
+    callback attribute averageMeasuredValue default = 2;
+    callback attribute averageMeasuredValueWindow default = 3600;
+    callback attribute uncertainty default = 1;
+    callback attribute measurementUnit default = 1;
+    callback attribute measurementMedium default = 0;
+    callback attribute levelValue default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -7248,17 +7386,17 @@ endpoint 1 {
   }
 
   server cluster RadonConcentrationMeasurement {
-    ram      attribute measuredValue default = 10;
-    ram      attribute minMeasuredValue default = 5;
-    ram      attribute maxMeasuredValue default = 100;
-    ram      attribute peakMeasuredValue default = 36;
-    ram      attribute peakMeasuredValueWindow default = 3600;
-    ram      attribute averageMeasuredValue default = 20;
-    ram      attribute averageMeasuredValueWindow default = 3600;
-    ram      attribute uncertainty default = 0;
-    ram      attribute measurementUnit default = 0;
-    ram      attribute measurementMedium default = 0;
-    ram      attribute levelValue default = 3;
+    callback attribute measuredValue default = 10;
+    callback attribute minMeasuredValue default = 5;
+    callback attribute maxMeasuredValue default = 100;
+    callback attribute peakMeasuredValue default = 36;
+    callback attribute peakMeasuredValueWindow default = 3600;
+    callback attribute averageMeasuredValue default = 20;
+    callback attribute averageMeasuredValueWindow default = 3600;
+    callback attribute uncertainty default = 0;
+    callback attribute measurementUnit default = 0;
+    callback attribute measurementMedium default = 0;
+    callback attribute levelValue default = 3;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -7455,13 +7593,45 @@ endpoint 1 {
   }
 }
 endpoint 2 {
+  device type ma_powersource = 17, version 1;
   device type ma_onofflight = 256, version 1;
 
 
-  server cluster Groups {
-    ram      attribute nameSupport;
+  server cluster Identify {
+    ram      attribute identifyTime default = 0x0000;
+    ram      attribute identifyType default = 0x00;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster Groups {
+    ram      attribute nameSupport;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster Scenes {
+    callback attribute sceneCount default = 0x00;
+    ram      attribute currentScene default = 0x00;
+    ram      attribute currentGroup default = 0x0000;
+    ram      attribute sceneValid default = 0x00;
+    ram      attribute nameSupport;
+    ram      attribute sceneTableSize;
+    callback attribute remainingCapacity;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster OnOff {
@@ -7470,6 +7640,10 @@ endpoint 2 {
     ram      attribute onTime default = 0;
     ram      attribute offWaitTime default = 0;
     ram      attribute startUpOnOff;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0x0000;
     ram      attribute clusterRevision default = 5;
   }
@@ -7479,8 +7653,13 @@ endpoint 2 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster PowerSource {
@@ -7491,6 +7670,10 @@ endpoint 2 {
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
     callback attribute endpointList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 2;
   }
@@ -7513,7 +7696,7 @@ endpoint 65534 {
     callback attribute clientList;
     callback attribute partsList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster NetworkCommissioning {

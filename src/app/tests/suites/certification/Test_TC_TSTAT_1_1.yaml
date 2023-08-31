@@ -31,27 +31,13 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Issue: https://github.com/project-chip/connectedhomeip/issues/26601
     - label: "Step 2: Read the global attribute: ClusterRevision"
-      verification: |
-          ./chip-tool thermostat read cluster-revision 1 1
-
-          On TH(chip-tool), verify that DUT responsds ClusterRevision attribute  value as 6
-
-          [1654082369.006076][7829:7834] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_FFFD DataVersion: 2954689426
-          [1654082369.006146][7829:7834] CHIP:TOO:   ClusterRevision: 5
-          [1654082369.006241][7829:7834] CHIP:EM: Sending Standalone Ack for MessageCounter:4310083 on exchange 63290i
-
-          This log and comment are as per the latest sdk but the vaue is wrong  https://github.com/project-chip/connectedhomeip/issues/26601
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 6
+          constraints:
+              type: int16u
 
     - label: "Step 3a: Read the global attribute: FeatureMap"
       PICS:
@@ -618,25 +604,11 @@ tests:
               type: list
               contains: [1]
 
-    #Manufacturer specific event IDs check not possible
-    - label:
-          "Step 7: Read EventList attribute from the DUT.For this cluster the
-          list is usually empty but it can contain manufacturer specific event
-          IDs."
-      verification: |
-          ./chip-tool thermostat read event-list 1 1
-           On TH(chip-tool), Verify that the DUT response provides a list of supported events. For this cluster the list is usually empty but it can contain manufacturer specific event IDs.
-           [1676466998.893033][29061:29063] CHIP:DMG: }
-           [1676466998.893114][29061:29063] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_FFFA DataVersion: 2603128677
-           [1676466998.893155][29061:29063] CHIP:TOO:   EventList: 0 entries
-           [1676466998.893209][29061:29063] CHIP:EM: <<< [E:35662i S:59401 M:190799889 (Ack:191492950)] (S) Msg TX to 1:0000000000000001 [3F11] --- Type 0000:10 (SecureChannel:StandaloneAck)
-           [1676466998.893221][29061:29063] CHIP:IN: (S) Sending msg 190799889 on secure session with LSID: 59401
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Step 7: Read EventList attribute from the DUT."
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list

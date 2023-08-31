@@ -152,16 +152,17 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 6a: Read the global attribute: AcceptedCommandList"
+    - label: "Step 6: Read the global attribute: AcceptedCommandList"
+      PICS: "!ACFREMON.S.C00.Rsp"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
+          value: []
           constraints:
               type: list
-              contains: []
 
     - label:
-          "Step 6b: Read the optional command (ResetCondition) in
+          "Step 6: Read the optional command (ResetCondition) in
           AcceptedCommandList"
       PICS: ACFREMON.S.C00.Rsp
       command: "readAttribute"

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: xx.1.1. [TC-OPSTATE-1.1] Global attributes with server as DUT
+name: 201.1.1. [TC-OPSTATE-1.1] Global Attributes with DUT as Server
 
 PICS:
     - OPSTATE.S
@@ -98,7 +98,7 @@ tests:
               contains: [0x01]
 
     - label: "Step 6a: Read the optional command(Start) in AcceptedCommandList"
-      PICS: OPSTATE.S.C02
+      PICS: OPSTATE.S.C02.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -107,7 +107,7 @@ tests:
               contains: [1, 2]
 
     - label: "Step 6b: Read the optional command(Stop) in AcceptedCommandList"
-      PICS: OPSTATE.S.C01
+      PICS: OPSTATE.S.C01.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -116,7 +116,7 @@ tests:
               contains: [1]
 
     - label: "Step 6c: Read the optional command(Pause) in AcceptedCommandList"
-      PICS: OPSTATE.S.C00
+      PICS: OPSTATE.S.C00.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -125,7 +125,7 @@ tests:
               contains: [0, 3]
 
     - label: "Step 6d: Read the optional command(Resume) in AcceptedCommandList"
-      PICS: OPSTATE.S.C03
+      PICS: OPSTATE.S.C03.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -134,7 +134,20 @@ tests:
               contains: [0, 3]
 
     - label: "Step 7: Read the global attribute: GeneratedCommandList"
-      PICS: (OPSTATE.S.C00 || OPSTATE.S.C01 || OPSTATE.S.C02 || OPSTATE.S.C03)
+      PICS:
+          "!OPSTATE.S.C00.Rsp && !OPSTATE.S.C01.Rsp && !OPSTATE.S.C02.Rsp &&
+          !OPSTATE.S.C03.Rsp"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 7: Read the global attribute: GeneratedCommandList"
+      PICS:
+          (OPSTATE.S.C00.Rsp || OPSTATE.S.C01.Rsp || OPSTATE.S.C02.Rsp ||
+          OPSTATE.S.C03.Rsp)
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

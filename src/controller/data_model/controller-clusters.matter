@@ -160,6 +160,9 @@ client cluster Groups = 4 {
 client cluster Scenes = 5 {
   bitmap Feature : BITMAP32 {
     kSceneNames = 0x1;
+    kExplicit = 0x2;
+    kTableSize = 0x4;
+    kFabricScenes = 0x8;
   }
 
   bitmap ScenesCopyMode : BITMAP8 {
@@ -1143,6 +1146,10 @@ client cluster TimeFormatLocalization = 44 {
   enum HourFormatEnum : ENUM8 {
     k12hr = 0;
     k24hr = 1;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kCalendarFormat = 0x1;
   }
 
   attribute HourFormatEnum hourFormat = 0;

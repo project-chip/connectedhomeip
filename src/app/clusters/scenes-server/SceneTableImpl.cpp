@@ -848,26 +848,22 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
 /// @param scene Scene providing the EFSs (extension field sets)
 CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(const SceneTableEntry & scene)
 {
-    ExtensionFieldSet EFS;
-    TransitionTimeMs time;
-    clusterId cluster;
-
     if (!this->HandlerListEmpty())
     {
         for (uint8_t i = 0; i < scene.mStorageData.mExtensionFieldSets.GetFieldSetCount(); i++)
         {
+            ExtensionFieldSet EFS;
             scene.mStorageData.mExtensionFieldSets.GetFieldSetAtPosition(EFS, i);
-            cluster          = EFS.mID;
-            time             = scene.mStorageData.mSceneTransitionTimeMs;
             ByteSpan EFSSpan = MutableByteSpan(EFS.mBytesBuffer, EFS.mUsedBytes);
 
             if (!EFS.IsEmpty())
             {
                 for (auto & handler : mHandlerList)
                 {
-                    if (handler.SupportsCluster(mEndpointId, cluster))
+                    if (handler.SupportsCluster(mEndpointId, EFS.mID))
                     {
-                        ReturnErrorOnFailure(handler.ApplyScene(mEndpointId, cluster, EFSSpan, time));
+                        ReturnErrorOnFailure(
+                            handler.ApplyScene(mEndpointId, EFS.mID, EFSSpan, scene.mStorageData.mSceneTransitionTimeMs));
                         break;
                     }
                 }

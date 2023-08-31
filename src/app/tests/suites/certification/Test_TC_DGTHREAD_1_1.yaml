@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 50.1.1. [TC-DGTHREAD-1.1] Global Attributes [DUT-Server]
 
@@ -157,7 +156,6 @@ tests:
                       62,
                       65528,
                       65529,
-
                       65531,
                       65532,
                       65533,
@@ -264,7 +262,7 @@ tests:
               contains: [58]
 
     - label: "Step 5a: TH reads EventList from DUT"
-      PICS: "PICS_EVENT_LIST_ENABLED &&  !DGTHREAD.S.E00 && !DGTHREAD.S.E01 "
+      PICS: " !DGTHREAD.S.E00 && !DGTHREAD.S.E01 && PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -274,7 +272,7 @@ tests:
 
     - label:
           "Step 5b: TH reads DGTHREAD.S.E00(ConnectionStatus) event in EventList"
-      PICS: PICS_EVENT_LIST_ENABLED && DGTHREAD.S.E00
+      PICS: DGTHREAD.S.E00 && PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -285,7 +283,7 @@ tests:
     - label:
           "Step 5c: TH reads DGTHREAD.S.E01(NetworkFaultChange) event in
           EventList"
-      PICS: PICS_EVENT_LIST_ENABLED && DGTHREAD.S.E01
+      PICS: DGTHREAD.S.E01 && PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -293,7 +291,7 @@ tests:
               type: list
               contains: [1]
 
-    - label: "Step 6a: TH reads AcceptedCommandList from DUT"
+    - label: "Step 6: TH reads AcceptedCommandList from DUT"
       PICS: " !DGTHREAD.S.F01 "
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -302,7 +300,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 6b: TH reads AcceptedCommandList from DUT"
+    - label: "Step 6: TH reads AcceptedCommandList from DUT"
       PICS: DGTHREAD.S.F01
       command: "readAttribute"
       attribute: "AcceptedCommandList"

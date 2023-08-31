@@ -82,7 +82,7 @@ tests:
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer and the value is  from supported_modes_dut, below is the sample log provided for the raspi platform:
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer that is in the list of modes returned in step 1, below is the sample log provided for the raspi platform:
 
           [1645776767.611140][4667:4672] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469718
           [1645776767.611214][4667:4672] CHIP:TOO:   CurrentMode: 0
@@ -93,7 +93,7 @@ tests:
       verification: |
           ./chip-tool modeselect read on-mode 1 1
 
-          Verify on TH(chip-tool) logs, OnMode attribute value is an integer and the value is from supported_modes_dut (As per spec default value is null) , below is the sample log provided for the raspi platform:
+          Verify on TH(chip-tool) logs, OnMode attribute value is an integer that is in the list of modes returned in step 1(As per spec default value is null) , below is the sample log provided for the raspi platform:
 
           [1649676072.465968][10754:10759] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4277065072
           [1649676072.466094][10754:10759] CHIP:TOO:   OnMode: null
@@ -104,7 +104,7 @@ tests:
       verification: |
           ./chip-tool modeselect read start-up-mode 1 1
 
-          Verify on TH(chip-tool) logs, StartUpMode attribute value is an integer and value is from supported_modes_dut,  below is the sample log provided for the raspi platform:
+          Verify on TH(chip-tool) logs, StartUpMode attribute value is an integer that is in the list of modes returned in step 1,  below is the sample log provided for the raspi platform:
 
           [1649677014.496348][10778:10784] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0004 DataVersion: 4277065072
           [1649677014.496469][10778:10784] CHIP:TOO:   StartUpMode: 0
@@ -126,7 +126,7 @@ tests:
       verification: |
           ./chip-tool modeselect read standard-namespace 1 1
 
-          Verify on TH(chip-tool) logs, StandardNamespace attribute value is an enum16(null is also acceptable),  below is the sample log provided for the raspi platform:
+          Verify on TH(chip-tool) logs, StandardNamespace attribute value is an enum16,  below is the sample log provided for the raspi platform:
 
           [1689750113.807806][3472:3474] CHIP:DMG: }
           [1689750113.807960][3472:3474] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0001 DataVersion: 628878473

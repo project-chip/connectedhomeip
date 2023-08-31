@@ -477,7 +477,7 @@ void DeviceCommissioner::Shutdown()
 
     ChipLogDetail(Controller, "Shutting down the commissioner");
 
-    mSetUpCodePairer.CommissionerShuttingDown();
+    mSetUpCodePairer.StopPairing();
 
     // Check to see if pairing in progress before shutting down
     CommissioneeDeviceProxy * device = mDeviceInPASEEstablishment;
@@ -916,11 +916,28 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestation(DeviceProxy * de
 CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(remoteDeviceId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
 
+    ChipLogProgress(Controller, "StopPairing called for node ID 0x" ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
+
+    // If we're still in the process of discovering the device, just stop the SetUpCodePairer
+    if (mSetUpCodePairer.StopPairing(remoteDeviceId))
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    // Otherwise we might be pairing and / or commissioning it.
     CommissioneeDeviceProxy * device = FindCommissioneeDevice(remoteDeviceId);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 
-    ReleaseCommissioneeDevice(device);
+    if (mDeviceBeingCommissioned == device)
+    {
+        CommissioningStageComplete(CHIP_ERROR_CANCELLED);
+    }
+    else
+    {
+        ReleaseCommissioneeDevice(device);
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -2150,7 +2167,7 @@ void DeviceCommissioner::ParseFabrics()
 
     if (mPairingDelegate != nullptr)
     {
-        mPairingDelegate->OnFabricCheck(info);
+        mPairingDelegate->OnFabricCheck(info.nodeId);
     }
 
     CommissioningDelegate::CommissioningReport report;
@@ -2399,7 +2416,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     break;
     case CommissioningStage::kCheckForMatchingFabric: {
         // Read the current fabrics
-        if (params.GetCheckForMatchingFabric())
+        if (!params.GetCheckForMatchingFabric())
         {
             // We don't actually want to do this step, so just bypass it
             ChipLogProgress(Controller, "kCheckForMatchingFabric step called without parameter set, skipping");

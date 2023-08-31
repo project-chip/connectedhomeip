@@ -33,7 +33,7 @@
   ],
   "endpointTypes": [
     {
-      "id": 3,
+      "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
         "id": 2,
@@ -5420,7 +5420,7 @@
       ]
     },
     {
-      "id": 7,
+      "id": 6,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 45,
@@ -9451,7 +9451,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -10389,7 +10389,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -10936,7 +10936,7 @@
       ]
     },
     {
-      "id": 4,
+      "id": 2,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 46,
@@ -15216,7 +15216,7 @@
       ]
     },
     {
-      "id": 6,
+      "id": 5,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 24,
@@ -15888,7 +15888,7 @@
       ]
     },
     {
-      "id": 5,
+      "id": 3,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 27,
@@ -16560,7 +16560,7 @@
       ]
     },
     {
-      "id": 8,
+      "id": 4,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 34,

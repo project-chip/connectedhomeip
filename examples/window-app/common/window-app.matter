@@ -148,123 +148,6 @@ server cluster Groups = 4 {
   fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
-/** Attributes and commands for scene configuration and manipulation. */
-server cluster Scenes = 5 {
-  bitmap Feature : BITMAP32 {
-    kSceneNames = 0x1;
-  }
-
-  bitmap ScenesCopyMode : BITMAP8 {
-    kCopyAllScenes = 0x1;
-  }
-
-  struct AttributeValuePair {
-    attrib_id attributeID = 0;
-    int32u attributeValue = 1;
-  }
-
-  struct ExtensionFieldSet {
-    cluster_id clusterID = 0;
-    AttributeValuePair attributeValueList[] = 1;
-  }
-
-  readonly attribute int8u sceneCount = 0;
-  readonly attribute int8u currentScene = 1;
-  readonly attribute group_id currentGroup = 2;
-  readonly attribute boolean sceneValid = 3;
-  readonly attribute bitmap8 nameSupport = 4;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct AddSceneRequest {
-    group_id groupID = 0;
-    INT8U sceneID = 1;
-    INT16U transitionTime = 2;
-    CHAR_STRING sceneName = 3;
-    ExtensionFieldSet extensionFieldSets[] = 4;
-  }
-
-  request struct ViewSceneRequest {
-    group_id groupID = 0;
-    INT8U sceneID = 1;
-  }
-
-  request struct RemoveSceneRequest {
-    group_id groupID = 0;
-    INT8U sceneID = 1;
-  }
-
-  request struct RemoveAllScenesRequest {
-    group_id groupID = 0;
-  }
-
-  request struct StoreSceneRequest {
-    group_id groupID = 0;
-    INT8U sceneID = 1;
-  }
-
-  request struct RecallSceneRequest {
-    group_id groupID = 0;
-    INT8U sceneID = 1;
-    optional nullable INT16U transitionTime = 2;
-  }
-
-  request struct GetSceneMembershipRequest {
-    group_id groupID = 0;
-  }
-
-  response struct AddSceneResponse = 0 {
-    status status = 0;
-    group_id groupID = 1;
-    INT8U sceneID = 2;
-  }
-
-  response struct ViewSceneResponse = 1 {
-    status status = 0;
-    group_id groupID = 1;
-    INT8U sceneID = 2;
-    optional INT16U transitionTime = 3;
-    optional CHAR_STRING sceneName = 4;
-    optional ExtensionFieldSet extensionFieldSets[] = 5;
-  }
-
-  response struct RemoveSceneResponse = 2 {
-    status status = 0;
-    group_id groupID = 1;
-    INT8U sceneID = 2;
-  }
-
-  response struct RemoveAllScenesResponse = 3 {
-    status status = 0;
-    group_id groupID = 1;
-  }
-
-  response struct StoreSceneResponse = 4 {
-    status status = 0;
-    group_id groupID = 1;
-    INT8U sceneID = 2;
-  }
-
-  response struct GetSceneMembershipResponse = 6 {
-    status status = 0;
-    nullable INT8U capacity = 1;
-    group_id groupID = 2;
-    optional INT8U sceneList[] = 3;
-  }
-
-  fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
-  fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
-  fabric command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
-  fabric command access(invoke: manage) RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
-  fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
-  fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
-  fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
-}
-
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
   bitmap Feature : BITMAP32 {
@@ -644,6 +527,10 @@ server cluster TimeFormatLocalization = 44 {
   enum HourFormatEnum : ENUM8 {
     k12hr = 0;
     k24hr = 1;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kCalendarFormat = 0x1;
   }
 
   attribute HourFormatEnum hourFormat = 0;
@@ -1940,6 +1827,7 @@ server cluster WindowCovering = 258 {
 
 endpoint 0 {
   device type ma_rootdevice = 22, version 1;
+  device type ma_powersource = 17, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -1950,6 +1838,7 @@ endpoint 0 {
     callback attribute partsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
@@ -1965,6 +1854,7 @@ endpoint 0 {
     callback attribute accessControlEntriesPerFabric default = 4;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -1995,6 +1885,7 @@ endpoint 0 {
     callback attribute capabilityMinima;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2017,6 +1908,7 @@ endpoint 0 {
     callback attribute supportedLocales;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2028,6 +1920,7 @@ endpoint 0 {
     callback attribute supportedCalendarTypes;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2036,6 +1929,7 @@ endpoint 0 {
   server cluster UnitLocalization {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2052,6 +1946,10 @@ endpoint 0 {
     callback attribute activeBatFaults;
     ram      attribute batChargeState;
     callback attribute endpointList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
   }
@@ -2064,6 +1962,7 @@ endpoint 0 {
     callback attribute supportsConcurrentConnection default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2080,6 +1979,7 @@ endpoint 0 {
     ram      attribute lastConnectErrorValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
@@ -2098,6 +1998,7 @@ endpoint 0 {
     callback attribute testEventTriggersEnabled default = false;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2221,6 +2122,7 @@ endpoint 0 {
     callback attribute adminVendorId default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2235,6 +2137,7 @@ endpoint 0 {
     callback attribute currentFabricIndex;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2247,6 +2150,7 @@ endpoint 0 {
     callback attribute maxGroupKeysPerFabric;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2285,19 +2189,6 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
-  }
-
-  server cluster Scenes {
-    callback attribute sceneCount default = 0x00;
-    ram      attribute currentScene default = 0x00;
-    ram      attribute currentGroup default = 0x0000;
-    ram      attribute sceneValid default = 0x00;
-    ram      attribute nameSupport;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
   }
 
   server cluster Descriptor {
@@ -2363,19 +2254,6 @@ endpoint 2 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
-  }
-
-  server cluster Scenes {
-    callback attribute sceneCount default = 0x00;
-    ram      attribute currentScene default = 0x00;
-    ram      attribute currentGroup default = 0x0000;
-    ram      attribute sceneValid default = 0x00;
-    ram      attribute nameSupport;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
   }
 
   server cluster Descriptor {

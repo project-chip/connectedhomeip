@@ -542,9 +542,9 @@ private:
             case Credentials::CertificateValidityResult::kExpired:
             case Credentials::CertificateValidityResult::kExpiredAtLastKnownGoodTime:
             case Credentials::CertificateValidityResult::kTimeUnknown: {
-                uint8_t certType;
+                Credentials::CertType certType;
                 ReturnErrorOnFailure(cert->mSubjectDN.GetCertType(certType));
-                if (certType == Credentials::kCertType_Root)
+                if (certType == Credentials::CertType::kRoot)
                 {
                     return CHIP_NO_ERROR;
                 }
