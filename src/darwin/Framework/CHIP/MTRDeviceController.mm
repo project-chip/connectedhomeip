@@ -87,8 +87,6 @@ static NSString * const kErrorGetCommissionee = @"Failure obtaining device being
 static NSString * const kErrorGetAttestationChallenge = @"Failure getting attestation challenge";
 static NSString * const kErrorSpake2pVerifierGenerationFailed = @"PASE verifier generation failed";
 static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifier serialization failed";
-static NSString * const kErrorAttestationTrustStoreInit = @"Init failure while creating the attestation trust store";
-static NSString * const kErrorDACVerifierInit = @"Init failure while creating the device attestation verifier";
 static NSString * const kErrorCDCertStoreInit = @"Init failure while initializing Certificate Declaration Signing Keys store";
 
 typedef void (^SyncWorkQueueBlock)(void);
@@ -412,26 +410,14 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         const chip::Credentials::AttestationTrustStore * trustStore;
         if (startupParams.productAttestationAuthorityCertificates) {
             _attestationTrustStoreBridge
-                = new (std::nothrow) MTRAttestationTrustStoreBridge(startupParams.productAttestationAuthorityCertificates);
-            if (_attestationTrustStoreBridge == nullptr) {
-                errorCode = CHIP_ERROR_NO_MEMORY;
-            }
-            if ([self checkForStartError:errorCode logMsg:kErrorAttestationTrustStoreInit]) {
-                return;
-            }
+                = new MTRAttestationTrustStoreBridge(startupParams.productAttestationAuthorityCertificates);
             trustStore = _attestationTrustStoreBridge;
         } else {
             // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
             trustStore = chip::Credentials::GetTestAttestationTrustStore();
         }
 
-        _defaultDACVerifier = new (std::nothrow) chip::Credentials::DefaultDACVerifier(trustStore);
-        if (_defaultDACVerifier == nullptr) {
-            errorCode = CHIP_ERROR_NO_MEMORY;
-        }
-        if ([self checkForStartError:errorCode logMsg:kErrorDACVerifierInit]) {
-            return;
-        }
+        _defaultDACVerifier = new chip::Credentials::DefaultDACVerifier(trustStore);
 
         if (startupParams.certificationDeclarationCertificates) {
             auto cdTrustStore = _defaultDACVerifier->GetCertificationDeclarationTrustStore();
