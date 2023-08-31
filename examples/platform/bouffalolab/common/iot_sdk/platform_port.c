@@ -162,7 +162,10 @@ void vAssertCalled(void)
 {
     void * ra = (void *) __builtin_return_address(0);
 
+#if CONF_ENABLE_FRAME_PTR == 0
     taskDISABLE_INTERRUPTS();
+#endif
+
     if (xPortIsInsideInterrupt())
     {
         printf("vAssertCalled, ra = %p in ISR\r\n", (void *) ra);
@@ -172,8 +175,11 @@ void vAssertCalled(void)
         printf("vAssertCalled, ra = %p in task %s\r\n", (void *) ra, pcTaskGetName(NULL));
     }
 
-    while (true)
-        ;
+#if CONF_ENABLE_FRAME_PTR
+    portABORT();
+#endif
+
+    while (true);
 }
 #endif
 
@@ -183,6 +189,7 @@ void __attribute__((weak)) user_vAssertCalled(void)
     void * ra = (void *) __builtin_return_address(0);
 
     taskDISABLE_INTERRUPTS();
+
     if (xPortIsInsideInterrupt())
     {
         printf("vAssertCalled, ra = %p in ISR\r\n", (void *) ra);
@@ -192,8 +199,7 @@ void __attribute__((weak)) user_vAssertCalled(void)
         printf("vAssertCalled, ra = %p in task %s\r\n", (void *) ra, pcTaskGetName(NULL));
     }
 
-    while (true)
-        ;
+    while (true);
 }
 
 void __attribute__((weak)) user_vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
@@ -221,8 +227,10 @@ void __attribute__((weak)) user_vApplicationMallocFailedHook(void)
     }
 }
 
+void bflb_assert(void) __attribute__ ((weak, alias ("user_vAssertCalled")));
 #else
 void user_vAssertCalled(void) __attribute__((weak, alias("vAssertCalled")));
+void bflb_assert(void) __attribute__ ((weak, alias ("vAssertCalled")));
 #endif
 
 // ================================================================================

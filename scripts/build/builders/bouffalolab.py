@@ -18,12 +18,14 @@ from enum import Enum, auto
 
 from .gn import GnBuilder
 
+
 def raise_exception(info):
     logging.fatal('*' * 80)
     logging.fatal('\t%s', info)
     logging.fatal('*' * 80)
 
     raise Exception(info)
+
 
 class BouffalolabApp(Enum):
     LIGHT = auto()
@@ -164,7 +166,7 @@ class BouffalolabBuilder(GnBuilder):
             self.argsOpt.append('chip_enable_wifi=true')
         else:
             self.argsOpt.append('chip_enable_wifi=false')
-            
+
         if enable_thread:
             self.argsOpt.append('chip_enable_openthread=true')
         else:
@@ -214,6 +216,8 @@ class BouffalolabBuilder(GnBuilder):
 
         if enable_frame_ptr:
             self.argsOpt.append("enable_debug_frame_ptr=true")
+        else:
+            self.argsOpt.append("enable_debug_frame_ptr=false")
 
         try:
             self.argsOpt.append('bouffalolab_sdk_root="%s"' % os.environ['BOUFFALOLAB_SDK_ROOT'])

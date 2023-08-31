@@ -20,7 +20,7 @@ import("${chip_root}/src/lib/lib.gni")
 declare_args() {
   bl_iot_sdk_root = "${chip_root}/third_party/bouffalolab/repo"
 
-  enable_debug_frame_ptr = true
+  enable_debug_frame_ptr = false
   debug_output_file = ""
 }
 
@@ -62,8 +62,8 @@ template("bl_iot_sdk") {
       rebase_path("${invoker.freertos_config}", root_build_dir),
     ]
 
-    if (defined(invoker.enable_frame_ptr) && invoker.enable_frame_ptr) {
-      cflags += [ "-fno-omit-frame-pointer" ]
+    if (defined(invoker.enable_debug_frame_ptr) && invoker.enable_debug_frame_ptr) {
+      cflags = [ "-fno-omit-frame-pointer" ]
     }
   }
 
@@ -154,7 +154,7 @@ template("bl_iot_sdk") {
   source_set("${sdk_target_name}_bl602_freertos") {
     defines = [ "portasmHANDLE_INTERRUPT=interrupt_entry" ]
 
-    if (defined(invoker.enable_frame_ptr) && invoker.enable_frame_ptr) {
+    if (defined(invoker.enable_debug_frame_ptr) && invoker.enable_debug_frame_ptr) {
       defines += [ 
         "CONF_ENABLE_FRAME_PTR=1",
         "CONF_ENABLE_FUNC_BACKTRACE_ELF=${invoker.debug_output_file}",

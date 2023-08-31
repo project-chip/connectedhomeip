@@ -19,6 +19,9 @@
 
 #include <stdint.h>
 
+extern "C" void bflb_assert(void);
+#define CHIP_CONFIG_ABORT() bflb_assert()
+
 // ==================== General Platform Adaptations ====================
 #define CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE const char *
 #define CHIP_CONFIG_PERSISTED_STORAGE_ENC_MSG_CNTR_ID 1

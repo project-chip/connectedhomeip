@@ -22,6 +22,7 @@ declare_args() {
   bl_iot_sdk_root = "${chip_root}/third_party/bouffalolab/repo"
 
   enable_debug_frame_ptr = true
+  debug_output_file = ""
 }
 
 assert(bl_iot_sdk_root != "", "bl_iot_sdk_root must be specified")
@@ -61,8 +62,8 @@ template("bl_iot_sdk") {
       rebase_path("${invoker.freertos_config}", root_build_dir),
     ]
 
-    if (defined(invoker.enable_frame_ptr) && invoker.enable_frame_ptr) {
-      cflags += [ "-fno-omit-frame-pointer" ]
+    if (defined(invoker.enable_debug_frame_ptr) && invoker.enable_debug_frame_ptr) {
+      cflags = [ "-fno-omit-frame-pointer" ]
     }
   }
 
@@ -167,8 +168,11 @@ template("bl_iot_sdk") {
 
   source_set("${sdk_target_name}_bl702_freertos") {
     defines = [ "portasmHANDLE_INTERRUPT=interrupt_entry" ]
-    if (defined(invoker.enable_frame_ptr) && invoker.enable_frame_ptr) {
-      defines += [ "CONF_ENABLE_FRAME_PTR" ]
+    if (defined(invoker.enable_debug_frame_ptr) && invoker.enable_debug_frame_ptr) {
+      defines += [ 
+        "CONF_ENABLE_FRAME_PTR=1",
+        "CONF_ENABLE_FUNC_BACKTRACE_ELF=${invoker.debug_output_file}",
+      ]
     }
 
     include_dirs = [ "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_freertos/portable/GCC/RISC-V/chip_specific_extensions/RV32F_float_abi_single" ]
@@ -193,6 +197,13 @@ template("bl_iot_sdk") {
       "-Wno-sign-compare",
       "-Wno-old-style-declaration",
     ]
+
+    if (defined(invoker.enable_debug_frame_ptr) && invoker.enable_debug_frame_ptr) {
+      cflags_c += [ 
+        "-Wno-incompatible-pointer-types",
+        "-Wno-int-conversion",
+      ]
+    }
 
     public_configs = [
       ":${sdk_target_name}_config",

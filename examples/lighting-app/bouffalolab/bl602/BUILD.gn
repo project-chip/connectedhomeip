@@ -107,6 +107,10 @@ bouffalolab_executable("lighting_app") {
     "SYS_AOS_LOOP_ENABLE",
   ]
 
+  if (enable_debug_frame_ptr) {
+    defines += [ "CONF_ENABLE_FRAME_PTR=1" ]
+  }
+
   if (false == enable_reset_counter) {
     defines += [ "BOOT_PIN_RESET=8" ]
   }
