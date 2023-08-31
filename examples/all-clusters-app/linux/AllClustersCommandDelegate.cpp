@@ -27,10 +27,10 @@
 #include <app/server/Server.h>
 #include <platform/PlatformManager.h>
 
+#include <air-quality-instance.h>
 #include <dishwasher-mode.h>
 #include <laundry-washer-mode.h>
 #include <rvc-modes.h>
-#include <air-quality-instance.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -177,7 +177,6 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
         {
             self->OnAirQualityChange(static_cast<uint32_t>(jsonAirQualityEnum.asUInt()));
         }
-
     }
     else
     {
@@ -432,7 +431,8 @@ void AllClustersAppCommandHandler::OnModeChangeHandler(std::string device, std::
 void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aEnum)
 {
     AirQuality::Instance * airQualityInstance = AirQuality::GetInstance();
-    Protocols::InteractionModel::Status status = airQualityInstance->UpdateAirQuality(static_cast<AirQuality::AirQualityEnum>(aEnum));
+    Protocols::InteractionModel::Status status =
+        airQualityInstance->UpdateAirQuality(static_cast<AirQuality::AirQualityEnum>(aEnum));
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
