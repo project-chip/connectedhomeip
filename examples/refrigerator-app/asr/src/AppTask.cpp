@@ -66,13 +66,11 @@ constexpr const uint8_t kNamespaceRefrigerator = 0x41;
 // Refrigerator Namespace: 0x41, tag 0x00 (Refrigerator)
 constexpr const uint8_t kTagRefrigerator = 0x00;
 // Refrigerator Namespace: 0x41, tag 0x01 (Freezer)
-constexpr const uint8_t kTagFreezer = 0x01;
-const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type refrigeratorTagList[] = {
-    { .namespaceID = kNamespaceRefrigerator, .tag = kTagRefrigerator }
-};
-const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList[] = {
-    { .namespaceID = kNamespaceRefrigerator, .tag = kTagFreezer }
-};
+constexpr const uint8_t kTagFreezer                                                     = 0x01;
+const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type refrigeratorTagList[] = { { .namespaceID = kNamespaceRefrigerator,
+                                                                                              .tag         = kTagRefrigerator } };
+const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList[]      = { { .namespaceID = kNamespaceRefrigerator,
+                                                                                         .tag         = kTagFreezer } };
 } // namespace
 
 void NetWorkCommissioningInstInit()
@@ -129,8 +127,9 @@ void AppTask::AppTaskMain(void * pvParameter)
     app::SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
     app::SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
 
-    //set TagList
-    SetTagList(kColdCabinetEndpointId, Span<const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(refrigeratorTagList));
+    // set TagList
+    SetTagList(kColdCabinetEndpointId,
+               Span<const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(refrigeratorTagList));
     SetTagList(kFreezeCabinetEndpointId, Span<const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList));
 
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
