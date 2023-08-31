@@ -18,8 +18,8 @@ step.
 
 ### Get IDF v5.1.1
 
--   Clone ESP-IDF
-    [v5.1.1 release](https://github.com/espressif/esp-idf/releases/tag/v5.1.1
+-   Clone ESP-IDF [v5.1.1
+    release](https://github.com/espressif/esp-idf/releases/tag/v5.1.1
 
     ```
     git clone -b v5.1.1 --recursive --depth 1 --shallow-submodule https://github.com/espressif/esp-idf.git
