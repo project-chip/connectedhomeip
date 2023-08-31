@@ -33,121 +33,6 @@ struct OperationalStateStruct {
     optional char_string<64> operationalStateLabel = 1;
 }
 
-/** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
-server cluster Identify = 3 {
-  enum EffectIdentifierEnum : ENUM8 {
-    kBlink = 0;
-    kBreathe = 1;
-    kOkay = 2;
-    kChannelChange = 11;
-    kFinishEffect = 254;
-    kStopEffect = 255;
-  }
-
-  enum EffectVariantEnum : ENUM8 {
-    kDefault = 0;
-  }
-
-  enum IdentifyTypeEnum : ENUM8 {
-    kNone = 0;
-    kLightOutput = 1;
-    kVisibleIndicator = 2;
-    kAudibleBeep = 3;
-    kDisplay = 4;
-    kActuator = 5;
-  }
-
-  attribute int16u identifyTime = 0;
-  readonly attribute IdentifyTypeEnum identifyType = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct IdentifyRequest {
-    INT16U identifyTime = 0;
-  }
-
-  request struct TriggerEffectRequest {
-    EffectIdentifierEnum effectIdentifier = 0;
-    EffectVariantEnum effectVariant = 1;
-  }
-
-  command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
-  command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
-}
-
-/** Attributes and commands for group configuration and manipulation. */
-server cluster Groups = 4 {
-  bitmap Feature : BITMAP32 {
-    kGroupNames = 0x1;
-  }
-
-  bitmap NameSupportBitmap : BITMAP8 {
-    kGroupNames = 0x80;
-  }
-
-  readonly attribute NameSupportBitmap nameSupport = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct AddGroupRequest {
-    group_id groupID = 0;
-    CHAR_STRING groupName = 1;
-  }
-
-  request struct ViewGroupRequest {
-    group_id groupID = 0;
-  }
-
-  request struct GetGroupMembershipRequest {
-    group_id groupList[] = 0;
-  }
-
-  request struct RemoveGroupRequest {
-    group_id groupID = 0;
-  }
-
-  request struct AddGroupIfIdentifyingRequest {
-    group_id groupID = 0;
-    CHAR_STRING groupName = 1;
-  }
-
-  response struct AddGroupResponse = 0 {
-    ENUM8 status = 0;
-    group_id groupID = 1;
-  }
-
-  response struct ViewGroupResponse = 1 {
-    ENUM8 status = 0;
-    group_id groupID = 1;
-    CHAR_STRING groupName = 2;
-  }
-
-  response struct GetGroupMembershipResponse = 2 {
-    nullable INT8U capacity = 0;
-    group_id groupList[] = 1;
-  }
-
-  response struct RemoveGroupResponse = 3 {
-    ENUM8 status = 0;
-    group_id groupID = 1;
-  }
-
-  fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
-  fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
-  fabric command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
-  fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
-  fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
-  fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
-}
-
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
   bitmap Feature : BITMAP32 {
@@ -170,6 +55,7 @@ server cluster Descriptor = 29 {
   readonly attribute CLUSTER_ID serverList[] = 1;
   readonly attribute CLUSTER_ID clientList[] = 2;
   readonly attribute ENDPOINT_NO partsList[] = 3;
+  readonly attribute SemanticTagStruct tagList[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -379,6 +265,10 @@ server cluster TimeFormatLocalization = 44 {
   enum HourFormatEnum : ENUM8 {
     k12hr = 0;
     k24hr = 1;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kCalendarFormat = 0x1;
   }
 
   attribute HourFormatEnum hourFormat = 0;
@@ -1055,19 +945,6 @@ endpoint 0 {
   device type ma_rootdevice = 22, version 1;
 
 
-  server cluster Identify {
-    ram      attribute identifyTime default = 0x0000;
-    ram      attribute identifyType default = 0x00;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-  }
-
-  server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-  }
-
   server cluster Descriptor {
     callback attribute deviceTypeList;
     callback attribute serverList;
@@ -1077,7 +954,7 @@ endpoint 0 {
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster AccessControl {
@@ -1272,7 +1149,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
   }
 }
 endpoint 2 {
@@ -1284,11 +1161,12 @@ endpoint 2 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster TemperatureControl {
@@ -1310,11 +1188,12 @@ endpoint 3 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster TemperatureControl {
