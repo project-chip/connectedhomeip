@@ -60,11 +60,18 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
                                               sharingType:MTRStorageSharingTypeNotShared];
     });
     if (resumptionNodeList != nil) {
-        if (![resumptionNodeList isKindOfClass:[NSMutableArray class]]) {
+        if (![resumptionNodeList isKindOfClass:[NSArray class]]) {
             MTR_LOG_ERROR("List of CASE resumption node IDs is not an array");
             return nil;
         }
-        _nodesWithResumptionInfo = resumptionNodeList;
+        for (id value in resumptionNodeList) {
+            if (![value isKindOfClass:[NSNumber class]]) {
+                MTR_LOG_ERROR("List of CASE resumption node IDs contains a non-number");
+                return nil;
+            }
+        }
+        _nodesWithResumptionInfo = [NSMutableArray arrayWithCapacity:[resumptionNodeList count]];
+        [_nodesWithResumptionInfo addObjectsFromArray:resumptionNodeList];
     } else {
         _nodesWithResumptionInfo = [[NSMutableArray alloc] init];
     }
@@ -83,7 +90,6 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
 
 - (void)storeResumptionInfo:(MTRCASESessionResumptionInfo *)resumptionInfo
 {
-    // TODO: THis should be using the "same acls" scoping, not "same identity".
     auto * oldInfo = [self findResumptionInfoByNodeID:resumptionInfo.nodeID];
     dispatch_sync(_storageDelegateQueue, ^{
         if (oldInfo != nil) {
@@ -110,7 +116,7 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
         // Update our resumption info node list.
         [_nodesWithResumptionInfo addObject:resumptionInfo.nodeID];
         [_storageDelegate controller:_controller
-                          storeValue:_nodesWithResumptionInfo
+                          storeValue:[NSArray arrayWithArray:_nodesWithResumptionInfo]
                               forKey:sResumptionNodeListKey
                        securityLevel:MTRStorageSecurityLevelSecure
                          sharingType:MTRStorageSharingTypeNotShared];
