@@ -17,6 +17,10 @@
 #include "MTRDeviceControllerDataStore.h"
 #import "MTRLogging_Internal.h"
 
+#include <lib/core/CASEAuthTag.h>
+#include <lib/core/NodeId.h>
+#include <lib/support/SafeInt.h>
+
 // FIXME: Are these good key strings? https://github.com/project-chip/connectedhomeip/issues/28973
 static NSString * sResumptionNodeListKey = @"caseResumptionNodeList";
 static NSString * sLastLocallyUsedNOCKey = @"lastLocallyUsedControllerNOC";
@@ -30,6 +34,60 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
 {
     return
         [NSString stringWithFormat:@"caseResumptionByResumptionID/%s", [resumptionID base64EncodedStringWithOptions:0].UTF8String];
+}
+
+static bool IsUnsignedIntegerNumber(NSNumber * _Nullable number)
+{
+    if (number == nil) {
+        return false;
+    }
+
+    // Not sure how to check for the number being an integer.
+
+    if ([number compare:@(0)] == NSOrderedAscending) {
+        return false;
+    }
+
+    return true;
+}
+
+static bool IsValidNodeIDNumber(NSNumber * _Nullable number)
+{
+    // Node IDs cannot be negative.
+    if (!IsUnsignedIntegerNumber(number)) {
+        return false;
+    }
+
+    // Validate that this is a valid operational ID, not some garbage unsigned
+    // int value that can't be a node id.
+    uint64_t unsignedValue = number.unsignedLongLongValue;
+    if (!chip::IsOperationalNodeId(unsignedValue)) {
+        return false;
+    }
+
+    return true;
+}
+
+static bool IsValidCATNumber(NSNumber * _Nullable number)
+{
+    // CATs cannot be negative.
+    if (!IsUnsignedIntegerNumber(number)) {
+        return false;
+    }
+
+    // Validate that this is a valid CAT value and, not some garbage unsigned int
+    // value that can't be a CAT.
+    uint64_t unsignedValue = number.unsignedLongLongValue;
+    if (!chip::CanCastTo<chip::CASEAuthTag>(unsignedValue)) {
+        return false;
+    }
+
+    auto tag = static_cast<chip::CASEAuthTag>(unsignedValue);
+    if (!chip::IsValidCASEAuthTag(tag)) {
+        return false;
+    }
+
+    return true;
 }
 
 @implementation MTRDeviceControllerDataStore {
@@ -67,6 +125,11 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
         for (id value in resumptionNodeList) {
             if (![value isKindOfClass:[NSNumber class]]) {
                 MTR_LOG_ERROR("List of CASE resumption node IDs contains a non-number");
+                return nil;
+            }
+
+            if (!IsValidNodeIDNumber(value)) {
+                MTR_LOG_ERROR("Resumption node ID contains invalid value: %@", value);
                 return nil;
             }
         }
@@ -222,7 +285,7 @@ static NSString * const sCATsKey = @"CATs";
     return YES;
 }
 
-- (instancetype)initWithCoder:(NSCoder *)decoder
+- (nullable instancetype)initWithCoder:(NSCoder *)decoder
 {
     self = [super init];
     if (self == nil) {
@@ -230,9 +293,24 @@ static NSString * const sCATsKey = @"CATs";
     }
 
     _nodeID = [decoder decodeObjectOfClass:[NSNumber class] forKey:sNodeIDKey];
+    if (!IsValidNodeIDNumber(_nodeID)) {
+        MTR_LOG_ERROR("MTRCASESessionResumptionInfo node ID has invalid value: %@", _nodeID);
+        return nil;
+    }
+
     _resumptionID = [decoder decodeObjectOfClass:[NSData class] forKey:sResumptionIDKey];
     _sharedSecret = [decoder decodeObjectOfClass:[NSData class] forKey:sSharedSecretKey];
     auto caseAuthenticatedTagArray = [decoder decodeArrayOfObjectsOfClass:[NSNumber class] forKey:sCATsKey];
+
+    for (NSNumber * value in caseAuthenticatedTagArray) {
+        if (!IsValidCATNumber(value)) {
+            MTR_LOG_ERROR("MTRCASESessionResumptionInfo CASE tag has invalid value: %@", value);
+            return nil;
+        }
+
+        // Range-checking will be done when we try to convert the set to CATValues.
+    }
+
     _caseAuthenticatedTags = [NSSet setWithArray:caseAuthenticatedTagArray];
     return self;
 }
