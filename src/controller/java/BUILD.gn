@@ -69,16 +69,21 @@ shared_library("jni") {
     "${chip_root}/src/platform",
   ]
 
-  if (matter_enable_java_generated_api) {
+  if (matter_enable_tlv_decoder_api) {
     defines += [ "USE_JAVA_TLV_ENCODE_DECODE" ]
 
     sources += [
-      "CHIPDefaultCallbacks.cpp",
-      "CHIPDefaultCallbacks.h",
       "CHIPTLVValueDecoder-JNI.cpp",
       "zap-generated/CHIPAttributeTLVValueDecoder.cpp",
-      "zap-generated/CHIPClustersWrite-JNI.cpp",
       "zap-generated/CHIPEventTLVValueDecoder.cpp",
+    ]
+  }
+
+  if (matter_enable_java_generated_api) {
+    sources += [
+      "CHIPDefaultCallbacks.cpp",
+      "CHIPDefaultCallbacks.h",
+      "zap-generated/CHIPClustersWrite-JNI.cpp",
       "zap-generated/CHIPInvokeCallbacks.cpp",
       "zap-generated/CHIPInvokeCallbacks.h",
       "zap-generated/CHIPReadCallbacks.cpp",
@@ -420,6 +425,10 @@ android_library("java") {
     "src/chip/devicecontroller/model/NodeState.java",
   ]
 
+  if (matter_enable_tlv_decoder_api) {
+    sources += [ "src/chip/devicecontroller/ChipTLVValueDecoder.java" ]
+  }
+
   if (matter_enable_java_generated_api) {
     sources += [
       "generated/java/chip/devicecontroller/ClusterReadMapping.java",
@@ -430,7 +439,6 @@ android_library("java") {
       "src/chip/clusterinfo/CommandResponseInfo.java",
       "src/chip/clusterinfo/DelegatedClusterCallback.java",
       "src/chip/clusterinfo/InteractionInfo.java",
-      "src/chip/devicecontroller/ChipTLVValueDecoder.java",
       "zap-generated/chip/devicecontroller/ChipClusters.java",
       "zap-generated/chip/devicecontroller/ChipEventStructs.java",
       "zap-generated/chip/devicecontroller/ChipStructs.java",
