@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 3.14.1. [TC-ALOGIN-12.1] Account Login Verification
 
@@ -74,6 +73,8 @@ tests:
           values:
               - name: "SetupPIN"
                 saveAs: setupPIN
+                constraints:
+                    minLength: 11
 
     - label:
           "Step 2: TH sends a Login command to the DUT with test values provided

@@ -2708,6 +2708,7 @@ WASHERCTRL.S.A0002=1
 WASHERCTRL.S.A0003=1
 WASHERCTRL.S.M.ManuallyControlledSpin=1
 WASHERCTRL.S.M.ManuallyControlledRinse=1
+WASHERCTRL.S.M.ManuallyControlled=0
 
 #RVC Run Mode
 RVCRUNM.S=1

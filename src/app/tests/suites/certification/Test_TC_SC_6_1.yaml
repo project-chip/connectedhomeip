@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    18.2.1. [TC-SC-6.1] Adding member to a group - DUT as Admin and TH as Group
+    26.4.1. [TC-SC-6.1] Adding member to a group - DUT as Admin and TH as Group
     Member [DUT-Client]
 
 PICS:
@@ -38,7 +38,9 @@ tests:
           DUT supports Groups Cluster
       disabled: true
 
-    - label: "TH should have the ACL entry with the AuthMode as Group by DUT"
+    - label:
+          "Step 1a: TH should have the ACL entry with the AuthMode as Group by
+          DUT"
       verification: |
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]' 1 0
 
@@ -114,16 +116,22 @@ tests:
       disabled: true
 
     - label:
-          "DUT generates fabric-unique GroupID, GroupName, random key, EpochKey0
-          and GroupKeySetID. Admin sets GroupKeySecurityPolicy = TrustFirst (0)
-          EpochStartTime0 = 0"
+          "Step 1b: DUT generates fabric-unique GroupID, GroupName, random key,
+          EpochKey0 and GroupKeySetID. Admin sets GroupKeySecurityPolicy =
+          TrustFirst (0) EpochStartTime0 = 0"
       verification: |
-
+          Sample epoch key values that will be used in the forthcomming steps:
+          "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 0,"epochKey1":
+          "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
+          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 
+          Sample Group Name: Grp1
+          GroupKeySetID: 42
+          GroupID = 1
       disabled: true
 
     - label:
-          "DUT sends KeySetWrite command to GroupKeyManagement cluster to TH on
-          EP0"
+          "Step 2: DUT sends KeySetWrite command to GroupKeyManagement cluster
+          to TH on EP0"
       PICS: GRPKEY.C.C00.Tx
       verification: |
           ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 42,
@@ -182,13 +190,13 @@ tests:
       disabled: true
 
     - label:
-          "DUT binds GroupID with GroupKeySetID in the GroupKeyMap attribute
-          list on GroupKeyManagement cluster"
+          "Step 3: DUT binds GroupID with GroupKeySetID in the GroupKeyMap
+          attribute list on GroupKeyManagement cluster"
       PICS: GRPKEY.C.A0000
       verification: |
           ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 1, "groupKeySetID": 42, "fabricIndex": 1}]' 1 0
 
-          Verify TH recieves GroupKeyMap attribute on TH(Reference app)log:
+          Verify TH recieves the binding of GroupKeySetID with the GroupID on TH(Reference app)log:
 
           [1659350562.020669][5824:5824] CHIP:EM: Received message of type 0x6 with protocolId (0, 1) and MessageCounter:167021683 on exchange 31153r
           [1659350562.020897][5824:5824] CHIP:EM: Handling via exchange: 31153r, Delegate: 0xaaaacb304f08
@@ -240,7 +248,7 @@ tests:
           [1659350562.022661][5824:5824] CHIP:DMG: AccessControl: allowed
       disabled: true
 
-    - label: "DUT sends AddGroup Command to TH on EP0"
+    - label: "Step 4: DUT sends AddGroup Command to TH on EP0"
       PICS: G.C.C00.Tx
       verification: |
           ./chip-tool groups add-group 0x0001 grp1 1 0
@@ -280,8 +288,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends ViewGroup command with the GroupID and GroupName to the
-          Group cluster on the TH on EP0"
+          "Step 5: DUT sends ViewGroup command with the GroupID and GroupName to
+          the Group cluster on the TH on EP0"
       PICS: G.C.C01.Tx
       verification: |
           ./chip-tool groups view-group 0x0001 1 0
@@ -319,7 +327,7 @@ tests:
           [1651471144.502628][4012:4012] CHIP:DMG: AccessControl: allowed
       disabled: true
 
-    - label: "DUT sends KeySetRead Command to TH"
+    - label: "Step 6: DUT sends KeySetRead Command to TH"
       PICS: GRPKEY.C.C01.Tx
       verification: |
           ./chip-tool groupkeymanagement key-set-read 42 1 0
@@ -358,8 +366,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT reads GroupKeyMap Attribute from the GroupKeyManagement cluster
-          from TH"
+          "Step 7: DUT reads GroupKeyMap Attribute from the GroupKeyManagement
+          cluster from TH"
       PICS: GRPKEY.C.A0000
       verification: |
           ./chip-tool groupkeymanagement read group-key-map 1 0
@@ -394,7 +402,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT reads GroupTable attribute from GroupKeyManagement cluster on TH"
+          "Step 8: DUT reads GroupTable attribute from GroupKeyManagement
+          cluster on TH"
       PICS: GRPKEY.C.A0001
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0

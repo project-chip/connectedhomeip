@@ -39,12 +39,13 @@ tests:
     - label:
           "Step 2: Manually put the DUT into a state wherein it can receive a
           Pause Command"
+      PICS: RVCOPSTATE.S.C00.Rsp
       verification: |
-
+          Manually put the DUT into a state wherein it can receive a Pause Command
       disabled: true
 
     - label: "Step 3: TH reads from the DUT the OperationalStateList attribute"
-      PICS: OPSTATE.S.A0003
+      PICS: RVCOPSTATE.S.A0003
       verification: |
           ./chip-tool operationalstate read operationalstatelist 1 1
 
@@ -52,29 +53,71 @@ tests:
            - all entries include an ID (enum8) and a label (string)
            - all provided IDs are in the allowed range
            - the list includes IDs for Error (0x03), Running (0x01), and Paused (0x02)
+
+          [1690457504.399241][18780:18782] CHIP:DMG:         SuppressResponse = true, 
+          [1690457504.399250][18780:18782] CHIP:DMG:         InteractionModelRevision = 1
+          [1690457504.399256][18780:18782] CHIP:DMG: }
+          [1690457504.399391][18780:18782] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0003 DataVersion: 4112784416
+          [1690457504.399435][18780:18782] CHIP:TOO:   OperationalStateList: 4 entries
+          [1690457504.399448][18780:18782] CHIP:TOO:     [1]: {
+          [1690457504.399462][18780:18782] CHIP:TOO:       OperationalStateID: 0
+          [1690457504.399468][18780:18782] CHIP:TOO:      }
+          [1690457504.399477][18780:18782] CHIP:TOO:     [2]: {
+          [1690457504.399484][18780:18782] CHIP:TOO:       OperationalStateID: 1
+          [1690457504.399488][18780:18782] CHIP:TOO:      }
+          [1690457504.399495][18780:18782] CHIP:TOO:     [3]: {
+          [1690457504.399501][18780:18782] CHIP:TOO:       OperationalStateID: 2
+          [1690457504.399507][18780:18782] CHIP:TOO:      }
+          [1690457504.399516][18780:18782] CHIP:TOO:     [4]: {
+          [1690457504.399522][18780:18782] CHIP:TOO:       OperationalStateID: 3
+          [1690457504.399528][18780:18782] CHIP:TOO:      }
+          [1690457504.399588][18780:18782] CHIP:EM: <<< [E:4138i S:8440 M:231131479 (Ack:25960670)] (S) Msg TX to 1:0000000000000001 [9100] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690457504.399601][18780:18782] CHIP:IN: (S) Sending msg 231131479 on secure session with LSID: 8440
+          [1690457504.399627][18780:18782] CHIP:EM: Flushed pending ack for MessageCounter:25960670 on exchange 4138i
       disabled: true
 
     - label: "Step 4: TH sends Pause command to the DUT"
-      PICS: OPSTATE.S.C00.Rsp && OPSTATE.S.C04.Tx
+      PICS: RVCOPSTATE.S.C00.Rsp && RVCOPSTATE.S.C04.Tx
       verification: |
           ./chip-tool operationalstate pause 1 1
 
            Via the TH (chip-tool), verify:
            - the response is an instance of OperationalCommandResponse
            - The ErrorStateID field is set to 0x00 (NoError)
+
+          [1690457565.893634][18795:18797] CHIP:DMG: },
+          [1690457565.893663][18795:18797] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0060 Command=0x0000_0004
+          [1690457565.893681][18795:18797] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Command 0x0000_0004
+          [1690457565.893714][18795:18797] CHIP:TOO:   OperationalCommandResponse: {
+          [1690457565.893729][18795:18797] CHIP:TOO:     commandResponseState: {
+          [1690457565.893736][18795:18797] CHIP:TOO:       ErrorStateID: 0
+          [1690457565.893744][18795:18797] CHIP:TOO:      }
+          [1690457565.893750][18795:18797] CHIP:TOO:    }
+          [1690457565.893766][18795:18797] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1690457565.893810][18795:18797] CHIP:EM: <<< [E:53497i S:10113 M:10465777 (Ack:34949769)] (S) Msg TX to 1:0000000000000001 [9100] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690457565.893825][18795:18797] CHIP:IN: (S) Sending msg 10465777 on secure session with LSID: 10113
+          [1690457565.893854][18795:18797] CHIP:EM: Flushed pending ack for MessageCounter:34949769 on exchange 53497i
       disabled: true
 
     - label: "Step 5: TH reads from the DUT the OperationalState attribute"
-      PICS: OPSTATE.S.A0004
+      PICS: RVCOPSTATE.S.A0004
       verification: |
-          ./chip-tool operationalstate read operationalstate 1 1
+          ./chip-tool operationalstate read operational-state 1 1
 
            Via the TH (chip-tool), verify:
            - the response has an OperationalStateID field that is set to 0x02 (Paused)
+
+          [1690457601.103082][18800:18802] CHIP:DMG:         InteractionModelRevision = 1
+          [1690457601.103090][18800:18802] CHIP:DMG: }
+          [1690457601.103210][18800:18802] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0004 DataVersion: 4112784416
+          [1690457601.103259][18800:18802] CHIP:TOO:   OperationalState: 2
+          [1690457601.103348][18800:18802] CHIP:EM: <<< [E:11253i S:42567 M:46310703 (Ack:189405783)] (S) Msg TX to 1:0000000000000001 [9100] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690457601.103366][18800:18802] CHIP:IN: (S) Sending msg 46310703 on secure session with LSID: 42567
+          [1690457601.103405][18800:18802] CHIP:EM: Flushed pending ack for MessageCounter:189405783 on exchange 11253i
       disabled: true
 
     - label: "Step 6: TH reads from the DUT the CountdownTime attribute"
-      PICS: OPSTATE.S.A0002
+      PICS: RVCOPSTATE.S.A0002
       verification: |
           ./chip-tool operationalstate read countdowntime 1 1
 
@@ -82,15 +125,22 @@ tests:
            - that CountdownTime attribute contains either null our a uint32 value
            - if non-null, verify that the value is in the range 1 to 259200
            - store the value in 'initialcountdown-time'
+
+          [1690457637.895405][18808:18810] CHIP:DMG: }
+          [1690457637.895474][18808:18810] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0002 DataVersion: 4112784416
+          [1690457637.895503][18808:18810] CHIP:TOO:   CountdownTime: null
+          [1690457637.895564][18808:18810] CHIP:EM: <<< [E:52039i S:4964 M:240484860 (Ack:178751334)] (S) Msg TX to 1:0000000000000001 [9100] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690457637.895576][18808:18810] CHIP:IN: (S) Sending msg 240484860 on secure session with LSID: 4964
+          [1690457637.895601][18808:18810] CHIP:EM: Flushed pending ack for MessageCounter:178751334 on exchange 52039i
       disabled: true
 
     - label: "Step 7: TH waits for 5 seconds"
       verification: |
-
+          TH waits for 5 seconds
       disabled: true
 
     - label: "Step 8: TH reads from the DUT the CountdownTime attribute"
-      PICS: OPSTATE.S.A0002
+      PICS: RVCOPSTATE.S.A0002
       verification: |
           ./chip-tool operationalstate read operationalerror 1 1
 
@@ -98,77 +148,159 @@ tests:
            - that CountdownTime attribute contains either null our a uint32 value
            - if non-null, verify that the value is in the range 1 to 259200
            - that the value is the same as 'initialcountdown-time'
+
+          0457676.885728][18815:18817] CHIP:DMG: }
+          [1690457676.885769][18815:18817] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0005 DataVersion: 4112784416
+          [1690457676.885785][18815:18817] CHIP:TOO:   OperationalError: {
+          [1690457676.885792][18815:18817] CHIP:TOO:     ErrorStateID: null
+          [1690457676.885795][18815:18817] CHIP:TOO:    }
+          [1690457676.885824][18815:18817] CHIP:EM: <<< [E:34621i S:36593 M:31631761 (Ack:117369530)] (S) Msg TX to 1:0000000000000001 [9100] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690457676.885830][18815:18817] CHIP:IN: (S) Sending msg 31631761 on secure session with LSID: 36593
+          [1690457676.885840][18815:18817] CHIP:EM: Flushed pending ack for MessageCounter:117369530 on exchange 34621i
       disabled: true
 
     - label: "Step 9: TH sends Pause command to the DUT"
-      PICS: OPSTATE.S.C00.Rsp && OPSTATE.S.C04.Tx
+      PICS: RVCOPSTATE.S.C00.Rsp && RVCOPSTATE.S.C04.Tx
       verification: |
           ./chip-tool operationalstate pause 1 1
 
            Via the TH (chip-tool), verify:
            - the response is an instance of OperationalCommandResponse
            - The ErrorStateID field is set to 0x00 (NoError)
+
+          [1690457728.313568][18837:18839] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0060 Command=0x0000_0004
+          [1690457728.313586]v[18837:18839] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Command 0x0000_0004
+          [1690457728.313621][18837:18839] CHIP:TOO:   OperationalCommandResponse: {
+          [1690457728.313628][18837:18839] CHIP:TOO:     commandResponseState: {
+          [1690457728.313635][18837:18839] CHIP:TOO:       ErrorStateID: 0
+          [1690457728.313643][18837:18839] CHIP:TOO:      }
+          [1690457728.313649][18837:18839] CHIP:TOO:    }
+          [1690457728.313665][18837:18839] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1690457728.313716][18837:18839] CHIP:EM: <<< [E:42609i S:31456 M:147711858 (Ack:200357019)] (S) Msg TX to 1:0000000000000001 [9100] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690457728.313729][18837:18839] CHIP:IN: (S) Sending msg 147711858 on secure session with LSID: 31456
       disabled: true
 
     - label: "Step 10: TH sends Resume command to the DUT"
-      PICS: OPSTATE.S.C03.Rsp && OPSTATE.S.C04.Tx
+      PICS: RVCOPSTATE.S.C03.Rsp && RVCOPSTATE.S.C04.Tx
       verification: |
           ./chip-tool operationalstate resume 1 1
 
            Via the TH (chip-tool), verify:
            - the response is an instance of OperationalCommandResponse
            - The ErrorStateID field is set to 0x00 (NoError)
+
+          [1690457755.614427][18844:18846] CHIP:DMG:         InteractionModelRevision = 1
+          [1690457755.614433][18844:18846] CHIP:DMG: },
+          [1690457755.614462][18844:18846] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0060 Command=0x0000_0004
+          [1690457755.614480][18844:18846] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Command 0x0000_0004
+          [1690457755.614513][18844:18846] CHIP:TOO:   OperationalCommandResponse: {
+          [1690457755.614520][18844:18846] CHIP:TOO:     commandResponseState: {
+          [1690457755.614527][18844:18846] CHIP:TOO:       ErrorStateID: 0
+          [1690457755.614535][18844:18846] CHIP:TOO:      }
+          [1690457755.614541][18844:18846] CHIP:TOO:    }
+          [1690457755.614557][18844:18846] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1690457755.614599][18844:18846] CHIP:EM: <<< [E:49568i S:61424 M:58873393 (Ack:23492466)] (S) Msg TX to 1:0000000000000001 [9100] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690457755.614612][18844:18846] CHIP:IN: (S) Sending msg 58873393 on secure session with LSID: 61424
       disabled: true
 
     - label: "Step 11: TH reads from the DUT the OperationalState attribute"
-      PICS: OPSTATE.S.A0004
+      PICS: RVCOPSTATE.S.A0004
       verification: |
-          ./chip-tool operationalstate read operationalstate 1 1
+          ./chip-tool operationalstate read operational-state 1 1
 
+           
            Via the TH (chip-tool), verify:
            - the response has an OperationalStateID field that is set to 0x01 (Running)
+
+          [1690457783.305883][18855:18857] CHIP:DMG:         SuppressResponse = true, 
+          [1690457783.305890][18855:18857] CHIP:DMG:         InteractionModelRevision = 1
+          [1690457783.305895][18855:18857] CHIP:DMG: }
+          [1690457783.305966][18855:18857] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0004 DataVersion: 4112784416
+          [1690457783.306000][18855:18857] CHIP:TOO:   OperationalState: 1
+          [1690457783.306061][18855:18857] CHIP:EM: <<< [E:1086i S:59702 M:253005485 (Ack:115020717)] (S) Msg TX to 1:0000000000000001 [9100] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690457783.306074][18855:18857] CHIP:IN: (S) Sending msg 253005485 on secure session with LSID: 59702
+          [1690457783.306098][18855:18857] CHIP:EM: Flushed pending ack for MessageCounter:115020717 on exchange 1086i
       disabled: true
 
     - label: "Step 12: TH sends Resume command to the DUT"
-      PICS: OPSTATE.S.C03.Rsp && OPSTATE.S.C04.Tx
+      PICS: RVCOPSTATE.S.C03.Rsp && RVCOPSTATE.S.C04.Tx
       verification: |
           ./chip-tool operationalstate resume 1 1
 
            Via the TH (chip-tool), verify:
            - the response is an instance of OperationalCommandResponse
            - The ErrorStateID field is set to 0x00 (NoError)
+
+          [1690457805.157170][18864:18866] CHIP:DMG: },
+          [1690457805.157199][18864:18866] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0060 Command=0x0000_0004
+          [1690457805.157217][18864:18866] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Command 0x0000_0004
+          [1690457805.157250][18864:18866] CHIP:TOO:   OperationalCommandResponse: {
+          [1690457805.157257][18864:18866] CHIP:TOO:     commandResponseState: {
+          [1690457805.157264][18864:18866] CHIP:TOO:       ErrorStateID: 0
+          [1690457805.157272][18864:18866] CHIP:TOO:      }
+          [1690457805.157278][18864:18866] CHIP:TOO:    }
+          [1690457805.157294][18864:18866] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1690457805.157352][18864:18866] CHIP:EM: <<< [E:10731i S:25117 M:217509704 (Ack:132046005)] (S) Msg TX to 1:0000000000000001 [9100] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690457805.157370][18864:18866] CHIP:IN: (S) Sending msg 217509704 on secure session with LSID: 25117
       disabled: true
 
     - label:
           "Step 13: Manually put the DUT into a state wherein it cannot receive
           a Pause command (e.g. Stopped state)"
+      PICS: RVCOPSTATE.S.C00.Rsp
       verification: |
-
+          Manually put the DUT into a state wherein it cannot receive a Pause command (e.g. Stopped state)
       disabled: true
 
     - label: "Step 14: TH sends Pause command to the DUT"
-      PICS: OPSTATE.S.C00.Rsp && OPSTATE.S.C04.Tx
+      PICS: RVCOPSTATE.S.C00.Rsp && RVCOPSTATE.S.C04.Tx
       verification: |
           ./chip-tool operationalstate pause 1 1
 
            Via the TH (chip-tool), verify:
            - the response is an instance of OperationalCommandResponse
            - The ErrorStateID field is set to 0x03 (CommandInvalidInState)
+
+          [1690457833.297603][18869:18871] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0060 Command=0x0000_0004
+          [1690457833.297621][18869:18871] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Command 0x0000_0004
+          [1690457833.297655][18869:18871] CHIP:TOO:   OperationalCommandResponse: {
+          [1690457833.297669][18869:18871] CHIP:TOO:     commandResponseState: {
+          [1690457833.297677][18869:18871] CHIP:TOO:       ErrorStateID: 3
+          [1690457833.297684][18869:18871] CHIP:TOO:      }
+          [1690457833.297690][18869:18871] CHIP:TOO:    }
+          [1690457833.297707][18869:18871] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1690457833.297758][18869:18871] CHIP:EM: <<< [E:23920i S:29729 M:8059920 (Ack:236393603)] (S) Msg TX to 1:0000000000000001 [9100] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690457833.297772][18869:18871] CHIP:IN: (S) Sending msg 8059920 on secure session with LSID: 29729
+          [1690457833.297825][18869:18871] CHIP:EM: Flushed pending ack for MessageCounter:236393603 on exchange 23920i
       disabled: true
 
     - label:
           "Step 15: Manually put the DUT into a state wherein it cannot receive
           a Resume command (e.g. Stopped state)"
+      PICS: RVCOPSTATE.S.C03.Rsp
       verification: |
-
+          Manually put the DUT into a state wherein it cannot receive a Resume command (e.g. Stopped state)
       disabled: true
 
     - label: "Step 16: TH sends Resume command to the DUT"
-      PICS: OPSTATE.S.C03.Rsp && OPSTATE.S.C04.Tx
+      PICS: RVCOPSTATE.S.C03.Rsp && RVCOPSTATE.S.C04.Tx
       verification: |
           ./chip-tool operationalstate resume 1 1
 
            Via the TH (chip-tool), verify:
            - the response is an instance of OperationalCommandResponse
            - The ErrorStateID field is set to 0x03 (CommandInvalidInState)
+
+          [1690457852.049135][18877:18879] CHIP:DMG: },
+          [1690457852.049164][18877:18879] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0060 Command=0x0000_0004
+          [1690457852.049183][18877:18879] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Command 0x0000_0004
+          [1690457852.049217][18877:18879] CHIP:TOO:   OperationalCommandResponse: {
+          [1690457852.049224][18877:18879] CHIP:TOO:     commandResponseState: {
+          [1690457852.049238][18877:18879] CHIP:TOO:       ErrorStateID: 3
+          [1690457852.049246][18877:18879] CHIP:TOO:      }
+          [1690457852.049252][18877:18879] CHIP:TOO:    }
+          [1690457852.049268][18877:18879] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1690457852.049318][18877:18879] CHIP:EM: <<< [E:46238i S:58444 M:133305011 (Ack:174432725)] (S) Msg TX to 1:0000000000000001 [9100] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690457852.049332][18877:18879] CHIP:IN: (S) Sending msg 133305011 on secure session with LSID: 58444
+          [1690457852.049375][18877:18879] CHIP:EM: Flushed pending ack for MessageCounter:174432725 on exchange 46238i
       disabled: true
