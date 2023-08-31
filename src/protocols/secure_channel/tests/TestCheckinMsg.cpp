@@ -70,12 +70,12 @@ void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
 
             // Verifiy that the output buffer changed
-            NL_TEST_ASSERT(inSuite, (memcmp(outputBuffer.data(), oldOutputBuffer.data(), 300) != 0));
-            memcpy(oldOutputBuffer.data(), outputBuffer.data(), 300);
+            NL_TEST_ASSERT(inSuite, !outputBuffer.data_equal(oldOutputBuffer));
+            CopySpanToMutableSpan(outputBuffer, oldOutputBuffer);
 
             // Increment by a random count. On the slim changes the increment is 0 add 1 to change output buffer
             counter += chip::Crypto::GetRandU32() + 1;
-            outputBuffer = MutableByteSpan(a, 300);
+            outputBuffer = MutableByteSpan(a);
         }
         keystore.DestroyKey(keyHandle);
     }
@@ -83,7 +83,7 @@ void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
     // Parameter check
     {
         uint8_t data[]                                               = { "This is some user Data. It should be encrypted" };
-        userData                                                     = chip::ByteSpan(data, 50);
+        userData                                                     = chip::ByteSpan(data);
         const ccm_128_test_vector & test                             = *ccm_128_test_vectors[0];
         uint8_t gargantuaBuffer[2 * CheckinMessage::sMaxAppDataSize] = { 0 };
 
@@ -93,16 +93,14 @@ void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
         Aes128KeyHandle keyHandle;
         NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
 
-        // Empty key handle with encrypt with either some garbage or with a 0 key
-        // Neitherless, considering the nature of the key it's the responsability of the
-        // caller to make sure the key is indeed valid.
-        Aes128KeyHandle emptyKeyHandle;
-        err = CheckinMessage::GenerateCheckinMessagePayload(emptyKeyHandle, counter, userData, outputBuffer);
-#if CHIP_CRYPTO_PSA
-        NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR != err));
-#else
-        NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
-#endif
+        // As of now passing an empty key handle while using PSA crypto will result in a failure.
+        // However when using OpenSSL this same test result in a success.
+        // Issue #28986
+
+        // Aes128KeyHandle emptyKeyHandle;
+        // err = CheckinMessage::GenerateCheckinMessagePayload(emptyKeyHandle, counter, userData, outputBuffer);
+        // ChipLogError(Inet, "%s", err.AsString());
+        // NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
 
         ByteSpan emptyData;
         err = CheckinMessage::GenerateCheckinMessagePayload(keyHandle, counter, emptyData, outputBuffer);
@@ -204,10 +202,10 @@ void TestCheckin_GenerateParse(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, (counter == decryptedCounter));
 
         // reset buffers
-        memset(a, 0, 300);
-        memset(b, 0, 300);
-        outputBuffer = MutableByteSpan(a, 300);
-        buffer       = MutableByteSpan(b, 300);
+        memset(a, 0, sizeof(a));
+        memset(b, 0, sizeof(b));
+        outputBuffer = MutableByteSpan(a);
+        buffer       = MutableByteSpan(b);
 
         counter += chip::Crypto::GetRandU32() + 1;
         keystore.DestroyKey(keyHandle);
