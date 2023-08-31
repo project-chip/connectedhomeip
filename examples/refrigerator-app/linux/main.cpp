@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/util/attribute-storage.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <static-supported-temperature-levels.h>
 
@@ -29,6 +30,19 @@ using namespace chip::app::Clusters;
 
 namespace {
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+
+// Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
+constexpr const uint8_t kNamespaceRefrigerator = 0x41;
+// Refrigerator Namespace: 0x41, tag 0x00 (Refrigerator)
+constexpr const uint8_t kTagRefrigerator = 0x00;
+// Refrigerator Namespace: 0x41, tag 0x01 (Freezer)
+constexpr const uint8_t kTagFreezer = 0x01;
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type refrigeratorTagList[] = {
+    { .namespaceID = kNamespaceRefrigerator, .tag = kTagRefrigerator }
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList[] = {
+    { .namespaceID = kNamespaceRefrigerator, .tag = kTagFreezer }
+};
 } // namespace
 
 void ApplicationInit()
@@ -40,6 +54,9 @@ void ApplicationInit()
     SetTreeCompositionForEndpoint(kRefEndpointId);
     SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
     SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
+    //set TagList
+    SetTagList(kColdCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(refrigeratorTagList));
+    SetTagList(kFreezeCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList));
 
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
