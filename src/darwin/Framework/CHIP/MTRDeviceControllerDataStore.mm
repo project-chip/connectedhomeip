@@ -36,11 +36,17 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
         [NSString stringWithFormat:@"caseResumptionByResumptionID/%s", [resumptionID base64EncodedStringWithOptions:0].UTF8String];
 }
 
-static bool IsUnsignedIntegerNumber(NSNumber * _Nullable number)
+static bool IsUnsignedIntegerNumber(id _Nullable value)
 {
-    if (number == nil) {
+    if (value == nil) {
         return false;
     }
+
+    if (![value isKindOfClass:[NSNumber class]]) {
+        return false;
+    }
+
+    NSNumber * number = value;
 
     // Not sure how to check for the number being an integer.
 
@@ -51,12 +57,14 @@ static bool IsUnsignedIntegerNumber(NSNumber * _Nullable number)
     return true;
 }
 
-static bool IsValidNodeIDNumber(NSNumber * _Nullable number)
+static bool IsValidNodeIDNumber(id _Nullable value)
 {
     // Node IDs cannot be negative.
-    if (!IsUnsignedIntegerNumber(number)) {
+    if (!IsUnsignedIntegerNumber(value)) {
         return false;
     }
+
+    NSNumber * number = value;
 
     // Validate that this is a valid operational ID, not some garbage unsigned
     // int value that can't be a node id.
@@ -68,12 +76,14 @@ static bool IsValidNodeIDNumber(NSNumber * _Nullable number)
     return true;
 }
 
-static bool IsValidCATNumber(NSNumber * _Nullable number)
+static bool IsValidCATNumber(id _Nullable value)
 {
     // CATs cannot be negative.
-    if (!IsUnsignedIntegerNumber(number)) {
+    if (!IsUnsignedIntegerNumber(value)) {
         return false;
     }
+
+    NSNumber * number = value;
 
     // Validate that this is a valid CAT value and, not some garbage unsigned int
     // value that can't be a CAT.
@@ -123,11 +133,6 @@ static bool IsValidCATNumber(NSNumber * _Nullable number)
             return nil;
         }
         for (id value in resumptionNodeList) {
-            if (![value isKindOfClass:[NSNumber class]]) {
-                MTR_LOG_ERROR("List of CASE resumption node IDs contains a non-number");
-                return nil;
-            }
-
             if (!IsValidNodeIDNumber(value)) {
                 MTR_LOG_ERROR("Resumption node ID contains invalid value: %@", value);
                 return nil;
@@ -293,16 +298,31 @@ static NSString * const sCATsKey = @"CATs";
     }
 
     _nodeID = [decoder decodeObjectOfClass:[NSNumber class] forKey:sNodeIDKey];
+    // For some built-in classes decoder will decode to them even if we ask for a
+    // different class (!).  So sanity-check what we got.
+    if (_nodeID != nil && ![_nodeID isKindOfClass:[NSNumber class]]) {
+        MTR_LOG_ERROR("MTRCASESessionResumptionInfo got %@ for node ID, not NSNumber.", _nodeID);
+        return nil;
+    }
     if (!IsValidNodeIDNumber(_nodeID)) {
         MTR_LOG_ERROR("MTRCASESessionResumptionInfo node ID has invalid value: %@", _nodeID);
         return nil;
     }
 
     _resumptionID = [decoder decodeObjectOfClass:[NSData class] forKey:sResumptionIDKey];
-    _sharedSecret = [decoder decodeObjectOfClass:[NSData class] forKey:sSharedSecretKey];
-    auto caseAuthenticatedTagArray = [decoder decodeArrayOfObjectsOfClass:[NSNumber class] forKey:sCATsKey];
+    if (_resumptionID != nil && ![_resumptionID isKindOfClass:[NSData class]]) {
+        MTR_LOG_ERROR("MTRCASESessionResumptionInfo got %@ for resumption ID, not NSData.", _resumptionID);
+        return nil;
+    }
 
-    for (NSNumber * value in caseAuthenticatedTagArray) {
+    _sharedSecret = [decoder decodeObjectOfClass:[NSData class] forKey:sSharedSecretKey];
+    if (_sharedSecret != nil && ![_sharedSecret isKindOfClass:[NSData class]]) {
+        MTR_LOG_ERROR("MTRCASESessionResumptionInfo got %@ for shared secret, not NSData.", _sharedSecret);
+        return nil;
+    }
+
+    auto caseAuthenticatedTagArray = [decoder decodeArrayOfObjectsOfClass:[NSNumber class] forKey:sCATsKey];
+    for (id value in caseAuthenticatedTagArray) {
         if (!IsValidCATNumber(value)) {
             MTR_LOG_ERROR("MTRCASESessionResumptionInfo CASE tag has invalid value: %@", value);
             return nil;
