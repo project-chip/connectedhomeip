@@ -111,11 +111,12 @@ class TC_XX_1_1(MatterBaseTest):
                     validate_attribute_id_range(attribute_id)
 
                 # -- Commands
-                logging.info(f"AcceptedCommandList: {accepted_command_list}")
+                logging.info(f"AcceptedCommandList: {[f'0x{command_id:02X}' for command_id in accepted_command_list]}")
+
                 for command_id in accepted_command_list:
                     validate_command_id_range(command_id)
 
-                logging.info(f"GeneratedCommandList: {generated_command_list}")
+                logging.info(f"GeneratedCommandList: {[f'0x{command_id:02X}' for command_id in generated_command_list]}")
                 for command_id in generated_command_list:
                     validate_command_id_range(command_id)
 
