@@ -1,0 +1,5 @@
+class TemperatureSensorManager
+{
+public:
+    TemperatureSensorManager();
+};
