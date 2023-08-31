@@ -337,65 +337,6 @@ tests:
               type: list
               contains: [33]
 
-    #List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
-    - label:
-          "Step 4r: TH reads AttributeList attribute from DUT. 1.The list MAY
-          contain values in the Manufacturer Extensible Identifier (MEI) range:
-          (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed MEI range
-          (0x0001 - 0xFFF1), these values SHALL be ignored. 2.The list SHALL NOT
-          contain any values in the Test Vendor or invalid range: (0x0000_5000 -
-          0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 - 0xXXXX_FFFF) and
-          (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the allowed MEI range
-          (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool pumpconfigurationandcontrol read attribute-list 1 1
-
-          Verify " AttributeList " value consists the list of mandatory attributes (0, 1, 2, 17, 18, 19, 32), global attributes (65528, 65529, 65531, 65530,  65533) and if DUT supports it lists optional attribute (values 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 16, 20, 21, 22, 23, 33) in RPI on the TH(Chip-tool) Log:
-
-          [1653994466.323987][6163:6168] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0200 Attribute 0x0000_FFFB DataVersion: 2088686512
-
-          [1676289423.470799][4494:4496] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0200 Attribute 0x0000_FFFB DataVersion: 2763063333
-          [1676289423.470926][4494:4496] CHIP:TOO:   AttributeList: 29 entries
-          [1676289423.470950][4494:4496] CHIP:TOO:     [1]: 0
-          [1676289423.470965][4494:4496] CHIP:TOO:     [2]: 1
-          [1676289423.470979][4494:4496] CHIP:TOO:     [3]: 2
-          [1676289423.470992][4494:4496] CHIP:TOO:     [4]: 3
-          [1676289423.471007][4494:4496] CHIP:TOO:     [5]: 4
-          [1676289423.471022][4494:4496] CHIP:TOO:     [6]: 5
-          [1676289423.471037][4494:4496] CHIP:TOO:     [7]: 6
-          [1676289423.471052][4494:4496] CHIP:TOO:     [8]: 7
-          [1676289423.471066][4494:4496] CHIP:TOO:     [9]: 8
-          [1676289423.471083][4494:4496] CHIP:TOO:     [10]: 9
-          [1676289423.471098][4494:4496] CHIP:TOO:     [11]: 10
-          [1676289423.471113][4494:4496] CHIP:TOO:     [12]: 11
-          [1676289423.471128][4494:4496] CHIP:TOO:     [13]: 12
-          [1676289423.471143][4494:4496] CHIP:TOO:     [14]: 16
-          [1676289423.471158][4494:4496] CHIP:TOO:     [15]: 17
-          [1676289423.471173][4494:4496] CHIP:TOO:     [16]: 18
-          [1676289423.471188][4494:4496] CHIP:TOO:     [17]: 19
-          [1676289423.471203][4494:4496] CHIP:TOO:     [18]: 20
-          [1676289423.471219][4494:4496] CHIP:TOO:     [19]: 21
-          [1676289423.471236][4494:4496] CHIP:TOO:     [20]: 22
-          [1676289423.471251][4494:4496] CHIP:TOO:     [21]: 23
-          [1676289423.471266][4494:4496] CHIP:TOO:     [22]: 32
-          [1676289423.471281][4494:4496] CHIP:TOO:     [23]: 33
-          [1676289423.471296][4494:4496] CHIP:TOO:     [24]: 65528
-          [1676289423.471312][4494:4496] CHIP:TOO:     [25]: 65529
-          [1676289423.471327][4494:4496] CHIP:TOO:     [26]: 65530
-          [1676289423.471342][4494:4496] CHIP:TOO:     [27]: 65531
-          [1676289423.471357][4494:4496] CHIP:TOO:     [28]: 65532
-          [1676289423.471372][4494:4496] CHIP:TOO:     [29]: 65533
-          [1676289423.471674][4494:4496] CHIP:EM: <<< [E:63825i M:222566558 (Ack:152045997)] (S) Msg TX to 1:00000000
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
     - label: "Step 5a: TH reads EventList from DUT"
       PICS:
           "PICS_EVENT_LIST_ENABLED && !PCC.S.E00 && !PCC.S.E01 && !PCC.S.E02 &&
@@ -596,107 +537,19 @@ tests:
               type: list
               contains: [0x10]
 
-    - label:
-          "Step 5s: TH reads from the DUT the EventList attribute. 1.The list
-          SHALL NOT contain any additional values in the standard or scoped
-          range: (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE) 2.
-          The list MAY contain values in the Manufacturer Extensible Identifier
-          (MEI) range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed
-          MEI range (0x0001 - 0xFFF1), these values SHALL be ignored. 3. The
-          list SHALL NOT contain any values in the Test Vendor or invalid range:
-          (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 -
-          0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
-          allowed MEI range (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool pumpconfigurationandcontrol read event-list 1 1
-
-          On TH(chip-tool) Verify that the DUT response contains the EventList attribute and have the list of supported events:
-          The list MAY include these optional entries:
-          - 0x00: SHALL be included if and only if PCC.S.E0000(SupplyVoltageLow)
-          - 0x01: SHALL be included if and only if PCC.S.E0001(SupplyVoltageHigh)
-          - 0x02: SHALL be included if and only if PCC.S.E0002(PowerMissingPhase)
-          - 0x03: SHALL be included if and only if PCC.S.E0003(SystemPressureLow)
-          - 0x04: SHALL be included if and only if PCC.S.E0004(SystemPressureHigh)
-          - 0x05: SHALL be included if and only if PCC.S.E0005(DryRunning)
-          - 0x06: SHALL be included if and only if PCC.S.E0006(MotorTemperatureHigh)
-          - 0x07: SHALL be included if and only if PCC.S.E0007(PumpMotorFatalFailure)
-          - 0x08: SHALL be included if and only if PCC.S.E0008(ElectronicTemperatureHigh)
-          - 0x09: SHALL be included if and only if PCC.S.E0009(PumpBlocked)
-          - 0x0a: SHALL be included if and only if PCC.S.E000a(SensorFailure)
-          - 0x0b: SHALL be included if and only if PCC.S.E000b(ElectronicNonFatalFailure)
-          - 0x0c: SHALL be included if and only if PCC.S.E000c(ElectronicFatalFailure)
-          - 0x0d: SHALL be included if and only if PCC.S.E000d(GeneralFault)
-          - 0x0e: SHALL be included if and only if PCC.S.E000e(Leakage)
-          - 0x0f: SHALL be included if and only if PCC.S.E000f(AirDetection)
-          - 0x10: SHALL be included if and only if PCC.S.E0010(TurbineOperation)
-
-          Below is the example log which is observed in the RPI platform the value may be differ based on the dut implementation.
-
-
-          [1686205705.406393][87308:87310] CHIP:DMG:         InteractionModelRevision = 1
-          [1686205705.406398][87308:87310] CHIP:DMG: }
-          [1686205705.406480][87308:87310] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0200 Attribute 0x0000_FFFA DataVersion: 1492393553
-          [1686205705.406516][87308:87310] CHIP:TOO:   EventList: 0 entries
-          [1686205705.406573][87308:87310] CHIP:EM: <<< [E:31574i S:8973 M:178548658 (Ack:33480356)] (S) Msg TX to 1:0000000000000001 [6D93] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1686205705.406586][87308:87310] CHIP:IN: (S) Sending msg 178548658 on secure session with LSID: 8973
-          [1686205705.406613][87308:87310] CHIP:EM: Flushed pending ack for MessageCounter:33480356 on exchange 31574i
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
 
     - label:
-          "Step 6: TH reads AcceptedCommandList attribute from DUT. 1.The list
-          MAY contain values in the Manufacturer Extensible Identifier (MEI)
-          range: (0xXXXX_0000 - 0xXXXX_00FF), where XXXX is the allowed MEI
-          range (0x0001 - 0xFFF1), these values SHALL be ignored. 2.The list
-          SHALL NOT contain any values in the Test Vendor or invalid range:
-          (0x0000_0100 - 0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and
-          (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the allowed MEI range
-          (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool pumpconfigurationandcontrol read accepted-command-list 1 1
-
-          Verify "AcceptedCommandList " consists the list of supported commands, Also verify that the DUT response with an empty list (0 entries) if there is no accepted command on the TH(Chip-tool) Log:
-
-          [1650441052.209252][7168:7173] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0200 Attribute 0x0000_FFF9 DataVersion: 57416550
-          [1650441052.209350][7168:7173] CHIP:TOO: AcceptedCommandList: 0 entries
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label:
-          "Step 7: TH reads GeneratedCommandList attribute from DUT. 1.The list
-          MAY contain values in the Manufacturer Extensible Identifier (MEI)
-          range: (0xXXXX_0000 - 0xXXXX_00FF), where XXXX is the allowed MEI
-          range (0x0001 - 0xFFF1), these values SHALL be ignored. 2.The list
-          SHALL NOT contain any values in the Test Vendor or invalid range:
-          (0x0000_0100 - 0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and
-          (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the allowed MEI range
-          (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool pumpconfigurationandcontrol read generated-command-list 1 1
-
-          Verify " GeneratedCommandList " consists the list of supported commands, Also verify that the DUT response with an empty list (0 entries) if there is no generated command on the TH(Chip-tool) Log:
-
-          [1650441182.692505][7174:7179] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0200 Attribute 0x0000_FFF8 DataVersion: 57416550 [1650441182.692600][7174:7179] CHIP:TOO:  GeneratedCommandList: 0 entries
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+          "Step 7:  TH reads from the DUT the GeneratedCommandList attribute."
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list

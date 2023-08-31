@@ -162,44 +162,40 @@ protected:
     CHIP_ERROR HandleStatusReport(System::PacketBufferHandle && msg, bool successExpected)
     {
         Protocols::SecureChannel::StatusReport report;
-        CHIP_ERROR err = report.Parse(std::move(msg));
-        ReturnErrorOnFailure(err);
+        ReturnErrorOnFailure(report.Parse(std::move(msg)));
         VerifyOrReturnError(report.GetProtocolId() == Protocols::SecureChannel::Id, CHIP_ERROR_INVALID_ARGUMENT);
 
         if (report.GetGeneralCode() == Protocols::SecureChannel::GeneralStatusCode::kSuccess &&
             report.GetProtocolCode() == Protocols::SecureChannel::kProtocolCodeSuccess && successExpected)
         {
             OnSuccessStatusReport();
+            return CHIP_NO_ERROR;
         }
-        else
+
+        if (report.GetGeneralCode() == Protocols::SecureChannel::GeneralStatusCode::kBusy &&
+            report.GetProtocolCode() == Protocols::SecureChannel::kProtocolCodeBusy)
         {
-            err = OnFailureStatusReport(report.GetGeneralCode(), report.GetProtocolCode());
-
-            if (report.GetGeneralCode() == Protocols::SecureChannel::GeneralStatusCode::kBusy &&
-                report.GetProtocolCode() == Protocols::SecureChannel::kProtocolCodeBusy)
+            if (!report.GetProtocolData().IsNull())
             {
-                if (!report.GetProtocolData().IsNull())
-                {
-                    Encoding::LittleEndian::Reader reader(report.GetProtocolData()->Start(),
-                                                          report.GetProtocolData()->DataLength());
+                Encoding::LittleEndian::Reader reader(report.GetProtocolData()->Start(), report.GetProtocolData()->DataLength());
 
-                    uint16_t minimumWaitTime = 0;
-                    err                      = reader.Read16(&minimumWaitTime).StatusCode();
-                    if (err != CHIP_NO_ERROR)
-                    {
-                        ChipLogError(SecureChannel, "Failed to read the minimum wait time: %" CHIP_ERROR_FORMAT, err.Format());
-                    }
-                    else
-                    {
-                        // TODO: CASE: Notify minimum wait time to clients on receiving busy status report #28290
-                        ChipLogProgress(SecureChannel, "Received busy status report with minimum wait time: %u ms",
-                                        minimumWaitTime);
-                    }
+                uint16_t minimumWaitTime = 0;
+                CHIP_ERROR waitTimeErr   = reader.Read16(&minimumWaitTime).StatusCode();
+                if (waitTimeErr != CHIP_NO_ERROR)
+                {
+                    ChipLogError(SecureChannel, "Failed to read the minimum wait time: %" CHIP_ERROR_FORMAT, waitTimeErr.Format());
+                }
+                else
+                {
+                    // TODO: CASE: Notify minimum wait time to clients on receiving busy status report #28290
+                    ChipLogProgress(SecureChannel, "Received busy status report with minimum wait time: %u ms", minimumWaitTime);
                 }
             }
         }
 
-        return err;
+        // It's very important that we propagate the return value from
+        // OnFailureStatusReport out to the caller.  Make sure we return it directly.
+        return OnFailureStatusReport(report.GetGeneralCode(), report.GetProtocolCode());
     }
 
     /**

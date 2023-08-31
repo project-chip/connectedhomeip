@@ -1883,6 +1883,12 @@ PICS:
       id: DESC.S.A0004
 
     #
+    #Feature
+    #
+    - label: "Does the device support the TagList command"
+      id: DESC.S.F00
+
+    #
     # client / attributes
     #
     - label:
@@ -8835,19 +8841,6 @@ PICS:
       id: OPSTATE.S.E01
 
     #Server Commands Received
-    - label: "Does the device implement receiving the Pause command?"
-      id: OPSTATE.S.C00
-
-    - label: "Does the device implement receiving the Stop command?"
-      id: OPSTATE.S.C01
-
-    - label: "Does the device implement receiving the Start command?"
-      id: OPSTATE.S.C02
-
-    - label: "Does the device implement receiving the Resume command?"
-      id: OPSTATE.S.C03
-
-    #Commands recevied
     - label: "Does the device implement receiving the Pause command?"
       id: OPSTATE.S.C00.Rsp
 

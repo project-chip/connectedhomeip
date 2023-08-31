@@ -665,7 +665,7 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
     if (g_variant_n_children(scan_result.get()) > 0)
     {
         GAutoPtr<GVariantIter> iter;
-        g_variant_get(scan_result.get(), "a(tstayqqyyyybb)", &MakeUniquePointerReceiver(iter).Get());
+        g_variant_get(scan_result.get(), "a(tstayqqynyybb)", &MakeUniquePointerReceiver(iter).Get());
         if (!iter)
         {
             delete scanResult;
@@ -679,17 +679,17 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
         guint16 panid;
         guint16 joiner_udp_port;
         guint8 channel;
-        guint8 rssi;
+        gint16 rssi;
         guint8 lqi;
         guint8 version;
         gboolean is_native;
         gboolean is_joinable;
 
-        while (g_variant_iter_loop(iter.get(), "(tstayqqyyyybb)", &ext_address, &network_name, &ext_panid, &steering_data, &panid,
+        while (g_variant_iter_loop(iter.get(), "(tstayqqynyybb)", &ext_address, &network_name, &ext_panid, &steering_data, &panid,
                                    &joiner_udp_port, &channel, &rssi, &lqi, &version, &is_native, &is_joinable))
         {
             ChipLogProgress(DeviceLayer,
-                            "Thread Network: %s (%016" PRIx64 ") ExtPanId(%016" PRIx64 ") RSSI %u LQI %u"
+                            "Thread Network: %s (%016" PRIx64 ") ExtPanId(%016" PRIx64 ") RSSI %d LQI %u"
                             " Version %u",
                             network_name, ext_address, ext_panid, rssi, lqi, version);
             NetworkCommissioning::ThreadScanResponse networkScanned;
@@ -706,8 +706,19 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
             networkScanned.channel         = channel;
             networkScanned.version         = version;
             networkScanned.extendedAddress = 0;
-            networkScanned.rssi            = rssi;
-            networkScanned.lqi             = lqi;
+            if (rssi > std::numeric_limits<int8_t>::max())
+            {
+                networkScanned.rssi = std::numeric_limits<int8_t>::max();
+            }
+            else if (rssi < std::numeric_limits<int8_t>::min())
+            {
+                networkScanned.rssi = std::numeric_limits<int8_t>::min();
+            }
+            else
+            {
+                networkScanned.rssi = static_cast<int8_t>(rssi);
+            }
+            networkScanned.lqi = lqi;
 
             scanResult->push_back(networkScanned);
         }
