@@ -41,7 +41,7 @@ void wifiInterface_eventScanDone(struct netif * interface, netbus_fs_scan_ind_cm
 void wifi_event_handler(uint32_t code);
 bool wifi_start_firmware_task(void);
 
-void network_netif_ext_callback(struct netif* netif, netif_nsc_reason_t reason, const netif_ext_callback_args_t* args);
+void network_netif_ext_callback(struct netif * netif, netif_nsc_reason_t reason, const netif_ext_callback_args_t * args);
 
 #ifdef __cplusplus
 }

@@ -138,7 +138,7 @@ CHIP_ERROR BLWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
 
     memcpy(wifi_ssid, ssid, ssidLen);
     memcpy(passwd, key, keyLen);
-    
+
     wifi_interface = wifi_mgmr_sta_enable();
 
     wifi_mgmr_sta_connect(&wifi_interface, wifi_ssid, passwd, NULL, NULL, 0, 0);
@@ -199,19 +199,21 @@ void BLWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callba
         {
             memset(mScanSSID, 0, sizeof(mScanSSID));
             memcpy(mScanSSID, ssid.data(), ssid.size());
-            iret = wifi_mgmr_scan_adv(NULL, NULL, NULL, 0, NULL, mScanSSID, 1, 0);
+            iret      = wifi_mgmr_scan_adv(NULL, NULL, NULL, 0, NULL, mScanSSID, 1, 0);
             mScanType = 1;
         }
         else
         {
-            iret = wifi_mgmr_scan(NULL, NULL);
+            iret      = wifi_mgmr_scan(NULL, NULL);
             mScanType = 0;
         }
 
-        if (0 == iret) {
+        if (0 == iret)
+        {
             mpScanCallback = callback;
         }
-        else {
+        else
+        {
             callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
         }
     }
@@ -353,17 +355,19 @@ bool BLWiFiDriver::WiFiNetworkIterator::Next(Network & item)
             item.connected = true;
         }
     }
-    
+
     return true;
 }
 
 void NetworkEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
-    if (!(DeviceEventType::IsPlatformSpecific(event->Type) && DeviceEventType::IsPublic(event->Type))) {
+    if (!(DeviceEventType::IsPlatformSpecific(event->Type) && DeviceEventType::IsPublic(event->Type)))
+    {
         return;
     }
 
-    switch (event->Type) {
+    switch (event->Type)
+    {
     case kWiFiOnInitDone:
         break;
     case kWiFiOnScanDone:
@@ -402,47 +406,51 @@ extern "C" void wifi_event_handler(uint32_t code)
 
     memset(&event, 0, sizeof(ChipDeviceEvent));
 
-    switch (code) {
-        case CODE_WIFI_ON_INIT_DONE: 
-            wifi_mgmr_start_background(&conf);
-            break;
-        case CODE_WIFI_ON_SCAN_DONE:
-            event.Type                                 = kWiFiOnScanDone;
-            PlatformMgr().PostEventOrDie(&event);
-            break;
-        case CODE_WIFI_ON_CONNECTED:
-            event.Type                                 = kWiFiOnConnected;
-            PlatformMgr().PostEventOrDie(&event);
-            break;
-        case CODE_WIFI_ON_GOT_IP: 
-            event.Type                                 = kGotIpAddress;
-            PlatformMgr().PostEventOrDie(&event);
-            break;
-        case CODE_WIFI_ON_DISCONNECT: 
-            event.Type                                 = kWiFiOnDisconnected;
-            PlatformMgr().PostEventOrDie(&event);
-            break;
-        default: 
-            ChipLogProgress(DeviceLayer, "[APP] [EVT] Unknown code %lu \r\n", code);
+    switch (code)
+    {
+    case CODE_WIFI_ON_INIT_DONE:
+        wifi_mgmr_start_background(&conf);
+        break;
+    case CODE_WIFI_ON_SCAN_DONE:
+        event.Type = kWiFiOnScanDone;
+        PlatformMgr().PostEventOrDie(&event);
+        break;
+    case CODE_WIFI_ON_CONNECTED:
+        event.Type = kWiFiOnConnected;
+        PlatformMgr().PostEventOrDie(&event);
+        break;
+    case CODE_WIFI_ON_GOT_IP:
+        event.Type = kGotIpAddress;
+        PlatformMgr().PostEventOrDie(&event);
+        break;
+    case CODE_WIFI_ON_DISCONNECT:
+        event.Type = kWiFiOnDisconnected;
+        PlatformMgr().PostEventOrDie(&event);
+        break;
+    default:
+        ChipLogProgress(DeviceLayer, "[APP] [EVT] Unknown code %lu \r\n", code);
     }
 }
 
-extern "C" void network_netif_ext_callback(struct netif* nif, netif_nsc_reason_t reason, const netif_ext_callback_args_t* args) 
+extern "C" void network_netif_ext_callback(struct netif * nif, netif_nsc_reason_t reason, const netif_ext_callback_args_t * args)
 {
     ChipDeviceEvent event;
 
     memset(&event, 0, sizeof(ChipDeviceEvent));
 
-    if ((LWIP_NSC_IPV6_ADDR_STATE_CHANGED & reason) && args) {
+    if ((LWIP_NSC_IPV6_ADDR_STATE_CHANGED & reason) && args)
+    {
 
-        if (args->ipv6_addr_state_changed.addr_index >= LWIP_IPV6_NUM_ADDRESSES || 
-            ip6_addr_islinklocal(netif_ip6_addr(nif, args->ipv6_addr_state_changed.addr_index))) {
+        if (args->ipv6_addr_state_changed.addr_index >= LWIP_IPV6_NUM_ADDRESSES ||
+            ip6_addr_islinklocal(netif_ip6_addr(nif, args->ipv6_addr_state_changed.addr_index)))
+        {
             return;
         }
 
         if (netif_ip6_addr_state(nif, args->ipv6_addr_state_changed.addr_index) != args->ipv6_addr_state_changed.old_state &&
-            ip6_addr_ispreferred(netif_ip6_addr_state(nif, args->ipv6_addr_state_changed.addr_index))) {
-            event.Type                                 = kGotIpv6Address;
+            ip6_addr_ispreferred(netif_ip6_addr_state(nif, args->ipv6_addr_state_changed.addr_index)))
+        {
+            event.Type = kGotIpv6Address;
             PlatformMgr().PostEventOrDie(&event);
         }
     }

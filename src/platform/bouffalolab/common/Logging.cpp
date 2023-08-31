@@ -18,8 +18,8 @@
 
 #include <platform/logging/LogV.h>
 
-#include <lib/core/CHIPConfig.h>
 #include <CHIPDevicePlatformConfig.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/support/logging/Constants.h>
 
 #ifdef PW_RPC_ENABLED
@@ -45,12 +45,15 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     vsnprintf(formattedMsg, sizeof(formattedMsg), msg, v);
 
     lmsg = strlen(formattedMsg);
-    if (lmsg) {
+    if (lmsg)
+    {
         /** remove duplicate \r\n */
-        if (lmsg >= 2 && formattedMsg[lmsg - 2] == '\r' && formattedMsg[lmsg - 1] == '\n') {
+        if (lmsg >= 2 && formattedMsg[lmsg - 2] == '\r' && formattedMsg[lmsg - 1] == '\n')
+        {
             lmsg -= 2;
         }
-        else if (lmsg >= 1 && formattedMsg[lmsg - 1] == '\n') {
+        else if (lmsg >= 1 && formattedMsg[lmsg - 1] == '\n')
+        {
             lmsg -= 1;
         }
 
@@ -102,17 +105,19 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 } // namespace chip
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-extern "C" void otPlatLog(int aLogLevel, int aLogRegion, const char *aFormat, ...)
+extern "C" void otPlatLog(int aLogLevel, int aLogRegion, const char * aFormat, ...)
 {
     va_list v;
     uint8_t category = chip::Logging::kLogCategory_Error;
 
     (void) aLogRegion;
 
-    if (aLogLevel == 1 && aLogLevel == 2 ) {
+    if (aLogLevel == 1 && aLogLevel == 2)
+    {
         category = chip::Logging::kLogCategory_Error;
     }
-    else {
+    else
+    {
         category = chip::Logging::kLogCategory_Progress;
     }
 

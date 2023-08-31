@@ -53,8 +53,8 @@ extern "C" {
 #include <hosal_gpio.h>
 }
 
-#include "mboard.h"
 #include "AppTask.h"
+#include "mboard.h"
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -214,7 +214,7 @@ void AppTask::AppTaskMain(void * pvParameter)
             }
 
 #ifdef BOOT_PIN_RESET
-            if (APP_EVENT_BTN_LONG & appEvent) 
+            if (APP_EVENT_BTN_LONG & appEvent)
             {
                 /** Turn off light to indicate button long press for factory reset is confirmed */
                 sLightLED.SetOnoff(false);
@@ -337,11 +337,12 @@ void AppTask::TimerEventHandler(app_event_t event)
     if (GetAppTask().mButtonPressedTime)
     {
 #ifdef BOOT_PIN_RESET
-        if (System::SystemClock().GetMonotonicMilliseconds64().count() - GetAppTask().mButtonPressedTime > APP_BUTTON_PRESS_LONG) 
+        if (System::SystemClock().GetMonotonicMilliseconds64().count() - GetAppTask().mButtonPressedTime > APP_BUTTON_PRESS_LONG)
         {
             GetAppTask().PostEvent(APP_EVENT_BTN_LONG);
         }
-        else if (System::SystemClock().GetMonotonicMilliseconds64().count() - GetAppTask().mButtonPressedTime >= APP_BUTTON_PRESS_SHORT)
+        else if (System::SystemClock().GetMonotonicMilliseconds64().count() - GetAppTask().mButtonPressedTime >=
+                 APP_BUTTON_PRESS_SHORT)
         {
 #if defined(BL602_NIGHT_LIGHT) || defined(BL706_NIGHT_LIGHT)
             /** change color to indicate to wait factory reset confirm */
@@ -415,7 +416,6 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
 
 #ifdef BOOT_PIN_RESET
 static hosal_gpio_dev_t gpio_key = { .port = BOOT_PIN_RESET, .config = INPUT_HIGH_IMPEDANCE, .priv = NULL };
-
 
 void AppTask::ButtonInit(void)
 {

@@ -112,7 +112,7 @@ extern "C" void wifiInterface_eventScanDone(struct netif * interface, netbus_fs_
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-extern "C" void ethernetInterface_eventGotIP(struct netif * interface) 
+extern "C" void ethernetInterface_eventGotIP(struct netif * interface)
 {
     ChipLogProgress(DeviceLayer, "ethernetInterface_eventGotIP");
     ConnectivityMgrImpl().OnConnectivityChanged(interface);
@@ -120,27 +120,30 @@ extern "C" void ethernetInterface_eventGotIP(struct netif * interface)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-extern "C" void network_netif_ext_callback(struct netif* nif, netif_nsc_reason_t reason, const netif_ext_callback_args_t* args) 
+extern "C" void network_netif_ext_callback(struct netif * nif, netif_nsc_reason_t reason, const netif_ext_callback_args_t * args)
 {
     ChipDeviceEvent event;
 
     memset(&event, 0, sizeof(ChipDeviceEvent));
 
-    if ((LWIP_NSC_IPV6_ADDR_STATE_CHANGED & reason) && args) {
+    if ((LWIP_NSC_IPV6_ADDR_STATE_CHANGED & reason) && args)
+    {
 
-        if (args->ipv6_addr_state_changed.addr_index >= LWIP_IPV6_NUM_ADDRESSES || 
-            ip6_addr_islinklocal(netif_ip6_addr(nif, args->ipv6_addr_state_changed.addr_index))) {
+        if (args->ipv6_addr_state_changed.addr_index >= LWIP_IPV6_NUM_ADDRESSES ||
+            ip6_addr_islinklocal(netif_ip6_addr(nif, args->ipv6_addr_state_changed.addr_index)))
+        {
             return;
         }
 
         if (netif_ip6_addr_state(nif, args->ipv6_addr_state_changed.addr_index) != args->ipv6_addr_state_changed.old_state &&
-            ip6_addr_ispreferred(netif_ip6_addr_state(nif, args->ipv6_addr_state_changed.addr_index))) {
-            event.Type                                 = kGotIpv6Address;
+            ip6_addr_ispreferred(netif_ip6_addr_state(nif, args->ipv6_addr_state_changed.addr_index)))
+        {
+            event.Type = kGotIpv6Address;
             PlatformMgr().PostEventOrDie(&event);
         }
     }
 }
-#endif //CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 
 } // namespace DeviceLayer
 } // namespace chip

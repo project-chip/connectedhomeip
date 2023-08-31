@@ -38,23 +38,27 @@ static int virt_net_spi_event_cb(virt_net_t obj, enum virt_net_event_code code, 
 
     assert(obj != NULL);
 
-    if (VIRT_NET_EV_ON_LINK_STATUS_DONE == code) {
+    if (VIRT_NET_EV_ON_LINK_STATUS_DONE == code)
+    {
         netbus_fs_link_status_ind_cmd_msg_t * pkg_data;
 
         pkg_data = (netbus_fs_link_status_ind_cmd_msg_t *) ((struct pkg_protocol *) opaque)->payload;
         record   = &pkg_data->record;
-        
+
         memcpy(&vnet_ap_record, record, sizeof(struct bflbwifi_ap_record));
-        if (record->link_status == BF1B_WIFI_LINK_STATUS_DOWN){
+        if (record->link_status == BF1B_WIFI_LINK_STATUS_DOWN)
+        {
             code = VIRT_NET_EV_ON_DISCONNECT;
         }
-        else {
+        else
+        {
             code = -1;
             return 0;
         }
     }
-    else if (VIRT_NET_EV_ON_SCAN_DONE == code) {
-        wifiInterface_eventScanDone((struct netif *)&obj->netif, opaque);
+    else if (VIRT_NET_EV_ON_SCAN_DONE == code)
+    {
+        wifiInterface_eventScanDone((struct netif *) &obj->netif, opaque);
     }
 
     wifi_event_handler(code);
@@ -76,7 +80,7 @@ bool wifi_start_firmware_task(void)
     }
 
     virt_net_setup_callback(vnet_spi, virt_net_spi_event_cb, NULL);
-    netifapi_netif_set_default((struct netif *)&vnet_spi->netif);
+    netifapi_netif_set_default((struct netif *) &vnet_spi->netif);
 
     netif_add_ext_callback(&netifExtCallback, network_netif_ext_callback);
 
@@ -93,7 +97,7 @@ struct netif * deviceInterface_getNetif(void)
     return NULL;
 }
 
-struct netif * otbr_getBackboneNetif(void) 
+struct netif * otbr_getBackboneNetif(void)
 {
     if (vnet_spi)
     {

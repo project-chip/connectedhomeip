@@ -58,7 +58,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 {
-    struct bflbwifi_ap_record *pApInfo = wifiInterface_getApInfo();
+    struct bflbwifi_ap_record * pApInfo = wifiInterface_getApInfo();
 
     if (NULL == pApInfo)
     {
@@ -72,7 +72,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
     using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
-    struct bflbwifi_ap_record *pApInfo = wifiInterface_getApInfo();
+    struct bflbwifi_ap_record * pApInfo = wifiInterface_getApInfo();
 
     if (NULL == pApInfo)
     {
@@ -99,7 +99,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetwork
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
 {
-    struct bflbwifi_ap_record *pApInfo = wifiInterface_getApInfo();
+    struct bflbwifi_ap_record * pApInfo = wifiInterface_getApInfo();
 
     if (NULL == pApInfo)
     {
@@ -114,7 +114,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNu
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 {
-    struct bflbwifi_ap_record *pApInfo = wifiInterface_getApInfo();
+    struct bflbwifi_ap_record * pApInfo = wifiInterface_getApInfo();
 
     if (NULL == pApInfo)
     {

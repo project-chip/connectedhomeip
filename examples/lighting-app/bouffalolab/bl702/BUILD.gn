@@ -20,8 +20,8 @@ import("${bouffalolab_iot_sdk_build_root}/bl702/bl_iot_sdk.gni")
 import("${bouffalolab_iot_sdk_build_root}/common/bouffalolab_executable.gni")
 import("${build_root}/config/defaults.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
-import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/bouffalolab/common/args.gni")
+import("${chip_root}/src/platform/device.gni")
 
 import("${chip_root}/src/app/chip_data_model.gni")
 
@@ -90,14 +90,10 @@ bl_iot_sdk("sdk") {
     include_dirs += [ "${examples_plat_dir}/common/plat" ]
   }
 
-  defines += [ 
-    "CHIP_DEVICE_CONFIG_ENABLE_ETHERNET=${chip_enable_ethernet}",
-  ]
+  defines += [ "CHIP_DEVICE_CONFIG_ENABLE_ETHERNET=${chip_enable_ethernet}" ]
 
   if (chip_enable_ethernet) {
-    defines += [ 
-      "CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE=48",
-    ]
+    defines += [ "CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE=48" ]
   }
 
   if (enable_psram) {
@@ -114,14 +110,11 @@ bl_iot_sdk("sdk") {
 }
 
 chip_data_model("bouffalolab-lighting") {
-
   if (chip_enable_openthread) {
     zap_file = "${example_dir}/data_model/lighting-app-thread.zap"
-  }
-  else if (chip_enable_wifi) {
+  } else if (chip_enable_wifi) {
     zap_file = "${example_dir}/data_model/lighting-app-wifi.zap"
-  }
-  else {
+  } else {
     zap_file = "${example_dir}/data_model/lighting-app-ethernet.zap"
   }
 
@@ -143,11 +136,9 @@ bouffalolab_executable("lighting_app") {
   if (enable_debug_frame_ptr) {
     defines += [ "CONF_ENABLE_FRAME_PTR=1" ]
   }
-  
+
   if (chip_config_network_layer_ble) {
-    defines += [
-      "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1"
-    ]
+    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1" ]
   }
 
   if (false == enable_reset_counter) {
@@ -163,8 +154,8 @@ bouffalolab_executable("lighting_app") {
   sources = [
     "${example_dir}/common/AppTask.cpp",
     "${example_dir}/common/ZclCallbacks.cpp",
-    "${examples_plat_dir}/common/iot_sdk/demo_pwm.c",
     "${examples_plat_dir}/common/iot_sdk/aos_task.c",
+    "${examples_plat_dir}/common/iot_sdk/demo_pwm.c",
     "${examples_plat_dir}/common/iot_sdk/platform_port.c",
     "${examples_plat_dir}/common/iot_sdk/uart.c",
     "${examples_plat_dir}/common/plat/LEDWidget.cpp",
@@ -190,9 +181,7 @@ bouffalolab_executable("lighting_app") {
   ]
 
   if (chip_enable_wifi || chip_enable_ethernet) {
-    include_dirs += [
-      "${examples_plat_dir}/bl702/lwipopts",
-    ]
+    include_dirs += [ "${examples_plat_dir}/bl702/lwipopts" ]
   }
 
   if (enable_psram) {
@@ -204,14 +193,12 @@ bouffalolab_executable("lighting_app") {
   }
 
   if (chip_enable_wifi || chip_enable_ethernet) {
-    include_dirs += [
-      "${examples_plat_dir}/common/route_hook",
-    ]
+    include_dirs += [ "${examples_plat_dir}/common/route_hook" ]
 
     if (chip_enable_wifi) {
-      defines += ["CHIP_DEVICE_CONFIG_ENABLE_WIFI"]
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_WIFI" ]
     }
-    
+
     sources += [
       "${examples_plat_dir}/common/route_hook/bl_route_hook.c",
       "${examples_plat_dir}/common/route_hook/bl_route_table.c",

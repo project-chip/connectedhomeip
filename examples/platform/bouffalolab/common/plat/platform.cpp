@@ -59,8 +59,8 @@
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET || CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <lwip/netif.h>
 #include <bl_route_hook.h>
+#include <lwip/netif.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI && BL602_ENABLE
 #include <wifi_mgmr_ext.h>
 #endif

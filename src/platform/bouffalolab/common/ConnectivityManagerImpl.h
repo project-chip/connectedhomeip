@@ -113,8 +113,7 @@ private:
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-    enum class ConnectivityFlags : uint16_t
-    {
+    enum class ConnectivityFlags : uint16_t{
         kHaveIPv4InternetConnectivity = 0x0001,
         kHaveIPv6InternetConnectivity = 0x0002,
         kAwaitingConnectivity         = 0x0010,

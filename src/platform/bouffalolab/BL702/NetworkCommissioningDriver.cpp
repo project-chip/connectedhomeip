@@ -35,7 +35,7 @@ CHIP_ERROR BLWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     mpScanCallback         = nullptr;
     mpConnectCallback      = nullptr;
     mpStatusChangeCallback = networkStatusChangeCallback;
-    
+
     err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiSSID, mSavedNetwork.credentials,
                                                    sizeof(mSavedNetwork.credentials), &credentialsLen);
     SuccessOrExit(err);
@@ -46,8 +46,8 @@ CHIP_ERROR BLWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     mSavedNetwork.credentialsLen = credentialsLen;
     mSavedNetwork.ssidLen        = ssidLen;
 
-    mStagingNetwork        = mSavedNetwork;
-    mScanSpecific          = false;
+    mStagingNetwork = mSavedNetwork;
+    mScanSpecific   = false;
 
 exit:
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -199,10 +199,10 @@ void BLWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callba
     }
 }
 
-void BLWiFiDriver::OnScanWiFiNetworkDone(void *opaque)
+void BLWiFiDriver::OnScanWiFiNetworkDone(void * opaque)
 {
     netbus_wifi_mgmr_msg_cmd_t * pkg_data = (netbus_wifi_mgmr_msg_cmd_t *) ((struct pkg_protocol *) opaque)->payload;
-    netbus_fs_scan_ind_cmd_msg_t * pmsg = (netbus_fs_scan_ind_cmd_msg_t *) ((netbus_fs_scan_ind_cmd_msg_t *) pkg_data);
+    netbus_fs_scan_ind_cmd_msg_t * pmsg   = (netbus_fs_scan_ind_cmd_msg_t *) ((netbus_fs_scan_ind_cmd_msg_t *) pkg_data);
 
     size_t i = 0, ap_num = 0;
     WiFiScanResponse *pScanResponse, *p;
@@ -228,12 +228,14 @@ void BLWiFiDriver::OnScanWiFiNetworkDone(void *opaque)
         return;
     }
 
-    if (ap_num) {
+    if (ap_num)
+    {
         p = pScanResponse = (WiFiScanResponse *) malloc(sizeof(WiFiScanResponse) * ap_num);
     }
-    else {
+    else
+    {
         p = pScanResponse = (WiFiScanResponse *) malloc(sizeof(WiFiScanResponse) * pmsg->num);
-        ap_num = pmsg->num;
+        ap_num            = pmsg->num;
     }
     for (i = 0; i < pmsg->num; i++)
     {
@@ -281,7 +283,7 @@ void BLWiFiDriver::OnScanWiFiNetworkDone(void *opaque)
 
 CHIP_ERROR GetConfiguredNetwork(Network & network)
 {
-    struct bflbwifi_ap_record *pApInfo = wifiInterface_getApInfo();
+    struct bflbwifi_ap_record * pApInfo = wifiInterface_getApInfo();
 
     if (NULL == pApInfo)
     {
@@ -378,11 +380,13 @@ bool BLWiFiDriver::WiFiNetworkIterator::Next(Network & item)
 
 void NetworkEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
-    if (!(DeviceEventType::IsPlatformSpecific(event->Type) && DeviceEventType::IsPublic(event->Type))) {
+    if (!(DeviceEventType::IsPlatformSpecific(event->Type) && DeviceEventType::IsPublic(event->Type)))
+    {
         return;
     }
 
-    switch (event->Type) {
+    switch (event->Type)
+    {
     case kWiFiOnInitDone:
         break;
     case kWiFiOnConnected:
@@ -413,21 +417,22 @@ extern "C" void wifi_event_handler(uint32_t code)
     ChipDeviceEvent event;
 
     memset(&event, 0, sizeof(ChipDeviceEvent));
-    switch (code) {
-        case VIRT_NET_EV_ON_CONNECTED:
-            event.Type                                 = kWiFiOnConnected;
-            PlatformMgr().PostEventOrDie(&event);
-            break;
-        case VIRT_NET_EV_ON_GOT_IP: 
-            event.Type                                 = kGotIpAddress;
-            PlatformMgr().PostEventOrDie(&event);
-            break;
-        case VIRT_NET_EV_ON_DISCONNECT: 
-            event.Type                                 = kWiFiOnDisconnected;
-            PlatformMgr().PostEventOrDie(&event);
-            break;
-        default: 
-            ChipLogProgress(DeviceLayer, "[APP] [EVT] Unknown code %lu \r\n", code);
+    switch (code)
+    {
+    case VIRT_NET_EV_ON_CONNECTED:
+        event.Type = kWiFiOnConnected;
+        PlatformMgr().PostEventOrDie(&event);
+        break;
+    case VIRT_NET_EV_ON_GOT_IP:
+        event.Type = kGotIpAddress;
+        PlatformMgr().PostEventOrDie(&event);
+        break;
+    case VIRT_NET_EV_ON_DISCONNECT:
+        event.Type = kWiFiOnDisconnected;
+        PlatformMgr().PostEventOrDie(&event);
+        break;
+    default:
+        ChipLogProgress(DeviceLayer, "[APP] [EVT] Unknown code %lu \r\n", code);
     }
 }
 

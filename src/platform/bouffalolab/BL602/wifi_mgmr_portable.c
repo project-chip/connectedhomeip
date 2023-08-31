@@ -1,6 +1,6 @@
+#include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-#include <stdbool.h>
 
 #include <aos/yloop.h>
 #include <bl60x_wifi_driver/wifi_mgmr.h>
@@ -156,7 +156,7 @@ struct netif * deviceInterface_getNetif(void)
     return wifi_mgmr_sta_netif_get();
 }
 
-static void wifi_event_handler_raw(input_event_t * event, void * private_data) 
+static void wifi_event_handler_raw(input_event_t * event, void * private_data)
 {
     wifi_event_handler(event->code);
 }

@@ -64,10 +64,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
-    
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     otRadio_opt_t opt;
-    opt.bf.isFtd = true;
+    opt.bf.isFtd        = true;
     opt.bf.isCoexEnable = true;
 
     ot_alarmInit();

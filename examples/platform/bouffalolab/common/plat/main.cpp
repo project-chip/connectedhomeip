@@ -33,7 +33,8 @@ void appError(int err)
 {
     ChipLogProgress(NotSpecified, "!!!!!!!!!!!! App Critical Error: %d !!!!!!!!!!!", err);
     portDISABLE_INTERRUPTS();
-    while (true) ;
+    while (true)
+        ;
 }
 
 void appError(CHIP_ERROR error)
@@ -47,7 +48,7 @@ extern "C" int START_ENTRY(void)
 
     easyflash_init();
     ef_load_env_cache();
-    
+
     ChipLogProgress(NotSpecified, "==================================================");
     ChipLogProgress(NotSpecified, "bouffalolab chip-lighting-example, built at " __DATE__ " " __TIME__);
     ChipLogProgress(NotSpecified, "==================================================");

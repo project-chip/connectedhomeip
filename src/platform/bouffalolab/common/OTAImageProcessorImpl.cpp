@@ -24,7 +24,7 @@ extern "C" {
 #include <hosal_ota.h>
 #endif
 
-extern void hal_reboot (void);
+extern void hal_reboot(void);
 }
 
 #include "OTAImageProcessorImpl.h"

@@ -18,7 +18,6 @@
 
 #pragma once
 
-
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
 
 #if CHIP_DEVICE_LAYER_TARGET_BL602

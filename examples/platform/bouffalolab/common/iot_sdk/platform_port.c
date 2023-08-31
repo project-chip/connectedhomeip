@@ -59,8 +59,8 @@
 
 #include <uart.h>
 
-#include <plat.h>
 #include "mboard.h"
+#include <plat.h>
 
 HOSAL_UART_DEV_DECL(uart_stdio, CHIP_UART_PORT, CHIP_UART_PIN_TX, CHIP_UART_PIN_RX, CHIP_UART_BAUDRATE);
 
@@ -90,7 +90,7 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
 
 void vApplicationMallocFailedHook(void)
 {
-    printf( "Memory Allocate Failed. Current left size is %d bytes", xPortGetFreeHeapSize());
+    printf("Memory Allocate Failed. Current left size is %d bytes", xPortGetFreeHeapSize());
     while (true)
     {
         /*empty here*/
@@ -104,7 +104,7 @@ void vApplicationIdleHook(void)
 }
 
 void vApplicationGetIdleTaskMemory(StaticTask_t ** ppxIdleTaskTCBBuffer, StackType_t ** ppxIdleTaskStackBuffer,
-                                              uint32_t * pulIdleTaskStackSize)
+                                   uint32_t * pulIdleTaskStackSize)
 {
     /* If the buffers to be provided to the Idle task are declared inside this
     function then they must be declared static - otherwise they will be allocated on
@@ -127,7 +127,7 @@ void vApplicationGetIdleTaskMemory(StaticTask_t ** ppxIdleTaskTCBBuffer, StackTy
 application must provide an implementation of vApplicationGetTimerTaskMemory()
 to provide the memory that is used by the Timer service task. */
 void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBuffer, StackType_t ** ppxTimerTaskStackBuffer,
-                                               uint32_t * pulTimerTaskStackSize)
+                                    uint32_t * pulTimerTaskStackSize)
 {
     /* If the buffers to be provided to the Timer task are declared inside this
     function then they must be declared static - otherwise they will be allocated on
@@ -179,7 +179,8 @@ void vAssertCalled(void)
     portABORT();
 #endif
 
-    while (true);
+    while (true)
+        ;
 }
 #endif
 
@@ -199,7 +200,8 @@ void __attribute__((weak)) user_vAssertCalled(void)
         printf("vAssertCalled, ra = %p in task %s\r\n", (void *) ra, pcTaskGetName(NULL));
     }
 
-    while (true);
+    while (true)
+        ;
 }
 
 void __attribute__((weak)) user_vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
@@ -227,10 +229,10 @@ void __attribute__((weak)) user_vApplicationMallocFailedHook(void)
     }
 }
 
-void bflb_assert(void) __attribute__ ((weak, alias ("user_vAssertCalled")));
+void bflb_assert(void) __attribute__((weak, alias("user_vAssertCalled")));
 #else
 void user_vAssertCalled(void) __attribute__((weak, alias("vAssertCalled")));
-void bflb_assert(void) __attribute__ ((weak, alias ("vAssertCalled")));
+void bflb_assert(void) __attribute__((weak, alias("vAssertCalled")));
 #endif
 
 // ================================================================================

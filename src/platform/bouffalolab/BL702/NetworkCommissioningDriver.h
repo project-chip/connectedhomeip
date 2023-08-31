@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <platform/NetworkCommissioning.h>
 #include <pkg_protocol.h>
+#include <platform/NetworkCommissioning.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -106,7 +106,7 @@ public:
 
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
     void OnConnectWiFiNetwork(bool isConnected);
-    void OnScanWiFiNetworkDone(void *opaque = NULL);
+    void OnScanWiFiNetworkDone(void * opaque = NULL);
     void OnNetworkStatusChange(void);
 
     CHIP_ERROR SetLastDisconnectReason(const ChipDeviceEvent * event);

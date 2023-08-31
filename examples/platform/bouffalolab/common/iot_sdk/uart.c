@@ -139,20 +139,20 @@ static int uartRxCallback(void * p_arg)
     {
         if (chipUart_var.head < MAX_BUFFER_SIZE)
         {
-            //len = hosal_uart_receive(&uart_stdio, chipUart_var.rxbuf + chipUart_var.head, MAX_BUFFER_SIZE - chipUart_var.head);
+            // len = hosal_uart_receive(&uart_stdio, chipUart_var.rxbuf + chipUart_var.head, MAX_BUFFER_SIZE - chipUart_var.head);
             chipUart_var.head = (chipUart_var.head + len) % MAX_BUFFER_SIZE;
         }
 
         if (0 == chipUart_var.head)
         {
-            //len = hosal_uart_receive(&uart_stdio, chipUart_var.rxbuf, chipUart_var.tail - 1);
+            // len = hosal_uart_receive(&uart_stdio, chipUart_var.rxbuf, chipUart_var.tail - 1);
             chipUart_var.head += len;
         }
     }
     else
     {
         chipUart_var.head +=
-            //hosal_uart_receive(&uart_stdio, chipUart_var.rxbuf + chipUart_var.head, chipUart_var.tail - chipUart_var.head - 1);
+        // hosal_uart_receive(&uart_stdio, chipUart_var.rxbuf + chipUart_var.head, chipUart_var.tail - chipUart_var.head - 1);
     }
 
     if (chipUart_var.head != chipUart_var.tail)

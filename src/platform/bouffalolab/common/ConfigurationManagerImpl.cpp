@@ -21,7 +21,7 @@
 
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
-extern "C" void hal_reboot (void);
+extern "C" void hal_reboot(void);
 
 namespace chip {
 namespace DeviceLayer {

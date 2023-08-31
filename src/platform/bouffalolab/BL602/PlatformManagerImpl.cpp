@@ -16,11 +16,11 @@
  */
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
-#include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
 #include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
+#include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <lwip/tcpip.h>
 

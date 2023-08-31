@@ -27,7 +27,6 @@ if (chip_enable_openthread) {
 }
 
 static_library("BL702") {
-
   defines = []
 
   sources = [
@@ -75,11 +74,11 @@ static_library("BL702") {
       "ConfigurationManagerImpl.cpp",
       "ConnectivityManagerImpl.cpp",
       "NetworkCommissioningDriver.cpp",
-      "wifi_mgmr_portable.c"
+      "wifi_mgmr_portable.c",
     ]
 
     deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
-  } 
+  }
 
   if (chip_enable_openthread) {
     # needed for MTD/FTD
@@ -101,7 +100,7 @@ static_library("BL702") {
       ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
-  } 
+  }
 
   if (chip_enable_ethernet) {
     sources += [
@@ -109,7 +108,7 @@ static_library("BL702") {
       "ConnectivityManagerImpl.cpp",
       "EthernetInterface.c",
     ]
-    
+
     deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
   }
 

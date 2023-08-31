@@ -64,7 +64,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 {
-    if (ConnectivityMgrImpl()._IsWiFiStationConnected()) {
+    if (ConnectivityMgrImpl()._IsWiFiStationConnected())
+    {
         return CopySpanToMutableSpan(ByteSpan(wifiMgmr.wifi_mgmr_stat_info.bssid), BssId);
     }
 
