@@ -83,7 +83,7 @@ def validate_command_id_range(command_id):
         asserts.fail(f"Invalid command id (0x{command_id:08X}) in invalid range")
 
 
-class TC_XX_1_1(MatterBaseTest):
+class TC_IDM_10_1(MatterBaseTest):
     @async_test_body
     async def test_xx_1_1(self):
 
