@@ -5,6 +5,11 @@ using namespace chip::app::Clusters::AirQuality;
 
 Instance * gAirQualityCluster = nullptr;
 
+Instance * AirQuality::GetInstance()
+{
+    return gAirQualityCluster;
+}
+
 void AirQuality::Shutdown()
 {
     if (gAirQualityCluster != nullptr)
