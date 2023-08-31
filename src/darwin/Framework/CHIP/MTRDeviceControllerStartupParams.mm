@@ -264,6 +264,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
     _productAttestationAuthorityCertificates = nil;
     _certificationDeclarationCertificates = nil;
+    _shouldAdvertiseOperational = NO;
 
     _ipk = ipk;
     _vendorID = vendorID;

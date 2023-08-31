@@ -47,6 +47,12 @@ MTR_NEWLY_AVAILABLE
 @property (nonatomic, copy, nullable) NSArray<MTRCertificateDERBytes> * certificationDeclarationCertificates;
 
 /**
+ * Whether the controller should advertise its operational identity.  Defaults
+ * to NO.
+ */
+@property (nonatomic, assign) BOOL shouldAdvertiseOperational;
+
+/**
  * Set an MTROperationalCertificateIssuer to call (on the provided queue) when
  * operational certificates need to be provided during commissioning.
  */
