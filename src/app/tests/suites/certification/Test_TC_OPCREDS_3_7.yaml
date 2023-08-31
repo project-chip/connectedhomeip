@@ -193,11 +193,13 @@ tests:
     - label: "Step 9: TH2 starts discovery of DUT using Operational Discovery"
       # PICS: ""
       # verification: ""
+      # Disabling this step as this occurs from the AddNOC command being run
       disabled: true
 
     - label: "Step 10: TH2 opens a CASE session with DUT over operational network"
       # PICS: ""
       # verification: "DUT is able to open the CASE session with TH2"
+      # Disabling this step as this occurs from the AddNOC command being run
       disabled: true
 
     - label: "Step 11: TH2 sends CommissioningComplete command"
