@@ -350,7 +350,10 @@ static NSString * const sCATsKey = @"CATs";
 NSSet<Class> * MTRDeviceControllerStorageClasses()
 {
     static NSSet * const sStorageClasses = [NSSet setWithArray:@[
-        [NSNumber class], [NSData class], [NSSet class], [MTRCASESessionResumptionInfo class], [NSMutableArray class]
+        [NSNumber class],
+        [NSData class],
+        [NSArray class],
+        [MTRCASESessionResumptionInfo class],
     ]];
     return sStorageClasses;
 }
