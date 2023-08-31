@@ -2382,6 +2382,26 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
 }
 
+- (void)test027_DeviceAttestation
+{
+    __auto_type * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Perform device attestation on the device"];
+
+    [device verifyAttestationWithQueue:queue
+                            completion:^(MTRDeviceAttestationResult * _Nullable result, NSError * _Nullable error) {
+                                XCTAssertNil(error);
+                                XCTAssertNotNil(result);
+                                XCTAssertTrue(result.attestationSucceded);
+                                XCTAssertEqualObjects(result.attestationInfo.basicInformationVendorID, @(0xFFF1));
+                                XCTAssertEqualObjects(result.attestationInfo.basicInformationProductID, @(0x8001));
+                                [expectation fulfill];
+                            }];
+
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+}
+
 - (void)test900_SubscribeAllAttributes
 {
     MTRBaseDevice * device = GetConnectedDevice();

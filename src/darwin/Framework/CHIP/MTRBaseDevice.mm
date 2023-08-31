@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #import <Matter/MTRDefines.h>
+#import <Matter/MTRDeviceAttestationInfo.h>
 
 #import "MTRAttributeTLVValueDecoder_Internal.h"
 #import "MTRBaseDevice_Internal.h"
@@ -31,6 +32,7 @@
 #import "MTRSetupPayload_Internal.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
+#import "zap-generated/MTRCommandPayloads_Internal.h"
 
 #include "app/ConcreteAttributePath.h"
 #include "app/ConcreteCommandPath.h"
@@ -45,9 +47,12 @@
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
 #include <app/util/error-mapping.h>
+#include <controller/CommissioneeDeviceProxy.h> // For kAttestationNonceLength
 #include <controller/CommissioningWindowOpener.h>
 #include <controller/ReadInteraction.h>
 #include <controller/WriteInteraction.h>
+#include <credentials/DeviceAttestationConstructor.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <setup_payload/SetupPayload.h>
 #include <system/SystemClock.h>
@@ -1698,6 +1703,259 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
                                            duration:duration
                                               queue:queue
                                          completion:completion];
+}
+
+namespace {
+class AttestationVerifierHelper {
+public:
+    AttestationVerifierHelper(Credentials::DeviceAttestationVerifier * verifier, MTRDeviceAttestationInfo * info,
+        dispatch_queue_t queue, MTRDeviceAttestationVerificationHandler completion)
+        : mVerifier(verifier)
+        , mInfo(info)
+        , mQueue(queue)
+        , mCompletion(completion)
+        , mCallback(CallbackFunc, this)
+    {
+    }
+
+    // AsyncVerify deletes the AttestationVerifierHelper when the async
+    // operation completes.
+    void AsyncVerify()
+    {
+        Credentials::DeviceAttestationVerifier::AttestationInfo info(AsByteSpan(mInfo.elementsTLV), AsByteSpan(mInfo.challenge),
+            AsByteSpan(mInfo.elementsSignature), AsByteSpan(mInfo.productAttestationIntermediateCertificate),
+            AsByteSpan(mInfo.deviceAttestationCertificate), AsByteSpan(mInfo.nonce),
+            static_cast<VendorId>(mInfo.basicInformationVendorID.unsignedShortValue),
+            mInfo.basicInformationProductID.unsignedShortValue);
+        mVerifier->VerifyAttestationInformation(info, &mCallback);
+    }
+
+private:
+    static void CallbackFunc(void * context, const Credentials::DeviceAttestationVerifier::AttestationInfo & info,
+        Credentials::AttestationVerificationResult result)
+    {
+        auto * self = static_cast<AttestationVerifierHelper *>(context);
+        auto * response = [[MTRDeviceAttestationResult alloc] init];
+        response.attestationInfo = self->mInfo;
+        if (result != Credentials::AttestationVerificationResult::kSuccess) {
+            MTR_LOG_ERROR("Device attestation verification failed with AttestationVerificationResult %u", to_underlying(result));
+            response.attestationSucceded = NO;
+        } else {
+            response.attestationSucceded = YES;
+        }
+
+        // We're going to delete ourselves; make sure we are not trying to use
+        // our members async.
+        auto completion = self->mCompletion;
+        dispatch_async(self->mQueue, ^{
+            completion(response, nil);
+        });
+        delete self;
+    }
+
+    Credentials::DeviceAttestationVerifier * mVerifier;
+    MTRDeviceAttestationInfo * mInfo;
+    dispatch_queue_t mQueue;
+    MTRDeviceAttestationVerificationHandler mCompletion;
+    Callback::Callback<Credentials::DeviceAttestationVerifier::OnAttestationInformationVerification> mCallback;
+};
+} // anonymous namespace
+
+- (void)verifyAttestationWithQueue:(dispatch_queue_t)queue completion:(MTRDeviceAttestationVerificationHandler)completion
+{
+    // TODO: Should we be using the caller queue for our intermediate work?
+    auto * basicInfo = [[MTRBaseClusterBasicInformation alloc] initWithDevice:self endpointID:@(kRootEndpointId) queue:queue];
+    auto * opCreds = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:self endpointID:@(kRootEndpointId) queue:queue];
+
+    __block NSNumber * vendorID;
+    __block NSNumber * productID;
+    __block NSData * dac;
+    __block NSData * pai;
+    __block NSData * attestationElements;
+    __block NSData * attestationSignature;
+    __block NSData * attestationChallenge;
+
+    NSMutableData * nonce = [NSMutableData dataWithLength:kAttestationNonceLength];
+    CHIP_ERROR err = Crypto::DRBG_get_bytes(static_cast<uint8_t *>(nonce.mutableBytes), nonce.length);
+    if (err != CHIP_NO_ERROR) {
+        dispatch_async(queue, ^{
+            completion(nil, [MTRError errorForCHIPErrorCode:err]);
+        });
+    }
+
+    // Sure would be nice to have await/async.  Try to avoid infinite completion
+    // nesting with a state machine instead.
+    enum class Step {
+        FetchVendorID,
+        FetchProductID,
+        FetchPAI,
+        FetchDAC,
+        DoAttestationRequest,
+        PerformAttestation,
+    };
+
+    using AttestationDriver = void (^)(Step);
+    __block __weak AttestationDriver weakAttestationDriver;
+    auto attestationDriver = ^(Step nextStep) {
+        switch (nextStep) {
+        case Step::FetchVendorID: {
+            // TODO: Consider combining the two Basic Information reads into a single MTRBaseDevice read
+            // with two paths.
+            AttestationDriver strongAttestationDriver = weakAttestationDriver;
+            [basicInfo readAttributeVendorIDWithCompletion:^(NSNumber * _Nullable result, NSError * _Nullable error) {
+                if (error != nil) {
+                    MTR_LOG_ERROR("%@ failed to get vendor ID for device attestation: %@", self, error);
+                    dispatch_async(queue, ^{
+                        completion(nil, error);
+                    });
+                    return;
+                }
+                vendorID = result;
+                strongAttestationDriver(Step::FetchProductID);
+            }];
+            break;
+        }
+        case Step::FetchProductID: {
+            AttestationDriver strongAttestationDriver = weakAttestationDriver;
+            [basicInfo readAttributeProductIDWithCompletion:^(NSNumber * _Nullable result, NSError * _Nullable error) {
+                if (error != nil) {
+                    MTR_LOG_ERROR("%@ failed to get product ID for device attestation: %@", self, error);
+                    dispatch_async(queue, ^{
+                        completion(nil, error);
+                    });
+                    return;
+                }
+                productID = result;
+                strongAttestationDriver(Step::FetchPAI);
+            }];
+            break;
+        }
+        case Step::FetchPAI: {
+            auto * params = [[MTROperationalCredentialsClusterCertificateChainRequestParams alloc] init];
+            params.certificateType = @(MTROperationalCredentialsCertificateChainTypeDACCertificate);
+            AttestationDriver strongAttestationDriver = weakAttestationDriver;
+            [opCreds
+                certificateChainRequestWithParams:params
+                                       completion:^(MTROperationalCredentialsClusterCertificateChainResponseParams * _Nullable data,
+                                           NSError * _Nullable error) {
+                                           if (error != nil) {
+                                               MTR_LOG_ERROR("%@ failed to get DAC for device attestation: %@", self, error);
+                                               dispatch_async(queue, ^{
+                                                   completion(nil, error);
+                                               });
+                                           }
+
+                                           dac = data.certificate;
+                                           strongAttestationDriver(Step::FetchDAC);
+                                       }];
+            break;
+        }
+        case Step::FetchDAC: {
+            auto * params = [[MTROperationalCredentialsClusterCertificateChainRequestParams alloc] init];
+            params.certificateType = @(MTROperationalCredentialsCertificateChainTypePAICertificate);
+            AttestationDriver strongAttestationDriver = weakAttestationDriver;
+            [opCreds
+                certificateChainRequestWithParams:params
+                                       completion:^(MTROperationalCredentialsClusterCertificateChainResponseParams * _Nullable data,
+                                           NSError * _Nullable error) {
+                                           if (error != nil) {
+                                               MTR_LOG_ERROR("%@ failed to get PAI for device attestation: %@", self, error);
+                                               dispatch_async(queue, ^{
+                                                   completion(nil, error);
+                                               });
+                                           }
+
+                                           pai = data.certificate;
+                                           strongAttestationDriver(Step::DoAttestationRequest);
+                                       }];
+            break;
+        }
+        case Step::DoAttestationRequest: {
+            auto * params = [[MTROperationalCredentialsClusterAttestationRequestParams alloc] init];
+            params.attestationNonce = nonce;
+            AttestationDriver strongAttestationDriver = weakAttestationDriver;
+            [opCreds attestationRequestWithParams:params
+                                       completion:^(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data,
+                                           NSError * _Nullable error) {
+                                           if (error != nil) {
+                                               MTR_LOG_ERROR("%@ failed to get attestation information for device attestation: %@",
+                                                   self, error);
+                                               dispatch_async(queue, ^{
+                                                   completion(nil, error);
+                                               });
+                                           }
+
+                                           attestationElements = data.attestationElements;
+                                           attestationSignature = data.attestationSignature;
+                                           attestationChallenge = data.attestationChallenge;
+                                           strongAttestationDriver(Step::PerformAttestation);
+                                       }];
+            break;
+        }
+        case Step::PerformAttestation: {
+            [self.deviceController
+                asyncGetCommissionerOnMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
+                    auto * verifier = commissioner->GetDeviceAttestationVerifier();
+                    if (verifier == nullptr) {
+                        MTR_LOG_ERROR("%@ failed to perform device attestation: no verifier", self);
+                        dispatch_async(queue, ^{
+                            completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+                        });
+                        return;
+                    }
+
+                    ByteSpan certificationDeclaration;
+                    ByteSpan nonceFromDevice; // Ignored; we must use the nonce
+                                              // we actually generated.
+                    uint32_t timestampDeconstructed;
+                    ByteSpan firmwareInfoSpan;
+                    Credentials::DeviceAttestationVendorReservedDeconstructor vendorReserved;
+
+                    CHIP_ERROR err = Credentials::DeconstructAttestationElements(AsByteSpan(attestationElements),
+                        certificationDeclaration, nonceFromDevice, timestampDeconstructed, firmwareInfoSpan, vendorReserved);
+                    if (err != CHIP_NO_ERROR) {
+                        MTR_LOG_ERROR("%@ failed to perform device attestation: error parsing attestation elements: %s", self,
+                            err.AsString());
+                        dispatch_async(queue, ^{
+                            completion(nil, [MTRError errorForCHIPErrorCode:err]);
+                        });
+                        return;
+                    }
+
+                    NSData * firmwareInfo = nil;
+                    if (!firmwareInfoSpan.empty()) {
+                        firmwareInfo = AsData(firmwareInfoSpan);
+                    }
+
+                    auto * info =
+                        [[MTRDeviceAttestationInfo alloc] initWithDeviceAttestationChallenge:attestationChallenge
+                                                                                       nonce:nonce
+                                                                                 elementsTLV:attestationElements
+                                                                           elementsSignature:attestationSignature
+                                                                deviceAttestationCertificate:dac
+                                                   productAttestationIntermediateCertificate:pai
+                                                                    certificationDeclaration:AsData(certificationDeclaration)
+                                                                                firmwareInfo:firmwareInfo
+                                                                    basicInformationVendorID:vendorID
+                                                                   basicInformationProductID:productID];
+
+                    auto * verifierHelper = new AttestationVerifierHelper(verifier, info, queue, completion);
+                    verifierHelper->AsyncVerify();
+                }
+                errorHandler:^(NSError * error) {
+                    dispatch_async(queue, ^{
+                        MTR_LOG_ERROR("%@ failed to get perform device attestation due to controller shutdown: %@", self, error);
+                        completion(nil, error);
+                    });
+                }];
+            break;
+        }
+        }
+    };
+
+    weakAttestationDriver = attestationDriver;
+
+    attestationDriver(Step::FetchVendorID);
 }
 
 #ifdef DEBUG

@@ -1065,6 +1065,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [baseDevice openCommissioningWindowWithDiscriminator:discriminator duration:duration queue:queue completion:completion];
 }
 
+- (void)verifyAttestationWithQueue:(dispatch_queue_t)queue completion:(MTRDeviceAttestationVerificationHandler)completion
+{
+    auto * baseDevice = [self newBaseDevice];
+    [baseDevice verifyAttestationWithQueue:queue completion:completion];
+}
+
 #pragma mark - Cache management
 
 // assume lock is held

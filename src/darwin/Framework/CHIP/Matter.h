@@ -36,6 +36,7 @@
 #import <Matter/MTRDevice.h>
 #import <Matter/MTRDeviceAttestationDelegate.h>
 #import <Matter/MTRDeviceAttestationInfo.h>
+#import <Matter/MTRDeviceAttestationResult.h>
 #import <Matter/MTRDeviceController+XPC.h>
 #import <Matter/MTRDeviceController.h>
 #import <Matter/MTRDeviceControllerDelegate.h>

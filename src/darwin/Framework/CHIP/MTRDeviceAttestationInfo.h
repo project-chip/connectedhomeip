@@ -70,6 +70,24 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  */
 @property (nonatomic, copy, readonly, nullable) NSData * firmwareInfo;
 
+/**
+ * The vendor ID value from the device's Basic Information cluster that was used
+ * for device attestation.  If attestation succeeds, this must match the vendor
+ * ID from the certification declaration.
+ */
+@property (nonatomic, readonly) NSNumber * basicInformationVendorID MTR_NEWLY_AVAILABLE;
+
+/**
+ * The product ID value from the device's Basic Information cluster that was
+ * used for device attestation.  If attestation succeeds, this must match one of
+ * the product IDs from the certification declaration.
+ */
+@property (nonatomic, readonly) NSNumber * basicInformationProductID MTR_NEWLY_AVAILABLE;
+
+/**
+ * Initializer without basicInformationVendorID and basicInformationProductID.
+ * Will set those properties to @(0).
+ */
 - (instancetype)initWithDeviceAttestationChallenge:(NSData *)challenge
                                              nonce:(NSData *)nonce
                                        elementsTLV:(MTRTLVBytes)elementsTLV
@@ -77,8 +95,19 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
                       deviceAttestationCertificate:(MTRCertificateDERBytes)deviceAttestationCertificate
          productAttestationIntermediateCertificate:(MTRCertificateDERBytes)processAttestationIntermediateCertificate
                           certificationDeclaration:(NSData *)certificationDeclaration
-                                      firmwareInfo:(NSData *)firmwareInfo;
+                                      firmwareInfo:(NSData *)firmwareInfo
+    MTR_NEWLY_DEPRECATED("Please use the version with basicInformationVendorID and basicInformationProductID");
 
+- (instancetype)initWithDeviceAttestationChallenge:(NSData *)challenge
+                                             nonce:(NSData *)nonce
+                                       elementsTLV:(MTRTLVBytes)elementsTLV
+                                 elementsSignature:(NSData *)elementsSignature
+                      deviceAttestationCertificate:(MTRCertificateDERBytes)deviceAttestationCertificate
+         productAttestationIntermediateCertificate:(MTRCertificateDERBytes)processAttestationIntermediateCertificate
+                          certificationDeclaration:(NSData *)certificationDeclaration
+                                      firmwareInfo:(NSData *)firmwareInfo
+                          basicInformationVendorID:(NSNumber *)basicInformationVendorID
+                         basicInformationProductID:(NSNumber *)basicInformationProductID MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRDeviceAttestationInfo", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
