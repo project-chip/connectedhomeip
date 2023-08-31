@@ -46,6 +46,8 @@
         "Disabled because the power source configuration cluster is now deprecated and not present in all-clusters",
         "Test_TC_PSCFG_1_1",
         "Test_TC_PSCFG_2_1",
-        "Test_TC_PSCFG_2_2"
+        "Test_TC_PSCFG_2_2",
+        "Disabled because darwin-framework-tool does not support GetCommissionerRootCertificate",
+        "Test_AddNewFabricFromExistingFabric"
     ]
 }

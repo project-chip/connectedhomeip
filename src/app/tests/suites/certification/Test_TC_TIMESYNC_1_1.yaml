@@ -249,59 +249,6 @@ tests:
           constraints:
               excludes: [0x0003]
 
-    #List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
-    - label:
-          "TS4: Check for mandatory attributes in AttributeList. 1.The list
-          SHALL NOT contain any additional values in the standard or scoped
-          range: (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE)
-          2.The list MAY contain values in the Manufacturer Extensible
-          Identifier (MEI) range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the
-          allowed MEI range (0x0001 - 0xFFF1), these values SHALL be ignored.
-          3.The list SHALL NOT contain any values in the Test Vendor or invalid
-          range: (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 -
-          0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
-          allowed MEI range (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool timesynchronization read attribute-list 1 0
-
-          Via the TH (chip-tool), verify:
-          -that AttributeList attribute contains list of supported attributes.
-          -that the list has mandatory attributes, optional attributes, supported features and Global attributes.
-
-          Below is the example value which is observed in the RPI platform the value may be differ based on the dut implementation.
-
-          [1688648771.261160][149504:149506] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0038 Attribute 0x0000_FFFB DataVersion: 1776331179
-          [1688648771.261232][149504:149506] CHIP:TOO:   AttributeList: 18 entries
-          [1688648771.261237][149504:149506] CHIP:TOO:     [1]: 0
-          [1688648771.261240][149504:149506] CHIP:TOO:     [2]: 1
-          [1688648771.261242][149504:149506] CHIP:TOO:     [3]: 2
-          [1688648771.261245][149504:149506] CHIP:TOO:     [4]: 3
-          [1688648771.261248][149504:149506] CHIP:TOO:     [5]: 4
-          [1688648771.261251][149504:149506] CHIP:TOO:     [6]: 5
-          [1688648771.261253][149504:149506] CHIP:TOO:     [7]: 6
-          [1688648771.261256][149504:149506] CHIP:TOO:     [8]: 7
-          [1688648771.261259][149504:149506] CHIP:TOO:     [9]: 8
-          [1688648771.261262][149504:149506] CHIP:TOO:     [10]: 10
-          [1688648771.261265][149504:149506] CHIP:TOO:     [11]: 11
-          [1688648771.261268][149504:149506] CHIP:TOO:     [12]: 12
-          [1688648771.261270][149504:149506] CHIP:TOO:     [13]: 65528
-          [1688648771.261273][149504:149506] CHIP:TOO:     [14]: 65529
-          [1688648771.261276][149504:149506] CHIP:TOO:     [15]: 65530
-          [1688648771.261279][149504:149506] CHIP:TOO:     [16]: 65531
-          [1688648771.261282][149504:149506] CHIP:TOO:     [17]: 65532
-          [1688648771.261284][149504:149506] CHIP:TOO:     [18]: 65533
-          [1688648771.261316][149504:149506] CHIP:EM: <<< [E:655i S:4249 M:65517419 (Ack:79799053)] (S) Msg TX to 1:0000000000000001 [3784] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1688648771.261321][149504:149506] CHIP:IN: (S) Sending msg 65517419 on secure session with LSID: 4249
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
     # Note - additional exclusions not handled here
 
     ##########################
@@ -349,51 +296,6 @@ tests:
       response:
           constraints:
               excludes: [0x04]
-
-    - label:
-          "TS5: TH reads from the DUT the EventList attribute. 1.The list SHALL
-          NOT contain any additional values in the standard or scoped range:
-          (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE) 2. The
-          list MAY contain values in the Manufacturer Extensible Identifier
-          (MEI) range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed
-          MEI range (0x0001 - 0xFFF1), these values SHALL be ignored. 3. The
-          list SHALL NOT contain any values in the Test Vendor or invalid range:
-          (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 -
-          0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
-          allowed MEI range (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool timesynchronization read event-list 1 0
-
-          Via the TH (chip-tool), verify:
-          The list SHALL include all the mandatory entries: 0x03
-          The list include entries based on feature support:
-            0x00 SHALL be included if and only if TIMESYNC.S.F00(TZ)
-            0x01 SHALL be included if and only if TIMESYNC.S.F00(TZ)
-            0x02 SHALL be included if and only if TIMESYNC.S.F00(TZ)
-            0x04 SHALL be included if and only if TIMESYNC.S.F03(TSC)
-
-          Below is the example value which is observed in the RPI platform the value may be differ based on the dut implementation.
-
-          [1688648817.829533][149513:149515] CHIP:DMG: }
-          [1688648817.829584][149513:149515] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0038 Attribute 0x0000_FFFA DataVersion: 1776331179
-          [1688648817.829600][149513:149515] CHIP:TOO:   EventList: 5 entries
-          [1688648817.829606][149513:149515] CHIP:TOO:     [1]: 0
-          [1688648817.829607][149513:149515] CHIP:TOO:     [2]: 1
-          [1688648817.829609][149513:149515] CHIP:TOO:     [3]: 2
-          [1688648817.829610][149513:149515] CHIP:TOO:     [4]: 3
-          [1688648817.829612][149513:149515] CHIP:TOO:     [5]: 4
-          [1688648817.829644][149513:149515] CHIP:EM: <<< [E:37598i S:15729 M:18516326 (Ack:233541454)] (S) Msg TX to 1:0000000000000001 [3784] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1688648817.829648][149513:149515] CHIP:IN: (S) Sending msg 18516326 on secure session with LSID: 15729
-          [1688648817.829657][149513:149515] CHIP:EM: Flushed pending ack for MessageCounter:233541454 on exchange 37598i
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
 
     # Note - additional exclusions not handled here
 
@@ -462,44 +364,6 @@ tests:
           constraints:
               excludes: [0x01]
 
-    - label:
-          "TS6: Check for mandatory commands in AcceptedCommandList. 1. The list
-          SHALL NOT contain any additional values in the standard or scoped
-          range: (0x0000_0000 - 0x0000_00FF) 2. The list MAY contain values in
-          the Manufacturer Extensible Identifier (MEI) range: (0xXXXX_0000 -
-          0xXXXX_00FF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1),
-          these values SHALL be ignored. 3. The list SHALL NOT contain any
-          values in the Test Vendor or invalid range: (0x0000_0100 -
-          0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 -
-          0xFFFF_FFFF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool timesynchronization read accepted-command-list 1 0
-
-          Via the TH (chip-tool), verify:
-          -that AcceptedCommandList attribute contains list of supported commands and that list has 5 entries .
-
-          Below is the example value which is observed in the RPI platform the value may be differ based on the dut implementation.
-
-          [1688648876.860364][149529:149531] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0038 Attribute 0x0000_FFF9 DataVersion: 1776331179
-          [1688648876.860405][149529:149531] CHIP:TOO:   AcceptedCommandList: 5 entries
-          [1688648876.860415][149529:149531] CHIP:TOO:     [1]: 0
-          [1688648876.860421][149529:149531] CHIP:TOO:     [2]: 1
-          [1688648876.860427][149529:149531] CHIP:TOO:     [3]: 2
-          [1688648876.860433][149529:149531] CHIP:TOO:     [4]: 4
-          [1688648876.860439][149529:149531] CHIP:TOO:     [5]: 5
-          [1688648876.860502][149529:149531] CHIP:EM: <<< [E:14853i S:24555 M:248733556 (Ack:60358064)] (S) Msg TX to 1:0000000000000001 [3784] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1688648876.860516][149529:149531] CHIP:IN: (S) Sending msg 248733556 on secure session with LSID: 24555
-          [1688648876.860554][149529:149531] CHIP:EM: Flushed pending ack for MessageCounter:60358064 on exchange 14853i
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
     # NOTE: exclusions not checked
 
     ##########################
@@ -522,39 +386,3 @@ tests:
       response:
           constraints:
               excludes: [0x03]
-
-    - label:
-          "TS7: Check for mandatory commands in GeneratedCommandList. 1.The list
-          SHALL NOT contain any additional values in the standard or scoped
-          range: (0x0000_0000 - 0x0000_00FF). 2.The list MAY contain values in
-          the Manufacturer Extensible Identifier (MEI) range: (0xXXXX_0000 -
-          0xXXXX_00FF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1),
-          these values SHALL be ignored. 3.The list SHALL NOT contain any values
-          in the Test Vendor or invalid range: (0x0000_0100 - 0x0000_FFFF),
-          (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where
-          XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool timesynchronization read generated-command-list 1 0
-
-          Via the TH (chip-tool), verify:
-          -that GeneratedCommandList attribute contains list of supported commands.
-          -that list has 1(command id-3) entries for this cluster based on DUT implementation.
-
-          Below is the example value which is observed in the RPI platform the value may be differ based on the dut implementation.
-
-          [1688648846.603041][149522:149524] CHIP:DMG: }
-          [1688648846.603137][149522:149524] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0038 Attribute 0x0000_FFF8 DataVersion: 1776331179
-          [1688648846.603172][149522:149524] CHIP:TOO:   GeneratedCommandList: 1 entries
-          [1688648846.603183][149522:149524] CHIP:TOO:     [1]: 3
-          [1688648846.603255][149522:149524] CHIP:EM: <<< [E:41394i S:2765 M:235105515 (Ack:166644135)] (S) Msg TX to 1:0000000000000001 [3784] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1688648846.603270][149522:149524] CHIP:IN: (S) Sending msg 235105515 on secure session with LSID: 2765
-          [1688648846.603316][149522:149524] CHIP:EM: Flushed pending ack for MessageCounter:166644135 on exchange 41394i
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"

@@ -17,11 +17,13 @@
 
 import base64
 import copy
+import functools
 import json
 import logging
 import pathlib
 import sys
-from dataclasses import dataclass
+from collections import defaultdict
+from dataclasses import dataclass, field
 from pprint import pprint
 from typing import Any, Callable, Optional
 
@@ -97,6 +99,15 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
     return matter_json_dict
 
 
+@dataclass
+class TagProblem:
+    root: int
+    missing_attribute: bool
+    missing_feature: bool
+    duplicates: set[int]
+    same_tag: set[int] = field(default_factory=set)
+
+
 def check_int_in_range(min_value: int, max_value: int, allow_null: bool = False) -> Callable:
     """Returns a checker for whether `obj` is an int that fits in a range."""
     def int_in_range_checker(obj: Any):
@@ -155,6 +166,13 @@ def check_list_of_ints_in_range(min_value: int, max_value: int, min_size: int = 
 def check_non_empty_list_of_ints_in_range(min_value: int, max_value: int, max_size: int = 65535, allow_null: bool = False) -> Callable:
     """Returns a checker for whether `obj` is a non-empty list of ints that fit in a range."""
     return check_list_of_ints_in_range(min_value, max_value, min_size=1, max_size=max_size, allow_null=allow_null)
+
+
+def check_no_duplicates(obj: Any) -> None:
+    if not isinstance(obj, list):
+        raise ValueError(f"Value {str(obj)} is not a list, but a list was expected (decoded type: {type(obj)})")
+    if len(set(obj)) != len(obj):
+        raise ValueError(f"Value {str(obj)} contains duplicate values")
 
 
 def separate_endpoint_types(endpoint_dict: dict[int, Any]) -> tuple[list[int], list[int]]:
@@ -230,6 +248,70 @@ def parts_list_cycles(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) 
         if parts_list_cycle_detect(visited, endpoint_id):
             cycles.append(endpoint_id)
     return cycles
+
+
+def create_device_type_lists(roots: list[int], endpoint_dict: dict[int, Any]) -> dict[int, dict[int, set[int]]]:
+    """Returns a list of endpoints per device type for each root in the list"""
+    device_types = {}
+    for root in roots:
+        tree_device_types = defaultdict(set)
+        eps = get_all_children(root, endpoint_dict)
+        eps.add(root)
+        for ep in eps:
+            for d in endpoint_dict[ep][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]:
+                tree_device_types[d.deviceType].add(ep)
+        device_types[root] = tree_device_types
+
+    return device_types
+
+
+def cmp_tag_list(a: Clusters.Descriptor.Structs.SemanticTagStruct, b: Clusters.Descriptor.Structs.SemanticTagStruct):
+    if a.mfgCode != b.mfgCode:
+        return -1 if a.mfgCode < b.mfgCode else 1
+    if a.namespaceID != b.namespaceID:
+        return -1 if a.namespaceID < b.namespaceID else 1
+    if a.tag != b.tag:
+        return -1 if a.tag < b.tag else 1
+    if a.label != b.label:
+        return -1 if a.label < b.label else 1
+    return 0
+
+
+def find_tag_list_problems(roots: list[int], device_types: dict[int, dict[int, set[int]]], endpoint_dict: dict[int, Any]) -> dict[int, TagProblem]:
+    """Checks for non-spec compliant tag lists"""
+    tag_problems = {}
+    for root in roots:
+        for _, endpoints in device_types[root].items():
+            if len(endpoints) < 2:
+                continue
+            for endpoint in endpoints:
+                missing_feature = not bool(endpoint_dict[endpoint][Clusters.Descriptor]
+                                           [Clusters.Descriptor.Attributes.FeatureMap] & Clusters.Descriptor.Bitmaps.Feature.kTagList)
+                if Clusters.Descriptor.Attributes.TagList not in endpoint_dict[endpoint][Clusters.Descriptor] or endpoint_dict[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] == []:
+                    tag_problems[endpoint] = TagProblem(root=root, missing_attribute=True,
+                                                        missing_feature=missing_feature, duplicates=endpoints)
+                    continue
+                # Check that this tag isn't the same as the other tags in the endpoint list
+                duplicate_tags = set()
+                for other in endpoints:
+                    if other == endpoint:
+                        continue
+                    # The OTHER endpoint is missing a tag list attribute - ignore this here, we'll catch that when we assess this endpoint as the primary
+                    if Clusters.Descriptor.Attributes.TagList not in endpoint_dict[other][Clusters.Descriptor]:
+                        continue
+
+                    if sorted(endpoint_dict[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList], key=functools.cmp_to_key(cmp_tag_list)) == sorted(endpoint_dict[other][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList], key=functools.cmp_to_key(cmp_tag_list)):
+                        duplicate_tags.add(other)
+                if len(duplicate_tags) != 0:
+                    duplicate_tags.add(endpoint)
+                    tag_problems[endpoint] = TagProblem(root=root, missing_attribute=False, missing_feature=missing_feature,
+                                                        duplicates=endpoints, same_tag=duplicate_tags)
+                    continue
+                if missing_feature:
+                    tag_problems[endpoint] = TagProblem(root=root, missing_attribute=False,
+                                                        missing_feature=missing_feature, duplicates=endpoints)
+
+    return tag_problems
 
 
 class TC_DeviceBasicComposition(MatterBaseTest):
@@ -368,21 +450,21 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         class RequiredMandatoryAttribute:
             id: int
             name: str
-            validator: Callable
+            validators: list[Callable]
 
         ATTRIBUTE_LIST_ID = 0xFFFB
 
         ATTRIBUTES_TO_CHECK = [
-            RequiredMandatoryAttribute(id=0xFFFD, name="ClusterRevision", validator=check_int_in_range(1, 0xFFFF)),
-            RequiredMandatoryAttribute(id=0xFFFC, name="FeatureMap", validator=check_int_in_range(0, 0xFFFF_FFFF)),
+            RequiredMandatoryAttribute(id=0xFFFD, name="ClusterRevision", validators=[check_int_in_range(1, 0xFFFF)]),
+            RequiredMandatoryAttribute(id=0xFFFC, name="FeatureMap", validators=[check_int_in_range(0, 0xFFFF_FFFF)]),
             RequiredMandatoryAttribute(id=0xFFFB, name="AttributeList",
-                                       validator=check_non_empty_list_of_ints_in_range(0, 0xFFFF_FFFF)),
+                                       validators=[check_non_empty_list_of_ints_in_range(0, 0xFFFF_FFFF), check_no_duplicates]),
             # TODO: Check for EventList
             # RequiredMandatoryAttribute(id=0xFFFA, name="EventList", validator=check_list_of_ints_in_range(0, 0xFFFF_FFFF)),
             RequiredMandatoryAttribute(id=0xFFF9, name="AcceptedCommandList",
-                                       validator=check_list_of_ints_in_range(0, 0xFFFF_FFFF)),
+                                       validators=[check_list_of_ints_in_range(0, 0xFFFF_FFFF), check_no_duplicates]),
             RequiredMandatoryAttribute(id=0xFFF8, name="GeneratedCommandList",
-                                       validator=check_list_of_ints_in_range(0, 0xFFFF_FFFF)),
+                                       validators=[check_list_of_ints_in_range(0, 0xFFFF_FFFF), check_no_duplicates]),
         ]
 
         self.print_step(3, "Validate all reported attributes match AttributeList")
@@ -404,14 +486,15 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                         success = False
                         continue
 
-                    # Validate attribute value based on the provided validator.
-                    try:
-                        req_attribute.validator(cluster[req_attribute.id])
-                    except ValueError as e:
-                        self.record_error(self.get_test_name(), location=location,
-                                          problem=f"Failed validation of value on {location.as_string(self.cluster_mapper)}: {str(e)}", spec_location="Global Elements")
-                        success = False
-                        continue
+                    # Validate attribute value based on the provided validators.
+                    for validator in req_attribute.validators:
+                        try:
+                            validator(cluster[req_attribute.id])
+                        except ValueError as e:
+                            self.record_error(self.get_test_name(), location=location,
+                                              problem=f"Failed validation of value on {location.as_string(self.cluster_mapper)}: {str(e)}", spec_location="Global Elements")
+                            success = False
+                            continue
 
         # Validate presence of claimed attributes
         if success:
@@ -666,6 +749,30 @@ class TC_DeviceBasicComposition(MatterBaseTest):
 
         if not success:
             self.fail_current_test("power source EndpointList attribute is incorrect")
+
+    def test_DESC_2_2(self):
+        self.print_step(1, "Wildcard read of device - already done")
+
+        self.print_step(2, "Identify all endpoints that are roots of a tree-composition")
+        _, tree = separate_endpoint_types(self.endpoints)
+        roots = find_tree_roots(tree, self.endpoints)
+
+        self.print_step(
+            3, "For each tree root, go through each of the children and add their endpoint IDs to a list of device types based on the DeviceTypes list")
+        device_types = create_device_type_lists(roots, self.endpoints)
+
+        self.print_step(
+            4, "For device types with more than one endpoint listed, ensure each of the listed endpoints has a tag attribute and the tag attributes are not the same")
+        problems = find_tag_list_problems(roots, device_types, self.endpoints)
+
+        for ep, problem in problems.items():
+            location = AttributePathLocation(endpoint_id=ep, cluster_id=Clusters.Descriptor.id,
+                                             attribute_id=Clusters.Descriptor.Attributes.TagList.attribute_id)
+            msg = f'problem on ep {ep}: missing feature = {problem.missing_feature}, missing attribute = {problem.missing_attribute}, duplicates = {problem.duplicates}, same_tags = {problem.same_tag}'
+            self.record_error(self.get_test_name(), location=location, problem=msg, spec_location="Descriptor TagList")
+
+        if problems:
+            self.fail_current_test("Problems with tags lists")
 
 
 if __name__ == "__main__":
