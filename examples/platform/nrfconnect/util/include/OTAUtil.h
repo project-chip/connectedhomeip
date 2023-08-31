@@ -54,7 +54,7 @@ void InitBasicOTARequestor();
  * boot after the OTA update.
  * Other CHIP_ERROR codes if the image could not be confirmed.
  */
-CHIP_ERROR OtaConfirmNewImage();
+void OtaConfirmNewImage();
 
 #endif // CONFIG_CHIP_OTA_REQUESTOR
 
