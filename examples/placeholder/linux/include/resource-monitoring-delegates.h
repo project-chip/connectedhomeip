@@ -20,39 +20,39 @@
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
 
-/// This is an application level Instance to handle ActivatedCarbonfilterMonitoringInstance commands according to the specific
+namespace chip {
+namespace app {
+namespace Clusters {
+
+namespace ActivatedCarbonFilterMonitoring {
+
+/// This is an application level Delegate to handle ActivatedCarbonFilterMonitoringDelegate commands according to the specific
 /// business logic.
-class ActivatedCarbonFilterMonitoringInstance : public chip::app::Clusters::ResourceMonitoring::Instance
+class ActivatedCarbonFilterMonitoringDelegate : public ResourceMonitoring::Delegate
 {
 private:
-    CHIP_ERROR AppInit() override;
+    CHIP_ERROR Init() override;
     chip::Protocols::InteractionModel::Status PreResetCondition() override;
     chip::Protocols::InteractionModel::Status PostResetCondition() override;
 
 public:
-    ActivatedCarbonFilterMonitoringInstance(
-        chip::EndpointId aEndpointId, uint32_t aFeature,
-        chip::app::Clusters::ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
-        bool aResetConditionCommandSupported) :
-        Instance(aEndpointId, chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id, aFeature, aDegradationDirection,
-                 aResetConditionCommandSupported){};
+    ~ActivatedCarbonFilterMonitoringDelegate() override = default;
 };
 
-/// This is an application level instance to handle HepaFilterMonitoringInstance commands according to the specific business logic.
-class HepaFilterMonitoringInstance : public chip::app::Clusters::ResourceMonitoring::Instance
+} // namespace ActivatedCarbonFilterMonitoring
+
+namespace HepaFilterMonitoring {
+
+/// This is an application level delegate to handle HepaFilterMonitoringDelegate commands according to the specific business logic.
+class HepaFilterMonitoringDelegate : public ResourceMonitoring::Delegate
 {
 private:
-    CHIP_ERROR AppInit() override;
+    CHIP_ERROR Init() override;
     chip::Protocols::InteractionModel::Status PreResetCondition() override;
     chip::Protocols::InteractionModel::Status PostResetCondition() override;
 
 public:
-    HepaFilterMonitoringInstance(
-        chip::EndpointId aEndpointId, uint32_t aFeature,
-        chip::app::Clusters::ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
-        bool aResetConditionCommandSupported) :
-        Instance(aEndpointId, chip::app::Clusters::HepaFilterMonitoring::Id, aFeature, aDegradationDirection,
-                 aResetConditionCommandSupported){};
+    ~HepaFilterMonitoringDelegate() override = default;
 };
 
 class ImmutableReplacementProductListManager : public chip::app::Clusters::ResourceMonitoring::ReplacementProductListManager
@@ -61,3 +61,9 @@ public:
     CHIP_ERROR
     Next(chip::app::Clusters::ResourceMonitoring::ReplacementProductStruct & item) override;
 };
+
+} // namespace HepaFilterMonitoring
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip
