@@ -137,14 +137,14 @@ tests:
           [1689933254.566702][48781:48783] CHIP:DMG:                                 Cluster = 0x1f,
           [1689933254.566705][48781:48783] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1689933254.566708][48781:48783] CHIP:DMG:                         }
-          [1689933254.566713][48781:48783] CHIP:DMG:                                 
+          [1689933254.566713][48781:48783] CHIP:DMG:
           [1689933254.566716][48781:48783] CHIP:DMG:                         StatusIB =
           [1689933254.566720][48781:48783] CHIP:DMG:                         {
           [1689933254.566723][48781:48783] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1689933254.566726][48781:48783] CHIP:DMG:                         },
-          [1689933254.566730][48781:48783] CHIP:DMG:                         
+          [1689933254.566730][48781:48783] CHIP:DMG:
           [1689933254.566732][48781:48783] CHIP:DMG:                 },
-          [1689933254.566739][48781:48783] CHIP:DMG:                 
+          [1689933254.566739][48781:48783] CHIP:DMG:
           [1689933254.566741][48781:48783] CHIP:DMG:                 AttributeStatusIB =
           [1689933254.566744][48781:48783] CHIP:DMG:                 {
           [1689933254.566747][48781:48783] CHIP:DMG:                         AttributePathIB =
@@ -154,14 +154,14 @@ tests:
           [1689933254.566760][48781:48783] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1689933254.566763][48781:48783] CHIP:DMG:                                 ListIndex = Null,
           [1689933254.566766][48781:48783] CHIP:DMG:                         }
-          [1689933254.566770][48781:48783] CHIP:DMG:                                 
+          [1689933254.566770][48781:48783] CHIP:DMG:
           [1689933254.566773][48781:48783] CHIP:DMG:                         StatusIB =
           [1689933254.566776][48781:48783] CHIP:DMG:                         {
           [1689933254.566779][48781:48783] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1689933254.566782][48781:48783] CHIP:DMG:                         },
-          [1689933254.566786][48781:48783] CHIP:DMG:                         
+          [1689933254.566786][48781:48783] CHIP:DMG:
           [1689933254.566789][48781:48783] CHIP:DMG:                 },
-          [1689933254.566794][48781:48783] CHIP:DMG:                 
+          [1689933254.566794][48781:48783] CHIP:DMG:
           [1689933254.566797][48781:48783] CHIP:DMG:                 AttributeStatusIB =
           [1689933254.566800][48781:48783] CHIP:DMG:                 {
           [1689933254.566802][48781:48783] CHIP:DMG:                         AttributePathIB =
@@ -171,16 +171,16 @@ tests:
           [1689933254.566815][48781:48783] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1689933254.566818][48781:48783] CHIP:DMG:                                 ListIndex = Null,
           [1689933254.566821][48781:48783] CHIP:DMG:                         }
-          [1689933254.566825][48781:48783] CHIP:DMG:                                 
+          [1689933254.566825][48781:48783] CHIP:DMG:
           [1689933254.566828][48781:48783] CHIP:DMG:                         StatusIB =
           [1689933254.566831][48781:48783] CHIP:DMG:                         {
           [1689933254.566834][48781:48783] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1689933254.566837][48781:48783] CHIP:DMG:                         },
-          [1689933254.566840][48781:48783] CHIP:DMG:                         
+          [1689933254.566840][48781:48783] CHIP:DMG:
           [1689933254.566843][48781:48783] CHIP:DMG:                 },
-          [1689933254.566847][48781:48783] CHIP:DMG:                 
+          [1689933254.566847][48781:48783] CHIP:DMG:
           [1689933254.566849][48781:48783] CHIP:DMG:         ],
-          [1689933254.566857][48781:48783] CHIP:DMG:         
+          [1689933254.566857][48781:48783] CHIP:DMG:
           [1689933254.566859][48781:48783] CHIP:DMG:         InteractionModelRevision = 1
           [1689933254.566862][48781:48783] CHIP:DMG: }
           [1689933254.566897][48781:48783] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -189,7 +189,7 @@ tests:
 
           If CR2 attempts to subscribe to an attribute on a cluster (ClusterID) for which it does not have access, the AttributePath used for the subscription would be in the form [[Attribute = AttributeName, Cluster = ClusterID, Endpoint = EndpointID]], but this action will be denied, and CR2 will not be able to access the attribute due to the restricted access.
 
-          below provided the  example command used to subscribe location attribute from basicinformation cluster from node id(4) that have access to the “levelcontrol” cluster 
+          below provided the  example command used to subscribe location attribute from basicinformation cluster from node id(4) that have access to the “levelcontrol” cluster
 
           basicinformation subscribe location 10 2400 1 0  --commissioner-nodeid  4
           [1689933387.304826][48781:48783] CHIP:EM: Rxd Ack; Removing MessageCounter:42350588 from Retrans Table on exchange 6319i
