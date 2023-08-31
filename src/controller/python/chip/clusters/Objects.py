@@ -5560,6 +5560,10 @@ class TimeFormatLocalization(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
+    class Bitmaps:
+        class Feature(IntFlag):
+            kCalendarFormat = 0x1
+
     class Attributes:
         @dataclass
         class HourFormat(ClusterAttributeDescriptor):
