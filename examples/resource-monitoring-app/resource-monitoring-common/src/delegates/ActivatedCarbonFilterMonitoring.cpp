@@ -23,7 +23,7 @@
 #include <app/data-model/Nullable.h>
 #include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
-#include <instances/ActivatedCarbonFilterMonitoring.h>
+#include <delegates/ActivatedCarbonFilterMonitoring.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -46,24 +46,24 @@ StaticReplacementProductListManager
     sActivatedCarbonFilterReplacementProductListManager(&sActivatedCarbonFilterReplacementProductsList[0],
                                                         ArraySize(sActivatedCarbonFilterReplacementProductsList));
 
-//-- Activated carbon filter Monitoring Instance methods
-CHIP_ERROR ActivatedCarbonFilterMonitoringInstance::AppInit()
+//-- Activated carbon filter Monitoring Delegate methods
+CHIP_ERROR ActivatedCarbonFilterMonitoringDelegate::Init()
 {
     ChipLogDetail(Zcl, "ActivatedCarbonFilterMonitoringDelegate::Init()");
 
-    SetReplacementProductListManagerInstance(&sActivatedCarbonFilterReplacementProductListManager);
+    GetInstance()->SetReplacementProductListManagerInstance(&sActivatedCarbonFilterReplacementProductListManager);
 
     return CHIP_NO_ERROR;
 }
 
-Status ActivatedCarbonFilterMonitoringInstance::PreResetCondition()
+Status ActivatedCarbonFilterMonitoringDelegate::PreResetCondition()
 {
-    ChipLogDetail(Zcl, "ActivatedCarbonFilterMonitoringInstance::PreResetCondition()");
+    ChipLogDetail(Zcl, "ActivatedCarbonFilterMonitoringDelegate::PreResetCondition()");
     return Status::Success;
 }
 
-Status ActivatedCarbonFilterMonitoringInstance::PostResetCondition()
+Status ActivatedCarbonFilterMonitoringDelegate::PostResetCondition()
 {
-    ChipLogDetail(Zcl, "ActivatedCarbonFilterMonitoringInstance::PostResetCondition()");
+    ChipLogDetail(Zcl, "ActivatedCarbonFilterMonitoringDelegate::PostResetCondition()");
     return Status::Success;
 }

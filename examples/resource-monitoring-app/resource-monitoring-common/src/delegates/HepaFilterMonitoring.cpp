@@ -23,7 +23,7 @@
 #include <app/data-model/Nullable.h>
 #include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
-#include <instances/HepaFilterMonitoring.h>
+#include <delegates/HepaFilterMonitoring.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -36,24 +36,24 @@ using chip::Protocols::InteractionModel::Status;
 
 static ImmutableReplacementProductListManager sHepaFilterReplacementProductListManager;
 
-//-- Hepa filter Monitoring instance methods
-CHIP_ERROR HepaFilterMonitoringInstance::AppInit()
+//-- Hepa filter Monitoring Delegate methods
+CHIP_ERROR HepaFilterMonitoringDelegate::Init()
 {
-    ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::Init()");
+    ChipLogDetail(Zcl, "HepaFilterMonitoringDelegate::Init()");
 
-    SetReplacementProductListManagerInstance(&sHepaFilterReplacementProductListManager);
+    GetInstance()->SetReplacementProductListManagerInstance(&sHepaFilterReplacementProductListManager);
 
     return CHIP_NO_ERROR;
 }
 
-Status HepaFilterMonitoringInstance::PreResetCondition()
+Status HepaFilterMonitoringDelegate::PreResetCondition()
 {
-    ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::PreResetCondition()");
+    ChipLogDetail(Zcl, "HepaFilterMonitoringDelegate::PreResetCondition()");
     return Status::Success;
 }
 
-Status HepaFilterMonitoringInstance::PostResetCondition()
+Status HepaFilterMonitoringDelegate::PostResetCondition()
 {
-    ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::PostResetCondition()");
+    ChipLogDetail(Zcl, "HepaFilterMonitoringDelegate::PostResetCondition()");
     return Status::Success;
 }
