@@ -16,7 +16,7 @@
 name: 219.3.2. [TC-TCCM-3.2] Startup Mode functionality with DUT as Server
 
 PICS:
-    - TCCM.S
+    - TCCM.S.A0002
 
 config:
     nodeId: 0x12344321
