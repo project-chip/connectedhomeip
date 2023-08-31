@@ -107,6 +107,20 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/protocol/wifi/si91x",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM4F",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4325x/support/inc",
+
+      #for LCD
+      "${efr32_sdk_root}/platform/middleware/glib",
+      "${efr32_sdk_root}/platform/middleware/glib/config",
+      "${efr32_sdk_root}/platform/middleware/glib/glib",
+      "${efr32_sdk_root}/platform/middleware/glib/dmd",
+      "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/memlcd/inc",
+      "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/memlcd/inc/memlcd_917",
+      "${wifi_sdk_root}/components/siwx917_soc/drivers/middleware/sleeptimer/inc",
+      "${wifi_sdk_root}/components/siwx917_soc/drivers/unified_api/inc",
+      "${efr32_sdk_root}/hardware/driver/memlcd/src/ls013b7dh03",
+      "${efr32_sdk_root}/platform/service/sleeptimer/inc",
+      "${efr32_sdk_root}/platform/service/sleeptimer/config",
+      "${efr32_sdk_root}/platform/service/sleeptimer/src",
     ]
 
     # Note that we're setting the mbedTLS and PSA configuration files through a
@@ -214,6 +228,15 @@ template("siwx917_sdk") {
     }
     if (invoker.enable_dic) {
       _include_dirs += [ "${chip_root}/third_party/silabs/mqtt/stack" ]
+    }
+    if (!disable_lcd) {
+      defines += [
+        "CONFIG_ENABLE_UART",
+        "__STATIC_INLINE=static inline",
+        "SI91X_SYSRTC_COUNT=1",
+        "SYSCALLS_WRITE",
+        "SPI_MULTI_SLAVE",
+      ]
     }
 
     # Enabling led interface
@@ -416,6 +439,43 @@ template("siwx917_sdk") {
         "${sdk_support_root}/matter/si91x/siwx917/BRD4325x/support/src/startup_common_RS1xxxx.c",
         "${wifi_sdk_root}/components/siwx917_soc/drivers/middleware/nvm3/src/sl_si91x_common_flash_intf.c",
       ]
+    }
+
+    if (!disable_lcd) {
+      sources += [
+        "${wifi_sdk_root}/components/siwx917_soc/drivers/cmsis_driver/SPI.c",
+        "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/memlcd/src/sl_memlcd.c",
+        "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/memlcd/src/sl_memlcd_display.c",
+        "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/memlcd/src/memlcd_917/sl_memlcd_spi.c",
+        "${wifi_sdk_root}/components/siwx917_soc/drivers/middleware/sleeptimer/src/sl_sleeptimer_hal_si91x_sysrtc.c",
+        "${wifi_sdk_root}/components/siwx917_soc/drivers/peripheral_drivers/src/rsi_sysrtc.c",
+        "${wifi_sdk_root}/components/siwx917_soc/drivers/unified_api/src/sl_si91x_ulp_timer.c",
+#        "${efr32_sdk_root}/hardware/driver/memlcd/src/sl_memlcd.c",
+#        "${efr32_sdk_root}/hardware/driver/memlcd/src/sl_memlcd_display.c",
+        "${efr32_sdk_root}/platform/middleware/glib/dmd/display/dmd_memlcd.c",
+        "${efr32_sdk_root}/platform/middleware/glib/fonts/glib_font_narrow_6x8.c",
+        "${efr32_sdk_root}/platform/middleware/glib/fonts/glib_font_normal_8x8.c",
+        "${efr32_sdk_root}/platform/middleware/glib/fonts/glib_font_number_16x20.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/bmp.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_bitmap.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_circle.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_line.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_polygon.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_rectangle.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_string.c",
+        "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
+      ]
+
+ #     sources += [
+#        "${efr32_sdk_root}/hardware/driver/memlcd/src/memlcd_usart/sl_memlcd_spi.c",
+#        "${efr32_sdk_root}/hardware/driver/memlcd/src/memlcd_usart/sl_memlcd_spi.c",
+#        "${efr32_sdk_root}/platform/emdrv/uartdrv/src/uartdrv.c",
+#        "${efr32_sdk_root}/platform/emlib/src/em_eusart.c",
+#        "${efr32_sdk_root}/platform/emlib/src/em_leuart.c",
+#        "${efr32_sdk_root}/platform/emlib/src/em_usart.c",
+#        "${silabs_gen_folder}/autogen/sl_uartdrv_init.c",
+#      ]
     }
 
     public_deps = [

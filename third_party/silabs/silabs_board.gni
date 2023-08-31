@@ -109,8 +109,8 @@ if (silabs_board == "BRD4304A") {
 } else if (silabs_board == "BRD4325C") {
   silabs_family = "SiWx917-common"
   silabs_mcu = "SiWG917M111MGTBA"
-  disable_lcd = true
-  show_qr_code = false
+  disable_lcd = false
+  show_qr_code = true
   wifi_soc = true
   wifi_soc_common_flash = true
 } else if (silabs_board == "BRD4325G") {
