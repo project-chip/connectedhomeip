@@ -41,9 +41,9 @@ MTR_HIDDEN
 MTR_HIDDEN
 @interface MTRDeviceControllerDataStore : NSObject
 
-- (instancetype)initWithController:(MTRDeviceController *)controller
-                   storageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
-              storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue;
+- (nullable instancetype)initWithController:(MTRDeviceController *)controller
+                            storageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
+                       storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue;
 
 /**
  * Resumption info APIs.
@@ -54,11 +54,12 @@ MTR_HIDDEN
 - (void)clearAllResumptionInfo;
 
 /**
- * APIs for storing/retrieving last-used fabric state.  These are used at
- * startup to make sure the new state and the old state are merged properly.
+ * Storage of the last NOC we used on this device.  This is local-only storage,
+ * because it's used to invalidate (or not) the local-only session resumption
+ * storage.
  */
-- (CHIP_ERROR)storeLastUsedNOC:(MTRCertificateTLVBytes)noc;
-- (MTRCertificateTLVBytes _Nullable)fetchLastUsedNOC;
+- (CHIP_ERROR)storeLastLocallyUsedNOC:(MTRCertificateTLVBytes)noc;
+- (MTRCertificateTLVBytes _Nullable)fetchLastLocallyUsedNOC;
 
 @end
 

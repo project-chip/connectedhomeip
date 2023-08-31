@@ -368,7 +368,7 @@ CHIP_ERROR MTRDemuxingStorage::SetIndexSpecificValue(FabricIndex index, NSString
             return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
         }
 
-        ReturnErrorOnFailure([controller.controllerDataStore storeLastUsedNOC:data]);
+        ReturnErrorOnFailure([controller.controllerDataStore storeLastLocallyUsedNOC:data]);
     }
 
     if (IsMemoryOnlyIndexSpecificKey(key)) {

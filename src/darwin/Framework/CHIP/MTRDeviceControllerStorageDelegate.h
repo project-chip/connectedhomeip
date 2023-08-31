@@ -30,26 +30,17 @@ typedef NS_ENUM(NSUInteger, MTRStorageSharingType) {
     // Data must not be shared at all (just store locally).
     MTRStorageSharingTypeNotShared,
 
-    // Data may be shared, but only between controllers that have the same node
-    // identity (same fabric, same node ID).  Sharing not required (could be
-    // stored locally).
-    MTRStorageSharingTypeSameIdentityAllowed,
-
     // Data must be shared, but only between controllers that have the same node
-    // identity (same fabric, same node ID).
-    MTRStorageSharingTypeSameIdentityRequired,
+    // identity (same fabric, same node ID, same CATs).
+    MTRStorageSharingTypeSameIdentity,
 
-    // Data may be shared, but only between controllers that have the same
+    // Data must be shared, but only between controllers that have the same
     // access to devices (e.g. controllers that all have the same CATs if ACLs
     // are being done via CATs).
     MTRStorageSharingTypeSameACLs,
 
-    // Data may be, but does not have to be, shared across all controllers on a
-    // given fabric.
-    MTRStorageSharingTypeSameFabricAllowed,
-
     // Data must be shared across all controllers on a given fabric.
-    MTRStorageSharingTypeSameFabricRequired,
+    MTRStorageSharingTypeSameFabric,
 } MTR_NEWLY_AVAILABLE;
 
 /**

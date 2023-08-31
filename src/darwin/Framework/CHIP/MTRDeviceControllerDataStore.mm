@@ -17,9 +17,9 @@
 #include "MTRDeviceControllerDataStore.h"
 #import "MTRLogging_Internal.h"
 
-// TODO: FIXME: Figure out whether these are good key strings.
+// FIXME: Are these good key strings? https://github.com/project-chip/connectedhomeip/issues/28973
 static NSString * sResumptionNodeListKey = @"caseResumptionNodeList";
-static NSString * sLastUsedNOCKey = @"lastUsedControllerNOC";
+static NSString * sLastLocallyUsedNOCKey = @"lastLocallyUsedControllerNOC";
 
 static NSString * ResumptionByNodeIDKey(NSNumber * nodeID)
 {
@@ -40,9 +40,9 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
     NSMutableArray<NSNumber *> * _nodesWithResumptionInfo;
 }
 
-- (instancetype)initWithController:(MTRDeviceController *)controller
-                   storageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
-              storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
+- (nullable instancetype)initWithController:(MTRDeviceController *)controller
+                            storageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
+                       storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
 {
     if (!(self = [super init])) {
         return nil;
@@ -57,7 +57,7 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
         resumptionNodeList = [_storageDelegate controller:_controller
                                               valueForKey:sResumptionNodeListKey
                                             securityLevel:MTRStorageSecurityLevelSecure
-                                              sharingType:MTRStorageSharingTypeSameIdentityAllowed];
+                                              sharingType:MTRStorageSharingTypeNotShared];
     });
     if (resumptionNodeList != nil) {
         if (![resumptionNodeList isKindOfClass:[NSMutableArray class]]) {
@@ -83,6 +83,7 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
 
 - (void)storeResumptionInfo:(MTRCASESessionResumptionInfo *)resumptionInfo
 {
+    // TODO: THis should be using the "same acls" scoping, not "same identity".
     auto * oldInfo = [self findResumptionInfoByNodeID:resumptionInfo.nodeID];
     dispatch_sync(_storageDelegateQueue, ^{
         if (oldInfo != nil) {
@@ -91,7 +92,7 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
             [_storageDelegate controller:_controller
                        removeValueForKey:ResumptionByResumptionIDKey(oldInfo.resumptionID)
                            securityLevel:MTRStorageSecurityLevelSecure
-                             sharingType:MTRStorageSharingTypeSameIdentityAllowed];
+                             sharingType:MTRStorageSharingTypeNotShared];
             [_nodesWithResumptionInfo removeObject:resumptionInfo.nodeID];
         }
 
@@ -99,12 +100,12 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
                           storeValue:resumptionInfo
                               forKey:ResumptionByNodeIDKey(resumptionInfo.nodeID)
                        securityLevel:MTRStorageSecurityLevelSecure
-                         sharingType:MTRStorageSharingTypeSameIdentityAllowed];
+                         sharingType:MTRStorageSharingTypeNotShared];
         [_storageDelegate controller:_controller
                           storeValue:resumptionInfo
                               forKey:ResumptionByResumptionIDKey(resumptionInfo.resumptionID)
                        securityLevel:MTRStorageSecurityLevelSecure
-                         sharingType:MTRStorageSharingTypeSameIdentityAllowed];
+                         sharingType:MTRStorageSharingTypeNotShared];
 
         // Update our resumption info node list.
         [_nodesWithResumptionInfo addObject:resumptionInfo.nodeID];
@@ -112,7 +113,7 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
                           storeValue:_nodesWithResumptionInfo
                               forKey:sResumptionNodeListKey
                        securityLevel:MTRStorageSecurityLevelSecure
-                         sharingType:MTRStorageSharingTypeSameIdentityAllowed];
+                         sharingType:MTRStorageSharingTypeNotShared];
     });
 }
 
@@ -127,11 +128,11 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
                 [_storageDelegate controller:_controller
                            removeValueForKey:ResumptionByResumptionIDKey(oldInfo.resumptionID)
                                securityLevel:MTRStorageSecurityLevelSecure
-                                 sharingType:MTRStorageSharingTypeSameIdentityAllowed];
+                                 sharingType:MTRStorageSharingTypeNotShared];
                 [_storageDelegate controller:_controller
                            removeValueForKey:ResumptionByNodeIDKey(oldInfo.nodeID)
                                securityLevel:MTRStorageSecurityLevelSecure
-                                 sharingType:MTRStorageSharingTypeSameIdentityAllowed];
+                                 sharingType:MTRStorageSharingTypeNotShared];
             });
         }
     }
@@ -139,27 +140,27 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
     [_nodesWithResumptionInfo removeAllObjects];
 }
 
-- (CHIP_ERROR)storeLastUsedNOC:(MTRCertificateTLVBytes)noc
+- (CHIP_ERROR)storeLastLocallyUsedNOC:(MTRCertificateTLVBytes)noc
 {
     __block BOOL ok;
     dispatch_sync(_storageDelegateQueue, ^{
         ok = [_storageDelegate controller:_controller
                                storeValue:noc
-                                   forKey:sLastUsedNOCKey
+                                   forKey:sLastLocallyUsedNOCKey
                             securityLevel:MTRStorageSecurityLevelSecure
-                              sharingType:MTRStorageSharingTypeSameIdentityRequired];
+                              sharingType:MTRStorageSharingTypeNotShared];
     });
     return ok ? CHIP_NO_ERROR : CHIP_ERROR_PERSISTED_STORAGE_FAILED;
 }
 
-- (MTRCertificateTLVBytes _Nullable)fetchLastUsedNOC
+- (MTRCertificateTLVBytes _Nullable)fetchLastLocallyUsedNOC
 {
     __block id data;
     dispatch_sync(_storageDelegateQueue, ^{
         data = [_storageDelegate controller:_controller
-                                valueForKey:sLastUsedNOCKey
+                                valueForKey:sLastLocallyUsedNOCKey
                               securityLevel:MTRStorageSecurityLevelSecure
-                                sharingType:MTRStorageSharingTypeSameIdentityRequired];
+                                sharingType:MTRStorageSharingTypeNotShared];
     });
 
     if (data == nil) {
@@ -173,14 +174,19 @@ static NSString * ResumptionByResumptionIDKey(NSData * resumptionID)
     return data;
 }
 
-- (nullable MTRCASESessionResumptionInfo *)_findResumptionInfoWithKey:(NSString *)key
+- (nullable MTRCASESessionResumptionInfo *)_findResumptionInfoWithKey:(nullable NSString *)key
 {
+    // key could be nil if [NSString stringWithFormat] returns nil for some reason.
+    if (key == nil) {
+        return nil;
+    }
+
     __block id resumptionInfo;
     dispatch_sync(_storageDelegateQueue, ^{
         resumptionInfo = [_storageDelegate controller:_controller
                                           valueForKey:key
                                         securityLevel:MTRStorageSecurityLevelSecure
-                                          sharingType:MTRStorageSharingTypeSameIdentityAllowed];
+                                          sharingType:MTRStorageSharingTypeNotShared];
     });
 
     if (resumptionInfo == nil) {
@@ -210,12 +216,18 @@ static NSString * const sCATsKey = @"CATs";
     return YES;
 }
 
-- (instancetype _Nullable)initWithCoder:(NSCoder *)decoder
+- (instancetype)initWithCoder:(NSCoder *)decoder
 {
+    self = [super init];
+    if (self == nil) {
+        return nil;
+    }
+
     _nodeID = [decoder decodeObjectOfClass:[NSNumber class] forKey:sNodeIDKey];
     _resumptionID = [decoder decodeObjectOfClass:[NSData class] forKey:sResumptionIDKey];
     _sharedSecret = [decoder decodeObjectOfClass:[NSData class] forKey:sSharedSecretKey];
-    _caseAuthenticatedTags = [decoder decodeObjectOfClass:[NSSet class] forKey:sCATsKey];
+    auto caseAuthenticatedTagArray = [decoder decodeArrayOfObjectsOfClass:[NSNumber class] forKey:sCATsKey];
+    _caseAuthenticatedTags = [NSSet setWithArray:caseAuthenticatedTagArray];
     return self;
 }
 
@@ -224,7 +236,9 @@ static NSString * const sCATsKey = @"CATs";
     [coder encodeObject:self.nodeID forKey:sNodeIDKey];
     [coder encodeObject:self.resumptionID forKey:sResumptionIDKey];
     [coder encodeObject:self.sharedSecret forKey:sSharedSecretKey];
-    [coder encodeObject:self.caseAuthenticatedTags forKey:sCATsKey];
+    // Encode the CATs as an array, so that we can decodeArrayOfObjectsOfClass
+    // to get type-safe decoding for them.
+    [coder encodeObject:[self.caseAuthenticatedTags allObjects] forKey:sCATsKey];
 }
 
 @end

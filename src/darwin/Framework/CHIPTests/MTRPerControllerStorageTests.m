@@ -115,9 +115,6 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 {
     XCTAssertEqualObjects(_controllerID, controller.uniqueIdentifier);
 
-    __auto_type * archiver = [[NSKeyedArchiver alloc] initRequiringSecureCoding:YES];
-    XCTAssertNotNil(archiver);
-
     NSError * error;
     NSData * data = [NSKeyedArchiver archivedDataWithRootObject:value requiringSecureCoding:YES error:&error];
     XCTAssertNil(error);

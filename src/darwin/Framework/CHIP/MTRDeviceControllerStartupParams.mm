@@ -554,7 +554,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
         return nil;
     }
 
-    auto * oldNOCTLV = [controller.controllerDataStore fetchLastUsedNOC];
+    auto * oldNOCTLV = [controller.controllerDataStore fetchLastLocallyUsedNOC];
     if (oldNOCTLV != nil) {
         ByteSpan oldNOCSpan = AsByteSpan(oldNOCTLV);
 
