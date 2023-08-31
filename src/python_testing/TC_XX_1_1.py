@@ -52,7 +52,7 @@ def get_element_prefix_suffix(element):
     prefix_mask = ~0xffff
     suffix_mask = 0xffff
 
-    prefix = (element & prefix_mask) >> 16
+    prefix = (element >> 16)
     suffix = (element & suffix_mask)
 
     return prefix, suffix
@@ -73,7 +73,7 @@ def is_attribute_id_in_valid_range(attribute_id):
         if suffix >= attribute_id_range_min:
             asserts.fail(f"Invalid attribute id {attribute_id:010x} in Test Vendor MC range")
 
-    else:  # prefix >= invalid_vendor_min_prefix and prefix >= invalid_vendor_max_prefix
+    else:  # prefix >= invalid_vendor_min_prefix and prefix <= invalid_vendor_max_prefix
         if suffix >= attribute_id_range_min:
             asserts.fail(f"Invalid attribute id {attribute_id:010x} in invalid range")
 
