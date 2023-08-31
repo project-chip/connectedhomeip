@@ -120,7 +120,7 @@ tests:
       # verification: ""
 
     - label:
-          "Step 6.2: TH2 generates the NOC, the Root CA Certificate and ICAC using the CSR elements from Step 5 and selects an IPK, all for use by TH2. The certificates shall have their subjects padded with additional data such that they are each the maximum certificate size of 400 bytes when encoded in the MatterCertificateEncoding.
+          "Step 6.2: TH2 generates the NOC, the Root CA Certificate and ICAC using the CSR elements from Step 5 and selects an IPK, all for use by TH2.
           Save ICAC as Intermediate_Certificate_TH2.
           Save NOC as Node_Operational_Certificate_TH2.
           Save IPK as IPK_TH2.
@@ -212,7 +212,7 @@ tests:
                 value: 0 # SUCCESS
       # verification: "DUT respond with SUCCESS at CommissioningComplete command sent by TH2"
 
-    - label: "Step 12.1: Save the FabricIndex for TH2's entry as TH2_Fabric_Index for future use."
+    - label: "Step 12: TH2 reads the Current Fabric Index attribute from the Node Operational Credentials cluster. Save the FabricIndex for TH2 as TH2_Fabric_Index."
       PICS: OPCREDS.S.A0001
       identity: "beta"
       nodeId: 0x43211234
@@ -221,19 +221,7 @@ tests:
       attribute: "CurrentFabricIndex"
       response:
           saveAs: TH2_Fabric_Index
-
-    - label: "Step 12.2: TH1 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster."
-      PICS: OPCREDS.S.A0001
-      identity: "alpha"
-      command: "readAttribute"
-      cluster: "Operational Credentials"
-      attribute: "Fabrics"
-      fabricFiltered: false
-      response:
-          value: [{ "FabricIndex": TH1_Fabric_Index, "Label": "", }, { "FabricIndex": TH2_Fabric_Index, "Label": "", },]
-          constraints:
-              type: list
-      # verification: "Verify that there are 2 entries in the list where one entry matches TH1_Fabric_Index and the other matches TH2_Fabric_Index."
+      # verification: Verify that there is a single entry for the Current Fabric Index.
 
     - label: "Step 13: TH2 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster"
       PICS: OPCREDS.S.A0001
