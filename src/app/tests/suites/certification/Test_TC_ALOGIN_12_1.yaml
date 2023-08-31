@@ -59,39 +59,91 @@ tests:
               - name: "Status"
                 value: 0
 
+    # - label:
+    #       "Step 1: TH sends a GetSetupPIN command to the DUT with test values
+    #       provided by the product maker."
+    #   PICS: ALOGIN.S.C00.Rsp
+    #   command: "GetSetupPIN"
+    #   timedInteractionTimeoutMs: 10000
+    #   arguments:
+    #       values:
+    #           - name: "TempAccountIdentifier"
+    #             value: TempAccountIdentifier
+    #   response:
+    #       values:
+    #           - name: "SetupPIN"
+    #             saveAs: setupPIN
+    #             constraints:
+    #                 minLength: 11
+
     - label:
           "Step 1: TH sends a GetSetupPIN command to the DUT with test values
           provided by the product maker."
-      PICS: ALOGIN.S.C00.Rsp
-      command: "GetSetupPIN"
-      timedInteractionTimeoutMs: 10000
+      PICS: ALOGIN.S.C00.Rsp && PICS_USER_PROMPT
+      verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+
+          ./chip-tool accountlogin get-setup-pin abcdefghijklmnopqrst 1 4 --timedInteractionTimeoutMs 1000
+          ./chip-tv-casting-app accountlogin get-setup-pin abcdefghijklmnopqrst 1 4 --timedInteractionTimeoutMs 1000
+
+          On TH(chip-tool),  Verify that the DUT responds with a valid GetSetupPINResponse.
+          [1666779483.473668][24918:24923] CHIP:DMG: Received Command Response Data, Endpoint=4 Cluster=0x0000_050E Command=0x0000_0001
+          [1666779483.473688][24918:24923] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_050E Command 0x0000_0001
+          [1666779483.473709][24918:24923] CHIP:TOO:   GetSetupPINResponse: {
+          [1666779483.473716][24918:24923] CHIP:TOO:     setupPIN: 34567890
+          [1666779483.473724][24918:24923] CHIP:TOO:    }
+          [1666779483.473741][24918:24923] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1666779483.473781][24918:24923] CHIP:EM: <<< [E:55844i M:50959985 (Ack:76245781)] (S) Msg TX to 1:0000000000000001 [F894] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1666779483.473794][24918:24923] CHIP:IN: (S) Sending msg 50959985 on secure session with LSID: 53816
+      cluster: "LogCommands"
+      command: "UserPrompt"
       arguments:
           values:
-              - name: "TempAccountIdentifier"
-                value: TempAccountIdentifier
-      response:
-          values:
-              - name: "SetupPIN"
-                saveAs: setupPIN
-                constraints:
-                    minLength: 11
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    # - label:
+    #       "Step 2: TH sends a Login command to the DUT with test values provided
+    #       by the product maker."
+    #   PICS: ALOGIN.S.C02.Rsp
+    #   command: "Login"
+    #   timedInteractionTimeoutMs: 10000
+    #   arguments:
+    #       values:
+    #           - name: "TempAccountIdentifier"
+    #             value: TempAccountIdentifier
+    #           - name: "SetupPIN"
+    #             value: setupPIN
 
     - label:
           "Step 2: TH sends a Login command to the DUT with test values provided
           by the product maker."
-      PICS: ALOGIN.S.C02.Rsp
-      command: "Login"
-      timedInteractionTimeoutMs: 10000
+      PICS: ALOGIN.S.C02.Rsp && PICS_USER_PROMPT
+      verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+
+          ./chip-tool accountlogin login abcdefghijklmnopqrst 34567890 1 4 --timedInteractionTimeoutMs 1000
+          ./chip-tv-casting-app accountlogin login abcdefghijklmnopqrst 34567890 1 4 --timedInteractionTimeoutMs 1000
+
+          On TH(chip-tool),  Verify that the DUT responds with a standard command response.
+          [1666779572.083273][24925:24930] CHIP:DMG: },
+          [1666779572.083314][24925:24930] CHIP:DMG: Received Command Response Status for Endpoint=4 Cluster=0x0000_050E Command=0x0000_0002 Status=0x0
+          [1666779572.083337][24925:24930] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1666779572.083380][24925:24930] CHIP:EM: <<< [E:20581i M:225012920 (Ack:11041406)] (S) Msg TX to 1:0000000000000001 [F894] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      cluster: "LogCommands"
+      command: "UserPrompt"
       arguments:
           values:
-              - name: "TempAccountIdentifier"
-                value: TempAccountIdentifier
-              - name: "SetupPIN"
-                value: setupPIN
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Step 3: TH sends a Logout command to the DUT with test values
           provided by the product maker."
-      PICS: ALOGIN.S.C03.Rsp
+      PICS: ALOGIN.S.C03.Rsp && PICS_USER_PROMPT
       command: "Logout"
       timedInteractionTimeoutMs: 10000
