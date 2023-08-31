@@ -54,7 +54,7 @@ tests:
            - all provided IDs are in the allowed range
            - the list includes IDs for Error (0x03), Running (0x01), and Paused (0x02)
 
-          [1690457504.399241][18780:18782] CHIP:DMG:         SuppressResponse = true, 
+          [1690457504.399241][18780:18782] CHIP:DMG:         SuppressResponse = true,
           [1690457504.399250][18780:18782] CHIP:DMG:         InteractionModelRevision = 1
           [1690457504.399256][18780:18782] CHIP:DMG: }
           [1690457504.399391][18780:18782] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0003 DataVersion: 4112784416
@@ -208,11 +208,11 @@ tests:
       verification: |
           ./chip-tool operationalstate read operational-state 1 1
 
-           
+
            Via the TH (chip-tool), verify:
            - the response has an OperationalStateID field that is set to 0x01 (Running)
 
-          [1690457783.305883][18855:18857] CHIP:DMG:         SuppressResponse = true, 
+          [1690457783.305883][18855:18857] CHIP:DMG:         SuppressResponse = true,
           [1690457783.305890][18855:18857] CHIP:DMG:         InteractionModelRevision = 1
           [1690457783.305895][18855:18857] CHIP:DMG: }
           [1690457783.305966][18855:18857] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0004 DataVersion: 4112784416

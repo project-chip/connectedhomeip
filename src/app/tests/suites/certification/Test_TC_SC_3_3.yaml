@@ -53,7 +53,7 @@ tests:
       verification: |
           Verify that the Initiator(all-clusters-app) sends the Sigma1 message to Responder(chip-tool)
 
-          [1683973647.719965][21642:21644] CHIP:DMG:  
+          [1683973647.719965][21642:21644] CHIP:DMG:
           [1683973647.720054][21642:21644] CHIP:SC: Sent Sigma1 msg
           [1683973647.720063][21642:21644] CHIP:DIS: OperationalSessionSetup[1:0000000000000001]: State change 3 --> 4
           [1683973647.723548][21642:21644] CHIP:DMG: << from UDP:[fe80::e9f6:2c08:2794:357d%wlp0s20f3]:5540 | 113416098 | [Secure Channel  (0) / Certificate Authenticated Session Establishment Sigma '2' (0x31) / Session = 0 / Exchange = 39248]

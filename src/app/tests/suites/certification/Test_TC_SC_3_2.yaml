@@ -38,9 +38,9 @@ tests:
 
           # 1 Please use Interactive mode to Verify this test cases
           Here the command to enter interactive mode:--
-            ./chip-tool interactive start   --trace_decode 1    
-                              
-          #2. Close the session(all-clusters-app), by sending mentioned command 
+            ./chip-tool interactive start   --trace_decode 1
+
+          #2. Close the session(all-clusters-app), by sending mentioned command
           sessionmanagement send-close-session 1 --evict-local-session true
 
           After the session closed, wait until  session resumtion for the previous subscribe request
@@ -52,7 +52,7 @@ tests:
           Save the value as 'read response' Note: Example for Read Request could
           be reading OnOff attribute value from OnOff Cluster"
       verification: |
-          onoff read on-off 1 1 --trace_decode 1 
+          onoff read on-off 1 1 --trace_decode 1
 
 
           [1690205836.161742][5604:5607] CHIP:DMG: ReportDataMessage =
@@ -70,15 +70,15 @@ tests:
           [1690205836.161873][5604:5607] CHIP:DMG:                                         Cluster = 0x6,
           [1690205836.161885][5604:5607] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1690205836.161896][5604:5607] CHIP:DMG:                                 }
-          [1690205836.161911][5604:5607] CHIP:DMG:                                         
-          [1690205836.161923][5604:5607] CHIP:DMG:                                 Data = false, 
+          [1690205836.161911][5604:5607] CHIP:DMG:
+          [1690205836.161923][5604:5607] CHIP:DMG:                                 Data = false,
           [1690205836.161933][5604:5607] CHIP:DMG:                         },
-          [1690205836.161949][5604:5607] CHIP:DMG:                         
+          [1690205836.161949][5604:5607] CHIP:DMG:
           [1690205836.161957][5604:5607] CHIP:DMG:                 },
-          [1690205836.161973][5604:5607] CHIP:DMG:                 
+          [1690205836.161973][5604:5607] CHIP:DMG:
           [1690205836.161980][5604:5607] CHIP:DMG:         ],
-          [1690205836.161995][5604:5607] CHIP:DMG:         
-          [1690205836.162003][5604:5607] CHIP:DMG:         SuppressResponse = true, 
+          [1690205836.161995][5604:5607] CHIP:DMG:
+          [1690205836.162003][5604:5607] CHIP:DMG:         SuppressResponse = true,
           [1690205836.162038][5604:5607] CHIP:DMG:         InteractionModelRevision = 1
           [1690205836.162048][5604:5607] CHIP:DMG: }
           [1690205836.162552][5604:5607] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 4077667495
@@ -91,7 +91,7 @@ tests:
       verification: |
           sessionmanagement send-close-session 1 --evict-local-session true
 
-          281718.852349][27911:27911] CHIP:TOO: Command: sessionmanagement send-close-session 1 --evict-local-session true 
+          281718.852349][27911:27911] CHIP:TOO: Command: sessionmanagement send-close-session 1 --evict-local-session true
           [1690281718.852946][27911:27914] CHIP:CTL: Stopping commissioning discovery over DNS-SD
           [1690281718.852990][27911:27914] CHIP:CTL: Setting attestation nonce to random value
       disabled: true
@@ -112,7 +112,7 @@ tests:
           initiatorEphPubKey initiatorSessionParams"
       verification: |
           Sigma1 Message from Initiator:
-          "packetHeader" : 
+          "packetHeader" :
                   {
                           "flags" : 4,
                           "msgCounter" : 209808419,
@@ -120,11 +120,11 @@ tests:
                           "sessionId" : 0,
                           "sourceNodeId" : 13804960529544229277
                   },
-                  "payload" : 
+                  "payload" :
                   {
-                          "decoded" : 
+                          "decoded" :
                           {
-                                  "case_sigma1" : 
+                                  "case_sigma1" :
                                   {
                                           "destination_id" : "hex:1044CF83361D9C05477E32115AA78C1D42FD46F2C3CD8492E50EF390F709F42C",
                                           "initiator_eph_pub_key" : "hex:04A3953CB2E653721B91C1765621B5F33341ABCD51C6EB8B6ED41B6ECF6FD66D1DE72283AEFF02091F81A9519A65BDCB1A8FE0C60B85DE9767B3FC3C67CDF8A3C6",
@@ -137,7 +137,7 @@ tests:
                           "hex" : "153001200F8C93B3FACAA2DB4A0052772352C48E72D8DDC192C8177B8F8D26BC029884402502D04F3003201044CF83361D9C05477E32115AA78C1D42FD46F2C3CD8492E50EF390F709F42C30044104A3953CB2E653721B91C1765621B5F33341ABCD51C6EB8B6ED41B6ECF6FD66D1DE72283AEFF02091F81A9519A65BDCB1A8FE0C60B85DE9767B3FC3C67CDF8A3C63006104B7113CED17477E981D74D68148235C830071038AA77A0C8DCF2BF748F6001968D431B18",
                           "size" : 182
                   },
-                  "payloadHeader" : 
+                  "payloadHeader" :
                   {
                           "exchangeFlags" : 5,
                           "exchangeId" : 37964,
@@ -152,7 +152,7 @@ tests:
           1690296519.586605][34367:34370] CHIP:ATM: {
                   "event" : "MessageReceived",
                   "messageType" : "Unauthenticated",
-                  "packetHeader" : 
+                  "packetHeader" :
                   {
                           "destinationNodeId" : 13804960529544229277,
                           "flags" : 1,
@@ -160,8 +160,8 @@ tests:
                           "securityFlags" : 0,
                           "sessionId" : 0
                   },
-                  "payload" : 
-                                  "case_sigma1" : 
+                  "payload" :
+                                  "case_sigma1" :
                                   {
                                           "destination_id" : "hex:1044CF83361D9C05477E32115AA78C1D42FD46F2C3CD8492E50EF390F709F42C",
                                           "initiator_eph_pub_key" : "hex:04A3953CB2E653721B91C1765621B5F33341ABCD51C6EB8B6ED41B6ECF6FD66D1DE72283AEFF02091F81A9519A65BDCB1A8FE0C60B85DE9767B3FC3C67CDF8A3C6",
@@ -174,7 +174,7 @@ tests:
                           "hex" : "153001200F8C93B3FACAA2DB4A0052772352C48E72D8DDC192C8177B8F8D26BC029884402502D04F3003201044CF83361D9C05477E32115AA78C1D42FD46F2C3CD8492E50EF390F709F42C30044104A3953CB2E653721B91C1765621B5F33341ABCD51C6EB8B6ED41B6ECF6FD66D1DE72283AEFF02091F81A9519A65BDCB1A8FE0C60B85DE9767B3FC3C67CDF8A3C63006104B7113CED17477E981D74D68148235C830071038AA77A0C8DCF2BF748F6001968D431B18",
                           "size" : 182
                   },
-                  "payloadHeader" : 
+                  "payloadHeader" :
                   {
                           "exchangeFlags" : 5,
                           "exchangeId" : 37964,
@@ -189,16 +189,16 @@ tests:
           1690296519.586605][34367:34370] CHIP:ATM: {
                   "event" : "MessageReceived",
                   "messageType" : "Unauthenticated",
-                  "packetHeader" : 
+                  "packetHeader" :
                   {
                           "destinationNodeId" : 13804960529544229277,
                           "flags" : 1,
                           "msgCounter" : 61852480,
                           "securityFlags" : 0,
                   {
-                          "decoded" : 
+                          "decoded" :
                           {
-                                  "case_sigma2_resume" : 
+                                  "case_sigma2_resume" :
                                   {
                                           "responder_sessoion_id" : "45029",
                                           "resumption_id" : "hex:D507CF90EEF665047D643F91FBBA3FC1",
@@ -208,7 +208,7 @@ tests:
                           "hex" : "15300110D507CF90EEF665047D643F91FBBA3FC1300210FB6A8A4000CF61E00E48BBD91A0D77C32503E5AF18",
                           "size" : 44
                   },
-                  "payloadHeader" : 
+                  "payloadHeader" :
                   {
                           "ackMessageCounter" : 209808419,
                           "exchangeFlags" : 6,
@@ -227,7 +227,7 @@ tests:
           responderMRPParams"
       verification: |
           Sigma1 Message from Initiator:
-          "packetHeader" : 
+          "packetHeader" :
                   {
                           "flags" : 4,
                           "msgCounter" : 209808419,
@@ -235,11 +235,11 @@ tests:
                           "sessionId" : 0,
                           "sourceNodeId" : 13804960529544229277
                   },
-                  "payload" : 
+                  "payload" :
                   {
-                          "decoded" : 
+                          "decoded" :
                           {
-                                  "case_sigma1" : 
+                                  "case_sigma1" :
                                   {
                                           "destination_id" : "hex:1044CF83361D9C05477E32115AA78C1D42FD46F2C3CD8492E50EF390F709F42C",
                                           "initiator_eph_pub_key" : "hex:04A3953CB2E653721B91C1765621B5F33341ABCD51C6EB8B6ED41B6ECF6FD66D1DE72283AEFF02091F81A9519A65BDCB1A8FE0C60B85DE9767B3FC3C67CDF8A3C6",
@@ -252,7 +252,7 @@ tests:
                           "hex" : "153001200F8C93B3FACAA2DB4A0052772352C48E72D8DDC192C8177B8F8D26BC029884402502D04F3003201044CF83361D9C05477E32115AA78C1D42FD46F2C3CD8492E50EF390F709F42C30044104A3953CB2E653721B91C1765621B5F33341ABCD51C6EB8B6ED41B6ECF6FD66D1DE72283AEFF02091F81A9519A65BDCB1A8FE0C60B85DE9767B3FC3C67CDF8A3C63006104B7113CED17477E981D74D68148235C830071038AA77A0C8DCF2BF748F6001968D431B18",
                           "size" : 182
                   },
-                  "payloadHeader" : 
+                  "payloadHeader" :
                   {
                           "exchangeFlags" : 5,
                           "exchangeId" : 37964,
@@ -267,7 +267,7 @@ tests:
           1690296519.586605][34367:34370] CHIP:ATM: {
                   "event" : "MessageReceived",
                   "messageType" : "Unauthenticated",
-                  "packetHeader" : 
+                  "packetHeader" :
                   {
                           "destinationNodeId" : 13804960529544229277,
                           "flags" : 1,
@@ -275,8 +275,8 @@ tests:
                           "securityFlags" : 0,
                           "sessionId" : 0
                   },
-                  "payload" : 
-                                  "case_sigma1" : 
+                  "payload" :
+                                  "case_sigma1" :
                                   {
                                           "destination_id" : "hex:1044CF83361D9C05477E32115AA78C1D42FD46F2C3CD8492E50EF390F709F42C",
                                           "initiator_eph_pub_key" : "hex:04A3953CB2E653721B91C1765621B5F33341ABCD51C6EB8B6ED41B6ECF6FD66D1DE72283AEFF02091F81A9519A65BDCB1A8FE0C60B85DE9767B3FC3C67CDF8A3C6",
@@ -289,7 +289,7 @@ tests:
                           "hex" : "153001200F8C93B3FACAA2DB4A0052772352C48E72D8DDC192C8177B8F8D26BC029884402502D04F3003201044CF83361D9C05477E32115AA78C1D42FD46F2C3CD8492E50EF390F709F42C30044104A3953CB2E653721B91C1765621B5F33341ABCD51C6EB8B6ED41B6ECF6FD66D1DE72283AEFF02091F81A9519A65BDCB1A8FE0C60B85DE9767B3FC3C67CDF8A3C63006104B7113CED17477E981D74D68148235C830071038AA77A0C8DCF2BF748F6001968D431B18",
                           "size" : 182
                   },
-                  "payloadHeader" : 
+                  "payloadHeader" :
                   {
                           "exchangeFlags" : 5,
                           "exchangeId" : 37964,
@@ -304,16 +304,16 @@ tests:
           1690296519.586605][34367:34370] CHIP:ATM: {
                   "event" : "MessageReceived",
                   "messageType" : "Unauthenticated",
-                  "packetHeader" : 
+                  "packetHeader" :
                   {
                           "destinationNodeId" : 13804960529544229277,
                           "flags" : 1,
                           "msgCounter" : 61852480,
                           "securityFlags" : 0,
                   {
-                          "decoded" : 
+                          "decoded" :
                           {
-                                  "case_sigma2_resume" : 
+                                  "case_sigma2_resume" :
                                   {
                                           "responder_sessoion_id" : "45029",
                                           "resumption_id" : "hex:D507CF90EEF665047D643F91FBBA3FC1",
@@ -323,7 +323,7 @@ tests:
                           "hex" : "15300110D507CF90EEF665047D643F91FBBA3FC1300210FB6A8A4000CF61E00E48BBD91A0D77C32503E5AF18",
                           "size" : 44
                   },
-                  "payloadHeader" : 
+                  "payloadHeader" :
                   {
                           "ackMessageCounter" : 209808419,
                           "exchangeFlags" : 6,

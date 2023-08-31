@@ -557,7 +557,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol read extension 2 0 --commissioner-name beta --commissioner-nodeid 223344
 
-          Via the TH2(chip-tool), Verify the AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1 
+          Via the TH2(chip-tool), Verify the AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1
 
           [1657289746.737641][19293:19298] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0001 DataVersion: 1884338152
           [1657289746.737713][19293:19298] CHIP:TOO:   Extension: 1 entries

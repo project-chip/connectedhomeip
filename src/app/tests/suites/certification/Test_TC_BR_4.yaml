@@ -6062,18 +6062,18 @@ tests:
           [1663925822.845888][1588:1588] CHIP:DMG:                                         Cluster = 0x2f,
           [1663925822.845919][1588:1588] CHIP:DMG:                                         Attribute = 0x0000_000E,
           [1663925822.845946][1588:1588] CHIP:DMG:                                 }
-          [1663925822.845978][1588:1588] CHIP:DMG:                                         
-          [1663925822.846007][1588:1588] CHIP:DMG:                                 Data = 3, 
+          [1663925822.845978][1588:1588] CHIP:DMG:
+          [1663925822.846007][1588:1588] CHIP:DMG:                                 Data = 3,
           [1663925822.846035][1588:1588] CHIP:DMG:                         },
-          [1663925822.846063][1588:1588] CHIP:DMG:                         
+          [1663925822.846063][1588:1588] CHIP:DMG:
           [1663925822.846086][1588:1588] CHIP:DMG:                 },
-          [1663925822.846112][1588:1588] CHIP:DMG:                 
+          [1663925822.846112][1588:1588] CHIP:DMG:
           [1663925822.846131][1588:1588] CHIP:DMG:         ],
-          [1663925822.846156][1588:1588] CHIP:DMG:         
-          [1663925822.846176][1588:1588] CHIP:DMG:         SuppressResponse = true, 
+          [1663925822.846156][1588:1588] CHIP:DMG:
+          [1663925822.846176][1588:1588] CHIP:DMG:         SuppressResponse = true,
           [1663925822.846201][1588:1588] CHIP:DMG:         InteractionModelRevision = 1
           [1663925822.846221][1588:1588] CHIP:DMG: }
-          [1663925822.846238][1588:1588] CHIP:DMG:  
+          [1663925822.846238][1588:1588] CHIP:DMG:
           [1663925822.846416][1588:1588] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
           [1663925822.846442][1588:1588] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
           [1663925822.846461][1588:1588] CHIP:DMG: IM RH moving to [AwaitingDestruction]

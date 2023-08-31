@@ -28,7 +28,7 @@ tests:
     - label: "Precondition"
       verification: |
           - Commission DUT to TH
-          - A given fabric SHALL NOT consume more than half (rounded down towards 0) of the Scene Table entries (as indicated in the SceneTableSize attribute). 
+          - A given fabric SHALL NOT consume more than half (rounded down towards 0) of the Scene Table entries (as indicated in the SceneTableSize attribute).
           - MaxRemainingCapacity is SceneTableSize/2.
       disabled: true
 
@@ -241,7 +241,7 @@ tests:
           field set to G1."
       PICS: S.S.C03.Rsp
       verification: |
-          ./chip-tool scenes remove-all-scenes 0x0001 1 1 
+          ./chip-tool scenes remove-all-scenes 0x0001 1 1
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0003
           CHIP:TOO:   RemoveAllScenesResponse: {

@@ -30,7 +30,7 @@ tests:
     - label: "Precondition"
       verification: |
           - TH1, TH2, and TH3 should be on separate, distinct fabrics.
-          - A given fabric SHALL NOT consume more than half (rounded down towards 0) of the Scene Table entries (as indicated in the SceneTableSize attribute). 
+          - A given fabric SHALL NOT consume more than half (rounded down towards 0) of the Scene Table entries (as indicated in the SceneTableSize attribute).
           - MaxRemainingCapacity is SceneTableSize/2.
       disabled: true
 

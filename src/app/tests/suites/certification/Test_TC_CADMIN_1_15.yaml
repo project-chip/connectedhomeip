@@ -125,7 +125,7 @@ tests:
           CHIP:TOO:       VendorId: 65521
           CHIP:TOO:       FabricId: 1
           CHIP:TOO:       NodeId: 1
-          CHIP:TOO:       Label: 
+          CHIP:TOO:       Label:
           CHIP:TOO:       FabricIndex: 1
           CHIP:TOO:      }
           CHIP:TOO:     [2]: {
@@ -133,7 +133,7 @@ tests:
           CHIP:TOO:       VendorId: 65521
           CHIP:TOO:       FabricId: 1
           CHIP:TOO:       NodeId: 2
-          CHIP:TOO:       Label: 
+          CHIP:TOO:       Label:
           CHIP:TOO:       FabricIndex: 2
           CHIP:TOO:      }
           CHIP:TOO:     [3]: {
@@ -141,7 +141,7 @@ tests:
           CHIP:TOO:       VendorId: 65521
           CHIP:TOO:       FabricId: 1
           CHIP:TOO:       NodeId: 3
-          CHIP:TOO:       Label: 
+          CHIP:TOO:       Label:
           CHIP:TOO:       FabricIndex: 3
           CHIP:TOO:      }
           CHIP:EM: Sending Standalone Ack for MessageCounter:9143157 on exchange 1147i

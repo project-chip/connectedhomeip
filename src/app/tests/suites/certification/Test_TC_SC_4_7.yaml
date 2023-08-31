@@ -27,7 +27,7 @@ config:
 tests:
     - label: "Precondition"
       verification: |
-          1. DUT is connected to the IP network 
+          1. DUT is connected to the IP network
           2. DUT and TH support Commissioner Discovery
       disabled: true
 

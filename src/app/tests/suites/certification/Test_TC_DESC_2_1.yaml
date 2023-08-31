@@ -56,7 +56,7 @@ tests:
           ./chip-tool descriptor read device-type-list 1 0
 
           on TH (Chip-tool) log, Verify that the DeviceTypeList contains one Root Node Device Type and may only contain other Node Device Types (device types with scope=node, it can be any of the following Power Source, OTA Requestor, OTA Provider) next to the Root Node Device Type. (here DeviceType: 17 is power source )
-          - Revision value is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform 
+          - Revision value is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform
 
           [1674552598.748946][21129:21131] CHIP:DMG: }
           [[1692617243.785786][31325:31327] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1437984882
@@ -76,7 +76,7 @@ tests:
           for each Endpoint supported by DUT (except Endpoint 0)."
       PICS: DESC.S.A0000 && DESC.S.A0003
       verification: |
-          For all the Endpoint’s listed from the previous step run the following steps. The device type should correspond to the id value in the device_type.json 
+          For all the Endpoint’s listed from the previous step run the following steps. The device type should correspond to the id value in the device_type.json
           Chip tool outputs all values in integer, convert to hex before comparing.
 
           ./chip-tool descriptor read  parts-list 1 1
@@ -88,11 +88,11 @@ tests:
 
           ./chip-tool descriptor read device-type-list 1 1
 
-          On TH (Chip-tool) log, Verify that 
-          - If PartsLists count is 0 then, DeviceTypeList count is at least one. 
+          On TH (Chip-tool) log, Verify that
+          - If PartsLists count is 0 then, DeviceTypeList count is at least one.
           - DeviceTypeList should contains exactly one Application Device Type [In below log 256(In hex 0x100) is a   Application Device Type(On/OffLight)] or set of Application Device Types which are a subset of each other.
           -  DeviceTypeList may contain one or more Utility Device Types, but not Root Node Device Type.[In below log DeviceType: 17(In hex 0x0011) is a Utility DeviceType ]
-          -  Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform 
+          -  Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform
 
           [1674552599.264189][21135:21137] CHIP:DMG: }
           [1692617790.900384][31584:31586] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2832593371
@@ -108,11 +108,11 @@ tests:
 
           ./chip-tool descriptor read device-type-list 1 1
 
-          On TH (Chip-tool) log, Verify that 
-          - If PartsLists count is 0 then, DeviceTypeList count is at least one. 
+          On TH (Chip-tool) log, Verify that
+          - If PartsLists count is 0 then, DeviceTypeList count is at least one.
           - DeviceTypeList should contains exactly one Application Device Type [In below log 256(In hex 0x100) is a   Application Device Type(On/OffLight)] or set of Application Device Types which are a subset of each other.
           -  DeviceTypeList may contain one or more Utility Device Types, but not Root Node Device Type.[In below log DeviceType: 17(In hex 0x0011) is a Utility DeviceType ]
-          -  Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform 
+          -  Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform
 
           [1674552599.264189][21135:21137] CHIP:DMG: }
           [1692617790.900384][31584:31586] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2832593371
@@ -136,11 +136,11 @@ tests:
 
           ./chip-tool descriptor read device-type-list 1 2
 
-          On TH (Chip-tool) log, Verify that 
-          - If PartsLists count is 0 then, DeviceTypeList count is at least one. 
+          On TH (Chip-tool) log, Verify that
+          - If PartsLists count is 0 then, DeviceTypeList count is at least one.
           - DeviceTypeList should contains exactly one Application Device Type [In below log 256(In hex 0x100) is a   Application Device Type(On/OffLight)] or set of Application Device Types which are a subset of each other.
           -  DeviceTypeList may contain one or more Utility Device Types, but not Root Node Device Type.[In below log DeviceType: 17(In hex 0x0011) is a Utility DeviceType ]
-          -  Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform 
+          -  Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform
 
           [1692618454.794870][31669:31671] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1103199808
           [1692618454.794946][31669:31671] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -157,7 +157,7 @@ tests:
     - label: "Step 2: TH reads 'ServerList' attribute."
       PICS: DESC.S.A0001
       verification: |
-          For all the Endpoint id’s listed in step 1a run the following steps. For all the server list entries listed in the output - Convert them to Hex values. For example 29 is 0x001D. Verify that these are also present in the device_type.json. Every server cluster listed in the JSON should correspond to a number here in the output. 
+          For all the Endpoint id’s listed in step 1a run the following steps. For all the server list entries listed in the output - Convert them to Hex values. For example 29 is 0x001D. Verify that these are also present in the device_type.json. Every server cluster listed in the JSON should correspond to a number here in the output.
 
           ./chip-tool descriptor read server-list 1 1
 

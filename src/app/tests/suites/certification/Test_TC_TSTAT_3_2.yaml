@@ -127,7 +127,7 @@ tests:
           and a reasonable negative value that is supported by the DUT."
       PICS: TSTAT.C.C00.Tx
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool thermostat setpoint-raise-lower 0 -10 1 1
 

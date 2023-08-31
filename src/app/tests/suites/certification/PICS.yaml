@@ -9236,7 +9236,7 @@ PICS:
     - label:
           "Can the Rinse attribute changed by physical control at the device?"
       id: WASHERCTRL.S.M.ManuallyControlledRinse
-    
+
     - label: "Can the device be controlled manually?"
       id: WASHERCTRL.S.M.ManuallyControlled
 

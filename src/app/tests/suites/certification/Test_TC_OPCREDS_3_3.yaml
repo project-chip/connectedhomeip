@@ -50,7 +50,7 @@ tests:
           [1641381202.376419][5628:5633] CHIP:CTL: Received success response 0x3df8
 
 
-          On TH(all-clusters-app) 
+          On TH(all-clusters-app)
           ./all-clusters-app --wifi
           [1641381202.306840][4431:4431] CHIP:DL: NVS set: chip-config/regulatory-location = 0 (0x0)
       disabled: true

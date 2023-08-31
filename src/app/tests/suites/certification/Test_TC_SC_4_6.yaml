@@ -32,7 +32,7 @@ tests:
 
     - label: "Precondition"
       verification: |
-          1. DUT is connected to the IP network or supports SoftAP 
+          1. DUT is connected to the IP network or supports SoftAP
           2. DUT and TH support Commissioner Discovery
       disabled: true
 
