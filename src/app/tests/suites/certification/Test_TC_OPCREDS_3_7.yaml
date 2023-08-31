@@ -41,13 +41,13 @@ tests:
     - label: "Step 1: Factory Reset DUT (to ensure NOC list is empty at the beginning of the following steps)"
       PICS: OPCREDS.S.A0000
       # verification: ""
-      # Disabling this step as the test starts with a freshly commissioned DUT device to the TH1 commissioner
+      # Disabling this step, because the test starts with a DUT device that has just been commissioned by the TH1 commissioner
       disabled: true
 
     - label: "Step 2: Start the commissioning process of DUT by TH1 on the first Fabric."
       # PICS: ""
       # verification: "Verify that TH1 successfully completes commissioning, including establishing a CASE session on the operational network and issuing a CommissioningComplete command."
-      # Disabling this step as the test starts with a freshly commissioned DUT device to the TH1 commissioner
+      # Disabling this step, because the test starts with a DUT device that has just been commissioned by the TH1 commissioner
 
       disabled: true
 
