@@ -28,7 +28,7 @@ SampleMeiServer sampleMeiServer;
 
 void MatterSampleMeiPluginServerInitCallback()
 {
-    ChipLogProgress(Zcl,"Sample Mei Init. Ep# %d Total Ep# %lu", EMBER_AF_SAMPLE_MEI_CLUSTER_SERVER_ENDPOINT_COUNT, kNumSupportedEndpoints);
+    ChipLogProgress(Zcl,"Sample Mei Init. Ep# %d Total Ep# %zu", EMBER_AF_SAMPLE_MEI_CLUSTER_SERVER_ENDPOINT_COUNT, kNumSupportedEndpoints);
     ReturnOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(&sampleMeiServer));
     VerifyOrReturn(registerAttributeAccessOverride(&sampleMeiServer), CHIP_ERROR_INCORRECT_STATE);
 
@@ -113,7 +113,7 @@ CHIP_ERROR SampleMeiServer::Read(const ConcreteReadAttributePath & aPath, Attrib
     switch (aPath.mAttributeId)
     {
         case Attributes::FlipFlop::Id:
-            ChipLogProgress(Zcl,"Read Attribute flip-flop from endpoint %d index %lu value %d", endpoint, endpointIndex, content[endpointIndex].flipflop);
+            ChipLogProgress(Zcl,"Read Attribute flip-flop from endpoint %d index %zu value %d", endpoint, endpointIndex, content[endpointIndex].flipflop);
             err = aEncoder.Encode(content[endpointIndex].flipflop);
             break;
         default:
@@ -138,7 +138,7 @@ CHIP_ERROR SampleMeiServer::Write(const ConcreteDataAttributePath & aPath, Attri
             {
                 auto oldValue = content[endpointIndex].flipflop;
                 ReturnErrorOnFailure(aDecoder.Decode(content[endpointIndex].flipflop));
-                ChipLogProgress(Zcl,"Write Attribute flip-flop on endpoint %d index %lu newValue %d oldValue %d", endpoint, endpointIndex, content[endpointIndex].flipflop, oldValue);
+                ChipLogProgress(Zcl,"Write Attribute flip-flop on endpoint %d index %zu newValue %d oldValue %d", endpoint, endpointIndex, content[endpointIndex].flipflop, oldValue);
             }
             break;
         default:
