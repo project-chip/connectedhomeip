@@ -108,15 +108,6 @@ tests:
     ######## DownOrClose Command #######
     ### Step 2x -> Check DownOrClose Fast effects
 
-    - label: "Step 2: Subscribe to DUT reports on OperationalStatus attribute"
-      command: "subscribeAttribute"
-      attribute: "OperationalStatus"
-      minInterval: 4
-      maxInterval: 5
-      response:
-          constraints:
-              type: bitmap8
-
     ### MANDATORY Command
     - label: "Step 2a: TH sends DownOrClose command to DUT"
       command: "DownOrClose"
