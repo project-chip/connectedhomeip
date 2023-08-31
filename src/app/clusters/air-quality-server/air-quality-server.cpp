@@ -93,6 +93,11 @@ Protocols::InteractionModel::Status Instance::UpdateAirQuality(AirQualityEnum aN
         break;
     }
 
+    if (to_underlying(aNewAirQuality) > 6)
+    {
+        return Protocols::InteractionModel::Status::InvalidValue;
+    }
+
     mAirQuality = aNewAirQuality;
     MatterReportingAttributeChangeCallback(ConcreteAttributePath(mEndpointId, Id, Attributes::AirQuality::Id));
     return Protocols::InteractionModel::Status::Success;
