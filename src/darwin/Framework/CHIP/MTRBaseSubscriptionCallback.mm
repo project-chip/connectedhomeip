@@ -27,6 +27,9 @@ void MTRBaseSubscriptionCallback::OnReportBegin()
 {
     mAttributeReports = [NSMutableArray new];
     mEventReports = [NSMutableArray new];
+    if (mReportBeginHandler) {
+        mReportBeginHandler();
+    }
 }
 
 // Reports attribute and event data if any exists

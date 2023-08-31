@@ -91,6 +91,8 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::Protocols::InteractionModel;
 
+typedef void (^FirstReportHandler)(void);
+
 namespace {
 
 class SubscriptionCallback final : public MTRBaseSubscriptionCallback {
@@ -98,9 +100,9 @@ public:
     SubscriptionCallback(DataReportCallback attributeReportCallback, DataReportCallback eventReportCallback,
         ErrorCallback errorCallback, MTRDeviceResubscriptionScheduledHandler resubscriptionCallback,
         SubscriptionEstablishedHandler subscriptionEstablishedHandler, OnDoneHandler onDoneHandler,
-        UnsolicitedMessageFromPublisherHandler unsolicitedMessageFromPublisherHandler)
+        UnsolicitedMessageFromPublisherHandler unsolicitedMessageFromPublisherHandler, ReportBeginHandler reportBeginHandler)
         : MTRBaseSubscriptionCallback(attributeReportCallback, eventReportCallback, errorCallback, resubscriptionCallback,
-            subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler)
+            subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler)
     {
     }
 
@@ -290,9 +292,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     _state = state;
     if (lastState != state) {
         if (state != MTRDeviceStateReachable) {
-            MTR_LOG_INFO("%@ Set estimated start time to nil due to state change", self);
+            MTR_LOG_INFO("%@ State change %lu => %lu, set estimated start time to nil", self, lastState, state);
             _estimatedStartTime = nil;
             _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
+        } else {
+            MTR_LOG_INFO("%@ State change %lu => %lu", self, lastState, state);
         }
         id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
         if (delegate) {
@@ -408,6 +412,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // ReadClient, this call or _setupSubscription would be no-ops.
     [self _reattemptSubscriptionNowIfNeeded];
 
+    os_unfair_lock_unlock(&self->_lock);
+}
+
+- (void)_handleReportBegin
+{
+    os_unfair_lock_lock(&self->_lock);
+    [self _changeState:MTRDeviceStateReachable];
     os_unfair_lock_unlock(&self->_lock);
 }
 
@@ -609,6 +620,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                            dispatch_async(self.queue, ^{
                                // OnUnsolicitedMessageFromPublisher
                                [self _handleUnsolicitedMessageFromPublisher];
+                           });
+                       },
+                       ^(void) {
+                           MTR_LOG_DEFAULT("%@ got report begin", self);
+                           dispatch_async(self.queue, ^{
+                               [self _handleReportBegin];
                            });
                        });
 

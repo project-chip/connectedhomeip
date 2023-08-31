@@ -56,13 +56,15 @@ typedef void (^ErrorCallback)(NSError * error);
 typedef void (^SubscriptionEstablishedHandler)(void);
 typedef void (^OnDoneHandler)(void);
 typedef void (^UnsolicitedMessageFromPublisherHandler)(void);
+typedef void (^ReportBeginHandler)(void);
 
 class MTRBaseSubscriptionCallback : public chip::app::ClusterStateCache::Callback {
 public:
     MTRBaseSubscriptionCallback(DataReportCallback attributeReportCallback, DataReportCallback eventReportCallback,
         ErrorCallback errorCallback, MTRDeviceResubscriptionScheduledHandler _Nullable resubscriptionCallback,
         SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler, OnDoneHandler _Nullable onDoneHandler,
-        UnsolicitedMessageFromPublisherHandler _Nullable unsolicitedMessageFromPublisherHandler = NULL)
+        UnsolicitedMessageFromPublisherHandler _Nullable unsolicitedMessageFromPublisherHandler = nil,
+        ReportBeginHandler _Nullable reportBeginHandler = nil)
         : mAttributeReportCallback(attributeReportCallback)
         , mEventReportCallback(eventReportCallback)
         , mErrorCallback(errorCallback)
@@ -71,6 +73,7 @@ public:
         , mBufferedReadAdapter(*this)
         , mOnDoneHandler(onDoneHandler)
         , mUnsolicitedMessageFromPublisherHandler(unsolicitedMessageFromPublisherHandler)
+        , mReportBeginHandler(reportBeginHandler)
     {
     }
 
@@ -137,6 +140,7 @@ private:
     MTRDeviceResubscriptionScheduledHandler _Nullable mResubscriptionCallback = nil;
     SubscriptionEstablishedHandler _Nullable mSubscriptionEstablishedHandler = nil;
     UnsolicitedMessageFromPublisherHandler _Nullable mUnsolicitedMessageFromPublisherHandler = nil;
+    ReportBeginHandler _Nullable mReportBeginHandler = nil;
     chip::app::BufferedReadCallback mBufferedReadAdapter;
 
     // Our lifetime management is a little complicated.  On errors that don't
