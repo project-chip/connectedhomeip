@@ -451,12 +451,31 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
                 bad_range_values = [a for a in cluster[ATTRIBUTE_LIST_ID] if a > standard_range_max and a < global_range_min]
-                print(bad_range_values)
                 for bad in bad_range_values:
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=bad)
                     self.record_error(self.get_test_name(), location=location,
                                       problem=f"Attribute in undefined range {bad} in cluster {cluster_id}", spec_location=f"Cluster {cluster_id}")
                     success = False
+
+        # Validate that any attribute in the manufacturer prefix range is in the standard suffix range.
+        suffix_mask = 0x000_FFFF
+        for endpoint_id, endpoint in self.endpoints_tlv.items():
+            for cluster_id, cluster in endpoint.items():
+                manufacturer_range_values = [a for a in cluster[ATTRIBUTE_LIST_ID] if a > mei_range_min]
+                for manufacturer_value in manufacturer_range_values:
+                    suffix = manufacturer_value & suffix_mask
+                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
+                                                     attribute_id=manufacturer_value)
+                    if suffix > standard_range_max and suffix < global_range_min:
+                        self.record_error(self.get_test_name(), location=location,
+                                          problem=f"Manufacturer attribute in undefined range {manufacturer_value} in cluster {cluster_id}",
+                                          spec_location=f"Cluster {cluster_id}")
+                        success = False
+                    elif suffix >= global_range_min:
+                        self.record_error(self.get_test_name(), location=location,
+                                          problem=f"Manufacturer attribute in global range {manufacturer_value} in cluster {cluster_id}",
+                                          spec_location=f"Cluster {cluster_id}")
+                        success = False
 
         # TODO: maybe while we're at it, we should check that the command list doesn't contain unexpected commands.
 
