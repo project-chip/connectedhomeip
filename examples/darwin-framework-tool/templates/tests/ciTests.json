@@ -48,8 +48,6 @@
         "Test_TC_PSCFG_2_1",
         "Test_TC_PSCFG_2_2",
         "Disabled because darwin-framework-tool does not support GetCommissionerRootCertificate",
-        "Test_AddNewFabricFromExistingFabric",
-        "Disabled in darwin due to comment: https://github.com/project-chip/connectedhomeip/pull/28985#issuecomment-1701574449",
-        "Test_TC_WASHERCTRL_2_2"
+        "Test_AddNewFabricFromExistingFabric"
     ]
 }
