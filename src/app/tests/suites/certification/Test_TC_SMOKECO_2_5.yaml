@@ -710,7 +710,9 @@ tests:
     - label:
           "Step 45: TH waits for a report of SmokeState attribute from DUT with
           a timeout of 300 seconds"
-      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0004 && SMOKECO.S.F00 && SMOKECO.S.A0001
+      PICS:
+          PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0004 && SMOKECO.S.F00 &&
+          SMOKECO.S.A0001
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
@@ -843,7 +845,9 @@ tests:
     - label:
           "Step 53: TH waits for a report of SmokeState attribute from DUT with
           a timeout of 300 seconds"
-      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0004 && SMOKECO.S.F00 && SMOKECO.S.A0001
+      PICS:
+          PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0004 && SMOKECO.S.F00 &&
+          SMOKECO.S.A0001
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
@@ -918,7 +922,9 @@ tests:
     - label:
           "Step 57: TH waits for a report of SmokeState attribute from DUT with
           a timeout of 300 seconds"
-      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0004 && SMOKECO.S.F00 && SMOKECO.S.A0001
+      PICS:
+          PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0004 && SMOKECO.S.F00 &&
+          SMOKECO.S.A0001
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
@@ -972,7 +978,9 @@ tests:
     - label:
           "Step 61: TH waits for a report of COState attribute from DUT with a
           timeout of 300 seconds"
-      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0004 && SMOKECO.S.F01 && SMOKECO.S.A0002
+      PICS:
+          PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0004 && SMOKECO.S.F01 &&
+          SMOKECO.S.A0002
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
@@ -1105,7 +1113,9 @@ tests:
     - label:
           "Step 69: TH waits for a report of COState attribute from DUT with a
           timeout of 300 seconds"
-      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0004 && SMOKECO.S.F01 && SMOKECO.S.A0002
+      PICS:
+          PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0004 && SMOKECO.S.F01 &&
+          SMOKECO.S.A0002
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
@@ -1180,7 +1190,9 @@ tests:
     - label:
           "Step 73: TH waits for a report of COState attribute from DUT with a
           timeout of 300 seconds"
-      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0004 && SMOKECO.S.F01 && SMOKECO.S.A0002
+      PICS:
+          PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0004 && SMOKECO.S.F01 &&
+          SMOKECO.S.A0002
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
