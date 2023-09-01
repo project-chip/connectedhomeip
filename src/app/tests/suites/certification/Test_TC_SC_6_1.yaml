@@ -138,7 +138,7 @@ tests:
           "groupKeySecurityPolicy": 0, "epochKey0":
           "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 1,"epochKey1":
           "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
-          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0 
+          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0
 
           Verify TH recieves KeySetWrite command on TH(Reference app)log:
 
@@ -146,8 +146,8 @@ tests:
           [1651471040.120980][4012:4012] CHIP:EM: Handling via exchange: 35559r, Delegate: 0xaaaaca97a088
           [1693548451.902266][9666:9666] CHIP:DMG: InvokeRequestMessage =
           [1693548451.902273][9666:9666] CHIP:DMG: {
-          [1693548451.902278][9666:9666] CHIP:DMG: 	suppressResponse = false, 
-          [1693548451.902286][9666:9666] CHIP:DMG: 	timedRequest = false, 
+          [1693548451.902278][9666:9666] CHIP:DMG: 	suppressResponse = false,
+          [1693548451.902286][9666:9666] CHIP:DMG: 	timedRequest = false,
           [1693548451.902293][9666:9666] CHIP:DMG: 	InvokeRequests =
           [1693548451.902308][9666:9666] CHIP:DMG: 	[
           [1693548451.902314][9666:9666] CHIP:DMG: 		CommandDataIB =
@@ -158,31 +158,31 @@ tests:
           [1693548451.902357][9666:9666] CHIP:DMG: 				ClusterId = 0x3f,
           [1693548451.902365][9666:9666] CHIP:DMG: 				CommandId = 0x0,
           [1693548451.902371][9666:9666] CHIP:DMG: 			},
-          [1693548451.902380][9666:9666] CHIP:DMG: 			
-          [1693548451.902389][9666:9666] CHIP:DMG: 			CommandFields = 
+          [1693548451.902380][9666:9666] CHIP:DMG:
+          [1693548451.902389][9666:9666] CHIP:DMG: 			CommandFields =
           [1693548451.902397][9666:9666] CHIP:DMG: 			{
-          [1693548451.902405][9666:9666] CHIP:DMG: 				0x0 = 
+          [1693548451.902405][9666:9666] CHIP:DMG: 				0x0 =
           [1693548451.902413][9666:9666] CHIP:DMG: 				{
-          [1693548451.902422][9666:9666] CHIP:DMG: 					0x0 = 42, 
-          [1693548451.902431][9666:9666] CHIP:DMG: 					0x1 = 0, 
+          [1693548451.902422][9666:9666] CHIP:DMG: 					0x0 = 42,
+          [1693548451.902431][9666:9666] CHIP:DMG: 					0x1 = 0,
           [1693548451.902439][9666:9666] CHIP:DMG: 					0x2 = [
-          [1693548451.902450][9666:9666] CHIP:DMG: 							0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf, 
+          [1693548451.902450][9666:9666] CHIP:DMG: 							0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf,
           [1693548451.902460][9666:9666] CHIP:DMG: 					] (16 bytes)
-          [1693548451.902471][9666:9666] CHIP:DMG: 					0x3 = 1, 
+          [1693548451.902471][9666:9666] CHIP:DMG: 					0x3 = 1,
           [1693548451.902479][9666:9666] CHIP:DMG: 					0x4 = [
-          [1693548451.902491][9666:9666] CHIP:DMG: 							0xd1, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf, 
+          [1693548451.902491][9666:9666] CHIP:DMG: 							0xd1, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf,
           [1693548451.902500][9666:9666] CHIP:DMG: 					] (16 bytes)
-          [1693548451.902509][9666:9666] CHIP:DMG: 					0x5 = 2220001, 
+          [1693548451.902509][9666:9666] CHIP:DMG: 					0x5 = 2220001,
           [1693548451.902517][9666:9666] CHIP:DMG: 					0x6 = [
-          [1693548451.902527][9666:9666] CHIP:DMG: 							0xd2, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf, 
+          [1693548451.902527][9666:9666] CHIP:DMG: 							0xd2, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf,
           [1693548451.902536][9666:9666] CHIP:DMG: 					] (16 bytes)
-          [1693548451.902544][9666:9666] CHIP:DMG: 					0x7 = 2220002, 
+          [1693548451.902544][9666:9666] CHIP:DMG: 					0x7 = 2220002,
           [1693548451.902553][9666:9666] CHIP:DMG: 				},
           [1693548451.902560][9666:9666] CHIP:DMG: 			},
           [1693548451.902567][9666:9666] CHIP:DMG: 		},
-          [1693548451.902581][9666:9666] CHIP:DMG: 		
+          [1693548451.902581][9666:9666] CHIP:DMG:
           [1693548451.902587][9666:9666] CHIP:DMG: 	],
-          [1693548451.902599][9666:9666] CHIP:DMG: 	
+          [1693548451.902599][9666:9666] CHIP:DMG:
           [1693548451.902606][9666:9666] CHIP:DMG: 	InteractionModelRevision = 10
           [1693548451.902613][9666:9666] CHIP:DMG: },
       disabled: true
