@@ -25,6 +25,9 @@ private:
     RvcOperationalState::RvcOperationalStateDelegate mOperationalStateDelegate;
     OperationalState::Instance mOperationalStateInstance;
 
+    bool mDocked = false;
+    bool mCharging = false;
+
 public:
     RvcDevice() :
         mRunModeDelegate(), mRunModeInstance(&mRunModeDelegate, RvcRunModeEndpoint, RvcRunMode::Id, 0), mCleanModeDelegate(),
@@ -33,8 +36,9 @@ public:
     {
         // set the current-mode at start-up
         mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
-        // Assume that the device is not docked.
-        mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+
+        // Hypothetically, the device checks if it is physically docked or charging
+        SetDeviceToIdleState();
 
         // set callback functions
         mRunModeDelegate.SetHandleChangeToMode(&RvcDevice::HandleRvcRunChangeToMode, this);
@@ -47,6 +51,12 @@ public:
      * Init all the clusters used by this device.
      */
     void Init();
+
+    /**
+     * Sets the device to and idle state, that is either the STOPPED, DOCKED or CHARGING state, depending on physical information.
+     * Note: in this example this is based on the mDocked and mChanging boolean variables.
+     */
+    void SetDeviceToIdleState();
 
     /**
      * Handles the RvcRunMode command requesting a mode change.
