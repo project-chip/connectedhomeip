@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if type "systemctl" > /dev/null; then
+    systemctl stop uic-mpc.service
+    systemctl disable uic-mpc.service
+    rm -rf /var/lib/uic-mpc/*
+fi

@@ -1,0 +1,145 @@
+#!/bin/sh -e
+# postinst script for Unify
+#
+# see: dh_installdeb(1)
+
+. /usr/share/debconf/confmodule
+
+UIC_VAR_DIR="/var/lib/uic-mpc/"
+
+UIC_CONFDIR=/etc/uic
+UIC_CONFFILE=$UIC_CONFDIR/uic.cfg
+
+setup_uic_user() {
+        if ! getent group uic >/dev/null; then
+                addgroup --quiet --system uic
+        fi
+
+        if ! getent group leds >/dev/null; then
+                addgroup --quiet --system leds
+        fi
+
+        if ! getent passwd uic >/dev/null; then
+                adduser --quiet --system --no-create-home --ingroup uic --home "$UIC_VAR_DIR" --shell /usr/sbin/nologin uic
+                usermod -a -G dialout uic
+        fi
+
+        # We need to do this separately in case the user was created by one of the other
+        # Unify packages.
+        if ! getent group leds | grep uic > /dev/null; then
+                usermod -a -G leds uic
+        fi
+}
+
+fix_permissions() {
+        mkdir -p $UIC_VAR_DIR
+        chown uic $UIC_VAR_DIR
+}
+
+handle_conf() {
+    if ! grep -q "mpc:" $UIC_CONFFILE
+    then
+      mkdir -p $UIC_CONFDIR
+      echo "mpc:" >>  $UIC_CONFFILE
+      echo "  datastore_file: /var/lib/uic-mpc/mpc.db" >> $UIC_CONFFILE
+      echo "  kvs: /var/lib/uic-mpc/mpc.kvs" >> $UIC_CONFFILE
+      echo "  pin: 2021" >> $UIC_CONFFILE
+      echo "  interface: eth0" >> $UIC_CONFFILE
+    fi
+
+    db_get uic-mpc/datastore_file
+    DSTORE="$RET"
+    if [ "$RET" = "" ]; then
+    	DSTORE="/var/lib/uic-mpc/mpc.db"
+    fi
+
+    db_get uic-mpc/kvs
+    KVS="$RET"
+    if [ "$RET" = "" ]; then
+        KVS="/var/lib/uic-mpc/mpc.kvs"
+    fi
+
+    db_get uic-mpc/pin
+    PIN="$RET"
+    if [ "$RET" = "" ]; then
+        pin="2021"
+    fi
+    
+    db_get uic-mpc/interface
+    INTERFACE="$RET"
+    if [ "$RET" = "" ]; then
+        interface="eth0"
+    fi
+
+    # Update configuration file with oucome of configuration
+    # This is a small state machine that can update the Unify config file, which is written in YAML
+    state=""
+    
+    while IFS= read line #Read IFS https://en.wikipedia.org/wiki/Input_Field_Separators
+    do
+      # Set the state depending on the line read from the config file
+      case "$line" in
+        "mpc:" )   # State: mpc
+          state="mpc"
+          ;;
+        " "* | "-"* )   # Lines starting with '-' or ' ' don't trigger state change.
+          # Do nothing.
+          ;;
+        *) state="" ;;    # Set state to empty, Any unknown text, that doesn't begin with '-' or ' '
+      esac
+      leftside=$(echo "$line" | cut -f1 -d":")
+      # STM to update entries under 'mpc:'
+      case $state in
+        "mpc" )
+          case "$line" in
+          "mpc:" )
+            echo "$line" ;;                   # mpc should not be indented
+          *"datastore_file:"*)
+            echo "$leftside: $DSTORE" ;;
+          *"kvs:"*)
+            echo "$leftside: $KVS" ;;
+          *"pin:"*)
+            echo "$leftside: $PIN" ;;
+          *"interface:"*)
+            echo "$leftside: $INTERFACE" ;;
+          *)
+            echo "$line" ;;                 # Anything inside mpc we indent
+          esac ;;
+        *)
+          echo "$line" ;;                     # Anything else we just echo the line
+                          # Without IFS= , echo here would remove the leading spaces and ruin the yaml formatting
+      esac
+    done < "$UIC_CONFFILE" > "$UIC_CONFFILE.tmp"
+    mv "$UIC_CONFFILE.tmp" "$UIC_CONFFILE"
+
+    echo "==="
+    echo "$UIC_CONFFILE new contents:"
+    echo "==="
+    cat "$UIC_CONFFILE"
+    echo "==="
+
+}
+
+case "$1" in
+        configure)
+                handle_conf
+                setup_uic_user
+                fix_permissions
+        ;;
+
+        abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+
+        *)
+                echo "postinst called with unknown argument \`$1'" >&2
+                exit 1
+        ;;
+esac
+
+# Reload AppArmor profile
+APP_PROFILE="/etc/apparmor.d/usr.sbin.uic-mpc"
+if [ -f "$APP_PROFILE" ] && aa-status --enabled 2>/dev/null; then
+       apparmor_parser -r "$APP_PROFILE" || true
+fi
+
+exit 0

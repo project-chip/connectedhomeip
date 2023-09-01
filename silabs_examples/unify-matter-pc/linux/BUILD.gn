@@ -108,7 +108,7 @@ action("debian") {
   sources = ["package.cfg"]
   outputs = ["$root_out_dir/packages/*.deb"]
   args = rebase_path(sources, root_build_dir) + ["uic-mpc", rebase_path(target_out_dir + "/bin/unify-matter-pc",
-          root_build_dir), rebase_path(target_gen_dir + "/uic-mpc", root_build_dir), "--output-dir",
+          root_build_dir), rebase_path(target_gen_dir + "/uic-mpc", root_build_dir), rebase_path("debconf", root_build_dir), "--output-dir",
           rebase_path(root_out_dir + "/packages", root_build_dir), target_cpu]
 }
 

@@ -1,0 +1,67 @@
+#!/bin/sh -e
+
+. /usr/share/debconf/confmodule
+
+UIC_CONFDIR=/etc/uic
+UIC_CONFFILE=$UIC_CONFDIR/uic.cfg
+
+
+if [ -e $UIC_CONFFILE ]; then
+  while IFS= read line #Read IFS https://en.wikipedia.org/wiki/Input_Field_Separators
+  do
+    # Set the state depending on the line read from the config file
+    case "$line" in
+      "mpc:" )   # State: mpc
+        state="mpc"
+        ;;
+      " "* | "-"* )   # Lines starting with '-' or ' ' don't trigger state change.
+        # Do nothing.
+        ;;
+      *) state="" ;;    # Set state to empty, Any unknown text, that doesn't begin with '-' or ' '
+    esac
+    # STM to update entries under 'mpc:'
+    case $state in
+      "mpc" )
+        case "$line" in
+        *"datastore_file:"* | *"kvs:"* | *"pin:"* | *"interface:"*)
+          echo "$line" ;;
+        *)
+          ;;                 # Anything else inside mpc we skip 
+        esac ;;
+      *)
+        ;;
+    esac
+  done < "$UIC_CONFFILE" > "$UIC_CONFFILE.sh.tmp"
+
+  # Replace : With =", append " to each line, Remove all spaces,
+  # Remove - in the beginning of the line
+  # Remove lines having "",
+  sed -e 's/:/="/g;s/$/"/g;s/ //g;s/^-//g;/""/d' $UIC_CONFFILE.sh.tmp > $UIC_CONFFILE.sh
+
+  echo "Existing config options"
+  cat $UIC_CONFFILE.sh
+  #Source the file to set $datastore_file, $kvs, $pin and $interface
+  . $UIC_CONFFILE.sh || true
+  rm $UIC_CONFFILE.sh $UIC_CONFFILE.sh.tmp
+
+  #Preload debconf with what was in the conf file
+  if [ ! -z "$datastore_file" ]; then
+     db_set uic-mpc/datastore_file "$datastore_file"
+  fi
+  if [ ! -z "$kvs" ]; then
+    db_set uic-mpc/kvs "$kvs"
+  fi
+  if [ ! -z "$pin" ]; then
+    db_set uic-mpc/pin "$pin"
+  fi
+  if [ ! -z "$interface" ]; then
+    db_set uic-mpc/interface "$interface"
+  fi
+fi
+
+
+db_input critical uic-mpc/datastore_file || true
+db_input critical uic-mpc/kvs || true
+db_input critical uic-mpc/pin || true
+db_input critical uic-mpc/interface || true
+db_go

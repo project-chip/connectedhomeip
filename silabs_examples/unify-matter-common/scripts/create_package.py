@@ -52,7 +52,7 @@ def addServiceFile(srvDir, desc, pkgName):
   srvEntryFile.close()
 
 # function will setup the temporary packaging directory
-def SetupPkgDir(pkgDir, pkgName, desc, pkgBin):
+def SetupPkgDir(pkgDir, pkgName, desc, pkgBin, debConf):
   # bin path
   binDir = pkgDir + '/usr/bin'
   # service file path
@@ -78,6 +78,15 @@ def SetupPkgDir(pkgDir, pkgName, desc, pkgBin):
 
   # copy binary to bin path
   shutil.copy2(pkgBin, binDir + '/' + pkgName)
+
+  os.makedirs(pkgDir + '/DEBIAN', exist_ok=True)
+
+  shutil.copy2(debConf + '/templates', pkgDir + '/DEBIAN/templates')
+  shutil.copy2(debConf + '/config', pkgDir + '/DEBIAN/config')
+  shutil.copy2(debConf + '/conffiles', pkgDir + '/DEBIAN/conffiles')
+  shutil.copy2(debConf + '/postinst', pkgDir + '/DEBIAN/postinst')
+  shutil.copy2(debConf + '/postrm', pkgDir + '/DEBIAN/postrm')
+  shutil.copy2(debConf + '/prerm', pkgDir + '/DEBIAN/prerm')
 
 # function fills in the ControlFile of debian package with meta data
 def updateControlFile(pkgDir, pkgName, desc, ver, unifyVer, arch='arm64', deps=['libunify'], priority='optional', section='devel'):
@@ -112,6 +121,7 @@ def main():
   cmdArgParser.add_argument('pkg_name')
   cmdArgParser.add_argument('pkg_bin')
   cmdArgParser.add_argument('pkg_dir')
+  cmdArgParser.add_argument('deb_conf')
   cmdArgParser.add_argument('arch')
   cmdArgParser.add_argument('-o', '--output-dir')
 
@@ -127,7 +137,7 @@ def main():
   ctrlFields = json.load(cfg)
   
   # setup package root with necessary files
-  SetupPkgDir(cmdArgs.pkg_dir, cmdArgs.pkg_name, ctrlFields['Description'], cmdArgs.pkg_bin)
+  SetupPkgDir(cmdArgs.pkg_dir, cmdArgs.pkg_name, ctrlFields['Description'], cmdArgs.pkg_bin, cmdArgs.deb_conf)
   
   # Add control file for package with meta data info
   updateControlFile(cmdArgs.pkg_dir, cmdArgs.pkg_name, ctrlFields['Description'], ctrlFields['Version'], ctrlFields['UnifyVersion'], cmdArgs.arch)

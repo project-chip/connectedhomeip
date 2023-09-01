@@ -1,0 +1,23 @@
+Template: uic-mpc/datastore_file
+Type: string
+Default: /var/lib/uic-mpc/mpc.db
+Description: The datastore file
+ (default: /var/lib/uic-mpc/mpc.db)
+
+Template: uic-mpc/kvs
+Type: string
+Default: /var/lib/uic-mpc/mpc.kvs
+Description: key value store file
+ (default: /var/lib/uic-mpc/mpc.kvs)
+
+Template: uic-mpc/pin
+Type: string
+Default: 2021
+Description: passcode
+ (default: 2021)
+
+Template: uic-mpc/interface
+Type: string
+Default: eth0
+Description: mpc interface
+ (default: eth0)
