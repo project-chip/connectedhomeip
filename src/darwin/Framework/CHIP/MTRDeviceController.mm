@@ -18,6 +18,7 @@
 
 #import "MTRDeviceController_Internal.h"
 
+#import "MTRAttestationTrustStoreBridge.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCommissionableBrowser.h"
 #import "MTRCommissionableBrowserResult_Internal.h"
@@ -86,6 +87,7 @@ static NSString * const kErrorGetCommissionee = @"Failure obtaining device being
 static NSString * const kErrorGetAttestationChallenge = @"Failure getting attestation challenge";
 static NSString * const kErrorSpake2pVerifierGenerationFailed = @"PASE verifier generation failed";
 static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifier serialization failed";
+static NSString * const kErrorCDCertStoreInit = @"Init failure while initializing Certificate Declaration Signing Keys store";
 
 typedef void (^SyncWorkQueueBlock)(void);
 typedef id (^SyncWorkQueueBlockWithReturnValue)(void);
@@ -101,6 +103,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
 @property (readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
 @property (readonly) chip::Credentials::PartialDACVerifier * partialDACVerifier;
+@property (readonly) chip::Credentials::DefaultDACVerifier * defaultDACVerifier;
 @property (readonly) MTRDeviceControllerDelegateBridge * deviceControllerDelegateBridge;
 @property (readonly) MTROperationalCredentialsDelegate * operationalCredentialsDelegate;
 @property (readonly) MTRP256KeypairBridge signingKeypairBridge;
@@ -110,6 +113,8 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 @property (readonly) NSMutableDictionary * nodeIDToDeviceMap;
 @property (readonly) os_unfair_lock deviceMapLock; // protects nodeIDToDeviceMap
 @property (readonly) MTRCommissionableBrowser * commissionableBrowser;
+@property (readonly) MTRAttestationTrustStoreBridge * attestationTrustStoreBridge;
+
 @end
 
 @implementation MTRDeviceController
@@ -233,6 +238,16 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 - (void)cleanup
 {
     VerifyOrDie(_cppCommissioner == nullptr);
+
+    if (_defaultDACVerifier) {
+        delete _defaultDACVerifier;
+        _defaultDACVerifier = nullptr;
+    }
+
+    if (_attestationTrustStoreBridge) {
+        delete _attestationTrustStoreBridge;
+        _attestationTrustStoreBridge = nullptr;
+    }
 
     [self clearDeviceAttestationDelegateBridge];
 
@@ -388,8 +403,40 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         // fabric information for the relevant fabric indices on controller
         // bring-up.
         commissionerParams.removeFromFabricTableOnShutdown = false;
-        commissionerParams.deviceAttestationVerifier = _factory.deviceAttestationVerifier;
         commissionerParams.permitMultiControllerFabrics = startupParams.allowMultipleControllersPerFabric;
+
+        // Set up our attestation verifier.  Assume we want to use the default
+        // one, until something tells us otherwise.
+        const chip::Credentials::AttestationTrustStore * trustStore;
+        if (startupParams.productAttestationAuthorityCertificates) {
+            _attestationTrustStoreBridge
+                = new MTRAttestationTrustStoreBridge(startupParams.productAttestationAuthorityCertificates);
+            trustStore = _attestationTrustStoreBridge;
+        } else {
+            // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
+            trustStore = chip::Credentials::GetTestAttestationTrustStore();
+        }
+
+        _defaultDACVerifier = new chip::Credentials::DefaultDACVerifier(trustStore);
+
+        if (startupParams.certificationDeclarationCertificates) {
+            auto cdTrustStore = _defaultDACVerifier->GetCertificationDeclarationTrustStore();
+            if (cdTrustStore == nullptr) {
+                errorCode = CHIP_ERROR_INCORRECT_STATE;
+            }
+            if ([self checkForStartError:errorCode logMsg:kErrorCDCertStoreInit]) {
+                return;
+            }
+
+            for (NSData * cdSigningCert in startupParams.certificationDeclarationCertificates) {
+                errorCode = cdTrustStore->AddTrustedKey(AsByteSpan(cdSigningCert));
+                if ([self checkForStartError:errorCode logMsg:kErrorCDCertStoreInit]) {
+                    return;
+                }
+            }
+        }
+
+        commissionerParams.deviceAttestationVerifier = _defaultDACVerifier;
 
         auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
 
@@ -725,7 +772,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         } else {
             // TODO: Once we are not supporting setNocChainIssuer this
             // branch can just go away.
-            self->_cppCommissioner->SetDeviceAttestationVerifier(self->_factory.deviceAttestationVerifier);
+            self->_cppCommissioner->SetDeviceAttestationVerifier(self->_defaultDACVerifier);
         }
         return YES;
     };
