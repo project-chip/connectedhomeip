@@ -138,8 +138,7 @@ static bool IsValidCATNumber(id _Nullable value)
                 return nil;
             }
         }
-        _nodesWithResumptionInfo = [NSMutableArray arrayWithCapacity:[resumptionNodeList count]];
-        [_nodesWithResumptionInfo addObjectsFromArray:resumptionNodeList];
+        _nodesWithResumptionInfo = [resumptionNodeList mutableCopy];
     } else {
         _nodesWithResumptionInfo = [[NSMutableArray alloc] init];
     }
@@ -184,7 +183,7 @@ static bool IsValidCATNumber(id _Nullable value)
         // Update our resumption info node list.
         [_nodesWithResumptionInfo addObject:resumptionInfo.nodeID];
         [_storageDelegate controller:_controller
-                          storeValue:[NSArray arrayWithArray:_nodesWithResumptionInfo]
+                          storeValue:[_nodesWithResumptionInfo copy]
                               forKey:sResumptionNodeListKey
                        securityLevel:MTRStorageSecurityLevelSecure
                          sharingType:MTRStorageSharingTypeNotShared];
@@ -349,6 +348,9 @@ static NSString * const sCATsKey = @"CATs";
 
 NSSet<Class> * MTRDeviceControllerStorageClasses()
 {
+    // This only needs to return the classes for toplevel things we are storing,
+    // plus NSNumber because some archivers use that internally to store
+    // information about what's being archived.
     static NSSet * const sStorageClasses = [NSSet setWithArray:@[
         [NSNumber class],
         [NSData class],
