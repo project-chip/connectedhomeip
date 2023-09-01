@@ -557,13 +557,14 @@ tests:
       verification: |
           ./chip-tool accesscontrol read extension 2 0 --commissioner-name beta --commissioner-nodeid 223344
 
-          On TH2(Chiptool) , Verify AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1
+          Via the TH2(chip-tool), Verify the AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1
 
           [1657289746.737641][19293:19298] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0001 DataVersion: 1884338152
           [1657289746.737713][19293:19298] CHIP:TOO:   Extension: 1 entries
           [1657289746.737778][19293:19298] CHIP:TOO:     [1]: {
           [1657289746.737803][19293:19298] CHIP:TOO:       Data: 17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018
-          [1657289746.737844][19293:19298] CHIP:TOO:       Fab
+          [1657289746.737844][19293:19298] CHIP:TOO:       FabricIndex: 2
+          [1657289746.737862][19293:19298] CHIP:TOO:      }
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP && ACL.S.A0001
