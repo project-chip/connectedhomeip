@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 MTR_HIDDEN
 #endif
 MTR_NEWLY_AVAILABLE
-@interface MTRDeviceControllerStartupParameters : NSObject
+@interface MTRDeviceControllerParameters : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -81,7 +81,7 @@ MTR_NEWLY_AVAILABLE
 MTR_HIDDEN
 #endif
 MTR_NEWLY_AVAILABLE
-@interface MTRDeviceControllerExternalCertificateStartupParameters : MTRDeviceControllerStartupParameters
+@interface MTRDeviceControllerExternalCertificateParameters : MTRDeviceControllerParameters
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
