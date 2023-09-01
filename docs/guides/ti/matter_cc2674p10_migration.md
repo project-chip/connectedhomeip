@@ -27,29 +27,30 @@ CC2674P10 device
   contents with the 7.10.01.24 version from 
   [TI's downloads page](https://www.ti.com/tool/download/SIMPLELINK-LOWPOWER-F2-SDK/7.10.01.24) which is required to add support SDK for the CC2674P10 device.
 
-## Configuring chip.syscfg in the SysConfig GUI
+## Configuring `chip.syscfg` in the SysConfig GUI
 
 1. To open `matter/examples/[application]/cc13x4_26x4/chip.syscfg` in the GUI, 
-  add the following line to the top of the file: `
-    // @cliArgs --product <path to SDK>/.metadata/product.json --board /ti/boards/LP_EM_CC1354P10_6 --rtos freertos`
-2. Open the syscfg file using the standalone Sysconfig GUI (`sysconfig_gui.sh`) 
+  add the following line to the top of the file: 
+  ```
+    // @cliArgs --product <path to SDK>/.metadata/product.json --board /ti/boards/LP_EM_CC1354P10_6 --rtos freertos
+  ```
+2. Open the `syscfg` file using the standalone Sysconfig GUI (`sysconfig_gui.sh`) 
   from the SysConfig installation folder.
 3. Click on *Show Device View* and then click *Switch*.
-4. Select *Board* as *None* and *Device* as *CC2674P10RGZ*, Unselect *Lock 
-  PinMux*, and click *Confirm*.
+4. Select *Board* as *None* and *Device* as *`CC2674P10RGZ`*, Unselect *`Lock PinMux`*, and click *Confirm*.
 5. To fix errors, make the following module changes:
     * *RF Design* and *RF Stacks -> BLE -> Radio*: click on *accepting the 
-      current value*, which should be *LP_CC2674P10_RGZ* in the drop down menu 
+      current value*, which should be *`LP_CC2674P10_RGZ`* in the drop down menu 
       for *Based On RF Design*
-    * *TI DEVICES -> Device Configuration*: Clear *XOSC Cap Array Modification*
+    * *TI DEVICES -> Device Configuration*: Clear *`XOSC Cap Array Modification`*
     * *TI DRIVERS -> RF*: Set *Global Event Mask* as *None* and *No. of Antenna 
       Switch Control Pins* as *0*
-    * *TI DRIVERS -> UART2 -> PinMux*: Set *UART Peripheral* to *UART0*, 
-      *TX Pin* to *DIO_13/19*, and *RX Pin* to *DIO_12/18*
-    * *TI DRIVERS APPS -> Button*: Set *PinMux* of *CONFIG_BTN_LEFT* to *DIO_15* 
-      and *CONFIG_BTN_RIGHT* to *DIO_14*
-    * *TI DRIVERS APPS -> LED*: Set *PinMux* of *CONFIG_LED_RED* to *DIO_6* and 
-      *CONFIG_LED_RIGHT* to *DIO_7* 
+    * *TI DRIVERS -> UART2 -> `PinMux`*: Set *UART Peripheral* to *UART0*, 
+      *TX Pin* to *`DIO_13/19`*, and *RX Pin* to *`DIO_12/18`*
+    * *TI DRIVERS APPS -> Button*: Set *`PinMux`* of *CONFIG_BTN_LEFT* to *`DIO_15`* 
+      and *CONFIG_BTN_RIGHT* to *`DIO_14`*
+    * *TI DRIVERS APPS -> LED*: Set *`PinMux`* of *CONFIG_LED_RED* to *`DIO_6`* and 
+      *CONFIG_LED_RIGHT* to *`DIO_7`* 
 6. Save the SysConfig file (click on *Save As*) and ensure the file name matches 
   the reference from `BUILD.gn` (default project name is `chip.syscfg`).
 7. Open the new SysConfig file with a text editor and remove the generated 
@@ -69,7 +70,7 @@ CC2674P10 device
 
 ## Modifications required for the CC2674R10
 
-After applying all items in the "Configuring chip.syscfg in the SysConfig GUI" 
+After applying all items in the "Configuring `chip.syscfg` in the SysConfig GUI" 
 section, additional steps must also be applied to generate Matter project for 
 the CC2674R10.
 
@@ -82,14 +83,14 @@ the CC2674R10.
 Furthermore, the subsequent changes apply specifically for the CC2674R10 and 
 should be addressed from a SysConfig Editor.
 1. Pins will need to be reconfigured as such: 
-    | SysConfig pin name | R10 PinMux |
-    | ------------------ | ---------- |
-    | UART_RX            | DIO_2      |
-    | UART_TX            | DIO_3      |
-    | CONFIG_BTN_LEFT    | DIO_13     |
-    | CONFIG_BTN_RIGHT   | DIO_14     |
-    | CONFIG_LED_RED     | DIO_6      |
-    | CONFIG_LED_GREEN   | DIO_7      |
+    | SysConfig pin name | R10 `PinMux`|
+    | ------------------ | ----------- |
+    | UART_RX            | `DIO_2`     |
+    | UART_TX            | `DIO_3`     |
+    | CONFIG_BTN_LEFT    | `DIO_13`    |
+    | CONFIG_BTN_RIGHT   | `DIO_14`    |
+    | CONFIG_LED_RED     | `DIO_6`     |
+    | CONFIG_LED_GREEN   | `DIO_7`     |
 2. *Custom -> IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8 -> Code Export Configuration*, 
   acknowledge and dismiss the PA radio setup error
 3. *Custom -> IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8 -> RF Command Symbols*,
