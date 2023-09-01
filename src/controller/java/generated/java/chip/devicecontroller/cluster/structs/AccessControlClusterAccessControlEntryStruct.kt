@@ -20,19 +20,17 @@ import chip.devicecontroller.cluster.*
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
-import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-import java.util.Optional
-
-class AccessControlClusterAccessControlEntryStruct (
-    val privilege: Int,
-    val authMode: Int,
-    val subjects: List<Long>?,
-    val targets: List<AccessControlClusterAccessControlTargetStruct>?,
-    val fabricIndex: Int) {
-  override fun toString(): String  = buildString {
+class AccessControlClusterAccessControlEntryStruct(
+  val privilege: Int,
+  val authMode: Int,
+  val subjects: List<Long>?,
+  val targets: List<AccessControlClusterAccessControlTargetStruct>?,
+  val fabricIndex: Int
+) {
+  override fun toString(): String = buildString {
     append("AccessControlClusterAccessControlEntryStruct {\n")
     append("\tprivilege : $privilege\n")
     append("\tauthMode : $authMode\n")
@@ -48,23 +46,23 @@ class AccessControlClusterAccessControlEntryStruct (
       put(ContextSpecificTag(TAG_PRIVILEGE), privilege)
       put(ContextSpecificTag(TAG_AUTH_MODE), authMode)
       if (subjects != null) {
-      startList(ContextSpecificTag(TAG_SUBJECTS))
-      for (item in subjects.iterator()) {
-        put(AnonymousTag, item)
+        startList(ContextSpecificTag(TAG_SUBJECTS))
+        for (item in subjects.iterator()) {
+          put(AnonymousTag, item)
+        }
+        endList()
+      } else {
+        putNull(ContextSpecificTag(TAG_SUBJECTS))
       }
-      endList()
-    } else {
-      putNull(ContextSpecificTag(TAG_SUBJECTS))
-    }
       if (targets != null) {
-      startList(ContextSpecificTag(TAG_TARGETS))
-      for (item in targets.iterator()) {
-        item.toTlv(AnonymousTag, this)
+        startList(ContextSpecificTag(TAG_TARGETS))
+        for (item in targets.iterator()) {
+          item.toTlv(AnonymousTag, this)
+        }
+        endList()
+      } else {
+        putNull(ContextSpecificTag(TAG_TARGETS))
       }
-      endList()
-    } else {
-      putNull(ContextSpecificTag(TAG_TARGETS))
-    }
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
@@ -77,39 +75,47 @@ class AccessControlClusterAccessControlEntryStruct (
     private const val TAG_TARGETS = 4
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader) : AccessControlClusterAccessControlEntryStruct {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader): AccessControlClusterAccessControlEntryStruct {
       tlvReader.enterStructure(tag)
       val privilege = tlvReader.getInt(ContextSpecificTag(TAG_PRIVILEGE))
       val authMode = tlvReader.getInt(ContextSpecificTag(TAG_AUTH_MODE))
-      val subjects = if (!tlvReader.isNull()) {
-      buildList<Long> {
-      tlvReader.enterList(ContextSpecificTag(TAG_SUBJECTS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getLong(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_SUBJECTS))
-      null
-    }
-      val targets = if (!tlvReader.isNull()) {
-      buildList<AccessControlClusterAccessControlTargetStruct> {
-      tlvReader.enterList(ContextSpecificTag(TAG_TARGETS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(AccessControlClusterAccessControlTargetStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_TARGETS))
-      null
-    }
+      val subjects =
+        if (!tlvReader.isNull()) {
+          buildList<Long> {
+            tlvReader.enterList(ContextSpecificTag(TAG_SUBJECTS))
+            while (!tlvReader.isEndOfContainer()) {
+              add(tlvReader.getLong(AnonymousTag))
+            }
+            tlvReader.exitContainer()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_SUBJECTS))
+          null
+        }
+      val targets =
+        if (!tlvReader.isNull()) {
+          buildList<AccessControlClusterAccessControlTargetStruct> {
+            tlvReader.enterList(ContextSpecificTag(TAG_TARGETS))
+            while (!tlvReader.isEndOfContainer()) {
+              add(AccessControlClusterAccessControlTargetStruct.fromTlv(AnonymousTag, tlvReader))
+            }
+            tlvReader.exitContainer()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_TARGETS))
+          null
+        }
       val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return AccessControlClusterAccessControlEntryStruct(privilege, authMode, subjects, targets, fabricIndex)
+      return AccessControlClusterAccessControlEntryStruct(
+        privilege,
+        authMode,
+        subjects,
+        targets,
+        fabricIndex
+      )
     }
   }
 }

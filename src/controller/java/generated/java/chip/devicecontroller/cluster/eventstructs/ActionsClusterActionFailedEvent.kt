@@ -17,21 +17,18 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
-import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-import java.util.Optional
-
-class ActionsClusterActionFailedEvent (
-    val actionID: Int,
-    val invokeID: Long,
-    val newState: Int,
-    val error: Int) {
-  override fun toString(): String  = buildString {
+class ActionsClusterActionFailedEvent(
+  val actionID: Int,
+  val invokeID: Long,
+  val newState: Int,
+  val error: Int
+) {
+  override fun toString(): String = buildString {
     append("ActionsClusterActionFailedEvent {\n")
     append("\tactionID : $actionID\n")
     append("\tinvokeID : $invokeID\n")
@@ -57,13 +54,13 @@ class ActionsClusterActionFailedEvent (
     private const val TAG_NEW_STATE = 2
     private const val TAG_ERROR = 3
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader) : ActionsClusterActionFailedEvent {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader): ActionsClusterActionFailedEvent {
       tlvReader.enterStructure(tag)
       val actionID = tlvReader.getInt(ContextSpecificTag(TAG_ACTION_I_D))
       val invokeID = tlvReader.getLong(ContextSpecificTag(TAG_INVOKE_I_D))
       val newState = tlvReader.getInt(ContextSpecificTag(TAG_NEW_STATE))
       val error = tlvReader.getInt(ContextSpecificTag(TAG_ERROR))
-      
+
       tlvReader.exitContainer()
 
       return ActionsClusterActionFailedEvent(actionID, invokeID, newState, error)

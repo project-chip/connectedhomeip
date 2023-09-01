@@ -17,23 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
-import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-import java.util.Optional
-
-class OperationalCredentialsClusterFabricDescriptorStruct (
-    val rootPublicKey: ByteArray,
-    val vendorID: Int,
-    val fabricID: Long,
-    val nodeID: Long,
-    val label: String,
-    val fabricIndex: Int) {
-  override fun toString(): String  = buildString {
+class OperationalCredentialsClusterFabricDescriptorStruct(
+  val rootPublicKey: ByteArray,
+  val vendorID: Int,
+  val fabricID: Long,
+  val nodeID: Long,
+  val label: String,
+  val fabricIndex: Int
+) {
+  override fun toString(): String = buildString {
     append("OperationalCredentialsClusterFabricDescriptorStruct {\n")
     append("\trootPublicKey : $rootPublicKey\n")
     append("\tvendorID : $vendorID\n")
@@ -65,7 +62,10 @@ class OperationalCredentialsClusterFabricDescriptorStruct (
     private const val TAG_LABEL = 5
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader) : OperationalCredentialsClusterFabricDescriptorStruct {
+    fun fromTlv(
+      tag: Tag,
+      tlvReader: TlvReader
+    ): OperationalCredentialsClusterFabricDescriptorStruct {
       tlvReader.enterStructure(tag)
       val rootPublicKey = tlvReader.getByteArray(ContextSpecificTag(TAG_ROOT_PUBLIC_KEY))
       val vendorID = tlvReader.getInt(ContextSpecificTag(TAG_VENDOR_I_D))
@@ -73,10 +73,17 @@ class OperationalCredentialsClusterFabricDescriptorStruct (
       val nodeID = tlvReader.getLong(ContextSpecificTag(TAG_NODE_I_D))
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
       val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return OperationalCredentialsClusterFabricDescriptorStruct(rootPublicKey, vendorID, fabricID, nodeID, label, fabricIndex)
+      return OperationalCredentialsClusterFabricDescriptorStruct(
+        rootPublicKey,
+        vendorID,
+        fabricID,
+        nodeID,
+        label,
+        fabricIndex
+      )
     }
   }
 }

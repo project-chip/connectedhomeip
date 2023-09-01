@@ -17,18 +17,13 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
-import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-import java.util.Optional
-
-class GeneralDiagnosticsClusterBootReasonEvent (
-    val bootReason: Int) {
-  override fun toString(): String  = buildString {
+class GeneralDiagnosticsClusterBootReasonEvent(val bootReason: Int) {
+  override fun toString(): String = buildString {
     append("GeneralDiagnosticsClusterBootReasonEvent {\n")
     append("\tbootReason : $bootReason\n")
     append("}\n")
@@ -45,10 +40,10 @@ class GeneralDiagnosticsClusterBootReasonEvent (
   companion object {
     private const val TAG_BOOT_REASON = 0
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader) : GeneralDiagnosticsClusterBootReasonEvent {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader): GeneralDiagnosticsClusterBootReasonEvent {
       tlvReader.enterStructure(tag)
       val bootReason = tlvReader.getInt(ContextSpecificTag(TAG_BOOT_REASON))
-      
+
       tlvReader.exitContainer()
 
       return GeneralDiagnosticsClusterBootReasonEvent(bootReason)
