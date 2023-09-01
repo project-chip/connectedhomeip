@@ -3659,8 +3659,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     // Cluster LaundryWasherMode attributes
     MTRAttributeIDTypeClusterLaundryWasherModeAttributeSupportedModesID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterLaundryWasherModeAttributeCurrentModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterLaundryWasherModeAttributeStartUpModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterLaundryWasherModeAttributeOnModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
     MTRAttributeIDTypeClusterLaundryWasherModeAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterLaundryWasherModeAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE
@@ -3679,10 +3677,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = 0x00000000,
     MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeCurrentModeID MTR_PROVISIONALLY_AVAILABLE
     = 0x00000001,
-    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeStartUpModeID MTR_PROVISIONALLY_AVAILABLE
-    = 0x00000002,
-    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeOnModeID MTR_PROVISIONALLY_AVAILABLE
-    = 0x00000003,
     MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeGeneratedCommandListID
         MTR_PROVISIONALLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
@@ -3792,8 +3786,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     // Cluster DishwasherMode attributes
     MTRAttributeIDTypeClusterDishwasherModeAttributeSupportedModesID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterDishwasherModeAttributeCurrentModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterDishwasherModeAttributeStartUpModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterDishwasherModeAttributeOnModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
     MTRAttributeIDTypeClusterDishwasherModeAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterDishwasherModeAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE
