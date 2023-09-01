@@ -18,6 +18,7 @@
 
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
+#import <Matter/MTROTAProviderDelegate.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -58,6 +59,12 @@ MTR_NEWLY_AVAILABLE
  */
 - (void)setOperationalCertificateIssuer:(id<MTROperationalCertificateIssuer>)operationalCertificateIssuer
                                   queue:(dispatch_queue_t)queue;
+
+/**
+ * Set an MTROTAProviderDelegate to call (on the provided queue).  Only needs to
+ * be called if this controller should be able to handle OTA for devices.
+ */
+- (void)setOTAProviderDelegate:(id<MTROTAProviderDelegate>)otaProviderDelegate queue:(dispatch_queue_t)queue;
 
 @end
 
