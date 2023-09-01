@@ -321,16 +321,25 @@ CHIP_ERROR ESP32Utils::InitWiFiStack(void)
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-    if (!esp_netif_create_default_wifi_ap())
+    // Lets not create a default AP interface if already present
+    if (!esp_netif_get_handle_from_ifkey("WIFI_AP_DEF"))
     {
-        ChipLogError(DeviceLayer, "Failed to create the WiFi AP netif");
-        return CHIP_ERROR_INTERNAL;
+        if (!esp_netif_create_default_wifi_ap())
+        {
+            ChipLogError(DeviceLayer, "Failed to create the WiFi AP netif");
+            return CHIP_ERROR_INTERNAL;
+        }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-    if (!esp_netif_create_default_wifi_sta())
+
+    // Lets not create a default station interface if already present
+    if (!esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"))
     {
-        ChipLogError(DeviceLayer, "Failed to create the WiFi STA netif");
-        return CHIP_ERROR_INTERNAL;
+        if (!esp_netif_create_default_wifi_sta())
+        {
+            ChipLogError(DeviceLayer, "Failed to create the WiFi STA netif");
+            return CHIP_ERROR_INTERNAL;
+        }
     }
 
     // Initialize the ESP WiFi layer.
