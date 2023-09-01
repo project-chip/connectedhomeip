@@ -10,6 +10,7 @@
 #include "gpiointerrupt.h"
 #include "sl_si91x_status.h"
 #include "sl_constants.h"
+#include "rsi_hal.h"
 #include <stdbool.h>
 #include <string.h>
 
@@ -42,7 +43,6 @@ static si91x_packet_queue_t cmd_queues[SI91X_QUEUE_MAX];
 
 extern void si91x_bus_thread(void *args);
 extern void si91x_event_handler_thread(void *args);
-static void gpio_interrupt(uint8_t interrupt_number);
 sl_status_t sli_verify_device_boot(uint32_t *rom_version);
 sl_status_t sli_wifi_select_option(const uint8_t configuration);
 
@@ -416,12 +416,6 @@ void sl_si91x_host_enable_bus_interrupt(void)
 void sl_si91x_host_disable_bus_interrupt(void)
 {
   NVIC_DisableIRQ(GPIO_ODD_IRQn);
-}
-
-static void gpio_interrupt(uint8_t interrupt_number)
-{
-  UNUSED_PARAMETER(interrupt_number);
-  sl_si91x_host_set_bus_event(NCP_HOST_BUS_RX_EVENT);
 }
 
 sl_status_t si91x_bootup_firmware(const uint8_t select_option)
