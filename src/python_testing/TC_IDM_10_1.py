@@ -42,7 +42,7 @@ def validate_attribute_id_range(attribute_id):
     prefix, suffix = split_element_into_prefix_suffix(attribute_id)
 
     if prefix == STANDARD_RANGE:
-        if suffix not in ATTRIBUTE_ID_RANGE and suffix not in GLOBAL_ATTRIBUTE_ID_RANGE :
+        if suffix not in ATTRIBUTE_ID_RANGE and suffix not in GLOBAL_ATTRIBUTE_ID_RANGE:
             asserts.fail(f"Invalid attribute id (0x{attribute_id:08X}) in standard range")
 
     elif prefix in MANUFACTURER_CODE_RANGE:
