@@ -22,8 +22,8 @@
 #import "MTRErrorTestUtils.h"
 #import "MTRFabricInfoChecker.h"
 #import "MTRTestKeys.h"
+#import "MTRTestPerControllerStorage.h"
 #import "MTRTestResetCommissioneeHelper.h"
-#import "MTRTestStorage.h"
 
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
@@ -65,73 +65,6 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertEqual(error.code, 0);
     [_expectation fulfill];
     _expectation = nil;
-}
-
-@end
-
-@interface MTRPerControllerStorageTestsStorageDelegate : NSObject <MTRDeviceControllerStorageDelegate>
-@property (nonatomic, readonly) NSMutableDictionary<NSString *, NSData *> * storage;
-@property (nonatomic, readonly) NSUUID * controllerID;
-@end
-
-@implementation MTRPerControllerStorageTestsStorageDelegate
-
-- (instancetype)initWithControllerID:(NSUUID *)controllerID
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    _storage = [[NSMutableDictionary alloc] init];
-    _controllerID = controllerID;
-    return self;
-}
-
-- (nullable id<NSSecureCoding>)controller:(MTRDeviceController *)controller
-                              valueForKey:(NSString *)key
-                            securityLevel:(MTRStorageSecurityLevel)securityLevel
-                              sharingType:(MTRStorageSharingType)sharingType
-{
-    XCTAssertEqualObjects(_controllerID, controller.uniqueIdentifier);
-
-    __auto_type * data = self.storage[key];
-    if (data == nil) {
-        return data;
-    }
-
-    NSError * error;
-    id value = [NSKeyedUnarchiver unarchivedObjectOfClasses:MTRDeviceControllerStorageClasses() fromData:data error:&error];
-    XCTAssertNil(error);
-    XCTAssertNotNil(data);
-
-    return value;
-}
-
-- (BOOL)controller:(MTRDeviceController *)controller
-        storeValue:(id<NSSecureCoding>)value
-            forKey:(NSString *)key
-     securityLevel:(MTRStorageSecurityLevel)securityLevel
-       sharingType:(MTRStorageSharingType)sharingType
-{
-    XCTAssertEqualObjects(_controllerID, controller.uniqueIdentifier);
-
-    NSError * error;
-    NSData * data = [NSKeyedArchiver archivedDataWithRootObject:value requiringSecureCoding:YES error:&error];
-    XCTAssertNil(error);
-    XCTAssertNotNil(data);
-
-    self.storage[key] = data;
-    return YES;
-}
-
-- (BOOL)controller:(MTRDeviceController *)controller
-    removeValueForKey:(NSString *)key
-        securityLevel:(MTRStorageSecurityLevel)securityLevel
-          sharingType:(MTRStorageSharingType)sharingType
-{
-    XCTAssertEqualObjects(_controllerID, controller.uniqueIdentifier);
-    self.storage[key] = nil;
-    return YES;
 }
 
 @end
@@ -319,7 +252,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
                                               operationalKeys:(MTRTestKeys *)operationalKeys
                                                      fabricID:(NSNumber *)fabricID
                                                        nodeID:(NSNumber *)nodeID
-                                                      storage:(MTRPerControllerStorageTestsStorageDelegate *)storage
+                                                      storage:(MTRTestPerControllerStorage *)storage
                                         caseAuthenticatedTags:(nullable NSSet *)caseAuthenticatedTags
                                                         error:(NSError * __autoreleasing *)error
                                             certificateIssuer:
@@ -376,7 +309,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
                                               operationalKeys:(MTRTestKeys *)operationalKeys
                                                      fabricID:(NSNumber *)fabricID
                                                        nodeID:(NSNumber *)nodeID
-                                                      storage:(MTRPerControllerStorageTestsStorageDelegate *)storage
+                                                      storage:(MTRTestPerControllerStorage *)storage
                                                         error:(NSError * __autoreleasing *)error
                                             certificateIssuer:
                                                 (MTRPerControllerStorageTestsCertificateIssuer * __autoreleasing *)certificateIssuer
@@ -395,7 +328,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
                                               operationalKeys:(MTRTestKeys *)operationalKeys
                                                      fabricID:(NSNumber *)fabricID
                                                        nodeID:(NSNumber *)nodeID
-                                                      storage:(MTRPerControllerStorageTestsStorageDelegate *)storage
+                                                      storage:(MTRTestPerControllerStorage *)storage
                                         caseAuthenticatedTags:(nullable NSSet *)caseAuthenticatedTags
                                                         error:(NSError * __autoreleasing *)error
 {
@@ -413,7 +346,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
                                               operationalKeys:(MTRTestKeys *)operationalKeys
                                                      fabricID:(NSNumber *)fabricID
                                                        nodeID:(NSNumber *)nodeID
-                                                      storage:(MTRPerControllerStorageTestsStorageDelegate *)storage
+                                                      storage:(MTRTestPerControllerStorage *)storage
                                                         error:(NSError * __autoreleasing *)error
 {
     return [self startControllerWithRootKeys:rootKeys
@@ -436,7 +369,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(operationalKeys);
 
-    __auto_type * storageDelegate = [[MTRPerControllerStorageTestsStorageDelegate alloc] initWithControllerID:[NSUUID UUID]];
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
 
     NSNumber * nodeID = @(123);
     NSNumber * fabricID = @(456);
@@ -481,7 +414,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(operationalKeys);
 
-    __auto_type * storageDelegate = [[MTRPerControllerStorageTestsStorageDelegate alloc] initWithControllerID:[NSUUID UUID]];
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
 
     NSNumber * nodeID = @(123);
     NSNumber * fabricID = @(456);
@@ -526,7 +459,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(operationalKeys);
     XCTAssertEqual(operationalKeys.signatureCount, 0);
 
-    __auto_type * storageDelegate = [[MTRPerControllerStorageTestsStorageDelegate alloc] initWithControllerID:[NSUUID UUID]];
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
 
     NSNumber * fabricID = @(456);
 
@@ -578,7 +511,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(operationalKeys);
     XCTAssertEqual(operationalKeys.signatureCount, 0);
 
-    __auto_type * storageDelegate = [[MTRPerControllerStorageTestsStorageDelegate alloc] initWithControllerID:[NSUUID UUID]];
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
 
     NSNumber * nodeID = @(123);
     NSNumber * fabricID = @(456);
@@ -675,7 +608,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(operationalKeys);
     XCTAssertEqual(operationalKeys.signatureCount, 0);
 
-    __auto_type * storageDelegate = [[MTRPerControllerStorageTestsStorageDelegate alloc] initWithControllerID:[NSUUID UUID]];
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
 
     NSNumber * nodeID1 = @(123);
     NSNumber * nodeID2 = @(246);
@@ -778,7 +711,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(operationalKeys);
     XCTAssertEqual(operationalKeys.signatureCount, 0);
 
-    __auto_type * storageDelegate = [[MTRPerControllerStorageTestsStorageDelegate alloc] initWithControllerID:[NSUUID UUID]];
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
 
     NSNumber * nodeID = @(123);
     NSNumber * fabricID = @(456);
@@ -887,7 +820,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     NSNumber * fabricID1 = @(1);
     NSNumber * fabricID2 = @(2);
 
-    __auto_type * storageDelegate1 = [[MTRPerControllerStorageTestsStorageDelegate alloc] initWithControllerID:[NSUUID UUID]];
+    __auto_type * storageDelegate1 = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
 
     // Start several controllers that have distinct identities but share some
     // node/fabric IDs.
@@ -904,7 +837,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller1);
     XCTAssertTrue([controller1 isRunning]);
 
-    __auto_type * storageDelegate2 = [[MTRPerControllerStorageTestsStorageDelegate alloc] initWithControllerID:[NSUUID UUID]];
+    __auto_type * storageDelegate2 = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
     MTRDeviceController * controller2 = [self startControllerWithRootKeys:rootKeys
                                                           operationalKeys:operationalKeys
                                                                  fabricID:fabricID1
@@ -915,7 +848,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller2);
     XCTAssertTrue([controller2 isRunning]);
 
-    __auto_type * storageDelegate3 = [[MTRPerControllerStorageTestsStorageDelegate alloc] initWithControllerID:[NSUUID UUID]];
+    __auto_type * storageDelegate3 = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
     MTRDeviceController * controller3 = [self startControllerWithRootKeys:rootKeys
                                                           operationalKeys:operationalKeys
                                                                  fabricID:fabricID2
