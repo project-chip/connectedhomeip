@@ -43,6 +43,7 @@
     "DeviceManagement": [
         "TestIcdManagementCluster",
         "Test_TC_OPCREDS_1_2",
+        "Test_TC_OPCREDS_3_7",
         "Test_TC_BINFO_1_1",
         "Test_TC_BINFO_2_1",
         "Test_TC_BINFO_2_2",
