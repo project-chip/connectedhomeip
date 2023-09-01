@@ -21,7 +21,7 @@
 
 #ifndef SL_WIFI_BOARD_READY_WAIT_TIME
 #define SL_WIFI_BOARD_READY_WAIT_TIME \
-  40000 //some scenarios like after firmware upgrade, it will take 40 seconds to boad ready
+  40000 //some scenarios like after firmware upgrade, it will take 40 seconds to board ready
 #endif
 
 typedef struct {
@@ -71,20 +71,6 @@ sl_status_t sl_si91x_host_init(void)
 
     // configure packet pending interrupt priority
   NVIC_SetPriority(GPIO_ODD_IRQn, PACKET_PENDING_INT_PRI);
-#if 0
-  // Start reset line low
-  GPIO_PinModeSet(WFX_RESET_PIN.port, WFX_RESET_PIN.pin, gpioModePushPull, 0);
-
-  // configure packet pending interrupt priority
-  NVIC_SetPriority(GPIO_ODD_IRQn, PACKET_PENDING_INT_PRI);
-
-  // Configure interrupt, sleep and wake confirmation pins
-  GPIOINT_CallbackRegister(WFX_INTERRUPT_PIN.pin, rsi_gpio_irq_cb);
-  GPIO_PinModeSet(WFX_INTERRUPT_PIN.port, WFX_INTERRUPT_PIN.pin, gpioModeInputPullFilter, 0);
-  GPIO_ExtIntConfig(WFX_INTERRUPT_PIN.port, WFX_INTERRUPT_PIN.pin, SL_WFX_HOST_PINOUT_SPI_IRQ, true, false, true);
-  GPIO_PinModeSet(WFX_SLEEP_CONFIRM_PIN.port, WFX_SLEEP_CONFIRM_PIN.pin, gpioModeWiredOrPullDown, 1);
-  GPIO_PinModeSet(WAKE_INDICATOR_PIN.port, WAKE_INDICATOR_PIN.pin, gpioModeWiredOrPullDown, 0);
-#endif
   memset(cmd_queues, 0, sizeof(cmd_queues));
 
   if (NULL == si91x_events) {
