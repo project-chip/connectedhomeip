@@ -20,7 +20,7 @@ import logging
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
-STANDARD_RANGE = 0x0000
+STANDARD_PREFIX = 0x0000
 MANUFACTURER_CODE_RANGE = range(0x0001, 0xFFF0 + 1)
 TEST_VENDOR_RANGE = range(0xFFF1, 0xFFF4 + 1)
 INVALID_VENDOR_RANGE = range(0xFFF5, 0xFFFF + 1)
@@ -41,7 +41,7 @@ def split_element_into_prefix_suffix(element):
 def validate_attribute_id_range(attribute_id):
     prefix, suffix = split_element_into_prefix_suffix(attribute_id)
 
-    if prefix == STANDARD_RANGE:
+    if prefix == STANDARD_PREFIX:
         if suffix not in ATTRIBUTE_ID_RANGE and suffix not in GLOBAL_ATTRIBUTE_ID_RANGE:
             asserts.fail(f"Invalid attribute id (0x{attribute_id:08X}) in standard range")
 
@@ -62,7 +62,7 @@ def validate_attribute_id_range(attribute_id):
 def validate_command_id_range(command_id):
     prefix, suffix = split_element_into_prefix_suffix(command_id)
 
-    if prefix == STANDARD_RANGE:
+    if prefix == STANDARD_PREFIX:
         if suffix not in COMMAND_ID_RANGE:
             asserts.fail(f"Invalid command id (0x{command_id:08X}) in standard range")
 
