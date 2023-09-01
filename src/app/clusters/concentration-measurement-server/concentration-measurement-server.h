@@ -32,9 +32,55 @@ namespace app {
 namespace Clusters {
 namespace ConcentrationMeasurement {
 
-struct DummyType
+namespace Detail {
+
+struct DummyNumericMeasurementMembers
 {
 };
+
+struct DummyPeakMeasurementMembers
+{
+};
+
+struct DummyAverageMeasurementMembers
+{
+};
+
+struct DummyLevelIndicationMembers
+{
+};
+
+class NumericMeasurementMembers
+{
+protected:
+    DataModel::Nullable<float> mMeasuredValue;
+    DataModel::Nullable<float> mMinMeasuredValue;
+    DataModel::Nullable<float> mMaxMeasuredValue;
+    MeasurementUnitEnum mMeasurementUnit;
+    float mUncertainty;
+};
+
+class PeakMeasurementMembers
+{
+protected:
+    DataModel::Nullable<float> mPeakMeasuredValue;
+    uint32_t mPeakMeasuredValueWindow;
+};
+
+class AverageMeasurementMembers
+{
+protected:
+    DataModel::Nullable<float> mAverageMeasuredValue;
+    uint32_t mAverageMeasuredValueWindow;
+};
+
+class LevelIndicationMembers
+{
+protected:
+    LevelValueEnum mLevel;
+};
+
+} // namespace Detail
 
 /**
  * This class provides the base implementation for the server side of the Concentration Measurement cluster as well as an API for
@@ -49,7 +95,14 @@ struct DummyType
  */
 template <bool NumericMeasurementEnabled, bool LevelIndicationEnabled, bool MediumLevelEnabled, bool CriticalLevelEnabled,
           bool PeakMeasurementEnabled, bool AverageMeasurementEnabled>
-class Instance : public AttributeAccessInterface
+class Instance
+    : public AttributeAccessInterface,
+      protected std::conditional_t<NumericMeasurementEnabled, Detail::NumericMeasurementMembers,
+                                   Detail::DummyNumericMeasurementMembers>,
+      protected std::conditional_t<PeakMeasurementEnabled, Detail::PeakMeasurementMembers, Detail::DummyPeakMeasurementMembers>,
+      protected std::conditional_t<AverageMeasurementEnabled, Detail::AverageMeasurementMembers,
+                                   Detail::DummyAverageMeasurementMembers>,
+      protected std::conditional_t<LevelIndicationEnabled, Detail::LevelIndicationMembers, Detail::DummyLevelIndicationMembers>
 {
 private:
     static const int WINDOW_MAX = 604800;
@@ -57,18 +110,7 @@ private:
     EndpointId mEndpointId{};
     ClusterId mClusterId{};
 
-    // Attribute data store
     MeasurementMediumEnum mMeasurementMedium;
-    std::conditional_t<NumericMeasurementEnabled, DataModel::Nullable<float>, DummyType> mMeasuredValue;
-    std::conditional_t<NumericMeasurementEnabled, DataModel::Nullable<float>, DummyType> mMinMeasuredValue;
-    std::conditional_t<NumericMeasurementEnabled, DataModel::Nullable<float>, DummyType> mMaxMeasuredValue;
-    std::conditional_t<NumericMeasurementEnabled, MeasurementUnitEnum, DummyType> mMeasurementUnit;
-    std::conditional_t<NumericMeasurementEnabled, float, DummyType> mUncertainty;
-    std::conditional_t<PeakMeasurementEnabled, DataModel::Nullable<float>, DummyType> mPeakMeasuredValue;
-    std::conditional_t<PeakMeasurementEnabled, uint32_t, DummyType> mPeakMeasuredValueWindow;
-    std::conditional_t<AverageMeasurementEnabled, DataModel::Nullable<float>, DummyType> mAverageMeasuredValue;
-    std::conditional_t<AverageMeasurementEnabled, uint32_t, DummyType> mAverageMeasuredValueWindow;
-    std::conditional_t<LevelIndicationEnabled, LevelValueEnum, DummyType> mLevel;
 
     uint32_t mFeature = 0;
 
@@ -80,67 +122,70 @@ private:
         case Attributes::MeasuredValue::Id:
             if constexpr (NumericMeasurementEnabled)
             {
-                ReturnErrorOnFailure(aEncoder.Encode(mMeasuredValue));
+                ReturnErrorOnFailure(aEncoder.Encode(this->mMeasuredValue));
             }
             break;
 
         case Attributes::MinMeasuredValue::Id:
             if constexpr (NumericMeasurementEnabled)
             {
-                ReturnErrorOnFailure(aEncoder.Encode(mMinMeasuredValue));
+                ReturnErrorOnFailure(aEncoder.Encode(this->mMinMeasuredValue));
             }
             break;
 
         case Attributes::MaxMeasuredValue::Id:
             if constexpr (NumericMeasurementEnabled)
             {
-                ReturnErrorOnFailure(aEncoder.Encode(mMaxMeasuredValue));
+                ReturnErrorOnFailure(aEncoder.Encode(this->mMaxMeasuredValue));
             }
             break;
 
         case Attributes::Uncertainty::Id:
             if constexpr (NumericMeasurementEnabled)
             {
-                ReturnErrorOnFailure(aEncoder.Encode(mUncertainty));
+                ReturnErrorOnFailure(aEncoder.Encode(this->mUncertainty));
             }
             break;
 
         case Attributes::MeasurementUnit::Id:
-            ReturnErrorOnFailure(aEncoder.Encode(mMeasurementUnit));
-            break;
+            if constexpr (NumericMeasurementEnabled)
+            {
+                ReturnErrorOnFailure(aEncoder.Encode(this->mMeasurementUnit));
+                break;
+            }
 
         case Attributes::PeakMeasuredValue::Id:
             if constexpr (PeakMeasurementEnabled)
             {
-                ReturnErrorOnFailure(aEncoder.Encode(mPeakMeasuredValue));
+                ReturnErrorOnFailure(aEncoder.Encode(this->mPeakMeasuredValue));
             }
             break;
 
         case Attributes::PeakMeasuredValueWindow::Id:
             if constexpr (PeakMeasurementEnabled)
             {
-                ReturnErrorOnFailure(aEncoder.Encode(mPeakMeasuredValueWindow));
+                ReturnErrorOnFailure(aEncoder.Encode(this->mPeakMeasuredValueWindow));
             }
             break;
 
         case Attributes::AverageMeasuredValue::Id:
             if constexpr (AverageMeasurementEnabled)
             {
-                ReturnErrorOnFailure(aEncoder.Encode(mAverageMeasuredValue));
+                ReturnErrorOnFailure(aEncoder.Encode(this->mAverageMeasuredValue));
             }
             break;
 
         case Attributes::AverageMeasuredValueWindow::Id:
             if constexpr (AverageMeasurementEnabled)
             {
-                ReturnErrorOnFailure(aEncoder.Encode(mAverageMeasuredValueWindow));
+                ReturnErrorOnFailure(aEncoder.Encode(this->mAverageMeasuredValueWindow));
             }
             break;
 
         case Attributes::LevelValue::Id:
             if constexpr (LevelIndicationEnabled)
             {
-                ReturnErrorOnFailure(aEncoder.Encode(mLevel));
+                ReturnErrorOnFailure(aEncoder.Encode(this->mLevel));
             }
             break;
 
@@ -210,58 +255,42 @@ private:
     };
 
     /**
-     * This checks is a given value is within the min and max constraints.
+     * This checks if a given nullable float is within the min and max constraints or two other nullable floats.
      * @param value The value to check.
      * @param minValue The minimum value.
      * @param maxValue The maximum value.
-     * @return true if the value is within the min and max constraints.
+     * @return true if the value is within the min and max constraints. If either of the pair of values being compared is null,
+     * that's considered to be within the constraint.
      */
     static bool CheckConstraintMinMax(DataModel::Nullable<float> value, DataModel::Nullable<float> minValue,
                                       DataModel::Nullable<float> maxValue)
     {
-        if (!minValue.IsNull() && !value.IsNull() && (minValue.Value() > value.Value()))
-        {
-            return false;
-        }
-
-        if (!maxValue.IsNull() && !value.IsNull() && (maxValue.Value() < value.Value()))
-        {
-            return false;
-        }
-
-        return true;
+        return (minValue.IsNull() || value.IsNull() || (value.Value() >= minValue.Value())) &&
+            (maxValue.IsNull() || value.IsNull() || (value.Value() <= maxValue.Value()));
     };
 
     /**
-     * This checks is a given value is greater than a given value.
+     * This checks if a given nullable float is less than or equal to another given nullable float.
      * @param value The value to check.
-     * @param valueToBeGreaterThan The value to be greater than.
-     * @return true if the value is greater than the given value.
+     * @param valueToBeLessThanOrEqualTo The value to be less than or equal to.
+     * @return true if value is less than or equal to valueToBeLessThanOrEqualTo, or if either of the values is Null.
      */
-    static bool CheckConstraintsGreaterThan(DataModel::Nullable<float> value, DataModel::Nullable<float> valueToBeGreaterThan)
+    static bool CheckConstraintsLessThanOrEqualTo(DataModel::Nullable<float> value,
+                                                  DataModel::Nullable<float> valueToBeLessThanOrEqualTo)
     {
-        if (!valueToBeGreaterThan.IsNull() && !value.IsNull() && (valueToBeGreaterThan.Value() > value.Value()))
-        {
-            return false;
-        }
-
-        return true;
+        return valueToBeLessThanOrEqualTo.IsNull() || value.IsNull() || (value.Value() <= valueToBeLessThanOrEqualTo.Value());
     };
 
     /**
-     * This checks is a given value is less than a given value.
+     * This checks if a given nullable float is greater than or equal to another given nullable float.
      * @param value The value to check.
-     * @param valueToBeLessThan The value to be less than.
-     * @return true if the value is less than the given value.
+     * @param valueToBeGreaterThanOrEqualTo The value to be greater than or equal to.
+     * @return true if value is greater than or equal to valueToBeGreaterThanOrEqualTo, or if either of the values is Null.
      */
-    static bool CheckConstraintsLessThan(DataModel::Nullable<float> value, DataModel::Nullable<float> valueToBeLessThan)
+    static bool CheckConstraintsGreaterThanOrEqualTo(DataModel::Nullable<float> value,
+                                                     DataModel::Nullable<float> valueToBeGreaterThanOrEqualTo)
     {
-        if (!valueToBeLessThan.IsNull() && !value.IsNull() && (valueToBeLessThan.Value() < value.Value()))
-        {
-            return false;
-        }
-
-        return true;
+        return valueToBeGreaterThanOrEqualTo.IsNull() || value.IsNull() || (value.Value() >= valueToBeGreaterThanOrEqualTo.Value());
     };
 
 public:
@@ -289,8 +318,10 @@ public:
     Instance(EndpointId aEndpointId, ClusterId aClusterId, MeasurementMediumEnum aMeasurementMedium,
              MeasurementUnitEnum aMeasurementUnit) :
         AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId),
-        mEndpointId(aEndpointId), mClusterId(aClusterId), mMeasurementMedium(aMeasurementMedium),
-        mMeasurementUnit(aMeasurementUnit){};
+        mEndpointId(aEndpointId), mClusterId(aClusterId), mMeasurementMedium(aMeasurementMedium)
+    {
+        this->mMeasurementUnit = aMeasurementUnit;
+    };
 
     ~Instance() override { unregisterAttributeAccessOverride(this); };
 
@@ -325,256 +356,164 @@ public:
         return CHIP_NO_ERROR;
     };
 
+    template <bool Enabled = NumericMeasurementEnabled, typename = std::enable_if_t<Enabled, CHIP_ERROR>>
     CHIP_ERROR SetMeasuredValue(DataModel::Nullable<float> aMeasuredValue)
     {
-        if constexpr (NumericMeasurementEnabled)
+        if (!CheckConstraintMinMax(aMeasuredValue, this->mMinMeasuredValue, this->mMaxMeasuredValue))
         {
-            if (!CheckConstraintMinMax(aMeasuredValue, mMinMeasuredValue, mMaxMeasuredValue))
-            {
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            }
-
-            DataModel::Nullable<float> oldValue = mMeasuredValue;
-            mMeasuredValue                      = aMeasuredValue;
-
-            if (oldValue != mMeasuredValue)
-            {
-                ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::MeasuredValue::Id);
-                MatterReportingAttributeChangeCallback(path);
-            }
-
-            return CHIP_NO_ERROR;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        else
-        {
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
+
+        // Check to see if a change has ocurred
+        VerifyOrReturnError(this->mMeasuredValue != aMeasuredValue, CHIP_NO_ERROR);
+        this->mMeasuredValue = aMeasuredValue;
+        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::MeasuredValue::Id);
+
+        return CHIP_NO_ERROR;
     };
 
+    template <bool Enabled = NumericMeasurementEnabled, typename = std::enable_if_t<Enabled, CHIP_ERROR>>
     CHIP_ERROR SetMinMeasuredValue(DataModel::Nullable<float> aMinMeasuredValue)
     {
-        if constexpr (NumericMeasurementEnabled)
+        if (!CheckConstraintsLessThanOrEqualTo(aMinMeasuredValue, this->mMaxMeasuredValue))
         {
-            if (!CheckConstraintsLessThan(aMinMeasuredValue, mMaxMeasuredValue))
-            {
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            }
-
-            if (!CheckConstraintsLessThan(aMinMeasuredValue, mMeasuredValue))
-            {
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            }
-
-            DataModel::Nullable<float> oldValue = mMinMeasuredValue;
-            mMinMeasuredValue                   = aMinMeasuredValue;
-
-            if (oldValue != mMinMeasuredValue)
-            {
-                ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::MinMeasuredValue::Id);
-                MatterReportingAttributeChangeCallback(path);
-            }
-
-            return CHIP_NO_ERROR;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        else
+
+        if (!CheckConstraintsLessThanOrEqualTo(aMinMeasuredValue, this->mMeasuredValue))
         {
-            return CHIP_ERROR_INCORRECT_STATE;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
+
+        // Check to see if a change has ocurred
+        VerifyOrReturnError(this->mMinMeasuredValue != aMinMeasuredValue, CHIP_NO_ERROR);
+        this->mMinMeasuredValue = aMinMeasuredValue;
+        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::MinMeasuredValue::Id);
+
+        return CHIP_NO_ERROR;
     };
 
+    template <bool Enabled = NumericMeasurementEnabled, typename = std::enable_if_t<Enabled, CHIP_ERROR>>
     CHIP_ERROR SetMaxMeasuredValue(DataModel::Nullable<float> aMaxMeasuredValue)
     {
-        if constexpr (NumericMeasurementEnabled)
+        if (!CheckConstraintsGreaterThanOrEqualTo(aMaxMeasuredValue, this->mMinMeasuredValue))
         {
-            if (!CheckConstraintsGreaterThan(aMaxMeasuredValue, mMinMeasuredValue))
-            {
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            }
-
-            if (!CheckConstraintsGreaterThan(aMaxMeasuredValue, mMeasuredValue))
-            {
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            }
-
-            DataModel::Nullable<float> oldValue = mMaxMeasuredValue;
-            mMaxMeasuredValue                   = aMaxMeasuredValue;
-
-            if (oldValue != mMaxMeasuredValue)
-            {
-                ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::MaxMeasuredValue::Id);
-                MatterReportingAttributeChangeCallback(path);
-            }
-
-            return CHIP_NO_ERROR;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        else
+
+        if (!CheckConstraintsGreaterThanOrEqualTo(aMaxMeasuredValue, this->mMeasuredValue))
         {
-            return CHIP_ERROR_INCORRECT_STATE;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
+
+        // Check to see if a change has ocurred
+        VerifyOrReturnError(this->mMaxMeasuredValue != aMaxMeasuredValue, CHIP_NO_ERROR);
+        this->mMaxMeasuredValue = aMaxMeasuredValue;
+        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::MaxMeasuredValue::Id);
+
+        return CHIP_NO_ERROR;
     };
 
+    template <bool Enabled = NumericMeasurementEnabled, typename = std::enable_if_t<Enabled, CHIP_ERROR>>
     CHIP_ERROR SetUncertainty(float aUncertainty)
     {
-        if constexpr (NumericMeasurementEnabled)
-        {
-            float oldValue = mUncertainty;
-            mUncertainty   = aUncertainty;
+        // Check to see if a change has ocurred
+        VerifyOrReturnError(this->mUncertainty != aUncertainty, CHIP_NO_ERROR);
+        this->mUncertainty = aUncertainty;
+        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::Uncertainty::Id);
 
-            if (oldValue != mUncertainty)
-            {
-                ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::Uncertainty::Id);
-                MatterReportingAttributeChangeCallback(path);
-            }
-
-            return CHIP_NO_ERROR;
-        }
-        else
-        {
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
+        return CHIP_NO_ERROR;
     };
 
+    template <bool Enabled = PeakMeasurementEnabled, typename = std::enable_if_t<Enabled, CHIP_ERROR>>
     CHIP_ERROR SetPeakMeasuredValue(DataModel::Nullable<float> aPeakMeasuredValue)
     {
-        if constexpr (PeakMeasurementEnabled)
+        if (!CheckConstraintMinMax(aPeakMeasuredValue, this->mMinMeasuredValue, this->mMaxMeasuredValue))
         {
-            if (!CheckConstraintMinMax(aPeakMeasuredValue, mMinMeasuredValue, mMaxMeasuredValue))
-            {
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            }
-
-            DataModel::Nullable<float> oldValue = mPeakMeasuredValue;
-            mPeakMeasuredValue                  = aPeakMeasuredValue;
-
-            if (oldValue != mPeakMeasuredValue)
-            {
-                ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::PeakMeasuredValue::Id);
-                MatterReportingAttributeChangeCallback(path);
-            }
-
-            return CHIP_NO_ERROR;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        else
-        {
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
+
+        // Check to see if a change has ocurred
+        VerifyOrReturnError(this->mPeakMeasuredValue != aPeakMeasuredValue, CHIP_NO_ERROR);
+        this->mPeakMeasuredValue = aPeakMeasuredValue;
+        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::PeakMeasuredValue::Id);
+
+        return CHIP_NO_ERROR;
     };
 
+    template <bool Enabled = PeakMeasurementEnabled, typename = std::enable_if_t<Enabled, CHIP_ERROR>>
     CHIP_ERROR SetPeakMeasuredValueWindow(uint32_t aPeakMeasuredValueWindow)
     {
-        if constexpr (PeakMeasurementEnabled)
+        if (aPeakMeasuredValueWindow > WINDOW_MAX)
         {
-            if (aPeakMeasuredValueWindow > WINDOW_MAX)
-            {
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            }
-
-            uint32_t oldValue        = mPeakMeasuredValueWindow;
-            mPeakMeasuredValueWindow = aPeakMeasuredValueWindow;
-
-            if (oldValue != mPeakMeasuredValueWindow)
-            {
-                ConcreteAttributePath path =
-                    ConcreteAttributePath(mEndpointId, mClusterId, Attributes::PeakMeasuredValueWindow::Id);
-                MatterReportingAttributeChangeCallback(path);
-            }
-
-            return CHIP_NO_ERROR;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        else
-        {
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
+
+        // Check to see if a change has ocurred
+        VerifyOrReturnError(this->mPeakMeasuredValueWindow != aPeakMeasuredValueWindow, CHIP_NO_ERROR);
+        this->mPeakMeasuredValueWindow = aPeakMeasuredValueWindow;
+        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::PeakMeasuredValueWindow::Id);
+
+        return CHIP_NO_ERROR;
     };
 
+    template <bool Enabled = AverageMeasurementEnabled, typename = std::enable_if_t<Enabled, CHIP_ERROR>>
     CHIP_ERROR SetAverageMeasuredValue(DataModel::Nullable<float> aAverageMeasuredValue)
     {
-        if constexpr (AverageMeasurementEnabled)
+        if (!CheckConstraintMinMax(aAverageMeasuredValue, this->mMinMeasuredValue, this->mMaxMeasuredValue))
         {
-            if (!CheckConstraintMinMax(aAverageMeasuredValue, mMinMeasuredValue, mMaxMeasuredValue))
-            {
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            }
-
-            DataModel::Nullable<float> oldValue = mAverageMeasuredValue;
-            mAverageMeasuredValue               = aAverageMeasuredValue;
-
-            if (oldValue != mAverageMeasuredValue)
-            {
-                ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::AverageMeasuredValue::Id);
-                MatterReportingAttributeChangeCallback(path);
-            }
-
-            return CHIP_NO_ERROR;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        else
-        {
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
+
+        // Check to see if a change has ocurred
+        VerifyOrReturnError(this->mAverageMeasuredValue != aAverageMeasuredValue, CHIP_NO_ERROR);
+        this->mAverageMeasuredValue = aAverageMeasuredValue;
+        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::AverageMeasuredValue::Id);
+
+        return CHIP_NO_ERROR;
     };
 
+    template <bool Enabled = AverageMeasurementEnabled, typename = std::enable_if_t<Enabled, CHIP_ERROR>>
     CHIP_ERROR SetAverageMeasuredValueWindow(uint32_t aAverageMeasuredValueWindow)
     {
-        if constexpr (AverageMeasurementEnabled)
+        if (aAverageMeasuredValueWindow > WINDOW_MAX)
         {
-            if (aAverageMeasuredValueWindow > WINDOW_MAX)
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        // Check to see if a change has ocurred
+        VerifyOrReturnError(this->mAverageMeasuredValueWindow != aAverageMeasuredValueWindow, CHIP_NO_ERROR);
+        this->mAverageMeasuredValueWindow = aAverageMeasuredValueWindow;
+        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::AverageMeasuredValueWindow::Id);
+
+        return CHIP_NO_ERROR;
+    };
+
+    template <bool Enabled = LevelIndicationEnabled, typename = std::enable_if_t<Enabled, CHIP_ERROR>>
+    CHIP_ERROR SetLevelValue(LevelValueEnum aLevel)
+    {
+        if constexpr (!MediumLevelEnabled)
+        {
+            if (aLevel == LevelValueEnum::kMedium)
             {
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
-
-            uint32_t oldValue           = mAverageMeasuredValueWindow;
-            mAverageMeasuredValueWindow = aAverageMeasuredValueWindow;
-
-            if (oldValue != mAverageMeasuredValueWindow)
-            {
-                ConcreteAttributePath path =
-                    ConcreteAttributePath(mEndpointId, mClusterId, Attributes::AverageMeasuredValueWindow::Id);
-                MatterReportingAttributeChangeCallback(path);
-            }
-
-            return CHIP_NO_ERROR;
         }
-        else
+
+        if constexpr (!CriticalLevelEnabled)
         {
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-    };
-
-    CHIP_ERROR SetLevelValue(LevelValueEnum aLevel)
-    {
-        if constexpr (LevelIndicationEnabled)
-        {
-            if constexpr (!MediumLevelEnabled)
+            if (aLevel == LevelValueEnum::kCritical)
             {
-                if (aLevel == LevelValueEnum::kMedium)
-                {
-                    return CHIP_ERROR_INVALID_ARGUMENT;
-                }
+                return CHIP_ERROR_INVALID_ARGUMENT;
             }
-
-            if constexpr (!CriticalLevelEnabled)
-            {
-                if (aLevel == LevelValueEnum::kCritical)
-                {
-                    return CHIP_ERROR_INVALID_ARGUMENT;
-                }
-            }
-
-            LevelValueEnum oldValue = mLevel;
-            mLevel                  = aLevel;
-
-            if (oldValue != mLevel)
-            {
-                ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LevelValue::Id);
-                MatterReportingAttributeChangeCallback(path);
-            }
-
-            return CHIP_NO_ERROR;
         }
-        else
-        {
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
+
+        // Check to see if a change has ocurred
+        VerifyOrReturnError(this->mLevel != aLevel, CHIP_NO_ERROR);
+        this->mLevel = aLevel;
+        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::LevelValue::Id);
+
+        return CHIP_NO_ERROR;
     };
 };
 

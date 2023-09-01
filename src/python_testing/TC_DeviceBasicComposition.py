@@ -28,6 +28,7 @@ from pprint import pprint
 from typing import Any, Callable, Optional
 
 import chip.clusters as Clusters
+import chip.clusters.ClusterObjects
 import chip.tlv
 from chip.clusters.Attribute import ValueDecodeFailure
 from matter_testing_support import AttributePathLocation, MatterBaseTest, async_test_body, default_matter_test_main
@@ -495,6 +496,71 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                                               problem=f"Failed validation of value on {location.as_string(self.cluster_mapper)}: {str(e)}", spec_location="Global Elements")
                             success = False
                             continue
+
+        # Validate there are attributes in the global range that are not in the required list
+        allowed_globals = [a.id for a in ATTRIBUTES_TO_CHECK]
+        # also allow event list because it's not disallowed
+        event_list_id = 0xFFFA
+        allowed_globals.append(event_list_id)
+        global_range_min = 0x0000_F000
+        standard_range_max = 0x000_4FFF
+        mei_range_min = 0x0001_0000
+        for endpoint_id, endpoint in self.endpoints_tlv.items():
+            for cluster_id, cluster in endpoint.items():
+                globals = [a for a in cluster[ATTRIBUTE_LIST_ID] if a >= global_range_min and a < mei_range_min]
+                unexpected_globals = sorted(list(set(globals) - set(allowed_globals)))
+                for unexpected in unexpected_globals:
+                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=unexpected)
+                    self.record_error(self.get_test_name(), location=location,
+                                      problem=f"Unexpected global attribute {unexpected} in cluster {cluster_id}", spec_location="Global elements")
+                    success = False
+
+        # validate that all the returned attributes in the standard clusters contain only known attribute ids
+        for endpoint_id, endpoint in self.endpoints_tlv.items():
+            for cluster_id, cluster in endpoint.items():
+                if cluster_id not in chip.clusters.ClusterObjects.ALL_ATTRIBUTES:
+                    # Skip clusters that are not part of the standard generated corpus (e.g. MS clusters)
+                    continue
+                standard_attributes = [a for a in cluster[ATTRIBUTE_LIST_ID] if a <= standard_range_max]
+                allowed_standard_attributes = chip.clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]
+                unexpected_standard_attributes = sorted(list(set(standard_attributes) - set(allowed_standard_attributes)))
+                for unexpected in unexpected_standard_attributes:
+                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=unexpected)
+                    self.record_error(self.get_test_name(), location=location,
+                                      problem=f"Unexpected standard attribute {unexpected} in cluster {cluster_id}", spec_location=f"Cluster {cluster_id}")
+                    success = False
+
+        # validate there are no attributes in the range between standard and global
+        for endpoint_id, endpoint in self.endpoints_tlv.items():
+            for cluster_id, cluster in endpoint.items():
+                bad_range_values = [a for a in cluster[ATTRIBUTE_LIST_ID] if a > standard_range_max and a < global_range_min]
+                for bad in bad_range_values:
+                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=bad)
+                    self.record_error(self.get_test_name(), location=location,
+                                      problem=f"Attribute in undefined range {bad} in cluster {cluster_id}", spec_location=f"Cluster {cluster_id}")
+                    success = False
+
+        # Validate that any attribute in the manufacturer prefix range is in the standard suffix range.
+        suffix_mask = 0x000_FFFF
+        for endpoint_id, endpoint in self.endpoints_tlv.items():
+            for cluster_id, cluster in endpoint.items():
+                manufacturer_range_values = [a for a in cluster[ATTRIBUTE_LIST_ID] if a > mei_range_min]
+                for manufacturer_value in manufacturer_range_values:
+                    suffix = manufacturer_value & suffix_mask
+                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
+                                                     attribute_id=manufacturer_value)
+                    if suffix > standard_range_max and suffix < global_range_min:
+                        self.record_error(self.get_test_name(), location=location,
+                                          problem=f"Manufacturer attribute in undefined range {manufacturer_value} in cluster {cluster_id}",
+                                          spec_location=f"Cluster {cluster_id}")
+                        success = False
+                    elif suffix >= global_range_min:
+                        self.record_error(self.get_test_name(), location=location,
+                                          problem=f"Manufacturer attribute in global range {manufacturer_value} in cluster {cluster_id}",
+                                          spec_location=f"Cluster {cluster_id}")
+                        success = False
+
+        # TODO: maybe while we're at it, we should check that the command list doesn't contain unexpected commands.
 
         # Validate presence of claimed attributes
         if success:
