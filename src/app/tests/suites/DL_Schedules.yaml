@@ -488,7 +488,7 @@ tests:
               - name: "UserIndex"
                 value: 2
               - name: "Status"
-                value: 0x01
+                value: 0x8B
 
     #
     # Excercise SetYearDay schedules with invalid parameters
@@ -686,7 +686,7 @@ tests:
               - name: "UserIndex"
                 value: 2
               - name: "Status"
-                value: 0x01
+                value: 0x8B
 
     #
     # Excercise Set Holiday schedules with invalid parameters
@@ -1799,7 +1799,7 @@ tests:
               - name: "UserIndex"
                 value: 1
               - name: "Status"
-                value: 0x01
+                value: 0x8B
 
     - label: "Make sure clearing first user also cleared year day schedules"
       command: "GetYearDaySchedule"
@@ -1816,7 +1816,7 @@ tests:
               - name: "UserIndex"
                 value: 1
               - name: "Status"
-                value: 0x01
+                value: 0x8B
 
     - label: "Make sure clearing second user also cleared week day schedules"
       command: "GetWeekDaySchedule"
@@ -1833,7 +1833,7 @@ tests:
               - name: "UserIndex"
                 value: 2
               - name: "Status"
-                value: 0x01
+                value: 0x8B
 
     - label: "Make sure clearing second user also cleared year day schedules"
       command: "GetYearDaySchedule"
@@ -1850,7 +1850,7 @@ tests:
               - name: "UserIndex"
                 value: 2
               - name: "Status"
-                value: 0x01
+                value: 0x8B
 
     # Make sure that all the manipulations did not affect the holiday schedules
     - label: "Make sure that first holiday schedule was not deleted"
