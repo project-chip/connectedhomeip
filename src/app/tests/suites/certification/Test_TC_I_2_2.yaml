@@ -178,7 +178,7 @@ tests:
           IdentifyType from Step 1b, in order to indicate to an observer which
           of several nodes and/or endpoints it is."
       verification: |
-          Verify that the device enters its identification state using the IdentifyType from step1b,
+          Verify that the identification state is terminated in the DUT.
           Here the Identifytype is 2(VisibleIndicator) which can be a small led that indicates the device is in identification state.
           This IdentifyType can vary to device ref: 1.2.5.1 in spec for the IdentifyTypeEnum of the particular DUT
       cluster: "LogCommands"
