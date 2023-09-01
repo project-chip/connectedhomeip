@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 3.14.1. [TC-ALOGIN-12.1] Account Login Verification
 
@@ -60,10 +59,11 @@ tests:
               - name: "Status"
                 value: 0
 
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/28992
     - label:
           "Step 1: TH sends a GetSetupPIN command to the DUT with test values
           provided by the product maker."
-      PICS: ALOGIN.S.C00.Rsp
+      PICS: ALOGIN.S.C00.Rsp && PICS_SKIP_SAMPLE_APP
       command: "GetSetupPIN"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -74,11 +74,13 @@ tests:
           values:
               - name: "SetupPIN"
                 saveAs: setupPIN
+                constraints:
+                    minLength: 11
 
     - label:
           "Step 2: TH sends a Login command to the DUT with test values provided
           by the product maker."
-      PICS: ALOGIN.S.C02.Rsp
+      PICS: ALOGIN.S.C02.Rsp && PICS_SKIP_SAMPLE_APP
       command: "Login"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -91,6 +93,6 @@ tests:
     - label:
           "Step 3: TH sends a Logout command to the DUT with test values
           provided by the product maker."
-      PICS: ALOGIN.S.C03.Rsp
+      PICS: ALOGIN.S.C03.Rsp && PICS_SKIP_SAMPLE_APP
       command: "Logout"
       timedInteractionTimeoutMs: 10000

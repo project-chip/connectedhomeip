@@ -1516,48 +1516,20 @@ DRLK.S.A0028.ReadOnly=1
 DRLK.S.A002c.ReadOnly=1
 
 #write attributes
-DRLK.S.A0004.Write=0
-DRLK.S.A0005.Write=0
-DRLK.S.A0006.Write=0
-DRLK.S.A0021.Write=1
-DRLK.S.A0022.Write=0
-DRLK.S.A0023.Write=1
-DRLK.S.A0024.Write=1
-DRLK.S.A0025.Write=1
-DRLK.S.A0028.Write=0
-DRLK.S.A0029.Write=1
-DRLK.S.A002a.Write=1
-DRLK.S.A002b.Write=1
-DRLK.S.A002c.Write=1
-DRLK.S.A0030.Write=1
-DRLK.S.A0031.Write=1
-DRLK.S.A0032.Write=1
-DRLK.S.A0033.Write=1
-DRLK.S.A0035.Write=0
+DRLK.S.M.SimulateNotFullyLocked=1
+DRLK.S.M.DetectLockJammed=1
+DRLK.S.M.LanguageAttributeWritable=1
+DRLK.S.M.LEDSettingsAttributeWritable=1
+DRLK.S.M.AutoRelockTimeAttributeWritable=1
+DRLK.S.M.SoundVolumeAttributeWritable=1
+DRLK.S.M.OperatingModeAttributeWritable=1
+DRLK.S.M.EnableLocalProgrammingAttributeWritable=0
+DRLK.S.M.LocalProgrammingFeaturesAttributeWritable=0
+DRLK.S.M.WrongCodeEntryLimitAttributeWritable=1
+DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable=1
+DRLK.S.M.RequirePINForRemoteOperationAttributeWritable=1
+DRLK.S.M.ExpiringUserTimeOutAttributeWritable=0
 
-#ReadOnly attributes
-DRLK.S.A0028.ReadOnly=1
-DRLK.S.A002c.ReadOnly=1
-
-#write attributes
-DRLK.S.A0004.Write=0
-DRLK.S.A0005.Write=0
-DRLK.S.A0006.Write=0
-DRLK.S.A0021.Write=1
-DRLK.S.A0022.Write=0
-DRLK.S.A0023.Write=1
-DRLK.S.A0024.Write=1
-DRLK.S.A0025.Write=1
-DRLK.S.A0028.Write=0
-DRLK.S.A0029.Write=1
-DRLK.S.A002a.Write=1
-DRLK.S.A002b.Write=1
-DRLK.S.A002c.Write=1
-DRLK.S.A0030.Write=1
-DRLK.S.A0031.Write=1
-DRLK.S.A0032.Write=1
-DRLK.S.A0033.Write=1
-DRLK.S.A0035.Write=0
 
 DRLK.C=1
 DRLK.C.F0a=0
@@ -2708,6 +2680,7 @@ WASHERCTRL.S.A0002=1
 WASHERCTRL.S.A0003=1
 WASHERCTRL.S.M.ManuallyControlledSpin=1
 WASHERCTRL.S.M.ManuallyControlledRinse=1
+WASHERCTRL.S.M.ManuallyControlled=0
 
 #RVC Run Mode
 RVCRUNM.S=1

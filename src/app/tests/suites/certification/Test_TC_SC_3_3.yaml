@@ -26,10 +26,10 @@ config:
 tests:
     - label: "Precondition"
       verification: |
-          execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
-          ./chip-all-clusters-app  --trace_decode 1
-
-          Once DUT reach the  commissionable state pls send below mentioned command on TH. Pls use equivalent command on the respective DUT
+          1. Underlying transport is reliable, either implicitly (i.e.: TCP) or explicitly (i.e.: MRP)
+          2. CASE was previously successfully completed between the initiator and responder and the previous session context is known by both nodes.
+          3. resumptionID of the previous session is saved for future user.
+          "execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT./chip-all-clusters-app  --trace_decode 1Once DUT reach the  commissionable state pls send below mentioned command on TH. Pls use equivalent command on the respective DUT
           ./chip-tool pairing onnetwork 1 20202021  --trace_decode 1
           Verify the commissioning completed with success on TH(chip-tool) from DUT
           [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
@@ -48,7 +48,32 @@ tests:
       disabled: true
 
     - label:
-          "Step 2b: Responder receives the Sigma1 message and extracts the
+          "Step 1a: Verify that the Initiator sends the Sigma1 message to
+          Responder"
+      verification: |
+          Verify that the Initiator(all-clusters-app) sends the Sigma1 message to Responder(chip-tool)
+
+          [1683973647.719965][21642:21644] CHIP:DMG:
+          [1683973647.720054][21642:21644] CHIP:SC: Sent Sigma1 msg
+          [1683973647.720063][21642:21644] CHIP:DIS: OperationalSessionSetup[1:0000000000000001]: State change 3 --> 4
+          [1683973647.723548][21642:21644] CHIP:DMG: << from UDP:[fe80::e9f6:2c08:2794:357d%wlp0s20f3]:5540 | 113416098 | [Secure Channel  (0) / Certificate Authenticated Session Establishment Sigma '2' (0x31) / Session = 0 / Exchange = 39248]
+      disabled: true
+
+    - label: "Step 1b: Verify that the Responder receives the Sigma1 message"
+      verification: |
+          Verify that the Responder(chip-tool) receives the Sigma1 message
+
+          [1683973647.720880][21637:21637] CHIP:EM: >>> [E:39248r S:0 M:63601755] (U) Msg RX from 0:A5F871EB0B6E3FF9 [0000] --- Type 0000:30 (SecureChannel:CASE_Sigma1)
+          [1683973647.720900][21637:21637] CHIP:EM: Handling via exchange: 39248r, Delegate: 0x56251895eee0
+          [1683973647.720920][21637:21637] CHIP:IN: CASE Server received Sigma1 message . Starting handshake. EC 0x562518c5ed60
+          [1683973647.720926][21637:21637] CHIP:IN: CASE Server disabling CASE session setups
+          [1683973647.720936][21637:21637] CHIP:SC: Received Sigma1 msg
+          [1683973647.720954][21637:21637] CHIP:SC: Peer assigned session key ID 49338
+          [1683973647.721189][21637:21637] CHIP:SC: CASE matched destination ID: fabricIndex 1, NodeID 0x0000000000000001
+      disabled: true
+
+    - label:
+          "Step 1c: Responder receives the Sigma1 message and extracts the
           following initiatorRandom initiatorSessionId destinationId
           resumptionID initiatorResumeMIC initiatorEphPubKey initiatorSEDParams"
       verification: |
@@ -73,10 +98,10 @@ tests:
           resumptionID is of Octet String maximum of length 16 bytes
           responderSessionID is of uint16
            sigma2ResumeMIC is of Octet String maximum of length 16 bytes
-          responderSessionParams is from any one of the following:
-                SESSION_IDLE_INTERVAL - Verify that it is of uint32
-                SESSION_ACTIVE_INTERVAL - Verify that it is of uint32
-                SESSION_ACTIVE_THRESHOLD - Verify that it is of uint16
+          responderSEDParams is from any one of the following:
+                SLEEPY_IDLE_INTERVAL - Verify that it is of uint32
+                SLEEPY_ACTIVE_INTERVAL - Verify that it is of uint32
+
 
           [1683973658.044236][21637:21637] CHIP:EM: Rxd Ack; Removing MessageCounter:113416101 from Retrans Table on exchange 32995r
           [1683973662.299442][21637:21637] CHIP:DMG: << from UDP:[fe80::e9f6:2c08:2794:357d%wlp0s20f3]:41363 | 167307433 | [Secure Channel  (0) / Certificate Authenticated Session Establishment Sigma '1' (0x30) / Session = 0 / Exchange = 32997]
@@ -124,7 +149,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 2c: Responder sends a TLV-encoded Sigma2_Resume message to
+          "Step 2: Responder sends a TLV-encoded Sigma2_Resume message to
           Initiator containing resumptionID responderSessionID sigma2ResumeMIC
           responderMRPParams"
       verification: |
@@ -182,8 +207,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 3a: Responder receives the SigmaFinished message and extracts
-          the following 1.ProtocolId 2.ProtocolCode"
+          "Step 3a: Verify that the Initiator sends a SigmaFinished message to
+          Responder"
       verification: |
           On Responder(chip-tool),  verify that responder(chip-tool) received  the SigmaFinished(The status report should be GeneralCode:SUCCESS,
           ProtocolId:SECURE_CHANNEL, and ProtocolCode:SESSION_ESTABLISHMENT_SUCCESS). message from Initiator
@@ -215,8 +240,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 3b: Verify that the Initiator sends a SigmaFinished message to
-          Responder"
+          "Step 3b: Responder receives the SigmaFinished message and extracts
+          the following ProtocolId ProtocolCode"
       verification: |
           On Responder(chip-tool),  verify that responder(chip-tool) received  the SigmaFinished(The status report should be GeneralCode:SUCCESS,
           ProtocolId:SECURE_CHANNEL, and ProtocolCode:SESSION_ESTABLISHMENT_SUCCESS). message from Initiator

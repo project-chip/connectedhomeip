@@ -41,7 +41,7 @@ tests:
           Group Key Management cluster with the following fields set in the
           GroupKeySet struct:GroupKeySetId is 1,EpochKey0 is
           epoch_key_set0_epoch0,GroupKeySecurityPolicy = TrustFirst
-          (1),GroupKeyMulticastPolicy = PerGroupID (0),EpochStartTime0 = 0,TH
+          (0),GroupKeyMulticastPolicy = PerGroupID (0),EpochStartTime0 = 1,TH
           binds GroupId with GroupKeySetID in the GroupKeyMap attribute list on
           GroupKeyManagement cluster with the values provided in the above steps"
       verification: |
@@ -49,7 +49,7 @@ tests:
 
           ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1,
           "groupKeySecurityPolicy": 0, "epochKey0":
-          "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
+          "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 1,"epochKey1":
           "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
           "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0
 
@@ -79,7 +79,7 @@ tests:
           [1686908179.975512][16775:16775] CHIP:DMG:                                         0x2 = [
           [1686908179.975535][16775:16775] CHIP:DMG:                                                         0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf,
           [1686908179.975553][16775:16775] CHIP:DMG:                                         ] (16 bytes)
-          [1686908179.975572][16775:16775] CHIP:DMG:                                         0x3 = 2220000,
+          [1686908179.975572][16775:16775] CHIP:DMG:                                         0x3 = 1,
           [1686908179.975586][16775:16775] CHIP:DMG:                                         0x4 = [
           [1686908179.975613][16775:16775] CHIP:DMG:                                                         0xd1, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf,
           [1686908179.975635][16775:16775] CHIP:DMG:                                         ] (16 bytes)

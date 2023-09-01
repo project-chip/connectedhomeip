@@ -17,6 +17,9 @@ name:
     29.1.8. [TC-DA-1.8] Device Attestation Request Validation-Success Scenario
     [DUT-Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+
 config:
     nodeId: 0x12344321
     cluster: "Basic Information"
