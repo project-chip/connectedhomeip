@@ -54,16 +54,17 @@ if (ti_simplelink_board == "CC1352R1_LAUNCHXL") {
   # set -DDeviceFamily_CC26X2?
   ti_simplelink_soc = "cc2652r1f3"
   ti_simplelink_bim_name = "cc2652r1lp"
-} else if (ti_simplelink_board == "LP_EM_CC1354P10_6" || ti_simplelink_board == "LP_EM_CC1354P10_1") {
+} else if (ti_simplelink_board == "LP_EM_CC1354P10_6" ||
+           ti_simplelink_board == "LP_EM_CC1354P10_1") {
   ti_simplelink_device_family = "cc13x4_26x4"
   ti_simplelink_soc_family = "cc13x4"
   ti_simplelink_isa = "m33f"
   ti_simplelink_soc = "cc1354p10"
   ti_simplelink_bim_name = "cc1354p10"
 } else if (ti_simplelink_board == "CC2674") {
-ti_simplelink_device_family = "cc13x4_26x4" #driverlib paths
-ti_simplelink_soc_family = "cc13x4" #ble path
-ti_simplelink_isa = "m33f"
+  ti_simplelink_device_family = "cc13x4_26x4"  #driverlib paths
+  ti_simplelink_soc_family = "cc13x4"  #ble path
+  ti_simplelink_isa = "m33f"
 } else if (ti_simplelink_board == "LP_CC2652R7") {
   ti_simplelink_device_family = "cc13x2x7_26x2x7"
   ti_simplelink_soc_family = "cc26x2"

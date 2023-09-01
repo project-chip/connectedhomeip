@@ -90,10 +90,9 @@ template("ti_sysconfig") {
         "-fno-exceptions",
         "-fno-unwind-tables",
       ]
-      if(ti_simplelink_device == ""){
+      if (ti_simplelink_device == "") {
         defines += [ "DeviceFamily_CC13X4" ]
-      }
-      else {
+      } else {
         defines += [ "DeviceFamily_CC26X4" ]
       }
     } else if (ti_simplelink_device_family == "cc32xx") {
@@ -113,7 +112,7 @@ template("ti_sysconfig") {
     sources = invoker.sources
     outputs = gen_outputs
 
-    if(ti_simplelink_device == ""){
+    if (ti_simplelink_device == "") {
       args = [
         ti_sysconfig_root,
         "-s",
@@ -128,8 +127,7 @@ template("ti_sysconfig") {
         "--rtos",
         "freertos",
       ]
-    }
-    else{
+    } else {
       args = [
         ti_sysconfig_root,
         "-s",
@@ -144,7 +142,7 @@ template("ti_sysconfig") {
         "--rtos",
         "freertos",
       ]
-   }
+    }
 
     foreach(source, sources) {
       args += [ rebase_path(source, root_build_dir) ]
@@ -228,16 +226,17 @@ template("ti_simplelink_sdk") {
       defines += [ "DeviceFamily_CC13X2X7_CC26X2X7" ]
       libs += [ "${ti_simplelink_sdk_root}/source/ti/devices/cc13x2x7_cc26x2x7/driverlib/bin/gcc/driverlib.lib" ]
     } else if (ti_simplelink_device_family == "cc13x4_26x4") {
-      if(ti_simplelink_device == ""){
+      if (ti_simplelink_device == "") {
         defines += [ "DeviceFamily_CC13X4" ]
-      }
-      else {
+      } else {
         defines += [ "DeviceFamily_CC26X4" ]
       }
-      if(ti_simplelink_board == "LP_EM_CC1354P10_1" || (ti_simplelink_board == "CC2674" &&  ti_simplelink_device == "CC2674R10RGZ")){
-        defines += ["EM_CC1354P10_1_LP"]
+      if (ti_simplelink_board == "LP_EM_CC1354P10_1" ||
+          (ti_simplelink_board == "CC2674" &&
+           ti_simplelink_device == "CC2674R10RGZ")) {
+        defines += [ "EM_CC1354P10_1_LP" ]
       }
-      defines += ["FLASH_ONLY_BUILD"]
+      defines += [ "FLASH_ONLY_BUILD" ]
       libs += [ "${ti_simplelink_sdk_root}/source/ti/devices/cc13x4_cc26x4/driverlib/bin/gcc/driverlib.lib" ]
     }
 
@@ -471,22 +470,23 @@ template("ti_simplelink_sdk") {
         "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/freertos/",
       ]
     } else if (ti_simplelink_device_family == "cc13x4_26x4") {
+      libs += [ "${ti_simplelink_sdk_root}/source/ti/dmm/lib/gcc/m4f/libdmmlib_freertos.a" ]
+      if (ti_simplelink_board == "LP_EM_CC1354P10_1" ||
+          (ti_simplelink_board == "CC2674" &&
+           ti_simplelink_device == "CC2674R10RGZ")) {
         libs += [
-          "${ti_simplelink_sdk_root}/source/ti/dmm/lib/gcc/m4f/libdmmlib_freertos.a",
-          ]
-        if(ti_simplelink_board == "LP_EM_CC1354P10_1" || (ti_simplelink_board == "CC2674" &&  ti_simplelink_device == "CC2674R10RGZ")){
-          libs += [
-            "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_1/OneLib.a",
-            "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_1/StackWrapper.a",
-          ]
-        }
-        else if(ti_simplelink_board == "LP_EM_CC1354P10_6" || (ti_simplelink_board == "CC2674" &&  ti_simplelink_device == "CC2674P10RGZ")){
-          libs += [
-            "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_6/OneLib.a",
-            "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_6/StackWrapper.a",
-          ]
-        }
-      
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_1/OneLib.a",
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_1/StackWrapper.a",
+        ]
+      } else if (ti_simplelink_board == "LP_EM_CC1354P10_6" ||
+                 (ti_simplelink_board == "CC2674" &&
+                  ti_simplelink_device == "CC2674P10RGZ")) {
+        libs += [
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_6/OneLib.a",
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_6/StackWrapper.a",
+        ]
+      }
+
       defines += [
         "ONE_BLE_LIB_SIZE_OPTIMIZATION",
         "NVOCMP_NVPAGES=3",
