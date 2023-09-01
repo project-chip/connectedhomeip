@@ -34,14 +34,11 @@ using namespace chip::app::Clusters;
 
 static AirPurifierManager * sAirPurifierManager = nullptr;
 
+// TODO: Make a generic version of this as part of the AirPurifierManager interface, then offload this to there in common code, so
+// we can keep this slim for each impl
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
-    ChipLogProgress(Zcl, "MatterPostAttributeChangeCallback, value:%d", *value);
-    ChipLogProgress(Zcl, "\tCluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mClusterId));
-    ChipLogProgress(Zcl, "\tAttribute ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mAttributeId));
-    ChipLogProgress(Zcl, "\tType: %d", type);
-
     if ((attributePath.mClusterId == FanControl::Id) && (attributePath.mAttributeId == FanControl::Attributes::PercentSetting::Id))
     {
         DataModel::Nullable<Percent> percentSetting = static_cast<DataModel::Nullable<uint8_t>>(*value);
@@ -71,8 +68,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
 void ApplicationInit()
 {
-    ChipLogDetail(NotSpecified, "Air Purifier: ApplicationInit()");
-
     SetParentEndpointForEndpoint(AIR_QUALITY_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
     SetParentEndpointForEndpoint(TEMPERATURE_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
     SetParentEndpointForEndpoint(RELATIVE_HUMIDITY_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
