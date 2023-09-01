@@ -89,13 +89,13 @@ Protocols::InteractionModel::Status Instance::UpdateAirQuality(AirQualityEnum aN
         }
     }
     break;
-    default:
+    case AirQualityEnum::kUnknown:
+    case AirQualityEnum::kGood:
+    case AirQualityEnum::kPoor:
         break;
-    }
-
-    if (to_underlying(aNewAirQuality) > 6)
-    {
+    default:{
         return Protocols::InteractionModel::Status::InvalidValue;
+    }
     }
 
     mAirQuality = aNewAirQuality;

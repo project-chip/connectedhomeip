@@ -432,11 +432,11 @@ void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aNewValue)
 {
     AirQuality::Instance * airQualityInstance = AirQuality::GetInstance();
     Protocols::InteractionModel::Status status =
-        airQualityInstance->UpdateAirQuality(static_cast<AirQuality::AirQualityEnum>(aEnum));
+        airQualityInstance->UpdateAirQuality(static_cast<AirQuality::AirQualityEnum>(aNewValue));
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogDetail(NotSpecified, "Invalid value: %u", aEnum);
+        ChipLogDetail(NotSpecified, "Invalid value: %u", aNewValue);
     }
 }
 
