@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -33,10 +33,9 @@
   ],
   "endpointTypes": [
     {
-      "id": 8,
+      "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 2,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 2,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        2
       ],
       "deviceVersions": [
         1
@@ -6252,10 +6247,9 @@
       ]
     },
     {
-      "id": 7,
+      "id": 2,
       "name": "MA-laundry-washer",
       "deviceTypeRef": {
-        "id": 49,
         "code": 115,
         "profileId": 259,
         "label": "MA-laundry-washer",
@@ -6263,15 +6257,11 @@
       },
       "deviceTypes": [
         {
-          "id": 49,
           "code": 115,
           "profileId": 259,
           "label": "MA-laundry-washer",
           "name": "MA-laundry-washer"
         }
-      ],
-      "deviceTypeRefs": [
-        49
       ],
       "deviceVersions": [
         1
@@ -11091,6 +11081,5 @@
       "endpointId": 1,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

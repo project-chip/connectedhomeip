@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -18,25 +18,24 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../src/app/zap-templates/app-templates.json",
-      "type": "gen-templates-json",
-      "version": "chip-v1"
-    },
-    {
-      "pathRelativity": "relativeToZap",
       "path": "../../../src/app/zap-templates/zcl/zcl.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
       "description": "Matter SDK ZCL data"
+    },
+    {
+      "pathRelativity": "relativeToZap",
+      "path": "../../../src/app/zap-templates/app-templates.json",
+      "type": "gen-templates-json",
+      "version": "chip-v1"
     }
   ],
   "endpointTypes": [
     {
-      "id": 5,
+      "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 55,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 55,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        55
       ],
       "deviceVersions": [
         1
@@ -7655,10 +7650,9 @@
       ]
     },
     {
-      "id": 6,
+      "id": 2,
       "name": "MA-thermostat",
       "deviceTypeRef": {
-        "id": 87,
         "code": 769,
         "profileId": 259,
         "label": "MA-thermostat",
@@ -7666,15 +7660,11 @@
       },
       "deviceTypes": [
         {
-          "id": 87,
           "code": 769,
           "profileId": 259,
           "label": "MA-thermostat",
           "name": "MA-thermostat"
         }
-      ],
-      "deviceTypeRefs": [
-        87
       ],
       "deviceVersions": [
         1
@@ -14830,6 +14820,5 @@
       "endpointId": 1,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }
