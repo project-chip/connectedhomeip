@@ -86,7 +86,7 @@ CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & 
 
     counter = Encoding::LittleEndian::Get32(appData.data());
     // Shift to remove the counter from the appData
-    memcpy(appData.data(), sizeof(CounterType) + appData.data(), appDataSize);
+    memmove(appData.data(), sizeof(CounterType) + appData.data(), appDataSize);
 
     appData.reduce_size(appDataSize);
     return err;
