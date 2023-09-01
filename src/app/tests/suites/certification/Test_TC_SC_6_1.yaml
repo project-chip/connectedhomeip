@@ -118,10 +118,10 @@ tests:
     - label:
           "Step 1b: DUT generates fabric-unique GroupID, GroupName, random key,
           EpochKey0 and GroupKeySetID. Admin sets GroupKeySecurityPolicy =
-          TrustFirst (0) EpochStartTime0 = 0"
+          TrustFirst (0) EpochStartTime0 = 1"
       verification: |
           Sample epoch key values that will be used in the forthcomming steps:
-          "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 0,"epochKey1":
+          "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 1,"epochKey1":
           "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
           "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002
           Sample Group Name: Grp1
@@ -136,9 +136,9 @@ tests:
       verification: |
           ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 42,
           "groupKeySecurityPolicy": 0, "epochKey0":
-          "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
+          "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 1,"epochKey1":
           "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
-          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0
+          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0 
 
           Verify TH recieves KeySetWrite command on TH(Reference app)log:
 
