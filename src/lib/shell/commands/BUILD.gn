@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/system/system.gni")
 
 source_set("commands") {
   sources = [
@@ -64,6 +65,10 @@ source_set("commands") {
 
     configs +=
         [ "${chip_root}/src/controller/data_model:data_model_zapgen_config" ]
+  }
+
+  if (chip_system_config_provide_statistics) {
+    sources += [ "Stat.cpp" ]
   }
 
   if (chip_device_platform != "none") {

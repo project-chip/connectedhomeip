@@ -25,7 +25,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     tizen:
         name: Tizen
@@ -54,10 +54,8 @@ jobs:
                       "./scripts/build/build_examples.py \
                           --enable-flashbundle \
                           --target tizen-arm-all-clusters \
-                          --target tizen-arm-all-clusters-minimal-no-wifi \
                           --target tizen-arm-chip-tool-ubsan \
                           --target tizen-arm-light \
-                          --target tizen-arm-light-no-ble-no-wifi \
                           build \
                           --copy-artifacts-to out/artifacts \
                       "

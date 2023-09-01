@@ -2552,7 +2552,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "1",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -4209,16 +4209,6 @@
           "define": "GENERAL_DIAGNOSTICS_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [
-            {
-              "name": "TestEventTrigger",
-              "code": 0,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 0
-            }
-          ],
           "attributes": [
             {
               "name": "NetworkInterfaces",
@@ -10512,7 +10502,7 @@
       ]
     },
     {
-      "id": 2,
+      "id": 4,
       "name": "MA-onofflight",
       "deviceTypeRef": {
         "id": 8,
@@ -34897,7 +34887,7 @@
       ]
     },
     {
-      "id": 4,
+      "id": 2,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 53,
