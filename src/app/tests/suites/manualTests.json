@@ -271,7 +271,7 @@
     ],
     "RVCCleanMode": ["Test_TC_RVCCLEANM_3_3"],
     "RVCOperationalState": ["Test_TC_RVCOPSTATE_2_2"],
-    "RVCRunMode": ["Test_TC_RVCRUNM_1_1", "Test_TC_RVCRUNM_3_3"],
+    "RVCRunMode": ["Test_TC_RVCRUNM_3_3"],
     "TemperatureControlledCabinetMode": [
         "Test_TC_TCCM_1_2",
         "Test_TC_TCCM_2_1",
