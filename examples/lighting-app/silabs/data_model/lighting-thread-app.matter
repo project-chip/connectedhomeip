@@ -152,6 +152,9 @@ server cluster Groups = 4 {
 server cluster Scenes = 5 {
   bitmap Feature : BITMAP32 {
     kSceneNames = 0x1;
+    kExplicit = 0x2;
+    kTableSize = 0x4;
+    kFabricScenes = 0x8;
   }
 
   bitmap ScenesCopyMode : BITMAP8 {
@@ -865,6 +868,10 @@ server cluster TimeFormatLocalization = 44 {
     k24hr = 1;
   }
 
+  bitmap Feature : BITMAP32 {
+    kCalendarFormat = 0x1;
+  }
+
   attribute HourFormatEnum hourFormat = 0;
   attribute CalendarTypeEnum activeCalendarType = 1;
   readonly attribute CalendarTypeEnum supportedCalendarTypes[] = 2;
@@ -1103,7 +1110,6 @@ server cluster PowerSource = 47 {
   readonly attribute int32u wiredNominalVoltage = 7;
   readonly attribute int32u wiredMaximumCurrent = 8;
   readonly attribute boolean wiredPresent = 9;
-  readonly attribute WiredFaultEnum activeWiredFaults[] = 10;
   readonly attribute endpoint_no endpointList[] = 31;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2526,13 +2532,12 @@ endpoint 1 {
     ram      attribute wiredNominalVoltage default = 5000;
     ram      attribute wiredMaximumCurrent default = 1000;
     ram      attribute wiredPresent default = 1;
-    callback attribute activeWiredFaults;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 2;
   }
 
@@ -2559,7 +2564,7 @@ endpoint 1 {
     ram      attribute coupleColorTempToLevelMinMireds;
     persist  attribute startUpColorTemperatureMireds;
     ram      attribute featureMap default = 0x1F;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
   }
 }
 

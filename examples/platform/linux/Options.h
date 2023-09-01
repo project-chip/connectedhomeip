@@ -66,6 +66,7 @@ struct LinuxDeviceOptions
     uint8_t testEventTriggerEnableKey[16] = { 0 };
     chip::FabricId commissionerFabricId   = chip::kUndefinedFabricId;
     std::vector<std::string> traceTo;
+    bool mSimulateNoInternalTime = false;
 
     static LinuxDeviceOptions & GetInstance();
 };

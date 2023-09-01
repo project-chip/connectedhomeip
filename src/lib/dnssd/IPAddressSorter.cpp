@@ -45,12 +45,10 @@ IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId
 {
     if (ip.IsIPv6())
     {
-#ifdef __APPLE__
         if (ip.IsIPv6LinkLocal())
         {
             return IpScore::kLinkLocal;
         }
-#endif // __APPLE__
 
         if (interfaceId.MatchLocalIPv6Subnet(ip))
         {
@@ -72,13 +70,6 @@ IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId
         {
             return IpScore::kUniqueLocal;
         }
-
-#ifndef __APPLE__
-        if (ip.IsIPv6LinkLocal())
-        {
-            return IpScore::kLinkLocal;
-        }
-#endif // __APPLE__
 
         return IpScore::kOtherIpv6;
     }

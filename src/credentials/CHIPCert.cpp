@@ -309,7 +309,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
 {
     CHIP_ERROR err                     = CHIP_NO_ERROR;
     const ChipCertificateData * caCert = nullptr;
-    uint8_t certType;
+    CertType certType;
 
     err = cert->mSubjectDN.GetCertType(certType);
     SuccessOrExit(err);
@@ -328,7 +328,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
                      err = CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
 
         // Verify that the certificate type is set to Root or ICA.
-        VerifyOrExit(certType == kCertType_ICA || certType == kCertType_Root, err = CHIP_ERROR_WRONG_CERT_TYPE);
+        VerifyOrExit(certType == CertType::kICA || certType == CertType::kRoot, err = CHIP_ERROR_WRONG_CERT_TYPE);
 
         // If a path length constraint was included, verify the cert depth vs. the specified constraint.
         //
@@ -365,7 +365,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
         }
 
         // If a required certificate type has been specified, verify it against the current certificate's type.
-        if (context.mRequiredCertType != kCertType_NotSpecified)
+        if (context.mRequiredCertType != CertType::kNotSpecified)
         {
             VerifyOrExit(certType == context.mRequiredCertType, err = CHIP_ERROR_WRONG_CERT_TYPE);
         }
@@ -569,7 +569,7 @@ void ValidationContext::Reset()
     mValidityPolicy = nullptr;
     mRequiredKeyUsages.ClearAll();
     mRequiredKeyPurposes.ClearAll();
-    mRequiredCertType = kCertType_NotSpecified;
+    mRequiredCertType = CertType::kNotSpecified;
 }
 
 bool ChipRDN::IsEqual(const ChipRDN & other) const
@@ -667,40 +667,40 @@ CHIP_ERROR ChipDN::AddAttribute(chip::ASN1::OID oid, CharSpan val, bool isPrinta
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipDN::GetCertType(uint8_t & certType) const
+CHIP_ERROR ChipDN::GetCertType(CertType & certType) const
 {
-    uint8_t lCertType    = kCertType_NotSpecified;
+    CertType lCertType   = CertType::kNotSpecified;
     bool fabricIdPresent = false;
     bool catsPresent     = false;
     uint8_t rdnCount     = RDNCount();
 
-    certType = kCertType_NotSpecified;
+    certType = CertType::kNotSpecified;
 
     for (uint8_t i = 0; i < rdnCount; i++)
     {
         if (rdn[i].mAttrOID == kOID_AttributeType_MatterRCACId)
         {
-            VerifyOrReturnError(lCertType == kCertType_NotSpecified, CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(lCertType == CertType::kNotSpecified, CHIP_ERROR_WRONG_CERT_DN);
 
-            lCertType = kCertType_Root;
+            lCertType = CertType::kRoot;
         }
         else if (rdn[i].mAttrOID == kOID_AttributeType_MatterICACId)
         {
-            VerifyOrReturnError(lCertType == kCertType_NotSpecified, CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(lCertType == CertType::kNotSpecified, CHIP_ERROR_WRONG_CERT_DN);
 
-            lCertType = kCertType_ICA;
+            lCertType = CertType::kICA;
         }
         else if (rdn[i].mAttrOID == kOID_AttributeType_MatterNodeId)
         {
-            VerifyOrReturnError(lCertType == kCertType_NotSpecified, CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(lCertType == CertType::kNotSpecified, CHIP_ERROR_WRONG_CERT_DN);
             VerifyOrReturnError(IsOperationalNodeId(rdn[i].mChipVal), CHIP_ERROR_WRONG_NODE_ID);
-            lCertType = kCertType_Node;
+            lCertType = CertType::kNode;
         }
         else if (rdn[i].mAttrOID == kOID_AttributeType_MatterFirmwareSigningId)
         {
-            VerifyOrReturnError(lCertType == kCertType_NotSpecified, CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(lCertType == CertType::kNotSpecified, CHIP_ERROR_WRONG_CERT_DN);
 
-            lCertType = kCertType_FirmwareSigning;
+            lCertType = CertType::kFirmwareSigning;
         }
         else if (rdn[i].mAttrOID == kOID_AttributeType_MatterFabricId)
         {
@@ -717,7 +717,7 @@ CHIP_ERROR ChipDN::GetCertType(uint8_t & certType) const
         }
     }
 
-    if (lCertType == kCertType_Node)
+    if (lCertType == CertType::kNode)
     {
         VerifyOrReturnError(fabricIdPresent, CHIP_ERROR_WRONG_CERT_DN);
     }
@@ -1151,7 +1151,7 @@ CHIP_ERROR ValidateChipRCAC(const ByteSpan & rcac)
     ChipCertificateSet certSet;
     ChipCertificateData certData;
     ValidationContext validContext;
-    uint8_t certType;
+    CertType certType;
 
     // Note that this function doesn't check RCAC NotBefore / NotAfter time validity.
     // It is assumed that RCAC should be valid at the time of installation by definition.
@@ -1161,7 +1161,7 @@ CHIP_ERROR ValidateChipRCAC(const ByteSpan & rcac)
     ReturnErrorOnFailure(certSet.LoadCert(rcac, CertDecodeFlags::kGenerateTBSHash));
 
     ReturnErrorOnFailure(certData.mSubjectDN.GetCertType(certType));
-    VerifyOrReturnError(certType == kCertType_Root, CHIP_ERROR_WRONG_CERT_TYPE);
+    VerifyOrReturnError(certType == CertType::kRoot, CHIP_ERROR_WRONG_CERT_TYPE);
 
     VerifyOrReturnError(certData.mSubjectDN.IsEqual(certData.mIssuerDN), CHIP_ERROR_WRONG_CERT_TYPE);
 
@@ -1337,10 +1337,10 @@ CHIP_ERROR ExtractCATsFromOpCert(const ByteSpan & opcert, CATValues & cats)
 CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues & cats)
 {
     uint8_t catCount = 0;
-    uint8_t certType;
+    CertType certType;
 
     ReturnErrorOnFailure(opcert.mSubjectDN.GetCertType(certType));
-    VerifyOrReturnError(certType == kCertType_Node, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(certType == CertType::kNode, CHIP_ERROR_INVALID_ARGUMENT);
 
     const ChipDN & subjectDN = opcert.mSubjectDN;
     for (uint8_t i = 0; i < subjectDN.RDNCount(); ++i)

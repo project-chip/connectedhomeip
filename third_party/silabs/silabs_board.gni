@@ -37,9 +37,13 @@ declare_args() {
   chip_enable_ble_rs911x = false
 
   wifi_soc = false
+  wifi_soc_common_flash = false
 
   #Disable MQTT by default
   enable_dic = false
+
+  # Disable AWS SDK OTA by default
+  aws_sdk_ota = false
 
   # Disable UART log forwarding by default
   sl_uart_log_output = false
@@ -97,11 +101,32 @@ if (silabs_board == "BRD4304A") {
   silabs_family = "efr32mg12"
   silabs_mcu = "EFR32MG12P433F1024GM68"
 } else if (silabs_board == "BRD4325B") {
-  silabs_family = "SiWx917"
-  silabs_mcu = "EFR32MG12P432F1024GL125"
+  silabs_family = "SiWx917-dual"
+  silabs_mcu = "SiWG917M111MGTBA"
   disable_lcd = true
   show_qr_code = false
   wifi_soc = true
+} else if (silabs_board == "BRD4325C") {
+  silabs_family = "SiWx917-common"
+  silabs_mcu = "SiWG917M111MGTBA"
+  disable_lcd = true
+  show_qr_code = false
+  wifi_soc = true
+  wifi_soc_common_flash = true
+} else if (silabs_board == "BRD4325G") {
+  silabs_family = "SiWx917-common"
+  silabs_mcu = "SiWG917M111MGTBA"
+  disable_lcd = true
+  show_qr_code = false
+  wifi_soc = true
+  wifi_soc_common_flash = true
+} else if (silabs_board == "BRD4338A") {
+  silabs_family = "SiWx917-common"
+  silabs_mcu = "SiWG917M111MGTBA"
+  disable_lcd = true
+  show_qr_code = false
+  wifi_soc = true
+  wifi_soc_common_flash = true
 } else if (silabs_board == "BRD4180A") {
   assert(
       false,
@@ -168,11 +193,6 @@ if (silabs_board == "BRD4304A") {
 } else if (silabs_board == "BRD4318A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240SD22VNA"
-
-  use_wstk_leds = false
-  use_external_flash = false
-  show_qr_code = false
-  disable_lcd = true
 } else {
   print(
       "Please provide a valid value for SILABS_BOARD env variable (currently supported BRD4304A, BRD4161A, BRD4163A, BRD4164A BRD4166A, BRD4170A, BRD4186C, BRD4187C, BRD2601B, BRD2703A, BRD4317A, BRD2704A)")

@@ -26,6 +26,10 @@
 namespace chip {
 namespace app {
 
+// Forward declaration of TestICDManager to allow it to be friend with ICDManager
+// Used in unit tests
+class TestICDManager;
+
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
  */
@@ -67,8 +71,17 @@ public:
     static System::Clock::Milliseconds32 GetFastPollingInterval() { return kFastPollingInterval; }
 
 protected:
+    friend class TestICDManager;
+
     static void OnIdleModeDone(System::Layer * aLayer, void * appState);
     static void OnActiveModeDone(System::Layer * aLayer, void * appState);
+    /**
+     * @brief Callback function called shortly before the device enters idle mode to allow checks to be made. This is currently only
+     * called once to prevent entering in a loop if some events re-trigger this check (for instance if a check for subscription
+     * before entering idle mode leads to emiting a report, we will re-enter UpdateOperationState and check again for subscription,
+     * etc.)
+     */
+    static void OnTransitionToIdle(System::Layer * aLayer, void * appState);
 
 private:
     // SIT ICDs should have a SlowPollingThreshold shorter than or equal to 15s (spec 9.16.1.5)
@@ -89,6 +102,7 @@ private:
     PersistentStorageDelegate * mStorage = nullptr;
     FabricTable * mFabricTable           = nullptr;
     ICDStateObserver * mStateObserver    = nullptr;
+    bool mTransitionToIdleCalled         = false;
 };
 
 } // namespace app
