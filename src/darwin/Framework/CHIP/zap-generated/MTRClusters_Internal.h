@@ -58,6 +58,11 @@
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
+@interface MTRClusterPulseWidthModulation ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
 @interface MTRClusterDescriptor ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
@@ -158,6 +163,11 @@
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
+@interface MTRClusterTimeSynchronization ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
 @interface MTRClusterBridgedDeviceBasicInformation ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
@@ -189,6 +199,21 @@
 @end
 
 @interface MTRClusterUserLabel ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterProxyConfiguration ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterProxyDiscovery ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterProxyValid ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
@@ -343,7 +368,17 @@
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
+@interface MTRClusterClientMonitoring ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
 @interface MTRClusterUnitTesting ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterFaultInjection ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end

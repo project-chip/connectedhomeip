@@ -105,6 +105,16 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
         }
         break;
     }
+    case Clusters::PulseWidthModulation::Id: {
+        using namespace Clusters::PulseWidthModulation;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case Clusters::Descriptor::Id: {
         using namespace Clusters::Descriptor;
         switch (aPath.mEventId) {
@@ -1201,6 +1211,16 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
         }
         break;
     }
+    case Clusters::TimeSynchronization::Id: {
+        using namespace Clusters::TimeSynchronization;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case Clusters::BridgedDeviceBasicInformation::Id: {
         using namespace Clusters::BridgedDeviceBasicInformation;
         switch (aPath.mEventId) {
@@ -1459,6 +1479,36 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
     }
     case Clusters::UserLabel::Id: {
         using namespace Clusters::UserLabel;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case Clusters::ProxyConfiguration::Id: {
+        using namespace Clusters::ProxyConfiguration;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case Clusters::ProxyDiscovery::Id: {
+        using namespace Clusters::ProxyDiscovery;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case Clusters::ProxyValid::Id: {
+        using namespace Clusters::ProxyValid;
         switch (aPath.mEventId) {
 
         default:
@@ -2256,6 +2306,16 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
         }
         break;
     }
+    case Clusters::ClientMonitoring::Id: {
+        using namespace Clusters::ClientMonitoring;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case Clusters::UnitTesting::Id: {
         using namespace Clusters::UnitTesting;
         switch (aPath.mEventId) {
@@ -2370,6 +2430,16 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
 
             return value;
         }
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case Clusters::FaultInjection::Id: {
+        using namespace Clusters::FaultInjection;
+        switch (aPath.mEventId) {
 
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
