@@ -123,6 +123,8 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                           queue:(dispatch_queue_t)queue
                 storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
            storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
+            otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
+       otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
                uniqueIdentifier:(NSUUID *)uniqueIdentifier
 {
     if (self = [super init]) {
@@ -142,6 +144,58 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                 return nil;
             }
         }
+
+        // Ensure the otaProviderDelegate, if any, is valid.
+        if (otaProviderDelegate == nil && otaProviderDelegateQueue != nil) {
+            MTR_LOG_ERROR("Must have otaProviderDelegate when we have otaProviderDelegateQueue");
+            return nil;
+        }
+
+        if (otaProviderDelegate != nil && otaProviderDelegateQueue == nil) {
+            MTR_LOG_ERROR("Must have otaProviderDelegateQueue when we have otaProviderDelegate");
+            return nil;
+        }
+
+        if (otaProviderDelegate != nil) {
+            if (![otaProviderDelegate respondsToSelector:@selector(handleQueryImageForNodeID:controller:params:completion:)]
+                && ![otaProviderDelegate respondsToSelector:@selector(handleQueryImageForNodeID:
+                                                                                     controller:params:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleQueryImageForNodeID");
+                return nil;
+            }
+            if (![otaProviderDelegate respondsToSelector:@selector(handleApplyUpdateRequestForNodeID:controller:params:completion:)]
+                && ![otaProviderDelegate
+                    respondsToSelector:@selector(handleApplyUpdateRequestForNodeID:controller:params:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleApplyUpdateRequestForNodeID");
+                return nil;
+            }
+            if (![otaProviderDelegate respondsToSelector:@selector(handleNotifyUpdateAppliedForNodeID:
+                                                                                           controller:params:completion:)]
+                && ![otaProviderDelegate
+                    respondsToSelector:@selector(handleNotifyUpdateAppliedForNodeID:controller:params:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleNotifyUpdateAppliedForNodeID");
+                return nil;
+            }
+            if (![otaProviderDelegate respondsToSelector:@selector
+                                      (handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:)]
+                && ![otaProviderDelegate respondsToSelector:@selector
+                                         (handleBDXTransferSessionBeginForNodeID:
+                                                                      controller:fileDesignator:offset:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleBDXTransferSessionBeginForNodeID");
+                return nil;
+            }
+            if (![otaProviderDelegate
+                    respondsToSelector:@selector(handleBDXQueryForNodeID:controller:blockSize:blockIndex:bytesToSkip:completion:)]
+                && ![otaProviderDelegate
+                    respondsToSelector:@selector(handleBDXQueryForNodeID:
+                                                              controller:blockSize:blockIndex:bytesToSkip:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleBDXQueryForNodeID");
+                return nil;
+            }
+        }
+
+        _otaProviderDelegate = otaProviderDelegate;
+        _otaProviderDelegateQueue = otaProviderDelegateQueue;
 
         _chipWorkQueue = queue;
         _factory = factory;

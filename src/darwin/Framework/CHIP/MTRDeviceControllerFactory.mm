@@ -61,7 +61,6 @@ static NSString * const kErrorCertificateValidityPolicyInit = @"Init certificate
 static NSString * const kErrorControllerFactoryInit = @"Init failure while initializing controller factory";
 static NSString * const kErrorKeystoreInit = @"Init failure while initializing persistent storage keystore";
 static NSString * const kErrorCertStoreInit = @"Init failure while initializing persistent storage operational certificate store";
-static NSString * const kErrorOtaProviderInit = @"Init failure while creating an OTA provider delegate";
 static NSString * const kErrorSessionKeystoreInit = @"Init failure while initializing session keystore";
 
 static bool sExitHandlerRegistered = false;
@@ -122,6 +121,9 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 //    must lock.
 // D. Locking around reads not from the Matter queue is OK but not required.
 @property (nonatomic, readonly) os_unfair_lock controllersLock;
+
+@property (nonatomic, readonly, nullable) id<MTROTAProviderDelegate> otaProviderDelegate;
+@property (nonatomic, readonly, nullable) dispatch_queue_t otaProviderDelegateQueue;
 
 - (BOOL)findMatchingFabric:(FabricTable &)fabricTable
                     params:(MTRDeviceControllerStartupParams *)params
@@ -289,9 +291,15 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
 - (void)cleanupStartupObjects
 {
-    if (_otaProviderDelegateBridge) {
-        delete _otaProviderDelegateBridge;
-        _otaProviderDelegateBridge = nullptr;
+    // Make sure the deinit order here is the reverse of the init order in
+    // startControllerFactory:
+    _certificationDeclarationCertificates = nil;
+    _productAttestationAuthorityCertificates = nil;
+
+    if (_opCertStore) {
+        _opCertStore->Finish();
+        delete _opCertStore;
+        _opCertStore = nullptr;
     }
 
     if (_keystore) {
@@ -300,11 +308,12 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         _keystore = nullptr;
     }
 
-    if (_opCertStore) {
-        _opCertStore->Finish();
-        delete _opCertStore;
-        _opCertStore = nullptr;
+    if (_otaProviderDelegateBridge) {
+        delete _otaProviderDelegateBridge;
+        _otaProviderDelegateBridge = nullptr;
     }
+    _otaProviderDelegateQueue = nil;
+    _otaProviderDelegate = nil;
 
     if (_sessionResumptionStorage) {
         delete _sessionResumptionStorage;
@@ -412,57 +421,12 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
             return;
         }
 
-        if (startupParams.otaProviderDelegate) {
-            if (![startupParams.otaProviderDelegate respondsToSelector:@selector(handleQueryImageForNodeID:
-                                                                                                controller:params:completion:)]
-                && ![startupParams.otaProviderDelegate
-                    respondsToSelector:@selector(handleQueryImageForNodeID:controller:params:completionHandler:)]) {
-                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleQueryImageForNodeID");
-                errorCode = CHIP_ERROR_INVALID_ARGUMENT;
-                return;
-            }
-            if (![startupParams.otaProviderDelegate
-                    respondsToSelector:@selector(handleApplyUpdateRequestForNodeID:controller:params:completion:)]
-                && ![startupParams.otaProviderDelegate
-                    respondsToSelector:@selector(handleApplyUpdateRequestForNodeID:controller:params:completionHandler:)]) {
-                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleApplyUpdateRequestForNodeID");
-                errorCode = CHIP_ERROR_INVALID_ARGUMENT;
-                return;
-            }
-            if (![startupParams.otaProviderDelegate
-                    respondsToSelector:@selector(handleNotifyUpdateAppliedForNodeID:controller:params:completion:)]
-                && ![startupParams.otaProviderDelegate
-                    respondsToSelector:@selector(handleNotifyUpdateAppliedForNodeID:controller:params:completionHandler:)]) {
-                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleNotifyUpdateAppliedForNodeID");
-                errorCode = CHIP_ERROR_INVALID_ARGUMENT;
-                return;
-            }
-            if (![startupParams.otaProviderDelegate
-                    respondsToSelector:@selector(handleBDXTransferSessionBeginForNodeID:
-                                                                             controller:fileDesignator:offset:completion:)]
-                && ![startupParams.otaProviderDelegate
-                    respondsToSelector:@selector
-                    (handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completionHandler:)]) {
-                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleBDXTransferSessionBeginForNodeID");
-                errorCode = CHIP_ERROR_INVALID_ARGUMENT;
-                return;
-            }
-            if (![startupParams.otaProviderDelegate
-                    respondsToSelector:@selector(handleBDXQueryForNodeID:controller:blockSize:blockIndex:bytesToSkip:completion:)]
-                && ![startupParams.otaProviderDelegate
-                    respondsToSelector:@selector(handleBDXQueryForNodeID:
-                                                              controller:blockSize:blockIndex:bytesToSkip:completionHandler:)]) {
-                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleBDXQueryForNodeID");
-                errorCode = CHIP_ERROR_INVALID_ARGUMENT;
-                return;
-            }
-            _otaProviderDelegateBridge = new MTROTAProviderDelegateBridge(startupParams.otaProviderDelegate);
-            if (_otaProviderDelegateBridge == nil) {
-                MTR_LOG_ERROR("Error: %@", kErrorOtaProviderInit);
-                errorCode = CHIP_ERROR_NO_MEMORY;
-                return;
-            }
+        _otaProviderDelegate = startupParams.otaProviderDelegate;
+        if (_otaProviderDelegate != nil) {
+            _otaProviderDelegateQueue = dispatch_queue_create(
+                "org.csa-iot.matter.framework.otaprovider.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         }
+        _otaProviderDelegateBridge = new MTROTAProviderDelegateBridge();
 
         // TODO: Allow passing a different keystore implementation via startupParams.
         _keystore = new PersistentStorageOperationalKeystore();
@@ -594,19 +558,25 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         return nil;
     }
 
-    id<MTRDeviceControllerStorageDelegate> storageDelegate;
-    dispatch_queue_t storageDelegateQueue;
+    id<MTRDeviceControllerStorageDelegate> _Nullable storageDelegate;
+    dispatch_queue_t _Nullable storageDelegateQueue;
     NSUUID * uniqueIdentifier;
+    id<MTROTAProviderDelegate> _Nullable otaProviderDelegate;
+    dispatch_queue_t _Nullable otaProviderDelegateQueue;
     if ([startupParams isKindOfClass:[MTRDeviceControllerStartupParameters class]]) {
         MTRDeviceControllerStartupParameters * params = startupParams;
         storageDelegate = params.storageDelegate;
         storageDelegateQueue = params.storageDelegateQueue;
         uniqueIdentifier = params.uniqueIdentifier;
+        otaProviderDelegate = params.otaProviderDelegate;
+        otaProviderDelegateQueue = params.otaProviderDelegateQueue;
     } else if ([startupParams isKindOfClass:[MTRDeviceControllerStartupParams class]]) {
         MTRDeviceControllerStartupParams * params = startupParams;
         storageDelegate = nil;
         storageDelegateQueue = nil;
         uniqueIdentifier = params.uniqueIdentifier;
+        otaProviderDelegate = nil;
+        otaProviderDelegateQueue = nil;
     } else {
         MTR_LOG_ERROR("Unknown kind of startup params: %@", startupParams);
         return nil;
@@ -628,10 +598,19 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         return nil;
     }
 
+    // Fall back to the factory-wide OTA provider delegate if one is not
+    // provided in the startup params.
+    if (otaProviderDelegate == nil) {
+        otaProviderDelegate = self.otaProviderDelegate;
+        otaProviderDelegateQueue = self.otaProviderDelegateQueue;
+    }
+
     // Create the controller, so we start the event loop, since we plan to do
     // our fabric table operations there.
     auto * controller = [self _createController:storageDelegate
                            storageDelegateQueue:storageDelegateQueue
+                            otaProviderDelegate:otaProviderDelegate
+                       otaProviderDelegateQueue:otaProviderDelegateQueue
                                uniqueIdentifier:uniqueIdentifier];
     if (controller == nil) {
         if (error != nil) {
@@ -874,6 +853,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
 - (MTRDeviceController * _Nullable)_createController:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
                                 storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
+                                 otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
+                            otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
                                     uniqueIdentifier:(NSUUID *)uniqueIdentifier
 {
     [self _assertCurrentQueueIsNotMatterQueue];
@@ -882,6 +863,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
                                                                               queue:_chipWorkQueue
                                                                     storageDelegate:storageDelegate
                                                                storageDelegateQueue:storageDelegateQueue
+                                                                otaProviderDelegate:otaProviderDelegate
+                                                           otaProviderDelegateQueue:otaProviderDelegateQueue
                                                                    uniqueIdentifier:uniqueIdentifier];
     if (controller == nil) {
         MTR_LOG_ERROR("Failed to init controller");
