@@ -1,12 +1,18 @@
 #include <air-quality-sensor-manager.h>
 
-AirQualitySensorManager::AirQualitySensorManager()
-{
-    InitializeConcentrations();
-}
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::DataModel;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::ConcentrationMeasurement;
+using namespace chip::app::Clusters::AirQuality;
 
-void AirQualitySensorManager::InitializeConcentrations()
+void AirQualitySensorManager::Init()
 {
+    // Air Quality
+    airQualityInstance.Init();
+    airQualityInstance.UpdateAirQuality(AirQualityEnum::kGood);
+
     // CO2
     carbonDioxideConcentrationMeasurementInstance.Init();
     carbonDioxideConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));

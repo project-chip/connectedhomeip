@@ -19,6 +19,28 @@ import("${chip_root}/src/app/common_flags.gni")
 
 assert(chip_build_tools)
 
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+
+# source_set("chip-air-purifier-common") {
+#   sources = [
+#     "${chip_root}/examples/air-purifier-app/air-purifier-common/src/air-purifier-manager.cpp",
+#     "${chip_root}/examples/air-purifier-app/air-purifier-common/src/air-quality-sensor-manager.cpp",
+#     "${chip_root}/examples/air-purifier-app/air-purifier-common/src/filter-delegates.cpp"
+#   ]
+
+#   deps = [
+#     "${chip_root}/examples/air-purifier-app/air-purifier-common",
+#     "${chip_root}/examples/platform/linux:app-main",
+#     "${chip_root}/src/app/tests/suites/credentials:dac_provider",
+#     "${chip_root}/src/lib",
+#   ]
+
+#   include_dirs =
+#       [ "${chip_root}/examples/air-purifier-app/air-purifier-common/include" ]
+
+#   cflags = [ "-Wconversion" ]
+# }
+
 config("includes") {
   include_dirs = [
     ".",
@@ -28,18 +50,24 @@ config("includes") {
 
 executable("chip-air-purifier-app") {
   sources = [
+    "${chip_root}/examples/air-purifier-app/air-purifier-common/src/air-purifier-manager.cpp",
+    "${chip_root}/examples/air-purifier-app/air-purifier-common/src/air-quality-sensor-manager.cpp",
+    "${chip_root}/examples/air-purifier-app/air-purifier-common/src/filter-delegates.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
 
   deps = [
-    "${chip_root}/examples/air-purifier-app/air-purifier-common",
     "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/examples/air-purifier-app/air-purifier-common",
     "${chip_root}/src/lib",
   ]
 
+  cflags = [ "-Wconversion" ]
+
   include_dirs = [
-    "include"
+    "include",
+    "${chip_root}/examples/air-purifier-app/air-purifier-common/include"
   ]
   output_dir = root_out_dir
 }
