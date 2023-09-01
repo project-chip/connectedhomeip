@@ -93,6 +93,8 @@ constexpr size_t kAES_CCM128_Block_Length = kAES_CCM128_Key_Length;
 constexpr size_t kAES_CCM128_Nonce_Length = 13;
 constexpr size_t kAES_CCM128_Tag_Length   = 16;
 
+constexpr size_t CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES = kAES_CCM128_Nonce_Length;
+
 /* These sizes are hardcoded here to remove header dependency on underlying crypto library
  * in a public interface file. The validity of these sizes is verified by static_assert in
  * the implementation files.

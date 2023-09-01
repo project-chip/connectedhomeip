@@ -30,7 +30,6 @@
 namespace chip {
 namespace Credentials {
     class GroupDataProvider;
-    class DeviceAttestationVerifier;
 } // namespace Credentials
 } // namespace chip
 
@@ -54,6 +53,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable MTRDeviceController *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex;
 
 /**
+ * Find a running controller, if any, for the given fabric index.  Allows
+ * controlling whether to include a controller that is in the middle of startup
+ * or shutdown.
+ */
+- (nullable MTRDeviceController *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex
+                                      includeControllerStartingUp:(BOOL)includeControllerStartingUp
+                                    includeControllerShuttingDown:(BOOL)includeControllerShuttingDown;
+
+/**
  * Notify the controller factory that a new operational instance with the given
  * compressed fabric id and node id has been observed.
  */
@@ -61,7 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) chip::PersistentStorageDelegate * storageDelegate;
 @property (readonly) chip::Credentials::GroupDataProvider * groupData;
-@property (readonly) chip::Credentials::DeviceAttestationVerifier * deviceAttestationVerifier;
+
 @end
 
 NS_ASSUME_NONNULL_END
