@@ -12,9 +12,12 @@ namespace Clusters {
 class AirQualitySensorManager
 {
 public:
-    AirQualitySensorManager(EndpointId aEndpointId, uint32_t airQualityFeatureMap) :
-        mEndpointId(aEndpointId), mAirQualityFeatureMap(airQualityFeatureMap),
-        airQualityInstance(mEndpointId, airQualityFeatureMap),
+    AirQualitySensorManager(EndpointId aEndpointId) :
+        mEndpointId(aEndpointId),
+        airQualityInstance(mEndpointId,
+                           BitMask<AirQuality::Feature, uint32_t>(AirQuality::Feature::kModerate, AirQuality::Feature::kFair,
+                                                                  AirQuality::Feature::kVeryPoor,
+                                                                  AirQuality::Feature::kExtremelyPoor)),
         carbonDioxideConcentrationMeasurementInstance(mEndpointId, CarbonDioxideConcentrationMeasurement::Id,
                                                       ConcentrationMeasurement::MeasurementMediumEnum::kAir,
                                                       ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
@@ -51,7 +54,6 @@ public:
 
 private:
     EndpointId mEndpointId;
-    uint32_t mAirQualityFeatureMap;
     AirQuality::Instance airQualityInstance;
     ConcentrationMeasurement::Instance<true, true, true, true, true, true> carbonDioxideConcentrationMeasurementInstance;
     ConcentrationMeasurement::Instance<true, true, true, true, true, true> carbonMonoxideConcentrationMeasurementInstance;

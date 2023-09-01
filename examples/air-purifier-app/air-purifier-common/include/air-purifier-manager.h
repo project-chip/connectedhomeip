@@ -31,8 +31,8 @@ public:
         hepaFilterInstance(&hepaFilterDelegate, mEndpointId, HepaFilterMonitoring::Id,
                            static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
                            ResourceMonitoring::DegradationDirectionEnum::kDown, true),
-        mAirQualitySensorManager(aAirQualitySensorEndpointId, (uint32_t) 0b1111),
-        mTemperatureSensorManager(aTemperatureSensorEndpointId), mHumiditySensorManager(aHumiditySensorEndpointId)
+        mAirQualitySensorManager(aAirQualitySensorEndpointId), mTemperatureSensorManager(aTemperatureSensorEndpointId),
+        mHumiditySensorManager(aHumiditySensorEndpointId)
     {
         FanControl::SetDefaultDelegate(mEndpointId, this);
         Init();
