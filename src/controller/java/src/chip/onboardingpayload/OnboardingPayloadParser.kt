@@ -17,9 +17,6 @@
 
 package chip.onboardingpayload
 
-import java.util.logging.Level
-import java.util.logging.Logger
-
 /** Parser for scanned QR code or Manual Pairing Code. */
 class OnboardingPayloadParser {
   /**
@@ -114,18 +111,5 @@ class OnboardingPayloadParser {
     }
 
     return payload
-  }
-
-  companion object {
-    private val LOGGER: Logger =
-      Logger.getLogger(OnboardingPayloadParser::class.java.getSimpleName())
-
-    init {
-      try {
-        System.loadLibrary("OnboardingPayload")
-      } catch (e: UnsatisfiedLinkError) {
-        LOGGER.log(Level.SEVERE, "Cannot load library.", e)
-      }
-    }
   }
 }
