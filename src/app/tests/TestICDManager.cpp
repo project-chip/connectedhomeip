@@ -198,7 +198,7 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mTransitionToIdleCalled == true);
         // Confirm that we are still in Active Mode
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
-        // Advance the clock enough the rest of the way to trigger the transition back to Idle Mode
+        // Advance the clock the rest of the way to trigger the transition back to Idle Mode
         timeToAdvance = ICD_ACTIVE_TIME_JITTER_MS + 1;
 
         AdvanceClockAndRunEventLoop(ctx, timeToAdvance);
