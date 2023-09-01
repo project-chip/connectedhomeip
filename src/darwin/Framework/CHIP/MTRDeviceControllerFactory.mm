@@ -851,11 +851,12 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     return [self _startDeviceController:startupParameters
                           fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
                               FabricTable * fabricTable, MTRDeviceController * controller, CHIP_ERROR & fabricError) {
+                              auto advertiseOperational = self.advertiseOperational && startupParameters.shouldAdvertiseOperational;
                               auto * params =
                                   [[MTRDeviceControllerStartupParamsInternal alloc] initForNewController:controller
                                                                                              fabricTable:fabricTable
                                                                                                 keystore:self->_keystore
-                                                                                    advertiseOperational:self.advertiseOperational
+                                                                                    advertiseOperational:advertiseOperational
                                                                                                   params:startupParameters
                                                                                                    error:fabricError];
                               if (params != nil) {

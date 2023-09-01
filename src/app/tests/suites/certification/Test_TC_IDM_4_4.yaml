@@ -17,6 +17,7 @@ name: 3.4.3.[TC-IDM-4.4] Persistent Subscription Test Cases. [DUT as Server]
 
 PICS:
     - MCORE.IDM.S
+    - MCORE.IDM.S.PersistentSubscription
 
 config:
     nodeId: 0x12344321
@@ -24,6 +25,18 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          1. The Cluster and Commands should be based on the cluster implementation on the DUT.
+          2. The cluster used in the below test steps is an example, User can use any supported chip cluster/attribute/command.
+      disabled: true
+
+    - label: "Precondition"
+      verification: |
+          1. Please use Interactive mode to Verify subscription test cases
+          2. Here the command to enter interactive mode:--   ./chip-tool interactive start
+      disabled: true
+
     - label:
           "Step 1: TH sends a subscription request action for an attribute to
           the DUT. Activate the subscription between DUT and the TH."
