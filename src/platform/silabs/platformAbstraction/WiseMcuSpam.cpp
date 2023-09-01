@@ -32,6 +32,9 @@ void RSI_Board_LED_Set(int, bool);
 void RSI_Board_LED_Toggle(int);
 void RSI_Wakeupsw_config(void);
 void RSI_Wakeupsw_config_gpio0(void);
+#ifdef SI917_RADIO_BOARD_V2
+void RSI_Wakeupsw_config_gpio11(void);
+#endif
 void sl_system_init(void);
 void soc_pll_config(void);
 }
@@ -58,7 +61,11 @@ CHIP_ERROR SilabsPlatform::Init(void)
 
     // BTN0 and BTN1 init
     RSI_Wakeupsw_config();
+#ifdef SI917_RADIO_BOARD_V2
+    RSI_Wakeupsw_config_gpio11();
+#else
     RSI_Wakeupsw_config_gpio0();
+#endif
 
 #if SILABS_LOG_ENABLED
     silabsInitLog();

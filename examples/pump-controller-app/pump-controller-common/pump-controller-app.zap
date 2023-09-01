@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -36,7 +36,6 @@
       "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 2,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 2,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        2
       ],
       "deviceVersions": [
         1
@@ -5647,7 +5642,6 @@
       "id": 2,
       "name": "MA-pumpcontroller",
       "deviceTypeRef": {
-        "id": 19,
         "code": 772,
         "profileId": 2457,
         "label": "MA-pumpcontroller",
@@ -5655,15 +5649,11 @@
       },
       "deviceTypes": [
         {
-          "id": 19,
           "code": 772,
           "profileId": 2457,
           "label": "MA-pumpcontroller",
           "name": "MA-pumpcontroller"
         }
-      ],
-      "deviceTypeRefs": [
-        19
       ],
       "deviceVersions": [
         1
@@ -6861,6 +6851,5 @@
       "endpointId": 1,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

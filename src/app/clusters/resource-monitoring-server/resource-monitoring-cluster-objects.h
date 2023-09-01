@@ -31,7 +31,6 @@ namespace ResourceMonitoring {
 
 // max of 20 characters as defined by the constraint on the ProductIdentifierValue in the specification
 static constexpr size_t kProductIdentifierValueMaxNameLength = 20u;
-static constexpr std::array<ClusterId, 2> AliasedClusters    = { HepaFilterMonitoring::Id, ActivatedCarbonFilterMonitoring::Id };
 
 // Enum for ChangeIndicationEnum
 enum class ChangeIndicationEnum : uint8_t

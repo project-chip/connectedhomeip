@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -36,7 +36,6 @@
       "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 2,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 2,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        2
       ],
       "deviceVersions": [
         1
@@ -5467,7 +5462,6 @@
       "id": 2,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
-        "id": 35,
         "code": 43,
         "profileId": 259,
         "label": "MA-fan",
@@ -5475,15 +5469,11 @@
       },
       "deviceTypes": [
         {
-          "id": 35,
           "code": 43,
           "profileId": 259,
           "label": "MA-fan",
           "name": "MA-fan"
         }
-      ],
-      "deviceTypeRefs": [
-        35
       ],
       "deviceVersions": [
         1
@@ -7003,6 +6993,5 @@
       "endpointId": 1,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

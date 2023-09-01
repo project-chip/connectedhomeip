@@ -210,23 +210,20 @@ def target_for_name(name: str):
     return TestTarget.ALL_CLUSTERS
 
 
-def tests_with_command(chip_tool: str, is_manual: bool, is_chip_tool_python_only: bool = False):
+def tests_with_command(chip_tool: str, is_manual: bool):
     """Executes `chip_tool` binary to see what tests are available, using cmd
     to get the list.
     """
     cmd = "list"
     if is_manual:
         cmd += "-manual"
-    elif is_chip_tool_python_only:
-        cmd += "-python-runner-only"
 
     result = subprocess.run([chip_tool, "tests", cmd], capture_output=True)
+    result.check_returncode()
 
     test_tags = set()
     if is_manual:
         test_tags.add(TestTag.MANUAL)
-    if is_chip_tool_python_only:
-        test_tags.add(TestTag.CHIP_TOOL_PYTHON_ONLY)
 
     in_development_tests = [s.replace(".yaml", "") for s in _GetInDevelopmentTests()]
 
@@ -244,9 +241,7 @@ def tests_with_command(chip_tool: str, is_manual: bool, is_chip_tool_python_only
         )
 
 
-# TODO We will move away from hardcoded list of yamltests to run all file when yamltests
-# parser/runner reaches parity with the code gen version.
-def _hardcoded_python_yaml_tests():
+def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool):
     manual_tests = _GetManualTests()
     flaky_tests = _GetFlakyTests()
     slow_tests = _GetSlowTests()
@@ -270,7 +265,7 @@ def _hardcoded_python_yaml_tests():
         if path.name in in_development_tests:
             tags.add(TestTag.IN_DEVELOPMENT)
 
-        if path.name in chip_repl_unsupported_tests:
+        if treat_repl_unsupported_as_in_development and path.name in chip_repl_unsupported_tests:
             tags.add(TestTag.IN_DEVELOPMENT)
 
         yield TestDefinition(
@@ -281,8 +276,13 @@ def _hardcoded_python_yaml_tests():
         )
 
 
-def AllYamlTests():
-    for test in _hardcoded_python_yaml_tests():
+def AllReplYamlTests():
+    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=True):
+        yield test
+
+
+def AllChipToolYamlTests():
+    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False):
         yield test
 
 
@@ -291,9 +291,6 @@ def AllChipToolTests(chip_tool: str):
         yield test
 
     for test in tests_with_command(chip_tool, is_manual=True):
-        yield test
-
-    for test in tests_with_command(chip_tool, is_manual=False, is_chip_tool_python_only=True):
         yield test
 
 
