@@ -18,6 +18,7 @@
 
 #import "MTRDeviceController_Internal.h"
 
+#import "MTRAttestationTrustStoreBridge.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCommissionableBrowser.h"
 #import "MTRCommissionableBrowserResult_Internal.h"
@@ -86,6 +87,7 @@ static NSString * const kErrorGetCommissionee = @"Failure obtaining device being
 static NSString * const kErrorGetAttestationChallenge = @"Failure getting attestation challenge";
 static NSString * const kErrorSpake2pVerifierGenerationFailed = @"PASE verifier generation failed";
 static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifier serialization failed";
+static NSString * const kErrorCDCertStoreInit = @"Init failure while initializing Certificate Declaration Signing Keys store";
 
 typedef void (^SyncWorkQueueBlock)(void);
 typedef id (^SyncWorkQueueBlockWithReturnValue)(void);
@@ -101,6 +103,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
 @property (readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
 @property (readonly) chip::Credentials::PartialDACVerifier * partialDACVerifier;
+@property (readonly) chip::Credentials::DefaultDACVerifier * defaultDACVerifier;
 @property (readonly) MTRDeviceControllerDelegateBridge * deviceControllerDelegateBridge;
 @property (readonly) MTROperationalCredentialsDelegate * operationalCredentialsDelegate;
 @property (readonly) MTRP256KeypairBridge signingKeypairBridge;
@@ -110,13 +113,90 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 @property (readonly) NSMutableDictionary * nodeIDToDeviceMap;
 @property (readonly) os_unfair_lock deviceMapLock; // protects nodeIDToDeviceMap
 @property (readonly) MTRCommissionableBrowser * commissionableBrowser;
+@property (readonly) MTRAttestationTrustStoreBridge * attestationTrustStoreBridge;
+
 @end
 
 @implementation MTRDeviceController
 
-- (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory queue:(dispatch_queue_t)queue
+- (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
+                          queue:(dispatch_queue_t)queue
+                storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
+           storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
+            otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
+       otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
+               uniqueIdentifier:(NSUUID *)uniqueIdentifier
 {
     if (self = [super init]) {
+        // Make sure our storage is all set up to work as early as possible,
+        // before we start doing anything else with the controller.
+        _uniqueIdentifier = uniqueIdentifier;
+        if (storageDelegate != nil) {
+            if (storageDelegateQueue == nil) {
+                MTR_LOG_ERROR("storageDelegate provided without storageDelegateQueue");
+                return nil;
+            }
+
+            _controllerDataStore = [[MTRDeviceControllerDataStore alloc] initWithController:self
+                                                                            storageDelegate:storageDelegate
+                                                                       storageDelegateQueue:storageDelegateQueue];
+            if (_controllerDataStore == nil) {
+                return nil;
+            }
+        }
+
+        // Ensure the otaProviderDelegate, if any, is valid.
+        if (otaProviderDelegate == nil && otaProviderDelegateQueue != nil) {
+            MTR_LOG_ERROR("Must have otaProviderDelegate when we have otaProviderDelegateQueue");
+            return nil;
+        }
+
+        if (otaProviderDelegate != nil && otaProviderDelegateQueue == nil) {
+            MTR_LOG_ERROR("Must have otaProviderDelegateQueue when we have otaProviderDelegate");
+            return nil;
+        }
+
+        if (otaProviderDelegate != nil) {
+            if (![otaProviderDelegate respondsToSelector:@selector(handleQueryImageForNodeID:controller:params:completion:)]
+                && ![otaProviderDelegate respondsToSelector:@selector(handleQueryImageForNodeID:
+                                                                                     controller:params:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleQueryImageForNodeID");
+                return nil;
+            }
+            if (![otaProviderDelegate respondsToSelector:@selector(handleApplyUpdateRequestForNodeID:controller:params:completion:)]
+                && ![otaProviderDelegate
+                    respondsToSelector:@selector(handleApplyUpdateRequestForNodeID:controller:params:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleApplyUpdateRequestForNodeID");
+                return nil;
+            }
+            if (![otaProviderDelegate respondsToSelector:@selector(handleNotifyUpdateAppliedForNodeID:
+                                                                                           controller:params:completion:)]
+                && ![otaProviderDelegate
+                    respondsToSelector:@selector(handleNotifyUpdateAppliedForNodeID:controller:params:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleNotifyUpdateAppliedForNodeID");
+                return nil;
+            }
+            if (![otaProviderDelegate respondsToSelector:@selector
+                                      (handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:)]
+                && ![otaProviderDelegate respondsToSelector:@selector
+                                         (handleBDXTransferSessionBeginForNodeID:
+                                                                      controller:fileDesignator:offset:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleBDXTransferSessionBeginForNodeID");
+                return nil;
+            }
+            if (![otaProviderDelegate
+                    respondsToSelector:@selector(handleBDXQueryForNodeID:controller:blockSize:blockIndex:bytesToSkip:completion:)]
+                && ![otaProviderDelegate
+                    respondsToSelector:@selector(handleBDXQueryForNodeID:
+                                                              controller:blockSize:blockIndex:bytesToSkip:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleBDXQueryForNodeID");
+                return nil;
+            }
+        }
+
+        _otaProviderDelegate = otaProviderDelegate;
+        _otaProviderDelegateQueue = otaProviderDelegateQueue;
+
         _chipWorkQueue = queue;
         _factory = factory;
         _deviceMapLock = OS_UNFAIR_LOCK_INIT;
@@ -191,8 +271,11 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         // _cppCommissioner, so we're not in a state where we claim to be
         // running but are actually partially shut down.
         _cppCommissioner = nullptr;
-        _storedFabricIndex = chip::kUndefinedFabricIndex;
         commissionerToShutDown->Shutdown();
+        // Don't clear out our fabric index association until controller
+        // shutdown completes, in case it wants to write to storage as it
+        // shuts down.
+        _storedFabricIndex = chip::kUndefinedFabricIndex;
         delete commissionerToShutDown;
         if (_operationalCredentialsDelegate != nil) {
             _operationalCredentialsDelegate->SetDeviceCommissioner(nullptr);
@@ -209,6 +292,16 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 - (void)cleanup
 {
     VerifyOrDie(_cppCommissioner == nullptr);
+
+    if (_defaultDACVerifier) {
+        delete _defaultDACVerifier;
+        _defaultDACVerifier = nullptr;
+    }
+
+    if (_attestationTrustStoreBridge) {
+        delete _attestationTrustStoreBridge;
+        _attestationTrustStoreBridge = nullptr;
+    }
 
     [self clearDeviceAttestationDelegateBridge];
 
@@ -364,7 +457,40 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         // fabric information for the relevant fabric indices on controller
         // bring-up.
         commissionerParams.removeFromFabricTableOnShutdown = false;
-        commissionerParams.deviceAttestationVerifier = _factory.deviceAttestationVerifier;
+        commissionerParams.permitMultiControllerFabrics = startupParams.allowMultipleControllersPerFabric;
+
+        // Set up our attestation verifier.  Assume we want to use the default
+        // one, until something tells us otherwise.
+        const chip::Credentials::AttestationTrustStore * trustStore;
+        if (startupParams.productAttestationAuthorityCertificates) {
+            _attestationTrustStoreBridge
+                = new MTRAttestationTrustStoreBridge(startupParams.productAttestationAuthorityCertificates);
+            trustStore = _attestationTrustStoreBridge;
+        } else {
+            // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
+            trustStore = chip::Credentials::GetTestAttestationTrustStore();
+        }
+
+        _defaultDACVerifier = new chip::Credentials::DefaultDACVerifier(trustStore);
+
+        if (startupParams.certificationDeclarationCertificates) {
+            auto cdTrustStore = _defaultDACVerifier->GetCertificationDeclarationTrustStore();
+            if (cdTrustStore == nullptr) {
+                errorCode = CHIP_ERROR_INCORRECT_STATE;
+            }
+            if ([self checkForStartError:errorCode logMsg:kErrorCDCertStoreInit]) {
+                return;
+            }
+
+            for (NSData * cdSigningCert in startupParams.certificationDeclarationCertificates) {
+                errorCode = cdTrustStore->AddTrustedKey(AsByteSpan(cdSigningCert));
+                if ([self checkForStartError:errorCode logMsg:kErrorCDCertStoreInit]) {
+                    return;
+                }
+            }
+        }
+
+        commissionerParams.deviceAttestationVerifier = _defaultDACVerifier;
 
         auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
 
@@ -700,7 +826,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         } else {
             // TODO: Once we are not supporting setNocChainIssuer this
             // branch can just go away.
-            self->_cppCommissioner->SetDeviceAttestationVerifier(self->_factory.deviceAttestationVerifier);
+            self->_cppCommissioner->SetDeviceAttestationVerifier(self->_defaultDACVerifier);
         }
         return YES;
     };

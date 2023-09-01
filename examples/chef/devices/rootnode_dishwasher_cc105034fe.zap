@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -33,10 +33,9 @@
   ],
   "endpointTypes": [
     {
-      "id": 13,
+      "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 2,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 2,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        2
       ],
       "deviceVersions": [
         1
@@ -6252,10 +6247,9 @@
       ]
     },
     {
-      "id": 14,
+      "id": 2,
       "name": "MA-dishwasher",
       "deviceTypeRef": {
-        "id": 47,
         "code": 117,
         "profileId": 259,
         "label": "MA-dishwasher",
@@ -6263,15 +6257,11 @@
       },
       "deviceTypes": [
         {
-          "id": 47,
           "code": 117,
           "profileId": 259,
           "label": "MA-dishwasher",
           "name": "MA-dishwasher"
         }
-      ],
-      "deviceTypeRefs": [
-        47
       ],
       "deviceVersions": [
         1
@@ -10843,6 +10833,5 @@
       "endpointId": 1,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

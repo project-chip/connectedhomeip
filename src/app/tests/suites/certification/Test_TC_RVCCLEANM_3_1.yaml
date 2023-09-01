@@ -65,7 +65,24 @@ tests:
               minValue: 0
               maxValue: 254
 
+    - label:
+          "If on_mode_dut is equal to old_current_mode_dut proceed to step 4.
+          Else proceed to step 6."
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: on_mode_dut
+              - name: "Value2"
+                value: old_current_mode_dut
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsExpectedValue
+
     - label: "Step 4: TH reads from the DUT the SupportedModes attribute."
+      runIf: IsExpectedValue
       PICS: RVCCLEANM.S.A0000 && RVCCLEANM.S.F00
       command: "readAttribute"
       attribute: "SupportedModes"
@@ -77,6 +94,7 @@ tests:
     - label:
           "Step 5: TH sends a ChangeToMode command to the DUT with NewMode set
           to new_mode_th"
+      runIf: IsExpectedValue
       PICS: RVCCLEANM.S.C00.Rsp && RVCCLEANM.S.F00
       command: "ChangeToMode"
       arguments:

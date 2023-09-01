@@ -152,6 +152,7 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
     """Tests that fail in chip-repl for some reason"""
     return {
         "Test_AddNewFabricFromExistingFabric.yaml",     # chip-repl does not support GetCommissionerRootCertificate and IssueNocChain command
+        "Test_TC_OPCREDS_3_7.yaml",         # chip-repl does not support GetCommissionerRootCertificate and IssueNocChain command
         "TestEqualities.yaml",              # chip-repl does not support pseudo-cluster commands that return a value
         "TestExampleCluster.yaml",          # chip-repl does not load custom pseudo clusters
         "TestAttributesById.yaml",           # chip-repl does not support AnyCommands (06/06/2023)
@@ -174,6 +175,8 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_DGGEN_2_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_LWM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_G_2_4.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_RVCRUNM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_RVCCLEANM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
     }
 
 
