@@ -340,6 +340,43 @@ kotlin_library("chipcluster_test") {
   kotlinc_flags = [ "-Xlint:deprecation" ]
 }
 
+kotlin_library("matter_controller") {
+  output_name = "MatterController.jar"
+
+  deps = [
+    ":java",
+    "${chip_root}/third_party/java_deps:annotation",
+  ]
+
+  sources = [
+    "src/matter/controller/ControllerParams.kt",
+    "src/matter/controller/Paths.kt",
+    "src/matter/controller/States.kt", 
+    "src/matter/controller/Requests.kt",            
+    "src/matter/controller/InvokeCallback.kt",
+    "src/matter/controller/MatterController.kt",
+    "src/matter/controller/MatterControllerException.kt",
+    "src/matter/controller/OperationalKeyConfig.kt",
+    "src/matter/controller/ReportCallback.kt",
+    "src/matter/controller/ResubscriptionAttemptCallback.kt",
+    "src/matter/controller/SubscriptionEstablishedCallback.kt",
+    "src/matter/controller/WriteAttributesCallback.kt",
+  ]
+
+  if (matter_enable_java_compilation) {
+    deps += [
+      "${chip_root}/third_party/java_deps:json",
+      "${chip_root}/third_party/java_deps/stub_src",
+    ]
+  } else {
+    deps += [ ":android" ]
+
+    data_deps += [ "${chip_root}/build/chip/java:shared_cpplib" ]
+  }
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]  
+}
+
 group("unit_tests") {
   deps = [
     ":chipcluster_test",
