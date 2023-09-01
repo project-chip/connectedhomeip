@@ -48,7 +48,7 @@ class TC_RVCRUNM_3_2(MatterBaseTest):
     async def check_preconditions(self, endpoint):
         # check whether the StartUpMode will be overridden by the OnMode attribute
 
-        if self.check_pics("RVCRUNM.S.F00") is False:
+        if not self.check_pics("RVCRUNM.S.F00"):
             return True
 
         logging.info("RVCRUNM.S.F00: 1")
