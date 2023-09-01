@@ -93,7 +93,7 @@ Protocols::InteractionModel::Status Instance::UpdateAirQuality(AirQualityEnum aN
     case AirQualityEnum::kGood:
     case AirQualityEnum::kPoor:
         break;
-    default:{
+    default: {
         return Protocols::InteractionModel::Status::InvalidValue;
     }
     }
