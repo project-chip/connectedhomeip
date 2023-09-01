@@ -26,9 +26,7 @@ TEST_VENDOR_RANGE = range(0xFFF1, 0xFFF4 + 1)
 INVALID_VENDOR_RANGE = range(0xFFF5, 0xFFFF + 1)
 
 ATTRIBUTE_ID_RANGE = range(0x0000, 0x4FFF + 1)
-GLOBAL_ATTRIBUTE_ID_RANGE = range(0xF000, 0xFFFE)
-ATTRIBUTE_INVALID_MAX = 0xFFFF
-
+GLOBAL_ATTRIBUTE_ID_RANGE = range(0xF000, 0xFFFE + 1)
 COMMAND_ID_RANGE = range(0x00, 0xFF + 1)
 COMMAND_ID_INVALID_MAX = 0xFFFF
 
@@ -45,7 +43,7 @@ def validate_attribute_id_range(attribute_id):
     prefix, suffix = split_element_into_prefix_suffix(attribute_id)
 
     if prefix == STANDARD_RANGE:
-        if suffix not in ATTRIBUTE_ID_RANGE and suffix not in GLOBAL_ATTRIBUTE_ID_RANGE or suffix == ATTRIBUTE_INVALID_MAX:
+        if suffix not in ATTRIBUTE_ID_RANGE and suffix not in GLOBAL_ATTRIBUTE_ID_RANGE :
             asserts.fail(f"Invalid attribute id (0x{attribute_id:08X}) in standard range")
 
     elif prefix in MANUFACTURER_CODE_RANGE:
