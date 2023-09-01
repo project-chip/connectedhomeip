@@ -166,7 +166,7 @@ int AppTask::Init()
     // Init Chip memory management before the stack
     Platform::MemoryInit();
 
-    PLAT_LOG("Version 3");
+    PLAT_LOG("Version 1");
 
     CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
