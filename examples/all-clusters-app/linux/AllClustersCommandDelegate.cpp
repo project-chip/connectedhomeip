@@ -167,11 +167,11 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "SetAirQuality")
     {
-        Json::Value jsonAirQualityEnum = self->mJsonValue["Enum"];
+        Json::Value jsonAirQualityEnum = self->mJsonValue["NewValue"];
 
         if (jsonAirQualityEnum.isNull())
         {
-            ChipLogError(NotSpecified, "The SetAirQuality command requires the Enum key.");
+            ChipLogError(NotSpecified, "The SetAirQuality command requires the NewValue key.");
         }
         else
         {
@@ -428,7 +428,7 @@ void AllClustersAppCommandHandler::OnModeChangeHandler(std::string device, std::
     }
 }
 
-void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aEnum)
+void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aNewValue)
 {
     AirQuality::Instance * airQualityInstance = AirQuality::GetInstance();
     Protocols::InteractionModel::Status status =
