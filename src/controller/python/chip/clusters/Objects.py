@@ -18092,6 +18092,9 @@ class DishwasherAlarm(Cluster):
             kTempTooHigh = 0x10
             kWaterLevelError = 0x20
 
+        class Feature(IntFlag):
+            kReset = 0x1
+
     class Commands:
         @dataclass
         class Reset(ClusterCommand):
