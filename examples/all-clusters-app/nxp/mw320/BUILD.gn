@@ -74,6 +74,7 @@ mw320_executable("shell_mw320") {
     "${chip_root}/examples/all-clusters-app/nxp/mw320/include",
   ]
   sources = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp",
