@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -36,7 +36,6 @@
       "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 2,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 2,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        2
       ],
       "deviceVersions": [
         1
@@ -5793,7 +5788,6 @@
       "id": 2,
       "name": "MA-dimmablelight",
       "deviceTypeRef": {
-        "id": 9,
         "code": 257,
         "profileId": 259,
         "label": "MA-dimmablelight",
@@ -5801,23 +5795,17 @@
       },
       "deviceTypes": [
         {
-          "id": 9,
           "code": 257,
           "profileId": 259,
           "label": "MA-dimmablelight",
           "name": "MA-dimmablelight"
         },
         {
-          "id": 3,
           "code": 17,
           "profileId": 259,
           "label": "MA-powersource",
           "name": "MA-powersource"
         }
-      ],
-      "deviceTypeRefs": [
-        9,
-        3
       ],
       "deviceVersions": [
         1,
@@ -9558,6 +9546,5 @@
       "endpointId": 1,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }
