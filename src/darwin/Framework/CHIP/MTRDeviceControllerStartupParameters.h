@@ -28,6 +28,25 @@ MTR_NEWLY_AVAILABLE
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
+ * The Product Attestation Authority certificates that are trusted to sign
+ * device attestation information (and in particular to sign Product Attestation
+ * Intermediate certificates, which then sign Device Attestation Certificates).
+ *
+ * Defaults to nil.
+ */
+@property (nonatomic, copy, nullable) NSArray<MTRCertificateDERBytes> * productAttestationAuthorityCertificates;
+
+/**
+ * The Certification Declaration certificates whose public keys correspond to
+ * private keys that are trusted to sign certification declarations.  Defaults
+ * to nil.
+ *
+ * These certificates are used in addition to, not replacing, the default set of
+ * well-known certification declaration signing keys.
+ */
+@property (nonatomic, copy, nullable) NSArray<MTRCertificateDERBytes> * certificationDeclarationCertificates;
+
+/**
  * Set an MTROperationalCertificateIssuer to call (on the provided queue) when
  * operational certificates need to be provided during commissioning.
  */

@@ -17,7 +17,6 @@
 #import "MTRDeviceControllerFactory.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 
-#import "MTRAttestationTrustStoreBridge.h"
 #import "MTRCertificates.h"
 #import "MTRControllerAccessControl.h"
 #import "MTRDemuxingStorage.h"
@@ -43,8 +42,6 @@
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
-#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
-#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <crypto/RawKeySessionKeystore.h>
 #include <lib/support/Pool.h>
@@ -58,15 +55,12 @@ using namespace chip::Controller;
 
 static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
 static NSString * const kErrorSessionResumptionStorageInit = @"Init failure while creating a session resumption storage delegate";
-static NSString * const kErrorAttestationTrustStoreInit = @"Init failure while creating the attestation trust store";
-static NSString * const kErrorDACVerifierInit = @"Init failure while creating the device attestation verifier";
 static NSString * const kErrorGroupProviderInit = @"Init failure while initializing group data provider";
 static NSString * const kErrorControllersInit = @"Init controllers array failure";
 static NSString * const kErrorCertificateValidityPolicyInit = @"Init certificate validity policy failure";
 static NSString * const kErrorControllerFactoryInit = @"Init failure while initializing controller factory";
 static NSString * const kErrorKeystoreInit = @"Init failure while initializing persistent storage keystore";
 static NSString * const kErrorCertStoreInit = @"Init failure while initializing persistent storage operational certificate store";
-static NSString * const kErrorCDCertStoreInit = @"Init failure while initializing Certificate Declaration Signing Keys store";
 static NSString * const kErrorOtaProviderInit = @"Init failure while creating an OTA provider delegate";
 static NSString * const kErrorSessionKeystoreInit = @"Init failure while initializing session keystore";
 
@@ -78,7 +72,6 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 @property (atomic, readonly) dispatch_queue_t chipWorkQueue;
 @property (readonly) DeviceControllerFactory * controllerFactory;
 @property (readonly) PersistentStorageDelegate * persistentStorageDelegate;
-@property (readonly) MTRAttestationTrustStoreBridge * attestationTrustStoreBridge;
 @property (readonly) MTROTAProviderDelegateBridge * otaProviderDelegateBridge;
 @property (readonly) Crypto::RawKeySessionKeystore * sessionKeystore;
 // We use TestPersistentStorageDelegate just to get an in-memory store to back
@@ -90,7 +83,12 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 @property (readonly) PersistentStorageOperationalKeystore * keystore;
 @property (readonly) Credentials::PersistentStorageOpCertStore * opCertStore;
 @property (readonly) MTROperationalBrowser * operationalBrowser;
-@property () chip::Credentials::DeviceAttestationVerifier * deviceAttestationVerifier;
+
+// productAttestationAuthorityCertificates and certificationDeclarationCertificates are just copied
+// from MTRDeviceControllerFactoryParams.
+@property (readonly, nullable) NSArray<MTRCertificateDERBytes> * productAttestationAuthorityCertificates;
+@property (readonly, nullable) NSArray<MTRCertificateDERBytes> * certificationDeclarationCertificates;
+
 @property (readonly) BOOL advertiseOperational;
 @property (nonatomic, readonly) Credentials::IgnoreCertificateValidityPeriodPolicy * certificateValidityPolicy;
 @property (readonly) MTRSessionResumptionStorageBridge * sessionResumptionStorage;
@@ -291,16 +289,6 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
 - (void)cleanupStartupObjects
 {
-    if (_deviceAttestationVerifier) {
-        delete _deviceAttestationVerifier;
-        _deviceAttestationVerifier = nullptr;
-    }
-
-    if (_attestationTrustStoreBridge) {
-        delete _attestationTrustStoreBridge;
-        _attestationTrustStoreBridge = nullptr;
-    }
-
     if (_otaProviderDelegateBridge) {
         delete _otaProviderDelegateBridge;
         _otaProviderDelegateBridge = nullptr;
@@ -504,44 +492,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
             return;
         }
 
-        // Initialize device attestation verifier
-        const Credentials::AttestationTrustStore * trustStore;
-        if (startupParams.productAttestationAuthorityCertificates) {
-            _attestationTrustStoreBridge
-                = new MTRAttestationTrustStoreBridge(startupParams.productAttestationAuthorityCertificates);
-            if (_attestationTrustStoreBridge == nullptr) {
-                MTR_LOG_ERROR("Error: %@", kErrorAttestationTrustStoreInit);
-                errorCode = CHIP_ERROR_NO_MEMORY;
-                return;
-            }
-            trustStore = _attestationTrustStoreBridge;
-        } else {
-            // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
-            trustStore = Credentials::GetTestAttestationTrustStore();
-        }
-        _deviceAttestationVerifier = new Credentials::DefaultDACVerifier(trustStore);
-        if (_deviceAttestationVerifier == nullptr) {
-            MTR_LOG_ERROR("Error: %@", kErrorDACVerifierInit);
-            errorCode = CHIP_ERROR_NO_MEMORY;
-            return;
-        }
-
-        if (startupParams.certificationDeclarationCertificates) {
-            auto cdTrustStore = _deviceAttestationVerifier->GetCertificationDeclarationTrustStore();
-            if (cdTrustStore == nullptr) {
-                MTR_LOG_ERROR("Error: %@", kErrorCDCertStoreInit);
-                errorCode = CHIP_ERROR_INCORRECT_STATE;
-                return;
-            }
-
-            for (NSData * cdSigningCert in startupParams.certificationDeclarationCertificates) {
-                errorCode = cdTrustStore->AddTrustedKey(AsByteSpan(cdSigningCert));
-                if (errorCode != CHIP_NO_ERROR) {
-                    MTR_LOG_ERROR("Error: %@", kErrorCDCertStoreInit);
-                    return;
-                }
-            }
-        }
+        _productAttestationAuthorityCertificates = [startupParams.productAttestationAuthorityCertificates copy];
+        _certificationDeclarationCertificates = [startupParams.certificationDeclarationCertificates copy];
 
         chip::Controller::FactoryInitParams params;
         if (startupParams.port != nil) {
@@ -827,6 +779,9 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
                                                                                                    params:startupParams];
                               if (params == nil) {
                                   fabricError = CHIP_ERROR_NO_MEMORY;
+                              } else {
+                                  params.productAttestationAuthorityCertificates = self.productAttestationAuthorityCertificates;
+                                  params.certificationDeclarationCertificates = self.certificationDeclarationCertificates;
                               }
 
                               return params;
@@ -879,6 +834,9 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
                                                                                               params:startupParams];
                               if (params == nil) {
                                   fabricError = CHIP_ERROR_NO_MEMORY;
+                              } else {
+                                  params.productAttestationAuthorityCertificates = self.productAttestationAuthorityCertificates;
+                                  params.certificationDeclarationCertificates = self.certificationDeclarationCertificates;
                               }
                               return params;
                           }
@@ -893,13 +851,22 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     return [self _startDeviceController:startupParameters
                           fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
                               FabricTable * fabricTable, MTRDeviceController * controller, CHIP_ERROR & fabricError) {
-                              return
+                              auto * params =
                                   [[MTRDeviceControllerStartupParamsInternal alloc] initForNewController:controller
                                                                                              fabricTable:fabricTable
                                                                                                 keystore:self->_keystore
                                                                                     advertiseOperational:self.advertiseOperational
                                                                                                   params:startupParameters
                                                                                                    error:fabricError];
+                              if (params != nil) {
+                                  if (params.productAttestationAuthorityCertificates == nil) {
+                                      params.productAttestationAuthorityCertificates = self.productAttestationAuthorityCertificates;
+                                  }
+                                  if (params.certificationDeclarationCertificates == nil) {
+                                      params.certificationDeclarationCertificates = self.certificationDeclarationCertificates;
+                                  }
+                              }
+                              return params;
                           }
                                   error:error];
 }

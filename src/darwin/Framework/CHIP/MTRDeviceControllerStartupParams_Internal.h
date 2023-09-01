@@ -96,6 +96,9 @@ MTR_HIDDEN
 
 @property (nonatomic, assign, readonly) BOOL allowMultipleControllersPerFabric;
 
+@property (nonatomic, nullable) NSArray<MTRCertificateDERBytes> * productAttestationAuthorityCertificates;
+@property (nonatomic, nullable) NSArray<MTRCertificateDERBytes> * certificationDeclarationCertificates;
+
 /**
  * A storage delegate that can be provided when initializing the startup params.
  * This must be provided if and only if the controller factory was initialized
