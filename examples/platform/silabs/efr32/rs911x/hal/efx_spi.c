@@ -216,6 +216,7 @@ sl_status_t sl_wfx_host_spi_cs_deassert(void)
     return SL_STATUS_OK;
 }
 
+#if defined(CONFIG_USE_EXTERNAL_FLASH)
 sl_status_t sl_wfx_host_spiflash_cs_assert(void)
 {
     GPIO_PinOutClear(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
@@ -227,7 +228,7 @@ sl_status_t sl_wfx_host_spiflash_cs_deassert(void)
     GPIO_PinOutSet(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
     return SL_STATUS_OK;
 }
-
+#endif // CONFIG_USE_EXTERNAL_FLASH
 sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void)
 {
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
@@ -248,7 +249,9 @@ sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void)
         xSemaphoreGive(spi_sem_sync_hdl);
         return SL_STATUS_FAIL;
     }
+#if defined(CONFIG_USE_EXTERNAL_FLASH)
     sl_wfx_host_spiflash_cs_assert();
+#endif // CONFIG_USE_EXTERNAL_FLASH
     return SL_STATUS_OK;
 }
 
@@ -263,7 +266,9 @@ sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
         return SL_STATUS_FAIL;
     }
     GPIO->USARTROUTE[SL_MX25_FLASH_SHUTDOWN_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
+#if defined(CONFIG_USE_EXTERNAL_FLASH)
     sl_wfx_host_spiflash_cs_deassert();
+#endif // CONFIG_USE_EXTERNAL_FLASH
     xSemaphoreGive(spi_sem_sync_hdl);
     return SL_STATUS_OK;
 }
