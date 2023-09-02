@@ -197,13 +197,15 @@ void BLWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callba
     {
         if (!ssid.empty())
         {
-            if (ssid.size() <= sizeof(mScanSSID)) {
+            if (ssid.size() <= sizeof(mScanSSID))
+            {
                 memset(mScanSSID, 0, sizeof(mScanSSID));
                 memcpy(mScanSSID, ssid.data(), ssid.size());
                 iret      = wifi_mgmr_scan_adv(NULL, NULL, NULL, 0, NULL, mScanSSID, 1, 0);
                 mScanType = 1;
             }
-            else {
+            else
+            {
                 iret = -1;
             }
         }
