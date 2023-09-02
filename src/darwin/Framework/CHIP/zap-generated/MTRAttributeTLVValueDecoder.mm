@@ -1778,6 +1778,7 @@ static id _Nullable DecodeAttributeValueForDescriptorCluster(
         }
         return value;
     }
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::TagList::Id: {
         using TypeInfo = Attributes::TagList::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -1825,6 +1826,7 @@ static id _Nullable DecodeAttributeValueForDescriptorCluster(
         }
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
     case Attributes::GeneratedCommandList::Id: {
         using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -4604,6 +4606,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(
         }
         return value;
     }
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::EndpointList::Id: {
         using TypeInfo = Attributes::EndpointList::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -4630,6 +4633,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(
         }
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
     case Attributes::GeneratedCommandList::Id: {
         using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
         TypeInfo::DecodableType cppValue;
