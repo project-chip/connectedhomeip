@@ -39,8 +39,6 @@ namespace Controller {
 
 static const int MILLIS_SINCE_BOOT  = 0;
 static const int MILLIS_SINCE_EPOCH = 1;
-// Add the bytes for attribute tag(1:control + 8:tag + 8:length) and structure(1:struct + 1:close container)
-static const int EXTRA_SPACE_FOR_ATTRIBUTE_TAG = 19;
 
 GetConnectedDeviceCallback::GetConnectedDeviceCallback(jobject wrapperCallback, jobject javaCallback) :
     mOnSuccess(OnDeviceConnectedFn, this), mOnFailure(OnDeviceConnectionFailureFn, this)
@@ -225,32 +223,6 @@ void ReportCallback::OnReportEnd()
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
-// Convert TLV blob to Json with structure, the element's tag is replaced with the actual attributeId.
-CHIP_ERROR ConvertReportTlvToJson(const uint32_t id, TLV::TLVReader & data, std::string & json)
-{
-    TLV::TLVWriter writer;
-    TLV::TLVReader readerForJavaTLV;
-    uint32_t size = 0;
-    readerForJavaTLV.Init(data);
-    size_t bufferLen                  = readerForJavaTLV.GetTotalLength() + EXTRA_SPACE_FOR_ATTRIBUTE_TAG;
-    std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(new uint8_t[bufferLen]);
-    writer.Init(buffer.get(), bufferLen);
-    TLV::TLVType outer;
-
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer));
-    TLV::Tag tag;
-    ReturnErrorOnFailure(ConvertTlvTag(id, tag));
-    ReturnErrorOnFailure(writer.CopyElement(tag, readerForJavaTLV));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    size = writer.GetLengthWritten();
-
-    TLV::TLVReader readerForJson;
-    readerForJson.Init(buffer.get(), size);
-    ReturnErrorOnFailure(readerForJson.Next());
-    // Convert TLV to JSON
-    return TlvToJson(readerForJson, json);
-}
-
 void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                                      const app::StatusIB & aStatus)
 {
@@ -314,7 +286,7 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
 
     // Convert TLV to JSON
     std::string json;
-    err = ConvertReportTlvToJson(static_cast<uint32_t>(aPath.mAttributeId), *apData, json);
+    err = TlvToJsonWithStruct(static_cast<uint32_t>(aPath.mAttributeId), *apData, json);
     VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(attributePathObj, nullptr, err));
     UtfString jsonString(env, json.c_str());
 
@@ -444,7 +416,7 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
 
     // Convert TLV to JSON
     std::string json;
-    err = ConvertReportTlvToJson(static_cast<uint32_t>(aEventHeader.mPath.mEventId), *apData, json);
+    err = TlvToJsonWithStruct(static_cast<uint32_t>(aEventHeader.mPath.mEventId), *apData, json);
     VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(eventPathObj, nullptr, err));
     UtfString jsonString(env, json.c_str());
 

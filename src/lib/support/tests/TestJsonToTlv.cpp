@@ -317,6 +317,26 @@ int Initialize(void * apSuite)
     return SUCCESS;
 }
 
+void TestJsonToTlvWithoutStruct(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVReader reader;
+    bool expectedVal       = false;
+    std::string jsonString = "{\n"
+                             "   \"1:BOOL\" : true\n"
+                             "}\n";
+
+    MutableByteSpan data(gBuf1);
+    JsonToTlvWithoutStruct(jsonString, data);
+
+    reader.Init(data);
+    err = reader.Next();
+    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    err = reader.Get(expectedVal);
+    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(gSuite, expectedVal == true);
+}
+
 int Finalize(void * aContext)
 {
     chip::Platform::MemoryShutdown();
@@ -328,6 +348,7 @@ const nlTest sTests[] =
 {
     NL_TEST_DEF("TestConverter", TestConverter),
     NL_TEST_DEF("Test32BitConvert", Test32BitConvert),
+    NL_TEST_DEF("TestJsonToTlvWithoutStruct", TestJsonToTlvWithoutStruct),
     NL_TEST_SENTINEL()
 };
 // clang-format on

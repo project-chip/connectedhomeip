@@ -48,4 +48,12 @@ std::string PrettyPrintJsonString(const std::string & jsonString);
  */
 std::string MakeJsonSingleLine(const std::string & jsonString);
 
+/*
+ *
+ * The TLV blob from the report during read/subscribe Interaction does not have a struct container, but the tlvToJson function
+ * expects the struct container for the TLV payload. Before converting to JSON, this convenient function firstly adds the struct
+ * container, if id is less than or equal to UINT8_MAX, it would encodes with the context tag, if id is larger than UINT8_MAX and
+ * less than or equal to UINT32_MAX, it would encodes with the implicit profile tag
+ */
+CHIP_ERROR TlvToJsonWithStruct(uint32_t id, const TLV::TLVReader & data, std::string & jsonString);
 } // namespace chip
