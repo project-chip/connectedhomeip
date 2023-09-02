@@ -1814,6 +1814,12 @@ enum class AlarmMap : uint32_t
     kTempTooHigh     = 0x10,
     kWaterLevelError = 0x20,
 };
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kReset = 0x1,
+};
 } // namespace DishwasherAlarm
 
 namespace OperationalState {

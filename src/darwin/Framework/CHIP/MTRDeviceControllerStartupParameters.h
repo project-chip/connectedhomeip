@@ -18,6 +18,7 @@
 
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
+#import <Matter/MTROTAProviderDelegate.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -47,11 +48,23 @@ MTR_NEWLY_AVAILABLE
 @property (nonatomic, copy, nullable) NSArray<MTRCertificateDERBytes> * certificationDeclarationCertificates;
 
 /**
+ * Whether the controller should advertise its operational identity.  Defaults
+ * to NO.
+ */
+@property (nonatomic, assign) BOOL shouldAdvertiseOperational;
+
+/**
  * Set an MTROperationalCertificateIssuer to call (on the provided queue) when
  * operational certificates need to be provided during commissioning.
  */
 - (void)setOperationalCertificateIssuer:(id<MTROperationalCertificateIssuer>)operationalCertificateIssuer
                                   queue:(dispatch_queue_t)queue;
+
+/**
+ * Set an MTROTAProviderDelegate to call (on the provided queue).  Only needs to
+ * be called if this controller should be able to handle OTA for devices.
+ */
+- (void)setOTAProviderDelegate:(id<MTROTAProviderDelegate>)otaProviderDelegate queue:(dispatch_queue_t)queue;
 
 @end
 

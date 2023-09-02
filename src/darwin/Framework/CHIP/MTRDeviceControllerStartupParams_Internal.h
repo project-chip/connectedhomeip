@@ -77,6 +77,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly) dispatch_queue_t storageDelegateQueue;
 @property (nonatomic, strong, readonly) NSUUID * uniqueIdentifier;
 
+@property (nonatomic, strong, readonly, nullable) id<MTROTAProviderDelegate> otaProviderDelegate;
+@property (nonatomic, strong, readonly, nullable) dispatch_queue_t otaProviderDelegateQueue;
+
 @end
 
 MTR_HIDDEN

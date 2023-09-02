@@ -264,6 +264,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
     _productAttestationAuthorityCertificates = nil;
     _certificationDeclarationCertificates = nil;
+    _shouldAdvertiseOperational = NO;
 
     _ipk = ipk;
     _vendorID = vendorID;
@@ -287,6 +288,13 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     _operationalCertificateIssuer = operationalCertificateIssuer;
     _operationalCertificateIssuerQueue = queue;
 }
+
+- (void)setOTAProviderDelegate:(id<MTROTAProviderDelegate>)otaProviderDelegate queue:(dispatch_queue_t)queue
+{
+    _otaProviderDelegate = otaProviderDelegate;
+    _otaProviderDelegateQueue = queue;
+}
+
 @end
 
 @implementation MTRDeviceControllerExternalCertificateStartupParameters

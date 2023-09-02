@@ -518,32 +518,6 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadDeviceType(ConnectivityManager::Thr
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-CHIP_ERROR ThreadStackManagerImpl::_GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
-{
-    (void) intervalsConfig;
-
-    ChipLogError(DeviceLayer, "SED intervals config is not supported on linux");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
-{
-    (void) intervalsConfig;
-
-    ChipLogError(DeviceLayer, "SED intervals config is not supported on linux");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_RequestSEDActiveMode(bool onOff, bool delayIdle)
-{
-    (void) onOff;
-    (void) delayIdle;
-
-    ChipLogError(DeviceLayer, "SED intervals config is not supported on linux");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-#endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 CHIP_ERROR ThreadStackManagerImpl::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
 {
