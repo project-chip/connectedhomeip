@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -33,10 +33,9 @@
   ],
   "endpointTypes": [
     {
-      "id": 2,
+      "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 2,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 2,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        2
       ],
       "deviceVersions": [
         1
@@ -224,7 +219,7 @@
           "mfgCode": null,
           "define": "GROUPS_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "AddGroupResponse",
@@ -4689,7 +4684,7 @@
           "mfgCode": null,
           "define": "SWITCH_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "NumberOfPositions",
@@ -5464,10 +5459,9 @@
       ]
     },
     {
-      "id": 1,
+      "id": 2,
       "name": "MA-extendedcolorlight",
       "deviceTypeRef": {
-        "id": 11,
         "code": 269,
         "profileId": 259,
         "label": "MA-extendedcolorlight",
@@ -5475,15 +5469,11 @@
       },
       "deviceTypes": [
         {
-          "id": 11,
           "code": 269,
           "profileId": 259,
           "label": "MA-extendedcolorlight",
           "name": "MA-extendedcolorlight"
         }
-      ],
-      "deviceTypeRefs": [
-        11
       ],
       "deviceVersions": [
         1
@@ -8287,7 +8277,7 @@
           "mfgCode": null,
           "define": "OCCUPANCY_SENSING_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "Occupancy",
