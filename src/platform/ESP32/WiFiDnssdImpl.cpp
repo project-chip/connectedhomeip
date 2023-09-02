@@ -27,6 +27,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/ESP32/ESP32Utils.h>
 
 namespace {
 
@@ -332,9 +333,8 @@ static CHIP_ERROR OnBrowseDone(BrowseContext * ctx)
                 if (ctx->mInterfaceId == chip::Inet::InterfaceId::Null())
                 {
                     // If the InterfaceId in the context is Null, we will use the Station netif by default.
-                    struct netif * lwip_netif =
-                        reinterpret_cast<struct netif *>(esp_netif_get_netif_impl(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF")));
-                    ctx->mService[servicesIndex].mInterface = chip::Inet::InterfaceId(lwip_netif);
+                    ctx->mService[servicesIndex].mInterface =
+                        Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetStationNetif());
                 }
                 else
                 {
@@ -419,9 +419,7 @@ static CHIP_ERROR ParseSrvResult(ResolveContext * ctx)
         if (ctx->mInterfaceId == chip::Inet::InterfaceId::Null())
         {
             // If the InterfaceId in the context is Null, we will use the Station netif by default.
-            struct netif * lwip_netif =
-                reinterpret_cast<struct netif *>(esp_netif_get_netif_impl(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF")));
-            ctx->mService->mInterface = chip::Inet::InterfaceId(lwip_netif);
+            ctx->mService->mInterface = Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetStationNetif());
         }
         else
         {

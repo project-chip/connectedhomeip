@@ -223,7 +223,7 @@ const char * ESP32Utils::WiFiModeToStr(wifi_mode_t wifiMode)
 
 struct netif * ESP32Utils::GetStationNetif(void)
 {
-    return GetNetif("WIFI_STA_DEF");
+    return GetNetif(kDefaultWiFiStationNetifKey);
 }
 
 CHIP_ERROR ESP32Utils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials)
@@ -322,7 +322,7 @@ CHIP_ERROR ESP32Utils::InitWiFiStack(void)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     // Lets not create a default AP interface if already present
-    if (!esp_netif_get_handle_from_ifkey("WIFI_AP_DEF"))
+    if (!esp_netif_get_handle_from_ifkey(kDefaultWiFiAPNetifKey))
     {
         if (!esp_netif_create_default_wifi_ap())
         {
@@ -333,7 +333,7 @@ CHIP_ERROR ESP32Utils::InitWiFiStack(void)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 
     // Lets not create a default station interface if already present
-    if (!esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"))
+    if (!esp_netif_get_handle_from_ifkey(kDefaultWiFiStationNetifKey))
     {
         if (!esp_netif_create_default_wifi_sta())
         {
