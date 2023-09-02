@@ -268,6 +268,7 @@ sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
     return SL_STATUS_OK;
 }
 
+#if defined(DISPLAY_ENABLED)
 sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
 {
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
@@ -297,7 +298,7 @@ sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
     xSemaphoreGive(spi_sem_sync_hdl);
     return SL_STATUS_OK;
 }
-
+#endif // DISPLAY_ENABLED
 #endif /* EFR32MG24 */
 
 /*****************************************************************************
