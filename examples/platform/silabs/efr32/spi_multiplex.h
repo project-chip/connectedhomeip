@@ -124,6 +124,7 @@ sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void);
  *****************************************************************************/
 sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void);
 
+#if defined(DISPLAY_ENABLED)
 /****************************************************************************
  * @fn  sl_status_t sl_wfx_host_pre_lcd_spi_transfer()
  * @brief
@@ -141,6 +142,7 @@ sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void);
  * @return SL_STATUS_OK
  *****************************************************************************/
 sl_status_t sl_wfx_host_post_lcd_spi_transfer(void);
+#endif // DISPLAY_ENABLED
 
 #if defined(WF200_WIFI)
 /****************************************************************************
