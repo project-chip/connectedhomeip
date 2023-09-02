@@ -47,10 +47,12 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  */
 @property (readonly, nonatomic, getter=isRunning) BOOL running;
 
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 /**
  * The ID assigned to this controller at creation time.
  */
 @property (readonly, nonatomic) NSUUID * uniqueIdentifier MTR_NEWLY_AVAILABLE;
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 /**
  * Return the Node ID assigned to the controller.  Will return nil if the
