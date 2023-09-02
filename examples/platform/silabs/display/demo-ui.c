@@ -102,11 +102,11 @@ void demoUIInit(GLIB_Context_t * context)
 
 sl_status_t updateDisplay(void)
 {
-#if (defined(EFR32MG24) && defined(SL_WIFI))
+#if (defined(EFR32MG24) && defined(SL_WIFI) && defined(DISPLAY_ENABLED))
     sl_wfx_host_pre_lcd_spi_transfer();
 #endif
     sl_status_t status = DMD_updateDisplay();
-#if (defined(EFR32MG24) && defined(SL_WIFI))
+#if (defined(EFR32MG24) && defined(SL_WIFI) && defined(DISPLAY_ENABLED))
     sl_wfx_host_post_lcd_spi_transfer();
 #endif
     if (status != DMD_OK)
