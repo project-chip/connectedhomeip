@@ -31,6 +31,9 @@ public:
     virtual void NewConnection(Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator);
     virtual void NewConnection(Ble::BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj);
     virtual CHIP_ERROR CancelConnection();
+
+private:
+    CHIP_ERROR DoCancel();
 };
 
 } // namespace Internal
