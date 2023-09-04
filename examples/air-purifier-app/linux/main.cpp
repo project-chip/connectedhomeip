@@ -25,61 +25,42 @@
 
 #define AIR_PURIFIER_ENDPOINT 1
 #define AIR_QUALITY_SENSOR_ENDPOINT 2
-#define RELATIVE_HUMIDITY_SENSOR_ENDPOINT 3
-#define TEMPERATURE_SENSOR_ENDPOINT 4
+#define TEMPERATURE_SENSOR_ENDPOINT 3
+#define RELATIVE_HUMIDITY_SENSOR_ENDPOINT 4
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-static AirPurifierManager * sAirPurifierManager = nullptr;
+static bool gInitialized = false;
 
-// TODO: Make a generic version of this as part of the AirPurifierManager interface, then offload this to there in common code, so
-// we can keep this slim for each impl
+// The MatterPostAttributeChangeCallback is offloaded to the main Air Purifier Manager class.
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
-    if ((attributePath.mClusterId == FanControl::Id) && (attributePath.mAttributeId == FanControl::Attributes::PercentSetting::Id))
+    if (gInitialized)
     {
-        DataModel::Nullable<Percent> percentSetting = static_cast<DataModel::Nullable<uint8_t>>(*value);
-        if (percentSetting.IsNull())
-        {
-            sAirPurifierManager->PercentSettingChangedCallback(0);
-        }
-        else
-        {
-            sAirPurifierManager->PercentSettingChangedCallback(percentSetting.Value());
-        }
-    }
-    else if ((attributePath.mClusterId == FanControl::Id) &&
-             (attributePath.mAttributeId == FanControl::Attributes::SpeedSetting::Id))
-    {
-        DataModel::Nullable<uint8_t> speedSetting = static_cast<DataModel::Nullable<uint8_t>>(*value);
-        if (speedSetting.IsNull())
-        {
-            sAirPurifierManager->SpeedSettingChangedCallback(0);
-        }
-        else
-        {
-            sAirPurifierManager->SpeedSettingChangedCallback(speedSetting.Value());
-        }
+        AirPurifierManager::GetInstance().PostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId,
+                                                                      attributePath.mAttributeId, type, size, value);
     }
 }
 
+// Initialize the Air Purifier Manager and set up the endpoint composition tree.
 void ApplicationInit()
 {
+    AirPurifierManager::GetInstance(EndpointId(AIR_PURIFIER_ENDPOINT), EndpointId(AIR_QUALITY_SENSOR_ENDPOINT),
+                                    EndpointId(TEMPERATURE_SENSOR_ENDPOINT), EndpointId(RELATIVE_HUMIDITY_SENSOR_ENDPOINT))
+
+        .Init();
     SetParentEndpointForEndpoint(AIR_QUALITY_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
     SetParentEndpointForEndpoint(TEMPERATURE_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
     SetParentEndpointForEndpoint(RELATIVE_HUMIDITY_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
-
-    sAirPurifierManager =
-        new AirPurifierManager(EndpointId(AIR_PURIFIER_ENDPOINT), EndpointId(AIR_QUALITY_SENSOR_ENDPOINT),
-                               EndpointId(TEMPERATURE_SENSOR_ENDPOINT), EndpointId(RELATIVE_HUMIDITY_SENSOR_ENDPOINT));
+    gInitialized = true;
 }
 
 void ApplicationShutdown()
 {
-    ChipLogDetail(NotSpecified, "Air Purifier: ApplicationInit()");
+    ChipLogDetail(NotSpecified, "Air Purifier: ApplicationShutdown()");
 }
 
 int main(int argc, char * argv[])

@@ -47,10 +47,9 @@ public:
                                               ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
         formaldehydeConcentrationMeasurementInstance(mEndpointId, FormaldehydeConcentrationMeasurement::Id,
                                                      ConcentrationMeasurement::MeasurementMediumEnum::kAir,
-                                                     ConcentrationMeasurement::MeasurementUnitEnum::kPpm)
-    {
-        Init();
-    };
+                                                     ConcentrationMeasurement::MeasurementUnitEnum::kPpm){};
+
+    void Init();
 
 private:
     EndpointId mEndpointId;
@@ -66,7 +65,6 @@ private:
         totalVolatileOrganicCompoundsConcentrationMeasurementInstance;
     ConcentrationMeasurement::Instance<true, true, true, true, true, true> ozoneConcentrationMeasurementInstance;
     ConcentrationMeasurement::Instance<true, true, true, true, true, true> formaldehydeConcentrationMeasurementInstance;
-    void Init();
 
     // TODO: Add public OnChange handlers for the AQ and Concentrations - maybe not required?
 };
