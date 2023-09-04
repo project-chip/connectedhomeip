@@ -38,6 +38,7 @@ declare_args() {
 
   wifi_soc = false
   wifi_soc_common_flash = false
+  sdk_support_board = ""
 
   #Disable MQTT by default
   enable_dic = false
@@ -106,6 +107,7 @@ if (silabs_board == "BRD4304A") {
   disable_lcd = true
   show_qr_code = false
   wifi_soc = true
+  sdk_support_board = "BRD4325x"
 } else if (silabs_board == "BRD4325C") {
   silabs_family = "SiWx917-common"
   silabs_mcu = "SiWG917M111MGTBA"
@@ -113,6 +115,7 @@ if (silabs_board == "BRD4304A") {
   show_qr_code = false
   wifi_soc = true
   wifi_soc_common_flash = true
+  sdk_support_board = "BRD4325x"
 } else if (silabs_board == "BRD4325G") {
   silabs_family = "SiWx917-common"
   silabs_mcu = "SiWG917M111MGTBA"
@@ -120,6 +123,7 @@ if (silabs_board == "BRD4304A") {
   show_qr_code = false
   wifi_soc = true
   wifi_soc_common_flash = true
+  sdk_support_board = "BRD4325x"
 } else if (silabs_board == "BRD4338A") {
   silabs_family = "SiWx917-common"
   silabs_mcu = "SiWG917M111MGTBA"
@@ -127,6 +131,7 @@ if (silabs_board == "BRD4304A") {
   show_qr_code = false
   wifi_soc = true
   wifi_soc_common_flash = true
+  sdk_support_board = "BRD4338A"
 } else if (silabs_board == "BRD4180A") {
   assert(
       false,
