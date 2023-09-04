@@ -33,8 +33,8 @@ CHIP_ERROR AndroidControllerExceptions::CreateAndroidControllerException(JNIEnv 
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
     JniClass controllerExceptionJniCls(controllerExceptionCls);
 
-    jmethodID exceptionConstructor = env->GetMethodID(controllerExceptionCls, "<init>", "(JLjava/lang/String;)V");
-    outEx = (jthrowable) env->NewObject(controllerExceptionCls, exceptionConstructor, static_cast<jlong>(errorCode),
+    jmethodID exceptionConstructor = env->GetMethodID(controllerExceptionCls, "<init>", "(ILjava/lang/String;)V");
+    outEx = (jthrowable) env->NewObject(controllerExceptionCls, exceptionConstructor, static_cast<jint>(errorCode),
                                         env->NewStringUTF(message));
     VerifyOrReturnError(outEx != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
     return CHIP_NO_ERROR;
