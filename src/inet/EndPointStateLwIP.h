@@ -22,8 +22,9 @@
 
 #pragma once
 
-#include <inet/EndPointBasis.h>
+#include <functional>
 
+#include <inet/EndPointBasis.h>
 #include <inet/IPAddress.h>
 
 struct udp_pcb;
@@ -46,6 +47,10 @@ protected:
         UDP     = 1,
         TCP     = 2
     } mLwIPEndPointType;
+
+    // Synchronously runs a function within the TCPIP task's context.
+    static void RunOnTCPIP(std::function<void()>);
+    static err_t RunOnTCPIPRet(std::function<err_t()>);
 };
 
 } // namespace Inet
