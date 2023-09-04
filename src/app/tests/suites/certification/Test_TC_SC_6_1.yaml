@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    18.2.1. [TC-SC-6.1] Adding member to a group - DUT as Admin and TH as Group
+    26.4.1. [TC-SC-6.1] Adding member to a group - DUT as Admin and TH as Group
     Member [DUT-Client]
 
 PICS:
@@ -38,7 +38,9 @@ tests:
           DUT supports Groups Cluster
       disabled: true
 
-    - label: "TH should have the ACL entry with the AuthMode as Group by DUT"
+    - label:
+          "Step 1a: TH should have the ACL entry with the AuthMode as Group by
+          DUT"
       verification: |
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]' 1 0
 
@@ -114,21 +116,27 @@ tests:
       disabled: true
 
     - label:
-          "DUT generates fabric-unique GroupID, GroupName, random key, EpochKey0
-          and GroupKeySetID. Admin sets GroupKeySecurityPolicy = TrustFirst (0)
-          EpochStartTime0 = 0"
+          "Step 1b: DUT generates fabric-unique GroupID, GroupName, random key,
+          EpochKey0 and GroupKeySetID. Admin sets GroupKeySecurityPolicy =
+          TrustFirst (0) EpochStartTime0 = 1"
       verification: |
-
+          Sample epoch key values that will be used in the forthcomming steps:
+          "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 1,"epochKey1":
+          "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
+          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002
+          Sample Group Name: Grp1
+          GroupKeySetID: 42
+          GroupID = 1
       disabled: true
 
     - label:
-          "DUT sends KeySetWrite command to GroupKeyManagement cluster to TH on
-          EP0"
+          "Step 2: DUT sends KeySetWrite command to GroupKeyManagement cluster
+          to TH on EP0"
       PICS: GRPKEY.C.C00.Tx
       verification: |
           ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 42,
           "groupKeySecurityPolicy": 0, "epochKey0":
-          "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
+          "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 1,"epochKey1":
           "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
           "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0
 
@@ -136,59 +144,57 @@ tests:
 
           [1651471040.120912][4012:4012] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:2398599 on exchange 35559r
           [1651471040.120980][4012:4012] CHIP:EM: Handling via exchange: 35559r, Delegate: 0xaaaaca97a088
-          [1651471040.121098][4012:4012] CHIP:DMG: InvokeRequestMessage =
-          [1651471040.121146][4012:4012] CHIP:DMG: {
-          [1651471040.121188][4012:4012] CHIP:DMG:        suppressResponse = false,
-          [1651471040.121238][4012:4012] CHIP:DMG:        timedRequest = false,
-          [1651471040.121282][4012:4012] CHIP:DMG:        InvokeRequests =
-          [1651471040.121346][4012:4012] CHIP:DMG:        [
-          [1651471040.121390][4012:4012] CHIP:DMG:                CommandDataIB =
-          [1651471040.121453][4012:4012] CHIP:DMG:                {
-          [1651471040.121501][4012:4012] CHIP:DMG:                        CommandPathIB =
-          [1651471040.121587][4012:4012] CHIP:DMG:                        {
-          [1651471040.121648][4012:4012] CHIP:DMG:                                EndpointId = 0x0,
-          [1651471040.121710][4012:4012] CHIP:DMG:                                ClusterId = 0x3f,
-          [1651471040.121775][4012:4012] CHIP:DMG:                                CommandId = 0x0,
-          [1651471040.121831][4012:4012] CHIP:DMG:                        },
-          [1651471040.121891][4012:4012] CHIP:DMG:
-          [1651471040.121941][4012:4012] CHIP:DMG:                        CommandData =
-          [1651471040.122003][4012:4012] CHIP:DMG:                        {
-          [1651471040.122058][4012:4012] CHIP:DMG:                                0x0 =
-          [1651471040.122116][4012:4012] CHIP:DMG:                                {
-          [1651471040.122171][4012:4012] CHIP:DMG:                                   0x0 = 42,
-          [1651471040.122222][4012:4012] CHIP:DMG:                                   0x1 = 0,
-          [1651471040.122276][4012:4012] CHIP:DMG:                                   0x2 = [
-          [1651471040.122339][4012:4012] CHIP:DMG:                                   0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf,
-          [1651471040.122390][4012:4012] CHIP:DMG:                                ]
-          [1651471040.122439][4012:4012] CHIP:DMG:                                   0x3 = 2220000,
-          [1651471040.122488][4012:4012] CHIP:DMG:                                   0x4 = [
-          [1651471040.122543][4012:4012] CHIP:DMG:                                   0xd1, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf,
-          [1651471040.122591][4012:4012] CHIP:DMG:                                ]
-          [1651471040.122639][4012:4012] CHIP:DMG:                                   0x5 = 2220001,
-          [1651471040.122684][4012:4012] CHIP:DMG:                                   0x6 = [
-          [1651471040.122739][4012:4012] CHIP:DMG:                                   0xd2, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf,
-          [1651471040.122791][4012:4012] CHIP:DMG:                                ]
-          [1651471040.122840][4012:4012] CHIP:DMG:                                   0x7 = 2220002,
-          [1651471040.122890][4012:4012] CHIP:DMG:                                },
-          [1651471040.122937][4012:4012] CHIP:DMG:                        },
-          [1651471040.122979][4012:4012] CHIP:DMG:                },
-          [1651471040.123032][4012:4012] CHIP:DMG:
-          [1651471040.123066][4012:4012] CHIP:DMG:        ],
-          [1651471040.123115][4012:4012] CHIP:DMG:
-          [1651471040.123151][4012:4012] CHIP:DMG:        InteractionModelRevision = 1
-          [1651471040.123185][4012:4012] CHIP:DMG: },
-          [1651471040.123286][4012:4012] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003F e=0 p=a
-          [1651471040.123337][4012:4012] CHIP:DMG: AccessControl: allowed
+          [1693548451.902266][9666:9666] CHIP:DMG: InvokeRequestMessage =
+          [1693548451.902273][9666:9666] CHIP:DMG: {
+          [1693548451.902278][9666:9666] CHIP:DMG: 	suppressResponse = false,
+          [1693548451.902286][9666:9666] CHIP:DMG: 	timedRequest = false,
+          [1693548451.902293][9666:9666] CHIP:DMG: 	InvokeRequests =
+          [1693548451.902308][9666:9666] CHIP:DMG: 	[
+          [1693548451.902314][9666:9666] CHIP:DMG: 		CommandDataIB =
+          [1693548451.902327][9666:9666] CHIP:DMG: 		{
+          [1693548451.902334][9666:9666] CHIP:DMG: 			CommandPathIB =
+          [1693548451.902342][9666:9666] CHIP:DMG: 			{
+          [1693548451.902349][9666:9666] CHIP:DMG: 				EndpointId = 0x0,
+          [1693548451.902357][9666:9666] CHIP:DMG: 				ClusterId = 0x3f,
+          [1693548451.902365][9666:9666] CHIP:DMG: 				CommandId = 0x0,
+          [1693548451.902371][9666:9666] CHIP:DMG: 			},
+          [1693548451.902380][9666:9666] CHIP:DMG:
+          [1693548451.902389][9666:9666] CHIP:DMG: 			CommandFields =
+          [1693548451.902397][9666:9666] CHIP:DMG: 			{
+          [1693548451.902405][9666:9666] CHIP:DMG: 				0x0 =
+          [1693548451.902413][9666:9666] CHIP:DMG: 				{
+          [1693548451.902422][9666:9666] CHIP:DMG: 					0x0 = 42,
+          [1693548451.902431][9666:9666] CHIP:DMG: 					0x1 = 0,
+          [1693548451.902439][9666:9666] CHIP:DMG: 					0x2 = [
+          [1693548451.902450][9666:9666] CHIP:DMG: 							0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf,
+          [1693548451.902460][9666:9666] CHIP:DMG: 					] (16 bytes)
+          [1693548451.902471][9666:9666] CHIP:DMG: 					0x3 = 1,
+          [1693548451.902479][9666:9666] CHIP:DMG: 					0x4 = [
+          [1693548451.902491][9666:9666] CHIP:DMG: 							0xd1, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf,
+          [1693548451.902500][9666:9666] CHIP:DMG: 					] (16 bytes)
+          [1693548451.902509][9666:9666] CHIP:DMG: 					0x5 = 2220001,
+          [1693548451.902517][9666:9666] CHIP:DMG: 					0x6 = [
+          [1693548451.902527][9666:9666] CHIP:DMG: 							0xd2, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf,
+          [1693548451.902536][9666:9666] CHIP:DMG: 					] (16 bytes)
+          [1693548451.902544][9666:9666] CHIP:DMG: 					0x7 = 2220002,
+          [1693548451.902553][9666:9666] CHIP:DMG: 				},
+          [1693548451.902560][9666:9666] CHIP:DMG: 			},
+          [1693548451.902567][9666:9666] CHIP:DMG: 		},
+          [1693548451.902581][9666:9666] CHIP:DMG:
+          [1693548451.902587][9666:9666] CHIP:DMG: 	],
+          [1693548451.902599][9666:9666] CHIP:DMG:
+          [1693548451.902606][9666:9666] CHIP:DMG: 	InteractionModelRevision = 10
+          [1693548451.902613][9666:9666] CHIP:DMG: },
       disabled: true
 
     - label:
-          "DUT binds GroupID with GroupKeySetID in the GroupKeyMap attribute
-          list on GroupKeyManagement cluster"
+          "Step 3: DUT binds GroupID with GroupKeySetID in the GroupKeyMap
+          attribute list on GroupKeyManagement cluster"
       PICS: GRPKEY.C.A0000
       verification: |
           ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 1, "groupKeySetID": 42, "fabricIndex": 1}]' 1 0
 
-          Verify TH recieves GroupKeyMap attribute on TH(Reference app)log:
+          Verify TH recieves the binding of GroupKeySetID with the GroupID on TH(Reference app)log:
 
           [1659350562.020669][5824:5824] CHIP:EM: Received message of type 0x6 with protocolId (0, 1) and MessageCounter:167021683 on exchange 31153r
           [1659350562.020897][5824:5824] CHIP:EM: Handling via exchange: 31153r, Delegate: 0xaaaacb304f08
@@ -240,7 +246,7 @@ tests:
           [1659350562.022661][5824:5824] CHIP:DMG: AccessControl: allowed
       disabled: true
 
-    - label: "DUT sends AddGroup Command to TH on EP0"
+    - label: "Step 4: DUT sends AddGroup Command to TH on EP0"
       PICS: G.C.C00.Tx
       verification: |
           ./chip-tool groups add-group 0x0001 grp1 1 0
@@ -280,8 +286,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends ViewGroup command with the GroupID and GroupName to the
-          Group cluster on the TH on EP0"
+          "Step 5: DUT sends ViewGroup command with the GroupID and GroupName to
+          the Group cluster on the TH on EP0"
       PICS: G.C.C01.Tx
       verification: |
           ./chip-tool groups view-group 0x0001 1 0
@@ -319,7 +325,7 @@ tests:
           [1651471144.502628][4012:4012] CHIP:DMG: AccessControl: allowed
       disabled: true
 
-    - label: "DUT sends KeySetRead Command to TH"
+    - label: "Step 6: DUT sends KeySetRead Command to TH"
       PICS: GRPKEY.C.C01.Tx
       verification: |
           ./chip-tool groupkeymanagement key-set-read 42 1 0
@@ -358,8 +364,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT reads GroupKeyMap Attribute from the GroupKeyManagement cluster
-          from TH"
+          "Step 7: DUT reads GroupKeyMap Attribute from the GroupKeyManagement
+          cluster from TH"
       PICS: GRPKEY.C.A0000
       verification: |
           ./chip-tool groupkeymanagement read group-key-map 1 0
@@ -394,7 +400,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT reads GroupTable attribute from GroupKeyManagement cluster on TH"
+          "Step 8: DUT reads GroupTable attribute from GroupKeyManagement
+          cluster on TH"
       PICS: GRPKEY.C.A0001
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0

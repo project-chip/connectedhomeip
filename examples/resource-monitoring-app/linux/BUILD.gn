@@ -31,8 +31,8 @@ config("includes") {
 executable("chip-resource-monitoring-app") {
   sources = [
     "${chip_root}/examples/resource-monitoring-app/resource-monitoring-common/src/ReplacementProductListManager.cpp",
-    "${chip_root}/examples/resource-monitoring-app/resource-monitoring-common/src/instances/ActivatedCarbonFilterMonitoring.cpp",
-    "${chip_root}/examples/resource-monitoring-app/resource-monitoring-common/src/instances/HepaFilterMonitoring.cpp",
+    "${chip_root}/examples/resource-monitoring-app/resource-monitoring-common/src/delegates/ActivatedCarbonFilterMonitoring.cpp",
+    "${chip_root}/examples/resource-monitoring-app/resource-monitoring-common/src/delegates/HepaFilterMonitoring.cpp",
     "include/CHIPProjectAppConfig.h",
     "src/main.cpp",
   ]
@@ -40,7 +40,7 @@ executable("chip-resource-monitoring-app") {
   deps = [
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/examples/resource-monitoring-app/resource-monitoring-common",
-    "${chip_root}/examples/resource-monitoring-app/resource-monitoring-common:instances",
+    "${chip_root}/examples/resource-monitoring-app/resource-monitoring-common:delegates",
     "${chip_root}/src/lib",
   ]
 

@@ -303,17 +303,17 @@ namespace BinaryInputBasic {
 namespace Attributes {
 
 namespace ActiveText {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace ActiveText
 
 namespace Description {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace Description
 
 namespace InactiveText {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace InactiveText
 
@@ -428,7 +428,7 @@ namespace Actions {
 namespace Attributes {
 
 namespace SetupURL {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // long_char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // long_char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace SetupURL
 
@@ -449,7 +449,7 @@ namespace BasicInformation {
 namespace Attributes {
 
 namespace NodeLabel {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace NodeLabel
 
@@ -530,7 +530,7 @@ namespace LocalizationConfiguration {
 namespace Attributes {
 
 namespace ActiveLocale {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace ActiveLocale
 
@@ -626,7 +626,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace Order
 
 namespace Description {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace Description
 
@@ -715,7 +715,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 } // namespace BatPresent
 
 namespace BatReplacementDescription {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace BatReplacementDescription
 
@@ -726,12 +726,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::B
 } // namespace BatCommonDesignation
 
 namespace BatANSIDesignation {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace BatANSIDesignation
 
 namespace BatIECDesignation {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace BatIECDesignation
 
@@ -1012,7 +1012,7 @@ namespace BridgedDeviceBasicInformation {
 namespace Attributes {
 
 namespace VendorName {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace VendorName
 
@@ -1022,12 +1022,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::VendorId value);
 } // namespace VendorID
 
 namespace ProductName {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace ProductName
 
 namespace NodeLabel {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace NodeLabel
 
@@ -1037,7 +1037,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace HardwareVersion
 
 namespace HardwareVersionString {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace HardwareVersionString
 
@@ -1047,32 +1047,32 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace SoftwareVersion
 
 namespace SoftwareVersionString {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace SoftwareVersionString
 
 namespace ManufacturingDate {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace ManufacturingDate
 
 namespace PartNumber {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace PartNumber
 
 namespace ProductURL {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // long_char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // long_char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace ProductURL
 
 namespace ProductLabel {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace ProductLabel
 
 namespace SerialNumber {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace SerialNumber
 
@@ -1082,7 +1082,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 } // namespace Reachable
 
 namespace UniqueID {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace UniqueID
 
@@ -1299,7 +1299,7 @@ namespace ModeSelect {
 namespace Attributes {
 
 namespace Description {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace Description
 
@@ -1829,7 +1829,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace NumberOfCredentialsSupportedPerUser
 
 namespace Language {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace Language
 
@@ -2743,7 +2743,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace DriftCompensation
 
 namespace CompensationText {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace CompensationText
 
@@ -3055,12 +3055,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace LampQuantity
 
 namespace LampType {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace LampType
 
 namespace LampManufacturer {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace LampManufacturer
 
@@ -3598,7 +3598,7 @@ namespace WakeOnLan {
 namespace Attributes {
 
 namespace MACAddress {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace MACAddress
 
@@ -3821,7 +3821,7 @@ namespace ApplicationBasic {
 namespace Attributes {
 
 namespace VendorName {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace VendorName
 
@@ -3831,7 +3831,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::VendorId value);
 } // namespace VendorID
 
 namespace ApplicationName {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace ApplicationName
 
@@ -3847,7 +3847,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ApplicationBas
 } // namespace Status
 
 namespace ApplicationVersion {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace ApplicationVersion
 
@@ -4669,22 +4669,22 @@ EmberAfStatus Set(chip::EndpointId endpoint, double value);
 } // namespace FloatDouble
 
 namespace OctetString {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan value); // octet_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value); // octet_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value);
 } // namespace OctetString
 
 namespace LongOctetString {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan value); // long_octet_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value); // long_octet_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value);
 } // namespace LongOctetString
 
 namespace CharString {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace CharString
 
 namespace LongCharString {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // long_char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // long_char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace LongCharString
 

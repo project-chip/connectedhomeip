@@ -127,7 +127,6 @@
 #define SCAN_BITMAP_OPTN_1 (1)
 #define IP_CONF_RSP_BUFF_LENGTH_4 (4)
 #define STATION (0)
-#define BG_SCAN_RES_SIZE (500)
 
 #define SPI_CONFIG_SUCCESS (0)
 

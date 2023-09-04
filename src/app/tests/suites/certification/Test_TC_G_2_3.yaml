@@ -52,10 +52,8 @@ tests:
           d1d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime1: 2220001 EpochKey2:
           d2d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime2: 2220002"
       verification: |
-          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1, "groupKeySecurityPolicy": 0, "epochKey0":
-          "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
-          "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
-          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0
+          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1,"groupKeySecurityPolicy": 0, "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 1,"epochKey1":"d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 18446744073709551613,"epochKey2":"d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 18446744073709551614 }' 1 0
+
 
           Verify DUT responds with SUCCESS status response on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
 

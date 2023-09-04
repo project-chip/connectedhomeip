@@ -918,16 +918,27 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(remoteDeviceId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
 
-    bool stopped = mSetUpCodePairer.StopPairing(remoteDeviceId);
+    ChipLogProgress(Controller, "StopPairing called for node ID 0x" ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
 
-    CommissioneeDeviceProxy * device = FindCommissioneeDevice(remoteDeviceId);
-    if (device != nullptr)
+    // If we're still in the process of discovering the device, just stop the SetUpCodePairer
+    if (mSetUpCodePairer.StopPairing(remoteDeviceId))
     {
-        ReleaseCommissioneeDevice(device);
-        stopped = true;
+        return CHIP_NO_ERROR;
     }
 
-    return (stopped) ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR;
+    // Otherwise we might be pairing and / or commissioning it.
+    CommissioneeDeviceProxy * device = FindCommissioneeDevice(remoteDeviceId);
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
+
+    if (mDeviceBeingCommissioned == device)
+    {
+        CommissioningStageComplete(CHIP_ERROR_CANCELLED);
+    }
+    else
+    {
+        ReleaseCommissioneeDevice(device);
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)

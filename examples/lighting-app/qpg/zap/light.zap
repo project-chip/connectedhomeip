@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -36,7 +36,6 @@
       "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 2,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 2,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        2
       ],
       "deviceVersions": [
         1
@@ -6419,7 +6414,6 @@
       "id": 2,
       "name": "MA-dimmablelight",
       "deviceTypeRef": {
-        "id": 11,
         "code": 269,
         "profileId": 259,
         "label": "MA-extendedcolorlight",
@@ -6427,15 +6421,11 @@
       },
       "deviceTypes": [
         {
-          "id": 11,
           "code": 269,
           "profileId": 259,
           "label": "MA-extendedcolorlight",
           "name": "MA-extendedcolorlight"
         }
-      ],
-      "deviceTypeRefs": [
-        11
       ],
       "deviceVersions": [
         1
@@ -10329,6 +10319,5 @@
       "endpointId": 1,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

@@ -19,7 +19,7 @@ config("config") {
   include_dirs = [ "include" ]
 }
 
-source_set("instances") {
+source_set("delegates") {
   public_configs = [ ":config" ]
 }
 
