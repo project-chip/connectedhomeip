@@ -1,6 +1,6 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
-//
+
 struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
