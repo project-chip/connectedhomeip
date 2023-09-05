@@ -22,6 +22,7 @@ import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
 declare_args() {
   # Location of the k32w1 SDK.
@@ -197,7 +198,6 @@ template("k32w1_sdk") {
       "SERIAL_MANAGER_NON_BLOCKING_MODE=1",
       "SERIAL_USE_CONFIGURE_STRUCTURE=1",
       "SDK_COMPONENT_INTEGRATION=1",
-      "SERIAL_PORT_TYPE_UART=1",
       "gSerialManagerMaxInterfaces_c=1",
       "SDK_OS_FREE_RTOS",
       "gAppHighSystemClockFrequency_d=1",
@@ -258,6 +258,16 @@ template("k32w1_sdk") {
       "gAdvertisingPowerLeveldBm_c=0",
       "gConnectPowerLeveldBm_c=0",
     ]
+
+    if (chip_enable_pw_rpc) {
+      defines += [
+        "SERIAL_PORT_TYPE_UART_DMA=1"
+      ]
+    } else {
+      defines += [
+        "SERIAL_PORT_TYPE_UART=1"
+      ]
+    }
 
     if (chip_with_low_power == 1 && chip_logging == true) {
       print("WARNING: enabling logs in low power might break the LP timings. Use at your own risk!")
@@ -396,6 +406,12 @@ template("k32w1_sdk") {
         "${k32w1_sdk_root}/devices/K32W1480/utilities/str/fsl_str.c",
       ]
 
+      if (chip_enable_pw_rpc) {
+        sources += [
+          "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_edma.c",
+          "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_lpuart_edma.c"
+        ]
+      }
     } else {
       sources += [
       "${k32w1_sdk_root}/middleware/wireless/bluetooth/application/common/ble_init.c",
@@ -418,6 +434,13 @@ template("k32w1_sdk") {
       "${k32w1_sdk_root}/platform/utilities/debug_console/fsl_debug_console.c",
       "${k32w1_sdk_root}/platform/utilities/str/fsl_str.c",
       ]
+
+      if (chip_enable_pw_rpc) {
+        sources += [
+          "${k32w1_sdk_root}/platform/drivers/lpuart/fsl_edma.c",
+          "${k32w1_sdk_root}/platform/drivers/lpuart/fsl_lpuart_edma.c"
+        ]
+      }
     }
 
     sources += [
