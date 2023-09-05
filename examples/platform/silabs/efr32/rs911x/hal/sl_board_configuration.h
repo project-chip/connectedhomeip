@@ -44,6 +44,14 @@ typedef struct
 #else
 #error "Need SPI Pins"
 #endif /* EFR32MG12_BRD4161A */
+#if EXP_BOARD && (defined(EFR32MG24_BRD4187C) || defined(BRD4187C) || defined(EFR32MG24_BRD4186C) || defined(BRD4186C))
+#define RESET_PIN PIN(A, 6)
+#define INTERRUPT_PIN PIN(A, 7)
+#define SLEEP_CONFIRM_PIN PIN(A, 5) /* Exp hdr 7 */
+#define SL_WFX_HOST_PINOUT_SPI_IRQ 5
+#endif
+
+
 #define NETWORK_INTERFACE_VALID(x) \
   (x == SL_NET_DEFAULT_WIFI_CLIENT_INTERFACE) || (x == SL_NET_DEFAULT_WIFI_AP_INTERFACE)
 #endif /* _RSI_BOARD_CONFIGURATION_H_ */
