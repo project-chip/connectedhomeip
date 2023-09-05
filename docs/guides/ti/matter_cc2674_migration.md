@@ -72,7 +72,7 @@ CC2674P10 device
 8. Move the `*.syscfg` file into the
    `matter/examples/[application]/cc13x4_26x4/` folder. Make sure that the
    `args.gni` parameters are aligned for the `CC2674P10RGZ` as detailed above,
-   and build the example using the `README.md` instructions. 
+   and build the example using the `README.md` instructions.
 
 ## Modifications required for the CC2674R10
 
@@ -80,14 +80,16 @@ After applying all items in the "Configuring `chip.syscfg` in the SysConfig GUI"
 section, additional steps must also be applied to generate Matter project for
 the CC2674R10.
 
-* `examples/[application]/cc13x4_26x4/args.gni` should have
-  `ti_simplelink_board` as `CC2674` and `ti_simplelink_device = CC2674R10RGZ`.
-* `examples/[application]/cc13x4_26x4/chip.syscfg` opened with a Text Editor
-  should change `ble.radioConfig.codeExportConfig.$name` to
-  `ti_devices_radioconfig_code_export_param2` and `ble.rfDesign` to `LP_EM_CC1354P10_1`
+-   `examples/[application]/cc13x4_26x4/args.gni` should have
+    `ti_simplelink_board` as `CC2674` and `ti_simplelink_device = CC2674R10RGZ`.
+-   `examples/[application]/cc13x4_26x4/chip.syscfg` opened with a Text Editor
+    should change `ble.radioConfig.codeExportConfig.$name` to
+    `ti_devices_radioconfig_code_export_param2` and `ble.rfDesign` to
+    `LP_EM_CC1354P10_1`
 
 Furthermore, the subsequent changes apply specifically for the CC2674R10 and
 should be addressed from a SysConfig Editor.
+
 1. Pins will need to be reconfigured as such:
 
     | SysConfig pin name | R10 `PinMux`|
@@ -99,10 +101,10 @@ should be addressed from a SysConfig Editor.
     | CONFIG_LED_RED     | `DIO_6`     |
     | CONFIG_LED_GREEN   | `DIO_7`     |
 
-2. *Custom -> IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8 -> Code Export Configuration*,
-  acknowledge and dismiss the PA radio setup error
-3. *Custom -> IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8 -> RF Command Symbols*,
-  change `CMD_RADIO_SETUP` from `RF_cmdRadioSetup` to `RF_cmdIeeeRadioSetup` and
-  add the following functions from the drop-down: `CMD_TX_TEST`,
-  `CMD_IEEE_ED_SCAN`, `CMD_IEEE_CSMA`, and `CMD_IEEE_RX_ACK`
+2. _Custom -> IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8 -> Code Export
+   Configuration_, acknowledge and dismiss the PA radio setup error
+3. _Custom -> IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8 -> RF Command
+   Symbols_, change `CMD_RADIO_SETUP` from `RF_cmdRadioSetup` to
+   `RF_cmdIeeeRadioSetup` and add the following functions from the drop-down:
+   `CMD_TX_TEST`,`CMD_IEEE_ED_SCAN`, `CMD_IEEE_CSMA`, and `CMD_IEEE_RX_ACK`
   

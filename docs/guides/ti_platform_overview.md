@@ -110,12 +110,12 @@ SimpleLink SDK.
 
 <hr>
 
-## CC2674 Migration 
+## CC2674 Migration
 
 For instructions on how to migrate the CC1354P10-6 examples to either the
 CC2674P10 or the CC2674R10, please refer to the guide linked below.
 
--  [TI CC2674 Migration Guide](ti/matter_cc2674_migration.md)
+-   [TI CC2674 Migration Guide](ti/matter_cc2674_migration.md)
 
 <hr>
 
