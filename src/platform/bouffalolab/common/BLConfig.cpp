@@ -111,9 +111,20 @@ CHIP_ERROR BLConfig::WriteConfigValue(const char * key, uint8_t * val, size_t si
 
     ef_port_env_lock();
 
-    if (size && val)
+
+    if (size)
     {
-        ret = ef_set_env_blob(key, val, size);
+        if (val) {
+            ret = ef_set_env_blob(key, val, size);
+        }
+        else {
+            ret = EF_ENV_ARG_ERR;
+        }
+    }
+    else 
+    {
+        uint8_t value_null = 0;
+        ret = ef_set_env_blob(key, &value_null, size);
     }
 
     ef_port_env_unlock();
@@ -240,11 +251,21 @@ CHIP_ERROR BLConfig::WriteKVS(const char * key, const void * value, size_t value
 
     ef_port_env_lock();
 
-    if (value && value_size)
-    {
-        ret = ef_set_env_blob(key, value, value_size);
-    }
 
+    if (value_size) 
+    {
+        if (value) {
+            ret = ef_set_env_blob(key, value, value_size);
+        }
+        else {
+            ret = EF_ENV_ARG_ERR;
+        }
+    }
+    else 
+    {
+        uint32_t value_null = 0;
+        ret = ef_set_env_blob(key, &value_null, value_size);
+    }
     ef_port_env_unlock();
 
     if (ret == EF_NO_ERR)

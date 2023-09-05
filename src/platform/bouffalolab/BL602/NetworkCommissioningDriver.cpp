@@ -44,10 +44,10 @@ CHIP_ERROR BLWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     size_t ssidLen        = 0;
     size_t credentialsLen = 0;
 
-    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiSSID, mSavedNetwork.credentials,
+    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiPassword, mSavedNetwork.credentials,
                                                    sizeof(mSavedNetwork.credentials), &credentialsLen);
     SuccessOrExit(err);
-    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiPassword, mSavedNetwork.ssid,
+    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiSSID, mSavedNetwork.ssid,
                                                    sizeof(mSavedNetwork.ssid), &ssidLen);
     SuccessOrExit(err);
 
@@ -160,8 +160,14 @@ CHIP_ERROR BLWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
     memcpy(passwd, key, keyLen);
     wifi_interface_t wifi_interface;
     wifi_interface = wifi_mgmr_sta_enable();
-    wifi_mgmr_sta_connect(&wifi_interface, wifi_ssid, passwd, NULL, NULL, 0, 0);
-
+    if(keyLen < 8 && keyLen != 5)
+    {
+        wifi_mgmr_sta_connect(&wifi_interface, wifi_ssid, NULL, NULL, NULL, 0, 0);
+    }
+    else
+    {
+        wifi_mgmr_sta_connect(&wifi_interface, wifi_ssid, passwd, NULL, NULL, 0, 0);
+    }
     return CHIP_NO_ERROR;
 }
 
