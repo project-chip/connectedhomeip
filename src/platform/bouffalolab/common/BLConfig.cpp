@@ -124,7 +124,7 @@ CHIP_ERROR BLConfig::WriteConfigValue(const char * key, uint8_t * val, size_t si
     }
     else
     {
-        uint8_t value_null = 0;
+        uint32_t value_null = 0;
         ret                = ef_set_env_blob(key, &value_null, size);
     }
 
