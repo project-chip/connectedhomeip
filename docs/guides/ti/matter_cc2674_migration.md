@@ -92,14 +92,14 @@ should be addressed from a SysConfig Editor.
 
 1. Pins will need to be reconfigured as such:
 
-    | SysConfig pin name | R10 `PinMux`|
-    | ------------------ | ----------- |
-    | UART_RX            | `DIO_2`     |
-    | UART_TX            | `DIO_3`     |
-    | CONFIG_BTN_LEFT    | `DIO_13`    |
-    | CONFIG_BTN_RIGHT   | `DIO_14`    |
-    | CONFIG_LED_RED     | `DIO_6`     |
-    | CONFIG_LED_GREEN   | `DIO_7`     |
+    | SysConfig pin name | R10 `PinMux` |
+    | ------------------ | -----------  |
+    | UART_RX            | `DIO_2`      |
+    | UART_TX            | `DIO_3`      |
+    | CONFIG_BTN_LEFT    | `DIO_13`     |
+    | CONFIG_BTN_RIGHT   | `DIO_14`     |
+    | CONFIG_LED_RED     | `DIO_6`      |
+    | CONFIG_LED_GREEN   | `DIO_7`      |
 
 2. _Custom -> IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8 -> Code Export
    Configuration_, acknowledge and dismiss the PA radio setup error
@@ -107,4 +107,5 @@ should be addressed from a SysConfig Editor.
    Symbols_, change `CMD_RADIO_SETUP` from `RF_cmdRadioSetup` to
    `RF_cmdIeeeRadioSetup` and add the following functions from the drop-down:
    `CMD_TX_TEST`,`CMD_IEEE_ED_SCAN`, `CMD_IEEE_CSMA`, and `CMD_IEEE_RX_ACK`
+   
   
