@@ -64,10 +64,23 @@
 #endif
 #endif
 
+// pw RPC uses UART DMA by default
 #ifdef PW_RPC_ENABLED
 #define CONSUMER_TASK_HANDLE RpcTaskHandle
+#ifndef STREAMER_UART_USE_DMA
+#define STREAMER_UART_USE_DMA 1
+#endif
 #else
 #define CONSUMER_TASK_HANDLE AppMatterCliTaskHandle
+#ifndef STREAMER_UART_USE_DMA
+#define STREAMER_UART_USE_DMA 0
+#endif
+#endif // PW_RPC_ENABLED
+
+#if STREAMER_UART_USE_DMA
+typedef serial_port_uart_dma_config_t streamer_serial_port_uart_config_t;
+#else
+typedef serial_port_uart_config_t streamer_serial_port_uart_config_t;
 #endif
 
 /* -------------------------------------------------------------------------- */
@@ -85,24 +98,34 @@ static SERIAL_MANAGER_HANDLE_DEFINE(streamerSerialHandle);
 static SERIAL_MANAGER_WRITE_HANDLE_DEFINE(streamerSerialWriteHandle);
 static SERIAL_MANAGER_READ_HANDLE_DEFINE(streamerSerialReadHandle);
 static volatile int txCount = 0;
-static char cacheBuffer;
+static bool readDone = true;
 
-static serial_port_uart_config_t uartConfig = {
-                                               .clockRate    = BOARD_APP_UART_CLK_FREQ,
-                                               .baudRate     = BOARD_DEBUG_UART_BAUDRATE,
-                                               .parityMode   = kSerialManager_UartParityDisabled,
-                                               .stopBitCount = kSerialManager_UartOneStopBit,
-                                               .enableRx     = 1,
-                                               .enableTx     = 1,
-                                               .enableRxRTS  = 0,
-                                               .enableTxCTS  = 0,
-                                               .instance     = BOARD_APP_UART_INSTANCE};
+static streamer_serial_port_uart_config_t uartConfig = {
+    .clockRate    = BOARD_APP_UART_CLK_FREQ,
+    .baudRate     = BOARD_DEBUG_UART_BAUDRATE,
+    .parityMode   = kSerialManager_UartParityDisabled,
+    .stopBitCount = kSerialManager_UartOneStopBit,
+    .enableRx     = 1,
+    .enableTx     = 1,
+    .enableRxRTS  = 0,
+    .enableTxCTS  = 0,
+    .instance     = BOARD_APP_UART_INSTANCE,
+#if STREAMER_UART_USE_DMA
+    .dma_instance = 0,
+    .rx_channel   = 1,
+    .tx_channel   = 0
+#endif
+};
 
 static uint8_t s_ringBuffer[STREAMER_UART_SERIAL_MANAGER_RING_BUFFER_SIZE];
 static const serial_manager_config_t s_serialManagerConfig = {
     .ringBuffer     = &s_ringBuffer[0],
     .ringBufferSize = STREAMER_UART_SERIAL_MANAGER_RING_BUFFER_SIZE,
+#if STREAMER_UART_USE_DMA
+    .type           = kSerialPort_UartDma,
+#else
     .type           = BOARD_DEBUG_UART_TYPE,
+#endif
     .blockType      = kSerialManager_NonBlocking,
     .portConfig     = (serial_port_uart_config_t *) &uartConfig,
 };
@@ -122,6 +145,13 @@ int streamer_nxp_init(streamer_t * streamer)
 #if defined(RW612_SERIES) || defined(RW610_SERIES)
     /* attach FRG3 clock to FLEXCOMM3 */
     BOARD_CLIAttachClk();
+#endif
+
+#if STREAMER_UART_USE_DMA
+    dma_channel_mux_configure_t dma_channel_mux;
+    dma_channel_mux.dma_dmamux_configure.dma_tx_channel_mux = kDmaRequestLPUART1Tx;
+    dma_channel_mux.dma_dmamux_configure.dma_rx_channel_mux = kDmaRequestLPUART1Rx;
+    uartConfig.dma_channel_mux_configure                    = &dma_channel_mux;
 #endif
 
     /*
@@ -156,7 +186,8 @@ int streamer_nxp_init(streamer_t * streamer)
 
 ssize_t streamer_nxp_read(streamer_t * streamer, char * buffer, size_t length)
 {
-    assert(length == 1);
+    uint32_t bytesRead = 0;
+    serial_manager_status_t status = kStatus_SerialManager_Success;
 
     if (length != 0)
     {
@@ -164,11 +195,26 @@ ssize_t streamer_nxp_read(streamer_t * streamer, char * buffer, size_t length)
          * If the reading process is over,
          * let CLI Task enter blocked state until notification
         **/
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        *buffer = cacheBuffer;
+        if (readDone)
+        {
+            ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+            readDone = false;
+        }
+
+        status = SerialManager_TryRead((serial_read_handle_t)streamerSerialReadHandle, (uint8_t *)buffer, length, &bytesRead);
+        assert(status != kStatus_SerialManager_Error);
+
+        /**
+         * If we are at the end of the line or the buffer is empty,
+         * consider the reading process done
+        **/
+        if ((buffer[length-1] == '\n') || (buffer[length-1] == '\r') || (bytesRead == 0))
+        {
+            readDone = true;
+        }
     }
 
-    return length;
+    return bytesRead;
 }
 
 ssize_t streamer_nxp_write(streamer_t * streamer, const char * buffer, size_t length)
@@ -218,19 +264,8 @@ static void Uart_RxCallBack(void *pData, serial_manager_callback_message_t *mess
 {
     if (CONSUMER_TASK_HANDLE != NULL)
     {
-        uint32_t bytesRead = 0;
-        auto res = SerialManager_TryRead((serial_read_handle_t)streamerSerialReadHandle, (uint8_t *)&cacheBuffer, 1, &bytesRead);
-        assert(res != kStatus_SerialManager_Error);
-
-        /**
-         * If we are at the end of the line or the buffer is empty,
-         * consider the reading process done
-        **/
-        if ((cacheBuffer != '\n') && (cacheBuffer != '\r') && (bytesRead != 0))
-        {
-            /* notify the main loop that a RX buffer is available */
-            xTaskNotifyGive(CONSUMER_TASK_HANDLE);
-        }
+        /* notify the main loop that a RX buffer is available */
+        xTaskNotifyGive(CONSUMER_TASK_HANDLE);
     }
 }
 
