@@ -33,20 +33,26 @@ public:
     AirPurifierManager(const AirPurifierManager &&)            = delete;
     AirPurifierManager & operator=(const AirPurifierManager &) = delete;
 
+    static void InitInstance(EndpointId aEndpointId = 1, EndpointId aAirQualitySensorEndpointId = 2,
+                             EndpointId aTemperatureSensorEndpointId = 3, EndpointId aHumiditySensorEndpointId = 4)
+    {
+        if (mInstance == nullptr)
+        {
+            mInstance = new AirPurifierManager(aEndpointId, aAirQualitySensorEndpointId, aTemperatureSensorEndpointId,
+                                               aHumiditySensorEndpointId);
+            mInstance->Init();
+        }
+    };
+
     /**
      * @brief Get an Air Purifier Manager object - this class acts as a singleton device manager for the air purifier
      * @param[in] aEndpointId    Endpoint that the air purifier is on
      * @param[in] aAirQualitySensorEndpointId    Endpoint that the air quality sensor is on
      * @param[in] aTemperatureSensorEndpointId    Endpoint that the temperature sensor is on
      * @param[in] aHumiditySensorEndpointId    Endpoint that the humidity sensor is on
+     * @return mInstance    The AirPurifierManager instance, note this this could be nullptr if InitInstance has not been called
      */
-    static AirPurifierManager & GetInstance(EndpointId aEndpointId = 1, EndpointId aAirQualitySensorEndpointId = 2,
-                                            EndpointId aTemperatureSensorEndpointId = 3, EndpointId aHumiditySensorEndpointId = 4)
-    {
-        static AirPurifierManager instance(aEndpointId, aAirQualitySensorEndpointId, aTemperatureSensorEndpointId,
-                                           aHumiditySensorEndpointId);
-        return instance;
-    }
+    static AirPurifierManager * GetInstance() { return mInstance; };
 
     /**
      * @brief Initialize the Air Purifier Manager and call init on underlying composed members.
@@ -69,6 +75,8 @@ public:
     void SpeedSettingChangedCallback(uint8_t aNewSpeedSetting);
 
 private:
+    inline static AirPurifierManager * mInstance;
+
     EndpointId mEndpointId;
     EndpointId mAirQualitySensorEndpointId;
     EndpointId mTemperatureSensorEndpointId;

@@ -32,30 +32,26 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-static bool gInitialized = false;
-
 // The MatterPostAttributeChangeCallback is offloaded to the main Air Purifier Manager class.
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
-    if (gInitialized)
+    if (AirPurifierManager::GetInstance() != nullptr)
     {
-        AirPurifierManager::GetInstance().PostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId,
-                                                                      attributePath.mAttributeId, type, size, value);
+        AirPurifierManager::GetInstance()->PostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId,
+                                                                       attributePath.mAttributeId, type, size, value);
     }
 }
 
 // Initialize the Air Purifier Manager and set up the endpoint composition tree.
 void ApplicationInit()
 {
-    AirPurifierManager::GetInstance(EndpointId(AIR_PURIFIER_ENDPOINT), EndpointId(AIR_QUALITY_SENSOR_ENDPOINT),
-                                    EndpointId(TEMPERATURE_SENSOR_ENDPOINT), EndpointId(RELATIVE_HUMIDITY_SENSOR_ENDPOINT))
+    AirPurifierManager::InitInstance(EndpointId(AIR_PURIFIER_ENDPOINT), EndpointId(AIR_QUALITY_SENSOR_ENDPOINT),
+                                     EndpointId(TEMPERATURE_SENSOR_ENDPOINT), EndpointId(RELATIVE_HUMIDITY_SENSOR_ENDPOINT));
 
-        .Init();
     SetParentEndpointForEndpoint(AIR_QUALITY_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
     SetParentEndpointForEndpoint(TEMPERATURE_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
     SetParentEndpointForEndpoint(RELATIVE_HUMIDITY_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
-    gInitialized = true;
 }
 
 void ApplicationShutdown()
