@@ -93,7 +93,7 @@ should be addressed from a SysConfig Editor.
 1. Pins will need to be reconfigured as such:
 
     | SysConfig pin name | R10 `PinMux` |
-    | ------------------ | -----------  |
+    | ------------------ | ------------ |
     | UART_RX            | `DIO_2`      |
     | UART_TX            | `DIO_3`      |
     | CONFIG_BTN_LEFT    | `DIO_13`     |
