@@ -16,21 +16,24 @@
  *    limitations under the License.
  */
 
-#include <string>
+#include <algorithm>
+#include <json/json.h>
 
 namespace chip {
-/*
- * Pretty-prints the input Json string using standard library pretty-printer.
- * This pretty-printer generates a Json string in a human friendly format with 3 space indentation
- * and nice representation of arrays and objects.
- * The input can be any string, as long as it's valid Json.
- */
-std::string PrettyPrintJsonString(const std::string & jsonString);
+std::string PrettyPrintJsonString(const std::string & jsonString)
+{
+    Json::Reader reader;
+    Json::Value jsonObject;
+    reader.parse(jsonString, jsonObject);
+    Json::StyledWriter writer;
+    return writer.write(jsonObject);
+}
 
-/*
- * Reformats the input Json string as a single-line string with no spaces or newlines.
- * The input can be any string, as long as it's valid Json.
- */
-std::string MakeJsonSingleLine(const std::string & jsonString);
+std::string MakeJsonSingleLine(const std::string & jsonString)
+{
+    std::string str = PrettyPrintJsonString(jsonString);
+    str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
+    return str;
+}
 
 } // namespace chip

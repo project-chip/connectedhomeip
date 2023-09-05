@@ -24,6 +24,7 @@ static_library("jsontlv") {
     "JsonToTlv.cpp",
     "TlvJson.cpp",
     "TlvToJson.cpp",
+    "TextFormat.cpp",
   ]
 
   public = [
