@@ -72,7 +72,10 @@ add_definitions(
 
 target_sources(app PRIVATE
                src/AppTask.cpp
-              #  src/ZclCallbacks.cpp
+               src/ZclCallbacks.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/../resource-monitoring-common/src/ReplacementProductListManager.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/../resource-monitoring-common/src/delegates/ActivatedCarbonFilterMonitoring.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/../resource-monitoring-common/src/delegates/HepaFilterMonitoring.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp

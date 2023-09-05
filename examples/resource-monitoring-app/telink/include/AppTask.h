@@ -22,17 +22,11 @@
 
 class AppTask : public AppTaskCommon
 {
-public:
-void UpdateClusterState(void);
-
 private:
     friend AppTask & GetAppTask(void);
     friend class AppTaskCommon;
 
     CHIP_ERROR Init(void);
-
-    static void AirQualityActionEventHandler(AppEvent * aEvent);
-    static void SelfTestHandler(AppEvent * aEvent);
 
     static AppTask sAppTask;
 };

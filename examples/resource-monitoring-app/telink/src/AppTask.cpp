@@ -16,9 +16,8 @@
  *    limitations under the License.
  */
 
-#include "AppConfig.h"
 #include "AppTask.h"
-#include <platform/CHIPDeviceLayer.h>
+
 #include <app/server/Server.h>
 #include <StaticReplacementProductListManager.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
@@ -26,8 +25,6 @@
 #include <delegates/ActivatedCarbonFilterMonitoring.h>
 #include <delegates/HepaFilterMonitoring.h>
 #include <stdint.h>
-
-#include <app-common/zap-generated/attributes/Accessors.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
@@ -59,15 +56,12 @@ static ResourceMonitoring::Instance gActivatedCarbonFilterInstance(&gActivatedCa
 
 CHIP_ERROR AppTask::Init(void)
 {
-#if APP_USE_EXAMPLE_START_BUTTON
-    SetExampleButtonCallbacks(AirQualityActionEventHandler);
-#endif
     InitCommonParts();
 
     gHepaFilterInstance.Init();
     gActivatedCarbonFilterInstance.Init();
 
-   CHIP_ERROR err = ConnectivityMgr().SetBLEDeviceName("TelinkResourceMonitoringDevice");
+   CHIP_ERROR err = ConnectivityMgr().SetBLEDeviceName("TelinkResMonDevice");
     if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("SetBLEDeviceName fail");
@@ -75,28 +69,4 @@ CHIP_ERROR AppTask::Init(void)
     }
 
     return CHIP_NO_ERROR;
-}
-
-void AppTask::UpdateClusterState(void)
-{
-    EndpointId endpoint  = 1;
-    // AirQualityState = AirQualityEnum::kGood;
-    // EmberAfStatus status = Clusters::AirQuality::Attributes::AirQuality::Set(endpoint, AirQualityState);
-    // VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set AirQuality attribute"));
-}
-
-void AppTask::SelfTestHandler(AppEvent * aEvent)
-{
-    // sAppTask.UpdateClusterState();
-}
-
-void AppTask::AirQualityActionEventHandler(AppEvent * aEvent)
-{
-    AppEvent event;
-    if (aEvent->Type == AppEvent::kEventType_Button)
-    {
-        event.ButtonEvent.Action = kButtonPushEvent;
-        event.Handler            = SelfTestHandler;
-        GetAppTask().PostEvent(&event);
-    }
 }

@@ -1,4 +1,4 @@
-# Matter Telink Air Quality Sensor Example Application
+# Matter Telink Resource Monitoring Example Application
 
 You can use this example as a reference for creating your own application.
 
@@ -107,17 +107,17 @@ be used to specify the the effect. It is able to be in following effects:
     ./chip-tool pairing ble-thread 1234 hex:0e080000000000010000000300000f35060004001fffe0020811111111222222220708fd61f77bd3df233e051000112233445566778899aabbccddeeff030e4f70656e54687265616444656d6f010212340410445f2b5ca6f2a93a55ce570a70efeecb0c0402a0fff8 20202021 3840
     ```
 
-3. Read the air quality state:
+3. Read the HEPA filter state:
 
     ```
-    ${CHIP_TOOL_DIR}/chip-tool airquality read air-quality 1234 1
+    ${CHIP_TOOL_DIR}/chip-tool hepafiltermonitoring read degradation-direction 1 1234
     ```
 
     here:
 
-    - **airquality** is name of cluster
+    - **hepafiltermonitoring** is name of cluster
     - **read** command to the cluster
-    - **air-quality** attribute to read
+    - **degradation-direction** attribute to read
     - **1234** destination-id
     - **1** endpoint-id
 
