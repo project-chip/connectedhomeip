@@ -13,7 +13,7 @@ Incorporated SimpleLink SDK.
 The following diagram is a simplified representation of a Matter application
 which built on the TI Platform.
 
-![matter_ti_overview_simplified](images/matter_ti_overview_simplified.png)
+![matter_ti_overview_simplified](./../images/matter_ti_overview_simplified.png)
 
 ## Texas Instruments SimpleLink SDK
 
