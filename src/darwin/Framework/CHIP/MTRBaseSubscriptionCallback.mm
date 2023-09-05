@@ -51,7 +51,13 @@ void MTRBaseSubscriptionCallback::ReportData()
     }
 }
 
-void MTRBaseSubscriptionCallback::OnReportEnd() { ReportData(); }
+void MTRBaseSubscriptionCallback::OnReportEnd()
+{
+    ReportData();
+    if (mReportEndHandler) {
+        mReportEndHandler();
+    }
+}
 
 void MTRBaseSubscriptionCallback::OnError(CHIP_ERROR aError)
 {
