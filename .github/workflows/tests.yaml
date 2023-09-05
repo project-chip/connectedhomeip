@@ -198,8 +198,6 @@ jobs:
                      "
 
             - name: Run Tests using the python parser sending commands to chip-tool
-              #   https://github.com/project-chip/connectedhomeip/issues/27673
-              if: matrix.build_variant != 'no-ble-tsan-clang'
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
@@ -274,8 +272,7 @@ jobs:
 
         strategy:
             matrix:
-                build_variant: [no-ble-asan-clang] 
-                # Since no-ble-tsan-clang doesn't run any tests, this is just wasted CI time for now
+                build_variant: [no-ble-asan-clang, no-ble-tsan-clang]
                 chip_tool: [""]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
@@ -322,8 +319,6 @@ jobs:
                      "
 
             - name: Run Tests using the python parser sending commands to chip-tool
-            #   https://github.com/project-chip/connectedhomeip/issues/27673
-              if: matrix.build_variant != 'no-ble-tsan-clang'
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
