@@ -33,7 +33,7 @@
   ],
   "endpointTypes": [
     {
-      "id": 24,
+      "id": 9,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
         "id": 2,
@@ -1591,7 +1591,7 @@
           "mfgCode": null,
           "define": "OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "QueryImage",
@@ -1755,7 +1755,7 @@
           "mfgCode": null,
           "define": "OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "attributes": [
             {
               "name": "DefaultOTAProviders",
@@ -5420,7 +5420,7 @@
       ]
     },
     {
-      "id": 19,
+      "id": 12,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 45,
@@ -10936,7 +10936,7 @@
       ]
     },
     {
-      "id": 20,
+      "id": 13,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 46,
@@ -15216,7 +15216,7 @@
       ]
     },
     {
-      "id": 21,
+      "id": 10,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 24,
@@ -15888,7 +15888,7 @@
       ]
     },
     {
-      "id": 22,
+      "id": 11,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 27,
@@ -16560,7 +16560,7 @@
       ]
     },
     {
-      "id": 23,
+      "id": 14,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 34,
