@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <json/json.h>
 #include <lib/core/TLV.h>
+#include <string>
 
 namespace chip {
 /*

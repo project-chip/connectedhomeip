@@ -22,7 +22,7 @@
 #include <lib/core/TLVReader.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/jsontlv/JsonToTlv.h>
-#include <lib/support/jsontlv/JsonUtilities.h>
+#include <lib/support/jsontlv/TextFormat.h>
 #include <lib/support/jsontlv/TlvToJson.h>
 #include <nlunit-test.h>
 

@@ -19,7 +19,7 @@
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <lib/support/UnitTestRegistration.h>
-#include <lib/support/jsontlv/JsonUtilities.h>
+#include <lib/support/jsontlv/TextFormat.h>
 #include <lib/support/jsontlv/TlvToJson.h>
 #include <nlunit-test.h>
 #include <system/SystemPacketBuffer.h>
