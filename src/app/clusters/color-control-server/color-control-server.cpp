@@ -38,7 +38,7 @@ using chip::Protocols::InteractionModel::Status;
 class DefaultColorControlSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
 public:
-    enum ColorControlEFS : uint8_t
+    enum class ColorControlEFS : uint8_t
     {
         kCurrentX = 0,
         kCurrentY,
@@ -49,10 +49,8 @@ public:
         kColorLoopTime,
         kColorTemperatureMireds,
         kEnhancedColorMode,
+        kColorControlMaxScenableAttributes,
     };
-
-    // As per spec, 2 attributes are scenable in the level control cluster
-    static constexpr uint8_t kColorControlMaxScenableAttributes = 9;
 
     DefaultColorControlSceneHandler() = default;
     ~DefaultColorControlSceneHandler() override {}
@@ -66,6 +64,10 @@ public:
         {
             buffer[0] = ColorControl::Id;
             clusterBuffer.reduce_size(1);
+        }
+        else
+        {
+            clusterBuffer.reduce_size(0);
         }
     }
 
@@ -84,7 +86,8 @@ public:
     {
         using AttributeValuePair = Scenes::Structs::AttributeValuePair::Type;
 
-        AttributeValuePair pairs[kColorControlMaxScenableAttributes];
+        AttributeValuePair pairs[static_cast<uint8_t>(ColorControlEFS::kColorControlMaxScenableAttributes)];
+
         size_t attributeCount = 0;
 
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kXy))
@@ -157,14 +160,36 @@ public:
         ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
 
         size_t attributeCount = 0;
-        uint32_t attributeBuffer[kColorControlMaxScenableAttributes];
-        auto pair_iterator = attributeValueList.begin();
+        auto pair_iterator    = attributeValueList.begin();
 
         // The color control cluster should have a maximum of 9 scenable attributes
         ReturnErrorOnFailure(attributeValueList.ComputeSize(&attributeCount));
-        VerifyOrReturnError(attributeCount <= kColorControlMaxScenableAttributes, CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(attributeCount <= static_cast<uint8_t>(ColorControlEFS::kColorControlMaxScenableAttributes),
+                            CHIP_ERROR_BUFFER_TOO_SMALL);
+        // Retrieve the buffers for different modes
+#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+        ColorControlServer::ColorHueTransitionState * colorHueTransitionState =
+            ColorControlServer::Instance().getColorHueTransitionState(endpoint);
+        ColorControlServer::Color16uTransitionState * colorSaturationTransitionState =
+            ColorControlServer::Instance().getSaturationTransitionState(endpoint);
+#endif
+#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+        ColorControlServer::Color16uTransitionState * colorXTransitionState =
+            ColorControlServer::Instance().getXTransitionState(endpoint);
+        ColorControlServer::Color16uTransitionState * colorYTransitionState =
+            ColorControlServer::Instance().getYTransitionState(endpoint);
+#endif
+#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+        ColorControlServer::Color16uTransitionState * colorTempTransitionState =
+            ColorControlServer::Instance().getTempTransitionState(endpoint);
+#endif
 
-        uint8_t attIdx;
+        // Initialize action attributes to default values in case they are not in the scene
+        uint8_t targetColorMode    = 0x00;
+        uint8_t loopActiveValue    = 0x00;
+        uint8_t loopDirectionValue = 0x00;
+        uint16_t loopTimeValue     = 0x0019; // Default loop time value according to spec
+
         while (pair_iterator.Next())
         {
             auto & decodePair = pair_iterator.GetValue();
@@ -172,47 +197,66 @@ public:
             switch (decodePair.attributeID)
             {
             case Attributes::CurrentX::Id:
-                attIdx = ColorControlEFS::kCurrentX;
+                if (SupportsColorMode(endpoint, EMBER_ZCL_ENHANCED_COLOR_MODE_CURRENT_X_AND_CURRENT_Y))
+                {
+                    if (decodePair.attributeValue)
+                        colorXTransitionState->finalValue =
+                            std::min(static_cast<uint16_t>(decodePair.attributeValue), colorXTransitionState->highLimit);
+                }
                 break;
             case Attributes::CurrentY::Id:
-                attIdx = ColorControlEFS::kCurrentY;
+                if (SupportsColorMode(endpoint, EMBER_ZCL_ENHANCED_COLOR_MODE_CURRENT_X_AND_CURRENT_Y))
+                {
+                    colorYTransitionState->finalValue =
+                        std::min(static_cast<uint16_t>(decodePair.attributeValue), colorYTransitionState->highLimit);
+                }
                 break;
             case Attributes::EnhancedCurrentHue::Id:
-                attIdx = ColorControlEFS::kEnhancedCurrentHue;
+                if (SupportsColorMode(endpoint, EMBER_ZCL_ENHANCED_COLOR_MODE_ENHANCED_CURRENT_HUE_AND_CURRENT_SATURATION))
+                {
+                    colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(decodePair.attributeValue);
+                }
                 break;
             case Attributes::CurrentSaturation::Id:
-                attIdx = ColorControlEFS::kCurrentSaturation;
+                if (SupportsColorMode(endpoint, EMBER_ZCL_ENHANCED_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION))
+                {
+                    colorSaturationTransitionState->finalValue =
+                        std::min(static_cast<uint16_t>(decodePair.attributeValue), colorSaturationTransitionState->highLimit);
+                }
                 break;
             case Attributes::ColorLoopActive::Id:
-                attIdx = ColorControlEFS::kColorLoopActive;
+                loopActiveValue = static_cast<uint8_t>(decodePair.attributeValue);
                 break;
             case Attributes::ColorLoopDirection::Id:
-                attIdx = ColorControlEFS::kColorLoopDirection;
+                loopDirectionValue = static_cast<uint8_t>(decodePair.attributeValue);
                 break;
             case Attributes::ColorLoopTime::Id:
-                attIdx = ColorControlEFS::kColorLoopTime;
+                loopTimeValue = static_cast<uint16_t>(decodePair.attributeValue);
                 break;
             case Attributes::ColorTemperatureMireds::Id:
-                attIdx = ColorControlEFS::kColorTemperatureMireds;
+                if (SupportsColorMode(endpoint, EMBER_ZCL_ENHANCED_COLOR_MODE_COLOR_TEMPERATURE))
+                {
+                    colorTempTransitionState->finalValue =
+                        std::min(static_cast<uint16_t>(decodePair.attributeValue), colorTempTransitionState->highLimit);
+                }
                 break;
             case Attributes::EnhancedColorMode::Id:
-                attIdx = ColorControlEFS::kEnhancedColorMode;
+                if (decodePair.attributeValue <= static_cast<uint8_t>(ColorControlServer::ColorMode::COLOR_MODE_EHSV))
+                {
+                    targetColorMode = static_cast<uint8_t>(decodePair.attributeValue);
+                }
                 break;
             default:
                 return CHIP_ERROR_INVALID_ARGUMENT;
                 break;
             }
-
-            attributeBuffer[attIdx] = decodePair.attributeValue;
         }
-
         ReturnErrorOnFailure(pair_iterator.GetStatus());
 
         // Switch to the mode saved in the scene
-        if (SupportsColorMode(endpoint, static_cast<uint8_t>(attributeBuffer[ColorControlEFS::kEnhancedColorMode])))
+        if (SupportsColorMode(endpoint, targetColorMode))
         {
-            ColorControlServer::Instance().handleModeSwitch(
-                endpoint, static_cast<uint8_t>(attributeBuffer[ColorControlEFS::kEnhancedColorMode]));
+            ColorControlServer::Instance().handleModeSwitch(endpoint, targetColorMode);
         }
         else
         {
@@ -221,65 +265,42 @@ public:
 
         uint16_t transitionTime10th = static_cast<uint16_t>(timeMs / 100);
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
-        ColorControlServer::ColorHueTransitionState * colorHueTransitionState =
-            ColorControlServer::Instance().getColorHueTransitionState(endpoint);
-        ColorControlServer::Color16uTransitionState * colorSaturationTransitionState =
-            ColorControlServer::Instance().getSaturationTransitionState(endpoint);
-        colorSaturationTransitionState->finalValue = static_cast<uint8_t>(attributeBuffer[ColorControlEFS::kCurrentSaturation]);
-        colorHueTransitionState->finalEnhancedHue  = static_cast<uint16_t>(attributeBuffer[ColorControlEFS::kEnhancedCurrentHue]);
-#endif
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
-        ColorControlServer::Color16uTransitionState * colorXTransitionState =
-            ColorControlServer::Instance().getXTransitionState(endpoint);
-        ColorControlServer::Color16uTransitionState * colorYTransitionState =
-            ColorControlServer::Instance().getYTransitionState(endpoint);
-        colorXTransitionState->finalValue = static_cast<uint16_t>(attributeBuffer[ColorControlEFS::kCurrentX]);
-        colorYTransitionState->finalValue = static_cast<uint16_t>(attributeBuffer[ColorControlEFS::kCurrentY]);
-#endif
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
-        ColorControlServer::Color16uTransitionState * colorTempTransitionState =
-            ColorControlServer::Instance().getTempTransitionState(endpoint);
-        colorTempTransitionState->finalValue = static_cast<uint16_t>(attributeBuffer[ColorControlEFS::kColorTemperatureMireds]);
-#endif
-
-        // Set Loop Scene Attributes and start loop if scene stored active loop
-        Attributes::ColorLoopDirection::Set(endpoint, static_cast<uint8_t>(attributeBuffer[ColorControlEFS::kColorLoopDirection]));
-        Attributes::ColorLoopTime::Set(endpoint, static_cast<uint8_t>(attributeBuffer[ColorControlEFS::kColorLoopTime]));
-        if (attributeBuffer[ColorControlEFS::kColorLoopActive] == 1)
+        if (loopActiveValue == 1 && ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kColorLoop))
         {
+            // Set Loop Scene Attributes and start loop if scene stored active loop
+            Attributes::ColorLoopDirection::Set(endpoint, loopDirectionValue);
+            Attributes::ColorLoopTime::Set(endpoint, loopTimeValue);
             // Tries to applie color control loop
             ColorControlServer::Instance().startColorLoop(endpoint, true);
         }
         else
         {
             // Execute movement to value depending on the mode in the saved scene
-            switch (attributeBuffer[ColorControlEFS::kEnhancedColorMode])
+            switch (targetColorMode)
             {
             case ColorControlServer::ColorMode::COLOR_MODE_HSV:
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
-                ColorControlServer::Instance().moveToSaturation(
-                    static_cast<uint8_t>(attributeBuffer[ColorControlEFS::kCurrentSaturation]), transitionTime10th, endpoint);
+                ColorControlServer::Instance().moveToSaturation(static_cast<uint8_t>(colorSaturationTransitionState->finalValue),
+                                                                transitionTime10th, endpoint);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
                 break;
             case ColorControlServer::ColorMode::COLOR_MODE_CIE_XY:
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
-                ColorControlServer::Instance().moveToColor(static_cast<uint16_t>(attributeBuffer[ColorControlEFS::kCurrentX]),
-                                                           static_cast<uint16_t>(attributeBuffer[ColorControlEFS::kCurrentY]),
+                ColorControlServer::Instance().moveToColor(colorXTransitionState->finalValue, colorYTransitionState->finalValue,
                                                            transitionTime10th, endpoint);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
                 break;
             case ColorControlServer::ColorMode::COLOR_MODE_TEMPERATURE:
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
                 ColorControlServer::Instance().moveToColorTemp(
-                    endpoint, static_cast<uint16_t>(attributeBuffer[ColorControlEFS::kColorTemperatureMireds]), transitionTime10th);
+                    endpoint, static_cast<uint16_t>(colorTempTransitionState->finalValue), transitionTime10th);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
                 break;
             case ColorControlServer::ColorMode::COLOR_MODE_EHSV:
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
                 ColorControlServer::Instance().moveToHueAndSaturation(
-                    static_cast<uint16_t>(attributeBuffer[ColorControlEFS::kEnhancedCurrentHue]),
-                    static_cast<uint8_t>(attributeBuffer[ColorControlEFS::kCurrentSaturation]), transitionTime10th, true, endpoint);
+                    colorHueTransitionState->finalEnhancedHue, static_cast<uint8_t>(colorSaturationTransitionState->finalValue),
+                    transitionTime10th, true, endpoint);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
                 break;
             default:
@@ -1166,13 +1187,6 @@ Status ColorControlServer::moveToSaturation(uint8_t saturation, uint16_t transit
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
     VerifyOrReturnError(nullptr != colorSaturationTransitionState, Status::UnsupportedEndpoint);
 
-    // limit checking:  hue and saturation are 0..254.  Spec dictates we ignore
-    // this and report a malformed packet.
-    if (saturation > MAX_SATURATION_VALUE)
-    {
-        return Status::ConstraintError;
-    }
-
     if (transitionTime == 0)
     {
         transitionTime++;
@@ -1225,13 +1239,6 @@ Status ColorControlServer::moveToHueAndSaturation(uint16_t hue, uint8_t saturati
 
     VerifyOrReturnError(nullptr != colorSaturationTransitionState, Status::UnsupportedEndpoint);
     VerifyOrReturnError(nullptr != colorHueTransitionState, Status::UnsupportedEndpoint);
-
-    // limit checking:  hue and saturation are 0..254.  Spec dictates we ignore
-    // this and report a constraint error.
-    if ((!isEnhanced && hue > MAX_HUE_VALUE) || saturation > MAX_SATURATION_VALUE)
-    {
-        return Status::ConstraintError;
-    }
 
     if (transitionTime == 0)
     {
@@ -1553,6 +1560,14 @@ bool ColorControlServer::moveToHueAndSaturationCommand(app::CommandHandler * com
                                                        uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
                                                        uint8_t optionsOverride, bool isEnhanced)
 {
+    // limit checking:  hue and saturation are 0..254.  Spec dictates we ignore
+    // this and report a constraint error.
+    if ((!isEnhanced && hue > MAX_HUE_VALUE) || saturation > MAX_SATURATION_VALUE)
+    {
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
+
     if (!shouldExecuteIfOff(commandPath.mEndpointId, optionsMask, optionsOverride))
     {
         commandObj->AddStatus(commandPath, Status::Success);
@@ -1751,6 +1766,12 @@ exit:
 bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                  const Commands::MoveToSaturation::DecodableType & commandData)
 {
+    if (commandData.saturation > MAX_SATURATION_VALUE)
+    {
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
+
     if (!shouldExecuteIfOff(commandPath.mEndpointId, commandData.optionsMask, commandData.optionsOverride))
     {
         commandObj->AddStatus(commandPath, Status::Success);
