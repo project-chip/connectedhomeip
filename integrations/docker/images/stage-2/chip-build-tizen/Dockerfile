@@ -35,6 +35,8 @@ RUN set -x \
 ENV TIZEN_VERSION 7.0
 ENV TIZEN_SDK_ROOT /opt/tizen-sdk
 
+# TODO(#28852): [Workflow] Make the build script used fixed version for Tizen docker
+# Fetch the version after tizen-unified_20230816.124244
 COPY tizen-sdk-installer $TIZEN_SDK_ROOT/files/installer
 RUN set -x \
     && bash $TIZEN_SDK_ROOT/files/installer/install.sh \
