@@ -1,10 +1,10 @@
-
 ```{toctree}
 :glob:
 :maxdepth: 1
 
 *
 ```
+
 # Texas Instruments platform overview
 
 The TI platform is a [Matter][matter_gh] platform based on the Texas Instruments
