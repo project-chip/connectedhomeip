@@ -15,7 +15,14 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
+
+#if defined(MTR_INTERNAL_INCLUDE) && defined(MTR_INCLUDED_FROM_UMBRELLA_HEADER)
+#error Internal includes should not happen from the umbrella header
+#endif
+
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED || defined(MTR_INTERNAL_INCLUDE)
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -105,6 +112,13 @@ MTR_NEWLY_AVAILABLE
 @end
 
 // TODO: FIXME: Is this a sane place to put this API?
-MTR_EXTERN MTR_NEWLY_AVAILABLE NSSet<Class> * MTRDeviceControllerStorageClasses(void);
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+MTR_EXTERN
+#else
+MTR_HIDDEN
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+MTR_NEWLY_AVAILABLE NSSet<Class> * MTRDeviceControllerStorageClasses(void);
 
 NS_ASSUME_NONNULL_END
+
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED || defined(MTR_INTERNAL_INCLUDE)

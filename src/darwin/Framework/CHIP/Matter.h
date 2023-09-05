@@ -17,6 +17,8 @@
 
 #import <Foundation/Foundation.h>
 
+#define MTR_INCLUDED_FROM_UMBRELLA_HEADER
+
 #import <Matter/MTRAsyncCallbackWorkQueue.h>
 #import <Matter/MTRBackwardsCompatShims.h>
 #import <Matter/MTRBaseClusters.h>
@@ -57,3 +59,5 @@
 #import <Matter/MTRStorage.h>
 #import <Matter/MTRStructsObjc.h>
 #import <Matter/MTRThreadOperationalDataset.h>
+
+#undef MTR_INCLUDED_FROM_UMBRELLA_HEADER

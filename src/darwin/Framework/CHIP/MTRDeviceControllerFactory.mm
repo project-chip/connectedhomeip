@@ -34,6 +34,9 @@
 #import "MTRPersistentStorageDelegateBridge.h"
 #import "MTRSessionResumptionStorageBridge.h"
 #import "NSDataSpanConversion.h"
+#if !MTR_PER_CONTROLLER_STORAGE_ENABLED
+#import "MTRDeviceControllerStartupParameters_Wrapper.h"
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #import <os/lock.h>
 
