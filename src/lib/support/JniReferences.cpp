@@ -135,15 +135,16 @@ CHIP_ERROR JniReferences::FindMethod(JNIEnv * env, jobject object, const char * 
 
     // Try `j$` when enabling Java8.
     std::string methodSignature_java8_str(methodSignature);
-    if (*methodId == nullptr && methodSignature_java8_str.find("java/util/Optional") != std::string::npos)
-    {
+    size_t pos = methodSignature_java8_str.find("java/util/Optional");
+    if (*methodId == nullptr && pos != std::string::npos) {
         // Replace all "java/util/Optional" with "j$/util/Optional".
-        while (methodSignature_java8_str.find("java/util/Optional") != std::string::npos)
-        {
-            size_t pos = methodSignature_java8_str.find("java/util/Optional");
-            methodSignature_java8_str.replace(pos, strlen("java/util/Optional"), "j$/util/Optional");
+        while (pos != std::string::npos) {
+            methodSignature_java8_str.replace(pos, strlen("java/util/Optional"),
+                                              "j$/util/Optional");
+            pos = methodSignature_java8_str.find("java/util/Optional");
         }
-        *methodId = env->GetMethodID(javaClass, methodName, methodSignature_java8_str.c_str());
+        *methodId = env->GetMethodID(javaClass, methodName,
+                                     methodSignature_java8_str.c_str());
     }
 
     VerifyOrReturnError(*methodId != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
