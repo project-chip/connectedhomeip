@@ -84,12 +84,13 @@ CHIP_ERROR JniReferences::GetClassRef(JNIEnv * env, const char * clsType, jclass
     if (strcmp(clsType, "java/util/Optional") == 0)
     {
         cls = env->FindClass("j$/util/Optional");
+        env->ExceptionClear();
     }
 
     if (cls == nullptr)
     {
-        env->ExceptionClear();
         cls = env->FindClass(clsType);
+        env->ExceptionClear();
     }
 
     if (cls == nullptr)
