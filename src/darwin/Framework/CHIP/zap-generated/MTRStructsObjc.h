@@ -992,6 +992,13 @@ MTR_DEPRECATED("Please use MTRApplicationBasicClusterApplicationStruct", ios(16.
 @interface MTRApplicationBasicClusterApplicationBasicApplication : MTRApplicationBasicClusterApplicationStruct
 @end
 
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRClientMonitoringClusterMonitoringRegistration : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull clientNodeId MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull iCid MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
+@end
+
 API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRUnitTestingClusterSimpleStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull a API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
