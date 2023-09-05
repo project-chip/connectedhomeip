@@ -20,7 +20,11 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerStartupParameters.h>
+#else
+#import "MTRDeviceControllerStartupParameters_Wrapper.h"
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/DataModelTypes.h>

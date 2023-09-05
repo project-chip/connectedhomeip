@@ -22,7 +22,12 @@
 
 #import <Foundation/Foundation.h>
 #import <Matter/MTRCertificates.h>
+#import <Matter/MTRDefines.h>
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerStartupParameters.h>
+#else
+@class MTRDeviceControllerStartupParameters;
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -93,12 +98,15 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  */
 - (instancetype)initWithStorage:(id<MTRStorage>)storage;
 
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 /*
  * Initialize the device controller factory without storage.  In this mode,
  * device controllers will need to have per-controller storage provided to allow
  * storing controller-specific information.
  */
 - (instancetype)init MTR_NEWLY_AVAILABLE;
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+
 @end
 
 API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -180,6 +188,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 - (MTRDeviceController * _Nullable)createControllerOnNewFabric:(MTRDeviceControllerStartupParams *)startupParams
                                                          error:(NSError * __autoreleasing *)error;
 
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 /**
  * Create an MTRDeviceController.  Returns nil on failure.
  *
@@ -191,6 +200,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  */
 - (MTRDeviceController * _Nullable)createController:(MTRDeviceControllerStartupParameters *)startupParameters
                                               error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 @end
 

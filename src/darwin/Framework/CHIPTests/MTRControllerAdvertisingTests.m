@@ -24,6 +24,8 @@
 #import "MTRTestKeys.h"
 #import "MTRTestPerControllerStorage.h"
 
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+
 static const uint16_t kTestVendorId = 0xFFF1u;
 static const uint16_t kTimeoutInSeconds = 3;
 
@@ -295,3 +297,5 @@ static const DNSServiceFlags kBrowseFlags = 0;
 }
 
 @end
+
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED

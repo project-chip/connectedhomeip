@@ -15,13 +15,22 @@
  */
 
 #import <Foundation/Foundation.h>
-
 #import <Matter/MTRDefines.h>
+
+#if defined(MTR_INTERNAL_INCLUDE) && defined(MTR_INCLUDED_FROM_UMBRELLA_HEADER)
+#error Internal includes should not happen from the umbrella header
+#endif
+
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED || defined(MTR_INTERNAL_INCLUDE)
+
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
 #import <Matter/MTROTAProviderDelegate.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
+#if !MTR_PER_CONTROLLER_STORAGE_ENABLED
+MTR_HIDDEN
+#endif
 MTR_NEWLY_AVAILABLE
 @interface MTRDeviceControllerStartupParameters : NSObject
 
@@ -68,6 +77,9 @@ MTR_NEWLY_AVAILABLE
 
 @end
 
+#if !MTR_PER_CONTROLLER_STORAGE_ENABLED
+MTR_HIDDEN
+#endif
 MTR_NEWLY_AVAILABLE
 @interface MTRDeviceControllerExternalCertificateStartupParameters : MTRDeviceControllerStartupParameters
 
@@ -119,3 +131,5 @@ MTR_NEWLY_AVAILABLE
 @end
 
 NS_ASSUME_NONNULL_END
+
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED || defined(MTR_INTERNAL_INCLUDE)
