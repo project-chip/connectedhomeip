@@ -106,4 +106,4 @@ should be addressed from a SysConfig Editor.
 3. _Custom -> IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8 -> RF Command
    Symbols_, change `CMD_RADIO_SETUP` from `RF_cmdRadioSetup` to
    `RF_cmdIeeeRadioSetup` and add the following functions from the drop-down:
-   
+   `CMD_TX_TEST`,`CMD_IEEE_ED_SCAN`, `CMD_IEEE_CSMA`, and `CMD_IEEE_RX_ACK`.
