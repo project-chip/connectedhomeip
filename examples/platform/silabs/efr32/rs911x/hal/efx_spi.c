@@ -38,16 +38,25 @@
 
 #include "silabs_utils.h"
 
+#include "silabs_utils.h"
+
 #include "gpiointerrupt.h"
 #include "sl_device_init_clocks.h"
+
+#if (defined(EFR32MG24)  && defined(DISPLAY_ENABLED))
 #include "sl_memlcd.h"
+#endif /* EFR32MG24 & DISPLAY_ENABLED*/
+
 #include "sl_status.h"
 
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "task.h"
 
+#if (defined(EFR32MG24)  && defined(CONFIG_USE_EXTERNAL_FLASH))
 #include "btl_interface.h"
+#endif /* EFR32MG24 & CONFIG_USE_EXTERNAL_FLASH*/
+
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
@@ -175,7 +184,7 @@ void rsi_hal_board_init(void)
 }
 
 #if defined(EFR32MG24)
-
+#if (defined(DISPLAY_ENABLED) || (defined(CONFIG_USE_EXTERNAL_FLASH)))
 void SPIDRV_SetBaudrate(uint32_t baudrate)
 {
     if (EUSART_BaudrateGet(MY_USART) == baudrate)
@@ -215,6 +224,7 @@ sl_status_t sl_wfx_host_spi_cs_deassert(void)
     xSemaphoreGive(spi_sem_sync_hdl);
     return SL_STATUS_OK;
 }
+#endif // DISPLAY_ENABLED || CONFIG_USE_EXTERNAL_FLASH
 
 #if defined(CONFIG_USE_EXTERNAL_FLASH)
 sl_status_t sl_wfx_host_spiflash_cs_assert(void)
@@ -228,7 +238,7 @@ sl_status_t sl_wfx_host_spiflash_cs_deassert(void)
     GPIO_PinOutSet(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
     return SL_STATUS_OK;
 }
-#endif // CONFIG_USE_EXTERNAL_FLASH
+
 sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void)
 {
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
@@ -249,9 +259,7 @@ sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void)
         xSemaphoreGive(spi_sem_sync_hdl);
         return SL_STATUS_FAIL;
     }
-#if defined(CONFIG_USE_EXTERNAL_FLASH)
     sl_wfx_host_spiflash_cs_assert();
-#endif // CONFIG_USE_EXTERNAL_FLASH
     return SL_STATUS_OK;
 }
 
@@ -266,16 +274,16 @@ sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
         return SL_STATUS_FAIL;
     }
     GPIO->USARTROUTE[SL_MX25_FLASH_SHUTDOWN_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
-#if defined(CONFIG_USE_EXTERNAL_FLASH)
     sl_wfx_host_spiflash_cs_deassert();
-#endif // CONFIG_USE_EXTERNAL_FLASH
     xSemaphoreGive(spi_sem_sync_hdl);
     return SL_STATUS_OK;
 }
+#endif // CONFIG_USE_EXTERNAL_FLASH
 
 #if defined(DISPLAY_ENABLED)
 sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
 {
+    SILABS_LOG("sl_wfx_host_pre_lcd_spi_transfer Test Kiran2");
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
     if (spi_enabled)
     {
@@ -340,9 +348,9 @@ static void spi_dmaTransfertComplete(SPIDRV_HandleData_t * pxHandle, Ecode_t tra
  **************************************************************************/
 int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint8_t mode)
 {
-#if defined(EFR32MG24)
+#if defined(EFR32MG24)  /* && (defined(DISPLAY_ENABLED) || (CONFIG_USE_EXTERNAL_FLASH))) */
     sl_wfx_host_spi_cs_assert();
-#endif /* EFR32MG24 */
+#endif /* EFR32MG24 && DISPLAY_ENABLED || CONFIG_USE_EXTERNAL_FLASH*/
     /*
         TODO: tx_buf and rx_buf needs to be replaced with a dummy buffer of length xlen to align with SDK of WiFi
     */
@@ -399,8 +407,8 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     }
 
     xSemaphoreGive(spiTransferLock);
-#if defined(EFR32MG24)
+#if (defined(EFR32MG24)  && (defined(DISPLAY_ENABLED) || (CONFIG_USE_EXTERNAL_FLASH))) 
     sl_wfx_host_spi_cs_deassert();
-#endif /* EFR32MG24 */
+#endif /* (EFR32MG24)  && (DISPLAY_ENABLED || CONFIG_USE_EXTERNAL_FLASH) */
     return rsiError;
 }

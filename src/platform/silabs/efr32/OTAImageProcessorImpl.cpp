@@ -170,7 +170,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
             writeBuffer[writeBufOffset] = 0;
             writeBufOffset++;
         }
-#if (defined(EFR32MG24) && defined(SL_WIFI))
+#if (defined(EFR32MG24) && defined(SL_WIFI) && defined(CONFIG_USE_EXTERNAL_FLASH))
         err = sl_wfx_host_pre_bootloader_spi_transfer();
         if (err != SL_STATUS_OK)
         {
@@ -179,7 +179,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         }
 #endif
         CORE_CRITICAL_SECTION(err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, writeBuffer, kAlignmentBytes);)
-#if (defined(EFR32MG24) && defined(SL_WIFI))
+#if (defined(EFR32MG24) && defined(SL_WIFI) && defined(CONFIG_USE_EXTERNAL_FLASH))
         err = sl_wfx_host_post_bootloader_spi_transfer();
         if (err != SL_STATUS_OK)
         {
@@ -208,7 +208,8 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
     // Force KVS to store pending keys such as data from StoreCurrentUpdateInfo()
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().ForceKeyMapSave();
-#if (defined(EFR32MG24) && defined(SL_WIFI))
+
+#if (defined(EFR32MG24) && defined(SL_WIFI) && defined(CONFIG_USE_EXTERNAL_FLASH))
     err = sl_wfx_host_pre_bootloader_spi_transfer();
     if (err != SL_STATUS_OK)
     {
@@ -222,7 +223,8 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         ChipLogError(SoftwareUpdate, "bootloader_verifyImage() error: %ld", err);
         // Call the OTARequestor API to reset the state
         GetRequestorInstance()->CancelImageUpdate();
-#if (defined(EFR32MG24) && defined(SL_WIFI))
+/* #if (defined(EFR32MG24) && defined(SL_WIFI)) */
+#if (defined(EFR32MG24) && defined(SL_WIFI) && defined(CONFIG_USE_EXTERNAL_FLASH))
         err = sl_wfx_host_post_bootloader_spi_transfer();
         if (err != SL_STATUS_OK)
         {
@@ -239,7 +241,8 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         ChipLogError(SoftwareUpdate, "bootloader_setImageToBootload() error: %ld", err);
         // Call the OTARequestor API to reset the state
         GetRequestorInstance()->CancelImageUpdate();
-#if (defined(EFR32MG24) && defined(SL_WIFI))
+
+#if (defined(EFR32MG24) && defined(SL_WIFI) && defined(CONFIG_USE_EXTERNAL_FLASH))
         err = sl_wfx_host_post_bootloader_spi_transfer();
         if (err != SL_STATUS_OK)
         {
@@ -250,7 +253,8 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         return;
     }
 
-#if (defined(EFR32MG24) && defined(SL_WIFI))
+
+#if (defined(EFR32MG24) && defined(SL_WIFI) && defined(CONFIG_USE_EXTERNAL_FLASH))
     err = sl_wfx_host_post_bootloader_spi_transfer();
     if (err != SL_STATUS_OK)
     {
@@ -310,7 +314,8 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         if (writeBufOffset == kAlignmentBytes)
         {
             writeBufOffset = 0;
-#if (defined(EFR32MG24) && defined(SL_WIFI))
+
+#if (defined(EFR32MG24) && defined(SL_WIFI) && defined(CONFIG_USE_EXTERNAL_FLASH))
             err = sl_wfx_host_pre_bootloader_spi_transfer();
             if (err != SL_STATUS_OK)
             {
@@ -319,7 +324,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
             }
 #endif
             CORE_CRITICAL_SECTION(err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, writeBuffer, kAlignmentBytes);)
-#if (defined(EFR32MG24) && defined(SL_WIFI))
+#if (defined(EFR32MG24) && defined(SL_WIFI) && defined(CONFIG_USE_EXTERNAL_FLASH))
             err = sl_wfx_host_post_bootloader_spi_transfer();
             if (err != SL_STATUS_OK)
             {
