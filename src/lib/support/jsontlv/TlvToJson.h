@@ -33,19 +33,4 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, std::string & jsonString);
  * Given a TLV encoded byte array, this function converts it into JSON object.
  */
 CHIP_ERROR TlvToJson(const ByteSpan & tlv, std::string & jsonString);
-
-/*
- * Pretty-prints the input Json string using standard library pretty-printer.
- * This pretty-printer generates a Json string in a human friendly format with 3 space indentation
- * and nice representation of arrays and objects.
- * The input can be any string, as long as it's valid Json.
- */
-std::string PrettyPrintJsonString(const std::string & jsonString);
-
-/*
- * Reformats the input Json string as a single-line string with no spaces or newlines.
- * The input can be any string, as long as it's valid Json.
- */
-std::string MakeJsonSingleLine(const std::string & jsonString);
-
 } // namespace chip

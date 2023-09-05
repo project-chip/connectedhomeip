@@ -28,6 +28,7 @@ static_library("jsontlv") {
 
   public = [
     "JsonToTlv.h",
+    "JsonUtilities.h",
     "TlvJson.h",
     "TlvToJson.h",
   ]
