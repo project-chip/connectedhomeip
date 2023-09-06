@@ -117,7 +117,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read battery-alert 1 1
+          ./chip-tool smokecoalarm read battery-alert 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0003 DataVersion: 1795725838
           [TOO]   BatteryAlert: 1
@@ -168,7 +168,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read battery-alert 1 1
+          ./chip-tool smokecoalarm read battery-alert 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0003 DataVersion: 1795725838
           [TOO]   BatteryAlert: 2
@@ -219,7 +219,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read battery-alert 1 1
+          ./chip-tool smokecoalarm read battery-alert 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0003 DataVersion: 1795725838
           [TOO]   BatteryAlert: 0
@@ -281,7 +281,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read hardware-fault-alert 1 1
+          ./chip-tool smokecoalarm read hardware-fault-alert 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0006 DataVersion: 1795725838
           [TOO]   HardwareFaultAlert: TRUE
@@ -333,7 +333,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read hardware-fault-alert 1 1
+          ./chip-tool smokecoalarm read hardware-fault-alert 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0006 DataVersion: 1795725838
           [TOO]   HardwareFaultAlert: FALSE
@@ -395,7 +395,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read end-of-service-alert 1 1
+          ./chip-tool smokecoalarm read end-of-service-alert 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0007 DataVersion: 1795725838
           [TOO]   EndOfServiceAlert: 1
@@ -447,7 +447,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read end-of-service-alert 1 1
+          ./chip-tool smokecoalarm read end-of-service-alert 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0007 DataVersion: 1795725838
           [TOO]   EndOfServiceAlert: 0
@@ -577,7 +577,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read test-in-progress 1 1
+          ./chip-tool smokecoalarm read test-in-progress 1 1
 
           This step needs to be completed quickly
 
