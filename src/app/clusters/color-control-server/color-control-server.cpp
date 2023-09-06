@@ -92,12 +92,18 @@ public:
 
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kXy))
         {
-            uint16_t xValue = 0x616B; // Default X value according to spec
-            Attributes::CurrentX::Get(endpoint, &xValue);
+            uint16_t xValue;
+            if (EMBER_ZCL_STATUS_SUCCESS != Attributes::CurrentX::Get(endpoint, &xValue))
+            {
+                xValue = 0x616B; // Default X value according to spec
+            }
             AddAttributeValuePair(pairs, Attributes::CurrentX::Id, xValue, attributeCount);
 
-            uint16_t yValue = 0x607D; // Default Y value according to spec
-            Attributes::CurrentY::Get(endpoint, &yValue);
+            uint16_t yValue;
+            if (EMBER_ZCL_STATUS_SUCCESS != Attributes::CurrentY::Get(endpoint, &yValue))
+            {
+                yValue = 0x607D; // Default Y value according to spec
+            }
             AddAttributeValuePair(pairs, Attributes::CurrentY::Id, yValue, attributeCount);
         }
 
@@ -110,35 +116,53 @@ public:
 
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kHueAndSaturation))
         {
-            uint8_t saturationValue = 0x00;
-            Attributes::CurrentSaturation::Get(endpoint, &saturationValue);
+            uint8_t saturationValue;
+            if (EMBER_ZCL_STATUS_SUCCESS != Attributes::CurrentSaturation::Get(endpoint, &saturationValue))
+            {
+                saturationValue = 0x00;
+            }
             AddAttributeValuePair(pairs, Attributes::CurrentSaturation::Id, saturationValue, attributeCount);
         }
 
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kColorLoop))
         {
-            uint8_t loopActiveValue = 0x00;
-            Attributes::ColorLoopActive::Get(endpoint, &loopActiveValue);
+            uint8_t loopActiveValue;
+            if (EMBER_ZCL_STATUS_SUCCESS != Attributes::ColorLoopActive::Get(endpoint, &loopActiveValue))
+            {
+                loopActiveValue = 0x00;
+            }
             AddAttributeValuePair(pairs, Attributes::ColorLoopActive::Id, loopActiveValue, attributeCount);
 
-            uint8_t loopDirectionValue = 0x00;
-            Attributes::ColorLoopDirection::Get(endpoint, &loopDirectionValue);
+            uint8_t loopDirectionValue;
+            if (EMBER_ZCL_STATUS_SUCCESS != Attributes::ColorLoopDirection::Get(endpoint, &loopDirectionValue))
+            {
+                loopDirectionValue = 0x00;
+            }
             AddAttributeValuePair(pairs, Attributes::ColorLoopDirection::Id, loopDirectionValue, attributeCount);
 
-            uint16_t loopTimeValue = 0x0019; // Default loop time value according to spec
-            Attributes::ColorLoopTime::Get(endpoint, &loopTimeValue);
+            uint16_t loopTimeValue;
+            if (EMBER_ZCL_STATUS_SUCCESS != Attributes::ColorLoopTime::Get(endpoint, &loopTimeValue))
+            {
+                loopTimeValue = 0x0019; // Default loop time value according to spec
+            }
             AddAttributeValuePair(pairs, Attributes::ColorLoopTime::Id, loopTimeValue, attributeCount);
         }
 
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kColorTemperature))
         {
-            uint16_t temperatureValue = 0x00FA;
-            Attributes::ColorTemperatureMireds::Get(endpoint, &temperatureValue);
+            uint16_t temperatureValue;
+            if (EMBER_ZCL_STATUS_SUCCESS != Attributes::ColorTemperatureMireds::Get(endpoint, &temperatureValue))
+            {
+                temperatureValue = 0x00FA; // Default temperature value according to spec
+            }
             AddAttributeValuePair(pairs, Attributes::ColorTemperatureMireds::Id, temperatureValue, attributeCount);
         }
 
-        uint8_t modeValue = ColorControlServer::ColorMode::COLOR_MODE_CIE_XY;
-        Attributes::EnhancedColorMode::Get(endpoint, &modeValue);
+        uint8_t modeValue;
+        if (EMBER_ZCL_STATUS_SUCCESS != Attributes::EnhancedColorMode::Get(endpoint, &modeValue))
+        {
+            modeValue = ColorControlServer::ColorMode::COLOR_MODE_CIE_XY; // Default mode value according to spec
+        }
         AddAttributeValuePair(pairs, Attributes::EnhancedColorMode::Id, modeValue, attributeCount);
 
         app::DataModel::List<AttributeValuePair> attributeValueList(pairs, attributeCount);
