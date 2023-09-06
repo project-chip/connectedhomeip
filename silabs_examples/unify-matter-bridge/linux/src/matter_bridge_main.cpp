@@ -160,6 +160,7 @@ int main(int argc, char * argv[])
     INIT_ZAP_TRANSLATOR(LevelControl);
     INIT_ZAP_TRANSLATOR(ColorControl);
     INIT_ZAP_TRANSLATOR(Thermostat);
+    INIT_ZAP_TRANSLATOR(DoorLock);
 
     // Sensor clusters
     INIT_ZAP_TRANSLATOR(IlluminanceMeasurement);
