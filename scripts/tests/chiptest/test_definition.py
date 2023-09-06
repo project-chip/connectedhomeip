@@ -218,6 +218,7 @@ class TestTag(Enum):
     FLAKY = auto()           # test is considered flaky (usually a bug/time dependent issue)
     IN_DEVELOPMENT = auto()  # test may not pass or undergoes changes
     CHIP_TOOL_PYTHON_ONLY = auto()  # test uses YAML features only supported by the CHIP_TOOL_PYTHON runner.
+    EXTRA_SLOW = auto()      # test uses Sleep and is generally _very_ slow (>= 60s is a typical threshold)
 
     def to_s(self):
         for (k, v) in TestTag.__members__.items():
