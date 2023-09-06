@@ -32,9 +32,9 @@ _DEFAULT_EXTENSIONS_DIR = 'scripts/tests/yaml/extensions'
 
 
 @click.pass_context
-def send_yaml_command(ctx, test_name: str, server_path: str, server_arguments: str, show_adapter_logs: bool, pics: str, additional_pseudo_clusters_directory: str, commands: List[str]):
+def send_yaml_command(ctx, test_name: str, server_path: str, server_arguments: str, show_adapter_logs: bool, pics: str, additional_pseudo_clusters_directory: str, commands: List[str], endpoint: int):
     kwargs = {'test_name': test_name, 'show_adapter_logs': show_adapter_logs, 'pics': pics,
-              'additional_pseudo_clusters_directory': additional_pseudo_clusters_directory}
+              'additional_pseudo_clusters_directory': additional_pseudo_clusters_directory, 'endpoint': endpoint}
 
     index = 0
     while len(commands) - index > 1:
@@ -98,6 +98,8 @@ def chiptool_runner_options(f):
                      help='Path to the PICS file to use.')(f)
     f = click.option('--additional_pseudo_clusters_directory', type=click.Path(), show_default=True, default=_DEFAULT_EXTENSIONS_DIR,
                      help='Path to a directory containing additional pseudo clusters.')(f)
+    f = click.option('--endpoint', type=int, default=1,
+                     help='The endpoint to run the tests against.')(f)
     return f
 
 
@@ -129,7 +131,7 @@ def maybe_update_stop_on_error(ctx):
 @click.argument('commands', nargs=-1)
 @chiptool_runner_options
 @click.pass_context
-def chiptool_py(ctx, commands: List[str], server_path: str, server_name: str, server_arguments: str, show_adapter_logs: bool, trace_file: str, trace_decode: bool, delay_in_ms: int, continueonfailure: bool, pics: str, additional_pseudo_clusters_directory: str):
+def chiptool_py(ctx, commands: List[str], server_path: str, server_name: str, server_arguments: str, show_adapter_logs: bool, trace_file: str, trace_decode: bool, delay_in_ms: int, continueonfailure: bool, pics: str, additional_pseudo_clusters_directory: str, endpoint: int):
     success = False
 
     server_arguments = maybe_update_server_arguments(ctx)
@@ -137,7 +139,7 @@ def chiptool_py(ctx, commands: List[str], server_path: str, server_name: str, se
 
     if len(commands) > 1 and commands[0] == 'tests':
         success = send_yaml_command(commands[1], server_path, server_arguments, show_adapter_logs, pics,
-                                    additional_pseudo_clusters_directory, commands[2:])
+                                    additional_pseudo_clusters_directory, commands[2:], endpoint)
     else:
         if server_path is None and server_name:
             paths_finder = PathsFinder()
