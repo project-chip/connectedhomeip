@@ -125,23 +125,11 @@ tests:
     #          type: list
 
     #Manufacturer specific event IDs check not possible
-    - label:
-          "Step 7: Read EventList attribute from the DUT. For this cluster the
-          list is usually empty but it can contain manufacturer specific event
-          IDs."
-      verification: |
-          ./chip-tool identify read event-list 1 1
-
-          On TH(chip-tool) verify that the DUT response provides a list of supported events. For this cluster the list is empty
-          1676291532.905818][27664:27666] CHIP:DMG: }
-          [1676291532.905861][27664:27666] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFA DataVersion: 4211856524
-          [1676291532.905871][27664:27666] CHIP:TOO:   EventList: 0 entries
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Step 7: Read EventList attribute from the DUT."
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list

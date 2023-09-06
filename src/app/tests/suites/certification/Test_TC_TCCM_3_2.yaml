@@ -16,7 +16,7 @@
 name: 219.3.2. [TC-TCCM-3.2] Startup Mode functionality with DUT as Server
 
 PICS:
-    - TCCM.S
+    - TCCM.S.A0002
 
 config:
     nodeId: 0x12344321
@@ -24,7 +24,12 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Note"
+    - label: "Preconditions"
+      verification: |
+          !TCCM.S.F00(DEPONOFF) | OnOff cluster’s StartUpOnOff attribute is NULL | StartUpOnOff is 0 | OnMode is NULL
+      disabled: true
+
+    - label: "NOTE"
       verification: |
           To Execute the TC-TCCM-3.2 test case using reboot in raspi device we followed the below suggested way:
 
@@ -54,7 +59,6 @@ tests:
           - If startup_mode_dut is null proceed to step 3. Else save startup_mode_dut as new_start_up_mode_th and proceed to step 5.
           - Here startup_mode_dut is null proceed to step 3.
 
-          [1690541247.515223][2594:2596] CHIP:DMG: }
           [1690541247.521286][2594:2596] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0002 DataVersion: 667171525
           [1690541247.523875][2594:2596] CHIP:TOO:   StartUpMode: null
       disabled: true

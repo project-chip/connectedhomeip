@@ -64,6 +64,7 @@ def load_config() -> None:
     config["esp32"] = dict()
     config["silabs-thread"] = dict()
     config["ameba"] = dict()
+    config["telink"] = dict()
     configFile = f"{_CHEF_SCRIPT_PATH}/config.yaml"
     if (os.path.exists(configFile)):
         configStream = open(configFile, 'r')
@@ -88,6 +89,8 @@ def load_config() -> None:
         config["ameba"]["MATTER_SDK"] = None
         config["ameba"]["MODEL"] = 'D'
         config["ameba"]["TTY"] = None
+        config["telink"]["ZEPHYR_BASE"] = os.environ.get('ZEPHYR_BASE')
+        config["telink"]["TTY"] = None
 
         flush_print(yaml.dump(config))
         yaml.dump(config, configStream)
@@ -275,6 +278,7 @@ def main() -> int:
             linux
             silabs-thread
             ameba
+            telink
 
         Device Types:
             {deviceTypes}
@@ -312,7 +316,7 @@ def main() -> int:
                       dest="build_target",
                       help="specifies target platform. See info below for currently supported target platforms",
                       choices=['nrfconnect', 'esp32',
-                               'linux', 'silabs-thread', 'ameba'],
+                               'linux', 'silabs-thread', 'ameba', 'telink'],
                       metavar="TARGET",
                       default="linux")
     parser.add_option("-r", "--rpc",
@@ -514,6 +518,16 @@ def main() -> int:
         if (config['ameba']['MODEL'] != 'D' and config['ameba']['MODEL'] != 'Z2'):
             flush_print("Ameba Model is not recognized, please input D or Z2")
             exit(1)
+    elif options.build_target == "telink":
+        if config['telink']['ZEPHYR_BASE'] is None:
+            flush_print(
+                'Path for Telink SDK was not found. Make sure Telink_SDK is set on your config.yaml file')
+            exit(1)
+        shell.run_cmd("export ZEPHYR_TOOLCHAIN_VARIANT=zephyr")
+        shell.run_cmd(
+            f"export ZEPHYR_BASE={config['telink']['ZEPHYR_BASE']}")
+        shell.run_cmd(
+            f'source {config["telink"]["ZEPHYR_BASE"]}/zephyr-env.sh')
     else:
         flush_print(f"Target {options.build_target} not supported")
 
@@ -536,7 +550,8 @@ def main() -> int:
             flush_print("Linux toolchain update not supported. Skipping")
         elif options.build_target == "Ameba":
             flush_print("Ameba toolchain update not supported. Skipping")
-
+        elif options.build_target == "telink":
+            flush_print("Telink toolchain update not supported. Skipping")
     #
     # Clean environment
     #
@@ -606,6 +621,8 @@ def main() -> int:
             flush_print("Menuconfig not available on Linux target. Skipping")
         elif options.build_target == "Ameba":
             flush_print("Menuconfig not available on Ameba target. Skipping")
+        elif options.build_target == "telink":
+            flush_print("Menuconfig not available on Telink target. Skipping")
 
     #
     # Build
@@ -639,7 +656,7 @@ def main() -> int:
 
         shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
 
-        if (options.build_target == "esp32") or (options.build_target == "nrfconnect") or (options.build_target == "ameba"):
+        if options.build_target in "esp32 nrfconnect ameba telink".split():
             with open("project_include.cmake", "w") as f:
                 f.write(textwrap.dedent(f"""\
                         set(CONFIG_DEVICE_VENDOR_ID {options.vid})
@@ -725,6 +742,14 @@ def main() -> int:
                     shell.run_cmd("make clean")
                 shell.run_cmd("make chef")
                 shell.run_cmd("make is")
+        elif options.build_target == "telink":
+            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/telink")
+            telink_build_cmds = ["west build"]
+            if options.do_clean:
+                telink_build_cmds.append("-p always")
+            if options.do_rpc:
+                telink_build_cmds.append("-- -DOVERLAY_CONFIG=rpc.overlay")
+            shell.run_cmd(" ".join(telink_build_cmds))
 
         elif options.build_target == "linux":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/linux")
@@ -900,7 +925,14 @@ def main() -> int:
                 shell.run_cmd(f"screen {config['ameba']['TTY']} 115200")
             else:
                 flush_print("Ameba Z2 image has not been flashed yet")
-
+        elif options.build_target == "telink":
+            if config['telink']['TTY'] is None:
+                flush_print(
+                    'The path for the serial enumeration for telink is not set. '
+                    'Make sure telink.TTY is set on your config.yaml file')
+                exit(1)
+            shell.run_cmd("killall screen")
+            shell.run_cmd(f"screen {config['telink']['TTY']} 115200")
     #
     # RPC Console
     #
