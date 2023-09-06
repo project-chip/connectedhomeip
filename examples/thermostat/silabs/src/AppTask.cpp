@@ -50,6 +50,12 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#ifdef DIC_ENABLE
+#define DECIMAL 10
+#define BYTE 5
+#include "dic.h"
+#endif // DIC_ENABLE
+
 /**********************************************************
  * Defines and Constants
  *********************************************************/
@@ -63,6 +69,10 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
+
+#ifdef DIC_ENABLE
+namespace ThermAttr = chip::app::Clusters::Thermostat::Attributes;
+#endif // DIC_ENABLE
 
 /**********************************************************
  * Variable declarations
@@ -173,3 +183,65 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
         sAppTask.PostEvent(&aEvent);
     }
 }
+
+#ifdef DIC_ENABLE
+void AppTask::DIC_AttrubiteHandler(AttributeId attributeId){
+    switch (attributeId)
+    {
+    case ThermAttr::LocalTemperature::Id: {
+        int8_t CurrentTemp = TempMgr().GetCurrentTemp();
+        char buffer[BYTE];
+        itoa(CurrentTemp, buffer, DECIMAL);
+        dic_sendmsg("LocalTemperature/Temp",(const char *)(buffer));
+    }
+    break;
+    case ThermAttr::OccupiedCoolingSetpoint::Id: {
+        int8_t coolingTemp =  TempMgr().GetCoolingSetPoint();
+        char buffer[BYTE];
+        itoa(coolingTemp, buffer, DECIMAL);
+        dic_sendmsg("OccupiedCoolingSetpoint/coolingTemp",(const char *)(buffer));
+    }
+    break;
+    case ThermAttr::OccupiedHeatingSetpoint::Id: {
+        int8_t heatingTemp = TempMgr().GetHeatingSetPoint();
+        char buffer[BYTE];
+        itoa(heatingTemp, buffer, DECIMAL);
+        dic_sendmsg("OccupiedHeatingSetpoint/heatingTemp", (const char *)(buffer));
+    }
+    break;
+    case ThermAttr::SystemMode::Id: {
+        int8_t mode = TempMgr().GetMode();
+        char buffer[BYTE];
+        const char* Mode;
+        switch (mode){
+            case 0:
+                Mode = "OFF";
+                break;
+            case 1:
+                Mode = "HEAT&COOL";
+                break;
+            case 3:
+                Mode ="COOL";
+                break;
+            case 4:
+                Mode ="HEAT";
+                break;
+            default:
+                Mode = "INVALID MODE";
+                break;
+        }
+        uint16_t current_temp = TempMgr().GetCurrentTemp();
+        itoa(current_temp, buffer, DECIMAL);
+        dic_sendmsg("thermostat/systemMode", Mode);
+        dic_sendmsg("thermostat/currentTemp", (const char *)(buffer));
+    }
+    break;
+
+    default: {
+        SILABS_LOG("Unhandled thermostat attribute %x", attributeId);
+        return;
+    }
+    break;
+    }
+}
+#endif // DIC_ENABLE
