@@ -6314,8 +6314,6 @@
           - Timed Invoke for server to client commands
           - Deprecated global attribute names
   removed:
-      clusters:
-          - ChefTestCluster
       commands:
           BasicInformation:
               - MfgSpecificPing
