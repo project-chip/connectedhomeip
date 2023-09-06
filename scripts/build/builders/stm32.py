@@ -59,14 +59,7 @@ class stm32Builder(GnBuilder):
                  root,
                  runner,
                  app: stm32App = stm32App.LIGHT,
-                 board: stm32Board = stm32Board.STM32WB55XX,
-                 chip_build_libshell: bool = False,
-                 chip_logging: bool = True,
-                 enable_factory: bool = False,
-                 enable_rotating_device_id: bool = False,
-                 enable_ota_requestor: bool = False,
-                 enable_lwip_ip6_hook: bool = False,
-                 enable_rpcs: bool = False):
+                 board: stm32Board = stm32Board.STM32WB55XX):
         super(stm32Builder, self).__init__(
             root=app.BuildRoot(root),
             runner=runner)
