@@ -33,6 +33,7 @@ source_set("manager-srcs") {
     ":cluster-srcs",
     ":observer-srcs",
     "${chip_root}/src/credentials:credentials",
+    "${chip_root}/src/protocols/secure_channel",
   ]
 }
 

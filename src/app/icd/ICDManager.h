@@ -65,6 +65,7 @@ public:
     bool IsKeepActive() { return mKeepActiveFlags.HasAny(); }
     ICDMode GetICDMode() { return mICDMode; }
     OperationalState GetOperationalState() { return mOperationalState; }
+    void SendCheckInMsgs();
 
     static System::Clock::Milliseconds32 GetSITPollingThreshold() { return kSITPollingThreshold; }
     static System::Clock::Milliseconds32 GetSlowPollingInterval() { return kSlowPollingInterval; }

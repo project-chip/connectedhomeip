@@ -26,6 +26,7 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/LockTracker.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <protocols/secure_channel/CheckinMessage.h>
 #include <stdlib.h>
 
 #ifndef ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
@@ -44,6 +45,9 @@ namespace app {
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IcdManagement;
+
+using namespace chip::Protocols;
+using namespace chip::Protocols::SecureChannel;
 
 void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ICDStateObserver * stateObserver)
 {
@@ -79,10 +83,63 @@ bool ICDManager::SupportsCheckInProtocol()
     bool success        = false;
     uint32_t featureMap = 0;
     // Can't use attribute accessors/Attributes::FeatureMap::Get in unit tests
-#ifndef CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
     success = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
 #endif
     return success ? ((featureMap & to_underlying(Feature::kCheckInProtocolSupport)) != 0) : false;
+}
+
+void ICDManager::SendCheckInMsgs()
+{
+    VerifyOrDie(mStorage != nullptr);
+    VerifyOrDie(mFabricTable != nullptr);
+    for (const auto & fabricInfo : *mFabricTable)
+    {
+        uint16_t supported_clients = IcdManagementServer::GetInstance().GetClientsSupportedPerFabric();
+        // TODO retrieve Check-in counter
+        // SecureChannel::CounterType counter = GetCheckInCounter();
+
+        ChipLogProgress(AppServer, "Max clients ICD per fabric %d", supported_clients);
+
+        IcdMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), supported_clients /*Table entry limit*/);
+        if (!table.IsEmpty())
+        {
+            ChipLogProgress(AppServer, "Retrieving ICD Check-in Clients");
+            for (uint16_t i = 0; i < table.Limit(); i++)
+            {
+                IcdMonitoringEntry entry;
+                if (CHIP_NO_ERROR != table.Get(i, entry))
+                {
+                    // No more entries in the table
+                    break;
+                }
+
+                // TODO check for active subscription
+
+                // bool active = InteractionModelEngine::GetInstance()->IsSubscriptionActive(entry.fabricIndex, entry.checkInNodeID,
+                // entry.monitoredSubject); if (!active)
+                // {
+                //     // TODO After PR 29260 is merged.
+                //     ByteSpan appData;
+                //     uint8_t b[CheckinMessage::sMinPayloadSize] = { 0 };
+                //     MutableByteSpan output{ b };
+
+                //     // Prepare Check-in payload
+                //     if(CHIP_NO_ERROR != CheckinMessage::GenerateCheckinMessagePayload(  entry.key,
+                //                                                     counter,
+                //                                                     appData,
+                //                                                     output))
+                //     {
+                //         ChipLogError(AppServer, "skipping node %lu", entry.checkInNodeID);
+                //         continue;
+                //     }
+
+                //     // Todo send this somewhere so that the address can be resolved and
+                //     // the payload can be send throught the network interface
+                // }
+            }
+        }
+    }
 }
 
 void ICDManager::UpdateIcdMode()
@@ -144,7 +201,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
         CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(slowPollInterval);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(AppServer, "Failed to set Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(AppServer, "Failed to set Slow Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
     else if (state == OperationalState::ActiveMode)
@@ -165,7 +222,13 @@ void ICDManager::UpdateOperationState(OperationalState state)
             CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(GetFastPollingInterval());
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(AppServer, "Failed to set Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
+                ChipLogError(AppServer, "Failed to set Fast Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
+            }
+
+            if (SupportsCheckInProtocol())
+            {
+                ChipLogProgress(AppServer, "Sending Check-in");
+                SendCheckInMsgs();
             }
 
             mStateObserver->OnEnterActiveMode();
