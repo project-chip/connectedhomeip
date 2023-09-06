@@ -392,7 +392,7 @@ tests:
     #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
     - label: "TH2 writes Extension attribute value as empty list"
       verification: |
-          ./chip-tool accesscontrol write extension '[{}]' 2 0 --commissioner-name beta --commissioner-nodeid 223344
+          ./chip-tool accesscontrol write extension '[]' 2 0 --commissioner-name beta --commissioner-nodeid 223344
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP && ACL.S.A0001

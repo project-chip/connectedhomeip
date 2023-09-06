@@ -258,13 +258,6 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
     //   "An ICD sender SHOULD increase t to also account for its own sleepy interval
     //   required to receive the acknowledgment"
     mrpBackoffTime += app::ICDManager::GetFastPollingInterval();
-#elif CHIP_DEVICE_CONFIG_ENABLE_SED
-    DeviceLayer::ConnectivityManager::SEDIntervalsConfig sedIntervals;
-
-    if (DeviceLayer::ConnectivityMgr().GetSEDIntervalsConfig(sedIntervals) == CHIP_NO_ERROR)
-    {
-        mrpBackoffTime += System::Clock::Timestamp(sedIntervals.ActiveIntervalMS);
-    }
 #endif
 
     mrpBackoffTime += CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;

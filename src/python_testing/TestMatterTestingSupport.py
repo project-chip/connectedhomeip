@@ -25,7 +25,8 @@ from chip.tlv import uint
 from matter_testing_support import (MatterBaseTest, async_test_body, compare_time, default_matter_test_main,
                                     get_wait_seconds_from_set_time, parse_pics, type_matches, utc_time_in_matter_epoch)
 from mobly import asserts, signals
-from TC_DeviceBasicComposition import find_tree_roots, get_all_children, parts_list_cycles, separate_endpoint_types
+from TC_DeviceBasicComposition import (TagProblem, create_device_type_lists, find_tag_list_problems, find_tree_roots,
+                                       get_all_children, parts_list_cycles, separate_endpoint_types)
 
 
 def get_raw_type_list():
@@ -209,7 +210,8 @@ class TestMatterTestingSupport(MatterBaseTest):
             for device_type in device_types:
                 device_types_structs.append(Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=device_type, revision=1))
             endpoint[Clusters.Descriptor] = {Clusters.Descriptor.Attributes.PartsList: parts_list,
-                                             Clusters.Descriptor.Attributes.DeviceTypeList: device_types_structs}
+                                             Clusters.Descriptor.Attributes.DeviceTypeList: device_types_structs,
+                                             Clusters.Descriptor.Attributes.FeatureMap: 0}
             return endpoint
 
         endpoints = {}
@@ -311,6 +313,230 @@ class TestMatterTestingSupport(MatterBaseTest):
         endpoints = self.create_example_topology()
         _, tree = separate_endpoint_types(endpoints)
         asserts.assert_equal(find_tree_roots(tree, endpoints), {2, 6, 13, 17}, "Incorrect tree root list")
+
+    def test_tag_list_problems(self):
+        # Right now, the whole endpoint list uses the same device id except for ep11, which is an aggregator
+        # The relevant trees are
+        # 2 - 1
+        #   - 3 - 4
+        #       - 5 - 9
+        #
+        # 6 - 7
+        #   - 8
+        #
+        # 13 - 12
+        #    - 14 - 15
+        #         - 16
+        #
+        # 17 - 18
+        #    - 19
+
+        endpoints = self.create_example_topology()
+        # First test, everything in every tree has the same device type, so the device lists
+        # should contain all the device endpoints
+        _, tree = separate_endpoint_types(endpoints)
+        roots = find_tree_roots(tree, endpoints)
+        device_types = create_device_type_lists(roots, endpoints)
+        asserts.assert_equal(set(roots), set(device_types.keys()), "Device types list does not match roots list")
+        for root in roots:
+            asserts.assert_equal({1}, set(device_types[root].keys()), "Unexpected device type found in device type list")
+
+        asserts.assert_equal(device_types[2][1], {2, 1, 3, 4, 5, 9}, "device type list for ep 2 is incorrect")
+        asserts.assert_equal(device_types[6][1], {6, 7, 8}, "device type list for ep 6 is incorrect")
+        asserts.assert_equal(device_types[13][1], {13, 12, 14, 15, 16}, "device type list for ep 13 is incorrect")
+        asserts.assert_equal(device_types[17][1], {17, 18, 19}, "device type list for ep 17 is incorrect")
+
+        # every single one of these should have the same problem - they have no tags
+        problems = find_tag_list_problems(roots, device_types, endpoints)
+        expected_problems = {2, 1, 3, 4, 5, 9, 6, 7, 8, 13, 12, 14, 15, 16, 17, 18, 19}
+        asserts.assert_equal(set(problems.keys()), expected_problems, "Incorrect set of tag problems")
+        for root in roots:
+            eps = get_all_children(root, endpoints)
+            eps.add(root)
+            for ep in eps:
+                expected_problem = TagProblem(root=root, missing_attribute=True,
+                                              missing_feature=True, duplicates=set(eps), same_tag=set())
+                asserts.assert_equal(problems[ep], expected_problem, f"Incorrect problem for ep {ep}")
+
+        # Add the feature for every endpoint, but not the attribute
+        for ep in expected_problems:
+            endpoints[ep][Clusters.Descriptor][Clusters.Descriptor.Attributes.FeatureMap] = 1
+        problems = find_tag_list_problems(roots, device_types, endpoints)
+        for root in roots:
+            eps = get_all_children(root, endpoints)
+            eps.add(root)
+            for ep in eps:
+                expected_problem = TagProblem(root=root, missing_attribute=True,
+                                              missing_feature=False, duplicates=set(eps), same_tag=set())
+                asserts.assert_equal(problems[ep], expected_problem, f"Incorrect problem for ep {ep}")
+
+        # Add empty tag lists
+        for ep in expected_problems:
+            endpoints[ep][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = []
+        problems = find_tag_list_problems(roots, device_types, endpoints)
+        for root in roots:
+            eps = get_all_children(root, endpoints)
+            eps.add(root)
+            for ep in eps:
+                expected_problem = TagProblem(root=root, missing_attribute=True,
+                                              missing_feature=False, duplicates=set(eps), same_tag=set())
+                asserts.assert_equal(problems[ep], expected_problem, f"Incorrect problem for ep {ep}")
+
+        # Add a tag list on every one of these, but make it the same tag
+        tag = Clusters.Descriptor.Structs.SemanticTagStruct()
+        for ep in expected_problems:
+            endpoints[ep][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [tag]
+        problems = find_tag_list_problems(roots, device_types, endpoints)
+        for root in roots:
+            eps = get_all_children(root, endpoints)
+            eps.add(root)
+            for ep in eps:
+                expected_problem = TagProblem(root=root, missing_attribute=False,
+                                              missing_feature=False, duplicates=set(eps), same_tag=set(eps))
+                asserts.assert_equal(problems[ep], expected_problem, f"Incorrect problem for ep {ep}")
+
+        # swap out all the tags lists so they're all different - we should get no problems
+        for ep in expected_problems:
+            tag = Clusters.Descriptor.Structs.SemanticTagStruct(tag=ep)
+            endpoints[ep][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [tag]
+        problems = find_tag_list_problems(roots, device_types, endpoints)
+        asserts.assert_equal(len(problems), 0, "Unexpected problems found in list")
+
+        # Remove all the feature maps, we should get all errors again
+        for ep in expected_problems:
+            endpoints[ep][Clusters.Descriptor][Clusters.Descriptor.Attributes.FeatureMap] = 0
+        problems = find_tag_list_problems(roots, device_types, endpoints)
+        for root in roots:
+            eps = get_all_children(root, endpoints)
+            eps.add(root)
+            for ep in eps:
+                expected_problem = TagProblem(root=root, missing_attribute=False,
+                                              missing_feature=True, duplicates=set(eps))
+                asserts.assert_equal(problems[ep], expected_problem, f"Incorrect problem for ep {ep}")
+
+        # Create a simple two-tree system where everything is OK, but the tags are the same between the trees (should be ok)
+        # 1 (dt 1) - 2 (dt 2) - tag 2
+        #          - 3 (dt 2) - tag 3
+        # 4 (dt 1) - 5 (dt 2) - tag 2
+        #          - 6 (dt 2) - tag 3
+        desc_dt2_tag2 = {Clusters.Descriptor.Attributes.FeatureMap: 1,
+                         Clusters.Descriptor.Attributes.PartsList: [],
+                         Clusters.Descriptor.Attributes.DeviceTypeList: [Clusters.Descriptor.Structs.DeviceTypeStruct(2, 1)],
+                         Clusters.Descriptor.Attributes.TagList: [Clusters.Descriptor.Structs.SemanticTagStruct(tag=2)]
+                         }
+        desc_dt2_tag3 = {Clusters.Descriptor.Attributes.FeatureMap: 1,
+                         Clusters.Descriptor.Attributes.PartsList: [],
+                         Clusters.Descriptor.Attributes.DeviceTypeList: [Clusters.Descriptor.Structs.DeviceTypeStruct(2, 1)],
+                         Clusters.Descriptor.Attributes.TagList: [Clusters.Descriptor.Structs.SemanticTagStruct(tag=3)]
+                         }
+        desc_ep1 = {Clusters.Descriptor.Attributes.FeatureMap: 0,
+                    Clusters.Descriptor.Attributes.PartsList: [2, 3],
+                    Clusters.Descriptor.Attributes.DeviceTypeList: [Clusters.Descriptor.Structs.DeviceTypeStruct(1, 1)],
+                    }
+        desc_ep4 = {Clusters.Descriptor.Attributes.FeatureMap: 0,
+                    Clusters.Descriptor.Attributes.PartsList: [5, 6],
+                    Clusters.Descriptor.Attributes.DeviceTypeList: [Clusters.Descriptor.Structs.DeviceTypeStruct(1, 1)],
+                    }
+        new_endpoints = {}
+        new_endpoints[1] = {Clusters.Descriptor: desc_ep1}
+        new_endpoints[2] = {Clusters.Descriptor: desc_dt2_tag2}
+        new_endpoints[3] = {Clusters.Descriptor: desc_dt2_tag3}
+        new_endpoints[4] = {Clusters.Descriptor: desc_ep4}
+        new_endpoints[5] = {Clusters.Descriptor: desc_dt2_tag2}
+        new_endpoints[6] = {Clusters.Descriptor: desc_dt2_tag3}
+
+        _, tree = separate_endpoint_types(new_endpoints)
+        roots = find_tree_roots(tree, new_endpoints)
+        device_types = create_device_type_lists(roots, new_endpoints)
+
+        problems = find_tag_list_problems(roots, device_types, new_endpoints)
+        asserts.assert_equal(len(problems), 0, "Unexpected problems found in list")
+
+        # Create a simple tree where ONE of the tags in the set matches, but not the other - should be no problems
+        # 1 (dt 1) - 2 (dt 2) - tag 2,3
+        #          - 3 (dt 2) - tag 2,4
+        desc_dt2_tag23 = {Clusters.Descriptor.Attributes.FeatureMap: 1,
+                          Clusters.Descriptor.Attributes.PartsList: [],
+                          Clusters.Descriptor.Attributes.DeviceTypeList: [Clusters.Descriptor.Structs.DeviceTypeStruct(2, 1)],
+                          Clusters.Descriptor.Attributes.TagList: [Clusters.Descriptor.Structs.SemanticTagStruct(
+                              tag=2), Clusters.Descriptor.Structs.SemanticTagStruct(tag=3)]
+                          }
+        desc_dt2_tag24 = {Clusters.Descriptor.Attributes.FeatureMap: 1,
+                          Clusters.Descriptor.Attributes.PartsList: [],
+                          Clusters.Descriptor.Attributes.DeviceTypeList: [Clusters.Descriptor.Structs.DeviceTypeStruct(2, 1)],
+                          Clusters.Descriptor.Attributes.TagList: [Clusters.Descriptor.Structs.SemanticTagStruct(
+                              tag=2), Clusters.Descriptor.Structs.SemanticTagStruct(tag=4)]
+                          }
+        simple = {}
+        simple[1] = {Clusters.Descriptor: desc_ep1}
+        simple[2] = {Clusters.Descriptor: desc_dt2_tag23}
+        simple[3] = {Clusters.Descriptor: desc_dt2_tag24}
+
+        _, tree = separate_endpoint_types(simple)
+        roots = find_tree_roots(tree, simple)
+        device_types = create_device_type_lists(roots, simple)
+
+        problems = find_tag_list_problems(roots, device_types, simple)
+        asserts.assert_equal(len(problems), 0, "Unexpected problems found in list")
+
+        # now both match, but the ordering is different - this SHOULD be a problem
+        desc_dt2_tag32 = {Clusters.Descriptor.Attributes.FeatureMap: 1,
+                          Clusters.Descriptor.Attributes.PartsList: [],
+                          Clusters.Descriptor.Attributes.DeviceTypeList: [Clusters.Descriptor.Structs.DeviceTypeStruct(2, 1)],
+                          Clusters.Descriptor.Attributes.TagList: [Clusters.Descriptor.Structs.SemanticTagStruct(
+                              tag=3), Clusters.Descriptor.Structs.SemanticTagStruct(tag=2)]
+                          }
+        simple[3] = {Clusters.Descriptor: desc_dt2_tag32}
+
+        problems = find_tag_list_problems(roots, device_types, simple)
+        # expect this problem reported on both 2 and 3 endpoints
+        expected_problem = TagProblem(root=1, missing_attribute=False, missing_feature=False, duplicates={2, 3}, same_tag={2, 3})
+        asserts.assert_true(2 in problems.keys(), "Missing problem report for ep2")
+        asserts.assert_true(3 in problems.keys(), "Missing problem report for ep3")
+        asserts.assert_equal(problems[2], expected_problem, "Problem report for simple EP2 is not as expected")
+        asserts.assert_equal(problems[3], expected_problem, "Problem report for simple EP3 is not as expected")
+
+        # Let's check that we're correctly checking all the pieces of the tag
+        # Different mfgcode
+        simple[2][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [
+            Clusters.Descriptor.Structs.SemanticTagStruct(mfgCode=1)]
+        simple[3][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [Clusters.Descriptor.Structs.SemanticTagStruct()]
+        problems = find_tag_list_problems(roots, device_types, simple)
+        asserts.assert_equal(len(problems), 0, "Unexpected problems found in list")
+
+        simple[3][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [
+            Clusters.Descriptor.Structs.SemanticTagStruct(mfgCode=2)]
+        problems = find_tag_list_problems(roots, device_types, simple)
+        asserts.assert_equal(len(problems), 0, "Unexpected problems found in list")
+
+        # Different namespace ids
+        simple[2][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [
+            Clusters.Descriptor.Structs.SemanticTagStruct(namespaceID=1)]
+        simple[3][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [Clusters.Descriptor.Structs.SemanticTagStruct()]
+        problems = find_tag_list_problems(roots, device_types, simple)
+        asserts.assert_equal(len(problems), 0, "Unexpected problems found in list")
+
+        # Different labels
+        simple[2][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [
+            Clusters.Descriptor.Structs.SemanticTagStruct(label="test")]
+        simple[3][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [Clusters.Descriptor.Structs.SemanticTagStruct()]
+        problems = find_tag_list_problems(roots, device_types, simple)
+        asserts.assert_equal(len(problems), 0, "Unexpected problems found in list")
+
+        simple[3][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [
+            Clusters.Descriptor.Structs.SemanticTagStruct(label="test1")]
+        problems = find_tag_list_problems(roots, device_types, simple)
+        asserts.assert_equal(len(problems), 0, "Unexpected problems found in list")
+
+        # One tag list is a subset of the other - this should pass
+        tag1 = Clusters.Descriptor.Structs.SemanticTagStruct(tag=1)
+        tag2 = Clusters.Descriptor.Structs.SemanticTagStruct(tag=2)
+        tag3 = Clusters.Descriptor.Structs.SemanticTagStruct(tag=3)
+
+        simple[2][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [tag1, tag2]
+        simple[3][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [tag1, tag2, tag3]
+        problems = find_tag_list_problems(roots, device_types, simple)
+        asserts.assert_equal(len(problems), 0, "Unexpected problems found in list")
 
 
 if __name__ == "__main__":

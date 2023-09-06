@@ -74,6 +74,7 @@ tests:
               type: list
               contains: [2]
 
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/26721
     - label: "Step 5: TH reads EventList attribute from DUT"
       verification: |
           ./chip-tool actions read event-list 1 1

@@ -358,8 +358,8 @@ tests:
       disabled: true
 
     - label:
-          "Verify TH_CE is now discoverable over DNS-SD with 2 Operational
-          service records (_matter._tcp SRV records)."
+          "Step 10: Verify TH_CE is now discoverable over DNS-SD with 2
+          Operational service records (_matter._tcp SRV records)."
       verification: |
           On any Linux platform execute this command or in TH_CR2
 
