@@ -144,15 +144,15 @@ static CHIP_ERROR ExtractNodeIDFromNOC(MTRCertificateDERBytes noc, NSNumber * __
     return self;
 }
 
-- (instancetype)initWithParameters:(MTRDeviceControllerStartupParameters *)params error:(CHIP_ERROR &)error
+- (instancetype)initWithParameters:(MTRDeviceControllerParameters *)params error:(CHIP_ERROR &)error
 {
     if (!(self = [super init])) {
         error = CHIP_ERROR_INCORRECT_STATE;
         return nil;
     }
 
-    if (![params isKindOfClass:[MTRDeviceControllerExternalCertificateStartupParameters class]]) {
-        MTR_LOG_ERROR("Unexpected subclass of MTRDeviceControllerStartupParameters");
+    if (![params isKindOfClass:[MTRDeviceControllerExternalCertificateParameters class]]) {
+        MTR_LOG_ERROR("Unexpected subclass of MTRDeviceControllerParameters");
         error = CHIP_ERROR_INVALID_ARGUMENT;
         return nil;
     }
@@ -251,7 +251,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
 @end
 
-@implementation MTRDeviceControllerStartupParameters
+@implementation MTRDeviceControllerParameters
 - (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
                    storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
                        uniqueIdentifier:(NSUUID *)uniqueIdentifier
@@ -301,7 +301,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
 @end
 
-@implementation MTRDeviceControllerExternalCertificateStartupParameters
+@implementation MTRDeviceControllerExternalCertificateParameters
 - (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
                    storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
                        uniqueIdentifier:(NSUUID *)uniqueIdentifier
@@ -542,7 +542,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
                          fabricTable:(chip::FabricTable *)fabricTable
                             keystore:(chip::Crypto::OperationalKeystore *)keystore
                 advertiseOperational:(BOOL)advertiseOperational
-                              params:(MTRDeviceControllerStartupParameters *)params
+                              params:(MTRDeviceControllerParameters *)params
                                error:(CHIP_ERROR &)error
 {
     if (!(self = [super initWithParameters:params error:error])) {

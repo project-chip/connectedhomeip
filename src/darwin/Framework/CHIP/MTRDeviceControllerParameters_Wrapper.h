@@ -17,9 +17,9 @@
 #include <Matter/MTRDefines.h>
 
 #if MTR_PER_CONTROLLER_STORAGE_ENABLED
-#error Should be including Matter/MTRDeviceControllerStartupParameters.h
+#error Should be including Matter/MTRDeviceControllerParameters.h
 #endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #define MTR_INTERNAL_INCLUDE
-#import <Matter/MTRDeviceControllerStartupParameters.h>
+#import <Matter/MTRDeviceControllerParameters.h>
 #undef MTR_INTERNAL_INCLUDE

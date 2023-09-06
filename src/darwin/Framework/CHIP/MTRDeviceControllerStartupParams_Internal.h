@@ -21,9 +21,9 @@
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
 #if MTR_PER_CONTROLLER_STORAGE_ENABLED
-#import <Matter/MTRDeviceControllerStartupParameters.h>
+#import <Matter/MTRDeviceControllerParameters.h>
 #else
-#import "MTRDeviceControllerStartupParameters_Wrapper.h"
+#import "MTRDeviceControllerParameters_Wrapper.h"
 #endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #include <crypto/CHIPCryptoPAL.h>
@@ -52,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithParams:(MTRDeviceControllerStartupParams *)params;
 @end
 
-@interface MTRDeviceControllerStartupParameters ()
+@interface MTRDeviceControllerParameters ()
 
 - (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
                    storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
@@ -64,7 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
                 intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
                         rootCertificate:(MTRCertificateDERBytes)rootCertificate;
 
-// When we have other subclasses of MTRDeviceControllerStartupParameters, we may
+// When we have other subclasses of MTRDeviceControllerParameters, we may
 // need to make more things nullable here and/or add more fields.  But for now
 // we know exactly what information we have.
 @property (nonatomic, copy, readonly) NSData * ipk;
@@ -157,7 +157,7 @@ MTR_HIDDEN
                          fabricTable:(chip::FabricTable *)fabricTable
                             keystore:(chip::Crypto::OperationalKeystore *)keystore
                 advertiseOperational:(BOOL)advertiseOperational
-                              params:(MTRDeviceControllerStartupParameters *)params
+                              params:(MTRDeviceControllerParameters *)params
                                error:(CHIP_ERROR &)error;
 
 /**
