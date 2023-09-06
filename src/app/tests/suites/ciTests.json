@@ -43,6 +43,7 @@
     "DeviceManagement": [
         "TestIcdManagementCluster",
         "Test_TC_OPCREDS_1_2",
+        "Test_TC_OPCREDS_3_7",
         "Test_TC_BINFO_1_1",
         "Test_TC_BINFO_2_1",
         "Test_TC_BINFO_2_2",
@@ -108,6 +109,11 @@
         "Test_TC_ULABEL_2_4"
     ],
     "LaundryWasherMode": ["Test_TC_LWM_1_1", "Test_TC_LWM_2_1"],
+    "LaundryWasherControl": [
+        "Test_TC_WASHERCTRL_1_1",
+        "Test_TC_WASHERCTRL_2_1",
+        "Test_TC_WASHERCTRL_2_2"
+    ],
     "MediaControl": [
         "Test_TC_LOWPOWER_1_1",
         "Test_TC_KEYPADINPUT_1_2",
@@ -177,7 +183,6 @@
     "RelativeHumidityMeasurement": ["Test_TC_RH_1_1", "Test_TC_RH_2_1"],
     "RoboticVacuumCleaner": [
         "Test_TC_RVCCLEANM_1_1",
-        "Test_TC_RVCCLEANM_3_1",
         "Test_TC_RVCRUNM_1_1",
         "Test_TC_RVCOPSTATE_1_1"
     ],
@@ -365,6 +370,7 @@
         "UnitLocalization",
         "TimeFormatLocalization",
         "LaundryWasherMode",
+        "LaundryWasherControl",
         "MediaControl",
         "ModeSelect",
         "MultipleFabrics",

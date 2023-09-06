@@ -51,6 +51,9 @@ public:
     static CHIP_ERROR MapError(esp_err_t error);
     static void RegisterESP32ErrorFormatter();
     static bool FormatError(char * buf, uint16_t bufSize, CHIP_ERROR err);
+
+    static constexpr char kDefaultWiFiStationNetifKey[] = "WIFI_STA_DEF";
+    static constexpr char kDefaultWiFiAPNetifKey[]      = "WIFI_AP_DEF";
 };
 
 #define ReturnMappedErrorOnFailure(expr)                                                                                           \

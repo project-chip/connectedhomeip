@@ -113,14 +113,20 @@ tests:
     - label:
           "Step 6: TH waits for a report of BatteryAlert attribute from DUT with
           a timeout of 300 seconds"
-      PICS: SMOKECO.S.A0003
-      command: "waitForReport"
-      attribute: "BatteryAlert"
-      timeout: 300
-      response:
-          value: 1
-          constraints:
-              type: enum8
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0003
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool.py smokecoalarm read battery-alert 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0003 DataVersion: 1795725838
+          [TOO]   BatteryAlert: 1
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 7: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
@@ -158,14 +164,20 @@ tests:
     - label:
           "Step 10: TH waits for a report of BatteryAlert attribute from DUT
           with a timeout of 300 seconds"
-      PICS: SMOKECO.S.A0003
-      command: "waitForReport"
-      attribute: "BatteryAlert"
-      timeout: 300
-      response:
-          value: 2
-          constraints:
-              type: enum8
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0003
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool.py smokecoalarm read battery-alert 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0003 DataVersion: 1795725838
+          [TOO]   BatteryAlert: 2
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 11: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
@@ -203,14 +215,20 @@ tests:
     - label:
           "Step 14: TH waits for a report of BatteryAlert attribute from DUT
           with a timeout of 300 seconds"
-      PICS: SMOKECO.S.A0003
-      command: "waitForReport"
-      attribute: "BatteryAlert"
-      timeout: 300
-      response:
-          value: 0
-          constraints:
-              type: enum8
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0003
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool.py smokecoalarm read battery-alert 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0003 DataVersion: 1795725838
+          [TOO]   BatteryAlert: 0
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 15: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
@@ -259,14 +277,20 @@ tests:
     - label:
           "Step 19: TH waits for a report of HardwareFaultAlert attribute from
           DUT with a timeout of 300 seconds"
-      PICS: SMOKECO.S.A0006
-      command: "waitForReport"
-      attribute: "HardwareFaultAlert"
-      timeout: 300
-      response:
-          value: 1
-          constraints:
-              type: boolean
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0006
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool.py smokecoalarm read hardware-fault-alert 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0006 DataVersion: 1795725838
+          [TOO]   HardwareFaultAlert: TRUE
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 20: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
@@ -305,14 +329,20 @@ tests:
     - label:
           "Step 23: TH waits for a report of HardwareFaultAlert attribute from
           DUT with a timeout of 300 seconds"
-      PICS: SMOKECO.S.A0006
-      command: "waitForReport"
-      attribute: "HardwareFaultAlert"
-      timeout: 300
-      response:
-          value: 0
-          constraints:
-              type: boolean
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0006
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool.py smokecoalarm read hardware-fault-alert 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0006 DataVersion: 1795725838
+          [TOO]   HardwareFaultAlert: FALSE
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 24: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
@@ -361,14 +391,20 @@ tests:
     - label:
           "Step 28: TH waits for a report of EndOfServiceAlert attribute from
           DUT with a timeout of 300 seconds"
-      PICS: SMOKECO.S.A0007
-      command: "waitForReport"
-      attribute: "EndOfServiceAlert"
-      timeout: 300
-      response:
-          value: 1
-          constraints:
-              type: enum8
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0007
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool.py smokecoalarm read end-of-service-alert 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0007 DataVersion: 1795725838
+          [TOO]   EndOfServiceAlert: 1
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 29: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
@@ -407,14 +443,20 @@ tests:
     - label:
           "Step 32: TH waits for a report of EndOfServiceAlert attribute from
           DUT with a timeout of 300 seconds"
-      PICS: SMOKECO.S.A0007
-      command: "waitForReport"
-      attribute: "EndOfServiceAlert"
-      timeout: 300
-      response:
-          value: 0
-          constraints:
-              type: enum8
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0007
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool.py smokecoalarm read end-of-service-alert 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0007 DataVersion: 1795725838
+          [TOO]   EndOfServiceAlert: 0
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 33: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
@@ -531,14 +573,22 @@ tests:
     - label:
           "Step 45: TH waits for a report of TestInProgress attribute from DUT
           with a timeout of 180 seconds"
-      PICS: SMOKECO.S.A0005
-      command: "waitForReport"
-      attribute: "TestInProgress"
-      timeout: 180
-      response:
-          value: 1
-          constraints:
-              type: boolean
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0005
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool.py smokecoalarm read test-in-progress 1 1
+
+          This step needs to be completed quickly
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0005 DataVersion: 1795725838
+          [TOO]   TestInProgress: TRUE
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 46: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
@@ -549,8 +599,15 @@ tests:
           constraints:
               type: enum8
 
+    - label: "Step 47a: TH subscribes to TestInProgress attribute from DUT"
+      PICS: SMOKECO.S.A0005
+      command: "subscribeAttribute"
+      attribute: "TestInProgress"
+      minInterval: 1
+      maxInterval: 900
+
     - label:
-          "Step 47: TH waits for a report of TestInProgress attribute from DUT
+          "Step 47b: TH waits for a report of TestInProgress attribute from DUT
           with a timeout of 180 seconds"
       PICS: SMOKECO.S.A0005
       command: "waitForReport"

@@ -86,12 +86,6 @@ public:
 
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR _GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig);
-    CHIP_ERROR _SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig);
-    CHIP_ERROR _RequestSEDFastPollingMode(bool onOff);
-#endif
-
     bool _HaveMeshConnectivity();
 
     CHIP_ERROR _GetAndLogThreadStatsCounters();

@@ -15,14 +15,24 @@
  */
 
 #import <Foundation/Foundation.h>
-
 #import <Matter/MTRDefines.h>
+
+#if defined(MTR_INTERNAL_INCLUDE) && defined(MTR_INCLUDED_FROM_UMBRELLA_HEADER)
+#error Internal includes should not happen from the umbrella header
+#endif
+
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED || defined(MTR_INTERNAL_INCLUDE)
+
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
+#import <Matter/MTROTAProviderDelegate.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
+#if !MTR_PER_CONTROLLER_STORAGE_ENABLED
+MTR_HIDDEN
+#endif
 MTR_NEWLY_AVAILABLE
-@interface MTRDeviceControllerStartupParameters : NSObject
+@interface MTRDeviceControllerParameters : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -47,16 +57,31 @@ MTR_NEWLY_AVAILABLE
 @property (nonatomic, copy, nullable) NSArray<MTRCertificateDERBytes> * certificationDeclarationCertificates;
 
 /**
+ * Whether the controller should advertise its operational identity.  Defaults
+ * to NO.
+ */
+@property (nonatomic, assign) BOOL shouldAdvertiseOperational;
+
+/**
  * Set an MTROperationalCertificateIssuer to call (on the provided queue) when
  * operational certificates need to be provided during commissioning.
  */
 - (void)setOperationalCertificateIssuer:(id<MTROperationalCertificateIssuer>)operationalCertificateIssuer
                                   queue:(dispatch_queue_t)queue;
 
+/**
+ * Set an MTROTAProviderDelegate to call (on the provided queue).  Only needs to
+ * be called if this controller should be able to handle OTA for devices.
+ */
+- (void)setOTAProviderDelegate:(id<MTROTAProviderDelegate>)otaProviderDelegate queue:(dispatch_queue_t)queue;
+
 @end
 
+#if !MTR_PER_CONTROLLER_STORAGE_ENABLED
+MTR_HIDDEN
+#endif
 MTR_NEWLY_AVAILABLE
-@interface MTRDeviceControllerExternalCertificateStartupParameters : MTRDeviceControllerStartupParameters
+@interface MTRDeviceControllerExternalCertificateParameters : MTRDeviceControllerParameters
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -106,3 +131,5 @@ MTR_NEWLY_AVAILABLE
 @end
 
 NS_ASSUME_NONNULL_END
+
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED || defined(MTR_INTERNAL_INCLUDE)

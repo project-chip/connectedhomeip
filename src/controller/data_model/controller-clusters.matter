@@ -3306,6 +3306,10 @@ client cluster DishwasherAlarm = 93 {
     kWaterLevelError = 0x20;
   }
 
+  bitmap Feature : BITMAP32 {
+    kReset = 0x1;
+  }
+
   info event Notify = 0 {
     AlarmMap active = 0;
     AlarmMap inactive = 1;
@@ -3493,7 +3497,7 @@ client cluster HepaFilterMonitoring = 113 {
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
-    kReplacementProductList = 0x3;
+    kReplacementProductList = 0x4;
   }
 
   struct ReplacementProductStruct {
@@ -3542,7 +3546,7 @@ client cluster ActivatedCarbonFilterMonitoring = 114 {
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
-    kReplacementProductList = 0x3;
+    kReplacementProductList = 0x4;
   }
 
   struct ReplacementProductStruct {
