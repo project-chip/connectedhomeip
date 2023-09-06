@@ -462,7 +462,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     for (NSDictionary<NSString *, id> * eventDict in eventReport) {
         // Whenever a StartUp event is received, reset the estimated start time
         //   New subscription case
-        //     - Starts Uncreachable
+        //     - Starts Unreachable
         //     - Receive priming report ReportBegin
         //     - Optionally receive UpTime attribute - update time and save start time estimate
         //     - Optionally receive StartUp event
