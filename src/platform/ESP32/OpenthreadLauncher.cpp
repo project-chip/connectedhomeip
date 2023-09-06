@@ -31,15 +31,21 @@
 #include "openthread/instance.h"
 #include "openthread/logging.h"
 #include "openthread/tasklet.h"
+#include <lib/core/CHIPError.h>
+#include <memory>
 
 static esp_netif_t * openthread_netif                       = NULL;
 static esp_openthread_platform_config_t * s_platform_config = NULL;
 static TaskHandle_t cli_transmit_task                       = NULL;
 static QueueHandle_t cli_transmit_task_queue                = NULL;
 
-QueueHandle_t get_cli_transmit_task_queue(void)
+CHIP_ERROR cli_transmit_task_post(std::unique_ptr<char[]> & cli_str)
 {
-    return cli_transmit_task_queue;
+    if (!cli_transmit_task_queue || xQueueSend(cli_transmit_task_queue, &cli_str, portMAX_DELAY) != pdTRUE)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+    return CHIP_NO_ERROR;
 }
 
 static int cli_output_callback(void * context, const char * format, va_list args)
@@ -65,20 +71,21 @@ static void esp_openthread_matter_cli_init(void)
 
 static void cli_transmit_worker(void * context)
 {
-    cli_transmit_task_queue = xQueueCreate(8, sizeof(char **));
+    cli_transmit_task_queue = xQueueCreate(8, sizeof(std::unique_ptr<char[]>));
     if (!cli_transmit_task_queue)
     {
+        vTaskDelete(NULL);
         return;
     }
-    char * command_line = NULL;
+
     while (true)
     {
+        std::unique_ptr<char[]> command_line(nullptr);
         if (xQueueReceive(cli_transmit_task_queue, &command_line, portMAX_DELAY) == pdTRUE)
         {
             if (command_line)
             {
-                esp_openthread_cli_input(command_line);
-                free(command_line);
+                esp_openthread_cli_input(command_line.get());
             }
             else
             {
@@ -93,7 +100,7 @@ static void cli_transmit_worker(void * context)
 
 static esp_err_t cli_command_transmit_task(void)
 {
-    xTaskCreate(cli_transmit_worker, "ocli_trans", 3072, xTaskGetCurrentTaskHandle(), 4, &cli_transmit_task);
+    xTaskCreate(cli_transmit_worker, "ocli_trans", 3072, xTaskGetCurrentTaskHandle(), 5, &cli_transmit_task);
     return ESP_OK;
 }
 

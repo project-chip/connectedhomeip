@@ -23,6 +23,7 @@
 #include "openthread_cli_register.h"
 #include "platform/ESP32/OpenthreadLauncher.h"
 #include <lib/shell/Engine.h>
+#include <memory>
 
 #define CLI_INPUT_BUFF_LENGTH 256u
 namespace chip {
@@ -30,27 +31,25 @@ namespace chip {
 static CHIP_ERROR OtcliHandler(int argc, char * argv[])
 {
     /* the beginning of command "matter esp ot cli" has already been removed */
-    char * cli_str = (char *) malloc(CLI_INPUT_BUFF_LENGTH);
-    memset(cli_str, 0, CLI_INPUT_BUFF_LENGTH);
+    std::unique_ptr<char[]> cli_str(new char[CLI_INPUT_BUFF_LENGTH]);
+    memset(cli_str.get(), 0, CLI_INPUT_BUFF_LENGTH);
     uint8_t len = 0;
     for (size_t i = 0; i < (size_t) argc; ++i)
     {
         len = len + strlen(argv[i]) + 1;
         if (len > CLI_INPUT_BUFF_LENGTH - 1)
         {
-            free(cli_str);
             return CHIP_ERROR_INTERNAL;
         }
-        strcat(cli_str, argv[i]);
-        strcat(cli_str, " ");
+        strcat(cli_str.get(), argv[i]);
+        strcat(cli_str.get(), " ");
     }
 
-    QueueHandle_t cli_trans_queue = get_cli_transmit_task_queue();
-    if (!cli_trans_queue || xQueueSend(cli_trans_queue, &cli_str, portMAX_DELAY) != pdTRUE)
+    if (cli_transmit_task_post(cli_str) != CHIP_NO_ERROR)
     {
-        free(cli_str);
         return CHIP_ERROR_INTERNAL;
     }
+    cli_str.release();
     return CHIP_NO_ERROR;
 }
 
