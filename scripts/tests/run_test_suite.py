@@ -174,7 +174,8 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
             TestTag.MANUAL,
             TestTag.IN_DEVELOPMENT,
             TestTag.FLAKY,
-            TestTag.EXTRA_SLOW
+            TestTag.EXTRA_SLOW,
+            TestTag.PURPOSEFUL_FAILURE,
         }
 
         if runtime != TestRunTime.CHIP_TOOL_PYTHON:
@@ -273,9 +274,19 @@ def cmd_list(context):
     default=None,
     type=int,
     help='If provided, fail if a test runs for longer than this time')
+@click.option(
+    '--expected-failures',
+    type=int,
+    default=0,
+    show_default=True,
+    help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
 @click.pass_context
 def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app,
-            tv_app, bridge_app, chip_repl_yaml_tester, chip_tool_with_python, pics_file, keep_going, test_timeout_seconds):
+            tv_app, bridge_app, chip_repl_yaml_tester, chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures):
+    if expected_failures != 0 and not keep_going:
+        logging.exception(f"'--expected-failures {expected_failures}' used without '--keep-going'")
+        sys.exit(2)
+
     runner = chiptest.runner.Runner()
 
     paths_finder = PathsFinder()
@@ -327,8 +338,14 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     apps_register = AppsRegister()
     apps_register.init()
 
+    def cleanup():
+        apps_register.uninit()
+        if sys.platform == 'linux':
+            chiptest.linux.ShutdownNamespaceForTestExecution()
+
     for i in range(iterations):
         logging.info("Starting iteration %d" % (i+1))
+        observed_failures = 0
         for test in context.obj.tests:
             if context.obj.include_tags:
                 if not (test.tags & context.obj.include_tags):
@@ -357,13 +374,17 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                 test_end = time.monotonic()
                 logging.exception('%-30s - FAILED in %0.2f seconds' %
                                   (test.name, (test_end - test_start)))
+                observed_failures += 1
                 if not keep_going:
-                    apps_register.uninit()
+                    cleanup()
                     sys.exit(2)
 
-    apps_register.uninit()
-    if sys.platform == 'linux':
-        chiptest.linux.ShutdownNamespaceForTestExecution()
+        if observed_failures != expected_failures:
+            logging.exception(f'Iteration {i}: expected failure count {expected_failures}, but got {observed_failures}')
+            cleanup()
+            sys.exit(2)
+
+    cleanup()
 
 
 # On linux, allow an execution shell to be prepared
