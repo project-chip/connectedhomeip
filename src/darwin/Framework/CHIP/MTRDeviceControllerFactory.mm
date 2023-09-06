@@ -17,6 +17,14 @@
 #import "MTRDeviceControllerFactory.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 
+#import <Matter/MTRDefines.h>
+
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+#import <Matter/MTRDeviceControllerParameters.h>
+#else
+#import "MTRDeviceControllerParameters_Wrapper.h"
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+
 #import "MTRCertificates.h"
 #import "MTRControllerAccessControl.h"
 #import "MTRDemuxingStorage.h"
@@ -34,9 +42,6 @@
 #import "MTRPersistentStorageDelegateBridge.h"
 #import "MTRSessionResumptionStorageBridge.h"
 #import "NSDataSpanConversion.h"
-#if !MTR_PER_CONTROLLER_STORAGE_ENABLED
-#import "MTRDeviceControllerStartupParameters_Wrapper.h"
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #import <os/lock.h>
 
@@ -547,8 +552,12 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
  * The fabricChecker block will run on the Matter queue, and is expected to
  * return nil if pre-startup fabric table checks fail, and set fabricError to
  * the right error value in that situation.
+ *
+ * The provided controller is expected to have just been allocated and to not be
+ * initialized yet.
  */
-- (MTRDeviceController * _Nullable)_startDeviceController:(id)startupParams
+- (MTRDeviceController * _Nullable)_startDeviceController:(MTRDeviceController *)controller
+                                            startupParams:(id)startupParams
                                             fabricChecker:(MTRDeviceControllerStartupParamsInternal * (^)(FabricTable * fabricTable,
                                                               MTRDeviceController * controller,
                                                               CHIP_ERROR & fabricError))fabricChecker
@@ -566,8 +575,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     NSUUID * uniqueIdentifier;
     id<MTROTAProviderDelegate> _Nullable otaProviderDelegate;
     dispatch_queue_t _Nullable otaProviderDelegateQueue;
-    if ([startupParams isKindOfClass:[MTRDeviceControllerStartupParameters class]]) {
-        MTRDeviceControllerStartupParameters * params = startupParams;
+    if ([startupParams isKindOfClass:[MTRDeviceControllerParameters class]]) {
+        MTRDeviceControllerParameters * params = startupParams;
         storageDelegate = params.storageDelegate;
         storageDelegateQueue = params.storageDelegateQueue;
         uniqueIdentifier = params.uniqueIdentifier;
@@ -608,19 +617,34 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         otaProviderDelegateQueue = self.otaProviderDelegateQueue;
     }
 
-    // Create the controller, so we start the event loop, since we plan to do
-    // our fabric table operations there.
-    auto * controller = [self _createController:storageDelegate
-                           storageDelegateQueue:storageDelegateQueue
-                            otaProviderDelegate:otaProviderDelegate
-                       otaProviderDelegateQueue:otaProviderDelegateQueue
-                               uniqueIdentifier:uniqueIdentifier];
+    controller = [controller initWithFactory:self
+                                       queue:_chipWorkQueue
+                             storageDelegate:storageDelegate
+                        storageDelegateQueue:storageDelegateQueue
+                         otaProviderDelegate:otaProviderDelegate
+                    otaProviderDelegateQueue:otaProviderDelegateQueue
+                            uniqueIdentifier:uniqueIdentifier];
     if (controller == nil) {
         if (error != nil) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY];
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
         }
         return nil;
     }
+
+    if ([_controllers count] == 0) {
+        // Bringing up the first controller.  Start the event loop now.  If we
+        // fail to bring it up, its cleanup will stop the event loop again.
+        chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
+        dispatch_sync(_chipWorkQueue, ^{
+            self->_operationalBrowser = new MTROperationalBrowser(self, self->_chipWorkQueue);
+        });
+    }
+
+    // Add the controller to _controllers now, so if we fail partway through its
+    // startup we will still do the right cleanups.
+    os_unfair_lock_lock(&_controllersLock);
+    [_controllers addObject:controller];
+    os_unfair_lock_unlock(&_controllersLock);
 
     __block MTRDeviceControllerStartupParamsInternal * params = nil;
     __block CHIP_ERROR fabricError = CHIP_NO_ERROR;
@@ -716,7 +740,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         return nil;
     }
 
-    return [self _startDeviceController:startupParams
+    return [self _startDeviceController:[MTRDeviceController alloc]
+                          startupParams:startupParams
                           fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
                               FabricTable * fabricTable, MTRDeviceController * controller, CHIP_ERROR & fabricError) {
                               const FabricInfo * fabric = nullptr;
@@ -792,7 +817,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         return nil;
     }
 
-    return [self _startDeviceController:startupParams
+    return [self _startDeviceController:[MTRDeviceController alloc]
+                          startupParams:startupParams
                           fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
                               FabricTable * fabricTable, MTRDeviceController * controller, CHIP_ERROR & fabricError) {
                               const FabricInfo * fabric = nullptr;
@@ -823,73 +849,6 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
                               return params;
                           }
                                   error:error];
-}
-
-- (MTRDeviceController * _Nullable)createController:(MTRDeviceControllerStartupParameters *)startupParameters
-                                              error:(NSError * __autoreleasing *)error
-{
-    [self _assertCurrentQueueIsNotMatterQueue];
-
-    return [self _startDeviceController:startupParameters
-                          fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
-                              FabricTable * fabricTable, MTRDeviceController * controller, CHIP_ERROR & fabricError) {
-                              auto advertiseOperational = self.advertiseOperational && startupParameters.shouldAdvertiseOperational;
-                              auto * params =
-                                  [[MTRDeviceControllerStartupParamsInternal alloc] initForNewController:controller
-                                                                                             fabricTable:fabricTable
-                                                                                                keystore:self->_keystore
-                                                                                    advertiseOperational:advertiseOperational
-                                                                                                  params:startupParameters
-                                                                                                   error:fabricError];
-                              if (params != nil) {
-                                  if (params.productAttestationAuthorityCertificates == nil) {
-                                      params.productAttestationAuthorityCertificates = self.productAttestationAuthorityCertificates;
-                                  }
-                                  if (params.certificationDeclarationCertificates == nil) {
-                                      params.certificationDeclarationCertificates = self.certificationDeclarationCertificates;
-                                  }
-                              }
-                              return params;
-                          }
-                                  error:error];
-}
-
-- (MTRDeviceController * _Nullable)_createController:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
-                                storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
-                                 otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
-                            otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
-                                    uniqueIdentifier:(NSUUID *)uniqueIdentifier
-{
-    [self _assertCurrentQueueIsNotMatterQueue];
-
-    MTRDeviceController * controller = [[MTRDeviceController alloc] initWithFactory:self
-                                                                              queue:_chipWorkQueue
-                                                                    storageDelegate:storageDelegate
-                                                               storageDelegateQueue:storageDelegateQueue
-                                                                otaProviderDelegate:otaProviderDelegate
-                                                           otaProviderDelegateQueue:otaProviderDelegateQueue
-                                                                   uniqueIdentifier:uniqueIdentifier];
-    if (controller == nil) {
-        MTR_LOG_ERROR("Failed to init controller");
-        return nil;
-    }
-
-    if ([_controllers count] == 0) {
-        // Bringing up the first controller.  Start the event loop now.  If we
-        // fail to bring it up, its cleanup will stop the event loop again.
-        chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
-        dispatch_sync(_chipWorkQueue, ^{
-            self->_operationalBrowser = new MTROperationalBrowser(self, self->_chipWorkQueue);
-        });
-    }
-
-    // Add the controller to _controllers now, so if we fail partway through its
-    // startup we will still do the right cleanups.
-    os_unfair_lock_lock(&_controllersLock);
-    [_controllers addObject:controller];
-    os_unfair_lock_unlock(&_controllersLock);
-
-    return controller;
 }
 
 // Finds a fabric that matches the given params, if one exists.
@@ -1126,6 +1085,37 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     }
 }
 
+- (MTRDeviceController * _Nullable)initializeController:(MTRDeviceController *)controller
+                                         withParameters:(MTRDeviceControllerParameters *)parameters
+                                                  error:(NSError * __autoreleasing *)error
+{
+    [self _assertCurrentQueueIsNotMatterQueue];
+
+    return [self _startDeviceController:controller
+                          startupParams:parameters
+                          fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
+                              FabricTable * fabricTable, MTRDeviceController * controller, CHIP_ERROR & fabricError) {
+                              auto advertiseOperational = self.advertiseOperational && parameters.shouldAdvertiseOperational;
+                              auto * params =
+                                  [[MTRDeviceControllerStartupParamsInternal alloc] initForNewController:controller
+                                                                                             fabricTable:fabricTable
+                                                                                                keystore:self->_keystore
+                                                                                    advertiseOperational:advertiseOperational
+                                                                                                  params:parameters
+                                                                                                   error:fabricError];
+                              if (params != nil) {
+                                  if (params.productAttestationAuthorityCertificates == nil) {
+                                      params.productAttestationAuthorityCertificates = self.productAttestationAuthorityCertificates;
+                                  }
+                                  if (params.certificationDeclarationCertificates == nil) {
+                                      params.certificationDeclarationCertificates = self.certificationDeclarationCertificates;
+                                  }
+                              }
+                              return params;
+                          }
+                                  error:error];
+}
+
 - (PersistentStorageDelegate *)storageDelegate
 {
     return _persistentStorageDelegate;
@@ -1176,7 +1166,7 @@ MTR_HIDDEN
     return self;
 }
 
-- (instancetype)init
+- (instancetype)initWithoutStorage
 {
     if (!(self = [super init])) {
         return nil;
@@ -1191,7 +1181,7 @@ MTR_HIDDEN
     _productAttestationAuthorityCertificates = nil;
     _certificationDeclarationCertificates = nil;
     _port = nil;
-    _shouldStartServer = NO;
+    _shouldStartServer = YES;
 
     return self;
 }

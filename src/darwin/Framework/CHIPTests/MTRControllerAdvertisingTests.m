@@ -133,8 +133,6 @@ static const DNSServiceFlags kBrowseFlags = 0;
     [self setContinueAfterFailure:NO];
 
     _storageQueue = dispatch_queue_create("test.storage.queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-
-    [self startFactory];
 }
 
 - (void)tearDown
@@ -143,22 +141,6 @@ static const DNSServiceFlags kBrowseFlags = 0;
     [self stopFactory];
     _storageQueue = nil;
     [super tearDown];
-}
-
-- (void)startFactory
-{
-    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
-    XCTAssertNotNil(factory);
-
-    __auto_type * factoryParams = [[MTRDeviceControllerFactoryParams alloc] init];
-    factoryParams.shouldStartServer = YES;
-
-    NSError * error;
-    BOOL ok = [factory startControllerFactory:factoryParams error:&error];
-    XCTAssertNil(error);
-    XCTAssertTrue(ok);
-
-    XCTAssertTrue(factory.isRunning);
 }
 
 - (void)stopFactory
@@ -180,9 +162,6 @@ static const DNSServiceFlags kBrowseFlags = 0;
 {
     XCTAssertTrue(error != NULL);
 
-    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
-    XCTAssertNotNil(factory);
-
     // Specify a fixed issuerID, so we get the same cert if we use the same keys.
     __auto_type * root = [MTRCertificates createRootCertificate:rootKeys issuerID:@(1) fabricID:nil error:error];
     XCTAssertNil(*error);
@@ -198,21 +177,20 @@ static const DNSServiceFlags kBrowseFlags = 0;
     XCTAssertNil(*error);
     XCTAssertNotNil(operational);
 
-    __auto_type * params =
-        [[MTRDeviceControllerExternalCertificateStartupParameters alloc] initWithStorageDelegate:storage
-                                                                            storageDelegateQueue:_storageQueue
-                                                                                uniqueIdentifier:storage.controllerID
-                                                                                             ipk:rootKeys.ipk
-                                                                                        vendorID:@(kTestVendorId)
-                                                                              operationalKeypair:operationalKeys
-                                                                          operationalCertificate:operational
-                                                                         intermediateCertificate:nil
-                                                                                 rootCertificate:root];
+    __auto_type * params = [[MTRDeviceControllerExternalCertificateParameters alloc] initWithStorageDelegate:storage
+                                                                                        storageDelegateQueue:_storageQueue
+                                                                                            uniqueIdentifier:storage.controllerID
+                                                                                                         ipk:rootKeys.ipk
+                                                                                                    vendorID:@(kTestVendorId)
+                                                                                          operationalKeypair:operationalKeys
+                                                                                      operationalCertificate:operational
+                                                                                     intermediateCertificate:nil
+                                                                                             rootCertificate:root];
     XCTAssertNotNil(params);
 
     params.shouldAdvertiseOperational = advertiseOperational;
 
-    return [factory createController:params error:error];
+    return [[MTRDeviceController alloc] initWithParameters:params error:error];
 }
 
 - (void)test001_CheckAdvertisingAsExpected
