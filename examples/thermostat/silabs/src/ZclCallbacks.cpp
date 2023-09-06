@@ -51,7 +51,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     {
         TempMgr().AttributeChangeHandler(attributePath.mEndpointId, attributeId, value, size);
 #ifdef DIC_ENABLE
-        dic::control::AttributeHandler(attributePath.mEndpointId,attributeId);
+        dic::control::AttributeHandler(attributePath.mEndpointId, attributeId);
 #endif // DIC_ENABLE
     }
 }
