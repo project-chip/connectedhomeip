@@ -23,8 +23,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <lib/shell/Engine.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <app/clusters/sample-mei-server/sample-mei-server.h>
-
 
 using namespace chip;
 using namespace chip::Shell;

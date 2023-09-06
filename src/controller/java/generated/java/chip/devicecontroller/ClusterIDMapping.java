@@ -319,8 +319,8 @@ public class ClusterIDMapping {
         if (clusterId == FaultInjection.ID) {
             return new FaultInjection();
         }
-        if (clusterId == SampleMeiCluster.ID) {
-            return new SampleMeiCluster();
+        if (clusterId == SampleMei.ID) {
+            return new SampleMei();
         }return null;
     }
     public static class Identify implements BaseCluster {
@@ -14168,14 +14168,14 @@ public class ClusterIDMapping {
             return Command.valueOf(name).getID();
         }
     }
-    public static class SampleMeiCluster implements BaseCluster {
+    public static class SampleMei implements BaseCluster {
         public static final long ID = 4294048800L;
         public long getID() {
             return ID;
         }
 
         public enum Attribute {
-            Attribute1(0L),
+            FlipFlop(0L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -14222,8 +14222,8 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            Test(0L),
-            TestAddArguments(2L),;
+            Ping(0L),
+            AddArguments(2L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -14241,17 +14241,17 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum TestAddArgumentsCommandField {Arg1(0),Arg2(1),;
+        }public enum AddArgumentsCommandField {Arg1(0),Arg2(1),;
                     private final int id;
-                    TestAddArgumentsCommandField(int id) {
+                    AddArgumentsCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static TestAddArgumentsCommandField value(int id) throws NoSuchFieldError {
-                        for (TestAddArgumentsCommandField field : TestAddArgumentsCommandField.values()) {
+                    public static AddArgumentsCommandField value(int id) throws NoSuchFieldError {
+                        for (AddArgumentsCommandField field : AddArgumentsCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

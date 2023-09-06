@@ -39564,7 +39564,7 @@ public class ChipClusters {
   }
 
   public static class SampleMeiCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 4294048800L;
+    public static final long CLUSTER_ID = 0xFFF1FC20L;
 
     public SampleMeiCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);

@@ -5192,29 +5192,29 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("unitTesting", writeUnitTestingInteractionInfo);
     Map<String, InteractionInfo> writeFaultInjectionInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("faultInjection", writeFaultInjectionInteractionInfo);
-    Map<String, InteractionInfo> writeSampleMeiClusterInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeSampleMeiClusterAttribute1CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo sampleMeiClusterattribute1CommandParameterInfo =
+    Map<String, InteractionInfo> writeSampleMeiInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeSampleMeiFlipFlopCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo sampleMeiflipFlopCommandParameterInfo =
         new CommandParameterInfo(
             "value", 
             Boolean.class, 
             Boolean.class 
         );
-    writeSampleMeiClusterAttribute1CommandParams.put(
+    writeSampleMeiFlipFlopCommandParams.put(
         "value",
-        sampleMeiClusterattribute1CommandParameterInfo
+        sampleMeiflipFlopCommandParameterInfo
     );
-    InteractionInfo writeSampleMeiClusterAttribute1AttributeInteractionInfo = new InteractionInfo(
+    InteractionInfo writeSampleMeiFlipFlopAttributeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.SampleMeiClusterCluster) cluster).writeAttribute1Attribute(
+        ((ChipClusters.SampleMeiCluster) cluster).writeFlipFlopAttribute(
           (DefaultClusterCallback) callback,
           (Boolean) commandArguments.get("value")
         );
       },
       () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeSampleMeiClusterAttribute1CommandParams
+      writeSampleMeiFlipFlopCommandParams
     );
-    writeSampleMeiClusterInteractionInfo.put("writeAttribute1Attribute", writeSampleMeiClusterAttribute1AttributeInteractionInfo);
-    writeAttributeMap.put("sampleMeiCluster", writeSampleMeiClusterInteractionInfo);return writeAttributeMap;
+    writeSampleMeiInteractionInfo.put("writeFlipFlopAttribute", writeSampleMeiFlipFlopAttributeInteractionInfo);
+    writeAttributeMap.put("sampleMei", writeSampleMeiInteractionInfo);return writeAttributeMap;
   }
 }

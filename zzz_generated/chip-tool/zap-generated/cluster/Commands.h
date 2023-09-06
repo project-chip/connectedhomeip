@@ -11385,7 +11385,7 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster SampleMei                                                   | 0xFFF1FC20|
+| Cluster SampleMei                                                   | 0xFFF1FC20 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Ping                                                              |   0x00 |
@@ -11416,16 +11416,23 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC20) command (0x00000000) on endpoint %u", endpointIds.at(0));
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::SampleMei::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::SampleMei::Commands::Ping::Id;
 
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC20, 0x00000000, mRequest);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC20) command (0x00000000) on Group %u", groupId);
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::SampleMei::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::SampleMei::Commands::Ping::Id;
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC20, 0x00000000, mRequest);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
 
 private:
@@ -11447,16 +11454,23 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC20) command (0x00000002) on endpoint %u", endpointIds.at(0));
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::SampleMei::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::SampleMei::Commands::AddArguments::Id;
 
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC20, 0x00000002, mRequest);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC20) command (0x00000002) on Group %u", groupId);
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::SampleMei::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::SampleMei::Commands::AddArguments::Id;
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC20, 0x00000002, mRequest);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
 
 private:
