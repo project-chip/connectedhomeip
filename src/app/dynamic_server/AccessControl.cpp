@@ -23,6 +23,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/InteractionModelEngine.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/Global.h>
 
 using namespace chip;
 using namespace chip::Access;
@@ -40,7 +41,7 @@ public:
     {
         return app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
     }
-} gDeviceTypeResolver;
+};
 
 // TODO: Make the policy more configurable by consumers.
 class AccessControlDelegate : public Access::AccessControl::Delegate
@@ -73,7 +74,15 @@ class AccessControlDelegate : public Access::AccessControl::Delegate
     }
 };
 
-AccessControlDelegate gDelegate;
+struct ControllerAccessControl
+{
+    DeviceTypeResolver mDeviceTypeResolver;
+    AccessControlDelegate mDelegate;
+    ControllerAccessControl() { GetAccessControl().Init(&mDelegate, mDeviceTypeResolver); }
+};
+
+Global<ControllerAccessControl> gControllerAccessControl;
+
 } // anonymous namespace
 
 namespace chip {
@@ -81,7 +90,7 @@ namespace app {
 namespace dynamic_server {
 void InitAccessControl()
 {
-    GetAccessControl().Init(&gDelegate, gDeviceTypeResolver);
+    (void) *gControllerAccessControl;
 }
 } // namespace dynamic_server
 } // namespace app

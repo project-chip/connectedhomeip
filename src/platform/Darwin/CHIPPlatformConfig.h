@@ -27,6 +27,7 @@
 
 #define CHIP_CONFIG_ABORT() abort()
 
+#include <os/trace_base.h> // for __dso_handle
 extern "C" int __cxa_atexit(void (*f)(void *), void * p, void * d);
 #define CHIP_CXA_ATEXIT(f, p) __cxa_atexit((f), (p), &__dso_handle)
 
