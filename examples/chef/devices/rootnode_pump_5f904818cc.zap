@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -36,7 +36,6 @@
       "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 2,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 2,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        2
       ],
       "deviceVersions": [
         1
@@ -6244,7 +6239,6 @@
       "id": 2,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
-        "id": 14,
         "code": 771,
         "profileId": 2457,
         "label": "MA-pump",
@@ -6252,15 +6246,11 @@
       },
       "deviceTypes": [
         {
-          "id": 14,
           "code": 771,
           "profileId": 2457,
           "label": "MA-pump",
           "name": "MA-pump"
         }
-      ],
-      "deviceTypeRefs": [
-        14
       ],
       "deviceVersions": [
         1
@@ -7689,7 +7679,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -7705,7 +7695,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -7721,7 +7711,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -7737,7 +7727,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -7981,7 +7971,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -7997,7 +7987,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -8013,7 +8003,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -8029,7 +8019,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -8193,7 +8183,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -8209,7 +8199,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -8225,7 +8215,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -8241,7 +8231,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -8302,6 +8292,5 @@
       "endpointId": 1,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }
