@@ -31,7 +31,7 @@ limitations under the License.
     <attribute side="server" code="0x0000" define="FLIP_FLOP" type="BOOLEAN" writable="true" default="false" optional="false">FlipFlop</attribute>
 
     <!-- Command Responses -->
-    <command source="server" code="0x01" name="AddArgumentsResponse" optional="true" disableDefaultResponse="true">
+    <command source="server" code="0x01" name="AddArgumentsResponse" optional="false" disableDefaultResponse="true">
       <description>
         Response for AddArguments that returns the sum.
       </description>

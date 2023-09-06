@@ -92,10 +92,9 @@ void SampleMeiServer::InvokeCommand(HandlerContext & ctxt)
                 return;
             }
 
-            AddArgumentsResponse::Type responseData;
-            responseData.returnValue = static_cast<uint8_t>(req.arg1 + req.arg2);
-            ctx.mCommandHandler.AddResponse(ctx.mRequestPath, responseData);
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
+            AddArgumentsResponse::Type response;
+            response.returnValue = static_cast<uint8_t>(req.arg1 + req.arg2);
+            ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
         });
         return;
     }
