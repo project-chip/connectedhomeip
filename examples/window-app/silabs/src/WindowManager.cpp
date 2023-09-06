@@ -507,22 +507,24 @@ void WindowManager::Cover::CallbackPositionSet(intptr_t arg)
     WindowManager::Cover::CoverWorkData * data = reinterpret_cast<WindowManager::Cover::CoverWorkData *>(arg);
     position.SetNonNull(data->percent100ths);
 
-    if (data->isTilt){
+    if (data->isTilt)
+    {
         TiltPositionSet(data->mEndpointId, position);
 #ifdef DIC_ENABLE
         uint16_t value = data->percent100ths;
         char buffer[BYTE];
         itoa(value, buffer, DECIMAL);
-        dic_sendmsg("tilt/position set", (const char *)(buffer));
+        dic_sendmsg("tilt/position set", (const char *) (buffer));
 #endif // DIC_ENABLE
     }
-    else{
+    else
+    {
         LiftPositionSet(data->mEndpointId, position);
 #ifdef DIC_ENABLE
         uint16_t value = data->percent100ths;
         char buffer[BYTE];
         itoa(value, buffer, DECIMAL);
-        dic_sendmsg("lift/position set",(const char *)(buffer));
+        dic_sendmsg("lift/position set", (const char *) (buffer));
 #endif // DIC_ENABLE
     }
     chip::Platform::Delete(data);

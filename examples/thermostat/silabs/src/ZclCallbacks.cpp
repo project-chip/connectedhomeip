@@ -30,7 +30,7 @@
 
 #ifdef DIC_ENABLE
 #include "AppTask.h"
-#endif //DIC_ENABLE
+#endif // DIC_ENABLE
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
