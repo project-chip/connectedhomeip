@@ -77,6 +77,25 @@ public:
      * Handles the RvcOperationalState resume command.
      */
     void HandleOpStateResumeCallback(Clusters::OperationalState::GenericOperationalError & err);
+
+    /**
+     * Updates the state machine when the device becomes fully-charged.
+     */
+    void HandleChargedMessage();
+
+    void HandleChargingMessage();
+
+    void HandleDockedMessage();
+
+    void HandleChargerFoundMessage();
+
+    void HandleLowChargeMessage();
+
+    void HandleActivityCompleteEvent();
+
+    void HandleErrorEvent();
+
+    void HandleClearErrorMessage();
 };
 
 } // namespace Clusters

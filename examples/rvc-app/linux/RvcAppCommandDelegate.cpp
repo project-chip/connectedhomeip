@@ -18,8 +18,10 @@
 
 #include "RvcAppCommandDelegate.h"
 #include <platform/PlatformManager.h>
+#include "rvc-device.h"
 
 using namespace chip;
+using namespace chip::app::Clusters;
 
 RvcAppCommandHandler * RvcAppCommandHandler::FromJSON(const char * json)
 {
@@ -59,6 +61,34 @@ void RvcAppCommandHandler::HandleCommand(intptr_t context)
     {
         self->OnChargedHandler();
     }
+    else if (name == "Charging")
+    {
+        self->OnChargingHandler();
+    }
+    else if (name == "Docked")
+    {
+        self->OnDockedHandler();
+    }
+    else if (name == "ChargerFound")
+    {
+        self->OnChargerFoundHandler();
+    }
+    else if (name == "LowCharge")
+    {
+        self->OnLowChargeHandler();
+    }
+    else if (name == "ActivityComplete")
+    {
+        self->OnActivityCompleteHandler();
+    }
+    else if (name == "ErrorEvent")
+    {
+        self->OnErrorEventHandler();
+    }
+    else if (name == "ClearError")
+    {
+        self->OnClearErrorHandler();
+    }
     else
     {
         ChipLogError(NotSpecified, "Unhandled command: Should never happens");
@@ -68,9 +98,54 @@ exit:
     Platform::Delete(self);
 }
 
+void RvcAppCommandHandler::SetRvcDevice(chip::app::Clusters::RvcDevice * aRvcDevice)
+{
+    mRvcDevice = aRvcDevice;
+}
+
 void RvcAppCommandHandler::OnChargedHandler()
 {
-    ChipLogError(NotSpecified, "Here!!");
+    mRvcDevice->HandleChargedMessage();
+}
+
+void RvcAppCommandHandler::OnChargingHandler()
+{
+    mRvcDevice->HandleChargingMessage();
+}
+
+void RvcAppCommandHandler::OnDockedHandler()
+{
+    mRvcDevice->HandleDockedMessage();
+}
+
+void RvcAppCommandHandler::OnChargerFoundHandler()
+{
+    mRvcDevice->HandleChargerFoundMessage();
+}
+
+void RvcAppCommandHandler::OnLowChargeHandler()
+{
+    mRvcDevice->HandleLowChargeMessage();
+}
+
+void RvcAppCommandHandler::OnActivityCompleteHandler()
+{
+    mRvcDevice->HandleActivityCompleteEvent();
+}
+
+void RvcAppCommandHandler::OnErrorEventHandler()
+{
+    mRvcDevice->HandleErrorEvent();
+}
+
+void RvcAppCommandHandler::OnClearErrorHandler()
+{
+    mRvcDevice->HandleClearErrorMessage();
+}
+
+void RvcAppCommandDelegate::SetRvcDevice(chip::app::Clusters::RvcDevice * aRvcDevice)
+{
+    mRvcDevice = aRvcDevice;
 }
 
 void RvcAppCommandDelegate::OnEventCommandReceived(const char * json)
@@ -82,5 +157,6 @@ void RvcAppCommandDelegate::OnEventCommandReceived(const char * json)
         return;
     }
 
+    handler->SetRvcDevice(mRvcDevice);
     chip::DeviceLayer::PlatformMgr().ScheduleWork(RvcAppCommandHandler::HandleCommand, reinterpret_cast<intptr_t>(handler));
 }

@@ -23,34 +23,36 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-// Todo s
-//  - Add a named pipe for out-of-band messages
-//  - Add and handle the following out-of-band messages
-//    - charged
-//    - docked?
-//    - charger found
-//    - low charge
-//    - activity complete
-//    - error event
-
 namespace {
 constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_rvc_fifo_";
 NamedPipeCommands sChipNamedPipeCommands;
 RvcAppCommandDelegate sRvcAppCommandDelegate;
 } // namespace
 
-RvcDevice * rvcDevice = nullptr;
+RvcDevice * gRvcDevice = nullptr;
 
 void ApplicationInit()
 {
-    rvcDevice = new RvcDevice;
-    rvcDevice->Init();
+    std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
+
+    if (sChipNamedPipeCommands.Start(path, &sRvcAppCommandDelegate) != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
+        sChipNamedPipeCommands.Stop();
+    }
+
+    gRvcDevice = new RvcDevice;
+    gRvcDevice->Init();
+
+    sRvcAppCommandDelegate.SetRvcDevice(gRvcDevice);
 }
 
 void ApplicationShutdown()
 {
-    delete rvcDevice;
-    rvcDevice = nullptr;
+    delete gRvcDevice;
+    gRvcDevice = nullptr;
+
+    sChipNamedPipeCommands.Stop();
 }
 
 int main(int argc, char * argv[])
@@ -58,14 +60,6 @@ int main(int argc, char * argv[])
     if (ChipLinuxAppInit(argc, argv) != 0)
     {
         return -1;
-    }
-
-    std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
-
-    if (sChipNamedPipeCommands.Start(path, &sRvcAppCommandDelegate) != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
-        sChipNamedPipeCommands.Stop();
     }
 
     ChipLinuxAppMainLoop();

@@ -21,6 +21,7 @@
 #include "NamedPipeCommands.h"
 #include <json/json.h>
 #include <platform/DiagnosticDataProvider.h>
+#include "rvc-device.h"
 
 class RvcAppCommandHandler
 {
@@ -31,18 +32,37 @@ public:
 
    RvcAppCommandHandler(Json::Value && jasonValue) : mJsonValue(std::move(jasonValue)) {}
 
+   void SetRvcDevice(chip::app::Clusters::RvcDevice * aRvcDevice);
+
 private:
    Json::Value mJsonValue;
+   chip::app::Clusters::RvcDevice * mRvcDevice;
 
    /**
     * Should be called to notify that the device has finished charging.
     */
    void OnChargedHandler();
 
+   void OnChargingHandler();
+
+   void OnDockedHandler();
+
+   void OnChargerFoundHandler();
+
+   void OnLowChargeHandler();
+
+   void OnActivityCompleteHandler();
+
+   void OnErrorEventHandler();
+
+   void OnClearErrorHandler();
 };
 
 class RvcAppCommandDelegate : public NamedPipeCommandDelegate
 {
+private:
+    chip::app::Clusters::RvcDevice * mRvcDevice;
 public:
-   void OnEventCommandReceived(const char * json) override;
+    void SetRvcDevice(chip::app::Clusters::RvcDevice * aRvcDevice);
+    void OnEventCommandReceived(const char * json) override;
 };
