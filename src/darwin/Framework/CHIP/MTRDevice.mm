@@ -463,13 +463,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         // Whenever a StartUp event is received, reset the estimated start time
         //   New subscription case
         //     - Starts Unreachable
+        //     - Start CASE and send subscription request
         //     - Receive priming report ReportBegin
         //     - Optionally receive UpTime attribute - update time and save start time estimate
         //     - Optionally receive StartUp event
         //       - Set estimated system time from event receipt time, or saved UpTime estimate if exists
         //     - ReportEnd handler clears the saved start time estimate based on UpTime
         //   Disconnected subscription case
-        //     Same as the above
+        //     - Starts Unreachable
+        //     - Resubscribe happens after some time, and then same as the above
         //   Subscription resumption after reboot case
         //     - Starts Reachable
         //     - Receive priming report ReportBegin
