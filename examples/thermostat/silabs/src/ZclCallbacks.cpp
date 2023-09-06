@@ -29,7 +29,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #ifdef DIC_ENABLE
-#include "AppTask.h"
+#include "dic_control.h"
 #endif // DIC_ENABLE
 
 using namespace ::chip;
@@ -51,7 +51,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     {
         TempMgr().AttributeChangeHandler(attributePath.mEndpointId, attributeId, value, size);
 #ifdef DIC_ENABLE
-        AppTask().DIC_AttrubiteHandler(attributeId);
+        dic::control::AttributeHandler(attributePath.mEndpointId,attributeId);
 #endif // DIC_ENABLE
     }
 }

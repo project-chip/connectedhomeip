@@ -88,15 +88,6 @@ public:
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
-    /**
-     * @brief share the status to cloud using DIC
-     *
-     * @param attributeId attribute id for the attribute
-     */
-#ifdef DIC_ENABLE
-    void DIC_AttrubiteHandler(AttributeId attributeId);
-#endif // DIC_ENABLE
-
 private:
     static AppTask sAppTask;
 
