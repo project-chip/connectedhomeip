@@ -19,14 +19,6 @@ from enum import Enum, auto
 from .gn import GnBuilder
 
 
-def raise_exception(info):
-    logging.fatal('*' * 80)
-    logging.fatal('\t%s', info)
-    logging.fatal('*' * 80)
-
-    raise Exception(info)
-
-
 class BouffalolabApp(Enum):
     LIGHT = auto()
 
@@ -34,19 +26,19 @@ class BouffalolabApp(Enum):
         if self == BouffalolabApp.LIGHT:
             return 'lighting-app'
         else:
-            raise_exception('Unknown app type: %r' % self)
+            raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self, chip_name):
         if self == BouffalolabApp.LIGHT:
             return ('chip-%s-lighting-example' % chip_name)
         else:
-            raise_exception('Unknown app type: %r' % self)
+            raise Exception('Unknown app type: %r' % self)
 
     def FlashBundleName(self):
         if self == BouffalolabApp.LIGHT:
             return 'lighting_app.flashbundle.txt'
         else:
-            raise_exception('Unknown app type: %r' % self)
+            raise Exception('Unknown app type: %r' % self)
 
 
 class BouffalolabBoard(Enum):
@@ -71,7 +63,13 @@ class BouffalolabBoard(Enum):
         elif self == BouffalolabBoard.BL704LDK:
             return 'BL704LDK'
         else:
-            raise_exception('Unknown board #: %r' % self)
+            raise Exception('Unknown board #: %r' % self)
+
+
+class BouffalolabMfd(Enum):
+    MFD_DISABLE = auto()
+    MFD_TEST = auto()
+    MFD_RELEASE = auto()
 
 
 class BouffalolabBuilder(GnBuilder):
@@ -88,7 +86,7 @@ class BouffalolabBuilder(GnBuilder):
                  enable_cdc: bool = False,
                  enable_resetCnt: bool = False,
                  enable_rotating_device_id: bool = False,
-                 function_mfd: str = "disable",
+                 function_mfd: BouffalolabMfd = BouffalolabMfd.MFD_DISABLE,
                  enable_ethernet: bool = False,
                  enable_wifi: bool = False,
                  enable_thread: bool = False,
@@ -130,14 +128,14 @@ class BouffalolabBuilder(GnBuilder):
 
             enable_wifi = True
             if enable_ethernet or enable_thread:
-                raise_exception('SoC %s doesn\'t support connectivity Ethernet/Thread.' % bouffalo_chip)
+                raise Exception('SoC %s doesn\'t support connectivity Ethernet/Thread.' % bouffalo_chip)
 
         elif bouffalo_chip == "bl702":
 
             self.argsOpt.append('module_type=\"{}\"'.format(module_type))
             if board != BouffalolabBoard.BL706DK:
                 if enable_ethernet or enable_wifi:
-                    raise_exception('Board %s doesn\'t support connectivity Ethernet/Wi-Fi.' % board)
+                    raise Exception('Board %s doesn\'t support connectivity Ethernet/Wi-Fi.' % board)
 
             if not enable_wifi and not enable_ethernet:
                 enable_thread = True
@@ -146,7 +144,7 @@ class BouffalolabBuilder(GnBuilder):
         elif bouffalo_chip == "bl702l":
 
             if enable_ethernet or enable_wifi:
-                raise_exception('SoC %s doesn\'t support connectivity Ethernet/Wi-Fi currently.' % bouffalo_chip)
+                raise Exception('SoC %s doesn\'t support connectivity Ethernet/Wi-Fi currently.' % bouffalo_chip)
 
             enable_thread = True
             openthread_project_core_config_file = "bl702l-openthread-core-bl-config.h"
@@ -187,9 +185,9 @@ class BouffalolabBuilder(GnBuilder):
 
         if enable_cdc:
             if bouffalo_chip != "bl702":
-                self.raise_exception('Chip %s does NOT support USB CDC' % bouffalo_chip)
+                raise Exception('Chip %s does NOT support USB CDC' % bouffalo_chip)
             if enable_ethernet:
-                self.raise_exception('BL706 Ethernet does NOT support USB CDC')
+                raise Exception('BL706 Ethernet does NOT support USB CDC')
 
             self.argsOpt.append('enable_cdc_module=true')
 
@@ -205,13 +203,13 @@ class BouffalolabBuilder(GnBuilder):
             self.argsOpt.append('chip_enable_additional_data_advertising=true')
             self.argsOpt.append('chip_enable_rotating_device_id=true')
 
-        if "disable" != function_mfd:
+        if BouffalolabMfd.MFD_DISABLE != function_mfd:
             if bouffalo_chip != "bl602":
-                self.raise_exception('Only BL602 support matter factory data feature currently.')
+                raise Exception('Only BL602 support matter factory data feature currently.')
 
-            if "release" == function_mfd:
+            if BouffalolabMfd.MFD_RELEASE == function_mfd:
                 self.argsOpt.append("chip_enable_factory_data=true")
-            elif "test" == function_mfd:
+            elif BouffalolabMfd.MFD_TEST == function_mfd:
                 self.argsOpt.append("chip_enable_factory_data_test=true")
 
         if enable_frame_ptr:

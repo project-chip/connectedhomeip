@@ -15,7 +15,7 @@
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidApp, AndroidBoard, AndroidBuilder, AndroidProfile
 from builders.asr import ASRApp, ASRBoard, ASRBuilder
-from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
+from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder, BouffalolabMfd
 from builders.cc32xx import cc32xxApp, cc32xxBuilder
 from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
 from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
@@ -618,11 +618,11 @@ def BuildBouffalolabTarget():
     target.AppendModifier('cdc', enable_cdc=True)
     target.AppendModifier('resetCnt', enable_resetCnt=True)
     target.AppendModifier('rotating_device_id', enable_rotating_device_id=True)
-    target.AppendModifier('mfd', function_mfd="release")
-    target.AppendModifier('mfdtest', function_mfd="test")
-    target.AppendModifier('ethernet', enable_ethernet="test")
-    target.AppendModifier('wifi', enable_wifi="test")
-    target.AppendModifier('thread', enable_thread="test")
+    target.AppendModifier('mfd', function_mfd=BouffalolabMfd.MFD_RELEASE)
+    target.AppendModifier('mfdtest', function_mfd=BouffalolabMfd.MFD_TEST)
+    target.AppendModifier('ethernet', enable_ethernet=True)
+    target.AppendModifier('wifi', enable_wifi=True)
+    target.AppendModifier('thread', enable_thread=True)
     target.AppendModifier('fp', enable_frame_ptr=True)
 
     return target
