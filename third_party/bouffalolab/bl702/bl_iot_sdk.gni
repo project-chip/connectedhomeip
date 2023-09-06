@@ -693,7 +693,6 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_entropy.c",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_linkmetric.c",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_logging.c",
-
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_misc.c",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_radio.c",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_settings.c",
