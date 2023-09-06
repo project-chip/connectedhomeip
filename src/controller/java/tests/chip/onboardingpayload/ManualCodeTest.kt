@@ -683,4 +683,79 @@ class ManualCodeTest {
       productId = payload.productId
     )
   }
+
+  /*
+   * Test Parse Short Manual PairingCode to Expected Payload
+   */
+  @Test
+  fun testParseShortManualPairingCodeToExpectedPayload() {
+    // Payload: MT:W0GU2OTB00KA0648G00
+    // Setup Pin Code: 20202021
+    // Setup Discriminator: 15
+
+    val parser = OnboardingPayloadParser()
+    assertThat(parser.parseManualPairingCode("34970112332"))
+      .isEqualTo(
+        OnboardingPayload(
+          discriminator = 15,
+          setupPinCode = 20202021,
+          version = 0,
+          vendorId = 0,
+          productId = 0,
+          hasShortDiscriminator = true,
+          commissioningFlow = CommissioningFlow.STANDARD.value,
+          discoveryCapabilities = mutableSetOf(),
+        )
+      )
+  }
+
+  /*
+   * Test Parse Long Manual PairingCode to Expected Payload
+   */
+  @Test
+  fun testParseLongManualPairingCodeToExpectedPayload() {
+    // Payload: MT:W0GU2OTB00KA0648G00
+    // Vendor Id: 9050 (0x235A)
+    // Product Id: 17729 (0x4541)
+    // Setup Pin Code: 20202021
+    // Setup Discriminator: 15
+
+    val parser = OnboardingPayloadParser()
+    assertThat(parser.parseManualPairingCode("749701123309050177298"))
+      .isEqualTo(
+        OnboardingPayload(
+          discriminator = 15,
+          setupPinCode = 20202021,
+          version = 0,
+          vendorId = 0x235A,
+          productId = 0x4541,
+          hasShortDiscriminator = true,
+          commissioningFlow = CommissioningFlow.CUSTOM.value,
+          discoveryCapabilities = mutableSetOf(),
+        )
+      )
+  }
+
+  /*
+   * Test Generate Manual PairingCode to Expected Payload
+   */
+  @Test
+  fun testGenerateManualPairingCodetoExpectedPayload() {
+    val parser = OnboardingPayloadParser()
+    assertThat(
+        parser.getManualPairingCodeFromPayload(
+          OnboardingPayload(
+            discriminator = 15,
+            setupPinCode = 20202021,
+            version = 0,
+            vendorId = 0x235A,
+            productId = 0x4541,
+            hasShortDiscriminator = true,
+            commissioningFlow = CommissioningFlow.CUSTOM.value,
+            discoveryCapabilities = mutableSetOf(),
+          )
+        )
+      )
+      .isEqualTo("749701123309050177298")
+  }
 }

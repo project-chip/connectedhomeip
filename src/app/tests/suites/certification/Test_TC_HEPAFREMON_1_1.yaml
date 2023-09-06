@@ -79,7 +79,7 @@ tests:
       response:
           constraints:
               type: bitmap32
-              hasMasksSet: [0x3]
+              hasMasksSet: [0x4]
 
     - label: "Step 4: Read the global attribute: AttributeList"
       PICS: PICS_EVENT_LIST_ENABLED

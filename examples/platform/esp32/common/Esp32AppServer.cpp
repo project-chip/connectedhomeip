@@ -27,6 +27,19 @@
 #if CONFIG_ENABLE_ICD_SERVER
 #include <ICDSubscriptionCallback.h>
 #endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if CONFIG_BT_ENABLED
+#include "esp_bt.h"
+#if CONFIG_BT_NIMBLE_ENABLED
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
+#include "esp_nimble_hci.h"
+#endif // ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
+#include "nimble/nimble_port.h"
+#endif // CONFIG_BT_NIMBLE_ENABLED
+#endif // CONFIG_BT_ENABLED
+#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+
 #include <string.h>
 
 using namespace chip;
@@ -100,6 +113,50 @@ static size_t hex_string_to_binary(const char * hex_string, uint8_t * buf, size_
 }
 #endif // CONFIG_TEST_EVENT_TRIGGER_ENABLED
 
+void Esp32AppServer::DeInitBLEIfCommissioned(void)
+{
+#if CONFIG_BT_ENABLED && CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
+    if (chip::Server::GetInstance().GetFabricTable().FabricCount() > 0)
+    {
+        esp_err_t err = ESP_OK;
+
+#if CONFIG_BT_NIMBLE_ENABLED
+        if (!ble_hs_is_enabled())
+        {
+            ESP_LOGI(TAG, "BLE already deinited");
+            return;
+        }
+        if (nimble_port_stop() != 0)
+        {
+            ESP_LOGE(TAG, "nimble_port_stop() failed");
+            return;
+        }
+        vTaskDelay(100);
+        nimble_port_deinit();
+
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
+        err = esp_nimble_hci_and_controller_deinit();
+#endif
+#endif /* CONFIG_BT_NIMBLE_ENABLED */
+
+#if CONFIG_IDF_TARGET_ESP32
+        err |= esp_bt_mem_release(ESP_BT_MODE_BTDM);
+#elif CONFIG_IDF_TARGET_ESP32C2 || CONFIG_IDF_TARGET_ESP32C3 || CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32H2
+        err |= esp_bt_mem_release(ESP_BT_MODE_BLE);
+#endif
+
+        if (err != ESP_OK)
+        {
+            ESP_LOGE(TAG, "BLE deinit failed");
+        }
+        else
+        {
+            ESP_LOGI(TAG, "BLE deinit successful and memory reclaimed");
+        }
+    }
+#endif /* CONFIG_BT_ENABLED && CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING */
+}
+
 void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 {
     // Init ZCL Data Model and CHIP App Server
@@ -136,4 +193,5 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
         chip::app::DnssdServer::Instance().StartServer();
     }
 #endif
+    DeInitBLEIfCommissioned();
 }
