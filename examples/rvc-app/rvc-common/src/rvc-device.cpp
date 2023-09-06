@@ -25,41 +25,17 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::Ch
         }
 
         mRunModeInstance.UpdateCurrentMode(NewMode);
-        // Set operational state to running
-        ChipError err =
-            mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
-        if (err != CHIP_NO_ERROR)
-        {
-            response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
-            response.statusText.SetValue(chip::CharSpan::fromCharString(err.AsString()));
-            return;
-        }
+        mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
         break;
     }
     case RvcRunMode::ModeCleaning: {
         mRunModeInstance.UpdateCurrentMode(NewMode);
-        // Set operational state to running
-        ChipError err =
-            mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
-        if (err != CHIP_NO_ERROR)
-        {
-            response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
-            response.statusText.SetValue(chip::CharSpan::fromCharString(err.AsString()));
-            return;
-        }
+        mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
     }
     break;
     case RvcRunMode::ModeIdle: {
         mRunModeInstance.UpdateCurrentMode(NewMode);
-        // Set operational state to running
-        ChipError err =
-            mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
-        if (err != CHIP_NO_ERROR)
-        {
-            response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
-            response.statusText.SetValue(chip::CharSpan::fromCharString(err.AsString()));
-            return;
-        }
+        mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
     }
     }
 
