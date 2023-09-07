@@ -27,6 +27,9 @@ void MTRBaseSubscriptionCallback::OnReportBegin()
 {
     mAttributeReports = [NSMutableArray new];
     mEventReports = [NSMutableArray new];
+    if (mReportBeginHandler) {
+        mReportBeginHandler();
+    }
 }
 
 // Reports attribute and event data if any exists
@@ -48,7 +51,13 @@ void MTRBaseSubscriptionCallback::ReportData()
     }
 }
 
-void MTRBaseSubscriptionCallback::OnReportEnd() { ReportData(); }
+void MTRBaseSubscriptionCallback::OnReportEnd()
+{
+    ReportData();
+    if (mReportEndHandler) {
+        mReportEndHandler();
+    }
+}
 
 void MTRBaseSubscriptionCallback::OnError(CHIP_ERROR aError)
 {
