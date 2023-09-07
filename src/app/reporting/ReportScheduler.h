@@ -171,6 +171,7 @@ public:
         ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
         return node->GetMaxTimestamp();
     }
+    ReadHandlerNode * GetReadHandlerNode(const ReadHandler * aReadHandler) { return FindReadHandlerNode(aReadHandler); }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 protected:
