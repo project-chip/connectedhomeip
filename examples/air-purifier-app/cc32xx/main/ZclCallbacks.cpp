@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <air-purifier-manager.h>
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
@@ -31,6 +32,11 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     if (attributePath.mClusterId == OnOff::Id && attributePath.mAttributeId == OnOff::Attributes::OnOff::Id)
     {
       PLAT_LOG("MatterPostAttributeChangeCallback from zclCallbacks.cpp");
+    }
+    if (AirPurifierManager::GetInstance() != nullptr)
+    {
+        AirPurifierManager::GetInstance()->PostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId,
+                                                                       attributePath.mAttributeId, type, size, value);
     }
 }
 
