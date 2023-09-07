@@ -24,6 +24,7 @@
 #include "laundry-washer-controls-delegate-impl.h"
 #include "laundry-washer-mode.h"
 #include "operational-state-delegate-impl.h"
+#include "resource-monitoring-delegates.h"
 #include "rvc-modes.h"
 #include "tcc-mode.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -227,6 +228,8 @@ void ApplicationShutdown()
     Clusters::RvcCleanMode::Shutdown();
     Clusters::RvcRunMode::Shutdown();
     Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Shutdown();
+    Clusters::HepaFilterMonitoring::Shutdown();
+    Clusters::ActivatedCarbonFilterMonitoring::Shutdown();
 
     Clusters::AirQuality::Shutdown();
     Clusters::OperationalState::Shutdown();

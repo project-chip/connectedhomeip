@@ -19,6 +19,7 @@
 #include "lib/dnssd/platform/Dnssd.h"
 
 #include <esp_err.h>
+#include <esp_netif_net_stack.h>
 #include <lwip/ip4_addr.h>
 #include <lwip/ip6_addr.h>
 
@@ -26,6 +27,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/ESP32/ESP32Utils.h>
 
 namespace {
 
@@ -323,12 +325,21 @@ static CHIP_ERROR OnBrowseDone(BrowseContext * ctx)
                 ctx->mService[servicesIndex].mAddressType   = MapAddressType(currentResult->ip_protocol);
                 ctx->mService[servicesIndex].mTransportType = ctx->mAddressType;
                 ctx->mService[servicesIndex].mPort          = currentResult->port;
-                ctx->mService[servicesIndex].mInterface     = ctx->mInterfaceId;
                 ctx->mService[servicesIndex].mTextEntries =
                     GetTextEntry(currentResult->txt, currentResult->txt_value_len, currentResult->txt_count);
                 ctx->mService[servicesIndex].mTextEntrySize = currentResult->txt_count;
                 ctx->mService[servicesIndex].mSubTypes      = NULL;
                 ctx->mService[servicesIndex].mSubTypeSize   = 0;
+                if (ctx->mInterfaceId == chip::Inet::InterfaceId::Null())
+                {
+                    // If the InterfaceId in the context is Null, we will use the Station netif by default.
+                    ctx->mService[servicesIndex].mInterface =
+                        Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetStationNetif());
+                }
+                else
+                {
+                    ctx->mService[servicesIndex].mInterface = ctx->mInterfaceId;
+                }
                 if (currentResult->addr)
                 {
                     Inet::IPAddress IPAddr;
@@ -403,9 +414,18 @@ static CHIP_ERROR ParseSrvResult(ResolveContext * ctx)
         ctx->mService->mAddressType   = MapAddressType(ctx->mSrvQueryResult->ip_protocol);
         ctx->mService->mTransportType = ctx->mService->mAddressType;
         ctx->mService->mPort          = ctx->mSrvQueryResult->port;
-        ctx->mService->mInterface     = ctx->mInterfaceId;
         ctx->mService->mSubTypes      = nullptr;
         ctx->mService->mSubTypeSize   = 0;
+        if (ctx->mInterfaceId == chip::Inet::InterfaceId::Null())
+        {
+            // If the InterfaceId in the context is Null, we will use the Station netif by default.
+            ctx->mService->mInterface = Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetStationNetif());
+        }
+        else
+        {
+            ctx->mService->mInterface = ctx->mInterfaceId;
+        }
+
         return CHIP_NO_ERROR;
     }
     else

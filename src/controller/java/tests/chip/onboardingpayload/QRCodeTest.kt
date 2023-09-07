@@ -315,6 +315,60 @@ class QRCodeTest {
     assertEquals("ABC", QRCodeOnboardingPayloadParser.extractPayload("%MT:ABC"))
   }
 
+  /*
+   * Test Parse QrCode to Expected Payload
+   */
+  @Test
+  fun testParseQrCodeToExpectedPayload() {
+    // Payload: MT:W0GU2OTB00KA0648G00
+    // Vendor Id: 9050 (0x235A)
+    // Product Id: 20043 (0x4E4B)
+    // Setup Pin Code: 20202021
+    // Setup Discriminator: 3840 (0xF00)
+
+    val parser = OnboardingPayloadParser()
+    assertThat(parser.parseQrCode("MT:W0GU2OTB00KA0648G00"))
+      .isEqualTo(
+        OnboardingPayload(
+          discriminator = 0xF00,
+          setupPinCode = 20202021,
+          version = 0,
+          vendorId = 0x235A,
+          productId = 0x4E4B,
+          commissioningFlow = CommissioningFlow.STANDARD.value,
+          discoveryCapabilities = mutableSetOf(DiscoveryCapability.BLE),
+        )
+      )
+  }
+
+  /*
+   * Test Generate QrCode from Expected Value
+   */
+  @Test
+  fun testGenerateQrCodeFromExpectedValue() {
+    // Payload: MT:W0GU2OTB00KA0648G00
+    // Vendor Id: 9050 (0x235A)
+    // Product Id: 20043 (0x4E4B)
+    // Setup Pin Code: 20202021
+    // Setup Discriminator: 3840 (0xF00)
+
+    val parser = OnboardingPayloadParser()
+    assertThat(
+        parser.getQrCodeFromPayload(
+          OnboardingPayload(
+            discriminator = 0xF00,
+            setupPinCode = 20202021,
+            version = 0,
+            vendorId = 0x235A,
+            productId = 0x4E4B,
+            commissioningFlow = CommissioningFlow.STANDARD.value,
+            discoveryCapabilities = mutableSetOf(DiscoveryCapability.BLE),
+          )
+        )
+      )
+      .isEqualTo("MT:W0GU2OTB00KA0648G00")
+  }
+
   companion object {
     const val kDefaultPayloadQRCode: String = "MT:M5L90MP500K64J00000"
   }

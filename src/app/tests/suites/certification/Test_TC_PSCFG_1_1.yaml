@@ -81,25 +81,11 @@ tests:
           constraints:
               type: list
 
-    #Manufacturer specific event IDs check not possible
-    - label:
-          "Step 7: Read EventList attribute from the DUT.For this cluster the
-          list is usually empty but it can contain manufacturer specific event
-          IDs."
-      verification: |
-          ./chip-tool powersourceconfiguration read event-list 1 0
-
-           Verify "EventList attribute " consists the list of supported events,  which for this cluster should be an empty list on the TH(Chip-tool) Log:
-           [1676465821.421939][28007:28009] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002E Attribute 0x0000_FFFA DataVersion: 1659126157
-           [1676465821.421975][28007:28009] CHIP:TOO:   EventList: 0 entries
-           [1676465821.422017][28007:28009] CHIP:EM: <<< [E:59109i S:5686 M:123325798 (Ack:214612225)] (S) Msg TX to 1:0000000000000001 [110F] --- Type 0000:10 (SecureChannel:StandaloneAck)
-           [1676465821.422029][28007:28009] CHIP:IN: (S) Sending msg 123325798 on secure session with LSID: 5686
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Step 7: Read EventList attribute from the DUT."
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list

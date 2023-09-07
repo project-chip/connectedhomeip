@@ -30,6 +30,7 @@ from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder, OpenIotSdkCryptoBackend
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
+from builders.stm32 import stm32App, stm32Board, stm32Builder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.ti import TIApp, TIBoard, TIBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
@@ -130,6 +131,7 @@ def BuildHostTarget():
         TargetPart('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE),
         TargetPart('contact-sensor', app=HostApp.CONTACT_SENSOR),
         TargetPart('dishwasher', app=HostApp.DISHWASHER),
+        TargetPart('refrigerator', app=HostApp.REFRIGERATOR),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -434,6 +436,7 @@ def BuildASRTarget():
         TargetPart('thermostat', app=ASRApp.THERMOSTAT),
         TargetPart('ota-requestor', app=ASRApp.OTA_REQUESTOR),
         TargetPart('dishwasher', app=ASRApp.DISHWASHER),
+        TargetPart('refrigerator', app=ASRApp.REFRIGERATOR),
     ])
 
     # modifiers
@@ -556,6 +559,22 @@ def BuildQorvoTarget():
         TargetPart('light', app=QpgApp.LIGHT),
         TargetPart('shell', app=QpgApp.SHELL),
         TargetPart('persistent-storage', app=QpgApp.PERSISTENT_STORAGE),
+    ])
+
+    return target
+
+
+def BuildStm32Target():
+    target = BuildTarget('stm32', stm32Builder)
+
+    # board
+    target.AppendFixedTargets([
+        TargetPart('STM32WB5MM-DK', board=stm32Board.STM32WB55XX),
+    ])
+
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('light', app=stm32App.LIGHT),
     ])
 
     return target
@@ -725,6 +744,7 @@ BUILD_TARGETS = [
     BuildNrfTarget(),
     BuildNrfNativeTarget(),
     BuildQorvoTarget(),
+    BuildStm32Target(),
     BuildTizenTarget(),
     BuildTelinkTarget(),
     BuildOpenIotSdkTargets(),

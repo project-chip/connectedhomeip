@@ -1111,4 +1111,59 @@
     XCTAssertEqual(error.code, MTRErrorCodeSchemaMismatch);
 }
 
+- (void)globalListAttributeHelper:(NSNumber *)clusterID
+{
+    // clusterID, AcceptedCommandList
+    NSDictionary * input = @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:clusterID attributeID:@(0xFFF9)],
+        MTRDataKey : @ {
+            MTRTypeKey : MTRArrayValueType,
+            MTRValueKey : @[
+                @{
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @(5),
+                    },
+                },
+                @{
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @(8),
+                    },
+                },
+            ],
+        },
+    };
+
+    NSError * error;
+    __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:input error:&error];
+    XCTAssertNotNil(report);
+    XCTAssertNil(error);
+
+    XCTAssertEqualObjects(input[MTRAttributePathKey], report.path);
+    XCTAssertNotNil(report.value);
+    XCTAssertTrue([report.value isKindOfClass:[NSArray class]]);
+
+    NSArray * array = report.value;
+    XCTAssertTrue([array[0] isKindOfClass:[NSNumber class]]);
+    XCTAssertEqualObjects(array[0], @(5));
+
+    XCTAssertTrue([array[1] isKindOfClass:[NSNumber class]]);
+    XCTAssertEqualObjects(array[1], @(8));
+
+    XCTAssertNil(report.error);
+}
+
+- (void)test037_GlobalListAttributeStandardCluster
+{
+    // OnOff cluster.
+    [self globalListAttributeHelper:@(0x0006)];
+}
+
+- (void)test037_GlobalListAttributeManufacturerSpecific
+{
+    // Manufacturer specific cluster IDs start at 0xFC00.
+    [self globalListAttributeHelper:@(0xFFF4FD01)];
+}
+
 @end

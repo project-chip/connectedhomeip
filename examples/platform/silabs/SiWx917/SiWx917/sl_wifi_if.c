@@ -162,6 +162,7 @@ int32_t wfx_rsi_disconnect()
 
 sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t result_length, void * arg)
 {
+    wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING);
     temp_reset = (wfx_wifi_scan_ext_t *) malloc(sizeof(wfx_wifi_scan_ext_t));
     memset(temp_reset, 0, sizeof(wfx_wifi_scan_ext_t));
     if (CHECK_IF_EVENT_FAILED(event))
@@ -169,7 +170,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
         SILABS_LOG("F: Join Event received with %u bytes payload\n", result_length);
         callback_status = *(sl_status_t *) result;
         wfx_rsi.join_retries += 1;
-        wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
+        wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTED);
         wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries++);
         if (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
         {
@@ -191,7 +192,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
     return SL_STATUS_OK;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
+#if SL_ICD_ENABLED
 /******************************************************************
  * @fn   wfx_rsi_power_save()
  * @brief
@@ -221,7 +222,7 @@ int32_t wfx_rsi_power_save()
     SILABS_LOG("Powersave Config Success");
     return status;
 }
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
+#endif /* SL_ICD_ENABLED */
 
 /*************************************************************************************
  * @fn  static int32_t wfx_wifi_rsi_init(void)
