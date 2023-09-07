@@ -1059,12 +1059,16 @@ server cluster HepaFilterMonitoring = 113 {
   readonly attribute DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute boolean inPlaceIndicator = 3;
+  attribute nullable epoch_s lastChangedTime = 4;
+  readonly attribute ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  command ResetCondition(): DefaultSuccess = 0;
 }
 
 /** Attributes and commands for monitoring activated carbon filters in a device */
@@ -1103,12 +1107,16 @@ server cluster ActivatedCarbonFilterMonitoring = 114 {
   readonly attribute DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute boolean inPlaceIndicator = 3;
+  attribute nullable epoch_s lastChangedTime = 4;
+  readonly attribute ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  command ResetCondition(): DefaultSuccess = 0;
 }
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
@@ -1184,6 +1192,7 @@ server cluster Thermostat = 513 {
   attribute access(write: manage) int16s maxHeatSetpointLimit = 22;
   attribute access(write: manage) ThermostatControlSequence controlSequenceOfOperation = 27;
   attribute access(write: manage) enum8 systemMode = 28;
+  readonly attribute bitmap16 thermostatRunningState = 41;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1268,6 +1277,14 @@ server cluster FanControl = 514 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct StepRequest {
+    StepDirectionEnum direction = 0;
+    optional boolean wrap = 1;
+    optional boolean lowestOff = 2;
+  }
+
+  command Step(StepRequest): DefaultSuccess = 0;
 }
 
 /** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
@@ -2016,6 +2033,8 @@ endpoint 1 {
     callback attribute degradationDirection default = 1;
     callback attribute changeIndication default = 0;
     callback attribute inPlaceIndicator default = 1;
+    callback attribute lastChangedTime;
+    callback attribute replacementProductList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2029,6 +2048,8 @@ endpoint 1 {
     callback attribute degradationDirection default = 1;
     callback attribute changeIndication default = 0;
     callback attribute inPlaceIndicator default = 1;
+    callback attribute lastChangedTime;
+    callback attribute replacementProductList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2411,6 +2432,7 @@ endpoint 5 {
     ram      attribute maxHeatSetpointLimit default = 3000;
     ram      attribute controlSequenceOfOperation default = 0x02;
     ram      attribute systemMode default = 0x00;
+    ram      attribute thermostatRunningState;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
