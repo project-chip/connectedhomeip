@@ -1292,6 +1292,7 @@ server cluster TemperatureMeasurement = 1026 {
   readonly attribute nullable int16s measuredValue = 0;
   readonly attribute nullable int16s minMeasuredValue = 1;
   readonly attribute nullable int16s maxMeasuredValue = 2;
+  readonly attribute int16u tolerance = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1305,6 +1306,7 @@ server cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
   readonly attribute nullable int16u maxMeasuredValue = 2;
+  readonly attribute int16u tolerance = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2075,7 +2077,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 47;
+    ram      attribute featureMap default = 63;
     ram      attribute clusterRevision default = 4;
   }
 }
@@ -2346,15 +2348,16 @@ endpoint 3 {
   }
 
   server cluster TemperatureMeasurement {
-    ram      attribute measuredValue;
+    ram      attribute measuredValue default = 0x8000;
     ram      attribute minMeasuredValue default = 0x8000;
     ram      attribute maxMeasuredValue default = 0x8000;
+    ram      attribute tolerance default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 4;
   }
 }
 endpoint 4 {
@@ -2386,9 +2389,10 @@ endpoint 4 {
   }
 
   server cluster RelativeHumidityMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
+    ram      attribute measuredValue default = 0;
+    ram      attribute minMeasuredValue default = 0;
+    ram      attribute maxMeasuredValue default = 0x2710;
+    ram      attribute tolerance;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2438,7 +2442,7 @@ endpoint 5 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
   }
 }
 
