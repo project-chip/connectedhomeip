@@ -674,8 +674,11 @@ def BuildGenioTarget():
 
 def BuildTelinkTarget():
     target = BuildTarget('telink', TelinkBuilder)
-    target.AppendFixedTargets(
-        [TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D)])
+
+    target.AppendFixedTargets([
+        TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D),
+        TargetPart('tlsr9528a', board=TelinkBoard.TLSR9528A),
+    ])
 
     target.AppendFixedTargets([
         TargetPart('all-clusters', app=TelinkApp.ALL_CLUSTERS),
