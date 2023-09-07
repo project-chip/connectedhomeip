@@ -214,56 +214,56 @@ Draft
 				<feature>Does the DUT support testing the FailedToFindChargingDock(0x40) error state?</feature>
 				<reference>223.2.5. Manual controllable - allclusters.html[pdf]</reference>
 				<status cond="RVCOPSTATE.S">O</status>
-				<support>false</support>
+				<support>true</support>
 			</picsItem>
 			<picsItem>
 				<itemNumber>RVCOPSTATE.S.M.ERR_STUCK</itemNumber>
 				<feature>Does the DUT support testing the Stuck(0x41) error state?</feature>
 				<reference>223.2.5. Manual controllable - allclusters.html[pdf]</reference>
 				<status cond="RVCOPSTATE.S">O</status>
-				<support>false</support>
+				<support>true</support>
 			</picsItem>
 			<picsItem>
 				<itemNumber>RVCOPSTATE.S.M.ERR_DUST_BIN_MISSING</itemNumber>
 				<feature>Does the DUT support testing the DustBinMissing(0x42) error state?</feature>
 				<reference>223.2.5. Manual controllable - allclusters.html[pdf]</reference>
 				<status cond="RVCOPSTATE.S">O</status>
-				<support>false</support>
+				<support>true</support>
 			</picsItem>
 			<picsItem>
 				<itemNumber>RVCOPSTATE.S.M.ERR_DUST_BIN_FULL</itemNumber>
 				<feature>Does the DUT support testing the DustBinFull(0x43) error state?</feature>
 				<reference>223.2.5. Manual controllable - allclusters.html[pdf]</reference>
 				<status cond="RVCOPSTATE.S">O</status>
-				<support>false</support>
+				<support>true</support>
 			</picsItem>
 			<picsItem>
 				<itemNumber>RVCOPSTATE.S.M.ERR_WATER_TANK_EMPTY</itemNumber>
 				<feature>Does the DUT support testing the WaterTankEmpty(0x44) error state?</feature>
 				<reference>223.2.5. Manual controllable - allclusters.html[pdf]</reference>
 				<status cond="RVCOPSTATE.S">O</status>
-				<support>false</support>
+				<support>true</support>
 			</picsItem>
 			<picsItem>
 				<itemNumber>RVCOPSTATE.S.M.ERR_WATER_TANK_MISSING</itemNumber>
 				<feature>Does the DUT support testing the WaterTankMissing(0x45) error state?</feature>
 				<reference>223.2.5. Manual controllable - allclusters.html[pdf]</reference>
 				<status cond="RVCOPSTATE.S">O</status>
-				<support>false</support>
+				<support>true</support>
 			</picsItem>
 			<picsItem>
 				<itemNumber>RVCOPSTATE.S.M.ERR_WATER_TANK_LID_OPEN</itemNumber>
 				<feature>Does the DUT support testing the WaterTankLidOpen(0x46) error state?</feature>
 				<reference>223.2.5. Manual controllable - allclusters.html[pdf]</reference>
 				<status cond="RVCOPSTATE.S">O</status>
-				<support>false</support>
+				<support>true</support>
 			</picsItem>
 			<picsItem>
 				<itemNumber>RVCOPSTATE.S.M.ERR_MOP_CLEANING_PAD_MISSING</itemNumber>
 				<feature>Does the DUT support testing the MopCleaningPadMissing(0x47) error state?</feature>
 				<reference>223.2.5. Manual controllable - allclusters.html[pdf]</reference>
 				<status cond="RVCOPSTATE.S">O</status>
-				<support>false</support>
+				<support>true</support>
 			</picsItem>
 		</manually>
 	</clusterSide>
