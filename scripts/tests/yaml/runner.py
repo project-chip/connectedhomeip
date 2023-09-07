@@ -224,6 +224,11 @@ CONTEXT_SETTINGS = dict(
             'server_name': 'chip-tool',
             'server_arguments': 'interactive server',
         },
+        'darwinframeworktool': {
+            'adapter': 'matter_chip_tool_adapter.adapter',
+            'server_name': 'darwin-framework-tool',
+            'server_arguments': 'interactive server',
+        },
         'app1': {
             'configuration_directory': 'examples/placeholder/linux/apps/app1',
             'adapter': 'matter_placeholder_adapter.adapter',
@@ -346,6 +351,15 @@ def chip_repl(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop
 @click.pass_context
 def chiptool(ctx, *args, **kwargs):
     """Run the test suite using chip-tool."""
+    return ctx.forward(websocket)
+
+
+@runner_base.command()
+@test_runner_options
+@websocket_runner_options
+@click.pass_context
+def darwinframeworktool(ctx, *args, **kwargs):
+    """Run the test suite using darwin-framework-tool."""
     return ctx.forward(websocket)
 
 
