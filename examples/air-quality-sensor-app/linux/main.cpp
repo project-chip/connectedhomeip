@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <air-quality-sensor-manager.h>
 #include "AirQualitySensorAppAttrUpdateDelegate.h"
 #include <AppMain.h>
 
@@ -27,6 +28,8 @@
 #include <imgui_ui/windows/qrcode.h>
 #endif
 
+#define AIR_QUALITY_SENSOR_ENDPOINT 1
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -37,7 +40,9 @@ NamedPipeCommands sChipNamedPipeCommands;
 AirQualitySensorAppAttrUpdateDelegate sAirQualitySensorAppCommandDelegate;
 } // namespace
 
-void ApplicationInit() {}
+void ApplicationInit() {
+    AirQualitySensorManager::InitInstance(EndpointId(AIR_QUALITY_SENSOR_ENDPOINT));
+}
 
 void ApplicationShutdown() {}
 
