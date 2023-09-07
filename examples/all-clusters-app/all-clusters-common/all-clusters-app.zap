@@ -10495,7 +10495,7 @@
       ]
     },
     {
-      "id": 4,
+      "id": 2,
       "name": "MA-onofflight",
       "deviceTypeRef": {
         "code": 256,
@@ -16926,7 +16926,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "15",
+              "defaultValue": "0",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -34866,7 +34866,7 @@
       ]
     },
     {
-      "id": 2,
+      "id": 4,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "code": 61442,
