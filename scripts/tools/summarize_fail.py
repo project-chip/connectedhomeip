@@ -61,6 +61,7 @@ def process_fail(id, pr, start_time, workflow):
     workflow_pass_rate_output_path = f"workflow_pass_rate/{slugify(workflow)}"
     if not os.path.exists(workflow_pass_rate_output_path):
         os.makedirs(workflow_pass_rate_output_path)
+        print(f"gh run list -R project-chip/connectedhomeip -b master -w {workflow} --json conclusion > {workflow_pass_rate_output_path}/run_list.json")
         subprocess.run(f"gh run list -R project-chip/connectedhomeip -b master -w {workflow} --json conclusion > {workflow_pass_rate_output_path}/run_list.json", shell=True)
     else:
         logging.info("This workflow has already been processed.")
