@@ -36,72 +36,42 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::Ch
     case to_underlying(RvcOperationalState::OperationalStateEnum::kDocked):
     case to_underlying(RvcOperationalState::OperationalStateEnum::kCharging):
     {
-        switch (NewMode)
+        // We could be in the charging state with an RvcRun mode != idle.
+        if (currentMode != RvcRunMode::ModeIdle && NewMode != RvcRunMode::ModeIdle)
         {
-        case RvcRunMode::ModeMapping: {
-            // change to mapping only allowed from the Idle state.
-            if (currentMode != RvcRunMode::ModeIdle)
-            {
-                response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
-                response.statusText.SetValue(
-                    chip::CharSpan::fromCharString("Change to the mapping mode is only allowed from idle"));
-                return;
-            }
+            response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
+            response.statusText.SetValue(
+                chip::CharSpan::fromCharString("Change to the mapping or cleaning mode is only allowed from idle"));
+            return;
+        }
 
-            mRunModeInstance.UpdateCurrentMode(NewMode);
-            // Set operational state to running
-            ChipError err =
-                mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
-            if (err != CHIP_NO_ERROR)
-            {
-                response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
-                response.statusText.SetValue(chip::CharSpan::fromCharString(err.AsString()));
-                return;
-            }
-            break;
-        }
-        case RvcRunMode::ModeCleaning: {
-            mRunModeInstance.UpdateCurrentMode(NewMode);
-            // Set operational state to running
-            ChipError err =
-                mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
-            if (err != CHIP_NO_ERROR)
-            {
-                response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
-                response.statusText.SetValue(chip::CharSpan::fromCharString(err.AsString()));
-                return;
-            }
-        }
-        break;
-        }
+        mRunModeInstance.UpdateCurrentMode(NewMode);
+        mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+        response.status = to_underlying(ModeBase::StatusCode::kSuccess);
+        return;
     }
     break;
     case to_underlying(OperationalState::OperationalStateEnum::kRunning):
     {
-        if (NewMode == RvcRunMode::ModeIdle)
+        if (NewMode != RvcRunMode::ModeIdle)
         {
-            mRunModeInstance.UpdateCurrentMode(NewMode);
-            ChipError err = mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
-            if (err != CHIP_NO_ERROR)
-            {
-                response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
-                response.statusText.SetValue(chip::CharSpan::fromCharString(err.AsString()));
-                return;
-            }
+            response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
+            response.statusText.SetValue(
+                chip::CharSpan::fromCharString("Change to the mapping or cleaning mode is only allowed from idle"));
+            return;
         }
+
+        mRunModeInstance.UpdateCurrentMode(NewMode);
+        mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
+        response.status = to_underlying(ModeBase::StatusCode::kSuccess);
+        return;
     }
     break;
-    case to_underlying(OperationalState::OperationalStateEnum::kError):
-    {
-        if (NewMode == RvcRunMode::ModeIdle)
-        {
-            mRunModeInstance.UpdateCurrentMode(NewMode);
-            SetDeviceToIdleState();
-        }
-    }
     }
 
-    response.status = to_underlying(ModeBase::StatusCode::kSuccess);
+    // If we fall through at any point, it's because the change is not supported in the current state.
+    response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
+    response.statusText.SetValue(chip::CharSpan::fromCharString("This change is not allowed at this time. "));
 }
 
 void RvcDevice::HandleRvcCleanChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
@@ -256,5 +226,6 @@ void RvcDevice::HandleClearErrorMessage()
         return;
     }
 
+    mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
     SetDeviceToIdleState();
 }
