@@ -110,7 +110,7 @@ class EventHandler(BaseHandler):
             self._event.readacl = AttrsToAccessPrivilege(attrs)
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'description':
-            return DescriptionHandler(self.context, self._event)
+            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         else:
             return BaseHandler(self.context)
 
@@ -347,7 +347,7 @@ class DescriptionHandler(BaseHandler):
     """
 
     def __init__(self, context: Context, target: Any):
-        super().__init__(context, handled=HandledDepth.ENTIRE_TREE)
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self.target = target
 
     def HandleContent(self, content):
