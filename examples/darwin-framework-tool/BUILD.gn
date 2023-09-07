@@ -14,6 +14,7 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/jsoncpp.gni")
 
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/build/config/compiler/compiler.gni")
@@ -132,6 +133,7 @@ action("build-darwin-framework") {
 config("config") {
   include_dirs = [
     ".",
+    "${chip_root}/examples/common",
     "${chip_root}/examples/darwin-framework-tool/commands/common",
     "${chip_root}/zzz_generated/darwin-framework-tool",
     "${chip_root}/zzz_generated/controller-clusters",
@@ -178,6 +180,13 @@ executable("darwin-framework-tool") {
     "commands/common/MTRError.mm",
     "commands/common/MTRError_Utils.h",
     "commands/common/MTRLogging.h",
+    "commands/common/RemoteDataModelLogger.h",
+    "commands/common/RemoteDataModelLogger.mm",
+    "commands/delay/Commands.h",
+    "commands/delay/SleepCommand.h",
+    "commands/delay/SleepCommand.mm",
+    "commands/delay/WaitForCommissioneeCommand.h",
+    "commands/delay/WaitForCommissioneeCommand.mm",
     "commands/discover/Commands.h",
     "commands/discover/DiscoverCommissionablesCommand.h",
     "commands/discover/DiscoverCommissionablesCommand.mm",
@@ -200,12 +209,16 @@ executable("darwin-framework-tool") {
 
   deps = [
     ":build-darwin-framework",
-    "${chip_root}/third_party/jsoncpp",
+    jsoncpp_root,
   ]
 
   if (config_use_interactive_mode) {
     sources += [ "commands/interactive/InteractiveCommands.mm" ]
-    deps += [ "${editline_root}:editline" ]
+
+    deps += [
+      "${chip_root}/examples/common/websocket-server",
+      "${editline_root}:editline",
+    ]
   }
 
   ldflags = [
@@ -240,6 +253,7 @@ executable("darwin-framework-tool") {
 
       # pics is needed by tests
       "${chip_root}/src/app/tests/suites/pics",
+      "${chip_root}/src/protocols:im_status",
     ]
 
     defines = []
@@ -248,6 +262,8 @@ executable("darwin-framework-tool") {
       "${chip_root}/config/standalone/",
       "${chip_root}/src/",
       "${chip_root}/src/include/",
+      "${chip_root}/src/protocols/",
+      "${chip_root}/src/protocols/interaction_model",
       "${chip_root}/third_party/nlassert/repo/include/",
       "${chip_root}/third_party/nlio/repo/include/",
       "${chip_root}/zzz_generated/app-common/",
