@@ -58,7 +58,7 @@ using namespace ::chip::DeviceLayer::Silabs;
 
 #ifdef DIC_ENABLE
 #define DECIMAL 10
-#define BYTE 5
+#define MSG_SIZE 5
 #include "dic.h"
 #endif // DIC_ENABLE
 
@@ -512,7 +512,7 @@ void WindowManager::Cover::CallbackPositionSet(intptr_t arg)
         TiltPositionSet(data->mEndpointId, position);
 #ifdef DIC_ENABLE
         uint16_t value = data->percent100ths;
-        char buffer[BYTE];
+        char buffer[MSG_SIZE];
         itoa(value, buffer, DECIMAL);
         dic_sendmsg("tilt/position set", (const char *) (buffer));
 #endif // DIC_ENABLE
@@ -522,7 +522,7 @@ void WindowManager::Cover::CallbackPositionSet(intptr_t arg)
         LiftPositionSet(data->mEndpointId, position);
 #ifdef DIC_ENABLE
         uint16_t value = data->percent100ths;
-        char buffer[BYTE];
+        char buffer[MSG_SIZE];
         itoa(value, buffer, DECIMAL);
         dic_sendmsg("lift/position set", (const char *) (buffer));
 #endif // DIC_ENABLE
