@@ -226,11 +226,11 @@ template("efr32_sdk") {
     }
 
     if (chip_enable_ble_rs911x) {
-    if (use_rs9116) {
-      _include_dirs += [ "${wifi_sapi_root}/sapi/include" ]
-    } else {
-      _include_dirs += [ "${wifi_sdk_root}/components/si91x/ble/inc" ]
-    }
+      if (use_rs9116) {
+        _include_dirs += [ "${wifi_sapi_root}/sapi/include" ]
+      } else {
+        _include_dirs += [ "${wifi_sdk_root}/components/si91x/ble/inc" ]
+      }
       _include_dirs += [ "${chip_root}/src/platform/silabs/rs911x" ]
     }
 
@@ -257,7 +257,6 @@ template("efr32_sdk") {
       "${silabs_mcu}=1",
       "${silabs_board}=1",
       "SL_BOARD_NAME=${silabs_board}",
-      "SL_SUPRESS_DEPRECATION_WARNINGS_SDK_3_1",
       "__HEAP_SIZE=0",
       "SL_THREADING_ALT=1",
       "SL_COMPONENT_CATALOG_PRESENT=1",
@@ -266,8 +265,6 @@ template("efr32_sdk") {
       "SL_RAIL_LIB_MULTIPROTOCOL_SUPPORT=1",
       "SL_RAIL_UTIL_PA_CONFIG_HEADER=<sl_rail_util_pa_config.h>",
       "RADIO_CONFIG_DMP_SUPPORT=1",
-      "SL_CATALOG_SLEEPTIMER_PRESENT",
-      "SL_CATALOG_POWER_MANAGER_PRESENT",
       #"__STACK_SIZE=0",
     ]
 
