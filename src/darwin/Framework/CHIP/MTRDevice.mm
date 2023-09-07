@@ -469,17 +469,17 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         //     - Optionally receive StartUp event
         //       - Set estimated system time from event receipt time, or saved UpTime estimate if exists
         //     - ReportEnd handler clears the saved start time estimate based on UpTime
-        //   Disconnected subscription case
+        //   Subscription dropped from client point of view case
         //     - Starts Unreachable
         //     - Resubscribe happens after some time, and then same as the above
-        //   Subscription resumption after reboot case
+        //   Server resuming subscription after reboot case
         //     - Starts Reachable
         //     - Receive priming report ReportBegin
         //     - Optionally receive UpTime attribute - update time and save value
         //     - Optionally receive StartUp event
         //       - Set estimated system time from event receipt time, or saved UpTime estimate if exists
         //     - ReportEnd handler clears the saved start time estimate based on UpTime
-        //   Subscription resumption after timeout case
+        //   Server resuming subscription after timeout case
         //     - Starts Reachable
         //     - Receive priming report ReportBegin
         //     - Optionally receive UpTime attribute - update time and save value
