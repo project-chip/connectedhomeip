@@ -142,12 +142,11 @@ CHIP_ERROR BLWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
     // - 64 bytes: WPA/WPA2/WPA3 raw hex PSK
     // Note 10 hex WEP64 and 13 bytes / 26 hex WEP128 passphrase are covered by 8~63 bytes WPA passphrase, so we don't check WEP64
     // hex and WEP128 passphrase.
-    if (keyLen ==BLWiFiDriver::WiFiCredentialLength::kOpen || keyLen == BLWiFiDriver::WiFiCredentialLength::kWEP64 ||
-        (keyLen >= BLWiFiDriver::WiFiCredentialLength::kMinWPAPSK &&
-        keyLen <= BLWiFiDriver::WiFiCredentialLength::kMaxWPAPSK))
+    if (keyLen == BLWiFiDriver::WiFiCredentialLength::kOpen || keyLen == BLWiFiDriver::WiFiCredentialLength::kWEP64 ||
+        (keyLen >= BLWiFiDriver::WiFiCredentialLength::kMinWPAPSK && keyLen <= BLWiFiDriver::WiFiCredentialLength::kMaxWPAPSK))
     {
 
-        if (keyLen==BLWiFiDriver::WiFiCredentialLength::kOpen)
+        if (keyLen == BLWiFiDriver::WiFiCredentialLength::kOpen)
         {
             wifiInterface_connect((char *) ssid, NULL);
         }
