@@ -88,31 +88,32 @@ defined:
 1. Pull docker image from repository:
 
     ```bash
-    $ docker pull ghcr.io/project-chip/chip-build-telink:1
+    $ docker pull ghcr.io/project-chip/chip-build-telink:10
     ```
 
-1. Run docker container:
+2. Run docker container:
 
     ```bash
-    $ docker run -it --rm -v ${CHIP_BASE}:/root/chip -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" ghcr.io/project-chip/chip-build-telink:1
+    $ docker run -it --rm -v ${CHIP_BASE}:/root/chip -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" ghcr.io/project-chip/chip-build-telink:10
     ```
 
     here `${CHIP_BASE}` is directory which contains CHIP repo files **!!!Pay
     attention that OUTPUT_DIR should contains ABSOLUTE path to output dir**
 
-1. Activate the build environment:
+3. Activate the build environment:
 
     ```bash
     $ source ./scripts/activate.sh
     ```
 
-1. In the example dir run:
+4. In the example dir run (replace _<build_target>_ with your board name, for
+   example, `tlsr9518adk80d` or `tlsr9528a`):
 
     ```bash
-    $ west build
+    $ west build -b <build_target>
     ```
 
-1. Flash binary:
+5. Flash binary:
 
     ```
     $ west flash --erase

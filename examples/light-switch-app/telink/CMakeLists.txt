@@ -15,8 +15,6 @@
 #
 cmake_minimum_required(VERSION 3.13.1)
 
-set(BOARD tlsr9518adk80d)
-
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(TELINK_COMMON ${CHIP_ROOT}/examples/platform/telink REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)

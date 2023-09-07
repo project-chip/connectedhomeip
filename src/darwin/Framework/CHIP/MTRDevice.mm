@@ -91,6 +91,8 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::Protocols::InteractionModel;
 
+typedef void (^FirstReportHandler)(void);
+
 namespace {
 
 class SubscriptionCallback final : public MTRBaseSubscriptionCallback {
@@ -98,9 +100,11 @@ public:
     SubscriptionCallback(DataReportCallback attributeReportCallback, DataReportCallback eventReportCallback,
         ErrorCallback errorCallback, MTRDeviceResubscriptionScheduledHandler resubscriptionCallback,
         SubscriptionEstablishedHandler subscriptionEstablishedHandler, OnDoneHandler onDoneHandler,
-        UnsolicitedMessageFromPublisherHandler unsolicitedMessageFromPublisherHandler)
+        UnsolicitedMessageFromPublisherHandler unsolicitedMessageFromPublisherHandler, ReportBeginHandler reportBeginHandler,
+        ReportEndHandler reportEndHandler)
         : MTRBaseSubscriptionCallback(attributeReportCallback, eventReportCallback, errorCallback, resubscriptionCallback,
-            subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler)
+            subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
+            reportEndHandler)
     {
     }
 
@@ -278,7 +282,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // Return YES if there's a valid delegate AND subscription is expected to report value
 - (BOOL)_subscriptionAbleToReport
 {
-    // TODO: include period from when first report comes in until establish callback
     return (_weakDelegate.strongObject) && (_state == MTRDeviceStateReachable);
 }
 
@@ -290,9 +293,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     _state = state;
     if (lastState != state) {
         if (state != MTRDeviceStateReachable) {
-            MTR_LOG_INFO("%@ Set estimated start time to nil due to state change", self);
+            MTR_LOG_INFO("%@ State change %lu => %lu, set estimated start time to nil", self, lastState, state);
             _estimatedStartTime = nil;
             _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
+        } else {
+            MTR_LOG_INFO("%@ State change %lu => %lu", self, lastState, state);
         }
         id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
         if (delegate) {
@@ -411,6 +416,20 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     os_unfair_lock_unlock(&self->_lock);
 }
 
+- (void)_handleReportBegin
+{
+    os_unfair_lock_lock(&self->_lock);
+    [self _changeState:MTRDeviceStateReachable];
+    os_unfair_lock_unlock(&self->_lock);
+}
+
+- (void)_handleReportEnd
+{
+    os_unfair_lock_lock(&self->_lock);
+    _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
+    os_unfair_lock_unlock(&self->_lock);
+}
+
 // assume lock is held
 - (void)_reportAttributes:(NSArray<NSDictionary<NSString *, id> *> *)attributes
 {
@@ -442,11 +461,33 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     NSDate * oldEstimatedStartTime = _estimatedStartTime;
     for (NSDictionary<NSString *, id> * eventDict in eventReport) {
         // Whenever a StartUp event is received, reset the estimated start time
+        //   New subscription case
+        //     - Starts Unreachable
+        //     - Start CASE and send subscription request
+        //     - Receive priming report ReportBegin
+        //     - Optionally receive UpTime attribute - update time and save start time estimate
+        //     - Optionally receive StartUp event
+        //       - Set estimated system time from event receipt time, or saved UpTime estimate if exists
+        //     - ReportEnd handler clears the saved start time estimate based on UpTime
+        //   Subscription dropped from client point of view case
+        //     - Starts Unreachable
+        //     - Resubscribe happens after some time, and then same as the above
+        //   Server resuming subscription after reboot case
+        //     - Starts Reachable
+        //     - Receive priming report ReportBegin
+        //     - Optionally receive UpTime attribute - update time and save value
+        //     - Optionally receive StartUp event
+        //       - Set estimated system time from event receipt time, or saved UpTime estimate if exists
+        //     - ReportEnd handler clears the saved start time estimate based on UpTime
+        //   Server resuming subscription after timeout case
+        //     - Starts Reachable
+        //     - Receive priming report ReportBegin
+        //     - Optionally receive UpTime attribute - update time and save value
+        //     - ReportEnd handler clears the saved start time estimate based on UpTime
         MTREventPath * eventPath = eventDict[MTREventPathKey];
         BOOL isStartUpEvent = (eventPath.cluster.unsignedLongValue == MTRClusterIDTypeBasicInformationID)
             && (eventPath.event.unsignedLongValue == MTREventIDTypeClusterBasicInformationEventStartUpID);
-        if (isStartUpEvent && (_state == MTRDeviceStateReachable)) {
-            // StartUp event received when server resumes subscription
+        if (isStartUpEvent) {
             if (_estimatedStartTimeFromGeneralDiagnosticsUpTime) {
                 // If UpTime was received, make use of it as mark of system start time
                 MTR_LOG_INFO("%@ StartUp event: set estimated start time forward to %@", self,
@@ -609,6 +650,18 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                            dispatch_async(self.queue, ^{
                                // OnUnsolicitedMessageFromPublisher
                                [self _handleUnsolicitedMessageFromPublisher];
+                           });
+                       },
+                       ^(void) {
+                           MTR_LOG_DEFAULT("%@ got report begin", self);
+                           dispatch_async(self.queue, ^{
+                               [self _handleReportBegin];
+                           });
+                       },
+                       ^(void) {
+                           MTR_LOG_DEFAULT("%@ got report end", self);
+                           dispatch_async(self.queue, ^{
+                               [self _handleReportEnd];
                            });
                        });
 
