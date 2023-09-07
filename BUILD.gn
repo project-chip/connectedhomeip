@@ -276,6 +276,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Set this to true to enable genio builds by default.
     enable_genio_builds = false
+
+    # Set this to true to enable stm32 builds by default.
+    enable_stm32_builds = false
   }
 
   # Pigweed does not provide a clang in some configurations.
