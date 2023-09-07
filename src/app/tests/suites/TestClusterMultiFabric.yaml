@@ -330,6 +330,7 @@ tests:
                       # These should actually be missing, not null, but right
                       # now our harness treats those the same, and we have no
                       # way to indicate "missing" in the YAML.
+                      # https://github.com/project-chip/connectedhomeip/issues/29110
                       fabricSensitiveInt8u: null,
                       optionalFabricSensitiveInt8u: null,
                       nullableFabricSensitiveInt8u: null,
@@ -342,6 +343,7 @@ tests:
                       # These should actually be missing, not null, but right
                       # now our harness treats those the same, and we have no
                       # way to indicate "missing" in the YAML.
+                      # https://github.com/project-chip/connectedhomeip/issues/29110
                       fabricSensitiveInt8u: null,
                       optionalFabricSensitiveInt8u: null,
                       nullableFabricSensitiveInt8u: null,
@@ -364,6 +366,7 @@ tests:
                       # These should actually be missing, not null, but right
                       # now our harness treats those the same, and we have no
                       # way to indicate "missing" in the YAML.
+                      # https://github.com/project-chip/connectedhomeip/issues/29110
                       fabricSensitiveInt8u: null,
                       optionalFabricSensitiveInt8u: null,
                       nullableFabricSensitiveInt8u: null,
@@ -376,6 +379,7 @@ tests:
                       # These should actually be missing, not null, but right
                       # now our harness treats those the same, and we have no
                       # way to indicate "missing" in the YAML.
+                      # https://github.com/project-chip/connectedhomeip/issues/29110
                       fabricSensitiveInt8u: null,
                       optionalFabricSensitiveInt8u: null,
                       nullableFabricSensitiveInt8u: null,
