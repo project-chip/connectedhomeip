@@ -36,7 +36,7 @@ error_catalog = {
 
 
 def process_fail(id, pr, start_time, workflow):
-    logging.info("Processing failure in {pr}, workflow {workflow} that started at {start_time}.")
+    logging.info(f"Processing failure in {pr}, workflow {workflow} that started at {start_time}.")
 
     logging.info("Building output file structure.")
     output_path = f"recent_fails_logs/{slugify(pr)}/{slugify(workflow)}/{slugify(start_time)}"
@@ -56,6 +56,15 @@ def process_fail(id, pr, start_time, workflow):
                 if error_message in fail_log:
                     root_cause = error_catalog[workflow_category][error_message]["short"]
                     break
+
+    logging.info(f"Checking recent pass/fail rate of workflow {workflow}.")
+    workflow_pass_rate_output_path = f"workflow_pass_rate/{slugify(workflow)}"
+    if not os.path.exists(workflow_pass_rate_output_path):
+        os.makedirs(workflow_pass_rate_output_path)
+        subprocess.run(f"gh run list -R project-chip/connectedhomeip -b master -w {workflow} --json workflowName > {slugify(workflow)}_run_list.json", shell=True)
+    else:
+        logging.info("This workflow has already been processed.")
+    
     return [pr, workflow, root_cause]
 
 
@@ -87,7 +96,10 @@ def main():
     root_causes.columns = ["Pull Request", "Workflow", "Cause of Failure"]
     print("Likely Root Cause of Recent Fails:")
     print(root_causes.to_string(index=False))
+    root_causes.to_csv("failure_cause_summary.csv")
 
+    logging.info("Listing percent fail rate of recent fails by workflow.")
+    # TODO
 
 if __name__ == "__main__":
     main()
