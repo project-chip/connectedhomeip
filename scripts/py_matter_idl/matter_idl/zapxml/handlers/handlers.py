@@ -110,7 +110,7 @@ class EventHandler(BaseHandler):
             self._event.readacl = AttrsToAccessPrivilege(attrs)
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'description':
-            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+            return DescriptionHandler(self.context, self._event)
         else:
             return BaseHandler(self.context)
 
