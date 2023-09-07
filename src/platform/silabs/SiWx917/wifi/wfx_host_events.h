@@ -32,7 +32,7 @@
 
 #include "sl_status.h"
 
-#define SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME 1000
+#define SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME_MS 1000
 /* Wi-Fi events*/
 #define SL_WFX_STARTUP_IND_ID (1)
 #define SL_WFX_CONNECT_IND_ID (2)
