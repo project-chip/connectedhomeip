@@ -738,7 +738,7 @@ void * wfx_rsi_alloc_pkt(uint16_t data_length)
     /* Confirm if packet is allocated */
 
     status = sl_si91x_allocate_command_buffer(&buffer, (void **) &packet, sizeof(sl_si91x_packet_t) + data_length,
-                                              SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME);
+                                              SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME_MS);
     //    VERIFY_STATUS_AND_RETURN(status);
     if (packet == NULL)
     {

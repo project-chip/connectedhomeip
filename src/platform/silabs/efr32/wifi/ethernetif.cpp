@@ -355,7 +355,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     sl_si91x_packet_t * packet;
     sl_status_t status = SL_STATUS_OK;
 #else
-    void * rsipkt;
+    void * packet;
 #endif
     struct pbuf * q;
     uint16_t framelength;
@@ -382,8 +382,8 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     VERIFY_STATUS_AND_RETURN(status);
     if (packet == NULL)
 #else// RS9116
-    rsipkt = wfx_rsi_alloc_pkt();
-    if (!rsipkt)
+    packet = wfx_rsi_alloc_pkt();
+    if (!packet)
 #endif // SIWX_917
     {
         SILABS_LOG("EN-RSI:No buf");
@@ -404,21 +404,13 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     /* Generate the packet */
     for (q = p, framelength = 0; q != NULL; q = q->next)
     {
-#if (SIWX_917 | EXP_BOARD)
         wfx_rsi_pkt_add_data(packet, (uint8_t *) (q->payload), (uint16_t) q->len, framelength);
-#else
-        wfx_rsi_pkt_add_data(rsipkt, (uint8_t *) (q->payload), (uint16_t) q->len, framelength);
-#endif
         framelength += q->len;
     }
     if (framelength < LWIP_FRAME_ALIGNMENT)
     {
         /* Add junk data to the end for frame alignment if framelength is less than 60 */
-#if (SIWX_917 | EXP_BOARD)
         wfx_rsi_pkt_add_data(packet, (uint8_t *) (p->payload), LWIP_FRAME_ALIGNMENT - framelength, framelength);
-#else
-        wfx_rsi_pkt_add_data(rsipkt, (uint8_t *) (p->payload), LWIP_FRAME_ALIGNMENT - framelength, framelength);
-#endif
     }
 #ifdef WIFI_DEBUG_ENABLED
     SILABS_LOG("EN-RSI: Sending %d", framelength);
@@ -433,7 +425,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
      /* forward the generated packet to RSI to
      * send the data over wifi network
      */
-    if (wfx_rsi_send_data(rsipkt, framelength))
+    if (wfx_rsi_send_data(packet, framelength))
 #endif
     {
         SILABS_LOG("*ERR*EN-RSI:Send fail");
