@@ -347,7 +347,7 @@ class DescriptionHandler(BaseHandler):
     """
 
     def __init__(self, context: Context, target: Any):
-        super().__init__(context, handled=HandledDepth.ENTIRE_TREE)
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self.target = target
 
     def HandleContent(self, content):
