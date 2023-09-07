@@ -18,6 +18,8 @@
 
 #include "RvcAppCommandDelegate.h"
 #include <platform/PlatformManager.h>
+
+#include <utility>
 #include "rvc-device.h"
 
 using namespace chip;
@@ -83,7 +85,8 @@ void RvcAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "ErrorEvent")
     {
-        self->OnErrorEventHandler();
+        std::string error = self->mJsonValue["Error"].asString();
+        self->OnErrorEventHandler(error);
     }
     else if (name == "ClearError")
     {
@@ -133,9 +136,9 @@ void RvcAppCommandHandler::OnActivityCompleteHandler()
     mRvcDevice->HandleActivityCompleteEvent();
 }
 
-void RvcAppCommandHandler::OnErrorEventHandler()
+void RvcAppCommandHandler::OnErrorEventHandler(const std::string& error)
 {
-    mRvcDevice->HandleErrorEvent();
+    mRvcDevice->HandleErrorEvent(error);
 }
 
 void RvcAppCommandHandler::OnClearErrorHandler()

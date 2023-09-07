@@ -18,6 +18,12 @@ The JSON message must have a `"Name"` key that contains the command name.
 This name is shown in the state machine diagram above.
 Example `echo '{"Name": "Charged"}' > /tmp/chip_rvc_fifo_42`.
 
+### ErrorEvent message
+
+The error event message requires the additional key `"Error"` which specifies the error state ID.
+This can be one of UnableToStartOrResume, UnableToCompleteOperation, CommandInvalidInState, FailedToFindChargingDock, 
+Stuck, DustBinMissing, DustBinFull, WaterTankEmpty, WaterTankMissing, WaterTankLidOpen, MopCleaningPadMissing
+
 ## Testing
 
 PICS files that show what this app supports testing are available in the `pics` directory as txt files.

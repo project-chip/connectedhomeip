@@ -53,7 +53,7 @@ private:
 
    void OnActivityCompleteHandler();
 
-   void OnErrorEventHandler();
+   void OnErrorEventHandler(const std::string& error);
 
    void OnClearErrorHandler();
 };

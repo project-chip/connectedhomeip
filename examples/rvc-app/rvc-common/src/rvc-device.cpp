@@ -210,11 +210,60 @@ void RvcDevice::HandleActivityCompleteEvent()
     mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
 }
 
-void RvcDevice::HandleErrorEvent()
+void RvcDevice::HandleErrorEvent(const std::string& error)
 {
-    const detail::Structs::ErrorStateStruct::Type err{
-        .errorStateID=1,
-    };
+    detail::Structs::ErrorStateStruct::Type err;
+
+    if (error == "UnableToStartOrResume")
+    {
+        err.errorStateID = to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume);
+    }
+    else if (error == "UnableToCompleteOperation")
+    {
+        err.errorStateID = to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation);
+    }
+    else if (error == "CommandInvalidInState")
+    {
+        err.errorStateID = to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState);
+    }
+    else if (error == "FailedToFindChargingDock")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kFailedToFindChargingDock);
+    }
+    else if (error == "Stuck")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kStuck);
+    }
+    else if (error == "DustBinMissing")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kDustBinMissing);
+    }
+    else if (error == "DustBinFull")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kDustBinFull);
+    }
+    else if (error == "WaterTankEmpty")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankEmpty);
+    }
+    else if (error == "WaterTankMissing")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankMissing);
+    }
+    else if (error == "WaterTankLidOpen")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankLidOpen);
+    }
+    else if (error == "MopCleaningPadMissing")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kMopCleaningPadMissing);
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Unhandled command: The 'Error' key of the 'ErrorEvent' message is not valid.");
+        return;
+    }
+
     mOperationalStateInstance.OnOperationalErrorDetected(err);
 }
 
