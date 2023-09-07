@@ -20,6 +20,7 @@
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/Global.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/dnssd/ResolverProxy.h>
@@ -72,7 +73,7 @@ private:
         kInitialized
     };
 
-    DiscoveryImplPlatform();
+    DiscoveryImplPlatform() = default;
 
     DiscoveryImplPlatform(const DiscoveryImplPlatform &) = delete;
     DiscoveryImplPlatform & operator=(const DiscoveryImplPlatform &) = delete;
@@ -99,7 +100,8 @@ private:
     ResolverProxy mResolverProxy;
     OperationalResolveDelegate * mOperationalDelegate = nullptr;
 
-    static DiscoveryImplPlatform sManager;
+    friend class Global<DiscoveryImplPlatform>;
+    static Global<DiscoveryImplPlatform> sManager;
 };
 
 } // namespace Dnssd

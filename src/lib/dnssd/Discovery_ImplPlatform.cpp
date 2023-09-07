@@ -370,9 +370,7 @@ void DnssdService::ToDiscoveredNodeData(const Span<Inet::IPAddress> & addresses,
     }
 }
 
-DiscoveryImplPlatform DiscoveryImplPlatform::sManager;
-
-DiscoveryImplPlatform::DiscoveryImplPlatform() = default;
+Global<DiscoveryImplPlatform> DiscoveryImplPlatform::sManager;
 
 CHIP_ERROR DiscoveryImplPlatform::InitImpl()
 {
@@ -681,7 +679,7 @@ CHIP_ERROR DiscoveryImplPlatform::ReconfirmRecord(const char * hostname, Inet::I
 
 DiscoveryImplPlatform & DiscoveryImplPlatform::GetInstance()
 {
-    return sManager;
+    return *sManager;
 }
 
 ServiceAdvertiser & chip::Dnssd::ServiceAdvertiser::Instance()

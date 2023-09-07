@@ -32,6 +32,7 @@
 #include <app/RequiredPrivilege.h>
 #include <app/util/af-types.h>
 #include <app/util/endpoint-config-api.h>
+#include <lib/core/Global.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FibonacciUtils.h>
@@ -41,13 +42,13 @@ namespace app {
 
 using Protocols::InteractionModel::Status;
 
-InteractionModelEngine sInteractionModelEngine;
+Global<InteractionModelEngine> sInteractionModelEngine;
 
 InteractionModelEngine::InteractionModelEngine() {}
 
 InteractionModelEngine * InteractionModelEngine::GetInstance()
 {
-    return &sInteractionModelEngine;
+    return &*sInteractionModelEngine;
 }
 
 CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
