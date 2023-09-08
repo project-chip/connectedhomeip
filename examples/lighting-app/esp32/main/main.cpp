@@ -39,6 +39,10 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/ESP32Utils.h>
 
+#if CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS
+#include <matter/tracing/insights_sys_stats.h>
+#endif
+
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
@@ -115,6 +119,7 @@ static void InitServer(intptr_t context)
 
     DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
+
 #if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
     esp_insights_config_t config = {
         .log_type = ESP_DIAG_LOG_TYPE_ERROR | ESP_DIAG_LOG_TYPE_WARNING | ESP_DIAG_LOG_TYPE_EVENT,
@@ -130,6 +135,10 @@ static void InitServer(intptr_t context)
 
     static Tracing::Insights::ESP32Backend backend;
     Tracing::Register(backend);
+// Setting the sampling time to 60 seconds i.e 60,000 ms
+#if CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS
+    chip::System::Stats::InsightsSystemMetrics::GetInstance().RegisterAndEnable(chip::System::Clock::Timeout(60000));
+#endif
 #endif
 }
 
