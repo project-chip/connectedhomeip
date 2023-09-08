@@ -248,6 +248,25 @@ def bundle_esp32(device_name: str) -> None:
             shutil.copy(src_item, dest_item)
 
 
+def bundle_telink(device_name: str) -> None:
+    zephyr_exts = ["elf", "map", "bin"]
+    telink_root = os.path.join(_CHEF_SCRIPT_PATH,
+                               "telink",
+                               "build",
+                               "zephyr")
+    sub_dir = os.path.join(_CD_STAGING_DIR, device_name)
+    os.mkdir(sub_dir)
+    for zephyr_ext in zephyr_exts:
+        input_base = f"zephyr.{zephyr_ext}"
+        output_base = f"{device_name}.{zephyr_ext}"
+        src_item = os.path.join(telink_root, input_base)
+        if zephyr_ext == "bin":
+            dest_item = os.path.join(sub_dir, output_base)
+        else:
+            dest_item = os.path.join(_CD_STAGING_DIR, output_base)
+        shutil.copy(src_item, dest_item)
+
+
 def main() -> int:
 
     check_python_version()

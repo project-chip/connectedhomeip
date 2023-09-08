@@ -79,75 +79,6 @@ server cluster Identify = 3 {
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
-/** Attributes and commands for group configuration and manipulation. */
-server cluster Groups = 4 {
-  bitmap Feature : BITMAP32 {
-    kGroupNames = 0x1;
-  }
-
-  bitmap NameSupportBitmap : BITMAP8 {
-    kGroupNames = 0x80;
-  }
-
-  readonly attribute NameSupportBitmap nameSupport = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct AddGroupRequest {
-    group_id groupID = 0;
-    CHAR_STRING groupName = 1;
-  }
-
-  request struct ViewGroupRequest {
-    group_id groupID = 0;
-  }
-
-  request struct GetGroupMembershipRequest {
-    group_id groupList[] = 0;
-  }
-
-  request struct RemoveGroupRequest {
-    group_id groupID = 0;
-  }
-
-  request struct AddGroupIfIdentifyingRequest {
-    group_id groupID = 0;
-    CHAR_STRING groupName = 1;
-  }
-
-  response struct AddGroupResponse = 0 {
-    ENUM8 status = 0;
-    group_id groupID = 1;
-  }
-
-  response struct ViewGroupResponse = 1 {
-    ENUM8 status = 0;
-    group_id groupID = 1;
-    CHAR_STRING groupName = 2;
-  }
-
-  response struct GetGroupMembershipResponse = 2 {
-    nullable INT8U capacity = 0;
-    group_id groupList[] = 1;
-  }
-
-  response struct RemoveGroupResponse = 3 {
-    ENUM8 status = 0;
-    group_id groupID = 1;
-  }
-
-  fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
-  fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
-  fabric command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
-  fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
-  fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
-  fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
-}
-
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
   bitmap Feature : BITMAP32 {
@@ -1062,12 +993,6 @@ endpoint 0 {
   server cluster Identify {
     ram      attribute identifyTime default = 0x0000;
     ram      attribute identifyType default = 0x00;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-  }
-
-  server cluster Groups {
-    ram      attribute nameSupport;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
   }

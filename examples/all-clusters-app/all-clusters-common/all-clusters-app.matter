@@ -3162,7 +3162,7 @@ server cluster HepaFilterMonitoring = 113 {
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
-    kReplacementProductList = 0x3;
+    kReplacementProductList = 0x4;
   }
 
   struct ReplacementProductStruct {
@@ -3210,7 +3210,7 @@ server cluster ActivatedCarbonFilterMonitoring = 114 {
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
-    kReplacementProductList = 0x3;
+    kReplacementProductList = 0x4;
   }
 
   struct ReplacementProductStruct {
@@ -6826,7 +6826,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 15;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6914,7 +6914,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 3;
+    ram      attribute featureMap default = 7;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6928,7 +6928,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 3;
+    ram      attribute featureMap default = 7;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -7233,7 +7233,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7252,7 +7252,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7271,7 +7271,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7290,7 +7290,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7309,7 +7309,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7328,7 +7328,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7347,7 +7347,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7366,7 +7366,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7385,7 +7385,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7404,7 +7404,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 

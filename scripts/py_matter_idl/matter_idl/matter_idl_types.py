@@ -166,6 +166,7 @@ class Event:
     fields: List[Field]
     readacl: AccessPrivilege = AccessPrivilege.VIEW
     qualities: EventQuality = EventQuality.NONE
+    description: Optional[str] = None
 
     @property
     def is_fabric_sensitive(self):

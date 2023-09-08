@@ -1934,7 +1934,7 @@ enum class Feature : uint32_t
 {
     kCondition              = 0x1,
     kWarning                = 0x2,
-    kReplacementProductList = 0x3,
+    kReplacementProductList = 0x4,
 };
 } // namespace HepaFilterMonitoring
 
@@ -1985,7 +1985,7 @@ enum class Feature : uint32_t
 {
     kCondition              = 0x1,
     kWarning                = 0x2,
-    kReplacementProductList = 0x3,
+    kReplacementProductList = 0x4,
 };
 } // namespace ActivatedCarbonFilterMonitoring
 
