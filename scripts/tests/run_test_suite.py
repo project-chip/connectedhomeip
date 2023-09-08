@@ -174,6 +174,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
             TestTag.MANUAL,
             TestTag.IN_DEVELOPMENT,
             TestTag.FLAKY,
+            TestTag.EXTRA_SLOW
         }
 
         if runtime != TestRunTime.CHIP_TOOL_PYTHON:
