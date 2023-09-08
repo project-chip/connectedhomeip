@@ -126,7 +126,7 @@ private:
      * @param[in] value          Pointer to the new value
      */
     void HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
-    void PercentSettingChangedCallback(uint8_t aNewPercentSetting);
+    void PercentSettingWriteCallback(uint8_t aNewPercentSetting);
     void SpeedSettingWriteCallback(uint8_t aNewSpeedSetting);
     void FanModeWriteCallback(FanControl::FanModeEnum aNewFanMode);
 

@@ -23,11 +23,11 @@ void AirPurifierManager::Init()
     {
         if (percentSetting.IsNull())
         {
-            PercentSettingChangedCallback(0);
+            PercentSettingWriteCallback(0);
         }
         else
         {
-            PercentSettingChangedCallback(percentSetting.Value());
+            PercentSettingWriteCallback(percentSetting.Value());
         }
     }
 
@@ -37,11 +37,11 @@ void AirPurifierManager::Init()
     {
         if (speedSetting.IsNull())
         {
-            SpeedSettingChangedCallback(0);
+            SpeedSettingWriteCallback(0);
         }
         else
         {
-            SpeedSettingChangedCallback(speedSetting.Value());
+            SpeedSettingWriteCallback(speedSetting.Value());
         }
     }
 
@@ -149,11 +149,11 @@ void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId
         DataModel::Nullable<Percent> percentSetting = static_cast<DataModel::Nullable<uint8_t>>(*value);
         if (percentSetting.IsNull())
         {
-            PercentSettingChangedCallback(0);
+            PercentSettingWriteCallback(0);
         }
         else
         {
-            PercentSettingChangedCallback(percentSetting.Value());
+            PercentSettingWriteCallback(percentSetting.Value());
         }
         break;
     }
@@ -162,18 +162,18 @@ void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId
         DataModel::Nullable<uint8_t> speedSetting = static_cast<DataModel::Nullable<uint8_t>>(*value);
         if (speedSetting.IsNull())
         {
-            SpeedSettingChangedCallback(0);
+            SpeedSettingWriteCallback(0);
         }
         else
         {
-            SpeedSettingChangedCallback(speedSetting.Value());
+            SpeedSettingWriteCallback(speedSetting.Value());
         }
         break;
     }
 
     case FanControl::Attributes::FanMode::Id: {
         FanControl::FanModeEnum fanMode = static_cast<FanControl::FanModeEnum>(*value);
-        FanModeChangedCallback(fanMode);
+        FanModeWriteCallback(fanMode);
         break;
     }
 
@@ -183,39 +183,39 @@ void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId
     }
 }
 
-void AirPurifierManager::PercentSettingChangedCallback(uint8_t aNewPercentSetting)
+void AirPurifierManager::PercentSettingWriteCallback(uint8_t aNewPercentSetting)
 {
     if (aNewPercentSetting != percentCurrent)
     {
-        ChipLogDetail(NotSpecified, "AirPurifierManager::PercentSettingChangedCallback: %d", aNewPercentSetting);
+        ChipLogDetail(NotSpecified, "AirPurifierManager::PercentSettingWriteCallback: %d", aNewPercentSetting);
         percentCurrent       = aNewPercentSetting;
         EmberAfStatus status = FanControl::Attributes::PercentCurrent::Set(mEndpointId, percentCurrent);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
             ChipLogError(NotSpecified,
-                         "AirPurifierManager::PercentSettingChangedCallback: failed to set PercentCurrent attribute: %d", status);
+                         "AirPurifierManager::PercentSettingWriteCallback: failed to set PercentCurrent attribute: %d", status);
         }
     }
 }
 
-void AirPurifierManager::SpeedSettingChangedCallback(uint8_t aNewSpeedSetting)
+void AirPurifierManager::SpeedSettingWriteCallback(uint8_t aNewSpeedSetting)
 {
     if (aNewSpeedSetting != speedCurrent)
     {
-        ChipLogDetail(NotSpecified, "AirPurifierManager::SpeedSettingChangedCallback: %d", aNewSpeedSetting);
+        ChipLogDetail(NotSpecified, "AirPurifierManager::SpeedSettingWriteCallback: %d", aNewSpeedSetting);
         speedCurrent         = aNewSpeedSetting;
         EmberAfStatus status = FanControl::Attributes::SpeedCurrent::Set(mEndpointId, speedCurrent);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
-            ChipLogError(NotSpecified, "AirPurifierManager::SpeedSettingChangedCallback: failed to set SpeedCurrent attribute: %d",
+            ChipLogError(NotSpecified, "AirPurifierManager::SpeedSettingWriteCallback: failed to set SpeedCurrent attribute: %d",
                          status);
         }
     }
 }
 
-void AirPurifierManager::FanModeChangedCallback(FanControl::FanModeEnum aNewFanMode)
+void AirPurifierManager::FanModeWriteCallback(FanControl::FanModeEnum aNewFanMode)
 {
-    ChipLogDetail(NotSpecified, "AirPurifierManager::FanModeChangedCallback: %d", (uint8_t) aNewFanMode);
+    ChipLogDetail(NotSpecified, "AirPurifierManager::FanModeWriteCallback: %d", (uint8_t) aNewFanMode);
     switch (aNewFanMode)
     {
     case FanControl::FanModeEnum::kOff: {
@@ -223,7 +223,7 @@ void AirPurifierManager::FanModeChangedCallback(FanControl::FanModeEnum aNewFanM
         EmberAfStatus status = FanControl::Attributes::PercentSetting::Set(mEndpointId, percentSetting);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
-            ChipLogError(NotSpecified, "AirPurifierManager::FanModeChangedCallback: failed to set PercentSetting attribute: %d",
+            ChipLogError(NotSpecified, "AirPurifierManager::FanModeWriteCallback: failed to set PercentSetting attribute: %d",
                          status);
         }
         break;
@@ -233,7 +233,7 @@ void AirPurifierManager::FanModeChangedCallback(FanControl::FanModeEnum aNewFanM
         EmberAfStatus status = FanControl::Attributes::PercentSetting::Set(mEndpointId, percentSetting);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
-            ChipLogError(NotSpecified, "AirPurifierManager::FanModeChangedCallback: failed to set PercentSetting attribute: %d",
+            ChipLogError(NotSpecified, "AirPurifierManager::FanModeWriteCallback: failed to set PercentSetting attribute: %d",
                          status);
         }
         break;
@@ -243,7 +243,7 @@ void AirPurifierManager::FanModeChangedCallback(FanControl::FanModeEnum aNewFanM
         EmberAfStatus status = FanControl::Attributes::PercentSetting::Set(mEndpointId, percentSetting);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
-            ChipLogError(NotSpecified, "AirPurifierManager::FanModeChangedCallback: failed to set PercentSetting attribute: %d",
+            ChipLogError(NotSpecified, "AirPurifierManager::FanModeWriteCallback: failed to set PercentSetting attribute: %d",
                          status);
         }
         break;
@@ -254,18 +254,18 @@ void AirPurifierManager::FanModeChangedCallback(FanControl::FanModeEnum aNewFanM
         EmberAfStatus status = FanControl::Attributes::PercentSetting::Set(mEndpointId, percentSetting);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
-            ChipLogError(NotSpecified, "AirPurifierManager::FanModeChangedCallback: failed to set PercentSetting attribute: %d",
+            ChipLogError(NotSpecified, "AirPurifierManager::FanModeWriteCallback: failed to set PercentSetting attribute: %d",
                          status);
         }
         break;
     }
     case FanControl::FanModeEnum::kSmart:
     case FanControl::FanModeEnum::kAuto: {
-        ChipLogProgress(NotSpecified, "AirPurifierManager::FanModeChangedCallback: Auto");
+        ChipLogProgress(NotSpecified, "AirPurifierManager::FanModeWriteCallback: Auto");
         break;
     }
     case FanControl::FanModeEnum::kUnknownEnumValue: {
-        ChipLogProgress(NotSpecified, "AirPurifierManager::FanModeChangedCallback: Unknown");
+        ChipLogProgress(NotSpecified, "AirPurifierManager::FanModeWriteCallback: Unknown");
         break;
     }
     }
