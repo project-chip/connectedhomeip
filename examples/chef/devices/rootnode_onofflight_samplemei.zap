@@ -33,7 +33,7 @@
   ],
   "endpointTypes": [
     {
-      "id": 5,
+      "id": 4,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
         "id": 2,
@@ -5420,7 +5420,7 @@
       ]
     },
     {
-      "id": 6,
+      "id": 3,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
         "id": 8,
@@ -7653,7 +7653,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "array",
-              "included": 1,
+              "included": 0,
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
