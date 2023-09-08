@@ -93,15 +93,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
 {
     uint32_t count = 0;
 
-    CHIP_ERROR err = ConfigurationMgr().GetRebootCount(count);
+    ReturnErrorOnFailure(ConfigurationMgr().GetRebootCount(count));
+    VerifyOrReturnError(count <= UINT16_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+    rebootCount = static_cast<uint16_t>(count);
 
-    if (err == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(count <= UINT16_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-        rebootCount = static_cast<uint16_t>(count);
-    }
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
