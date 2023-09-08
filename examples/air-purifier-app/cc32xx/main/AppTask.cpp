@@ -46,7 +46,7 @@
 
 #include <air-purifier-manager.h>
 
-
+#include <CC32XXConfig.h>
 /* syscfg */
 #include <ti_drivers_config.h>
 
@@ -293,8 +293,13 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         {
             PLAT_LOG("DispatchEvent: kEventType_ButtonRight: kAppEventButtonType_Clicked");
         }
+        if ( AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
+        {
+            //this is just a workaround until TI fixes the syncing of KVS to NV after e.g. a unpair.
+            PLAT_LOG("DispatchEvent: kEventType_ButtonRight: LONG clicked - writing KVS to NV");
+            DeviceLayer::Internal::CC32XXConfig::WriteKVSToNV();
+        }
         break;
-
     case AppEvent::kEventType_AppEvent:
         if (NULL != aEvent->Handler)
         {
