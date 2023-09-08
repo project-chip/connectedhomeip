@@ -26,7 +26,7 @@ Stuck, DustBinMissing, DustBinFull, WaterTankEmpty, WaterTankMissing, WaterTankL
 
 ## Testing
 
-PICS files that show what this app supports testing are available in the `pics` directory as txt files.
+PICS files that detail what this app supports testing are available in the `pics` directory as txt files.
 After building the RVC example app, chip-tool, and setting up the testing environment, python tests can be executed with
 `./scripts/tests/run_python_test.py --script src/python_testing/<script_name>.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/<PICS_FILE>.txt --int-arg <PIXIT_Definitions:1>"`
 
@@ -100,3 +100,8 @@ PIXIT: `PIXIT_ENDPOINT:1`
 Example command: `./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCOPSTATE_2_3.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/RVC_Operational_State_Cluster_Test_Plan.txt --int-arg PIXIT_ENDPOINT:1"`
 
 Use the out-of-band messages, chip-tool messages and the state machine diagram to navigate to the required states.
+
+### Running the yaml tests
+
+After commissioning the device, all the yaml tests can be run by running the `run_all_yaml_tests.sh` script from the 
+root dir with the node ID that the device was commissioned with.
