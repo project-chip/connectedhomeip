@@ -81,7 +81,14 @@ public:
         char credentials[DeviceLayer::Internal::kMaxWiFiKeyLength];
         uint8_t credentialsLen = 0;
     };
-
+    enum WiFiCredentialLength
+    {
+        kOpen      = 0,
+        kWEP64     = 5,
+        kMinWPAPSK = 8,
+        kMaxWPAPSK = 63,
+        kWPAPSKHex = 64,
+    };
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
     CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) override;

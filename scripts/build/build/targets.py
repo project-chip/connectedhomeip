@@ -30,6 +30,7 @@ from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder, OpenIotSdkCryptoBackend
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
+from builders.stm32 import stm32App, stm32Board, stm32Builder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.ti import TIApp, TIBoard, TIBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
@@ -563,6 +564,22 @@ def BuildQorvoTarget():
     return target
 
 
+def BuildStm32Target():
+    target = BuildTarget('stm32', stm32Builder)
+
+    # board
+    target.AppendFixedTargets([
+        TargetPart('STM32WB5MM-DK', board=stm32Board.STM32WB55XX),
+    ])
+
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('light', app=stm32App.LIGHT),
+    ])
+
+    return target
+
+
 def BuildTizenTarget():
     target = BuildTarget('tizen', TizenBuilder)
 
@@ -661,8 +678,11 @@ def BuildGenioTarget():
 
 def BuildTelinkTarget():
     target = BuildTarget('telink', TelinkBuilder)
-    target.AppendFixedTargets(
-        [TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D)])
+
+    target.AppendFixedTargets([
+        TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D),
+        TargetPart('tlsr9528a', board=TelinkBoard.TLSR9528A),
+    ])
 
     target.AppendFixedTargets([
         TargetPart('all-clusters', app=TelinkApp.ALL_CLUSTERS),
@@ -728,6 +748,7 @@ BUILD_TARGETS = [
     BuildNrfTarget(),
     BuildNrfNativeTarget(),
     BuildQorvoTarget(),
+    BuildStm32Target(),
     BuildTizenTarget(),
     BuildTelinkTarget(),
     BuildOpenIotSdkTargets(),

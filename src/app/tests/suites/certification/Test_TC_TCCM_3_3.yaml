@@ -18,7 +18,9 @@ name:
     Server
 
 PICS:
-    - TCCM.S
+    - TCCM.S.A0002
+    - TCCM.S.A0003
+    - TCCM.S.F00
 
 config:
     nodeId: 0x12344321

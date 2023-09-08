@@ -89,3 +89,24 @@ jobs:
               shell: bash
               run: |
                   ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t nrfconnect"
+
+    chef_telink:
+        name: Chef - Telink CI Examples
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+
+        container:
+            image: ghcr.io/project-chip/chip-build-telink:10
+            options: --user root
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: telink
+            - name: CI Examples Telink
+              shell: bash
+              run: |
+                  ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t telink"

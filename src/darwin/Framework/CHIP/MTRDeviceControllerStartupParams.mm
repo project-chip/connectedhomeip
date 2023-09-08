@@ -23,7 +23,11 @@
 #import "MTRP256KeypairBridge.h"
 #import "NSDataSpanConversion.h"
 
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
+#else
+#import "MTRDeviceControllerStorageDelegate_Wrapper.h"
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #include <controller/OperationalCredentialsDelegate.h>
 #include <credentials/CHIPCert.h>
@@ -140,15 +144,15 @@ static CHIP_ERROR ExtractNodeIDFromNOC(MTRCertificateDERBytes noc, NSNumber * __
     return self;
 }
 
-- (instancetype)initWithParameters:(MTRDeviceControllerStartupParameters *)params error:(CHIP_ERROR &)error
+- (instancetype)initWithParameters:(MTRDeviceControllerParameters *)params error:(CHIP_ERROR &)error
 {
     if (!(self = [super init])) {
         error = CHIP_ERROR_INCORRECT_STATE;
         return nil;
     }
 
-    if (![params isKindOfClass:[MTRDeviceControllerExternalCertificateStartupParameters class]]) {
-        MTR_LOG_ERROR("Unexpected subclass of MTRDeviceControllerStartupParameters");
+    if (![params isKindOfClass:[MTRDeviceControllerExternalCertificateParameters class]]) {
+        MTR_LOG_ERROR("Unexpected subclass of MTRDeviceControllerParameters");
         error = CHIP_ERROR_INVALID_ARGUMENT;
         return nil;
     }
@@ -247,7 +251,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
 @end
 
-@implementation MTRDeviceControllerStartupParameters
+@implementation MTRDeviceControllerParameters
 - (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
                    storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
                        uniqueIdentifier:(NSUUID *)uniqueIdentifier
@@ -264,6 +268,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
     _productAttestationAuthorityCertificates = nil;
     _certificationDeclarationCertificates = nil;
+    _shouldAdvertiseOperational = NO;
 
     _ipk = ipk;
     _vendorID = vendorID;
@@ -287,9 +292,16 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     _operationalCertificateIssuer = operationalCertificateIssuer;
     _operationalCertificateIssuerQueue = queue;
 }
+
+- (void)setOTAProviderDelegate:(id<MTROTAProviderDelegate>)otaProviderDelegate queue:(dispatch_queue_t)queue
+{
+    _otaProviderDelegate = otaProviderDelegate;
+    _otaProviderDelegateQueue = queue;
+}
+
 @end
 
-@implementation MTRDeviceControllerExternalCertificateStartupParameters
+@implementation MTRDeviceControllerExternalCertificateParameters
 - (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
                    storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
                        uniqueIdentifier:(NSUUID *)uniqueIdentifier
@@ -530,7 +542,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
                          fabricTable:(chip::FabricTable *)fabricTable
                             keystore:(chip::Crypto::OperationalKeystore *)keystore
                 advertiseOperational:(BOOL)advertiseOperational
-                              params:(MTRDeviceControllerStartupParameters *)params
+                              params:(MTRDeviceControllerParameters *)params
                                error:(CHIP_ERROR &)error
 {
     if (!(self = [super initWithParameters:params error:error])) {

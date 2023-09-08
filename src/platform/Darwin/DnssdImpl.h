@@ -82,12 +82,13 @@ public:
      *                      Example:
      *                        _matterc._udp,_V65521,_S15,_L3840,_CM
      *                        _matter._tcp,_I4CEEAD044CC35B63
+     * @param[in]  name     The instance name for the service.
      * @param[out] context  A reference to the context previously registered
      *
      * @return     On success, the context parameter will point to the previously
      *             registered context.
      */
-    CHIP_ERROR GetRegisterContextOfType(const char * type, RegisterContext ** context);
+    CHIP_ERROR GetRegisterContextOfTypeAndName(const char * type, const char * name, RegisterContext ** context);
 
     /**
      * Return a pointer to an existing ResolveContext for the given
@@ -146,7 +147,7 @@ struct RegisterContext : public GenericContext
     void DispatchFailure(const char * errorStr, CHIP_ERROR err) override;
     void DispatchSuccess() override;
 
-    bool matches(const char * sType) { return mType.compare(sType) == 0; }
+    bool matches(const char * type, const char * name) { return mType == type && mInstanceName == name; }
 };
 
 struct BrowseHandler : public GenericContext

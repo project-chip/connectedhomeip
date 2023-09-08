@@ -52,7 +52,7 @@ declare_args() {
       chip_device_platform == "cc13x2_26x2" ||
       chip_device_platform == "cc13x4_26x4" ||
       chip_device_platform == "k32w0" || chip_device_platform == "tizen" ||
-      chip_device_platform == "webos"
+      chip_device_platform == "webos" || chip_device_platform == "stm32"
 }
 
 declare_args() {
@@ -172,6 +172,8 @@ if (chip_device_platform == "cc13x2_26x2") {
   _chip_device_layer = "openiotsdk"
 } else if (chip_device_platform == "asr") {
   _chip_device_layer = "ASR"
+} else if (chip_device_platform == "stm32") {
+  _chip_device_layer = "stm32"
 }
 
 if (chip_device_platform != "external") {
@@ -241,5 +243,6 @@ assert(
         chip_device_platform == "bl602" || chip_device_platform == "bl702" ||
         chip_device_platform == "bl702l" || chip_device_platform == "mt793x" ||
         chip_device_platform == "SiWx917" ||
-        chip_device_platform == "openiotsdk" || chip_device_platform == "asr",
+        chip_device_platform == "openiotsdk" || chip_device_platform == "asr" ||
+        chip_device_platform == "stm32",
     "Please select a valid value for chip_device_platform")

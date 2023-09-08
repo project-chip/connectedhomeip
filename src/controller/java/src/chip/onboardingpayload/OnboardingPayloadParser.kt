@@ -17,9 +17,6 @@
 
 package chip.onboardingpayload
 
-import java.util.logging.Level
-import java.util.logging.Logger
-
 /** Parser for scanned QR code or Manual Pairing Code. */
 class OnboardingPayloadParser {
   /**
@@ -57,9 +54,7 @@ class OnboardingPayloadParser {
     qrCodeString: String,
     skipPayloadValidation: Boolean
   ): OnboardingPayload {
-    val payload = OnboardingPayload()
-
-    QRCodeOnboardingPayloadParser(qrCodeString).populatePayload(payload)
+    val payload = QRCodeOnboardingPayloadParser(qrCodeString).populatePayload()
 
     if (skipPayloadValidation == false && !payload.isValidQRCodePayload()) {
       throw OnboardingPayloadException("Invalid payload")
@@ -106,26 +101,12 @@ class OnboardingPayloadParser {
     manualPairingCodeString: String,
     skipPayloadValidation: Boolean
   ): OnboardingPayload {
-    val payload = OnboardingPayload()
-    ManualOnboardingPayloadParser(manualPairingCodeString).populatePayload(payload)
+    val payload = ManualOnboardingPayloadParser(manualPairingCodeString).populatePayload()
 
     if (skipPayloadValidation == false && !payload.isValidManualCode()) {
       throw OnboardingPayloadException("Invalid manual entry code")
     }
 
     return payload
-  }
-
-  companion object {
-    private val LOGGER: Logger =
-      Logger.getLogger(OnboardingPayloadParser::class.java.getSimpleName())
-
-    init {
-      try {
-        System.loadLibrary("OnboardingPayload")
-      } catch (e: UnsatisfiedLinkError) {
-        LOGGER.log(Level.SEVERE, "Cannot load library.", e)
-      }
-    }
   }
 }

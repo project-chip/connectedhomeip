@@ -112,7 +112,7 @@ private:
 
     MeasurementMediumEnum mMeasurementMedium;
 
-    uint32_t mFeature = 0;
+    uint32_t mFeatureMap = 0;
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override
@@ -191,6 +191,10 @@ private:
 
         case Attributes::MeasurementMedium::Id:
             ReturnErrorOnFailure(aEncoder.Encode(mMeasurementMedium));
+            break;
+
+        case Attributes::FeatureMap::Id:
+            ReturnErrorOnFailure(aEncoder.Encode(mFeatureMap));
             break;
         }
 
@@ -351,7 +355,7 @@ public:
         // Register the object as attribute provider
         VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
 
-        mFeature = GenerateFeatureMap();
+        mFeatureMap = GenerateFeatureMap();
 
         return CHIP_NO_ERROR;
     };
