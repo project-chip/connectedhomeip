@@ -202,7 +202,7 @@ void sys_unlock_tcpip_core(void);
 #ifndef MEMP_NUM_UDP_PCB
 #define MEMP_NUM_UDP_PCB (6 + (LWIP_MDNS_RESPONDER))
 #endif
-/* MEMP_NUM_TCP_PCB: the number of simulatenously active TCP
+/* MEMP_NUM_TCP_PCB: the number of simultaneously active TCP
    connections. */
 #ifndef MEMP_NUM_TCP_PCB
 #define MEMP_NUM_TCP_PCB 10
