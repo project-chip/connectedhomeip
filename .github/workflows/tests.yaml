@@ -223,6 +223,7 @@ jobs:
                      --exclude-tags MANUAL \
                      --exclude-tags FLAKY \
                      --exclude-tags IN_DEVELOPMENT \
+                     --exclude-tags EXTRA_SLOW \
                      --exclude-tags SLOW \
                      run \
                      --iterations 1 \
