@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -33,10 +33,9 @@
   ],
   "endpointTypes": [
     {
-      "id": 3,
+      "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 2,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 2,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        2
       ],
       "deviceVersions": [
         1
@@ -7437,10 +7432,9 @@
       ]
     },
     {
-      "id": 4,
+      "id": 2,
       "name": "MA-videoplayer",
       "deviceTypeRef": {
-        "id": 36,
         "code": 35,
         "profileId": 259,
         "label": "MA-casting-videoplayer",
@@ -7448,15 +7442,11 @@
       },
       "deviceTypes": [
         {
-          "id": 36,
           "code": 35,
           "profileId": 259,
           "label": "MA-casting-videoplayer",
           "name": "MA-casting-videoplayer"
         }
-      ],
-      "deviceTypeRefs": [
-        36
       ],
       "deviceVersions": [
         1
@@ -9793,10 +9783,9 @@
       ]
     },
     {
-      "id": 1,
+      "id": 3,
       "name": "MA-speaker",
       "deviceTypeRef": {
-        "id": 40,
         "code": 34,
         "profileId": 259,
         "label": "MA-speaker",
@@ -9804,15 +9793,11 @@
       },
       "deviceTypes": [
         {
-          "id": 40,
           "code": 34,
           "profileId": 259,
           "label": "MA-speaker",
           "name": "MA-speaker"
         }
-      ],
-      "deviceTypeRefs": [
-        40
       ],
       "deviceVersions": [
         1
@@ -10593,10 +10578,9 @@
       ]
     },
     {
-      "id": 2,
+      "id": 4,
       "name": "MA-contentapplication",
       "deviceTypeRef": {
-        "id": 41,
         "code": 36,
         "profileId": 259,
         "label": "MA-contentapp",
@@ -10604,15 +10588,11 @@
       },
       "deviceTypes": [
         {
-          "id": 41,
           "code": 36,
           "profileId": 259,
           "label": "MA-contentapp",
           "name": "MA-contentapp"
         }
-      ],
-      "deviceTypeRefs": [
-        41
       ],
       "deviceVersions": [
         1
@@ -12556,6 +12536,5 @@
       "endpointId": 3,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

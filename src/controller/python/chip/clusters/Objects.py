@@ -5560,6 +5560,10 @@ class TimeFormatLocalization(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
+    class Bitmaps:
+        class Feature(IntFlag):
+            kCalendarFormat = 0x1
+
     class Attributes:
         @dataclass
         class HourFormat(ClusterAttributeDescriptor):
@@ -18088,6 +18092,9 @@ class DishwasherAlarm(Cluster):
             kTempTooHigh = 0x10
             kWaterLevelError = 0x20
 
+        class Feature(IntFlag):
+            kReset = 0x1
+
     class Commands:
         @dataclass
         class Reset(ClusterCommand):
@@ -19169,7 +19176,7 @@ class HepaFilterMonitoring(Cluster):
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
-            kReplacementProductList = 0x3
+            kReplacementProductList = 0x4
 
     class Structs:
         @dataclass
@@ -19464,7 +19471,7 @@ class ActivatedCarbonFilterMonitoring(Cluster):
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
-            kReplacementProductList = 0x3
+            kReplacementProductList = 0x4
 
     class Structs:
         @dataclass

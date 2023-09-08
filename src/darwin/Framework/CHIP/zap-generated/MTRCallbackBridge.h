@@ -3914,7 +3914,8 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDescriptorTagListListAttributeCallbackBridge : public MTRCallbackBridge<DescriptorTagListListAttributeCallback>
+class MTR_PROVISIONALLY_AVAILABLE MTRDescriptorTagListListAttributeCallbackBridge
+    : public MTRCallbackBridge<DescriptorTagListListAttributeCallback>
 {
 public:
     MTRDescriptorTagListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
@@ -3929,7 +3930,8 @@ public:
             value);
 };
 
-class MTRDescriptorTagListListAttributeCallbackSubscriptionBridge : public MTRDescriptorTagListListAttributeCallbackBridge
+class MTR_PROVISIONALLY_AVAILABLE MTRDescriptorTagListListAttributeCallbackSubscriptionBridge
+    : public MTRDescriptorTagListListAttributeCallbackBridge
 {
 public:
     MTRDescriptorTagListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5859,7 +5861,8 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRPowerSourceEndpointListListAttributeCallbackBridge : public MTRCallbackBridge<PowerSourceEndpointListListAttributeCallback>
+class MTR_PROVISIONALLY_AVAILABLE MTRPowerSourceEndpointListListAttributeCallbackBridge
+    : public MTRCallbackBridge<PowerSourceEndpointListListAttributeCallback>
 {
 public:
     MTRPowerSourceEndpointListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
@@ -5871,7 +5874,7 @@ public:
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & value);
 };
 
-class MTRPowerSourceEndpointListListAttributeCallbackSubscriptionBridge
+class MTR_PROVISIONALLY_AVAILABLE MTRPowerSourceEndpointListListAttributeCallbackSubscriptionBridge
     : public MTRPowerSourceEndpointListListAttributeCallbackBridge
 {
 public:

@@ -22,7 +22,7 @@ PICS:
     - ICDM.S.C03.Rsp
 
 config:
-    nodeId: "0x12344321"
+    nodeId: 0x12344321
     cluster: "Basic Information"
     endpoint: 0
 
@@ -30,7 +30,13 @@ tests:
     - label: "Step 1: TH reads from the DUT the ActiveModeThreshold attribute."
       PICS: ICDM.S.A0002
       verification: |
-          Verify that the DUT response contains an uint16; value is 300 or higher
+          ./chip-tool icdmanagement read active-mode-threshold 1 0
+
+          On TH(chip-tool) log, Verify ActiveModeThreshold attribute should contains an uint16; value is 300 or higher below is the sample log provided for the raspi platform:
+
+
+          [1685127625953] [48160:461013] [TOO] Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0002 DataVersion: 326159709
+          [1685127625953] [48160:461013] [TOO]   ActiveModeThreshold: 300
       disabled: true
 
     - label: "Step 2: TH sends StayActiveRequest command."
@@ -44,5 +50,5 @@ tests:
           ActiveModeThreshold"
       PICS: ICDM.S.C03.Rsp
       verification: |
-          Verify DUT increases the remaining time in active mode by one ActiveModeThreshold
+          Design details pending.
       disabled: true

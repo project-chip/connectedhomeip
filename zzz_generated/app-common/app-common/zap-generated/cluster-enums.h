@@ -545,6 +545,12 @@ enum class HourFormatEnum : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kCalendarFormat = 0x1,
+};
 } // namespace TimeFormatLocalization
 
 namespace UnitLocalization {
@@ -1808,6 +1814,12 @@ enum class AlarmMap : uint32_t
     kTempTooHigh     = 0x10,
     kWaterLevelError = 0x20,
 };
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kReset = 0x1,
+};
 } // namespace DishwasherAlarm
 
 namespace OperationalState {
@@ -1922,7 +1934,7 @@ enum class Feature : uint32_t
 {
     kCondition              = 0x1,
     kWarning                = 0x2,
-    kReplacementProductList = 0x3,
+    kReplacementProductList = 0x4,
 };
 } // namespace HepaFilterMonitoring
 
@@ -1973,7 +1985,7 @@ enum class Feature : uint32_t
 {
     kCondition              = 0x1,
     kWarning                = 0x2,
-    kReplacementProductList = 0x3,
+    kReplacementProductList = 0x4,
 };
 } // namespace ActivatedCarbonFilterMonitoring
 

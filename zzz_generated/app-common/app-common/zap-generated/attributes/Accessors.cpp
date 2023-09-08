@@ -1556,7 +1556,7 @@ namespace Attributes {
 
 namespace ActiveText {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[16 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, zclString, sizeof(zclString));
@@ -1587,7 +1587,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 
 namespace Description {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[16 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, zclString, sizeof(zclString));
@@ -1618,7 +1618,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 
 namespace InactiveText {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[16 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, zclString, sizeof(zclString));
@@ -2175,7 +2175,7 @@ namespace Attributes {
 
 namespace SetupURL {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[512 + 2];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Actions::Id, Id, zclString, sizeof(zclString));
@@ -2274,7 +2274,7 @@ namespace Attributes {
 
 namespace NodeLabel {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[32 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, sizeof(zclString));
@@ -2686,7 +2686,7 @@ namespace Attributes {
 
 namespace ActiveLocale {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[35 + 1];
     EmberAfStatus status =
@@ -3145,7 +3145,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 
 namespace Description {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[60 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, zclString, sizeof(zclString));
@@ -3742,7 +3742,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
 
 namespace BatReplacementDescription {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[60 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, zclString, sizeof(zclString));
@@ -3804,7 +3804,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::B
 
 namespace BatANSIDesignation {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[20 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, zclString, sizeof(zclString));
@@ -3835,7 +3835,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 
 namespace BatIECDesignation {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[20 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, zclString, sizeof(zclString));
@@ -5275,7 +5275,7 @@ namespace Attributes {
 
 namespace VendorName {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[32 + 1];
     EmberAfStatus status =
@@ -5339,7 +5339,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::VendorId value)
 
 namespace ProductName {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[32 + 1];
     EmberAfStatus status =
@@ -5372,7 +5372,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 
 namespace NodeLabel {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[32 + 1];
     EmberAfStatus status =
@@ -5436,7 +5436,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 
 namespace HardwareVersionString {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[64 + 1];
     EmberAfStatus status =
@@ -5500,7 +5500,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
 
 namespace SoftwareVersionString {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[64 + 1];
     EmberAfStatus status =
@@ -5533,7 +5533,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 
 namespace ManufacturingDate {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[16 + 1];
     EmberAfStatus status =
@@ -5566,7 +5566,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 
 namespace PartNumber {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[32 + 1];
     EmberAfStatus status =
@@ -5599,7 +5599,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 
 namespace ProductURL {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[256 + 2];
     EmberAfStatus status =
@@ -5632,7 +5632,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 
 namespace ProductLabel {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[64 + 1];
     EmberAfStatus status =
@@ -5665,7 +5665,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 
 namespace SerialNumber {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[32 + 1];
     EmberAfStatus status =
@@ -5729,7 +5729,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
 
 namespace UniqueID {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[32 + 1];
     EmberAfStatus status =
@@ -6702,7 +6702,7 @@ namespace Attributes {
 
 namespace Description {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[64 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ModeSelect::Id, Id, zclString, sizeof(zclString));
@@ -9512,7 +9512,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 
 namespace Language {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[3 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, sizeof(zclString));
@@ -15260,7 +15260,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 
 namespace CompensationText {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[254 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, zclString, sizeof(zclString));
@@ -17288,7 +17288,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 
 namespace LampType {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[16 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, zclString, sizeof(zclString));
@@ -17319,7 +17319,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 
 namespace LampManufacturer {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[16 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, zclString, sizeof(zclString));
@@ -20315,7 +20315,7 @@ namespace Attributes {
 
 namespace MACAddress {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[32 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WakeOnLan::Id, Id, zclString, sizeof(zclString));
@@ -21424,7 +21424,7 @@ namespace Attributes {
 
 namespace VendorName {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[32 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, zclString, sizeof(zclString));
@@ -21486,7 +21486,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::VendorId value)
 
 namespace ApplicationName {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[32 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, zclString, sizeof(zclString));
@@ -21579,7 +21579,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ApplicationBas
 
 namespace ApplicationVersion {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[32 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, zclString, sizeof(zclString));
@@ -26557,7 +26557,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, double value)
 
 namespace OctetString {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value)
 {
     uint8_t zclString[10 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, sizeof(zclString));
@@ -26588,7 +26588,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
 
 namespace LongOctetString {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value)
 {
     uint8_t zclString[1000 + 2];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, sizeof(zclString));
@@ -26619,7 +26619,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
 
 namespace CharString {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[10 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, sizeof(zclString));
@@ -26650,7 +26650,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 
 namespace LongCharString {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[1000 + 2];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, sizeof(zclString));

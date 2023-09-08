@@ -251,7 +251,6 @@ static BOOL sNeedsStackShutdown = YES;
 
     __auto_type * factoryParams = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
     factoryParams.port = @(kLocalPort);
-    factoryParams.shouldStartServer = YES;
 
     BOOL ok = [factory startControllerFactory:factoryParams error:nil];
     XCTAssertTrue(ok);

@@ -116,14 +116,14 @@
     "ServerDirectories": {
         "ACCESS_CONTROL_CLUSTER": ["access-control-server"],
         "ACCOUNT_LOGIN_CLUSTER": ["account-login-server"],
-        "ACTIONS_CLUSTER": ["air-quality-server"],
+        "ACTIONS_CLUSTER": [],
         "ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER": [
             "resource-monitoring-server"
         ],
         "ADMINISTRATOR_COMMISSIONING_CLUSTER": [
             "administrator-commissioning-server"
         ],
-        "AIR_QUALITY_CLUSTER": [],
+        "AIR_QUALITY_CLUSTER": ["air-quality-server"],
         "ALARM_CLUSTER": [],
         "APPLICATION_BASIC_CLUSTER": ["application-basic-server"],
         "APPLICATION_LAUNCHER_CLUSTER": ["application-launcher-server"],
