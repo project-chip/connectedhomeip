@@ -28973,4 +28973,7 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 1,
-      
+      "networkId": 0
+    }
+  ]
+}
