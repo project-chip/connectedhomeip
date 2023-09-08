@@ -313,6 +313,7 @@ template("efr32_sdk") {
         defines += [
           "EXP_BOARD=1",
           "CHIP_9117=1",
+          "SL_WIFI_COMPONENT_INCLUDED",
         ]
       } else if (use_wf200) {
         defines += [
