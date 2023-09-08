@@ -23,8 +23,13 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <lib/support/CHIPMemString.h>
+#include <zap-generated/gen_config.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 
 #define MQTT_SUBSCRIBE_TOPIC "command"
+
+using namespace chip;
+using namespace ::chip::DeviceLayer;
 
 namespace dic {
     namespace control {
@@ -33,6 +38,10 @@ namespace dic {
         void SubscribeMQTT(intptr_t context);
 
         void subscribeCB(void);
+
+#ifdef ZCL_USING_THERMOSTAT_CLUSTER_SERVER    
+        void AttributeHandler(EndpointId endpointId, AttributeId attributeId);
+#endif //ZCL_USING_THERMOSTAT_CLUSTER_SERVER
 
     }
 }
