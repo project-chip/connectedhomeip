@@ -1187,9 +1187,9 @@ server cluster Thermostat = 513 {
   }
 
   readonly attribute nullable int16s localTemperature = 0;
+  readonly attribute int16s absMinHeatSetpointLimit = 3;
+  readonly attribute int16s absMaxHeatSetpointLimit = 4;
   attribute int16s occupiedHeatingSetpoint = 18;
-  attribute access(write: manage) int16s minHeatSetpointLimit = 21;
-  attribute access(write: manage) int16s maxHeatSetpointLimit = 22;
   attribute access(write: manage) ThermostatControlSequence controlSequenceOfOperation = 27;
   attribute access(write: manage) enum8 systemMode = 28;
   readonly attribute bitmap16 thermostatRunningState = 41;
@@ -2431,9 +2431,9 @@ endpoint 5 {
 
   server cluster Thermostat {
     ram      attribute localTemperature;
+    ram      attribute absMinHeatSetpointLimit default = 700;
+    ram      attribute absMaxHeatSetpointLimit default = 3000;
     ram      attribute occupiedHeatingSetpoint default = 2000;
-    ram      attribute minHeatSetpointLimit default = 1700;
-    ram      attribute maxHeatSetpointLimit default = 3000;
     ram      attribute controlSequenceOfOperation default = 0x02;
     ram      attribute systemMode default = 0x00;
     ram      attribute thermostatRunningState;
