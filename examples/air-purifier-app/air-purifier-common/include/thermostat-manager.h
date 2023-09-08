@@ -13,8 +13,8 @@ public:
 
     void Init();
 
-    void HeatingSetpointChangedCallback(int16_t newValue);
-    void SystemModeChangedCallback(uint8_t newValue);
+    void HeatingSetpointWriteCallback(int16_t newValue);
+    void SystemModeWriteCallback(uint8_t newValue);
 
     void OnLocalTemperatureChangeCallback(int16_t temperature);
 

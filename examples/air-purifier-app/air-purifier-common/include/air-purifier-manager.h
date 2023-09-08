@@ -127,12 +127,12 @@ private:
      */
     void HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
     void PercentSettingChangedCallback(uint8_t aNewPercentSetting);
-    void SpeedSettingChangedCallback(uint8_t aNewSpeedSetting);
-    void FanModeChangedCallback(FanControl::FanModeEnum aNewFanMode);
+    void SpeedSettingWriteCallback(uint8_t aNewSpeedSetting);
+    void FanModeWriteCallback(FanControl::FanModeEnum aNewFanMode);
 
     void HandleThermostatAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
-    void ThermostatHeatingSetpointChangedCallback(int16_t aNewHeatingSetpoint);
-    void ThermostatSystemModeChangedCallback(uint8_t aNewSystemMode);
+    void ThermostatHeatingSetpointWriteCallback(int16_t aNewHeatingSetpoint);
+    void ThermostatSystemModeWriteCallback(uint8_t aNewSystemMode);
 };
 
 } // namespace Clusters

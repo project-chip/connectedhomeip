@@ -20,9 +20,9 @@ void ThermostatManager::Init()
                    ChipLogError(NotSpecified, "Failed to set Thermostat MaxHeatSetpointLimit attribute"));
 }
 
-void ThermostatManager::HeatingSetpointChangedCallback(int16_t newValue)
+void ThermostatManager::HeatingSetpointWriteCallback(int16_t newValue)
 {
-    ChipLogDetail(NotSpecified, "ThermostatManager::HeatingSetpointChangedCallback: %d", newValue);
+    ChipLogDetail(NotSpecified, "ThermostatManager::HeatingSetpointWriteCallback: %d", newValue);
     uint8_t systemMode;
     EmberAfStatus status = Thermostat::Attributes::SystemMode::Get(mEndpointId, &systemMode);
     VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to get Thermostat SystemMode attribute"));
@@ -41,9 +41,9 @@ void ThermostatManager::HeatingSetpointChangedCallback(int16_t newValue)
     }
 }
 
-void ThermostatManager::SystemModeChangedCallback(uint8_t newValue)
+void ThermostatManager::SystemModeWriteCallback(uint8_t newValue)
 {
-    ChipLogDetail(NotSpecified, "ThermostatManager::SystemModeChangedCallback: %d", newValue);
+    ChipLogDetail(NotSpecified, "ThermostatManager::SystemModeWriteCallback: %d", newValue);
     if ((Thermostat::ThermostatSystemMode) newValue == Thermostat::ThermostatSystemMode::kOff)
     {
         SetHeating(false);

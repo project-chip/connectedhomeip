@@ -277,23 +277,23 @@ void AirPurifierManager::HandleThermostatAttributeChange(AttributeId attributeId
     {
     case Thermostat::Attributes::OccupiedHeatingSetpoint::Id: {
         int16_t heatingSetpoint = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
-        ThermostatHeatingSetpointChangedCallback(heatingSetpoint);
+        ThermostatHeatingSetpointWriteCallback(heatingSetpoint);
         break;
     }
     case Thermostat::Attributes::SystemMode::Id: {
         uint8_t systemMode = static_cast<uint8_t>(*value);
-        ThermostatSystemModeChangedCallback(systemMode);
+        ThermostatSystemModeWriteCallback(systemMode);
         break;
     }
     }
 }
 
-void AirPurifierManager::ThermostatHeatingSetpointChangedCallback(int16_t aNewHeatingSetpoint)
+void AirPurifierManager::ThermostatHeatingSetpointWriteCallback(int16_t aNewHeatingSetpoint)
 {
-    mThermostatManager.HeatingSetpointChangedCallback(aNewHeatingSetpoint);
+    mThermostatManager.HeatingSetpointWriteCallback(aNewHeatingSetpoint);
 }
 
-void AirPurifierManager::ThermostatSystemModeChangedCallback(uint8_t aNewSystemMode)
+void AirPurifierManager::ThermostatSystemModeWriteCallback(uint8_t aNewSystemMode)
 {
-    mThermostatManager.SystemModeChangedCallback(aNewSystemMode);
+    mThermostatManager.SystemModeWriteCallback(aNewSystemMode);
 }
