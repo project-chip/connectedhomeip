@@ -192,6 +192,8 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_G_2_4.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_RVCRUNM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_RVCCLEANM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        # chip-repl and chip-tool disagree on what the YAML here should look like: https://github.com/project-chip/connectedhomeip/issues/29110
+        "TestClusterMultiFabric.yaml",
     }
 
 
