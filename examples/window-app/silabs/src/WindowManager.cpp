@@ -58,7 +58,7 @@ using namespace ::chip::DeviceLayer::Silabs;
 
 #ifdef DIC_ENABLE
 #define DECIMAL 10
-#define MSG_SIZE 5
+#define MSG_SIZE 6
 #include "dic.h"
 #endif // DIC_ENABLE
 
