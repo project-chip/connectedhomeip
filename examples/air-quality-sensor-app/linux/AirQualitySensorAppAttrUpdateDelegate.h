@@ -23,18 +23,6 @@
 #include <json/json.h>
 #include <platform/DiagnosticDataProvider.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace AirQuality {
-
-void Shutdown();
-
-} // namespace AirQuality
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
 class AirQualitySensorAttrUpdateHandler
 {
 public:
