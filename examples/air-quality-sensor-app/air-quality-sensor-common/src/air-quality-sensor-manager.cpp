@@ -203,11 +203,11 @@ void AirQualitySensorManager::OnFormaldehydeMeasurementChangeHandler(float newVa
 void AirQualitySensorManager::OnTemperatureMeasurementChangeHandler(int16_t newValue)
 {
     mTemperatureSensorManager.OnTemperatureChangeHandler(newValue);
-    ChipLogDetail(NotSpecified, "Updated Formaldehyde value: %hu", newValue);
+    ChipLogDetail(NotSpecified, "Updated Temperature value: %hu", newValue);
 }
 
 void AirQualitySensorManager::OnHumidityMeasurementChangeHandler(uint16_t newValue)
 {
     mHumiditySensorManager.OnHumidityChangeHandler(newValue);
-    ChipLogDetail(NotSpecified, "Updated Formaldehyde value: %hu", newValue);
+    ChipLogDetail(NotSpecified, "Updated Humidity value: %hu", newValue);
 }
