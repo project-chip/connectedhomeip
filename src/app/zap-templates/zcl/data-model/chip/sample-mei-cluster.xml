@@ -20,11 +20,13 @@ limitations under the License.
   <cluster>
     <domain>General</domain>
     <name>Sample MEI</name>
+    <!-- The MSB 16 bits of <code> are the VendorID. Replace this with your
+         VendorID. 0xFFF1 is a Test VendorID.
+
+         The LSB 16 bits of <code> are a self-assigned ClusterID -->
     <code>0xFFF1FC20</code>
     <define>SAMPLE_MEI_CLUSTER</define>
     <description>The Sample MEI cluster showcases a cluster manufacturer extensions</description>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
 
     <!-- Attributes -->
     <!-- A simple boolean attribute that flips or flops -->
