@@ -10,7 +10,6 @@ CONC_ENDPOINT=2
 TEMP_MEAS_ENDPOINT=3
 RH_ENDPOINT=4
 TSTAT_ENDPOINT=5
-NODEID=0x12344321
 
 CHIPTOOL_CMD="./scripts/tests/yaml/chiptool.py tests"
 PICS=examples/air-purifier-app/air-purifier-common/air-purifier-pics
