@@ -1825,6 +1825,7 @@ exports.model = {
       "Online non-functional",
       "Unavailable",
       "Offline",
+      "Commisioning Started",
     ], //
     "NodeStateSecurity" : [
       "None",
@@ -1833,6 +1834,7 @@ exports.model = {
       "Z-Wave S2 Authenticated",
       "Z-Wave S2 Access Control",
       "Zigbee Z3",
+      "Matter",
     ], //
     "OTADeviceSpecificImageType" : [
       "ClientSecurityCredentials",

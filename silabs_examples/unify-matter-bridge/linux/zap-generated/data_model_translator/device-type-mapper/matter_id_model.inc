@@ -170,6 +170,8 @@ namespace app {
                     { "SceneValid", SceneValid::Id },
                     { "NameSupport", NameSupport::Id },
                     { "LastConfiguredBy", LastConfiguredBy::Id },
+                    { "SceneTableSize", SceneTableSize::Id },
+                    { "RemainingCapacity", RemainingCapacity::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -276,6 +278,7 @@ namespace app {
                     { "ServerList", ServerList::Id },
                     { "ClientList", ClientList::Id },
                     { "PartsList", PartsList::Id },
+                    { "TagList", TagList::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -353,6 +356,7 @@ namespace app {
                     { "Reachable", Reachable::Id },
                     { "UniqueID", UniqueID::Id },
                     { "CapabilityMinima", CapabilityMinima::Id },
+                    { "ProductAppearance", ProductAppearance::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -479,6 +483,7 @@ namespace app {
                     { "BatFunctionalWhileCharging", BatFunctionalWhileCharging::Id },
                     { "BatChargingCurrent", BatChargingCurrent::Id },
                     { "ActiveBatChargeFaults", ActiveBatChargeFaults::Id },
+                    { "EndpointList", EndpointList::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -708,6 +713,9 @@ namespace app {
                     { "LocalTime", LocalTime::Id },
                     { "TimeZoneDatabase", TimeZoneDatabase::Id },
                     { "NTPServerAvailable", NTPServerAvailable::Id },
+                    { "TimeZoneListMaxSize", TimeZoneListMaxSize::Id },
+                    { "DSTOffsetListMaxSize", DSTOffsetListMaxSize::Id },
+                    { "SupportsDNSResolve", SupportsDNSResolve::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -735,6 +743,7 @@ namespace app {
                     { "SerialNumber", SerialNumber::Id },
                     { "Reachable", Reachable::Id },
                     { "UniqueID", UniqueID::Id },
+                    { "ProductAppearance", ProductAppearance::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -885,7 +894,20 @@ namespace app {
         } // namespace BooleanState
         namespace IcdManagement {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "IdleModeInterval", IdleModeInterval::Id },
+                    { "ActiveModeInterval", ActiveModeInterval::Id },
+                    { "ActiveModeThreshold", ActiveModeThreshold::Id },
+                    { "RegisteredClients", RegisteredClients::Id },
+                    { "ICDCounter", ICDCounter::Id },
+                    { "ClientsSupportedPerFabric", ClientsSupportedPerFabric::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace IcdManagement
         namespace ModeSelect {
@@ -908,77 +930,257 @@ namespace app {
         } // namespace ModeSelect
         namespace LaundryWasherMode {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "SupportedModes", SupportedModes::Id },
+                    { "CurrentMode", CurrentMode::Id },
+                    { "StartUpMode", StartUpMode::Id },
+                    { "OnMode", OnMode::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace LaundryWasherMode
         namespace RefrigeratorAndTemperatureControlledCabinetMode {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "SupportedModes", SupportedModes::Id },
+                    { "CurrentMode", CurrentMode::Id },
+                    { "StartUpMode", StartUpMode::Id },
+                    { "OnMode", OnMode::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace RefrigeratorAndTemperatureControlledCabinetMode
         namespace LaundryWasherControls {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "SpinSpeeds", SpinSpeeds::Id },
+                    { "SpinSpeedCurrent", SpinSpeedCurrent::Id },
+                    { "NumberOfRinses", NumberOfRinses::Id },
+                    { "SupportedRinses", SupportedRinses::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace LaundryWasherControls
         namespace RvcRunMode {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "SupportedModes", SupportedModes::Id },
+                    { "CurrentMode", CurrentMode::Id },
+                    { "StartUpMode", StartUpMode::Id },
+                    { "OnMode", OnMode::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace RvcRunMode
         namespace RvcCleanMode {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "SupportedModes", SupportedModes::Id },
+                    { "CurrentMode", CurrentMode::Id },
+                    { "StartUpMode", StartUpMode::Id },
+                    { "OnMode", OnMode::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace RvcCleanMode
         namespace TemperatureControl {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "TemperatureSetpoint", TemperatureSetpoint::Id },
+                    { "MinTemperature", MinTemperature::Id },
+                    { "MaxTemperature", MaxTemperature::Id },
+                    { "Step", Step::Id },
+                    { "SelectedTemperatureLevel", SelectedTemperatureLevel::Id },
+                    { "SupportedTemperatureLevels", SupportedTemperatureLevels::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace TemperatureControl
         namespace RefrigeratorAlarm {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "Mask", Mask::Id },
+                    { "State", State::Id },
+                    { "Supported", Supported::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace RefrigeratorAlarm
         namespace DishwasherMode {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "SupportedModes", SupportedModes::Id },
+                    { "CurrentMode", CurrentMode::Id },
+                    { "StartUpMode", StartUpMode::Id },
+                    { "OnMode", OnMode::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace DishwasherMode
         namespace AirQuality {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "AirQuality", AirQuality::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace AirQuality
         namespace SmokeCoAlarm {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "ExpressedState", ExpressedState::Id },
+                    { "SmokeState", SmokeState::Id },
+                    { "COState", COState::Id },
+                    { "BatteryAlert", BatteryAlert::Id },
+                    { "DeviceMuted", DeviceMuted::Id },
+                    { "TestInProgress", TestInProgress::Id },
+                    { "HardwareFaultAlert", HardwareFaultAlert::Id },
+                    { "EndOfServiceAlert", EndOfServiceAlert::Id },
+                    { "InterconnectSmokeAlarm", InterconnectSmokeAlarm::Id },
+                    { "InterconnectCOAlarm", InterconnectCOAlarm::Id },
+                    { "ContaminationState", ContaminationState::Id },
+                    { "SmokeSensitivityLevel", SmokeSensitivityLevel::Id },
+                    { "ExpiryDate", ExpiryDate::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace SmokeCoAlarm
         namespace DishwasherAlarm {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "Mask", Mask::Id },
+                    { "Latch", Latch::Id },
+                    { "State", State::Id },
+                    { "Supported", Supported::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace DishwasherAlarm
         namespace OperationalState {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "PhaseList", PhaseList::Id },
+                    { "CurrentPhase", CurrentPhase::Id },
+                    { "CountdownTime", CountdownTime::Id },
+                    { "OperationalStateList", OperationalStateList::Id },
+                    { "OperationalState", OperationalState::Id },
+                    { "OperationalError", OperationalError::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace OperationalState
         namespace RvcOperationalState {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "PhaseList", PhaseList::Id },
+                    { "CurrentPhase", CurrentPhase::Id },
+                    { "CountdownTime", CountdownTime::Id },
+                    { "OperationalStateList", OperationalStateList::Id },
+                    { "OperationalState", OperationalState::Id },
+                    { "OperationalError", OperationalError::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace RvcOperationalState
         namespace HepaFilterMonitoring {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "Condition", Condition::Id },
+                    { "DegradationDirection", DegradationDirection::Id },
+                    { "ChangeIndication", ChangeIndication::Id },
+                    { "InPlaceIndicator", InPlaceIndicator::Id },
+                    { "LastChangedTime", LastChangedTime::Id },
+                    { "ReplacementProductList", ReplacementProductList::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace HepaFilterMonitoring
         namespace ActivatedCarbonFilterMonitoring {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "Condition", Condition::Id },
+                    { "DegradationDirection", DegradationDirection::Id },
+                    { "ChangeIndication", ChangeIndication::Id },
+                    { "InPlaceIndicator", InPlaceIndicator::Id },
+                    { "LastChangedTime", LastChangedTime::Id },
+                    { "ReplacementProductList", ReplacementProductList::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace ActivatedCarbonFilterMonitoring
         namespace DoorLock {
@@ -1195,6 +1397,7 @@ namespace app {
                     { "RockSetting", RockSetting::Id },
                     { "WindSupport", WindSupport::Id },
                     { "WindSetting", WindSetting::Id },
+                    { "AirflowDirection", AirflowDirection::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -1421,52 +1624,232 @@ namespace app {
         } // namespace OccupancySensing
         namespace CarbonMonoxideConcentrationMeasurement {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "MeasuredValue", MeasuredValue::Id },
+                    { "MinMeasuredValue", MinMeasuredValue::Id },
+                    { "MaxMeasuredValue", MaxMeasuredValue::Id },
+                    { "PeakMeasuredValue", PeakMeasuredValue::Id },
+                    { "PeakMeasuredValueWindow", PeakMeasuredValueWindow::Id },
+                    { "AverageMeasuredValue", AverageMeasuredValue::Id },
+                    { "AverageMeasuredValueWindow", AverageMeasuredValueWindow::Id },
+                    { "Uncertainty", Uncertainty::Id },
+                    { "MeasurementUnit", MeasurementUnit::Id },
+                    { "MeasurementMedium", MeasurementMedium::Id },
+                    { "LevelValue", LevelValue::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace CarbonMonoxideConcentrationMeasurement
         namespace CarbonDioxideConcentrationMeasurement {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "MeasuredValue", MeasuredValue::Id },
+                    { "MinMeasuredValue", MinMeasuredValue::Id },
+                    { "MaxMeasuredValue", MaxMeasuredValue::Id },
+                    { "PeakMeasuredValue", PeakMeasuredValue::Id },
+                    { "PeakMeasuredValueWindow", PeakMeasuredValueWindow::Id },
+                    { "AverageMeasuredValue", AverageMeasuredValue::Id },
+                    { "AverageMeasuredValueWindow", AverageMeasuredValueWindow::Id },
+                    { "Uncertainty", Uncertainty::Id },
+                    { "MeasurementUnit", MeasurementUnit::Id },
+                    { "MeasurementMedium", MeasurementMedium::Id },
+                    { "LevelValue", LevelValue::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace CarbonDioxideConcentrationMeasurement
         namespace NitrogenDioxideConcentrationMeasurement {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "MeasuredValue", MeasuredValue::Id },
+                    { "MinMeasuredValue", MinMeasuredValue::Id },
+                    { "MaxMeasuredValue", MaxMeasuredValue::Id },
+                    { "PeakMeasuredValue", PeakMeasuredValue::Id },
+                    { "PeakMeasuredValueWindow", PeakMeasuredValueWindow::Id },
+                    { "AverageMeasuredValue", AverageMeasuredValue::Id },
+                    { "AverageMeasuredValueWindow", AverageMeasuredValueWindow::Id },
+                    { "Uncertainty", Uncertainty::Id },
+                    { "MeasurementUnit", MeasurementUnit::Id },
+                    { "MeasurementMedium", MeasurementMedium::Id },
+                    { "LevelValue", LevelValue::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace NitrogenDioxideConcentrationMeasurement
         namespace OzoneConcentrationMeasurement {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "MeasuredValue", MeasuredValue::Id },
+                    { "MinMeasuredValue", MinMeasuredValue::Id },
+                    { "MaxMeasuredValue", MaxMeasuredValue::Id },
+                    { "PeakMeasuredValue", PeakMeasuredValue::Id },
+                    { "PeakMeasuredValueWindow", PeakMeasuredValueWindow::Id },
+                    { "AverageMeasuredValue", AverageMeasuredValue::Id },
+                    { "AverageMeasuredValueWindow", AverageMeasuredValueWindow::Id },
+                    { "Uncertainty", Uncertainty::Id },
+                    { "MeasurementUnit", MeasurementUnit::Id },
+                    { "MeasurementMedium", MeasurementMedium::Id },
+                    { "LevelValue", LevelValue::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace OzoneConcentrationMeasurement
         namespace Pm25ConcentrationMeasurement {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "MeasuredValue", MeasuredValue::Id },
+                    { "MinMeasuredValue", MinMeasuredValue::Id },
+                    { "MaxMeasuredValue", MaxMeasuredValue::Id },
+                    { "PeakMeasuredValue", PeakMeasuredValue::Id },
+                    { "PeakMeasuredValueWindow", PeakMeasuredValueWindow::Id },
+                    { "AverageMeasuredValue", AverageMeasuredValue::Id },
+                    { "AverageMeasuredValueWindow", AverageMeasuredValueWindow::Id },
+                    { "Uncertainty", Uncertainty::Id },
+                    { "MeasurementUnit", MeasurementUnit::Id },
+                    { "MeasurementMedium", MeasurementMedium::Id },
+                    { "LevelValue", LevelValue::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace Pm25ConcentrationMeasurement
         namespace FormaldehydeConcentrationMeasurement {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "MeasuredValue", MeasuredValue::Id },
+                    { "MinMeasuredValue", MinMeasuredValue::Id },
+                    { "MaxMeasuredValue", MaxMeasuredValue::Id },
+                    { "PeakMeasuredValue", PeakMeasuredValue::Id },
+                    { "PeakMeasuredValueWindow", PeakMeasuredValueWindow::Id },
+                    { "AverageMeasuredValue", AverageMeasuredValue::Id },
+                    { "AverageMeasuredValueWindow", AverageMeasuredValueWindow::Id },
+                    { "Uncertainty", Uncertainty::Id },
+                    { "MeasurementUnit", MeasurementUnit::Id },
+                    { "MeasurementMedium", MeasurementMedium::Id },
+                    { "LevelValue", LevelValue::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace FormaldehydeConcentrationMeasurement
         namespace Pm1ConcentrationMeasurement {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "MeasuredValue", MeasuredValue::Id },
+                    { "MinMeasuredValue", MinMeasuredValue::Id },
+                    { "MaxMeasuredValue", MaxMeasuredValue::Id },
+                    { "PeakMeasuredValue", PeakMeasuredValue::Id },
+                    { "PeakMeasuredValueWindow", PeakMeasuredValueWindow::Id },
+                    { "AverageMeasuredValue", AverageMeasuredValue::Id },
+                    { "AverageMeasuredValueWindow", AverageMeasuredValueWindow::Id },
+                    { "Uncertainty", Uncertainty::Id },
+                    { "MeasurementUnit", MeasurementUnit::Id },
+                    { "MeasurementMedium", MeasurementMedium::Id },
+                    { "LevelValue", LevelValue::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace Pm1ConcentrationMeasurement
         namespace Pm10ConcentrationMeasurement {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "MeasuredValue", MeasuredValue::Id },
+                    { "MinMeasuredValue", MinMeasuredValue::Id },
+                    { "MaxMeasuredValue", MaxMeasuredValue::Id },
+                    { "PeakMeasuredValue", PeakMeasuredValue::Id },
+                    { "PeakMeasuredValueWindow", PeakMeasuredValueWindow::Id },
+                    { "AverageMeasuredValue", AverageMeasuredValue::Id },
+                    { "AverageMeasuredValueWindow", AverageMeasuredValueWindow::Id },
+                    { "Uncertainty", Uncertainty::Id },
+                    { "MeasurementUnit", MeasurementUnit::Id },
+                    { "MeasurementMedium", MeasurementMedium::Id },
+                    { "LevelValue", LevelValue::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace Pm10ConcentrationMeasurement
         namespace TotalVolatileOrganicCompoundsConcentrationMeasurement {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "MeasuredValue", MeasuredValue::Id },
+                    { "MinMeasuredValue", MinMeasuredValue::Id },
+                    { "MaxMeasuredValue", MaxMeasuredValue::Id },
+                    { "PeakMeasuredValue", PeakMeasuredValue::Id },
+                    { "PeakMeasuredValueWindow", PeakMeasuredValueWindow::Id },
+                    { "AverageMeasuredValue", AverageMeasuredValue::Id },
+                    { "AverageMeasuredValueWindow", AverageMeasuredValueWindow::Id },
+                    { "Uncertainty", Uncertainty::Id },
+                    { "MeasurementUnit", MeasurementUnit::Id },
+                    { "MeasurementMedium", MeasurementMedium::Id },
+                    { "LevelValue", LevelValue::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace TotalVolatileOrganicCompoundsConcentrationMeasurement
         namespace RadonConcentrationMeasurement {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "MeasuredValue", MeasuredValue::Id },
+                    { "MinMeasuredValue", MinMeasuredValue::Id },
+                    { "MaxMeasuredValue", MaxMeasuredValue::Id },
+                    { "PeakMeasuredValue", PeakMeasuredValue::Id },
+                    { "PeakMeasuredValueWindow", PeakMeasuredValueWindow::Id },
+                    { "AverageMeasuredValue", AverageMeasuredValue::Id },
+                    { "AverageMeasuredValueWindow", AverageMeasuredValueWindow::Id },
+                    { "Uncertainty", Uncertainty::Id },
+                    { "MeasurementUnit", MeasurementUnit::Id },
+                    { "MeasurementMedium", MeasurementMedium::Id },
+                    { "LevelValue", LevelValue::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace RadonConcentrationMeasurement
         namespace WakeOnLan {
@@ -2240,6 +2623,11 @@ namespace app {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
                     { "SetUTCTime", SetUTCTime::Id },
+                    { "SetTrustedTimeSource", SetTrustedTimeSource::Id },
+                    { "SetTimeZone", SetTimeZone::Id },
+                    { "SetTimeZoneResponse", SetTimeZoneResponse::Id },
+                    { "SetDSTOffset", SetDSTOffset::Id },
+                    { "SetDefaultNTP", SetDefaultNTP::Id }
                 };
             } // namespace Commands
         } // namespace TimeSynchronization
@@ -2324,7 +2712,12 @@ namespace app {
         } // namespace BooleanState
         namespace IcdManagement {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
+                    { "RegisterClient", RegisterClient::Id },
+                    { "RegisterClientResponse", RegisterClientResponse::Id },
+                    { "UnregisterClient", UnregisterClient::Id },
+                    { "StayActiveRequest", StayActiveRequest::Id }
+                };
             } // namespace Commands
         } // namespace IcdManagement
         namespace ModeSelect {
@@ -2336,12 +2729,18 @@ namespace app {
         } // namespace ModeSelect
         namespace LaundryWasherMode {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
+                    { "ChangeToMode", ChangeToMode::Id },
+                    { "ChangeToModeResponse", ChangeToModeResponse::Id }
+                };
             } // namespace Commands
         } // namespace LaundryWasherMode
         namespace RefrigeratorAndTemperatureControlledCabinetMode {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
+                    { "ChangeToMode", ChangeToMode::Id },
+                    { "ChangeToModeResponse", ChangeToModeResponse::Id }
+                };
             } // namespace Commands
         } // namespace RefrigeratorAndTemperatureControlledCabinetMode
         namespace LaundryWasherControls {
@@ -2351,17 +2750,25 @@ namespace app {
         } // namespace LaundryWasherControls
         namespace RvcRunMode {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
+                    { "ChangeToMode", ChangeToMode::Id },
+                    { "ChangeToModeResponse", ChangeToModeResponse::Id }
+                };
             } // namespace Commands
         } // namespace RvcRunMode
         namespace RvcCleanMode {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
+                    { "ChangeToMode", ChangeToMode::Id },
+                    { "ChangeToModeResponse", ChangeToModeResponse::Id }
+                };
             } // namespace Commands
         } // namespace RvcCleanMode
         namespace TemperatureControl {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
+                    { "SetTemperature", SetTemperature::Id }
+                };
             } // namespace Commands
         } // namespace TemperatureControl
         namespace RefrigeratorAlarm {
@@ -2371,7 +2778,10 @@ namespace app {
         } // namespace RefrigeratorAlarm
         namespace DishwasherMode {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
+                    { "ChangeToMode", ChangeToMode::Id },
+                    { "ChangeToModeResponse", ChangeToModeResponse::Id }
+                };
             } // namespace Commands
         } // namespace DishwasherMode
         namespace AirQuality {
@@ -2381,32 +2791,53 @@ namespace app {
         } // namespace AirQuality
         namespace SmokeCoAlarm {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
+                    { "SelfTestRequest", SelfTestRequest::Id }
+                };
             } // namespace Commands
         } // namespace SmokeCoAlarm
         namespace DishwasherAlarm {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
+                    { "Reset", Reset::Id },
+                    { "ModifyEnabledAlarms", ModifyEnabledAlarms::Id }
+                };
             } // namespace Commands
         } // namespace DishwasherAlarm
         namespace OperationalState {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
+                    { "Pause", Pause::Id },
+                    { "Stop", Stop::Id },
+                    { "Start", Start::Id },
+                    { "Resume", Resume::Id },
+                    { "OperationalCommandResponse", OperationalCommandResponse::Id }
+                };
             } // namespace Commands
         } // namespace OperationalState
         namespace RvcOperationalState {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
+                    { "Pause", Pause::Id },
+                    { "Stop", Stop::Id },
+                    { "Start", Start::Id },
+                    { "Resume", Resume::Id },
+                    { "OperationalCommandResponse", OperationalCommandResponse::Id }
+                };
             } // namespace Commands
         } // namespace RvcOperationalState
         namespace HepaFilterMonitoring {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
+                    { "ResetCondition", ResetCondition::Id }
+                };
             } // namespace Commands
         } // namespace HepaFilterMonitoring
         namespace ActivatedCarbonFilterMonitoring {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
+                    { "ResetCondition", ResetCondition::Id }
+                };
             } // namespace Commands
         } // namespace ActivatedCarbonFilterMonitoring
         namespace DoorLock {
@@ -2436,6 +2867,7 @@ namespace app {
                     { "GetCredentialStatus", GetCredentialStatus::Id },
                     { "GetCredentialStatusResponse", GetCredentialStatusResponse::Id },
                     { "ClearCredential", ClearCredential::Id },
+                    { "UnboltDoor", UnboltDoor::Id }
                 };
             } // namespace Commands
         } // namespace DoorLock
@@ -2478,7 +2910,9 @@ namespace app {
         } // namespace Thermostat
         namespace FanControl {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
+                    { "Step", Step::Id }
+                };
             } // namespace Commands
         } // namespace FanControl
         namespace ThermostatUserInterfaceConfiguration {

@@ -73,6 +73,7 @@ namespace app {
                     { "ProductLabel", ProductLabel::Id },
                     { "PhysicalEnvironment", Reachable::Id },
                     { "DeviceEnabled", UniqueID::Id },
+                    { "DisableLocalConfig", ProductAppearance::Id },
                 };
             } // namespace Attributes
         } // namespace Basic

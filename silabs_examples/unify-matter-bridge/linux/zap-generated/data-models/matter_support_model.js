@@ -275,6 +275,8 @@ exports.model = {
       3 : "SceneValid",
       4 : "NameSupport",
       5 : "LastConfiguredBy",
+      6 : "SceneTableSize",
+      7 : "RemainingCapacity",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -498,6 +500,7 @@ exports.model = {
       1 : "ServerList",
       2 : "ClientList",
       3 : "PartsList",
+      4 : "TagList",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -672,6 +675,7 @@ exports.model = {
       17 : "Reachable",
       18 : "UniqueID",
       19 : "CapabilityMinima",
+      20 : "ProductAppearance",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -857,6 +861,7 @@ exports.model = {
       28 : "BatFunctionalWhileCharging",
       29 : "BatChargingCurrent",
       30 : "ActiveBatChargeFaults",
+      31 : "EndpointList",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1243,11 +1248,41 @@ exports.model = {
     name : "TimeSynchronization",
     commands : {
       0 : {
-        name : "SetUtcTime",
+        name : "SetUTCTime",
         arguments : [
-          "UtcTime",
+          "UTCTime",
           "Granularity",
           "TimeSource",
+        ],
+      },
+      1 : {
+        name : "SetTrustedTimeSource",
+        arguments : [
+          "TrustedTimeSource",
+        ],
+      },
+      2 : {
+        name : "SetTimeZone",
+        arguments : [
+          "TimeZone",
+        ],
+      },
+      3 : {
+        name : "SetTimeZoneResponse",
+        arguments : [
+          "DSTOffsetRequired",
+        ],
+      },
+      4 : {
+        name : "SetDSTOffset",
+        arguments : [
+          "DSTOffset",
+        ],
+      },
+      5 : {
+        name : "SetDefaultNTP",
+        arguments : [
+          "DefaultNTP",
         ],
       },
     },
@@ -1255,13 +1290,16 @@ exports.model = {
       0 : "UTCTime",
       1 : "Granularity",
       2 : "TimeSource",
-      3 : "TrustedTimeNodeId",
-      4 : "DefaultNtp",
+      3 : "TrustedTimeSource",
+      4 : "DefaultNTP",
       5 : "TimeZone",
-      6 : "DstOffset",
+      6 : "DSTOffset",
       7 : "LocalTime",
       8 : "TimeZoneDatabase",
-      9 : "NtpServerPort",
+      9 : "NTPServerAvailable",
+      10 : "TimeZoneListMaxSize",
+      11 : "DSTOffsetListMaxSize",
+      12 : "SupportsDNSResolve",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1289,6 +1327,7 @@ exports.model = {
       15 : "SerialNumber",
       17 : "Reachable",
       18 : "UniqueID",
+      20 : "ProductAppearance",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1481,7 +1520,7 @@ exports.model = {
       4 : {
         name : "KeySetReadAllIndices",
         arguments : [
-          "GroupKeySetIDs",
+
         ],
       },
       5 : {
@@ -1579,6 +1618,53 @@ exports.model = {
       65533 : "ClusterRevision",
     },
   },
+  70 : {
+    name : "IcdManagement",
+    commands : {
+      0 : {
+        name : "RegisterClient",
+        arguments : [
+          "CheckInNodeID",
+          "MonitoredSubject",
+          "Key",
+          "VerificationKey",
+        ],
+      },
+      1 : {
+        name : "RegisterClientResponse",
+        arguments : [
+          "ICDCounter",
+        ],
+      },
+      2 : {
+        name : "UnregisterClient",
+        arguments : [
+          "CheckInNodeID",
+          "VerificationKey",
+        ],
+      },
+      3 : {
+        name : "StayActiveRequest",
+        arguments : [
+
+        ],
+      },
+    },
+    attributes : {
+      0 : "IdleModeInterval",
+      1 : "ActiveModeInterval",
+      2 : "ActiveModeThreshold",
+      3 : "RegisteredClients",
+      4 : "ICDCounter",
+      5 : "ClientsSupportedPerFabric",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
   80 : {
     name : "ModeSelect",
     commands : {
@@ -1596,6 +1682,435 @@ exports.model = {
       3 : "CurrentMode",
       4 : "StartUpMode",
       5 : "OnMode",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  81 : {
+    name : "LaundryWasherMode",
+    commands : {
+      0 : {
+        name : "ChangeToMode",
+        arguments : [
+          "NewMode",
+        ],
+      },
+      1 : {
+        name : "ChangeToModeResponse",
+        arguments : [
+          "Status",
+          "StatusText",
+        ],
+      },
+    },
+    attributes : {
+      0 : "SupportedModes",
+      1 : "CurrentMode",
+      2 : "StartUpMode",
+      3 : "OnMode",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  82 : {
+    name : "RefrigeratorAndTemperatureControlledCabinetMode",
+    commands : {
+      0 : {
+        name : "ChangeToMode",
+        arguments : [
+          "NewMode",
+        ],
+      },
+      1 : {
+        name : "ChangeToModeResponse",
+        arguments : [
+          "Status",
+          "StatusText",
+        ],
+      },
+    },
+    attributes : {
+      0 : "SupportedModes",
+      1 : "CurrentMode",
+      2 : "StartUpMode",
+      3 : "OnMode",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  83 : {
+    name : "LaundryWasherControls",
+    commands : {},
+    attributes : {
+      0 : "SpinSpeeds",
+      1 : "SpinSpeedCurrent",
+      2 : "NumberOfRinses",
+      3 : "SupportedRinses",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  84 : {
+    name : "RvcRunMode",
+    commands : {
+      0 : {
+        name : "ChangeToMode",
+        arguments : [
+          "NewMode",
+        ],
+      },
+      1 : {
+        name : "ChangeToModeResponse",
+        arguments : [
+          "Status",
+          "StatusText",
+        ],
+      },
+    },
+    attributes : {
+      0 : "SupportedModes",
+      1 : "CurrentMode",
+      2 : "StartUpMode",
+      3 : "OnMode",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  85 : {
+    name : "RvcCleanMode",
+    commands : {
+      0 : {
+        name : "ChangeToMode",
+        arguments : [
+          "NewMode",
+        ],
+      },
+      1 : {
+        name : "ChangeToModeResponse",
+        arguments : [
+          "Status",
+          "StatusText",
+        ],
+      },
+    },
+    attributes : {
+      0 : "SupportedModes",
+      1 : "CurrentMode",
+      2 : "StartUpMode",
+      3 : "OnMode",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  86 : {
+    name : "TemperatureControl",
+    commands : {
+      0 : {
+        name : "SetTemperature",
+        arguments : [
+          "TargetTemperature",
+          "TargetTemperatureLevel",
+        ],
+      },
+    },
+    attributes : {
+      0 : "TemperatureSetpoint",
+      1 : "MinTemperature",
+      2 : "MaxTemperature",
+      3 : "Step",
+      4 : "SelectedTemperatureLevel",
+      5 : "SupportedTemperatureLevels",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  87 : {
+    name : "RefrigeratorAlarm",
+    commands : {},
+    attributes : {
+      0 : "Mask",
+      2 : "State",
+      3 : "Supported",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  89 : {
+    name : "DishwasherMode",
+    commands : {
+      0 : {
+        name : "ChangeToMode",
+        arguments : [
+          "NewMode",
+        ],
+      },
+      1 : {
+        name : "ChangeToModeResponse",
+        arguments : [
+          "Status",
+          "StatusText",
+        ],
+      },
+    },
+    attributes : {
+      0 : "SupportedModes",
+      1 : "CurrentMode",
+      2 : "StartUpMode",
+      3 : "OnMode",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  91 : {
+    name : "AirQuality",
+    commands : {},
+    attributes : {
+      0 : "AirQuality",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  92 : {
+    name : "SmokeCoAlarm",
+    commands : {
+      0 : {
+        name : "SelfTestRequest",
+        arguments : [
+
+        ],
+      },
+    },
+    attributes : {
+      0 : "ExpressedState",
+      1 : "SmokeState",
+      2 : "COState",
+      3 : "BatteryAlert",
+      4 : "DeviceMuted",
+      5 : "TestInProgress",
+      6 : "HardwareFaultAlert",
+      7 : "EndOfServiceAlert",
+      8 : "InterconnectSmokeAlarm",
+      9 : "InterconnectCOAlarm",
+      10 : "ContaminationState",
+      11 : "SmokeSensitivityLevel",
+      12 : "ExpiryDate",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  93 : {
+    name : "DishwasherAlarm",
+    commands : {
+      0 : {
+        name : "Reset",
+        arguments : [
+          "Alarms",
+        ],
+      },
+      1 : {
+        name : "ModifyEnabledAlarms",
+        arguments : [
+          "Mask",
+        ],
+      },
+    },
+    attributes : {
+      0 : "Mask",
+      1 : "Latch",
+      2 : "State",
+      3 : "Supported",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  96 : {
+    name : "OperationalState",
+    commands : {
+      0 : {
+        name : "Pause",
+        arguments : [
+
+        ],
+      },
+      1 : {
+        name : "Stop",
+        arguments : [
+
+        ],
+      },
+      2 : {
+        name : "Start",
+        arguments : [
+
+        ],
+      },
+      3 : {
+        name : "Resume",
+        arguments : [
+
+        ],
+      },
+      4 : {
+        name : "OperationalCommandResponse",
+        arguments : [
+          "CommandResponseState",
+        ],
+      },
+    },
+    attributes : {
+      0 : "PhaseList",
+      1 : "CurrentPhase",
+      2 : "CountdownTime",
+      3 : "OperationalStateList",
+      4 : "OperationalState",
+      5 : "OperationalError",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  97 : {
+    name : "RvcOperationalState",
+    commands : {
+      0 : {
+        name : "Pause",
+        arguments : [
+
+        ],
+      },
+      1 : {
+        name : "Stop",
+        arguments : [
+
+        ],
+      },
+      2 : {
+        name : "Start",
+        arguments : [
+
+        ],
+      },
+      3 : {
+        name : "Resume",
+        arguments : [
+
+        ],
+      },
+      4 : {
+        name : "OperationalCommandResponse",
+        arguments : [
+          "CommandResponseState",
+        ],
+      },
+    },
+    attributes : {
+      0 : "PhaseList",
+      1 : "CurrentPhase",
+      2 : "CountdownTime",
+      3 : "OperationalStateList",
+      4 : "OperationalState",
+      5 : "OperationalError",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  113 : {
+    name : "HepaFilterMonitoring",
+    commands : {
+      0 : {
+        name : "ResetCondition",
+        arguments : [
+
+        ],
+      },
+    },
+    attributes : {
+      0 : "Condition",
+      1 : "DegradationDirection",
+      2 : "ChangeIndication",
+      3 : "InPlaceIndicator",
+      4 : "LastChangedTime",
+      5 : "ReplacementProductList",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  114 : {
+    name : "ActivatedCarbonFilterMonitoring",
+    commands : {
+      0 : {
+        name : "ResetCondition",
+        arguments : [
+
+        ],
+      },
+    },
+    attributes : {
+      0 : "Condition",
+      1 : "DegradationDirection",
+      2 : "ChangeIndication",
+      3 : "InPlaceIndicator",
+      4 : "LastChangedTime",
+      5 : "ReplacementProductList",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1807,6 +2322,12 @@ exports.model = {
         name : "ClearCredential",
         arguments : [
           "Credential",
+        ],
+      },
+      39 : {
+        name : "UnboltDoor",
+        arguments : [
+          "PINCode",
         ],
       },
     },
@@ -2104,7 +2625,16 @@ exports.model = {
   },
   514 : {
     name : "FanControl",
-    commands : {},
+    commands : {
+      0 : {
+        name : "Step",
+        arguments : [
+          "Direction",
+          "Wrap",
+          "LowestOff",
+        ],
+      },
+    },
     attributes : {
       0 : "FanMode",
       1 : "FanModeSequence",
@@ -2117,6 +2647,7 @@ exports.model = {
       8 : "RockSetting",
       9 : "WindSupport",
       10 : "WindSetting",
+      11 : "AirflowDirection",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -2519,6 +3050,236 @@ exports.model = {
       48 : "PhysicalContactOccupiedToUnoccupiedDelay",
       49 : "PhysicalContactUnoccupiedToOccupiedDelay",
       50 : "PhysicalContactUnoccupiedToOccupiedThreshold",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  1036 : {
+    name : "CarbonMonoxideConcentrationMeasurement",
+    commands : {},
+    attributes : {
+      0 : "MeasuredValue",
+      1 : "MinMeasuredValue",
+      2 : "MaxMeasuredValue",
+      3 : "PeakMeasuredValue",
+      4 : "PeakMeasuredValueWindow",
+      5 : "AverageMeasuredValue",
+      6 : "AverageMeasuredValueWindow",
+      7 : "Uncertainty",
+      8 : "MeasurementUnit",
+      9 : "MeasurementMedium",
+      10 : "LevelValue",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  1037 : {
+    name : "CarbonDioxideConcentrationMeasurement",
+    commands : {},
+    attributes : {
+      0 : "MeasuredValue",
+      1 : "MinMeasuredValue",
+      2 : "MaxMeasuredValue",
+      3 : "PeakMeasuredValue",
+      4 : "PeakMeasuredValueWindow",
+      5 : "AverageMeasuredValue",
+      6 : "AverageMeasuredValueWindow",
+      7 : "Uncertainty",
+      8 : "MeasurementUnit",
+      9 : "MeasurementMedium",
+      10 : "LevelValue",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  1043 : {
+    name : "NitrogenDioxideConcentrationMeasurement",
+    commands : {},
+    attributes : {
+      0 : "MeasuredValue",
+      1 : "MinMeasuredValue",
+      2 : "MaxMeasuredValue",
+      3 : "PeakMeasuredValue",
+      4 : "PeakMeasuredValueWindow",
+      5 : "AverageMeasuredValue",
+      6 : "AverageMeasuredValueWindow",
+      7 : "Uncertainty",
+      8 : "MeasurementUnit",
+      9 : "MeasurementMedium",
+      10 : "LevelValue",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  1045 : {
+    name : "OzoneConcentrationMeasurement",
+    commands : {},
+    attributes : {
+      0 : "MeasuredValue",
+      1 : "MinMeasuredValue",
+      2 : "MaxMeasuredValue",
+      3 : "PeakMeasuredValue",
+      4 : "PeakMeasuredValueWindow",
+      5 : "AverageMeasuredValue",
+      6 : "AverageMeasuredValueWindow",
+      7 : "Uncertainty",
+      8 : "MeasurementUnit",
+      9 : "MeasurementMedium",
+      10 : "LevelValue",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  1066 : {
+    name : "Pm25ConcentrationMeasurement",
+    commands : {},
+    attributes : {
+      0 : "MeasuredValue",
+      1 : "MinMeasuredValue",
+      2 : "MaxMeasuredValue",
+      3 : "PeakMeasuredValue",
+      4 : "PeakMeasuredValueWindow",
+      5 : "AverageMeasuredValue",
+      6 : "AverageMeasuredValueWindow",
+      7 : "Uncertainty",
+      8 : "MeasurementUnit",
+      9 : "MeasurementMedium",
+      10 : "LevelValue",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  1067 : {
+    name : "FormaldehydeConcentrationMeasurement",
+    commands : {},
+    attributes : {
+      0 : "MeasuredValue",
+      1 : "MinMeasuredValue",
+      2 : "MaxMeasuredValue",
+      3 : "PeakMeasuredValue",
+      4 : "PeakMeasuredValueWindow",
+      5 : "AverageMeasuredValue",
+      6 : "AverageMeasuredValueWindow",
+      7 : "Uncertainty",
+      8 : "MeasurementUnit",
+      9 : "MeasurementMedium",
+      10 : "LevelValue",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  1068 : {
+    name : "Pm1ConcentrationMeasurement",
+    commands : {},
+    attributes : {
+      0 : "MeasuredValue",
+      1 : "MinMeasuredValue",
+      2 : "MaxMeasuredValue",
+      3 : "PeakMeasuredValue",
+      4 : "PeakMeasuredValueWindow",
+      5 : "AverageMeasuredValue",
+      6 : "AverageMeasuredValueWindow",
+      7 : "Uncertainty",
+      8 : "MeasurementUnit",
+      9 : "MeasurementMedium",
+      10 : "LevelValue",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  1069 : {
+    name : "Pm10ConcentrationMeasurement",
+    commands : {},
+    attributes : {
+      0 : "MeasuredValue",
+      1 : "MinMeasuredValue",
+      2 : "MaxMeasuredValue",
+      3 : "PeakMeasuredValue",
+      4 : "PeakMeasuredValueWindow",
+      5 : "AverageMeasuredValue",
+      6 : "AverageMeasuredValueWindow",
+      7 : "Uncertainty",
+      8 : "MeasurementUnit",
+      9 : "MeasurementMedium",
+      10 : "LevelValue",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  1070 : {
+    name : "TotalVolatileOrganicCompoundsConcentrationMeasurement",
+    commands : {},
+    attributes : {
+      0 : "MeasuredValue",
+      1 : "MinMeasuredValue",
+      2 : "MaxMeasuredValue",
+      3 : "PeakMeasuredValue",
+      4 : "PeakMeasuredValueWindow",
+      5 : "AverageMeasuredValue",
+      6 : "AverageMeasuredValueWindow",
+      7 : "Uncertainty",
+      8 : "MeasurementUnit",
+      9 : "MeasurementMedium",
+      10 : "LevelValue",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  1071 : {
+    name : "RadonConcentrationMeasurement",
+    commands : {},
+    attributes : {
+      0 : "MeasuredValue",
+      1 : "MinMeasuredValue",
+      2 : "MaxMeasuredValue",
+      3 : "PeakMeasuredValue",
+      4 : "PeakMeasuredValueWindow",
+      5 : "AverageMeasuredValue",
+      6 : "AverageMeasuredValueWindow",
+      7 : "Uncertainty",
+      8 : "MeasurementUnit",
+      9 : "MeasurementMedium",
+      10 : "LevelValue",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3128,43 +3889,6 @@ exports.model = {
       65533 : "ClusterRevision",
     },
   },
-  4166 : {
-    name : "ClientMonitoring",
-    commands : {
-      0 : {
-        name : "RegisterClientMonitoring",
-        arguments : [
-          "ClientNodeId",
-          "ICid",
-        ],
-      },
-      1 : {
-        name : "UnregisterClientMonitoring",
-        arguments : [
-          "ClientNodeId",
-          "ICid",
-        ],
-      },
-      2 : {
-        name : "StayAwakeRequest",
-        arguments : [
-
-        ],
-      },
-    },
-    attributes : {
-      0 : "IdleModeInterval",
-      1 : "ActiveModeInterval",
-      2 : "ActiveModeThreshold",
-      3 : "ExpectedClients",
-      65528 : "GeneratedCommandList",
-      65529 : "AcceptedCommandList",
-      65530 : "EventList",
-      65531 : "AttributeList",
-      65532 : "FeatureMap",
-      65533 : "ClusterRevision",
-    },
-  },
   4294048773 : {
     name : "UnitTesting",
     commands : {
@@ -3584,6 +4308,19 @@ exports.model = {
       "Notification",
       "Alarm",
     ], //
+    "AirQualityEnum" : [
+      "Unknown",
+      "Good",
+      "Fair",
+      "Moderate",
+      "Poor",
+      "VeryPoor",
+      "ExtremelyPoor",
+    ], //
+    "AirflowDirectionEnum" : [
+      "Forward",
+      "Reverse",
+    ], //
     "AlarmCodeEnum" : [
       "LockJammed",
       "LockFactoryReset",
@@ -3594,9 +4331,10 @@ exports.model = {
       "DoorAjar",
       "ForcedUser",
     ], //
-    "AnonymousDataState" : [
-      "NoSourceFound",
-      "SourceFound",
+    "AlarmStateEnum" : [
+      "Normal",
+      "Warning",
+      "Critical",
     ], //
     "ApplicationLauncherStatusEnum" : [
       "Success",
@@ -3609,7 +4347,7 @@ exports.model = {
       "ActiveHidden",
       "ActiveVisibleNotFocus",
     ], //
-    "AssociationFailureCause" : [
+    "AssociationFailureCauseEnum" : [
       "Unknown",
       "AssociationFailed",
       "AuthenticationFailed",
@@ -3625,7 +4363,42 @@ exports.model = {
       "Closing",
       "Opening",
     ], //
-    "BatChargeFault" : [
+    "BatApprovedChemistryEnum" : [
+      "Unspecified",
+      "Alkaline",
+      "LithiumCarbonFluoride",
+      "LithiumChromiumOxide",
+      "LithiumCopperOxide",
+      "LithiumIronDisulfide",
+      "LithiumManganeseDioxide",
+      "LithiumThionylChloride",
+      "Magnesium",
+      "MercuryOxide",
+      "NickelOxyhydride",
+      "SilverOxide",
+      "ZincAir",
+      "ZincCarbon",
+      "ZincChloride",
+      "ZincManganeseDioxide",
+      "LeadAcid",
+      "LithiumCobaltOxide",
+      "LithiumIon",
+      "LithiumIonPolymer",
+      "LithiumIronPhosphate",
+      "LithiumSulfur",
+      "LithiumTitanate",
+      "NickelCadmium",
+      "NickelHydrogen",
+      "NickelIron",
+      "NickelMetalHydride",
+      "NickelZinc",
+      "SilverZinc",
+      "SodiumIon",
+      "SodiumSulfur",
+      "ZincBromide",
+      "ZincCerium",
+    ], //
+    "BatChargeFaultEnum" : [
       "Unspecified",
       "AmbientTooHot",
       "AmbientTooCold",
@@ -3638,23 +4411,106 @@ exports.model = {
       "ChargerUnderVoltage",
       "SafetyTimeout",
     ], //
-    "BatChargeLevel" : [
+    "BatChargeLevelEnum" : [
       "Ok",
       "Warning",
       "Critical",
     ], //
-    "BatChargeState" : [
+    "BatChargeStateEnum" : [
       "Unknown",
       "IsCharging",
       "IsAtFullCharge",
       "IsNotCharging",
     ], //
-    "BatFault" : [
-      "Unspecfied",
+    "BatCommonDesignationEnum" : [
+      "Unspecified",
+      "Aaa",
+      "Aa",
+      "C",
+      "D",
+      "4v5",
+      "6v0",
+      "9v0",
+      "12aa",
+      "Aaaa",
+      "A",
+      "B",
+      "F",
+      "N",
+      "No6",
+      "SubC",
+      "A23",
+      "A27",
+      "Ba5800",
+      "Duplex",
+      "4sr44",
+      "523",
+      "531",
+      "15v0",
+      "22v5",
+      "30v0",
+      "45v0",
+      "67v5",
+      "J",
+      "Cr123a",
+      "Cr2",
+      "2cr5",
+      "CrP2",
+      "CrV3",
+      "Sr41",
+      "Sr43",
+      "Sr44",
+      "Sr45",
+      "Sr48",
+      "Sr54",
+      "Sr55",
+      "Sr57",
+      "Sr58",
+      "Sr59",
+      "Sr60",
+      "Sr63",
+      "Sr64",
+      "Sr65",
+      "Sr66",
+      "Sr67",
+      "Sr68",
+      "Sr69",
+      "Sr516",
+      "Sr731",
+      "Sr712",
+      "Lr932",
+      "A5",
+      "A10",
+      "A13",
+      "A312",
+      "A675",
+      "Ac41e",
+      "10180",
+      "10280",
+      "10440",
+      "14250",
+      "14430",
+      "14500",
+      "14650",
+      "15270",
+      "16340",
+      "Rcr123a",
+      "17500",
+      "17670",
+      "18350",
+      "18500",
+      "18650",
+      "19670",
+      "25500",
+      "26650",
+      "32600",
+    ], //
+    "BatFaultEnum" : [
+      "Unspecified",
       "OverTemp",
       "UnderTemp",
     ], //
-    "BatReplaceability" : [
+    "BatReplaceabilityEnum" : [
       "Unspecified",
       "NotReplaceable",
       "UserReplaceable",
@@ -3669,7 +4525,7 @@ exports.model = {
       "SoftwareUpdateCompleted",
       "SoftwareReset",
     ], //
-    "CalendarType" : [
+    "CalendarTypeEnum" : [
       "Buddhist",
       "Chinese",
       "Coptic",
@@ -3775,6 +4631,11 @@ exports.model = {
       "DACCertificate",
       "PAICertificate",
     ], //
+    "ChangeIndicationEnum" : [
+      "Ok",
+      "Warning",
+      "Critical",
+    ], //
     "ChangeTypeEnum" : [
       "Changed",
       "Added",
@@ -3787,6 +4648,52 @@ exports.model = {
     ], //
     "ColorControlOptions" : [
       "ExecuteIfOff",
+    ], //
+    "ColorEnum" : [
+      "Black",
+      "Navy",
+      "Green",
+      "Teal",
+      "Maroon",
+      "Purple",
+      "Olive",
+      "Gray",
+      "Blue",
+      "Lime",
+      "Aqua",
+      "Red",
+      "Fuchsia",
+      "Yellow",
+      "White",
+      "Nickel",
+      "Chrome",
+      "Brass",
+      "Copper",
+      "Silver",
+      "Gold",
+    ], //
+    "ColorEnum" : [
+      "Black",
+      "Navy",
+      "Green",
+      "Teal",
+      "Maroon",
+      "Purple",
+      "Olive",
+      "Gray",
+      "Blue",
+      "Lime",
+      "Aqua",
+      "Red",
+      "Fuchsia",
+      "Yellow",
+      "White",
+      "Nickel",
+      "Chrome",
+      "Brass",
+      "Copper",
+      "Silver",
+      "Gold",
     ], //
     "ColorLoopAction" : [
       "Deactivate",
@@ -3802,7 +4709,7 @@ exports.model = {
       "CurrentXAndCurrentY",
       "ColorTemperature",
     ], //
-    "CommissioningError" : [
+    "CommissioningErrorEnum" : [
       "Ok",
       "ValueOutsideRange",
       "InvalidAuthentication",
@@ -3818,10 +4725,28 @@ exports.model = {
       "Connected",
       "NotConnected",
     ], //
+    "ConnectionStatusEnum" : [
+      "Connected",
+      "NotConnected",
+    ], //
+    "ContaminationStateEnum" : [
+      "Normal",
+      "Low",
+      "Warning",
+      "Critical",
+    ], //
     "ContentLaunchStatusEnum" : [
       "Success",
       "UrlNotAvailable",
       "AuthFailed",
+    ], //
+    "ControlModeEnum" : [
+      "ConstantSpeed",
+      "ConstantPressure",
+      "ProportionalPressure",
+      "ConstantFlow",
+      "ConstantTemperature",
+      "Automatic",
     ], //
     "CredentialRuleEnum" : [
       "Single",
@@ -3841,13 +4766,15 @@ exports.model = {
       "Clear",
       "Modify",
     ], //
-    "DeviceStatus2Structure" : [
-      "IrisSymptomCode",
+    "DegradationDirectionEnum" : [
+      "Up",
+      "Down",
     ], //
     "DlLockState" : [
       "NotFullyLocked",
       "Locked",
       "Unlocked",
+      "Unlatched",
     ], //
     "DlLockType" : [
       "DeadBolt",
@@ -3861,6 +4788,7 @@ exports.model = {
       "InterconnectedLock",
       "DeadLatch",
       "DoorFurniture",
+      "Eurocylinder",
     ], //
     "DlStatus" : [
       "Success",
@@ -3978,6 +4906,21 @@ exports.model = {
       "DoorUnspecifiedError",
       "DoorAjar",
     ], //
+    "EffectIdentifierEnum" : [
+      "Blink",
+      "Breathe",
+      "Okay",
+      "ChannelChange",
+      "FinishEffect",
+      "StopEffect",
+    ], //
+    "EffectVariantEnum" : [
+      "Default",
+    ], //
+    "EndOfServiceEnum" : [
+      "Normal",
+      "Expired",
+    ], //
     "EndProductType" : [
       "RollerShade",
       "RomanShade",
@@ -4016,15 +4959,34 @@ exports.model = {
       "ColorTemperature",
       "EnhancedCurrentHueAndCurrentSaturation",
     ], //
-    "FanModeSequenceType" : [
-      "OffLowMedHigh",
-      "OffLowHigh",
-      "OffLowMedHighAuto",
-      "OffLowHighAuto",
-      "OffOnAuto",
-      "OffOn",
+    "ErrorStateEnum" : [
+      "NoError",
+      "UnableToStartOrResume",
+      "UnableToCompleteOperation",
+      "CommandInvalidInState",
     ], //
-    "FanModeType" : [
+    "ErrorStateEnum" : [
+      "FailedToFindChargingDock",
+      "Stuck",
+      "DustBinMissing",
+      "DustBinFull",
+      "WaterTankEmpty",
+      "WaterTankMissing",
+      "WaterTankLidOpen",
+      "MopCleaningPadMissing",
+    ], //
+    "ExpressedStateEnum" : [
+      "Normal",
+      "SmokeAlarm",
+      "COAlarm",
+      "BatteryAlert",
+      "Testing",
+      "HardwareFault",
+      "EndOfService",
+      "InterconnectSmoke",
+      "InterconnectCO",
+    ], //
+    "FanModeEnum" : [
       "Off",
       "Low",
       "Medium",
@@ -4032,6 +4994,14 @@ exports.model = {
       "On",
       "Auto",
       "Smart",
+    ], //
+    "FanModeSequenceEnum" : [
+      "OffLowMedHigh",
+      "OffLowHigh",
+      "OffLowMedHighAuto",
+      "OffLowHighAuto",
+      "OffOnAuto",
+      "OffOn",
     ], //
     "FaultType" : [
       "Unspecified",
@@ -4047,7 +5017,7 @@ exports.model = {
       "MillisecondsGranularity",
       "MicrosecondsGranularity",
     ], //
-    "GroupKeySecurityPolicy" : [
+    "GroupKeySecurityPolicyEnum" : [
       "TrustFirst",
       "CacheAndSync",
     ], //
@@ -4064,7 +5034,7 @@ exports.model = {
       "NonVolatileMemoryError",
       "TamperDetected",
     ], //
-    "HourFormat" : [
+    "HourFormatEnum" : [
       "12hr",
       "24hr",
     ], //
@@ -4083,21 +5053,10 @@ exports.model = {
       "Up",
       "Down",
     ], //
-    "IdentifyEffectIdentifier" : [
-      "Blink",
-      "Breathe",
-      "Okay",
-      "ChannelChange",
-      "FinishEffect",
-      "StopEffect",
-    ], //
-    "IdentifyEffectVariant" : [
-      "Default",
-    ], //
-    "IdentifyIdentifyType" : [
+    "IdentifyTypeEnum" : [
       "None",
-      "VisibleLight",
-      "VisibleLED",
+      "LightOutput",
+      "VisibleIndicator",
       "AudibleBeep",
       "Display",
       "Actuator",
@@ -4115,6 +5074,11 @@ exports.model = {
       "Scart",
       "Usb",
       "Other",
+    ], //
+    "IntentEnum" : [
+      "EndUserSupport",
+      "NetworkDiag",
+      "CrashLogs",
     ], //
     "InterfaceTypeEnum" : [
       "Unspecified",
@@ -4136,7 +5100,14 @@ exports.model = {
       "LevelFourLockout",
       "LevelfiveLockout",
     ], //
-    "LightSensorType" : [
+    "LevelValueEnum" : [
+      "Unknown",
+      "Low",
+      "Medium",
+      "High",
+      "Critical",
+    ], //
+    "LightSensorTypeEnum" : [
       "Photodiode",
       "Cmos",
     ], //
@@ -4153,28 +5124,30 @@ exports.model = {
       "Pin",
       "Rfid",
       "Fingerprint",
+      "FingerVein",
+      "Face",
     ], //
     "LockOperationTypeEnum" : [
       "Lock",
       "Unlock",
       "NonAccessUserEvent",
       "ForcedUserEvent",
+      "Unlatch",
     ], //
-    "LogsIntent" : [
-      "EndUserSupport",
-      "NetworkDiag",
-      "CrashLogs",
+    "MeasurementMediumEnum" : [
+      "Air",
+      "Water",
+      "Soil",
     ], //
-    "LogsStatus" : [
-      "Success",
-      "Exhausted",
-      "NoLogs",
-      "Busy",
-      "Denied",
-    ], //
-    "LogsTransferProtocol" : [
-      "ResponsePayload",
-      "Bdx",
+    "MeasurementUnitEnum" : [
+      "Ppm",
+      "Ppb",
+      "Ppt",
+      "Mgm3",
+      "Ugm3",
+      "Ngm3",
+      "Pm3",
+      "Bqm3",
     ], //
     "MediaPlaybackStatusEnum" : [
       "Success",
@@ -4188,11 +5161,39 @@ exports.model = {
       "Pixels",
       "Percentage",
     ], //
+    "ModeTag" : [
+      "Normal",
+      "Delicate",
+      "Heavy",
+      "Whites",
+    ], //
+    "ModeTag" : [
+      "RapidCool",
+      "RapidFreeze",
+    ], //
+    "ModeTag" : [
+      "Normal",
+      "Heavy",
+      "Light",
+    ], //
+    "ModeTag" : [
+      "DeepClean",
+      "Vacuum",
+      "Mop",
+    ], //
+    "ModeTag" : [
+      "Idle",
+      "Cleaning",
+    ], //
     "MoveMode" : [
       "Up",
       "Down",
     ], //
-    "NetworkCommissioningStatus" : [
+    "MuteStateEnum" : [
+      "NotMuted",
+      "Muted",
+    ], //
+    "NetworkCommissioningStatusEnum" : [
       "Success",
       "OutOfRange",
       "BoundsExceeded",
@@ -4207,17 +5208,17 @@ exports.model = {
       "IPBindFailed",
       "UnknownError",
     ], //
-    "NetworkFault" : [
-      "Unspecified",
-      "LinkDown",
-      "HardwareFailure",
-      "NetworkJammed",
-    ], //
     "NetworkFaultEnum" : [
       "Unspecified",
       "HardwareFailure",
       "NetworkJammed",
       "ConnectionFailed",
+    ], //
+    "NetworkFaultEnum" : [
+      "Unspecified",
+      "LinkDown",
+      "HardwareFailure",
+      "NetworkJammed",
     ], //
     "NodeOperationalCertStatusEnum" : [
       "Ok",
@@ -4230,6 +5231,12 @@ exports.model = {
       "FabricConflict",
       "LabelConflict",
       "InvalidFabricIndex",
+    ], //
+    "NumberOfRinsesEnum" : [
+      "None",
+      "Normal",
+      "Extra",
+      "Max",
     ], //
     "OTAAnnouncementReason" : [
       "SimpleAnnouncement",
@@ -4271,10 +5278,10 @@ exports.model = {
       "RollingBack",
       "DelayedOnUserConsent",
     ], //
-    "OccupancySensorType" : [
+    "OccupancySensorTypeEnum" : [
       "Pir",
       "Ultrasonic",
-      "PirAndUltrasonic",
+      "PIRAndUltrasonic",
       "PhysicalContact",
     ], //
     "OnOffDelayedAllOffEffectVariant" : [
@@ -4294,10 +5301,6 @@ exports.model = {
       "On",
       "TogglePreviousOnOff",
     ], //
-    "OperatingMode" : [
-      "Normal",
-      "Configure",
-    ], //
     "OperatingModeEnum" : [
       "Normal",
       "Vacation",
@@ -4312,6 +5315,12 @@ exports.model = {
       "Restricted",
       "InsufficientBattery",
     ], //
+    "OperationModeEnum" : [
+      "Normal",
+      "Minimum",
+      "Maximum",
+      "Local",
+    ], //
     "OperationSourceEnum" : [
       "Unspecified",
       "Manual",
@@ -4323,6 +5332,17 @@ exports.model = {
       "Remote",
       "Rfid",
       "Biometric",
+    ], //
+    "OperationalStateEnum" : [
+      "Stopped",
+      "Running",
+      "Paused",
+      "Error",
+    ], //
+    "OperationalStateEnum" : [
+      "SeekingCharger",
+      "Charging",
+      "Docked",
     ], //
     "OutputTypeEnum" : [
       "Hdmi",
@@ -4366,25 +5386,34 @@ exports.model = {
       "NotPlaying",
       "Buffering",
     ], //
-    "PowerSourceStatus" : [
+    "PowerSourceStatusEnum" : [
       "Unspecified",
       "Active",
       "Standby",
       "Unavailable",
     ], //
-    "PumpControlMode" : [
-      "ConstantSpeed",
-      "ConstantPressure",
-      "ProportionalPressure",
-      "ConstantFlow",
-      "ConstantTemperature",
-      "Automatic",
+    "ProductFinishEnum" : [
+      "Other",
+      "Matte",
+      "Satin",
+      "Polished",
+      "Rugged",
+      "Fabric",
     ], //
-    "PumpOperationMode" : [
-      "Normal",
-      "Minimum",
-      "Maximum",
-      "Local",
+    "ProductFinishEnum" : [
+      "Other",
+      "Matte",
+      "Satin",
+      "Polished",
+      "Rugged",
+      "Fabric",
+    ], //
+    "ProductIdentifierTypeEnum" : [
+      "Upc",
+      "Gtin8",
+      "Ean",
+      "Gtin14",
+      "Oem",
     ], //
     "RadioFaultEnum" : [
       "Unspecified",
@@ -4395,18 +5424,12 @@ exports.model = {
       "BLEFault",
       "EthernetFault",
     ], //
-    "RegulatoryLocationType" : [
+    "RegulatoryLocationTypeEnum" : [
       "Indoor",
       "Outdoor",
       "IndoorOutdoor",
     ], //
-    "RemoteEnableFlags" : [
-      "Disabled",
-      "TemporarilyLockedDisabled",
-      "EnabledRemoteControl",
-      "EnabledRemoteAndEnergyControl",
-    ], //
-    "RoutingRole" : [
+    "RoutingRoleEnum" : [
       "Unspecified",
       "Unassigned",
       "SleepyEndDevice",
@@ -4424,13 +5447,18 @@ exports.model = {
       "Up",
       "Down",
     ], //
-    "SecurityType" : [
+    "SecurityTypeEnum" : [
       "Unspecified",
       "None",
       "Wep",
       "Wpa",
       "Wpa2",
       "Wpa3",
+    ], //
+    "SensitivityEnum" : [
+      "High",
+      "Standard",
+      "Low",
     ], //
     "SetpointAdjustMode" : [
       "Heat",
@@ -4453,9 +5481,36 @@ exports.model = {
       "Saturday",
     ], //
     "StatusCode" : [
+      "CleaningInProgress",
+    ], //
+    "StatusCode" : [
+      "Stuck",
+      "DustBinMissing",
+      "DustBinFull",
+      "WaterTankEmpty",
+      "WaterTankMissing",
+      "WaterTankLidOpen",
+      "MopCleaningPadMissing",
+      "BatteryLow",
+    ], //
+    "StatusCode" : [
       "Busy",
       "PAKEParameterError",
       "WindowNotOpen",
+    ], //
+    "StatusCode" : [
+      "TimeNotAccepted",
+    ], //
+    "StatusEnum" : [
+      "Success",
+      "Exhausted",
+      "NoLogs",
+      "Busy",
+      "Denied",
+    ], //
+    "StepDirectionEnum" : [
+      "Increase",
+      "Decrease",
     ], //
     "StepMode" : [
       "Up",
@@ -4466,7 +5521,7 @@ exports.model = {
       "TargetNotFound",
       "NotAllowed",
     ], //
-    "TempUnit" : [
+    "TempUnitEnum" : [
       "Fahrenheit",
       "Celsius",
       "Kelvin",
@@ -4503,28 +5558,33 @@ exports.model = {
       "Dry",
       "Sleep",
     ], //
-    "TimeEncoding" : [
-      "Relative",
-      "Absolute",
-    ], //
     "TimeSourceEnum" : [
       "None",
       "Unknown",
       "Admin",
       "NodeTimeCluster",
-      "NonFabricSntp",
-      "NonFabricNtp",
-      "FabricSntp",
-      "FabricNtp",
-      "MixedNtp",
-      "NonFabricSntpNts",
-      "NonFabricNtpNts",
-      "FabricSntpNts",
-      "FabricNtpNts",
-      "MixedNtpNts",
+      "NonMatterSNTP",
+      "NonMatterNTP",
+      "MatterSNTP",
+      "MatterNTP",
+      "MixedNTP",
+      "NonMatterSNTPNTS",
+      "NonMatterNTPNTS",
+      "MatterSNTPNTS",
+      "MatterNTPNTS",
+      "MixedNTPNTS",
       "CloudSource",
       "Ptp",
       "Gnss",
+    ], //
+    "TimeZoneDatabaseEnum" : [
+      "Full",
+      "Partial",
+      "None",
+    ], //
+    "TransferProtocolEnum" : [
+      "ResponsePayload",
+      "Bdx",
     ], //
     "Type" : [
       "RollerShade",
@@ -4556,42 +5616,45 @@ exports.model = {
       "ScheduleRestrictedUser",
       "RemoteOnlyUser",
     ], //
-    "WiFiBand" : [
+    "WiFiBandEnum" : [
       "2g4",
       "3g65",
       "5g",
       "6g",
       "60g",
+      "1g",
     ], //
-    "WiFiConnectionStatus" : [
-      "Connected",
-      "NotConnected",
-    ], //
-    "WiFiVersionType" : [
+    "WiFiVersionEnum" : [
       "A",
       "B",
       "G",
       "N",
       "Ac",
       "Ax",
+      "Ah",
     ], //
-    "WiredCurrentType" : [
+    "WiredCurrentTypeEnum" : [
       "Ac",
       "Dc",
     ], //
-    "WiredFault" : [
-      "Unspecfied",
+    "WiredFaultEnum" : [
+      "Unspecified",
       "OverVoltage",
       "UnderVoltage",
     ], //
   },
 
   bitmaps : {
-    "ApplicationLauncherFeature" : {
-      1 : "ApplicationPlatform",
+    "AlarmMap" : {
+      1 : "InflowError",
+      2 : "DrainError",
+      4 : "DoorError",
+      8 : "TempTooLow",
+      16 : "TempTooHigh",
+      32 : "WaterLevelError",
     },
-    "AudioOutputFeature" : {
-      1 : "NameUpdates",
+    "AlarmMap" : {
+      1 : "DoorOpen",
     },
     "BarrierControlCapabilities" : {
       1 : "PartialBarrier",
@@ -4626,23 +5689,12 @@ exports.model = {
       4 : "MaskVal3",
       64 : "MaskVal4",
     },
-    "ChannelFeature" : {
-      1 : "ChannelList",
-      2 : "LineupInfo",
-    },
     "ColorCapabilities" : {
       1 : "HueSaturationSupported",
       2 : "EnhancedHueSupported",
       4 : "ColorLoopSupported",
       8 : "XYAttributesSupported",
       16 : "ColorTemperatureSupported",
-    },
-    "ColorControlFeature" : {
-      1 : "HueAndSaturation",
-      2 : "EnhancedHue",
-      4 : "ColorLoop",
-      8 : "Xy",
-      16 : "ColorTemperature",
     },
     "ColorLoopUpdateFlags" : {
       1 : "UpdateAction",
@@ -4672,10 +5724,6 @@ exports.model = {
       16 : "TiltPositionAware",
       32 : "LiftEncoderControlled",
       64 : "TiltEncoderControlled",
-    },
-    "ContentLauncherFeature" : {
-      1 : "ContentSearch",
-      2 : "URLPlayback",
     },
     "DayOfWeek" : {
       1 : "Sunday",
@@ -4798,7 +5846,185 @@ exports.model = {
       32 : "Friday",
       64 : "Saturday",
     },
-    "DoorLockFeature" : {
+    "Feature" : {
+      1 : "OnOff",
+    },
+    "Feature" : {
+      1 : "Fair",
+      2 : "Moderate",
+      4 : "VeryPoor",
+      8 : "ExtremelyPoor",
+    },
+    "Feature" : {
+      1 : "TemperatureUnit",
+    },
+    "Feature" : {
+      1 : "Spin",
+      2 : "Rinse",
+    },
+    "Feature" : {
+      1 : "TagList",
+    },
+    "Feature" : {
+      1 : "TemperatureNumber",
+      2 : "TemperatureLevel",
+      4 : "TemperatureStep",
+    },
+    "Feature" : {
+      1 : "NavigationKeyCodes",
+      2 : "LocationKeys",
+      4 : "NumberKeys",
+    },
+    "Feature" : {
+      1 : "WaterMarks",
+    },
+    "Feature" : {
+      1 : "NameUpdates",
+    },
+    "Feature" : {
+      1 : "OnOff",
+    },
+    "Feature" : {
+      1 : "NameUpdates",
+    },
+    "Feature" : {
+      1 : "PacketCounts",
+      2 : "ErrorCounts",
+    },
+    "Feature" : {
+      1 : "Extended",
+    },
+    "Feature" : {
+      1 : "ApplicationPlatform",
+    },
+    "Feature" : {
+      1 : "ChannelList",
+      2 : "LineupInfo",
+    },
+    "Feature" : {
+      1 : "MultiSpeed",
+      2 : "Auto",
+      4 : "Rocking",
+      8 : "Wind",
+      16 : "Step",
+      32 : "AirflowDirection",
+    },
+    "Feature" : {
+      1 : "PacketCounts",
+      2 : "ErrorCounts",
+    },
+    "Feature" : {
+      1 : "Condition",
+      2 : "Warning",
+      3 : "ReplacementProductList",
+    },
+    "Feature" : {
+      1 : "ContentSearch",
+      2 : "URLPlayback",
+    },
+    "Feature" : {
+      1 : "Lighting",
+      2 : "DeadFront",
+    },
+    "Feature" : {
+      1 : "LatchingSwitch",
+      2 : "MomentarySwitch",
+      4 : "MomentarySwitchRelease",
+      8 : "MomentarySwitchLongPress",
+      16 : "MomentarySwitchMultiPress",
+    },
+    "Feature" : {
+      1 : "SmokeAlarm",
+      2 : "CoAlarm",
+    },
+    "Feature" : {
+      1 : "AdvancedSeek",
+      2 : "VariableSpeed",
+    },
+    "Feature" : {
+      1 : "CheckInProtocolSupport",
+    },
+    "Feature" : {
+      1 : "CacheAndSync",
+    },
+    "Feature" : {
+      1 : "TimeZone",
+      2 : "NTPClient",
+      4 : "NTPServer",
+      8 : "TimeSyncClient",
+    },
+    "Feature" : {
+      1 : "Wired",
+      2 : "Battery",
+      4 : "Rechargeable",
+      8 : "Replaceable",
+    },
+    "Feature" : {
+      1 : "Lift",
+      2 : "Tilt",
+      4 : "PositionAwareLift",
+      8 : "AbsolutePosition",
+      16 : "PositionAwareTilt",
+    },
+    "Feature" : {
+      1 : "GroupNames",
+    },
+    "Feature" : {
+      1 : "OnOff",
+      2 : "Lighting",
+      4 : "Frequency",
+    },
+    "Feature" : {
+      1 : "ConstantPressure",
+      2 : "CompensatedPressure",
+      4 : "ConstantFlow",
+      8 : "ConstantSpeed",
+      16 : "ConstantTemperature",
+      32 : "Automatic",
+      64 : "LocalOperation",
+    },
+    "Feature" : {
+      1 : "WiFiNetworkInterface",
+      2 : "ThreadNetworkInterface",
+      4 : "EthernetNetworkInterface",
+    },
+    "Feature" : {
+      1 : "PacketCounts",
+      2 : "ErrorCounts",
+      4 : "MLECounts",
+      8 : "MACCounts",
+    },
+    "Feature" : {
+      1 : "HueAndSaturation",
+      2 : "EnhancedHue",
+      4 : "ColorLoop",
+      8 : "Xy",
+      16 : "ColorTemperature",
+    },
+    "Feature" : {
+      1 : "SceneNames",
+      2 : "Explicit",
+      4 : "TableSize",
+      8 : "FabricScenes",
+    },
+    "Feature" : {
+      1 : "NumericMeasurement",
+      2 : "LevelIndication",
+      4 : "MediumLevel",
+      8 : "CriticalLevel",
+      16 : "PeakMeasurement",
+      32 : "AverageMeasurement",
+    },
+    "Feature" : {
+      1 : "Heating",
+      2 : "Cooling",
+      4 : "Occupancy",
+      8 : "ScheduleConfiguration",
+      16 : "Setback",
+      32 : "AutoMode",
+      64 : "LocalTemperatureNotExposed",
+    },
+    "Feature" : {
       1 : "PinCredential",
       2 : "RfidCredential",
       4 : "FingerCredentials",
@@ -4811,47 +6037,11 @@ exports.model = {
       512 : "Notification",
       1024 : "YearDayAccessSchedules",
       2048 : "HolidaySchedules",
-    },
-    "EthernetNetworkDiagnosticsFeature" : {
-      1 : "PacketCounts",
-      2 : "ErrorCounts",
-    },
-    "FanControlFeature" : {
-      1 : "MultiSpeed",
-      2 : "Auto",
-      4 : "Rocking",
-      8 : "Wind",
-    },
-    "Feature" : {
-      1 : "Lift",
-      2 : "Tilt",
-      4 : "PositionAwareLift",
-      8 : "AbsolutePosition",
-      16 : "PositionAwareTilt",
-    },
-    "GroupClusterFeature" : {
-      1 : "GroupNames",
-    },
-    "KeypadInputFeature" : {
-      1 : "NavigationKeyCodes",
-      2 : "LocationKeys",
-      4 : "NumberKeys",
-    },
-    "LevelControlFeature" : {
-      1 : "OnOff",
-      2 : "Lighting",
-      4 : "Frequency",
+      4096 : "Unbolt",
     },
     "LevelControlOptions" : {
       1 : "ExecuteIfOff",
       2 : "CoupleColorTempToLevel",
-    },
-    "MediaInputFeature" : {
-      1 : "NameUpdates",
-    },
-    "MediaPlaybackFeature" : {
-      1 : "AdvancedSeek",
-      2 : "VariableSpeed",
     },
     "Mode" : {
       1 : "MotorDirectionReversed",
@@ -4863,15 +6053,10 @@ exports.model = {
       1 : "HeatSetpointPresent",
       2 : "CoolSetpointPresent",
     },
-    "ModeSelectFeature" : {
-      1 : "Deponoff",
+    "NameSupportBitmap" : {
+      128 : "GroupNames",
     },
-    "NetworkCommissioningFeature" : {
-      1 : "WiFiNetworkInterface",
-      2 : "ThreadNetworkInterface",
-      4 : "EthernetNetworkInterface",
-    },
-    "Occupancy" : {
+    "OccupancyBitmap" : {
       1 : "Occupied",
     },
     "OccupancySensorTypeBitmap" : {
@@ -4882,33 +6067,12 @@ exports.model = {
     "OnOffControl" : {
       1 : "AcceptOnlyWhenOn",
     },
-    "OnOffFeature" : {
-      1 : "Lighting",
-    },
     "OperationalStatus" : {
       3 : "Global",
       12 : "Lift",
       48 : "Tilt",
     },
-    "PowerSourceFeature" : {
-      1 : "Wired",
-      2 : "Battery",
-      4 : "Rechargeable",
-      8 : "Replaceable",
-    },
-    "PressureFeature" : {
-      1 : "Extended",
-    },
-    "PumpFeature" : {
-      1 : "ConstantPressure",
-      2 : "CompensatedPressure",
-      4 : "ConstantFlow",
-      8 : "ConstantSpeed",
-      16 : "ConstantTemperature",
-      32 : "Automatic",
-      64 : "Local",
-    },
-    "PumpStatus" : {
+    "PumpStatusBitmap" : {
       1 : "DeviceFault",
       2 : "Supplyfault",
       4 : "SpeedLow",
@@ -4919,7 +6083,7 @@ exports.model = {
       128 : "RemoteFlow",
       256 : "RemoteTemperature",
     },
-    "RockSupportMask" : {
+    "RockBitmap" : {
       1 : "RockLeftRight",
       2 : "RockUpDown",
       4 : "RockRound",
@@ -4938,9 +6102,6 @@ exports.model = {
       1024 : "ManualOperation",
       2048 : "Protection",
     },
-    "SceneFeatures" : {
-      1 : "SceneNames",
-    },
     "ScenesCopyMode" : {
       1 : "CopyAllScenes",
     },
@@ -4949,58 +6110,18 @@ exports.model = {
       2 : "ValueB",
       4 : "ValueC",
     },
-    "SoftwareDiagnosticsFeature" : {
-      1 : "WaterMarks",
-    },
-    "StartTime" : {
-      63 : "Minutes",
-      192 : "TimeEncoding",
-      65280 : "Hours",
-    },
     "SupportedStreamingProtocol" : {
       1 : "Dash",
       2 : "Hls",
     },
-    "SwitchFeature" : {
-      1 : "LatchingSwitch",
-      2 : "MomentarySwitch",
-      4 : "MomentarySwitchRelease",
-      8 : "MomentarySwitchLongPress",
-      16 : "MomentarySwitchMultiPress",
-    },
-    "ThermostatFeature" : {
-      1 : "Heating",
-      2 : "Cooling",
-      4 : "Occupancy",
-      8 : "ScheduleConfiguration",
-      16 : "Setback",
-      32 : "AutoMode",
-    },
-    "ThreadNetworkDiagnosticsFeature" : {
-      1 : "PacketCounts",
-      2 : "ErrorCounts",
-      4 : "MLECounts",
-      8 : "MACCounts",
-    },
-    "UnitLocalizationFeature" : {
-      1 : "TemperatureUnit",
-    },
-    "WiFiNetworkDiagnosticsFeature" : {
-      1 : "PacketCounts",
-      2 : "ErrorCounts",
-    },
-    "WiFiSecurity" : {
+    "WiFiSecurityBitmap" : {
       1 : "Unencrypted",
       2 : "Wep",
       4 : "WpaPersonal",
       8 : "Wpa2Personal",
       16 : "Wpa3Personal",
     },
-    "WindSettingMask" : {
-      1 : "SleepWind",
-      2 : "NaturalWind",
-    },
-    "WindSupportMask" : {
+    "WindBitmap" : {
       1 : "SleepWind",
       2 : "NaturalWind",
     },

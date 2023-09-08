@@ -33,10 +33,13 @@ PressureMeasurement
 FlowMeasurement
 RelativityHumidity
 OccupancySensing
+SoilMoisture
 PhMeasurement
 ElectricalConductivityMeasurement
 WindSpeedMeasurement
 CarbonMonoxide
+CarbonDioxide
+PM25
 IASZone
 IASACE
 IASWD
