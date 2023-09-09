@@ -197,6 +197,13 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
     }
 
 
+def _GetPurposefulFailureTests() -> Set[str]:
+    """Tests that fail in YAML on purpose."""
+    return {
+        "TestPurposefulFailureEqualities.yaml"
+    }
+
+
 def _AllYamlTests():
     yaml_test_suite_path = Path(_YAML_TEST_SUITE_PATH)
 
@@ -270,6 +277,7 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, use_short
     extra_slow_tests = _GetExtraSlowTests()
     in_development_tests = _GetInDevelopmentTests()
     chip_repl_unsupported_tests = _GetChipReplUnsupportedTests()
+    purposeful_failure_tests = _GetPurposefulFailureTests()
 
     for path in _AllYamlTests():
         if not _IsValidYamlTest(path.name):
@@ -290,6 +298,9 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, use_short
 
         if path.name in in_development_tests:
             tags.add(TestTag.IN_DEVELOPMENT)
+
+        if path.name in purposeful_failure_tests:
+            tags.add(TestTag.PURPOSEFUL_FAILURE)
 
         if treat_repl_unsupported_as_in_development and path.name in chip_repl_unsupported_tests:
             tags.add(TestTag.IN_DEVELOPMENT)
