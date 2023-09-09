@@ -26,8 +26,8 @@ import javax.annotation.Nullable;
 public final class NodeState {
   private Map<Integer, EndpointState> endpoints;
 
-  public NodeState(Map<Integer, EndpointState> endpoints) {
-    this.endpoints = endpoints;
+  public NodeState() {
+    this.endpoints = new HashMap<>();
   }
 
   public Map<Integer, EndpointState> getEndpointStates() {
@@ -60,7 +60,7 @@ public final class NodeState {
     }
 
     // This will overwrite previous attributes.
-    clusterState.getAttributeStates().put(attributeId, attributeStateToAdd);
+    clusterState.getAttributeStates().put(attributeId, attributeStateToAdd.clone());
   }
 
   private void addEvent(int endpointId, long clusterId, long eventId, EventState eventStateToAdd) {
@@ -79,7 +79,7 @@ public final class NodeState {
     if (!clusterState.getEventStates().containsKey(eventId)) {
       clusterState.getEventStates().put(eventId, new ArrayList<EventState>());
     }
-    clusterState.getEventStates().get(eventId).add(eventStateToAdd);
+    clusterState.getEventStates().get(eventId).add(eventStateToAdd.clone());
   }
 
   @Override

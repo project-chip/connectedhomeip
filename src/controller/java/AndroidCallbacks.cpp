@@ -61,7 +61,9 @@ public:
         return;
     }
 
-    ~JniChipAttributePath() { mEnv->DeleteLocalRef(mData); }
+    ~JniChipAttributePath() { 
+        ChipLogError(Controller, "deleting JniChipAttributePath");
+        mEnv->DeleteLocalRef(mData); }
 
     CHIP_ERROR GetError() { return mError; }
     jobject GetData() { return mData; }
@@ -92,7 +94,9 @@ public:
         return;
     }
 
-    ~JniChipEventPath() { mEnv->DeleteLocalRef(mData); }
+    ~JniChipEventPath() { 
+        ChipLogError(Controller, "deleting JniChipEventPath");
+        mEnv->DeleteLocalRef(mData); }
 
     CHIP_ERROR GetError() { return mError; }
     jobject GetData() { return mData; }
@@ -246,13 +250,9 @@ void ReportCallback::OnReportBegin()
 
     err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/model/NodeState", mNodeStateCls);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not get NodeState class"));
-    jmethodID nodeStateCtor = env->GetMethodID(mNodeStateCls, "<init>", "(Ljava/util/Map;)V");
+    jmethodID nodeStateCtor = env->GetMethodID(mNodeStateCls, "<init>", "()V");
     VerifyOrReturn(nodeStateCtor != nullptr, ChipLogError(Controller, "Could not find NodeState constructor"));
-
-    jobject map = nullptr;
-    err         = JniReferences::GetInstance().CreateHashMap(map);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not create HashMap"));
-    mNodeStateObj = env->NewObject(mNodeStateCls, nodeStateCtor, map);
+    mNodeStateObj = env->NewObject(mNodeStateCls, nodeStateCtor);
 }
 
 void ReportCallback::OnDeallocatePaths(app::ReadPrepareParams && aReadPrepareParams)
@@ -275,15 +275,22 @@ void ReportCallback::OnReportEnd()
     // Transform C++ jobject pair list to a Java HashMap, and call onReport() on the Java callback.
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-
+    VerifyOrReturn(mNodeStateObj != nullptr, ChipLogError(Controller, "mNodeStateObj is empty"));
     jmethodID onReportMethod;
     err = JniReferences::GetInstance().FindMethod(env, mReportCallbackRef, "onReport", "(Lchip/devicecontroller/model/NodeState;)V",
                                                   &onReportMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onReport method"));
-
-    DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mReportCallbackRef, onReportMethod, mNodeStateObj);
-    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
+    if (err == CHIP_NO_ERROR)
+    {
+        DeviceLayer::StackUnlock unlock;
+        env->CallVoidMethod(mReportCallbackRef, onReportMethod, mNodeStateObj);
+        env->DeleteLocalRef(mNodeStateObj);
+        VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
+    }
+    else
+    {
+        ChipLogError(Controller, "Could not find onReport method");
+        env->DeleteLocalRef(mNodeStateObj);
+    }
 }
 
 // Convert TLV blob to Json with structure, the element's tag is replaced with the actual attributeId.
@@ -387,20 +394,19 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     chip::JniClass attributeStateJniCls(attributeStateCls);
     jmethodID attributeStateCtor = env->GetMethodID(attributeStateCls, "<init>", "(Ljava/lang/Object;[BLjava/lang/String;)V");
     VerifyOrReturn(attributeStateCtor != nullptr, ChipLogError(Controller, "Could not find AttributeState constructor"));
-    jobject attributeStateObj =
-        env->NewObject(attributeStateCls, attributeStateCtor, value, jniByteArray.jniValue(), jsonString.jniValue());
-    VerifyOrReturn(attributeStateObj != nullptr, ChipLogError(Controller, "Could not create AttributeState object"));
-
     // Add AttributeState to NodeState
     jmethodID addAttributeMethod;
     err = JniReferences::GetInstance().FindMethod(env, mNodeStateObj, "addAttribute",
                                                   "(IJJLchip/devicecontroller/model/AttributeState;)V", &addAttributeMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find addAttribute method"));
+
+    jobject attributeStateObj =
+        env->NewObject(attributeStateCls, attributeStateCtor, value, jniByteArray.jniValue(), jsonString.jniValue());
+    VerifyOrReturn(attributeStateObj != nullptr, ChipLogError(Controller, "Could not create AttributeState object"));
     env->CallVoidMethod(mNodeStateObj, addAttributeMethod, static_cast<jint>(aPath.mEndpointId),
                         static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId), attributeStateObj);
-    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
     env->DeleteLocalRef(attributeStateObj);
-
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
     UpdateClusterDataVersion();
 }
 
@@ -518,20 +524,23 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     chip::JniClass eventStateJniCls(eventStateCls);
     jmethodID eventStateCtor = env->GetMethodID(eventStateCls, "<init>", "(JIIJLjava/lang/Object;[BLjava/lang/String;)V");
     VerifyOrReturn(eventStateCtor != nullptr, ChipLogError(Controller, "Could not find EventState constructor"));
-    jobject eventStateObj = env->NewObject(eventStateCls, eventStateCtor, eventNumber, priorityLevel, timestampType, timestampValue,
-                                           value, jniByteArray.jniValue(), jsonString.jniValue());
-    VerifyOrReturn(eventStateObj != nullptr, ChipLogError(Controller, "Could not create EventState object"));
-
+    
     // Add EventState to NodeState
     jmethodID addEventMethod;
     err = JniReferences::GetInstance().FindMethod(env, mNodeStateObj, "addEvent", "(IJJLchip/devicecontroller/model/EventState;)V",
                                                   &addEventMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find addEvent method"));
+
+    jobject eventStateObj = env->NewObject(eventStateCls, eventStateCtor, eventNumber, priorityLevel, timestampType, timestampValue,
+                                           value, jniByteArray.jniValue(), jsonString.jniValue());
+    VerifyOrReturn(eventStateObj != nullptr, ChipLogError(Controller, "Could not create EventState object"));
+
+
     env->CallVoidMethod(mNodeStateObj, addEventMethod, static_cast<jint>(aEventHeader.mPath.mEndpointId),
                         static_cast<jlong>(aEventHeader.mPath.mClusterId), static_cast<jlong>(aEventHeader.mPath.mEventId),
                         eventStateObj);
-    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
     env->DeleteLocalRef(eventStateObj);
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
 CHIP_ERROR InvokeCallback::CreateInvokeElement(const app::ConcreteCommandPath & aPath, TLV::TLVReader * apData, jobject & outObj)

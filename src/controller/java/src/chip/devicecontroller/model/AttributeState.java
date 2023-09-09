@@ -39,6 +39,12 @@ public final class AttributeState {
     }
   }
 
+  public AttributeState(Object valueObject, byte[] tlv, JSONObject json) {
+    this.valueObject = valueObject;
+    this.tlv = tlv;
+    this.json = json;
+  }
+
   public Object getValue() {
     return valueObject;
   }
@@ -53,4 +59,21 @@ public final class AttributeState {
   public JSONObject getJson() {
     return json;
   }
+
+  public AttributeState clone() {
+    // Copy the value object.
+    // Object valueObjectCopy;
+    //if (valueObject instanceof Cloneable) {
+    //    valueObjectCopy = ((Cloneable) valueObject).clone();
+    //}
+
+    // Copy the TLV byte array.
+    byte[] tlvCopy = new byte[tlv.length];
+    System.arraycopy(tlv, 0, tlvCopy, 0, tlv.length);
+
+    // Copy the JSON object.
+    JSONObject jsonCopy = new JSONObject(json.toString());
+
+    return new AttributeState(null, tlvCopy, jsonCopy);
+}
 }

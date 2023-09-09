@@ -58,6 +58,23 @@ public final class EventState {
     }
   }
 
+  public EventState(
+    long eventNumber,
+    int priorityLevel,
+    int timestampType,
+    long timestampValue,
+    Object valueObject,
+    byte[] tlv,
+    JSONObject json) {
+  this.eventNumber = eventNumber;
+  this.priorityLevel = priorityLevel;
+  this.timestampType = timestampType;
+  this.timestampValue = timestampValue;
+  this.valueObject = valueObject;
+  this.tlv = tlv;
+  this.json = json;
+}
+
   public long getEventNumber() {
     return eventNumber;
   }
@@ -93,4 +110,21 @@ public final class EventState {
   public String toString() {
     return valueObject.toString();
   }
+
+  public EventState clone() {
+    // Copy the value object.
+    // Object valueObjectCopy;
+    // if (valueObject instanceof Cloneable) {
+    //     valueObjectCopy = ((Cloneable) valueObject).clone();
+    // }
+
+    // Copy the TLV byte array.
+    byte[] tlvCopy = new byte[tlv.length];
+    System.arraycopy(tlv, 0, tlvCopy, 0, tlv.length);
+
+    // Copy the JSON object.
+    JSONObject jsonCopy = new JSONObject(json.toString());
+
+    return new EventState(eventNumber, priorityLevel, timestampType, timestampValue, null, tlvCopy, jsonCopy);
+}
 }
