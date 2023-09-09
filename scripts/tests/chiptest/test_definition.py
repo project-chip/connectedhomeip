@@ -219,6 +219,7 @@ class TestTag(Enum):
     IN_DEVELOPMENT = auto()  # test may not pass or undergoes changes
     CHIP_TOOL_PYTHON_ONLY = auto()  # test uses YAML features only supported by the CHIP_TOOL_PYTHON runner.
     EXTRA_SLOW = auto()      # test uses Sleep and is generally _very_ slow (>= 60s is a typical threshold)
+    PURPOSEFUL_FAILURE = auto()  # test fails on purpose
 
     def to_s(self):
         for (k, v) in TestTag.__members__.items():
