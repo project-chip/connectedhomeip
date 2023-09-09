@@ -142,6 +142,7 @@ private:
     NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
     int32_t mLastDisconnectedReason;
 
+    /** +1 byte for string termination */
     char mScanSSID[DeviceLayer::Internal::kMaxWiFiSSIDLength + 1];
     uint32_t mScanType;
 };
