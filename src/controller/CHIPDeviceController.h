@@ -190,6 +190,16 @@ public:
         return nullptr;
     }
 
+    Messaging::ExchangeManager * ExchangeMgr()
+    {
+        if (mSystemState)
+        {
+            return mSystemState->ExchangeMgr();
+        }
+
+        return nullptr;
+    }
+
     CHIP_ERROR GetPeerAddressAndPort(NodeId peerId, Inet::IPAddress & addr, uint16_t & port);
 
     /**

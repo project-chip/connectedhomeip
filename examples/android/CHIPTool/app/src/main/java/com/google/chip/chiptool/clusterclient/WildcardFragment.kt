@@ -16,6 +16,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.ChipIdLookup
+import chip.devicecontroller.ClusterIDMapping.GroupKeyManagement
+import chip.devicecontroller.ClusterIDMapping.Groups
 import chip.devicecontroller.InvokeCallback
 import chip.devicecontroller.ReportCallback
 import chip.devicecontroller.ResubscriptionAttemptCallback
@@ -29,6 +31,7 @@ import chip.devicecontroller.model.InvokeElement
 import chip.devicecontroller.model.NodeState
 import chip.jsontlv.putJsonString
 import chip.tlv.AnonymousTag
+import chip.tlv.ContextSpecificTag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 import com.google.chip.chiptool.ChipClient
@@ -40,7 +43,9 @@ import java.util.Optional
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.concurrent.thread
 
 class WildcardFragment : Fragment() {
   private var _binding: WildcardFragmentBinding? = null
@@ -138,6 +143,85 @@ class WildcardFragment : Fragment() {
       binding.isUrgentLabel.visibility = getVisibility(subscribeBtnOn)
       binding.isUrgentSp.visibility = getVisibility(subscribeBtnOn)
       binding.shutdownSubscriptionBtn.visibility = getVisibility(subscribeBtnOn)
+
+      val groupIds = deviceController.availableGroupIds
+      Log.d(TAG, "groupId : $groupIds")
+      if (groupIds.isEmpty()) {
+        deviceController.addGroup(0x4141, "TestName")
+        deviceController.addKeySet(0xAAAA, 0, 0x000000000021dfe0, hexStringToByteArray("d0d1d2d3d4d5d6d7d8d9dadbdcdddedf"))
+        deviceController.bindKeySet(0x4141, 0xAAAA)
+
+        val tlvWriter = TlvWriter()
+        tlvWriter.startStructure(AnonymousTag)
+        tlvWriter.startStructure(ContextSpecificTag(GroupKeyManagement.KeySetWriteCommandField.GroupKeySet.id))
+        tlvWriter.put(ContextSpecificTag(0), 42U)
+        tlvWriter.put(ContextSpecificTag(1), 0U)
+        tlvWriter.put(ContextSpecificTag(2), hexStringToByteArray("d0d1d2d3d4d5d6d7d8d9dadbdcdddedf"))
+        tlvWriter.put(ContextSpecificTag(3), 2220000U)
+        tlvWriter.put(ContextSpecificTag(4), hexStringToByteArray("d0d1d2d3d4d5d6d7d8d9dadbdcdddedf"))
+        tlvWriter.put(ContextSpecificTag(5), 2220001U)
+        tlvWriter.put(ContextSpecificTag(6), hexStringToByteArray("d0d1d2d3d4d5d6d7d8d9dadbdcdddedf"))
+        tlvWriter.put(ContextSpecificTag(7), 2220002U)
+        tlvWriter.endStructure()
+        tlvWriter.endStructure()
+
+        val tlvWriter2 = TlvWriter()
+        tlvWriter2.startArray(AnonymousTag)
+        tlvWriter2.startStructure(AnonymousTag)
+        tlvWriter2.put(ContextSpecificTag(1), 0x4141U)
+        tlvWriter2.put(ContextSpecificTag(2), 42U)
+        tlvWriter2.endStructure()
+        tlvWriter2.endArray()
+
+        val tlvWriter3 = TlvWriter()
+        tlvWriter3.startStructure(AnonymousTag)
+        tlvWriter3.put(ContextSpecificTag(0), 0x4141U)
+        tlvWriter3.put(ContextSpecificTag(1), "Light")
+        tlvWriter3.endStructure()
+        scope.launch {
+          deviceController.invoke(
+                  object : InvokeCallback {
+                    override fun onError(e: java.lang.Exception?) {
+                      Log.d(TAG, "onError : ", e)
+                    }
+
+                    override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
+                      Log.d(TAG, "onResponse")
+                    }
+                  },
+                  ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+                  InvokeElement.newInstance(0, GroupKeyManagement.ID, GroupKeyManagement.Command.KeySetWrite.id, tlvWriter.getEncoded(), null),
+                  0, 0)
+
+          delay(1000)
+          deviceController.write(
+                  writeAttributeCallback,
+                  ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+                  listOf(AttributeWriteRequest.newInstance(0, GroupKeyManagement.ID, GroupKeyManagement.Attribute.GroupKeyMap.id, tlvWriter2.getEncoded())),
+                  0,
+                  0
+          )
+          delay(1000)
+          deviceController.invoke(
+                  object : InvokeCallback {
+                    override fun onError(e: java.lang.Exception?) {
+                      Log.d(TAG, "onError : ", e)
+                    }
+
+                    override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
+                      Log.d(TAG, "onResponse")
+                    }
+                  },
+                  ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+                  InvokeElement.newInstance(0, Groups.ID, Groups.Command.AddGroup.id, tlvWriter3.getEncoded(), null),
+                  0, 0)
+        }
+      }
+      for (groupId in groupIds) {
+        Log.d(TAG, "groupId : $groupId : ${deviceController.getGroupName(groupId)}, ${deviceController.findKeySetId(groupId).get()}")
+      }
+      val keySetIds = deviceController.keysetIds
+      Log.d(TAG, "keySetId : $keySetIds")
     }
 
     binding.sendBtn.setOnClickListener {
@@ -348,7 +432,7 @@ class WildcardFragment : Fragment() {
 
     deviceController.write(
       writeAttributeCallback,
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      deviceController.getGroupDevicePointer(0x4141),
       listOf(writeRequest),
       timedRequestTimeoutMs,
       imTimeoutMs
@@ -365,7 +449,7 @@ class WildcardFragment : Fragment() {
       InvokeElement.newInstance(endpointId, clusterId, commandId, null, jsonString)
     deviceController.invoke(
       invokeCallback,
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      deviceController.getGroupDevicePointer(0x4141)/*ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)*/,
       invokeElement,
       timedRequestTimeoutMs,
       imTimeoutMs
@@ -640,6 +724,17 @@ class WildcardFragment : Fragment() {
     private const val EVENT = 2
 
     fun newInstance(): WildcardFragment = WildcardFragment()
+
+    fun hexStringToByteArray(hexString: String): ByteArray {
+      val len = hexString.length
+      val data = ByteArray(len / 2)
+      var i = 0
+      while (i < len) {
+        data[i / 2]= ((Character.digit(hexString[i], 16) shl 4) + Character.digit(hexString[i + 1], 16)).toByte()
+        i += 2
+      }
+      return data
+    }
 
     private val TLV_MAP =
       mapOf(
