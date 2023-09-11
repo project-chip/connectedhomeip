@@ -108,20 +108,6 @@ be used to specify the the effect. It is able to be in following effects:
     ./chip-tool pairing ble-thread 1234 hex:0e080000000000010000000300000f35060004001fffe0020811111111222222220708fd61f77bd3df233e051000112233445566778899aabbccddeeff030e4f70656e54687265616444656d6f010212340410445f2b5ca6f2a93a55ce570a70efeecb0c0402a0fff8 20202021 3840
     ```
 
-3. Read the HEPA filter state:
-
-    ```
-    ${CHIP_TOOL_DIR}/chip-tool hepafiltermonitoring read degradation-direction 1 1234
-    ```
-
-    here:
-
-    - **hepafiltermonitoring** is name of cluster
-    - **read** command to the cluster
-    - **degradation-direction** attribute to read
-    - **1234** destination-id
-    - **1** endpoint-id
-
 ### OTA with Linux OTA Provider
 
 OTA feature enabled by default only for ota-requestor-app example. To enable OTA
