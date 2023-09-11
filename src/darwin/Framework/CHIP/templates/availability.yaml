@@ -7400,7 +7400,7 @@
           - LaundryWasherControls
           - RVCOperationalState
           - DishwasherAlarm
-          - SampleMei
+          - SampleMEI
       attributes:
           # EventList generally not stable yet.
           Scenes:
