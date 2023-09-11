@@ -61,8 +61,7 @@ def process_fail(id, pr, start_time, workflow):
     workflow_pass_rate_output_path = f"workflow_pass_rate/{slugify(workflow)}"
     if not os.path.exists(workflow_pass_rate_output_path):
         os.makedirs(workflow_pass_rate_output_path)
-        print(f"gh run list -R project-chip/connectedhomeip -b master -w {workflow} --json conclusion > {workflow_pass_rate_output_path}/run_list.json")
-        subprocess.run(f"gh run list -R project-chip/connectedhomeip -b master -w {workflow} --json conclusion > {workflow_pass_rate_output_path}/run_list.json", shell=True)
+        subprocess.run(f"gh run list -R project-chip/connectedhomeip -b master -w '{workflow}' --json conclusion > {workflow_pass_rate_output_path}/run_list.json", shell=True)
     else:
         logging.info("This workflow has already been processed.")
     
@@ -100,7 +99,11 @@ def main():
     root_causes.to_csv("failure_cause_summary.csv")
 
     logging.info("Listing percent fail rate of recent fails by workflow.")
-    # TODO
+    for workflow in next(os.walk("workflow_pass_rate"))[1]:
+        try:
+            info = pd.read_json(f"workflow_pass_rate/{workflow}/run_list.json")
+        except:
+            logging.error(f"Recent runs info for {workflow} was not collected.")
 
 if __name__ == "__main__":
     main()
