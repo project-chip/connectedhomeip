@@ -11,8 +11,8 @@
 #include <platform/CHIPDeviceConfig.h>
 
 #ifdef ZCL_USING_SAMPLE_MEI_CLUSTER_SERVER
-#define SAMPLE_MEI_NUM_SUPPORTED_ENDPOINTS                                                                                       \
-(EMBER_AF_SAMPLE_MEI_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+#define SAMPLE_MEI_NUM_SUPPORTED_ENDPOINTS                                                                                         \
+    (EMBER_AF_SAMPLE_MEI_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
 #else
 #define SAMPLE_MEI_NUM_SUPPORTED_ENDPOINTS CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
 #endif /* ZCL_USING_SAMPLE_MEI_CLUSTER_SERVER */
@@ -46,8 +46,10 @@ class SampleMeiServer : public AttributeAccessInterface, public CommandHandlerIn
 {
 public:
     // Register on all endpoints.
-    SampleMeiServer() : AttributeAccessInterface(Optional<EndpointId>::Missing(), SampleMei::Id),
-                        CommandHandlerInterface(Optional<EndpointId>(), Id) {}
+    SampleMeiServer() :
+        AttributeAccessInterface(Optional<EndpointId>::Missing(), SampleMei::Id),
+        CommandHandlerInterface(Optional<EndpointId>(), Id)
+    {}
     static SampleMeiServer & Instance();
     void Shutdown();
 
@@ -62,7 +64,7 @@ public:
 #if SAMPLE_MEI_NUM_SUPPORTED_ENDPOINTS > 0
     SampleMeiContent content[kNumSupportedEndpoints];
 #else
-    SampleMeiContent* content = nullptr;
+    SampleMeiContent * content = nullptr;
 #endif
 
     size_t GetNumSupportedEndpoints() const;
