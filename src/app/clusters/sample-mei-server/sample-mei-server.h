@@ -52,6 +52,9 @@ public:
         CommandHandlerInterface(Optional<EndpointId>(), Id)
     {}
     static SampleMeiServer & Instance();
+
+    // Currently not used, but should be called from a whole-cluster shutdown
+    // callback once cluster lifecycle is clearer
     void Shutdown();
 
     // Attributes

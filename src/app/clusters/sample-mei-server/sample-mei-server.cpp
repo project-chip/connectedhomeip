@@ -47,6 +47,8 @@ void MatterSampleMeiPluginServerInitCallback()
 
 void MatterSampleMeiClusterServerShutdownCallback(chip::EndpointId endpoint)
 {
+    // There's currently no whole-cluster shutdown callback. That would trigger
+    // call to `Shutdown`. Thus ep-based shutdown calls `UnregisterEndpoint`
     sampleMeiServer.UnregisterEndpoint(endpoint);
 }
 
