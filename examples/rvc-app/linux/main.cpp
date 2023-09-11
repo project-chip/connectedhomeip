@@ -26,7 +26,7 @@ RvcDevice * rvcDevice = nullptr;
 
 void ApplicationInit()
 {
-    rvcDevice = new RvcDevice;
+    rvcDevice = new RvcDevice(1);
     rvcDevice->Init();
 }
 
