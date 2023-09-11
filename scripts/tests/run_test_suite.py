@@ -169,7 +169,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
 
     # If just defaults specified, do not run manual and in development
     # Specific target basically includes everything
-    if 'all' in target and not include_tags:
+    if 'all' in target and not include_tags and not exclude_tags:
         exclude_tags = {
             TestTag.MANUAL,
             TestTag.IN_DEVELOPMENT,

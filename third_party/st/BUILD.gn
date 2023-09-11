@@ -1,0 +1,45 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/stm32_sdk.gni")
+
+import("${chip_root}/src/platform/device.gni")
+import("${stm32_sdk_build_root}/stm32_sdk.gni")
+
+declare_args() {
+  # Build target to use for STM32 SDK. Use this to set global SDK defines.
+  stm32_sdk_target = ""
+}
+
+assert(stm32_sdk_target != "", "stm32_sdk_target must be specified")
+
+group("stm32_sdk") {
+  public_deps = [ stm32_sdk_target ]
+}
+
+config("stm32_mbedtls_config") {
+  if (stm32_family == "stm32wb5") {
+    defines = [ "MBEDTLS_USER_CONFIG_FILE=<examples/platform/stm32/config_files/STM32WB5/matter_config.h>" ]
+
+    include_dirs = [
+      chip_root,
+      "${chip_root}/examples/platform/stm32/config_files/STM32WB5/",
+    ]
+  }
+}
+mbedtls_target("mbedtls") {
+  public_configs = [ ":stm32_mbedtls_config" ]
+  public_deps = [ "${stm32_sdk_build_root}:stm32_sdk" ]
+}

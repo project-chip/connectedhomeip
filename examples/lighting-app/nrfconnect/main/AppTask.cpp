@@ -203,6 +203,11 @@ CHIP_ERROR AppTask::Init()
     GetDFUOverSMP().ConfirmNewImage();
 #endif
 
+#ifdef CONFIG_CHIP_OTA_REQUESTOR
+    /* OTA image confirmation must be done before the factory data init. */
+    OtaConfirmNewImage();
+#endif
+
     // Initialize lighting device (PWM)
     uint8_t minLightLevel = kDefaultMinLevel;
     Clusters::LevelControl::Attributes::MinLevel::Get(kLightEndpointId, &minLightLevel);
@@ -216,15 +221,6 @@ CHIP_ERROR AppTask::Init()
         return chip::System::MapErrorZephyr(ret);
     }
     mPWMDevice.SetCallbacks(ActionInitiated, ActionCompleted);
-
-#ifdef CONFIG_CHIP_OTA_REQUESTOR
-    /* OTA image confirmation must be done before the factory data init. */
-    err = OtaConfirmNewImage();
-    if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
-#endif
 
     // Initialize CHIP server
 #if CONFIG_CHIP_FACTORY_DATA
