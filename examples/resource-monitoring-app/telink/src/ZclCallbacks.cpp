@@ -54,7 +54,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         ActivatedCarbonFilterMonitoring::DegradationDirectionEnum CarbonFilterState = *(reinterpret_cast<ActivatedCarbonFilterMonitoring::DegradationDirectionEnum *>(value));
         ChipLogProgress(Zcl, "Activated Carbon Filter cluster: " ChipLogFormatMEI " state %d", ChipLogValueMEI(clusterId),
                         to_underlying(CarbonFilterState));
-    }    
+    }
 }
 
 /** @brief Hepa Filter Monitoring Cluster Init
