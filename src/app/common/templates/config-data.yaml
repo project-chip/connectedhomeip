@@ -64,6 +64,7 @@ ClustersWithShutdownFunctions:
     - Door Lock
     - Level Control
     - Color Control
+    - SampleMei
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock
