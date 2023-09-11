@@ -22,7 +22,6 @@
 #include <filter-delegates.h>
 #include <relative-humidity-sensor-manager.h>
 #include <temperature-sensor-manager.h>
-#include <thermostat-manager.h>
 
 #pragma once
 
@@ -53,13 +52,12 @@ public:
     AirPurifierManager & operator=(const AirPurifierManager &) = delete;
 
     static void InitInstance(EndpointId aEndpointId = 1, EndpointId aAirQualitySensorEndpointId = 2,
-                             EndpointId aTemperatureSensorEndpointId = 3, EndpointId aHumiditySensorEndpointId = 4,
-                             EndpointId aThermostatEndpointId = 5)
+                             EndpointId aTemperatureSensorEndpointId = 3, EndpointId aHumiditySensorEndpointId = 4)
     {
         if (mInstance == nullptr)
         {
             mInstance = new AirPurifierManager(aEndpointId, aAirQualitySensorEndpointId, aTemperatureSensorEndpointId,
-                                               aHumiditySensorEndpointId, aThermostatEndpointId);
+                                               aHumiditySensorEndpointId);
             mInstance->Init();
         }
     };
@@ -114,7 +112,6 @@ private:
     AirQualitySensorManager mAirQualitySensorManager;
     TemperatureSensorManager mTemperatureSensorManager;
     RelativeHumiditySensorManager mHumiditySensorManager;
-    ThermostatManager mThermostatManager;
 
     /**
      * @brief Construct a new Air Purifier Manager object - this class acts as a singleton device manager for the air purifier
@@ -124,7 +121,7 @@ private:
      * @param[in] aHumiditySensorEndpointId    Endpoint that the humidity sensor is on
      */
     AirPurifierManager(EndpointId aEndpointId, EndpointId aAirQualitySensorEndpointId, EndpointId aTemperatureSensorEndpointId,
-                       EndpointId aHumiditySensorEndpointId, EndpointId aThermostatEndpointId) :
+                       EndpointId aHumiditySensorEndpointId) :
         FanControl::Delegate(aEndpointId),
         mEndpointId(aEndpointId),
         activatedCarbonFilterInstance(&activatedCarbonFilterDelegate, mEndpointId, ActivatedCarbonFilterMonitoring::Id,
@@ -134,7 +131,7 @@ private:
                            static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
                            ResourceMonitoring::DegradationDirectionEnum::kDown, true),
         mAirQualitySensorManager(aAirQualitySensorEndpointId), mTemperatureSensorManager(aTemperatureSensorEndpointId),
-        mHumiditySensorManager(aHumiditySensorEndpointId), mThermostatManager(aThermostatEndpointId){};
+        mHumiditySensorManager(aHumiditySensorEndpointId){};
 
     /**
      * @brief Handle attribute changes for the Fan Control Cluster
@@ -147,10 +144,6 @@ private:
     void PercentSettingWriteCallback(uint8_t aNewPercentSetting);
     void SpeedSettingWriteCallback(uint8_t aNewSpeedSetting);
     void FanModeWriteCallback(FanControl::FanModeEnum aNewFanMode);
-
-    void HandleThermostatAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
-    void ThermostatHeatingSetpointWriteCallback(int16_t aNewHeatingSetpoint);
-    void ThermostatSystemModeWriteCallback(uint8_t aNewSystemMode);
 };
 
 } // namespace Clusters

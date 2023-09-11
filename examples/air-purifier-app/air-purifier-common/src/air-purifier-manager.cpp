@@ -33,7 +33,6 @@ void AirPurifierManager::Init()
     mAirQualitySensorManager.Init();
     mTemperatureSensorManager.Init();
     mHumiditySensorManager.Init();
-    mThermostatManager.Init();
 
     DataModel::Nullable<Percent> percentSetting;
     EmberAfStatus status = FanControl::Attributes::PercentSetting::Get(mEndpointId, percentSetting);
@@ -65,7 +64,6 @@ void AirPurifierManager::Init()
 
     // Set up some sane initial values
     mTemperatureSensorManager.OnTemperatureChangeHandler(2000);
-    mThermostatManager.OnLocalTemperatureChangeCallback(2000);
     mHumiditySensorManager.OnHumidityChangeHandler(5000);
 }
 
@@ -76,11 +74,6 @@ void AirPurifierManager::PostAttributeChangeCallback(EndpointId endpoint, Cluste
     {
     case FanControl::Id: {
         HandleFanControlAttributeChange(attributeId, type, size, value);
-        break;
-    }
-
-    case Thermostat::Id: {
-        HandleThermostatAttributeChange(attributeId, type, size, value);
         break;
     }
 
@@ -287,31 +280,4 @@ void AirPurifierManager::FanModeWriteCallback(FanControl::FanModeEnum aNewFanMod
         break;
     }
     }
-}
-
-void AirPurifierManager::HandleThermostatAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
-{
-    switch (attributeId)
-    {
-    case Thermostat::Attributes::OccupiedHeatingSetpoint::Id: {
-        int16_t heatingSetpoint = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
-        ThermostatHeatingSetpointWriteCallback(heatingSetpoint);
-        break;
-    }
-    case Thermostat::Attributes::SystemMode::Id: {
-        uint8_t systemMode = static_cast<uint8_t>(*value);
-        ThermostatSystemModeWriteCallback(systemMode);
-        break;
-    }
-    }
-}
-
-void AirPurifierManager::ThermostatHeatingSetpointWriteCallback(int16_t aNewHeatingSetpoint)
-{
-    mThermostatManager.HeatingSetpointWriteCallback(aNewHeatingSetpoint);
-}
-
-void AirPurifierManager::ThermostatSystemModeWriteCallback(uint8_t aNewSystemMode)
-{
-    mThermostatManager.SystemModeWriteCallback(aNewSystemMode);
 }
