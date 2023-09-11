@@ -312,7 +312,7 @@ combination with JLinkRTTClient as follows:
     ```
     chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
 
-    chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [<chip-tool-node-id>], "targets": null }{"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": null }]' <lighting-node-id> 0
+    chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [<chip-tool-node-id>], "targets": null },{"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": null }]' <lighting-node-id> 0
 
     chip-tool binding write binding '[{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster":6}]' 1 1
     ```
