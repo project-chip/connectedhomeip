@@ -52,12 +52,12 @@ public:
     /**
      * Handles the RvcRunMode command requesting a mode change.
      */
-    void HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response);
+    void HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::ChangeToModeResponse::Type & response);
 
     /**
      * Handles the RvcCleanMode command requesting a mode change.
      */
-    void HandleRvcCleanChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response);
+    void HandleRvcCleanChangeToMode(uint8_t newMode, ModeBase::Commands::ChangeToModeResponse::Type & response);
 
     /**
      * Handles the RvcOperationalState pause command.

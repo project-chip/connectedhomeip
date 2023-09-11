@@ -9,11 +9,11 @@ void RvcDevice::Init()
     mOperationalStateInstance.Init();
 }
 
-void RvcDevice::HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
+void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
     uint8_t currentMode = mRunModeInstance.GetCurrentMode();
 
-    switch (NewMode)
+    switch (newMode)
     {
     case RvcRunMode::ModeMapping: {
         // change to mapping only allowed from the Idle state.
@@ -24,17 +24,17 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::Ch
             return;
         }
 
-        mRunModeInstance.UpdateCurrentMode(NewMode);
+        mRunModeInstance.UpdateCurrentMode(newMode);
         mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
         break;
     }
     case RvcRunMode::ModeCleaning: {
-        mRunModeInstance.UpdateCurrentMode(NewMode);
+        mRunModeInstance.UpdateCurrentMode(newMode);
         mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
     }
     break;
     case RvcRunMode::ModeIdle: {
-        mRunModeInstance.UpdateCurrentMode(NewMode);
+        mRunModeInstance.UpdateCurrentMode(newMode);
         mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
     }
     }
@@ -42,7 +42,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::Ch
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
-void RvcDevice::HandleRvcCleanChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
+void RvcDevice::HandleRvcCleanChangeToMode(uint8_t newMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
     uint8_t rvcRunCurrentMode = mRunModeInstance.GetCurrentMode();
 
