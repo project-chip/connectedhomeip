@@ -41,7 +41,7 @@ tests:
       command: "readAttribute"
       attribute: "NumberOfHolidaySchedulesSupported"
       response:
-          saveAs: NumberOfHolidaySchedulesSupported
+          saveAs: NumberOfHolidaySchedulesSupportedValue
           constraints:
               minValue: 0
               maxValue: 255
