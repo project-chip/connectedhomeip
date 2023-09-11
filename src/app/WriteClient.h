@@ -46,10 +46,10 @@ namespace app {
 class InteractionModelEngine;
 
 /**
- *  @brief The read client represents the initiator side of a Write Interaction, and is responsible
+ *  @brief The write client represents the initiator side of a Write Interaction, and is responsible
  *  for generating one Write Request for a particular set of attributes, and handling the Write response.
- *  Consumer can allocate one write client, then call PrepareAttribute, insert attribute value, followed by FinishAttribute for
- * every attribute it wants to insert in write request, then call SendWriteRequest
+ *  Consumer can allocate one write client, then call PrepareAttribute, insert attribute value, followed
+ *  by FinishAttribute for every attribute it wants to insert in write request, then call SendWriteRequest
  *
  *  Note: When writing lists, you may receive multiple write status responses for a single list.
  *  Please see ChunkedWriteCallback.h for a high level API which will merge status codes for
