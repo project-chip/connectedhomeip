@@ -1,10 +1,8 @@
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/air-quality-server/air-quality-server.h>
-#include <app/clusters/concentration-measurement-server/concentration-measurement-server.h>
-
 #include <relative-humidity-sensor-manager.h>
 #include <temperature-sensor-manager.h>
+
+#include <app/clusters/air-quality-server/air-quality-server.h>
+#include <app/clusters/concentration-measurement-server/concentration-measurement-server.h>
 
 #pragma once
 

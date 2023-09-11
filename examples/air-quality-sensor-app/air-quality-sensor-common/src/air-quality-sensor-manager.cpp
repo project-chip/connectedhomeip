@@ -137,7 +137,7 @@ void AirQualitySensorManager::Init()
 void AirQualitySensorManager::OnAirQualityChangeHandler(AirQualityEnum newValue)
 {
     mAirQualityInstance.UpdateAirQuality(static_cast<AirQualityEnum>(newValue));
-    ChipLogDetail(NotSpecified, "Updated AirQuality value: %huu", newValue);
+    ChipLogDetail(NotSpecified, "Updated AirQuality value: %huu", (uint8_t) newValue);
 }
 
 void AirQualitySensorManager::OnCarbonDioxideMeasurementChangeHandler(float newValue)

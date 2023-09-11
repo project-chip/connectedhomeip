@@ -46,12 +46,14 @@ ti_sysconfig("sysconfig") {
 }
 
 source_set("air_quality_sensor_app_sdk") {
+
   defines = []
 
   configs -= [ "${build_root}/config/compiler:std_default" ]
   configs += [ ":sdk_posix_config" ]
 
   sources = [
+    "${project_dir}/main/AirQualitySensorAppAttrUpdateDelegate.cpp",
     "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/include/air-quality-sensor-manager.h",
     "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/src/air-quality-sensor-manager.cpp",
     "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/include/relative-humidity-sensor-manager.h",
@@ -72,6 +74,7 @@ source_set("air_quality_sensor_app_sdk") {
     "${project_dir}/main/ifmod/",
     "${chip_root}/src/platform/cc32xx",
     "${chip_root}/examples/platform/cc32xx",
+    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/include",
   ]
 
   deps = [
@@ -80,6 +83,7 @@ source_set("air_quality_sensor_app_sdk") {
     "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/third_party/jsoncpp",
   ]
 }
 
@@ -94,7 +98,6 @@ ti_simplelink_executable("air_quality_sensor_app") {
  #   "${project_dir}/main/CXXExceptionStubs.cpp",
     "${project_dir}/main/DeviceCallbacks.cpp",
     "${project_dir}/main/UartHelper.c",
-    "${project_dir}/main/AirQualitySensorAppAttrUpdateDelegate.cpp"
   ]
 
   deps = [
@@ -102,7 +105,6 @@ ti_simplelink_executable("air_quality_sensor_app") {
     ":sdk",
     ":sysconfig",
     "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common",
-    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common:air-quality-sensor-attr-update-handler",    
     "${chip_root}/examples/platform/cc32xx:cc32xx-attestation-credentials",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
