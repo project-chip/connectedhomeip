@@ -660,7 +660,7 @@
 #endif
 
 #if defined(ZCL_USING_SAMPLE_MEI_CLUSTER_SERVER) || defined(ZCL_USING_SAMPLE_MEI_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_SAMPLE_MEI_CLUSTER { chip::app::Clusters::SampleMei::Id, "Sample MEI" },
+#define CHIP_PRINTCLUSTER_SAMPLE_MEI_CLUSTER { chip::app::Clusters::SampleMei::Id, "Sample Mei" },
 #else
 #define CHIP_PRINTCLUSTER_SAMPLE_MEI_CLUSTER
 #endif

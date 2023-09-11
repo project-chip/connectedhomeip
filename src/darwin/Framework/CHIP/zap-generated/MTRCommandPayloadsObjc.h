@@ -9968,8 +9968,8 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEventReq
     : MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams
 @end
 
-MTR_NEWLY_AVAILABLE
-@interface MTRSampleMEIClusterPingParams : NSObject <NSCopying>
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRSampleMeiClusterPingParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -9996,13 +9996,13 @@ MTR_NEWLY_AVAILABLE
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-MTR_NEWLY_AVAILABLE
-@interface MTRSampleMEIClusterAddArgumentsResponseParams : NSObject <NSCopying>
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRSampleMeiClusterAddArgumentsResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull returnValue MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull returnValue MTR_PROVISIONALLY_AVAILABLE;
 
 /**
- * Initialize an MTRSampleMEIClusterAddArgumentsResponseParams with a response-value dictionary
+ * Initialize an MTRSampleMeiClusterAddArgumentsResponseParams with a response-value dictionary
  * of the sort that MTRDeviceResponseHandler would receive.
  *
  * Will return nil and hand out an error if the response-value dictionary is not
@@ -10012,15 +10012,15 @@ MTR_NEWLY_AVAILABLE
  * schema for this command.
  */
 - (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+                                         error:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 @end
 
-MTR_NEWLY_AVAILABLE
-@interface MTRSampleMEIClusterAddArgumentsParams : NSObject <NSCopying>
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRSampleMeiClusterAddArgumentsParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull arg1 MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg2 MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull arg2 MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *

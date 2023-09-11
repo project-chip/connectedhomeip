@@ -19,7 +19,7 @@ limitations under the License.
 
   <cluster>
     <domain>General</domain>
-    <name>Sample MEI</name>
+    <name>Sample Mei</name>
     <!-- The MSB 16 bits of <code> are the VendorID. Replace this with your
          VendorID. 0xFFF1 is a Test VendorID.
 

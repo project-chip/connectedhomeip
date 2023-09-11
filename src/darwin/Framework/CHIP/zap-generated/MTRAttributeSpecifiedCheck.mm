@@ -5453,7 +5453,7 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL AttributeIsSpecifiedInSampleMEICluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInSampleMeiCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::SampleMei;
     switch (aAttributeId) {
@@ -5767,7 +5767,7 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
         return AttributeIsSpecifiedInUnitTestingCluster(aAttributeId);
     }
     case Clusters::SampleMei::Id: {
-        return AttributeIsSpecifiedInSampleMEICluster(aAttributeId);
+        return AttributeIsSpecifiedInSampleMeiCluster(aAttributeId);
     }
     default: {
         return NO;

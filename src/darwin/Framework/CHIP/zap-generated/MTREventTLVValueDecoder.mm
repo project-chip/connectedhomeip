@@ -3326,7 +3326,7 @@ static id _Nullable DecodeEventPayloadForUnitTestingCluster(EventId aEventId, TL
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForSampleMEICluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForSampleMeiCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::SampleMei;
     switch (aEventId) {
@@ -3622,7 +3622,7 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
         return DecodeEventPayloadForUnitTestingCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::SampleMei::Id: {
-        return DecodeEventPayloadForSampleMEICluster(aPath.mEventId, aReader, aError);
+        return DecodeEventPayloadForSampleMeiCluster(aPath.mEventId, aReader, aError);
     }
     default: {
         break;

@@ -157,7 +157,7 @@ typedef void (*UnitTestingClusterTestEmitTestEventResponseCallbackType)(
     void *, const chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventResponse::DecodableType &);
 typedef void (*UnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackType)(
     void *, const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType &);
-typedef void (*SampleMEIClusterAddArgumentsResponseCallbackType)(
+typedef void (*SampleMeiClusterAddArgumentsResponseCallbackType)(
     void *, const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType &);
 
 typedef void (*IdentifyClusterEffectIdentifierEnumAttributeCallback)(void *, chip::app::Clusters::Identify::EffectIdentifierEnum);
@@ -1847,13 +1847,13 @@ typedef void (*UnitTestingEventListListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*UnitTestingAttributeListListAttributeCallback)(void * context,
                                                               const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*SampleMEIGeneratedCommandListListAttributeCallback)(
+typedef void (*SampleMeiGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*SampleMEIAcceptedCommandListListAttributeCallback)(
+typedef void (*SampleMeiAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*SampleMEIEventListListAttributeCallback)(void * context,
+typedef void (*SampleMeiEventListListAttributeCallback)(void * context,
                                                         const chip::app::DataModel::DecodableList<chip::EventId> & data);
-typedef void (*SampleMEIAttributeListListAttributeCallback)(void * context,
+typedef void (*SampleMeiAttributeListListAttributeCallback)(void * context,
                                                             const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 
 class MTRDefaultSuccessCallbackBridge : public MTRCallbackBridge<DefaultSuccessCallback>
@@ -18801,127 +18801,131 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRSampleMEIGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<SampleMEIGeneratedCommandListListAttributeCallback>
+class MTR_PROVISIONALLY_AVAILABLE MTRSampleMeiGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<SampleMeiGeneratedCommandListListAttributeCallback>
 {
 public:
-    MTRSampleMEIGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<SampleMEIGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRSampleMeiGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SampleMeiGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRSampleMEIGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRSampleMeiGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                 MTRActionBlock action) :
-        MTRCallbackBridge<SampleMEIGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<SampleMeiGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class MTRSampleMEIGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRSampleMEIGeneratedCommandListListAttributeCallbackBridge
+class MTR_PROVISIONALLY_AVAILABLE MTRSampleMeiGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRSampleMeiGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRSampleMEIGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRSampleMeiGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                             MTRActionBlock action,
                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRSampleMEIGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        MTRSampleMeiGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRSampleMEIGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRSampleMEIGeneratedCommandListListAttributeCallbackBridge::OnDone;
+    using MTRSampleMeiGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSampleMeiGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRSampleMEIAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<SampleMEIAcceptedCommandListListAttributeCallback>
+class MTR_PROVISIONALLY_AVAILABLE MTRSampleMeiAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<SampleMeiAcceptedCommandListListAttributeCallback>
 {
 public:
-    MTRSampleMEIAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<SampleMEIAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRSampleMeiAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SampleMeiAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRSampleMEIAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRSampleMeiAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                MTRActionBlock action) :
-        MTRCallbackBridge<SampleMEIAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<SampleMeiAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class MTRSampleMEIAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRSampleMEIAcceptedCommandListListAttributeCallbackBridge
+class MTR_PROVISIONALLY_AVAILABLE MTRSampleMeiAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRSampleMeiAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRSampleMEIAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRSampleMeiAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                            MTRActionBlock action,
                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRSampleMEIAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        MTRSampleMeiAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRSampleMEIAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRSampleMEIAcceptedCommandListListAttributeCallbackBridge::OnDone;
+    using MTRSampleMeiAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSampleMeiAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRSampleMEIEventListListAttributeCallbackBridge : public MTRCallbackBridge<SampleMEIEventListListAttributeCallback>
+class MTR_PROVISIONALLY_AVAILABLE MTRSampleMeiEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<SampleMeiEventListListAttributeCallback>
 {
 public:
-    MTRSampleMEIEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<SampleMEIEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRSampleMeiEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SampleMeiEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRSampleMEIEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<SampleMEIEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRSampleMeiEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<SampleMeiEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
 };
 
-class MTRSampleMEIEventListListAttributeCallbackSubscriptionBridge : public MTRSampleMEIEventListListAttributeCallbackBridge
+class MTR_PROVISIONALLY_AVAILABLE MTRSampleMeiEventListListAttributeCallbackSubscriptionBridge
+    : public MTRSampleMeiEventListListAttributeCallbackBridge
 {
 public:
-    MTRSampleMEIEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRSampleMeiEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                  MTRActionBlock action,
                                                                  MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRSampleMEIEventListListAttributeCallbackBridge(queue, handler, action),
+        MTRSampleMeiEventListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRSampleMEIEventListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRSampleMEIEventListListAttributeCallbackBridge::OnDone;
+    using MTRSampleMeiEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSampleMeiEventListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRSampleMEIAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<SampleMEIAttributeListListAttributeCallback>
+class MTR_PROVISIONALLY_AVAILABLE MTRSampleMeiAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<SampleMeiAttributeListListAttributeCallback>
 {
 public:
-    MTRSampleMEIAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<SampleMEIAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRSampleMeiAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SampleMeiAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRSampleMEIAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<SampleMEIAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRSampleMeiAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<SampleMeiAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
 };
 
-class MTRSampleMEIAttributeListListAttributeCallbackSubscriptionBridge : public MTRSampleMEIAttributeListListAttributeCallbackBridge
+class MTR_PROVISIONALLY_AVAILABLE MTRSampleMeiAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRSampleMeiAttributeListListAttributeCallbackBridge
 {
 public:
-    MTRSampleMEIAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRSampleMeiAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                      MTRActionBlock action,
                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRSampleMEIAttributeListListAttributeCallbackBridge(queue, handler, action),
+        MTRSampleMeiAttributeListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRSampleMEIAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRSampleMEIAttributeListListAttributeCallbackBridge::OnDone;
+    using MTRSampleMeiAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSampleMeiAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -19855,15 +19859,15 @@ public:
                 const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & data);
 };
 
-class MTRSampleMEIClusterAddArgumentsResponseCallbackBridge
-    : public MTRCallbackBridge<SampleMEIClusterAddArgumentsResponseCallbackType>
+class MTR_PROVISIONALLY_AVAILABLE MTRSampleMeiClusterAddArgumentsResponseCallbackBridge
+    : public MTRCallbackBridge<SampleMeiClusterAddArgumentsResponseCallbackType>
 {
 public:
-    MTRSampleMEIClusterAddArgumentsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<SampleMEIClusterAddArgumentsResponseCallbackType>(queue, handler, OnSuccessFn){};
+    MTRSampleMeiClusterAddArgumentsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SampleMeiClusterAddArgumentsResponseCallbackType>(queue, handler, OnSuccessFn){};
 
-    MTRSampleMEIClusterAddArgumentsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<SampleMEIClusterAddArgumentsResponseCallbackType>(queue, handler, action, OnSuccessFn){};
+    MTRSampleMeiClusterAddArgumentsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<SampleMeiClusterAddArgumentsResponseCallbackType>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType & data);

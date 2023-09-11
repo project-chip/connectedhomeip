@@ -31347,7 +31347,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 @end
 
-@implementation MTRClusterSampleMEI
+@implementation MTRClusterSampleMei
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
 {
@@ -31367,21 +31367,21 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 {
     [self pingWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
-- (void)pingWithParams:(MTRSampleMEIClusterPingParams * _Nullable)params
+- (void)pingWithParams:(MTRSampleMeiClusterPingParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
     NSString * logPrefix =
         [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint,
-                  (unsigned int) MTRClusterIDTypeSampleMEIID, (unsigned int) MTRCommandIDTypeClusterSampleMEICommandPingID];
+                  (unsigned int) MTRClusterIDTypeSampleMeiID, (unsigned int) MTRCommandIDTypeClusterSampleMeiCommandPingID];
     // Make a copy of params before we go async.
     params = [params copy];
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterSampleMEI alloc] initWithDevice:baseDevice
+        auto * cluster = [[MTRBaseClusterSampleMei alloc] initWithDevice:baseDevice
                                                               endpointID:@(self.endpoint)
                                                                    queue:self.device.queue];
         [cluster pingWithParams:params
@@ -31407,27 +31407,27 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     }
 }
 
-- (void)addArgumentsWithParams:(MTRSampleMEIClusterAddArgumentsParams *)params
+- (void)addArgumentsWithParams:(MTRSampleMeiClusterAddArgumentsParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                    completion:(void (^)(MTRSampleMEIClusterAddArgumentsResponseParams * _Nullable data,
+                    completion:(void (^)(MTRSampleMeiClusterAddArgumentsResponseParams * _Nullable data,
                                    NSError * _Nullable error))completion
 {
     NSString * logPrefix =
         [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint,
-                  (unsigned int) MTRClusterIDTypeSampleMEIID, (unsigned int) MTRCommandIDTypeClusterSampleMEICommandAddArgumentsID];
+                  (unsigned int) MTRClusterIDTypeSampleMeiID, (unsigned int) MTRCommandIDTypeClusterSampleMeiCommandAddArgumentsID];
     // Make a copy of params before we go async.
     params = [params copy];
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterSampleMEI alloc] initWithDevice:baseDevice
+        auto * cluster = [[MTRBaseClusterSampleMei alloc] initWithDevice:baseDevice
                                                               endpointID:@(self.endpoint)
                                                                    queue:self.device.queue];
         [cluster
             addArgumentsWithParams:params
-                        completion:^(MTRSampleMEIClusterAddArgumentsResponseParams * _Nullable value, NSError * _Nullable error) {
+                        completion:^(MTRSampleMeiClusterAddArgumentsResponseParams * _Nullable value, NSError * _Nullable error) {
                             MTRClustersLogCompletion(logPrefix, value, error);
                             dispatch_async(self.callbackQueue, ^{
                                 completion(value, error);
@@ -31452,8 +31452,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 - (NSDictionary<NSString *, id> *)readAttributeFlipFlopWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint)
-                                          clusterID:@(MTRClusterIDTypeSampleMEIID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSampleMEIAttributeFlipFlopID)
+                                          clusterID:@(MTRClusterIDTypeSampleMeiID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSampleMeiAttributeFlipFlopID)
                                              params:params];
 }
 
@@ -31469,8 +31469,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(self.endpoint)
-                                    clusterID:@(MTRClusterIDTypeSampleMEIID)
-                                  attributeID:@(MTRAttributeIDTypeClusterSampleMEIAttributeFlipFlopID)
+                                    clusterID:@(MTRClusterIDTypeSampleMeiID)
+                                  attributeID:@(MTRAttributeIDTypeClusterSampleMeiAttributeFlipFlopID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -31479,48 +31479,48 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint)
-                                          clusterID:@(MTRClusterIDTypeSampleMEIID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSampleMEIAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeSampleMeiID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSampleMeiAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint)
-                                          clusterID:@(MTRClusterIDTypeSampleMEIID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSampleMEIAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeSampleMeiID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSampleMeiAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint)
-                                          clusterID:@(MTRClusterIDTypeSampleMEIID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSampleMEIAttributeEventListID)
+                                          clusterID:@(MTRClusterIDTypeSampleMeiID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSampleMeiAttributeEventListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint)
-                                          clusterID:@(MTRClusterIDTypeSampleMEIID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSampleMEIAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeSampleMeiID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSampleMeiAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint)
-                                          clusterID:@(MTRClusterIDTypeSampleMEIID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSampleMEIAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeSampleMeiID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSampleMeiAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint)
-                                          clusterID:@(MTRClusterIDTypeSampleMEIID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSampleMEIAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeSampleMeiID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSampleMeiAttributeClusterRevisionID)
                                              params:params];
 }
 

@@ -482,7 +482,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRSampleMEIClusterAddArgumentsResponseParams (InternalMethods)
+@interface MTRSampleMeiClusterAddArgumentsResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
     (const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType &)decodableStruct;
