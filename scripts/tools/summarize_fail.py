@@ -110,7 +110,7 @@ def main():
             logging.error(f"Recent runs info for {workflow} was not collected.")
     fail_rate = pd.DataFrame.from_dict(fail_rate, 'index', columns=["Fail Rate"])
     print("Recent Fail Rate of Each Workflow:")
-    print(fail_rate.to_string(index=False))
+    print(fail_rate.to_string())
     fail_rate.to_csv("workflow_fail_rate.csv")
 
 if __name__ == "__main__":
