@@ -198,7 +198,7 @@ jobs:
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink Shell App
+            - name: Build example Telink (B91) Shell App
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-shell' build"
