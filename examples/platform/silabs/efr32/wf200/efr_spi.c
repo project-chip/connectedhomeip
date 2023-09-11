@@ -41,6 +41,7 @@
 
 #include "sl_wfx_board.h"
 #include "sl_wfx_host.h"
+#include "sl_wfx_host_api.h"
 #include "sl_wfx_task.h"
 #include "wfx_host_events.h"
 
@@ -48,23 +49,21 @@
 #include "sl_power_manager.h"
 #endif
 
-#if defined(EFR32MG12)
 #include "sl_spidrv_exp_config.h"
-extern SPIDRV_Handle_t sl_spidrv_exp_handle;
-#define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
-#elif defined(EFR32MG24)
-#include "sl_spidrv_eusart_exp_config.h"
+#include "sl_spidrv_instances.h"
 #include "spi_multiplex.h"
+#if (defined(EFR32MG12) || defined(EFR32MG24))
+#define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
 #else
 #error "Unknown platform"
 #endif
 
 #define USART SL_WFX_HOST_PINOUT_SPI_PERIPHERAL
 
-#if defined(EFR32MG24)
+#if SL_SPICTRL_MUX
 StaticSemaphore_t spi_sem_peripheral;
-SemaphoreHandle_t spi_sem_sync_hdl;
-#endif /* EFR32MG24 */
+static SemaphoreHandle_t spi_sem_sync_hdl;
+#endif // SL_SPICTRL_MUX
 
 StaticSemaphore_t xEfrSpiSemaBuffer;
 static SemaphoreHandle_t spi_sem;
@@ -113,23 +112,23 @@ sl_status_t sl_wfx_host_init_bus(void)
     spi_sem = xSemaphoreCreateBinaryStatic(&xEfrSpiSemaBuffer);
     xSemaphoreGive(spi_sem);
 
-#if defined(EFR32MG24)
+#if SL_SPICTRL_MUX
     if (spi_sem_sync_hdl == NULL)
     {
         spi_sem_sync_hdl = xSemaphoreCreateBinaryStatic(&spi_sem_peripheral);
     }
     configASSERT(spi_sem_sync_hdl);
     xSemaphoreGive(spi_sem_sync_hdl);
-#endif /* EFR32MG24 */
+#endif /* SL_SPICTRL_MUX */
     return SL_STATUS_OK;
 }
 
 sl_status_t sl_wfx_host_deinit_bus(void)
 {
     vSemaphoreDelete(spi_sem);
-#if defined(EFR32MG24)
+#if SL_SPICTRL_MUX
     vSemaphoreDelete(spi_sem_sync_hdl);
-#endif /* EFR32MG24 */
+#endif /* SL_SPICTRL_MUX */
     // Stop DMAs.
     DMADRV_StopTransfer(rx_dma_channel);
     DMADRV_StopTransfer(tx_dma_channel);
@@ -142,10 +141,10 @@ sl_status_t sl_wfx_host_deinit_bus(void)
 
 sl_status_t sl_wfx_host_spi_cs_assert()
 {
-#if defined(EFR32MG24)
+#if SL_SPICTRL_MUX
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
     SPIDRV_SetBaudrate(SL_SPIDRV_EXP_BITRATE_MULTIPLEXED);
-#endif /* EFR32MG24 */
+#endif /* SL_SPICTRL_MUX */
     GPIO_PinOutClear(SL_SPIDRV_EXP_CS_PORT, SL_SPIDRV_EXP_CS_PIN);
     return SL_STATUS_OK;
 }
@@ -153,9 +152,9 @@ sl_status_t sl_wfx_host_spi_cs_assert()
 sl_status_t sl_wfx_host_spi_cs_deassert()
 {
     GPIO_PinOutSet(SL_SPIDRV_EXP_CS_PORT, SL_SPIDRV_EXP_CS_PIN);
-#if defined(EFR32MG24)
+#if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);
-#endif /* EFR32MG24 */
+#endif /* SL_SPICTRL_MUX */
     return SL_STATUS_OK;
 }
 
@@ -370,9 +369,7 @@ void sl_wfx_host_gpio_init(void)
     NVIC_SetPriority(GPIO_EVEN_IRQn, 5);
     NVIC_SetPriority(GPIO_ODD_IRQn, 5);
 }
-
-#if defined(EFR32MG24)
-
+#if SL_SPICTRL_MUX
 void SPIDRV_SetBaudrate(uint32_t baudrate)
 {
     if (USART_BaudrateGet(MY_USART) == baudrate)
@@ -391,7 +388,8 @@ void SPIDRV_SetBaudrate(uint32_t baudrate)
 
     USART_InitSync(MY_USART, &usartInit);
 }
-#if defined(CONFIG_USE_EXTERNAL_FLASH)
+#endif // SL_SPICTRL_MUX
+#if SL_MUX25CTRL_MUX
 sl_status_t sl_wfx_host_spiflash_cs_assert(void)
 {
     GPIO_PinOutClear(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
@@ -403,18 +401,21 @@ sl_status_t sl_wfx_host_spiflash_cs_deassert(void)
     GPIO_PinOutSet(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
     return SL_STATUS_OK;
 }
-#endif // CONFIG_USE_EXTERNAL_FLASH
+#endif // SL_MUX25CTRL_MUX
 
+#if SL_BTLCTRL_MUX
 sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void)
 {
+#if SL_SPICTRL_MUX
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
+#endif // SL_SPICTRL_MUX
     /*
      * Assert CS pin for EXT SPI Flash
      */
     SPIDRV_SetBaudrate(SL_SPIDRV_MX25_FLASH_BITRATE);
-#if defined(CONFIG_USE_EXTERNAL_FLASH)
+#if SL_MUX25CTRL_MUX
     sl_wfx_host_spiflash_cs_assert();
-#endif // CONFIG_USE_EXTERNAL_FLASH
+#endif // SL_MUX25CTRL_MUX
     return SL_STATUS_OK;
 }
 
@@ -423,17 +424,22 @@ sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
     /*
      * De-Assert CS pin for EXT SPI Flash
      */
-#if defined(CONFIG_USE_EXTERNAL_FLASH)
+#if SL_MUX25CTRL_MUX
     sl_wfx_host_spiflash_cs_deassert();
-#endif // CONFIG_USE_EXTERNAL_FLASH
+#endif // SL_MUX25CTRL_MUX
+#if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);
+#endif // SL_SPICTRL_MUX
     return SL_STATUS_OK;
 }
+#endif // SL_BTLCTRL_MUX
 
-#if defined(DISPLAY_ENABLED)
+#if SL_LCDCTRL_MUX
 sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
 {
+#if SL_SPICTRL_MUX
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
+#endif // SL_SPICTRL_MUX
     SPIDRV_SetBaudrate(SL_SPIDRV_LCD_BITRATE);
     /*LCD CS is handled as part of LCD gsdk*/
     return SL_STATUS_OK;
@@ -441,37 +447,50 @@ sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
 
 sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
 {
+#if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);
+#endif // SL_SPICTRL_MUX
     return SL_STATUS_OK;
 }
-#endif // DISPLAY_ENABLED
+#endif // SL_LCDCTRL_MUX
 
+#if SL_UARTCTRL_MUX
 sl_status_t sl_wfx_host_pre_uart_transfer(void)
 {
+#if SL_SPICTRL_MUX
     if (spi_sem_sync_hdl == NULL)
     {
-        // UART is initialized before host SPI interface
-        // spi_sem_sync_hdl will not be initalized during execution
+#endif // SL_SPICTRL_MUX
+       // UART is initialized before host SPI interface
+       // spi_sem_sync_hdl will not be initalized during execution
         GPIO_PinModeSet(gpioPortA, 8, gpioModePushPull, 1);
+#if SL_SPICTRL_MUX
         return SL_STATUS_OK;
     }
+#endif // SL_SPICTRL_MUX
     sl_wfx_disable_irq();
     sl_wfx_host_disable_platform_interrupt();
+#if SL_SPICTRL_MUX
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
+#endif // SL_SPICTRL_MUX
     GPIO_PinModeSet(gpioPortA, 8, gpioModePushPull, 1);
     return SL_STATUS_OK;
 }
 
 sl_status_t sl_wfx_host_post_uart_transfer(void)
 {
+#if SL_SPICTRL_MUX
     if (spi_sem_sync_hdl == NULL)
     {
         return SL_STATUS_OK;
     }
+#endif // SL_SPICTRL_MUX
     GPIO_PinModeSet(gpioPortA, 8, gpioModeInputPull, 1);
+#if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);
+#endif // SL_SPICTRL_MUX
     sl_wfx_host_enable_platform_interrupt();
     sl_wfx_enable_irq();
     return SL_STATUS_OK;
 }
-#endif /* EFR32MG24 */
+#endif // SL_UARTCTRL_MUX

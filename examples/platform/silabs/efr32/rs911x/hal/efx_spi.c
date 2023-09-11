@@ -33,6 +33,7 @@
 #include "em_usart.h"
 #elif defined(EFR32MG24)
 #include "em_eusart.h"
+#include "sl_spidrv_eusart_exp_config.h"
 #endif
 #include "spidrv.h"
 
@@ -42,6 +43,7 @@
 #include "sl_device_init_clocks.h"
 #include "sl_memlcd.h"
 #include "sl_status.h"
+#include "spi_multiplex.h"
 
 #include "FreeRTOS.h"
 #include "event_groups.h"
@@ -78,10 +80,10 @@
 #define CONCAT(A, B) (A##B)
 #define SPI_CLOCK(N) CONCAT(cmuClock_USART, N)
 
-#if defined(EFR32MG24)
+#if SL_SPICTRL_MUX
 StaticSemaphore_t spi_sem_peripheral;
-SemaphoreHandle_t spi_sem_sync_hdl;
-#endif /* EFR32MG24 */
+static SemaphoreHandle_t spi_sem_sync_hdl;
+#endif // SL_SPICTRL_MUX
 
 StaticSemaphore_t xEfxSpiIntfSemaBuffer;
 static SemaphoreHandle_t spiTransferLock;
@@ -89,12 +91,11 @@ static TaskHandle_t spiInitiatorTaskHandle = NULL;
 
 static uint32_t dummy_buffer; /* Used for DMA - when results don't matter */
 
+#include "sl_spidrv_instances.h"
 #if defined(EFR32MG12)
-#include "sl_spidrv_exp_config.h"
-extern SPIDRV_Handle_t sl_spidrv_exp_handle;
 #define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
 #elif defined(EFR32MG24)
-#include "spi_multiplex.h"
+#define SL_SPIDRV_HANDLE sl_spidrv_eusart_exp_handle
 #else
 #error "Unknown platform"
 #endif
@@ -175,14 +176,14 @@ void rsi_hal_board_init(void)
     spiTransferLock = xSemaphoreCreateBinaryStatic(&xEfxSpiIntfSemaBuffer);
     xSemaphoreGive(spiTransferLock);
 
-#if defined(EFR32MG24)
+#if SL_SPICTRL_MUX
     if (spi_sem_sync_hdl == NULL)
     {
         spi_sem_sync_hdl = xSemaphoreCreateBinaryStatic(&spi_sem_peripheral);
     }
     configASSERT(spi_sem_sync_hdl);
     xSemaphoreGive(spi_sem_sync_hdl);
-#endif /* EFR32MG24 */
+#endif /* SL_SPICTRL_MUX */
 
     /* GPIO INIT of MG12 & MG24 : Reset, Wakeup, Interrupt */
     sl_wfx_host_gpio_init();
@@ -203,8 +204,7 @@ void sl_si91x_host_enable_high_speed_bus()
     // dummy function for wifi-sdk
 }
 
-#if defined(EFR32MG24)
-
+#if SL_SPICTRL_MUX
 void SPIDRV_SetBaudrate(uint32_t baudrate)
 {
     if (EUSART_BaudrateGet(MY_USART) == baudrate)
@@ -214,9 +214,11 @@ void SPIDRV_SetBaudrate(uint32_t baudrate)
     }
     EUSART_BaudrateSet(MY_USART, 0, baudrate);
 }
+#endif // SL_SPICTRL_MUX
 
 sl_status_t sl_wfx_host_spi_cs_assert(void)
 {
+#if SL_SPICTRL_MUX
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
 
     if (!spi_enabled) // Reduce sl_spidrv_init_instances
@@ -224,12 +226,16 @@ sl_status_t sl_wfx_host_spi_cs_assert(void)
         sl_spidrv_init_instances();
         spi_enabled = true;
     }
+#endif // SL_SPICTRL_MUX
+#if defined(EFR32MG24)
     GPIO_PinOutClear(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
+#endif // EFR32MG24
     return SL_STATUS_OK;
 }
 
 sl_status_t sl_wfx_host_spi_cs_deassert(void)
 {
+#if SL_SPICTRL_MUX
     if (spi_enabled)
     {
         if (ECODE_EMDRV_SPIDRV_OK != SPIDRV_DeInit(SL_SPIDRV_HANDLE))
@@ -239,13 +245,18 @@ sl_status_t sl_wfx_host_spi_cs_deassert(void)
         }
         spi_enabled = false;
     }
+#endif // SL_SPICTRL_MUX
+#if defined(EFR32MG24)
     GPIO_PinOutSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
     GPIO->EUSARTROUTE[SL_SPIDRV_EUSART_EXP_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
+#endif // EFR32MG24
+#if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);
+#endif // SL_SPICTRL_MUX
     return SL_STATUS_OK;
 }
 
-#if defined(CONFIG_USE_EXTERNAL_FLASH)
+#if SL_MUX25CTRL_MUX
 sl_status_t sl_wfx_host_spiflash_cs_assert(void)
 {
     GPIO_PinOutClear(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
@@ -257,9 +268,12 @@ sl_status_t sl_wfx_host_spiflash_cs_deassert(void)
     GPIO_PinOutSet(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
     return SL_STATUS_OK;
 }
-#endif // CONFIG_USE_EXTERNAL_FLASH
+#endif // SL_MUX25CTRL_MUX
+
+#if SL_BTLCTRL_MUX
 sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void)
 {
+#if SL_SPICTRL_MUX
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
     if (spi_enabled)
     {
@@ -270,17 +284,20 @@ sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void)
         }
         spi_enabled = false;
     }
+#endif // SL_SPICTRL_MUX
     // bootloader_init takes care of SPIDRV_Init()
     int32_t status = bootloader_init();
     if (status != BOOTLOADER_OK)
     {
         SILABS_LOG("bootloader_init error: %x", status);
+#if SL_SPICTRL_MUX
         xSemaphoreGive(spi_sem_sync_hdl);
+#endif // SL_SPICTRL_MUX
         return SL_STATUS_FAIL;
     }
-#if defined(CONFIG_USE_EXTERNAL_FLASH)
+#if SL_MUX25CTRL_MUX
     sl_wfx_host_spiflash_cs_assert();
-#endif // CONFIG_USE_EXTERNAL_FLASH
+#endif // SL_MUX25CTRL_MUX
     return SL_STATUS_OK;
 }
 
@@ -291,20 +308,26 @@ sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
     if (status != BOOTLOADER_OK)
     {
         SILABS_LOG("bootloader_deinit error: %x", status);
+#if SL_SPICTRL_MUX
         xSemaphoreGive(spi_sem_sync_hdl);
+#endif // SL_SPICTRL_MUX
         return SL_STATUS_FAIL;
     }
     GPIO->USARTROUTE[SL_MX25_FLASH_SHUTDOWN_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
-#if defined(CONFIG_USE_EXTERNAL_FLASH)
+#if SL_MUX25CTRL_MUX
     sl_wfx_host_spiflash_cs_deassert();
-#endif // CONFIG_USE_EXTERNAL_FLASH
+#endif // SL_MUX25CTRL_MUX
+#if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);
+#endif // SL_SPICTRL_MUX
     return SL_STATUS_OK;
 }
+#endif // SL_BTLCTRL_MUX
 
-#if defined(DISPLAY_ENABLED)
+#if SL_LCDCTRL_MUX
 sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
 {
+#if SL_SPICTRL_MUX
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
     if (spi_enabled)
     {
@@ -315,10 +338,13 @@ sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
         }
         spi_enabled = false;
     }
+#endif // SL_SPICTRL_MUX
     // sl_memlcd_refresh takes care of SPIDRV_Init()
     if (SL_STATUS_OK != sl_memlcd_refresh(sl_memlcd_get()))
     {
+#if SL_SPICTRL_MUX
         xSemaphoreGive(spi_sem_sync_hdl);
+#endif // SL_SPICTRL_MUX
         return SL_STATUS_FAIL;
     }
     return SL_STATUS_OK;
@@ -329,11 +355,12 @@ sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
     USART_Enable(SL_MEMLCD_SPI_PERIPHERAL, usartDisable);
     CMU_ClockEnable(SPI_CLOCK(SL_MEMLCD_SPI_PERIPHERAL_NO), false);
     GPIO->USARTROUTE[SL_MEMLCD_SPI_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
+#if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);
+#endif // SL_SPICTRL_MUX
     return SL_STATUS_OK;
 }
-#endif // DISPLAY_ENABLED
-#endif /* EFR32MG24 */
+#endif // SL_LCDCTRL_MUX
 
 /*****************************************************************************
  *@brief
@@ -369,9 +396,7 @@ static void spi_dmaTransfertComplete(SPIDRV_HandleData_t * pxHandle, Ecode_t tra
  **************************************************************************/
 int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint8_t mode)
 {
-#if defined(EFR32MG24)
     sl_wfx_host_spi_cs_assert();
-#endif /* EFR32MG24 */
     /*
         TODO: tx_buf and rx_buf needs to be replaced with a dummy buffer of length xlen to align with SDK of WiFi
     */
@@ -429,9 +454,7 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     }
 
     xSemaphoreGive(spiTransferLock);
-#if defined(EFR32MG24)
     sl_wfx_host_spi_cs_deassert();
-#endif /* EFR32MG24 */
     return rsiError;
 }
 
