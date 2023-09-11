@@ -1288,7 +1288,12 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(struct ble_gap_event * gapEvent)
             disconReason = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
             break;
         }
-        HandleConnectionError(gapEvent->disconnect.conn.conn_handle, disconReason);
+
+        ChipDeviceEvent connectionErrorEvent;
+        connectionErrorEvent.Type                           = DeviceEventType::kCHIPoBLEConnectionError;
+        connectionErrorEvent.CHIPoBLEConnectionError.ConId  = gapEvent->disconnect.conn.conn_handle;
+        connectionErrorEvent.CHIPoBLEConnectionError.Reason = disconReason;
+        ReturnErrorOnFailure(PlatformMgr().PostEvent(&connectionErrorEvent));
     }
 
     ChipDeviceEvent disconnectEvent;
