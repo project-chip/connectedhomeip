@@ -87,7 +87,6 @@ class Arguments(BaseArguments):
     def __init__(self):
         super().__init__()
         self.version = Arguments.VERSION
-        self.option = None
         self.conn = None
         self.generate = None
         self.stop = None
@@ -113,8 +112,8 @@ class Arguments(BaseArguments):
 
     def configure(self, parser):
         super().configure(parser)
-        parser.add_argument('-o', '--option', type=str, help='[string] Generic options.')
         parser.add_argument('-j', '--jlink', type=str, help='[string] J-Link connection.')
+        parser.add_argument('-l', '--pylink_lib', type=str, help='[string] Path to the PyLink library.')
         parser.add_argument('-g', '--generate', action='store_true', help='[boolean] Generate certificates.', default=None)
         parser.add_argument('-s', '--stop', action='store_true', help='[string] Generate JSON file and stop', default=None)
         parser.add_argument('-r', '--csr', action='store_true', help='[boolean] Generate Certificate Signing Request', default=None)
@@ -124,8 +123,8 @@ class Arguments(BaseArguments):
         parser.add_argument('-V',  '--vendor_name', type=str, help='[string] vendor name')
         parser.add_argument('-p',  '--product_id', type=parseInt, help='[int] Product ID')
         parser.add_argument('-P',  '--product_name', type=str, help='[string] product name')
-        parser.add_argument('-pl', '--product_label', type=str, help='[string] Provide the product label [optional]')
-        parser.add_argument('-pu', '--product_url', type=str, help='[string] Provide the product url [optional]')
+        parser.add_argument('-pl', '--product_label', type=str, help='[string] Provide the product label')
+        parser.add_argument('-pu', '--product_url', type=str, help='[string] Provide the product url')
         parser.add_argument('-pn', '--part_number', type=str, help='[string] Part number')
         parser.add_argument('-hv', '--hw_version', type=parseInt, help='[int] Hardware version value')
         parser.add_argument('-hs', '--hw_version_str', type=str, help='[string] Hardware version string')
@@ -155,9 +154,8 @@ class Arguments(BaseArguments):
 
     def decode(self, d, args):
         c = Config()
-
-        c.option = decode(d, 'patch', args.option)
         c.jlink = decode(d, 'jlink', args.jlink)
+        c.pylink_lib = decode(d, 'pylink_lib', args.pylink_lib)
         c.generate = decode(d, 'generate', args.generate)
         c.stop = decode(d, 'stop', args.stop)
         c.csr = decode(d, 'csr', args.csr)
@@ -203,8 +201,8 @@ class Arguments(BaseArguments):
 
     def encode(self):
         d = {}
-        encode(d, 'option', self.option)
         encode(d, 'jlink', self.conn.encode())
+        encode(d, 'pylink_lib', self.conn.lib_path)
         encode(d, 'generate', self.generate)
         encode(d, 'stop', self.stop)
         encode(d, 'csr', self.csr)
@@ -249,8 +247,6 @@ class Arguments(BaseArguments):
 
 
     def process(self, args):
-
-        self.option = args.option
 
         # Connection
         self.conn = ConnectionArguments()
@@ -341,6 +337,7 @@ class Arguments(BaseArguments):
 class ConnectionArguments:
 
     def __init__(self):
+        self.lib_path = None
         self.serial_num = None
         self.ip_addr = None
         self.port = None
@@ -357,6 +354,9 @@ class ConnectionArguments:
             return ''
 
     def decode(self, args):
+
+        if args.pylink_lib is not None:
+            self.lib_path = args.pylink_lib
 
         if args.jlink is None:
             return

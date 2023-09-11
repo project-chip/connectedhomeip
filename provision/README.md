@@ -85,7 +85,8 @@ The provisioning script and the GFW communicates through J-Link RTT using the Py
 | Arguments                 | Conformance          | Type               | Description                                                                             |
 | ------------------------- | -------------------- | ------------------ | --------------------------------------------------------------------------------------- |
 | -c,  --config             | optional             | string             | Path to a JSON configuration file            |
-| -j,  --jlink              | optional<sup>1</sup> | dec/hex            | JLink connection string.  |
+| -j,  --jlink              | optional<sup>1</sup> | dec/string         | JLink connection string.  |
+| -l,  --pylink_lib         | optional             | string             | Path to the PyLink library.  |
 | -g,  --generate           | optional             | flag               | Auto-generate test certificates            |
 | -s,  --stop               | optional             | flag               | Stop mode: When true, only generate the JSON configuration, and exit.                    |
 | -r,  --csr                | optional             | flag               | CSR mode: When true, instructs the GFW to generate the private key, and issue a CSR.                    |
