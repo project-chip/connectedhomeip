@@ -32,7 +32,7 @@ namespace app {
 namespace Clusters {
 namespace AirQuality {
 
-Instance::Instance(EndpointId aEndpointId, uint32_t aFeature) :
+Instance::Instance(EndpointId aEndpointId, BitMask<Feature> aFeature) :
     AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id), mEndpointId(aEndpointId), mFeature(aFeature)
 {}
 
@@ -51,9 +51,9 @@ CHIP_ERROR Instance::Init()
     return CHIP_NO_ERROR;
 }
 
-bool Instance::HasFeature(AirQualityEnum aFeature) const
+bool Instance::HasFeature(Feature aFeature) const
 {
-    return mFeature & to_underlying(aFeature);
+    return mFeature.Has(aFeature);
 }
 
 Protocols::InteractionModel::Status Instance::UpdateAirQuality(AirQualityEnum aNewAirQuality)
@@ -62,35 +62,40 @@ Protocols::InteractionModel::Status Instance::UpdateAirQuality(AirQualityEnum aN
     switch (aNewAirQuality)
     {
     case AirQualityEnum::kFair: {
-        if (!HasFeature(AirQualityEnum::kFair))
+        if (!HasFeature(Feature::kFair))
         {
             return Protocols::InteractionModel::Status::ConstraintError;
         }
     }
     break;
     case AirQualityEnum::kModerate: {
-        if (!HasFeature(AirQualityEnum::kModerate))
+        if (!HasFeature(Feature::kModerate))
         {
             return Protocols::InteractionModel::Status::ConstraintError;
         }
     }
     break;
-    case AirQualityEnum::kPoor: {
-        if (!HasFeature(AirQualityEnum::kPoor))
+    case AirQualityEnum::kVeryPoor: {
+        if (!HasFeature(Feature::kVeryPoor))
         {
             return Protocols::InteractionModel::Status::ConstraintError;
         }
     }
     break;
     case AirQualityEnum::kExtremelyPoor: {
-        if (!HasFeature(AirQualityEnum::kExtremelyPoor))
+        if (!HasFeature(Feature::kExtremelyPoor))
         {
             return Protocols::InteractionModel::Status::ConstraintError;
         }
     }
     break;
-    default:
+    case AirQualityEnum::kUnknown:
+    case AirQualityEnum::kGood:
+    case AirQualityEnum::kPoor:
         break;
+    default: {
+        return Protocols::InteractionModel::Status::InvalidValue;
+    }
     }
 
     mAirQuality = aNewAirQuality;
@@ -109,6 +114,9 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     {
     case Attributes::AirQuality::Id:
         ReturnErrorOnFailure(aEncoder.Encode(mAirQuality));
+        break;
+    case Attributes::FeatureMap::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mFeature.Raw()));
         break;
     }
     return CHIP_NO_ERROR;

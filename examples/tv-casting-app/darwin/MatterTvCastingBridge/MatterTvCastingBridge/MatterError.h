@@ -26,6 +26,10 @@
 
 @property NSString * _Nullable message;
 
+extern MatterError * _Nonnull MATTER_NO_ERROR;
+extern MatterError * _Nonnull MATTER_ERROR_INCORRECT_STATE;
+extern MatterError * _Nonnull MATTER_ERROR_INVALID_ARGUMENT;
+
 - (MatterError * _Nonnull)initWithCode:(uint32_t)code message:(NSString * _Nullable)message;
 
 @end

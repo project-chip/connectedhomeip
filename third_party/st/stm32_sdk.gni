@@ -1,0 +1,182 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/freertos.gni")
+import("//build_overrides/mbedtls.gni")
+import("//build_overrides/stm32_sdk.gni")
+
+import("${freertos_root}/freertos.gni")
+import("${mbedtls_root}/mbedtls.gni")
+import("stm32_board.gni")
+
+#import("${lwip_root}/lwip.gni")
+
+declare_args() {
+  kvs_max_entries = 75
+
+  use_external_flash = false
+
+  stm32_sdk_root = "${chip_root}/third_party/st"
+
+  stm32_ic_family = "STM32WB5MM-DK"
+}
+
+if (stm32_family == "stm32wb5") {
+  use_stm32_wpan = true
+}
+
+assert(stm32_sdk_root != "", "ST SDK root must be specified")
+
+#
+# Defines an stm32 SDK build target.
+#
+# Parameters:
+#   stm32_sdk_root - The location of the stm32 SDK.
+#   sources - The sources files to build.
+#
+template("stm32_sdk") {
+  if (defined(invoker.stm32_sdk_root)) {
+    stm32_sdk_root = invoker.stm32_sdk_root
+  }
+
+  assert(stm32_sdk_root != "", "stm32_sdk_root must be specified")
+
+  use_stm32_wpan = false
+  if (defined(invoker.use_stm32_wpan)) {
+    if (invoker.use_stm32_wpan) {
+      use_stm32_wpan = true
+    }
+  }
+
+  if (defined(invoker.stm32_target_ic)) {
+    stm_target_ic = invoker.stm32_target_ic
+  }
+
+  sdk_target_name = target_name
+
+  slist_stm32_board =
+      read_file("${stm32_sdk_root}/FAMILY/BOARD/${stm32_board}_sdk.gn_helper",
+                "scope")
+  slist_stm32_family =
+      read_file("${stm32_sdk_root}/FAMILY/${stm32_family}_sdk.gn_helper",
+                "scope")
+
+  config("${sdk_target_name}_config") {
+    include_dirs = []
+
+    if (defined(invoker.include_dirs)) {
+      include_dirs += invoker.include_dirs
+    }
+
+    libs = [
+      #  add any common .o/.a library here
+    ]
+
+    # Treat these includes as system includes, so warnings in them are not fatal.
+    _include_dirs = [
+      # common .h used by STM32
+    ]
+
+    defines = [
+      # common defines
+      "DEBUG",
+      "USE_HAL_DRIVER",
+    ]
+
+    # Note that we're setting the mbedTLS and PSA configuration files through a
+    # define. This means the build system by default does not pick up changes in
+    # the content of these, only when changing the filename itself.
+    # To fix this, these files are also manually depended upon in the source set
+    # declared in stm32_mbedtls_config further down this file.
+    if (stm32_family == "stm32wb5") {
+      defines += [ "MBEDTLS_USER_CONFIG_FILE=<examples/platform/stm32/config_files/STM32WB5/matter_config.h>" ]
+    }
+
+    if (defined(invoker.enable_sleepy_device)) {
+      if (invoker.enable_sleepy_device) {
+        defines += [
+          "CHIP_DEVICE_CONFIG_ENABLE_SED=1",
+          "STM32_SLEEP_DEVICE",
+        ]
+      }
+    }
+
+    _include_dirs += slist_stm32_board.INCLUDE_DIRS
+    _include_dirs += slist_stm32_family.INCLUDE_DIRS
+
+    defines += slist_stm32_board.DEFINES
+    defines += slist_stm32_family.DEFINES
+
+    libs += slist_stm32_board.LIBS
+    libs += slist_stm32_family.LIBS
+
+    cflags = []
+    foreach(include_dir, _include_dirs) {
+      cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
+    }
+
+    cflags += [
+      "-Wno-maybe-uninitialized",
+      "-Wno-shadow",
+    ]
+
+    cflags += slist_stm32_board.FLAGS
+    cflags += slist_stm32_family.FLAGS
+
+    if (defined(invoker.defines)) {
+      defines += invoker.defines
+    }
+  }
+
+  source_set("stm32_mbedtls_config") {
+    # We're setting the mbedTLS config flags here as the stm32_sdk target
+    # acts as the mbedTLS target for stm32 builds. We need this for the build
+    # system to recompile mbedTLS (= the SDK) when the mbedTLS config gets
+    # edited.
+    if (stm32_family == "stm32wb5") {
+      sources = [
+        "${chip_root}/examples/platform/stm32/config_files/STM32WB5/FreeRTOSConfig.h",
+        "${chip_root}/examples/platform/stm32/config_files/STM32WB5/matter_config.h",
+      ]
+    }
+
+    public_deps = [ "${chip_root}/src/crypto:crypto_buildconfig" ]
+  }
+
+  source_set(sdk_target_name) {
+    if (defined(invoker.enable_sleepy_device)) {
+    }
+
+    sources = slist_stm32_family.SOURCES
+    sources += slist_stm32_board.SOURCES
+
+    if ((defined(invoker.show_qr_code) && invoker.show_qr_code) ||
+        (defined(invoker.disable_lcd) && !invoker.disable_lcd)) {
+      sources += [
+        #
+        #
+      ]
+    }
+
+    public_deps = [ ":stm32_mbedtls_config" ]
+
+    if (defined(invoker.sources)) {
+      sources += invoker.sources
+    }
+
+    public_configs = [ ":${sdk_target_name}_config" ]
+  }
+}

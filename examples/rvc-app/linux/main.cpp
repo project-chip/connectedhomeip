@@ -41,7 +41,7 @@ void ApplicationInit()
         sChipNamedPipeCommands.Stop();
     }
 
-    gRvcDevice = new RvcDevice;
+    gRvcDevice = new RvcDevice(1);
     gRvcDevice->Init();
 
     sRvcAppCommandDelegate.SetRvcDevice(gRvcDevice);

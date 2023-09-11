@@ -190,13 +190,32 @@ template("tizen_qemu_mkisofs") {
       "-input-charset=default",
       "-VCHIP",  # Volume ID = CHIP
       "-JRU",  # Joliet + Rock Ridge with untranslated filenames
+    ]
+
+    # Exclude files from the ISO image which might otherwise be included
+    # by non-tracked assets in case of adding entire directory. This will
+    # not exclude files added explicitly.
+    if (defined(invoker.assets_non_tracked_exclude_globs)) {
+      foreach(glob, invoker.assets_non_tracked_exclude_globs) {
+        args += [
+          "-m",
+          glob,
+        ]
+      }
+    }
+
+    args += [
       "-o",
       rebase_path(image_file),
       rebase_path(invoker.runner),
     ]
+
     if (defined(invoker.assets)) {
       args += invoker.assets
       inputs += invoker.assets
+    }
+    if (defined(invoker.assets_non_tracked)) {
+      args += invoker.assets_non_tracked
     }
 
     script = "${build_root}/gn_run_binary.py"

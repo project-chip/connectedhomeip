@@ -298,7 +298,33 @@ tests:
                 constraints:
                     minValue: 1081
 
-    - label: "Step 12: TH sends Clear Year Day Schedule to DUT"
+    - label:
+          "Step 12: TH sends Get Year Day Schedule Command to DUT for
+          non-existent User"
+      PICS: DRLK.S.F0a && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
+      command: "GetYearDaySchedule"
+      arguments:
+          values:
+              - name: "YearDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 2
+      response:
+          values:
+              - name: "YearDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 2
+              - name: "Status"
+                value: 0x8B
+              - name: "LocalStartTime"
+                constraints:
+                    hasValue: false
+              - name: "LocalEndTime"
+                constraints:
+                    hasValue: false
+
+    - label: "Step 13: TH sends Clear Year Day Schedule to DUT"
       PICS: DRLK.S.F0a && DRLK.S.C10.Rsp
       command: "ClearYearDaySchedule"
       arguments:

@@ -158,6 +158,22 @@ class OnboardingPayload(
       setupPinCode == other.setupPinCode
   }
 
+  override fun toString(): String {
+    return "OnboardingPayload(" +
+      "version=$version, " +
+      "vendorId=$vendorId, " +
+      "productId=$productId, " +
+      "commissioningFlow=$commissioningFlow, " +
+      "discoveryCapabilities=$discoveryCapabilities, " +
+      "discriminator=$discriminator, " +
+      "hasShortDiscriminator=$hasShortDiscriminator, " +
+      "setupPinCode=$setupPinCode, " +
+      "optionalQRCodeInfo=$optionalQRCodeInfo, " +
+      "optionalVendorData=$optionalVendorData, " +
+      "optionalExtensionData=$optionalExtensionData" +
+      ")"
+  }
+
   fun addOptionalQRCodeInfo(info: OptionalQRCodeInfo) {
     optionalQRCodeInfo[info.tag] = info
   }

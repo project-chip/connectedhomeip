@@ -46,43 +46,44 @@ SmokeCoAlarmServer & SmokeCoAlarmServer::Instance()
 void SmokeCoAlarmServer::SetExpressedStateByPriority(EndpointId endpointId,
                                                      const std::array<ExpressedStateEnum, kPriorityOrderLength> & priorityOrder)
 {
-    AlarmStateEnum alarmState          = AlarmStateEnum::kNormal;
-    EndOfServiceEnum endOfServiceState = EndOfServiceEnum::kNormal;
-    bool active                        = false;
-
     for (ExpressedStateEnum priority : priorityOrder)
     {
+        AlarmStateEnum alarmState          = AlarmStateEnum::kNormal;
+        EndOfServiceEnum endOfServiceState = EndOfServiceEnum::kNormal;
+        bool active                        = false;
+        bool success                       = false;
+
         switch (priority)
         {
         case ExpressedStateEnum::kSmokeAlarm:
-            VerifyOrReturn(GetSmokeState(endpointId, alarmState));
+            success = GetSmokeState(endpointId, alarmState);
             break;
         case ExpressedStateEnum::kCOAlarm:
-            VerifyOrReturn(GetCOState(endpointId, alarmState));
+            success = GetCOState(endpointId, alarmState);
             break;
         case ExpressedStateEnum::kBatteryAlert:
-            VerifyOrReturn(GetBatteryAlert(endpointId, alarmState));
+            success = GetBatteryAlert(endpointId, alarmState);
             break;
         case ExpressedStateEnum::kTesting:
-            VerifyOrReturn(GetTestInProgress(endpointId, active));
+            success = GetTestInProgress(endpointId, active);
             break;
         case ExpressedStateEnum::kHardwareFault:
-            VerifyOrReturn(GetHardwareFaultAlert(endpointId, active));
+            success = GetHardwareFaultAlert(endpointId, active);
             break;
         case ExpressedStateEnum::kEndOfService:
-            VerifyOrReturn(GetEndOfServiceAlert(endpointId, endOfServiceState));
+            success = GetEndOfServiceAlert(endpointId, endOfServiceState);
             break;
         case ExpressedStateEnum::kInterconnectSmoke:
-            VerifyOrReturn(GetInterconnectSmokeAlarm(endpointId, alarmState));
+            success = GetInterconnectSmokeAlarm(endpointId, alarmState);
             break;
         case ExpressedStateEnum::kInterconnectCO:
-            VerifyOrReturn(GetInterconnectCOAlarm(endpointId, alarmState));
+            success = GetInterconnectCOAlarm(endpointId, alarmState);
             break;
         default:
             break;
         }
 
-        if ((alarmState != AlarmStateEnum::kNormal) || (endOfServiceState != EndOfServiceEnum::kNormal) || active)
+        if (success && ((alarmState != AlarmStateEnum::kNormal) || (endOfServiceState != EndOfServiceEnum::kNormal) || active))
         {
             SetExpressedState(endpointId, priority);
             return;
@@ -186,20 +187,22 @@ bool SmokeCoAlarmServer::SetDeviceMuted(EndpointId endpointId, MuteStateEnum new
     {
         AlarmStateEnum alarmState;
 
-        VerifyOrReturnValue(GetAttribute(endpointId, SmokeState::Id, SmokeState::Get, alarmState), false);
-        VerifyOrReturnValue(alarmState != AlarmStateEnum::kCritical, false);
+        // If the attribute has been read and the attribute is Critical, return false
 
-        VerifyOrReturnValue(GetAttribute(endpointId, COState::Id, COState::Get, alarmState), false);
-        VerifyOrReturnValue(alarmState != AlarmStateEnum::kCritical, false);
+        bool success = GetSmokeState(endpointId, alarmState);
+        VerifyOrReturnValue(!success || alarmState != AlarmStateEnum::kCritical, false);
 
-        VerifyOrReturnValue(GetAttribute(endpointId, BatteryAlert::Id, BatteryAlert::Get, alarmState), false);
-        VerifyOrReturnValue(alarmState != AlarmStateEnum::kCritical, false);
+        success = GetCOState(endpointId, alarmState);
+        VerifyOrReturnValue(!success || alarmState != AlarmStateEnum::kCritical, false);
 
-        VerifyOrReturnValue(GetAttribute(endpointId, InterconnectSmokeAlarm::Id, InterconnectSmokeAlarm::Get, alarmState), false);
-        VerifyOrReturnValue(alarmState != AlarmStateEnum::kCritical, false);
+        success = GetBatteryAlert(endpointId, alarmState);
+        VerifyOrReturnValue(!success || alarmState != AlarmStateEnum::kCritical, false);
 
-        VerifyOrReturnValue(GetAttribute(endpointId, InterconnectCOAlarm::Id, InterconnectCOAlarm::Get, alarmState), false);
-        VerifyOrReturnValue(alarmState != AlarmStateEnum::kCritical, false);
+        success = GetInterconnectSmokeAlarm(endpointId, alarmState);
+        VerifyOrReturnValue(!success || alarmState != AlarmStateEnum::kCritical, false);
+
+        success = GetInterconnectCOAlarm(endpointId, alarmState);
+        VerifyOrReturnValue(!success || alarmState != AlarmStateEnum::kCritical, false);
     }
 
     VerifyOrReturnValue(SetAttribute(endpointId, DeviceMuted::Id, DeviceMuted::Set, newDeviceMuted), false);
@@ -466,10 +469,15 @@ template <typename T>
 bool SmokeCoAlarmServer::GetAttribute(EndpointId endpointId, AttributeId attributeId,
                                       EmberAfStatus (*getFn)(EndpointId endpointId, T * value), T & value) const
 {
-    EmberAfStatus status = getFn(endpointId, &value);
-    bool success         = (EMBER_ZCL_STATUS_SUCCESS == status);
+    EmberAfStatus status   = getFn(endpointId, &value);
+    bool success           = (EMBER_ZCL_STATUS_SUCCESS == status);
+    bool unsupportedStatus = (EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE == status);
 
-    if (!success)
+    if (unsupportedStatus)
+    {
+        ChipLogProgress(Zcl, "Read unsupported SmokeCOAlarm attribute: attribute=" ChipLogFormatMEI, ChipLogValueMEI(attributeId));
+    }
+    else if (!success)
     {
         ChipLogError(Zcl, "Failed to read SmokeCOAlarm attribute: attribute=" ChipLogFormatMEI ", status=0x%x",
                      ChipLogValueMEI(attributeId), to_underlying(status));

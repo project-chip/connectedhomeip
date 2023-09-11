@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -36,7 +36,6 @@
       "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 2,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 2,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        2
       ],
       "deviceVersions": [
         1
@@ -5087,7 +5082,6 @@
       "id": 2,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
-        "id": 15,
         "code": 259,
         "profileId": 259,
         "label": "MA-onofflightswitch",
@@ -5095,15 +5089,11 @@
       },
       "deviceTypes": [
         {
-          "id": 15,
           "code": 259,
           "profileId": 259,
           "label": "MA-onofflightswitch",
           "name": "MA-onofflightswitch"
         }
-      ],
-      "deviceTypeRefs": [
-        15
       ],
       "deviceVersions": [
         1
@@ -6955,7 +6945,6 @@
       "id": 3,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
-        "id": 53,
         "code": 61442,
         "profileId": 259,
         "label": "MA-secondary-network-commissioning",
@@ -6963,15 +6952,11 @@
       },
       "deviceTypes": [
         {
-          "id": 53,
           "code": 61442,
           "profileId": 259,
           "label": "MA-secondary-network-commissioning",
           "name": "MA-secondary-network-commissioning"
         }
-      ],
-      "deviceTypeRefs": [
-        53
       ],
       "deviceVersions": [
         1
@@ -7540,6 +7525,5 @@
       "endpointId": 65534,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

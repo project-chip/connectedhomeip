@@ -9,10 +9,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-const EndpointId RvcRunModeEndpoint          = 1;
-const EndpointId RvcCleanModeEndpoint        = 1;
-const EndpointId RvcOperationalStateEndpoint = 1;
-
 class RvcDevice
 {
 private:
@@ -29,10 +25,15 @@ private:
     bool mCharging = false;
 
 public:
-    RvcDevice() :
-        mRunModeDelegate(), mRunModeInstance(&mRunModeDelegate, RvcRunModeEndpoint, RvcRunMode::Id, 0), mCleanModeDelegate(),
-        mCleanModeInstance(&mCleanModeDelegate, RvcCleanModeEndpoint, RvcCleanMode::Id, 0), mOperationalStateDelegate(),
-        mOperationalStateInstance(&mOperationalStateDelegate, RvcOperationalStateEndpoint, RvcOperationalState::Id)
+    /**
+     * This class is responsible for initialising all the RVC clusters and manging the interactions between them as required by
+     * the specific "business logic". See the state machine diagram.
+     * @param aRvcClustersEndpoint The endpoint ID where all the RVC clusters exist.
+     */
+    explicit RvcDevice(EndpointId aRvcClustersEndpoint) :
+        mRunModeDelegate(), mRunModeInstance(&mRunModeDelegate, aRvcClustersEndpoint, RvcRunMode::Id, 0), mCleanModeDelegate(),
+        mCleanModeInstance(&mCleanModeDelegate, aRvcClustersEndpoint, RvcCleanMode::Id, 0), mOperationalStateDelegate(),
+        mOperationalStateInstance(&mOperationalStateDelegate, aRvcClustersEndpoint, RvcOperationalState::Id)
     {
         // set the current-mode at start-up
         mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
@@ -61,12 +62,12 @@ public:
     /**
      * Handles the RvcRunMode command requesting a mode change.
      */
-    void HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response);
+    void HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::ChangeToModeResponse::Type & response);
 
     /**
      * Handles the RvcCleanMode command requesting a mode change.
      */
-    void HandleRvcCleanChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response);
+    void HandleRvcCleanChangeToMode(uint8_t newMode, ModeBase::Commands::ChangeToModeResponse::Type & response);
 
     /**
      * Handles the RvcOperationalState pause command.

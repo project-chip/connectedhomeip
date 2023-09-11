@@ -25,7 +25,7 @@ void RvcDevice::SetDeviceToIdleState()
     }
 }
 
-void RvcDevice::HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
+void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
     uint8_t currentState = mOperationalStateInstance.GetCurrentOperationalState();
     uint8_t currentMode = mRunModeInstance.GetCurrentMode();
@@ -37,7 +37,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::Ch
     case to_underlying(RvcOperationalState::OperationalStateEnum::kCharging):
     {
         // We could be in the charging state with an RvcRun mode != idle.
-        if (currentMode != RvcRunMode::ModeIdle && NewMode != RvcRunMode::ModeIdle)
+        if (currentMode != RvcRunMode::ModeIdle && newMode != RvcRunMode::ModeIdle)
         {
             response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
             response.statusText.SetValue(
@@ -45,7 +45,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::Ch
             return;
         }
 
-        mRunModeInstance.UpdateCurrentMode(NewMode);
+        mRunModeInstance.UpdateCurrentMode(newMode);
         mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
         response.status = to_underlying(ModeBase::StatusCode::kSuccess);
         return;
@@ -53,7 +53,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::Ch
     break;
     case to_underlying(OperationalState::OperationalStateEnum::kRunning):
     {
-        if (NewMode != RvcRunMode::ModeIdle)
+        if (newMode != RvcRunMode::ModeIdle)
         {
             response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
             response.statusText.SetValue(
@@ -61,7 +61,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::Ch
             return;
         }
 
-        mRunModeInstance.UpdateCurrentMode(NewMode);
+        mRunModeInstance.UpdateCurrentMode(newMode);
         mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
         response.status = to_underlying(ModeBase::StatusCode::kSuccess);
         return;
@@ -74,7 +74,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t NewMode, ModeBase::Commands::Ch
     response.statusText.SetValue(chip::CharSpan::fromCharString("This change is not allowed at this time. "));
 }
 
-void RvcDevice::HandleRvcCleanChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
+void RvcDevice::HandleRvcCleanChangeToMode(uint8_t newMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
     uint8_t rvcRunCurrentMode = mRunModeInstance.GetCurrentMode();
 
