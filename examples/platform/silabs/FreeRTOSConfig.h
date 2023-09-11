@@ -290,14 +290,14 @@ standard names. */
 #define configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS 2
 #ifndef configNUM_USER_THREAD_LOCAL_STORAGE_POINTERS
 #define configNUM_USER_THREAD_LOCAL_STORAGE_POINTERS 0
-#define configNUM_THREAD_LOCAL_STORAGE_POINTERS (configNUM_USER_THREAD_LOCAL_STORAGE_POINTERS \
-           + configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS)
+#define configNUM_THREAD_LOCAL_STORAGE_POINTERS                                                                                    \
+    (configNUM_USER_THREAD_LOCAL_STORAGE_POINTERS + configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS)
 #endif
 #else /* PERFORMANCE_TEST_ENABLED */
 #ifndef configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS
 #define configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS 0
 #endif
-#endif/* PERFORMANCE_TEST_ENABLED */
+#endif /* PERFORMANCE_TEST_ENABLED */
 
 #if defined(__GNUC__)
 /* For the linker. */
