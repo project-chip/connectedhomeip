@@ -853,7 +853,8 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 #endif
 
     // Set param need_confirm as false will send notification, otherwise indication.
-    err = MapBLEError(esp_ble_gatts_send_indicate(mAppIf, conId, mTXCharAttrHandle, data->DataLength(), data->Start(), true /* need_confirm */));
+    err = MapBLEError(
+        esp_ble_gatts_send_indicate(mAppIf, conId, mTXCharAttrHandle, data->DataLength(), data->Start(), true /* need_confirm */));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "esp_ble_gatts_send_indicate() failed: %s", ErrorStr(err));
