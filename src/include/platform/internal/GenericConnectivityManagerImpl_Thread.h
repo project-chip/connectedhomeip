@@ -63,11 +63,6 @@ protected:
     bool _IsThreadApplicationControlled();
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType();
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR _GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
-    CHIP_ERROR _SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
-    CHIP_ERROR _RequestSEDActiveMode(bool onOff, bool delayIdle = false);
-#endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
@@ -143,28 +138,6 @@ GenericConnectivityManagerImpl_Thread<ImplClass>::_SetThreadDeviceType(Connectiv
 {
     return ThreadStackMgrImpl().SetThreadDeviceType(deviceType);
 }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-template <class ImplClass>
-inline CHIP_ERROR
-GenericConnectivityManagerImpl_Thread<ImplClass>::_GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
-{
-    return ThreadStackMgrImpl().GetSEDIntervalsConfig(intervalsConfig);
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_SetSEDIntervalsConfig(
-    const ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
-{
-    return ThreadStackMgrImpl().SetSEDIntervalsConfig(intervalsConfig);
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_RequestSEDActiveMode(bool onOff, bool delayIdle)
-{
-    return ThreadStackMgrImpl().RequestSEDActiveMode(onOff, delayIdle);
-}
-#endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 template <class ImplClass>

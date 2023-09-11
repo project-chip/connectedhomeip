@@ -1276,6 +1276,9 @@ StatusCode
 stderr
 stdout
 sterm
+stmicroelectronics
+stm
+stlink
 storagepath
 str
 strcpy
@@ -1352,6 +1355,7 @@ ThreadNetworkDiagnostics
 threadOperationalDataset
 ThreadStackManager
 ThreadStackManagerImpl
+thread
 ths
 Thunderboard
 timedInteractionTimeoutMs

@@ -20,8 +20,8 @@
 #include <StaticReplacementProductListManager.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <bitset>
-#include <instances/ActivatedCarbonFilterMonitoring.h>
-#include <instances/HepaFilterMonitoring.h>
+#include <delegates/ActivatedCarbonFilterMonitoring.h>
+#include <delegates/HepaFilterMonitoring.h>
 #include <stdint.h>
 
 using namespace chip;
@@ -36,11 +36,17 @@ constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Featu
                                                      static_cast<uint32_t>(Feature::kWarning) |
                                                      static_cast<uint32_t>(Feature::kReplacementProductList) };
 
-static HepaFilterMonitoringInstance gHepaFilterInstance(0x1, static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
+static HepaFilterMonitoringDelegate gHepaFilterDelegate;
+static ResourceMonitoring::Instance gHepaFilterInstance(&gHepaFilterDelegate, 0x1, HepaFilterMonitoring::Id,
+                                                        static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
                                                         Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown, true);
-static ActivatedCarbonFilterMonitoringInstance
-    gActivatedCarbonFilterInstance(0x1, static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()),
-                                   Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown, true);
+
+static ActivatedCarbonFilterMonitoringDelegate gActivatedCarbonFilterDelegate;
+static ResourceMonitoring::Instance gActivatedCarbonFilterInstance(&gActivatedCarbonFilterDelegate, 0x1,
+                                                                   ActivatedCarbonFilterMonitoring::Id,
+                                                                   static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()),
+                                                                   Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown,
+                                                                   true);
 
 void ApplicationInit()
 {

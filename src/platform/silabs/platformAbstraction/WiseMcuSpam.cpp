@@ -26,6 +26,7 @@
 
 // TODO add includes ?
 extern "C" {
+#include "em_core.h"
 #include "sl_event_handler.h"
 
 void RSI_Board_LED_Set(int, bool);
@@ -55,6 +56,9 @@ CHIP_ERROR SilabsPlatform::Init(void)
     mButtonCallback = nullptr;
 
     sl_system_init();
+
+    // TODO: Setting the highest priority for SVCall_IRQn to avoid the HardFault issue
+    NVIC_SetPriority(SVCall_IRQn, CORE_INTERRUPT_HIGHEST_PRIORITY);
 
     // Configuration the clock rate
     soc_pll_config();

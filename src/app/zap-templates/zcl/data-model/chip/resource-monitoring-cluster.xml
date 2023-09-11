@@ -68,7 +68,7 @@ limitations under the License.
     <cluster code="0x0072" />
     <field name="Condition" mask="0x01" />
     <field name="Warning" mask="0x02" />
-    <field name="ReplacementProductList" mask="0x03" />
+    <field name="ReplacementProductList" mask="0x04" />
   </bitmap>
 
   <!-- Cluster Data Types -->

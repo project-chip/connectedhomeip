@@ -212,6 +212,7 @@ class TestXmlParser(unittest.TestCase):
                                                events=[Event(priority=EventPriority.INFO,
                                                              name='FabricEvent',
                                                              code=0x1234,
+                                                             description="This is a test event",
                                                              fields=[Field(data_type=DataType(name='node_id'),
                                                                            code=1,
                                                                            name='AdminNodeID',

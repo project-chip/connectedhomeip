@@ -60,9 +60,17 @@ CHIP_ERROR CastingApp::Initialize(const AppParameters & appParameters)
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     MutableByteSpanDataProvider * uniqueIdProvider = appParameters.GetRotatingDeviceIdUniqueIdProvider();
-    if (uniqueIdProvider != nullptr && uniqueIdProvider->Get() != nullptr)
+    if (uniqueIdProvider != nullptr)
     {
-        ReturnErrorOnFailure(chip::DeviceLayer::ConfigurationMgr().SetRotatingDeviceIdUniqueId(*uniqueIdProvider->Get()));
+        chip::MutableByteSpan * uniqueId = uniqueIdProvider->Get();
+        if (uniqueId != nullptr)
+        {
+            ReturnErrorOnFailure(chip::DeviceLayer::ConfigurationMgr().SetRotatingDeviceIdUniqueId(*uniqueId));
+        }
+        else
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
     }
 #endif // CHIP_ENABLE_ROTATING_DEVICE_ID
 

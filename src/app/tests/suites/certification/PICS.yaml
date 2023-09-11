@@ -2664,67 +2664,60 @@ PICS:
     #
     # Server write attributes
     #
+    - label: "Does the device implement simulation of a Not Fully Locked State?"
+      id: DRLK.S.M.SimulateNotFullyLocked
 
-    - label: "Does the DUT(server) support the DoorOpen Events attribute?"
-      id: DRLK.S.A0004.Write
+    - label: "Does the device implement detection of a LockJammed State?"
+      id: DRLK.S.M.DetectLockJammed
 
-    - label: "Does the DUT(server) support the DoorClosedEvents attribute?"
-      id: DRLK.S.A0005.Write
-
-    - label: "Does the DUT(server) support the OpenPeriod attribute?"
-      id: DRLK.S.A0006.Write
-
-    - label: "Does the DUT(server) support the Language attribute?"
-      id: DRLK.S.A0021.Write
-
-    - label: "Does the DUT(server) support the LEDSettings attribute?"
-      id: DRLK.S.A0022.Write
-
-    - label: "Does the DUT(server) support the AutoRelockTime attribute?"
-      id: DRLK.S.A0023.Write
-
-    - label: "Does the DUT(server) support the SoundVolume attribute?"
-      id: DRLK.S.A0024.Write
-
-    - label: "Does the DUT(server) support the OperatingMode attribute?"
-      id: DRLK.S.A0025.Write
+    - label: "Does the device implement Language attribute with write access?"
+      id: DRLK.S.M.LanguageAttributeWritable
 
     - label:
-          "Does the DUT(server) support the EnableLocalProgramming attribute?"
-      id: DRLK.S.A0028.Write
-
-    - label: "Does the DUT(server) support the EnableOneTouchLocking attribute?"
-      id: DRLK.S.A0029.Write
-
-    - label: "Does the DUT(server) support the EnableInsideStatusLED attribute?"
-      id: DRLK.S.A002a.Write
+          "Does the device implement LEDSettings attribute with write access?"
+      id: DRLK.S.M.LEDSettingsAttributeWritable
 
     - label:
-          "Does the DUT(server) support the EnablePrivacyModeButton attribute?"
-      id: DRLK.S.A002b.Write
+          "Does the device implement AutoRelockTime attribute with write access?"
+      id: DRLK.S.M.AutoRelockTimeAttributeWritable
 
     - label:
-          "Does the DUT(server) support the LocalProgrammingFeatures attribute?"
-      id: DRLK.S.A002c.Write
-
-    - label: "Does the DUT(server) support the WrongCodeEntryLimit attribute?"
-      id: DRLK.S.A0030.Write
+          "Does the device implement SoundVolume attribute with write access?"
+      id: DRLK.S.M.SoundVolumeAttributeWritable
 
     - label:
-          "Does the DUT(server) support the UserCodedTemporaryDisableTime
-          attribute?"
-      id: DRLK.S.A0031.Write
-
-    - label: "Does the DUT(server) support the SendPINOverTheAir attribute?"
-      id: DRLK.S.A0032.Write
+          "Does the device implement OperatingMode attribute with write access?"
+      id: DRLK.S.M.OperatingModeAttributeWritable
 
     - label:
-          "Does the DUT(server) support the RequirePINForRemoteOperation
-          attribute?"
-      id: DRLK.S.A0033.Write
+          "Does the device implement EnableLocalProgramming attribute with write
+          access?"
+      id: DRLK.S.M.EnableLocalProgrammingAttributeWritable
 
-    - label: "Does the DUT(server) support the ExpiringUserTimeOut attribute?"
-      id: DRLK.S.A0035.Write
+    - label:
+          "Does the device implement LocalProgrammingFeatures attribute with
+          write access?"
+      id: DRLK.S.M.LocalProgrammingFeaturesAttributeWritable
+
+    - label:
+          "Does the device implement WrongCodeEntryLimit attribute with write
+          access?"
+      id: DRLK.S.M.WrongCodeEntryLimitAttributeWritable
+
+    - label:
+          "Does the device implement UserCodedTemporaryDisableTime attribute
+          with write access?"
+      id: DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable
+
+    - label:
+          "Does the device implement RequirePINForRemoteOperation attribute with
+          write access?"
+      id: DRLK.S.M.RequirePINForRemoteOperationAttributeWritable
+
+    - label:
+          "Does the device implement ExpiringUserTimeOut attribute with write
+          access?"
+      id: DRLK.S.M.ExpiringUserTimeOutAttributeWritable
 
     #
     # server / commandsReceived
@@ -8909,15 +8902,6 @@ PICS:
       id: SMOKECO.S.A0009
 
     - label: "Does the device implement the ContaminationState attribute?"
-      id: SMOKECO.S.A0010
-
-    - label: "Does the device implement the SensitivityLevel attribute?"
-      id: SMOKECO.S.A0011
-
-    - label: "Does the device implement the ExpiryDate attribute?"
-      id: SMOKECO.S.A0012
-
-    - label: "Does the device implement the ContaminationState attribute?"
       id: SMOKECO.S.A000a
 
     - label: "Does the device implement the SensitivityLevel attribute?"
@@ -8960,7 +8944,7 @@ PICS:
       id: SMOKECO.S.E09
 
     - label: "Does the device implement the AllClear event?"
-      id: SMOKECO.S.E10
+      id: SMOKECO.S.E0a
 
     #
     # server / manually
@@ -9236,6 +9220,9 @@ PICS:
     - label:
           "Can the Rinse attribute changed by physical control at the device?"
       id: WASHERCTRL.S.M.ManuallyControlledRinse
+
+    - label: "Can the device be controlled manually?"
+      id: WASHERCTRL.S.M.ManuallyControlled
 
     #
     #RVC Run Mode
