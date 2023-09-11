@@ -28,14 +28,13 @@ void RvcDevice::SetDeviceToIdleState()
 void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
     uint8_t currentState = mOperationalStateInstance.GetCurrentOperationalState();
-    uint8_t currentMode = mRunModeInstance.GetCurrentMode();
+    uint8_t currentMode  = mRunModeInstance.GetCurrentMode();
 
     switch (currentState)
     {
     case to_underlying(OperationalState::OperationalStateEnum::kStopped):
     case to_underlying(RvcOperationalState::OperationalStateEnum::kDocked):
-    case to_underlying(RvcOperationalState::OperationalStateEnum::kCharging):
-    {
+    case to_underlying(RvcOperationalState::OperationalStateEnum::kCharging): {
         // We could be in the charging state with an RvcRun mode != idle.
         if (currentMode != RvcRunMode::ModeIdle && newMode != RvcRunMode::ModeIdle)
         {
@@ -51,8 +50,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
         return;
     }
     break;
-    case to_underlying(OperationalState::OperationalStateEnum::kRunning):
-    {
+    case to_underlying(OperationalState::OperationalStateEnum::kRunning): {
         if (newMode != RvcRunMode::ModeIdle)
         {
             response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
@@ -116,7 +114,8 @@ void RvcDevice::HandleOpStateResumeCallback(Clusters::OperationalState::GenericO
 
 void RvcDevice::HandleChargedMessage()
 {
-    if (mOperationalStateInstance.GetCurrentOperationalState() != to_underlying(RvcOperationalState::OperationalStateEnum::kCharging))
+    if (mOperationalStateInstance.GetCurrentOperationalState() !=
+        to_underlying(RvcOperationalState::OperationalStateEnum::kCharging))
     {
         ChipLogError(NotSpecified, "RVC App: The 'Charged' command is only excepted when the device is in the 'Charging' state.");
         return;
@@ -152,7 +151,6 @@ void RvcDevice::HandleChargingMessage()
     mCharging = true;
 
     mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCharging));
-
 }
 
 void RvcDevice::HandleDockedMessage()
@@ -170,14 +168,16 @@ void RvcDevice::HandleDockedMessage()
 
 void RvcDevice::HandleChargerFoundMessage()
 {
-    if (mOperationalStateInstance.GetCurrentOperationalState() != to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger))
+    if (mOperationalStateInstance.GetCurrentOperationalState() !=
+        to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger))
     {
-        ChipLogError(NotSpecified, "RVC App: The 'ChargerFound' command is only excepted when the device is in the 'SeekingCharger' state.");
+        ChipLogError(NotSpecified,
+                     "RVC App: The 'ChargerFound' command is only excepted when the device is in the 'SeekingCharger' state.");
         return;
     }
 
-    mCharging= true;
-    mDocked = true;
+    mCharging = true;
+    mDocked   = true;
 
     mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCharging));
 }
@@ -197,7 +197,8 @@ void RvcDevice::HandleActivityCompleteEvent()
 {
     if (mOperationalStateInstance.GetCurrentOperationalState() != to_underlying(OperationalState::OperationalStateEnum::kRunning))
     {
-        ChipLogError(NotSpecified, "RVC App: The 'ActivityComplete' command is only excepted when the device is in the 'Running' state.");
+        ChipLogError(NotSpecified,
+                     "RVC App: The 'ActivityComplete' command is only excepted when the device is in the 'Running' state.");
         return;
     }
 
@@ -210,7 +211,7 @@ void RvcDevice::HandleActivityCompleteEvent()
     mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
 }
 
-void RvcDevice::HandleErrorEvent(const std::string& error)
+void RvcDevice::HandleErrorEvent(const std::string & error)
 {
     detail::Structs::ErrorStateStruct::Type err;
 

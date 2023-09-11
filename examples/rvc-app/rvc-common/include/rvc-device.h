@@ -21,7 +21,7 @@ private:
     RvcOperationalState::RvcOperationalStateDelegate mOperationalStateDelegate;
     OperationalState::Instance mOperationalStateInstance;
 
-    bool mDocked = false;
+    bool mDocked   = false;
     bool mCharging = false;
 
 public:
@@ -100,7 +100,7 @@ public:
      * FailedToFindChargingDock, Stuck, DustBinMissing, DustBinFull, WaterTankEmpty, WaterTankMissing, WaterTankLidOpen or
      * MopCleaningPadMissing.
      */
-    void HandleErrorEvent(const std::string& error);
+    void HandleErrorEvent(const std::string & error);
 
     void HandleClearErrorMessage();
 };

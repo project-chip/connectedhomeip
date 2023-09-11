@@ -1,26 +1,26 @@
 /*
-*
-*    Copyright (c) 2023 Project CHIP Authors
-*    All rights reserved.
-*
-*    Licensed under the Apache License, Version 2.0 (the "License");
-*    you may not use this file except in compliance with the License.
-*    You may obtain a copy of the License at
-*
-*        http://www.apache.org/licenses/LICENSE-2.0
-*
-*    Unless required by applicable law or agreed to in writing, software
-*    distributed under the License is distributed on an "AS IS" BASIS,
-*    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*    See the License for the specific language governing permissions and
-*    limitations under the License.
-*/
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 
 #include "RvcAppCommandDelegate.h"
 #include <platform/PlatformManager.h>
 
-#include <utility>
 #include "rvc-device.h"
+#include <utility>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -32,8 +32,7 @@ RvcAppCommandHandler * RvcAppCommandHandler::FromJSON(const char * json)
 
     if (!reader.parse(json, value))
     {
-        ChipLogError(NotSpecified,
-                     "RVC App: Error parsing JSON with error %s:", reader.getFormattedErrorMessages().c_str());
+        ChipLogError(NotSpecified, "RVC App: Error parsing JSON with error %s:", reader.getFormattedErrorMessages().c_str());
         return nullptr;
     }
 
@@ -136,7 +135,7 @@ void RvcAppCommandHandler::OnActivityCompleteHandler()
     mRvcDevice->HandleActivityCompleteEvent();
 }
 
-void RvcAppCommandHandler::OnErrorEventHandler(const std::string& error)
+void RvcAppCommandHandler::OnErrorEventHandler(const std::string & error)
 {
     mRvcDevice->HandleErrorEvent(error);
 }
