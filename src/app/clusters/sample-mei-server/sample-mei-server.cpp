@@ -215,4 +215,3 @@ size_t SampleMeiServer::NextEmptyIndex() const
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
