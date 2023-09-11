@@ -58,10 +58,10 @@ def process_fail(id, pr, start_time, workflow):
                     break
 
     logging.info(f"Checking recent pass/fail rate of workflow {workflow}.")
-    workflow_pass_rate_output_path = f"workflow_pass_rate/{slugify(workflow)}"
-    if not os.path.exists(workflow_pass_rate_output_path):
-        os.makedirs(workflow_pass_rate_output_path)
-        subprocess.run(f"gh run list -R project-chip/connectedhomeip -b master -w '{workflow}' --json conclusion > {workflow_pass_rate_output_path}/run_list.json", shell=True)
+    workflow_fail_rate_output_path = f"workflow_pass_rate/{slugify(workflow)}"
+    if not os.path.exists(workflow_fail_rate_output_path):
+        os.makedirs(workflow_fail_rate_output_path)
+        subprocess.run(f"gh run list -R project-chip/connectedhomeip -b master -w '{workflow}' --json conclusion > {workflow_fail_rate_output_path}/run_list.json", shell=True)
     else:
         logging.info("This workflow has already been processed.")
     
@@ -85,7 +85,7 @@ def main():
     logging.info("Listing frequency of recent fails by workflow.")
     frequency = df["Workflow"].value_counts(normalize=True).mul(100).astype(
         str).reset_index(name="Percentage")  # Reformat this from "50.0" to "50%"
-    print("Percentage Frequency of Fails by Workflow:")
+    print("Share of Recent Fails by Workflow:")
     print(frequency.to_string(index=False))
     print()
     frequency.to_csv("recent_workflow_fails_frequency.csv")
@@ -96,14 +96,22 @@ def main():
     root_causes.columns = ["Pull Request", "Workflow", "Cause of Failure"]
     print("Likely Root Cause of Recent Fails:")
     print(root_causes.to_string(index=False))
+    print()
     root_causes.to_csv("failure_cause_summary.csv")
 
     logging.info("Listing percent fail rate of recent fails by workflow.")
+    fail_rate = {}
     for workflow in next(os.walk("workflow_pass_rate"))[1]:
         try:
             info = pd.read_json(f"workflow_pass_rate/{workflow}/run_list.json")
+            info = info[info["conclusion"].str.len() > 0]
+            fail_rate[workflow] = [info.value_counts(normalize=True)["failure"] * 100]
         except:
             logging.error(f"Recent runs info for {workflow} was not collected.")
+    fail_rate = pd.DataFrame.from_dict(results, 'index', columns=["Fail Rate"])
+    print("Recent Fail Rate of Each Workflow:")
+    print(fail_rate.to_string(index=False))
+    fail_rate.to_csv("workflow_fail_rate.csv")
 
 if __name__ == "__main__":
     main()
