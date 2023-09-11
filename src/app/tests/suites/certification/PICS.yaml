@@ -7074,10 +7074,10 @@ PICS:
       id: LTIME.S.A0002
 
     - label: "Does the DUT (Server) support 12 Hr Hour Format ?"
-      id: LTIME.S.A0000.12HR
+      id: LTIME.S.M.12HR
 
     - label: "Does the DUT (Server) support 24 Hr Hour Format ?"
-      id: LTIME.S.A0000.24HR
+      id: LTIME.S.M.24HR
 
     #
     # client / attributes

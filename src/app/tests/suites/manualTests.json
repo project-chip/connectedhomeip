@@ -276,6 +276,7 @@
     "TemperatureControlledCabinetMode": [
         "Test_TC_TCCM_1_2",
         "Test_TC_TCCM_2_1",
+        "Test_TC_TCCM_3_2",
         "Test_TC_TCCM_3_3"
     ],
     "Switch": ["Test_TC_SWTCH_2_2", "Test_TC_SWTCH_3_2"],

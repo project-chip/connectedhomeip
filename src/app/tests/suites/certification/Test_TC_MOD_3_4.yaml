@@ -81,6 +81,7 @@ tests:
           "Step 2d: Select a value from the list in step 2c with a different
           value than the StartUpMode value read in step 1. TH sends a write
           command for OnMode to the DUT with the selected value."
+      runIf: IsExpectedValue
       PICS: MOD.S.A0002 && MOD.S.C00.Rsp
       command: "writeAttribute"
       attribute: "OnMode"
