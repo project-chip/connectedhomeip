@@ -55,7 +55,11 @@ constexpr size_t kMaxMetadataLen       = 512; // The maximum length of Metadata 
 constexpr size_t kUpdateTokenMaxLength = 32;  // The expected length of the Update Token parameter used in multiple commands
 constexpr size_t kUpdateTokenMinLength = 8;   // The expected length of the Update Token parameter used in multiple commands
 
+#if kOtaProviderDelegateTableSize == 0
+OTAProviderDelegate ** gDelegateTable = nullptr;
+#else
 OTAProviderDelegate * gDelegateTable[kOtaProviderDelegateTableSize] = { nullptr };
+#endif
 
 OTAProviderDelegate * GetDelegate(EndpointId endpoint)
 {
