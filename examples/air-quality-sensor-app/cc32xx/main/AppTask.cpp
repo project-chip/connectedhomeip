@@ -41,6 +41,8 @@
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 
+#include "AirQualitySensorAppAttrUpdateDelegate.h"
+
 #include <ti/drivers/apps/Button.h>
 #include <ti/drivers/apps/LED.h>
 
@@ -89,6 +91,15 @@ int AppTask::StartAppTask()
 
     // Start App task.
     if (xTaskCreate(AppTaskMain, "APP", APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, APP_TASK_PRIORITY, &sAppTaskHandle) !=
+        pdPASS)
+    {
+        PLAT_LOG("Failed to create app task");
+        while (true)
+            ;
+    }
+
+    // Start App task.
+    if (xTaskCreate(AirQualityTaskMain, "AIR-APP", APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, APP_TASK_PRIORITY, &sAppTaskHandle) !=
         pdPASS)
     {
         PLAT_LOG("Failed to create app task");
@@ -186,6 +197,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     AppEvent event;
 
     sAppTask.Init();
+    
 
     while (true)
     {
@@ -195,6 +207,12 @@ void AppTask::AppTaskMain(void * pvParameter)
             sAppTask.DispatchEvent(&event);
         }
     }
+}
+
+void AppTask::AirQualityTaskMain(void * pvParameter)
+{
+    AirQualitySensorAppAttrUpdateDelegate runDelegate;
+    //this function should never return
 }
 
 void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask events)

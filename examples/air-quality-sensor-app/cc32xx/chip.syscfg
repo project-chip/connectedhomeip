@@ -38,7 +38,7 @@ Button1.$name     = "CONFIG_BTN_LEFT";
 Button2.$hardware = system.deviceData.board.components.SW3;
 Button2.$name     = "CONFIG_BTN_RIGHT";
 
-LED1.$hardware = system.deviceData.board.components.LED_BLUE;
+LED1.$hardware = system.deviceData.board.components.LED_YELLOW;
 LED1.$name     = "CONFIG_LED_BLUE";
 
 LED2.$hardware = system.deviceData.board.components.LED_GREEN;
