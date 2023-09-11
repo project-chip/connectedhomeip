@@ -13,7 +13,7 @@ This app can support most of the tests in the test plans.
 
 ## Out-of-band messages
 
-Out-of-band messages are available to simulate typical device behaviours and
+Out-of-band messages are available to simulate typical device behaviors and
 allow the app to navigate to all the states. To send an out-of-band message,
 echo the JSON message to the `/tmp/chip_rvc_fifq_<PID>` file. The JSON message
 must have a `"Name"` key that contains the command name. This name is shown in
@@ -41,10 +41,10 @@ use chip-tool to switch on the commissioning window
 the `--script-args` above.
 `--commissioning-method on-network --discriminator XXXX --passcode XXXX`.
 
-Below are the PICS files and PXIT definitions required for the different python
+Below are the PICS files and PIXIT definitions required for the different python
 tests.
 
-### RvcClean cluster
+### RvcCleanMode cluster
 
 PICS: `examples/rvc-app/rvc-common/pics/RVC_Clean_Mode_Cluster_Test_Plan.txt`
 
@@ -74,7 +74,7 @@ transition to mode 2", set the RvcRunMode to 0.
 This is not applicable because the RVC device does not support the StartUpMode
 attribute.
 
-### RvcRun cluster
+### RvcRunMode cluster
 
 PICS: `examples/rvc-app/rvc-common/pics/RVC_Run_Mode_Cluster_Test_Plan.txt`
 
