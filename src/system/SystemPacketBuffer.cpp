@@ -681,7 +681,7 @@ PacketBufferHandle PacketBufferHandle::CloneData() const
 
     for (PacketBuffer * original = mBuffer; original != nullptr; original = original->ChainedBuffer())
     {
-        uint16_t originalDataSize     = original->MaxDataLength();
+        uint16_t originalDataSize     = original->DataLength();
         uint16_t originalReservedSize = original->ReservedSize();
 
         if (originalDataSize + originalReservedSize > PacketBuffer::kMaxSizeWithoutReserve)
