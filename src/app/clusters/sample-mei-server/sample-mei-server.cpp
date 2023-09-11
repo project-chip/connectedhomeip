@@ -28,7 +28,7 @@ SampleMeiServer sampleMeiServer;
 
 void MatterSampleMeiPluginServerInitCallback()
 {
-    ChipLogProgress(Zcl, "Sample Mei Init. Ep# %d Total Ep# %u", EMBER_AF_SAMPLE_MEI_CLUSTER_SERVER_ENDPOINT_COUNT,
+    ChipLogProgress(Zcl, "Sample MEI Init. Ep# %d Total Ep# %u", EMBER_AF_SAMPLE_MEI_CLUSTER_SERVER_ENDPOINT_COUNT,
                     static_cast<uint16_t>(kNumSupportedEndpoints));
     ReturnOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(&sampleMeiServer));
     VerifyOrReturn(registerAttributeAccessOverride(&sampleMeiServer), CHIP_ERROR_INCORRECT_STATE);
