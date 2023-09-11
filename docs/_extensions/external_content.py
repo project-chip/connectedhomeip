@@ -2,8 +2,8 @@
 External content
 ################
 
-Copyright (c) 2021 Nordic Semiconductor ASA
-SPDX-License-Identifier: Apache-2.0
+SPDX-FileCopyrightText: 2021 Nordic Semiconductor ASA
+SPDX-License-Identifier: SPDX-License-Identifier: Apache-2.0
 
 Introduction
 ============

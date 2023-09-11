@@ -1,6 +1,6 @@
-/* Copyright 2019 Cypress Semiconductor Corporation
+/* SPDX-FileCopyrightText: 2019 Cypress Semiconductor Corporation
  *
- * Copyright (c) 2018 Open Source Foundries Limited
+ * SPDX-FileCopyrightText: 2018 Open Source Foundries Limited
  *
  * SPDX-License-Identifier: Apache-2.0
  */

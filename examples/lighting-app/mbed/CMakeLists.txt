@@ -1,4 +1,4 @@
-# Copyright (c) 2021 ARM Limited. All rights reserved.
+# SPDX-FileCopyrightText: 2021 ARM Limited
 # SPDX-License-Identifier: Apache-2.0
 
 cmake_minimum_required(VERSION 3.19.0)
