@@ -70,6 +70,8 @@ _DevicePairingDelegate_OnOpenWindowCompleteFunct = CFUNCTYPE(
     None, c_uint64, c_uint32, c_char_p, c_char_p, PyChipError)
 _DevicePairingDelegate_OnCommissioningStatusUpdateFunct = CFUNCTYPE(
     None, c_uint64, c_uint8, PyChipError)
+_DevicePairingDelegate_OnFabricCheckFunct = CFUNCTYPE(
+    None, c_uint64)
 # void (*)(Device *, CHIP_ERROR).
 #
 # CHIP_ERROR is actually signed, so using c_uint32 is weird, but everything
@@ -248,6 +250,7 @@ class ChipDeviceControllerBase():
 
         self.devCtrl = devCtrl
         self.name = name
+        self.fabricCheckNodeId = -1
 
         self._Cluster = ChipClusters(builtins.chipStack)
         self._Cluster.InitLib(self._dmLib)
@@ -266,6 +269,9 @@ class ChipDeviceControllerBase():
                 self._ChipStack.commissioningEventRes = self._dmLib.pychip_GetCompletionError()
             self._ChipStack.commissioningCompleteEvent.set()
             self._ChipStack.completeEvent.set()
+
+        def HandleFabricCheck(nodeId):
+            self.fabricCheckNodeId = nodeId
 
         def HandleOpenWindowComplete(nodeid: int, setupPinCode: int, setupManualCode: str,
                                      setupQRCode: str, err: PyChipError) -> None:
@@ -318,6 +324,9 @@ class ChipDeviceControllerBase():
             HandleCommissioningComplete)
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
             self.devCtrl, self.cbHandleCommissioningCompleteFunct)
+
+        self.cbHandleFabricCheckFunct = _DevicePairingDelegate_OnFabricCheckFunct(HandleFabricCheck)
+        self._dmLib.pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback(self.cbHandleFabricCheckFunct)
 
         self.cbHandleOpenWindowCompleteFunct = _DevicePairingDelegate_OnOpenWindowCompleteFunct(
             HandleOpenWindowComplete)
@@ -1010,7 +1019,7 @@ class ChipDeviceControllerBase():
                     event = pathTuple[1]
                 else:
                     raise ValueError("Unsupported Attribute Path")
-                urgent = pathTuple[-1]
+                urgent = bool(pathTuple[-1]) if len(pathTuple) > 2 else False
         return ClusterAttribute.EventPath(
             EndpointId=endpoint, Cluster=cluster, Event=event, Urgent=urgent)
 
@@ -1348,6 +1357,9 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_SetTrustedTimeSource.restype = PyChipError
             self._dmLib.pychip_DeviceController_SetTrustedTimeSource.argtypes = [c_uint64, c_uint16]
 
+            self._dmLib.pychip_DeviceController_SetCheckMatchingFabric.restype = PyChipError
+            self._dmLib.pychip_DeviceController_SetCheckMatchingFabric.argtypes = [c_bool]
+
             self._dmLib.pychip_DeviceController_ResetCommissioningParameters.restype = PyChipError
             self._dmLib.pychip_DeviceController_ResetCommissioningParameters.argtypes = []
 
@@ -1440,6 +1452,10 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback.argtypes = [
                 c_void_p, _DevicePairingDelegate_OnCommissioningStatusUpdateFunct]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback.restype = PyChipError
+
+            self._dmLib.pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback.argtypes = [
+                _DevicePairingDelegate_OnFabricCheckFunct]
+            self._dmLib.pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback.restype = PyChipError
 
             self._dmLib.pychip_GetConnectedDeviceByNodeId.argtypes = [
                 c_void_p, c_uint64, _DeviceAvailableFunct]
@@ -1661,6 +1677,15 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetTrustedTimeSource(nodeId, endpoint)
         ).raise_on_error()
+
+    def SetCheckMatchingFabric(self, check: bool):
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetCheckMatchingFabric(check)
+        ).raise_on_error()
+
+    def GetFabricCheckResult(self) -> int:
+        return self.fabricCheckNodeId
 
     def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,
                             filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None, discoveryTimeoutMsec: int = 30000) -> PyChipError:

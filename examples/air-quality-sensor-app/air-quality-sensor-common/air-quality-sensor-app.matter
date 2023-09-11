@@ -75,6 +75,10 @@ server cluster Identify = 3 {
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
+  bitmap Feature : BITMAP32 {
+    kTagList = 0x1;
+  }
+
   struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
@@ -2042,7 +2046,7 @@ endpoint 1 {
   }
 
   server cluster AirQuality {
-    ram      attribute airQuality default = 0;
+    callback attribute airQuality default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2076,9 +2080,9 @@ endpoint 1 {
   }
 
   server cluster CarbonMonoxideConcentrationMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2088,9 +2092,9 @@ endpoint 1 {
   }
 
   server cluster CarbonDioxideConcentrationMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2100,9 +2104,9 @@ endpoint 1 {
   }
 
   server cluster NitrogenDioxideConcentrationMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2112,9 +2116,9 @@ endpoint 1 {
   }
 
   server cluster OzoneConcentrationMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2124,9 +2128,9 @@ endpoint 1 {
   }
 
   server cluster Pm25ConcentrationMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2136,9 +2140,9 @@ endpoint 1 {
   }
 
   server cluster FormaldehydeConcentrationMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2148,9 +2152,9 @@ endpoint 1 {
   }
 
   server cluster Pm1ConcentrationMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2160,9 +2164,9 @@ endpoint 1 {
   }
 
   server cluster Pm10ConcentrationMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2172,9 +2176,9 @@ endpoint 1 {
   }
 
   server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2184,9 +2188,9 @@ endpoint 1 {
   }
 
   server cluster RadonConcentrationMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;

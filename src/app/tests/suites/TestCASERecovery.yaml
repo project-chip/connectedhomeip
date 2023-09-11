@@ -33,7 +33,7 @@ tests:
       command: "readAttribute"
       attribute: "DataModelRevision"
       response:
-          value: 1
+          value: 17
 
     - label: "Reboot the server"
       cluster: "SystemCommands"
@@ -72,4 +72,4 @@ tests:
       command: "readAttribute"
       attribute: "DataModelRevision"
       response:
-          value: 1
+          value: 17

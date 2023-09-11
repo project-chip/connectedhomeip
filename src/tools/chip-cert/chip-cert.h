@@ -274,7 +274,7 @@ public:
                 (mFlags.Has(CertErrorFlags::kExtBasicPathLenWrong) || mFlags.Has(CertErrorFlags::kExtBasicPathLen0) ||
                  mFlags.Has(CertErrorFlags::kExtBasicPathLen1) || mFlags.Has(CertErrorFlags::kExtBasicPathLen2)));
     }
-    int GetExtensionBasicPathLenValue(uint8_t & certType)
+    int GetExtensionBasicPathLenValue(chip::Credentials::CertType certType)
     {
         if (mFlags.Has(CertErrorFlags::kExtBasicPathLen0))
         {
@@ -290,15 +290,15 @@ public:
         }
         if (mFlags.Has(CertErrorFlags::kExtBasicPathLenWrong))
         {
-            if (certType == chip::Credentials::kCertType_Node)
+            if (certType == chip::Credentials::CertType::kNode)
             {
                 return 2;
             }
-            if (certType == chip::Credentials::kCertType_ICA)
+            if (certType == chip::Credentials::CertType::kICA)
             {
                 return 1;
             }
-            if (certType == chip::Credentials::kCertType_Root)
+            if (certType == chip::Credentials::CertType::kRoot)
             {
                 return 0;
             }
@@ -438,10 +438,10 @@ extern bool LoadChipCert(const char * fileNameOrStr, bool isTrused, chip::Creden
 extern bool WriteCert(const char * fileName, X509 * cert, CertFormat certFmt);
 extern bool WriteChipCert(const char * fileName, const chip::ByteSpan & cert, CertFormat certFmt);
 
-extern bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey, const struct tm & validFrom,
-                     uint32_t validDays, int pathLen, const FutureExtensionWithNID * futureExts, uint8_t futureExtsCount,
-                     X509 * newCert, EVP_PKEY * newKey, CertStructConfig & certConfig);
-extern CHIP_ERROR MakeCertTLV(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey,
+extern bool MakeCert(chip::Credentials::CertType certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey,
+                     const struct tm & validFrom, uint32_t validDays, int pathLen, const FutureExtensionWithNID * futureExts,
+                     uint8_t futureExtsCount, X509 * newCert, EVP_PKEY * newKey, CertStructConfig & certConfig);
+extern CHIP_ERROR MakeCertTLV(chip::Credentials::CertType certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey,
                               const struct tm & validFrom, uint32_t validDays, int pathLen,
                               const FutureExtensionWithNID * futureExts, uint8_t futureExtsCount, X509 * x509Cert,
                               EVP_PKEY * newKey, CertStructConfig & certConfig, chip::MutableByteSpan & chipCert);

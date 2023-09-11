@@ -638,7 +638,7 @@ void Engine::Run()
         ReadHandler * readHandler = imEngine->ActiveHandlerAt(mCurReadHandlerIdx % (uint32_t) imEngine->mReadHandlers.Allocated());
         VerifyOrDie(readHandler != nullptr);
 
-        if (imEngine->GetReportScheduler()->IsReportableNow(readHandler))
+        if (readHandler->ShouldReportUnscheduled() || imEngine->GetReportScheduler()->IsReportableNow(readHandler))
         {
             mRunningReadHandler = readHandler;
             CHIP_ERROR err      = BuildAndSendSingleReportData(readHandler);
@@ -831,7 +831,7 @@ CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
             // We call AttributePathIsDirty for both read interactions and subscribe interactions, since we may send inconsistent
             // attribute data between two chunks. AttributePathIsDirty will not schedule a new run for read handlers which are
             // waiting for a response to the last message chunk for read interactions.
-            if (handler->IsGeneratingReports() || handler->IsAwaitingReportResponse())
+            if (handler->CanStartReporting() || handler->IsAwaitingReportResponse())
             {
                 for (auto object = handler->GetAttributePathList(); object != nullptr; object = object->mpNext)
                 {

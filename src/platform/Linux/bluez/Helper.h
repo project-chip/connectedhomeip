@@ -50,15 +50,17 @@
 
 #pragma once
 
-#include "Types.h"
+#include <lib/core/CHIPError.h>
+#include <system/SystemPacketBuffer.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include "Types.h"
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & aBleAdvConfig, BluezEndpoint *& apEndpoint);
+CHIP_ERROR InitBluezBleLayer(bool aIsCentral, const char * apBleAddr, const BLEAdvConfig & aBleAdvConfig,
+                             BluezEndpoint *& apEndpoint);
 CHIP_ERROR ShutdownBluezBleLayer(BluezEndpoint * apEndpoint);
 CHIP_ERROR SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf);
 CHIP_ERROR CloseBluezConnection(BLE_CONNECTION_OBJECT apConn);
@@ -74,11 +76,9 @@ CHIP_ERROR BluezSubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn);
 /// Unsubscribe from the CHIP TX characteristic on the remote peripheral device
 CHIP_ERROR BluezUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn);
 
-CHIP_ERROR ConnectDevice(BluezDevice1 * apDevice, BluezEndpoint * apEndpoint);
+CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice, BluezEndpoint * apEndpoint);
 void CancelConnect(BluezEndpoint * apEndpoint);
 
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

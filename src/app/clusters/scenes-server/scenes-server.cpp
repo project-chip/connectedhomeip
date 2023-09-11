@@ -510,7 +510,15 @@ void ScenesServer::GroupWillBeRemoved(FabricIndex aFabricIx, EndpointId aEndpoin
     SceneTable * sceneTable = scenes::GetSceneTableImpl(aEndpointId);
     VerifyOrReturn(nullptr != sceneTable);
 
-    MakeSceneInvalid(aEndpointId);
+    chip::GroupId currentGroup;
+    Attributes::CurrentGroup::Get(aEndpointId, &currentGroup);
+
+    // If currentGroup is what is being removed, we can't possibly still have a valid scene,
+    // because the scene we have (if any) will also be removed.
+    if (aGroupId == currentGroup)
+    {
+        MakeSceneInvalid(aEndpointId);
+    }
 
     VerifyOrReturn(nullptr != mGroupProvider);
     if (0 != aGroupId && !mGroupProvider->HasEndpoint(aFabricIx, aGroupId, aEndpointId))

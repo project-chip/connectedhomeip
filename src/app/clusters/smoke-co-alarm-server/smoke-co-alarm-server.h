@@ -25,10 +25,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
-#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
-#include <app/util/config.h>
-#include <protocols/interaction_model/StatusCode.h>
 
 /**
  * @brief Smoke CO Alarm Server Plugin class
@@ -37,6 +34,9 @@ class SmokeCoAlarmServer
 {
 public:
     static SmokeCoAlarmServer & Instance();
+
+    /* Expected byte size of the PriorityOrder */
+    static constexpr size_t kPriorityOrderLength = 8;
 
     using AlarmStateEnum         = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
     using ContaminationStateEnum = chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum;
@@ -47,19 +47,23 @@ public:
     using SensitivityEnum        = chip::app::Clusters::SmokeCoAlarm::SensitivityEnum;
 
     /**
-     * For all the functions below, the return value is true on success, false on failure
+     * @brief Set the highest level of Expressed State according to priorityOrder
+     * @param endpointId ID of the endpoint
+     * @param priorityOrder Priority order of expressed state from highest to lowest
      */
+    void SetExpressedStateByPriority(chip::EndpointId endpointId,
+                                     const std::array<ExpressedStateEnum, kPriorityOrderLength> & priorityOrder);
 
     /**
-     * @brief Updates the expressed state with new value
-     *
-     * @note If the value of ExpressedState is not Normal, the attribute corresponding to the value should not be Normal.
-     *
+     * @brief Set the highest level of Expressed State according to priorityOrder
      * @param endpointId ID of the endpoint
-     * @param newExpressedState new expressed state
      * @return true on success, false on failure
      */
-    bool SetExpressedState(chip::EndpointId endpointId, ExpressedStateEnum newExpressedState);
+    bool RequestSelfTest(chip::EndpointId endpointId);
+
+    /**
+     * For all the functions below, the return value is true on success, false on failure
+     */
 
     bool SetSmokeState(chip::EndpointId endpointId, AlarmStateEnum newSmokeState);
     bool SetCOState(chip::EndpointId endpointId, AlarmStateEnum newCOState);
@@ -95,14 +99,22 @@ public:
 
 private:
     /**
+     * @brief Updates the expressed state with new value
+     *
+     * @note If the value of ExpressedState is not Normal, the attribute corresponding to the value should not be Normal.
+     *
+     * @param endpointId ID of the endpoint
+     * @param newExpressedState new expressed state
+     */
+    void SetExpressedState(chip::EndpointId endpointId, ExpressedStateEnum newExpressedState);
+
+    /**
      * @brief Common handler for SelfTestRequest commands
      *
      * @param commandObj    original command context
      * @param commandPath   original command path
-     * @return true         if successful
-     * @return false        if error happened
      */
-    bool HandleRemoteSelfTestRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
+    void HandleRemoteSelfTestRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
 
     /**
      * @brief Send generic event
@@ -162,8 +174,5 @@ private:
  * @note The application must set the ExpressedState to "Testing"
  *
  * @param endpointId endpoint for which SelfTestRequest command is called
- *
- * @retval true on success
- * @retval false if error happened (err should be set to appropriate error code)
  */
-bool emberAfPluginSmokeCoAlarmSelfTestRequestCommand(chip::EndpointId endpointId);
+void emberAfPluginSmokeCoAlarmSelfTestRequestCommand(chip::EndpointId endpointId);
