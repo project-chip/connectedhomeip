@@ -137,6 +137,17 @@ set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
 # Define 'chip-ota-image' target for building CHIP OTA image
 # ==============================================================================
 
+
+if(${TLNK_USB_DONGLE} MATCHES y)
+  if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BOARD}_usb_boot.overlay")
+    set(USB_BOOT_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}_usb_boot.overlay")
+  else()
+    unset(USB_BOOT_DTC_OVERLAY_FILE)
+  endif()
+else()
+  unset(USB_BOOT_DTC_OVERLAY_FILE)
+endif()
+
 if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BOARD}.overlay")
     set(GLOBAL_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}.overlay")
 else()
@@ -153,14 +164,14 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
     add_custom_target(build_mcuboot ALL
         COMMAND
         west build -b ${BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
-            -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE} -DDTC_OVERLAY_FILE=${GLOBAL_DTC_OVERLAY_FILE}
+            -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE} -DDTC_OVERLAY_FILE="${GLOBAL_DTC_OVERLAY_FILE};${USB_BOOT_DTC_OVERLAY_FILE}"
     )
 
     add_custom_target(merge_mcuboot ALL
         COMMAND
         dd if=${PROJECT_BINARY_DIR}/../modules/chip-module/build_mcuboot/zephyr/zephyr.bin of=${PROJECT_BINARY_DIR}/zephyr.bin
         COMMAND
-        dd if=${PROJECT_BINARY_DIR}/zephyr.signed.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=76
+        dd if=${PROJECT_BINARY_DIR}/zephyr.signed.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=100
     )
 
     chip_ota_image(chip-ota-image
@@ -175,7 +186,7 @@ endif()
 if (CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE)
     add_custom_target(merge_factory_data ALL
         COMMAND
-        dd if=${PROJECT_BINARY_DIR}/factory/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=1040
+        dd if=${PROJECT_BINARY_DIR}/factory/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=1052
     )
 if (CONFIG_CHIP_OTA_IMAGE_BUILD)
     add_dependencies(merge_factory_data merge_mcuboot)

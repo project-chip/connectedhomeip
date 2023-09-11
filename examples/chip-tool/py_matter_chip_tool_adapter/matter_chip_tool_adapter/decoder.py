@@ -303,6 +303,22 @@ class StructFieldsNameConverter():
                     )
                     del value[str(field_code)]
 
+                # darwin-framework-tool returns the field name but with a different casing than what
+                # the test suite expects.
+                # To not confuse the test suite, the field name is replaced by its field name
+                # equivalent from the spec and then removed.
+                wrong_casing_field_name = field_name[0].lower(
+                ) + field_name[1:]
+                if field_name not in value and field_name[0].upper() == field_name[0] and wrong_casing_field_name in value:
+                    value[field_name] = self.run(
+                        specs,
+                        value[wrong_casing_field_name],
+                        cluster_name,
+                        field_type,
+                        field_array
+                    )
+                    del value[wrong_casing_field_name]
+
             if specs.is_fabric_scoped(struct):
                 value[_FABRIC_INDEX_FIELD_NAME] = self.run(
                     specs,

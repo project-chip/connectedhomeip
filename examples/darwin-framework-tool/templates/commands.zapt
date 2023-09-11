@@ -74,6 +74,10 @@ public:
             {{#if hasSpecificResponse}}
                 ^(MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase responseName}}Params * _Nullable values, NSError * _Nullable error) {
                     NSLog(@"Values: %@", values);
+                    if (error == nil) {
+                        constexpr chip::CommandId responseId = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase responseName}}::Id;
+                        RemoteDataModelLogger::LogCommandAsJSON(@(endpointId), @(clusterId), @(responseId), values);
+                    }
             {{else}}
                 ^(NSError * _Nullable error) {
             {{/if}}
@@ -81,6 +85,12 @@ public:
                     if (error != nil) {
                         mError = error;
                         LogNSError("Error", error);
+                        {{#if hasSpecificResponse}}
+                          constexpr chip::CommandId responseId = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase responseName}}::Id;
+                          RemoteDataModelLogger::LogCommandErrorAsJSON(@(endpointId), @(clusterId), @(responseId), error);
+                        {{else}}
+                          RemoteDataModelLogger::LogCommandErrorAsJSON(@(endpointId), @(clusterId), @(commandId), error);
+                        {{/if}}
                     }
                     if (responsesNeeded == 0) {
                         SetCommandExitStatus(mError);
@@ -153,8 +163,11 @@ public:
         {{~/if_is_fabric_scoped_struct~}}
         ^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
         NSLog(@"{{asUpperCamelCase parent.name preserveAcronyms=true}}.{{asUpperCamelCase name preserveAcronyms=true}} response %@", [value description]);
-        if (error != nil) {
+        if (error == nil) {
+          RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+        } else {
           LogNSError("{{asUpperCamelCase parent.name preserveAcronyms=true}} {{asUpperCamelCase name preserveAcronyms=true}} read Error", error);
+          RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
         }
         SetCommandExitStatus(error);
          }];
@@ -200,17 +213,33 @@ public:
         {{#if_chip_complex}}
         {{asObjectiveCType type parent.name}} value;
         {{>decodable_value target="value" source="mValue" cluster=parent.name errorCode="return err;" depth=0}}
-        {{else if (isOctetString type)}}
-        {{asObjectiveCType type parent.name}} value = [[NSData alloc] initWithBytes:mValue.data() length:mValue.size()];
-        {{else if (isString type)}}
-        {{asObjectiveCType type parent.name}} value = [[NSString alloc] initWithBytes:mValue.data() length:mValue.size() encoding:NSUTF8StringEncoding];
         {{else}}
-        {{asObjectiveCType type parent.name}} value = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:mValue];
+          {{#if isNullable}}
+            {{asObjectiveCType type parent.name}} value = nil;
+            if (!mValue.IsNull()) {
+              {{#if (isOctetString type)}}
+                value = [[NSData alloc] initWithBytes:mValue.Value().data() length:mValue.Value().size()];
+              {{else if (isString type)}}
+                value = [[NSString alloc] initWithBytes:mValue.Value().data() length:mValue.Value().size() encoding:NSUTF8StringEncoding];
+              {{else}}
+                value = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:mValue.Value()];
+              {{/if}}
+            }
+          {{else}}
+            {{#if (isOctetString type)}}
+              {{asObjectiveCType type parent.name}} value = [[NSData alloc] initWithBytes:mValue.data() length:mValue.size()];
+            {{else if (isString type)}}
+              {{asObjectiveCType type parent.name}} value = [[NSString alloc] initWithBytes:mValue.data() length:mValue.size() encoding:NSUTF8StringEncoding];
+            {{else}}
+              {{asObjectiveCType type parent.name}} value = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:mValue{{#if isNullable}}.Value(){{/if}}];
+            {{/if}}
+          {{/if}}
         {{/if_chip_complex}}
 
         [cluster write{{>attribute}}WithValue:value params:params completion:^(NSError * _Nullable error) {
             if (error != nil) {
               LogNSError("{{asUpperCamelCase parent.name preserveAcronyms=true}} {{asUpperCamelCase name preserveAcronyms=true}} write Error", error);
+              RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
             }
             SetCommandExitStatus(error);
             }];
@@ -222,11 +251,11 @@ private:
     {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}} mValue;
     TypedComplexArgument<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}> mComplex;
     {{else if (isOctetString type)}}
-    chip::ByteSpan mValue;
+    {{#if isNullable}}chip::app::DataModel::Nullable<chip::ByteSpan>{{else}}chip::ByteSpan{{/if}} mValue;
     {{else if (isCharString type)}}
-    chip::ByteSpan mValue;
+    {{#if isNullable}}chip::app::DataModel::Nullable<chip::ByteSpan>{{else}}chip::ByteSpan{{/if}} mValue;
     {{else}}
-    {{as_underlying_zcl_type type}} mValue;
+    {{#if isNullable}}chip::app::DataModel::Nullable<{{as_underlying_zcl_type type}}>{{else}}{{as_underlying_zcl_type type}}{{/if}} mValue;
     {{/if_chip_complex}}
 };
 
@@ -265,6 +294,11 @@ public:
                                 subscriptionEstablished:^(){ mSubscriptionEstablished=YES; }
                                 reportHandler:^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
         NSLog(@"{{asUpperCamelCase parent.name preserveAcronyms=true}}.{{asUpperCamelCase name preserveAcronyms=true}} response %@", [value description]);
+            if (error == nil) {
+              RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+            } else {
+              RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+            }
         SetCommandExitStatus(error);
          }];
 
