@@ -70,7 +70,7 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 
 #include <lib/support/BytesToHex.h>
 
-#ifdef PERFORMANCE_TEST_ENABLED 
+#ifdef PERFORMANCE_TEST_ENABLED
 #include <performance_test_commands.h>
 #endif
 
