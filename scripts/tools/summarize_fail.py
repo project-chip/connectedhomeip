@@ -108,7 +108,7 @@ def main():
             fail_rate[workflow] = [info.value_counts(normalize=True)["failure"] * 100]
         except:
             logging.error(f"Recent runs info for {workflow} was not collected.")
-    fail_rate = pd.DataFrame.from_dict(results, 'index', columns=["Fail Rate"])
+    fail_rate = pd.DataFrame.from_dict(fail_rate, 'index', columns=["Fail Rate"])
     print("Recent Fail Rate of Each Workflow:")
     print(fail_rate.to_string(index=False))
     fail_rate.to_csv("workflow_fail_rate.csv")
