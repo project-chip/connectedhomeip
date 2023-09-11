@@ -186,12 +186,12 @@ jobs:
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink Resource Monitoring App
+            - name: Build example Telink (B91) Resource Monitoring App
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-resource-monitoring' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9518adk80d pump-controller-app \
+                    telink tlsr9518adk80d resource-monitoring-app \
                     out/telink-tlsr9518adk80d-resource-monitoring/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
