@@ -47,6 +47,9 @@ INVALID_TESTS = {
     "PICS_Example.yaml",
     "Response_Example.yaml",
     "Test_Example.yaml",
+    "Test_Example_1.yaml",
+    "Test_Example_2.yaml",
+    "Test_Example_3.yaml",
 }
 
 
@@ -127,6 +130,16 @@ def _GetSlowTests() -> Set[str]:
     }
 
 
+def _GetExtraSlowTests() -> Set[str]:
+    """Generally tests using sleep() so much they should never run in CI.
+
+       1 minute seems like a good threshold to consider something extra slow
+    """
+    return {
+        "Test_TC_DGGEN_2_1.yaml",                         # > 2 hours
+    }
+
+
 def _GetInDevelopmentTests() -> Set[str]:
     """Tests that fail in YAML for some reason."""
     return {
@@ -145,6 +158,8 @@ def _GetInDevelopmentTests() -> Set[str]:
                                              # TestEventTriggersEnabled is true, which it's not in CI.
         "Test_TC_SMOKECO_2_6.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
                                              # TestEventTriggersEnabled is true, which it's not in CI.
+        "Test_TC_IDM_1_2.yaml",  # Broken harness: https://github.com/project-chip/connectedhomeip/issues/29115
+        "Test_TC_S_2_4.yaml",  # https://github.com/project-chip/connectedhomeip/issues/29117
     }
 
 
@@ -177,6 +192,15 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_G_2_4.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_RVCRUNM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_RVCCLEANM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        # chip-repl and chip-tool disagree on what the YAML here should look like: https://github.com/project-chip/connectedhomeip/issues/29110
+        "TestClusterMultiFabric.yaml",
+    }
+
+
+def _GetPurposefulFailureTests() -> Set[str]:
+    """Tests that fail in YAML on purpose."""
+    return {
+        "TestPurposefulFailureEqualities.yaml"
     }
 
 
@@ -243,12 +267,17 @@ def tests_with_command(chip_tool: str, is_manual: bool):
         )
 
 
-def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool):
+def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, use_short_run_name: bool):
+    """
+    use_short_run_name should be true if we want the run_name to be "Test_ABC" instead of "some/path/Test_ABC.yaml"
+    """
     manual_tests = _GetManualTests()
     flaky_tests = _GetFlakyTests()
     slow_tests = _GetSlowTests()
+    extra_slow_tests = _GetExtraSlowTests()
     in_development_tests = _GetInDevelopmentTests()
     chip_repl_unsupported_tests = _GetChipReplUnsupportedTests()
+    purposeful_failure_tests = _GetPurposefulFailureTests()
 
     for path in _AllYamlTests():
         if not _IsValidYamlTest(path.name):
@@ -264,14 +293,25 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool):
         if path.name in slow_tests:
             tags.add(TestTag.SLOW)
 
+        if path.name in extra_slow_tests:
+            tags.add(TestTag.EXTRA_SLOW)
+
         if path.name in in_development_tests:
             tags.add(TestTag.IN_DEVELOPMENT)
+
+        if path.name in purposeful_failure_tests:
+            tags.add(TestTag.PURPOSEFUL_FAILURE)
 
         if treat_repl_unsupported_as_in_development and path.name in chip_repl_unsupported_tests:
             tags.add(TestTag.IN_DEVELOPMENT)
 
+        if use_short_run_name:
+            run_name = path.stem  # `path.stem` converts "some/path/Test_ABC_1.2.yaml" to "Test_ABC.1.2"
+        else:
+            run_name = str(path)
+
         yield TestDefinition(
-            run_name=str(path),
+            run_name=run_name,
             name=path.stem,  # `path.stem` converts "some/path/Test_ABC_1.2.yaml" to "Test_ABC.1.2"
             target=target_for_name(path.name),
             tags=tags,
@@ -279,12 +319,12 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool):
 
 
 def AllReplYamlTests():
-    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=True):
+    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=True, use_short_run_name=False):
         yield test
 
 
 def AllChipToolYamlTests():
-    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False):
+    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, use_short_run_name=True):
         yield test
 
 
