@@ -9,13 +9,13 @@ You can use this example as a reference for creating your own application.
 1. Pull docker image from repository:
 
     ```bash
-    $ docker pull ghcr.io/project-chip/chip-build-telink:1
+    $ docker pull ghcr.io/project-chip/chip-build-telink:10
     ```
 
 2. Run docker container:
 
     ```bash
-    $ docker run -it --rm -v ${CHIP_BASE}:/root/chip -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" ghcr.io/project-chip/chip-build-telink:1
+    $ docker run -it --rm -v ${CHIP_BASE}:/root/chip -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" ghcr.io/project-chip/chip-build-telink:10
     ```
 
     here `${CHIP_BASE}` is directory which contains CHIP repo files **!!!Pay
@@ -27,10 +27,11 @@ You can use this example as a reference for creating your own application.
     $ source ./scripts/activate.sh
     ```
 
-4. In the example dir run:
+4. In the example dir run (replace _<build_target>_ with your board name, for
+   example, `tlsr9518adk80d` or `tlsr9528a`):
 
     ```bash
-    $ west build
+    $ west build -b <build_target>
     ```
 
 5. Flash binary:
@@ -58,7 +59,7 @@ The following buttons are available on **tlsr9518adk80d** board:
 | Name     | Function               | Description                                                                                            |
 | :------- | :--------------------- | :----------------------------------------------------------------------------------------------------- |
 | Button 1 | Factory reset          | Perform factory reset to forget currently commissioned Thread network and back to uncommissioned state |
-| Button 2 | AirQuality control     | Manually triggers the AirQuality state                                                                 |
+| Button 2 | NA                     | NA                                                                                                     |
 | Button 3 | Thread start           | Commission thread with static credentials and enables the Thread on device                             |
 | Button 4 | Open commission window | The button is opening commissioning window to perform commissioning over BLE                           |
 
