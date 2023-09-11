@@ -83,7 +83,7 @@ def main():
     df.to_csv("recent_fails.csv", index=False)
 
     logging.info("Listing frequency of recent fails by workflow.")
-    frequency = df["Workflow"].value_counts(normalize=True).mul(100).astype(
+    frequency = df["Workflow"].value_counts(normalize=True).mul(100).round().astype(
         str).reset_index(name="Percentage")  # Reformat this from "50.0" to "50%"
     print("Share of Recent Fails by Workflow:")
     print(frequency.to_string(index=False))
@@ -105,7 +105,7 @@ def main():
         try:
             info = pd.read_json(f"workflow_pass_rate/{workflow}/run_list.json")
             info = info[info["conclusion"].str.len() > 0]
-            fail_rate[workflow] = [info.value_counts(normalize=True)["failure"] * 100]
+            fail_rate[workflow] = [info.value_counts(normalize=True).mul(100).round()["failure"]]
         except:
             logging.error(f"Recent runs info for {workflow} was not collected.")
     fail_rate = pd.DataFrame.from_dict(fail_rate, 'index', columns=["Fail Rate"])
