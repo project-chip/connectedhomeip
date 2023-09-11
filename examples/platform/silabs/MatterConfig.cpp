@@ -231,7 +231,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #endif
 
 #ifdef PERFORMANCE_TEST_ENABLED
-    // Set up Test Event Trigger command of the General Diagnostics cluster. Used only in performace testing
+    // Set up Test Event Trigger command of the General Diagnostics cluster. Used only in performance testing
     static SilabsTestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(kTestEventTriggerEnableKey) };
     initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
 #endif
