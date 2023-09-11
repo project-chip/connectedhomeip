@@ -47,7 +47,7 @@ void MatterSampleMeiPluginServerInitCallback()
 
 void MatterSampleMeiClusterServerShutdownCallback(chip::EndpointId endpoint)
 {
-    sampleMeiServer.Shutdown();
+    sampleMeiServer.UnregisterEndpoint(endpoint);
 }
 
 // *****************************************************************************
@@ -147,8 +147,8 @@ CHIP_ERROR SampleMeiServer::Write(const ConcreteDataAttributePath & aPath, Attri
         ReturnErrorOnFailure(aDecoder.Decode(content[endpointIndex].flipflop));
         ChipLogProgress(Zcl, "Write Attribute flip-flop on endpoint %d index %u newValue %d oldValue %d", endpoint,
                         static_cast<uint16_t>(endpointIndex), content[endpointIndex].flipflop, oldValue);
-    }
-    break;
+        break;
+        }
     default:
         break;
     }
