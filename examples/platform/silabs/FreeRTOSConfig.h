@@ -108,7 +108,7 @@ extern "C" {
 #include <stdint.h>
 
 #ifdef SIWX_917
-#include "RS1xxxx_9117.h"
+#include "si91x_device.h"
 extern uint32_t SystemCoreClock;
 #else // For EFR32
 #include "RTE_Components.h"
@@ -181,7 +181,12 @@ to all Cortex-M ports, and do not rely on any particular library functions. */
 #define configKERNEL_INTERRUPT_PRIORITY (255)
 /* !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
+#ifdef SIWX_917
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY 20
+#else
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY 48
+#endif // SIWX_917
+
 #define configENABLE_FPU 0
 #define configENABLE_MPU 0
 /* FreeRTOS Secure Side Only and TrustZone Security Extension */
@@ -227,9 +232,9 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #endif // DIC
 #else  // SL_WIFI
 #if SL_CONFIG_OPENTHREAD_LIB == 1
-#define configTOTAL_HEAP_SIZE ((size_t)(28 * 1024))
+#define configTOTAL_HEAP_SIZE ((size_t)(40 * 1024))
 #else
-#define configTOTAL_HEAP_SIZE ((size_t)(26 * 1024))
+#define configTOTAL_HEAP_SIZE ((size_t)(38 * 1024))
 #endif // SL_CONFIG_OPENTHREAD_LIB
 #endif // configTOTAL_HEAP_SIZE
 #endif // configTOTAL_HEAP_SIZE

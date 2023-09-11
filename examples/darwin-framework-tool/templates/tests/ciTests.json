@@ -30,6 +30,8 @@
         "Test_TC_ACL_2_8",
         "Test_TC_ACL_2_9",
         "Test_TC_ACL_2_10",
+        "Disabled due to GetCommissionerRootCertificate command not being supported",
+        "Test_TC_OPCREDS_3_7",
         "DL_LockUnlock",
         "Disabled due to Events verification not supported",
         "Test_TC_BINFO_2_2",
@@ -39,9 +41,15 @@
         "Test_TC_SMOKECO_2_3",
         "Test_TC_SMOKECO_2_4",
         "Test_TC_SMOKECO_2_5",
+        "Test_TC_DGGEN_2_1",
+        "Test_TC_OPSTATE_2_4",
+        "Disabled due to undefined properties",
+        "Test_TC_SMOKECO_2_6",
         "Disabled because the power source configuration cluster is now deprecated and not present in all-clusters",
         "Test_TC_PSCFG_1_1",
         "Test_TC_PSCFG_2_1",
-        "Test_TC_PSCFG_2_2"
+        "Test_TC_PSCFG_2_2",
+        "Disabled because darwin-framework-tool does not support GetCommissionerRootCertificate",
+        "Test_AddNewFabricFromExistingFabric"
     ]
 }

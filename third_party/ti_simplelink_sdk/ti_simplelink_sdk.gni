@@ -247,6 +247,7 @@ template("ti_simplelink_sdk") {
         "${ti_simplelink_sdk_root}/kernel/freertos/dpl/PowerCC26X2_freertos.c",
         "${ti_simplelink_sdk_root}/kernel/freertos/dpl/TimerPCC26XX_freertos.c",
         "${ti_simplelink_sdk_root}/kernel/freertos/startup/startup_cc13x2_cc26x2_gcc.c",
+        "${ti_simplelink_sdk_root}/source/ti/drivers/sha2/SHA2CC26X2.c",
       ]
     } else if (ti_simplelink_device_family == "cc13x4_26x4") {
       sources += [
@@ -255,6 +256,7 @@ template("ti_simplelink_sdk") {
         "${ti_simplelink_sdk_root}/kernel/freertos/dpl/PowerCC26X2_freertos.c",
         "${ti_simplelink_sdk_root}/kernel/freertos/dpl/TimerPCC26XX_freertos.c",
         "${ti_simplelink_sdk_root}/kernel/freertos/startup/startup_cc13x4_cc26x4_gcc.c",
+        "${ti_simplelink_sdk_root}/source/ti/drivers/sha2/SHA2CC26X2.c",
       ]
     } else if (ti_simplelink_device_family == "cc32xx") {
       sources += [

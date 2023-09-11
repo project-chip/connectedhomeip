@@ -21,10 +21,8 @@ import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("silabs_board.gni")
 
-if (use_rs9116) {
+if (use_rs9116 || use_SiWx917) {
   wifi_sapi_root = "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
-} else {
-  wifi_sapi_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
 }
 
 declare_args() {
@@ -54,7 +52,7 @@ declare_args() {
   sl_ot_active_interval_ms = 200  # 200ms Active Intervals
 
   # ICD Matter Configuration flags
-  sl_idle_mode_interval_ms = 600000  # 10min Idle Mode Interval
+  sl_idle_mode_interval_s = 600  # 10min Idle Mode Interval
   sl_active_mode_interval_ms = 1000  # 1s Active Mode Interval
   sl_active_mode_threshold_ms = 500  # 500ms Active Mode Threshold
   sl_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
@@ -354,7 +352,7 @@ template("efr32_sdk") {
         "SL_ICD_ENABLED=1",
         "SL_ACTIVE_MODE_THRESHOLD=${sl_active_mode_threshold_ms}",
         "SL_ACTIVE_MODE_INTERVAL=${sl_active_mode_interval_ms}",
-        "SL_IDLE_MODE_INTERVAL=${sl_idle_mode_interval_ms}",
+        "SL_IDLE_MODE_INTERVAL=${sl_idle_mode_interval_s}",
         "SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${sl_icd_supported_clients_per_fabric}",
       ]
 
@@ -518,16 +516,7 @@ template("efr32_sdk") {
       cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
     }
 
-    cflags += [
-      "-Wno-maybe-uninitialized",
-      "-Wno-shadow",
-
-      # see https://github.com/project-chip/connectedhomeip/issues/26058
-      "-Wno-error=array-parameter",
-
-      # see https://github.com/project-chip/connectedhomeip/issues/26170
-      "-Wno-error=array-bounds",
-    ]
+    cflags += [ "-Wno-shadow" ]
 
     if (silabs_family == "efr32mg24" || silabs_family == "mgm24") {
       cflags += [ "-mcmse" ]
@@ -692,6 +681,10 @@ template("efr32_sdk") {
     if (enable_dic) {
       sources += [
         "${chip_root}/third_party/silabs/mqtt/stack/mqtt.c",
+        "${efr32_sdk_root}/util/third_party/mbedtls/library/ctr_drbg.c",
+        "${efr32_sdk_root}/util/third_party/mbedtls/library/entropy.c",
+        "${efr32_sdk_root}/util/third_party/mbedtls/library/entropy_poll.c",
+        "${efr32_sdk_root}/util/third_party/mbedtls/library/rsa.c",
         "${efr32_sdk_root}/util/third_party/mbedtls/library/rsa_alt_helpers.c",
       ]
     }

@@ -7615,18 +7615,36 @@
                   - TimeFailure
                   - MissingTrustedTimeSource
 
-- release: "Future"
-  versions: "future"
+- release: "Fall 2023 #2"
+  versions:
+      ios: "17.1"
+      macos: "14.1"
+      watchos: "10.1"
+      tvos: "17.1"
   introduced:
+      bitmaps:
+          TimeFormatLocalization:
+              - Feature
+      bitmap values:
+          OnOff:
+              Feature:
+                  - DeadFront
+          TimeFormatLocalization:
+              Feature:
+                  - CalendarFormat
+  provisional:
       attributes:
+          # New things, not quite finalized.
           PowerSource:
               - EndpointList
           Descriptor:
               - TagList
       structs:
+          # New things, not quite finalized.
           Descriptor:
               - SemanticTagStruct
       struct fields:
+          # New things, not quite finalized.
           Descriptor:
               SemanticTagStruct:
                   - mfgCode
@@ -7634,20 +7652,27 @@
                   - tag
                   - label
       bitmaps:
+          # CacheAndSync is provisional in the spec.
           GroupKeyManagement:
               - Feature
+          # New things, not quite finalized.
           Descriptor:
               - Feature
       bitmap values:
-          OnOff:
-              Feature:
-                  - DeadFront
-          GroupKeyManagement:
-              Feature:
-                  - CacheAndSync
+          # New things, not quite finalized.
           Descriptor:
               Feature:
                   - TagList
+          # CacheAndSync is provisional in the spec.
+          GroupKeyManagement:
+              Feature:
+                  - CacheAndSync
+          # Scenes are generally provisional for now.
+          Scenes:
+              Feature:
+                  - Explicit
+                  - TableSize
+                  - FabricScenes
   removed:
       clusters:
           # Clusters that really should just not be exposed, even if they're in our XML.
@@ -7657,3 +7682,6 @@
           - ProxyConfiguration
           - ProxyDiscovery
           - ProxyValid
+
+- release: "Future"
+  versions: "future"

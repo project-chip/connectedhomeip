@@ -34,7 +34,7 @@ public:
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aFeature The bitmask value that identifies which features are supported by this instance.
      */
-    Instance(EndpointId aEndpointId, uint32_t eFeature);
+    Instance(EndpointId aEndpointId, BitMask<Feature> aFeature);
 
     ~Instance() override;
 
@@ -49,7 +49,7 @@ public:
      * Returns true if the feature is supported.
      * @param feature the feature to check.
      */
-    bool HasFeature(AirQualityEnum) const;
+    bool HasFeature(Feature aFeature) const;
 
     /**
      * Sets the AirQuality attribute.
@@ -66,7 +66,7 @@ public:
 private:
     EndpointId mEndpointId;
     AirQualityEnum mAirQuality = AirQualityEnum::kUnknown;
-    uint32_t mFeature;
+    BitMask<Feature> mFeature;
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;

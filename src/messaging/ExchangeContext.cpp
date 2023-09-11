@@ -91,45 +91,6 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
     mResponseTimeout = timeout;
 }
 
-#if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
-void ExchangeContext::UpdateSEDIntervalMode()
-{
-    if (!HasSessionHandle())
-    {
-        // After the session has been deleted, no further communication can occur on the exchange,
-        // so withdraw a SED active mode request.
-        UpdateSEDIntervalMode(false);
-        return;
-    }
-
-    Transport::PeerAddress address;
-
-    switch (GetSessionHandle()->GetSessionType())
-    {
-    case Transport::Session::SessionType::kSecure:
-        address = GetSessionHandle()->AsSecureSession()->GetPeerAddress();
-        break;
-    case Transport::Session::SessionType::kUnauthenticated:
-        address = GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress();
-        break;
-    default:
-        return;
-    }
-
-    VerifyOrReturn(address.GetTransportType() != Transport::Type::kBle);
-    UpdateSEDIntervalMode(IsResponseExpected() || IsSendExpected() || IsMessageNotAcked());
-}
-
-void ExchangeContext::UpdateSEDIntervalMode(bool activeMode)
-{
-    if (activeMode != IsRequestingActiveMode())
-    {
-        SetRequestingActiveMode(activeMode);
-        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(activeMode, true);
-    }
-}
-#endif
-
 CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle && msgBuf,
                                         const SendFlags & sendFlags)
 {
@@ -156,7 +117,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     bool reliableTransmissionRequested =
         GetSessionHandle()->RequireMRP() && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck) && !IsGroupExchangeContext();
 
-    bool startedResponseTimer = false;
+    bool currentMessageExpectResponse = false;
     // If a response message is expected...
     if (sendFlags.Has(SendMessageFlags::kExpectResponse) && !IsGroupExchangeContext())
     {
@@ -178,7 +139,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
                 SetResponseExpected(false);
                 return err;
             }
-            startedResponseTimer = true;
+            currentMessageExpectResponse = true;
         }
     }
 
@@ -222,9 +183,9 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 #endif
         if (err != CHIP_NO_ERROR)
         {
-            // We should only cancel the response timer if the ExchangeContext fails to send the message that starts the response
-            // timer.
-            if (startedResponseTimer)
+            // We should only cancel the response timer if the ExchangeContext fails to send the message that expects a
+            // response.
+            if (currentMessageExpectResponse)
             {
                 CancelResponseTimer();
                 SetResponseExpected(false);
@@ -243,7 +204,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 #if CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
             DeviceLayer::ChipDeviceEvent event;
             event.Type                       = DeviceLayer::DeviceEventType::kChipMsgSentEvent;
-            event.MessageSent.ExpectResponse = IsResponseExpected();
+            event.MessageSent.ExpectResponse = currentMessageExpectResponse;
             CHIP_ERROR status                = DeviceLayer::PlatformMgr().PostEvent(&event);
             if (status != CHIP_NO_ERROR)
             {
@@ -399,11 +360,6 @@ ExchangeContext::~ExchangeContext()
     // Ensure that DoClose has been called by the time we get here. If not, we have a leak somewhere.
     //
     VerifyOrDie(mFlags.Has(Flags::kFlagClosed));
-
-#if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
-    // Make sure that the exchange withdraws the request for Sleepy End Device active mode.
-    UpdateSEDIntervalMode(false);
-#endif
 
     // Ideally, in this scenario, the retransmit table should
     // be clear of any outstanding messages for this context and
@@ -681,10 +637,6 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
 
 void ExchangeContext::MessageHandled()
 {
-#if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
-    UpdateSEDIntervalMode();
-#endif
-
     if (mFlags.Has(Flags::kFlagClosed) || IsResponseExpected() || IsSendExpected())
     {
         return;

@@ -289,7 +289,18 @@ public:
             return err;
         }
 
-        OnOffServer::Instance().scheduleTimerCallbackMs(sceneEventControl(endpoint), timeMs);
+        // This handler assumes it is being used with the default handler for the level control. Therefore if the level control
+        // cluster with on off feature is present on the endpoint and the level control handler is registered, it assumes this
+        // handler will take action on the on-off state. This assumes the level control attributes were also saved in the scene.
+        // This is to prevent a behavior where the on off state is set by this handler, and then the level control handler or vice
+        // versa.
+#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
+        if (!(LevelControlWithOnOffFeaturePresent(endpoint) &&
+              Scenes::ScenesServer::Instance().IsHandlerRegistered(endpoint, LevelControlServer::GetSceneHandler())))
+#endif
+        {
+            OnOffServer::Instance().scheduleTimerCallbackMs(sceneEventControl(endpoint), timeMs);
+        }
 
         return CHIP_NO_ERROR;
     }
@@ -592,7 +603,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
 
 #ifdef EMBER_AF_PLUGIN_SCENES
         // Registers Scene handlers for the On/Off cluster on the server
-        app::Clusters::Scenes::ScenesServer::Instance().RegisterSceneHandler(OnOffServer::Instance().GetSceneHandler());
+        app::Clusters::Scenes::ScenesServer::Instance().RegisterSceneHandler(endpoint, OnOffServer::Instance().GetSceneHandler());
 #endif
 
 #ifdef EMBER_AF_PLUGIN_MODE_SELECT

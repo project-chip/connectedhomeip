@@ -1088,6 +1088,19 @@ chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::Endp
     return emAfEndpoints[endpointIndex].deviceTypeList;
 }
 
+CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
+                                            Clusters::Descriptor::Structs::SemanticTagStruct::Type & tag)
+{
+    uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
+
+    if (endpointIndex == 0xFFFF || index >= emAfEndpoints[endpointIndex].tagList.size())
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+    tag = emAfEndpoints[endpointIndex].tagList[index];
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR emberAfSetDeviceTypeList(EndpointId endpoint, Span<const EmberAfDeviceType> deviceTypeList)
 {
     uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
@@ -1097,6 +1110,18 @@ CHIP_ERROR emberAfSetDeviceTypeList(EndpointId endpoint, Span<const EmberAfDevic
     }
 
     emAfEndpoints[endpointIndex].deviceTypeList = deviceTypeList;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SetTagList(EndpointId endpoint, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList)
+{
+    uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
+    if (endpointIndex == 0xFFFF)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    emAfEndpoints[endpointIndex].tagList = tagList;
     return CHIP_NO_ERROR;
 }
 

@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -36,7 +36,6 @@
       "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 2,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 2,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        2
       ],
       "deviceVersions": [
         1
@@ -7658,7 +7653,6 @@
       "id": 2,
       "name": "MA-thermostat",
       "deviceTypeRef": {
-        "id": 34,
         "code": 769,
         "profileId": 259,
         "label": "MA-thermostat",
@@ -7666,15 +7660,11 @@
       },
       "deviceTypes": [
         {
-          "id": 34,
           "code": 769,
           "profileId": 259,
           "label": "MA-thermostat",
           "name": "MA-thermostat"
         }
-      ],
-      "deviceTypeRefs": [
-        34
       ],
       "deviceVersions": [
         1
@@ -11678,7 +11668,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -14830,6 +14820,5 @@
       "endpointId": 1,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

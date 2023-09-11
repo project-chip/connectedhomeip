@@ -2,10 +2,6 @@
 	path = third_party/nlassert/repo
 	url = https://github.com/nestlabs/nlassert.git
 	branch  = master
-[submodule "nlfaultinjection"]
-	path = third_party/nlfaultinjection/repo
-	url = https://github.com/nestlabs/nlfaultinjection.git
-	branch  = master
 [submodule "nlio"]
 	path = third_party/nlio/repo
 	url = https://github.com/nestlabs/nlio.git
@@ -323,3 +319,9 @@
 	url = https://github.com/SiliconLabs/wiseconnect
 	branch = master
 	platforms = efr32
+[submodule "third_party/st/STM32CubeWB"]
+	path = third_party/st/STM32CubeWB
+	url = https://github.com/STMicroelectronics/STM32CubeWB.git
+        branch = v1.17.0
+        platform = stm32
+

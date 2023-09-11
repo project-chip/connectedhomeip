@@ -69,7 +69,6 @@ public:
     {
         assertChipStackLockedByCurrentThread();
 
-        VerifyOrReturnError(mDelegate != nil, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -108,7 +107,6 @@ public:
 
         mExchangeMgr = nullptr;
         mSystemLayer = nullptr;
-        mDelegateNotificationQueue = nil;
 
         return CHIP_NO_ERROR;
     }
@@ -119,18 +117,6 @@ public:
 
         if (mInitialized && mFabricIndex.Value() == controller.fabricIndex) {
             ResetState();
-        }
-    }
-
-    void SetDelegate(id<MTROTAProviderDelegate> delegate, dispatch_queue_t delegateNotificationQueue)
-    {
-        if (delegate) {
-            mDelegate = delegate;
-            mDelegateNotificationQueue = delegateNotificationQueue;
-        } else {
-            ResetState();
-            mDelegate = nil;
-            mDelegateNotificationQueue = nil;
         }
     }
 
@@ -161,6 +147,9 @@ public:
             mExchangeCtx->Close();
             mExchangeCtx = nullptr;
         }
+
+        mDelegate = nil;
+        mDelegateNotificationQueue = nil;
 
         mInitialized = false;
     }
@@ -464,6 +453,16 @@ private:
             ResetState();
         }
 
+        auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:fabricIndex];
+        VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        mDelegate = controller.otaProviderDelegate;
+        mDelegateNotificationQueue = controller.otaProviderDelegateQueue;
+
+        // We should have already checked that this controller supports OTA.
+        VerifyOrReturnError(mDelegate != nil, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mDelegateNotificationQueue != nil, CHIP_ERROR_INCORRECT_STATE);
+
         // Start a timer to track whether we receive a BDX init after a successful query image in a reasonable amount of time
         CHIP_ERROR err = mSystemLayer->StartTimer(kBdxInitReceivedTimeout, HandleBdxInitReceivedTimeoutExpired, this);
         LogErrorOnFailure(err);
@@ -498,18 +497,11 @@ BdxOTASender gOtaSender;
 NSInteger const kOtaProviderEndpoint = 0;
 } // anonymous namespace
 
-MTROTAProviderDelegateBridge::MTROTAProviderDelegateBridge(id<MTROTAProviderDelegate> delegate)
-    : mDelegate(delegate)
-    , mDelegateNotificationQueue(
-          dispatch_queue_create("org.csa-iot.matter.framework.otaprovider.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL))
-{
-    gOtaSender.SetDelegate(delegate, mDelegateNotificationQueue);
-    Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, this);
-}
+MTROTAProviderDelegateBridge::MTROTAProviderDelegateBridge() { Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, this); }
 
 MTROTAProviderDelegateBridge::~MTROTAProviderDelegateBridge()
 {
-    gOtaSender.SetDelegate(nil, nil);
+    gOtaSender.ResetState();
     Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, nullptr);
 }
 
@@ -545,6 +537,12 @@ bool GetPeerNodeInfo(CommandHandler * commandHandler, const ConcreteCommandPath 
         [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:commandHandler->GetAccessingFabricIndex()];
     if (controller == nil) {
         commandHandler->AddStatus(commandPath, Status::Failure);
+        return false;
+    }
+
+    if (!controller.otaProviderDelegate) {
+        // This controller does not support OTA.
+        commandHandler->AddStatus(commandPath, Status::UnsupportedCommand);
         return false;
     }
 
@@ -723,8 +721,8 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                           }];
     };
 
-    auto strongDelegate = mDelegate;
-    dispatch_async(mDelegateNotificationQueue, ^{
+    auto strongDelegate = controller.otaProviderDelegate;
+    dispatch_async(controller.otaProviderDelegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector(handleQueryImageForNodeID:controller:params:completion:)]) {
             [strongDelegate handleQueryImageForNodeID:@(nodeId)
                                            controller:controller
@@ -783,8 +781,8 @@ void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * com
     auto * commandParams = [[MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams alloc] init];
     ConvertToApplyUpdateRequestParams(commandData, commandParams);
 
-    auto strongDelegate = mDelegate;
-    dispatch_async(mDelegateNotificationQueue, ^{
+    auto strongDelegate = controller.otaProviderDelegate;
+    dispatch_async(controller.otaProviderDelegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector(handleApplyUpdateRequestForNodeID:controller:params:completion:)]) {
             [strongDelegate handleApplyUpdateRequestForNodeID:@(nodeId)
                                                    controller:controller
@@ -839,8 +837,8 @@ void MTROTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * co
     auto * commandParams = [[MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams alloc] init];
     ConvertToNotifyUpdateAppliedParams(commandData, commandParams);
 
-    auto strongDelegate = mDelegate;
-    dispatch_async(mDelegateNotificationQueue, ^{
+    auto strongDelegate = controller.otaProviderDelegate;
+    dispatch_async(controller.otaProviderDelegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector(handleNotifyUpdateAppliedForNodeID:controller:params:completion:)]) {
             [strongDelegate handleNotifyUpdateAppliedForNodeID:@(nodeId)
                                                     controller:controller

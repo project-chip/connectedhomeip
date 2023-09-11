@@ -68,8 +68,12 @@
 #ifdef DIC_ENABLE
 #define LWIP_DNS 1
 #define DNS_RAND_TXID() ((u32_t) rand())
+#define TCP_MSS (4 * 1152)
+#define TCPIP_THREAD_PRIO (3)
 #else
 #define LWIP_DNS 0
+#define TCP_MSS (1152)
+#define TCPIP_THREAD_PRIO (2)
 #endif /* DIC_ENABLE */
 
 #define LWIP_FREERTOS_USE_STATIC_TCPIP_TASK 1
@@ -77,7 +81,7 @@
 #define LWIP_RAW 1
 #define MEMP_NUM_RAW_PCB (4)
 
-#define MEMP_NUM_UDP_PCB (7)
+#define MEMP_NUM_UDP_PCB (6)
 
 #define LWIP_HAVE_LOOPIF (0)
 
@@ -125,12 +129,11 @@
 #define MEMP_SEPARATE_POOLS (1)
 #define LWIP_PBUF_FROM_CUSTOM_POOLS (0)
 #define MEMP_USE_CUSTOM_POOLS (0)
-#define PBUF_POOL_SIZE (32)
+#define PBUF_POOL_SIZE (16)
 #define PBUF_POOL_BUFSIZE (1280) // IPv6 path MTU
 #define PBUF_CUSTOM_POOL_IDX_START (MEMP_PBUF_POOL_SMALL)
 #define PBUF_CUSTOM_POOL_IDX_END (MEMP_PBUF_POOL_LARGE)
 
-#define TCP_MSS (1152)
 #define TCP_SND_BUF (2 * TCP_MSS)
 #define TCP_LISTEN_BACKLOG (1)
 
@@ -139,8 +142,6 @@
 #define PBUF_LINK_HLEN (14)
 
 #define TCPIP_THREAD_STACKSIZE (2048)
-
-#define TCPIP_THREAD_PRIO (2)
 
 #define NETIF_MAX_HWADDR_LEN 8U
 

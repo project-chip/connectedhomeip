@@ -25,8 +25,8 @@ config:
 
 tests:
     - label:
-          "TH is instructed to start advertising two or more services using
-          DNS-SD"
+          "Step 1: TH is instructed to start advertising two or more services
+          using DNS-SD"
       verification: |
           1. On the raspi controller, publish matter service, using below command
 
@@ -34,8 +34,8 @@ tests:
       disabled: true
 
     - label:
-          "By any means, DUT is instructed to perform an unicast UDP query to
-          the DNS-SD Discovery Proxy on TH for services"
+          "Step 2: By any means, DUT is instructed to perform an unicast UDP
+          query to the DNS-SD Discovery Proxy on TH for services"
       PICS:
           MCORE.SC.SII_OP_DISCOVERY_KEY && MCORE.SC.SAI_OP_DISCOVERY_KEY &&
           MCORE.SC.T_KEY
@@ -58,14 +58,16 @@ tests:
              txt = ["T=0" "SAI=300" "SII=5000"]
       disabled: true
 
-    - label: "TH performs a change in one of the services configured at step 1"
+    - label:
+          "Step 3: TH performs a change in one of the services configured at
+          step 1"
       verification: |
           1. On the raspi controller, publish matter service chanding the T value 1, using below command
 
           $avahi-publish-service 87E1B004E235A130-8FC7772401CD0696 _matter._tcp 22222 SII=3000 SAI=4000 T=1
       disabled: true
 
-    - label: "DUT must receive a notification with new data"
+    - label: "Step 4: DUT must receive a notification with new data"
       PICS:
           MCORE.SC.SII_OP_DISCOVERY_KEY && MCORE.SC.SAI_OP_DISCOVERY_KEY &&
           MCORE.SC.T_KEY

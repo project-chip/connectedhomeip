@@ -1,0 +1,96 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    26.3.6. [TC-GRPKEY-5.4] Verification for KeySetReadResponse Command for
+    CacheAndSync
+
+PICS:
+    - GRPKEY.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: Admin sends KeySetWrite command by setting
+          GroupKeySecurityPolicy to CacheAndSync to GroupKeyManagement cluster
+          on the DUT Note: KeySetWrite command is sent by setting the following
+          fields to the corresponding values. Values given below are for
+          reference purpose. groupKeySetID: 0x01a3 groupKeySecurityPolicy:
+          CacheAndSync (1) epochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          epochStartTime0: 1 epochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          epochStartTime1: 2220001 epochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          epochStartTime2: 2220002"
+      PICS: "!GRPKEY.S.F00 && GRPKEY.S.C00.Rsp "
+      verification: |
+          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": "0x01a3", "groupKeySecurityPolicy": 1, "epochKey0": "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 1, "epochKey1": "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2": "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0
+
+          Verify DUT sends INVALID_COMMAND response on  TH(chip-tool)  Logs:
+
+          [1689931711.125327][6681:6684] CHIP:DMG: InvokeResponseMessage =
+          [1689931711.125329][6681:6684] CHIP:DMG: {
+          [1689931711.125331][6681:6684] CHIP:DMG:         suppressResponse = false,
+          [1689931711.125333][6681:6684] CHIP:DMG:         InvokeResponseIBs =
+          [1689931711.125337][6681:6684] CHIP:DMG:         [
+          [1689931711.125339][6681:6684] CHIP:DMG:                 InvokeResponseIB =
+          [1689931711.125343][6681:6684] CHIP:DMG:                 {
+          [1689931711.125344][6681:6684] CHIP:DMG:                         CommandStatusIB =
+          [1689931711.125347][6681:6684] CHIP:DMG:                         {
+          [1689931711.125349][6681:6684] CHIP:DMG:                                 CommandPathIB =
+          [1689931711.125353][6681:6684] CHIP:DMG:                                 {
+          [1689931711.125355][6681:6684] CHIP:DMG:                                         EndpointId = 0x0,
+          [1689931711.125357][6681:6684] CHIP:DMG:                                         ClusterId = 0x3f,
+          [1689931711.125360][6681:6684] CHIP:DMG:                                         CommandId = 0x0,
+          [1689931711.125362][6681:6684] CHIP:DMG:                                 },
+          [1689931711.125365][6681:6684] CHIP:DMG:
+          [1689931711.125367][6681:6684] CHIP:DMG:                                 StatusIB =
+          [1689931711.125370][6681:6684] CHIP:DMG:                                 {
+          [1689931711.125372][6681:6684] CHIP:DMG:                                         status = 0x85 (INVALID_COMMAND),
+          [1689931711.125374][6681:6684] CHIP:DMG:                                 },
+          [1689931711.125376][6681:6684] CHIP:DMG:
+          [1689931711.125378][6681:6684] CHIP:DMG:                         },
+          [1689931711.125381][6681:6684] CHIP:DMG:
+          [1689931711.125383][6681:6684] CHIP:DMG:                 },
+          [1689931711.125386][6681:6684] CHIP:DMG:
+          [1689931711.125388][6681:6684] CHIP:DMG:         ],
+          [1689931711.125391][6681:6684] CHIP:DMG:
+          [1689931711.125393][6681:6684] CHIP:DMG:         InteractionModelRevision = 1
+          [1689931711.125395][6681:6684] CHIP:DMG: },
+      disabled: true
+
+    - label:
+          "Step 2: Admin sends KeySetWrite command by setting the values as
+          given in Step 1"
+      PICS: GRPKEY.S.F00 && GRPKEY.S.C00.Rsp
+      verification: |
+          CacheAndSync feature bit not enabled in V1.2
+      disabled: true
+
+    - label:
+          "Step 3: Admin maps GroupId 0x0103 with GroupKeySetID 0x01a3 in the
+          GroupKeyMap attribute list on GroupKeyManagement cluster on the DUT"
+      PICS: GRPKEY.F00 && GRPKEY.S.A0000
+      verification: |
+          CacheAndSync feature bit not enabled in V1.2
+      disabled: true
+
+    - label: "Step 4: Admin sends KeySetRead Command to DUT"
+      PICS: GRPKEY.S.F00 && GRPKEY.S.C01.Rsp
+      verification: |
+          CacheAndSync feature bit not enabled in V1.2
+      disabled: true

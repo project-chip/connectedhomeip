@@ -52,6 +52,12 @@ source_set("air_quality_sensor_app_sdk") {
   configs += [ ":sdk_posix_config" ]
 
   sources = [
+    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/include/air-quality-sensor-manager.h",
+    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/src/air-quality-sensor-manager.cpp",
+    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/include/relative-humidity-sensor-manager.h",
+    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/include/temperature-sensor-manager.h",
+    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/src/AirQualitySensorAttrUpdateHandler.cpp",
+    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/include/AirQualitySensorAttrUpdateHandler.h",
     "${chip_root}/src/platform/cc32xx/Logging.cpp",
     "${project_dir}/main/cc32xxWifiInit.c",
     "${project_dir}/main/main.cpp",
@@ -72,7 +78,6 @@ source_set("air_quality_sensor_app_sdk") {
     ":sdk",
     ":sysconfig",
     "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common",
-    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common:air-quality-sensor-attr-update-handler",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]

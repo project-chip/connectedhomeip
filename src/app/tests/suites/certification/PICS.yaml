@@ -1774,8 +1774,25 @@ PICS:
     - label:
           "Can the Dishwasher Alarm attribute changed by physical control at the
           device?"
-      id: DISHALM.M.ManuallyControlled
+      id: DISHALM.S.M.ManuallyControlled
 
+    - label: "Does the device support the Inflow alarm?"
+      id: DISHALM.S.M.InflowAlarmSupported
+
+    - label: "Does the device support the Drain alarm?"
+      id: DISHALM.S.M.DrainAlarmSupported
+
+    - label: "Does the device support the Door alarm?"
+      id: DISHALM.S.M.DoorAlarmSupported
+
+    - label: "Does the device support the TempLow alarm?"
+      id: DISHALM.S.M.TempLowAlarmSupported
+
+    - label: "Does the device support the TempHigh alarm?"
+      id: DISHALM.S.M.TempHighAlarmSupported
+
+    - label: "Does the device support the WaterLevel alarm?"
+      id: DISHALM.S.M.WaterLevelAlarmSupported
     #
     # server / Commands received
     #
@@ -1790,11 +1807,20 @@ PICS:
     - label: "Does the device implement the DISHM cluster as a server?"
       id: DISHM.S
 
+    - label: "IDoes the DUT support testing the failed ChangeToMode command?"
+      id: DISHM.S.M.CAN_TEST_MODE_FAILURE
+
+    # PIXIT
+
     - label:
           "Id of mode the device will fail to transition to, given its current
           state"
-      id: PIXIT.DISHM.CAN_TEST_MODE_FAILURE
+      id: PIXIT.DISHM.MODE_CHANGE_FAIL
 
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.DISHM.MODE_CHANGE_OK
     #
     # server / features
     #
@@ -1855,6 +1881,12 @@ PICS:
 
     - label: "Does the DUT(server) support the TAGLIST attribute?"
       id: DESC.S.A0004
+
+    #
+    #Feature
+    #
+    - label: "Does the device support the TagList command"
+      id: DESC.S.F00
 
     #
     # client / attributes
@@ -2632,67 +2664,60 @@ PICS:
     #
     # Server write attributes
     #
+    - label: "Does the device implement simulation of a Not Fully Locked State?"
+      id: DRLK.S.M.SimulateNotFullyLocked
 
-    - label: "Does the DUT(server) support the DoorOpen Events attribute?"
-      id: DRLK.S.A0004.Write
+    - label: "Does the device implement detection of a LockJammed State?"
+      id: DRLK.S.M.DetectLockJammed
 
-    - label: "Does the DUT(server) support the DoorClosedEvents attribute?"
-      id: DRLK.S.A0005.Write
-
-    - label: "Does the DUT(server) support the OpenPeriod attribute?"
-      id: DRLK.S.A0006.Write
-
-    - label: "Does the DUT(server) support the Language attribute?"
-      id: DRLK.S.A0021.Write
-
-    - label: "Does the DUT(server) support the LEDSettings attribute?"
-      id: DRLK.S.A0022.Write
-
-    - label: "Does the DUT(server) support the AutoRelockTime attribute?"
-      id: DRLK.S.A0023.Write
-
-    - label: "Does the DUT(server) support the SoundVolume attribute?"
-      id: DRLK.S.A0024.Write
-
-    - label: "Does the DUT(server) support the OperatingMode attribute?"
-      id: DRLK.S.A0025.Write
+    - label: "Does the device implement Language attribute with write access?"
+      id: DRLK.S.M.LanguageAttributeWritable
 
     - label:
-          "Does the DUT(server) support the EnableLocalProgramming attribute?"
-      id: DRLK.S.A0028.Write
-
-    - label: "Does the DUT(server) support the EnableOneTouchLocking attribute?"
-      id: DRLK.S.A0029.Write
-
-    - label: "Does the DUT(server) support the EnableInsideStatusLED attribute?"
-      id: DRLK.S.A002a.Write
+          "Does the device implement LEDSettings attribute with write access?"
+      id: DRLK.S.M.LEDSettingsAttributeWritable
 
     - label:
-          "Does the DUT(server) support the EnablePrivacyModeButton attribute?"
-      id: DRLK.S.A002b.Write
+          "Does the device implement AutoRelockTime attribute with write access?"
+      id: DRLK.S.M.AutoRelockTimeAttributeWritable
 
     - label:
-          "Does the DUT(server) support the LocalProgrammingFeatures attribute?"
-      id: DRLK.S.A002c.Write
-
-    - label: "Does the DUT(server) support the WrongCodeEntryLimit attribute?"
-      id: DRLK.S.A0030.Write
+          "Does the device implement SoundVolume attribute with write access?"
+      id: DRLK.S.M.SoundVolumeAttributeWritable
 
     - label:
-          "Does the DUT(server) support the UserCodedTemporaryDisableTime
-          attribute?"
-      id: DRLK.S.A0031.Write
-
-    - label: "Does the DUT(server) support the SendPINOverTheAir attribute?"
-      id: DRLK.S.A0032.Write
+          "Does the device implement OperatingMode attribute with write access?"
+      id: DRLK.S.M.OperatingModeAttributeWritable
 
     - label:
-          "Does the DUT(server) support the RequirePINForRemoteOperation
-          attribute?"
-      id: DRLK.S.A0033.Write
+          "Does the device implement EnableLocalProgramming attribute with write
+          access?"
+      id: DRLK.S.M.EnableLocalProgrammingAttributeWritable
 
-    - label: "Does the DUT(server) support the ExpiringUserTimeOut attribute?"
-      id: DRLK.S.A0035.Write
+    - label:
+          "Does the device implement LocalProgrammingFeatures attribute with
+          write access?"
+      id: DRLK.S.M.LocalProgrammingFeaturesAttributeWritable
+
+    - label:
+          "Does the device implement WrongCodeEntryLimit attribute with write
+          access?"
+      id: DRLK.S.M.WrongCodeEntryLimitAttributeWritable
+
+    - label:
+          "Does the device implement UserCodedTemporaryDisableTime attribute
+          with write access?"
+      id: DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable
+
+    - label:
+          "Does the device implement RequirePINForRemoteOperation attribute with
+          write access?"
+      id: DRLK.S.M.RequirePINForRemoteOperationAttributeWritable
+
+    - label:
+          "Does the device implement ExpiringUserTimeOut attribute with write
+          access?"
+      id: DRLK.S.M.ExpiringUserTimeOutAttributeWritable
 
     #
     # server / commandsReceived
@@ -2862,7 +2887,7 @@ PICS:
       id: DRLK.S.Simulate.NotFullyLocked
 
     - label: "Does the DUT(server) detect a LockJammed State?"
-      id: DRLK.S.DetectLockJammed
+      id: DRLK.S.M.DetectLockJammed
 
     #
     # client / attributes
@@ -3609,6 +3634,43 @@ PICS:
           "Does the DUT(Server) support Group Key Management CacheAndSync
           feature?"
       id: GRPKEY.S.F00
+
+    #
+    #server attributes
+    #
+    - label: "Does the device implement the GroupKeyMap attribute?"
+      id: GRPKEY.S.A0000
+
+    - label: "Does the device implement the GroupTable attribute?"
+      id: GRPKEY.S.A0001
+
+    - label: "Does the device implement the MaxGroupsPerFabric attribute?"
+      id: GRPKEY.S.A0002
+
+    - label: "Does the device implement the MaxGroupKeysPerFabric attribute?"
+      id: GRPKEY.S.A0003
+
+    #
+    # server commandsGenerated
+    #
+    - label: "Does the device implement the KeySetWrite command}?"
+      id: GRPKEY.S.C00.Rsp
+
+    - label: "Does the device implement the KeySetRead command}?"
+      id: GRPKEY.S.C01.Rsp
+
+    - label: "Does the device implement the KeySetReadResponse command}?"
+      id: GRPKEY.S.C02.Rsp
+
+    - label: "Does the device implement the KeySetRemove command}?"
+      id: GRPKEY.S.C03.Rsp
+
+    - label: "Does the device implement the KeySetReadAllIndices command}?"
+      id: GRPKEY.S.C04.Rsp
+
+    - label:
+          "Does the device implement the KeySetReadAllIndicesResponse command}?"
+      id: GRPKEY.S.C05.Rsp
 
     #
     # client / attributes
@@ -8773,19 +8835,6 @@ PICS:
 
     #Server Commands Received
     - label: "Does the device implement receiving the Pause command?"
-      id: OPSTATE.S.C00
-
-    - label: "Does the device implement receiving the Stop command?"
-      id: OPSTATE.S.C01
-
-    - label: "Does the device implement receiving the Start command?"
-      id: OPSTATE.S.C02
-
-    - label: "Does the device implement receiving the Resume command?"
-      id: OPSTATE.S.C03
-
-    #Commands recevied
-    - label: "Does the device implement receiving the Pause command?"
       id: OPSTATE.S.C00.Rsp
 
     - label: "Does the device implement receiving the Stop command?"
@@ -8930,10 +8979,18 @@ PICS:
     - label: "Does the device implement the LWM cluster as a server?"
       id: LWM.S
 
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: LWM.S.M.CAN_TEST_MODE_FAILURE
+
     - label:
           "Id of mode the device will fail to transition to, given its current
           state"
-      id: PIXIT.LWM.CAN_TEST_MODE_FAILURE
+      id: PIXIT.LWM.MODE_CHANGE_FAIL
+
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.LWM.MODE_CHANGE_OK
 
     #
     # server / features
@@ -9012,21 +9069,36 @@ PICS:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: RVCCLEANM.S.C01.Tx
 
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: RVCCLEANM.S.M.CAN_TEST_MODE_FAILURE
+
     - label:
           "Id of mode the device will fail to transition to, given its current
           state"
-      id: PIXIT.RVCCLEANM.CAN_TEST_MODE_FAILURE
+      id: PIXIT.RVCCLEANM.MODE_CHANGE_FAIL
 
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.RVCCLEANM.MODE_CHANGE_OK
     #
     #Temperature Controlled Cabinet Mode Cluster
     #
     - label: "Does the device implement the TCCM cluster as a server?"
       id: TCCM.S
 
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: TCCM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.TCCM.MODE_CHANGE_OK
+
     - label:
           "Id of mode the device will fail to transition to, given its current
           state"
-      id: PIXIT.TCCM.CAN_TEST_MODE_FAILURE
+      id: PIXIT.TCCM.MODE_CHANGE_FAIL
 
     #Features
     - label:
@@ -9103,6 +9175,9 @@ PICS:
           device?"
       id: TCC.M.ManuallyControlledTemperature
 
+    - label: "Does the device support the INVALID_IN_MODE response"
+      id: TCTL.S.M.SupportsInvalidInMode
+
     #Commands received
     - label:
           "Does the device implement receiving the SetTemperatureCommand
@@ -9155,16 +9230,27 @@ PICS:
           "Can the Rinse attribute changed by physical control at the device?"
       id: WASHERCTRL.S.M.ManuallyControlledRinse
 
+    - label: "Can the device be controlled manually?"
+      id: WASHERCTRL.S.M.ManuallyControlled
+
     #
     #RVC Run Mode
     #
     - label: "Does the device implement the RVCRUNM cluster as a server?"
       id: RVCRUNM.S
 
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: RVCRUNM.S.M.CAN_TEST_MODE_FAILURE
+
     - label:
           "Id of mode the device will fail to transition to, given its current
           state"
-      id: PIXIT.RVCRUNM.CAN_TEST_MODE_FAILURE
+      id: PIXIT.RVCRUNM.MODE_CHANGE_FAIL
+
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.RVCRUNM.MODE_CHANGE_OK
 
     #Features
     - label:

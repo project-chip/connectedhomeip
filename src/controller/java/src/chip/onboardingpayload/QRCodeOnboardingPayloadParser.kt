@@ -24,8 +24,9 @@ import java.util.concurrent.atomic.AtomicInteger
  *   to a OnboardingPayload object
  */
 class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
-  fun populatePayload(outPayload: OnboardingPayload) {
+  fun populatePayload(): OnboardingPayload {
     var indexToReadFrom: AtomicInteger = AtomicInteger(0)
+    var outPayload: OnboardingPayload = OnboardingPayload()
 
     val payload = extractPayload(mBase38Representation)
     if (payload.length == 0) {
@@ -60,6 +61,8 @@ class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
     }
 
     // TODO: populate TLV optional fields
+
+    return outPayload
   }
 
   companion object {

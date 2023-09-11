@@ -15,6 +15,10 @@
 
 name: 219.3.1. [TC-TCCM-3.1] On Mode functionality with DUT as Server
 
+PICS:
+    - TCCM.S.A0003
+    - TCCM.S.F00
+
 config:
     nodeId: 0x12344321
     cluster: "Basic Information"
@@ -26,20 +30,51 @@ tests:
           1. Refrigerator and Temperature Controlled Cabinet and OnOff clusters are available on the same endpoint
 
           2. The OnMode attribute is set to a non-NULL value from the mode values indicated by the SupportedModes attribute.
-      disabled: true
 
-    - label: "Note"
-      verification: |
-          To execute this test case set onmode to any integer value because as default it value has null.
+          Read the SupportedModes attribute,  select a value from SupportedModes and save the value as OnMode_value
+
+          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read supported-modes 1 1
+
+          On TH(chip-tool) log, Verify the list of  SupportedModes and below is the sample log provided for the raspi platform:
+
+          [1692182446.526184][3967:3969] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0000 DataVersion: 69758028
+          [1692182446.526293][3967:3969] CHIP:TOO:   SupportedModes: 3 entries
+          [1692182446.526346][3967:3969] CHIP:TOO:     [1]: {
+          [1692182446.526371][3967:3969] CHIP:TOO:       Label: Normal
+          [1692182446.526395][3967:3969] CHIP:TOO:       Mode: 0
+          [1692182446.526423][3967:3969] CHIP:TOO:       ModeTags: 1 entries
+          [1692182446.526468][3967:3969] CHIP:TOO:         [1]: {
+          [1692182446.526493][3967:3969] CHIP:TOO:           Value: 0
+          [1692182446.526516][3967:3969] CHIP:TOO:          }
+          [1692182446.526540][3967:3969] CHIP:TOO:      }
+          [1692182446.526572][3967:3969] CHIP:TOO:     [2]: {
+          [1692182446.526595][3967:3969] CHIP:TOO:       Label: Rapid Cool
+          [1692182446.526617][3967:3969] CHIP:TOO:       Mode: 1
+          [1692182446.526642][3967:3969] CHIP:TOO:       ModeTags: 1 entries
+          [1692182446.526670][3967:3969] CHIP:TOO:         [1]: {
+          [1692182446.526695][3967:3969] CHIP:TOO:           Value: 16384
+          [1692182446.526717][3967:3969] CHIP:TOO:          }
+          [1692182446.526741][3967:3969] CHIP:TOO:      }
+          [1692182446.526773][3967:3969] CHIP:TOO:     [3]: {
+          [1692182446.526795][3967:3969] CHIP:TOO:       Label: Rapid Freeze
+          [1692182446.526817][3967:3969] CHIP:TOO:       Mode: 2
+          [1692182446.526842][3967:3969] CHIP:TOO:       ModeTags: 1 entries
+          [1692182446.526870][3967:3969] CHIP:TOO:         [1]: {
+          [1692182446.526894][3967:3969] CHIP:TOO:           Value: 16385
+          [1692182446.526917][3967:3969] CHIP:TOO:          }
+          [1692182446.526940][3967:3969] CHIP:TOO:      }
+
+
+          Set the OnMode attribute value to OnMode_value
 
           ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode write on-mode 0 1 1
 
           On TH(chip-tool) log, Verify DUT responds with a SUCCESS (value 0x00) status response and below is the sample log provided for the raspi platform:
 
-          [1690190139.816096][16383:16385] CHIP:DMG:                         StatusIB =
-          [1690190139.816100][16383:16385] CHIP:DMG:                         {
-          [1690190139.816102][16383:16385] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1690190139.816105][16383:16385] CHIP:DMG:                         },
+          [1692170913.264454][3071:3073] CHIP:DMG:                         StatusIB =
+          [1692170913.264489][3071:3073] CHIP:DMG:                         {
+          [1692170913.264522][3071:3073] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1692170913.264557][3071:3073] CHIP:DMG:                         },
       disabled: true
 
     - label:
@@ -54,7 +89,7 @@ tests:
       verification: |
           ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read on-mode 1 1
 
-          On TH(chip-tool), Verify that OnMode attribute value is an integer or Null
+          On TH(chip-tool), Verify that OnMode attribute value is an integer
           Save the value as on_mode_dut and below is the sample log provided for the raspi platform, here OnMode value is 0
 
           [1690190167.005388][16387:16389] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0003 DataVersion: 473867556

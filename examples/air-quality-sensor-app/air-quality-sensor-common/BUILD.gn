@@ -15,26 +15,10 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
-config("config") {
-  include_dirs =  [ "include" ]
-}
-
 chip_data_model("air-quality-sensor-common") {
   zap_file = "air-quality-sensor-app.zap"
 
   zap_pregenerated_dir =
       "${chip_root}/zzz_generated/air-quality-sensor-app/zap-generated"
   is_server = true
-}
-
-source_set("air-quality-sensor-attr-update-handler") {
-  deps = [
-    "${chip_root}/src/lib",
-    "${chip_root}/third_party/jsoncpp"
-  ]
-  public_configs = [ ":config" ]
-  sources = [
-    "include/AirQualitySensorAttrUpdateHandler.h",
-    "src/AirQualitySensorAttrUpdateHandler.cpp",
-  ]
 }

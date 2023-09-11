@@ -165,8 +165,7 @@ class ManualCodeTest {
     // Test short 11 digit code
     var generator = ManualOnboardingPayloadGenerator(payload)
     var result = generator.payloadDecimalStringRepresentation()
-    var outPayload = OnboardingPayload()
-    ManualOnboardingPayloadParser(result).populatePayload(outPayload)
+    var outPayload = ManualOnboardingPayloadParser(result).populatePayload()
     assertPayloadValues(
       outPayload,
       payload.setupPinCode,
@@ -183,8 +182,7 @@ class ManualCodeTest {
     // Test long 21 digit code
     generator = ManualOnboardingPayloadGenerator(payload)
     result = generator.payloadDecimalStringRepresentation()
-    outPayload = OnboardingPayload()
-    ManualOnboardingPayloadParser(result).populatePayload(outPayload)
+    outPayload = ManualOnboardingPayloadParser(result).populatePayload()
     assertPayloadValues(
       outPayload,
       payload.setupPinCode,
@@ -216,12 +214,11 @@ class ManualCodeTest {
    */
   @Test
   fun testPayloadParser_partialPayload() {
-    val payload = getDefaultPayload()
     var decimalString = "2361087535"
 
     decimalString += Verhoeff10.computeCheckChar(decimalString)
     assertEquals(11, decimalString.length)
-    ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
+    var payload = ManualOnboardingPayloadParser(decimalString).populatePayload()
     assertPayloadValues(
       payload,
       pinCode = 123456780,
@@ -234,7 +231,7 @@ class ManualCodeTest {
     decimalString = "236-108753-5"
     decimalString += computeCheckChar(decimalString)
     assertEquals(13, decimalString.length)
-    ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
+    payload = ManualOnboardingPayloadParser(decimalString).populatePayload()
     assertPayloadValues(
       payload,
       pinCode = 123456780,
@@ -246,13 +243,13 @@ class ManualCodeTest {
     decimalString = "0000010000"
     decimalString += Verhoeff10.computeCheckChar(decimalString)
     assertEquals(11, decimalString.length)
-    ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
+    payload = ManualOnboardingPayloadParser(decimalString).populatePayload()
     assertPayloadValues(payload, pinCode = 1, discriminator = 0, vendorId = 0, productId = 0)
 
     decimalString = "63610875350000000000"
     decimalString += Verhoeff10.computeCheckChar(decimalString)
     assertEquals(21, decimalString.length)
-    ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
+    payload = ManualOnboardingPayloadParser(decimalString).populatePayload()
     assertPayloadValues(
       payload,
       pinCode = 123456780,
@@ -265,19 +262,40 @@ class ManualCodeTest {
     decimalString = "0033407535"
     decimalString += Verhoeff10.computeCheckChar(decimalString)
     assertEquals(11, decimalString.length)
-    ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
+    payload = ManualOnboardingPayloadParser(decimalString).populatePayload()
+    assertPayloadValues(
+      payload,
+      pinCode = 123456780,
+      discriminator = 0,
+      vendorId = 0,
+      productId = 0
+    )
 
     // no vid (= 0)
     decimalString = "63610875350000014526"
     decimalString += Verhoeff10.computeCheckChar(decimalString)
     assertEquals(21, decimalString.length)
-    ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
+    payload = ManualOnboardingPayloadParser(decimalString).populatePayload()
+    assertPayloadValues(
+      payload,
+      pinCode = 123456780,
+      discriminator = 0xa,
+      vendorId = 0,
+      productId = 14526
+    )
 
     // no pid (= 0)
     decimalString = "63610875354536700000"
     decimalString += Verhoeff10.computeCheckChar(decimalString)
     assertEquals(21, decimalString.length)
-    ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
+    payload = ManualOnboardingPayloadParser(decimalString).populatePayload()
+    assertPayloadValues(
+      payload,
+      pinCode = 123456780,
+      discriminator = 0xa,
+      vendorId = 45367,
+      productId = 0
+    )
   }
 
   /*
@@ -285,11 +303,10 @@ class ManualCodeTest {
    */
   @Test
   fun testPayloadParser_fullPayload() {
-    val payload = getDefaultPayload()
     var decimalString = "63610875354536714526"
 
     decimalString += Verhoeff10.computeCheckChar(decimalString)
-    ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
+    var payload = ManualOnboardingPayloadParser(decimalString).populatePayload()
     assertPayloadValues(
       payload,
       pinCode = 123456780,
@@ -301,7 +318,7 @@ class ManualCodeTest {
     // The same thing, but with dashes separating digit groups.
     decimalString = "6361-0875-3545-3671-4526"
     decimalString += computeCheckChar(decimalString)
-    ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
+    payload = ManualOnboardingPayloadParser(decimalString).populatePayload()
     assertPayloadValues(
       payload,
       pinCode = 123456780,
@@ -312,7 +329,7 @@ class ManualCodeTest {
 
     decimalString = "52927623630456200032"
     decimalString += Verhoeff10.computeCheckChar(decimalString)
-    ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
+    payload = ManualOnboardingPayloadParser(decimalString).populatePayload()
     assertPayloadValues(
       payload,
       pinCode = 38728284,
@@ -323,7 +340,7 @@ class ManualCodeTest {
 
     decimalString = "40000100000000100001"
     decimalString += Verhoeff10.computeCheckChar(decimalString)
-    ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
+    payload = ManualOnboardingPayloadParser(decimalString).populatePayload()
     assertPayloadValues(payload, pinCode = 1, discriminator = 0, vendorId = 1, productId = 1)
   }
 
@@ -332,13 +349,13 @@ class ManualCodeTest {
    */
   @Test
   fun testPayloadParser_invalidEntry() {
-    val payload = OnboardingPayload()
+    var payload = OnboardingPayload()
 
     // Empty input
     var decimalString = ""
     decimalString += Verhoeff10.computeCheckChar(decimalString)
     try {
-      ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
+      payload = ManualOnboardingPayloadParser(decimalString).populatePayload()
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
     }
@@ -348,7 +365,7 @@ class ManualCodeTest {
     decimalString = "24184.2196"
     try {
       decimalString += Verhoeff10.computeCheckChar(decimalString)
-      ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
+      payload = ManualOnboardingPayloadParser(decimalString).populatePayload()
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
     }
@@ -358,7 +375,7 @@ class ManualCodeTest {
     decimalString = "2456"
     try {
       decimalString += Verhoeff10.computeCheckChar(decimalString)
-      ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
+      payload = ManualOnboardingPayloadParser(decimalString).populatePayload()
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
     }
@@ -368,7 +385,7 @@ class ManualCodeTest {
     decimalString = "123456789123456785671"
     try {
       decimalString += Verhoeff10.computeCheckChar(decimalString)
-      ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
+      payload = ManualOnboardingPayloadParser(decimalString).populatePayload()
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
     }
@@ -378,7 +395,7 @@ class ManualCodeTest {
     decimalString = "12749875380"
     try {
       decimalString += Verhoeff10.computeCheckChar(decimalString)
-      ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
+      payload = ManualOnboardingPayloadParser(decimalString).populatePayload()
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
     }
@@ -388,7 +405,7 @@ class ManualCodeTest {
     decimalString = "23456789123456785610"
     try {
       decimalString += Verhoeff10.computeCheckChar(decimalString)
-      ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
+      payload = ManualOnboardingPayloadParser(decimalString).populatePayload()
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
     }
@@ -398,7 +415,7 @@ class ManualCodeTest {
     decimalString = "2327680000"
     try {
       decimalString += Verhoeff10.computeCheckChar(decimalString)
-      ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
+      payload = ManualOnboardingPayloadParser(decimalString).populatePayload()
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
     }
@@ -407,7 +424,7 @@ class ManualCodeTest {
     // wrong check digit
     decimalString = "02684354589"
     try {
-      ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
+      payload = ManualOnboardingPayloadParser(decimalString).populatePayload()
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
     }
@@ -420,11 +437,9 @@ class ManualCodeTest {
   @Test
   fun testShortCodeReadWrite() {
     val inPayload = getDefaultPayload()
-    val outPayload = OnboardingPayload()
-
     var generator = ManualOnboardingPayloadGenerator(inPayload)
     var result = generator.payloadDecimalStringRepresentation()
-    ManualOnboardingPayloadParser(result).populatePayload(outPayload)
+    val outPayload = ManualOnboardingPayloadParser(result).populatePayload()
 
     // Override the discriminator in the input payload with the short version,
     // since that's what we will produce.
@@ -442,10 +457,9 @@ class ManualCodeTest {
     inPayload.vendorId = 1
     inPayload.productId = 1
 
-    val outPayload = OnboardingPayload()
     var generator = ManualOnboardingPayloadGenerator(inPayload)
     var result = generator.payloadDecimalStringRepresentation()
-    ManualOnboardingPayloadParser(result).populatePayload(outPayload)
+    val outPayload = ManualOnboardingPayloadParser(result).populatePayload()
 
     // Override the discriminator in the input payload with the short version,
     // since that's what we will produce.
@@ -651,8 +665,7 @@ class ManualCodeTest {
     val generator = ManualOnboardingPayloadGenerator(payload)
     val result = generator.payloadDecimalStringRepresentation()
 
-    val outPayload = OnboardingPayload()
-    ManualOnboardingPayloadParser(result).populatePayload(outPayload)
+    val outPayload = ManualOnboardingPayloadParser(result).populatePayload()
 
     assertPayloadValues(
       outPayload,
@@ -672,8 +685,7 @@ class ManualCodeTest {
     val generator = ManualOnboardingPayloadGenerator(payload)
     val result = generator.payloadDecimalStringRepresentation()
 
-    val outPayload = OnboardingPayload()
-    ManualOnboardingPayloadParser(result).populatePayload(outPayload)
+    val outPayload = ManualOnboardingPayloadParser(result).populatePayload()
 
     assertPayloadValues(
       outPayload,
@@ -682,5 +694,80 @@ class ManualCodeTest {
       vendorId = payload.vendorId,
       productId = payload.productId
     )
+  }
+
+  /*
+   * Test Parse Short Manual PairingCode to Expected Payload
+   */
+  @Test
+  fun testParseShortManualPairingCodeToExpectedPayload() {
+    // Payload: MT:W0GU2OTB00KA0648G00
+    // Setup Pin Code: 20202021
+    // Setup Discriminator: 15
+
+    val parser = OnboardingPayloadParser()
+    assertThat(parser.parseManualPairingCode("34970112332"))
+      .isEqualTo(
+        OnboardingPayload(
+          discriminator = 15,
+          setupPinCode = 20202021,
+          version = 0,
+          vendorId = 0,
+          productId = 0,
+          hasShortDiscriminator = true,
+          commissioningFlow = CommissioningFlow.STANDARD.value,
+          discoveryCapabilities = mutableSetOf(),
+        )
+      )
+  }
+
+  /*
+   * Test Parse Long Manual PairingCode to Expected Payload
+   */
+  @Test
+  fun testParseLongManualPairingCodeToExpectedPayload() {
+    // Payload: MT:W0GU2OTB00KA0648G00
+    // Vendor Id: 9050 (0x235A)
+    // Product Id: 17729 (0x4541)
+    // Setup Pin Code: 20202021
+    // Setup Discriminator: 15
+
+    val parser = OnboardingPayloadParser()
+    assertThat(parser.parseManualPairingCode("749701123309050177298"))
+      .isEqualTo(
+        OnboardingPayload(
+          discriminator = 15,
+          setupPinCode = 20202021,
+          version = 0,
+          vendorId = 0x235A,
+          productId = 0x4541,
+          hasShortDiscriminator = true,
+          commissioningFlow = CommissioningFlow.CUSTOM.value,
+          discoveryCapabilities = mutableSetOf(),
+        )
+      )
+  }
+
+  /*
+   * Test Generate Manual PairingCode to Expected Payload
+   */
+  @Test
+  fun testGenerateManualPairingCodetoExpectedPayload() {
+    val parser = OnboardingPayloadParser()
+    assertThat(
+        parser.getManualPairingCodeFromPayload(
+          OnboardingPayload(
+            discriminator = 15,
+            setupPinCode = 20202021,
+            version = 0,
+            vendorId = 0x235A,
+            productId = 0x4541,
+            hasShortDiscriminator = true,
+            commissioningFlow = CommissioningFlow.CUSTOM.value,
+            discoveryCapabilities = mutableSetOf(),
+          )
+        )
+      )
+      .isEqualTo("749701123309050177298")
   }
 }

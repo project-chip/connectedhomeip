@@ -44,10 +44,12 @@ template("siwx917_sdk") {
 
     # Treat these includes as system includes, so warnings in them are not fatal.
     _include_dirs = [
+      "${chip_root}",
       "${chip_root}/examples/platform/silabs/SiWx917/SiWx917",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4325x/support/hal",
       "${efr32_sdk_root}/platform/emdrv/nvm3/inc",
       "${efr32_sdk_root}/platform/emdrv/common/inc",
+      "${efr32_sdk_root}/platform/service/device_init/inc",
       "${sdk_support_root}/matter/mbedtls/tinycrypt/inc",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4325x/autogen",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4325x/config",
@@ -133,6 +135,7 @@ template("siwx917_sdk") {
       "KVS_MAX_ENTRIES=${kvs_max_entries}",
       "${silabs_mcu}=1",
       "${silabs_board}=1",
+      "SL_BOARD_NAME=${silabs_board}",
       "__HEAP_SIZE=0",
       "PLATFORM_HEADER=\"platform-header.h\"",
       "USE_NVM3=1",
@@ -163,21 +166,17 @@ template("siwx917_sdk") {
     ]
 
     if (silabs_board == "BRD4325B") {
-      defines += [
-        "BRD4325A",
-        "BRD4325B",
-        "DUAL_FLASH_EN",
-      ]
+      defines += [ "DUAL_FLASH_EN" ]
     }
-    if (silabs_board == "BRD4325C") {
+    if (wifi_soc_common_flash) {
       defines += [
-        "BRD4325C",
         "CHIP_917B0 = 1",
-        "SL_BOARD_NAME=\"BRD4325C\"",
         "COMMON_FLASH_EN=1",
         "EXECUTION_FROM_RAM",
-        "SL_BOARD_REV=\"A01\"",
       ]
+      if (silabs_board == "BRD4338A") {
+        defines += [ "SI917_RADIO_BOARD_V2=1" ]
+      }
     }
 
     if (chip_build_libshell) {
@@ -235,6 +234,10 @@ template("siwx917_sdk") {
 
     if (enable_dic) {
       defines += [ "DIC_ENABLE=1" ]
+    }
+
+    if (aws_sdk_ota) {
+      defines += [ "ENABLE_AWS_OTA_FEAT=1" ]
     }
 
     libs += [ "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a" ]
@@ -348,6 +351,7 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default_common_linker.c",
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_lock.c",
       "${efr32_sdk_root}/platform/emlib/src/em_core.c",
+      "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_nvic.c",
       "${efr32_sdk_root}/platform/service/system/src/sl_system_init.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/croutine.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/event_groups.c",
@@ -407,7 +411,7 @@ template("siwx917_sdk") {
       ]
     }
 
-    if (silabs_board == "BRD4325C") {
+    if (wifi_soc_common_flash) {
       sources += [
         "${sdk_support_root}/matter/si91x/siwx917/BRD4325x/support/src/startup_common_RS1xxxx.c",
         "${wifi_sdk_root}/components/siwx917_soc/drivers/middleware/nvm3/src/sl_si91x_common_flash_intf.c",

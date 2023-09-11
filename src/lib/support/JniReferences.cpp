@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <cstring>
 #include <jni.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
@@ -79,8 +80,18 @@ CHIP_ERROR JniReferences::GetClassRef(JNIEnv * env, const char * clsType, jclass
     CHIP_ERROR err = CHIP_NO_ERROR;
     jclass cls     = nullptr;
 
-    cls = env->FindClass(clsType);
-    env->ExceptionClear();
+    // Try `j$/util/Optional` when enabling Java8.
+    if (strcmp(clsType, "java/util/Optional") == 0)
+    {
+        cls = env->FindClass("j$/util/Optional");
+        env->ExceptionClear();
+    }
+
+    if (cls == nullptr)
+    {
+        cls = env->FindClass(clsType);
+        env->ExceptionClear();
+    }
 
     if (cls == nullptr)
     {
@@ -121,6 +132,20 @@ CHIP_ERROR JniReferences::FindMethod(JNIEnv * env, jobject object, const char * 
     VerifyOrReturnError(javaClass != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
 
     *methodId = env->GetMethodID(javaClass, methodName, methodSignature);
+
+    // Try `j$` when enabling Java8.
+    std::string methodSignature_java8_str(methodSignature);
+    if (*methodId == nullptr && methodSignature_java8_str.find("java/util/Optional") != std::string::npos)
+    {
+        // Replace all "java/util/Optional" with "j$/util/Optional".
+        while (methodSignature_java8_str.find("java/util/Optional") != std::string::npos)
+        {
+            size_t pos = methodSignature_java8_str.find("java/util/Optional");
+            methodSignature_java8_str.replace(pos, strlen("java/util/Optional"), "j$/util/Optional");
+        }
+        *methodId = env->GetMethodID(javaClass, methodName, methodSignature_java8_str.c_str());
+    }
+
     VerifyOrReturnError(*methodId != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
     return err;
@@ -174,12 +199,12 @@ void JniReferences::ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * fun
 void JniReferences::ThrowError(JNIEnv * env, jclass exceptionCls, CHIP_ERROR errToThrow)
 {
     env->ExceptionClear();
-    jmethodID constructor = env->GetMethodID(exceptionCls, "<init>", "(ILjava/lang/String;)V");
+    jmethodID constructor = env->GetMethodID(exceptionCls, "<init>", "(JLjava/lang/String;)V");
     VerifyOrReturn(constructor != NULL);
 
     jstring jerrStr = env->NewStringUTF(ErrorStr(errToThrow));
 
-    jthrowable outEx = (jthrowable) env->NewObject(exceptionCls, constructor, static_cast<jint>(errToThrow.AsInteger()), jerrStr);
+    jthrowable outEx = (jthrowable) env->NewObject(exceptionCls, constructor, static_cast<jlong>(errToThrow.AsInteger()), jerrStr);
     VerifyOrReturn(!env->ExceptionCheck());
     env->Throw(outEx);
 }
@@ -193,6 +218,13 @@ CHIP_ERROR JniReferences::CreateOptional(jobject objectToWrap, jobject & outOpti
     chip::JniClass jniClass(optionalCls);
 
     jmethodID ofMethod = env->GetStaticMethodID(optionalCls, "ofNullable", "(Ljava/lang/Object;)Ljava/util/Optional;");
+
+    // Try `Lj$/util/Optional;` when enabling Java8.
+    if (ofMethod == nullptr)
+    {
+        ofMethod = env->GetStaticMethodID(optionalCls, "ofNullable", "(Ljava/lang/Object;)Lj$/util/Optional;");
+    }
+
     VerifyOrReturnError(ofMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
     outOptional = env->CallStaticObjectMethod(optionalCls, ofMethod, objectToWrap);
 

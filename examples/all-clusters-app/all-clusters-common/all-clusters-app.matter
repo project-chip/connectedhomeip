@@ -558,6 +558,7 @@ server cluster Descriptor = 29 {
   readonly attribute CLUSTER_ID serverList[] = 1;
   readonly attribute CLUSTER_ID clientList[] = 2;
   readonly attribute ENDPOINT_NO partsList[] = 3;
+  readonly attribute SemanticTagStruct tagList[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1020,6 +1021,10 @@ server cluster TimeFormatLocalization = 44 {
   enum HourFormatEnum : ENUM8 {
     k12hr = 0;
     k24hr = 1;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kCalendarFormat = 0x1;
   }
 
   attribute HourFormatEnum hourFormat = 0;
@@ -2978,6 +2983,10 @@ server cluster DishwasherAlarm = 93 {
     kWaterLevelError = 0x20;
   }
 
+  bitmap Feature : BITMAP32 {
+    kReset = 0x1;
+  }
+
   info event Notify = 0 {
     AlarmMap active = 0;
     AlarmMap inactive = 1;
@@ -3153,7 +3162,7 @@ server cluster HepaFilterMonitoring = 113 {
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
-    kReplacementProductList = 0x3;
+    kReplacementProductList = 0x4;
   }
 
   struct ReplacementProductStruct {
@@ -3201,7 +3210,7 @@ server cluster ActivatedCarbonFilterMonitoring = 114 {
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
-    kReplacementProductList = 0x3;
+    kReplacementProductList = 0x4;
   }
 
   struct ReplacementProductStruct {
@@ -6130,12 +6139,13 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster Binding {
@@ -6223,7 +6233,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6634,12 +6644,13 @@ endpoint 1 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster Binding {
@@ -6815,7 +6826,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 15;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6903,7 +6914,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 3;
+    ram      attribute featureMap default = 7;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6917,7 +6928,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 3;
+    ram      attribute featureMap default = 7;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -7047,7 +7058,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0023;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
   }
 
   server cluster FanControl {
@@ -7646,12 +7657,13 @@ endpoint 2 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster PowerSource {
@@ -7688,7 +7700,7 @@ endpoint 65534 {
     callback attribute clientList;
     callback attribute partsList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster NetworkCommissioning {
