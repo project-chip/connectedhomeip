@@ -44,14 +44,17 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     if (clusterId == HepaFilterMonitoring::Id && attributeId == HepaFilterMonitoring::Attributes::DegradationDirection::Id)
     {
         static_assert(sizeof(HepaFilterMonitoring::DegradationDirectionEnum) == 1, "Wrong size");
-        HepaFilterMonitoring::DegradationDirectionEnum HepaFilterState = *(reinterpret_cast<HepaFilterMonitoring::DegradationDirectionEnum *>(value));
+        HepaFilterMonitoring::DegradationDirectionEnum HepaFilterState =
+            *(reinterpret_cast<HepaFilterMonitoring::DegradationDirectionEnum *>(value));
         ChipLogProgress(Zcl, "Hepa Filter Monitoring cluster: " ChipLogFormatMEI " state %d", ChipLogValueMEI(clusterId),
                         to_underlying(HepaFilterState));
     }
-    else if (clusterId == ActivatedCarbonFilterMonitoring::Id && attributeId == ActivatedCarbonFilterMonitoring::Attributes::DegradationDirection::Id)
+    else if (clusterId == ActivatedCarbonFilterMonitoring::Id &&
+             attributeId == ActivatedCarbonFilterMonitoring::Attributes::DegradationDirection::Id)
     {
         static_assert(sizeof(ActivatedCarbonFilterMonitoring::DegradationDirectionEnum) == 1, "Wrong size");
-        ActivatedCarbonFilterMonitoring::DegradationDirectionEnum CarbonFilterState = *(reinterpret_cast<ActivatedCarbonFilterMonitoring::DegradationDirectionEnum *>(value));
+        ActivatedCarbonFilterMonitoring::DegradationDirectionEnum CarbonFilterState =
+            *(reinterpret_cast<ActivatedCarbonFilterMonitoring::DegradationDirectionEnum *>(value));
         ChipLogProgress(Zcl, "Activated Carbon Filter cluster: " ChipLogFormatMEI " state %d", ChipLogValueMEI(clusterId),
                         to_underlying(CarbonFilterState));
     }

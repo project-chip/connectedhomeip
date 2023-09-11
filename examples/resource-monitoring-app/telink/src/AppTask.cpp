@@ -18,9 +18,9 @@
 
 #include "AppTask.h"
 
-#include <app/server/Server.h>
 #include <StaticReplacementProductListManager.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
+#include <app/server/Server.h>
 #include <bitset>
 #include <delegates/ActivatedCarbonFilterMonitoring.h>
 #include <delegates/HepaFilterMonitoring.h>
@@ -61,7 +61,7 @@ CHIP_ERROR AppTask::Init(void)
     gHepaFilterInstance.Init();
     gActivatedCarbonFilterInstance.Init();
 
-   CHIP_ERROR err = ConnectivityMgr().SetBLEDeviceName("TelinkResMonDevice");
+    CHIP_ERROR err = ConnectivityMgr().SetBLEDeviceName("TelinkResMonDevice");
     if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("SetBLEDeviceName fail");
