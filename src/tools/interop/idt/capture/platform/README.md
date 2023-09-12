@@ -6,8 +6,8 @@ platforms.
 ## Adding new platforms
 
 1. Add the platform package in this directory (`/platform`).
-2. Create a class which subclasses `capture.base.PlatformLogStreamer`.
-3. Add the class to `__all__` in `/platform/__init__.py`.
+1. Create a subclass of `capture.base.PlatformLogStreamer`.
+1. Add the new class to `__all__` in `/platform/__init__.py`.
 
 # Implementation requirements
 

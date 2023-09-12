@@ -1,9 +1,9 @@
-# Interop Debugging Tool
+# Interoperability Debugging Tool
 
 ## Overview
 
-The “Interop Debugging Tool” (IDT) is a python-based tool that supports a
-variety of commands that are useful in the context of interop testing of Matter
+The “Interoperability Debugging Tool” (IDT) is a python-based tool that supports a
+variety of commands that are useful in the context of interoperability testing of Matter
 devices and app controllers.
 
 ### Discovery
@@ -54,7 +54,7 @@ environment.
 ### Environment details
 
 1. This guide and the `idt` scripts expect **_one_** instance of `idt` on both
-   the admin computer (e.g. macbook) and the target environment.
+   the admin computer and the target environment.
 1. The expected install location on the target environment is the home directory
    of the user specified in `idt/scripts/vars.sh`. Default values are:
     ```

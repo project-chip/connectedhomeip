@@ -298,8 +298,8 @@ connstring
 conntype
 const
 ContentApp
-ContentApp's
 ContentAppPlatform
+ContentApp's
 ContentLaunch
 ContentLauncher
 continuousHinting
@@ -659,6 +659,8 @@ ICMP
 IDF
 IDL
 IDLs
+idt
+IDT
 idx
 ifconfig
 ifdef
@@ -925,6 +927,7 @@ nl
 NLUnitTest
 NLUnitTests
 nmcli
+nmtui
 noc
 NodeId
 nongnu
@@ -1020,11 +1023,13 @@ params
 PartNumber
 PASE
 Passcode
+passwd
 PBKDF
 pbuf
 pbufs
 pbxproj
 PCA
+pcap
 pcaps
 PDFs
 PDK
@@ -1049,6 +1054,7 @@ PlatformManager
 PlatformManagerImpl
 plt
 png
+Podman
 PollControl
 pollInterval
 polymorphism
@@ -1144,8 +1150,8 @@ REPL
 repo
 req
 Requestor
-Requestor's
 RequestorCanConsent
+Requestor's
 Requestors
 responder
 RestrictedEvent
@@ -1198,8 +1204,8 @@ SDB
 SDC
 SDHC
 SDK
-SDK's
 sdkconfig
+SDK's
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -1276,9 +1282,9 @@ StatusCode
 stderr
 stdout
 sterm
-stmicroelectronics
-stm
 stlink
+stm
+stmicroelectronics
 storagepath
 str
 strcpy
@@ -1351,11 +1357,11 @@ textboxes
 TFT
 ThermostatUserInterfaceConfiguration
 ThIsIsNoTMyReAlGiThUbToKeNSoDoNoTtRy
+thread
 ThreadNetworkDiagnostics
 threadOperationalDataset
 ThreadStackManager
 ThreadStackManagerImpl
-thread
 ths
 Thunderboard
 timedInteractionTimeoutMs
