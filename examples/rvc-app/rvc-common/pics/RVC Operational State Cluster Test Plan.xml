@@ -193,14 +193,14 @@ Draft
 				<feature>Does the DUT support testing the UnableToStartOrResume(0x01) error state?</feature>
 				<reference>223.2.5. Manual controllable - allclusters.html[pdf]</reference>
 				<status cond="RVCOPSTATE.S">O</status>
-				<support>false</support>
+				<support>true</support>
 			</picsItem>
 			<picsItem>
 				<itemNumber>RVCOPSTATE.S.M.ERR_UNABLE_TO_COMPLETE_OPERATION</itemNumber>
 				<feature>Does the DUT support testing the UnableToCompleteOperation(0x02) error state?</feature>
 				<reference>223.2.5. Manual controllable - allclusters.html[pdf]</reference>
 				<status cond="RVCOPSTATE.S">O</status>
-				<support>false</support>
+				<support>true</support>
 			</picsItem>
 			<picsItem>
 				<itemNumber>RVCOPSTATE.S.M.ERR_COMMAND_INVALID_IN_STATE</itemNumber>
