@@ -24,6 +24,9 @@ config:
     endpoint: 1
 
     GroupKeyManagement.Endpoint: 0
+    G1:
+      type: int16u
+      defaultValue: 0x0001
     Groups.Endpoint: 1
 
 tests:
@@ -64,7 +67,7 @@ tests:
       command: "writeAttribute"
       attribute: "GroupKeyMap"
       arguments:
-          value: [{ FabricIndex: 1, GroupId: 0x0001, GroupKeySetID: 0x01a1 }]
+          value: [{ FabricIndex: 1, GroupId: G1, GroupKeySetID: 0x01a1 }]
 
     - label: "Step 0c: TH sends a RemoveAllGroups command to DUT."
       PICS: G.S.C04.Rsp
@@ -81,7 +84,7 @@ tests:
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "GroupName"
                 value: "Group1"
       response:
@@ -89,7 +92,7 @@ tests:
               - name: "Status"
                 value: 0
               - name: "GroupID"
-                value: 0x0001
+                value: G1
 
     - label:
           "Step 2b: TH sends a RemoveAllScenes command to DUT with the GroupID
@@ -99,13 +102,13 @@ tests:
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
       response:
           values:
               - name: "Status"
                 value: 0
               - name: "GroupID"
-                value: 0x0001
+                value: G1
 
     - label:
           "Step 3: TH sends a AddScene command to DUT with the GroupID field set
@@ -116,7 +119,7 @@ tests:
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x0001
               - name: "TransitionTime"
@@ -131,7 +134,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
 
@@ -185,7 +188,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
 
@@ -250,7 +253,7 @@ tests:
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
 
@@ -260,7 +263,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 20000
+                value: 20500
 
     - label:
           "TH confirm the DUT reached AC1 (on level control cluster) after 20s"
@@ -327,7 +330,7 @@ tests:
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
@@ -339,7 +342,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 5000
+                value: 5500
 
     - label:
           "TH confirm the DUT reached AC2 (on level control cluster) after 5s"
@@ -406,13 +409,11 @@ tests:
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
                 value: null
-      response:
-          error: SUCCESS
 
     - label:
           "Step 8: TH removes the Group key set that was added by sending a

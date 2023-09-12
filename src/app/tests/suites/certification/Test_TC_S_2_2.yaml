@@ -237,6 +237,8 @@ tests:
                 value: 0x0001
               - name: "SceneID"
                 value: 0x01
+      response:
+          error: ''
 
     - label: "Step 3c: TH reads the SceneCount attribute from DUT."
       PICS: S.S.A0000 && S.S.A0001 && S.S.A0002 && S.S.A0003 && !S.S.F03
@@ -264,7 +266,7 @@ tests:
       response:
           value: 0x0001
           constraints:
-              type: groupid
+              type: int16u
 
     - label: "Step 3f: TH reads the SceneValid attribute from DUT."
       PICS: S.S.A0000 && S.S.A0001 && S.S.A0002 && S.S.A0003 && !S.S.F03
@@ -273,7 +275,7 @@ tests:
       response:
           value: true
           constraints:
-              type: int8u
+              type: boolean
 
     - label: "Step 3g: TH reads attribute SceneTableSize from DUT."
       PICS: S.S.F03 && S.S.F02
@@ -431,10 +433,6 @@ tests:
                                         AttributeID: 0x0000,
                                         AttributeValue: 0x64,
                                     },
-                                    {
-                                        AttributeID: 0x0001,
-                                        AttributeValue: 0x00,
-                                    },
                                 ],
                         },
                     ]
@@ -547,10 +545,6 @@ tests:
                                     {
                                         AttributeID: 0x0000,
                                         AttributeValue: 0x64,
-                                    },
-                                    {
-                                        AttributeID: 0x0001,
-                                        AttributeValue: 0x00,
                                     },
                                 ],
                         },

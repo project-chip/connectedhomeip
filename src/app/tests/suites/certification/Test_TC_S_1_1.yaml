@@ -151,7 +151,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [0, 1, 2, 3, 4, 5, 6, 40, 41, 42]
+              contains: [0, 1, 2, 3, 4, 5, 6, 64, 65, 66]
 
     - label: "Step 6b: Read AcceptedCommandList (global attribute 65529)"
       PICS: (!S.S.C40.Rsp)
@@ -169,7 +169,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [0, 1, 2, 3, 4, 5, 6, 40, 41, 42]
+              contains: [0, 1, 2, 3, 4, 5, 6, 64, 65, 66]
 
     - label: "Step 6d: Read AcceptedCommandList (global attribute 65529)"
       PICS: (!S.C.C40.Tx)
@@ -186,7 +186,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [0, 1, 2, 3, 4, 5, 6]
+              contains: [0, 1, 2, 3, 4, 6]
 
     - label:
           "Step 7b: Read optional command(EnhancedAddSceneResponse) in
@@ -197,7 +197,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [40]
+              contains: [64]
 
     - label:
           "Step 7c: Read optional command(EnhancedViewSceneResponse) in
@@ -208,7 +208,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [41]
+              contains: [65]
 
     - label:
           "Step 7d: Read optional command(CopySceneResponse) in
@@ -219,4 +219,4 @@ tests:
       response:
           constraints:
               type: list
-              contains: [42]
+              contains: [66]

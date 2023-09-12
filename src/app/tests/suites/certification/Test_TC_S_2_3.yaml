@@ -24,7 +24,7 @@ config:
     endpoint: 1
     G1:
         type: int16u
-        defaultValue: 0x0001
+        defaultValue: 0x0101
     GroupKeyManagement.Endpoint: 0
 
 tests:
@@ -87,7 +87,7 @@ tests:
               - name: "GroupID"
                 value: G1
               - name: "GroupName"
-                value: "Group1"
+                value: "Group #1"
       response:
           values:
               - name: "Status"
@@ -125,7 +125,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "Capacity"
-                value: (maxScenes/2)
+                value: maxScenes / 2
               - name: "GroupID"
                 value: G1
               - name: "SceneList"
@@ -164,10 +164,6 @@ tests:
                                         AttributeID: 0x0000,
                                         AttributeValue: 0x64,
                                     },
-                                    {
-                                        AttributeID: 0x0001,
-                                        AttributeValue: 0x00,
-                                    },
                                 ],
                         },
                     ]
@@ -184,7 +180,7 @@ tests:
           "Step 2b: TH sends a AddScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x01, the TransitionTime field set
           to 0x0001 (1s) and a set of extension fields appropriate to AC1."
-      PICS: S.S.C40.Rsp && PICS_SDK_CI_ONLY
+      PICS: (!S.S.C40.Rsp) && PICS_SDK_CI_ONLY
       command: "AddScene"
       arguments:
           values:
@@ -211,10 +207,6 @@ tests:
                                     {
                                         AttributeID: 0x0000,
                                         AttributeValue: 0x64,
-                                    },
-                                    {
-                                        AttributeID: 0x0001,
-                                        AttributeValue: 0x00,
                                     },
                                 ],
                         },
@@ -274,7 +266,7 @@ tests:
           [1670970505.890328][5742:5744] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0040
           [1670970505.890458][5742:5744] CHIP:TOO:   EnhancedAddSceneResponse: {
           [1670970505.890551][5742:5744] CHIP:TOO:     status: 0
-          [1670970505.890608][5742:5744] CHIP:TOO:     groupId: 1
+          [1670970505.890608][5742:5744] CHIP:TOO:     groupId: 101
           [1670970505.890717][5742:5744] CHIP:TOO:     sceneId: 1
           [1670970505.890774][5742:5744] CHIP:TOO:    }
       cluster: "LogCommands"
@@ -336,7 +328,7 @@ tests:
           [1670970505.890328][5742:5744] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
           [1670970505.890458][5742:5744] CHIP:TOO:   AddSceneResponse: {
           [1670970505.890551][5742:5744] CHIP:TOO:     status: 0
-          [1670970505.890608][5742:5744] CHIP:TOO:     groupId: 1
+          [1670970505.890608][5742:5744] CHIP:TOO:     groupId: 101
           [1670970505.890717][5742:5744] CHIP:TOO:     sceneId: 1
           [1670970505.890774][5742:5744] CHIP:TOO:    }
       cluster: "LogCommands"
@@ -389,10 +381,6 @@ tests:
                                         AttributeID: 0x0000,
                                         AttributeValue: 0x64,
                                     },
-                                    {
-                                        AttributeID: 0x0001,
-                                        AttributeValue: 0x00,
-                                    },
                                 ],
                         },
                     ]
@@ -400,7 +388,7 @@ tests:
     - label:
           "Step 3b: TH sends a ViewScene command to DUT with the GroupID field
           set to G1 and the SceneID field set to 0x01."
-      PICS: S.S.C41.Rsp && PICS_SDK_CI_ONLY
+      PICS: (!S.S.C41.Rsp) && PICS_SDK_CI_ONLY
       command: "ViewScene"
       arguments:
           values:
@@ -433,10 +421,6 @@ tests:
                                     {
                                         AttributeID: 0x0000,
                                         AttributeValue: 0x64,
-                                    },
-                                    {
-                                        AttributeID: 0x0001,
-                                        AttributeValue: 0x00,
                                     },
                                 ],
                         },
@@ -513,7 +497,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "Capacity"
-                value: (maxScenes/2) - 1
+                value: ( maxScenes / 2 ) - 1
               - name: "GroupID"
                 value: G1
               - name: "SceneList"
@@ -558,7 +542,7 @@ tests:
           field set to G1 and the scene ID field set to 0x01."
       PICS: S.S.C05.Rsp
       command: "RecallScene"
-      groupId: 0x0001
+      groupId: 0x101
       arguments:
           values:
               - name: "GroupID"
@@ -577,7 +561,7 @@ tests:
 
     - label:
           "TH confirm the DUT reached AC1 (on level control cluster) after 1s"
-      PICS: S.S.C40.Rsp
+      PICS: PICS_SDK_CI_ONLY && S.S.C05.Rsp
       cluster: "Level Control"
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -639,7 +623,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "Capacity"
-                value: (maxScenes/2) - 2
+                value: ( maxScenes / 2 ) - 2
               - name: "GroupID"
                 value: G1
               - name: "SceneList"
