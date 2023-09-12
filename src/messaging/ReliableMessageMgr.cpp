@@ -158,9 +158,9 @@ void ReliableMessageMgr::ExecuteActions()
             // Do not StartTimer, we will schedule the timer at the end of the timer handler.
             mRetransTable.ReleaseObject(entry);
 
-            // That marked the exchange as not having an un-acked message... but
-            // of course it _does_ have an un-acked message and we have just
-            // given up on waiting for the ack.
+            // Dropping our entry marked the exchange as not having an un-acked
+            // message... but of course it _does_ have an un-acked message and
+            // we have just given up on waiting for the ack.
 
             ec->GetReliableMessageContext()->SetMessageNotAcked(true);
 
