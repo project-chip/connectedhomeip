@@ -18,12 +18,12 @@
 
 #pragma once
 
-#include "Types.h"
 #include "CastingPlayer.h"
+#include "Types.h"
 
-#include <vector>
 #include <controller/CHIPCommissionableNodeController.h>
 #include <controller/DeviceDiscoveryDelegate.h>
+#include <vector>
 
 namespace matter {
 namespace casting {
@@ -35,32 +35,30 @@ namespace core {
  */
 enum CastingPlayerDiscoveryState
 {
-    DISCOVERY_NOT_READY,  // Default state, mClientDelegate isn't initialized
-    DISCOVERY_READY,      // After SetDelegate and before StartDiscovery, mClientDelegate is initialized
-    DISCOVERY_RUNNING,    // After StartDiscovery success
+    DISCOVERY_NOT_READY, // Default state, mClientDelegate isn't initialized
+    DISCOVERY_READY,     // After SetDelegate and before StartDiscovery, mClientDelegate is initialized
+    DISCOVERY_RUNNING,   // After StartDiscovery success
 };
 
 class DLL_EXPORT DiscoveryDelegate
 {
 public:
     virtual ~DiscoveryDelegate() {}
-    virtual void HandleOnAdded(Strong<CastingPlayer> player) = 0;
+    virtual void HandleOnAdded(Strong<CastingPlayer> player)    = 0;
     virtual void HandleOnUpdated(Strong<CastingPlayer> players) = 0;
     // virtual void HandleOnRemoved(std::vector<Strong<CastingPlayer>> players);
-
 };
 
 class CastingPlayerDiscovery;
 
-class DeviceDiscoveryDelegateImpl : public chip::Controller::DeviceDiscoveryDelegate {
+class DeviceDiscoveryDelegateImpl : public chip::Controller::DeviceDiscoveryDelegate
+{
 private:
     DiscoveryDelegate * mClientDelegate = nullptr;
 
 public:
-    DeviceDiscoveryDelegateImpl(){}
-    DeviceDiscoveryDelegateImpl(DiscoveryDelegate * delegate){
-        mClientDelegate = delegate;
-    }
+    DeviceDiscoveryDelegateImpl() {}
+    DeviceDiscoveryDelegateImpl(DiscoveryDelegate * delegate) { mClientDelegate = delegate; }
 
     void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 };
@@ -76,7 +74,7 @@ private:
     static CastingPlayerDiscovery * _castingPlayerDiscovery;
 
     CastingPlayerDiscovery(CastingPlayerDiscovery & other) = delete;
-    void operator=(const CastingPlayerDiscovery &)         = delete;
+    void operator=(const CastingPlayerDiscovery &) = delete;
 
     chip::Controller::CommissionableNodeController mCommissionableNodeController;
     CastingPlayerDiscoveryState mState = DISCOVERY_NOT_READY;
@@ -100,17 +98,18 @@ public:
 
     void SetDelegate(DiscoveryDelegate * clientDelegate)
     {
-        if(clientDelegate == nullptr){
+        if (clientDelegate == nullptr)
+        {
             mState = DISCOVERY_NOT_READY;
         }
-        else{
+        else
+        {
             mState = DISCOVERY_READY;
         }
         mDelegate = DeviceDiscoveryDelegateImpl(clientDelegate);
-
     }
 
-    std::vector<Strong<CastingPlayer>> * GetCastingPlayers(){return &mCastingPlayers;}
+    std::vector<Strong<CastingPlayer>> * GetCastingPlayers() { return &mCastingPlayers; }
 };
 
 }; // namespace core
