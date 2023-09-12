@@ -107,7 +107,7 @@ def main():
             info = pd.read_json(f"workflow_pass_rate/{workflow}/run_list.json")
             info = info[info["conclusion"].str.len() > 0]
             fail_rate[workflow] = [info.value_counts(normalize=True).mul(100).round()["failure"]]
-        except Exception as error:
+        except Exception:
             logging.exception(f"Recent runs info for {workflow} was not collected.")
     fail_rate = pd.DataFrame.from_dict(fail_rate, 'index', columns=["Fail Rate"])
     print("Recent Fail Rate of Each Workflow:")
