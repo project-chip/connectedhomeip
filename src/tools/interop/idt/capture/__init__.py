@@ -1,8 +1,7 @@
 from capture import ecosystem, platform
 from capture.pcap import PacketCaptureRunner
 
-from .factory import (CaptureEcosystems, CapturePlatforms, EcosystemCapture,
-                      PlatformLogStreamer)
+from .factory import CaptureEcosystems, CapturePlatforms, EcosystemCapture, PlatformLogStreamer
 from .shell_utils import BashRunner
 
 __all__ = [

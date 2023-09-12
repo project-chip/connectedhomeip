@@ -1,7 +1,6 @@
 import os
 
-from capture.file_utils import (add_border, create_standard_log_name,
-                                print_and_write)
+from capture.file_utils import add_border, create_standard_log_name, print_and_write
 from capture.platform.android import Android
 
 
