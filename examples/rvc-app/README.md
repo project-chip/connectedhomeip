@@ -20,13 +20,13 @@ must have a `"Name"` key that contains the command name. This name is shown in
 the state machine diagram above. Example
 `echo '{"Name": "Charged"}' > /tmp/chip_rvc_fifo_42`.
 
-### ErrorEvent message
+### `ErrorEvent` message
 
 The error event message requires the additional key `"Error"` which specifies
-the error state ID. This can be one of UnableToStartOrResume,
-UnableToCompleteOperation, CommandInvalidInState, FailedToFindChargingDock,
-Stuck, DustBinMissing, DustBinFull, WaterTankEmpty, WaterTankMissing,
-WaterTankLidOpen, MopCleaningPadMissing.
+the error state ID. This can be one of `UnableToStartOrResume`,
+`UnableToCompleteOperation`, `CommandInvalidInState`, `FailedToFindChargingDock`,
+`Stuck`, `DustBinMissing`, `DustBinFull`, `WaterTankEmpty`, `WaterTankMissing`,
+`WaterTankLidOpen`, `MopCleaningPadMissing`.
 
 ## Testing
 
@@ -43,15 +43,15 @@ the `--script-args` above.
 
 Below are the PIXIT definitions required for the different python tests.
 
-### RvcCleanMode cluster
+### RVC Clean Mode cluster
 
-#### TC_RVCCLEANM_1_2.py
+#### TC 1.2
 
 PIXIT: `PIXIT_ENDPOINT:1`  
 Example command:
 `./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCCLEANM_1_2.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/RVC_App_Test_Plan.txt --int-arg PIXIT_ENDPOINT:1"`
 
-#### TC_RVCCLEANM_2_1.py
+#### TC 2.1
 
 PIXIT:
 `PIXIT_ENDPOINT:1 PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:1 PIXIT.RVCCLEANM.MODE_CHANGE_OK:2`  
@@ -59,26 +59,26 @@ Example command:
 `/scripts/tests/run_python_test.py --script src/python_testing/TC_RVCCLEANM_2_1.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/RVC_App_Test_Plan.txt --int-arg PIXIT_ENDPOINT:1 PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:1 PIXIT.RVCCLEANM.MODE_CHANGE_OK:2"`
 
 When asked "Manually put the device in a state from which it will FAIL to
-transition to mode 1", set the RvcRunMode to 1.
+transition to mode 1", set the `RvcRunMode` to 1.
 `chip-tool rvcrunmode change-to-mode 1`
 
 When asked "Manually put the device in a state from which it will SUCCESSFULLY
-transition to mode 2", set the RvcRunMode to 0.
+transition to mode 2", set the `RvcRunMode` to 0.
 `chip-tool rvcrunmode change-to-mode 0`
 
-#### TC_RVCCLEANM_3_2.py
+#### TC 3.2
 
-This is not applicable because this RVC device does not support the StartUpMode
+This is not applicable because this RVC device does not support the `StartUpMode`
 attribute.
 
-### RvcRunMode cluster
+### RVC Run Mode cluster
 
-#### TC_RVCRUNM_1_2.py
+#### TC 1.2
 
 PIXIT: `PIXIT_ENDPOINT:1` Example command:
 `./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCRUNM_1_2.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/RVC_App_Test_Plan.txt --int-arg PIXIT_ENDPOINT:1"`
 
-#### TC_RVCRUNM_2_1.py
+#### TC 2.1
 
 PIXIT:
 `PIXIT_ENDPOINT:1 PIXIT.RVCRUNM.MODE_CHANGE_FAIL:2 PIXIT.RVCRUNM.MODE_CHANGE_OK:0`  
@@ -86,20 +86,20 @@ Example command:
 `./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCRUNM_2_1.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/RVC_App_Test_Plan.txt --int-arg PIXIT_ENDPOINT:1 PIXIT.RVCRUNM.MODE_CHANGE_FAIL:2 PIXIT.RVCRUNM.MODE_CHANGE_OK:0"`
 
 When asked "Manually put the device in a state from which it will FAIL to
-transition to mode 2", set the RvcRunMode to 1.
+transition to mode 2", set the `RvcRunMode` to 1.
 `chip-tool rvcrunmode change-to-mode 1`
 
 When asked "Manually put the device in a state from which it will SUCCESSFULLY
 transition to mode 0", do nothing.
 
-#### TC_RVCRUNM_3_2.py
+#### TC 3.2
 
-This is not applicable because the RVC device does not support the StartUpMode
+This is not applicable because this RVC device does not support the `StartUpMode`
 attribute.
 
-### RvcOperationalState cluster
+### RVC Operational State cluster
 
-#### TC_RVCOPSTATE_2_1.py
+#### TC 2.1
 
 PIXIT: `PIXIT_ENDPOINT:1`  
 Example command:
@@ -108,7 +108,7 @@ Example command:
 Use the out-of-band messages, chip-tool messages and the state machine diagram
 to navigate to the required states.
 
-#### TC_RVCOPSTATE_2_3.py
+#### TC 2.3
 
 PIXIT: `PIXIT_ENDPOINT:1`  
 Example command:
