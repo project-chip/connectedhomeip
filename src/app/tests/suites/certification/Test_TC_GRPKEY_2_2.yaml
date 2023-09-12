@@ -65,7 +65,7 @@ tests:
     - label:
           "Step 3: TH sends KeySetRead command to GroupKeyManagement cluster
           with GroupKeySetID as 0x01a"
-      PICS: GRPKEY.S.C01.Rsp
+      PICS: GRPKEY.S.C01.Rsp && GRPKEY.S.C02.Tx
       command: "KeySetRead"
       arguments:
           values:
@@ -575,7 +575,7 @@ tests:
     - label:
           "Step 18: TH sends KeySetRead command to GroupKeyManagement cluster
           with GroupKeySetID as 0x01a"
-      PICS: GRPKEY.S.C01.Rsp
+      PICS: GRPKEY.S.C01.Rsp && GRPKEY.S.C02.Tx
       command: "KeySetRead"
       arguments:
           values:
@@ -736,7 +736,7 @@ tests:
           [1692342735.277550][8297:8300] CHIP:TOO:       [2]: 1
           [1692342735.277554][8297:8300] CHIP:TOO:       [3]: 0
           [1692342735.277557][8297:8300] CHIP:TOO:    }
-      PICS: GRPKEY.S.C05.Rsp && PICS_SKIP_SAMPLE_APP
+      PICS: GRPKEY.S.C04.Rsp && GRPKEY.S.C05.Tx && PICS_SKIP_SAMPLE_APP
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:

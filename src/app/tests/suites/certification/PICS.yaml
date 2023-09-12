@@ -3660,7 +3660,7 @@ PICS:
       id: GRPKEY.S.C01.Rsp
 
     - label: "Does the device implement the KeySetReadResponse command}?"
-      id: GRPKEY.S.C02.Rsp
+      id: GRPKEY.S.C02.Tx
 
     - label: "Does the device implement the KeySetRemove command}?"
       id: GRPKEY.S.C03.Rsp
@@ -3670,7 +3670,7 @@ PICS:
 
     - label:
           "Does the device implement the KeySetReadAllIndicesResponse command}?"
-      id: GRPKEY.S.C05.Rsp
+      id: GRPKEY.S.C05.Tx
 
     #
     # client / attributes
