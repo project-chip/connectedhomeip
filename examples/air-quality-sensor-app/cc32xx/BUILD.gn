@@ -53,13 +53,6 @@ source_set("air_quality_sensor_app_sdk") {
   configs += [ ":sdk_posix_config" ]
 
   sources = [
-    "${project_dir}/main/AirQualitySensorAppAttrUpdateDelegate.cpp",
-    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/include/air-quality-sensor-manager.h",
-    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/src/air-quality-sensor-manager.cpp",
-    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/include/relative-humidity-sensor-manager.h",
-    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/include/temperature-sensor-manager.h",
-    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/src/AirQualitySensorAttrUpdateHandler.cpp",
-    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/include/AirQualitySensorAttrUpdateHandler.h",
     "${project_dir}/main/Logging.cpp",
     "${project_dir}/main/cc32xxWifiInit.c",
     "${project_dir}/main/main.cpp",
@@ -72,9 +65,6 @@ source_set("air_quality_sensor_app_sdk") {
     "${project_dir}/include",
     "${project_dir}/main",
     "${project_dir}/main/ifmod/",
-    "${chip_root}/src/platform/cc32xx",
-    "${chip_root}/examples/platform/cc32xx",
-    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/include",
   ]
 
   deps = [
@@ -98,6 +88,9 @@ ti_simplelink_executable("air_quality_sensor_app") {
  #   "${project_dir}/main/CXXExceptionStubs.cpp",
     "${project_dir}/main/DeviceCallbacks.cpp",
     "${project_dir}/main/UartHelper.c",
+    "${project_dir}/main/AirQualitySensorAppAttrUpdateDelegate.cpp",
+    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/src/air-quality-sensor-manager.cpp",
+    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/src/AirQualitySensorAttrUpdateHandler.cpp",
   ]
 
   deps = [
@@ -114,6 +107,9 @@ ti_simplelink_executable("air_quality_sensor_app") {
   include_dirs = [
     "${project_dir}",
     "${project_dir}/main",
+    "${chip_root}/src/platform/cc32xx",
+    "${chip_root}/examples/platform/cc32xx",
+    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/include",
   ]
 
   cflags = [
