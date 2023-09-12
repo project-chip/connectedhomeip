@@ -201,7 +201,7 @@ class InteropDebuggingTool:
             border_print(f"Starting capture for {ecosystem}")
             ecosystems[ecosystem].start_capture()
 
-        border_print(f"Press enter to stop streaming", important=True)
+        border_print("Press enter to stop streaming", important=True)
         input("")
 
         if pcap:

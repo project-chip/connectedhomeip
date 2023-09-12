@@ -28,7 +28,7 @@ class PacketCaptureRunner:
             time.sleep(self.start_delay_seconds)
             if not self.pcap_proc.command_is_running():
                 print(
-                    f"Pcap did not start, you might need root; please authorize if prompted.")
+                    "Pcap did not start, you might need root; please authorize if prompted.")
                 BashRunner("sudo echo \"\"", sync=True)
                 print("Retrying pcap with sudo...")
                 self.pcap_command = f"sudo {self.pcap_command}"
