@@ -9,9 +9,9 @@
 NODEID=$1
 RVC_DEVICE_ENDPOINT=1
 
-PICS_RUN="examples/rvc-app/rvc-common/pics/RVC_Clean_Mode_Cluster_Test_Plan.txt"
-PICS_CLEAN="examples/rvc-app/rvc-common/pics/RVC_Run_Mode_Cluster_Test_Plan.txt"
-PICS_OP_STATE="examples/rvc-app/rvc-common/pics/RVC_Operational_State_Cluster_Test_Plan.txt"
+PICS_RUN="examples/rvc-app/rvc-common/pics/RVC_App_Test_Plan.txt"
+PICS_CLEAN="examples/rvc-app/rvc-common/pics/RVC_App_Test_Plan.txt"
+PICS_OP_STATE="examples/rvc-app/rvc-common/pics/RVC_App_Test_Plan.txt"
 
 if [ -z "$NODEID" ]; then
     echo "Usage: run_all_yaml_tests [Node ID]"
@@ -20,8 +20,8 @@ fi
 
 # RVC Clean Mode cluster
 ./scripts/tests/yaml/chiptool.py tests Test_TC_RVCCLEANM_1_1 --PICS "$PICS_CLEAN" --nodeId "$NODEID" --endpoint "$RVC_DEVICE_ENDPOINT" &&
-    ./scripts/tests/yaml/chiptool.py tests Test_TC_RVCCLEANM_1_2 --PICS "$PICS_CLEAN" --nodeId "$NODEID" --endpoint "$RVC_DEVICE_ENDPOINT" &&
-    ./scripts/tests/yaml/chiptool.py tests Test_TC_RVCCLEANM_2_1 --PICS "$PICS_CLEAN" --nodeId "$NODEID" --endpoint "$RVC_DEVICE_ENDPOINT" &&
+    ./scripts/tests/yaml/chiptool.py tests Test_TC_RVCCLEANM_3_1 --PICS "$PICS_CLEAN" --nodeId "$NODEID" --endpoint "$RVC_DEVICE_ENDPOINT" &&
+    ./scripts/tests/yaml/chiptool.py tests Test_TC_RVCCLEANM_3_3 --PICS "$PICS_CLEAN" --nodeId "$NODEID" --endpoint "$RVC_DEVICE_ENDPOINT" &&
 
     # RVC Operational State cluster
     ./scripts/tests/yaml/chiptool.py tests Test_TC_RVCOPSTATE_1_1 --PICS "$PICS_OP_STATE" --nodeId "$NODEID" --endpoint "$RVC_DEVICE_ENDPOINT" &&
@@ -29,6 +29,6 @@ fi
 
     # RVC Run Mode cluster
     ./scripts/tests/yaml/chiptool.py tests Test_TC_RVCRUNM_1_1 --PICS "$PICS_RUN" --nodeId "$NODEID" --endpoint "$RVC_DEVICE_ENDPOINT" &&
-    ./scripts/tests/yaml/chiptool.py tests Test_TC_RVCRUNM_1_2 --PICS "$PICS_RUN" --nodeId "$NODEID" --endpoint "$RVC_DEVICE_ENDPOINT" &&
-    ./scripts/tests/yaml/chiptool.py tests Test_TC_RVCRUNM_2_1 --PICS "$PICS_RUN" --nodeId "$NODEID" --endpoint "$RVC_DEVICE_ENDPOINT" &&
+    ./scripts/tests/yaml/chiptool.py tests Test_TC_RVCRUNM_3_1 --PICS "$PICS_RUN" --nodeId "$NODEID" --endpoint "$RVC_DEVICE_ENDPOINT" &&
+    ./scripts/tests/yaml/chiptool.py tests Test_TC_RVCRUNM_3_3 --PICS "$PICS_RUN" --nodeId "$NODEID" --endpoint "$RVC_DEVICE_ENDPOINT" &&
     echo done
