@@ -1,0 +1,8 @@
+*~
+.DS_Store
+./venv/
+.idea/
+OUT/
+__pycache__/
+.zip
+IDT_ARTIFACTS/
