@@ -26,9 +26,6 @@ config:
     new_mode_th:
         type: int8u
         defaultValue: 2
-    WaitTimeAfterOnCommand:
-        type: int16u
-        defaultValue: 5000
     nonNull_OnMode_value:
         type: int8u
         defaultValue: 0
@@ -117,14 +114,6 @@ tests:
       PICS: OO.S.C01.Rsp && TCCM.S.F00
       cluster: "On/Off"
       command: "On"
-
-    - label: "Wait to turn on/Off"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: WaitTimeAfterOnCommand
 
     - label: "Step 8: TH reads the CurrentMode attribute from the DUT"
       PICS: TCCM.S.A0001 && TCCM.S.F00
