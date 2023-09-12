@@ -21,6 +21,7 @@ import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
+
 class TC_DISHM_2_1(MatterBaseTest):
 
     async def read_mode_attribute_expect_success(self, endpoint, attribute):
@@ -45,7 +46,7 @@ class TC_DISHM_2_1(MatterBaseTest):
 
         self.endpoint = self.user_params.get("endpoint", 1)
         logging.info("This test expects to find this cluster on endpoint 1")
-        
+
         self.modeok = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_OK']
         self.can_test_mode_failure = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_FAIL']
 

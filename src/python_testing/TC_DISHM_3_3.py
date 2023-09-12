@@ -23,6 +23,7 @@ from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
+
 class TC_DISHM_3_3(MatterBaseTest):
 
     async def read_mod_attribute_expect_success(self, endpoint, attribute):
@@ -57,11 +58,11 @@ class TC_DISHM_3_3(MatterBaseTest):
         if not self.check_pics("DISHM.S.A0002"):
             logging.info("Test skipped because PICS DISHM.S.A0002 (StartupMode)")
             return
-        
+
         if not self.check_pics("DISHM.S.A0003"):
             logging.info("Test skipped because PICS DISHM.S.A0003 (OnMode) is not set")
             return
-        
+
         if not self.check_pics("DISHM.S.F00"):
             logging.info("Test skipped because PICS DISHM.S.F00 (DepOnOff) is not set")
             return

@@ -24,8 +24,6 @@ from matter_testing_support import MatterBaseTest, async_test_body, default_matt
 from mobly import asserts
 
 
-
-
 class TC_DISHM_3_1(MatterBaseTest):
 
     async def read_mode_attribute_expect_success(self, endpoint, attribute):
@@ -59,7 +57,7 @@ class TC_DISHM_3_1(MatterBaseTest):
         onOff = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr)
         logging.info("OnOff: %s" % (onOff))
 
-        # Verify that OnMode is non-null and a mode value from the supported modes attribute 
+        # Verify that OnMode is non-null and a mode value from the supported modes attribute
         cluster = Clusters.Objects.DishwasherMode
         attr = Clusters.DishwasherMode.Attributes.OnMode
         onMode = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr)
@@ -80,7 +78,7 @@ class TC_DISHM_3_1(MatterBaseTest):
             return True
 
         return False
-    
+
     @async_test_body
     async def test_TC_DISHM_3_1(self):
         # Adding endpoint here to avoid definition in command line
@@ -95,14 +93,14 @@ class TC_DISHM_3_1(MatterBaseTest):
         if not self.check_pics("DISHM.S.A0003"):
             logging.info("Test skipped because PICS DISHM.S.A0003 (OnMode) is not set")
             return
-        
+
         if not self.check_pics("DISHM.S.F00"):
             logging.info("Test skipped because PICS DISHM.S.F00 (DepOnOff) is not set")
             return
 
         ret = await self.check_preconditions(self.endpoint)
         asserts.assert_true(ret, "invalid preconditions - OnMode is non-null or not a mode in the Supported Modes attribute")
- 
+
         attributes = Clusters.DishwasherMode.Attributes
 
         from enum import Enum

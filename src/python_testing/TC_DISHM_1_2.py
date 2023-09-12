@@ -23,7 +23,6 @@ from matter_testing_support import MatterBaseTest, async_test_body, default_matt
 from mobly import asserts
 
 
-
 class TC_DISHM_1_2(MatterBaseTest):
 
     async def read_mode_attribute_expect_success(self, endpoint, attribute):
@@ -35,10 +34,10 @@ class TC_DISHM_1_2(MatterBaseTest):
 
         self.endpoint = self.user_params.get("endpoint", 1)
         logging.info("This test expects to find this cluster on endpoint 1")
-        
+
         asserts.assert_true(self.check_pics("DISHM.S.A0000"), "DISHM.S.A0000 must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.A0001"), "DISHM.S.A0001 must be supported")
-        
+
         attributes = Clusters.DishwasherMode.Attributes
 
         self.print_step(1, "Commissioning, already done")
