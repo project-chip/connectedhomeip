@@ -93,7 +93,7 @@ tests:
       command: "readAttribute"
       attribute: "OnMode"
       response:
-          value: Step3OnModeValue
+          saveAs: Step3OnModeValue
 
     - label:
           "Step 4: TH writes 1 to StartUpOnOff attribute of the OnOff Cluster of
