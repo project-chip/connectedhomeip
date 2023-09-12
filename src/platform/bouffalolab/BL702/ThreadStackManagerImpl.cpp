@@ -103,16 +103,6 @@ extern "C" otInstance * otrGetInstance()
     return ThreadStackMgrImpl().OTInstance();
 }
 
-extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
-{
-    return calloc(aNum, aSize);
-}
-
-extern "C" void otPlatFree(void * aPtr)
-{
-    free(aPtr);
-}
-
 extern "C" uint32_t otrEnterCrit(void)
 {
     if (xPortIsInsideInterrupt())

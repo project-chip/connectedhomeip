@@ -284,8 +284,7 @@ tests:
           #
           #      TODO: This can be fixed using the `saveAs` function.
           #
-          value:
-              [
+          value: [
                   {
                       FabricIndex: 1,
                       fabricSensitiveInt8u: 33,
@@ -328,39 +327,29 @@ tests:
                   },
                   {
                       FabricIndex: 2,
-                      fabricSensitiveInt8u: 0,
+                      # These should actually be missing, not null, but right
+                      # now our harness treats those the same, and we have no
+                      # way to indicate "missing" in the YAML.
+                      # https://github.com/project-chip/connectedhomeip/issues/29110
+                      fabricSensitiveInt8u: null,
+                      optionalFabricSensitiveInt8u: null,
                       nullableFabricSensitiveInt8u: null,
-                      fabricSensitiveCharString: "",
-                      fabricSensitiveStruct:
-                          {
-                              a: 0,
-                              b: false,
-                              c: 0,
-                              d: "",
-                              e: "",
-                              f: 0,
-                              g: 0,
-                              h: 0,
-                          },
-                      fabricSensitiveInt8uList: [],
+                      fabricSensitiveCharString: null,
+                      fabricSensitiveStruct: null,
+                      fabricSensitiveInt8uList: null,
                   },
                   {
                       FabricIndex: 2,
-                      fabricSensitiveInt8u: 0,
+                      # These should actually be missing, not null, but right
+                      # now our harness treats those the same, and we have no
+                      # way to indicate "missing" in the YAML.
+                      # https://github.com/project-chip/connectedhomeip/issues/29110
+                      fabricSensitiveInt8u: null,
+                      optionalFabricSensitiveInt8u: null,
                       nullableFabricSensitiveInt8u: null,
-                      fabricSensitiveCharString: "",
-                      fabricSensitiveStruct:
-                          {
-                              a: 0,
-                              b: false,
-                              c: 0,
-                              d: "",
-                              e: "",
-                              f: 0,
-                              g: 0,
-                              h: 0,
-                          },
-                      fabricSensitiveInt8uList: [],
+                      fabricSensitiveCharString: null,
+                      fabricSensitiveStruct: null,
+                      fabricSensitiveInt8uList: null,
                   },
               ]
 
@@ -371,43 +360,32 @@ tests:
       fabricFiltered: false
       attribute: "list_fabric_scoped"
       response:
-          value:
-              [
+          value: [
                   {
                       FabricIndex: 1,
-                      fabricSensitiveInt8u: 0,
+                      # These should actually be missing, not null, but right
+                      # now our harness treats those the same, and we have no
+                      # way to indicate "missing" in the YAML.
+                      # https://github.com/project-chip/connectedhomeip/issues/29110
+                      fabricSensitiveInt8u: null,
+                      optionalFabricSensitiveInt8u: null,
                       nullableFabricSensitiveInt8u: null,
-                      fabricSensitiveCharString: "",
-                      fabricSensitiveStruct:
-                          {
-                              a: 0,
-                              b: false,
-                              c: 0,
-                              d: "",
-                              e: "",
-                              f: 0,
-                              g: 0,
-                              h: 0,
-                          },
-                      fabricSensitiveInt8uList: [],
+                      fabricSensitiveCharString: null,
+                      fabricSensitiveStruct: null,
+                      fabricSensitiveInt8uList: null,
                   },
                   {
                       FabricIndex: 1,
-                      fabricSensitiveInt8u: 0,
+                      # These should actually be missing, not null, but right
+                      # now our harness treats those the same, and we have no
+                      # way to indicate "missing" in the YAML.
+                      # https://github.com/project-chip/connectedhomeip/issues/29110
+                      fabricSensitiveInt8u: null,
+                      optionalFabricSensitiveInt8u: null,
                       nullableFabricSensitiveInt8u: null,
-                      fabricSensitiveCharString: "",
-                      fabricSensitiveStruct:
-                          {
-                              a: 0,
-                              b: false,
-                              c: 0,
-                              d: "",
-                              e: "",
-                              f: 0,
-                              g: 0,
-                              h: 0,
-                          },
-                      fabricSensitiveInt8uList: [],
+                      fabricSensitiveCharString: null,
+                      fabricSensitiveStruct: null,
+                      fabricSensitiveInt8uList: null,
                   },
                   {
                       FabricIndex: 2,

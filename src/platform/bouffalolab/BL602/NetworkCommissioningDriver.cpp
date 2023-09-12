@@ -44,11 +44,11 @@ CHIP_ERROR BLWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     size_t ssidLen        = 0;
     size_t credentialsLen = 0;
 
-    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiSSID, mSavedNetwork.credentials,
+    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiPassword, mSavedNetwork.credentials,
                                                    sizeof(mSavedNetwork.credentials), &credentialsLen);
     SuccessOrExit(err);
-    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiPassword, mSavedNetwork.ssid,
-                                                   sizeof(mSavedNetwork.ssid), &ssidLen);
+    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiSSID, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid),
+                                                   &ssidLen);
     SuccessOrExit(err);
 
     mSavedNetwork.credentialsLen = credentialsLen;
@@ -160,7 +160,33 @@ CHIP_ERROR BLWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
     memcpy(passwd, key, keyLen);
     wifi_interface_t wifi_interface;
     wifi_interface = wifi_mgmr_sta_enable();
-    wifi_mgmr_sta_connect(&wifi_interface, wifi_ssid, passwd, NULL, NULL, 0, 0);
+    // Valid Credentials length are:
+    // - 0 bytes: Unsecured (open) connection
+    // - 5 bytes: WEP-64 passphrase
+    // - 10 hexadecimal ASCII characters: WEP-64 40-bit hex raw PSK
+    // - 13 bytes: WEP-128 passphrase
+    // - 26 hexadecimal ASCII characters: WEP-128 104-bit hex raw PSK
+    // - 8..63 bytes: WPA/WPA2/WPA3 passphrase
+    // - 64 bytes: WPA/WPA2/WPA3 raw hex PSK
+    // Note 10 hex WEP64 and 13 bytes / 26 hex WEP128 passphrase are covered by 8~63 bytes WPA passphrase, so we don't check WEP64
+    // hex and WEP128 passphrase.
+    if (keyLen == BLWiFiDriver::WiFiCredentialLength::kOpen || keyLen == BLWiFiDriver::WiFiCredentialLength::kWEP64 ||
+        (keyLen >= BLWiFiDriver::WiFiCredentialLength::kMinWPAPSK && keyLen <= BLWiFiDriver::WiFiCredentialLength::kMaxWPAPSK))
+    {
+
+        if (keyLen == BLWiFiDriver::WiFiCredentialLength::kOpen)
+        {
+            wifi_mgmr_sta_connect(&wifi_interface, wifi_ssid, NULL, NULL, NULL, 0, 0);
+        }
+        else
+        {
+            wifi_mgmr_sta_connect(&wifi_interface, wifi_ssid, passwd, NULL, NULL, 0, 0);
+        }
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_STRING_LENGTH;
+    }
 
     return CHIP_NO_ERROR;
 }
