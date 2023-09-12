@@ -34,7 +34,7 @@ CommandHandlerInterfaceOnlyClusters:
     - HepaFilterMonitoring
     - RvcOperationalState
     # cluster format should match ClustersWithInitFunctions et al
-    # See https://github.com/project-chip/zap/issues/1134
+    # See https://github.com/project-chip/connectedhomeip/issues/29186
     - SampleMei
 
 # We need a more configurable way of deciding which clusters have which init functions....
