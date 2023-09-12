@@ -168,15 +168,12 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
     memset(temp_reset, 0, sizeof(wfx_wifi_scan_ext_t));
     if (CHECK_IF_EVENT_FAILED(event))
     {
-        SILABS_LOG("F: Join Event received with %u bytes payload\n", result_length);
         callback_status = *(sl_status_t *) result;
         return SL_STATUS_FAIL;
     }
     /*
      * Join was complete - Do the DHCP
      */
-    SILABS_LOG("%s: join completed.", __func__);
-    SILABS_LOG("%c: Join Event received with %u bytes payload\n", *result, result_length);
     xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_CONN);
     callback_status = SL_STATUS_OK;
     return SL_STATUS_OK;
@@ -245,11 +242,14 @@ int32_t wfx_wifi_rsi_init(void)
 static int32_t wfx_rsi_init(void)
 {
     sl_status_t status;
+
+#ifndef RSI_M4_INTERFACE
     status = wfx_wifi_rsi_init();
     if(status != SL_STATUS_OK) {
       SILABS_LOG("wfx_rsi_init failed %x", status);
       return status;
     }
+#endif
 
     status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, (sl_mac_address_t *) &wfx_rsi.sta_mac.octet[0]);
     if (status != SL_STATUS_OK)
@@ -430,7 +430,7 @@ static void wfx_rsi_do_join(void)
         connect_security_mode = SL_WIFI_OPEN;
         break;
     default:
-        SILABS_LOG("%s: error: unknown security type.");
+        SILABS_LOG("error: unknown security type.");
         return;
     }
 
@@ -486,6 +486,15 @@ static void wfx_rsi_do_join(void)
                 osThreadYield();
             }
             status = callback_status;
+            if(status == SL_STATUS_OK)
+            {
+              SILABS_LOG("%s: join completed.", __func__);
+            }
+            else
+            {
+              SILABS_LOG("%s: join failed. status %d", __func__, callback_status);
+            }
+
         }
         else
         {
