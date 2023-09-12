@@ -33,7 +33,9 @@ CommandHandlerInterfaceOnlyClusters:
     - ActivatedCarbonFilterMonitoring
     - HepaFilterMonitoring
     - RvcOperationalState
-    - SampleMei # cluster format should match ClustersWithInitFunctions et al
+    # cluster format should match ClustersWithInitFunctions et al
+    # See https://github.com/project-chip/zap/issues/1134
+    - SampleMei
 
 # We need a more configurable way of deciding which clusters have which init functions....
 # See https://github.com/project-chip/connectedhomeip/issues/4369

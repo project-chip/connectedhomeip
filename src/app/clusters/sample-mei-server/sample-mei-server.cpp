@@ -30,17 +30,6 @@ void MatterSampleMeiPluginServerInitCallback()
                     static_cast<uint16_t>(kNumSupportedEndpoints));
     ReturnOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(&SampleMeiServer::Instance()));
     VerifyOrReturn(registerAttributeAccessOverride(&SampleMeiServer::Instance()), CHIP_ERROR_INCORRECT_STATE);
-
-    // registers the fixed endpoints
-    // for (uint16_t endpointIndex = 0; endpointIndex < FIXED_ENDPOINT_COUNT; endpointIndex++)
-    // {
-    //     auto endpoint = emberAfEndpointFromIndex(endpointIndex);
-    //     ChipLogProgress(Zcl, "Creating cluster, Ep index %d", endpoint);
-    //     if (emberAfContainsServer(endpoint, SampleMei::Id))
-    //     {
-    //         sampleMeiServer.RegisterEndpoint(endpoint);
-    //     }
-    // }
 }
 
 void emberAfSampleMeiClusterServerInitCallback(chip::EndpointId endpoint)
