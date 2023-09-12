@@ -38,19 +38,9 @@ using chip::Protocols::InteractionModel::Status;
 class DefaultColorControlSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
 public:
-    enum class ColorControlEFS : uint8_t
-    {
-        kCurrentX = 0,
-        kCurrentY,
-        kEnhancedCurrentHue,
-        kCurrentSaturation,
-        kColorLoopActive,
-        kColorLoopDirection,
-        kColorLoopTime,
-        kColorTemperatureMireds,
-        kEnhancedColorMode,
-        kColorControlMaxScenableAttributes,
-    };
+    // As per spec, 9 attributes are scenable in the color control cluster, if new scenables attributes are added, this value should
+    // be updated.
+    static constexpr uint8_t kColorControlScenableAttributesCount = 9;
 
     DefaultColorControlSceneHandler() = default;
     ~DefaultColorControlSceneHandler() override {}
@@ -86,7 +76,7 @@ public:
     {
         using AttributeValuePair = Scenes::Structs::AttributeValuePair::Type;
 
-        AttributeValuePair pairs[static_cast<uint8_t>(ColorControlEFS::kColorControlMaxScenableAttributes)];
+        AttributeValuePair pairs[kColorControlScenableAttributesCount];
 
         size_t attributeCount = 0;
 
@@ -188,8 +178,7 @@ public:
 
         // The color control cluster should have a maximum of 9 scenable attributes
         ReturnErrorOnFailure(attributeValueList.ComputeSize(&attributeCount));
-        VerifyOrReturnError(attributeCount <= static_cast<uint8_t>(ColorControlEFS::kColorControlMaxScenableAttributes),
-                            CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(attributeCount <= kColorControlScenableAttributesCount, CHIP_ERROR_BUFFER_TOO_SMALL);
         // Retrieve the buffers for different modes
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
         ColorControlServer::ColorHueTransitionState * colorHueTransitionState =
@@ -294,7 +283,7 @@ public:
             // Set Loop Scene Attributes and start loop if scene stored active loop
             Attributes::ColorLoopDirection::Set(endpoint, loopDirectionValue);
             Attributes::ColorLoopTime::Set(endpoint, loopTimeValue);
-            // Tries to applie color control loop
+            // Tries to apply color control loop
             ColorControlServer::Instance().startColorLoop(endpoint, true);
         }
         else
@@ -1211,11 +1200,6 @@ Status ColorControlServer::moveToSaturation(uint8_t saturation, uint16_t transit
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
     VerifyOrReturnError(nullptr != colorSaturationTransitionState, Status::UnsupportedEndpoint);
 
-    if (transitionTime == 0)
-    {
-        transitionTime++;
-    }
-
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
 
@@ -1225,8 +1209,9 @@ Status ColorControlServer::moveToSaturation(uint8_t saturation, uint16_t transit
     // now, kick off the state machine.
     initSaturationTransitionState(endpoint, colorSaturationTransitionState);
     colorSaturationTransitionState->finalValue     = saturation;
-    colorSaturationTransitionState->stepsRemaining = transitionTime;
-    colorSaturationTransitionState->stepsTotal     = transitionTime;
+    colorSaturationTransitionState->stepsRemaining = max<uint16_t>(transitionTime, 1);
+    colorSaturationTransitionState->stepsTotal     = colorSaturationTransitionState->stepsRemaining;
+    colorSaturationTransitionState->timeRemaining  = transitionTime;
     colorSaturationTransitionState->endpoint       = endpoint;
     colorSaturationTransitionState->lowLimit       = MIN_SATURATION_VALUE;
     colorSaturationTransitionState->highLimit      = MAX_SATURATION_VALUE;
@@ -1234,7 +1219,7 @@ Status ColorControlServer::moveToSaturation(uint8_t saturation, uint16_t transit
     SetHSVRemainingTime(endpoint);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), TRANSITION_UPDATE_TIME_MS.count());
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
 
     return Status::Success;
 }
@@ -1263,11 +1248,6 @@ Status ColorControlServer::moveToHueAndSaturation(uint16_t hue, uint8_t saturati
 
     VerifyOrReturnError(nullptr != colorSaturationTransitionState, Status::UnsupportedEndpoint);
     VerifyOrReturnError(nullptr != colorHueTransitionState, Status::UnsupportedEndpoint);
-
-    if (transitionTime == 0)
-    {
-        transitionTime++;
-    }
 
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
@@ -1307,15 +1287,17 @@ Status ColorControlServer::moveToHueAndSaturation(uint16_t hue, uint8_t saturati
     }
 
     colorHueTransitionState->up             = moveUp;
-    colorHueTransitionState->stepsRemaining = transitionTime;
-    colorHueTransitionState->stepsTotal     = transitionTime;
+    colorHueTransitionState->stepsRemaining = max<uint16_t>(transitionTime, 1);
+    colorHueTransitionState->stepsTotal     = colorHueTransitionState->stepsRemaining;
+    colorHueTransitionState->timeRemaining  = transitionTime;
     colorHueTransitionState->endpoint       = endpoint;
     colorHueTransitionState->repeat         = false;
 
     initSaturationTransitionState(endpoint, colorSaturationTransitionState);
     colorSaturationTransitionState->finalValue     = saturation;
-    colorSaturationTransitionState->stepsRemaining = transitionTime;
-    colorSaturationTransitionState->stepsTotal     = transitionTime;
+    colorSaturationTransitionState->stepsRemaining = colorHueTransitionState->stepsRemaining;
+    colorSaturationTransitionState->stepsTotal     = colorHueTransitionState->stepsRemaining;
+    colorSaturationTransitionState->timeRemaining  = transitionTime;
     colorSaturationTransitionState->endpoint       = endpoint;
     colorSaturationTransitionState->lowLimit       = MIN_SATURATION_VALUE;
     colorSaturationTransitionState->highLimit      = MAX_SATURATION_VALUE;
@@ -1323,7 +1305,7 @@ Status ColorControlServer::moveToHueAndSaturation(uint16_t hue, uint8_t saturati
     SetHSVRemainingTime(endpoint);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), TRANSITION_UPDATE_TIME_MS.count());
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
 
     return Status::Success;
 }
