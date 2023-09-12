@@ -1581,7 +1581,6 @@ bool ColorControlServer::moveToHueAndSaturationCommand(app::CommandHandler * com
     }
     Status status = moveToHueAndSaturation(hue, saturation, transitionTime, isEnhanced, commandPath.mEndpointId);
 #ifdef EMBER_AF_PLUGIN_SCENES
-    //  the scene has been changed (the value of color temp has changed)
     Scenes::ScenesServer::Instance().MakeSceneInvalid(commandPath.mEndpointId);
 #endif // EMBER_AF_PLUGIN_SCENES
     commandObj->AddStatus(commandPath, status);
@@ -1772,6 +1771,8 @@ exit:
 bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                  const Commands::MoveToSaturation::DecodableType & commandData)
 {
+    // limit checking: saturation is 0..254.  Spec dictates we ignore
+    // this and report a malformed packet.
     if (commandData.saturation > MAX_SATURATION_VALUE)
     {
         commandObj->AddStatus(commandPath, Status::ConstraintError);
@@ -1785,7 +1786,6 @@ bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandOb
     }
     Status status = moveToSaturation(commandData.saturation, commandData.transitionTime, commandPath.mEndpointId);
 #ifdef EMBER_AF_PLUGIN_SCENES
-    //  the scene has been changed (the value of color temp has changed)
     Scenes::ScenesServer::Instance().MakeSceneInvalid(commandPath.mEndpointId);
 #endif // EMBER_AF_PLUGIN_SCENES
     commandObj->AddStatus(commandPath, status);
@@ -1970,7 +1970,6 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
 
 exit:
 #ifdef EMBER_AF_PLUGIN_SCENES
-    //  the scene has been changed (the value of color temp has changed)
     Scenes::ScenesServer::Instance().MakeSceneInvalid(endpoint);
 #endif // EMBER_AF_PLUGIN_SCENES
     commandObj->AddStatus(commandPath, status);
@@ -2180,7 +2179,6 @@ bool ColorControlServer::moveToColorCommand(app::CommandHandler * commandObj, co
 
     Status status = moveToColor(commandData.colorX, commandData.colorY, commandData.transitionTime, commandPath.mEndpointId);
 #ifdef EMBER_AF_PLUGIN_SCENES
-    //  the scene has been changed (the value of color temp has changed)
     Scenes::ScenesServer::Instance().MakeSceneInvalid(commandPath.mEndpointId);
 #endif // EMBER_AF_PLUGIN_SCENES
     commandObj->AddStatus(commandPath, status);
@@ -2708,7 +2706,6 @@ bool ColorControlServer::moveToColorTempCommand(app::CommandHandler * commandObj
 
     Status status = moveToColorTemp(commandPath.mEndpointId, commandData.colorTemperatureMireds, commandData.transitionTime);
 #ifdef EMBER_AF_PLUGIN_SCENES
-    //  the scene has been changed (the value of color temp has changed)
     Scenes::ScenesServer::Instance().MakeSceneInvalid(commandPath.mEndpointId);
 #endif // EMBER_AF_PLUGIN_SCENES
     commandObj->AddStatus(commandPath, status);
@@ -3061,7 +3058,7 @@ void emberAfColorControlClusterServerInitCallback(EndpointId endpoint)
     ColorControlServer::Instance().startUpColorTempCommand(endpoint);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 #ifdef EMBER_AF_PLUGIN_SCENES
-    // Registers Scene handlers for the level control cluster on the server
+    // Registers Scene handlers for the color control cluster on the server
     app::Clusters::Scenes::ScenesServer::Instance().RegisterSceneHandler(endpoint,
                                                                          ColorControlServer::Instance().GetSceneHandler());
 #endif
