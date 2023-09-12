@@ -44,7 +44,7 @@ tests:
           1 TH2 supports On/Off server on Endpoint 1.
 
           2 TH3 supports On/Off server on Endpoint 2.
-                  
+
           3 DUT supports On/Off client.
 
           1. TH1 - Test Harness1 as Commissioner

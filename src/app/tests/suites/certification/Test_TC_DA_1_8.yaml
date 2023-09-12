@@ -418,7 +418,7 @@ tests:
           [1690280928.950144][13907:13907] CHIP:DMG: {
           [1690280928.950146][13907:13907] CHIP:DMG:     peer_address = UDP:[fe80::5a6b:cc3a:f0c1:ab99%wlp0s20f3]:44344
           [1690280928.950147][13907:13907] CHIP:DMG: }
-          [1690280928.950149][13907:13907] CHIP:DMG:  
+          [1690280928.950149][13907:13907] CHIP:DMG:
           [1690280928.950160][13907:13907] CHIP:EM: <<< [E:42046r S:55761 M:4615769 (Ack:127152057)] (S) Msg TX to 1:000000000001B669 [BCFB] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1690280928.950165][13907:13907] CHIP:IN: (S) Sending msg 4615769 on secure session with LSID: 55761
           [1690280928.950185][13907:13907] CHIP:DMG: Command handler moving to [CommandSen]
@@ -585,7 +585,7 @@ tests:
 
           On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
 
-          [1690281643.630949][14294:14294] CHIP:DMG:  
+          [1690281643.630949][14294:14294] CHIP:DMG:
           [1690281643.630963][14294:14294] CHIP:EM: <<< [E:39979r S:47218 M:84512679 (Ack:239864246)] (S) Msg TX to 1:000000000001B669 [1239] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1690281643.630969][14294:14294] CHIP:IN: (S) Sending msg 84512679 on secure session with LSID: 47218
           [1690281643.630996][14294:14294] CHIP:DMG: Command handler moving to [CommandSen]
@@ -923,7 +923,7 @@ tests:
 
           On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
 
-          [1690283198.563854][14969:14969] CHIP:DMG:  
+          [1690283198.563854][14969:14969] CHIP:DMG:
           [1690283198.563874][14969:14969] CHIP:EM: <<< [E:31520r S:48689 M:92701905 (Ack:201369370)] (S) Msg TX to 1:000000000001B669 [665B] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1690283198.563880][14969:14969] CHIP:IN: (S) Sending msg 92701905 on secure session with LSID: 48689
           [1690283198.563904][14969:14969] CHIP:DMG: Command handler moving to [CommandSen]
