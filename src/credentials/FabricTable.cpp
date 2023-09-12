@@ -1540,7 +1540,7 @@ CHIP_ERROR FabricTable::AllocatePendingOperationalKey(Optional<FabricIndex> fabr
     // We can only allocate a pending key if no pending state (NOC, ICAC) already present,
     // since there can only be one pending state per fail-safe.
     VerifyOrReturnError(!mStateFlags.Has(StateFlags::kIsPendingFabricDataPresent), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(outputCsr.size() >= Crypto::kMAX_CSR_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(outputCsr.size() >= Crypto::kMIN_CSR_Buffer_Size, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     EnsureNextAvailableFabricIndexUpdated();
     FabricIndex fabricIndexToUse = kUndefinedFabricIndex;

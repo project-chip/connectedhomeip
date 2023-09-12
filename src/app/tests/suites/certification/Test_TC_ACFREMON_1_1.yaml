@@ -79,7 +79,7 @@ tests:
       response:
           constraints:
               type: bitmap32
-              hasMasksSet: [0x3]
+              hasMasksSet: [0x4]
 
     - label: "Step 4a: Read the global attribute: AttributeList"
       PICS: PICS_EVENT_LIST_ENABLED
@@ -143,51 +143,7 @@ tests:
               type: list
               contains: [5]
 
-    #List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
-    - label:
-          "Step 4f: TH reads AttributeList attribute from DUT. 1.The list SHALL
-          NOT contain any additional values in the standard or scoped range:
-          (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE). 2.The
-          list MAY contain values in the Manufacturer Extensible Identifier
-          (MEI) range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed
-          MEI range (0x0001 - 0xFFF1), these values SHALL be ignored. 3.The list
-          SHALL NOT contain any values in the Test Vendor or invalid range:
-          (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 -
-          0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
-          allowed MEI range (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool activatedcarbonfiltermonitoring read attribute-list 1 1
-
-          Via the TH (chip-tool), verify that the AttributeList attribute contains
-          - Mandatory entries:0x0002, 0xfff8, 0xfff9, 0xfffa, 0xfffb, 0xfffc & 0xfffd
-          - Optional entries:- 0x0003
-          - Based on feature support:- 0x0000, 0x0001
-
-          [1685958590.636044][11442:11444] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0072 Attribute 0x0000_FFFB DataVersion: 403478864
-          [1690179748.767756][7924:7926] CHIP:TOO:   AttributeList: 12 entries
-          [1690179748.767825][7924:7926] CHIP:TOO:     [1]: 0
-          [1690179748.767885][7924:7926] CHIP:TOO:     [2]: 1
-          [1690179748.767943][7924:7926] CHIP:TOO:     [3]: 2
-          [1690179748.767999][7924:7926] CHIP:TOO:     [4]: 3
-          [1690179748.768056][7924:7926] CHIP:TOO:     [5]: 4
-          [1690179748.768112][7924:7926] CHIP:TOO:     [6]: 5
-          [1690179748.768170][7924:7926] CHIP:TOO:     [7]: 65528
-          [1690179748.768227][7924:7926] CHIP:TOO:     [8]: 65529
-          [1690179748.768283][7924:7926] CHIP:TOO:     [9]: 65530
-          [1690179748.768340][7924:7926] CHIP:TOO:     [10]: 65531
-          [1690179748.768397][7924:7926] CHIP:TOO:     [11]: 65532
-          [1690179748.768454][7924:7926] CHIP:TOO:     [12]: 65533
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Step 5a: TH reads EventList attribute from DUT"
+    - label: "Step 5: TH reads EventList attribute from DUT"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
@@ -196,36 +152,7 @@ tests:
           constraints:
               type: list
 
-    #List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
-    - label:
-          "Step 5b: TH reads from the DUT the EventList attribute. 1.The list
-          SHALL NOT contain any additional values in the standard or scoped
-          range: (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE) 2.
-          The list MAY contain values in the Manufacturer Extensible Identifier
-          (MEI) range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed
-          MEI range (0x0001 - 0xFFF1), these values SHALL be ignored. 3. The
-          list SHALL NOT contain any values in the Test Vendor or invalid range:
-          (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 -
-          0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
-          allowed MEI range (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool activatedcarbonfiltermonitoring read event-list 1 1
-
-          Via the TH (chip-tool), verify that the EventList attribute. Below mentioned log is based on the RPI implementation, Value may vary on real DUT
-
-          [1685958846.723249][11454:11456] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0072 Attribute 0x0000_FFFA DataVersion: 403478864
-          [1685958846.723431][11454:11456] CHIP:TOO:   EventList: 0 entries
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Step 6a: Read the global attribute: AcceptedCommandList"
+    - label: "Step 6: Read the global attribute: AcceptedCommandList"
       PICS: "!ACFREMON.S.C00.Rsp"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -235,7 +162,7 @@ tests:
               type: list
 
     - label:
-          "Step 6a: Read the optional command (ResetCondition) in
+          "Step 6: Read the optional command (ResetCondition) in
           AcceptedCommandList"
       PICS: ACFREMON.S.C00.Rsp
       command: "readAttribute"
@@ -245,69 +172,10 @@ tests:
               type: list
               contains: [0]
 
-    #List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
-    - label:
-          "Step 6b: TH reads from the DUT the AcceptedCommandList attribute.
-          1.The list SHALL NOT contain any additional values in the standard or
-          scoped range: (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 -
-          0x0000_FFFE). 2.The list MAY contain values in the Manufacturer
-          Extensible Identifier (MEI) range: (0xXXXX_0000 - 0xXXXX_4FFF), where
-          XXXX is the allowed MEI range (0x0001 - 0xFFF1), these values SHALL be
-          ignored. 3.The list SHALL NOT contain any values in the Test Vendor or
-          invalid range: (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF),
-          (0xXXXX_5000 - 0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where
-          XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool activatedcarbonfiltermonitoring read accepted-command-list 1 1
-
-          Via the TH (chip-tool), verify that the AcceptedCommandList attribute. Below mentioned log is based on the RPI implementation, Value may vary on real DUT
-
-          [1685959114.395290][11468:11470] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0072 Attribute 0x0000_FFF9 DataVersion: 403478864
-          [1685959114.395414][11468:11470] CHIP:TOO:   AcceptedCommandList: 0 entries
-          [1690183785.805331][8169:8171] CHIP:TOO:     [1]: 0
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Step 7a: Read the global attribute: GeneratedCommandList"
+    - label: "Step 7: Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
           value: []
           constraints:
               type: list
-
-    #List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
-    - label:
-          "Step 7b: TH reads from the DUT the GeneratedCommandList attribute.
-          1.The list SHALL NOT contain any additional values in the standard or
-          scoped range: (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 -
-          0x0000_FFFE). 2.The list MAY contain values in the Manufacturer
-          Extensible Identifier (MEI) range: (0xXXXX_0000 - 0xXXXX_4FFF), where
-          XXXX is the allowed MEI range (0x0001 - 0xFFF1), these values SHALL be
-          ignored. 3.The list SHALL NOT contain any values in the Test Vendor or
-          invalid range: (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF),
-          (0xXXXX_5000 - 0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where
-          XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool activatedcarbonfiltermonitoring read generated-command-list 1 1
-
-          Via the TH (chip-tool), verify that the GeneratedCommandList attribute. Below mentioned log is based on the RPI implementation, Value may vary on real DUT
-
-          [1685959192.277991][11472:11474] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0072 Attribute 0x0000_FFF8 DataVersion: 403478864
-          [1685959192.278115][11472:11474] CHIP:TOO:   GeneratedCommandList: 0 entries
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"

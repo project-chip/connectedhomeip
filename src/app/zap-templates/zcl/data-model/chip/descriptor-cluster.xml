@@ -42,6 +42,9 @@ limitations under the License.
     <code>0x001d</code>
     <define>DESCRIPTOR_CLUSTER</define>
     <description>The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters.</description>
+
+    <globalAttribute side="either" code="0xFFFD" value="2"/>
+
     <attribute side="server" code="0x0000" define="DEVICE_LIST" type="ARRAY" entryType="DeviceTypeStruct" writable="false" optional="false">DeviceTypeList</attribute>
     <attribute side="server" code="0x0001" define="SERVER_LIST" type="ARRAY" entryType="CLUSTER_ID" writable="false" optional="false">ServerList</attribute>
     <attribute side="server" code="0x0002" define="CLIENT_LIST" type="ARRAY" entryType="CLUSTER_ID" writable="false" optional="false">ClientList</attribute>

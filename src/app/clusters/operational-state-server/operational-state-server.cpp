@@ -78,8 +78,7 @@ CHIP_ERROR Instance::SetCurrentPhase(const DataModel::Nullable<uint8_t> & aPhase
     mCurrentPhase                         = aPhase;
     if (mCurrentPhase != oldPhase)
     {
-        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentPhase::Id);
-        MatterReportingAttributeChangeCallback(path);
+        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::CurrentPhase::Id);
     }
     return CHIP_NO_ERROR;
 }
@@ -95,16 +94,14 @@ CHIP_ERROR Instance::SetOperationalState(uint8_t aOpState)
     if (mOperationalError.errorStateID != to_underlying(ErrorStateEnum::kNoError))
     {
         mOperationalError.Set(to_underlying(ErrorStateEnum::kNoError));
-        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OperationalError::Id);
-        MatterReportingAttributeChangeCallback(path);
+        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::OperationalError::Id);
     }
 
     uint8_t oldState  = mOperationalState;
     mOperationalState = aOpState;
     if (mOperationalState != oldState)
     {
-        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OperationalState::Id);
-        MatterReportingAttributeChangeCallback(path);
+        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::OperationalState::Id);
     }
     return CHIP_NO_ERROR;
 }
@@ -130,17 +127,15 @@ void Instance::OnOperationalErrorDetected(const Structs::ErrorStateStruct::Type 
     // Set the OperationalState attribute to Error
     if (mOperationalState != to_underlying(OperationalStateEnum::kError))
     {
-        mOperationalState          = to_underlying(OperationalStateEnum::kError);
-        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OperationalState::Id);
-        MatterReportingAttributeChangeCallback(path);
+        mOperationalState = to_underlying(OperationalStateEnum::kError);
+        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::OperationalState::Id);
     }
 
     // Set the OperationalError attribute
-    if (mOperationalError.IsEqual(aError))
+    if (!mOperationalError.IsEqual(aError))
     {
         mOperationalError.Set(aError.errorStateID, aError.errorStateLabel, aError.errorStateDetails);
-        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OperationalError::Id);
-        MatterReportingAttributeChangeCallback(path);
+        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::OperationalError::Id);
     }
 
     // Generate an ErrorDetected event

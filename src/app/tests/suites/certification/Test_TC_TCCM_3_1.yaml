@@ -15,6 +15,10 @@
 
 name: 219.3.1. [TC-TCCM-3.1] On Mode functionality with DUT as Server
 
+PICS:
+    - TCCM.S.A0003
+    - TCCM.S.F00
+
 config:
     nodeId: 0x12344321
     cluster: "Basic Information"

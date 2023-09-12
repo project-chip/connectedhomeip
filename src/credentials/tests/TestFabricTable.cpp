@@ -690,7 +690,7 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         FabricId fabricId = 44;
         NodeId nodeId     = 999;
 
-        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
@@ -810,7 +810,7 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         NodeId nodeId           = 1000;
         FabricIndex fabricIndex = 2;
 
-        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
 
         // Make sure to tag fabric index to pending opkey: otherwise the UpdateNOC fails
@@ -1070,7 +1070,7 @@ void TestAddMultipleSameRootDifferentFabricId(nlTestSuite * inSuite, void * inCo
         FabricId fabricId = 1111;
         NodeId nodeId     = 55;
 
-        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
@@ -1113,7 +1113,7 @@ void TestAddMultipleSameRootDifferentFabricId(nlTestSuite * inSuite, void * inCo
         FabricId fabricId = 2222;
         NodeId nodeId     = 66;
 
-        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
@@ -1177,7 +1177,7 @@ void TestAddMultipleSameFabricIdDifferentRoot(nlTestSuite * inSuite, void * inCo
         FabricId fabricId = 1111;
         NodeId nodeId     = 55;
 
-        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
@@ -1220,7 +1220,7 @@ void TestAddMultipleSameFabricIdDifferentRoot(nlTestSuite * inSuite, void * inCo
         FabricId fabricId = 1111;
         NodeId nodeId     = 66;
 
-        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
@@ -1302,7 +1302,7 @@ void TestPersistence(nlTestSuite * inSuite, void * inContext)
             FabricId fabricId = 1111;
             NodeId nodeId     = 55;
 
-            uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+            uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
             MutableByteSpan csrSpan{ csrBuf };
             NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
@@ -1361,7 +1361,7 @@ void TestPersistence(nlTestSuite * inSuite, void * inContext)
             FabricId fabricId = 2222;
             NodeId nodeId     = 66;
 
-            uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+            uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
             MutableByteSpan csrSpan{ csrBuf };
             NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
@@ -1614,7 +1614,7 @@ void TestAddNocFailSafe(nlTestSuite * inSuite, void * inContext)
         FabricId fabricId = 11;
         NodeId nodeId     = 55;
 
-        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
@@ -1700,7 +1700,7 @@ void TestAddNocFailSafe(nlTestSuite * inSuite, void * inContext)
         FabricId fabricId = 44;
         NodeId nodeId     = 999;
 
-        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
@@ -1846,7 +1846,7 @@ void TestUpdateNocFailSafe(nlTestSuite * inSuite, void * inContext)
         FabricId fabricId = 44;
         NodeId nodeId     = 999;
 
-        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
@@ -1937,7 +1937,7 @@ void TestUpdateNocFailSafe(nlTestSuite * inSuite, void * inContext)
         NodeId nodeId           = 1000;
         FabricIndex fabricIndex = 1;
 
-        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
 
         // Make sure to tag fabric index to pending opkey: otherwise the UpdateNOC fails
@@ -2049,7 +2049,7 @@ void TestUpdateNocFailSafe(nlTestSuite * inSuite, void * inContext)
         NodeId nodeId           = 1001;
         FabricIndex fabricIndex = 1;
 
-        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
 
         // Make sure to tag fabric index to pending opkey: otherwise the UpdateNOC fails
@@ -2220,7 +2220,7 @@ void TestFabricLabelChange(nlTestSuite * inSuite, void * inContext)
         FabricId fabricId = 1111;
         NodeId nodeId     = 55;
 
-        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
@@ -2291,7 +2291,7 @@ void TestFabricLabelChange(nlTestSuite * inSuite, void * inContext)
         FabricId fabricId = 1111;
         NodeId nodeId     = 66; // Update node ID from 55 to 66
 
-        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
         NL_TEST_ASSERT_SUCCESS(inSuite,
                                fabricTable.AllocatePendingOperationalKey(chip::MakeOptional(static_cast<FabricIndex>(1)), csrSpan));
@@ -2449,7 +2449,7 @@ void TestAddNocRootCollision(nlTestSuite * inSuite, void * inContext)
         FabricId fabricId = 1111;
         NodeId nodeId     = 55;
 
-        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
@@ -2502,7 +2502,7 @@ void TestAddNocRootCollision(nlTestSuite * inSuite, void * inContext)
         FabricId fabricId = 1111;
         NodeId nodeId     = 55;
 
-        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
@@ -2556,7 +2556,7 @@ void TestAddNocRootCollision(nlTestSuite * inSuite, void * inContext)
         FabricId fabricId = 2222;
         NodeId nodeId     = 55;
 
-        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
@@ -2629,7 +2629,7 @@ void TestInvalidChaining(nlTestSuite * inSuite, void * inContext)
         FabricId fabricId = 1111;
         NodeId nodeId     = 55;
 
-        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
@@ -2816,7 +2816,7 @@ void TestCommitMarker(nlTestSuite * inSuite, void * inContext)
             FabricId fabricId = 1111;
             NodeId nodeId     = 55;
 
-            uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+            uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
             MutableByteSpan csrSpan{ csrBuf };
             NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
@@ -2882,7 +2882,7 @@ void TestCommitMarker(nlTestSuite * inSuite, void * inContext)
             FabricId fabricId = 2222;
             NodeId nodeId     = 66;
 
-            uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+            uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
             MutableByteSpan csrSpan{ csrBuf };
             NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 

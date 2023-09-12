@@ -60,11 +60,13 @@ template("chip_test_group") {
     }
   }
 
-  group("${_test_group_name}_run") {
-    if (chip_link_tests) {
-      deps = []
-      foreach(_test, invoker.deps) {
-        deps += [ get_label_info(_test, "label_no_toolchain") + "_run" ]
+  if (chip_pw_run_tests) {
+    group("${_test_group_name}_run") {
+      if (chip_link_tests) {
+        deps = []
+        foreach(_test, invoker.deps) {
+          deps += [ get_label_info(_test, "label_no_toolchain") + "_run" ]
+        }
       }
     }
   }

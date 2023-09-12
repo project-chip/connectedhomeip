@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -33,10 +33,9 @@
   ],
   "endpointTypes": [
     {
-      "id": 8,
+      "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 2,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 2,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        2
       ],
       "deviceVersions": [
         1
@@ -264,7 +259,7 @@
           "mfgCode": null,
           "define": "GROUPS_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "AddGroupResponse",
@@ -6252,10 +6247,9 @@
       ]
     },
     {
-      "id": 7,
+      "id": 2,
       "name": "MA-refrigerator",
       "deviceTypeRef": {
-        "id": 48,
         "code": 112,
         "profileId": 259,
         "label": "MA-refrigerator",
@@ -6263,15 +6257,11 @@
       },
       "deviceTypes": [
         {
-          "id": 48,
           "code": 112,
           "profileId": 259,
           "label": "MA-refrigerator",
           "name": "MA-refrigerator"
         }
-      ],
-      "deviceTypeRefs": [
-        48
       ],
       "deviceVersions": [
         1
@@ -8485,7 +8475,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "2",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -8687,7 +8677,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "2",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -11686,10 +11676,9 @@
       ]
     },
     {
-      "id": 5,
+      "id": 3,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
-        "id": 51,
         "code": 113,
         "profileId": 259,
         "label": "MA-temperature-controlled-cabinet",
@@ -11697,15 +11686,11 @@
       },
       "deviceTypes": [
         {
-          "id": 51,
           "code": 113,
           "profileId": 259,
           "label": "MA-temperature-controlled-cabinet",
           "name": "MA-temperature-controlled-cabinet"
         }
-      ],
-      "deviceTypeRefs": [
-        51
       ],
       "deviceVersions": [
         1
@@ -12202,10 +12187,9 @@
       ]
     },
     {
-      "id": 6,
+      "id": 4,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
-        "id": 51,
         "code": 113,
         "profileId": 259,
         "label": "MA-temperature-controlled-cabinet",
@@ -12213,15 +12197,11 @@
       },
       "deviceTypes": [
         {
-          "id": 51,
           "code": 113,
           "profileId": 259,
           "label": "MA-temperature-controlled-cabinet",
           "name": "MA-temperature-controlled-cabinet"
         }
-      ],
-      "deviceTypeRefs": [
-        51
       ],
       "deviceVersions": [
         1
@@ -12747,6 +12727,5 @@
       "endpointId": 3,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

@@ -100,14 +100,20 @@ tests:
     - label:
           "Step 6: TH waits for a report of COState attribute from DUT with a
           timeout of 300 seconds"
-      PICS: SMOKECO.S.A0002
-      command: "waitForReport"
-      attribute: "COState"
-      timeout: 300
-      response:
-          value: 1
-          constraints:
-              type: enum8
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0002
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read costate 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
+          [TOO]   COState: 1
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 7: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
@@ -122,7 +128,7 @@ tests:
       PICS: SMOKECO.S.E01
       command: "readEvent"
       event: "COAlarm"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: { AlarmSeverityLevel: 1 }
 
@@ -180,14 +186,20 @@ tests:
     - label:
           "Step 15: TH waits for a report of COState attribute from DUT with a
           timeout of 300 seconds"
-      PICS: SMOKECO.S.A0002
-      command: "waitForReport"
-      attribute: "COState"
-      timeout: 300
-      response:
-          value: 2
-          constraints:
-              type: enum8
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0002
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read costate 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
+          [TOO]   COState: 2
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 16: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
@@ -202,7 +214,7 @@ tests:
       PICS: SMOKECO.S.E01
       command: "readEvent"
       event: "COAlarm"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: { AlarmSeverityLevel: 2 }
 
@@ -225,14 +237,20 @@ tests:
     - label:
           "Step 19: TH waits for a report of COState attribute from DUT with a
           timeout of 300 seconds"
-      PICS: SMOKECO.S.A0002
-      command: "waitForReport"
-      attribute: "COState"
-      timeout: 300
-      response:
-          value: 0
-          constraints:
-              type: enum8
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0002
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read costate 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
+          [TOO]   COState: 0
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 20: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
@@ -247,6 +265,6 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      eventNumber: "newEventsOnly"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value: {}

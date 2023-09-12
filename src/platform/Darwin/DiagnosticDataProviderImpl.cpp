@@ -89,6 +89,17 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
+{
+    uint32_t count = 0;
+
+    ReturnErrorOnFailure(ConfigurationMgr().GetRebootCount(count));
+    VerifyOrReturnError(count <= UINT16_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+    rebootCount = static_cast<uint16_t>(count);
+
+    return CHIP_NO_ERROR;
+}
+
 DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
 {
     return DiagnosticDataProviderImpl::GetDefaultInstance();

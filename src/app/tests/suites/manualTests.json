@@ -253,11 +253,7 @@
     "LevelControl": [],
     "LaundryWasherMode": ["Test_TC_LWM_1_2", "Test_TC_LWM_3_2"],
     "OnOff": ["Test_TC_OO_2_3"],
-    "OperationalState": [
-        "Test_TC_OPSTATE_2_1",
-        "Test_TC_OPSTATE_2_2",
-        "Test_TC_OPSTATE_2_3"
-    ],
+    "OperationalState": ["Test_TC_OPSTATE_2_2"],
     "RelativeHumidityMeasurement": ["Test_TC_RH_2_2"],
     "SmokeCOAlarm": [],
     "RefrigeratorAlarm": [
@@ -267,11 +263,7 @@
     ],
     "RVCCleanMode": ["Test_TC_RVCCLEANM_3_3"],
     "RVCOperationalState": ["Test_TC_RVCOPSTATE_2_2"],
-    "RVCRunMode": [
-        "Test_TC_RVCRUNM_1_1",
-        "Test_TC_RVCRUNM_3_1",
-        "Test_TC_RVCRUNM_3_3"
-    ],
+    "RVCRunMode": ["Test_TC_RVCRUNM_3_3"],
     "TemperatureControlledCabinetMode": [
         "Test_TC_TCCM_1_2",
         "Test_TC_TCCM_2_1",
@@ -309,13 +301,7 @@
         "Test_TC_BRBINFO_2_2",
         "Test_TC_BRBINFO_3_1"
     ],
-    "WasherControls": [
-        "Test_TC_WASHERCTRL_1_1",
-        "Test_TC_WASHERCTRL_2_1",
-        "Test_TC_WASHERCTRL_2_2",
-        "Test_TC_WASHERCTRL_3_1",
-        "Test_TC_WASHERCTRL_3_2"
-    ],
+    "LaundryWasherControl": [],
     "AccessControlEnforcement": [],
     "collection": [
         "DeviceDiscovery",
@@ -381,6 +367,6 @@
         "UserLabel",
         "BridgedDeviceBasicInformation",
         "AccessControlEnforcement",
-        "WasherControls"
+        "LaundryWasherControl"
     ]
 }
