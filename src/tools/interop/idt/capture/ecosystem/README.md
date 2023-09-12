@@ -1,6 +1,7 @@
 # Ecosystem
 
-This directory contains the capture process and log analysis implementations and validation tests for each ecosystem.
+This directory contains the capture process and log analysis implementations and
+validation tests for each ecosystem.
 
 ## Adding new ecosystems
 
@@ -10,4 +11,4 @@ This directory contains the capture process and log analysis implementations and
 
 ### Notes
 
-Captures should be run in separate processes and minimize blocking main.    
+Captures should be run in separate processes and minimize blocking main.

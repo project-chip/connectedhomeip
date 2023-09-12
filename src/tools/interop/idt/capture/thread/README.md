@@ -1,5 +1,5 @@
-Like pcap runner, we should add a thread runner that periodically dumps the following to a log.
-Maybe also thread pcap?
+Like pcap runner, we should add a thread runner that periodically dumps the
+following to a log. Maybe also thread pcap?
 
 ```
 ot-ctl log level 5
@@ -21,5 +21,6 @@ ip -6 neigh
 ip -6 route list table all
 ```
 
-This would require hooking 52840 RCP to the Pi and having it join the active thread net before capture.   
+This would require hooking 52840 RCP to the Pi and having it join the active
+thread net before capture.  
 otbr is already cloned in the docker image.

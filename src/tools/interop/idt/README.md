@@ -2,34 +2,34 @@
 
 ## Overview
 
-The “Interop Debugging Tool” (IDT) is a python-based tool that supports a variety of 
-commands that are useful in the context of interop testing of Matter devices and 
-app controllers.
+The “Interop Debugging Tool” (IDT) is a python-based tool that supports a
+variety of commands that are useful in the context of interop testing of Matter
+devices and app controllers.
 
 ### Discovery
 
-While in discovery mode, the tool displays all Matter devices that are in 
-commission and/or operational mode. This is useful to have a clear 
-understanding of all Matter devices currently “active” in the testing environment.
+While in discovery mode, the tool displays all Matter devices that are in
+commission and/or operational mode. This is useful to have a clear understanding
+of all Matter devices currently “active” in the testing environment.
 
-The Google Developer Center provides a good overview 
-of [Commissionable and Operational Discovery](https://developers.home.google.com/matter/primer/commissionable-and-operational-discovery).   
+The Google Developer Center provides a good overview of
+[Commissionable and Operational Discovery](https://developers.home.google.com/matter/primer/commissionable-and-operational-discovery).  
 See also section “4.3. Discovery” of the Matter spec for official documentation.
 
 When run interactively, discovery functions in one of two modes: BLE and mDNS.
 
-### Capture 
+### Capture
 
-While in capture mode, the tool starts capturing all data of interest 
-(e.g. video recording of interactions with the mobile app, logs from all components
-involved, network packets capture, etc.) while a test is being conducted manually. It also 
-provides feedback to the user on test setup and execution.
+While in capture mode, the tool starts capturing all data of interest (e.g.
+video recording of interactions with the mobile app, logs from all components
+involved, network packets capture, etc.) while a test is being conducted
+manually. It also provides feedback to the user on test setup and execution.
 
-When the test completes, capture mode is stopped and all captured data is zipped in
-a file that can then be sent to all parties involved in investigating any issue
-uncovered via the manual test. Each ecosystem may implement an analysis that analyzes 
-capture data, displays info to the user, probes the local environment and generates 
-additional artifacts.
+When the test completes, capture mode is stopped and all captured data is zipped
+in a file that can then be sent to all parties involved in investigating any
+issue uncovered via the manual test. Each ecosystem may implement an analysis
+that analyzes capture data, displays info to the user, probes the local
+environment and generates additional artifacts.
 
 ## Getting started
 
@@ -37,43 +37,44 @@ additional artifacts.
 
 ### Environment overview
 
-The execution environment of IDT when using Raspberry Pi is shown in the figure below.
+The execution environment of IDT when using Raspberry Pi is shown in the figure
+below.
 
 [TODO] add figure.
 
-The Raspberry Pi is referred to as the "target environment" in this document. 
-It is where all  the "discovery" and "capture" work is performed.
+The Raspberry Pi is referred to as the "target environment" in this document. It
+is where all the "discovery" and "capture" work is performed.
 
-The "admin" computer is the machine used to connect to and control the pi, 
-and to fetch artifacts which were created during capture from the pi.
+The "admin" computer is the machine used to connect to and control the pi, and
+to fetch artifacts which were created during capture from the pi.
 
-This repository may be used on both the admin computer and the target environment.
+This repository may be used on both the admin computer and the target
+environment.
 
 ### Environment details
 
-1. This guide and the `idt` scripts expect ***one*** instance of `idt` on both the 
-   admin computer (e.g. macbook) and the target environment.
-1. The expected install location on the target environment is the 
-   home directory of the user specified in `idt/scripts/vars.sh`. Default values 
-   are: 
-   ```
-   PIHOST="kali-raspberry-pi" 
-   PIUSER="kali"
-   ```
-1. Helper scripts may be used on admin computers that support `zsh` and `bash` 
+1. This guide and the `idt` scripts expect **_one_** instance of `idt` on both
+   the admin computer (e.g. macbook) and the target environment.
+1. The expected install location on the target environment is the home directory
+   of the user specified in `idt/scripts/vars.sh`. Default values are:
+    ```
+    PIHOST="kali-raspberry-pi"
+    PIUSER="kali"
+    ```
+1. Helper scripts may be used on admin computers that support `zsh` and `bash`
    (Linux and macOS).
-1. Windows may be used as the admin computer via tools like `PowerShell`, 
+1. Windows may be used as the admin computer via tools like `PowerShell`,
    `MobaXterm` and `FileZilla`.
-1. This setup is intended to work with the admin computer and Pi connected to the
-   same Wi-Fi network, which is also the Wi-Fi network used for testing.
+1. This setup is intended to work with the admin computer and Pi connected to
+   the same Wi-Fi network, which is also the Wi-Fi network used for testing.
 1. Corporate networks are not expected to be used as test networks.
-
 
 ### Prepare the Pi
 
 1. A >= 128 GB SD card is recommended.
-1. Flash the Pi SD with the latest `Kali Linux RaspberryPi 2, 3, 4 and 400 (img.xz)` image (32 bit).
-    * Use [Raspberry Pi Imager](https://github.com/raspberrypi/rpi-imager) to 
+1. Flash the Pi SD with the latest
+   `Kali Linux RaspberryPi 2, 3, 4 and 400 (img.xz)` image (32 bit).
+    - Use [Raspberry Pi Imager](https://github.com/raspberrypi/rpi-imager) to
       [download the image and prepare the SD](https://www.kali.org/docs/arm/using-rpi-imager-to-write-raspberry-pi-images/).
 1. Plug the SD into the Pi.
 1. Connect the Pi to your network via **ethernet.** [TODO] provide alternative
@@ -83,64 +84,74 @@ This repository may be used on both the admin computer and the target environmen
 
 #### Linux and macOS admin computers
 
-1. On your admin computer, source the `alias` script from the parent directory of `idt` to get `idt` commands in your current shell.
-   ```bash
-    source idt/scripts/alias.sh 
-    ```
-    * To avoid having to repeat this step for each session, optionally configure automatic aliases permanently.
-    * ***NOTE:*** Once run, `idt` commands will be globally and automatically available. If you need to remove the installation, edit the `.rc` files mentioned in `setup_shell`.
+1. On your admin computer, source the `alias` script from the parent directory
+   of `idt` to get `idt` commands in your current shell.
     ```bash
-    source idt/scripts/setup_shell.sh 
+     source idt/scripts/alias.sh
+    ```
+    - To avoid having to repeat this step for each session, optionally configure
+      automatic aliases permanently.
+    - **_NOTE:_** Once run, `idt` commands will be globally and automatically
+      available. If you need to remove the installation, edit the `.rc` files
+      mentioned in `setup_shell`.
+    ```bash
+    source idt/scripts/setup_shell.sh
     ```
 1. Send `idt` to the Pi:
-   ```
-   idt_push
-   ```
+    ```
+    idt_push
+    ```
 1. `ssh` to the Pi (the default password for Kali is `kali`):
-   * ***NOTE:*** You may need to wait a few minutes after boot for the `ssh` server to be available on the Pi. Retry if needed!
-   ```
-   idt_connect
-   ```
+    - **_NOTE:_** You may need to wait a few minutes after boot for the `ssh`
+      server to be available on the Pi. Retry if needed!
+    ```
+    idt_connect
+    ```
 
 #### Windows admin computers
 
-1. Open `PowerShell`, cd to the directory containing `idt` and send `idt` to the Pi:
-   ```
-   scp -r ./idt/* kali@kali:/home/kali/idt
-   ```
-1. `ssh` to the Pi, e.g. with `MobaXterm` (the default password for Kali is `kali`)
-   * ***NOTE:*** You may need to wait a few minutes after boot for the `ssh` server to be available on the Pi. Retry if needed!
-   * Use `kali@kali-raspberry-pi` or `kali@$ip` where `$ip` is the Pi's IP found in 
-     your router admin panel.
+1. Open `PowerShell`, cd to the directory containing `idt` and send `idt` to the
+   Pi:
+    ```
+    scp -r ./idt/* kali@kali:/home/kali/idt
+    ```
+1. `ssh` to the Pi, e.g. with `MobaXterm` (the default password for Kali is
+   `kali`)
+    - **_NOTE:_** You may need to wait a few minutes after boot for the `ssh`
+      server to be available on the Pi. Retry if needed!
+    - Use `kali@kali-raspberry-pi` or `kali@$ip` where `$ip` is the Pi's IP
+      found in your router admin panel.
 
-### Configure the Pi   
+### Configure the Pi
 
 1. Once in an ssh session, set a strong password.
-   ```
-   sudo passwd kali
-   ```
+    ```
+    sudo passwd kali
+    ```
 1. Inside the Pi, configure Wi-Fi. Disconnect ethernet and reboot.
-   ```
-   nmtui
-   ```
+    ```
+    nmtui
+    ```
 1. Set up `idt`:
-   ```commandline
-   cd ~                               # Go to idt parent dir
-   source idt/scripts/setup_shell.sh  # Setup atuo aliases
-   source idt/scripts/alias.sh        # Get aliases now
-   idt_bootstrap                      # Initial configuration
-   idt_build                          # Build the container image
-   ```
+    ```commandline
+    cd ~                               # Go to idt parent dir
+    source idt/scripts/setup_shell.sh  # Setup atuo aliases
+    source idt/scripts/alias.sh        # Get aliases now
+    idt_bootstrap                      # Initial configuration
+    idt_build                          # Build the container image
+    ```
 
 ### Install updates
 
-SCP may not overwrite all files. To clear the `idt` dir off of the Pi safely between pushes, exit the container and:
+SCP may not overwrite all files. To clear the `idt` dir off of the Pi safely
+between pushes, exit the container and:
 
 ```
 idt_clean
 ```
 
-NOTE the idt artifacts directory is contained in idt, so running this will delete any artifacts ([TODO] change).
+NOTE the idt artifacts directory is contained in idt, so running this will
+delete any artifacts ([TODO] change).
 
 Then from the admin computer:
 
@@ -152,17 +163,19 @@ idt_push
 
 This package should also work on most other Debian (/based) systems.
 
-The machine running `idt` should be connected to the same Wi-Fi network used for testing.
+The machine running `idt` should be connected to the same Wi-Fi network used for
+testing.
 
-- From the parent directory of `idt`, run `source idt/scripts/alias.sh`.
-- Optionally, run `source idt/scripts/setup_shell.sh ` to install aliases permanently.
+-   From the parent directory of `idt`, run `source idt/scripts/alias.sh`.
+-   Optionally, run `source idt/scripts/setup_shell.sh` to install aliases
+    permanently.
 
-> You may use `idt` natively (Python virtual environment) OR via Docker. 
+> You may use `idt` natively (Python virtual environment) OR via Docker.
 
 ### Python virtual environment
 
-- `idt` is currently tested on `Python 3.11`.  
-- `adb` and `tcpdump` are required.
+-   `idt` is currently tested on `Python 3.11`.
+-   `adb` and `tcpdump` are required.
 
 Setup a virtual environment and install python dependencies:
 
@@ -178,7 +191,7 @@ Remember to re-enter the virtual environment as needed. [TODO] script
 
 ### Docker
 
-- Run `idt_build` and `idt_activate` to enter the `idt` environment.
+-   Run `idt_build` and `idt_activate` to enter the `idt` environment.
 
 [TODO] Podman
 
@@ -192,21 +205,21 @@ Follow the Debian installation steps above, but do not use Docker.
 
 ## User guide
 
-> ***IMPORTANT***  
+> **_IMPORTANT_**  
 > `idt_` commands are shell aliases helpful for administrative commands.  
 > `idt` invokes the `idt` python package.
 
 Pi users, as needed:
 
-* For users with Windows admin computers, reconnect e.g., using `MobaXterm` 
-* Other users reconnect `ssh` to the Pi (from your admin computer):
-   ```
-   idt_connect
-   ```
-* Run the `idt` container (from the Pi):
-   ```
-   idt_activate
-   ```
+-   For users with Windows admin computers, reconnect e.g., using `MobaXterm`
+-   Other users reconnect `ssh` to the Pi (from your admin computer):
+    ```
+    idt_connect
+    ```
+-   Run the `idt` container (from the Pi):
+    ```
+    idt_activate
+    ```
 
 ### Capture
 
@@ -264,7 +277,7 @@ Pausing to check if pcap started...
 tcpdump: wlp0s20f3: You don't have permission to perform this capture on that device
 (socket: Operation not permitted)
 Pcap did not start, you might need root; please authorize if prompted.
-[sudo] password for user: 
+[sudo] password for user:
 
 Retrying pcap start...
 tcpdump: listening on wlp0s20f3, link-type EN10MB (Ethernet), snapshot length 262144 bytes
@@ -277,17 +290,17 @@ ________________________________________________________________
 android_model: Pixel 6
 android_version: 14
 android_api: 34
-build_fingerprint: 
-odm_build_fingerprint: 
-product_build_fingerprint: 
-vendor_build_fingerprint: 
+build_fingerprint:
+odm_build_fingerprint:
+product_build_fingerprint:
+vendor_build_fingerprint:
 display_width: 1080
 display_height: 2400
 container_info: versionName=23.31.16 (190400-555695945)
     versionName=23.18.18 (190408-535401451)
 home_module_info: com.google.android.gms.home [v233116000]
 optional_home_module_info: com.google.android.gms.optional_home [233116065] [23.31.16 (100400-0)] [Download:0000003a/dl-Home.optional_233116100400.apk] [download:/Home.optional/233116100400:Home.optional:233116100400]
-policy_home_module_info: 
+policy_home_module_info:
 thread_info: com.google.android.gms.threadnetwork [v233116000]
 mdns_info: com.google.android.gms.mdns [v214]
 gha_info: versionName=3.5.1.4
@@ -429,13 +442,15 @@ Output zip: /home/user/idt/IDT_ARTIFACTS/idt_20230831_010707.zip
 
 #### Artifacts
 
-Each ecosystem and platform involved in the capture will have their own subdirectory in the root artifact dir.
+Each ecosystem and platform involved in the capture will have their own
+subdirectory in the root artifact dir.
 
 To download your artifacts, run these commands from your admin computer:
 
 `idt_fetch_artifacts`
 
-On windows admin computers, you may use `FileZilla` to pull the archive listed at the end of output.
+On windows admin computers, you may use `FileZilla` to pull the archive listed
+at the end of output.
 
 ### Discovery
 
@@ -461,7 +476,7 @@ ________________________________________________________________
 
 2023-08-31 01:26:54,792.792 WARNING {matter_ble} [browse_interactive]
 Scanning BLE
-DCL Lookup: https://webui.dcl.csa-iot.org/ 
+DCL Lookup: https://webui.dcl.csa-iot.org/
 
 2023-08-31 01:27:00.836
 DISCOVERED
@@ -512,32 +527,33 @@ Browsing Matter mDNS, press enter to stop
 ServiceInfo(type='_matterc._udp.local.', name='06AEDAC2B84C4599._matterc._udp.local.', addresses=[b'\xc0\xa8\x08\x9c'], port=5540, weight=0, priority=0, server='4822545F33BC.local.', properties={b'VP': b'4488+257', b'DT': b'266', b'DN': b'Mini Smart Wi-Fi Plug', b'SII': b'5000', b'SAI': b'300', b'T': b'1', b'D': b'2678', b'CM': b'0', b'RI': b'0900C680E972C4C1A25BA2F6B532BDEC42C3', b'PH': b'36', b'PI': b''}, interface_index=None)
 COMMISSIONABLE
 VID: 0x1188 PID: 0x101
- 
+
 
 2023-08-31 01:39:35,563.563 INFO {matter_mdns} [add_service]
 ServiceInfo(type='_matter._tcp.local.', name='61701BF6702881AF-0000000081854C07._matter._tcp.local.', addresses=[b'\xc0\xa8\x08\x80'], port=5540, weight=0, priority=0, server='083AF242E210.local.', properties={b'T': b'1'}, interface_index=None)
-OPERATIONAL 
+OPERATIONAL
 
 2023-08-31 01:39:35,564.564 INFO {matter_mdns} [add_service]
 ServiceInfo(type='_matter._tcp.local.', name='61701BF6702881AF-0000000068DB496F._matter._tcp.local.', addresses=[b'\xc0\xa8\x08\x9c'], port=5540, weight=0, priority=0, server='4822545F33BC.local.', properties={b'SII': b'5000', b'SAI': b'300', b'T': b'1'}, interface_index=None)
-OPERATIONAL 
+OPERATIONAL
 
 2023-08-31 01:39:35,664.664 INFO {matter_mdns} [add_service]
 ServiceInfo(type='_matter._tcp.local.', name='61701bf6702881af-000000001a3fbb61._matter._tcp.local.', addresses=[b'\xc0\xa8\x08\xba'], port=5540, weight=0, priority=0, server='44070B4C4C2E.local.', properties={}, interface_index=None)
-OPERATIONAL 
+OPERATIONAL
 
 2023-08-31 01:39:35,668.668 INFO {matter_mdns} [add_service]
 ServiceInfo(type='_meshcop._udp.local.', name='Google Nest Hub Max (a6f7)._meshcop._udp.local.', addresses=[b'\xc0\xa8\x08\xba'], port=49154, weight=0, priority=0, server='fuchsia-4407-0b4c-4c2e.local.', properties={b'vcd': b'106A6D1B9B99FEAA301026F7D2DDE8CD', b'id': b'\x10jm\x1b\x9b\x99\xfe\xaa0\x10&\xf7\xd2\xdd\xe8\xcd', b'vo': b'|\xd9\\', b'vvo': b'7CD95C', b'vxp': b'1dc3269b3297a6d6', b'vat': b'000064cd6e100d51', b'rv': b'1', b'tv': b'1.3.0', b'sb': b'\x00\x00\x001', b'nn': b'NEST-PAN-C15C', b'xp': b'\x1d\xc3&\x9b2\x97\xa6\xd6', b'vn': b'Google Inc.', b'mn': b'Google Nest Hub Max', b'xa': b'\x02\x08\xbd\xc7\x10N\xa6\xf7', b'at': b'\x00\x00d\xcdn\x10\rQ', b'pt': b'y\x16N\x9f'}, interface_index=None)
-THREAD_BORDER_ROUTER 
+THREAD_BORDER_ROUTER
 
 2023-08-31 01:39:35,669.669 INFO {matter_mdns} [add_service]
 ServiceInfo(type='_matter._tcp.local.', name='61701BF6702881AF-00000000031F052C._matter._tcp.local.', addresses=[], port=5540, weight=0, priority=0, server='2A188ACDA87BA8E7.local.', properties={b'SII': b'800', b'SAI': b'800', b'T': b'0'}, interface_index=None)
-OPERATIONAL 
+OPERATIONAL
 ```
 
 #### Artifacts
 
-There is a per device log for ble scanning in `ble` subdirectory of the root artifact dir.
+There is a per device log for ble scanning in `ble` subdirectory of the root
+artifact dir.
 
 [TODO] mDNS per device log
 
@@ -545,4 +561,5 @@ There is a per device log for ble scanning in `ble` subdirectory of the root art
 
 See the README in `/capture/ecosystem` for guidance on adding new ecosystems.
 
-`/capture/ecosystem/play_services_user` contains a minimal example implementation.
+`/capture/ecosystem/play_services_user` contains a minimal example
+implementation.
