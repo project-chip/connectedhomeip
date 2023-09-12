@@ -42,12 +42,12 @@ enum CastingPlayerDiscoveryState
 
 class DLL_EXPORT DiscoveryDelegate
 {
-public:    
+public:
     virtual ~DiscoveryDelegate() {}
     virtual void HandleOnAdded(Strong<CastingPlayer> player) = 0;
     virtual void HandleOnUpdated(Strong<CastingPlayer> players) = 0;
     // virtual void HandleOnRemoved(std::vector<Strong<CastingPlayer>> players);
-    
+
 };
 
 class CastingPlayerDiscovery;
@@ -107,7 +107,7 @@ public:
             mState = DISCOVERY_READY;
         }
         mDelegate = DeviceDiscoveryDelegateImpl(clientDelegate);
-        
+
     }
 
     std::vector<Strong<CastingPlayer>> * GetCastingPlayers(){return &mCastingPlayers;}
