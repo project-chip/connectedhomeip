@@ -44,6 +44,10 @@ namespace chip {
 namespace app {
 namespace {
 
+static_assert(ConfigurationManager::kMaxDeviceNameLen == Dnssd::kKeyDeviceNameMaxLength,
+              "Max device name length constants are not matching: ConfigurationManager::kMaxDeviceNameLen and "
+              "Dnssd::kKeyDeviceNameMaxLength");
+
 void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 {
     switch (event->Type)
