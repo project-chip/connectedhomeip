@@ -7686,3 +7686,8 @@
 
 - release: "Future"
   versions: "future"
+  provisional:
+      bitmaps:
+          BarrierControl:
+              - BarrierControlCapabilities
+              - BarrierControlSafetyStatus
