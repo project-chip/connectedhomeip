@@ -316,6 +316,9 @@ static constexpr ClusterId Id = 0xFFF1FC05;
 namespace FaultInjection {
 static constexpr ClusterId Id = 0xFFF1FC06;
 } // namespace FaultInjection
+namespace SampleMei {
+static constexpr ClusterId Id = 0xFFF1FC20;
+} // namespace SampleMei
 
 } // namespace Clusters
 } // namespace app
