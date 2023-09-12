@@ -65,6 +65,10 @@
 #include "dic_control.h"
 #endif // DIC_ENABLE
 
+#ifdef PERFORMANCE_TEST_ENABLED
+#include <performance_test_commands.h>
+#endif // PERFORMANCE_TEST_ENABLED
+
 /**********************************************************
  * Defines and Constants
  *********************************************************/
@@ -247,6 +251,10 @@ CHIP_ERROR BaseApplication::Init()
     ConfigurationMgr().LogDeviceConfig();
 
     OutputQrCode(true /*refreshLCD at init*/);
+
+#ifdef PERFORMANCE_TEST_ENABLED
+    RegisterPerfTestCommands();
+#endif // PERFORMANCE_TEST_ENABLED
 
     PlatformMgr().AddEventHandler(OnPlatformEvent, 0);
 #ifdef SL_WIFI
