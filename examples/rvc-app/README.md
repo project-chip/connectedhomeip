@@ -15,7 +15,7 @@ This app can support most of the tests in the test plans.
 
 Out-of-band messages are available to simulate typical device behaviors and
 allow the app to navigate to all the states. To send an out-of-band message,
-echo the JSON message to the `/tmp/chip_rvc_fifq_<PID>` file. The JSON message
+echo the JSON message to the `/tmp/chip_rvc_fifo_<PID>` file. The JSON message
 must have a `"Name"` key that contains the command name. This name is shown in
 the state machine diagram above. Example
 `echo '{"Name": "Charged"}' > /tmp/chip_rvc_fifo_42`.
@@ -26,7 +26,7 @@ The error event message requires the additional key `"Error"` which specifies
 the error state ID. This can be one of UnableToStartOrResume,
 UnableToCompleteOperation, CommandInvalidInState, FailedToFindChargingDock,
 Stuck, DustBinMissing, DustBinFull, WaterTankEmpty, WaterTankMissing,
-WaterTankLidOpen, MopCleaningPadMissing
+WaterTankLidOpen, MopCleaningPadMissing.
 
 ## Testing
 
@@ -37,7 +37,7 @@ and setting up the testing environment, python tests can be executed with
 
 **Note:** If the testing environment has not been commissioned with the RVC app,
 use chip-tool to switch on the commissioning window
-`chip-tool pairing open-commissioning-window`, and add the following flags ta
+`chip-tool pairing open-commissioning-window`, and add the following flags to
 the `--script-args` above.
 `--commissioning-method on-network --discriminator XXXX --passcode XXXX`.
 
@@ -115,7 +115,7 @@ Example command:
 `./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCOPSTATE_2_3.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/RVC_App_Test_Plan.txt --int-arg PIXIT_ENDPOINT:1"`
 
 Use the out-of-band messages, chip-tool messages and the state machine diagram
-to navigate to the required states.
+to transition to the required states.
 
 ### Running the yaml tests
 
