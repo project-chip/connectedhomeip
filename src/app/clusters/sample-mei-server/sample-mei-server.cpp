@@ -155,7 +155,7 @@ CHIP_ERROR SampleMeiServer::Write(const ConcreteDataAttributePath & aPath, Attri
         ChipLogProgress(Zcl, "Write Attribute flip-flop on Ep %d index %u newValue %d oldValue %d", endpoint,
                         static_cast<uint16_t>(endpointIndex), content[endpointIndex].flipflop, oldValue);
         break;
-        }
+    }
     default:
         break;
     }

@@ -7,9 +7,9 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
+#include <app/util/config.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceConfig.h>
-#include <app/util/config.h>
 
 #ifdef ZCL_USING_SAMPLE_MEI_CLUSTER_SERVER
 #define SAMPLE_MEI_NUM_SUPPORTED_ENDPOINTS                                                                                         \
