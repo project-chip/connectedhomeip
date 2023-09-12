@@ -43,7 +43,7 @@ class TC_DISHM_3_2(MatterBaseTest):
     async def check_preconditions(self, endpoint):
         # check whether the StartUpMode will be overridden by the OnMode attribute
 
-        if self.check_pics("DISHM.S.F00") == False:
+        if not self.check_pics("DISHM.S.F00"):
             return True
 
         logging.info("DISHM.S.F00: 1")
