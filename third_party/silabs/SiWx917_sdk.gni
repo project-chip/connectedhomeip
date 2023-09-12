@@ -25,6 +25,12 @@ import("silabs_board.gni")
 declare_args() {
   wifi_sdk_root = "${chip_root}/third_party/silabs/wifi_sdk"
   examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
+
+  if (silabs_board == "BRD4338A") {
+    sdk_support_board = "BRD4338A"
+  } else {
+    sdk_support_board = "BRD4325x"
+  }
 }
 
 # Defines an siwx917 SDK build target.
