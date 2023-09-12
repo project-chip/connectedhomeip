@@ -106,7 +106,7 @@ public:
      * @brief Handles changes in Formaldehyde concentration measurement.
      * @param[in] newValue The new air value to be applied.
      */
-    void OnFormaldehydeMeasurementChangeHandler(float newValue);  
+    void OnFormaldehydeMeasurementChangeHandler(float newValue);
 
     /**
      * @brief Handles changes in Temperature measurement.
