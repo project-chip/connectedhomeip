@@ -301,4 +301,3 @@ resource-monitoring-app/**/README
 
 rvc-app/README
 ```
-
