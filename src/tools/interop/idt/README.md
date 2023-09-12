@@ -2,9 +2,9 @@
 
 ## Overview
 
-The “Interoperability Debugging Tool” (IDT) is a python-based tool that supports a
-variety of commands that are useful in the context of interoperability testing of Matter
-devices and app controllers.
+The “Interoperability Debugging Tool” (IDT) is a python-based tool that supports
+a variety of commands that are useful in the context of interoperability testing
+of Matter devices and app controllers.
 
 ### Discovery
 
