@@ -9969,7 +9969,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEventReq
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRSampleMeiClusterPingParams : NSObject <NSCopying>
+@interface MTRSampleMEIClusterPingParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -9997,12 +9997,12 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRSampleMeiClusterAddArgumentsResponseParams : NSObject <NSCopying>
+@interface MTRSampleMEIClusterAddArgumentsResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull returnValue MTR_PROVISIONALLY_AVAILABLE;
 
 /**
- * Initialize an MTRSampleMeiClusterAddArgumentsResponseParams with a response-value dictionary
+ * Initialize an MTRSampleMEIClusterAddArgumentsResponseParams with a response-value dictionary
  * of the sort that MTRDeviceResponseHandler would receive.
  *
  * Will return nil and hand out an error if the response-value dictionary is not
@@ -10016,7 +10016,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRSampleMeiClusterAddArgumentsParams : NSObject <NSCopying>
+@interface MTRSampleMEIClusterAddArgumentsParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull arg1 MTR_PROVISIONALLY_AVAILABLE;
 

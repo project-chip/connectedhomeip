@@ -809,7 +809,7 @@ void emberAfUnitTestingClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfFaultInjectionClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Sample Mei Cluster Init
+/** @brief Sample MEI Cluster Init
  *
  * Cluster Init
  *
@@ -8313,10 +8313,10 @@ void emberAfFaultInjectionClusterServerTickCallback(chip::EndpointId endpoint);
 void emberAfFaultInjectionClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// Sample Mei Cluster
+// Sample MEI Cluster
 //
 
-/** @brief Sample Mei Cluster Server Init
+/** @brief Sample MEI Cluster Server Init
  *
  * Server Init
  *
@@ -8324,7 +8324,7 @@ void emberAfFaultInjectionClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfSampleMeiClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief Sample Mei Cluster Server Shutdown
+/** @brief Sample MEI Cluster Server Shutdown
  *
  * Server Shutdown
  *
@@ -8332,7 +8332,7 @@ void emberAfSampleMeiClusterServerInitCallback(chip::EndpointId endpoint);
  */
 void MatterSampleMeiClusterServerShutdownCallback(chip::EndpointId endpoint);
 
-/** @brief Sample Mei Cluster Client Init
+/** @brief Sample MEI Cluster Client Init
  *
  * Client Init
  *
@@ -8340,7 +8340,7 @@ void MatterSampleMeiClusterServerShutdownCallback(chip::EndpointId endpoint);
  */
 void emberAfSampleMeiClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief Sample Mei Cluster Server Attribute Changed
+/** @brief Sample MEI Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
@@ -8348,7 +8348,7 @@ void emberAfSampleMeiClusterClientInitCallback(chip::EndpointId endpoint);
  */
 void MatterSampleMeiClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief Sample Mei Cluster Server Pre Attribute Changed
+/** @brief Sample MEI Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -8361,7 +8361,7 @@ chip::Protocols::InteractionModel::Status
 MatterSampleMeiClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Sample Mei Cluster Client Pre Attribute Changed
+/** @brief Sample MEI Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -8374,7 +8374,7 @@ chip::Protocols::InteractionModel::Status
 MatterSampleMeiClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Sample Mei Cluster Server Tick
+/** @brief Sample MEI Cluster Server Tick
  *
  * Server Tick
  *
@@ -8382,7 +8382,7 @@ MatterSampleMeiClusterClientPreAttributeChangedCallback(const chip::app::Concret
  */
 void emberAfSampleMeiClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief Sample Mei Cluster Client Tick
+/** @brief Sample MEI Cluster Client Tick
  *
  * Client Tick
  *

@@ -15771,7 +15771,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForSampleMeiCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForSampleMEICluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::SampleMei;
     switch (aAttributeId) {
@@ -16085,7 +16085,7 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
         return DecodeAttributeValueForUnitTestingCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::SampleMei::Id: {
-        return DecodeAttributeValueForSampleMeiCluster(aPath.mAttributeId, aReader, aError);
+        return DecodeAttributeValueForSampleMEICluster(aPath.mAttributeId, aReader, aError);
     }
     default: {
         break;

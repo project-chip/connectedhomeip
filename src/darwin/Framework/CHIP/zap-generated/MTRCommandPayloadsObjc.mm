@@ -15183,7 +15183,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams
 @end
-@implementation MTRSampleMeiClusterPingParams
+@implementation MTRSampleMEIClusterPingParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -15195,7 +15195,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRSampleMeiClusterPingParams alloc] init];
+    auto other = [[MTRSampleMEIClusterPingParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -15210,7 +15210,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRSampleMeiClusterAddArgumentsResponseParams
+@implementation MTRSampleMEIClusterAddArgumentsResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -15222,7 +15222,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRSampleMeiClusterAddArgumentsResponseParams alloc] init];
+    auto other = [[MTRSampleMEIClusterAddArgumentsResponseParams alloc] init];
 
     other.returnValue = self.returnValue;
 
@@ -15278,7 +15278,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRSampleMeiClusterAddArgumentsResponseParams (InternalMethods)
+@implementation MTRSampleMEIClusterAddArgumentsResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
     (const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType &)decodableStruct
@@ -15289,7 +15289,7 @@ NS_ASSUME_NONNULL_BEGIN
     return CHIP_NO_ERROR;
 }
 @end
-@implementation MTRSampleMeiClusterAddArgumentsParams
+@implementation MTRSampleMEIClusterAddArgumentsParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -15305,7 +15305,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRSampleMeiClusterAddArgumentsParams alloc] init];
+    auto other = [[MTRSampleMEIClusterAddArgumentsParams alloc] init];
 
     other.arg1 = self.arg1;
     other.arg2 = self.arg2;

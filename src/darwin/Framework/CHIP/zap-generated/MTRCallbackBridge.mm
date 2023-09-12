@@ -19608,7 +19608,7 @@ void MTRUnitTestingAttributeListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRSampleMeiGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRSampleMEIGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -19631,7 +19631,7 @@ void MTRSampleMeiGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRSampleMeiGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRSampleMEIGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -19646,7 +19646,7 @@ void MTRSampleMeiGeneratedCommandListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRSampleMeiAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRSampleMEIAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -19669,7 +19669,7 @@ void MTRSampleMeiAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRSampleMeiAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRSampleMEIAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -19684,7 +19684,7 @@ void MTRSampleMeiAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRSampleMeiEventListListAttributeCallbackBridge::OnSuccessFn(
+void MTRSampleMEIEventListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -19707,7 +19707,7 @@ void MTRSampleMeiEventListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRSampleMeiEventListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRSampleMEIEventListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -19722,7 +19722,7 @@ void MTRSampleMeiEventListListAttributeCallbackSubscriptionBridge::OnSubscriptio
     }
 }
 
-void MTRSampleMeiAttributeListListAttributeCallbackBridge::OnSuccessFn(
+void MTRSampleMEIAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -19745,7 +19745,7 @@ void MTRSampleMeiAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRSampleMeiAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRSampleMEIAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20580,10 +20580,10 @@ void MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackBridge::O
     DispatchSuccess(context, response);
 };
 
-void MTRSampleMeiClusterAddArgumentsResponseCallbackBridge::OnSuccessFn(
+void MTRSampleMEIClusterAddArgumentsResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType & data)
 {
-    auto * response = [MTRSampleMeiClusterAddArgumentsResponseParams new];
+    auto * response = [MTRSampleMEIClusterAddArgumentsResponseParams new];
     CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
     if (err != CHIP_NO_ERROR) {
         OnFailureFn(context, err);

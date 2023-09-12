@@ -21,35 +21,40 @@ using namespace chip::app::Clusters::SampleMei;
 using namespace chip::app::Clusters::SampleMei::Commands;
 using namespace chip::app::Clusters::SampleMei::Attributes;
 
-SampleMeiServer sampleMeiServer;
-
 // *****************************************************************************
 // Init/Shutdown Callbacks
 
 void MatterSampleMeiPluginServerInitCallback()
 {
-    ChipLogProgress(Zcl, "Sample MEI Init. Ep# %d Total Ep# %u", EMBER_AF_SAMPLE_MEI_CLUSTER_SERVER_ENDPOINT_COUNT,
+    ChipLogProgress(Zcl, "Sample MEI Init. Ep %d, Total Ep %u", EMBER_AF_SAMPLE_MEI_CLUSTER_SERVER_ENDPOINT_COUNT,
                     static_cast<uint16_t>(kNumSupportedEndpoints));
-    ReturnOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(&sampleMeiServer));
-    VerifyOrReturn(registerAttributeAccessOverride(&sampleMeiServer), CHIP_ERROR_INCORRECT_STATE);
+    ReturnOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(&SampleMeiServer::Instance()));
+    VerifyOrReturn(registerAttributeAccessOverride(&SampleMeiServer::Instance()), CHIP_ERROR_INCORRECT_STATE);
 
     // registers the fixed endpoints
-    for (uint16_t endpointIndex = 0; endpointIndex < FIXED_ENDPOINT_COUNT; endpointIndex++)
-    {
-        auto endpoint = emberAfEndpointFromIndex(endpointIndex);
-        ChipLogProgress(Zcl, "Creating cluster, Ep index %d", endpoint);
-        if (emberAfContainsServer(endpoint, SampleMei::Id))
-        {
-            sampleMeiServer.RegisterEndpoint(endpoint);
-        }
-    }
+    // for (uint16_t endpointIndex = 0; endpointIndex < FIXED_ENDPOINT_COUNT; endpointIndex++)
+    // {
+    //     auto endpoint = emberAfEndpointFromIndex(endpointIndex);
+    //     ChipLogProgress(Zcl, "Creating cluster, Ep index %d", endpoint);
+    //     if (emberAfContainsServer(endpoint, SampleMei::Id))
+    //     {
+    //         sampleMeiServer.RegisterEndpoint(endpoint);
+    //     }
+    // }
+}
+
+void emberAfSampleMeiClusterServerInitCallback(chip::EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "Creating Sample MEI cluster, Ep %d", endpoint);
+    SampleMeiServer::Instance().RegisterEndpoint(endpoint);
 }
 
 void MatterSampleMeiClusterServerShutdownCallback(chip::EndpointId endpoint)
 {
     // There's currently no whole-cluster shutdown callback. That would trigger
     // call to `Shutdown`. Thus ep-based shutdown calls `UnregisterEndpoint`
-    sampleMeiServer.UnregisterEndpoint(endpoint);
+    ChipLogProgress(Zcl, "Shutting down Sample MEI cluster, Ep %d", endpoint);
+    SampleMeiServer::Instance().UnregisterEndpoint(endpoint);
 }
 
 // *****************************************************************************
@@ -87,13 +92,13 @@ void SampleMeiServer::InvokeCommand(HandlerContext & ctxt)
     {
     case Commands::Ping::Id:
         HandleCommand<Commands::Ping::DecodableType>(ctxt, [endpoint](HandlerContext & ctx, const auto & req) {
-            ChipLogProgress(Zcl, "Ping Command on endpoint %d", endpoint);
+            ChipLogProgress(Zcl, "Ping Command on Ep %d", endpoint);
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
         });
         return;
     case Commands::AddArguments::Id:
         HandleCommand<Commands::AddArguments::DecodableType>(ctxt, [endpoint](HandlerContext & ctx, const auto & req) {
-            ChipLogProgress(Zcl, "AddArgumentsCommand on endpoint %d", endpoint);
+            ChipLogProgress(Zcl, "AddArgumentsCommand on Ep %d", endpoint);
             if (req.arg1 > UINT8_MAX - req.arg2)
             {
                 ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
@@ -115,13 +120,13 @@ CHIP_ERROR SampleMeiServer::Read(const ConcreteReadAttributePath & aPath, Attrib
     auto endpointIndex = EndpointIndex(endpoint);
     if (endpointIndex == std::numeric_limits<size_t>::max())
     {
-        return CHIP_ERROR_NO_ENDPOINT;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     switch (aPath.mAttributeId)
     {
     case Attributes::FlipFlop::Id:
-        ChipLogProgress(Zcl, "Read Attribute flip-flop from endpoint %d index %u value %d", endpoint,
+        ChipLogProgress(Zcl, "Read Attribute flip-flop from Ep %d index %u value %d", endpoint,
                         static_cast<uint16_t>(endpointIndex), content[endpointIndex].flipflop);
         err = aEncoder.Encode(content[endpointIndex].flipflop);
         break;
@@ -139,7 +144,7 @@ CHIP_ERROR SampleMeiServer::Write(const ConcreteDataAttributePath & aPath, Attri
     auto endpointIndex = EndpointIndex(endpoint);
     if (endpointIndex == std::numeric_limits<size_t>::max())
     {
-        return CHIP_ERROR_NO_ENDPOINT;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     switch (aPath.mAttributeId)
@@ -147,7 +152,7 @@ CHIP_ERROR SampleMeiServer::Write(const ConcreteDataAttributePath & aPath, Attri
     case Attributes::FlipFlop::Id: {
         auto oldValue = content[endpointIndex].flipflop;
         ReturnErrorOnFailure(aDecoder.Decode(content[endpointIndex].flipflop));
-        ChipLogProgress(Zcl, "Write Attribute flip-flop on endpoint %d index %u newValue %d oldValue %d", endpoint,
+        ChipLogProgress(Zcl, "Write Attribute flip-flop on Ep %d index %u newValue %d oldValue %d", endpoint,
                         static_cast<uint16_t>(endpointIndex), content[endpointIndex].flipflop, oldValue);
         break;
         }
@@ -160,6 +165,7 @@ CHIP_ERROR SampleMeiServer::Write(const ConcreteDataAttributePath & aPath, Attri
 
 SampleMeiServer & SampleMeiServer::Instance()
 {
+    static SampleMeiServer sampleMeiServer;
     return sampleMeiServer;
 }
 
@@ -181,7 +187,7 @@ CHIP_ERROR SampleMeiServer::RegisterEndpoint(EndpointId endpointId)
     size_t endpointIndex = NextEmptyIndex();
     if (endpointIndex == std::numeric_limits<size_t>::max())
     {
-        return CHIP_ERROR_NO_ENDPOINT;
+        return CHIP_ERROR_NO_MEMORY;
     }
 
     content[endpointIndex] = SampleMeiContent(endpointId);
@@ -193,7 +199,7 @@ CHIP_ERROR SampleMeiServer::UnregisterEndpoint(EndpointId endpointId)
     size_t endpointIndex = EndpointIndex(endpointId);
     if (endpointIndex == std::numeric_limits<size_t>::max())
     {
-        return CHIP_ERROR_NO_ENDPOINT;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     content[endpointIndex].endpoint = kInvalidEndpointId;

@@ -8985,27 +8985,27 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @end
 
 /**
- * Cluster Sample Mei
+ * Cluster Sample MEI
  *    The Sample MEI cluster showcases a cluster manufacturer extensions
  */
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRClusterSampleMei : MTRCluster
+@interface MTRClusterSampleMEI : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)pingWithParams:(MTRSampleMeiClusterPingParams * _Nullable)params
+- (void)pingWithParams:(MTRSampleMEIClusterPingParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)pingWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)addArgumentsWithParams:(MTRSampleMeiClusterAddArgumentsParams *)params
+- (void)addArgumentsWithParams:(MTRSampleMEIClusterAddArgumentsParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                    completion:(void (^)(MTRSampleMeiClusterAddArgumentsResponseParams * _Nullable data,
+                    completion:(void (^)(MTRSampleMEIClusterAddArgumentsResponseParams * _Nullable data,
                                    NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFlipFlopWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;

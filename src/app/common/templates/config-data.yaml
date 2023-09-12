@@ -33,7 +33,7 @@ CommandHandlerInterfaceOnlyClusters:
     - ActivatedCarbonFilterMonitoring
     - HepaFilterMonitoring
     - RvcOperationalState
-    - SampleMei
+    - SampleMei # cluster format should match ClustersWithInitFunctions et al
 
 # We need a more configurable way of deciding which clusters have which init functions....
 # See https://github.com/project-chip/connectedhomeip/issues/4369
@@ -49,6 +49,7 @@ ClustersWithInitFunctions:
     - Time Format Localization
     - Thermostat
     - Mode Select
+    - Sample MEI
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic
@@ -64,7 +65,7 @@ ClustersWithShutdownFunctions:
     - Door Lock
     - Level Control
     - Color Control
-    - SampleMei
+    - Sample MEI
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock
