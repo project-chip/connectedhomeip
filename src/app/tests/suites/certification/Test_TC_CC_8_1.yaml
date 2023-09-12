@@ -218,7 +218,7 @@ tests:
       command: "readAttribute"
       attribute: "ColorTempPhysicalMinMireds"
       response:
-          saveAs: ColorTempPhysicalMinMireds
+          saveAs: ColorTempPhysicalMinMiredsValue
           constraints:
               type: int16u
               minValue: 0
@@ -229,7 +229,7 @@ tests:
       command: "readAttribute"
       attribute: "ColorTempPhysicalMaxMireds"
       response:
-          saveAs: ColorTempPhysicalMaxMireds
+          saveAs: ColorTempPhysicalMaxMiredsValue
           constraints:
               type: int16u
               minValue: 0
@@ -245,8 +245,8 @@ tests:
           values:
               - name: "ColorTemperatureMireds"
                 value:
-                    ( ColorTempPhysicalMinMireds + ColorTempPhysicalMaxMireds )
-                    / 2
+                    ( ColorTempPhysicalMinMiredsValue +
+                    ColorTempPhysicalMaxMiredsValue ) / 2
               - name: "TransitionTime"
                 value: 0
               - name: "OptionsMask"
@@ -274,12 +274,12 @@ tests:
                 value: 1
               - name: "Rate"
                 value:
-                    ( ColorTempPhysicalMaxMireds - ColorTempPhysicalMinMireds )
-                    / 40
+                    ( ColorTempPhysicalMaxMiredsValue -
+                    ColorTempPhysicalMinMiredsValue ) / 40
               - name: "ColorTemperatureMinimumMireds"
-                value: ColorTempPhysicalMinMireds
+                value: ColorTempPhysicalMinMiredsValue
               - name: "ColorTemperatureMaximumMireds"
-                value: ColorTempPhysicalMaxMireds
+                value: ColorTempPhysicalMaxMiredsValue
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
@@ -309,8 +309,8 @@ tests:
       attribute: "ColorTemperatureMireds"
       response:
           constraints:
-              minValue: ColorTempPhysicalMinMireds
-              maxValue: ColorTempPhysicalMaxMireds
+              minValue: ColorTempPhysicalMinMiredsValue
+              maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label: "Wait 2s"
       cluster: "DelayCommands"
@@ -326,8 +326,8 @@ tests:
       attribute: "ColorTemperatureMireds"
       response:
           constraints:
-              minValue: ColorTempPhysicalMinMireds
-              maxValue: ColorTempPhysicalMaxMireds
+              minValue: ColorTempPhysicalMinMiredsValue
+              maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label:
           "Step 5a: TH sends EnhancedMoveToHue command to DUT with

@@ -46,7 +46,7 @@ tests:
       cluster: "Operational Credentials"
       attribute: "CurrentFabricIndex"
       response:
-          saveAs: CurrentFabricIndex
+          saveAs: CurrentFabricIndexValue
 
     - label:
           "Step 3: TH reads DUT Endpoint 0 AccessControl cluster
@@ -66,9 +66,9 @@ tests:
                           AuthMode: 2,
                           Subjects: [CommissionerNodeId],
                           Targets: null,
-                          FabricIndex: CurrentFabricIndex,
+                          FabricIndex: CurrentFabricIndexValue,
                       },
-                  FabricIndex: CurrentFabricIndex,
+                  FabricIndex: CurrentFabricIndexValue,
               }
 
     - label:
@@ -89,14 +89,14 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
                       AuthMode: 3,
                       Subjects: null,
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -210,14 +210,14 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
                       AuthMode: 3,
                       Subjects: [0],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
       response:
