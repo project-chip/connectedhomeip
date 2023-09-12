@@ -1,2 +1,2 @@
 cd idt
-sudo rm -R $IDT_OUTPUT_DIR
+sudo rm -R "$IDT_OUTPUT_DIR"

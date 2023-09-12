@@ -1,2 +1,2 @@
 source idt/scripts/vars.sh
-ssh $PIUSER@$PIHOST
+ssh "$PIUSER@$PIHOST"

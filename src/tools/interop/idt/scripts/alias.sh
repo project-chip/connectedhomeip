@@ -1,9 +1,9 @@
 if [[ $SHELL == "/bin/zsh" ]]; then
   echo "idt using zsh config"
-  export IDT_SRC_PARENT="$(dirname $0)/../.."
+  export IDT_SRC_PARENT="$(dirname "$0")/../.."
 else
   echo "idt using bash config"
-  export IDT_SRC_PARENT="$(dirname ${BASH_SOURCE[0]:-$0})/../.."
+  export IDT_SRC_PARENT="$(dirname "${BASH_SOURCE[0]:-$0}")/../.."
 fi
 
 export IDT_OUTPUT_DIR="IDT_ARTIFACTS"
