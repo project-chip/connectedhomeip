@@ -179,7 +179,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
     return SL_STATUS_OK;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
+#if SL_ICD_ENABLED
 /******************************************************************
  * @fn   wfx_rsi_power_save()
  * @brief
@@ -209,7 +209,7 @@ int32_t wfx_rsi_power_save()
     SILABS_LOG("Powersave Config Success");
     return status;
 }
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
+#endif /* SL_ICD_ENABLED */
 
 /*************************************************************************************
  * @fn  static int32_t wfx_wifi_rsi_init(void)

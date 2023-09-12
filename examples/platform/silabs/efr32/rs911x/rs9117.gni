@@ -21,10 +21,6 @@ rs911x_inc_plat = [
   "${wifi_sdk_root}/components/si91x/inc",
   "${wifi_sdk_root}/components/si91x/memory",
   "${wifi_sdk_root}/components/si91x/sl_net/inc",
-#
-#  # siwx917_soc component
-#  "${wifi_sdk_root}/components/siwx917_soc/inc",
-#  "${wifi_sdk_root}/components/siwx917_soc/wifi_inc",
 
   # wifi component
   "${wifi_sdk_root}/components/protocol/wifi/inc",
