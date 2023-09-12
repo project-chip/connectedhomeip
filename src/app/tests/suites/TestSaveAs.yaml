@@ -802,3 +802,38 @@ tests:
       attribute: "octet_string"
       arguments:
           value: readAttributeOctetStringDefaultValue
+
+    # Tests for null values
+    - label: "Read attribute nullable_boolean Default Value"
+      command: "readAttribute"
+      attribute: "nullable_boolean"
+      response:
+          saveAs: readAttributeNullableBooleanDefaultValue
+          value: false
+
+    - label: "Write attribute nullable_boolean to null"
+      command: "writeAttribute"
+      attribute: "nullable_boolean"
+      arguments:
+          value: null
+
+    - label: "Read attribute nullable_boolean null Value"
+      command: "readAttribute"
+      attribute: "nullable_boolean"
+      response:
+          saveAs: readAttributeNullableBooleanNullValue
+          value: null
+
+    - label:
+          "Read attribute nullable_boolean null Value again and compare it to
+          the previously saved value"
+      command: "readAttribute"
+      attribute: "nullable_boolean"
+      response:
+          value: readAttributeNullableBooleanNullValue
+
+    - label: "Write attribute nullable_boolean Default Value"
+      command: "writeAttribute"
+      attribute: "nullable_boolean"
+      arguments:
+          value: readAttributeNullableBooleanDefaultValue
