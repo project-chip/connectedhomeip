@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
-#include <air-quality-sensor-manager.h>
 #include "AirQualitySensorAppAttrUpdateDelegate.h"
 #include <AppMain.h>
+#include <air-quality-sensor-manager.h>
 
 #include <app/util/af.h>
 #include <platform/CHIPDeviceBuildConfig.h>
@@ -40,7 +40,8 @@ NamedPipeCommands sChipNamedPipeCommands;
 AirQualitySensorAppAttrUpdateDelegate sAirQualitySensorAppCommandDelegate;
 } // namespace
 
-void ApplicationInit() {
+void ApplicationInit()
+{
     AirQualitySensorManager::InitInstance(EndpointId(AIR_QUALITY_SENSOR_ENDPOINT));
 }
 

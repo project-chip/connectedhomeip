@@ -75,59 +75,73 @@ void AirQualitySensorAttrUpdateHandler::HandleCommand(intptr_t context)
     });
 
     AirQualitySensorManager * mInstance = AirQualitySensorManager::GetInstance();
-    if(clusterName == "AirQuality") {
+    if (clusterName == "AirQuality")
+    {
         uint8_t newValue = static_cast<uint8_t>(self->mJsonValue["NewValue"].asUInt());
         mInstance->OnAirQualityChangeHandler(static_cast<AirQualityEnum>(newValue));
     }
-    else if(clusterName == "TemperatureMeasurement") {
+    else if (clusterName == "TemperatureMeasurement")
+    {
         int16_t newValue = static_cast<int16_t>(self->mJsonValue["NewValue"].asUInt());
         mInstance->OnTemperatureMeasurementChangeHandler(newValue);
     }
-    else if(clusterName == "RelativeHumidityMeasurement") {
+    else if (clusterName == "RelativeHumidityMeasurement")
+    {
         uint16_t newValue = static_cast<uint16_t>(self->mJsonValue["NewValue"].asUInt());
         mInstance->OnHumidityMeasurementChangeHandler(newValue);
     }
-    else if(clusterName == "CarbonDioxideConcentrationMeasurement") {
+    else if (clusterName == "CarbonDioxideConcentrationMeasurement")
+    {
         float newValue = static_cast<float>(self->mJsonValue["NewValue"].asDouble());
         mInstance->OnCarbonDioxideMeasurementChangeHandler(newValue);
     }
-    else if(clusterName == "CarbonMonoxideConcentrationMeasurement") {
+    else if (clusterName == "CarbonMonoxideConcentrationMeasurement")
+    {
         float newValue = static_cast<float>(self->mJsonValue["NewValue"].asDouble());
         mInstance->OnCarbonMonoxideMeasurementChangeHandler(newValue);
     }
-    else if(clusterName == "NitrogenDioxideConcentrationMeasurement") {
+    else if (clusterName == "NitrogenDioxideConcentrationMeasurement")
+    {
         float newValue = static_cast<float>(self->mJsonValue["NewValue"].asDouble());
         mInstance->OnNitrogenDioxideMeasurementChangeHandler(newValue);
     }
-    else if(clusterName == "OzoneConcentrationMeasurement") {
+    else if (clusterName == "OzoneConcentrationMeasurement")
+    {
         float newValue = static_cast<float>(self->mJsonValue["NewValue"].asDouble());
         mInstance->OnOzoneMeasurementChangeHandler(newValue);
     }
-    else if(clusterName == "Pm25ConcentrationMeasurement") {
+    else if (clusterName == "Pm25ConcentrationMeasurement")
+    {
         float newValue = static_cast<float>(self->mJsonValue["NewValue"].asDouble());
         mInstance->OnPm25MeasurementChangeHandler(newValue);
     }
-    else if(clusterName == "FormaldehydeConcentration") {
+    else if (clusterName == "FormaldehydeConcentration")
+    {
         float newValue = static_cast<float>(self->mJsonValue["NewValue"].asDouble());
         mInstance->OnFormaldehydeMeasurementChangeHandler(newValue);
     }
-    else if(clusterName == "Pm1ConcentrationMeasurement") {
+    else if (clusterName == "Pm1ConcentrationMeasurement")
+    {
         float newValue = static_cast<float>(self->mJsonValue["NewValue"].asDouble());
         mInstance->OnPm1MeasurementChangeHandler(newValue);
     }
-    else if(clusterName == "Pm10ConcentrationMeasurement") {
+    else if (clusterName == "Pm10ConcentrationMeasurement")
+    {
         float newValue = static_cast<float>(self->mJsonValue["NewValue"].asDouble());
         mInstance->OnPm10MeasurementChangeHandler(newValue);
     }
-    else if(clusterName == "TotalVolatileOrganicCompoundsConcentrationMeasurement") {
+    else if (clusterName == "TotalVolatileOrganicCompoundsConcentrationMeasurement")
+    {
         float newValue = static_cast<float>(self->mJsonValue["NewValue"].asDouble());
         mInstance->OnTotalVolatileOrganicCompoundsMeasurementChangeHandler(newValue);
     }
-    else if(clusterName == "RadonConcentrationMeasurement") {
+    else if (clusterName == "RadonConcentrationMeasurement")
+    {
         float newValue = static_cast<float>(self->mJsonValue["NewValue"].asDouble());
         mInstance->OnRadonMeasurementChangeHandler(newValue);
     }
-    else {
+    else
+    {
         ChipLogError(NotSpecified, "Invalid cluster name %s", clusterName.c_str());
     }
 
