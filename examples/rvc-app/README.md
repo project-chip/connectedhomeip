@@ -24,9 +24,10 @@ the state machine diagram above. Example
 
 The error event message requires the additional key `"Error"` which specifies
 the error state ID. This can be one of `UnableToStartOrResume`,
-`UnableToCompleteOperation`, `CommandInvalidInState`, `FailedToFindChargingDock`,
-`Stuck`, `DustBinMissing`, `DustBinFull`, `WaterTankEmpty`, `WaterTankMissing`,
-`WaterTankLidOpen`, `MopCleaningPadMissing`.
+`UnableToCompleteOperation`, `CommandInvalidInState`,
+`FailedToFindChargingDock`, `Stuck`, `DustBinMissing`, `DustBinFull`,
+`WaterTankEmpty`, `WaterTankMissing`, `WaterTankLidOpen`,
+`MopCleaningPadMissing`.
 
 ## Testing
 
@@ -68,8 +69,8 @@ transition to mode 2", set the `RvcRunMode` to 0.
 
 #### TC 3.2
 
-This is not applicable because this RVC device does not support the `StartUpMode`
-attribute.
+This is not applicable because this RVC device does not support the
+`StartUpMode` attribute.
 
 ### RVC Run Mode cluster
 
@@ -94,8 +95,8 @@ transition to mode 0", do nothing.
 
 #### TC 3.2
 
-This is not applicable because this RVC device does not support the `StartUpMode`
-attribute.
+This is not applicable because this RVC device does not support the
+`StartUpMode` attribute.
 
 ### RVC Operational State cluster
 
