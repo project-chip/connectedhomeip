@@ -133,7 +133,7 @@ environment.
     nmtui
     ```
 1. Set up `idt`:
-    ```commandline
+    ```
     cd ~                               # Go to idt parent dir
     source idt/scripts/setup_shell.sh  # Setup atuo aliases
     source idt/scripts/alias.sh        # Get aliases now
@@ -179,7 +179,7 @@ testing.
 
 Setup a virtual environment and install python dependencies:
 
-```commandline
+```
 idt_go
 cd idt
 python -m venv /venv
@@ -223,7 +223,7 @@ Pi users, as needed:
 
 ### Capture
 
-```commandline
+```
 idt capture -h
 
 usage: idt capture [-h] [--platform {Android}]
@@ -454,7 +454,7 @@ at the end of output.
 
 ### Discovery
 
-```commandline
+```
 idt discover -h
 
 usage: idt discover [-h] --type {ble,b,mdns,m}
