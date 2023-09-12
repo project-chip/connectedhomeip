@@ -54,7 +54,7 @@ public:
     void Init();
 
     /**
-     * Sets the device to and idle state, that is either the STOPPED, DOCKED or CHARGING state, depending on physical information.
+     * Sets the device to an idle state, that is either the STOPPED, DOCKED or CHARGING state, depending on physical information.
      * Note: in this example this is based on the mDocked and mChanging boolean variables.
      */
     void SetDeviceToIdleState();

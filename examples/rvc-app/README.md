@@ -68,7 +68,7 @@ transition to mode 2", set the RvcRunMode to 0.
 
 #### TC_RVCCLEANM_3_2.py
 
-This is not applicable because the RVC device does not support the StartUpMode
+This is not applicable because this RVC device does not support the StartUpMode
 attribute.
 
 ### RvcRunMode cluster
