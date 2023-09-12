@@ -109,7 +109,7 @@ CHIP_ERROR SampleMeiServer::Read(const ConcreteReadAttributePath & aPath, Attrib
     auto endpointIndex = EndpointIndex(endpoint);
     if (endpointIndex == std::numeric_limits<size_t>::max())
     {
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);;
     }
 
     switch (aPath.mAttributeId)
@@ -133,7 +133,7 @@ CHIP_ERROR SampleMeiServer::Write(const ConcreteDataAttributePath & aPath, Attri
     auto endpointIndex = EndpointIndex(endpoint);
     if (endpointIndex == std::numeric_limits<size_t>::max())
     {
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
     }
 
     switch (aPath.mAttributeId)
