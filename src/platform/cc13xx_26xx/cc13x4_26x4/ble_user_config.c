@@ -68,7 +68,7 @@
 #ifndef CC23X0
 #if !defined(DeviceFamily_CC26X1)
 #include <driverlib/pka.h>
-#if !defined(DeviceFamily_CC13X4)
+#if !defined(DeviceFamily_CC13X4) && !defined(DeviceFamily_CC26X4)
 #include <driverlib/rf_bt5_coex.h>
 #endif
 #else
