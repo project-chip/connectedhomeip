@@ -41,7 +41,7 @@ tests:
       attribute: "SelectedTemperatureLevel"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 31
 
