@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include "core/CastingPlayer.h"
+#include "core/CastingPlayerDiscovery.h"
 #include "core/Types.h"
 
 #include <LinuxCommissionableDataProvider.h>
@@ -75,6 +77,30 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
     return provider.Init(options.spake2pVerifier, options.spake2pSalt, spake2pIterationCount, setupPasscode,
                          options.payload.discriminator.GetLongValue());
 }
+
+class DiscoveryDelegateImpl : public DiscoveryDelegate
+{
+private:
+    int commissionersCount = 0;
+
+public:
+    void HandleOnAdded(Strong<CastingPlayer> player) override
+    {
+        if (commissionersCount == 0)
+        {
+            ChipLogProgress(AppServer, "Select discovered commissioner to request commissioning");
+
+            ChipLogProgress(AppServer, "Example: cast request 0");
+        }
+        ++commissionersCount;
+        ChipLogProgress(AppServer, "Discovered Commissioners #%d", commissionersCount);
+        player->LogDetail();
+    }
+    void HandleOnUpdated(Strong<CastingPlayer> player) override
+    {
+        ChipLogProgress(AppServer, "Updated commissioner with ID: %s", player->GetId());
+    }
+};
 
 /**
  * @brief Provides the unique ID that is used by the SDK to generate the Rotating Device ID.
@@ -147,6 +173,16 @@ int main(int argc, char * argv[])
     err = CastingApp::GetInstance()->Start();
     VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
                         ChipLogError(AppServer, "CastingApp::Start failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+    DiscoveryDelegateImpl delegate;
+    CastingPlayerDiscovery::GetInstance()->SetDelegate(&delegate);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
+                        ChipLogError(AppServer, "CastingPlayerDiscovery::SetDelegate failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+    // Discover CastingPlayers
+    err = CastingPlayerDiscovery::GetInstance()->StartDiscovery(35); // 35 represents device type: Matter video players
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
+                        ChipLogError(AppServer, "CastingPlayerDiscovery::StartDiscovery failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 

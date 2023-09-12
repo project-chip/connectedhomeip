@@ -48,6 +48,19 @@ CHIP_ERROR CommissionableNodeController::DiscoverCommissioners(Dnssd::DiscoveryF
     return mResolver->DiscoverCommissioners(discoveryFilter);
 }
 
+CHIP_ERROR CommissionableNodeController::StopDiscovery()
+{
+
+    if (mResolver == nullptr)
+    {
+        return AbstractDnssdDiscoveryController::StopDiscovery();
+    }
+    else
+    {
+        return mResolver->StopDiscovery();
+    }
+};
+
 CommissionableNodeController::~CommissionableNodeController()
 {
     mDNSResolver.SetCommissioningDelegate(nullptr);
