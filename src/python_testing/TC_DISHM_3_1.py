@@ -23,9 +23,7 @@ from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
-# This test requires several additional command line arguments
-# run with
-# --int-arg PIXIT_ENDPOINT:<endpoint>
+
 
 
 class TC_DISHM_3_1(MatterBaseTest):
@@ -54,10 +52,40 @@ class TC_DISHM_3_1(MatterBaseTest):
         asserts.assert_true(type_matches(ret, Clusters.Objects.OnOff.Commands.Off),
                             "Unexpected return type for OnOff")
 
+    async def check_preconditions(self, endpoint):
+        # Check to see if both the OnOff and DishwasherMode clusters are available on the same endpoint
+        cluster = Clusters.Objects.OnOff
+        attr = Clusters.OnOff.Attributes.OnOff
+        onOff = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr)
+        logging.info("OnOff: %s" % (onOff))
+
+        # Verify that OnMode is non-null and a mode value from the supported modes attribute 
+        cluster = Clusters.Objects.DishwasherMode
+        attr = Clusters.DishwasherMode.Attributes.OnMode
+        onMode = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr)
+        logging.info("OnMode: %s" % (onMode))
+
+        cluster = Clusters.Objects.DishwasherMode
+        attr = Clusters.DishwasherMode.Attributes.SupportedModes
+        supported_modes = await self.read_mod_attribute_expect_success(endpoint=endpoint, attribute=attr)
+
+        supported_modes_dut = []
+        for m in supported_modes:
+            if m.mode in supported_modes_dut:
+                asserts.fail("SupportedModes must have unique mode values!")
+            else:
+                supported_modes_dut.append(m.mode)
+
+        if onMode != NullValue and onMode in supported_modes_dut:
+            return True
+
+        return False
+    
     @async_test_body
     async def test_TC_DISHM_3_1(self):
         # Adding endpoint here to avoid definition in command line
         self.endpoint = self.user_params.get("endpoint", 1)
+        logging.info("This test expects to find this cluster on endpoint 1")
 
         asserts.assert_true(self.check_pics("DISHM.S.A0000"), "DISHM.S.A0000 must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.A0001"), "DISHM.S.A0001 must be supported")
@@ -67,7 +95,14 @@ class TC_DISHM_3_1(MatterBaseTest):
         if not self.check_pics("DISHM.S.A0003"):
             logging.info("Test skipped because PICS DISHM.S.A0003 (OnMode) is not set")
             return
+        
+        if not self.check_pics("DISHM.S.F00"):
+            logging.info("Test skipped because PICS DISHM.S.F00 (DepOnOff) is not set")
+            return
 
+        ret = await self.check_preconditions(self.endpoint)
+        asserts.assert_true(ret, "invalid preconditions - OnMode is non-null or not a mode in the Supported Modes attribute")
+ 
         attributes = Clusters.DishwasherMode.Attributes
 
         from enum import Enum

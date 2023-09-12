@@ -21,11 +21,6 @@ import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
-# This test requires several additional command line arguments
-# run with
-# --int-arg PIXIT_ENDPOINT:<endpoint> PIXIT_MODEOK:<mode id> PIXIT_MODEFAIL:<mode id>
-
-
 class TC_DISHM_2_1(MatterBaseTest):
 
     async def read_mode_attribute_expect_success(self, endpoint, attribute):
@@ -49,6 +44,8 @@ class TC_DISHM_2_1(MatterBaseTest):
                             "the --int-arg flag as PIXIT.DISHM.MODE_CHANGE_FAIL:<mode id>")
 
         self.endpoint = self.user_params.get("endpoint", 1)
+        logging.info("This test expects to find this cluster on endpoint 1")
+        
         self.modeok = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_OK']
         self.can_test_mode_failure = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_FAIL']
 
@@ -94,7 +91,7 @@ class TC_DISHM_2_1(MatterBaseTest):
         ret = await self.send_change_to_mode_cmd(newMode=old_current_mode_dut)
         asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode to the current mode should be a no-op")
 
-        if self.can_test_mode_failure is True:
+        if self.check_pics("DISHM.S.M.CAN_TEST_MODE_FAILURE"):
             self.print_step(5, "Manually put the device in a state from which it will FAIL to transition to mode %d" % (self.modefail))
             input("Press Enter when done.\n")
 
@@ -121,41 +118,40 @@ class TC_DISHM_2_1(MatterBaseTest):
 
             asserts.assert_true(current_mode == old_current_mode_dut, "CurrentMode changed after failed ChangeToMode command!")
 
-        if self.modeok is True:
-            self.print_step(9, "Manually put the device in a state from which it will SUCCESSFULLY transition to mode %d" % (self.modeok))
-            input("Press Enter when done.\n")
+        self.print_step(9, "Manually put the device in a state from which it will SUCCESSFULLY transition to mode %d" % (self.modeok))
+        input("Press Enter when done.\n")
 
-            self.print_step(10, "Read CurrentMode attribute")
-            old_current_mode_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        self.print_step(10, "Read CurrentMode attribute")
+        old_current_mode_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-            logging.info("CurrentMode: %s" % (old_current_mode_dut))
+        logging.info("CurrentMode: %s" % (old_current_mode_dut))
 
-            self.print_step(11, "Send ChangeToMode command with NewMode set to %d" % (self.modeok))
+        self.print_step(11, "Send ChangeToMode command with NewMode set to %d" % (self.modeok))
 
-            ret = await self.send_change_to_mode_cmd(newMode=self.modeok)
-            asserts.assert_true(ret.status == CommonCodes.SUCCESS.value,
-                                "Changing to mode %d must succeed due to the current state of the device" % (self.modeok))
+        ret = await self.send_change_to_mode_cmd(newMode=self.modeok)
+        asserts.assert_true(ret.status == CommonCodes.SUCCESS.value,
+                            "Changing to mode %d must succeed due to the current state of the device" % (self.modeok))
 
-            self.print_step(12, "Read CurrentMode attribute")
-            current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        self.print_step(12, "Read CurrentMode attribute")
+        current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-            logging.info("CurrentMode: %s" % (current_mode))
+        logging.info("CurrentMode: %s" % (current_mode))
 
-            asserts.assert_true(current_mode == self.modeok,
-                                "CurrentMode doesn't match the argument of the successful ChangeToMode command!")
+        asserts.assert_true(current_mode == self.modeok,
+                            "CurrentMode doesn't match the argument of the successful ChangeToMode command!")
 
-            self.print_step(13, "Send ChangeToMode command with NewMode set to %d" % (invalid_mode_th))
+        self.print_step(13, "Send ChangeToMode command with NewMode set to %d" % (invalid_mode_th))
 
-            ret = await self.send_change_to_mode_cmd(newMode=invalid_mode_th)
-            asserts.assert_true(ret.status == CommonCodes.UNSUPPORTED_MODE.value,
-                                "Attempt to change to invalid mode %d didn't fail as expected" % (invalid_mode_th))
+        ret = await self.send_change_to_mode_cmd(newMode=invalid_mode_th)
+        asserts.assert_true(ret.status == CommonCodes.UNSUPPORTED_MODE.value,
+                            "Attempt to change to invalid mode %d didn't fail as expected" % (invalid_mode_th))
 
-            self.print_step(14, "Read CurrentMode attribute")
-            current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        self.print_step(14, "Read CurrentMode attribute")
+        current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-            logging.info("CurrentMode: %s" % (current_mode))
+        logging.info("CurrentMode: %s" % (current_mode))
 
-            asserts.assert_true(current_mode == self.modeok, "CurrentMode changed after failed ChangeToMode command!")
+        asserts.assert_true(current_mode == self.modeok, "CurrentMode changed after failed ChangeToMode command!")
 
 
 if __name__ == "__main__":

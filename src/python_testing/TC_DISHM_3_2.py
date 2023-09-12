@@ -23,11 +23,6 @@ from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
-# This test requires several additional command line arguments
-# run with
-# --int-arg PIXIT_ENDPOINT:<endpoint>
-
-
 class TC_DISHM_3_2(MatterBaseTest):
 
     async def read_mod_attribute_expect_success(self, endpoint, attribute):
@@ -44,11 +39,36 @@ class TC_DISHM_3_2(MatterBaseTest):
         ret = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, Clusters.DishwasherMode.Attributes.StartUpMode(newMode))])
         asserts.assert_equal(ret[0].Status, Status.Success, "Writing to StartUpMode failed")
 
+    async def check_preconditions(self, endpoint):
+        # check whether the StartUpMode will be overridden by the OnMode attribute
+
+        if self.check_pics("DISHM.S.F00") == False:
+            return True
+
+        logging.info("DISHM.S.F00: 1")
+
+        cluster = Clusters.Objects.OnOff
+        attr = Clusters.OnOff.Attributes.StartUpOnOff
+        startUpOnOff = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr)
+        logging.info("StartUpOnOff: %s" % (startUpOnOff))
+        if startUpOnOff == NullValue or startUpOnOff == 0:
+            return True
+
+        cluster = Clusters.Objects.DishwasherMode
+        attr = Clusters.DishwasherMode.Attributes.OnMode
+        onMode = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr)
+        logging.info("OnMode: %s" % (onMode))
+        if onMode == NullValue:
+            return True
+
+        return False
+
     @async_test_body
     async def test_TC_DISHM_3_2(self):
 
         self.endpoint = self.user_params.get("endpoint", 1)
-
+        logging.info("This test expects to find this cluster on endpoint 1")
+        
         asserts.assert_true(self.check_pics("DISHM.S.A0000"), "DISHM.S.A0000 must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.A0001"), "DISHM.S.A0001 must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.C00.Rsp"), "DISHM.S.C00.Rsp must be supported")
@@ -58,6 +78,11 @@ class TC_DISHM_3_2(MatterBaseTest):
             logging.info("Test skipped because PICS DISHM.S.A0002 (StartupMode) is not set")
             return
 
+        depOnOffKey = "DISHM.S.F00"
+        asserts.assert_true(depOnOffKey in self.matter_test_config.pics, "%s must be provided" % (depOnOffKey))
+
+        ret = await self.check_preconditions(self.endpoint)
+        asserts.assert_true(ret, "invalid preconditions - StartUpMode overridden by OnMode")
         attributes = Clusters.DishwasherMode.Attributes
 
         from enum import Enum

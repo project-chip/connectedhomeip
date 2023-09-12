@@ -23,11 +23,6 @@ from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
-# This test requires several additional command line arguments
-# run with
-# --int-arg PIXIT_ENDPOINT:<endpoint>
-
-
 class TC_DISHM_3_3(MatterBaseTest):
 
     async def read_mod_attribute_expect_success(self, endpoint, attribute):
@@ -52,16 +47,24 @@ class TC_DISHM_3_3(MatterBaseTest):
     async def test_TC_DISHM_3_3(self):
 
         self.endpoint = self.user_params.get("endpoint", 1)
+        logging.info("This test expects to find this cluster on endpoint 1")
 
         asserts.assert_true(self.check_pics("DISHM.S.A0000"), "DISHM.S.A0000 must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.A0001"), "DISHM.S.A0001 must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.C00.Rsp"), "DISHM.S.C00.Rsp must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.C01.Tx"), "DISHM.S.C01.Tx must be supported")
 
-        if not self.check_pics("DISHM.S.A0002") and self.check_pics("DISHM.S.A0003"):
-            logging.info("Test skipped because PICS DISHM.S.A0002 (StartupMode) and/or DISHM.S.A0003 (OnMode) is not set")
+        if not self.check_pics("DISHM.S.A0002"):
+            logging.info("Test skipped because PICS DISHM.S.A0002 (StartupMode)")
             return
-
+        
+        if not self.check_pics("DISHM.S.A0003"):
+            logging.info("Test skipped because PICS DISHM.S.A0003 (OnMode) is not set")
+            return
+        
+        if not self.check_pics("DISHM.S.F00"):
+            logging.info("Test skipped because PICS DISHM.S.F00 (DepOnOff) is not set")
+            return
         attributes = Clusters.DishwasherMode.Attributes
 
         from enum import Enum

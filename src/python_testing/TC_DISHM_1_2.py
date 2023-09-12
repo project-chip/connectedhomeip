@@ -22,9 +22,6 @@ from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
-# This test requires several additional command line arguments
-# run with
-# --int-arg PIXIT_ENDPOINT:<endpoint>
 
 
 class TC_DISHM_1_2(MatterBaseTest):
@@ -37,10 +34,11 @@ class TC_DISHM_1_2(MatterBaseTest):
     async def test_TC_DISHM_1_2(self):
 
         self.endpoint = self.user_params.get("endpoint", 1)
-
+        logging.info("This test expects to find this cluster on endpoint 1")
+        
         asserts.assert_true(self.check_pics("DISHM.S.A0000"), "DISHM.S.A0000 must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.A0001"), "DISHM.S.A0001 must be supported")
-
+        
         attributes = Clusters.DishwasherMode.Attributes
 
         self.print_step(1, "Commissioning, already done")
@@ -50,7 +48,8 @@ class TC_DISHM_1_2(MatterBaseTest):
 
         logging.info("SupportedModes: %s" % (supported_modes))
 
-        asserts.assert_greater_equal(len(supported_modes), 1, "SupportedModes must have at least one entries!")
+        asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least two entries!")
+        asserts.assert_less_equal(len(supported_modes), 255, "SupportedModes must have at most 255 entries!")
 
         supported_modes_dut = []
         for m in supported_modes:
