@@ -103,6 +103,7 @@ static_library("inet") {
   ]
 
   if (chip_system_config_use_lwip) {
+    sources += [ "EndPointStateLwIP.cpp" ]
     public_deps += [ "${chip_root}/src/lwip" ]
   }
 
