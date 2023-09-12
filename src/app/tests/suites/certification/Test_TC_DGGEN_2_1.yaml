@@ -103,8 +103,8 @@ tests:
                 value: nodeId
 
     - label:
-          "Step 2b: TH reads a RebootCount attribute value from DUT. Store the
-          value in boot_count2."
+          "Step 2b: TH reads a RebootCount attribute value from DUT. Verify that
+          boot_count2 is greater than boot_count1."
       PICS: DGGEN.S.A0001
       command: "readAttribute"
       attribute: "RebootCount"

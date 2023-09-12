@@ -99,8 +99,8 @@ tests:
 
     #Issue https://github.com/project-chip/connectedhomeip/issues/26127
     - label:
-          "TH1 puts DUT into commissioning mode, TH2 commissions DUT using admin
-          node ID N2"
+          "Step 3: TH1 puts DUT into commissioning mode, TH2 commissions DUT
+          using admin node ID N2"
       verification: |
           Open a commissioning window On TH1(Chiptool)using below command
 
@@ -128,7 +128,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH2 starts a commissioning process with DUT"
+    - label: "Step 3: TH2 starts a commissioning process with DUT"
       PICS: PICS_SDK_CI_ONLY
       identity: "beta"
       cluster: "CommissionerCommands"
@@ -445,7 +445,7 @@ tests:
 
     - label: "TH2 Connects to the device again after reboot."
       verification: |
-          Commission TH2 to the device(DUT) again after reboot.
+          Connect TH2 to the device(DUT) again after reboot.
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP

@@ -120,9 +120,9 @@ tests:
                                   AuthMode: 2,
                                   Subjects: [CommissionerNodeId],
                                   Targets: null,
-                                  FabricIndex: CurrentFabricIndex,
+                                  FabricIndex: CurrentFabricIndexValue,
                               },
-                          FabricIndex: CurrentFabricIndex,
+                          FabricIndex: CurrentFabricIndexValue,
                       }
           - values:
                 - value:
@@ -136,9 +136,9 @@ tests:
                                   AuthMode: 2,
                                   Subjects: [CommissionerNodeId],
                                   Targets: null,
-                                  FabricIndex: CurrentFabricIndex,
+                                  FabricIndex: CurrentFabricIndexValue,
                               },
-                          FabricIndex: CurrentFabricIndex,
+                          FabricIndex: CurrentFabricIndexValue,
                       }
           - values:
                 - value:
@@ -152,9 +152,9 @@ tests:
                                   AuthMode: 3,
                                   Subjects: null,
                                   Targets: null,
-                                  FabricIndex: CurrentFabricIndex,
+                                  FabricIndex: CurrentFabricIndexValue,
                               },
-                          FabricIndex: CurrentFabricIndex,
+                          FabricIndex: CurrentFabricIndexValue,
                       }
 
     - label:
@@ -209,9 +209,9 @@ tests:
                                   AuthMode: 3,
                                   Subjects: null,
                                   Targets: null,
-                                  FabricIndex: CurrentFabricIndex,
+                                  FabricIndex: CurrentFabricIndexValue,
                               },
-                          FabricIndex: CurrentFabricIndex,
+                          FabricIndex: CurrentFabricIndexValue,
                       }
           - values:
                 - value:
@@ -225,9 +225,9 @@ tests:
                                   AuthMode: 2,
                                   Subjects: [CommissionerNodeId],
                                   Targets: null,
-                                  FabricIndex: CurrentFabricIndex,
+                                  FabricIndex: CurrentFabricIndexValue,
                               },
-                          FabricIndex: CurrentFabricIndex,
+                          FabricIndex: CurrentFabricIndexValue,
                       }
           - values:
                 - value:
@@ -241,7 +241,7 @@ tests:
                                   AuthMode: 2,
                                   Subjects: [CommissionerNodeId],
                                   Targets: null,
-                                  FabricIndex: CurrentFabricIndex,
+                                  FabricIndex: CurrentFabricIndexValue,
                               },
-                          FabricIndex: CurrentFabricIndex,
+                          FabricIndex: CurrentFabricIndexValue,
                       }

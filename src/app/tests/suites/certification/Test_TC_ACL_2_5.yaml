@@ -143,9 +143,9 @@ tests:
                           LatestValue:
                               {
                                   Data: D_OK_EMPTY,
-                                  FabricIndex: CurrentFabricIndex,
+                                  FabricIndex: CurrentFabricIndexValue,
                               },
-                          FabricIndex: CurrentFabricIndex,
+                          FabricIndex: CurrentFabricIndexValue,
                       }
           - values:
                 - value:
@@ -156,9 +156,9 @@ tests:
                           LatestValue:
                               {
                                   Data: D_OK_SINGLE,
-                                  FabricIndex: CurrentFabricIndex,
+                                  FabricIndex: CurrentFabricIndexValue,
                               },
-                          FabricIndex: CurrentFabricIndex,
+                          FabricIndex: CurrentFabricIndexValue,
                       }
 
     - label:
@@ -187,8 +187,11 @@ tests:
                   AdminPasscodeID: null,
                   ChangeType: 2,
                   LatestValue:
-                      { Data: D_OK_SINGLE, FabricIndex: CurrentFabricIndex },
-                  FabricIndex: CurrentFabricIndex,
+                      {
+                          Data: D_OK_SINGLE,
+                          FabricIndex: CurrentFabricIndexValue,
+                      },
+                  FabricIndex: CurrentFabricIndexValue,
               }
 
     - label:
@@ -221,8 +224,11 @@ tests:
                   AdminPasscodeID: null,
                   ChangeType: 1,
                   LatestValue:
-                      { Data: D_OK_EMPTY, FabricIndex: CurrentFabricIndex },
-                  FabricIndex: CurrentFabricIndex,
+                      {
+                          Data: D_OK_EMPTY,
+                          FabricIndex: CurrentFabricIndexValue,
+                      },
+                  FabricIndex: CurrentFabricIndexValue,
               }
 
     - label:
@@ -248,6 +254,9 @@ tests:
                   AdminPasscodeID: null,
                   ChangeType: 2,
                   LatestValue:
-                      { Data: D_OK_EMPTY, FabricIndex: CurrentFabricIndex },
-                  FabricIndex: CurrentFabricIndex,
+                      {
+                          Data: D_OK_EMPTY,
+                          FabricIndex: CurrentFabricIndexValue,
+                      },
+                  FabricIndex: CurrentFabricIndexValue,
               }

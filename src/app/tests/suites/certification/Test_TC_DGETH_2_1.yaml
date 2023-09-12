@@ -85,8 +85,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Issue: https://github.com/project-chip/connectedhomeip/issues/29090
-    #Test-plan: https://github.com/CHIP-Specifications/chip-test-plans/issues/3413
+    #Test-plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3413
     - label:
           "Step 4d: Upon a node reboot, PacketRxCount attribute value will be
           reset to 0"
@@ -112,6 +111,7 @@ tests:
               minValue: 0
               maxValue: "18446744073709551615"
 
+    #Test-plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3413
     - label:
           "Step 5b: Read PacketTxCount attribute constraints, Upon a node
           reboot, the value will be reset to 0"
