@@ -124,9 +124,17 @@ class BouffalolabBuilder(GnBuilder):
         self.argsOpt.append('board=\"{}\"'.format(self.board.GnArgName()))
         self.argsOpt.append('baudrate=\"{}\"'.format(baudrate))
 
+        if not (enable_wifi or enable_thread or enable_ethernet):
+           # decide default connectivity for each chip
+            if bouffalo_chip == "bl602":
+                enable_wifi, enable_thread, enable_ethernet = True, False, False
+            elif bouffalo_chip == "bl702":
+                enable_wifi, enable_thread, enable_ethernet = False, True, False
+            elif bouffalo_chip == "bl702l":
+                enable_wifi, enable_thread, enable_ethernet = False, True, False
+
         if bouffalo_chip == "bl602":
 
-            enable_wifi = True
             if enable_ethernet or enable_thread:
                 raise Exception('SoC %s doesn\'t support connectivity Ethernet/Thread.' % bouffalo_chip)
 
@@ -137,17 +145,10 @@ class BouffalolabBuilder(GnBuilder):
                 if enable_ethernet or enable_wifi:
                     raise Exception('Board %s doesn\'t support connectivity Ethernet/Wi-Fi.' % board)
 
-            if not enable_wifi and not enable_ethernet:
-                enable_thread = True
-                openthread_project_core_config_file = "bl702-openthread-core-bl-config.h"
-
         elif bouffalo_chip == "bl702l":
 
             if enable_ethernet or enable_wifi:
                 raise Exception('SoC %s doesn\'t support connectivity Ethernet/Wi-Fi currently.' % bouffalo_chip)
-
-            enable_thread = True
-            openthread_project_core_config_file = "bl702l-openthread-core-bl-config.h"
 
         if enable_wifi or enable_thread:
             self.argsOpt.append('chip_config_network_layer_ble=true')
@@ -157,31 +158,24 @@ class BouffalolabBuilder(GnBuilder):
 
         if enable_ethernet:
             self.argsOpt.append('chip_enable_ethernet=true')
+            self.argsOpt.append('chip_mdns="minimal"')
+            self.argsOpt.append('chip_inet_config_enable_ipv4=true')
         else:
             self.argsOpt.append('chip_enable_ethernet=false')
 
         if enable_wifi:
             self.argsOpt.append('chip_enable_wifi=true')
+            self.argsOpt.append('chip_mdns="minimal"')
+            self.argsOpt.append('chip_inet_config_enable_ipv4=true')
         else:
             self.argsOpt.append('chip_enable_wifi=false')
 
         if enable_thread:
             self.argsOpt.append('chip_enable_openthread=true')
+            self.argsOpt.append('chip_mdns="platform"')
+            self.argsOpt.append('openthread_project_core_config_file="{}-openthread-core-bl-config.h"'.format(bouffalo_chip))
         else:
             self.argsOpt.append('chip_enable_openthread=false')
-
-        if enable_thread:
-            self.argsOpt.append('openthread_project_core_config_file="{}"'.format(openthread_project_core_config_file))
-
-        if enable_thread:
-            self.argsOpt.append('chip_mdns="platform"')
-        elif enable_wifi or enable_ethernet:
-            self.argsOpt.append('chip_mdns="minimal"')
-
-        if enable_ethernet or enable_wifi:
-            self.argsOpt.append('chip_inet_config_enable_ipv4=true')
-        else:
-            self.argsOpt.append('chip_inet_config_enable_ipv4=false')
 
         if enable_cdc:
             if bouffalo_chip != "bl702":
