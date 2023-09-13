@@ -63,12 +63,13 @@ public:
      * @brief Execute an emulated command
      *
      * @param handlerContext
+     * @param cdata Holder for the emulated command data and payload
      * @return
      *  - CHIP_ERROR_OK if the command was successfully emulated.
      *  - CHIP_ERROR_NOT_IMPLEMENTED If the command is not emulated
      *
      */
-    CHIP_ERROR invoke_command(chip::app::CommandHandlerInterface::HandlerContext & handlerContext) const;
+    CHIP_ERROR invoke_command(chip::app::CommandHandlerInterface::HandlerContext & handlerContext, emulated_cmd_payload & cdata) const;
 
     /**
      * @brief Read an emulated attribute

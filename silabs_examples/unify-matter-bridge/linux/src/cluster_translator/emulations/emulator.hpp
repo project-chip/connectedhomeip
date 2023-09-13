@@ -14,6 +14,8 @@
 #ifndef EMULATOR_HPP
 #define EMULATOR_HPP
 
+#include <string>
+#include <nlohmann/json.hpp>
 #include "matter.h"
 #include "matter_endpoint_builder.hpp"
 #include "unify_node_state_monitor.hpp"
@@ -22,6 +24,16 @@ namespace unify::matter_bridge {
 
 using namespace chip::app;
 using namespace chip::app::Clusters;
+
+/**
+ * @brief Structure to hold command and payload data for emulated commands
+ *
+ */
+struct emulated_cmd_payload {
+    std::string cmd;
+    nlohmann::json payload = {};
+    bool cmd_emulation_completed = true;
+};
 
 class EmulatorInterface
 {
@@ -72,9 +84,10 @@ public:
      * @brief Handle a clusters emulated command
      *
      * @param handlerContext
+     * @param cdata Holder for the emulated command data and payload
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR command(CommandHandlerInterface::HandlerContext & handlerContext) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR command(CommandHandlerInterface::HandlerContext & handlerContext, emulated_cmd_payload & cdata) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
      * @brief Handle a clusters emulated attribute read

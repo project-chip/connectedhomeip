@@ -264,7 +264,7 @@ bool ClusterEmulator::is_attribute_emulated(const ConcreteAttributePath & aPath)
     return (it != cluster_emulators_attribute_id_map.end());
 }
 
-CHIP_ERROR ClusterEmulator::invoke_command(CommandHandlerInterface::HandlerContext & handlerContext) const
+CHIP_ERROR ClusterEmulator::invoke_command(CommandHandlerInterface::HandlerContext & handlerContext, emulated_cmd_payload & cdata) const
 {
     if (is_command_emulated(handlerContext.mRequestPath))
     {
@@ -273,7 +273,7 @@ CHIP_ERROR ClusterEmulator::invoke_command(CommandHandlerInterface::HandlerConte
 
         sl_log_debug(LOG_TAG, "%s emualtor is emulating command 0x%04x ", e->emulated_cluster_name(),
                      handlerContext.mRequestPath.mCommandId);
-        return e->command(handlerContext);
+        return e->command(handlerContext, cdata);
     }
 
     return CHIP_ERROR_NOT_IMPLEMENTED;

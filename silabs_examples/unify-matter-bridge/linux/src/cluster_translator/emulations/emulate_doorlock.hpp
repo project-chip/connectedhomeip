@@ -16,6 +16,8 @@
 
 // Emulator interface
 #include "emulator.hpp"
+#include "sl_log.h"
+
 
 namespace unify::matter_bridge {
 
@@ -24,6 +26,11 @@ using namespace chip::app::Clusters;
 
 class EmulateDoorLock : public EmulatorInterface
 {
+private :
+    nlohmann::json inline convert_to_json(const chip::Span<const unsigned char>& value)
+    {
+        return std::string(reinterpret_cast<const char*>(value.data()), value.size());
+    }
 public:
     const char * emulated_cluster_name() const override { return "DoorLock"; }
 
@@ -32,6 +39,11 @@ public:
     std::vector<chip::AttributeId> emulated_attributes() const override
     {
         return { DoorLock::Attributes::OperatingMode::Id, DoorLock::Attributes::SupportedOperatingModes::Id };
+    }
+
+    std::vector<chip::CommandId> emulated_commands() const override
+    {
+        return { DoorLock::Commands::LockDoor::Id, DoorLock::Commands::UnlockDoor::Id };
     }
 
     /**
@@ -55,6 +67,8 @@ public:
                                                                          2,
                                                                          ZAP_TYPE(BITMAP16),
                                                                          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)});
+        cluster_builder.incoming_commands.emplace_back(DoorLock::Commands::LockDoor::Id);
+        cluster_builder.incoming_commands.emplace_back(DoorLock::Commands::UnlockDoor::Id);
 
         return CHIP_NO_ERROR;
     }
@@ -94,6 +108,56 @@ public:
         }
         }
         return CHIP_ERROR_INVALID_ARGUMENT;
+    };
+
+    /**
+     * @brief Handle an emulated command for Doorlock cluster
+     *
+     * @param handlerContext
+     * @param cdata Holder for the emulated command data and payload
+     * @return CHIP_ERROR
+     */
+    CHIP_ERROR command(CommandHandlerInterface::HandlerContext & handlerContext, emulated_cmd_payload & cdata)
+    {
+        // Doorlock cluster emulated command need further handling in command_translotor.
+        cdata.cmd_emulation_completed = false;
+
+        switch (handlerContext.mRequestPath.mCommandId)
+        {
+        case DoorLock::Commands::LockDoor::Id: {
+            DoorLock::Commands::LockDoor::DecodableType data;
+            cdata.cmd = "LockDoor"; // "LockDoor";
+            if (DataModel::Decode(handlerContext.GetReader(), data) == CHIP_NO_ERROR) {
+                if (data.PINCode.HasValue()) {
+                    try {
+                        cdata.payload["PINOrRFIDCode"] = convert_to_json(data.PINCode.Value());
+                    } catch (std::exception& ex) {
+                        sl_log_warning("Failed to add the command arguments value to json format: %s", ex.what());
+                    }
+                } else {
+                    cdata.payload["PINOrRFIDCode"] = "";
+                }
+            }
+            return CHIP_NO_ERROR;
+        }
+        case DoorLock::Commands::UnlockDoor::Id: {
+            DoorLock::Commands::UnlockDoor::DecodableType data;
+            cdata.cmd = "UnlockDoor"; // "UnlockDoor";
+            if (DataModel::Decode(handlerContext.GetReader(), data) == CHIP_NO_ERROR) {
+                if (data.PINCode.HasValue()) {
+                    try {
+                        cdata.payload["PINOrRFIDCode"] = convert_to_json(data.PINCode.Value());
+                    } catch (std::exception & ex) {
+                        sl_log_warning("Failed to add the command arguments value to json format: %s", ex.what());
+                    }
+                } else {
+                    cdata.payload["PINOrRFIDCode"] = "";
+                }
+            }
+            return CHIP_NO_ERROR;
+        }
+        }
+        return CHIP_ERROR_NOT_IMPLEMENTED; 
     };
 };
 

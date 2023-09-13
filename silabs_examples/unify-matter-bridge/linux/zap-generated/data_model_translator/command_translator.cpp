@@ -43,8 +43,16 @@ void IdentifyClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
     nlohmann::json payload = {};
 
     if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
-        m_node_state_monitor.emulator().invoke_command(ctxt);
-        return;
+        emulated_cmd_payload cdata;
+        m_node_state_monitor.emulator().invoke_command(ctxt, cdata);
+        // if cmd is not completely handled in invoke_command, then
+        // cmd_emulation_completed should be set to false in emulated cmd handling
+        if (!cdata.cmd_emulation_completed) {
+            cmd = cdata.cmd;
+            payload = cdata.payload;
+        } else {
+            return;
+        }
     }
 
     switch (ctxt.mRequestPath.mCommandId) {
@@ -101,8 +109,16 @@ void GroupsClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
     nlohmann::json payload = {};
 
     if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
-        m_node_state_monitor.emulator().invoke_command(ctxt);
-        return;
+        emulated_cmd_payload cdata;
+        m_node_state_monitor.emulator().invoke_command(ctxt, cdata);
+        // if cmd is not completely handled in invoke_command, then
+        // cmd_emulation_completed should be set to false in emulated cmd handling
+        if (!cdata.cmd_emulation_completed) {
+            cmd = cdata.cmd;
+            payload = cdata.payload;
+        } else {
+            return;
+        }
     }
 
     switch (ctxt.mRequestPath.mCommandId) {
@@ -203,8 +219,16 @@ void OnOffClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerC
     nlohmann::json payload = {};
 
     if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
-        m_node_state_monitor.emulator().invoke_command(ctxt);
-        return;
+        emulated_cmd_payload cdata;
+        m_node_state_monitor.emulator().invoke_command(ctxt, cdata);
+        // if cmd is not completely handled in invoke_command, then
+        // cmd_emulation_completed should be set to false in emulated cmd handling
+        if (!cdata.cmd_emulation_completed) {
+            cmd = cdata.cmd;
+            payload = cdata.payload;
+        } else {
+            return;
+        }
     }
 
     switch (ctxt.mRequestPath.mCommandId) {
@@ -295,8 +319,16 @@ void LevelControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface::H
     nlohmann::json payload = {};
 
     if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
-        m_node_state_monitor.emulator().invoke_command(ctxt);
-        return;
+        emulated_cmd_payload cdata;
+        m_node_state_monitor.emulator().invoke_command(ctxt, cdata);
+        // if cmd is not completely handled in invoke_command, then
+        // cmd_emulation_completed should be set to false in emulated cmd handling
+        if (!cdata.cmd_emulation_completed) {
+            cmd = cdata.cmd;
+            payload = cdata.payload;
+        } else {
+            return;
+        }
     }
 
     switch (ctxt.mRequestPath.mCommandId) {
@@ -535,8 +567,16 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
     nlohmann::json payload = {};
 
     if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
-        m_node_state_monitor.emulator().invoke_command(ctxt);
-        return;
+        emulated_cmd_payload cdata;
+        m_node_state_monitor.emulator().invoke_command(ctxt, cdata);
+        // if cmd is not completely handled in invoke_command, then
+        // cmd_emulation_completed should be set to false in emulated cmd handling
+        if (!cdata.cmd_emulation_completed) {
+            cmd = cdata.cmd;
+            payload = cdata.payload;
+        } else {
+            return;
+        }
     }
 
     switch (ctxt.mRequestPath.mCommandId) {
@@ -843,8 +883,16 @@ void BarrierControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface:
     nlohmann::json payload = {};
 
     if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
-        m_node_state_monitor.emulator().invoke_command(ctxt);
-        return;
+        emulated_cmd_payload cdata;
+        m_node_state_monitor.emulator().invoke_command(ctxt, cdata);
+        // if cmd is not completely handled in invoke_command, then
+        // cmd_emulation_completed should be set to false in emulated cmd handling
+        if (!cdata.cmd_emulation_completed) {
+            cmd = cdata.cmd;
+            payload = cdata.payload;
+        } else {
+            return;
+        }
     }
 
     switch (ctxt.mRequestPath.mCommandId) {
@@ -891,8 +939,16 @@ void ThermostatClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Han
     nlohmann::json payload = {};
 
     if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
-        m_node_state_monitor.emulator().invoke_command(ctxt);
-        return;
+        emulated_cmd_payload cdata;
+        m_node_state_monitor.emulator().invoke_command(ctxt, cdata);
+        // if cmd is not completely handled in invoke_command, then
+        // cmd_emulation_completed should be set to false in emulated cmd handling
+        if (!cdata.cmd_emulation_completed) {
+            cmd = cdata.cmd;
+            payload = cdata.payload;
+        } else {
+            return;
+        }
     }
 
     switch (ctxt.mRequestPath.mCommandId) {
@@ -1028,8 +1084,16 @@ void FanControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Han
     nlohmann::json payload = {};
 
     if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
-        m_node_state_monitor.emulator().invoke_command(ctxt);
-        return;
+        emulated_cmd_payload cdata;
+        m_node_state_monitor.emulator().invoke_command(ctxt, cdata);
+        // if cmd is not completely handled in invoke_command, then
+        // cmd_emulation_completed should be set to false in emulated cmd handling
+        if (!cdata.cmd_emulation_completed) {
+            cmd = cdata.cmd;
+            payload = cdata.payload;
+        } else {
+            return;
+        }
     }
 
     switch (ctxt.mRequestPath.mCommandId) {
@@ -1065,8 +1129,16 @@ void ThermostatUserInterfaceConfigurationClusterCommandHandler::InvokeCommand(Co
     nlohmann::json payload = {};
 
     if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
-        m_node_state_monitor.emulator().invoke_command(ctxt);
-        return;
+        emulated_cmd_payload cdata;
+        m_node_state_monitor.emulator().invoke_command(ctxt, cdata);
+        // if cmd is not completely handled in invoke_command, then
+        // cmd_emulation_completed should be set to false in emulated cmd handling
+        if (!cdata.cmd_emulation_completed) {
+            cmd = cdata.cmd;
+            payload = cdata.payload;
+        } else {
+            return;
+        }
     }
 
     switch (ctxt.mRequestPath.mCommandId) {
@@ -1096,8 +1168,16 @@ void ColorControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface::H
     nlohmann::json payload = {};
 
     if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
-        m_node_state_monitor.emulator().invoke_command(ctxt);
-        return;
+        emulated_cmd_payload cdata;
+        m_node_state_monitor.emulator().invoke_command(ctxt, cdata);
+        // if cmd is not completely handled in invoke_command, then
+        // cmd_emulation_completed should be set to false in emulated cmd handling
+        if (!cdata.cmd_emulation_completed) {
+            cmd = cdata.cmd;
+            payload = cdata.payload;
+        } else {
+            return;
+        }
     }
 
     switch (ctxt.mRequestPath.mCommandId) {
@@ -1696,8 +1776,16 @@ void IlluminanceMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerIn
     nlohmann::json payload = {};
 
     if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
-        m_node_state_monitor.emulator().invoke_command(ctxt);
-        return;
+        emulated_cmd_payload cdata;
+        m_node_state_monitor.emulator().invoke_command(ctxt, cdata);
+        // if cmd is not completely handled in invoke_command, then
+        // cmd_emulation_completed should be set to false in emulated cmd handling
+        if (!cdata.cmd_emulation_completed) {
+            cmd = cdata.cmd;
+            payload = cdata.payload;
+        } else {
+            return;
+        }
     }
 
     switch (ctxt.mRequestPath.mCommandId) {
@@ -1727,8 +1815,16 @@ void TemperatureMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerIn
     nlohmann::json payload = {};
 
     if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
-        m_node_state_monitor.emulator().invoke_command(ctxt);
-        return;
+        emulated_cmd_payload cdata;
+        m_node_state_monitor.emulator().invoke_command(ctxt, cdata);
+        // if cmd is not completely handled in invoke_command, then
+        // cmd_emulation_completed should be set to false in emulated cmd handling
+        if (!cdata.cmd_emulation_completed) {
+            cmd = cdata.cmd;
+            payload = cdata.payload;
+        } else {
+            return;
+        }
     }
 
     switch (ctxt.mRequestPath.mCommandId) {
@@ -1758,8 +1854,16 @@ void PressureMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInter
     nlohmann::json payload = {};
 
     if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
-        m_node_state_monitor.emulator().invoke_command(ctxt);
-        return;
+        emulated_cmd_payload cdata;
+        m_node_state_monitor.emulator().invoke_command(ctxt, cdata);
+        // if cmd is not completely handled in invoke_command, then
+        // cmd_emulation_completed should be set to false in emulated cmd handling
+        if (!cdata.cmd_emulation_completed) {
+            cmd = cdata.cmd;
+            payload = cdata.payload;
+        } else {
+            return;
+        }
     }
 
     switch (ctxt.mRequestPath.mCommandId) {
@@ -1789,8 +1893,16 @@ void FlowMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInterface
     nlohmann::json payload = {};
 
     if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
-        m_node_state_monitor.emulator().invoke_command(ctxt);
-        return;
+        emulated_cmd_payload cdata;
+        m_node_state_monitor.emulator().invoke_command(ctxt, cdata);
+        // if cmd is not completely handled in invoke_command, then
+        // cmd_emulation_completed should be set to false in emulated cmd handling
+        if (!cdata.cmd_emulation_completed) {
+            cmd = cdata.cmd;
+            payload = cdata.payload;
+        } else {
+            return;
+        }
     }
 
     switch (ctxt.mRequestPath.mCommandId) {
@@ -1820,8 +1932,16 @@ void RelativeHumidityMeasurementClusterCommandHandler::InvokeCommand(CommandHand
     nlohmann::json payload = {};
 
     if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
-        m_node_state_monitor.emulator().invoke_command(ctxt);
-        return;
+        emulated_cmd_payload cdata;
+        m_node_state_monitor.emulator().invoke_command(ctxt, cdata);
+        // if cmd is not completely handled in invoke_command, then
+        // cmd_emulation_completed should be set to false in emulated cmd handling
+        if (!cdata.cmd_emulation_completed) {
+            cmd = cdata.cmd;
+            payload = cdata.payload;
+        } else {
+            return;
+        }
     }
 
     switch (ctxt.mRequestPath.mCommandId) {
@@ -1851,8 +1971,16 @@ void OccupancySensingClusterCommandHandler::InvokeCommand(CommandHandlerInterfac
     nlohmann::json payload = {};
 
     if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
-        m_node_state_monitor.emulator().invoke_command(ctxt);
-        return;
+        emulated_cmd_payload cdata;
+        m_node_state_monitor.emulator().invoke_command(ctxt, cdata);
+        // if cmd is not completely handled in invoke_command, then
+        // cmd_emulation_completed should be set to false in emulated cmd handling
+        if (!cdata.cmd_emulation_completed) {
+            cmd = cdata.cmd;
+            payload = cdata.payload;
+        } else {
+            return;
+        }
     }
 
     switch (ctxt.mRequestPath.mCommandId) {
@@ -1882,8 +2010,16 @@ void ElectricalMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInt
     nlohmann::json payload = {};
 
     if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
-        m_node_state_monitor.emulator().invoke_command(ctxt);
-        return;
+        emulated_cmd_payload cdata;
+        m_node_state_monitor.emulator().invoke_command(ctxt, cdata);
+        // if cmd is not completely handled in invoke_command, then
+        // cmd_emulation_completed should be set to false in emulated cmd handling
+        if (!cdata.cmd_emulation_completed) {
+            cmd = cdata.cmd;
+            payload = cdata.payload;
+        } else {
+            return;
+        }
     }
 
     switch (ctxt.mRequestPath.mCommandId) {

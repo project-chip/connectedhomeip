@@ -46,8 +46,16 @@ void {{asUpperCamelCase label}}ClusterCommandHandler::InvokeCommand(
   nlohmann::json payload     = {};
 
   if( m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath) ) {
-    m_node_state_monitor.emulator().invoke_command(ctxt);
-    return;
+    emulated_cmd_payload cdata;
+    m_node_state_monitor.emulator().invoke_command(ctxt, cdata);
+    // if cmd is not completely handled in invoke_command, then
+    // cmd_emulation_completed should be set to false in emulated cmd handling
+    if(!cdata.cmd_emulation_completed) {
+      cmd = cdata.cmd;
+      payload = cdata.payload;
+    } else {
+      return;
+    }  
   }
 
   switch (ctxt.mRequestPath.mCommandId) {
