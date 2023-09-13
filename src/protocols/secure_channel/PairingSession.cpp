@@ -20,6 +20,7 @@
 
 #include <lib/core/TLVTypes.h>
 #include <lib/support/SafeInt.h>
+#include <tracing/DurationTimer.h>
 
 namespace chip {
 
@@ -34,6 +35,9 @@ CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager
 
 CHIP_ERROR PairingSession::ActivateSecureSession(const Transport::PeerAddress & peerAddress)
 {
+    chip::timing::TimespecTimer timer ( "Inet: ActivateSecureSession" );
+    timer.start();
+
     // Prepare SecureSession fields, including key derivation, first, before activation
     Transport::SecureSession * secureSession = mSecureSessionHolder->AsSecureSession();
     ReturnErrorOnFailure(DeriveSecureSession(secureSession->GetCryptoContext()));
@@ -48,6 +52,8 @@ CHIP_ERROR PairingSession::ActivateSecureSession(const Transport::PeerAddress & 
 
     ChipLogDetail(Inet, "New secure session activated for device " ChipLogFormatScopedNodeId ", LSID:%d PSID:%d!",
                   ChipLogValueScopedNodeId(GetPeer()), secureSession->GetLocalSessionId(), peerSessionId);
+
+    timer.stop();
 
     return CHIP_NO_ERROR;
 }
