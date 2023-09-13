@@ -22,14 +22,14 @@ namespace chip{
             clock_gettime(CLOCK_REALTIME, &now);
             t1 = now;
             //todo use logging instead of stdout
-            cout <<  "Timer "<< label << " start (sec) " << toTimeStr( now ) << '\n';
+            cout <<  "Timer "<< label << " start " << toTimeStr( now ) << '\n';
         }
 
         void TimespecTimer::stop(){
             struct timespec now;
             clock_gettime(CLOCK_REALTIME, &now) ;
             t2 = now;
-            cout <<  "Timer "<< label << " stop (sec) " << toTimeStr( now ) << '\n';
+            cout <<  "Timer "<< label << " stop " << toTimeStr( now ) << '\n';
             duration();
         }
 

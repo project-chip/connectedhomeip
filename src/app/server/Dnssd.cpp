@@ -380,7 +380,7 @@ void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
 {
     ChipLogProgress(Discovery, "Updating services using commissioning mode %d", static_cast<int>(mode));
     
-    chip::timing::TimespecTimer timer ( "Device Discover " );
+    chip::timing::TimespecTimer timer ( "Discover: StartServer " );
     timer.start();
 
     DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, 0);
