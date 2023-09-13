@@ -40,7 +40,8 @@
 #include <platform/ESP32/ESP32Utils.h>
 
 #if CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS
-#include <matter/tracing/insights_sys_stats.h>
+#include <tracing/esp32_trace/insights_sys_stats.h>
+#define START_TIMEOUT_MS 600000
 #endif
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
@@ -135,9 +136,9 @@ static void InitServer(intptr_t context)
 
     static Tracing::Insights::ESP32Backend backend;
     Tracing::Register(backend);
-// Setting the sampling time to 60 seconds i.e 60,000 ms
+
 #if CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS
-    chip::System::Stats::InsightsSystemMetrics::GetInstance().RegisterAndEnable(chip::System::Clock::Timeout(60000));
+    chip::System::Stats::InsightsSystemMetrics::GetInstance().RegisterAndEnable(chip::System::Clock::Timeout(START_TIMEOUT_MS));
 #endif
 #endif
 }

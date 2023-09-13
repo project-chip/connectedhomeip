@@ -38,7 +38,7 @@ public:
      * This api unregisters the system stats which are registered
      * as metrics to the esp-insights.
      */
-    CHIP_ERROR Unregister();
+    CHIP_ERROR Unregister(intptr_t arg);
 
     /*
      * This api cancels the timeout providing the user the flexibility
@@ -60,8 +60,8 @@ private:
     System::Clock::Timeout mTimeout;
     char * mLabels[chip::System::Stats::kNumEntries];
 
-    static void SamplingIntervalHandler(System::Layer * systemLayer, void * context);
-    static void CancelSamplingInterval(intptr_t arg);
+    static void SamplingHandler(System::Layer * systemLayer, void * context);
+    static void SetSamplingHandler(intptr_t arg);
 };
 
 } // namespace Stats

@@ -33,23 +33,24 @@ InsightsSystemMetrics & InsightsSystemMetrics::GetInstance()
     return instance;
 }
 
-void InsightsSystemMetrics::SamplingIntervalHandler(Layer * systemLayer, void * context)
+void InsightsSystemMetrics::SamplingHandler(Layer * systemLayer, void * context)
 {
     auto instance            = static_cast<InsightsSystemMetrics *>(context);
     count_t * highwatermarks = GetHighWatermarks();
     for (int i = 0; i < System::Stats::kNumEntries; i++)
     {
-        esp_err_t err = esp_diag_metrics_add_uint(instance->mLabels[i], static_cast<int>(highwatermarks[i]));
+        esp_err_t err = esp_diag_metrics_add_uint(instance->mLabels[i], static_cast<uint32_t>(highwatermarks[i]));
         if (err != ESP_OK)
         {
             ESP_LOGE(kTag, "Failed to add the metric:%s, err:%d", instance->mLabels[i], err);
         }
     }
-    DeviceLayer::SystemLayer().StartTimer(instance->GetSamplingInterval(), SamplingIntervalHandler, instance);
+    DeviceLayer::SystemLayer().StartTimer(instance->GetSamplingInterval(), SamplingHandler, instance);
 }
 
-CHIP_ERROR InsightsSystemMetrics::Unregister()
+CHIP_ERROR InsightsSystemMetrics::Unregister(intptr_t arg)
 {
+    InsightsSystemMetrics * instance = reinterpret_cast<InsightsSystemMetrics *>(arg);
     if (!mRegistered)
     {
         return CHIP_ERROR_INCORRECT_STATE;
@@ -67,13 +68,28 @@ CHIP_ERROR InsightsSystemMetrics::Unregister()
             mLabels[i] = nullptr;
         }
     }
+    mRegistered = false;
+    DeviceLayer::SystemLayer().CancelTimer(SamplingHandler, instance);
     return CHIP_NO_ERROR;
 }
 
-void InsightsSystemMetrics::CancelSamplingInterval(intptr_t arg)
+void InsightsSystemMetrics::SetSamplingHandler(intptr_t arg)
 {
-    auto instance = static_cast<InsightsSystemMetrics *>(reinterpret_cast<void *>(arg));
-    DeviceLayer::SystemLayer().CancelTimer(SamplingIntervalHandler, instance);
+    InsightsSystemMetrics * instance = reinterpret_cast<InsightsSystemMetrics *>(arg);
+
+    if (instance->mTimeout == System::Clock::kZero)
+    {
+        DeviceLayer::SystemLayer().CancelTimer(SamplingHandler, instance);
+    }
+    else
+    {
+        DeviceLayer::SystemLayer().CancelTimer(SamplingHandler, instance);
+        CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(instance->mTimeout, SamplingHandler, instance);
+        if (err != CHIP_NO_ERROR)
+        {
+            ESP_LOGE(kTag, "Failed to start the new timer %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
 }
 
 CHIP_ERROR InsightsSystemMetrics::SetSamplingInterval(chip::System::Clock::Timeout aTimeout)
@@ -82,24 +98,9 @@ CHIP_ERROR InsightsSystemMetrics::SetSamplingInterval(chip::System::Clock::Timeo
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
+    mTimeout = aTimeout;
 
-    if (aTimeout == System::Clock::kZero)
-    {
-        DeviceLayer::PlatformMgr().ScheduleWork(CancelSamplingInterval, reinterpret_cast<intptr_t>(this));
-    }
-    else if (aTimeout != mTimeout)
-    {
-        DeviceLayer::PlatformMgr().ScheduleWork(CancelSamplingInterval, reinterpret_cast<intptr_t>(this));
-        mTimeout       = aTimeout;
-        CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(mTimeout, SamplingIntervalHandler, this);
-        if (err != CHIP_NO_ERROR)
-        {
-            ESP_LOGE(kTag, "Failed to start the new timer %" CHIP_ERROR_FORMAT, err.Format());
-            return err;
-        }
-    }
-
-    return CHIP_NO_ERROR;
+    return DeviceLayer::PlatformMgr().ScheduleWork(SetSamplingHandler, reinterpret_cast<intptr_t>(this));
 }
 
 CHIP_ERROR InsightsSystemMetrics::RegisterAndEnable(chip::System::Clock::Timeout aTimeout)
@@ -130,7 +131,7 @@ CHIP_ERROR InsightsSystemMetrics::RegisterAndEnable(chip::System::Clock::Timeout
 
         if (mLabels[i] == NULL)
         {
-            Unregister();
+            Unregister(reinterpret_cast<intptr_t>(this));
             return CHIP_ERROR_NO_MEMORY;
         }
 
@@ -138,13 +139,14 @@ CHIP_ERROR InsightsSystemMetrics::RegisterAndEnable(chip::System::Clock::Timeout
         if (err != ESP_OK)
         {
             ESP_LOGE(kTag, "Failed to register metric:%s, err:%d", mLabels[i], err);
+            Unregister(reinterpret_cast<intptr_t>(this));
             return CHIP_ERROR_INCORRECT_STATE;
         }
     }
 
     mTimeout = System::Clock::Milliseconds32(aTimeout);
 
-    CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(GetSamplingInterval(), SamplingIntervalHandler, this);
+    CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(GetSamplingInterval(), SamplingHandler, this);
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(kTag, "Failed to start the timer, err:%" CHIP_ERROR_FORMAT, err.Format());
