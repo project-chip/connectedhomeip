@@ -25,7 +25,7 @@
 
 #include <nlunit-test.h>
 
-#if !defined(CHIP_DEVICE_LAYER_TARGET_FAKE) || CHIP_DEVICE_LAYER_TARGET_FAKE != 1
+#if CHIP_DEVICE_LAYER_TARGET_FAKE != 1
 #error "This test is designed for use only with the fake platform"
 #endif
 
