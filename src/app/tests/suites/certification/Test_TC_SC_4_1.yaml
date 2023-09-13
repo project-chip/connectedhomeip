@@ -1200,6 +1200,20 @@ tests:
               - name: "value"
                 value: deviceType
 
+    #TODO
+    - label: "Step 10h: Check Commissioning Mode (_CM)"
+      verification: |
+          subtype _CM must not be present
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && MCORE.SC.EXTENDED_DISCOVERY
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
     # TXT Records
 
     - label: "Step 10i: TXT key for discriminator (D)"
