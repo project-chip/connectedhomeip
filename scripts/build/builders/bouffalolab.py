@@ -112,7 +112,6 @@ class BouffalolabBuilder(GnBuilder):
         self.chip_name = bouffalo_chip
         self.enable_frame_ptr = enable_frame_ptr
 
-        openthread_project_core_config_file = None
         toolchain = os.path.join(root, os.path.split(os.path.realpath(__file__))[0], '../../../config/bouffalolab/toolchain')
         toolchain = 'custom_toolchain="{}:riscv_gcc"'.format(toolchain)
         if toolchain:
@@ -125,7 +124,7 @@ class BouffalolabBuilder(GnBuilder):
         self.argsOpt.append('baudrate=\"{}\"'.format(baudrate))
 
         if not (enable_wifi or enable_thread or enable_ethernet):
-           # decide default connectivity for each chip
+            # decide default connectivity for each chip
             if bouffalo_chip == "bl602":
                 enable_wifi, enable_thread, enable_ethernet = True, False, False
             elif bouffalo_chip == "bl702":
@@ -173,6 +172,7 @@ class BouffalolabBuilder(GnBuilder):
         if enable_thread:
             self.argsOpt.append('chip_enable_openthread=true')
             self.argsOpt.append('chip_mdns="platform"')
+            self.argsOpt.append('chip_inet_config_enable_ipv4=false')
             self.argsOpt.append('openthread_project_core_config_file="{}-openthread-core-bl-config.h"'.format(bouffalo_chip))
         else:
             self.argsOpt.append('chip_enable_openthread=false')
