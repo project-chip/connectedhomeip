@@ -107,7 +107,10 @@ declare -a args=(
     "mac_deployment_target=\"$LLVM_TARGET_TRIPLE_OS_VERSION$LLVM_TARGET_TRIPLE_SUFFIX\""
 )
 
-[[ $CONFIGURATION == Debug ]] && args+=('is_debug=true')
+case "$CONFIGURATION" in
+    Debug) args+=('is_debug=true') ;;
+    Release) args+=('is_debug=false') ;;
+esac
 
 [[ $PLATFORM_FAMILY_NAME != macOS ]] && {
     args+=(

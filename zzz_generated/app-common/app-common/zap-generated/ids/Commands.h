@@ -1479,6 +1479,24 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace FaultInjection
 
+namespace SampleMei {
+namespace Commands {
+
+namespace Ping {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Ping
+
+namespace AddArgumentsResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace AddArgumentsResponse
+
+namespace AddArguments {
+static constexpr CommandId Id = 0x00000002;
+} // namespace AddArguments
+
+} // namespace Commands
+} // namespace SampleMei
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip

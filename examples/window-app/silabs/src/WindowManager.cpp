@@ -56,6 +56,12 @@ using namespace ::chip::DeviceLayer::Silabs;
 #define APP_STATE_LED 0
 #define APP_ACTION_LED 1
 
+#ifdef DIC_ENABLE
+#define DECIMAL 10
+#define MSG_SIZE 6
+#include "dic.h"
+#endif // DIC_ENABLE
+
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace chip::app::Clusters::WindowCovering;
@@ -502,10 +508,25 @@ void WindowManager::Cover::CallbackPositionSet(intptr_t arg)
     position.SetNonNull(data->percent100ths);
 
     if (data->isTilt)
+    {
         TiltPositionSet(data->mEndpointId, position);
+#ifdef DIC_ENABLE
+        uint16_t value = data->percent100ths;
+        char buffer[MSG_SIZE];
+        itoa(value, buffer, DECIMAL);
+        dic_sendmsg("tilt/position set", (const char *) (buffer));
+#endif // DIC_ENABLE
+    }
     else
+    {
         LiftPositionSet(data->mEndpointId, position);
-
+#ifdef DIC_ENABLE
+        uint16_t value = data->percent100ths;
+        char buffer[MSG_SIZE];
+        itoa(value, buffer, DECIMAL);
+        dic_sendmsg("lift/position set", (const char *) (buffer));
+#endif // DIC_ENABLE
+    }
     chip::Platform::Delete(data);
 }
 
