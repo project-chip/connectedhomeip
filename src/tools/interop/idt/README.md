@@ -126,7 +126,8 @@ environment.
     ```
     sudo passwd kali
     ```
-1. Inside the RPi, configure Wi-Fi. Disconnect ethernet, reboot and connect again.
+1. Inside the RPi, configure Wi-Fi. Disconnect ethernet, reboot and connect
+   again.
     ```
     nmtui
     ```
