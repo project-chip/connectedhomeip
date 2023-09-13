@@ -2612,7 +2612,23 @@ enum class SafetyStatus : uint16_t
 };
 } // namespace WindowCovering
 
-namespace BarrierControl {} // namespace BarrierControl
+namespace BarrierControl {
+
+// Bitmap for BarrierControlCapabilities
+enum class BarrierControlCapabilities : uint8_t
+{
+    kPartialBarrier = 0x1,
+};
+
+// Bitmap for BarrierControlSafetyStatus
+enum class BarrierControlSafetyStatus : uint16_t
+{
+    kRemoteLockout       = 0x1,
+    kTemperDetected      = 0x2,
+    kFailedCommunication = 0x4,
+    kPositionFailure     = 0x8,
+};
+} // namespace BarrierControl
 
 namespace PumpConfigurationAndControl {
 
@@ -4118,6 +4134,8 @@ enum class FaultType : uint8_t
     kUnknownEnumValue = 5,
 };
 } // namespace FaultInjection
+
+namespace SampleMei {} // namespace SampleMei
 
 } // namespace Clusters
 } // namespace app

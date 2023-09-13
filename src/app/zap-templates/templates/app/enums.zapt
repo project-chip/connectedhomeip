@@ -18,12 +18,3 @@ enum EmberAf{{asType label}} : {{asUnderlyingZclType name}} {
 };
 {{/if}}
 {{/zcl_enums}}
-
-{{#zcl_bitmaps}}
-{{#if (isInConfigList label "DefineBitmaps")}}
-{{#zcl_bitmap_items}}
-#define EMBER_AF_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}} ({{mask}})
-#define EMBER_AF_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}}_OFFSET ({{asOffset mask}})
-{{/zcl_bitmap_items}}
-{{/if}}
-{{/zcl_bitmaps}}

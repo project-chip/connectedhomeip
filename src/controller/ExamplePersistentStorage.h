@@ -65,6 +65,9 @@ public:
     // Clear all of the persistent storage for running session.
     CHIP_ERROR SyncClearAll();
 
+    // Get the directory actually being used for the storage.
+    const char * GetDirectory() const;
+
 private:
     CHIP_ERROR CommitConfig(const char * directory, const char * name);
     inipp::Ini<char> mConfig;
