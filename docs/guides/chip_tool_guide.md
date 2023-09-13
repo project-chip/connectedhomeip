@@ -685,19 +685,22 @@ commissioner-related flags:
 -   `--commissioner-nodeid`
 
 These flags let you control which fabric and node ID are used for the CHIP Tool
-when interacting with devices. They are especially useful in scenarios where you are working
-with more than one fabric, but you can also use them with a single CHIP Tool node identity.
+when interacting with devices. They are especially useful in scenarios where you
+are working with more than one fabric, but you can also use them with a single
+CHIP Tool node identity.
 
 #### `--commissioner-name` flag
 
-This flag lets you control which fabric is used by selecting a specific fabric commissioner.
+This flag lets you control which fabric is used by selecting a specific fabric
+commissioner.
 
 As per the CHIP Tool implementation, the commissioners are required to have the
 following names: `alpha` for the first one, `beta` for the second one, `gamma`
 for the third one, `4` for the fourth one, `5` for the fifth one, and so on.
 
 If you don't use this flag, the CHIP Tool assumes that the command is meant for
-the `alpha` commissioner and hence for the fabric associated with this commissioner.
+the `alpha` commissioner and hence for the fabric associated with this
+commissioner.
 
 **Example of commands:**
 
@@ -709,17 +712,18 @@ $ ./chip-tool any subscribe-by-id '0x0028,0x0028,0x0101,0x0028,0x0028,0x0028' '5
 
 #### `--commissioner-nodeid` flag
 
-This flag lets you select the node ID to use on the fabric specified
-with the `--commissioner-name` flag.
+This flag lets you select the node ID to use on the fabric specified with the
+`--commissioner-name` flag.
 
-If you don't use this flag, the CHIP Tool assumes that the command is sent
-with the ID value that the CHIP Tool has in storage. If there's none, the CHIP Tool sends
-the command with the default fallback node ID `112233`.
+If you don't use this flag, the CHIP Tool assumes that the command is sent with
+the ID value that the CHIP Tool has in storage. If there's none, the CHIP Tool
+sends the command with the default fallback node ID `112233`.
 
-> **Note:** If the device has been already commissioned with a specific `--commissioner-nodeid`,
-> you must always provide the `--commissioner-nodeid` flag with the CHIP Tool commands or
-> update the Access Control List (ACL) on the device. Otherwise, the default fallback node ID `112233`
-> is used and the communication will fail.
+> **Note:** If the device has been already commissioned with a specific
+> `--commissioner-nodeid`, you must always provide the `--commissioner-nodeid`
+> flag with the CHIP Tool commands or update the Access Control List (ACL) on
+> the device. Otherwise, the default fallback node ID `112233` is used and the
+> communication will fail.
 
 **Example of commands:**
 
@@ -856,10 +860,10 @@ $ ./chip-tool discover commissioners
 The `pairing` command supports different methods for Matter device commissioning
 procedure. The recommended methods are the following:
 
-- `code-thread` - For Thread commissioning.
-- `code-wifi` - For Wi-Fi commissioning.
-- `code` - For commissioning the device when it is already present in an
-  IP network.
+-   `code-thread` - For Thread commissioning.
+-   `code-wifi` - For Wi-Fi commissioning.
+-   `code` - For commissioning the device when it is already present in an IP
+    network.
 
 Alternatively, you can also use the following methods described in the
 [Using CHIP Tool for Matter device testing](#using-chip-tool-for-matter-device-testing)
@@ -882,24 +886,29 @@ $ ./chip-tool pairing
 
 **Example of commands:**
 
-The following command commissions the Thread device with the node ID `1` to the Matter fabric.
-The `hex:...` parameter is the operational dataset that contains information about the Thread network to which the device is going to be commissioned.
-The onboarding dataset payload `34970112332` (short manual pairing code) is used to discover and commission the device.
+The following command commissions the Thread device with the node ID `1` to the
+Matter fabric. The `hex:...` parameter is the operational dataset that contains
+information about the Thread network to which the device is going to be
+commissioned. The onboarding dataset payload `34970112332` (short manual pairing
+code) is used to discover and commission the device.
 
 ```
 $ ./chip-tool pairing code-thread 1 hex:000030000150208562618342348532605109bd31cda6908667addca8789211addac0102c4a9 34970112332
 ```
 
-The following command commissions the Wi-Fi device with the node ID `1` to the Matter fabric
-The SSID `wifi_test` and the password `admin123` is the required information about the Wi-Fi network to which the device is going to be commissioned.
-The onboarding dataset payload `34970112332` (short manual pairing code) is used to discover and commission the device.
+The following command commissions the Wi-Fi device with the node ID `1` to the
+Matter fabric The SSID `wifi_test` and the password `admin123` is the required
+information about the Wi-Fi network to which the device is going to be
+commissioned. The onboarding dataset payload `34970112332` (short manual pairing
+code) is used to discover and commission the device.
 
 ```
 $ ./chip-tool pairing code-wifi 1 wifi_test admin123 34970112332
 ```
 
-The following command commissions the device with the node ID `1` to the Matter fabric.
-The onboarding dataset payload `MT:8IXS142C00KA0648G00` (QR code payload) is used to discover and commission the device.
+The following command commissions the device with the node ID `1` to the Matter
+fabric. The onboarding dataset payload `MT:8IXS142C00KA0648G00` (QR code
+payload) is used to discover and commission the device.
 
 ```
 $ ./chip-tool pairing code 1 MT:8IXS142C00KA0648G00
@@ -917,29 +926,31 @@ to modify attestation-related settings:
     matches the PAI and the DAC certificates programmed on the device. Without
     this flag, the CHIP Tool uses the built-in test PAA certificate.
 
--   `--cd-trust-store-path` - Use to provide the path to the directory containing the key that
-    is used to validate the device's Certification Declaration. The path can be absolute or
-    relative to the current working directory. With this flag, the CHIP tool
-    looks for additional public keys, in addition to the well-known built-in public keys 
-    (built-in public keys `src/credentials/attestation_verifier/DefaultDeviceAttestationVerifier.cpp`),
+-   `--cd-trust-store-path` - Use to provide the path to the directory
+    containing the key that is used to validate the device's Certification
+    Declaration. The path can be absolute or relative to the current working
+    directory. With this flag, the CHIP tool looks for additional public keys,
+    in addition to the well-known built-in public keys (built-in public keys
+    `src/credentials/attestation_verifier/DefaultDeviceAttestationVerifier.cpp`),
     to be used to validate Certification Declaration signatures.
 
+*   `--only-allow-trusted-cd-keys` - Use to only allow the keys from
+    `--cd-trust-store-path` and not the built-in test key. If the flag is not
+    provided or it is provided with the value `false`, untrusted CD verifying
+    keys are allowed. If it is provided with the value `true`
+    (`--only-allow-trusted-cd-keys true`), test keys are disallowed and CD
+    signed with the test key will not be accepted.
 
--   `--only-allow-trusted-cd-keys` - Use to only allow the keys from `--cd-trust-store-path`
-    and not the built-in test key. If the flag is not provided or it is provided with the
-    value `false`, untrusted CD verifying keys are allowed. If it is
-    provided with the value `true` (`--only-allow-trusted-cd-keys true`), test
-    keys are disallowed and CD signed with the test key will not be accepted.
-
--   `--bypass-attestation-verifier` - Use to bypass the attestation verifier. If
+*   `--bypass-attestation-verifier` - Use to bypass the attestation verifier. If
     the flag is not provided or it is provided with the value `false`, the
-    attestation verifier is not bypassed. If it is provided with the value `true`
-    (`--bypass-attestation-verifier true`), the commissioning will continue
-    in case of the attestation verification failure. The failure can be caused
-    by errors in Certification Declaration, PAA or PAI certificates, or
-    in the Device Attestation Certificate. This option can be helpful if you want
-    to quickly commission a device with PAI and DAC certificates based on
-    an unknown PAA and/or with a Certification Declaration signed by an unknown key.
+    attestation verifier is not bypassed. If it is provided with the value
+    `true` (`--bypass-attestation-verifier true`), the commissioning will
+    continue in case of the attestation verification failure. The failure can be
+    caused by errors in Certification Declaration, PAA or PAI certificates, or
+    in the Device Attestation Certificate. This option can be helpful if you
+    want to quickly commission a device with PAI and DAC certificates based on
+    an unknown PAA and/or with a Certification Declaration signed by an unknown
+    key.
 
 <hr>
 
@@ -995,9 +1006,9 @@ cases.
 
 ##### Writing ACL to the `accesscontrol` cluster
 
-The Access Control List concept allows to govern all Data Model
-interactions (such as read attribute, write attribute, invoke command). For more
-information about ACL, see
+The Access Control List concept allows to govern all Data Model interactions
+(such as read attribute, write attribute, invoke command). For more information
+about ACL, see
 [Access Control Guide](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/access-control-guide.md).
 
 To write ACL to the `accesscontrol` cluster, use the following command pattern:
