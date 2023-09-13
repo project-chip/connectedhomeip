@@ -1,5 +1,3 @@
-<a name="matter-k32w1-lighting-example-application"></a>
-
 # Matter K32W1 Lighting Example Application
 
 Matter K32W1 Lighting Example demonstrates how to remotely control a light bulb.
@@ -35,9 +33,7 @@ into an existing Matter network and can be controlled by this network.
     -   [Running OTA](#running-ota)
     -   [Known issues](#known-issues)
 
-    </hr>
-
-<a name="introduction"></a>
+</hr>
 
 ## Introduction
 
@@ -56,15 +52,11 @@ Thread disabled, and it should be paired over Bluetooth LE with the Matter
 controller and obtain configuration from it. The actions required before
 establishing full communication are described below.
 
-<a name="bluetooth-le-advertising"></a>
-
 ### Bluetooth LE Advertising
 
 In this example, to commission the device onto a Matter network, it must be
 discoverable over Bluetooth LE. For security reasons, you must start Bluetooth
 LE advertising manually after powering up the device by pressing Button SW2.
-
-<a name="bluetooth-le-rendezvous"></a>
 
 ### Bluetooth LE Rendezvous
 
@@ -77,8 +69,6 @@ from the Matter device. The data payload is encoded within a QR code, or printed
 to the UART console.
 
 ### Thread Provisioning
-
-<a name="device-ui"></a>
 
 ## Device UI
 
@@ -124,8 +114,6 @@ point before the 6 second limit.
 can be used to mimic a user manually operating a switch. The button behaves as a
 toggle, swapping the state every time it is pressed.
 
-<a name="building"></a>
-
 ## Building
 
 In order to build the Matter example, we recommend using a Linux distribution
@@ -155,9 +143,7 @@ set to 1.
 After a successful build, the `elf` and `srec` files are found in `out/debug/` -
 see the files prefixed with `chip-k32w1-light-example`.
 
-<a name="smu2-memory"></a>
-
-### SMU2 Memory
+### `SMU2` Memory
 
 Some Matter instances and global variables can be placed in the `NBU` `SMU2`
 memory. When compiling with OpenThread FTD support (`chip_openthread_ftd=true`)
@@ -178,8 +164,6 @@ for names and `SMU2` memory range size.
 To use the `SMU2` Memory an optimized `NBU` binary is also needed. See
 [Flashing the NBU image](#flashing-the-nbu-image).
 
-<a name="flashing"></a>
-
 ## Flashing
 
 Two images must be written to the board: one for the host (CM33) and one for the
@@ -190,9 +174,7 @@ one needed on the `NBU` side can be found in the downloaded NXP-SDK package at
 path -
 `middleware\wireless\ieee-802.15.4\bin\k32w1\k32w1_nbu_ble_15_4_dyn_matter_$version.sb3`.
 
-<a name="flashing-the-nbu-image"></a>
-
-### Flashing the NBU image
+### Flashing the `NBU` image
 
 `NBU` image should be written only when a new NXP-SDK is released.
 
@@ -204,8 +186,6 @@ can be used for updating the `NBU/radio` core:
 -   Section 3.3 – Updating `NBU` for Wireless examples - use the corresponding
     .sb3 file found in the SDK package at path
     `middleware\wireless\ieee-802.15.4\bin\k32w1\`
-
-<a name="flashing-the-host-image"></a>
 
 ### Flashing the host image
 
@@ -237,8 +217,6 @@ quit
 ```bash
 $  jlink -device K32W1480 -if SWD -speed 4000 -autoconnect 1 -CommanderScript commands_script
 ```
-
-<a name="debugging"></a>
 
 ## Debugging
 
@@ -285,13 +263,9 @@ Run -> Debug Configurations... -> C/C++ Application
 
 ![Debug K32W1](../../../../platform/nxp/k32w/k32w1/doc/images/debug_k32w1.jpg)
 
-<a name="ota"></a>
-
 ## OTA
 
-<a name="convert-srec-into-sb3-file"></a>
-
-### Convert srec into sb3 file
+### Convert `srec` into `sb3` file
 
 The OTA image files must be encrypted using Over The Air Programming Tool
 ([OTAP](https://www.nxp.com/design/microcontrollers-developer-resources/connectivity-tool-suite:CONNECTIVITY-TOOL-SUITE?#downloads)).
@@ -309,8 +283,6 @@ In `OTAP` application
 -   image information: will update "Application Core (MCU)" - this will generate
     the image only for the CM33 core
 -   keep other settings at default values
-
-<a name="convert-sb3-into-ota-file"></a>
 
 ### Convert sb3 into ota file
 
@@ -342,8 +314,6 @@ has its own software version (given by
 having a correct OTA process, the OTA header version should be the same as the
 binary embedded software version. A user can set a custom software version in
 the gn build args by setting `chip_software_version` to the wanted version.
-
-<a name="running-ota"></a>
 
 ### Running OTA
 
@@ -420,8 +390,6 @@ Start the OTA process:
 ```
 user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
 ```
-
-<a name="known-issues"></a>
 
 ### Known issues
 

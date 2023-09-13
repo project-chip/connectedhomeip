@@ -1,5 +1,3 @@
-<a name="matter-k32w1-contact-sensor-example-application"></a>
-
 # Matter K32W1 Contact Sensor Example Application
 
 Matter K32W1 Contact Sensor Example uses buttons to test changing the lock and
@@ -32,9 +30,7 @@ into an existing Matter network and can be controlled by this network.
     -   [Known issues](#known-issues)
 -   [Low power](#low-power)
 
-    </hr>
-
-<a name="introduction"></a>
+</hr>
 
 ## Introduction
 
@@ -53,15 +49,11 @@ has Thread disabled, and it should be paired over Bluetooth LE with the Matter
 controller and obtain configuration from it. The actions required before
 establishing full communication are described below.
 
-<a name="bluetooth-le-advertising"></a>
-
 ### Bluetooth LE Advertising
 
 In this example, to commission the device onto a Matter network, it must be
 discoverable over Bluetooth LE. For security reasons, you must start Bluetooth
 LE advertising manually after powering up the device by pressing Button SW2.
-
-<a name="bluetooth-le-rendezvous"></a>
 
 ### Bluetooth LE Rendezvous
 
@@ -74,8 +66,6 @@ from the Matter device. The data payload is encoded within a QR code, or printed
 to the UART console.
 
 ### Thread Provisioning
-
-<a name="device-ui"></a>
 
 ## Device UI
 
@@ -101,7 +91,7 @@ states are depicted:
     service connectivity.
 
 NOTE: LED2 will be disabled when CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR is
-enabled. On K32W1 EVK board, PTB0 is wired to LED2 also is wired to CS (Chip
+enabled. On K32W1 EVK board, `PTB0` is wired to LED2 also is wired to CS (Chip
 Select) External Flash Memory. OTA image is stored in external memory because of
 it's size. If LED2 is enabled then it will affect External Memory CS and OTA
 will not work.
@@ -119,8 +109,6 @@ point before the 6 second limit.
 
 **Button SW3** can be used to change the state of the simulated contact sensor.
 The button behaves as a toggle, swapping the state every time it is pressed.
-
-<a name="building"></a>
 
 ## Building
 
@@ -148,8 +136,6 @@ set to 1.
 After a successful build, the `elf` and `srec` files are found in `out/debug/` -
 `see the files prefixed with chip-k32w1-contact-example`.
 
-<a name="flashing"></a>
-
 ## Flashing
 
 Two images must be written to the board: one for the host (CM33) and one for the
@@ -160,9 +146,7 @@ one needed on the `NBU` side can be found in the downloaded NXP-SDK package at
 path -
 `middleware\wireless\ieee-802.15.4\bin\k32w1\k32w1_nbu_ble_15_4_dyn_matter_$version.sb3`.
 
-<a name="flashing-the-nbu-image"></a>
-
-### Flashing the NBU image
+### Flashing the `NBU` image
 
 `NBU` image should be written only when a new NXP-SDK is released.
 
@@ -174,8 +158,6 @@ can be used for updating the `NBU/radio` core:
 -   Section 3.3 – Updating `NBU` for Wireless examples - use the corresponding
     `.sb3` file found in the SDK package at path
     `middleware\wireless\ieee-802.15.4\bin\k32w1\`
-
-<a name="flashing-the-host-image"></a>
 
 ### Flashing the host image
 
@@ -207,8 +189,6 @@ quit
 ```bash
 $  jlink -device K32W1480 -if SWD -speed 4000 -autoconnect 1 -CommanderScript commands_script
 ```
-
-<a name="debugging"></a>
 
 ## Debugging
 
@@ -255,13 +235,9 @@ Run -> Debug Configurations... -> C/C++ Application
 
 ![Debug K32W1](../../../../platform/nxp/k32w/k32w1/doc/images/debug_k32w1.jpg)
 
-<a name="ota"></a>
-
 ## OTA
 
-<a name="convert-srec-into-sb3-file"></a>
-
-### Convert srec into sb3 file
+### Convert `srec` into `sb3` file
 
 The OTA image files must be encrypted using Over The Air Programming Tool
 ([OTAP](https://www.nxp.com/design/microcontrollers-developer-resources/connectivity-tool-suite:CONNECTIVITY-TOOL-SUITE?#downloads)).
@@ -279,8 +255,6 @@ In `OTAP` application
 -   image information: will update "Application Core (MCU)" - this will generate
     the image only for the CM33 core
 -   keep other settings at default values
-
-<a name="convert-sb3-into-ota-file"></a>
 
 ### Convert sb3 into ota file
 
@@ -312,8 +286,6 @@ has its own software version (given by
 having a correct OTA process, the OTA header version should be the same as the
 binary embedded software version. A user can set a custom software version in
 the gn build args by setting `chip_software_version` to the wanted version.
-
-<a name="running-ota"></a>
 
 ### Running OTA
 
@@ -407,8 +379,6 @@ In order to maintain a low power consumption, the LEDs showing the state of the
 contact sensor and the internal state are disabled. Console logs can be used
 instead. Also, please note that once the board is flashed with MCUXpresso the
 debugger disconnects because the board enters low power.
-
-<a name="known-issues"></a>
 
 ### Known issues
 
