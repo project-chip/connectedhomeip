@@ -2409,12 +2409,12 @@ endpoint 1 {
     ram      attribute sceneValid default = 0x00;
     ram      attribute nameSupport default = 0x80;
     ram      attribute lastConfiguredBy;
-    ram      attribute sceneTableSize;
-    callback attribute remainingCapacity;
+    ram      attribute sceneTableSize default = 16;
+    callback attribute remainingCapacity default = 8;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 5;
   }
 
