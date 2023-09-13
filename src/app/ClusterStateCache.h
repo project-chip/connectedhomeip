@@ -71,6 +71,14 @@ public:
     class Callback : public ReadClient::Callback
     {
     public:
+        Callback() = default;
+
+        // Callbacks are not expected to be copyable or movable.
+        Callback(const Callback &) = delete;
+        Callback(Callback &&)      = delete;
+        Callback & operator=(const Callback &) = delete;
+        Callback & operator=(Callback &&) = delete;
+
         /*
          * Called anytime an attribute value has changed in the cache
          */
@@ -102,6 +110,11 @@ public:
     {
         mHighestReceivedEventNumber = highestReceivedEventNumber;
     }
+
+    ClusterStateCache(const ClusterStateCache &) = delete;
+    ClusterStateCache(ClusterStateCache &&)      = delete;
+    ClusterStateCache & operator=(const ClusterStateCache &) = delete;
+    ClusterStateCache & operator=(ClusterStateCache &&) = delete;
 
     void SetHighestReceivedEventNumber(EventNumber highestReceivedEventNumber)
     {
