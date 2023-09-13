@@ -35,16 +35,6 @@
     ],
     "templates": [
         {
-            "path": "ChipStructs-java.zapt",
-            "name": "CHIP structs for Java",
-            "output": "src/controller/java/zap-generated/chip/devicecontroller/ChipStructs.java"
-        },
-        {
-            "path": "ChipEventStructs-java.zapt",
-            "name": "CHIP Event structs for Java",
-            "output": "src/controller/java/zap-generated/chip/devicecontroller/ChipEventStructs.java"
-        },
-        {
             "path": "CHIPInvokeCallbacks.zapt",
             "name": "CHIP cluster invoke callbacks for Java (native code)",
             "output": "src/controller/java/zap-generated/CHIPInvokeCallbacks.h"

@@ -790,6 +790,23 @@ class JavaClassGenerator(__JavaCodeGenerator):
             }
         )
 
+        self.internal_render_one_output(
+            template_path="ChipStructs_java.jinja",
+            output_file_name="java/chip/devicecontroller/ChipStructs.java",
+            vars={
+                'idl': self.idl,
+                'clientClusters': clientClusters,
+            }
+        )
+
+        self.internal_render_one_output(
+            template_path="ChipEventStructs_java.jinja",
+            output_file_name="java/chip/devicecontroller/ChipEventStructs.java",
+            vars={
+                'idl': self.idl,
+                'clientClusters': clientClusters,
+            }
+        )
         # Every cluster has its own impl, to avoid
         # very large compilations (running out of RAM)
         for cluster in self.idl.clusters:
