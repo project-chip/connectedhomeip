@@ -19,6 +19,8 @@
 #include "rvc-device.h"
 #include <AppMain.h>
 
+#define RVC_ENDPOINT 1
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -41,7 +43,7 @@ void ApplicationInit()
         sChipNamedPipeCommands.Stop();
     }
 
-    gRvcDevice = new RvcDevice(1);
+    gRvcDevice = new RvcDevice(RVC_ENDPOINT);
     gRvcDevice->Init();
 
     sRvcAppCommandDelegate.SetRvcDevice(gRvcDevice);
