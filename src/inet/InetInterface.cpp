@@ -591,7 +591,7 @@ short InterfaceIterator::GetFlags()
             mIntfFlags       = intfData.ifr_flags;
             mIntfFlagsCached = true;
         }
-#if __MBED__
+#ifdef __MBED__
         CloseIOCTLSocket();
 #endif
     }
@@ -675,7 +675,7 @@ uint8_t InterfaceAddressIterator::GetPrefixLength()
     {
         if (mCurAddr->ifa_addr->sa_family == AF_INET6)
         {
-#if !__MBED__
+#ifndef __MBED__
             struct sockaddr_in6 & netmask = *reinterpret_cast<struct sockaddr_in6 *>(mCurAddr->ifa_netmask);
             return NetmaskToPrefixLength(netmask.sin6_addr.s6_addr, 16);
 #else  // __MBED__
