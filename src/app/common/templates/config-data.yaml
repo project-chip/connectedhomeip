@@ -12,12 +12,6 @@ WeakEnums:
     - RadioFaultEnum
     - StepMode
 
-DefineBitmaps:
-    # Allow-list of bitmaps that we generates as #define as well as enum classes.
-    # The goal is to drive this down to 0.
-    - BarrierControlCapabilities
-    - BarrierControlSafetyStatus
-
 CommandHandlerInterfaceOnlyClusters:
     # List of clusters that are implemented entirely with
     # CommandHandlerInterface and hence do not need generated command dispatch.

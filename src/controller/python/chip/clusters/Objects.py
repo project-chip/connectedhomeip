@@ -22316,6 +22316,16 @@ class BarrierControl(Cluster):
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
 
+    class Bitmaps:
+        class BarrierControlCapabilities(IntFlag):
+            kPartialBarrier = 0x1
+
+        class BarrierControlSafetyStatus(IntFlag):
+            kRemoteLockout = 0x1
+            kTemperDetected = 0x2
+            kFailedCommunication = 0x4
+            kPositionFailure = 0x8
+
     class Commands:
         @dataclass
         class BarrierControlGoToPercent(ClusterCommand):
