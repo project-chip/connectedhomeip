@@ -34,6 +34,8 @@ source_set("manager-srcs") {
     ":observer-srcs",
     "${chip_root}/src/credentials:credentials",
   ]
+
+  defines = [ "ICD_REPORT_ON_ENTER_ACTIVE_MODE=${chip_report_on_active_mode}" ]
 }
 
 # ICD management cluster source-set is broken out of the main source-set to enable unit tests
