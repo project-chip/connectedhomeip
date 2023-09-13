@@ -218,6 +218,7 @@ void SPIDRV_SetBaudrate(uint32_t baudrate)
 
 sl_status_t sl_wfx_host_spi_cs_assert(void)
 {
+    SILABS_LOG("sl_wfx_host_spi_cs_assert started.");
 #if SL_SPICTRL_MUX
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
 
@@ -230,11 +231,13 @@ sl_status_t sl_wfx_host_spi_cs_assert(void)
 #if defined(EFR32MG24)
     GPIO_PinOutClear(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
 #endif // EFR32MG24
+    SILABS_LOG("sl_wfx_host_spi_cs_assert completed.");
     return SL_STATUS_OK;
 }
 
 sl_status_t sl_wfx_host_spi_cs_deassert(void)
 {
+    SILABS_LOG("sl_wfx_host_spi_cs_deassert started.");
 #if SL_SPICTRL_MUX
     if (spi_enabled)
     {
@@ -253,19 +256,24 @@ sl_status_t sl_wfx_host_spi_cs_deassert(void)
 #if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);
 #endif // SL_SPICTRL_MUX
+    SILABS_LOG("sl_wfx_host_spi_cs_deassert completed.");
     return SL_STATUS_OK;
 }
 
 #if SL_MUX25CTRL_MUX
 sl_status_t sl_wfx_host_spiflash_cs_assert(void)
 {
+    SILABS_LOG("sl_wfx_host_spiflash_cs_assert started.");
     GPIO_PinOutClear(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
+    SILABS_LOG("sl_wfx_host_spiflash_cs_assert completed.");
     return SL_STATUS_OK;
 }
 
 sl_status_t sl_wfx_host_spiflash_cs_deassert(void)
 {
+    SILABS_LOG("sl_wfx_host_spiflash_cs_deassert started.");
     GPIO_PinOutSet(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
+    SILABS_LOG("sl_wfx_host_spiflash_cs_deassert completed.");
     return SL_STATUS_OK;
 }
 #endif // SL_MUX25CTRL_MUX
@@ -273,6 +281,7 @@ sl_status_t sl_wfx_host_spiflash_cs_deassert(void)
 #if SL_BTLCTRL_MUX
 sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void)
 {
+    SILABS_LOG("sl_wfx_host_pre_bootloader_spi_transfer started.");
 #if SL_SPICTRL_MUX
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
     if (spi_enabled)
@@ -298,11 +307,13 @@ sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void)
 #if SL_MUX25CTRL_MUX
     sl_wfx_host_spiflash_cs_assert();
 #endif // SL_MUX25CTRL_MUX
+    SILABS_LOG("sl_wfx_host_pre_bootloader_spi_transfer completed.");
     return SL_STATUS_OK;
 }
 
 sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
 {
+    SILABS_LOG("sl_wfx_host_post_bootloader_spi_transfer started.");
     // bootloader_deinit will do USART disable
     int32_t status = bootloader_deinit();
     if (status != BOOTLOADER_OK)
@@ -320,6 +331,7 @@ sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
 #if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);
 #endif // SL_SPICTRL_MUX
+    SILABS_LOG("sl_wfx_host_post_bootloader_spi_transfer completed.");
     return SL_STATUS_OK;
 }
 #endif // SL_BTLCTRL_MUX
@@ -327,6 +339,7 @@ sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
 #if SL_LCDCTRL_MUX
 sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
 {
+    SILABS_LOG("sl_wfx_host_pre_lcd_spi_transfer started.");
 #if SL_SPICTRL_MUX
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
     if (spi_enabled)
@@ -347,17 +360,20 @@ sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
 #endif // SL_SPICTRL_MUX
         return SL_STATUS_FAIL;
     }
+    SILABS_LOG("sl_wfx_host_pre_lcd_spi_transfer completed.");
     return SL_STATUS_OK;
 }
 
 sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
 {
+    SILABS_LOG("sl_wfx_host_post_lcd_spi_transfer started.");
     USART_Enable(SL_MEMLCD_SPI_PERIPHERAL, usartDisable);
     CMU_ClockEnable(SPI_CLOCK(SL_MEMLCD_SPI_PERIPHERAL_NO), false);
     GPIO->USARTROUTE[SL_MEMLCD_SPI_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
 #if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);
 #endif // SL_SPICTRL_MUX
+    SILABS_LOG("sl_wfx_host_post_lcd_spi_transfer completed.");
     return SL_STATUS_OK;
 }
 #endif // SL_LCDCTRL_MUX

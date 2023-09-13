@@ -141,20 +141,24 @@ sl_status_t sl_wfx_host_deinit_bus(void)
 
 sl_status_t sl_wfx_host_spi_cs_assert()
 {
+    SILABS_LOG("sl_wfx_host_spi_cs_assert started.");
 #if SL_SPICTRL_MUX
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
     SPIDRV_SetBaudrate(SL_SPIDRV_EXP_BITRATE_MULTIPLEXED);
 #endif /* SL_SPICTRL_MUX */
     GPIO_PinOutClear(SL_SPIDRV_EXP_CS_PORT, SL_SPIDRV_EXP_CS_PIN);
+    SILABS_LOG("sl_wfx_host_spi_cs_assert completed.");
     return SL_STATUS_OK;
 }
 
 sl_status_t sl_wfx_host_spi_cs_deassert()
 {
+    SILABS_LOG("sl_wfx_host_spi_cs_deassert started.");
     GPIO_PinOutSet(SL_SPIDRV_EXP_CS_PORT, SL_SPIDRV_EXP_CS_PIN);
 #if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);
 #endif /* SL_SPICTRL_MUX */
+    SILABS_LOG("sl_wfx_host_spi_cs_deassert completed.");
     return SL_STATUS_OK;
 }
 
