@@ -309,9 +309,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertisingProcess(void)
 
     if (!mBLERadioInitialized)
     {
-        char bt_dev_name[CONFIG_BT_DEVICE_NAME_MAX];
-        strncpy(bt_dev_name, bt_get_name(), sizeof(bt_dev_name));
-
         /* Switch off Thread */
         ThreadStackMgrImpl().SetThreadEnabled(false);
         ThreadStackMgrImpl().SetRadioBlocked(true);
@@ -319,7 +316,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertisingProcess(void)
         /* Init BLE stack */
         err = bt_enable(NULL);
         VerifyOrReturnError(err == 0, MapErrorZephyr(err));
-        (void) bt_set_name(bt_dev_name);
+
         mBLERadioInitialized = true;
 #if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
         pm_policy_state_lock_get(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
