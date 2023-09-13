@@ -1406,10 +1406,10 @@ endpoint 0 {
   server cluster GeneralCommissioning {
     ram      attribute breadcrumb default = 0x0000000000000000;
     callback attribute basicCommissioningInfo;
-    callback attribute regulatoryConfig;
-    callback attribute locationCapability;
-    callback attribute supportsConcurrentConnection;
-    ram      attribute featureMap default = 6;
+    callback attribute regulatoryConfig default = 0;
+    callback attribute locationCapability default = 0;
+    callback attribute supportsConcurrentConnection default = 1;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
     handle command ArmFailSafe;
@@ -1611,5 +1611,3 @@ endpoint 1 {
     callback attribute clusterRevision;
   }
 }
-
-
