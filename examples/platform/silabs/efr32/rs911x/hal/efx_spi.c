@@ -396,7 +396,9 @@ static void spi_dmaTransfertComplete(SPIDRV_HandleData_t * pxHandle, Ecode_t tra
  **************************************************************************/
 int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint8_t mode)
 {
+#if SL_SPICTRL_MUX
     sl_wfx_host_spi_cs_assert();
+#endif // SL_SPICTRL_MUX
     /*
         TODO: tx_buf and rx_buf needs to be replaced with a dummy buffer of length xlen to align with SDK of WiFi
     */
@@ -454,7 +456,9 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     }
 
     xSemaphoreGive(spiTransferLock);
+#if SL_SPICTRL_MUX
     sl_wfx_host_spi_cs_deassert();
+#endif // SL_SPICTRL_MUX
     return rsiError;
 }
 
