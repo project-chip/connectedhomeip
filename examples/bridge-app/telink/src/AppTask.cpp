@@ -413,7 +413,7 @@ CHIP_ERROR AppTask::Init(void)
 #endif
     InitCommonParts();
 
-    err = ConnectivityMgr().SetBLEDeviceName("TelinkLight");
+    err = ConnectivityMgr().SetBLEDeviceName("TelinkBridge");
     if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("SetBLEDeviceName fail");

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -62,6 +62,8 @@
 #define CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS 1
 #endif // CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS
 
+#if CONFIG_PM
+
 #ifndef CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 #define CHIP_CONFIG_ENABLE_SERVER_IM_EVENT 0
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
@@ -97,6 +99,8 @@
 #ifndef CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES
 #define CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES 2
 #endif // CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES
+
+#endif // CONFIG_PM
 
 #ifndef CHIP_CONFIG_MAX_FABRICS
 #define CHIP_CONFIG_MAX_FABRICS 5

@@ -47,7 +47,7 @@ else()
   set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE})
 endif()
 
-set(CONF_FILE ${CHIP_ROOT}/config/telink/app/zephyr.conf prj.conf)
+set(CONF_FILE prj.conf)
 
 # Load NCS/Zephyr build system
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/telink/chip-module)
