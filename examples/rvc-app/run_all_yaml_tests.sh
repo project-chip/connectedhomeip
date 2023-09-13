@@ -27,5 +27,4 @@ fi
 
     # RVC Run Mode cluster
     ./scripts/tests/yaml/chiptool.py tests Test_TC_RVCRUNM_1_1 --PICS "$PICS_RUN" --nodeId "$NODEID" --endpoint "$RVC_DEVICE_ENDPOINT" &&
-
     echo done
