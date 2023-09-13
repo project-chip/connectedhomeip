@@ -57,7 +57,7 @@ config POSIX_MAX_FDS
 
 # Application stack size
 config MAIN_STACK_SIZE
-    default 2354 if PM
+    default 2600 if PM
     default 4096
 
 config INIT_STACKS
@@ -212,6 +212,9 @@ config OPENTHREAD_THREAD_STACK_SIZE
 config OPENTHREAD_RADIO_WORKQUEUE_STACK_SIZE
     default 361 if PM
     default 608
+
+config OPENTHREAD_SLAAC
+    default y
 
 config OPENTHREAD_MANUAL_START
     default y
