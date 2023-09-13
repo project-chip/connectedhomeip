@@ -1562,3 +1562,5 @@ zhengyaohan
 Zigbee
 zigbeealliance
 zigbeethread
+PIXIT
+RVC
