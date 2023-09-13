@@ -19,10 +19,14 @@ name:
 
 PICS:
     - RVCRUNM.S
+    - RVCRUNM.S.A0002
+    - RVCRUNM.S.A0003
+    - RVCRUNM.S.F00
+    - OO.S.A4003
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
+    cluster: "RVC Run Mode"
     endpoint: 0
 
 tests:

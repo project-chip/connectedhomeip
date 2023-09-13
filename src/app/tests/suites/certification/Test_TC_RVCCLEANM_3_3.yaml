@@ -19,10 +19,14 @@ name:
 
 PICS:
     - RVCCLEANM.S
+    - RVCCLEANM.S.A0002
+    - RVCCLEANM.S.A0003
+    - RVCCLEANM.S.F00
+    - OO.S.A4003
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
+    cluster: "RVC Clean Mode"
     endpoint: 0
 
 tests:
