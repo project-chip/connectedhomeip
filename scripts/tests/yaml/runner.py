@@ -260,8 +260,12 @@ def runner_base(ctx, configuration_directory: str, test_name: str, configuration
     specifications = SpecDefinitionsFromPaths(specifications_paths.split(','), pseudo_clusters)
     tests_finder = TestsFinder(configuration_directory, configuration_name)
 
+    test_list = tests_finder.get(test_name)
+    if len(test_list) == 0:
+        raise Exception(f"No tests found for test name '{test_name}'")
+
     parser_config = TestParserConfig(pics, specifications, kwargs)
-    parser_builder_config = TestParserBuilderConfig(tests_finder.get(test_name), parser_config, hooks=TestParserLogger())
+    parser_builder_config = TestParserBuilderConfig(test_list, parser_config, hooks=TestParserLogger())
     parser_builder_config.options.stop_on_error = stop_on_error
     while ctx:
         ctx.obj = ParserGroup(parser_builder_config, pseudo_clusters)

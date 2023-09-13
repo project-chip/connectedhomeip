@@ -70,6 +70,10 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 
 #include <lib/support/BytesToHex.h>
 
+#ifdef PERFORMANCE_TEST_ENABLED
+#include <performance_test_commands.h>
+#endif
+
 #if CHIP_ENABLE_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
 #include <openthread/cli.h>
@@ -224,6 +228,12 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     // instead of the default (insecure) one.
     gOperationalKeystore.Init();
     initParams.operationalKeystore = &gOperationalKeystore;
+#endif
+
+#ifdef PERFORMANCE_TEST_ENABLED
+    // Set up Test Event Trigger command of the General Diagnostics cluster. Used only in performance testing
+    static SilabsTestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(kTestEventTriggerEnableKey) };
+    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
 #endif
 
     // Initialize the remaining (not overridden) providers to the SDK example defaults

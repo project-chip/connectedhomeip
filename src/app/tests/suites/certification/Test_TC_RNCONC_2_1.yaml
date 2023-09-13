@@ -36,7 +36,7 @@ tests:
       command: "readAttribute"
       attribute: "MinMeasuredValue"
       response:
-          saveAs: MinMeasuredValue
+          saveAs: MinMeasuredValueValue
           constraints:
               type: single
               minValue: 0
@@ -46,10 +46,10 @@ tests:
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
       response:
-          saveAs: MaxMeasuredValue
+          saveAs: MaxMeasuredValueValue
           constraints:
               type: single
-              minValue: MinMeasuredValue
+              minValue: MinMeasuredValueValue
 
     - label: "Step 4: TH reads from the DUT the MeasuredValue attribute."
       PICS: RNCONC.S.A0000
@@ -58,8 +58,8 @@ tests:
       response:
           constraints:
               type: single
-              minValue: MinMeasuredValue
-              maxValue: MaxMeasuredValue
+              minValue: MinMeasuredValueValue
+              maxValue: MaxMeasuredValueValue
 
     - label: "Step 5: TH reads from the DUT the PeakMeasuredValue attribute."
       PICS: RNCONC.S.A0003
@@ -68,8 +68,8 @@ tests:
       response:
           constraints:
               type: single
-              minValue: MinMeasuredValue
-              maxValue: MaxMeasuredValue
+              minValue: MinMeasuredValueValue
+              maxValue: MaxMeasuredValueValue
 
     - label:
           "Step 6: TH reads from the DUT the PeakMeasuredValueWindow attribute."
@@ -89,8 +89,8 @@ tests:
       response:
           constraints:
               type: single
-              minValue: MinMeasuredValue
-              maxValue: MaxMeasuredValue
+              minValue: MinMeasuredValueValue
+              maxValue: MaxMeasuredValueValue
 
     - label:
           "Step 8: TH reads from the DUT the AverageMeasuredValueWindow

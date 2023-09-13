@@ -8902,15 +8902,6 @@ PICS:
       id: SMOKECO.S.A0009
 
     - label: "Does the device implement the ContaminationState attribute?"
-      id: SMOKECO.S.A0010
-
-    - label: "Does the device implement the SensitivityLevel attribute?"
-      id: SMOKECO.S.A0011
-
-    - label: "Does the device implement the ExpiryDate attribute?"
-      id: SMOKECO.S.A0012
-
-    - label: "Does the device implement the ContaminationState attribute?"
       id: SMOKECO.S.A000a
 
     - label: "Does the device implement the SensitivityLevel attribute?"
@@ -8953,7 +8944,7 @@ PICS:
       id: SMOKECO.S.E09
 
     - label: "Does the device implement the AllClear event?"
-      id: SMOKECO.S.E10
+      id: SMOKECO.S.E0a
 
     #
     # server / manually
