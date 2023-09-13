@@ -28,6 +28,7 @@ class PlatformLogStreamer(ABC):
         """
          artifact_dir: the fully qualified path of the output directory. This directory already exists
         """
+        raise NotImplementedError
 
     @abstractmethod
     def start_streaming(self) -> None:
@@ -35,7 +36,7 @@ class PlatformLogStreamer(ABC):
         Begin streaming logs
         Start should be able to be called repeatedly without restarting streaming
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def stop_streaming(self) -> None:
@@ -43,7 +44,7 @@ class PlatformLogStreamer(ABC):
         Stop streaming logs
         Stop should not cause an error even if the stream is not running
         """
-        pass
+        raise NotImplementedError
 
 
 class UnsupportedCapturePlatformException(Exception):
@@ -67,21 +68,21 @@ class EcosystemCapture(ABC):
         platform: the instance of the log streamer for the selected platform
         artifact_dir: the fully qualified path of the output directory. This directory already exists.
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def start_capture(self) -> None:
         """
         Start the capture
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def stop_capture(self) -> None:
         """
         Stop the capture
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def analyze_capture(self) -> None:
@@ -89,4 +90,4 @@ class EcosystemCapture(ABC):
         Parse the capture and create + display helpful analysis artifacts that are unique to the ecosystem
         Write analysis artifacts to artifact_dir
         """
-        pass
+        raise NotImplementedError

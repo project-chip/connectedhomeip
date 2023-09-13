@@ -48,7 +48,10 @@ class PlayServices(EcosystemCapture):
 
         self.analysis = PlayServicesAnalysis(self.platform, self.artifact_dir)
 
-        service_ids = ['336', '305', '168']
+        service_ids = ['336',  # Home
+                       '305',  # Thread
+                       '168',  # mDNS
+                       ]
         for service_id in service_ids:
             verbose_command = f"shell setprop log.tag.gms_svc_id:{service_id} VERBOSE"
             self.platform.run_adb_command(verbose_command)

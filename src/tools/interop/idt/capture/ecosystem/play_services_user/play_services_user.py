@@ -53,11 +53,11 @@ class PlayServicesUser(EcosystemCapture):
             for line in logcat_file:
                 if "CommissioningServiceBin: Binding to service" in line:
                     print_and_write(
-                        f"3P commissioner initiated GPS commissioning\n{line}",
+                        f"3P commissioner initiated Play Services commissioning\n{line}",
                         analysis_file)
                 elif "CommissioningServiceBin: Sending commissioning request to bound service" in line:
                     print_and_write(
-                        f"GPS commissioning complete; passing back to 3P\n{line}",
+                        f"Play Services commissioning complete; passing back to 3P\n{line}",
                         analysis_file)
                 elif "CommissioningServiceBin: Received commissioning complete from bound service" in line:
                     print_and_write(

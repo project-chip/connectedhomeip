@@ -44,7 +44,8 @@ class PlayServicesAnalysis:
             self.matter_commissioner_logs += line
 
     def _log_proc_commissioning_failed(self, line: str) -> None:
-        if self.fail_trace_line_counter > 15:
+        parsed_stack_trace_max_depth = 15
+        if self.fail_trace_line_counter > parsed_stack_trace_max_depth:
             self.fail_trace_line_counter = -1
         if self.fail_trace_line_counter > -1 and 'SetupDevice' in line:
             self.failure_stack_trace += line
@@ -81,7 +82,7 @@ class PlayServicesAnalysis:
         print_and_write(self.failure_stack_trace, analysis_file)
         print_and_write(add_border('PASE Handshake'), analysis_file)
         print_and_write(self.pake_logs, analysis_file)
-        print_and_write(add_border('mDNS resolution'), analysis_file)
+        print_and_write(add_border('DNS-SD resolution'), analysis_file)
         print_and_write(self.resolver_logs, analysis_file)
         print_and_write(add_border('CASE handshake'), analysis_file)
         print_and_write(self.sigma_logs, analysis_file)

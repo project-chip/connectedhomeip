@@ -12,11 +12,9 @@ While in discovery mode, the tool displays all Matter devices that are in
 commission and/or operational mode. This is useful to have a clear understanding
 of all Matter devices currently “active” in the testing environment.
 
-The Google Developer Center provides a good overview of
-[Commissionable and Operational Discovery](https://developers.home.google.com/matter/primer/commissionable-and-operational-discovery).  
-See also section “4.3. Discovery” of the Matter spec for official documentation.
+See section “4.3. Discovery” of the Matter spec for official documentation.
 
-When run interactively, discovery functions in one of two modes: BLE and mDNS.
+When run interactively, discovery functions in one of two modes: BLE and DNS-SD.
 
 ### Capture
 
@@ -45,10 +43,10 @@ below.
 The Raspberry Pi is referred to as the "target environment" in this document. It
 is where all the "discovery" and "capture" work is performed.
 
-The "admin" computer is the machine used to connect to and control the pi, and
-to fetch artifacts which were created during capture from the pi.
+The "admin" computer is the machine used to connect to and control the RPi, and
+to fetch artifacts which were created during capture from the RPi.
 
-This repository may be used on both the admin computer and the target
+This directory contains tools for use on both the admin computer and the target
 environment.
 
 ### Environment details
@@ -65,22 +63,22 @@ environment.
    (Linux and macOS).
 1. Windows may be used as the admin computer via tools like `PowerShell`,
    `MobaXterm` and `FileZilla`.
-1. This setup is intended to work with the admin computer and Pi connected to
+1. This setup is intended to work with the admin computer and RPi connected to
    the same Wi-Fi network, which is also the Wi-Fi network used for testing.
 1. Corporate networks are not expected to be used as test networks.
 
-### Prepare the Pi
+### Prepare the RPi
 
 1. A >= 128 GB SD card is recommended.
-1. Flash the Pi SD with the latest
+1. Flash the RPi SD with the latest
    `Kali Linux RaspberryPi 2, 3, 4 and 400 (img.xz)` image (32 bit).
     - Use [Raspberry Pi Imager](https://github.com/raspberrypi/rpi-imager) to
       [download the image and prepare the SD](https://www.kali.org/docs/arm/using-rpi-imager-to-write-raspberry-pi-images/).
-1. Plug the SD into the Pi.
-1. Connect the Pi to your network via **ethernet.** [TODO] provide alternative
-1. Boot the Pi.
+1. Plug the SD into the RPi.
+1. Connect the RPi to your network via **ethernet.** [TODO] provide alternative
+1. Boot the RPi.
 
-### Configure admin computer and push to the Pi
+### Configure admin computer and push to the RPi
 
 #### Linux and macOS admin computers
 
@@ -97,13 +95,13 @@ environment.
     ```bash
     source idt/scripts/setup_shell.sh
     ```
-1. Send `idt` to the Pi:
+1. Send `idt` to the RPi:
     ```
     idt_push
     ```
-1. `ssh` to the Pi (the default password for Kali is `kali`):
+1. `ssh` to the PRi (the default password for Kali is `kali`):
     - **_NOTE:_** You may need to wait a few minutes after boot for the `ssh`
-      server to be available on the Pi. Retry if needed!
+      server to be available on the RPi. Retry if needed!
     ```
     idt_connect
     ```
@@ -111,24 +109,24 @@ environment.
 #### Windows admin computers
 
 1. Open `PowerShell`, cd to the directory containing `idt` and send `idt` to the
-   Pi:
+   RPi:
     ```
     scp -r ./idt/* kali@kali:/home/kali/idt
     ```
-1. `ssh` to the Pi, e.g. with `MobaXterm` (the default password for Kali is
+1. `ssh` to the RPi, e.g. with `MobaXterm` (the default password for Kali is
    `kali`)
     - **_NOTE:_** You may need to wait a few minutes after boot for the `ssh`
-      server to be available on the Pi. Retry if needed!
-    - Use `kali@kali-raspberry-pi` or `kali@$ip` where `$ip` is the Pi's IP
+      server to be available on the RPi. Retry if needed!
+    - Use `kali@kali-raspberry-pi` or `kali@$ip` where `$ip` is the RPi's IP
       found in your router admin panel.
 
-### Configure the Pi
+### Configure the RPi
 
 1. Once in an ssh session, set a strong password.
     ```
     sudo passwd kali
     ```
-1. Inside the Pi, configure Wi-Fi. Disconnect ethernet and reboot.
+1. Inside the RPi, configure Wi-Fi. Disconnect ethernet, reboot and connect again.
     ```
     nmtui
     ```
@@ -143,7 +141,7 @@ environment.
 
 ### Install updates
 
-SCP may not overwrite all files. To clear the `idt` dir off of the Pi safely
+SCP may not overwrite all files. To clear the `idt` dir off of the RPi safely
 between pushes, exit the container and:
 
 ```
@@ -182,7 +180,7 @@ Setup a virtual environment and install python dependencies:
 ```
 idt_go
 cd idt
-python -m venv /venv
+python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
@@ -209,14 +207,14 @@ Follow the Debian installation steps above, but do not use Docker.
 > `idt_` commands are shell aliases helpful for administrative commands.  
 > `idt` invokes the `idt` python package.
 
-Pi users, as needed:
+RPi users, as needed:
 
 -   For users with Windows admin computers, reconnect e.g., using `MobaXterm`
--   Other users reconnect `ssh` to the Pi (from your admin computer):
+-   Other users reconnect `ssh` to the RPi (from your admin computer):
     ```
     idt_connect
     ```
--   Run the `idt` container (from the Pi):
+-   Run the `idt` container (from the RPi):
     ```
     idt_activate
     ```
