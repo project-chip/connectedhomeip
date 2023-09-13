@@ -54,6 +54,7 @@ tests:
       PICS: ACL.S.E00
       command: "readEvent"
       event: "AccessControlEntryChanged"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value:
               {

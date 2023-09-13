@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 22.4.1. [TC-SC-4.1] Commissionable Node Discovery [DUT as Commissionee]
 
@@ -1201,11 +1200,6 @@ tests:
               - name: "value"
                 value: deviceType
 
-    - label: "Step 10h: Check Commissioning Mode (_CM)"
-      PICS: MCORE.SC.EXTENDED_DISCOVERY
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionableByCommissioningMode"
-
     # TXT Records
 
     - label: "Step 10i: TXT key for discriminator (D)"
@@ -1275,7 +1269,7 @@ tests:
           an unsigned integer with units of milliseconds and shall be encoded as
           a variable length decimal number in ASCII, omitting leading zeros.
           Shall not exceed 65535."
-      PICS: MCORE.SC.SAI_OP_DISCOVERY_KEY
+      PICS: MCORE.SC.SAI_OP_DISCOVERY_KEY && MCORE.SC.EXTENDED_DISCOVERY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:

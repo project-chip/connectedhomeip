@@ -260,7 +260,11 @@
     "DoorLock": ["Test_TC_DRLK_2_10", "Test_TC_DRLK_3_2"],
     "LocalizationConfiguration": [],
     "LevelControl": [],
-    "LaundryWasherMode": ["Test_TC_LWM_1_2", "Test_TC_LWM_3_2"],
+    "LaundryWasherMode": [
+        "Test_TC_LWM_1_2",
+        "Test_TC_LWM_3_2",
+        "Test_TC_LWM_3_3"
+    ],
     "OnOff": ["Test_TC_OO_2_3"],
     "OperationalState": ["Test_TC_OPSTATE_2_2"],
     "RelativeHumidityMeasurement": ["Test_TC_RH_2_2"],

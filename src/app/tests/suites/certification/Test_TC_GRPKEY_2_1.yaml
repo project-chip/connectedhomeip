@@ -85,8 +85,7 @@ tests:
                         EpochStartTime2: "18446744073709551614",
                     }
 
-    #Step 5 Removed in test-plan PR: https://github.com/CHIP-Specifications/chip-test-plans/pull/3425
-    #TH sends AddGroup Command to DUT on PIXIT.G.ENDPOINT with the the following settings GroupID: 0x0103 GroupName: "Test Group"
+    # Step 5 does not exist in the test plan.
 
     - label:
           "Step 6: TH reads GroupTable attribute from GroupKeyManagement cluster
@@ -185,5 +184,3 @@ tests:
           value: MaxGroupKeysPerFabricValue
       response:
           error: UNSUPPORTED_WRITE
-    #Step 12 Removed in test-plan PR: https://github.com/CHIP-Specifications/chip-test-plans/pull/3425
-    #TH cleans up the groups by sending the RemoveAllGroups command to the DUT on PIXIT.G.ENDPOINT
