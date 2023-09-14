@@ -325,11 +325,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     foreach(possible_device_layer_target_define,
             possible_device_layer_target_defines) {
       if (possible_device_layer_target_define == device_layer_target_define) {
+        found_device_layer_target_define = true
         defines += [
           "CHIP_DEVICE_LAYER_TARGET_${possible_device_layer_target_define}=1",
         ]
       } else {
-        found_device_layer_target_define = true
         defines += [
           "CHIP_DEVICE_LAYER_TARGET_${possible_device_layer_target_define}=0",
         ]
