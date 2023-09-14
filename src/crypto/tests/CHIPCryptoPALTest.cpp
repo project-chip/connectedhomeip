@@ -574,14 +574,11 @@ static void TestRawIntegerToDerInvalidCases(nlTestSuite * inSuite, void * inCont
     HeapChecker heapChecker(inSuite);
     // Cover case of invalid buffers
     uint8_t placeholder[10] = { 0 };
-    MutableByteSpan good_out_buffer(placeholder, sizeof(placeholder));
-    ByteSpan good_buffer(placeholder, sizeof(placeholder));
+    MutableByteSpan good_out_buffer(placeholder);
+    ByteSpan good_buffer(placeholder);
 
-    MutableByteSpan bad_out_buffer_nullptr(nullptr, sizeof(placeholder));
-    MutableByteSpan bad_out_buffer_empty(placeholder, 0);
-
-    ByteSpan bad_buffer_nullptr(nullptr, sizeof(placeholder));
-    ByteSpan bad_buffer_empty(placeholder, 0);
+    MutableByteSpan bad_out_buffer_empty;
+    ByteSpan bad_buffer_empty;
 
     struct ErrorCase
     {
@@ -591,9 +588,7 @@ static void TestRawIntegerToDerInvalidCases(nlTestSuite * inSuite, void * inCont
     };
 
     const ErrorCase error_cases[] = {
-        { .input = good_buffer, .output = bad_out_buffer_nullptr, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
         { .input = good_buffer, .output = bad_out_buffer_empty, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
-        { .input = bad_buffer_nullptr, .output = good_out_buffer, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
         { .input = bad_buffer_empty, .output = good_out_buffer, .expected_status = CHIP_ERROR_INVALID_ARGUMENT }
     };
 
@@ -681,7 +676,6 @@ static void TestReadDerLengthInvalidCases(nlTestSuite * inSuite, void * inContex
 {
     uint8_t placeholder[1];
 
-    ByteSpan bad_buffer_nullptr(nullptr, sizeof(placeholder));
     ByteSpan bad_buffer_empty(placeholder, 0);
 
     const uint8_t zero_multi_byte_length[] = { 0x80 };
@@ -716,7 +710,6 @@ static void TestReadDerLengthInvalidCases(nlTestSuite * inSuite, void * inContex
     };
 
     const ErrorCase error_cases[] = {
-        { .input_buf = bad_buffer_nullptr, .expected_status = CHIP_ERROR_BUFFER_TOO_SMALL },
         { .input_buf = bad_buffer_empty, .expected_status = CHIP_ERROR_BUFFER_TOO_SMALL },
         { .input_buf = zero_multi_byte_length_buf, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
         { .input_buf = single_byte_length_zero_buf, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },

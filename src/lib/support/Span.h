@@ -42,9 +42,14 @@ public:
     using reference = T &;
 
     constexpr Span() : mDataBuf(nullptr), mDataLen(0) {}
-    constexpr Span(pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen) {}
+
+    Span(pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen)
+    {
+        VerifyOrDie(databuf != nullptr || datalen == 0);
+    }
+
     template <class U, size_t N, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
-    constexpr explicit Span(U (&databuf)[N]) : Span(databuf, N)
+    constexpr explicit Span(U (&databuf)[N]) : mDataBuf(databuf), mDataLen(N)
     {}
 
     template <class U, size_t N, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
@@ -216,8 +221,11 @@ public:
     template <class U,
               typename = std::enable_if_t<std::is_pointer<U>::value && sizeof(std::remove_pointer_t<U>) == sizeof(T) &&
                                           std::is_convertible<U, T *>::value>>
-    constexpr explicit FixedSpan(U databuf) : mDataBuf(databuf)
-    {}
+    explicit FixedSpan(U databuf) : mDataBuf(databuf)
+    {
+        VerifyOrDie(databuf != nullptr || N == 0);
+    }
+
     template <class U, size_t M, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
     constexpr explicit FixedSpan(U (&databuf)[M]) : mDataBuf(databuf)
     {
@@ -282,7 +290,7 @@ private:
 
 template <class T>
 template <class U, size_t N, typename>
-constexpr Span<T>::Span(const FixedSpan<U, N> & other) : Span(other.data(), other.size())
+constexpr Span<T>::Span(const FixedSpan<U, N> & other) : mDataBuf(other.data()), mDataLen(other.size())
 {}
 
 template <class T>
