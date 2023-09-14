@@ -629,6 +629,7 @@ template("bl_iot_sdk") {
     ]
 
     cflags_cc = [ "-Wno-conversion" ]
+
   }
 
   source_set("${sdk_target_name}_ble") {
@@ -761,6 +762,8 @@ template("bl_iot_sdk") {
     include_dirs = [
       "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_ethernet/Inc",
     ]
+
+    cflags_cc = [ "-Wno-conversion" ]
   }
 
   source_set("${sdk_target_name}_ethernet") {
@@ -945,6 +948,7 @@ template("bl_iot_sdk") {
     public_deps = [
       ":${sdk_target_name}_BSP_Driver",
       ":${sdk_target_name}_bl702_freertos",
+      ":${sdk_target_name}_ble",
       ":${sdk_target_name}_fs",
       ":${sdk_target_name}_hosal",
       ":${sdk_target_name}_libc",
@@ -955,19 +959,15 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_utils",
     ]
 
-    if (defined(invoker.chip_config_network_layer_ble) && invoker.chip_config_network_layer_ble) {
-      public_deps += [ ":${sdk_target_name}_ble" ]
-    }
-
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
       public_deps += [ ":${sdk_target_name}_wifi" ]
-      public_deps += [ ":${sdk_target_name}_lwip" ]
-    } else if (defined(invoker.chip_enable_ethernet) && invoker.chip_enable_ethernet) {
-      public_deps += [ ":${sdk_target_name}_ethernet" ]
       public_deps += [ ":${sdk_target_name}_lwip" ]
     } else if (defined(invoker.chip_enable_openthread) &&
                invoker.chip_enable_openthread) {
       public_deps += [ ":${sdk_target_name}_openthread_port" ]
+    } else {
+      public_deps += [ ":${sdk_target_name}_ethernet" ]
+      public_deps += [ ":${sdk_target_name}_lwip" ]
     }
 
     if (defined(invoker.enable_cdc_module) && invoker.enable_cdc_module) {

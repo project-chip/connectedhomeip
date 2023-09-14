@@ -705,9 +705,9 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_stage",
       ":${sdk_target_name}_sys",
       ":${sdk_target_name}_utils",
-      "":${sdk_target_name}_config_BSP_Driver""
     ]
-
+    public_configs = [ ":${sdk_target_name}_config_BSP_Driver" ]
+    
     if (defined(invoker.chip_config_network_layer_ble) && invoker.chip_config_network_layer_ble) {
       public_deps += [ ":${sdk_target_name}_ble" ]
     }
