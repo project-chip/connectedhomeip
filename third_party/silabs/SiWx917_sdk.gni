@@ -73,9 +73,7 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/si91x/sl_net/inc",
 
       # siwx917_soc component
-      "${wifi_sdk_root}/components/siwx917_soc/core/config",
-      "${wifi_sdk_root}/components/siwx917_soc/inc",
-      "${wifi_sdk_root}/components/siwx917_soc/boards/config/brd4325b",
+      "${wifi_sdk_root}/components/siwx917_soc/boards/config/${silabs_board_lower}",
       "${wifi_sdk_root}/components/siwx917_soc/boards/inc",
       "${wifi_sdk_root}/components/siwx917_soc/core/chip/inc",
       "${wifi_sdk_root}/components/siwx917_soc/core/config",
@@ -97,8 +95,6 @@ template("siwx917_sdk") {
 
       # si91x_support component
       "${wifi_sdk_root}/components/si91x_support/inc",
-      "${wifi_sdk_root}/components/si91x_support/brd4325b",
-      "${wifi_sdk_root}/components/si91x_support/siwx917_soc",
 
       # wifi_resources component
       "${wifi_sdk_root}/resources/certificates",
