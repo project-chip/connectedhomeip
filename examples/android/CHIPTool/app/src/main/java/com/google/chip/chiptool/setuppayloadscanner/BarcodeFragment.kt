@@ -139,9 +139,9 @@ class BarcodeFragment : Fragment() {
 
     // workaround: can not use gms to scan the code in China, added a EditText to debug
     binding.manualCodeBtn.setOnClickListener {
-      val qrCode = binding.manualCodeEditText.text.toString()
-      Log.d(TAG, "Submit Code:$qrCode")
-      handleInputQrCode(qrCode)
+      val code = binding.manualCodeEditText.text.toString()
+      Log.d(TAG, "Submit Code:$code")
+      handleInputCode(code)
     }
   }
 
@@ -178,24 +178,24 @@ class BarcodeFragment : Fragment() {
     }
   }
 
-  private fun handleInputQrCode(qrCode: String) {
+  private fun handleInputCode(code: String) {
     lateinit var payload: OnboardingPayload
     try {
-      payload = OnboardingPayloadParser().parseQrCode(qrCode)
-    } catch (ex: OnboardingPayloadException) {
-      try {
-        payload = OnboardingPayloadParser().parseManualPairingCode(qrCode)
-      } catch (ex: Exception) {
-        Log.e(TAG, "Unrecognized Manual Pairing Code", ex)
-        Toast.makeText(requireContext(), "Unrecognized Manual Pairing Code", Toast.LENGTH_SHORT)
-          .show()
+      payload = if(code.startsWith("MT:")){
+        OnboardingPayloadParser().parseQrCode(code)
+      } else {
+        OnboardingPayloadParser().parseManualPairingCode(code)
       }
+
+      FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
+        ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
     } catch (ex: UnrecognizedQrCodeException) {
-      Log.e(TAG, "Unrecognized QR Code", ex)
+      Log.e(TAG, "Unrecognized Code", ex)
       Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
+    } catch (ex: Exception) {
+      Log.e(TAG, "Exception, $ex")
+      Toast.makeText(requireContext(), "Occur Exception, $ex", Toast.LENGTH_SHORT).show()
     }
-    FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
-      ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
   }
 
   private fun handleScannedQrCode(barcode: Barcode) {
