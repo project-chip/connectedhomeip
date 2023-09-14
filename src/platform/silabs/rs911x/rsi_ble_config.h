@@ -18,6 +18,7 @@
 #ifndef RSI_BLE_CONFIG_H
 #define RSI_BLE_CONFIG_H
 
+
 #include "rsi_ble_apis.h"
 #if (SIWX_917 | EXP_BOARD)
 #include "rsi_user.h"
@@ -105,6 +106,7 @@
 
 #if (SIWX_917 | EXP_BOARD)
 #define RSI_BLE_MAX_NBR_CENTRALS (1)
+#define FRONT_END_SWITCH_SEL2 BIT(30)
 #else
 #define RSI_BLE_MAX_NBR_MASTERS (1)
 #endif
