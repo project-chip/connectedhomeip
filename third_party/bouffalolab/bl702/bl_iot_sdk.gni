@@ -236,6 +236,10 @@ template("bl_iot_sdk") {
       "DISABLE_PRINT=1",
     ]
 
+    if (defined(invoker.chip_config_network_layer_ble) && invoker.chip_config_network_layer_ble) {
+      defines += [ "CFG_BLE_ENABLE" ]
+    }
+
     sources = [
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_adc.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_boot2.c",
@@ -307,6 +311,11 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_utils",
       ":${sdk_target_name}_config_freertos",
     ]
+
+    if (defined(invoker.chip_config_network_layer_ble) && invoker.chip_config_network_layer_ble) {
+      configs += [ ":${sdk_target_name}_ble_config" ]
+    }
+
     public_configs = [
       ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_hosal",
@@ -910,7 +919,6 @@ template("bl_iot_sdk") {
     public_deps = [
       ":${sdk_target_name}_BSP_Driver",
       ":${sdk_target_name}_bl702_freertos",
-      ":${sdk_target_name}_ble",
       ":${sdk_target_name}_ethernet",
       ":${sdk_target_name}_fs",
       ":${sdk_target_name}_hosal",
@@ -921,6 +929,10 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_sys",
       ":${sdk_target_name}_utils",
     ]
+
+    if (defined(invoker.chip_config_network_layer_ble) && invoker.chip_config_network_layer_ble) {
+      public_deps += [ ":${sdk_target_name}_ble" ]
+    }
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
       public_deps += [ ":${sdk_target_name}_wifi" ]

@@ -192,6 +192,7 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_hosal") {
+    defines = [ "CFG_BLE_ENABLE" ]
     sources = [
       "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_adc.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_boot2.c",
@@ -271,6 +272,7 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_fs",
       ":${sdk_target_name}_config_utils",
       ":${sdk_target_name}_config_freertos",
+      ":${sdk_target_name}_ble_config",
     ]
     public_configs = [
       ":${sdk_target_name}_config",
