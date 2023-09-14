@@ -98,7 +98,7 @@ def connect_device(devCtrl, setupPayload, commissionableDevice, nodeId=None):
         log.error("Commission discovered device failed {}".format(str(ex)))
         return None
     if not res:
-        log.info("Commission discovered device failed (no response received)")
+        log.info("Commission discovered device failed: %r" % res)
         return None
     return nodeId
 
