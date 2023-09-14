@@ -83,7 +83,7 @@ extern struct wfx_rsi wfx_rsi;
 extern "C" {
 #endif
 void wfx_rsidev_init(void);
-int32_t wfx_rsi_task(void * arg);
+void wfx_rsi_task(void * arg);
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
 void wfx_ip_changed_notify(int got_ip);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */

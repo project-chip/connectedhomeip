@@ -381,14 +381,14 @@ sl_status_t bg_scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_
     return SL_STATUS_OK;
 }
 /***************************************************************************************
- * @fn   static sl_status_t wfx_rsi_save_ap_info()
+ * @fn   static void wfx_rsi_save_ap_info()
  * @brief
  *       Saving the details of the AP
  * @param[in]  None
  * @return
  *       None
  *******************************************************************************************/
-static sl_status_t wfx_rsi_save_ap_info() // translation
+static void wfx_rsi_save_ap_info() // translation
 {
     sl_status_t status                                   = SL_STATUS_OK;
     sl_wifi_scan_configuration_t wifi_scan_configuration = { 0 };
@@ -407,7 +407,6 @@ static sl_status_t wfx_rsi_save_ap_info() // translation
         }
         status = scan_results_complete ? callback_status : SL_STATUS_TIMEOUT;
     }
-    return status;
 }
 
 /********************************************************************************************
@@ -527,7 +526,7 @@ static sl_status_t wfx_rsi_do_join(void)
  *       None
  **********************************************************************************/
 /* ARGSUSED */
-int32_t wfx_rsi_task(void * arg)
+void wfx_rsi_task(void * arg)
 {
     EventBits_t flags;
     TickType_t last_dhcp_poll, now;
@@ -538,7 +537,7 @@ int32_t wfx_rsi_task(void * arg)
     if (rsi_status != RSI_SUCCESS)
     {
         SILABS_LOG("%s: error: wfx_rsi_init with status: %02x", __func__, rsi_status);
-        return rsi_status;
+        return;
     }
     wfx_lwip_start();
     last_dhcp_poll = xTaskGetTickCount();
@@ -673,11 +672,13 @@ int32_t wfx_rsi_task(void * arg)
                 advanced_scan_configuration.trigger_level        = ADV_SCAN_THRESHOLD;
                 advanced_scan_configuration.trigger_level_change = ADV_RSSI_TOLERANCE_THRESHOLD;
                 advanced_scan_configuration.enable_multi_probe   = ADV_MULTIPROBE;
-                status = sl_wifi_set_advanced_scan_configuration(&advanced_scan_configuration);
-                /* Terminate with end of scan which is no ap sent back */
-                wifi_scan_configuration.type                   = SL_WIFI_SCAN_TYPE_ADV_SCAN;
-                wifi_scan_configuration.periodic_scan_interval = ADV_SCAN_PERIODICITY;
-                sl_wifi_set_scan_callback(bg_scan_callback_handler, NULL);
+                /* Terminate with end of scan which is no ap sent back */      
+                status = sl_wifi_set_scan_callback(bg_scan_callback_handler, NULL);
+                if (SL_STATUS_OK != status)
+                {
+                    return;
+                }
+
                 status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, NULL, &wifi_scan_configuration);
                 if (SL_STATUS_IN_PROGRESS == status)
                 {
@@ -689,7 +690,6 @@ int32_t wfx_rsi_task(void * arg)
                     }
                     status = scan_results_complete ? callback_status : SL_STATUS_TIMEOUT;
                 }
-                return status;
             }
         }
 #endif /* SL_WFX_CONFIG_SCAN */
