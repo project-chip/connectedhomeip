@@ -32,11 +32,14 @@ declare_args() {
   use_hw_sha256 = false
   use_hw_aes = false
 
-  # icd configuration flags
-  chip_enable_icd_subscription_handle = false
-  chip_ot_idle_interval_ms = 1000  # 1s Idle Intervals
-  chip_ot_active_interval_ms = 100  # 100ms Active Intervals
-  chip_active_mode_threshold = 500  # 500ms Active mode threshold
+  # ICD Matter Configuration flags
+  chip_ot_idle_interval_ms = 2000           # 2s Idle Intervals
+  chip_ot_active_interval_ms = 500          # 500ms Active Intervals
+
+  nxp_idle_mode_interval_s = 600            # 10min Idle Mode Interval
+  nxp_active_mode_interval_ms = 10000       # 10s Active Mode Interval
+  nxp_active_mode_threshold_ms = 1000       # 1s Active Mode Threshold
+  nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
 }
 
 openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
@@ -257,6 +260,14 @@ template("k32w1_sdk") {
       "BLE_HIGH_TX_POWER=0",            # when enabled overwrite default tx power with following values gAdvertisingPowerLeveldBm_c and gConnectPowerLeveldBm_c
       "gAdvertisingPowerLeveldBm_c=0",
       "gConnectPowerLeveldBm_c=0",
+      #move these platform specific defines to args.gni
+      "NXP_OT_IDLE_INTERVAL=${chip_ot_idle_interval_ms}",
+      "NXP_OT_ACTIVE_INTERVAL=${chip_ot_active_interval_ms}",
+      "NXP_ICD_ENABLED=1",
+      "NXP_ACTIVE_MODE_THRESHOLD=${nxp_active_mode_threshold_ms}",
+      "NXP_ACTIVE_MODE_INTERVAL=${nxp_active_mode_interval_ms}",
+      "NXP_IDLE_MODE_INTERVAL=${nxp_idle_mode_interval_s}",
+      "NXP_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${nxp_icd_supported_clients_per_fabric}",
     ]
 
     if (chip_enable_pw_rpc) {

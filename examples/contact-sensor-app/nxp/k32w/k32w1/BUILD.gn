@@ -84,13 +84,6 @@ k32w1_executable("contact_sensor_app") {
     "main/main.cpp",
   ]
 
-  if (chip_enable_icd_subscription_handle) {
-    sources += [
-      "${chip_root}/examples/platform/nxp/common/icd/ICDSubscriptionCallback.cpp",
-      "${chip_root}/examples/platform/nxp/common/icd/ICDSubscriptionCallback.h",
-    ]
-  }
-
   deps = [
     ":sdk",
     "${chip_root}/examples/common/QRCode",
