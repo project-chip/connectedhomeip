@@ -267,13 +267,14 @@ public:
     template <typename T>
     inline CHIP_ERROR
     command_test(nlTestSuite * sSuite, const std::string & topic, const std::string & json_payload, T & request,
-                 typename chip::Controller::TypedCommandCallback<typename T::ResponseType>::OnSuccessCallbackType onSuccessCb)
+                 typename chip::Controller::TypedCommandCallback<typename T::ResponseType>::OnSuccessCallbackType onSuccessCb,
+                 const chip::Optional<uint16_t> & timedInvokeTimeoutMs)
     {
         CHIP_ERROR err   = CHIP_NO_ERROR;
         auto onFailureCb = [&err](CHIP_ERROR aError) { err = aError; };
 
         err = chip::Controller::InvokeCommandRequest<T>(&GetExchangeManager(), GetSessionBobToAlice(), kEndpointId, request,
-                                                        onSuccessCb, onFailureCb);
+                                                        onSuccessCb, onFailureCb, timedInvokeTimeoutMs);
         NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
         DrainAndServiceIO();
 
@@ -291,7 +292,7 @@ public:
     {
         auto onSuccessCb = [sSuite](const chip::app::ConcreteCommandPath & commandPath, const chip::app::StatusIB & aStatus,
                                     const chip::app::DataModel::NullObjectType & dataResponse) { NL_TEST_ASSERT(sSuite, true); };
-        return command_test<T>(sSuite, topic, json_payload, request, onSuccessCb);
+        return command_test<T>(sSuite, topic, json_payload, request, onSuccessCb, chip::NullOptional);
     }
 
     /**
@@ -307,7 +308,17 @@ public:
         auto onSuccessCb = [&response](const chip::app::ConcreteCommandPath & commandPath, const chip::app::StatusIB & aStatus,
                                        const typename T::ResponseType & dataResponse) { response = dataResponse; };
 
-        return command_test<T>(sSuite, topic, json_payload, request, onSuccessCb);
+        return command_test<T>(sSuite, topic, json_payload, request, onSuccessCb, chip::NullOptional);
+    }
+
+    template <typename T>
+    inline CHIP_ERROR command_test(nlTestSuite * sSuite, const std::string & topic, const std::string & json_payload,
+                                   T & request, uint16_t timedInvokeTimeoutMs)
+    {
+        auto onSuccessCb = [sSuite](const chip::app::ConcreteCommandPath & commandPath, const chip::app::StatusIB & aStatus,
+                                    const chip::app::DataModel::NullObjectType & dataResponse) { NL_TEST_ASSERT(sSuite, true); };
+
+        return command_test<T>(sSuite, topic, json_payload, request, onSuccessCb, chip::MakeOptional(timedInvokeTimeoutMs));
     }
 
 private:
