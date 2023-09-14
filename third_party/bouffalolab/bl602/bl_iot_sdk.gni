@@ -283,7 +283,7 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_fs",
       ":${sdk_target_name}_config_utils",
       ":${sdk_target_name}_config_freertos",
-      ":${sdk_target_name}_ble_config",
+      ":${sdk_target_name}_config_ble",
     ]
     public_configs = [
       ":${sdk_target_name}_config",

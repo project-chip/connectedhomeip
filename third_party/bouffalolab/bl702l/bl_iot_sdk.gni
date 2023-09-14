@@ -262,10 +262,9 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_sys",
       ":${sdk_target_name}_config_fs",
       ":${sdk_target_name}_config_utils",
-      ":${sdk_target_name}_ble_config",
     ]
     if (defined(invoker.chip_config_network_layer_ble) && invoker.chip_config_network_layer_ble) {
-      configs += [ ":${sdk_target_name}_ble_config" ]
+      configs += [ ":${sdk_target_name}_config_ble" ]
     }
 
     public_configs = [
@@ -706,13 +705,13 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_stage",
       ":${sdk_target_name}_sys",
       ":${sdk_target_name}_utils",
+      "":${sdk_target_name}_config_BSP_Driver""
     ]
 
     if (defined(invoker.chip_config_network_layer_ble) && invoker.chip_config_network_layer_ble) {
       public_deps += [ ":${sdk_target_name}_ble" ]
     }
 
-    public_configs = [ ":${sdk_target_name}_config_BSP_Driver" ]
     if (defined(invoker.chip_enable_openthread) &&
         invoker.chip_enable_openthread) {
       public_deps += [ ":${sdk_target_name}_openthread_port" ]
