@@ -853,9 +853,10 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdService
     resolveContext->mAddressType = ToAvahiProtocol(addressType);
     resolveContext->mFullType    = GetFullType(type, protocol);
 
-    AvahiServiceResolver * resolver = avahi_service_resolver_new(
-        mClient, avahiInterface, resolveContext->mTransport, name, resolveContext->mFullType.c_str(), nullptr,
-        resolveContext->mAddressType, static_cast<AvahiLookupFlags>(0), HandleResolve, reinterpret_cast<void *>(resolveContext->mNumber));
+    AvahiServiceResolver * resolver =
+        avahi_service_resolver_new(mClient, avahiInterface, resolveContext->mTransport, name, resolveContext->mFullType.c_str(),
+                                   nullptr, resolveContext->mAddressType, static_cast<AvahiLookupFlags>(0), HandleResolve,
+                                   reinterpret_cast<void *>(resolveContext->mNumber));
     // Otherwise the resolver will be freed in the callback
     if (resolver == nullptr)
     {
@@ -876,7 +877,8 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
     ResolveContext * context = sInstance.ResolveContextForHandle(handle);
     std::vector<TextEntry> textEntries;
 
-    if (context == nullptr) {
+    if (context == nullptr)
+    {
         ChipLogError(Discovery, "Invalid context for handling resolves: %ld", static_cast<long>(handle));
         return;
     }

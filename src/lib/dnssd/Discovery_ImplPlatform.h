@@ -91,15 +91,15 @@ private:
                               size_t subTypeSize, uint16_t port, Inet::InterfaceId interfaceId, const chip::ByteSpan & mac,
                               DnssdServiceProtocol procotol, PeerId peerId);
 
-    static void HandleNodeIdResolve(void * context, DnssdService * result, const Span<Inet::IPAddress> & addresses, CHIP_ERROR error);
+    static void HandleNodeIdResolve(void * context, DnssdService * result, const Span<Inet::IPAddress> & addresses,
+                                    CHIP_ERROR error);
 
     State mState = State::kUninitialized;
     uint8_t mCommissionableInstanceName[sizeof(uint64_t)];
     ResolverProxy mResolverProxy;
-    OperationalResolveDelegate *mOperationalDelegate = nullptr;
+    OperationalResolveDelegate * mOperationalDelegate = nullptr;
 
     static DiscoveryImplPlatform sManager;
-
 };
 
 } // namespace Dnssd

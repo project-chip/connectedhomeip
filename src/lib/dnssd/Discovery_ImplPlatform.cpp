@@ -272,11 +272,13 @@ CHIP_ERROR AddTxtRecord(TxtFieldKey key, TextEntry * entries, size_t & entriesCo
 
 } // namespace
 
-void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * result, const Span<Inet::IPAddress> & addresses, CHIP_ERROR error)
+void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * result, const Span<Inet::IPAddress> & addresses,
+                                                CHIP_ERROR error)
 {
-    DiscoveryImplPlatform *impl = static_cast<DiscoveryImplPlatform*>(context);
+    DiscoveryImplPlatform * impl = static_cast<DiscoveryImplPlatform *>(context);
 
-    if (impl->mOperationalDelegate == nullptr) {
+    if (impl->mOperationalDelegate == nullptr)
+    {
         ChipLogError(Discovery, "No delegate to handle node resolution data.");
         return;
     }
@@ -331,7 +333,6 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
     nodeData.LogNodeIdResolved();
     impl->mOperationalDelegate->OnOperationalNodeResolved(nodeData);
 }
-
 
 void DnssdService::ToDiscoveredNodeData(const Span<Inet::IPAddress> & addresses, DiscoveredNodeData & nodeData)
 {

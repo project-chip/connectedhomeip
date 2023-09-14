@@ -116,7 +116,7 @@ public:
     CHIP_ERROR Resolve(const char * name, const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
                        chip::Inet::IPAddressType transportType, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
                        void * context);
-    void StopResolve(const char *name);
+    void StopResolve(const char * name);
 
     Poller & GetPoller() { return mPoller; }
 
@@ -139,7 +139,7 @@ private:
 
     struct ResolveContext
     {
-        size_t    mNumber; // unique number for this context
+        size_t mNumber; // unique number for this context
         MdnsAvahi * mInstance;
         DnssdResolveCallback mCallback;
         void * mContext;
@@ -148,11 +148,13 @@ private:
         AvahiProtocol mTransport;
         AvahiProtocol mAddressType;
         std::string mFullType;
-        uint8_t mAttempts = 0;
-        AvahiServiceResolver *mResolver = nullptr;
+        uint8_t mAttempts                = 0;
+        AvahiServiceResolver * mResolver = nullptr;
 
-        ~ResolveContext() {
-            if (mResolver != nullptr) {
+        ~ResolveContext()
+        {
+            if (mResolver != nullptr)
+            {
                 avahi_service_resolver_free(mResolver);
             }
         }
@@ -162,11 +164,11 @@ private:
     static MdnsAvahi sInstance;
 
     /// Allocates a new resolve context with a unique `mNumber`
-    ResolveContext *AllocateResolveContext();
+    ResolveContext * AllocateResolveContext();
 
-    ResolveContext *ResolveContextForHandle(size_t handle);
+    ResolveContext * ResolveContextForHandle(size_t handle);
     void FreeResolveContext(size_t handle);
-    void FreeResolveContext(const char *name);
+    void FreeResolveContext(const char * name);
 
     static void HandleClientState(AvahiClient * client, AvahiClientState state, void * context);
     void HandleClientState(AvahiClient * client, AvahiClientState state);

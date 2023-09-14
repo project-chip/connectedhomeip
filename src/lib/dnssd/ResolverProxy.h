@@ -158,7 +158,7 @@ public:
 
     // TODO: ResolverProxy should not be used anymore to implement operational node resolution
     //       This method still here because Resolver interface requires it
-    CHIP_ERROR ResolveNodeId(const PeerId & peerId) override {return CHIP_ERROR_NOT_IMPLEMENTED;}
+    CHIP_ERROR ResolveNodeId(const PeerId & peerId) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override {}
 
 private:
