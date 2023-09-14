@@ -28,8 +28,6 @@
 //! Disable feature
 #define RSI_DISABLE 0
 
-#define SI91X_LISTEN_INTERVAL 0
-
 static const sl_wifi_device_configuration_t config = {
     .boot_option = LOAD_NWP_FW,
     .mac_address = NULL,

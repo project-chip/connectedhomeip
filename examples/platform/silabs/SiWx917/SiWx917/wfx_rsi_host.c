@@ -56,7 +56,7 @@ sl_status_t wfx_wifi_start(void)
     /*
      * Create the Wifi driver task
      */
-    wfx_rsi.wlan_task = xTaskCreateStatic(wfx_rsi_task, "wfx_rsi", WFX_RSI_TASK_SZ, NULL, WLAN_DRIVER_TASK_PRIORITY,
+    wfx_rsi.wlan_task = xTaskCreateStatic((void *)wfx_rsi_task, "wfx_rsi", WFX_RSI_TASK_SZ, NULL, WLAN_DRIVER_TASK_PRIORITY,
                                           wfxRsiTaskStack, &wfxRsiTaskBuffer);
 
     if (NULL == wfx_rsi.wlan_task)
