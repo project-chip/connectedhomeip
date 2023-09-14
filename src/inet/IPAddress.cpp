@@ -194,7 +194,7 @@ lwip_ip_addr_type IPAddress::ToLwIPAddrType(IPAddressType typ)
 
 ip6_addr_t IPAddress::ToIPv6() const
 {
-    ip6_addr_t ipAddr = { 0 };
+    ip6_addr_t ipAddr = {};
     static_assert(sizeof(ipAddr.addr) == sizeof(Addr), "ip6_addr_t size mismatch");
     memcpy(&ipAddr.addr, Addr, sizeof(ipAddr.addr));
     return ipAddr;

@@ -34,6 +34,10 @@
 #import <CoreData/CoreData.h>
 #import <CoreFoundation/CoreFoundation.h>
 
+#ifndef CHIP_CONFIG_DARWIN_STORAGE_VERBOSE_LOGGING
+#define CHIP_CONFIG_DARWIN_STORAGE_VERBOSE_LOGGING 0
+#endif // CHIP_CONFIG_DARWIN_STORAGE_VERBOSE_LOGGING
+
 @interface KeyValueItem : NSManagedObject
 
 @property (nonatomic, retain) NSString * key;

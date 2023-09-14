@@ -267,7 +267,7 @@ Example:
 -   [SiliconLabs](./silabs_efr32_building.md)
 -   [Simulated Linux](./simulated_device_linux.md)
 -   [Telink](/examples/lighting-app/telink/README.md)
--   [TI Platform](./ti_platform_overview.md)
+-   [TI Platform](./ti/ti_platform_overview.md)
 -   [TI All Clusters](/examples/all-clusters-app/cc13x4_26x4/README.md)
 -   [Tizen](/examples/lighting-app/tizen/README.md)
 
