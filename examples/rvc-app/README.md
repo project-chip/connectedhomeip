@@ -57,7 +57,7 @@ Example command:
 PIXIT:
 `PIXIT_ENDPOINT:1 PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:1 PIXIT.RVCCLEANM.MODE_CHANGE_OK:2`  
 Example command:
-`/scripts/tests/run_python_test.py --script src/python_testing/TC_RVCCLEANM_2_1.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/RVC_App_Test_Plan.txt --int-arg PIXIT_ENDPOINT:1 PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:1 PIXIT.RVCCLEANM.MODE_CHANGE_OK:2"`
+`./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCCLEANM_2_1.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/RVC_App_Test_Plan.txt --int-arg PIXIT_ENDPOINT:1 PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:1 PIXIT.RVCCLEANM.MODE_CHANGE_OK:2"`
 
 When asked "Manually put the device in a state from which it will FAIL to
 transition to mode 1", set the `RvcRunMode` to 1.
@@ -69,8 +69,12 @@ transition to mode 2", set the `RvcRunMode` to 0.
 
 #### TC 3.2
 
-This is not applicable because this RVC device does not support the
-`StartUpMode` attribute.
+PIXIT:
+`PIXIT_ENDPOINT:1`  
+Example command:
+`./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCCLEANM_3_2.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/RVC_App_Test_Plan.txt --int-arg PIXIT_ENDPOINT:1"`
+
+When asked "Physically power cycle the device", do so.
 
 ### RVC Run Mode cluster
 
