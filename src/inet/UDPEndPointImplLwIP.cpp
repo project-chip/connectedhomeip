@@ -195,10 +195,7 @@ CHIP_ERROR UDPEndPointImplLwIP::SendMsgImpl(const IPPacketInfo * pktInfo, System
             return udp_sendto_if(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort,
                                  intfId.GetPlatformInterface());
         }
-        else
-        {
-            return udp_sendto(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort);
-        }
+        return udp_sendto(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort);
     });
 
     ip_addr_copy(mUDP->local_ip, boundAddr);
@@ -461,11 +458,8 @@ CHIP_ERROR UDPEndPointImplLwIP::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInt
             return join ? igmp_joingroup_netif(lNetif, &lIPv4Address) //
                         : igmp_leavegroup_netif(lNetif, &lIPv4Address);
         }
-        else
-        {
-            return join ? igmp_joingroup(IP4_ADDR_ANY4, &lIPv4Address) //
-                        : igmp_leavegroup(IP4_ADDR_ANY4, &lIPv4Address);
-        }
+        return join ? igmp_joingroup(IP4_ADDR_ANY4, &lIPv4Address) //
+                    : igmp_leavegroup(IP4_ADDR_ANY4, &lIPv4Address);
     });
 
     if (lStatus == ERR_MEM)
@@ -496,11 +490,8 @@ CHIP_ERROR UDPEndPointImplLwIP::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInt
             return join ? mld6_joingroup_netif(lNetif, &lIPv6Address) //
                         : mld6_leavegroup_netif(lNetif, &lIPv6Address);
         }
-        else
-        {
-            return join ? mld6_joingroup(IP6_ADDR_ANY6, &lIPv6Address) //
-                        : mld6_leavegroup(IP6_ADDR_ANY6, &lIPv6Address);
-        }
+        return join ? mld6_joingroup(IP6_ADDR_ANY6, &lIPv6Address) //
+                    : mld6_leavegroup(IP6_ADDR_ANY6, &lIPv6Address);
     });
 
     if (lStatus == ERR_MEM)

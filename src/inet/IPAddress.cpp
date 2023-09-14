@@ -108,7 +108,7 @@ ip4_addr_t IPAddress::ToIPv4() const
 
 #endif // INET_CONFIG_ENABLE_IPV4
 
-ip_addr_t IPAddress::ToLwIPAddr(void) const
+ip_addr_t IPAddress::ToLwIPAddr() const
 {
     ip_addr_t ret;
 
