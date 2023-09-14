@@ -84,6 +84,10 @@ declare_args() {
 
   # When using minmdns, set the number of parallel resolves
   chip_config_minmdns_max_parallel_resolves = 2
+
+  # If set to true, adds a string "info" field to Cancelable.
+  # Only here for backwards compat.  Generally should not be set to true.
+  chip_config_cancelable_has_info_string_field = false
 }
 
 if (chip_target_style == "") {
