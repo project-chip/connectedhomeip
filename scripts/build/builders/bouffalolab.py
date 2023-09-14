@@ -132,6 +132,10 @@ class BouffalolabBuilder(GnBuilder):
             elif bouffalo_chip == "bl702l":
                 enable_wifi, enable_thread, enable_ethernet = False, True, False
 
+        if (enable_ethernet or enable_wifi) and enable_thread:
+            raise Exception('')
+
+        # hardware connectivity support check
         if bouffalo_chip == "bl602":
 
             if enable_ethernet or enable_thread:
@@ -149,33 +153,21 @@ class BouffalolabBuilder(GnBuilder):
             if enable_ethernet or enable_wifi:
                 raise Exception('SoC %s doesn\'t support connectivity Ethernet/Wi-Fi currently.' % bouffalo_chip)
 
-        if enable_wifi or enable_thread:
-            self.argsOpt.append('chip_config_network_layer_ble=true')
-        else:
-            # for enable_ethernet, do not need ble for commissioning
-            self.argsOpt.append('chip_config_network_layer_ble=false')
+        self.argsOpt.append('chip_enable_ethernet={}'.format(str(enable_ethernet).lower()))
+        self.argsOpt.append('chip_enable_wifi={}'.format(str(enable_wifi).lower()))
+        self.argsOpt.append('chip_enable_openthread={}'.format(str(enable_thread).lower()))
 
-        if enable_ethernet:
-            self.argsOpt.append('chip_enable_ethernet=true')
+        # for enable_ethernet, do not need ble for commissioning
+        self.argsOpt.append('chip_config_network_layer_ble={}'.format(str(enable_wifi or enable_thread)).lower())
+
+        if enable_ethernet or enable_wifi:
             self.argsOpt.append('chip_mdns="minimal"')
             self.argsOpt.append('chip_inet_config_enable_ipv4=true')
-        else:
-            self.argsOpt.append('chip_enable_ethernet=false')
-
-        if enable_wifi:
-            self.argsOpt.append('chip_enable_wifi=true')
-            self.argsOpt.append('chip_mdns="minimal"')
-            self.argsOpt.append('chip_inet_config_enable_ipv4=true')
-        else:
-            self.argsOpt.append('chip_enable_wifi=false')
 
         if enable_thread:
-            self.argsOpt.append('chip_enable_openthread=true')
             self.argsOpt.append('chip_mdns="platform"')
             self.argsOpt.append('chip_inet_config_enable_ipv4=false')
-            self.argsOpt.append('openthread_project_core_config_file="{}-openthread-core-bl-config.h"'.format(bouffalo_chip))
-        else:
-            self.argsOpt.append('chip_enable_openthread=false')
+            self.argsOpt.append('openthread_project_core_config_file="{}-openthread-core-bl-config.h"'.format(bouffalo_chip))            
 
         if enable_cdc:
             if bouffalo_chip != "bl702":
