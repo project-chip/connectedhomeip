@@ -13,7 +13,7 @@ void RvcDevice::SetDeviceToIdleState()
 {
     if (mCharging)
     {
-        mDocked   = true;
+        mDocked = true;
         mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCharging));
     }
     else if (mDocked)
