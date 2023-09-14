@@ -889,7 +889,7 @@ tests:
           represented as a variable length decimal number in ASCII without
           leading zeros"
       # The device type is not broadcasted by the accessory under CI.
-      PICS: MCORE.SC.VENDOR_SUBTYPE
+      PICS: MCORE.SC.DEVTYPE_SUBTYPE
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByDeviceType"
       arguments:
