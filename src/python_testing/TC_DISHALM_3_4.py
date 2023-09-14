@@ -107,9 +107,11 @@ class TC_DISHALM_3_4(MatterBaseTest):
         logging.info("Latch: %s" % (latch_response))
 
         if latch_response & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kTempTooLow:
-            asserts.assert_true(state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kTempTooLow, "Bit 3 of State is not set to 1 while bit 3 of Latch is 1")
+            asserts.assert_true(state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kTempTooLow,
+                                "Bit 3 of State is not set to 1 while bit 3 of Latch is 1")
         else:
-            asserts.assert_false(state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kTempTooLow, "Bit 3 of State is not set to 0 while bit 3 of Latch is 0")
+            asserts.assert_false(state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kTempTooLow,
+                                 "Bit 3 of State is not set to 0 while bit 3 of Latch is 0")
 
         self.print_step("3a", "Send to the DUT the Reset Command with bit 3 of Alarms set to 1")
         alarm = Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kTempTooLow

@@ -77,7 +77,8 @@ class TC_DISHALM_3_6(MatterBaseTest):
         logging.info("Notify: %s" % (notify))
         logging.info("Notify State: %s" % (notify_state))
 
-        asserts.assert_true(notify_state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kWaterLevelError, "State bit 5 is not set to TRUE")
+        asserts.assert_true(notify_state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kWaterLevelError,
+                            "State bit 5 is not set to TRUE")
 
         self.print_step("2b", "After a few seconds, read from the DUT the State Attribute")
         state = self.read_state_attribute(endpoint=endpoint)
@@ -107,9 +108,11 @@ class TC_DISHALM_3_6(MatterBaseTest):
         logging.info("Latch: %s" % (latch_response))
 
         if latch_response & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kWaterLevelError:
-            asserts.assert_true(state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kWaterLevelError, "Bit 5 of State is not set to 1 while bit 5 of Latch is 1")
+            asserts.assert_true(state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kWaterLevelError,
+                                "Bit 5 of State is not set to 1 while bit 5 of Latch is 1")
         else:
-            asserts.assert_false(state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kWaterLevelError, "Bit 5 of State is not set to 0 while bit 5 of Latch is 0")
+            asserts.assert_false(state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kWaterLevelError,
+                                 "Bit 5 of State is not set to 0 while bit 5 of Latch is 0")
 
         self.print_step("3a", "Send to the DUT the Reset Command with bit 5 of Alarms set to 1")
         alarm = Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kWaterLevelError

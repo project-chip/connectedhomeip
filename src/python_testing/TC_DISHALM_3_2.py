@@ -108,9 +108,11 @@ class TC_DISHALM_3_2(MatterBaseTest):
         logging.info("Latch: %s" % (latch_response))
 
         if latch_response & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kDrainError:
-            asserts.assert_true(state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kDrainError, "Bit 1 of State is not set to 1 while bit 1 of Latch is 1")
+            asserts.assert_true(state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kDrainError,
+                                "Bit 1 of State is not set to 1 while bit 1 of Latch is 1")
         else:
-            asserts.assert_false(state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kDrainError, "Bit 1 of State is not set to 0 while bit 1 of Latch is 0")
+            asserts.assert_false(state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kDrainError,
+                                 "Bit 1 of State is not set to 0 while bit 1 of Latch is 0")
 
         self.print_step("3a", "Send to the DUT the Reset Command with bit 1 of Alarms set to 1")
         alarm = Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kDrainError
