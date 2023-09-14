@@ -40,17 +40,25 @@ enum CastingPlayerDiscoveryState
     DISCOVERY_RUNNING,   // After StartDiscovery success
 };
 
+/**
+ * @brief DiscoveryDelegate handles callbacks as CastingPlayers are discovered, updated, or lost
+ * from the network.
+ */
 class DLL_EXPORT DiscoveryDelegate
 {
 public:
     virtual ~DiscoveryDelegate() {}
-    virtual void HandleOnAdded(Strong<CastingPlayer> player)    = 0;
-    virtual void HandleOnUpdated(Strong<CastingPlayer> players) = 0;
-    // virtual void HandleOnRemoved(std::vector<Strong<CastingPlayer>> players);
+    virtual void HandleOnAdded(memory::Strong<CastingPlayer> player)    = 0;
+    virtual void HandleOnUpdated(memory::Strong<CastingPlayer> players) = 0;
+    // virtual void HandleOnRemoved(memory::Strong<CastingPlayer> players) = 0;
 };
 
 class CastingPlayerDiscovery;
 
+/**
+ * @brief DeviceDiscoveryDelegateImpl defines functionality for when callback
+ * OnDiscoveredDevice is thrown.
+ */
 class DeviceDiscoveryDelegateImpl : public chip::Controller::DeviceDiscoveryDelegate
 {
 private:
@@ -63,11 +71,15 @@ public:
     void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 };
 
+/**
+ * @brief CastingPlayerDiscovery represents the discovery of Casting Players.
+ * This class is a singleton.
+ */
 class CastingPlayerDiscovery
 {
 
 private:
-    std::vector<Strong<CastingPlayer>> mCastingPlayers;
+    std::vector<memory::Strong<CastingPlayer>> mCastingPlayers;
     DeviceDiscoveryDelegateImpl mDelegate;
 
     CastingPlayerDiscovery();
@@ -109,7 +121,9 @@ public:
         mDelegate = DeviceDiscoveryDelegateImpl(clientDelegate);
     }
 
-    std::vector<Strong<CastingPlayer>> * GetCastingPlayers() { return &mCastingPlayers; }
+    std::vector<memory::Strong<CastingPlayer>> GetCastingPlayers() { return mCastingPlayers; }
+
+    friend class DeviceDiscoveryDelegateImpl;
 };
 
 }; // namespace core

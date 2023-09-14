@@ -84,7 +84,7 @@ private:
     int commissionersCount = 0;
 
 public:
-    void HandleOnAdded(Strong<CastingPlayer> player) override
+    void HandleOnAdded(matter::casting::memory::Strong<CastingPlayer> player) override
     {
         if (commissionersCount == 0)
         {
@@ -96,7 +96,7 @@ public:
         ChipLogProgress(AppServer, "Discovered Commissioners #%d", commissionersCount);
         player->LogDetail();
     }
-    void HandleOnUpdated(Strong<CastingPlayer> player) override
+    void HandleOnUpdated(matter::casting::memory::Strong<CastingPlayer> player) override
     {
         ChipLogProgress(AppServer, "Updated commissioner with ID: %s", player->GetId());
     }
@@ -180,7 +180,8 @@ int main(int argc, char * argv[])
                         ChipLogError(AppServer, "CastingPlayerDiscovery::SetDelegate failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     // Discover CastingPlayers
-    err = CastingPlayerDiscovery::GetInstance()->StartDiscovery(35); // 35 represents device type: Matter video players
+    const uint64_t kTargetPlayerDeviceType = 35; // 35 represents device type: Matter video players
+    err                                    = CastingPlayerDiscovery::GetInstance()->StartDiscovery(kTargetPlayerDeviceType);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
                         ChipLogError(AppServer, "CastingPlayerDiscovery::StartDiscovery failed %" CHIP_ERROR_FORMAT, err.Format()));
 

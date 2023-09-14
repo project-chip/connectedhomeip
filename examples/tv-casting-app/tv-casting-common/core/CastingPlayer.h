@@ -30,7 +30,6 @@ namespace matter {
 namespace casting {
 namespace core {
 
-using namespace memory;
 // using namespace endpoint;
 
 enum ConnectionError
@@ -48,90 +47,107 @@ const int kIdMaxLength   = chip::Dnssd::kHostNameMaxLength + kPortMaxLength;
 class Attributes
 {
 public:
-    char id[kIdMaxLength]                               = {};
-    char name[chip::Dnssd::kMaxDeviceNameLen + 1]       = {};
-    char host_name[chip::Dnssd::kHostNameMaxLength + 1] = {};
-    size_t num_IPs; // number of valid IP addresses
-    chip::Inet::IPAddress ip_address[chip::Dnssd::CommonResolutionData::kMaxIPAddresses];
-    uint16_t product_id;
-    uint16_t vendor_id;
-    uint32_t type;
+    char id[kIdMaxLength]                                  = {};
+    char deviceName[chip::Dnssd::kMaxDeviceNameLen + 1]    = {};
+    char hostName[chip::Dnssd::kHostNameMaxLength + 1]     = {};
+    char instanceName[chip::Dnssd::kHostNameMaxLength + 1] = {};
+    unsigned int numIPs; // number of valid IP addresses
+    chip::Inet::IPAddress ipAddresses[chip::Dnssd::CommonResolutionData::kMaxIPAddresses];
+    uint16_t productId;
+    uint16_t vendorId;
+    uint32_t deviceType;
 };
-
+/**
+ * @brief CastingPlayer represent a Casting Server which can be connected to once discovered
+ * through Matter Commissioner discovery over DNS-SD.
+ */
 class CastingPlayer : public std::enable_shared_from_this<CastingPlayer>
 {
 private:
-    // std::vector<Strong<Endpoint>> endpoints;
-    bool connected = false;
-    Attributes attributes;
+    // std::vector<memory::Strong<Endpoint>> endpoints;
+    bool mConnected = false;
+    Attributes mAttributes;
 
 public:
-    CastingPlayer(Attributes playerAttributes) { attributes = playerAttributes; }
-    const char * GetId() const { return attributes.id; }
+    CastingPlayer(Attributes playerAttributes) { mAttributes = playerAttributes; }
+    const char * GetId() const { return mAttributes.id; }
 
-    const char * GetName() const { return attributes.name; }
+    const char * GetDeviceName() const { return mAttributes.deviceName; }
 
-    const char * GetHostName() const { return attributes.host_name; }
+    const char * GetHostName() const { return mAttributes.hostName; }
 
-    size_t GetNumIPs() const { return attributes.num_IPs; }
+    const char * GetInstanceName() const { return mAttributes.instanceName; }
 
-    const chip::Inet::IPAddress & GetIPAddress(size_t idx) const { return attributes.ip_address[idx]; }
+    uint GetNumIPs() const { return mAttributes.numIPs; }
 
-    uint16_t GetProductId() const { return attributes.product_id; }
+    chip::Inet::IPAddress * GetIPAddresses() { return mAttributes.ipAddresses; }
 
-    uint16_t GetVendorId() const { return attributes.vendor_id; }
+    uint16_t GetProductId() const { return mAttributes.productId; }
 
-    uint32_t GetType() const { return attributes.type; }
+    uint16_t GetVendorId() const { return mAttributes.vendorId; }
+
+    uint32_t GetDeviceType() const { return mAttributes.deviceType; }
 
     // public:
-    // void RegisterEndpoint(const Strong<Endpoint> endpoint) { endpoints.push_back(endpoint); }
+    // void RegisterEndpoint(const memory::Strong<Endpoint> endpoint) { endpoints.push_back(endpoint); }
 
-    // const std::vector<Strong<Endpoint>> GetEndpoints() const { return endpoints; }
+    // const std::vector<memory::Strong<Endpoint>> GetEndpoints() const { return endpoints; }
+
+    // Only compare the ID when checking if the Casting Players are equivalent
+    bool operator==(const CastingPlayer & other) const
+    {
+        int compareResult = strcmp(this->mAttributes.id, other.mAttributes.id);
+        return (compareResult == 0) ? 1 : 0;
+    }
 
 public:
-    bool IsConnected() const { return connected; }
+    bool IsConnected() const { return mConnected; }
 
     void Connect(const long timeout, ConnectCallback onCompleted);
     void Disconnect(const long timeout, DisconnectCallback onCompleted);
 
     void LogDetail() const
     {
-        if (strlen(attributes.id) != 0)
+        if (strlen(mAttributes.id) != 0)
         {
-            ChipLogDetail(Discovery, "\tID: %s", attributes.id);
+            ChipLogDetail(Discovery, "\tID: %s", mAttributes.id);
         }
-        if (strlen(attributes.name) != 0)
+        if (strlen(mAttributes.deviceName) != 0)
         {
-            ChipLogDetail(Discovery, "\tName: %s", attributes.name);
+            ChipLogDetail(Discovery, "\tName: %s", mAttributes.deviceName);
         }
-        if (strlen(attributes.host_name) != 0)
+        if (strlen(mAttributes.hostName) != 0)
         {
-            ChipLogDetail(Discovery, "\tHost Name: %s", attributes.host_name);
+            ChipLogDetail(Discovery, "\tHost Name: %s", mAttributes.hostName);
         }
-        if (attributes.num_IPs > 0)
+        if (strlen(mAttributes.instanceName) != 0)
         {
-            ChipLogDetail(Discovery, "\tNumber of IPs: %zu", attributes.num_IPs);
+            ChipLogDetail(Discovery, "\tInstance Name: %s", mAttributes.instanceName);
+        }
+        if (mAttributes.numIPs > 0)
+        {
+            ChipLogDetail(Discovery, "\tNumber of IPs: %u", mAttributes.numIPs);
         }
         char buf[chip::Inet::IPAddress::kMaxStringLength];
-        if (strlen(attributes.ip_address[0].ToString(buf)) != 0)
+        if (strlen(mAttributes.ipAddresses[0].ToString(buf)) != 0)
         {
-            for (unsigned j = 0; j < attributes.num_IPs; j++)
+            for (unsigned j = 0; j < mAttributes.numIPs; j++)
             {
-                char * ipAddressOut = attributes.ip_address[j].ToString(buf);
+                char * ipAddressOut = mAttributes.ipAddresses[j].ToString(buf);
                 ChipLogDetail(AppServer, "\tIP Address #%d: %s", j + 1, ipAddressOut);
             }
         }
-        if (attributes.product_id > 0)
+        if (mAttributes.productId > 0)
         {
-            ChipLogDetail(Discovery, "\tProduct ID: %u", attributes.product_id);
+            ChipLogDetail(Discovery, "\tProduct ID: %u", mAttributes.productId);
         }
-        if (attributes.vendor_id > 0)
+        if (mAttributes.vendorId > 0)
         {
-            ChipLogDetail(Discovery, "\tVendor ID: %u", attributes.vendor_id);
+            ChipLogDetail(Discovery, "\tVendor ID: %u", mAttributes.vendorId);
         }
-        if (attributes.type > 0)
+        if (mAttributes.deviceType > 0)
         {
-            ChipLogDetail(Discovery, "\tType: %" PRIu32, attributes.type);
+            ChipLogDetail(Discovery, "\tDevice Type: %" PRIu32, mAttributes.deviceType);
         }
     }
 };
