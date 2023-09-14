@@ -645,12 +645,6 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId)
     service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolTcp;
     service.mAddressType = Inet::IPAddressType::kAny;
 
-    // mDelegate is a ResolverDelegateProxy
-    //    - that is just created fully
-    //    - callback seems to use it somehow
-    // TODO:
-    //    - figure out what OperationalNodeResolved and others do ....
-
     return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeIdResolve, this);
 }
 
