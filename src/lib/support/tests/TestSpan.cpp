@@ -161,24 +161,22 @@ static void TestFixedByteSpan(nlTestSuite * inSuite, void * inContext)
     uint8_t arr[] = { 1, 2, 3 };
 
     FixedByteSpan<3> s0 = FixedByteSpan<3>();
-    NL_TEST_ASSERT(inSuite, s0.data() == nullptr);
+    NL_TEST_ASSERT(inSuite, s0.data() != nullptr);
     NL_TEST_ASSERT(inSuite, s0.size() == 3);
-    NL_TEST_ASSERT(inSuite, s0.empty());
     NL_TEST_ASSERT(inSuite, s0.data_equal(s0));
-    NL_TEST_ASSERT(inSuite, IsSpanUsable(s0) == false);
+    NL_TEST_ASSERT(inSuite, s0[0] == 0);
+    NL_TEST_ASSERT(inSuite, s0[1] == 0);
+    NL_TEST_ASSERT(inSuite, s0[2] == 0);
 
     FixedByteSpan<2> s1(arr);
     NL_TEST_ASSERT(inSuite, s1.data() == arr);
     NL_TEST_ASSERT(inSuite, s1.size() == 2);
-    NL_TEST_ASSERT(inSuite, !s1.empty());
     NL_TEST_ASSERT(inSuite, s1.data_equal(s1));
-    NL_TEST_ASSERT(inSuite, IsSpanUsable(s1) == true);
 
     FixedByteSpan<3> s2(arr);
     NL_TEST_ASSERT(inSuite, s2.data() == arr);
     NL_TEST_ASSERT(inSuite, s2.size() == 3);
     NL_TEST_ASSERT(inSuite, s2.data()[2] == 3);
-    NL_TEST_ASSERT(inSuite, !s2.empty());
     NL_TEST_ASSERT(inSuite, s2.data_equal(s2));
     NL_TEST_ASSERT(inSuite, s2.front() == 1);
     NL_TEST_ASSERT(inSuite, s2.back() == 3);
@@ -190,7 +188,6 @@ static void TestFixedByteSpan(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, s3.data() == arr);
     NL_TEST_ASSERT(inSuite, s3.size() == 3);
     NL_TEST_ASSERT(inSuite, s3.data()[2] == 3);
-    NL_TEST_ASSERT(inSuite, !s3.empty());
     NL_TEST_ASSERT(inSuite, s3.data_equal(s2));
 
     uint8_t arr2[] = { 3, 2, 1 };

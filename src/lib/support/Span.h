@@ -157,6 +157,42 @@ private:
     size_t mDataLen;
 };
 
+namespace detail {
+
+// To make FixedSpan (specifically various FixedByteSpan types) default constructible
+// without creating a weird "empty() == true but size() != 0" state, we need an
+// appropriate sized array of zeroes. With a naive definition like
+//      template <class T, size_t N> constexpr T kZero[N] {};
+// we would end up with separate zero arrays for each size, and might also accidentally
+// increase the read-only data size of the binary by a large amount. Instead, we define
+// a per-type limit for the zero array, FixedSpan won't be default constructible for
+// T / N combinations that exceed the limit. The default limit is 0.
+template <class T>
+struct zero_limit : std::integral_constant<size_t, 0>
+{
+};
+
+// FixedByteSpan types up to N=65 currently need to be default-constructible.
+template <>
+struct zero_limit<uint8_t> : std::integral_constant<size_t, 65>
+{
+};
+
+template <class T>
+constexpr T kZeroes[zero_limit<T>::value]{};
+
+template <class T, size_t N>
+constexpr T const * shared_zeroes()
+{
+    static_assert(N <= zero_limit<typename std::remove_const<T>::type>::value, "N exceeds zero_limit<T>");
+    return kZeroes<typename std::remove_const<T>::type>;
+}
+
+} // namespace detail
+
+/**
+ * Similar to a Span but with a fixed size.
+ */
 template <class T, size_t N>
 class FixedSpan
 {
@@ -164,7 +200,8 @@ public:
     using pointer   = T *;
     using reference = T &;
 
-    constexpr FixedSpan() : mDataBuf(nullptr) {}
+    // Creates a FixedSpan pointing to a sequence of zeroes.
+    constexpr FixedSpan() : mDataBuf(detail::shared_zeroes<T, N>()) {}
 
     // We want to allow construction from things that look like T*, but we want
     // to make construction from an array use the constructor that asserts the
@@ -200,10 +237,11 @@ public:
     }
 
     constexpr pointer data() const { return mDataBuf; }
-    constexpr size_t size() const { return N; }
-    constexpr bool empty() const { return data() == nullptr; }
     constexpr pointer begin() const { return mDataBuf; }
     constexpr pointer end() const { return mDataBuf + N; }
+
+    // The size of a FixedSpan is always N. There is intentially no empty() method.
+    static constexpr size_t size() { return N; }
 
     // Element accessors, matching the std::span API.
     // VerifyOrDie cannot be used inside a constexpr function, because it uses
@@ -211,7 +249,7 @@ public:
     // and that's not allowed in constexpr functions.
     reference operator[](size_t index) const
     {
-        VerifyOrDie(index < size());
+        VerifyOrDie(index < N);
         return data()[index];
     }
     reference front() const { return (*this)[0]; }
@@ -221,14 +259,13 @@ public:
     template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
     bool data_equal(const FixedSpan<U, N> & other) const
     {
-        return (empty() && other.empty()) ||
-            (!empty() && !other.empty() && (memcmp(data(), other.data(), size() * sizeof(T)) == 0));
+        return (memcmp(data(), other.data(), N * sizeof(T)) == 0);
     }
 
     template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
     bool data_equal(const Span<U> & other) const
     {
-        return (size() == other.size() && (empty() || (memcmp(data(), other.data(), size() * sizeof(T)) == 0)));
+        return (N == other.size() && memcmp(data(), other.data(), N * sizeof(T)) == 0);
     }
 
     // operator== explicitly not implemented on FixedSpan, because its meaning
@@ -252,7 +289,7 @@ template <class T>
 template <class U, size_t N, typename>
 inline bool Span<T>::data_equal(const FixedSpan<U, N> & other) const
 {
-    return (size() == other.size()) && (empty() || (memcmp(data(), other.data(), size() * sizeof(T)) == 0));
+    return other.data_equal(*this);
 }
 
 /**
@@ -266,15 +303,10 @@ inline bool IsSpanUsable(const Span<T> & span)
     return (span.data() != nullptr) && (span.size() > 0);
 }
 
-/**
- * @brief Returns true if the `span` could be used to access some data,
- *        false otherwise.
- * @param[in] span The FixedSpan to validate.
- */
 template <typename T, size_t N>
-inline bool IsSpanUsable(const FixedSpan<T, N> & span)
+[[deprecated("FixedSpan is always usable / non-empty if N > 0")]] inline bool IsSpanUsable(const FixedSpan<T, N> & span)
 {
-    return (span.data() != nullptr);
+    return N > 0;
 }
 
 using ByteSpan        = Span<const uint8_t>;
