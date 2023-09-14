@@ -133,7 +133,7 @@ class BouffalolabBuilder(GnBuilder):
                 enable_wifi, enable_thread, enable_ethernet = False, True, False
 
         if (enable_ethernet or enable_wifi) and enable_thread:
-            raise Exception('')
+            raise Exception('Currently, Thread cannot be enabled with Wi-Fi or Ethernet')
 
         # hardware connectivity support check
         if bouffalo_chip == "bl602":
@@ -167,7 +167,7 @@ class BouffalolabBuilder(GnBuilder):
         if enable_thread:
             self.argsOpt.append('chip_mdns="platform"')
             self.argsOpt.append('chip_inet_config_enable_ipv4=false')
-            self.argsOpt.append('openthread_project_core_config_file="{}-openthread-core-bl-config.h"'.format(bouffalo_chip))            
+            self.argsOpt.append('openthread_project_core_config_file="{}-openthread-core-bl-config.h"'.format(bouffalo_chip))
 
         if enable_cdc:
             if bouffalo_chip != "bl702":
