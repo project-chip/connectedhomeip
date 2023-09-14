@@ -25,15 +25,17 @@
 
 #include <lwip/tcpip.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <platform/bouffalolab/BL702/WiFiInterface.h>
-#endif
+#include <platform/bouffalolab/BL702/wifi_mgmr_portable.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread_port.h>
 #include <utils_list.h>
-#else
-#include <platform/bouffalolab/BL702/EthernetInterface.h>
 #endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+#include <platform/bouffalolab/BL702/EthernetInterface.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 
 extern "C" {
 #include <bl_sec.h>
@@ -63,23 +65,16 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    wifiInterface_init();
-#elif CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     otRadio_opt_t opt;
-    opt.byte            = 0;
+    opt.bf.isFtd        = true;
     opt.bf.isCoexEnable = true;
 
     ot_alarmInit();
     ot_radioInit(opt);
-#else
-    ethernetInterface_init();
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
-
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
     err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16);
     SuccessOrExit(err);
@@ -91,6 +86,14 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err                  = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::mEventLoopTask = backup_eventLoopTask;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    wifi_start_firmware_task();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+    ethernetInterface_init();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 
 exit:
     return err;

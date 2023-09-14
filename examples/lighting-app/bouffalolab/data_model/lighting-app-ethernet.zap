@@ -889,7 +889,7 @@
           "mfgCode": null,
           "define": "DESCRIPTOR_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "DeviceTypeList",
@@ -2583,7 +2583,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "2",
+              "defaultValue": "1",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -2961,7 +2961,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "array",
-              "included": 1,
+              "included": 0,
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
@@ -3066,7 +3066,7 @@
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 0
             }
           ],
@@ -3095,7 +3095,7 @@
           "mfgCode": null,
           "define": "THREAD_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "Channel",
@@ -4152,7 +4152,7 @@
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 0
             }
           ],
@@ -4490,7 +4490,7 @@
           "mfgCode": null,
           "define": "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "attributes": [
             {
               "name": "PHYRate",
@@ -6129,7 +6129,7 @@
               "storageOption": "NVM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x01",
+              "defaultValue": "0x1",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -8379,5 +8379,6 @@
       "endpointId": 1,
       "networkId": 0
     }
-  ]
+  ],
+  "log": []
 }

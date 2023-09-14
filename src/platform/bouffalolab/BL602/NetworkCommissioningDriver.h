@@ -1,6 +1,6 @@
 /*
- *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
+
+void NetworkEventHandler(const ChipDeviceEvent * event, intptr_t arg);
 
 namespace {
 constexpr uint8_t kMaxWiFiNetworks                  = 1;
@@ -132,7 +134,6 @@ public:
 
 private:
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
-    CHIP_ERROR StartScanWiFiNetworks(ByteSpan ssid);
 
     WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;
@@ -140,6 +141,10 @@ private:
     ConnectCallback * mpConnectCallback;
     NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
     int32_t mLastDisconnectedReason;
+
+    /** +1 byte for string termination */
+    char mScanSSID[DeviceLayer::Internal::kMaxWiFiSSIDLength + 1];
+    uint32_t mScanType;
 };
 
 } // namespace NetworkCommissioning
