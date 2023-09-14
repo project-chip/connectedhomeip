@@ -996,6 +996,31 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return attributeValueToReturn;
 }
 
+- (nullable id)readAttributeWithEndpointID:(NSNumber *)endpointID
+                                 clusterID:(NSNumber *)clusterID
+                               attributeID:(NSNumber *)attributeID
+                                    params:(MTRReadParams * _Nullable)params
+                                     error:(NSError * __autoreleasing *)error
+{
+    NSDictionary<NSString *, id> * value = [self readAttributeWithEndpointID:endpointID
+                                                                   clusterID:clusterID
+                                                                 attributeID:attributeID
+                                                                      params:params];
+    if (value == nil) {
+        return nil;
+    }
+
+    auto * path = [MTRAttributePath attributePathWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID];
+
+    auto * report = [[MTRAttributeReport alloc] initWithResponseValue:@{
+        MTRAttributePathKey : path,
+        MTRDataKey : value,
+    }
+                                                                error:error];
+
+    return report.value;
+}
+
 - (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
                          attributeID:(NSNumber *)attributeID

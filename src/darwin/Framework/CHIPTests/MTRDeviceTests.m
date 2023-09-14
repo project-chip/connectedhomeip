@@ -1505,6 +1505,34 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertNotEqual(attributeReportsReceived, 0);
     XCTAssertNotEqual(eventReportsReceived, 0);
 
+    // Do a basic sanity-check on our MTRCluster read API.
+    __auto_type * descriptorCluster = [[MTRClusterDescriptor alloc] initWithDevice:device endpointID:@(1) queue:queue];
+    __auto_type * untypedDeviceTypeList = [descriptorCluster readAttributeDeviceTypeListWithParams:nil];
+    XCTAssertNotNil(untypedDeviceTypeList);
+
+    NSError * error;
+    NSArray * typedDeviceTypeList = [descriptorCluster readAttributeDeviceTypeListWithParams:nil error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(typedDeviceTypeList);
+
+    __auto_type * path = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(0x001D) attributeID:@(0x0000)];
+    __auto_type * report =
+        [[MTRAttributeReport alloc] initWithResponseValue:@{ @"attributePath" : path, @"data" : untypedDeviceTypeList }
+                                                    error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(report);
+
+    NSArray * typedValue = report.value;
+    XCTAssertEqual(typedDeviceTypeList.count, typedValue.count);
+    for (unsigned i = 0; i < typedDeviceTypeList.count; ++i) {
+        XCTAssertTrue([typedDeviceTypeList[i] isKindOfClass:[MTRDescriptorClusterDeviceTypeStruct class]]);
+        XCTAssertTrue([typedValue[i] isKindOfClass:[MTRDescriptorClusterDeviceTypeStruct class]]);
+        MTRDescriptorClusterDeviceTypeStruct * struct1 = typedDeviceTypeList[i];
+        MTRDescriptorClusterDeviceTypeStruct * struct2 = typedValue[i];
+        XCTAssertEqualObjects(struct1.deviceType, struct2.deviceType);
+        XCTAssertEqualObjects(struct1.revision, struct2.revision);
+    }
+
     // Before resubscribe, first test write failure and expected value effects
     NSNumber * testEndpointID = @(1);
     NSNumber * testClusterID = @(8);

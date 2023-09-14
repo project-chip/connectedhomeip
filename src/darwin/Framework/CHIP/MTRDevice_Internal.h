@@ -44,6 +44,13 @@ typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 // false-positives, for example due to compressed fabric id collisions.
 - (void)nodeMayBeAdvertisingOperational;
 
+// Helper to read strongly typed values, for use from MTRCluster.
+- (nullable id)readAttributeWithEndpointID:(NSNumber *)endpointID
+                                 clusterID:(NSNumber *)clusterID
+                               attributeID:(NSNumber *)attributeID
+                                    params:(MTRReadParams * _Nullable)params
+                                     error:(NSError * __autoreleasing *)error;
+
 @property (nonatomic, readonly) MTRDeviceController * deviceController;
 @property (nonatomic, readonly, copy) NSNumber * nodeID;
 // Queue used for various internal bookkeeping work.
