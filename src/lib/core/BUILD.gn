@@ -75,6 +75,7 @@ source_set("chip_config_header") {
   public_deps = [
     ":chip_buildconfig",
     "${chip_root}/src/ble:ble_config_header",
+    "${chip_root}/src/inet:inet_config_header",
     "${chip_root}/src/system:system_config_header",
   ]
 
