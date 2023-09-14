@@ -884,6 +884,7 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
                 }
 
                 session->MarkAsDefunct();
+                session->DispatchSessionEvent(&SessionDelegate::OnSessionHang);
             });
     }
 
