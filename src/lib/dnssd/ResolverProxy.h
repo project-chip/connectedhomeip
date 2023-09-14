@@ -151,12 +151,15 @@ public:
         mDelegate = nullptr;
     }
 
-    CHIP_ERROR ResolveNodeId(const PeerId & peerId) override;
-    void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override;
     CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR StopDiscovery() override;
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override;
+
+    // TODO: ResolverProxy should not be used anymore to implement operational node resolution
+    //       This method still here because Resolver interface requires it
+    CHIP_ERROR ResolveNodeId(const PeerId & peerId) override {return CHIP_ERROR_NOT_IMPLEMENTED;}
+    void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override {}
 
 private:
     ResolverDelegateProxy * mDelegate                            = nullptr;
