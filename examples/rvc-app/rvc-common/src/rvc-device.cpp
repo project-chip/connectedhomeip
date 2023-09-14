@@ -13,6 +13,7 @@ void RvcDevice::SetDeviceToIdleState()
 {
     if (mCharging)
     {
+        mDocked   = true;
         mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCharging));
     }
     else if (mDocked)
@@ -44,6 +45,8 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
             return;
         }
 
+        mCharging = false;
+        mDocked   = false;
         mRunModeInstance.UpdateCurrentMode(newMode);
         mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
         response.status = to_underlying(ModeBase::StatusCode::kSuccess);
