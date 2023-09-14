@@ -344,9 +344,35 @@ public class ChipDeviceController {
     releaseOperationalDevicePointer(devicePtr);
   }
 
+  public enum GroupKeySecurityPolicy {
+    TrustFirst(0), CacheAndSync(1);
+
+    private int id;
+
+    GroupKeySecurityPolicy(int id) {
+      this.id = id;
+    }
+
+    int getID() {
+      return id;
+    }
+
+
+    public static GroupKeySecurityPolicy value(int id) {
+      for (GroupKeySecurityPolicy policy : GroupKeySecurityPolicy.values()) {
+        if (policy.id == id) {
+          return policy;
+        }
+      }
+      return null;
+    }
+  }
+
   public long getGroupDevicePointer(int groupId) {
     return getGroupDevicePointer(deviceControllerPtr, groupId);
   }
+
+  public native void releaseGroupDevicePointer(long devicePtr);
 
   public List<Integer> getAvailableGroupIds() {
     return getAvailableGroupIds(deviceControllerPtr);
@@ -364,20 +390,32 @@ public class ChipDeviceController {
     return addGroup(deviceControllerPtr, groupId, groupName);
   }
 
+  public boolean removeGroup(int groupId) {
+    return removeGroup(deviceControllerPtr, groupId);
+  }
+
+  public List<Integer> getKeySetIds() {
+    return getKeySetIds(deviceControllerPtr);
+  }
+
+  public Optional<GroupKeySecurityPolicy> getKeySecurityPolicy(int keySetId) {
+    return getKeySecurityPolicy(deviceControllerPtr, keySetId).map(id -> GroupKeySecurityPolicy.value(id));
+  }
+
   public boolean bindKeySet(int groupId, int keySetId) {
     return bindKeySet(deviceControllerPtr, groupId, keySetId);
   }
 
-  public enum GroupKeySecurityPolicy {
-    TrustFirst, CacheAndSync
+  public boolean unbindKeySet(int groupId, int keySetId) {
+    return unbindKeySet(deviceControllerPtr, groupId, keySetId);
   }
 
-  public boolean addKeySet(int keySetId, int keyPolicy, long validityTime, byte[] epochKey) {
-    return addKeySet(deviceControllerPtr, keySetId, keyPolicy, validityTime, epochKey);
+  public boolean addKeySet(int keySetId, GroupKeySecurityPolicy keyPolicy, long validityTime, byte[] epochKey) {
+    return addKeySet(deviceControllerPtr, keySetId, keyPolicy.getID(), validityTime, epochKey);
   }
 
-  public List<Integer> getKeysetIds() {
-    return getKeysetIds(deviceControllerPtr);
+  public boolean removeKeySet(int keySetId) {
+    return removeKeySet(deviceControllerPtr, keySetId);
   }
 
   public void onConnectDeviceComplete() {
@@ -1199,11 +1237,19 @@ public class ChipDeviceController {
 
   private native boolean addGroup(long deviceControllerPtr, int groupId, String groupName);
 
+  private native boolean removeGroup(long deviceControllerPtr, int groupId);
+
+  private native List<Integer> getKeySetIds(long deviceControllerPtr);
+
+  private native Optional<Integer> getKeySecurityPolicy(long deviceControllerPtr, int keySetId);
+
   private native boolean bindKeySet(long deviceControllerPtr, int groupId, int keySetId);
+
+  private native boolean unbindKeySet(long deviceControllerPtr, int groupId, int keySetId);
 
   private native boolean addKeySet(long deviceControllerPtr, int keySetId, int keyPolicy, long validityTime, byte[] epochKey);
 
-  private native List<Integer> getKeysetIds(long deviceControllerPtr);
+  private native boolean removeKeySet(long deviceControllerPtr, int keySetId);
 
   private native void deleteDeviceController(long deviceControllerPtr);
 
