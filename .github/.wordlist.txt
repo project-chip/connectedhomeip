@@ -1430,6 +1430,7 @@ UnitLocalization
 unpair
 unprovisioned
 Unsecure
+Unselect
 untrusted
 updateAvailable
 updateNotAvailable
@@ -1561,3 +1562,5 @@ zhengyaohan
 Zigbee
 zigbeealliance
 zigbeethread
+PIXIT
+RVC

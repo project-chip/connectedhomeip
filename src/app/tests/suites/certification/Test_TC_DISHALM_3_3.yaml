@@ -57,6 +57,12 @@ tests:
            [1689842371.478410][2614:2616] CHIP:EM: <<< [E:35394i S:46214 M:140335917 (Ack:184279491)] (S) Msg TX to 1:0000000000000001 [C4B0] --- Type 0000:10 (SecureChannel:StandaloneAck)
       disabled: true
 
+    - label: "Step 1d: Set the value of LatchResponse to 0."
+      PICS: " !DISHALM.S.A0001 "
+      verification: |
+          When the DISHALM.S.A0001(Latch)  feature is not supported or enabled, Set the value of LatchResponse to 0.
+      disabled: true
+
     - label:
           "Step 2a: Operate device to set the condition to raise the Door alarm"
       PICS: DISHALM.S.M.ManuallyControlled

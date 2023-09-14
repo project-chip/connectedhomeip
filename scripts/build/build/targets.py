@@ -132,6 +132,7 @@ def BuildHostTarget():
         TargetPart('contact-sensor', app=HostApp.CONTACT_SENSOR),
         TargetPart('dishwasher', app=HostApp.DISHWASHER),
         TargetPart('refrigerator', app=HostApp.REFRIGERATOR),
+        TargetPart('rvc', app=HostApp.RVC),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):

@@ -359,15 +359,21 @@
 #endif /* CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE */
 
 /**
- *  @def CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE
+ *  @def CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM
  *
  *  @brief
- *      LwIP @pbuf_type for System::PacketBuffer allocations.
+ *      In LwIP builds, this selects whether to use LwIP @pbuf_type @PBUF_RAM (1)
+ *      or @PBUF_POOL (0) for System::PacketBuffer allocations.
  *
  *      Note that this does not affect allocations by LwIP itself, e.g. the normal receive path.
  */
-#ifndef CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE
-#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE PBUF_POOL
+#ifndef CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM 0
+#endif /* CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM */
+
+// Catch configurations attempting to use the former method (see issue #29208).
+#ifdef CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE
+#error "See CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM"
 #endif /* CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE */
 
 /**

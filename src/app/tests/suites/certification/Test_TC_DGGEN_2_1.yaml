@@ -31,7 +31,7 @@ config:
         defaultValue: "0x0000000000000003"
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -39,8 +39,83 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Step 1a: Reset Devices to factory defaults"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
+
+    - label: "Step 1a: Reset Devices to factory defaults"
+      PICS: PICS_USER_PROMPT
+      verification: |
+          Reset Devices to factory defaults
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 1b: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2a: TH reads a RebootCount attribute value from DUT."
+      PICS: DGGEN.S.A0001
+      command: "readAttribute"
+      attribute: "RebootCount"
+      response:
+          saveAs: boot_count1
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 1
+
+    - label: "Step 2b: Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Step 2b: Reboot target device(DUT)"
+      PICS: PICS_USER_PROMPT
+      verification: |
+          Did the DUT successfully reboot?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 2b: TH reads a RebootCount attribute value from DUT. Verify that
+          boot_count2 is greater than boot_count1."
+      PICS: DGGEN.S.A0001
+      command: "readAttribute"
+      attribute: "RebootCount"
+      response:
+          constraints:
+              type: int16u
+              minValue: boot_count1 + 1
+              maxValue: 65535
+
     #Not possible in YAML. what extact values to be checked
-    - label: "Step 2: TH reads NetworkInterfaces structure attribute from DUT."
+    - label: "Step 3: TH reads NetworkInterfaces structure attribute from DUT."
       verification: |
           ./chip-tool generaldiagnostics read network-interfaces 1 0
           On TH(chip-tool), Verify that The NetworkInterfaces attribute SHALL be a list of NetworkInterface structs, i.e The read data type( NetworkInterface struct) must match the value listed below
@@ -104,55 +179,6 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-
-    - label: "Step 3a: TH reads a RebootCount attribute value from DUT."
-      PICS: DGGEN.S.A0001
-      command: "readAttribute"
-      attribute: "RebootCount"
-      response:
-          saveAs: boot_count1
-          constraints:
-              type: int16u
-              minValue: 1
-              maxValue: 65535
-
-    - label: "Step 3b: Reboot target device"
-      PICS: PICS_SDK_CI_ONLY
-      cluster: "SystemCommands"
-      command: "Reboot"
-
-    - label: "Step 3b: Reboot target device(DUT)"
-      PICS: PICS_USER_PROMPT
-      verification: |
-          Did the DUT successfully reboot?
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Please reboot the DUT and enter 'y' after DUT starts"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
-
-    - label:
-          "Step 3b: TH reads a RebootCount attribute value from DUT. Store the
-          value in boot_count2."
-      PICS: DGGEN.S.A0001
-      command: "readAttribute"
-      attribute: "RebootCount"
-      response:
-          constraints:
-              type: int16u
-              minValue: boot_count1 + 1
-              maxValue: 65535
 
     - label:
           "Step 4a: TH reads the Uptime attribute value of DUT. Store the value
@@ -328,11 +354,11 @@ tests:
           saveAs: TestEventTriggersEnabledValue
 
     - label:
-          "Step 9b: Verify ff this TestEventTriggersEnabled attribute value is
-          set to True"
+          "Step 9b: Verify TestEventTriggersEnabled attribute value is set to
+          True"
       PICS: DGGEN.S.A0008
       cluster: "EqualityCommands"
-      command: "UnsignedNumberEquals"
+      command: "BooleanEquals"
       arguments:
           values:
               - name: "Value1"

@@ -72,6 +72,14 @@ public:
     class Callback
     {
     public:
+        Callback() = default;
+
+        // Callbacks are not expected to be copyable or movable.
+        Callback(const Callback &) = delete;
+        Callback(Callback &&)      = delete;
+        Callback & operator=(const Callback &) = delete;
+        Callback & operator=(Callback &&) = delete;
+
         virtual ~Callback() = default;
 
         /**

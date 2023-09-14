@@ -1503,7 +1503,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 /**
  * @def CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC
  *
- * @brief Default value for the ICD Management cluster ClientsSupportedPerFabric attribute, in milliseconds
+ * @brief Default value for the ICD Management cluster ClientsSupportedPerFabric attribute
  */
 #ifndef CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC
 #define CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC 2
