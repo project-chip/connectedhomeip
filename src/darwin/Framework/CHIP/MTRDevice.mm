@@ -297,7 +297,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             _estimatedStartTime = nil;
             _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
         } else {
-            MTR_LOG_INFO("%@ State change %lu => %lu", self, (unsigned long)lastState, (unsigned long)state);
+            MTR_LOG_INFO("%@ State change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
         }
         id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
         if (delegate) {
