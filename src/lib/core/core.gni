@@ -86,7 +86,7 @@ declare_args() {
   chip_config_minmdns_max_parallel_resolves = 2
 
   # If set to true, adds a string "info" field to Cancelable.
-  # Only here for backwards compat.  Generally should not be set to true.
+  # Only here for backwards compat.  Generally, THIS SHOULD NOT BE SET TO TRUE.
   chip_config_cancelable_has_info_string_field = false
 }
 
