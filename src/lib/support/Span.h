@@ -300,15 +300,10 @@ inline bool Span<T>::data_equal(const FixedSpan<U, N> & other) const
     return other.data_equal(*this);
 }
 
-/**
- * @brief Returns true if the `span` could be used to access some data,
- *        false otherwise.
- * @param[in] span The Span to validate.
- */
 template <typename T>
-inline bool IsSpanUsable(const Span<T> & span)
+[[deprecated("Use !empty()")]] inline bool IsSpanUsable(const Span<T> & span)
 {
-    return (span.data() != nullptr) && (span.size() > 0);
+    return !span.empty();
 }
 
 template <typename T, size_t N>
@@ -327,7 +322,7 @@ using MutableCharSpan = Span<char>;
 
 inline CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan & out_buf)
 {
-    VerifyOrReturnError(IsSpanUsable(span_to_copy), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!span_to_copy.empty(), CHIP_ERROR_INVALID_ARGUMENT); // why?
     VerifyOrReturnError(out_buf.size() >= span_to_copy.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     memcpy(out_buf.data(), span_to_copy.data(), span_to_copy.size());
@@ -338,7 +333,7 @@ inline CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan &
 
 inline CHIP_ERROR CopyCharSpanToMutableCharSpan(CharSpan cspan_to_copy, MutableCharSpan & out_buf)
 {
-    VerifyOrReturnError(IsSpanUsable(cspan_to_copy), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!cspan_to_copy.empty(), CHIP_ERROR_INVALID_ARGUMENT); // why?
     VerifyOrReturnError(out_buf.size() >= cspan_to_copy.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     memcpy(out_buf.data(), cspan_to_copy.data(), cspan_to_copy.size());
