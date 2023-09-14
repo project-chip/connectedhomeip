@@ -197,8 +197,16 @@
         "Test_TC_SMOKECO_2_6"
     ],
     "Switch": ["Test_TC_SWTCH_1_1", "Test_TC_SWTCH_2_1"],
-    "TemperatureControlledCabinetMode": ["Test_TC_TCCM_1_1"],
-    "TemperatureControl": ["Test_TC_TCTL_1_1"],
+    "TemperatureControlledCabinetMode": [
+        "Test_TC_TCCM_1_1",
+        "Test_TC_TCCM_3_1"
+    ],
+    "TemperatureControl": [
+        "Test_TC_TCTL_1_1",
+        "Test_TC_TCTL_2_1",
+        "Test_TC_TCTL_2_2",
+        "Test_TC_TCTL_2_3"
+    ],
     "TemperatureMeasurement": ["Test_TC_TMP_1_1", "Test_TC_TMP_2_1"],
     "Thermostat": ["Test_TC_TSTAT_1_1", "Test_TC_TSTAT_2_1"],
     "ThermostatUserConfiguration": [
