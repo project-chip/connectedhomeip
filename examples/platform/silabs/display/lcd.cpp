@@ -67,17 +67,19 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
     }
 
     /* Enable the memory lcd */
-    //status = sl_board_enable_display();
+#if (SIWX_917)
     RSI_NPSSGPIO_InputBufferEn(SL_BOARD_ENABLE_DISPLAY_PIN, 1U);
     RSI_NPSSGPIO_SetPinMux(SL_BOARD_ENABLE_DISPLAY_PIN, 0);
     RSI_NPSSGPIO_SetDir(SL_BOARD_ENABLE_DISPLAY_PIN, 0);
     RSI_NPSSGPIO_SetPin(SL_BOARD_ENABLE_DISPLAY_PIN, 1U);
-
-/*    if (status != SL_STATUS_OK)
+#else
+    status = sl_board_enable_display();
+    if (status != SL_STATUS_OK)
     {
         SILABS_LOG("Board Display enable fail %d", status);
         err = CHIP_ERROR_INTERNAL;
-    }*/
+    }
+#endif
 
     /* Initialize the DMD module for the DISPLAY device driver. */
     status = DMD_init(0);
