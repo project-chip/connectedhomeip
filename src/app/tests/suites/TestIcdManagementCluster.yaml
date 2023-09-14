@@ -171,7 +171,7 @@ tests:
                   { CheckInNodeID: 201, MonitoredSubject: 2001 },
               ]
 
-    - label: "Register 1.1"
+    - label: "Register 1.1 (update)"
       command: "RegisterClient"
       arguments:
           values:

@@ -44,18 +44,24 @@ uint8_t ICDManager::OpenExchangeContextCount = 0;
 static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDManager::OpenExchangeContextCount cannot hold count for the max exchange count");
 
-void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ICDStateObserver * stateObserver)
+void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ICDStateObserver * stateObserver,
+                      Crypto::SessionKeystore * sessionKeyStore)
 {
     VerifyOrDie(storage != nullptr);
     VerifyOrDie(fabricTable != nullptr);
     VerifyOrDie(stateObserver != nullptr);
+    VerifyOrDie(sessionKeyStore != nullptr);
 
     mStorage       = storage;
     mFabricTable   = fabricTable;
     mStateObserver = stateObserver;
     VerifyOrDie(ICDNotifier::GetInstance().Subscribe(this) == CHIP_NO_ERROR);
+    mSessionKeyStore = sessionKeyStore;
 
     uint32_t activeModeInterval = ICDManagementServer::GetInstance().GetActiveModeIntervalMs();
+
+    ICDManagementServer::GetInstance().SetSessionKeyStore(mSessionKeyStore);
+
     VerifyOrDie(kFastPollingInterval.count() < activeModeInterval);
 
     UpdateICDMode();
@@ -102,7 +108,7 @@ void ICDManager::UpdateICDMode()
         for (const auto & fabricInfo : *mFabricTable)
         {
             // We only need 1 valid entry to ensure LIT compliance
-            ICDMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), 1 /*Table entry limit*/);
+            ICDMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), 1 /*Table entry limit*/, mSessionKeyStore);
             if (!table.IsEmpty())
             {
                 tempMode = ICDMode::LIT;
