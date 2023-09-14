@@ -88,7 +88,7 @@ def connect_device(devCtrl, setupPayload, commissionableDevice, nodeId=None):
     if nodeId is None:
         nodeId = random.randint(1, 1000000)
 
-    log.info("Connecting to device %d" % nodeId);
+    log.info("Connecting to device %d" % nodeId)
 
     pincode = int(setupPayload.attributes['SetUpPINCode'])
     try:
