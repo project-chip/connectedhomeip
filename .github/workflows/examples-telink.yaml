@@ -104,15 +104,18 @@ jobs:
 
             - name: Build example Telink (B91) Lighting App with RPC, Shell and Factory Data
               run: |
-                  ./scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
                   ./scripts/build/gn_gen.sh
                   ./scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE chip-cert chip-tool spake2p"
+                  (cd ./out/$BUILD_TYPE && rm -rf !("chip-cert"|"chip-tool"|"spake2p"))
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-light-rpc-shell-factory-data' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9518adk80d lighting-app-rpc-shell-factory-data \
                     out/telink-tlsr9518adk80d-light-rpc-shell-factory-data/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink-tlsr*
 
             - name: Build example Telink (B92) Lighting App with RPC, Shell and Factory Data
               run: |
