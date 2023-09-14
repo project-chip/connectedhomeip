@@ -139,11 +139,7 @@ CHIP_ERROR AppTask::Init()
 
 #ifdef CONFIG_CHIP_OTA_REQUESTOR
     /* OTA image confirmation must be done before the factory data init. */
-    err = OtaConfirmNewImage();
-    if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
+    OtaConfirmNewImage();
 #endif
 
     // Initialize CHIP server

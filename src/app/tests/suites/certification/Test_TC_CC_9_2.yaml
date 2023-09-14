@@ -255,7 +255,7 @@ tests:
       attribute: "ColorLoopStartEnhancedHue"
       PICS: CC.S.F01 && CC.S.F02 && CC.S.A4005 && CC.S.C44.Rsp
       response:
-          saveAs: ColorLoopStartEnhancedHue
+          saveAs: ColorLoopStartEnhancedHueValue2
 
     - label: "Step 3c: Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
@@ -264,7 +264,7 @@ tests:
       response:
           constraints:
               type: int16u
-              minValue: ColorLoopStartEnhancedHue
+              minValue: ColorLoopStartEnhancedHueValue2
               maxValue: 65535
 
     - label: "Wait for 30S"
@@ -283,7 +283,7 @@ tests:
       response:
           constraints:
               type: int16u
-              minValue: ColorLoopStartEnhancedHue
+              minValue: ColorLoopStartEnhancedHueValue2
               maxValue: 65535
 
     - label:
@@ -323,14 +323,14 @@ tests:
       PICS: CC.S.F01 && CC.S.F02 && CC.S.A4006 && CC.S.C44.Rsp
       attribute: "ColorLoopStoredEnhancedHue"
       response:
-          saveAs: ColorLoopStoredEnhancedHueValue
+          saveAs: ColorLoopStoredEnhancedHueValue3
 
     - label: "Step 4c: Read EnhancedCurrentHue attribute from DUT."
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       PICS: CC.S.F01 && CC.S.F02 && CC.S.A4000 && CC.S.C44.Rsp
       response:
-          value: ColorLoopStoredEnhancedHueValue
+          value: ColorLoopStoredEnhancedHueValue3
 
     - label: "Turn off light for color control tests"
       PICS: OO.S.C00.Rsp

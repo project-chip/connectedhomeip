@@ -2104,7 +2104,7 @@ static void TestX509_CertChainValidation(nlTestSuite * inSuite, void * inContext
         {  sTestCert_PAA_FFF2_ValInPast_Cert,   sTestCert_PAI_FFF2_8006_ValInPast_Cert,    sTestCert_DAC_FFF2_8006_0024_ValInPast_Cert,     CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
         {  sTestCert_PAA_FFF2_ValInFuture_Cert, sTestCert_PAI_FFF2_8006_ValInFuture_Cert,  sTestCert_DAC_FFF2_8006_0025_ValInFuture_Cert,   CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
         // Valid cases without intermediate:
-        {  ByteSpan(sTestCert_Root01_DER, sTestCert_Root01_DER_Len), ByteSpan(), ByteSpan(sTestCert_Node01_02_DER, sTestCert_Node01_02_DER_Len), CHIP_NO_ERROR,          CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_Root01_DER,                ByteSpan(),                                sTestCert_Node01_02_DER,                         CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
         // Error cases with invalid (empty Span) inputs:
         {  ByteSpan(),                          sTestCert_PAI_FFF1_8000_Cert,              sTestCert_DAC_FFF1_8000_0000_Cert,               CHIP_ERROR_INVALID_ARGUMENT, CertificateChainValidationResult::kRootArgumentInvalid },
         {  sTestCert_PAA_FFF1_Cert,             sTestCert_PAI_FFF1_8000_Cert,              ByteSpan(),                                      CHIP_ERROR_INVALID_ARGUMENT, CertificateChainValidationResult::kLeafArgumentInvalid },

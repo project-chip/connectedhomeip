@@ -1577,7 +1577,7 @@ tests:
           "Step 10a: Writes (sets back) default value of MinHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F01 && TSTAT.S.A0015 && TSTAT.S.A0003
+      PICS: TSTAT.S.F00 && TSTAT.S.A0015 && TSTAT.S.A0003
       arguments:
           value: AbsMinHeatSetpointLimitValue
 
@@ -1585,21 +1585,21 @@ tests:
           "Step 10a: Writes (sets back) default value of MinHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F01 && TSTAT.S.A0015 && !TSTAT.S.A0003
+      PICS: TSTAT.S.F00 && TSTAT.S.A0015 && !TSTAT.S.A0003
       arguments:
           value: 700
 
     - label: "Step 10a: Writes (sets back)default value of MaxHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F01 && TSTAT.S.A0016 && !TSTAT.S.F05 && TSTAT.S.A0004
+      PICS: TSTAT.S.F00 && TSTAT.S.A0016 && !TSTAT.S.F05 && TSTAT.S.A0004
       arguments:
           value: AbsMaxHeatSetpointLimitValue
 
     - label: "Step 10a: Writes (sets back)default value of MaxHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F01 && TSTAT.S.A0016 && !TSTAT.S.F05 && !TSTAT.S.A0004
+      PICS: TSTAT.S.F00 && TSTAT.S.A0016 && !TSTAT.S.F05 && !TSTAT.S.A0004
       arguments:
           value: 3000
 
@@ -1607,7 +1607,7 @@ tests:
           "Step 10a: Writes MaxHeatSetpointLimit That meets the deadband of 2.5C"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F01 && TSTAT.S.A0016 && TSTAT.S.F05
+      PICS: TSTAT.S.F00 && TSTAT.S.A0016 && TSTAT.S.F05
       arguments:
           value: 2950
 

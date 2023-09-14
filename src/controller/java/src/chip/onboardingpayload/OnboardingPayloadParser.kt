@@ -54,9 +54,7 @@ class OnboardingPayloadParser {
     qrCodeString: String,
     skipPayloadValidation: Boolean
   ): OnboardingPayload {
-    val payload = OnboardingPayload()
-
-    QRCodeOnboardingPayloadParser(qrCodeString).populatePayload(payload)
+    val payload = QRCodeOnboardingPayloadParser(qrCodeString).populatePayload()
 
     if (skipPayloadValidation == false && !payload.isValidQRCodePayload()) {
       throw OnboardingPayloadException("Invalid payload")
@@ -103,8 +101,7 @@ class OnboardingPayloadParser {
     manualPairingCodeString: String,
     skipPayloadValidation: Boolean
   ): OnboardingPayload {
-    val payload = OnboardingPayload()
-    ManualOnboardingPayloadParser(manualPairingCodeString).populatePayload(payload)
+    val payload = ManualOnboardingPayloadParser(manualPairingCodeString).populatePayload()
 
     if (skipPayloadValidation == false && !payload.isValidManualCode()) {
       throw OnboardingPayloadException("Invalid manual entry code")

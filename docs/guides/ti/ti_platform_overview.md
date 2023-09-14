@@ -1,3 +1,10 @@
+```{toctree}
+:glob:
+:maxdepth: 1
+
+*
+```
+
 # Texas Instruments platform overview
 
 The TI platform is a [Matter][matter_gh] platform based on the Texas Instruments
@@ -6,7 +13,7 @@ Incorporated SimpleLink SDK.
 The following diagram is a simplified representation of a Matter application
 which built on the TI Platform.
 
-![matter_ti_overview_simplified](images/matter_ti_overview_simplified.png)
+![matter_ti_overview_simplified](./../images/matter_ti_overview_simplified.png)
 
 ## Texas Instruments SimpleLink SDK
 
@@ -96,9 +103,9 @@ handled by the platform implementation files.
 Sample Matter applications are provided for the TI platform. These can be used
 as reference for your own application.
 
--   [lock-app](../../examples/lock-app/cc13x2x7_26x2x7/README.md)
--   [pump-app](../../examples/pump-app/cc13x2x7_26x2x7/README.md)
--   [pump-controller-app](../../examples/pump-controller-app/cc13x2x7_26x2x7/README.md)
+-   [lock-app](../../../examples/lock-app/cc13x2x7_26x2x7/README.md)
+-   [pump-app](../../../examples/pump-app/cc13x2x7_26x2x7/README.md)
+-   [pump-controller-app](../../../examples/pump-controller-app/cc13x2x7_26x2x7/README.md)
 
 <hr>
 
@@ -107,6 +114,15 @@ as reference for your own application.
 The TI platform uses GN to generate ninja build scripts. Build files have
 already been written to build and link the TI specific code within the
 SimpleLink SDK.
+
+<hr>
+
+## CC2674 Migration
+
+For instructions on how to migrate the CC1354P10-6 examples to either the
+CC2674P10 or the CC2674R10, please refer to the guide linked below.
+
+-   [TI CC2674 Migration Guide](./matter_cc2674_migration.md)
 
 <hr>
 

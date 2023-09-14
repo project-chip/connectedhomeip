@@ -252,15 +252,16 @@ CHIP_ERROR InitCredentialSets()
         P256SerializedKeypair opKeysSerialized;
 
         // TODO: Rename gCommissioner* to gInitiator*
-        memcpy(opKeysSerialized.Bytes(), sTestCert_Node01_02_PublicKey, sTestCert_Node01_02_PublicKey_Len);
-        memcpy(opKeysSerialized.Bytes() + sTestCert_Node01_02_PublicKey_Len, sTestCert_Node01_02_PrivateKey,
-               sTestCert_Node01_02_PrivateKey_Len);
+        memcpy(opKeysSerialized.Bytes(), sTestCert_Node01_02_PublicKey.data(), sTestCert_Node01_02_PublicKey.size());
+        memcpy(opKeysSerialized.Bytes() + sTestCert_Node01_02_PublicKey.size(), sTestCert_Node01_02_PrivateKey.data(),
+               sTestCert_Node01_02_PrivateKey.size());
 
-        ReturnErrorOnFailure(opKeysSerialized.SetLength(sTestCert_Node01_02_PublicKey_Len + sTestCert_Node01_02_PrivateKey_Len));
+        ReturnErrorOnFailure(
+            opKeysSerialized.SetLength(sTestCert_Node01_02_PublicKey.size() + sTestCert_Node01_02_PrivateKey.size()));
 
-        chip::ByteSpan rcacSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len);
-        chip::ByteSpan icacSpan(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len);
-        chip::ByteSpan nocSpan(sTestCert_Node01_02_Chip, sTestCert_Node01_02_Chip_Len);
+        chip::ByteSpan rcacSpan(sTestCert_Root01_Chip);
+        chip::ByteSpan icacSpan(sTestCert_ICA01_Chip);
+        chip::ByteSpan nocSpan(sTestCert_Node01_02_Chip);
         chip::ByteSpan opKeySpan(opKeysSerialized.ConstBytes(), opKeysSerialized.Length());
 
         ReturnErrorOnFailure(
@@ -281,11 +282,12 @@ CHIP_ERROR InitCredentialSets()
         P256SerializedKeypair opKeysSerialized;
 
         auto deviceOpKey = Platform::MakeUnique<Crypto::P256Keypair>();
-        memcpy(opKeysSerialized.Bytes(), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
-        memcpy(opKeysSerialized.Bytes() + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
-               sTestCert_Node01_01_PrivateKey_Len);
+        memcpy(opKeysSerialized.Bytes(), sTestCert_Node01_01_PublicKey.data(), sTestCert_Node01_01_PublicKey.size());
+        memcpy(opKeysSerialized.Bytes() + sTestCert_Node01_01_PublicKey.size(), sTestCert_Node01_01_PrivateKey.data(),
+               sTestCert_Node01_01_PrivateKey.size());
 
-        ReturnErrorOnFailure(opKeysSerialized.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len));
+        ReturnErrorOnFailure(
+            opKeysSerialized.SetLength(sTestCert_Node01_01_PublicKey.size() + sTestCert_Node01_01_PrivateKey.size()));
 
         ReturnErrorOnFailure(deviceOpKey->Deserialize(opKeysSerialized));
 
@@ -295,9 +297,9 @@ CHIP_ERROR InitCredentialSets()
         ReturnErrorOnFailure(
             InitFabricTable(gDeviceFabrics, &gDeviceStorageDelegate, &gDeviceOperationalKeystore, &gDeviceOpCertStore));
 
-        chip::ByteSpan rcacSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len);
-        chip::ByteSpan icacSpan(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len);
-        chip::ByteSpan nocSpan(sTestCert_Node01_01_Chip, sTestCert_Node01_01_Chip_Len);
+        chip::ByteSpan rcacSpan(sTestCert_Root01_Chip);
+        chip::ByteSpan icacSpan(sTestCert_ICA01_Chip);
+        chip::ByteSpan nocSpan(sTestCert_Node01_01_Chip);
 
         ReturnErrorOnFailure(gDeviceFabrics.AddNewFabricForTest(rcacSpan, icacSpan, nocSpan, ByteSpan{}, &gDeviceFabricIndex));
     }

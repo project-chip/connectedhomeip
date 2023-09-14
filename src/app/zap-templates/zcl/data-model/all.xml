@@ -92,4 +92,5 @@
    <xi:include href="draft/electrical-measurement-cluster.xml" />
    <xi:include href="draft/input-output-value-clusters.xml" />
    <xi:include href="draft/onoff-switch-configuration-cluster.xml" />
+   <xi:include href="chip/sample-mei-cluster.xml" />
 </all>
