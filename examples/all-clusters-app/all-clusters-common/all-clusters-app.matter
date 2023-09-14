@@ -3925,6 +3925,17 @@ server cluster WindowCovering = 258 {
 
 /** This cluster provides control of a barrier (garage door). */
 server cluster BarrierControl = 259 {
+  bitmap BarrierControlCapabilities : BITMAP8 {
+    kPartialBarrier = 0x1;
+  }
+
+  bitmap BarrierControlSafetyStatus : BITMAP16 {
+    kRemoteLockout = 0x1;
+    kTemperDetected = 0x2;
+    kFailedCommunication = 0x4;
+    kPositionFailure = 0x8;
+  }
+
   readonly attribute enum8 barrierMovingState = 1;
   readonly attribute bitmap16 barrierSafetyStatus = 2;
   readonly attribute bitmap8 barrierCapabilities = 3;
@@ -6722,7 +6733,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
     ram      attribute manufacturerExtension default = 255;
   }
 

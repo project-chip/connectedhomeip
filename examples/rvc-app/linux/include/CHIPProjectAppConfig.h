@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2023 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,19 +16,19 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *          Example project configuration file for CHIP.
+ *
+ *          This is a place to put application or project-specific overrides
+ *          to the default configuration values for general CHIP features.
+ *
+ */
+
 #pragma once
 
-#include <app/ReadHandler.h>
+// include the CHIPProjectConfig from config/standalone
+#include <CHIPProjectConfig.h>
 
-class ICDUtil : public chip::app::ReadHandler::ApplicationCallback
-{
-    CHIP_ERROR OnSubscriptionRequested(chip::app::ReadHandler & aReadHandler,
-                                       chip::Transport::SecureSession & aSecureSession) override;
-    friend ICDUtil & GetICDUtil();
-    static ICDUtil sICDUtil;
-};
-
-inline ICDUtil & GetICDUtil()
-{
-    return ICDUtil::sICDUtil;
-}
+#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 116 // 0x0074 = 116 = Matter Robotic Vacuum Cleaner
+#define CHIP_DEVICE_CONFIG_DEVICE_NAME "Test RVC"

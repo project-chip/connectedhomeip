@@ -391,3 +391,7 @@
 @interface MTRBaseClusterUnitTesting ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @end
+
+@interface MTRBaseClusterSampleMEI ()
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@end

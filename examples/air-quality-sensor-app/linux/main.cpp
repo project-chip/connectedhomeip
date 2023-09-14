@@ -18,6 +18,7 @@
 
 #include "AirQualitySensorAppAttrUpdateDelegate.h"
 #include <AppMain.h>
+#include <air-quality-sensor-manager.h>
 
 #include <app/util/af.h>
 #include <platform/CHIPDeviceBuildConfig.h>
@@ -26,6 +27,8 @@
 #include <imgui_ui/ui.h>
 #include <imgui_ui/windows/qrcode.h>
 #endif
+
+#define AIR_QUALITY_SENSOR_ENDPOINT 1
 
 using namespace chip;
 using namespace chip::app;
@@ -37,7 +40,10 @@ NamedPipeCommands sChipNamedPipeCommands;
 AirQualitySensorAppAttrUpdateDelegate sAirQualitySensorAppCommandDelegate;
 } // namespace
 
-void ApplicationInit() {}
+void ApplicationInit()
+{
+    AirQualitySensorManager::InitInstance(EndpointId(AIR_QUALITY_SENSOR_ENDPOINT));
+}
 
 void ApplicationShutdown() {}
 

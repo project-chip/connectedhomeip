@@ -15,4 +15,6 @@
 declare_args() {
   chip_enable_factory_data = false
   chip_enable_factory_data_test = false
+
+  chip_enable_ethernet = false
 }

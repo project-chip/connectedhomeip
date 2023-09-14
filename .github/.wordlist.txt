@@ -849,6 +849,7 @@ MDNS
 MediaInput
 MediaPlayback
 MediaTek
+MEI
 mem
 memdf
 MemMonitoring
@@ -1429,6 +1430,7 @@ UnitLocalization
 unpair
 unprovisioned
 Unsecure
+Unselect
 untrusted
 updateAvailable
 updateNotAvailable
@@ -1560,3 +1562,5 @@ zhengyaohan
 Zigbee
 zigbeealliance
 zigbeethread
+PIXIT
+RVC

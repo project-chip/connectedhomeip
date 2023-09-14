@@ -45,9 +45,6 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TimeUtils.h>
 #include <protocols/Protocols.h>
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
 
 namespace chip {
 namespace Credentials {

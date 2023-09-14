@@ -32,6 +32,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/support/CHIPArgParser.hpp>
+#include <platform/CHIPDeviceConfig.h>
 #include <setup_payload/SetupPayload.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
