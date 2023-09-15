@@ -39,7 +39,9 @@ Shell::Engine sShellDnsBrowseSubcommands;
 Shell::Engine sShellDnsSubcommands;
 Dnssd::ResolverProxy sResolverProxy;
 
-class DnsShellResolverDelegate : public Dnssd::OperationalResolveDelegate, public Dnssd::CommissioningResolveDelegate
+class DnsShellResolverDelegate : public Dnssd::OperationalResolveDelegate,
+                                 public Dnssd::CommissioningResolveDelegate,
+                                 public Dnssd::OperationalBrowseDeleagete
 {
 public:
     void OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeData) override
@@ -115,6 +117,13 @@ public:
             streamer_printf(streamer_get(), "      %s\r\n", nodeData.resolutionData.ipAddress[i].ToString(ipAddressBuf));
         }
     }
+
+    virtual void OnOperationalNodeDiscovered(const Dnssd::OperationalNodeData & operationalData) override
+    {
+        streamer_printf(streamer_get(), "Operational Browse found a node:\r\n");
+        streamer_printf(streamer_get(), "   Fabric: %016x\r\n");
+        streamer_printf(streamer_get(), "   NodeId: %lu\r\n", operationalData.peerId.GetNodeId());
+    };
 
 private:
     char ipAddressBuf[Inet::IPAddress::kMaxStringLength];
@@ -210,6 +219,21 @@ CHIP_ERROR BrowseCommissionerHandler(int argc, char ** argv)
     return sResolverProxy.DiscoverCommissioners(filter);
 }
 
+CHIP_ERROR BrowseOpertionalHandler(int argc, char ** argv)
+{
+    Dnssd::DiscoveryFilter filter;
+
+    if (!ParseSubType(argc, argv, filter))
+    {
+        streamer_printf(streamer_get(), "Invalid argument\r\n");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    streamer_printf(streamer_get(), "Browsing operational nodes...\r\n");
+
+    return sResolverProxy.DiscoverOperational(filter);
+}
+
 CHIP_ERROR BrowseHandler(int argc, char ** argv)
 {
     if (argc == 0)
@@ -232,6 +256,7 @@ CHIP_ERROR DnsHandler(int argc, char ** argv)
     sResolverProxy.Init(DeviceLayer::UDPEndPointManager());
     sResolverProxy.SetOperationalDelegate(&sDnsShellResolverDelegate);
     sResolverProxy.SetCommissioningDelegate(&sDnsShellResolverDelegate);
+    sResolverProxy.SetOperationalBrowseDelegate(&sDnsShellResolverDelegate);
 
     return sShellDnsSubcommands.ExecCommand(argc, argv);
 }
@@ -245,13 +270,16 @@ void RegisterDnsCommands()
           "Browse Matter commissionable nodes. Usage: dns browse commissionable [subtype]" },
         { &BrowseCommissionerHandler, "commissioner",
           "Browse Matter commissioner nodes. Usage: dns browse commissioner [subtype]" },
+        { &BrowseOpertionalHandler, "operational",
+          "Browse Matter all operationional nodes. Usage: dns browse operational [subtype]" },
+
     };
 
     static const shell_command_t sDnsSubCommands[] = {
         { &ResolveHandler, "resolve",
           "Resolve the DNS service. Usage: dns resolve <fabric-id> <node-id> (e.g. dns resolve 5544332211 1)" },
         { &BrowseHandler, "browse",
-          "Browse DNS services published by Matter nodes. Usage: dns browse <commissionable|commissioner>" },
+          "Browse DNS services published by Matter nodes. Usage: dns browse <commissionable|commissioner|operational>" },
     };
 
     static const shell_command_t sDnsCommand = { &DnsHandler, "dns", "Dns client commands" };

@@ -55,10 +55,17 @@ public:
     {
         mResolverProxy.SetCommissioningDelegate(delegate);
     }
+
+    void SetOperationalBrowseDelegate(OperationalBrowseDeleagete * delegate) override
+    {
+        mResolverProxy.SetOperationalBrowseDelegate(delegate);
+    }
+
     CHIP_ERROR ResolveNodeId(const PeerId & peerId) override;
     void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override;
     CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
+    CHIP_ERROR DiscoverOperational(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR StopDiscovery() override;
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override;
 

@@ -645,6 +645,12 @@ void DiscoveryImplPlatform::NodeIdResolutionNoLongerNeeded(const PeerId & peerId
     ChipDnssdResolveNoLongerNeeded(name);
 }
 
+CHIP_ERROR DiscoveryImplPlatform::DiscoverOperational(DiscoveryFilter filter)
+{
+    ReturnErrorOnFailure(InitImpl());
+    return mResolverProxy.DiscoverOperational(filter);
+}
+
 CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissionableNodes(DiscoveryFilter filter)
 {
     ReturnErrorOnFailure(InitImpl());
@@ -719,6 +725,23 @@ void ResolverProxy::NodeIdResolutionNoLongerNeeded(const PeerId & peerId)
 ResolverProxy::~ResolverProxy()
 {
     Shutdown();
+}
+
+CHIP_ERROR ResolverProxy::DiscoverOperational(DiscoveryFilter filter)
+{
+    StopDiscovery();
+
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mDelegate->Retain();
+
+    char serviceName[kMaxCommissionerServiceNameSize];
+    ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kOperational));
+
+    intptr_t browseIdentifier;
+    ReturnErrorOnFailure(ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny,
+                                         Inet::InterfaceId::Null(), HandleNodeBrowse, mDelegate, &browseIdentifier));
+    mDiscoveryContext.Emplace(browseIdentifier);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ResolverProxy::DiscoverCommissionableNodes(DiscoveryFilter filter)
