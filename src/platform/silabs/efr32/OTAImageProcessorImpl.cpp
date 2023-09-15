@@ -23,12 +23,7 @@
 extern "C" {
 #include "btl_interface.h"
 #include "em_bus.h" // For CORE_CRITICAL_SECTION
-#if SL_BTLCTRL_MUX
 #include "spi_multiplex.h"
-// #ifdef WF200_WIFI // TODO: (MATTER-1905) clean up of MACROs
-// #include "sl_wfx_host_api.h"
-// #endif
-#endif // SL_BTLCTRL_MUX
 }
 
 #include <platform/silabs/SilabsConfig.h>

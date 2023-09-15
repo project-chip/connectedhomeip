@@ -23,11 +23,9 @@
 #include "dmd/dmd.h"
 #include "em_types.h"
 #include "glib.h"
+#include "spi_multiplex.h"
 #include <stdio.h>
 #include <string.h>
-#if SL_LCDCTRL_MUX
-#include "spi_multiplex.h"
-#endif
 
 // Main Logo and App image
 #define SILICONLABS_X_POSITION ((glibContext.pDisplayGeometry->xSize - SILICONLABS_BITMAP_WIDTH) / 2)
