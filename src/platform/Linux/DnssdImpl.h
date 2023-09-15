@@ -156,6 +156,7 @@ private:
             if (mResolver != nullptr)
             {
                 avahi_service_resolver_free(mResolver);
+                mResolver = nullptr;
             }
         }
     };
