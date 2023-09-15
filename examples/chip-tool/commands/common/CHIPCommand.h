@@ -220,6 +220,18 @@ private:
     static const chip::Credentials::AttestationTrustStore * sTrustStore;
 
     static void RunQueuedCommand(intptr_t commandArg);
+    typedef decltype(RunQueuedCommand) MatterWorkCallback;
+    static void RunCommandCleanup(intptr_t commandArg);
+
+    // Do cleanup after a commmand is done running.  Must happen with the
+    // Matter stack locked.
+    void CleanupAfterRun();
+
+    // Run the given callback on the Matter thread.  Return whether we managed
+    // to successfully dispatch it to the Matter thread.  If we did, *timedOut
+    // will be set to whether we timed out or whether our mWaitingForResponse
+    // got set to false by the callback itself.
+    CHIP_ERROR RunOnMatterQueue(MatterWorkCallback callback, chip::System::Clock::Timeout timeout, bool * timedOut);
 
     CHIP_ERROR mCommandExitStatus = CHIP_ERROR_INTERNAL;
 
