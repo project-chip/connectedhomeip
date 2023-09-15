@@ -23,6 +23,9 @@ declare_args() {
 
   # Substitute fake platform when building with chip_device_platform=auto.
   chip_fake_platform = false
+
+  # Whether the target architecture is big-endian (true) or little-endian (false).
+  chip_target_is_big_endian = false
 }
 
 if (chip_device_platform == "auto") {

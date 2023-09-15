@@ -151,11 +151,9 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       defines += [ "CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME=\"${chip_device_config_firmware_build_time}\"" ]
     }
 
-    if (chip_use_transitional_commissionable_data_provider) {
-      defines += [ "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=1" ]
-    } else {
-      defines += [ "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=0" ]
-    }
+    defines += [ "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=${chip_use_transitional_commissionable_data_provider}" ]
+
+    defines += [ "CHIP_CONFIG_BIG_ENDIAN_TARGET=${chip_target_is_big_endian}" ]
 
     if (chip_device_platform == "cc13x2_26x2") {
       device_layer_target_define = "CC13X2_26X2"
