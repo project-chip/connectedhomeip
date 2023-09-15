@@ -37,10 +37,34 @@ class CompatibilityChecker:
         logging.error(reason)
         self.compatible = Compatibility.INCOMPATIBLE
 
+    def CheckEnumCompatible(self, original: Enum, updated: Optional[Enum]):
+        if not updated:
+            self._MarkIncompatible(f"Enumeration {original.name} was deleted")
+            return
+
+        if original.base_type != updated.base_type:
+            self._MarkIncompatible(f"Enumeration {original.name} switched base type from {original.base_type} to {updated.base_type}")
+
+        # Validate that all old entries exist
+        for entry in original.entries:
+            # old entry must exist and have identical code
+            existing = [item for item in updated.entries if item.name == entry.name ]
+            if len(existing) == 0:
+              self._MarkIncompatible(f"Enumeration {original.name} removed entry {entry.name}")
+            elif existing[0].code != entry.code:
+              self._MarkIncompatible(f"Enumeration {original.name} changed code for entry {entry.name}")
+
+            
+
     def CheckEnumListCompatible(self, original: List[Enum], updated: List[Enum]):
         updated_enums = {}
         for item in updated:
             updated_enums[item.name] = item
+
+        for original_enum in original:
+            updated_enum = updated_enums.get(original_enum.name)
+            self.CheckEnumCompatible(original_enum, updated_enum)
+
         # self._MarkIncompatible("NOT YET IMPLEMENTED")
 
     def CheckStructListCompatible(self, original: List[Struct], updated: List[Struct]):

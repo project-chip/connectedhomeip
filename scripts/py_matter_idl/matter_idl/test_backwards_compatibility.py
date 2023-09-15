@@ -82,6 +82,12 @@ class TestCompatibilityChecks(unittest.TestCase):
             "enum A: ENUM8 {A = 1; }",
             Compatibility.FORWARD_FAIL)
 
+        # Switching codes is never ok
+        self.ValidateUpdate(
+            "enum A: ENUM8 {A = 1; B = 2; }",
+            "enum A: ENUM8 {A = 1; B = 3; }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
 
 if __name__ == '__main__':
     unittest.main()
