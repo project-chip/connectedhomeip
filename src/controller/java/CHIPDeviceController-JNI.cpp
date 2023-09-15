@@ -55,6 +55,10 @@
 #include <system/SystemClock.h>
 #include <vector>
 
+#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+#include <app/dynamic_server/AccessControl.h>
+#endif // CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+
 #ifdef JAVA_MATTER_CONTROLLER_TEST
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #else
@@ -135,6 +139,10 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     err = AndroidChipPlatformJNI_OnLoad(jvm, reserved);
     SuccessOrExit(err);
 #endif // JAVA_MATTER_CONTROLLER_TEST
+
+#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+    chip::app::dynamic_server::InitAccessControl();
+#endif // CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
 
 exit:
     if (err != CHIP_NO_ERROR)

@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,24 +15,14 @@
  */
 #pragma once
 
-#import <Foundation/Foundation.h>
-#import <Matter/MTRDefines.h>
-
-NS_ASSUME_NONNULL_BEGIN
-
-MTR_HIDDEN
-@interface MTRControllerAccessControl : NSObject
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-+ (instancetype)alloc NS_UNAVAILABLE;
-
+namespace chip {
+namespace app {
+namespace dynamic_server {
 /**
  * Initialize the access control module. Must be called on the Matter task
  * queue.
  */
-+ (void)init;
-
-@end
-
-NS_ASSUME_NONNULL_END
+void InitAccessControl();
+} // namespace dynamic_server
+} // namespace app
+} // namespace chip

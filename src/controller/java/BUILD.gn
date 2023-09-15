@@ -17,6 +17,8 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 import("${chip_root}/build/chip/tests.gni")
+import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/platform/device.gni")
 
 if (!matter_enable_java_compilation) {
   import("${build_root}/config/android_abi.gni")
@@ -85,6 +87,10 @@ shared_library("jni") {
     ]
 
     deps += [ "${chip_root}/src/controller/data_model:java-jni-sources" ]
+  }
+
+  if (chip_build_controler_dynamic_server) {
+    defines += [ "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER" ]
   }
 
   if (matter_enable_java_compilation) {
