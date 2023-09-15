@@ -376,6 +376,7 @@ void sl_wfx_host_gpio_init(void)
 #if SL_SPICTRL_MUX
 void SPIDRV_SetBaudrate(uint32_t baudrate)
 {
+    SILABS_LOG("%s started.", __func__);
     if (USART_BaudrateGet(MY_USART) == baudrate)
     {
         // USART synced to baudrate already
@@ -391,18 +392,23 @@ void SPIDRV_SetBaudrate(uint32_t baudrate)
     usartInit.autoCsEnable           = true;
 
     USART_InitSync(MY_USART, &usartInit);
+    SILABS_LOG("%s completed.", __func__);
 }
 #endif // SL_SPICTRL_MUX
 #if SL_MUX25CTRL_MUX
 sl_status_t sl_wfx_host_spiflash_cs_assert(void)
 {
+    SILABS_LOG("%s started.", __func__);
     GPIO_PinOutClear(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
+    SILABS_LOG("%s completed.", __func__);
     return SL_STATUS_OK;
 }
 
 sl_status_t sl_wfx_host_spiflash_cs_deassert(void)
 {
+    SILABS_LOG("%s started.", __func__);
     GPIO_PinOutSet(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
+    SILABS_LOG("%s completed.", __func__);
     return SL_STATUS_OK;
 }
 #endif // SL_MUX25CTRL_MUX
@@ -410,6 +416,7 @@ sl_status_t sl_wfx_host_spiflash_cs_deassert(void)
 #if SL_BTLCTRL_MUX
 sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void)
 {
+    SILABS_LOG("%s started.", __func__);
 #if SL_SPICTRL_MUX
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
 #endif // SL_SPICTRL_MUX
@@ -420,11 +427,13 @@ sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void)
 #if SL_MUX25CTRL_MUX
     sl_wfx_host_spiflash_cs_assert();
 #endif // SL_MUX25CTRL_MUX
+    SILABS_LOG("%s completed.", __func__);
     return SL_STATUS_OK;
 }
 
 sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
 {
+    SILABS_LOG("%s started.", __func__);
     /*
      * De-Assert CS pin for EXT SPI Flash
      */
@@ -434,6 +443,7 @@ sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
 #if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);
 #endif // SL_SPICTRL_MUX
+    SILABS_LOG("%s completed.", __func__);
     return SL_STATUS_OK;
 }
 #endif // SL_BTLCTRL_MUX
@@ -441,19 +451,23 @@ sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
 #if SL_LCDCTRL_MUX
 sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
 {
+    SILABS_LOG("%s started.", __func__);
 #if SL_SPICTRL_MUX
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
 #endif // SL_SPICTRL_MUX
     SPIDRV_SetBaudrate(SL_SPIDRV_LCD_BITRATE);
     /*LCD CS is handled as part of LCD gsdk*/
+    SILABS_LOG("%s completed.", __func__);
     return SL_STATUS_OK;
 }
 
 sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
 {
+    SILABS_LOG("%s started.", __func__);
 #if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);
 #endif // SL_SPICTRL_MUX
+    SILABS_LOG("%s completed.", __func__);
     return SL_STATUS_OK;
 }
 #endif // SL_LCDCTRL_MUX
@@ -461,6 +475,7 @@ sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
 #if SL_UARTCTRL_MUX
 sl_status_t sl_wfx_host_pre_uart_transfer(void)
 {
+    SILABS_LOG("%s started.", __func__);
 #if SL_SPICTRL_MUX
     if (spi_sem_sync_hdl == NULL)
     {
@@ -469,6 +484,7 @@ sl_status_t sl_wfx_host_pre_uart_transfer(void)
        // spi_sem_sync_hdl will not be initalized during execution
         GPIO_PinModeSet(gpioPortA, 8, gpioModePushPull, 1);
 #if SL_SPICTRL_MUX
+        SILABS_LOG("%s completed.", __func__);
         return SL_STATUS_OK;
     }
 #endif // SL_SPICTRL_MUX
@@ -478,14 +494,17 @@ sl_status_t sl_wfx_host_pre_uart_transfer(void)
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
 #endif // SL_SPICTRL_MUX
     GPIO_PinModeSet(gpioPortA, 8, gpioModePushPull, 1);
+    SILABS_LOG("%s completed.", __func__);
     return SL_STATUS_OK;
 }
 
 sl_status_t sl_wfx_host_post_uart_transfer(void)
 {
+    SILABS_LOG("%s started.", __func__);
 #if SL_SPICTRL_MUX
     if (spi_sem_sync_hdl == NULL)
     {
+        SILABS_LOG("%s completed.", __func__);
         return SL_STATUS_OK;
     }
 #endif // SL_SPICTRL_MUX
@@ -495,6 +514,7 @@ sl_status_t sl_wfx_host_post_uart_transfer(void)
 #endif // SL_SPICTRL_MUX
     sl_wfx_host_enable_platform_interrupt();
     sl_wfx_enable_irq();
+    SILABS_LOG("%s completed.", __func__);
     return SL_STATUS_OK;
 }
 #endif // SL_UARTCTRL_MUX

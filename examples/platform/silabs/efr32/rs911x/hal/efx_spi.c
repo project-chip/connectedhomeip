@@ -207,58 +207,55 @@ void sl_si91x_host_enable_high_speed_bus()
 #if SL_SPICTRL_MUX
 void SPIDRV_SetBaudrate(uint32_t baudrate)
 {
+    SILABS_LOG("%s started.", __func__);
     if (EUSART_BaudrateGet(MY_USART) == baudrate)
     {
         // EUSART synced to baudrate already
         return;
     }
     EUSART_BaudrateSet(MY_USART, 0, baudrate);
+    SILABS_LOG("%s completed.", __func__);
 }
-#endif // SL_SPICTRL_MUX
 
 sl_status_t sl_wfx_host_spi_cs_assert(void)
 {
-    SILABS_LOG("sl_wfx_host_spi_cs_assert started.");
-#if SL_SPICTRL_MUX
+    // SILABS_LOG("sl_wfx_host_spi_cs_assert started.");
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
 
     if (!spi_enabled) // Reduce sl_spidrv_init_instances
     {
         sl_spidrv_init_instances();
+#if defined(EFR32MG24)
+        GPIO_PinOutClear(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
+#endif // EFR32MG24
         spi_enabled = true;
     }
-#endif // SL_SPICTRL_MUX
-#if defined(EFR32MG24)
-    GPIO_PinOutClear(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
-#endif // EFR32MG24
-    SILABS_LOG("sl_wfx_host_spi_cs_assert completed.");
+    // SILABS_LOG("sl_wfx_host_spi_cs_assert completed.");
     return SL_STATUS_OK;
 }
 
 sl_status_t sl_wfx_host_spi_cs_deassert(void)
 {
-    SILABS_LOG("sl_wfx_host_spi_cs_deassert started.");
-#if SL_SPICTRL_MUX
+    // SILABS_LOG("sl_wfx_host_spi_cs_deassert started.");
     if (spi_enabled)
     {
         if (ECODE_EMDRV_SPIDRV_OK != SPIDRV_DeInit(SL_SPIDRV_HANDLE))
         {
             xSemaphoreGive(spi_sem_sync_hdl);
+            SILABS_LOG("%s error.", __func__);
             return SL_STATUS_FAIL;
         }
+#if defined(EFR32MG24)
+        GPIO_PinOutSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
+        GPIO->EUSARTROUTE[SL_SPIDRV_EUSART_EXP_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
+#endif // EFR32MG24
         spi_enabled = false;
     }
-#endif // SL_SPICTRL_MUX
-#if defined(EFR32MG24)
-    GPIO_PinOutSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
-    GPIO->EUSARTROUTE[SL_SPIDRV_EUSART_EXP_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
-#endif // EFR32MG24
-#if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);
-#endif // SL_SPICTRL_MUX
-    SILABS_LOG("sl_wfx_host_spi_cs_deassert completed.");
+    // SILABS_LOG("sl_wfx_host_spi_cs_deassert completed.");
     return SL_STATUS_OK;
 }
+#endif // SL_SPICTRL_MUX
 
 #if SL_MUX25CTRL_MUX
 sl_status_t sl_wfx_host_spiflash_cs_assert(void)
@@ -289,6 +286,7 @@ sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void)
         if (ECODE_EMDRV_SPIDRV_OK != SPIDRV_DeInit(SL_SPIDRV_HANDLE))
         {
             xSemaphoreGive(spi_sem_sync_hdl);
+            SILABS_LOG("%s error.", __func__);
             return SL_STATUS_FAIL;
         }
         spi_enabled = false;
@@ -347,6 +345,7 @@ sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
         if (ECODE_EMDRV_SPIDRV_OK != SPIDRV_DeInit(SL_SPIDRV_HANDLE))
         {
             xSemaphoreGive(spi_sem_sync_hdl);
+            SILABS_LOG("%s error.", __func__);
             return SL_STATUS_FAIL;
         }
         spi_enabled = false;
@@ -358,6 +357,7 @@ sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
 #if SL_SPICTRL_MUX
         xSemaphoreGive(spi_sem_sync_hdl);
 #endif // SL_SPICTRL_MUX
+        SILABS_LOG("%s error.", __func__);
         return SL_STATUS_FAIL;
     }
     SILABS_LOG("sl_wfx_host_pre_lcd_spi_transfer completed.");
