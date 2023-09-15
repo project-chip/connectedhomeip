@@ -61,6 +61,15 @@ public:
                         result.mrpRemoteConfig.mActiveRetransTimeout.count());
         streamer_printf(streamer_get(), "   MRP ACTIVE Threshold timet:    %u ms\r\n",
                         result.mrpRemoteConfig.mActiveThresholdTime.count());
+
+        // Schedule a retry. Not called directly so we do not recurse in OnNodeAddressResolved
+        SystemLayer().ScheduleLambda([this] {
+            CHIP_ERROR err = AddressResolve::Resolver::Instance().TryNextResult(Handle());
+            if (err != CHIP_NO_ERROR && err != CHIP_ERROR_WELL_EMPTY)
+            {
+                ChipLogError(Discovery, "Failed to list next result: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+        });
     }
 
     void OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason) override
