@@ -63,7 +63,7 @@ public:
                         result.mrpRemoteConfig.mActiveThresholdTime.count());
 
         // Schedule a retry. Not called directly so we do not recurse in OnNodeAddressResolved
-        SystemLayer().ScheduleLambda([this] {
+        DeviceLayer::SystemLayer().ScheduleLambda([this] {
             CHIP_ERROR err = AddressResolve::Resolver::Instance().TryNextResult(Handle());
             if (err != CHIP_NO_ERROR && err != CHIP_ERROR_WELL_EMPTY)
             {
