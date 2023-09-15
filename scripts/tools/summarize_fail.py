@@ -1,6 +1,7 @@
 import logging
 import os
 import subprocess
+import time
 
 import pandas as pd
 from slugify import slugify
@@ -62,7 +63,7 @@ def process_fail(id, pr, start_time, workflow):
     if not os.path.exists(workflow_fail_rate_output_path):
         os.makedirs(workflow_fail_rate_output_path)
         subprocess.run(
-            f"gh run list -R project-chip/connectedhomeip -b master -w '{workflow}' --json conclusion > {workflow_fail_rate_output_path}/run_list.json", shell=True)
+            f"gh run list -R project-chip/connectedhomeip -b master -w '{workflow}' -L 100 --created {time.strftime('%Y-%m-%d')} --json conclusion > {workflow_fail_rate_output_path}/run_list.json", shell=True)
     else:
         logging.info("This workflow has already been processed.")
 
@@ -71,7 +72,7 @@ def process_fail(id, pr, start_time, workflow):
 
 def main():
     logging.info("Gathering recent fails information into run_list.json.")
-    subprocess.run("gh run list -R project-chip/connectedhomeip -b master -s failure --json databaseId,displayTitle,startedAt,workflowName > run_list.json", shell=True)
+    subprocess.run(f"gh run list -R project-chip/connectedhomeip -b master -s failure -L 100 --created {time.strftime('%Y-%m-%d')} --json databaseId,displayTitle,startedAt,workflowName > run_list.json", shell=True)
 
     logging.info("Reading run_list.json into a DataFrame.")
     df = pd.read_json("run_list.json")
