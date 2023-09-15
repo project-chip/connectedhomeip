@@ -17,7 +17,7 @@ import logging
 from enum import Enum, auto
 from typing import List, Optional
 
-from matter_idl.matter_idl_types import Bitmap, Cluster, Command, Enum, Event, Idl, Struct, ClusterSide
+from matter_idl.matter_idl_types import Bitmap, Cluster, ClusterSide, Command, Enum, Event, Idl, Struct
 
 
 class Compatibility(Enum):
@@ -60,7 +60,8 @@ class CompatibilityChecker:
             if len(existing) == 0:
                 self._MarkIncompatible(f"Enumeration {original.name} removed entry {entry.name}")
             elif existing[0].code != entry.code:
-                self._MarkIncompatible(f"Enumeration {original.name} changed code for entry {entry.name}")
+                self._MarkIncompatible(
+                    f"Enumeration {original.name} changed code for entry {entry.name} from {entry.code} to {existing[0].code}")
 
     def CheckBitmapCompatible(self, original: Bitmap, updated: Optional[Bitmap]):
         if not updated:
@@ -78,7 +79,8 @@ class CompatibilityChecker:
             if len(existing) == 0:
                 self._MarkIncompatible(f"Bitmap {original.name} removed entry {entry.name}")
             elif existing[0].code != entry.code:
-                self._MarkIncompatible(f"Bitmap {original.name} changed code for entry {entry.name}")
+                self._MarkIncompatible(
+                    f"Bitmap {original.name} changed code for entry {entry.name} from {entry.code} to {existing[0].code}")
 
     def CheckEnumListCompatible(self, original: List[Enum], updated: List[Enum]):
         updated_enums = {}
