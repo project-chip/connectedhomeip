@@ -16,6 +16,7 @@
  */
 #include "AndroidCallbacks.h"
 #include <controller/java/AndroidClusterExceptions.h>
+#include <controller/java/AndroidConnectionFailureExceptions.h>
 #include <controller/java/AndroidControllerExceptions.h>
 #if USE_JAVA_TLV_ENCODE_DECODE
 #include <controller/java/CHIPAttributeTLVValueDecoder.h>
@@ -156,7 +157,7 @@ void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, Messaging::
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
-void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
+void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, const ExtendedConnectionFailureInfo & failureInfo)
 {
     JNIEnv * env         = JniReferences::GetInstance().GetEnvForCurrentThread();
     auto * self          = static_cast<GetConnectedDeviceCallback *>(context);
@@ -177,8 +178,8 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, con
     VerifyOrReturn(failureMethod != nullptr, ChipLogError(Controller, "Could not find onConnectionFailure method"));
 
     jthrowable exception;
-    CHIP_ERROR err = AndroidControllerExceptions::GetInstance().CreateAndroidControllerException(env, ErrorStr(error),
-                                                                                                 error.AsInteger(), exception);
+    CHIP_ERROR err = AndroidConnectionFailureExceptions::GetInstance().CreateAndroidConnectionFailureException(
+        env, ErrorStr(failureInfo.error), failureInfo.error.AsInteger(), failureInfo.connectionState, exception);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         ChipLogError(Controller,
@@ -186,7 +187,7 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, con
                      ErrorStr(err)));
 
     DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(javaCallback, failureMethod, peerId.GetNodeId(), exception);
+    env->CallVoidMethod(javaCallback, failureMethod, failureInfo.peerId.GetNodeId(), exception);
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 

@@ -30,7 +30,8 @@ CHIP_ERROR CASESessionManager::Init(chip::System::Layer * systemLayer, const CAS
 }
 
 void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                                Callback::Callback<OnDeviceConnectionFailure> * onFailure
+                                                Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                                                Callback::Callback<OnExtendedDeviceConnectionFailure> * onExtendedConnectionFailure
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                                 ,
                                                 uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry
@@ -54,6 +55,14 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
             {
                 onFailure->mCall(onFailure->mContext, peerId, CHIP_ERROR_NO_MEMORY);
             }
+
+            if (onExtendedConnectionFailure != nullptr)
+            {
+                // Initialize the ExtendedConnectionFailureInfo object
+                ExtendedConnectionFailureInfo failureInfo(peerId, CHIP_ERROR_NO_MEMORY, CaseConnectionState::Uninitialized);
+                onExtendedConnectionFailure->mCall(onExtendedConnectionFailure->mContext, failureInfo);
+            }
+
             return;
         }
     }
@@ -66,7 +75,7 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
-    session->Connect(onConnection, onFailure);
+    session->Connect(onConnection, onFailure, onExtendedConnectionFailure);
 }
 
 void CASESessionManager::ReleaseSessionsForFabric(FabricIndex fabricIndex)

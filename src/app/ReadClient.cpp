@@ -1234,7 +1234,7 @@ CHIP_ERROR ReadClient::EstablishSessionToPeer()
     ChipLogProgress(DataManagement, "Trying to establish a CASE session for subscription");
     auto * caseSessionManager = InteractionModelEngine::GetInstance()->GetCASESessionManager();
     VerifyOrReturnError(caseSessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    caseSessionManager->FindOrEstablishSession(mPeer, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    caseSessionManager->FindOrEstablishSession(mPeer, &mOnConnectedCallback, &mOnConnectionFailureCallback, nullptr);
     return CHIP_NO_ERROR;
 }
 

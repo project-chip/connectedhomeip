@@ -46,16 +46,16 @@ using chip::AddressResolve::ResolveResult;
 
 namespace chip {
 
-void OperationalSessionSetup::MoveToState(State aTargetState)
+void OperationalSessionSetup::MoveToState(CaseConnectionState aTargetState)
 {
     if (mState != aTargetState)
     {
-        ChipLogDetail(Discovery, "OperationalSessionSetup[%u:" ChipLogFormatX64 "]: State change %d --> %d",
+        ChipLogDetail(Discovery, "OperationalSessionSetup[%u:" ChipLogFormatX64 "]: CaseConnectionState change %d --> %d",
                       mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()), to_underlying(mState),
                       to_underlying(aTargetState));
 
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
-        if (mState == State::WaitingForRetry)
+        if (mState == CaseConnectionState::WaitingForRetry)
         {
             CancelSessionSetupReattempt();
         }
@@ -63,7 +63,7 @@ void OperationalSessionSetup::MoveToState(State aTargetState)
 
         mState = aTargetState;
 
-        if (aTargetState != State::Connecting)
+        if (aTargetState != CaseConnectionState::Connecting)
         {
             CleanupCASEClient();
         }
@@ -72,8 +72,8 @@ void OperationalSessionSetup::MoveToState(State aTargetState)
 
 bool OperationalSessionSetup::AttachToExistingSecureSession()
 {
-    VerifyOrReturnError(mState == State::NeedsAddress || mState == State::ResolvingAddress || mState == State::HasAddress ||
-                            mState == State::WaitingForRetry,
+    VerifyOrReturnError(mState == CaseConnectionState::NeedsAddress || mState == CaseConnectionState::ResolvingAddress ||
+                            mState == CaseConnectionState::HasAddress || mState == CaseConnectionState::WaitingForRetry,
                         false);
 
     auto sessionHandle =
@@ -92,7 +92,8 @@ bool OperationalSessionSetup::AttachToExistingSecureSession()
 }
 
 void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * onConnection,
-                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                                      Callback::Callback<OnExtendedDeviceConnectionFailure> * onExtendedConnectionFailure)
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
     bool isConnected = false;
@@ -102,44 +103,44 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
     // If anything goes wrong below, we'll trigger failures (including any queued from
     // a previous iteration which in theory shouldn't happen, but this is written to be more defensive)
     //
-    EnqueueConnectionCallbacks(onConnection, onFailure);
+    EnqueueConnectionCallbacks(onConnection, onFailure, onExtendedConnectionFailure);
 
     switch (mState)
     {
-    case State::Uninitialized:
+    case CaseConnectionState::Uninitialized:
         err = CHIP_ERROR_INCORRECT_STATE;
         break;
 
-    case State::NeedsAddress:
+    case CaseConnectionState::NeedsAddress:
         isConnected = AttachToExistingSecureSession();
         if (!isConnected)
         {
             // LookupPeerAddress could perhaps call back with a result
             // synchronously, so do our state update first.
-            MoveToState(State::ResolvingAddress);
+            MoveToState(CaseConnectionState::ResolvingAddress);
             err = LookupPeerAddress();
             if (err != CHIP_NO_ERROR)
             {
                 // Roll back the state change, since we are presumably not in
                 // the middle of a lookup.
-                MoveToState(State::NeedsAddress);
+                MoveToState(CaseConnectionState::NeedsAddress);
             }
         }
 
         break;
 
-    case State::ResolvingAddress:
-    case State::WaitingForRetry:
+    case CaseConnectionState::ResolvingAddress:
+    case CaseConnectionState::WaitingForRetry:
         isConnected = AttachToExistingSecureSession();
         break;
 
-    case State::HasAddress:
+    case CaseConnectionState::HasAddress:
         isConnected = AttachToExistingSecureSession();
         if (!isConnected)
         {
-            // We should not actually every be in be in State::HasAddress. This
-            // is because in the same call that we moved to State::HasAddress
-            // we either move to State::Connecting or call
+            // We should not actually every be in be in CaseConnectionState::HasAddress. This
+            // is because in the same call that we moved to CaseConnectionState::HasAddress
+            // we either move to CaseConnectionState::Connecting or call
             // DequeueConnectionCallbacks with an error thus releasing
             // ourselves before any call would reach this section of code.
             err = CHIP_ERROR_INCORRECT_STATE;
@@ -147,10 +148,10 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
 
         break;
 
-    case State::Connecting:
+    case CaseConnectionState::Connecting:
         break;
 
-    case State::SecureConnected:
+    case CaseConnectionState::SecureConnected:
         isConnected = true;
         break;
 
@@ -160,7 +161,7 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
 
     if (isConnected)
     {
-        MoveToState(State::SecureConnected);
+        MoveToState(CaseConnectionState::SecureConnected);
     }
 
     //
@@ -180,7 +181,7 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
 
 void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config)
 {
-    if (mState == State::Uninitialized)
+    if (mState == CaseConnectionState::Uninitialized)
     {
         return;
     }
@@ -202,7 +203,7 @@ void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & ad
         mCASEClient->SetRemoteMRPIntervals(config);
     }
 
-    if (mState != State::ResolvingAddress)
+    if (mState != CaseConnectionState::ResolvingAddress)
     {
         ChipLogError(Discovery, "Received UpdateDeviceData in incorrect state");
         DequeueConnectionCallbacks(CHIP_ERROR_INCORRECT_STATE);
@@ -211,7 +212,7 @@ void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & ad
         return;
     }
 
-    MoveToState(State::HasAddress);
+    MoveToState(CaseConnectionState::HasAddress);
     mInitParams.sessionManager->UpdateAllSessionsPeerAddress(mPeerId, addr);
 
     if (mPerformingAddressUpdate)
@@ -233,7 +234,7 @@ void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & ad
 
     // Move to the ResolvingAddress state, in case we have more results,
     // since we expect to receive results in that state.
-    MoveToState(State::ResolvingAddress);
+    MoveToState(CaseConnectionState::ResolvingAddress);
     if (CHIP_NO_ERROR == Resolver::Instance().TryNextResult(mAddressLookupHandle))
     {
         // No need to NotifyRetryHandlers, since we never actually
@@ -257,13 +258,14 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ReliableMessagePro
         return err;
     }
 
-    MoveToState(State::Connecting);
+    MoveToState(CaseConnectionState::Connecting);
 
     return CHIP_NO_ERROR;
 }
 
-void OperationalSessionSetup::EnqueueConnectionCallbacks(Callback::Callback<OnDeviceConnected> * onConnection,
-                                                         Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+void OperationalSessionSetup::EnqueueConnectionCallbacks(
+    Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+    Callback::Callback<OnExtendedDeviceConnectionFailure> * onExtendedConnectionFailure)
 {
     if (onConnection != nullptr)
     {
@@ -274,19 +276,25 @@ void OperationalSessionSetup::EnqueueConnectionCallbacks(Callback::Callback<OnDe
     {
         mConnectionFailure.Enqueue(onFailure->Cancel());
     }
+
+    if (onExtendedConnectionFailure != nullptr)
+    {
+        mExtendedConnectionFailure.Enqueue(onExtendedConnectionFailure->Cancel());
+    }
 }
 
 void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error, ReleaseBehavior releaseBehavior)
 {
-    Cancelable failureReady, successReady;
+    Cancelable failureReady, extendedFailureReady, successReady;
 
     //
     // Dequeue both failure and success callback lists into temporary stack args before invoking either of them.
     // We do this since we may not have a valid 'this' pointer anymore upon invoking any of those callbacks
     // since the callee may destroy this object as part of that callback.
     //
-    mConnectionFailure.DequeueAll(failureReady);
     mConnectionSuccess.DequeueAll(successReady);
+    mConnectionFailure.DequeueAll(failureReady);
+    mExtendedConnectionFailure.DequeueAll(extendedFailureReady);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     // Clear out mConnectionRetry, so that those cancelables are not holding
@@ -311,11 +319,12 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error, Relea
 
     // DO NOT touch any members of this object after this point.  It's dead.
 
-    NotifyConnectionCallbacks(failureReady, successReady, error, peerId, performingAddressUpdate, exchangeMgr,
-                              optionalSessionHandle);
+    NotifyConnectionCallbacks(failureReady, extendedFailureReady, successReady, error, mState, peerId, performingAddressUpdate,
+                              exchangeMgr, optionalSessionHandle);
 }
 
-void OperationalSessionSetup::NotifyConnectionCallbacks(Cancelable & failureReady, Cancelable & successReady, CHIP_ERROR error,
+void OperationalSessionSetup::NotifyConnectionCallbacks(Cancelable & failureReady, Cancelable & extendedFailureReady,
+                                                        Cancelable & successReady, CHIP_ERROR error, CaseConnectionState state,
                                                         const ScopedNodeId & peerId, bool performingAddressUpdate,
                                                         Messaging::ExchangeManager * exchangeMgr,
                                                         const Optional<SessionHandle> & optionalSessionHandle)
@@ -339,6 +348,23 @@ void OperationalSessionSetup::NotifyConnectionCallbacks(Cancelable & failureRead
         }
     }
 
+    while (extendedFailureReady.mNext != &extendedFailureReady)
+    {
+        // We expect that we only have callbacks if we are not performing just address update.
+        VerifyOrDie(!performingAddressUpdate);
+        Callback::Callback<OnExtendedDeviceConnectionFailure> * cb =
+            Callback::Callback<OnExtendedDeviceConnectionFailure>::FromCancelable(extendedFailureReady.mNext);
+
+        cb->Cancel();
+
+        if (error != CHIP_NO_ERROR)
+        {
+            // Initialize the ExtendedConnectionFailureInfo object
+            ExtendedConnectionFailureInfo failureInfo(peerId, error, state);
+            cb->mCall(cb->mContext, failureInfo);
+        }
+    }
+
     while (successReady.mNext != &successReady)
     {
         // We expect that we only have callbacks if we are not performing just address update.
@@ -357,7 +383,7 @@ void OperationalSessionSetup::NotifyConnectionCallbacks(Cancelable & failureRead
 
 void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
 {
-    VerifyOrReturn(mState == State::Connecting,
+    VerifyOrReturn(mState == CaseConnectionState::Connecting,
                    ChipLogError(Discovery, "OnSessionEstablishmentError was called while we were not connecting"));
 
     if (CHIP_ERROR_TIMEOUT == error)
@@ -370,7 +396,7 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
 
         // Move to the ResolvingAddress state, in case we have more results,
         // since we expect to receive results in that state.
-        MoveToState(State::ResolvingAddress);
+        MoveToState(CaseConnectionState::ResolvingAddress);
         if (CHIP_NO_ERROR == Resolver::Instance().TryNextResult(mAddressLookupHandle))
         {
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
@@ -383,7 +409,7 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
         // Moving back to the Connecting state would be a bit of a lie, since we
         // don't have an mCASEClient.  Just go back to NeedsAddress, since
         // that's really where we are now.
-        MoveToState(State::NeedsAddress);
+        MoveToState(CaseConnectionState::NeedsAddress);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
         if (mRemainingAttempts > 0)
@@ -392,7 +418,7 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
             CHIP_ERROR err = ScheduleSessionSetupReattempt(reattemptDelay);
             if (err == CHIP_NO_ERROR)
             {
-                MoveToState(State::WaitingForRetry);
+                MoveToState(CaseConnectionState::WaitingForRetry);
                 NotifyRetryHandlers(error, remoteMprConfig, reattemptDelay);
                 return;
             }
@@ -406,7 +432,7 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
 
 void OperationalSessionSetup::OnSessionEstablished(const SessionHandle & session)
 {
-    VerifyOrReturn(mState == State::Connecting,
+    VerifyOrReturn(mState == CaseConnectionState::Connecting,
                    ChipLogError(Discovery, "OnSessionEstablished was called while we were not connecting"));
 
     if (!mSecureSession.Grab(session))
@@ -419,7 +445,7 @@ void OperationalSessionSetup::OnSessionEstablished(const SessionHandle & session
         return;
     }
 
-    MoveToState(State::SecureConnected);
+    MoveToState(CaseConnectionState::SecureConnected);
 
     DequeueConnectionCallbacks(CHIP_NO_ERROR);
 }
@@ -482,7 +508,7 @@ CHIP_ERROR OperationalSessionSetup::LookupPeerAddress()
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
     // NOTE: This is public API that can be used to update our stored peer
-    // address even when we are in State::Connected, so we do not make any
+    // address even when we are in CaseConnectionState::Connected, so we do not make any
     // MoveToState calls in this method.
     if (mAddressLookupHandle.IsActive())
     {
@@ -514,11 +540,11 @@ void OperationalSessionSetup::PerformAddressUpdate()
     }
 
     // We must be newly-allocated to handle this address lookup, so must be in the NeedsAddress state.
-    VerifyOrDie(mState == State::NeedsAddress);
+    VerifyOrDie(mState == CaseConnectionState::NeedsAddress);
 
     // We are doing an address lookup whether we have an active session for this peer or not.
     mPerformingAddressUpdate = true;
-    MoveToState(State::ResolvingAddress);
+    MoveToState(CaseConnectionState::ResolvingAddress);
     CHIP_ERROR err = LookupPeerAddress();
     if (err != CHIP_NO_ERROR)
     {
@@ -545,10 +571,10 @@ void OperationalSessionSetup::OnNodeAddressResolutionFailed(const PeerId & peerI
     // where multicast DNS does not actually work and hence only the initial
     // unicast DNS-SD queries get a response.
     //
-    // We check for State::ResolvingAddress just in case in the meantime
+    // We check for CaseConnectionState::ResolvingAddress just in case in the meantime
     // something weird happened and we are no longer trying to resolve an
     // address.
-    if (mState == State::ResolvingAddress && mResolveAttemptsAllowed > 0)
+    if (mState == CaseConnectionState::ResolvingAddress && mResolveAttemptsAllowed > 0)
     {
         ChipLogProgress(Discovery, "Retrying operational DNS-SD discovery. Attempts remaining: %u", mResolveAttemptsAllowed);
 
@@ -592,7 +618,7 @@ void OperationalSessionSetup::UpdateAttemptCount(uint8_t attemptCount)
         return;
     }
 
-    if (mState != State::NeedsAddress)
+    if (mState != CaseConnectionState::NeedsAddress)
     {
         // We're in the middle of an attempt already, so decrement attemptCount
         // by 1 to account for that.
@@ -620,7 +646,7 @@ CHIP_ERROR OperationalSessionSetup::ScheduleSessionSetupReattempt(System::Clock:
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    MoveToState(State::NeedsAddress);
+    MoveToState(CaseConnectionState::NeedsAddress);
     // Stop exponential backoff before our delays get too large.
     //
     // Note that mAttemptsDone is always > 0 here, because we have
@@ -671,7 +697,7 @@ void OperationalSessionSetup::TrySetupAgain(System::Layer * systemLayer, void * 
 {
     auto * self = static_cast<OperationalSessionSetup *>(state);
 
-    self->MoveToState(State::ResolvingAddress);
+    self->MoveToState(CaseConnectionState::ResolvingAddress);
     CHIP_ERROR err = self->LookupPeerAddress();
     if (err == CHIP_NO_ERROR)
     {

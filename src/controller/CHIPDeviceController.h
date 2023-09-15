@@ -231,11 +231,25 @@ public:
      * called yet, and neither callback will be called in the future.
      */
     CHIP_ERROR GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                  chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+                                  chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                                  chip::Callback::Callback<OnExtendedDeviceConnectionFailure> * onExtendedConnectionFailure)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-        mSystemState->CASESessionMgr()->FindOrEstablishSession(ScopedNodeId(peerNodeId, GetFabricIndex()), onConnection, onFailure);
+        mSystemState->CASESessionMgr()->FindOrEstablishSession(ScopedNodeId(peerNodeId, GetFabricIndex()), onConnection, onFailure,
+                                                               onExtendedConnectionFailure);
         return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                  chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+    {
+        return GetConnectedDevice(peerNodeId, onConnection, onFailure, nullptr);
+    }
+
+    CHIP_ERROR GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                  chip::Callback::Callback<OnExtendedDeviceConnectionFailure> * onExtendedDeviceConnectionFailure)
+    {
+        return GetConnectedDevice(peerNodeId, onConnection, nullptr, onExtendedDeviceConnectionFailure);
     }
 
     /**

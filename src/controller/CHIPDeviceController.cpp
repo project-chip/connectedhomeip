@@ -2774,7 +2774,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         mSystemState->SessionMgr()->ExpireAllSessions(scopedPeerId);
 
         mSystemState->CASESessionMgr()->FindOrEstablishSession(scopedPeerId, &mOnDeviceConnectedCallback,
-                                                               &mOnDeviceConnectionFailureCallback
+                                                               &mOnDeviceConnectionFailureCallback, nullptr
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                                                ,
                                                                /* attemptCount = */ 3, &mOnDeviceConnectionRetryCallback

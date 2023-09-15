@@ -18,6 +18,7 @@
 package com.matter.controller.commands.pairing
 
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.ConnectionFailureException
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback
 import chip.devicecontroller.WriteAttributesCallback
 import chip.devicecontroller.model.AttributeWriteRequest
@@ -66,8 +67,18 @@ class PairOnNetworkLongImWriteCommand(
       logger.log(Level.INFO, "onDeviceConnected")
     }
 
-    override fun onConnectionFailure(nodeId: Long, error: Exception?) {
+    override fun onConnectionFailure(nodeId: Long, error: Exception) {
       logger.log(Level.INFO, "onConnectionFailure")
+
+      if (error is ConnectionFailureException) {
+        val connectionState = error.connectionState
+        logger.log(Level.INFO, "Connection failure with state: $connectionState")
+      } else {
+        logger.log(
+          Level.INFO,
+          "Connection failure with an error of type: ${error.javaClass.simpleName}"
+        )
+      }
     }
   }
 
