@@ -34,9 +34,9 @@
 
 #pragma once
 
-constexpr const char kIdentityAlpha[] = "alpha";
-constexpr const char kIdentityBeta[]  = "beta";
-constexpr const char kIdentityGamma[] = "gamma";
+inline constexpr const char kIdentityAlpha[] = "alpha";
+inline constexpr const char kIdentityBeta[]  = "beta";
+inline constexpr const char kIdentityGamma[] = "gamma";
 // The null fabric commissioner is a commissioner that isn't on a fabric.
 // This is a legal configuration in which the commissioner delegates
 // operational communication and invocation of the commssioning complete
@@ -46,7 +46,7 @@ constexpr const char kIdentityGamma[] = "gamma";
 // commissioner portion of such an architecture.  The null-fabric-commissioner
 // can carry a commissioning flow up until the point of operational channel
 // (CASE) communcation.
-constexpr const char kIdentityNull[] = "null-fabric-commissioner";
+inline constexpr const char kIdentityNull[] = "null-fabric-commissioner";
 
 class CHIPCommand : public Command
 {

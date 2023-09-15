@@ -32,4 +32,4 @@
 #define CHIP_DEVICE_INTERACTION_MODEL_REVISION 11
 #endif
 
-constexpr uint8_t kInteractionModelRevisionTag = 0xFF;
+inline constexpr uint8_t kInteractionModelRevisionTag = 0xFF;
