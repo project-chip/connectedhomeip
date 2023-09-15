@@ -260,7 +260,8 @@ template("bl_iot_sdk") {
       "DISABLE_PRINT=1",
     ]
 
-    if (defined(invoker.chip_config_network_layer_ble) && invoker.chip_config_network_layer_ble) {
+    if (defined(invoker.chip_config_network_layer_ble) &&
+        invoker.chip_config_network_layer_ble) {
       defines += [ "CFG_BLE_ENABLE" ]
     }
 
@@ -336,7 +337,8 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_freertos",
     ]
 
-    if (defined(invoker.chip_config_network_layer_ble) && invoker.chip_config_network_layer_ble) {
+    if (defined(invoker.chip_config_network_layer_ble) &&
+        invoker.chip_config_network_layer_ble) {
       configs += [ ":${sdk_target_name}_config_ble" ]
     }
 
@@ -629,7 +631,6 @@ template("bl_iot_sdk") {
     ]
 
     cflags_cc = [ "-Wno-conversion" ]
-
   }
 
   source_set("${sdk_target_name}_ble") {
