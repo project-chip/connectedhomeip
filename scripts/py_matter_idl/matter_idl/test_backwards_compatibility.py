@@ -106,6 +106,31 @@ class TestCompatibilityChecks(unittest.TestCase):
             "client cluster A = 0x10 { enum X : ENUM8 {} }",
             Compatibility.BACKWARD_FAIL)
 
+    def test_bitmaps(self):
+        # deleting a bitmap
+        self.ValidateUpdate(
+            "client Cluster X = 1 { bitmap A: BITMAP8{} bitmap B: BITMAP8{} }",
+            "client Cluster X = 1 { bitmap A: BITMAP8{} }",
+            Compatibility.FORWARD_FAIL)
+
+        # Changing type of a bitmap
+        self.ValidateUpdate(
+            " client cluster X = 1 { bitmap A: BITMAP8{} }",
+            " client cluster X = 1 { bitmap A: BITMAP16{} }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+        # Adding values is ok, removing values is not
+        self.ValidateUpdate(
+            " client cluster X = 1 { bitmap A: BITMAP8 { kA = 0x01; kB = 0x02; } }",
+            " client cluster X = 1 { bitmap A: BITMAP8 { kA = 0x01; } }",
+            Compatibility.FORWARD_FAIL)
+
+        # Switching codes is never ok
+        self.ValidateUpdate(
+            " client cluster X = 1 { bitmap A: BITMAP8 { kA = 0x01; kB = 0x02; } }",
+            " client cluster X = 1 { bitmap A: BITMAP8 { kA = 0x01; kB = 0x04; } }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
 
 if __name__ == '__main__':
     unittest.main()
