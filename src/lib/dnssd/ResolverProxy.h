@@ -24,38 +24,11 @@ namespace chip {
 namespace Dnssd {
 
 class ResolverDelegateProxy : public ReferenceCounted<ResolverDelegateProxy>,
-                              public OperationalResolveDelegate,
                               public CommissioningResolveDelegate
 
 {
 public:
-    void SetOperationalDelegate(OperationalResolveDelegate * delegate) { mOperationalDelegate = delegate; }
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) { mCommissioningDelegate = delegate; }
-
-    // OperationalResolveDelegate
-    void OnOperationalNodeResolved(const ResolvedNodeData & nodeData) override
-    {
-        if (mOperationalDelegate != nullptr)
-        {
-            mOperationalDelegate->OnOperationalNodeResolved(nodeData);
-        }
-        else
-        {
-            ChipLogError(Discovery, "Missing operational delegate. Data discarded.");
-        }
-    }
-
-    void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override
-    {
-        if (mOperationalDelegate != nullptr)
-        {
-            mOperationalDelegate->OnOperationalNodeResolutionFailed(peerId, error);
-        }
-        else
-        {
-            ChipLogError(Discovery, "Missing operational delegate. Failure info discarded.");
-        }
-    }
 
     // CommissioningResolveDelegate
     void OnNodeDiscovered(const DiscoveredNodeData & nodeData) override
@@ -71,7 +44,6 @@ public:
     }
 
 private:
-    OperationalResolveDelegate * mOperationalDelegate     = nullptr;
     CommissioningResolveDelegate * mCommissioningDelegate = nullptr;
 };
 
@@ -90,13 +62,6 @@ public:
 
         if (mDelegate != nullptr)
         {
-            if (mPreInitOperationalDelegate != nullptr)
-            {
-                ChipLogProgress(Discovery, "Setting operational delegate post init");
-                mDelegate->SetOperationalDelegate(mPreInitOperationalDelegate);
-                mPreInitOperationalDelegate = nullptr;
-            }
-
             if (mPreInitCommissioningDelegate != nullptr)
             {
                 ChipLogProgress(Discovery, "Setting commissioning delegate post init");
@@ -112,18 +77,10 @@ public:
 
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override
     {
-        if (mDelegate != nullptr)
-        {
-            mDelegate->SetOperationalDelegate(delegate);
-        }
-        else
-        {
-            if (delegate != nullptr)
-            {
-                ChipLogProgress(Discovery, "Delaying proxy of operational discovery: missing delegate");
-            }
-            mPreInitOperationalDelegate = delegate;
-        }
+       /// Unfortunately cannot remove this method since it is in a Resolver interface.
+       ChipLogError(Discovery, "!!! Operational proxy does NOT support operational discovery");
+       ChipLogError(Discovery, "!!! Please use AddressResolver or DNSSD Resolver directly");
+       chipDie();  // force detection of invalid usages.
     }
 
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override
@@ -145,7 +102,6 @@ public:
     void Shutdown() override
     {
         VerifyOrReturn(mDelegate != nullptr);
-        mDelegate->SetOperationalDelegate(nullptr);
         mDelegate->SetCommissioningDelegate(nullptr);
         mDelegate->Release();
         mDelegate = nullptr;
@@ -163,7 +119,6 @@ public:
 
 private:
     ResolverDelegateProxy * mDelegate                            = nullptr;
-    OperationalResolveDelegate * mPreInitOperationalDelegate     = nullptr;
     CommissioningResolveDelegate * mPreInitCommissioningDelegate = nullptr;
 
     // While discovery (commissionable or commissioner) is ongoing,
