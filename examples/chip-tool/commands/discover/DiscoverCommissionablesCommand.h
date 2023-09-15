@@ -46,31 +46,14 @@ private:
 class DiscoverCommissionablesStartCommand : public CHIPCommand
 {
 public:
-    DiscoverCommissionablesStartCommand(CredentialIssuerCommands * credIssuerCommands) : CHIPCommand("start", credIssuerCommands) {}
+    DiscoverCommissionablesStartCommand(CredentialIssuerCommands * credIssuerCommands) :
+        CHIPCommand("start-commissionables", credIssuerCommands,
+                    "Start browsing for commissionable nodes over the networks (mdns, BLE).")
+    {}
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(30); }
-};
-
-class DiscoverCommissionablesStopCommand : public CHIPCommand
-{
-public:
-    DiscoverCommissionablesStopCommand(CredentialIssuerCommands * credIssuerCommands) : CHIPCommand("stop", credIssuerCommands) {}
-
-    /////////// CHIPCommand Interface /////////
-    CHIP_ERROR RunCommand() override;
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(1); }
-};
-
-class DiscoverCommissionablesListCommand : public CHIPCommand
-{
-public:
-    DiscoverCommissionablesListCommand(CredentialIssuerCommands * credIssuerCommands) : CHIPCommand("list", credIssuerCommands) {}
-
-    /////////// CHIPCommand Interface /////////
-    CHIP_ERROR RunCommand() override;
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(1); }
 };
 
 class DiscoverCommissionablesCommand : public DiscoverCommissionablesCommandBase

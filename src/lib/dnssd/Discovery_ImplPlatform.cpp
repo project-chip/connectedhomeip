@@ -76,8 +76,8 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, const Spa
 
     VerifyOrDie(proxy != nullptr);
 
-    PeerId peerId;
-    error = ExtractIdFromInstanceName(result->mName, &peerId);
+    ResolvedNodeData nodeData;
+    error = result->ToResolvedNodeData(addresses, nodeData);
     if (CHIP_NO_ERROR != error)
     {
         proxy->OnOperationalNodeResolutionFailed(PeerId(), error);
@@ -86,33 +86,6 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, const Spa
     }
 
     VerifyOrDie(proxy != nullptr);
-
-    ResolvedNodeData nodeData;
-    Platform::CopyString(nodeData.resolutionData.hostName, result->mHostName);
-    nodeData.resolutionData.interfaceId = result->mInterface;
-    nodeData.resolutionData.port        = result->mPort;
-    nodeData.operationalData.peerId     = peerId;
-
-    size_t addressesFound = 0;
-    for (auto & ip : addresses)
-    {
-        if (addressesFound == ArraySize(nodeData.resolutionData.ipAddress))
-        {
-            // Out of space.
-            ChipLogProgress(Discovery, "Can't add more IPs to ResolvedNodeData");
-            break;
-        }
-        nodeData.resolutionData.ipAddress[addressesFound] = ip;
-        ++addressesFound;
-    }
-    nodeData.resolutionData.numIPs = addressesFound;
-
-    for (size_t i = 0; i < result->mTextEntrySize; ++i)
-    {
-        ByteSpan key(reinterpret_cast<const uint8_t *>(result->mTextEntries[i].mKey), strlen(result->mTextEntries[i].mKey));
-        ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
-        FillNodeDataFromTxt(key, val, nodeData.resolutionData);
-    }
 
     nodeData.LogNodeIdResolved();
     proxy->OnOperationalNodeResolved(nodeData);
@@ -370,6 +343,44 @@ void DnssdService::ToDiscoveredNodeData(const Span<Inet::IPAddress> & addresses,
         FillNodeDataFromTxt(key, val, resolutionData);
         FillNodeDataFromTxt(key, val, commissionData);
     }
+}
+
+CHIP_ERROR DnssdService::ToResolvedNodeData(const Span<Inet::IPAddress> & addresses, ResolvedNodeData & nodeData)
+{
+    auto & resolutionData  = nodeData.resolutionData;
+    auto & operationalData = nodeData.operationalData;
+
+    PeerId peerId;
+    ReturnErrorOnFailure(ExtractIdFromInstanceName(mName, &peerId));
+
+    Platform::CopyString(resolutionData.hostName, mHostName);
+
+    size_t addressesFound = 0;
+    for (auto & ip : addresses)
+    {
+        if (addressesFound == ArraySize(resolutionData.ipAddress))
+        {
+            // Out of space.
+            ChipLogProgress(Discovery, "Can't add more IPs to ResolvedNodeData");
+            break;
+        }
+        resolutionData.ipAddress[addressesFound] = ip;
+        ++addressesFound;
+    }
+
+    resolutionData.interfaceId = mInterface;
+    resolutionData.numIPs      = addressesFound;
+    resolutionData.port        = mPort;
+    operationalData.peerId     = peerId;
+
+    for (size_t i = 0; i < mTextEntrySize; ++i)
+    {
+        ByteSpan key(reinterpret_cast<const uint8_t *>(mTextEntries[i].mKey), strlen(mTextEntries[i].mKey));
+        ByteSpan val(mTextEntries[i].mData, mTextEntries[i].mDataSize);
+        FillNodeDataFromTxt(key, val, resolutionData);
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 DiscoveryImplPlatform DiscoveryImplPlatform::sManager;

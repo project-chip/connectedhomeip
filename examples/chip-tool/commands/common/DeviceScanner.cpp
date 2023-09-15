@@ -26,8 +26,10 @@ using namespace chip::Ble;
 constexpr const char * kBleKey = "BLE";
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-CHIP_ERROR DeviceScanner::Start()
+CHIP_ERROR DeviceScanner::StartInternal()
 {
+    VerifyOrReturnError(mIsBrowsing == false, CHIP_ERROR_INCORRECT_STATE);
+
     mDiscoveredResults.clear();
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -36,12 +38,43 @@ CHIP_ERROR DeviceScanner::Start()
 
     ReturnErrorOnFailure(chip::Dnssd::Resolver::Instance().Init(DeviceLayer::UDPEndPointManager()));
 
-    char serviceName[kMaxCommissionableServiceNameSize];
-    auto filter = DiscoveryFilterType::kNone;
-    ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionableNode));
+    return CHIP_NO_ERROR;
+}
 
-    return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny,
-                           Inet::InterfaceId::Null(), this);
+CHIP_ERROR DeviceScanner::StartCommissionableDiscovery()
+{
+    ReturnErrorOnFailure(StartInternal());
+
+    char serviceName[kMaxCommissionableServiceNameSize];
+    auto filter   = DiscoveryFilterType::kNone;
+    auto type     = DiscoveryType::kCommissionableNode;
+    auto protocol = DnssdServiceProtocol::kDnssdProtocolUdp;
+
+    ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, type));
+    ReturnErrorOnFailure(ChipDnssdBrowse(serviceName, protocol, Inet::IPAddressType::kAny, Inet::InterfaceId::Null(), this));
+
+    mIsBrowsing = true;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceScanner::StartOperationalDiscovery(chip::Optional<uint64_t> compressedFabricIdFilter)
+{
+    ReturnErrorOnFailure(StartInternal());
+
+    char serviceName[kMaxOperationalServiceNameSize];
+    auto filter = DiscoveryFilter(DiscoveryFilterType::kNone);
+    if (compressedFabricIdFilter.HasValue())
+    {
+        filter = DiscoveryFilter(DiscoveryFilterType::kCompressedFabricId, compressedFabricIdFilter.Value());
+    }
+    auto type     = DiscoveryType::kOperational;
+    auto protocol = DnssdServiceProtocol::kDnssdProtocolTcp;
+
+    ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, type));
+    ReturnErrorOnFailure(ChipDnssdBrowse(serviceName, protocol, Inet::IPAddressType::kAny, Inet::InterfaceId::Null(), this));
+
+    mIsBrowsing = true;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceScanner::Stop()
@@ -50,7 +83,10 @@ CHIP_ERROR DeviceScanner::Stop()
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().StopBleScan());
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-    return ChipDnssdStopBrowse(this);
+    ReturnErrorOnFailure(ChipDnssdStopBrowse(this));
+
+    mIsBrowsing = false;
+    return CHIP_NO_ERROR;
 }
 
 void DeviceScanner::OnNodeDiscovered(const DiscoveredNodeData & nodeData)
@@ -79,10 +115,27 @@ void DeviceScanner::OnNodeDiscovered(const DiscoveredNodeData & nodeData)
     nodeData.LogDetail();
 }
 
+void DeviceScanner::OnOperationalNodeResolved(const ResolvedNodeData & nodeData)
+{
+    auto & operationalData = nodeData.operationalData;
+    ChipLogProgress(chipTool, "OnOperationalNodeResolved peerId: " ChipLogFormatX64 ":" ChipLogFormatX64,
+                    ChipLogValueX64(operationalData.peerId.GetCompressedFabricId()),
+                    ChipLogValueX64(operationalData.peerId.GetNodeId()));
+}
+
+void DeviceScanner::OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) {}
+
 void DeviceScanner::OnBrowseAdd(chip::Dnssd::DnssdService service)
 {
     ChipLogProgress(chipTool, "OnBrowseAdd: %s", service.mName);
-    LogErrorOnFailure(ChipDnssdResolve(&service, service.mInterface, this));
+    if (service.mProtocol == DnssdServiceProtocol::kDnssdProtocolUdp)
+    {
+        LogErrorOnFailure(ChipDnssdResolve(&service, service.mInterface, static_cast<CommissioningResolveDelegate *>(this)));
+    }
+    else
+    {
+        LogErrorOnFailure(ChipDnssdResolve(&service, service.mInterface, static_cast<OperationalResolveDelegate *>(this)));
+    }
 
     auto & instanceData  = mDiscoveredResults[service.mName];
     auto & interfaceData = instanceData[service.mInterface.GetPlatformInterface()];

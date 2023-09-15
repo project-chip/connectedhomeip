@@ -42,6 +42,7 @@ struct DeviceScannerResult
 };
 
 class DeviceScanner : public chip::Dnssd::CommissioningResolveDelegate,
+                      public chip::Dnssd::OperationalResolveDelegate,
                       public chip::Dnssd::DnssdBrowseDelegate
 #if CONFIG_NETWORK_LAYER_BLE
     ,
@@ -49,7 +50,9 @@ class DeviceScanner : public chip::Dnssd::CommissioningResolveDelegate,
 #endif // CONFIG_NETWORK_LAYER_BLE
 {
 public:
-    CHIP_ERROR Start();
+    DeviceScanner() : mIsBrowsing(false){};
+    CHIP_ERROR StartCommissionableDiscovery();
+    CHIP_ERROR StartOperationalDiscovery(chip::Optional<uint64_t> compressedFabricIdFilter);
     CHIP_ERROR Stop();
     CHIP_ERROR Get(uint16_t index, chip::RendezvousParameters & params);
     CHIP_ERROR Get(uint16_t index, chip::Dnssd::CommonResolutionData & resolutionData);
@@ -57,6 +60,10 @@ public:
 
     /////////// CommissioningResolveDelegate Interface /////////
     void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
+
+    /////////// OperationalResolveDelegate Interface /////////
+    void OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
+    void OnOperationalNodeResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
 
     /////////// DnssdBrowseDelegate Interface /////////
     void OnBrowseAdd(chip::Dnssd::DnssdService service) override;
@@ -70,8 +77,10 @@ public:
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 private:
+    CHIP_ERROR StartInternal();
     std::unordered_map<std::string, std::map<chip::Inet::InterfaceId::PlatformType, std::vector<DeviceScannerResult>>>
         mDiscoveredResults;
+    bool mIsBrowsing;
 };
 
 DeviceScanner & GetDeviceScanner();

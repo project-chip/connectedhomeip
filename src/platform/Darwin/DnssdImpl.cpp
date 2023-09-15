@@ -299,8 +299,9 @@ static CHIP_ERROR Resolve(void * context, DnssdResolveCallback callback, uint32_
     return Resolve(sdCtx, interfaceId, addressType, type, name);
 }
 
-static CHIP_ERROR Resolve(CommissioningResolveDelegate * delegate, uint32_t interfaceId, chip::Inet::IPAddressType addressType,
-                          const char * type, const char * name)
+template <typename T>
+static CHIP_ERROR Resolve(T * delegate, uint32_t interfaceId, chip::Inet::IPAddressType addressType, const char * type,
+                          const char * name)
 {
     auto counterHolder = GetCounterHolder(name);
     auto sdCtx         = chip::Platform::New<ResolveContext>(delegate, addressType, name, std::move(counterHolder));
@@ -448,6 +449,16 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inte
 }
 
 CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, CommissioningResolveDelegate * delegate)
+{
+    VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsSupportedProtocol(service->mProtocol), CHIP_ERROR_INVALID_ARGUMENT);
+
+    auto regtype     = GetFullType(service);
+    auto interfaceId = GetInterfaceId(interface);
+    return Resolve(delegate, interfaceId, service->mAddressType, regtype.c_str(), service->mName);
+}
+
+CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, OperationalResolveDelegate * delegate)
 {
     VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSupportedProtocol(service->mProtocol), CHIP_ERROR_INVALID_ARGUMENT);
