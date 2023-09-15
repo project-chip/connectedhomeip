@@ -38,12 +38,15 @@ class Compatibility(Flag):
 class TestCompatibilityChecks(unittest.TestCase):
 
     def _AssumeCompatiblity(self, old: str, new: str, old_idl: Idl, new_idl: Idl, expect_compatible: bool):
-        if expect_compatible != IsBackwardsCompatible(old_idl, new_idl):
-            if expect_compatible:
-                reason = "EXPECTED COMPATIBLE, but failed"
-            else:
-                reason = "EXPECTED NOT COMPATIBLE, but succeeded"
-            self.fail(f"""Failed compatibility test
+        if expect_compatible == IsBackwardsCompatible(old_idl, new_idl):
+            return
+
+        if expect_compatible:
+            reason = "EXPECTED COMPATIBLE, but failed"
+        else:
+            reason = "EXPECTED NOT COMPATIBLE, but succeeded"
+
+        self.fail(f"""Failed compatibility test
 {reason}:
 --------------------- OLD -----------------
 {old}

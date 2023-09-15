@@ -96,7 +96,6 @@ class CompatibilityChecker:
             updated_structs[item.name] = item
         # TODO: implement
 
-
     def CheckCommandListCompatible(self, original: List[Command], updated: List[Command]):
         updated_commands = {}
         for item in updated:
