@@ -14,7 +14,7 @@
 # limitations under the License.
 
 import unittest
-from enum import auto, Flag
+from enum import Flag, auto
 
 try:
     from matter_idl.matter_idl_parser import CreateParser
@@ -26,13 +26,13 @@ except ImportError:
         os.path.join(os.path.dirname(__file__), '..')))
     from matter_idl.matter_idl_parser import CreateParser
 
-from matter_idl.matter_idl_types import Idl
 from matter_idl.backwards_compatibility import IsBackwardsCompatible
+from matter_idl.matter_idl_types import Idl
 
 
 class Compatibility(Flag):
-    FORWARD_FAIL  = auto() # old -> new is wrong
-    BACKWARD_FAIL = auto() # new -> old is wrong
+    FORWARD_FAIL = auto()  # old -> new is wrong
+    BACKWARD_FAIL = auto()  # new -> old is wrong
 
 
 class TestCompatibilityChecks(unittest.TestCase):
@@ -51,7 +51,7 @@ class TestCompatibilityChecks(unittest.TestCase):
 {new}
 -------------------------------------------""")
 
-    def ValidateUpdate(self, old: str , new: str, flags: Compatibility):
+    def ValidateUpdate(self, old: str, new: str, flags: Compatibility):
         old_idl = CreateParser(skip_meta=True).parse(old)
         new_idl = CreateParser(skip_meta=True).parse(new)
 
@@ -61,7 +61,6 @@ class TestCompatibilityChecks(unittest.TestCase):
         self._AssumeCompatiblity(new, old, new_idl, old_idl, Compatibility.BACKWARD_FAIL not in flags)
         self._AssumeCompatiblity(new, new, new_idl, new_idl, True)
         self._AssumeCompatiblity(old, old, old_idl, old_idl, True)
-
 
     def test_top_level_enums(self):
         # deleting a top level enum

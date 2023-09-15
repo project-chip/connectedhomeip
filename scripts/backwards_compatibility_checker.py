@@ -32,8 +32,8 @@ except ImportError:
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'py_matter_idl')))
     from matter_idl.matter_idl_parser import CreateParser
 
-from matter_idl.matter_idl_types import Idl
 from matter_idl.backwards_compatibility import IsBackwardsCompatible
+from matter_idl.matter_idl_types import Idl
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
@@ -43,6 +43,7 @@ __LOG_LEVELS__ = {
     'warn': logging.WARN,
     'fatal': logging.FATAL,
 }
+
 
 @click.command()
 @click.option(
@@ -81,6 +82,7 @@ def main(log_level, old_idl, new_idl):
         sys.exit(1)
 
     sys.exit(0)
+
 
 if __name__ == '__main__':
     main(auto_envvar_prefix='CHIP')

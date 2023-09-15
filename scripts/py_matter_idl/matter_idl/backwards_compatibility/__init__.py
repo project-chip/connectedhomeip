@@ -12,13 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import itertools
-
+import logging
 from enum import Enum, auto
 from typing import List, Optional
 
-from matter_idl.matter_idl_types import Idl, Struct, Enum, Cluster, Bitmap, Command, Event
+from matter_idl.matter_idl_types import Bitmap, Cluster, Command, Enum, Event, Idl, Struct
 
 
 class Compatibility(Enum):
@@ -43,18 +42,17 @@ class CompatibilityChecker:
             return
 
         if original.base_type != updated.base_type:
-            self._MarkIncompatible(f"Enumeration {original.name} switched base type from {original.base_type} to {updated.base_type}")
+            self._MarkIncompatible(
+                f"Enumeration {original.name} switched base type from {original.base_type} to {updated.base_type}")
 
         # Validate that all old entries exist
         for entry in original.entries:
             # old entry must exist and have identical code
-            existing = [item for item in updated.entries if item.name == entry.name ]
+            existing = [item for item in updated.entries if item.name == entry.name]
             if len(existing) == 0:
-              self._MarkIncompatible(f"Enumeration {original.name} removed entry {entry.name}")
+                self._MarkIncompatible(f"Enumeration {original.name} removed entry {entry.name}")
             elif existing[0].code != entry.code:
-              self._MarkIncompatible(f"Enumeration {original.name} changed code for entry {entry.name}")
-
-            
+                self._MarkIncompatible(f"Enumeration {original.name} changed code for entry {entry.name}")
 
     def CheckEnumListCompatible(self, original: List[Enum], updated: List[Enum]):
         updated_enums = {}
@@ -78,7 +76,6 @@ class CompatibilityChecker:
         for item in updated:
             updated_bitmaps[item.name] = item
         # self._MarkIncompatible("NOT YET IMPLEMENTED")
-        
 
     def CheckCommandListCompatible(self, original: List[Command], updated: List[Command]):
         updated_commands = {}
@@ -101,14 +98,14 @@ class CompatibilityChecker:
             updated_cluster = updated_clusters.get(original_cluster.name)
             self.CheckClusterCompatible(original_cluster, updated_cluster)
 
-
     def CheckClusterCompatible(self, original_cluster: Cluster, updated_cluster: Optional[Cluster]):
         if not updated_cluster:
             self._MarkIncompatible(f"Cluster {original_cluster.name} not found in updated list")
             return
 
         if original_cluster.code != updated_cluster.code:
-            self._MarkIncompatible(f"Cluster {original_cluster.name} has different codes {original_cluster.code} != {updated_cluster.code}")
+            self._MarkIncompatible(
+                f"Cluster {original_cluster.name} has different codes {original_cluster.code} != {updated_cluster.code}")
 
         self.CheckEnumListCompatible(original_cluster.enums, updated_cluster.enums)
         self.CheckStructListCompatible(original_cluster.structs, updated_cluster.structs)
@@ -125,6 +122,7 @@ class CompatibilityChecker:
         self.CheckClusterListCompatible(self._original_idl.clusters, self._updated_idl.clusters)
 
         return self.compatible
+
 
 def IsBackwardsCompatible(original: Idl, updated: Idl):
     """
