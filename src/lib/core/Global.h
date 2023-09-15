@@ -36,8 +36,9 @@ class Global
 {
 public:
     /// Returns the global object, initializing it if necessary.
-    T & operator*() { return get(); }
-    T * operator->() { return &get(); }
+    /// NOT threads-safe, external synchronization is required.
+    T & get() { return _get(); }
+    T * operator->() { return &_get(); }
 
 #if CHIP_CONFIG_GLOBALS_LAZY_INIT
 public:
@@ -50,9 +51,9 @@ private:
     alignas(T) unsigned char mStorage[sizeof(T)] = {};
     bool mInitialized                            = false;
 
-    T & value() { return *reinterpret_cast<T *>(mStorage); }
+    T & _value() { return *reinterpret_cast<T *>(mStorage); }
 
-    T & get()
+    T & _get()
     {
         if (!mInitialized)
         {
@@ -62,17 +63,17 @@ private:
             CHIP_CXA_ATEXIT(&destroy, this);
 #endif // CHIP_CONFIG_GLOBALS_NO_DESTRUCT
         }
-        return value();
+        return _value();
     }
 
-    static void destroy(void * context) { static_cast<Global<T> *>(context)->value().~T(); }
+    static void destroy(void * context) { static_cast<Global<T> *>(context)->_value().~T(); }
 
 #else // CHIP_CONFIG_GLOBALS_LAZY_INIT
 public:
     constexpr Global() : mValue() {}
 
 private:
-    T & get() { return mValue; }
+    T & _get() { return mValue; }
 
 #if CHIP_CONFIG_GLOBALS_NO_DESTRUCT
 public:

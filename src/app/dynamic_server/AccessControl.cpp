@@ -90,7 +90,7 @@ namespace app {
 namespace dynamic_server {
 void InitAccessControl()
 {
-    (void) *gControllerAccessControl;
+    gControllerAccessControl.get(); // force initialization
 }
 } // namespace dynamic_server
 } // namespace app

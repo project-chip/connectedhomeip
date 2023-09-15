@@ -86,7 +86,7 @@ private:
  */
 inline BLEManager & BLEMgr(void)
 {
-    return *BLEManagerImpl::sInstance;
+    return BLEManagerImpl::sInstance.get();
 }
 
 /**
@@ -97,7 +97,7 @@ inline BLEManager & BLEMgr(void)
  */
 inline BLEManagerImpl & BLEMgrImpl(void)
 {
-    return *BLEManagerImpl::sInstance;
+    return BLEManagerImpl::sInstance.get();
 }
 
 } // namespace Internal

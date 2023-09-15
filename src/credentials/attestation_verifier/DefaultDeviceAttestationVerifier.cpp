@@ -691,7 +691,7 @@ CHIP_ERROR CsaCdKeysTrustStore::LookupVerifyingKey(const ByteSpan & kid, Crypto:
 
 const AttestationTrustStore * GetTestAttestationTrustStore()
 {
-    return &*gTestAttestationTrustStore;
+    return &gTestAttestationTrustStore.get();
 }
 
 DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore)

@@ -679,7 +679,7 @@ CHIP_ERROR DiscoveryImplPlatform::ReconfirmRecord(const char * hostname, Inet::I
 
 DiscoveryImplPlatform & DiscoveryImplPlatform::GetInstance()
 {
-    return *sManager;
+    return sManager.get();
 }
 
 ServiceAdvertiser & chip::Dnssd::ServiceAdvertiser::Instance()

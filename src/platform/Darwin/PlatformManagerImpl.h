@@ -105,7 +105,7 @@ private:
  */
 inline PlatformManager & PlatformMgr(void)
 {
-    return *PlatformManagerImpl::sInstance;
+    return PlatformManagerImpl::sInstance.get();
 }
 
 /**
@@ -116,7 +116,7 @@ inline PlatformManager & PlatformMgr(void)
  */
 inline PlatformManagerImpl & PlatformMgrImpl(void)
 {
-    return *PlatformManagerImpl::sInstance;
+    return PlatformManagerImpl::sInstance.get();
 }
 
 } // namespace DeviceLayer

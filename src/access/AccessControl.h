@@ -105,7 +105,7 @@ public:
 
         Entry() = default;
 
-        Entry(Entry && other) : mDelegate(other.mDelegate) { other.mDelegate = &*mDefaultDelegate; }
+        Entry(Entry && other) : mDelegate(other.mDelegate) { other.mDelegate = &mDefaultDelegate.get(); }
 
         Entry & operator=(Entry && other)
         {
@@ -113,7 +113,7 @@ public:
             {
                 mDelegate->Release();
                 mDelegate       = other.mDelegate;
-                other.mDelegate = &*mDefaultDelegate;
+                other.mDelegate = &mDefaultDelegate.get();
             }
             return *this;
         }
@@ -209,7 +209,7 @@ public:
          */
         CHIP_ERROR RemoveTarget(size_t index) { return mDelegate->RemoveTarget(index); }
 
-        bool HasDefaultDelegate() const { return mDelegate == &*mDefaultDelegate; }
+        bool HasDefaultDelegate() const { return mDelegate == &mDefaultDelegate.get(); }
 
         const Delegate & GetDelegate() const { return *mDelegate; }
 
@@ -224,12 +224,12 @@ public:
         void ResetDelegate()
         {
             mDelegate->Release();
-            mDelegate = &*mDefaultDelegate;
+            mDelegate = &mDefaultDelegate.get();
         }
 
     private:
         static Global<Delegate> mDefaultDelegate;
-        Delegate * mDelegate = &*mDefaultDelegate;
+        Delegate * mDelegate = &mDefaultDelegate.get();
     };
 
     /**
@@ -277,12 +277,12 @@ public:
         void ResetDelegate()
         {
             mDelegate->Release();
-            mDelegate = &*mDefaultDelegate;
+            mDelegate = &mDefaultDelegate.get();
         }
 
     private:
         static Global<Delegate> mDefaultDelegate;
-        Delegate * mDelegate = &*mDefaultDelegate;
+        Delegate * mDelegate = &mDefaultDelegate.get();
     };
 
     /**

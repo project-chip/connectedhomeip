@@ -632,7 +632,7 @@ void AccessControl::NotifyEntryChanged(const SubjectDescriptor * subjectDescript
 
 AccessControl & GetAccessControl()
 {
-    return (globalAccessControl) ? *globalAccessControl : *defaultAccessControl;
+    return (globalAccessControl) ? *globalAccessControl : defaultAccessControl.get();
 }
 
 void SetAccessControl(AccessControl & accessControl)

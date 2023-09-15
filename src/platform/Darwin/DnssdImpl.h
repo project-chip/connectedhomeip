@@ -66,7 +66,7 @@ public:
     MdnsContexts(const MdnsContexts &) = delete;
     MdnsContexts & operator=(const MdnsContexts &) = delete;
     ~MdnsContexts();
-    static MdnsContexts & GetInstance() { return *sInstance; }
+    static MdnsContexts & GetInstance() { return sInstance.get(); }
 
     CHIP_ERROR Add(GenericContext * context, DNSServiceRef sdRef);
     CHIP_ERROR Remove(GenericContext * context);
