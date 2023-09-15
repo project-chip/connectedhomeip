@@ -15,25 +15,46 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "RvcAppCommandDelegate.h"
 #include "rvc-device.h"
 #include <AppMain.h>
+
+#define RVC_ENDPOINT 1
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-RvcDevice * rvcDevice = nullptr;
+namespace {
+constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_rvc_fifo_";
+NamedPipeCommands sChipNamedPipeCommands;
+RvcAppCommandDelegate sRvcAppCommandDelegate;
+} // namespace
+
+RvcDevice * gRvcDevice = nullptr;
 
 void ApplicationInit()
 {
-    rvcDevice = new RvcDevice(1);
-    rvcDevice->Init();
+    std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
+
+    if (sChipNamedPipeCommands.Start(path, &sRvcAppCommandDelegate) != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
+        sChipNamedPipeCommands.Stop();
+    }
+
+    gRvcDevice = new RvcDevice(RVC_ENDPOINT);
+    gRvcDevice->Init();
+
+    sRvcAppCommandDelegate.SetRvcDevice(gRvcDevice);
 }
 
 void ApplicationShutdown()
 {
-    delete rvcDevice;
-    rvcDevice = nullptr;
+    delete gRvcDevice;
+    gRvcDevice = nullptr;
+
+    sChipNamedPipeCommands.Stop();
 }
 
 int main(int argc, char * argv[])

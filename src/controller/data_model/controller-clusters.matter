@@ -4344,6 +4344,17 @@ client cluster WindowCovering = 258 {
 
 /** This cluster provides control of a barrier (garage door). */
 client cluster BarrierControl = 259 {
+  bitmap BarrierControlCapabilities : BITMAP8 {
+    kPartialBarrier = 0x1;
+  }
+
+  bitmap BarrierControlSafetyStatus : BITMAP16 {
+    kRemoteLockout = 0x1;
+    kTemperDetected = 0x2;
+    kFailedCommunication = 0x4;
+    kPositionFailure = 0x8;
+  }
+
   readonly attribute enum8 barrierMovingState = 1;
   readonly attribute bitmap16 barrierSafetyStatus = 2;
   readonly attribute bitmap8 barrierCapabilities = 3;
