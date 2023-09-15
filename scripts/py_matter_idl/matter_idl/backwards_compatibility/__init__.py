@@ -63,31 +63,29 @@ class CompatibilityChecker:
             updated_enum = updated_enums.get(original_enum.name)
             self.CheckEnumCompatible(original_enum, updated_enum)
 
-        # self._MarkIncompatible("NOT YET IMPLEMENTED")
-
     def CheckStructListCompatible(self, original: List[Struct], updated: List[Struct]):
         updated_structs = {}
         for item in updated:
             updated_structs[item.name] = item
-        # self._MarkIncompatible("NOT YET IMPLEMENTED")
+        # TODO: implement
 
     def CheckBitmapListCompatible(self, original: List[Bitmap], updated: List[Bitmap]):
         updated_bitmaps = {}
         for item in updated:
             updated_bitmaps[item.name] = item
-        # self._MarkIncompatible("NOT YET IMPLEMENTED")
+        # TODO: implement
 
     def CheckCommandListCompatible(self, original: List[Command], updated: List[Command]):
         updated_commands = {}
         for item in updated:
             updated_commands[item.name] = item
-        # self._MarkIncompatible("NOT YET IMPLEMENTED")
+        # TODO: implement
 
     def CheckEventListCompatible(self, original: List[Event], updated: List[Event]):
         updated_events = {}
         for item in updated:
             updated_events[item.name] = item
-        # self._MarkIncompatible("NOT YET IMPLEMENTED")
+        # TODO: implement
 
     def CheckClusterListCompatible(self, original: List[Cluster], updated: List[Cluster]):
         updated_clusters = {}
