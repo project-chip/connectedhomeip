@@ -41,8 +41,10 @@ struct StoredDataList : public PersistentData<kMaxSerializedSize>
     EntryType first_entry = kdefaultUndefinedEntry;
     uint16_t entry_count  = 0;
 
-    StoredDataList() = default;
-    StoredDataList(EntryType first) : first_entry(first), entry_count(1) {}
+    StoredDataList(PersistentStorageDelegate * storage) : PersistentData<kMaxSerializedSize>(storage) {}
+    StoredDataList(PersistentStorageDelegate * storage, EntryType first) :
+        PersistentData<kMaxSerializedSize>(storage), first_entry(first), entry_count(1)
+    {}
 
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
     {
@@ -77,14 +79,7 @@ struct StoredDataList : public PersistentData<kMaxSerializedSize>
 constexpr size_t kPersistentFabricBufferMax = 32;
 struct FabricList : StoredDataList<FabricIndex, kPersistentFabricBufferMax>
 {
-    // Subclasses need to define UpdateKey to be whatever fabric list key they
-    // care about.
-
-    void Clear() override
-    {
-        first_entry = kUndefinedFabricIndex;
-        entry_count = 0;
-    }
+    FabricList(PersistentStorageDelegate * storage) : StoredDataList<FabricIndex, kPersistentFabricBufferMax>(storage) {}
 };
 } // namespace CommonPersistentData
 } // namespace chip

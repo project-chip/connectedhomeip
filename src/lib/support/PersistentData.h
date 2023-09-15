@@ -28,19 +28,16 @@ namespace chip {
 template <size_t kMaxSerializedSize>
 struct PersistentData
 {
-    PersistentData(PersistentStorageDelegate * storage = nullptr) : mStorage(storage) {}
+    PersistentData(PersistentStorageDelegate * storage) : mStorage(storage) {}
     virtual ~PersistentData() = default;
 
     virtual CHIP_ERROR UpdateKey(StorageKeyName & key)          = 0;
     virtual CHIP_ERROR Serialize(TLV::TLVWriter & writer) const = 0;
     virtual CHIP_ERROR Deserialize(TLV::TLVReader & reader)     = 0;
-    virtual void Clear()                                        = 0;
 
-    virtual CHIP_ERROR Save() { return this->Save(this->mStorage); }
-
-    virtual CHIP_ERROR Save(PersistentStorageDelegate * storage)
+    virtual CHIP_ERROR Save()
     {
-        VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(nullptr != mStorage, CHIP_ERROR_INVALID_ARGUMENT);
 
         StorageKeyName key = StorageKeyName::Uninitialized();
         ReturnErrorOnFailure(UpdateKey(key));
@@ -50,49 +47,49 @@ struct PersistentData
         writer.Init(mBuffer, sizeof(mBuffer));
 
         ReturnErrorOnFailure(Serialize(writer));
-
         // Save serialized data
-        return storage->SyncSetKeyValue(key.KeyName(), mBuffer, static_cast<uint16_t>(writer.GetLengthWritten()));
+        return mStorage->SyncSetKeyValue(key.KeyName(), mBuffer, static_cast<uint16_t>(writer.GetLengthWritten()));
     }
 
-    virtual CHIP_ERROR Load() { return this->Load(this->mStorage); }
-
-    virtual CHIP_ERROR Load(PersistentStorageDelegate * storage)
+    virtual CHIP_ERROR Load(bool once = false)
     {
-        VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(nullptr != mStorage, CHIP_ERROR_INVALID_ARGUMENT);
+
+        if (mLoaded && once)
+        {
+            return CHIP_NO_ERROR;
+        }
 
         StorageKeyName key = StorageKeyName::Uninitialized();
 
         // Update storage key
         ReturnErrorOnFailure(UpdateKey(key));
 
-        // Set data to defaults
-        Clear();
-
         // Load the serialized data
         uint16_t size  = static_cast<uint16_t>(sizeof(mBuffer));
-        CHIP_ERROR err = storage->SyncGetKeyValue(key.KeyName(), mBuffer, size);
+        CHIP_ERROR err = mStorage->SyncGetKeyValue(key.KeyName(), mBuffer, size);
         VerifyOrReturnError(CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND != err, CHIP_ERROR_NOT_FOUND);
         ReturnErrorOnFailure(err);
-
         // Decode serialized data
         TLV::TLVReader reader;
         reader.Init(mBuffer, size);
-        return Deserialize(reader);
+        err     = Deserialize(reader);
+        mLoaded = (CHIP_NO_ERROR == err);
+        return err;
     }
 
-    virtual CHIP_ERROR Delete(PersistentStorageDelegate * storage)
+    virtual CHIP_ERROR Delete()
     {
-        VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(nullptr != mStorage, CHIP_ERROR_INVALID_ARGUMENT);
 
         StorageKeyName key = StorageKeyName::Uninitialized();
         ReturnErrorOnFailure(UpdateKey(key));
-
-        return storage->SyncDeleteKeyValue(key.KeyName());
+        return mStorage->SyncDeleteKeyValue(key.KeyName());
     }
 
     PersistentStorageDelegate * mStorage = nullptr;
     uint8_t mBuffer[kMaxSerializedSize]  = { 0 };
+    bool mLoaded                         = false;
 };
 
 } // namespace chip
