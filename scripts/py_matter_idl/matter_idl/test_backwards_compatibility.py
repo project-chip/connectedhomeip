@@ -105,9 +105,15 @@ class TestCompatibilityChecks(unittest.TestCase):
 
         # Adding an enum is ok. Also validates code formatting
         self.ValidateUpdate(
-            "client cluster A = 16 {}",
-            "client cluster A = 0x10 { enum X : ENUM8 {} }",
+            "server cluster A = 16 {}",
+            "server cluster A = 0x10 { enum X : ENUM8 {} }",
             Compatibility.BACKWARD_FAIL)
+
+        # Detects side switch
+        self.ValidateUpdate(
+            "client cluster A = 1 {}",
+            "server cluster A = 1 {}",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
     def test_bitmaps(self):
         # deleting a bitmap

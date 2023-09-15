@@ -17,13 +17,21 @@ import logging
 from enum import Enum, auto
 from typing import List, Optional
 
-from matter_idl.matter_idl_types import Bitmap, Cluster, Command, Enum, Event, Idl, Struct
+from matter_idl.matter_idl_types import Bitmap, Cluster, Command, Enum, Event, Idl, Struct, ClusterSide
 
 
 class Compatibility(Enum):
     UNKNOWN = auto()
     COMPATIBLE = auto()
     INCOMPATIBLE = auto()
+
+
+def FullClusterName(cluster: Cluster) -> str:
+    "Builds a unique cluster name considering the side as well"
+    if cluster.side == ClusterSide.CLIENT:
+        return f"client::{cluster.name}"
+    else:
+        return f"server::{cluster.name}"
 
 
 class CompatibilityChecker:
@@ -111,20 +119,20 @@ class CompatibilityChecker:
     def CheckClusterListCompatible(self, original: List[Cluster], updated: List[Cluster]):
         updated_clusters = {}
         for item in updated:
-            updated_clusters[item.name] = item
+            updated_clusters[FullClusterName(item)] = item
 
         for original_cluster in original:
-            updated_cluster = updated_clusters.get(original_cluster.name)
+            updated_cluster = updated_clusters.get(FullClusterName(original_cluster))
             self.CheckClusterCompatible(original_cluster, updated_cluster)
 
     def CheckClusterCompatible(self, original_cluster: Cluster, updated_cluster: Optional[Cluster]):
         if not updated_cluster:
-            self._MarkIncompatible(f"Cluster {original_cluster.name} not found in updated list")
+            self._MarkIncompatible(f"Cluster {FullClusterName(original_cluster)} not found in updated list")
             return
 
         if original_cluster.code != updated_cluster.code:
             self._MarkIncompatible(
-                f"Cluster {original_cluster.name} has different codes {original_cluster.code} != {updated_cluster.code}")
+                f"Cluster {FullClusterName(original_cluster)} has different codes {original_cluster.code} != {updated_cluster.code}")
 
         self.CheckEnumListCompatible(original_cluster.enums, updated_cluster.enums)
         self.CheckStructListCompatible(original_cluster.structs, updated_cluster.structs)
