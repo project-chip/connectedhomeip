@@ -29,9 +29,9 @@ class Compatibility(Enum):
 def FullClusterName(cluster: Cluster) -> str:
     "Builds a unique cluster name considering the side as well"
     if cluster.side == ClusterSide.CLIENT:
-        return f"client::{cluster.name}"
+        return f"{cluster.name}/client"
     else:
-        return f"server::{cluster.name}"
+        return f"{cluster.name}/server"
 
 
 class CompatibilityChecker:
