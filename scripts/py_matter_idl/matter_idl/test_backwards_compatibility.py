@@ -54,88 +54,94 @@ class TestCompatibilityChecks(unittest.TestCase):
 {new}
 -------------------------------------------""")
 
-    def ValidateUpdate(self, old: str, new: str, flags: Compatibility):
+    def ValidateUpdate(self, name: str, old: str, new: str, flags: Compatibility):
         old_idl = CreateParser(skip_meta=True).parse(old)
         new_idl = CreateParser(skip_meta=True).parse(new)
+        with self.subTest(validate=name):
+            # Validate compatibility and that no changes are always compatible
+            with self.subTest(direction="Forward"):
+                self._AssumeCompatiblity(old, new, old_idl, new_idl, Compatibility.FORWARD_FAIL not in flags)
 
-        # Validate compatibility and that no changes are always compatible
+            with self.subTest(direction="Backward"):
+                self._AssumeCompatiblity(new, old, new_idl, old_idl, Compatibility.BACKWARD_FAIL not in flags)
 
-        self._AssumeCompatiblity(old, new, old_idl, new_idl, Compatibility.FORWARD_FAIL not in flags)
-        self._AssumeCompatiblity(new, old, new_idl, old_idl, Compatibility.BACKWARD_FAIL not in flags)
-        self._AssumeCompatiblity(new, new, new_idl, new_idl, True)
-        self._AssumeCompatiblity(old, old, old_idl, old_idl, True)
+            with self.subTest(direction="NEW-to-NEW"):
+                self._AssumeCompatiblity(new, new, new_idl, new_idl, True)
+
+            with self.subTest(direction="OLD-to-OLD"):
+                self._AssumeCompatiblity(old, old, old_idl, old_idl, True)
 
     def test_top_level_enums(self):
-        # deleting a top level enum
         self.ValidateUpdate(
+            "delete a top level enum",
             "enum A: ENUM8{} enum B: ENUM8{}",
             "enum A: ENUM8{}",
             Compatibility.FORWARD_FAIL)
 
-        # Changing type of an enum
         self.ValidateUpdate(
+            "change an enum type",
             "enum A: ENUM8{}",
             "enum A: ENUM16{}",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
-        # Adding values is ok, removing values is not
         self.ValidateUpdate(
+            "Adding enum values is ok, removing values is not",
             "enum A: ENUM8 {A = 1; B = 2;}",
             "enum A: ENUM8 {A = 1; }",
             Compatibility.FORWARD_FAIL)
 
-        # Switching codes is never ok
         self.ValidateUpdate(
+            "Switching enum codes is never ok",
             "enum A: ENUM8 {A = 1; B = 2; }",
             "enum A: ENUM8 {A = 1; B = 3; }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
     def test_basic_clusters(self):
-        # Switching cluster codes is never ok
         self.ValidateUpdate(
+            "Switching cluster codes is never ok",
             "client cluster A = 1 {}",
             "client cluster A = 2 {}",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
-        # Removing a cluster is not ok
         self.ValidateUpdate(
+            "Removing a cluster is not ok",
             "client cluster A = 1 {} client cluster B = 2 {}",
             "client cluster A = 1 {}",
             Compatibility.FORWARD_FAIL)
 
-        # Adding an enum is ok. Also validates code formatting
         self.ValidateUpdate(
+            "Adding an enum is ok. Also validates code formatting",
             "server cluster A = 16 {}",
             "server cluster A = 0x10 { enum X : ENUM8 {} }",
             Compatibility.BACKWARD_FAIL)
 
-        # Detects side switch
         self.ValidateUpdate(
+            "Detects side switch for clusters",
             "client cluster A = 1 {}",
             "server cluster A = 1 {}",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
     def test_bitmaps(self):
-        # deleting a bitmap
         self.ValidateUpdate(
+            "Deleting a bitmap is not ok",
             "client Cluster X = 1 { bitmap A: BITMAP8{} bitmap B: BITMAP8{} }",
             "client Cluster X = 1 { bitmap A: BITMAP8{} }",
             Compatibility.FORWARD_FAIL)
 
-        # Changing type of a bitmap
         self.ValidateUpdate(
+            "Changing a bitmap type is never ok",
             " client cluster X = 1 { bitmap A: BITMAP8{} }",
             " client cluster X = 1 { bitmap A: BITMAP16{} }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
-        # Adding values is ok, removing values is not
         self.ValidateUpdate(
+            "Adding bitmap values is ok, removing values is not",
             " client cluster X = 1 { bitmap A: BITMAP8 { kA = 0x01; kB = 0x02; } }",
             " client cluster X = 1 { bitmap A: BITMAP8 { kA = 0x01; } }",
             Compatibility.FORWARD_FAIL)
 
-        # Switching codes is never ok
         self.ValidateUpdate(
+            "Switching bitmap codes is never ok",
             " client cluster X = 1 { bitmap A: BITMAP8 { kA = 0x01; kB = 0x02; } }",
             " client cluster X = 1 { bitmap A: BITMAP8 { kA = 0x01; kB = 0x04; } }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
