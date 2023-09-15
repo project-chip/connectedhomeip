@@ -24,9 +24,9 @@ namespace DeviceLayer {
 namespace NetworkCommissioning {
 
 namespace {
-constexpr uint8_t kMaxWiFiNetworks                  = 1;
-constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
-constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
+inline constexpr uint8_t kMaxWiFiNetworks                  = 1;
+inline constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
+inline constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
 } // namespace
 
 class BLScanResponseIterator : public Iterator<WiFiScanResponse>
@@ -42,9 +42,9 @@ public:
         }
 
         item.security.SetRaw(mpScanResults[mIternum].auth);
-        item.ssidLen = mpScanResults[mIternum].ssid_len < chip::DeviceLayer::Internal::kMaxWiFiSSIDLength
-            ? mpScanResults[mIternum].ssid_len
-            : chip::DeviceLayer::Internal::kMaxWiFiSSIDLength;
+        item.ssidLen  = mpScanResults[mIternum].ssid_len < chip::DeviceLayer::Internal::kMaxWiFiSSIDLength
+             ? mpScanResults[mIternum].ssid_len
+             : chip::DeviceLayer::Internal::kMaxWiFiSSIDLength;
         item.channel  = mpScanResults[mIternum].channel;
         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
         item.rssi     = mpScanResults[mIternum].rssi;

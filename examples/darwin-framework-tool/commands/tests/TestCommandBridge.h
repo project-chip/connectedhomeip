@@ -41,7 +41,7 @@ const char basePath[] = "./src/app/tests/suites/commands/delay/scripts/";
 const char * getScriptsFolder() { return basePath; }
 } // namespace
 
-constexpr const char * kDefaultKey = "default";
+inline constexpr const char * kDefaultKey = "default";
 
 @interface TestDeviceControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property TestCommandBridge * commandBridge;
@@ -58,7 +58,7 @@ constexpr const char * kDefaultKey = "default";
 
 NS_ASSUME_NONNULL_END
 
-constexpr uint16_t kTimeoutInSeconds = 90;
+inline constexpr uint16_t kTimeoutInSeconds = 90;
 
 class TestCommandBridge : public CHIPCommandBridge,
                           public ValueChecker,
@@ -111,7 +111,7 @@ public:
     CHIP_ERROR WaitForMs(
         const char * _Nullable identity, const chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type & value)
     {
-        dispatch_time_t delayTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(value.ms * NSEC_PER_MSEC));
+        dispatch_time_t delayTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t) (value.ms * NSEC_PER_MSEC));
         dispatch_after(delayTime, mCallbackQueue, ^(void) {
             NextTest();
         });

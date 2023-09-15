@@ -28,7 +28,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestUtils.h>
 
-constexpr uint8_t kMaxAllowedPaths = 64;
+inline constexpr uint8_t kMaxAllowedPaths = 64;
 
 namespace chip {
 namespace test_utils {

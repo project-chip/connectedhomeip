@@ -36,12 +36,12 @@ namespace DeviceLayer {
 static constexpr size_t kMaxThreadNameLength = 8;
 
 // 48-bit IEEE MAC Address or a 64-bit IEEE MAC Address (e.g. EUI-64).
-constexpr size_t kMaxHardwareAddrSize = 8;
+inline constexpr size_t kMaxHardwareAddrSize = 8;
 
-constexpr size_t kMaxIPv4AddrSize  = 4;
-constexpr size_t kMaxIPv6AddrSize  = 16;
-constexpr size_t kMaxIPv4AddrCount = 4;
-constexpr size_t kMaxIPv6AddrCount = 8;
+inline constexpr size_t kMaxIPv4AddrSize  = 4;
+inline constexpr size_t kMaxIPv6AddrSize  = 16;
+inline constexpr size_t kMaxIPv4AddrCount = 4;
+inline constexpr size_t kMaxIPv6AddrCount = 8;
 
 using BootReasonType = app::Clusters::GeneralDiagnostics::BootReasonEnum;
 
@@ -186,8 +186,8 @@ private:
     WiFiDiagnosticsDelegate * mWiFiDiagnosticsDelegate = nullptr;
 
     // No copy, move or assignment.
-    DiagnosticDataProvider(const DiagnosticDataProvider &)  = delete;
-    DiagnosticDataProvider(const DiagnosticDataProvider &&) = delete;
+    DiagnosticDataProvider(const DiagnosticDataProvider &)             = delete;
+    DiagnosticDataProvider(const DiagnosticDataProvider &&)            = delete;
     DiagnosticDataProvider & operator=(const DiagnosticDataProvider &) = delete;
 };
 
