@@ -23,8 +23,7 @@
 namespace chip {
 namespace Dnssd {
 
-class ResolverDelegateProxy : public ReferenceCounted<ResolverDelegateProxy>,
-                              public CommissioningResolveDelegate
+class ResolverDelegateProxy : public ReferenceCounted<ResolverDelegateProxy>, public CommissioningResolveDelegate
 
 {
 public:
@@ -77,10 +76,10 @@ public:
 
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override
     {
-       /// Unfortunately cannot remove this method since it is in a Resolver interface.
-       ChipLogError(Discovery, "!!! Operational proxy does NOT support operational discovery");
-       ChipLogError(Discovery, "!!! Please use AddressResolver or DNSSD Resolver directly");
-       chipDie();  // force detection of invalid usages.
+        /// Unfortunately cannot remove this method since it is in a Resolver interface.
+        ChipLogError(Discovery, "!!! Operational proxy does NOT support operational discovery");
+        ChipLogError(Discovery, "!!! Please use AddressResolver or DNSSD Resolver directly");
+        chipDie(); // force detection of invalid usages.
     }
 
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override
