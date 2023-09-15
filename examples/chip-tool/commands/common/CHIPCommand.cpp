@@ -549,14 +549,7 @@ CHIP_ERROR CHIPCommand::RunOnMatterQueue(MatterWorkCallback callback, chip::Syst
     auto waitingUntil = std::chrono::system_clock::now() + std::chrono::duration_cast<std::chrono::seconds>(timeout);
     {
         std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);
-        if (!cvWaitingForResponse.wait_until(lk, waitingUntil, [this]() { return !this->mWaitingForResponse; }))
-        {
-            *timedOut = true;
-        }
-        else
-        {
-            *timedOut = false;
-        }
+        *timedOut = !cvWaitingForResponse.wait_until(lk, waitingUntil, [this]() { return !this->mWaitingForResponse; });
     }
 
     return CHIP_NO_ERROR;
