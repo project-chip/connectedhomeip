@@ -292,3 +292,12 @@ window-app/**/README
 
 resource-monitoring-app/**/README
 ```
+
+## Air Quality Sensor example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+rvc-app/README
+```

@@ -52,7 +52,7 @@ tests:
       cluster: "Operational Credentials"
       attribute: "CurrentFabricIndex"
       response:
-          saveAs: CurrentFabricIndex
+          saveAs: CurrentFabricIndexValue
 
     - label:
           "Step 2:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute"
@@ -67,7 +67,7 @@ tests:
                       AuthMode: "2",
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -92,7 +92,7 @@ tests:
                       AuthMode: "2",
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
       response:

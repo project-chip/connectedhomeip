@@ -301,8 +301,6 @@ CHIP_ERROR TLVWriter::VPutStringF(Tag tag, const char * fmt, va_list ap)
     size_t skipLen;
     size_t writtenBytes;
 #elif CONFIG_HAVE_VCBPRINTF
-#elif CONFIG_TLV_TRUNCATE
-    size_t maxLen;
 #else
     char * tmpBuf;
 #endif
@@ -323,17 +321,6 @@ CHIP_ERROR TLVWriter::VPutStringF(Tag tag, const char * fmt, va_list ap)
         lenFieldSize = kTLVFieldSize_2Byte;
     else
         lenFieldSize = kTLVFieldSize_4Byte;
-
-#if !(CONFIG_HAVE_VCBPRINTF) && !(CONFIG_HAVE_VSNPRINTF_EX) && CONFIG_TLV_TRUNCATE
-    // no facilities for splitting the stream across multiple buffers,
-    // just write however much fits in the current buffer.
-    // assume conservative tag length at this time (8 bytes)
-    maxLen = mRemainingLen -
-        (1 + 8 + (1 << static_cast<uint8_t>(lenFieldSize)) +
-         1); // 1 : control byte, 8 : tag length, stringLen + 1 for null termination
-    if (maxLen < dataLen)
-        dataLen = maxLen;
-#endif
 
     // write length.
     err = WriteElementHead(

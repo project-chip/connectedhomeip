@@ -40,6 +40,12 @@ CHIP_ERROR CHIPCommandBridge::Run()
     ChipLogProgress(chipTool, "Running Command");
     ReturnErrorOnFailure(MaybeSetUpStack());
     SetIdentity(mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha);
+
+    {
+        std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
+        mWaitingForResponse = YES;
+    }
+
     ReturnLogErrorOnFailure(RunCommand());
 
     auto err = StartWaiting(GetWaitDuration());

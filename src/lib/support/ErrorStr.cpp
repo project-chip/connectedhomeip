@@ -167,7 +167,7 @@ DLL_EXPORT void FormatError(char * buf, uint16_t bufSize, const char * subsys, C
 {
 #if CHIP_CONFIG_SHORT_ERROR_STR
 
-    if (subsys == NULL)
+    if (subsys == nullptr)
     {
         (void) snprintf(buf, bufSize, "Error " CHIP_CONFIG_SHORT_FORM_ERROR_VALUE_FORMAT, err.AsInteger());
     }
