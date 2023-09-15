@@ -87,6 +87,25 @@ class TestCompatibilityChecks(unittest.TestCase):
             "enum A: ENUM8 {A = 1; B = 3; }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
+    def test_basic_clusters(self):
+        # Switching cluster codes is never ok
+        self.ValidateUpdate(
+            "client cluster A = 1 {}",
+            "client cluster A = 2 {}",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+        # Removing a cluster is not ok
+        self.ValidateUpdate(
+            "client cluster A = 1 {} client cluster B = 2 {}",
+            "client cluster A = 1 {}",
+            Compatibility.FORWARD_FAIL)
+
+        # Adding an enum is ok. Also validates code formatting
+        self.ValidateUpdate(
+            "client cluster A = 16 {}",
+            "client cluster A = 0x10 { enum X : ENUM8 {} }",
+            Compatibility.BACKWARD_FAIL)
+
 
 if __name__ == '__main__':
     unittest.main()
