@@ -89,7 +89,7 @@ shared_library("jni") {
     deps += [ "${chip_root}/src/controller/data_model:java-jni-sources" ]
   }
 
-  if (chip_build_controler_dynamic_server) {
+  if (chip_build_controller_dynamic_server) {
     defines += [ "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER" ]
   }
 
