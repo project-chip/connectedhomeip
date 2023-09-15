@@ -110,6 +110,7 @@ public:
     virtual CHIP_ERROR GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults);
     virtual CHIP_ERROR GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults);
     virtual CHIP_ERROR GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults);
+    virtual CHIP_ERROR GetAverageWearCount(uint32_t & averageWearCount);
 
     /*
      * Get the linked list of network interfaces of the current plaform. After usage, each caller of GetNetworkInterfaces
@@ -273,6 +274,11 @@ inline CHIP_ERROR DiagnosticDataProvider::GetActiveRadioFaults(GeneralFaults<kMa
 }
 
 inline CHIP_ERROR DiagnosticDataProvider::GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+inline CHIP_ERROR DiagnosticDataProvider::GetAverageWearCount(uint32_t & averageWearCount)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
