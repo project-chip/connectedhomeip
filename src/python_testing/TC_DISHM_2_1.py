@@ -60,7 +60,7 @@ class TC_DISHM_2_1(MatterBaseTest):
         self.print_step(1, "Commissioning, already done")
 
         self.print_step(2, "Read SupportedModes attribute")
-        supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
+        supported_modes = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
         logging.info("SupportedModes: %s" % (supported_modes))
 
@@ -70,7 +70,7 @@ class TC_DISHM_2_1(MatterBaseTest):
 
         self.print_step(3, "Read CurrentMode attribute")
 
-        old_current_mode_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        old_current_mode_dut = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
         logging.info("CurrentMode: %s" % (old_current_mode_dut))
 
@@ -97,7 +97,7 @@ class TC_DISHM_2_1(MatterBaseTest):
             input("Press Enter when done.\n")
 
             self.print_step(6, "Read CurrentMode attribute")
-            old_current_mode_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+            old_current_mode_dut = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
             logging.info("CurrentMode: %s" % (old_current_mode_dut))
 
@@ -113,7 +113,7 @@ class TC_DISHM_2_1(MatterBaseTest):
             asserts.assert_true(st_text_len in range(1, 65), "StatusText length (%d) must be between 1 and 64" % (st_text_len))
 
             self.print_step(8, "Read CurrentMode attribute")
-            current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+            current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
             logging.info("CurrentMode: %s" % (current_mode))
 
@@ -123,7 +123,7 @@ class TC_DISHM_2_1(MatterBaseTest):
         input("Press Enter when done.\n")
 
         self.print_step(10, "Read CurrentMode attribute")
-        old_current_mode_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        old_current_mode_dut = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
         logging.info("CurrentMode: %s" % (old_current_mode_dut))
 
@@ -134,7 +134,7 @@ class TC_DISHM_2_1(MatterBaseTest):
                             "Changing to mode %d must succeed due to the current state of the device" % (self.modeok))
 
         self.print_step(12, "Read CurrentMode attribute")
-        current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
         logging.info("CurrentMode: %s" % (current_mode))
 
@@ -148,7 +148,7 @@ class TC_DISHM_2_1(MatterBaseTest):
                             "Attempt to change to invalid mode %d didn't fail as expected" % (invalid_mode_th))
 
         self.print_step(14, "Read CurrentMode attribute")
-        current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
         logging.info("CurrentMode: %s" % (current_mode))
 

@@ -43,7 +43,7 @@ class TC_DISHM_1_2(MatterBaseTest):
         self.print_step(1, "Commissioning, already done")
 
         self.print_step(2, "Read SupportedModes attribute")
-        supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
+        supported_modes = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
         logging.info("SupportedModes: %s" % (supported_modes))
 
@@ -84,26 +84,28 @@ class TC_DISHM_1_2(MatterBaseTest):
                 is_mfg = (0x8000 <= t.value and t.value <= 0xBFFF)
                 asserts.assert_true(t.value in commonTags.keys() or t.value in runTags or is_mfg,
                                     "Found a SupportedModes entry with invalid mode tag value!")
+                tagName_length = len(t)
+                asserts.assert_true(tagName_length in range(1, 65), "TagName is not the appropriate length")
                 if t.value == Clusters.DishwasherMode.Enums.ModeTag.kNormal:
                     normal_present = True
         asserts.assert_true(normal_present, "The Supported Modes does not have an entry of Normal(0x4000)")
 
         self.print_step(3, "Read CurrentMode attribute")
-        current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
         logging.info("CurrentMode: %s" % (current_mode))
         asserts.assert_true(current_mode in supported_modes_dut, "CurrentMode is not a supported mode!")
 
         if self.check_pics("DISHM.S.A0003"):
             self.print_step(4, "Read OnMode attribute")
-            on_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.OnMode)
+            on_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.OnMode)
 
             logging.info("OnMode: %s" % (on_mode))
             asserts.assert_true(on_mode in supported_modes_dut or on_mode == NullValue, "OnMode is not a supported mode!")
 
         if self.check_pics("DISHM.S.A0002"):
             self.print_step(5, "Read StartUpMode attribute")
-            startup_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.StartUpMode)
+            startup_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.StartUpMode)
 
             logging.info("StartUpMode: %s" % (startup_mode))
             asserts.assert_true(startup_mode in supported_modes_dut or startup_mode ==

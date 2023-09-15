@@ -26,7 +26,7 @@ from mobly import asserts
 
 class TC_DISHM_3_3(MatterBaseTest):
 
-    async def read_mod_attribute_expect_success(self, endpoint, attribute):
+    async def read_mode_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.DishwasherMode
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
@@ -79,7 +79,7 @@ class TC_DISHM_3_3(MatterBaseTest):
 
         self.print_step(2, "Read StartUpMode attribute")
 
-        startup_mode_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.StartUpMode)
+        startup_mode_dut = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.StartUpMode)
 
         logging.info("StartUpMode: %s" % (startup_mode_dut))
 
@@ -87,7 +87,7 @@ class TC_DISHM_3_3(MatterBaseTest):
 
         self.print_step(3, "Read OnMode attribute")
 
-        old_on_mode_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.OnMode)
+        old_on_mode_dut = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.OnMode)
 
         logging.info("OnMode: %s" % (old_on_mode_dut))
 
@@ -96,7 +96,7 @@ class TC_DISHM_3_3(MatterBaseTest):
         if old_on_mode_dut == startup_mode_dut:
 
             self.print_step(4, "Read SupportedModes attribute")
-            supported_modes_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
+            supported_modes_dut = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
             logging.info("SupportedModes: %s" % (supported_modes_dut))
 
@@ -116,7 +116,7 @@ class TC_DISHM_3_3(MatterBaseTest):
 
         self.print_step(6, "Read OnMode attribute")
 
-        new_on_mode_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.OnMode)
+        new_on_mode_dut = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.OnMode)
 
         logging.info("OnMode: %s" % (new_on_mode_dut))
 
@@ -135,7 +135,7 @@ class TC_DISHM_3_3(MatterBaseTest):
 
         self.print_step(9, "Read CurrentMode attribute")
 
-        current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
         logging.info("CurrentMode: %s" % (current_mode))
 

@@ -65,7 +65,7 @@ class TC_DISHM_3_1(MatterBaseTest):
 
         cluster = Clusters.Objects.DishwasherMode
         attr = Clusters.DishwasherMode.Attributes.SupportedModes
-        supported_modes = await self.read_mod_attribute_expect_success(endpoint=endpoint, attribute=attr)
+        supported_modes = await self.read_mode_attribute_expect_success(endpoint=endpoint, attribute=attr)
 
         supported_modes_dut = []
         for m in supported_modes:
@@ -114,7 +114,7 @@ class TC_DISHM_3_1(MatterBaseTest):
 
         self.print_step(2, "Read OnMode attribute")
 
-        on_mode_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.OnMode)
+        on_mode_dut = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.OnMode)
 
         logging.info("OnMode: %s" % (on_mode_dut))
 
@@ -122,14 +122,14 @@ class TC_DISHM_3_1(MatterBaseTest):
 
         self.print_step(3, "Read CurrentMode attribute")
 
-        old_current_mode_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        old_current_mode_dut = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
         logging.info("CurrentMode: %s" % (old_current_mode_dut))
 
         if old_current_mode_dut == on_mode_dut:
 
             self.print_step(4, "Read SupportedModes attribute")
-            supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
+            supported_modes = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
             logging.info("SupportedModes: %s" % (supported_modes))
 
@@ -149,17 +149,17 @@ class TC_DISHM_3_1(MatterBaseTest):
 
         self.print_step(6, "Send Off command")
 
-        ret = await self.write_onoff_off_mode()
+        ret = await self.send_off_command()
         asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode to off should succeed")
 
         self.print_step(7, "Send On command")
 
-        ret = await self.write_onoff_on_mode()
+        ret = await self.send_on_command()
         asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode to on should succeed")
 
         self.print_step(8, "Read CurrentMode attribute")
 
-        current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
         logging.info("CurrentMode: %s" % (current_mode))
 
