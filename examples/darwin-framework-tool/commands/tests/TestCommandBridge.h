@@ -111,7 +111,7 @@ public:
     CHIP_ERROR WaitForMs(
         const char * _Nullable identity, const chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type & value)
     {
-        dispatch_time_t delayTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t) (value.ms * NSEC_PER_MSEC));
+        dispatch_time_t delayTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(value.ms * NSEC_PER_MSEC));
         dispatch_after(delayTime, mCallbackQueue, ^(void) {
             NextTest();
         });

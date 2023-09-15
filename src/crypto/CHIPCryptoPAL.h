@@ -580,8 +580,8 @@ public:
 
     Aes128KeyHandle(const Aes128KeyHandle &) = delete;
     Aes128KeyHandle(Aes128KeyHandle &&)      = delete;
-    void operator=(const Aes128KeyHandle &)  = delete;
-    void operator=(Aes128KeyHandle &&)       = delete;
+    void operator=(const Aes128KeyHandle &) = delete;
+    void operator=(Aes128KeyHandle &&) = delete;
 
     /**
      * @brief Get internal context cast to the desired key representation

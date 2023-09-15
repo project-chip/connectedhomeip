@@ -51,7 +51,7 @@ public:
         item.wiFiBand = (mpScanResults[mIternum].band == CY_WCM_WIFI_BAND_2_4GHZ)
             ? chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4
             : chip::DeviceLayer::NetworkCommissioning::WiFiBand::k5g;
-        item.rssi     = mpScanResults[mIternum].signal_strength;
+        item.rssi = mpScanResults[mIternum].signal_strength;
         memcpy(item.ssid, mpScanResults[mIternum].SSID, item.ssidLen);
         memcpy(item.bssid, mpScanResults[mIternum].BSSID, 6);
 
