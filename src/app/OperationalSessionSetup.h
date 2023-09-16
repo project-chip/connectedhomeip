@@ -121,13 +121,13 @@ enum class CaseConnectionState : uint8_t
                       // end to make logs easier to understand.
 };
 
-struct ExtendedConnectionFailureInfo
+struct ConnnectionFailureInfo
 {
     const ScopedNodeId & peerId;
     CHIP_ERROR error;
     CaseConnectionState connectionState;
 
-    ExtendedConnectionFailureInfo(const ScopedNodeId & peer, CHIP_ERROR err, CaseConnectionState state) :
+    ConnnectionFailureInfo(const ScopedNodeId & peer, CHIP_ERROR err, CaseConnectionState state) :
         peerId(peer), error(err), connectionState(state)
     {}
 };
@@ -149,7 +149,7 @@ typedef void (*OnDeviceConnectionFailure)(void * context, const ScopedNodeId & p
 /**
  * Callback prototype when secure session establishment fails.
  */
-typedef void (*OnExtendedDeviceConnectionFailure)(void * context, const ExtendedConnectionFailureInfo & failureInfo);
+typedef void (*OnExtendedDeviceConnectionFailure)(void * context, const ConnnectionFailureInfo & failureInfo);
 
 /**
  * Callback prototype when secure session establishement has failed and will be
@@ -201,6 +201,24 @@ public:
         mState           = CaseConnectionState::NeedsAddress;
         mAddressLookupHandle.SetListener(this);
     }
+
+    /*
+     * This function can be called to establish a secure session with the device.
+     *
+     * The device is expected to have been commissioned, A CASE session
+     * setup will be triggered.
+     *
+     * On establishing the session, the callback function `onConnection` will be called. If the
+     * session setup fails, `onFailure` will be called.
+     *
+     * If the session already exists, `onConnection` will be called immediately,
+     * before the Connect call returns.
+     *
+     * `onFailure` may be called before the Connect call returns, for error
+     * cases that are detected synchronously (e.g. inability to start an address
+     * lookup).
+     */
+    void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
     /*
      * This function can be called to establish a secure session with the device.

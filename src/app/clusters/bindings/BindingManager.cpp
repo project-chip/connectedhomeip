@@ -109,7 +109,7 @@ CHIP_ERROR BindingManager::EstablishConnection(const ScopedNodeId & nodeId)
     VerifyOrReturnError(connectionCallback != nullptr, CHIP_ERROR_NO_MEMORY);
 
     mInitParams.mCASESessionManager->FindOrEstablishSession(nodeId, connectionCallback->GetOnDeviceConnected(),
-                                                            connectionCallback->GetOnDeviceConnectionFailure(), nullptr);
+                                                            connectionCallback->GetOnDeviceConnectionFailure());
     if (mLastSessionEstablishmentError == CHIP_ERROR_NO_MEMORY)
     {
         // Release the least recently used entry
@@ -123,7 +123,7 @@ CHIP_ERROR BindingManager::EstablishConnection(const ScopedNodeId & nodeId)
             // At this point connectionCallback is null since it deletes itself when the callback is called.
             connectionCallback = Platform::New<ConnectionCallback>(*this);
             mInitParams.mCASESessionManager->FindOrEstablishSession(nodeId, connectionCallback->GetOnDeviceConnected(),
-                                                                    connectionCallback->GetOnDeviceConnectionFailure(), nullptr);
+                                                                    connectionCallback->GetOnDeviceConnectionFailure());
         }
     }
     return mLastSessionEstablishmentError;

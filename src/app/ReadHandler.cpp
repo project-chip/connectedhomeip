@@ -127,7 +127,7 @@ void ReadHandler::ResumeSubscription(CASESessionManager & caseSessionManager,
 
     // Ask IM engine to start CASE session with subscriber
     ScopedNodeId peerNode = ScopedNodeId(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex);
-    caseSessionManager.FindOrEstablishSession(peerNode, &mOnConnectedCallback, &mOnConnectionFailureCallback, nullptr);
+    caseSessionManager.FindOrEstablishSession(peerNode, &mOnConnectedCallback, &mOnConnectionFailureCallback);
 }
 
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS

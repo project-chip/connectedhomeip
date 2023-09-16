@@ -19,7 +19,7 @@ package chip.devicecontroller;
 
 @SuppressWarnings("serial")
 public class ConnectionFailureException extends ChipDeviceControllerException {
-  enum ConnectionState {
+  public enum ConnectionState {
     UNINITIALIZED, // Error state: OperationalSessionSetup is useless
     NEEDS_ADDRESS, // No address known, lookup not started yet.
     RESOLVING_ADDRESS, // Address lookup in progress.

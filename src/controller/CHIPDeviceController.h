@@ -235,6 +235,10 @@ public:
                                   chip::Callback::Callback<OnExtendedDeviceConnectionFailure> * onExtendedConnectionFailure)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+
+        // Ensure that only one of onFailure and onExtendedConnectionFailure is provided.
+        VerifyOrReturnError(!(onFailure && onExtendedConnectionFailure), CHIP_ERROR_INVALID_ARGUMENT);
+
         mSystemState->CASESessionMgr()->FindOrEstablishSession(ScopedNodeId(peerNodeId, GetFabricIndex()), onConnection, onFailure,
                                                                onExtendedConnectionFailure);
         return CHIP_NO_ERROR;

@@ -435,8 +435,7 @@ CHIP_ERROR TimeSynchronizationServer::AttemptToGetTimeFromTrustedNode()
     {
         CASESessionManager * caseSessionManager = Server::GetInstance().GetCASESessionManager();
         ScopedNodeId nodeId(mTrustedTimeSource.Value().nodeID, mTrustedTimeSource.Value().fabricIndex);
-        caseSessionManager->FindOrEstablishSession(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback,
-                                                   nullptr);
+        caseSessionManager->FindOrEstablishSession(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_NOT_FOUND;

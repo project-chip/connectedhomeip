@@ -92,6 +92,12 @@ bool OperationalSessionSetup::AttachToExistingSecureSession()
 }
 
 void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * onConnection,
+                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+{
+    Connect(onConnection, onFailure, nullptr);
+}
+
+void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * onConnection,
                                       Callback::Callback<OnDeviceConnectionFailure> * onFailure,
                                       Callback::Callback<OnExtendedDeviceConnectionFailure> * onExtendedConnectionFailure)
 {
@@ -359,8 +365,8 @@ void OperationalSessionSetup::NotifyConnectionCallbacks(Cancelable & failureRead
 
         if (error != CHIP_NO_ERROR)
         {
-            // Initialize the ExtendedConnectionFailureInfo object
-            ExtendedConnectionFailureInfo failureInfo(peerId, error, state);
+            // Initialize the ConnnectionFailureInfo object
+            ConnnectionFailureInfo failureInfo(peerId, error, state);
             cb->mCall(cb->mContext, failureInfo);
         }
     }

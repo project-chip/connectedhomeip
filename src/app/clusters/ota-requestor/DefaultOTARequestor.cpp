@@ -372,8 +372,7 @@ void DefaultOTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
     ChipLogDetail(SoftwareUpdate, "Establishing session to provider node ID 0x" ChipLogFormatX64 " on fabric index %d",
                   ChipLogValueX64(mProviderLocation.Value().providerNodeID), mProviderLocation.Value().fabricIndex);
 
-    mCASESessionManager->FindOrEstablishSession(GetProviderScopedId(), &mOnConnectedCallback, &mOnConnectionFailureCallback,
-                                                nullptr);
+    mCASESessionManager->FindOrEstablishSession(GetProviderScopedId(), &mOnConnectedCallback, &mOnConnectionFailureCallback);
 }
 
 void DefaultOTARequestor::DisconnectFromProvider()

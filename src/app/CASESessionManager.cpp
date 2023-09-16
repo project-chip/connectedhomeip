@@ -30,16 +30,38 @@ CHIP_ERROR CASESessionManager::Init(chip::System::Layer * systemLayer, const CAS
 }
 
 void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                                Callback::Callback<OnDeviceConnectionFailure> * onFailure,
-                                                Callback::Callback<OnExtendedDeviceConnectionFailure> * onExtendedConnectionFailure
+                                                Callback::Callback<OnDeviceConnectionFailure> * onFailure
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                                 ,
                                                 uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 )
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    FindOrEstablishSession(peerId, onConnection, onFailure, nullptr, attemptCount, onRetry);
+#else
+    FindOrEstablishSession(peerId, onConnection, onFailure, nullptr);
+#endif
+}
+
+void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                                Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                                                Callback::Callback<OnExtendedDeviceConnectionFailure> * onExtendedConnectionFailure
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                                ,
+                                                uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry
+#endif
+)
+{
     ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = [%d:" ChipLogFormatX64 "]", peerId.GetFabricIndex(),
                   ChipLogValueX64(peerId.GetNodeId()));
+
+    // Check if both onFailure and onExtendedConnectionFailure are provided.
+    if (onFailure && onExtendedConnectionFailure)
+    {
+        ChipLogError(CASESessionManager, "FindOrEstablishSession: Both onFailure and onExtendedConnectionFailure are provided");
+        return;
+    }
 
     bool forAddressUpdate             = false;
     OperationalSessionSetup * session = FindExistingSessionSetup(peerId, forAddressUpdate);
@@ -55,11 +77,10 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
             {
                 onFailure->mCall(onFailure->mContext, peerId, CHIP_ERROR_NO_MEMORY);
             }
-
-            if (onExtendedConnectionFailure != nullptr)
+            else if (onExtendedConnectionFailure != nullptr)
             {
-                // Initialize the ExtendedConnectionFailureInfo object
-                ExtendedConnectionFailureInfo failureInfo(peerId, CHIP_ERROR_NO_MEMORY, CaseConnectionState::Uninitialized);
+                // Initialize the ConnnectionFailureInfo object
+                ConnnectionFailureInfo failureInfo(peerId, CHIP_ERROR_NO_MEMORY, CaseConnectionState::Uninitialized);
                 onExtendedConnectionFailure->mCall(onExtendedConnectionFailure->mContext, failureInfo);
             }
 
