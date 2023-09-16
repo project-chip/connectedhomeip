@@ -40,6 +40,12 @@ synchronize submodules:
 git submodule update --init
 ```
 
+After synchronizing the modules you need to pull the latest changes:
+
+```
+git pull
+```
+
 ## Prerequisites
 
 Before building, you must install a few OS specific dependencies.
