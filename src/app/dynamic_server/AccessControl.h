@@ -15,6 +15,8 @@
  */
 #pragma once
 
+// Experimental API for Access Control
+
 namespace chip {
 namespace app {
 namespace dynamic_server {
