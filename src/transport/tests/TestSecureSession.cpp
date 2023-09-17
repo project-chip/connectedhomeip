@@ -48,13 +48,13 @@ void SecureChannelInitTest(nlTestSuite * inSuite, void * inContext)
 
     // Test the channel is successfully created with valid parameters
     NL_TEST_ASSERT(inSuite,
-                   channel.InitFromKeyPair(sessionKeystore, keypair, keypair2.Pubkey(), ByteSpan(nullptr, 0),
+                   channel.InitFromKeyPair(sessionKeystore, keypair, keypair2.Pubkey(), ByteSpan(),
                                            CryptoContext::SessionInfoType::kSessionEstablishment,
                                            CryptoContext::SessionRole::kInitiator) == CHIP_NO_ERROR);
 
     // Test the channel cannot be reinitialized
     NL_TEST_ASSERT(inSuite,
-                   channel.InitFromKeyPair(sessionKeystore, keypair, keypair2.Pubkey(), ByteSpan(nullptr, 0),
+                   channel.InitFromKeyPair(sessionKeystore, keypair, keypair2.Pubkey(), ByteSpan(),
                                            CryptoContext::SessionInfoType::kSessionEstablishment,
                                            CryptoContext::SessionRole::kInitiator) == CHIP_ERROR_INCORRECT_STATE);
 

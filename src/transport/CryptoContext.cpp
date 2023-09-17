@@ -86,7 +86,7 @@ CHIP_ERROR CryptoContext::InitFromSecret(SessionKeystore & keystore, const ByteS
     constexpr uint8_t kTestSharedSecret[CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH] = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;
     static_assert(sizeof(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE) == CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH,
                   "CHIP_CONFIG_TEST_SHARED_SECRET_VALUE must be 32 bytes");
-    const ByteSpan & testSalt = ByteSpan(nullptr, 0);
+    const ByteSpan & testSalt = ByteSpan();
     (void) info;
 
 #warning                                                                                                                           \

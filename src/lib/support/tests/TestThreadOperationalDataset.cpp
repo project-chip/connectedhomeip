@@ -30,7 +30,7 @@ void TestInit(nlTestSuite * inSuite, void * inContext)
 
     uint8_t longerThanOperationalDatasetSize[255]{};
     NL_TEST_ASSERT(inSuite, dataset.Init(ByteSpan(longerThanOperationalDatasetSize)) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, dataset.Init(ByteSpan(nullptr, 0)) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, dataset.Init(ByteSpan()) == CHIP_NO_ERROR);
 
     {
         uint8_t data[] = { 0x01, 0x02, 0x03 };
