@@ -69,9 +69,7 @@ CHIP_ERROR CryptoContext::InitFromSecret(SessionKeystore & keystore, const ByteS
                                          SessionInfoType infoType, SessionRole role)
 {
     VerifyOrReturnError(mKeyAvailable == false, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(secret.data() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(secret.size() > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError((salt.size() == 0) || (salt.data() != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
 
     ByteSpan info = (infoType == SessionInfoType::kSessionResumption) ? ByteSpan(RSEKeysInfo) : ByteSpan(SEKeysInfo);
 
