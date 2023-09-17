@@ -226,17 +226,20 @@ public:
 class ArrayAttestationTrustStore : public AttestationTrustStore
 {
 public:
-    ArrayAttestationTrustStore(const ByteSpan * const * derCerts, size_t numCerts) : mDerCerts(derCerts), mNumCerts(numCerts) {}
+    ArrayAttestationTrustStore(const ByteSpan * derCerts, size_t numCerts) : mDerCerts(derCerts), mNumCerts(numCerts) {}
 
     CHIP_ERROR GetProductAttestationAuthorityCert(const ByteSpan & skid, MutableByteSpan & outPaaDerBuffer) const override
     {
         VerifyOrReturnError(!skid.empty() && (skid.data() != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(skid.size() == Crypto::kSubjectKeyIdentifierLength, CHIP_ERROR_INVALID_ARGUMENT);
 
-        for (size_t paaIdx = 0; paaIdx < mNumCerts; ++paaIdx)
+        size_t paaIdx;
+        ByteSpan candidate;
+
+        for (paaIdx = 0; paaIdx < mNumCerts; ++paaIdx)
         {
             uint8_t skidBuf[Crypto::kSubjectKeyIdentifierLength] = { 0 };
-            ByteSpan const & candidate                           = *mDerCerts[paaIdx];
+            candidate                                            = mDerCerts[paaIdx];
             MutableByteSpan candidateSkidSpan{ skidBuf };
             VerifyOrReturnError(CHIP_NO_ERROR == Crypto::ExtractSKIDFromX509Cert(candidate, candidateSkidSpan),
                                 CHIP_ERROR_INTERNAL);
@@ -252,7 +255,7 @@ public:
     }
 
 protected:
-    const ByteSpan * const * mDerCerts;
+    const ByteSpan * mDerCerts;
     const size_t mNumCerts;
 };
 
