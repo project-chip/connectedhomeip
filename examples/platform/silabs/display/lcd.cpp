@@ -288,9 +288,9 @@ void SilabsLCD::SetQRCode(uint8_t * str, uint32_t size)
 void SilabsLCD::ShowQRCode(bool show)
 {
     if (mCurrentScreen != QRCodeScreen)
-        {
-            mCurrentScreen = QRCodeScreen;
-        }
+    {
+        mCurrentScreen = QRCodeScreen;
+    }
 
     WriteQRCode();
 }
