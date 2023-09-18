@@ -25,7 +25,7 @@ config:
 
 tests:
     - label: "Note"
-      verifications: |
+      verification: |
           This is a simulated example log for instructional purposes only. In real scenarios, the actual log may vary depending on the feature implementation in Reference App.
       disabled: true
 

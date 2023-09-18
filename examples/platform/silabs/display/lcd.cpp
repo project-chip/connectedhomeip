@@ -125,12 +125,10 @@ int SilabsLCD::Update(void)
 
 void SilabsLCD::WriteDemoUI(bool state)
 {
-#ifdef QR_CODE_ENABLED
-    if (mShowQRCode)
+    if (mCurrentScreen != DemoScreen)
     {
-        mShowQRCode = false;
+        mCurrentScreen = DemoScreen;
     }
-#endif
     dState.mainState = state;
     WriteDemoUI();
 }
@@ -149,9 +147,102 @@ void SilabsLCD::WriteDemoUI()
     }
 }
 
+void SilabsLCD::WriteStatus()
+{
+    uint8_t lineNb = 0;
+    char str[20];
+
+    GLIB_clear(&glibContext);
+    sprintf(str, "# Fabrics : %d", mStatus.nbFabric);
+    GLIB_drawStringOnLine(&glibContext, str, lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
+
+    if (strlen(mStatus.networkName) >= sizeof(str))
+    {
+        memcpy(str, mStatus.networkName, sizeof(str) - 1);
+        str[sizeof(str) - 1] = '\0';
+    }
+    else
+    {
+        memcpy(str, mStatus.networkName, sizeof(str));
+    }
+
+#if SL_WIFI
+    GLIB_drawStringOnLine(&glibContext, "SSID : ", lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
+    GLIB_drawStringOnLine(&glibContext, str, lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
+#else
+    GLIB_drawStringOnLine(&glibContext, "PANID : ", lineNb, GLIB_ALIGN_LEFT, 0, 0, true);
+    GLIB_drawStringOnLine(&glibContext, str, lineNb++, GLIB_ALIGN_LEFT, 64, 0, true);
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
+    GLIB_drawStringOnLine(&glibContext, "OT Type : FTD", lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
+#else
+    GLIB_drawStringOnLine(&glibContext, "OT Type : MTD", lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
+#endif // FTD
+#endif
+    GLIB_drawStringOnLine(&glibContext, "", lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
+    sprintf(str, "Connected : %c", mStatus.connected ? 'Y' : 'N');
+    GLIB_drawStringOnLine(&glibContext, str, lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
+    sprintf(str, "Advertising : %c", mStatus.advertising ? 'Y' : 'N');
+    GLIB_drawStringOnLine(&glibContext, str, lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    GLIB_drawStringOnLine(&glibContext, "Is ICD : Y", lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
+#else
+    GLIB_drawStringOnLine(&glibContext, "Is ICD : N", lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
+#endif
+
+    updateDisplay();
+}
+
 void SilabsLCD::SetCustomUI(customUICB cb)
 {
     customUI = cb;
+}
+
+void SilabsLCD::SetScreen(Screen_e screen)
+{
+    if (screen >= InvalidScreen)
+    {
+        return;
+    }
+
+    switch (screen)
+    {
+    case DemoScreen:
+        WriteDemoUI();
+        break;
+    case StatusScreen:
+        WriteStatus();
+        break;
+#ifdef QR_CODE_ENABLED
+    case QRCodeScreen:
+        WriteQRCode();
+        break;
+#endif
+    default:
+        break;
+    }
+}
+
+void SilabsLCD::CycleScreens(void)
+{
+#ifdef QR_CODE_ENABLED
+    if (mCurrentScreen < QRCodeScreen)
+#else
+    if (mCurrentScreen < StatusScreen)
+#endif
+    {
+        mCurrentScreen++;
+    }
+    else
+    {
+        mCurrentScreen = DemoScreen;
+    }
+
+    SetScreen(static_cast<Screen_e>(mCurrentScreen));
+}
+
+void SilabsLCD::SetStatus(DisplayStatus_t & status)
+{
+    mStatus = status;
 }
 
 #ifdef QR_CODE_ENABLED
@@ -194,19 +285,14 @@ void SilabsLCD::SetQRCode(uint8_t * str, uint32_t size)
     }
 }
 
-void SilabsLCD::ShowQRCode(bool show, bool forceRefresh)
+void SilabsLCD::ShowQRCode(bool show)
 {
-    if (show != mShowQRCode || forceRefresh)
+    if (mCurrentScreen != QRCodeScreen)
     {
-        (show) ? WriteQRCode() : WriteDemoUI();
-        mShowQRCode = show;
+        mCurrentScreen = QRCodeScreen;
     }
-}
 
-void SilabsLCD::ToggleQRCode(void)
-{
-    (mShowQRCode) ? WriteDemoUI() : WriteQRCode();
-    mShowQRCode = !mShowQRCode;
+    WriteQRCode();
 }
 
 void SilabsLCD::LCDFillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h)

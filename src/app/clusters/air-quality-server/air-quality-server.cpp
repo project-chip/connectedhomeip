@@ -115,6 +115,9 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case Attributes::AirQuality::Id:
         ReturnErrorOnFailure(aEncoder.Encode(mAirQuality));
         break;
+    case Attributes::FeatureMap::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mFeature.Raw()));
+        break;
     }
     return CHIP_NO_ERROR;
 }

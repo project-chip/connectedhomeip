@@ -15087,6 +15087,104 @@ public class ClusterInfoMapping {
         }
       }
 
+      public static class DelegatedSampleMeiClusterAddArgumentsResponseCallback implements ChipClusters.SampleMeiCluster.AddArgumentsResponseCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+        @Override
+        public void onSuccess(Integer returnValue) {
+           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+               CommandResponseInfo returnValueResponseValue = new CommandResponseInfo("returnValue", "Integer");
+               responseValues.put(returnValueResponseValue, returnValue);
+           callback.onSuccess(responseValues);
+        }
+
+        @Override
+        public void onError(Exception error) {
+          callback.onFailure(error);
+        }
+      }
+
+      public static class DelegatedSampleMeiClusterGeneratedCommandListAttributeCallback implements ChipClusters.SampleMeiCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<Long> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedSampleMeiClusterAcceptedCommandListAttributeCallback implements ChipClusters.SampleMeiCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<Long> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedSampleMeiClusterEventListAttributeCallback implements ChipClusters.SampleMeiCluster.EventListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<Long> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedSampleMeiClusterAttributeListAttributeCallback implements ChipClusters.SampleMeiCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<Long> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+
 
  public Map<String, ClusterInfo> getClusterMap() {
     Map<String, ClusterInfo> clusterMap = initializeClusterMap();
@@ -15392,6 +15490,9 @@ public class ClusterInfoMapping {
       ClusterInfo faultInjectionClusterInfo = new ClusterInfo(
         (ptr, endpointId) -> new ChipClusters.FaultInjectionCluster(ptr, endpointId), new HashMap<>());
       clusterMap.put("faultInjection", faultInjectionClusterInfo);
+      ClusterInfo sampleMeiClusterInfo = new ClusterInfo(
+        (ptr, endpointId) -> new ChipClusters.SampleMeiCluster(ptr, endpointId), new HashMap<>());
+      clusterMap.put("sampleMei", sampleMeiClusterInfo);
     return clusterMap;
  }
 
@@ -15493,6 +15594,7 @@ public class ClusterInfoMapping {
       destination.get("electricalMeasurement").combineCommands(source.get("electricalMeasurement"));
       destination.get("unitTesting").combineCommands(source.get("unitTesting"));
       destination.get("faultInjection").combineCommands(source.get("faultInjection"));
+      destination.get("sampleMei").combineCommands(source.get("sampleMei"));
  }
 
  @SuppressWarnings("unchecked")
@@ -20323,6 +20425,42 @@ public class ClusterInfoMapping {
        );
        faultInjectionClusterInteractionInfoMap.put("failRandomlyAtFault", faultInjectionfailRandomlyAtFaultInteractionInfo);
      commandMap.put("faultInjection", faultInjectionClusterInteractionInfoMap);
+     Map<String, InteractionInfo> sampleMeiClusterInteractionInfoMap = new LinkedHashMap<>();
+     Map<String, CommandParameterInfo> sampleMeipingCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       InteractionInfo sampleMeipingInteractionInfo = new InteractionInfo(
+         (cluster, callback, commandArguments) -> {
+           ((ChipClusters.SampleMeiCluster) cluster)
+           .ping((DefaultClusterCallback) callback
+           
+           );
+         },
+         () -> new DelegatedDefaultClusterCallback(),
+           sampleMeipingCommandParams
+       );
+       sampleMeiClusterInteractionInfoMap.put("ping", sampleMeipingInteractionInfo);
+     Map<String, CommandParameterInfo> sampleMeiaddArgumentsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       CommandParameterInfo sampleMeiaddArgumentsarg1CommandParameterInfo = new CommandParameterInfo("arg1", Integer.class, Integer.class);
+       sampleMeiaddArgumentsCommandParams.put("arg1",sampleMeiaddArgumentsarg1CommandParameterInfo);
+      
+       CommandParameterInfo sampleMeiaddArgumentsarg2CommandParameterInfo = new CommandParameterInfo("arg2", Integer.class, Integer.class);
+       sampleMeiaddArgumentsCommandParams.put("arg2",sampleMeiaddArgumentsarg2CommandParameterInfo);
+     
+       InteractionInfo sampleMeiaddArgumentsInteractionInfo = new InteractionInfo(
+         (cluster, callback, commandArguments) -> {
+           ((ChipClusters.SampleMeiCluster) cluster)
+           .addArguments((ChipClusters.SampleMeiCluster.AddArgumentsResponseCallback) callback
+           , (Integer)
+           commandArguments.get("arg1")
+           , (Integer)
+           commandArguments.get("arg2")
+           
+           );
+         },
+         () -> new DelegatedSampleMeiClusterAddArgumentsResponseCallback(),
+           sampleMeiaddArgumentsCommandParams
+       );
+       sampleMeiClusterInteractionInfoMap.put("addArguments", sampleMeiaddArgumentsInteractionInfo);
+     commandMap.put("sampleMei", sampleMeiClusterInteractionInfoMap);
      return commandMap;
   }
 

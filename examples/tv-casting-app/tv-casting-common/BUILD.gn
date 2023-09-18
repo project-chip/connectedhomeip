@@ -111,8 +111,10 @@ chip_data_model("tv-casting-common") {
 
   public_configs = [ ":config" ]
 
-  include_dirs =
-      [ "${chip_root}/examples/tv-casting-app/tv-casting-common/include" ]
+  include_dirs = [
+    "${chip_root}/examples/tv-casting-app/tv-casting-common/include",
+    "${chip_root}/examples/tv-casting-app/tv-casting-common",
+  ]
 
   is_server = true
 }

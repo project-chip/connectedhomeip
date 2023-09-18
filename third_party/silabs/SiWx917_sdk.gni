@@ -52,13 +52,13 @@ template("siwx917_sdk") {
     _include_dirs = [
       "${chip_root}",
       "${chip_root}/examples/platform/silabs/SiWx917/SiWx917",
-      "${sdk_support_root}/matter/si91x/siwx917/BRD4325x/support/hal",
+      "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/support/hal",
       "${efr32_sdk_root}/platform/emdrv/nvm3/inc",
       "${efr32_sdk_root}/platform/emdrv/common/inc",
       "${efr32_sdk_root}/platform/service/device_init/inc",
       "${sdk_support_root}/matter/mbedtls/tinycrypt/inc",
-      "${sdk_support_root}/matter/si91x/siwx917/BRD4325x/autogen",
-      "${sdk_support_root}/matter/si91x/siwx917/BRD4325x/config",
+      "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/autogen",
+      "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/config",
       "${chip_root}/third_party/mbedtls/repo/include",
       "${chip_root}/third_party/mbedtls/repo/library",
 
@@ -73,8 +73,7 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/si91x/sl_net/inc",
 
       # siwx917_soc component
-      "${wifi_sdk_root}/components/siwx917_soc/inc",
-      "${wifi_sdk_root}/components/siwx917_soc/boards/config/brd4325b",
+      "${wifi_sdk_root}/components/siwx917_soc/boards/config/${silabs_board_lower}",
       "${wifi_sdk_root}/components/siwx917_soc/boards/inc",
       "${wifi_sdk_root}/components/siwx917_soc/core/chip/inc",
       "${wifi_sdk_root}/components/siwx917_soc/core/config",
@@ -96,8 +95,6 @@ template("siwx917_sdk") {
 
       # si91x_support component
       "${wifi_sdk_root}/components/si91x_support/inc",
-      "${wifi_sdk_root}/components/si91x_support/brd4325b",
-      "${wifi_sdk_root}/components/si91x_support/siwx917_soc",
 
       # wifi_resources component
       "${wifi_sdk_root}/resources/certificates",
@@ -118,7 +115,7 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/kernel/include",
       "${wifi_sdk_root}/components/protocol/wifi/si91x",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM4F",
-      "${sdk_support_root}/matter/si91x/siwx917/BRD4325x/support/inc",
+      "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/support/inc",
     ]
 
     # Note that we're setting the mbedTLS and PSA configuration files through a
@@ -336,6 +333,7 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/siwx917_soc/core/chip/src/rsi_deepsleep_soc.c",
       "${wifi_sdk_root}/components/siwx917_soc/core/chip/src/rsi_system_config.c",
       "${wifi_sdk_root}/components/siwx917_soc/core/chip/src/system_si91x.c",
+      "${wifi_sdk_root}/components/siwx917_soc/core/config/src/rsi_nvic_priorities_config.c",
       "${wifi_sdk_root}/components/siwx917_soc/drivers/cmsis_driver/UDMA.c",
       "${wifi_sdk_root}/components/siwx917_soc/drivers/cmsis_driver/USART.c",
       "${wifi_sdk_root}/components/siwx917_soc/drivers/peripheral_drivers/src/clock_update.c",
@@ -418,8 +416,8 @@ template("siwx917_sdk") {
     # nvm3 ans startup
     if (silabs_board == "BRD4325B") {
       sources += [
-        "${sdk_support_root}/matter/si91x/siwx917/BRD4325x/support/src/startup_RS1xxxx.c",
-        "${wifi_sdk_root}/components/siwx917_soc/drivers/service/nvm3/src/sl_si91x_common_flash_intf.c",
+        "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/support/src/startup_RS1xxxx.c",
+        "${wifi_sdk_root}/components/siwx917_soc/drivers/service/nvm3/src/sl_si91x_dual_flash_intf.c",
       ]
     }
 

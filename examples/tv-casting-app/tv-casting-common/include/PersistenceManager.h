@@ -21,7 +21,7 @@
 #include "TargetEndpointInfo.h"
 #include "TargetVideoPlayerInfo.h"
 
-constexpr size_t kMaxCachedVideoPlayers = 32;
+inline constexpr size_t kMaxCachedVideoPlayers = 32;
 
 class PersistenceManager : public chip::FabricTable::Delegate
 {

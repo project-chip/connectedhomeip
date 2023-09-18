@@ -131,19 +131,22 @@ void ReliableMessageMgr::ExecuteActions()
 
         if (sendCount == CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS)
         {
+            // Make sure our exchange stays alive until we are done working with it.
+            ExchangeHandle ec(entry->ec);
+
             ChipLogError(ExchangeManager,
                          "Failed to Send CHIP MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange
                          " sendCount: %u max retries: %d",
-                         messageCounter, ChipLogValueExchange(&entry->ec.Get()), sendCount, CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
+                         messageCounter, ChipLogValueExchange(&ec.Get()), sendCount, CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
 
             // Don't check whether the session in the exchange is valid, because when the session is released, the retrans entry is
             // cleared inside ExchangeContext::OnSessionReleased, so the session must be valid if the entry exists.
-            SessionHandle session = entry->ec->GetSessionHandle();
+            SessionHandle session = ec->GetSessionHandle();
 
             // If the exchange is expecting a response, it will handle sending
             // this notification once it detects that it has not gotten a
             // response.  Otherwise, we need to do it.
-            if (!entry->ec->IsResponseExpected())
+            if (!ec->IsResponseExpected())
             {
                 if (session->IsSecureSession() && session->AsSecureSession()->IsCASESession())
                 {
@@ -154,6 +157,13 @@ void ReliableMessageMgr::ExecuteActions()
 
             // Do not StartTimer, we will schedule the timer at the end of the timer handler.
             mRetransTable.ReleaseObject(entry);
+
+            // Dropping our entry marked the exchange as not having an un-acked
+            // message... but of course it _does_ have an un-acked message and
+            // we have just given up on waiting for the ack.
+
+            ec->GetReliableMessageContext()->SetMessageNotAcked(true);
+
             return Loop::Continue;
         }
 

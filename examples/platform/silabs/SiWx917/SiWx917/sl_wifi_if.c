@@ -164,12 +164,21 @@ int32_t wfx_rsi_disconnect()
 
 sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t result_length, void * arg)
 {
+    wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING);
     temp_reset = (wfx_wifi_scan_ext_t *) malloc(sizeof(wfx_wifi_scan_ext_t));
     memset(temp_reset, 0, sizeof(wfx_wifi_scan_ext_t));
     if (CHECK_IF_EVENT_FAILED(event))
     {
         SILABS_LOG("F: Join Event received with %u bytes payload\n", result_length);
         callback_status = *(sl_status_t *) result;
+        wfx_rsi.join_retries += 1;
+        wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTED);
+        wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries++);
+        if (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
+        {
+            xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
+        }
+        is_wifi_disconnection_event = true;
         return SL_STATUS_FAIL;
     }
     /*

@@ -44,7 +44,7 @@ namespace chip {
 extern const char * kSpake2pI2RSessionInfo;
 extern const char * kSpake2pR2ISessionInfo;
 
-constexpr uint16_t kPBKDFParamRandomNumberSize = 32;
+inline constexpr uint16_t kPBKDFParamRandomNumberSize = 32;
 
 using namespace Crypto;
 
@@ -239,7 +239,7 @@ protected:
 };
 
 // The following constants are node IDs that test devices and test controllers use.
-constexpr chip::NodeId kTestControllerNodeId = 112233;
-constexpr chip::NodeId kTestDeviceNodeId     = 12344321;
+inline constexpr chip::NodeId kTestControllerNodeId = 112233;
+inline constexpr chip::NodeId kTestDeviceNodeId     = 12344321;
 
 } // namespace chip

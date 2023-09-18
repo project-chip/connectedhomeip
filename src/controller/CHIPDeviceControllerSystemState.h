@@ -54,7 +54,7 @@
 
 namespace chip {
 
-constexpr size_t kMaxDeviceTransportBlePendingPackets = 1;
+inline constexpr size_t kMaxDeviceTransportBlePendingPackets = 1;
 
 using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 #if INET_CONFIG_ENABLE_IPV4

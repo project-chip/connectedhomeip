@@ -45,17 +45,7 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
-    dispatch_queue_t GetWorkQueue()
-    {
-        if (mWorkQueue == nullptr)
-        {
-            mWorkQueue = dispatch_queue_create(CHIP_CONTROLLER_QUEUE, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-            dispatch_suspend(mWorkQueue);
-            mIsWorkQueueSuspended = true;
-        }
-        return mWorkQueue;
-    }
-
+    dispatch_queue_t GetWorkQueue();
     bool IsWorkQueueCurrentQueue() const;
 
     CHIP_ERROR StartBleScan(BleScannerDelegate * delegate = nullptr);
