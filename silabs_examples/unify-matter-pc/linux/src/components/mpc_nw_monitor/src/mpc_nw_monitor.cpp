@@ -77,14 +77,16 @@ class OperationalDiscover : public chip::Dnssd::OperationalBrowseDeleagete
     }
     void OnOperationalNodeDiscovered(const chip::Dnssd::OperationalNodeData & operationalData) override
     {
-        if (chip::Server::GetInstance().GetFabricTable().FindFabricWithCompressedId(operationalData.peerId.GetCompressedFabricId()))
+        sl_log_debug(LOG_TAG, "Found matter node with node ID " ChipLogFormatX64 ":" ChipLogFormatX64, 
+                            ChipLogValueX64(operationalData.peerId.GetCompressedFabricId()),
+                            ChipLogValueX64(operationalData.peerId.GetNodeId()));
+        if (chip::Server::GetInstance().GetFabricTable().FindFabricWithCompressedId(
+                                                        operationalData.peerId.GetCompressedFabricId()))
         {
-            sl_log_debug(LOG_TAG, "Found matter node with node ID %16X :: %i", operationalData.peerId.GetCompressedFabricId(),
-                         operationalData.peerId.GetNodeId());
             // prepare networkList entry
-            auto networkList = to_string(operationalData.peerId.GetCompressedFabricId());
-            networkList.append(":");
-            networkList.append(to_string(operationalData.peerId.GetNodeId()));
+            auto networkListEntry = to_string(operationalData.peerId.GetCompressedFabricId());
+            networkListEntry.append(":");
+            networkListEntry.append(to_string(operationalData.peerId.GetNodeId()));
             attribute node;
 
             try
@@ -93,9 +95,21 @@ class OperationalDiscover : public chip::Dnssd::OperationalBrowseDeleagete
                 for (auto unids : attribute::root().children(ATTRIBUTE_NODE_ID))
                 {
                     node = unids.child_by_type(DOTDOT_ATTRIBUTE_ID_STATE_NETWORK_LIST);
-                    if (node.is_valid() && (node.reported<string>().find(networkList) != string::npos))
+                    if (!node.is_valid()) 
                     {
-                        sl_log_debug(LOG_TAG, "entry already exixts in networkList of %s", unids.reported<string>().c_str());
+                        // ideally not a possible case but skip if networklist doesn't exist
+                        sl_log_debug(LOG_TAG, "Skipped node [%x] due to absence of networkList attribute", node);
+                        continue;
+                    }
+                    auto node_nw_list_str = node.reported<string>();
+                    std::vector<std::string> node_nw_list;
+                    size_t findIndex = 0;
+                    boost::algorithm::split(node_nw_list, node_nw_list_str.c_str(), boost::is_any_of(","));
+                    for (findIndex = 0; (node_nw_list[findIndex] != networkListEntry) 
+                                            && (findIndex < node_nw_list.size()); findIndex++);
+                    if (findIndex != node_nw_list.size())
+                    {
+                        sl_log_debug(LOG_TAG, "entry already exists in networkList of %s", unids.reported<string>().c_str());
                         break;
                     }
                     node = attribute(ATTRIBUTE_STORE_INVALID_NODE);
@@ -112,6 +126,7 @@ class OperationalDiscover : public chip::Dnssd::OperationalBrowseDeleagete
                 }
                 else
                 {
+                    sl_log_debug(LOG_TAG, "Found matter node with node ID " ChipLogFormatX64, ChipLogValueX64(operationalData.peerId.GetNodeId()));
                     string unid;
                     generateUNID(unid);
                     node = attribute::root().add_node(ATTRIBUTE_NODE_ID);
@@ -132,8 +147,8 @@ class OperationalDiscover : public chip::Dnssd::OperationalBrowseDeleagete
                     // Register resolver completion call back for all other node for post interview processing
                     mpc_attribute_resolver_helper_set_resolution_listener(node);
                 }
-                sl_log_debug(LOG_TAG, "networkList formed [%s] -> <%s>", node.reported<string>().c_str(), networkList.c_str());
-                attribute_store_set_reported_string(node.emplace_node(DOTDOT_ATTRIBUTE_ID_STATE_NETWORK_LIST), networkList.c_str());
+                sl_log_debug(LOG_TAG, "networkList formed [%s] -> <%s>", node.reported<string>().c_str(), networkListEntry.c_str());
+                attribute_store_set_reported_string(node.emplace_node(DOTDOT_ATTRIBUTE_ID_STATE_NETWORK_LIST), networkListEntry.c_str());
                 auto ep = node.emplace_node<EndpointId>(ATTRIBUTE_ENDPOINT_ID, 0);
                 ep.emplace_node<NodeStateSecurity>(DOTDOT_ATTRIBUTE_ID_STATE_SECURITY, ZCL_NODE_STATE_SECURITY_MATTER);
                 ep.emplace_node<uint32_t>(DOTDOT_ATTRIBUTE_ID_STATE_MAXIMUM_COMMAND_DELAY, 1);
