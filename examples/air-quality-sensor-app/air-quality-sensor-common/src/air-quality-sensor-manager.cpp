@@ -137,67 +137,67 @@ void AirQualitySensorManager::Init()
 void AirQualitySensorManager::OnAirQualityChangeHandler(AirQualityEnum newValue)
 {
     mAirQualityInstance.UpdateAirQuality(static_cast<AirQualityEnum>(newValue));
-    ChipLogDetail(NotSpecified, "Updated AirQuality value: %huu", (uint8_t) newValue);
+    ChipLogDetail(NotSpecified, "Updated AirQuality value: %hu", (uint8_t) newValue);
 }
 
 void AirQualitySensorManager::OnCarbonDioxideMeasurementChangeHandler(float newValue)
 {
     mCarbonDioxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    ChipLogDetail(NotSpecified, "Updated Carbon Dioxide: %f", newValue);
+    ChipLogDetail(NotSpecified, "Updated Carbon Dioxide: %d", (int)newValue);
 }
 
 void AirQualitySensorManager::OnCarbonMonoxideMeasurementChangeHandler(float newValue)
 {
     mCarbonMonoxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    ChipLogDetail(NotSpecified, "Updated Carbon Monoxide value: %f", newValue);
+    ChipLogDetail(NotSpecified, "Updated Carbon Monoxide value: %d", (int)newValue);
 }
 
 void AirQualitySensorManager::OnNitrogenDioxideMeasurementChangeHandler(float newValue)
 {
     mNitrogenDioxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    ChipLogDetail(NotSpecified, "Updated Nitrogen Dioxide value: %f", newValue);
+    ChipLogDetail(NotSpecified, "Updated Nitrogen Dioxide value: %d", (int)newValue);
 }
 
 void AirQualitySensorManager::OnPm1MeasurementChangeHandler(float newValue)
 {
     mPm1ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    ChipLogDetail(NotSpecified, "Updated PM1 value: %f", newValue);
+    ChipLogDetail(NotSpecified, "Updated PM1 value: %d", (int)newValue);
 }
 
 void AirQualitySensorManager::OnPm10MeasurementChangeHandler(float newValue)
 {
     mPm10ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    ChipLogDetail(NotSpecified, "Updated PM10 value: %f", newValue);
+    ChipLogDetail(NotSpecified, "Updated PM10 value: %d", (int)newValue);
 }
 
 void AirQualitySensorManager::OnPm25MeasurementChangeHandler(float newValue)
 {
     mPm25ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    ChipLogDetail(NotSpecified, "Updated PM2.5 value: %f", newValue);
+    ChipLogDetail(NotSpecified, "Updated PM2.5 value: %d", (int)newValue);
 }
 
 void AirQualitySensorManager::OnRadonMeasurementChangeHandler(float newValue)
 {
     mRadonConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    ChipLogDetail(NotSpecified, "Updated Radon value: %f", newValue);
+    ChipLogDetail(NotSpecified, "Updated Radon value: %d", (int)newValue);
 }
 
 void AirQualitySensorManager::OnTotalVolatileOrganicCompoundsMeasurementChangeHandler(float newValue)
 {
     mTotalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    ChipLogDetail(NotSpecified, "Updated Total Volatile Organic Compounds value: %f", newValue);
+    ChipLogDetail(NotSpecified, "Updated Total Volatile Organic Compounds value: %d", (int)newValue);
 }
 
 void AirQualitySensorManager::OnOzoneMeasurementChangeHandler(float newValue)
 {
     mOzoneConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    ChipLogDetail(NotSpecified, "Updated Ozone value: %f", newValue);
+    ChipLogDetail(NotSpecified, "Updated Ozone value: %d", (int)newValue);
 }
 
 void AirQualitySensorManager::OnFormaldehydeMeasurementChangeHandler(float newValue)
 {
     mFormaldehydeConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    ChipLogDetail(NotSpecified, "Updated Formaldehyde value: %f", newValue);
+    ChipLogDetail(NotSpecified, "Updated Formaldehyde value: %d", (int)newValue);
 }
 
 void AirQualitySensorManager::OnTemperatureMeasurementChangeHandler(int16_t newValue)
