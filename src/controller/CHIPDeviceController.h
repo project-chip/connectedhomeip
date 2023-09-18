@@ -81,7 +81,7 @@ namespace Controller {
 
 using namespace chip::Protocols::UserDirectedCommissioning;
 
-constexpr uint16_t kNumMaxActiveDevices = CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES;
+inline constexpr uint16_t kNumMaxActiveDevices = CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES;
 
 // Raw functions for cluster callbacks
 void OnBasicFailure(void * context, CHIP_ERROR err);

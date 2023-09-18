@@ -183,6 +183,16 @@ tests:
           [1687257759.711136][17346:17348] CHIP:TOO:   SwitchLatched: {
           [1687257759.711140][17346:17348] CHIP:TOO:     NewPosition: 2
           [1687257759.711141][17346:17348] CHIP:TOO:    }
+
+          In the current SDK development, Max number of positions is configured as 2, hence the current  test step should fail as NewPosition reached more than the Max NumberOfPositions.
+          If the DUT supports more number of positions, then for the command in previous step, position should increase to the next level. Below is the sample command to execute, if the DUT supports NumberOfPositions >  2 .
+
+          ./chip-tool switch read current-position 1 1
+
+          Verify CurrentPosition value is 2 On TH(chip-tool) Log and below is the sample log provided for the raspi platform:
+
+          [1659600502.023560][4306:4311] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001 DataVersion: 391463069
+          [1687847841.651568][19369:19371] CHIP:TOO:   CurrentPosition: 2
       disabled: true
 
     - label:
@@ -214,6 +224,15 @@ tests:
           [1687258513.235235][17561:17563] CHIP:TOO:   SwitchLatched: {
           [1687258513.235238][17561:17563] CHIP:TOO:     NewPosition: 3
           [1687258513.235239][17561:17563] CHIP:TOO:    }
+
+          In the current SDK development, Max number of positions are configured as 2, hence the current  test step should fail as its reached more than the numberof position. If the DUT supports more number of positions, then for the above command, it should increase to the next level. Below is the sample command to execute , if the DUT supports more than 2 NumberOfPositions.
+
+          ./chip-tool switch read current-position 1 1
+
+          Verify CurrentPosition value is 3 On TH(chip-tool) Log and below is the sample log provided for the raspi platform and below is the sample log provided for the raspi platform:
+
+          [1659600502.023560][4306:4311] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001 DataVersion: 391463069
+          [1687847873.385882][19378:19380] CHIP:TOO:   CurrentPosition: 3
       disabled: true
 
     - label: "Step 2h: Operator returns switch to first position"

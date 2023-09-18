@@ -42,8 +42,8 @@
 #include <ble/BleConfig.h>
 #include <system/SystemConfig.h>
 
-/* COMING SOON: making the INET Layer optional entails making this inclusion optional. */
-// #include "InetConfig.h"
+#include <inet/InetConfig.h>
+
 /*
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL <= 0
 #error "chip SDK requires INET_TCP_IDLE_CHECK_INTERVAL > 0"

@@ -46,7 +46,7 @@
 
 namespace chip {
 
-constexpr size_t kAttestationNonceLength = 32;
+inline constexpr size_t kAttestationNonceLength = 32;
 
 struct ControllerDeviceInitParams
 {
