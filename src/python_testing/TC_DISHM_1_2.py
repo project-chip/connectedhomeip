@@ -84,8 +84,8 @@ class TC_DISHM_1_2(MatterBaseTest):
                 is_mfg = (0x8000 <= t.value and t.value <= 0xBFFF)
                 asserts.assert_true(t.value in commonTags.keys() or t.value in runTags or is_mfg,
                                     "Found a SupportedModes entry with invalid mode tag value!")
-                tagName_length = len(t)
-                asserts.assert_true(tagName_length in range(1, 65), "TagName is not the appropriate length")
+
+                asserts.assert_true(type(t.label) == str and len(t.label) in range(1, 65), "TagName is not the appropriate length or type")
                 if t.value == Clusters.DishwasherMode.Enums.ModeTag.kNormal:
                     normal_present = True
         asserts.assert_true(normal_present, "The Supported Modes does not have an entry of Normal(0x4000)")
