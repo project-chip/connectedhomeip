@@ -248,7 +248,7 @@ int32_t wfx_wifi_rsi_init(void)
  * @return
  *        None
  *****************************************************************************************/
-static int32_t wfx_rsi_init(void)
+static sl_status_t wfx_rsi_init(void)
 {
     sl_status_t status;
 
@@ -416,9 +416,9 @@ static void wfx_rsi_save_ap_info() // translation
  * @return
  *        None
  **********************************************************************************************/
-static void wfx_rsi_do_join(void)
+static sl_status_t wfx_rsi_do_join(void)
 {
-    int32_t status;
+    sl_status_t status = SL_STATUS_OK;
     sl_wifi_security_t connect_security_mode;
     switch (wfx_rsi.sec.security)
     {
@@ -437,7 +437,7 @@ static void wfx_rsi_do_join(void)
         break;
     default:
         SILABS_LOG("error: unknown security type.");
-        return;
+        return status;
     }
 
     if (wfx_rsi.dev_state & (WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED))
@@ -474,7 +474,7 @@ static void wfx_rsi_do_join(void)
         if (SL_STATUS_OK != status)
         {
             SILABS_LOG("wfx_rsi_do_join: RSI callback register join failed with status: %02x", status);
-            return;
+            return status;
         }
 
         sl_wifi_client_configuration_t ap = { 0 };
@@ -507,6 +507,7 @@ static void wfx_rsi_do_join(void)
             }
         }
     }
+    return status;
 }
 
 /*********************************************************************************
@@ -526,10 +527,10 @@ void wfx_rsi_task(void * arg)
     TickType_t last_dhcp_poll, now;
     struct netif * sta_netif;
     (void) arg;
-    uint32_t rsi_status = wfx_rsi_init();
-    if (rsi_status != RSI_SUCCESS)
+    sl_status_t status = wfx_rsi_init();
+    if (status != RSI_SUCCESS)
     {
-        SILABS_LOG("%s: error: wfx_rsi_init with status: %02x", __func__, rsi_status);
+        SILABS_LOG("wfx_rsi_task: error: wfx_rsi_init with status: %02x", status);
         return;
     }
     wfx_lwip_start();
@@ -537,7 +538,7 @@ void wfx_rsi_task(void * arg)
     sta_netif      = wfx_get_netif(SL_WFX_STA_INTERFACE);
     wfx_started_notify();
 
-    SILABS_LOG("%s: starting event wait", __func__);
+    SILABS_LOG("wfx_rsi_task: starting event wait");
     for (;;)
     {
         /*
@@ -616,7 +617,7 @@ void wfx_rsi_task(void * arg)
             // saving the AP related info
             wfx_rsi_save_ap_info();
             // Joining to the network
-            wfx_rsi_do_join();
+            status = wfx_rsi_do_join();
         }
         if (flags & WFX_EVT_STA_CONN)
         {
