@@ -175,7 +175,7 @@ template("siwx917_sdk") {
       "FLASH_PAGE_SIZE",
       "SL_NVM3_PRESENT",
       "ROM_WIRELESS",
-      "BRD4325A", #TODO: should be removed after SoC macro clean-up
+      "BRD4325A",  #TODO: should be removed after SoC macro clean-up
     ]
 
     if (silabs_board == "BRD4325B") {

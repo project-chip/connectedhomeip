@@ -23,7 +23,7 @@ import("silabs_board.gni")
 
 if (use_rs9116) {
   wifi_sapi_root = "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
-} else if(use_SiWx917) {
+} else if (use_SiWx917) {
   wifi_sdk_root = "${chip_root}/third_party/silabs/wifi_sdk"
 }
 
@@ -196,13 +196,14 @@ template("efr32_sdk") {
       # Headers needed for Init no function will be called if OT is not used
       "${sl_ot_efr32_root}",
     ]
-    
-    if(use_SiWx917) {
-    _include_dirs += [
+
+    if (use_SiWx917) {
+      _include_dirs += [
         "${wifi_sdk_root}/components/si91x/inc",
         "${wifi_sdk_root}/components/si91x/memory",
         "${wifi_sdk_root}/components/si91x/sl_net/inc",
-              # wifi component
+
+        # wifi component
         "${wifi_sdk_root}/components/protocol/wifi/inc",
 
         # si91x_support component
@@ -265,6 +266,7 @@ template("efr32_sdk") {
       "SL_RAIL_LIB_MULTIPROTOCOL_SUPPORT=1",
       "SL_RAIL_UTIL_PA_CONFIG_HEADER=<sl_rail_util_pa_config.h>",
       "RADIO_CONFIG_DMP_SUPPORT=1",
+
       #"__STACK_SIZE=0",
     ]
 
@@ -281,9 +283,11 @@ template("efr32_sdk") {
     }
 
     if (chip_enable_ble_rs911x) {
-      defines += [ "RSI_BLE_ENABLE=1" ,
-                   "BLE_ENABLE=1",
-                   "RSI_LITTLE_ENDIAN=1",]
+      defines += [
+        "RSI_BLE_ENABLE=1",
+        "BLE_ENABLE=1",
+        "RSI_LITTLE_ENDIAN=1",
+      ]
     }
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
@@ -733,26 +737,24 @@ template("efr32_sdk") {
     }
 
     if (chip_enable_ble_rs911x) {
-    
-    if (use_rs9116) {
-      sources += [
-        "${wifi_sapi_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
-        "${wifi_sapi_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
-        "${wifi_sapi_root}/sapi/bluetooth/rsi_bt_common_apis.c",
-        "${wifi_sapi_root}/sapi/driver/rsi_bt_ble.c",
-      ]
-    } else {
-      sources += [
-        "${wifi_sdk_root}/components/si91x/ble/src/rsi_ble_gap_apis.c",
-        "${wifi_sdk_root}/components/si91x/ble/src/rsi_ble_gatt_apis.c",
-        "${wifi_sdk_root}/components/si91x/ble/src/rsi_bt_common_apis.c",
-        "${wifi_sdk_root}/components/si91x/ble/src/rsi_bt_ble.c",
-        "${wifi_sdk_root}/components/si91x/ble/src/rsi_common_apis.c",
-        "${wifi_sdk_root}/components/si91x/ble/src/rsi_utils.c",
-        "${wifi_sdk_root}/components/si91x/ble/src/sl_si91x_ble.c",
-      ]
-    }
-
+      if (use_rs9116) {
+        sources += [
+          "${wifi_sapi_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
+          "${wifi_sapi_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
+          "${wifi_sapi_root}/sapi/bluetooth/rsi_bt_common_apis.c",
+          "${wifi_sapi_root}/sapi/driver/rsi_bt_ble.c",
+        ]
+      } else {
+        sources += [
+          "${wifi_sdk_root}/components/si91x/ble/src/rsi_ble_gap_apis.c",
+          "${wifi_sdk_root}/components/si91x/ble/src/rsi_ble_gatt_apis.c",
+          "${wifi_sdk_root}/components/si91x/ble/src/rsi_bt_ble.c",
+          "${wifi_sdk_root}/components/si91x/ble/src/rsi_bt_common_apis.c",
+          "${wifi_sdk_root}/components/si91x/ble/src/rsi_common_apis.c",
+          "${wifi_sdk_root}/components/si91x/ble/src/rsi_utils.c",
+          "${wifi_sdk_root}/components/si91x/ble/src/sl_si91x_ble.c",
+        ]
+      }
     } else {
       sources += [
         "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_mbedtls_context.c",
