@@ -85,9 +85,9 @@ class MatterBleScanner:
 
     async def browse(self, scanner: BleakScanner) -> None:
         devices: dict[str, tuple[BLEDevice, AdvertisementData]] = await scanner.discover(return_adv=True)
-        for address in devices:
-            ble_device = devices[address][0]
-            ad_data = devices[address][1]
+        for device in devices.values():
+            ble_device = device[0]
+            ad_data = device[1]
             for name, bin_data in ad_data.service_data.items():
                 self.log_ble_discovery(
                     name, bin_data, ble_device, ad_data.rssi)
