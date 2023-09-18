@@ -367,7 +367,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/stage/yloop/src/yloop.c",
     ]
 
-    defines = [ "EF_ENV_CACHE_TABLE_SIZE=32" ]
+    defines = [ "EF_ENV_CACHE_TABLE_SIZE=64" ]
     cflags_c = [ "-Wno-sign-compare" ]
     configs += [
       ":${sdk_target_name}_config_BSP_Driver",
