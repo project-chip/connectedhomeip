@@ -1199,7 +1199,7 @@ CHIP_ERROR ConvertIntegerDERToRaw(ByteSpan derInt, uint8_t * rawInt, const uint1
 
 CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, MutableByteSpan & derSig)
 {
-    VerifyOrReturnError(derSig.size() >= rawSig.size() + kEmitDerIntegerOverhead, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(derSig.size() >= kMax_ECDSA_Signature_Length_Der, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     ASN1Writer writer;
     writer.Init(derSig);

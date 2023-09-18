@@ -43,10 +43,18 @@ public:
 
     constexpr Span() : mDataBuf(nullptr), mDataLen(0) {}
 
+    // Note: VerifyOrDie cannot be used inside a constexpr function, because it uses
+    // "static" on some platforms (e.g. when CHIP_PW_TOKENIZER_LOGGING is true)
+    // and that's not allowed in constexpr functions.
+
     Span(pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen)
     {
-        VerifyOrDie(databuf != nullptr || datalen == 0);
+        VerifyOrDie(databuf != nullptr || datalen == 0); // not constexpr on some platforms
     }
+
+    // A Span can only point to null if it is empty (size == 0). The default constructor
+    // should be used to construct empty Spans. All other cases involving null are invalid.
+    Span(std::nullptr_t null, size_t size) = delete;
 
     template <class U, size_t N, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
     constexpr explicit Span(U (&databuf)[N]) : mDataBuf(databuf), mDataLen(N)
@@ -88,12 +96,9 @@ public:
     constexpr pointer end() const { return data() + size(); }
 
     // Element accessors, matching the std::span API.
-    // VerifyOrDie cannot be used inside a constexpr function, because it uses
-    // "static" on some platforms (e.g. when CHIP_PW_TOKENIZER_LOGGING is true)
-    // and that's not allowed in constexpr functions.
     reference operator[](size_t index) const
     {
-        VerifyOrDie(index < size());
+        VerifyOrDie(index < size()); // not constexpr on some platforms
         return data()[index];
     }
     reference front() const { return (*this)[0]; }
@@ -184,7 +189,7 @@ struct zero_limit<uint8_t> : std::integral_constant<size_t, 65>
 };
 
 template <class T>
-constexpr T kZeroes[zero_limit<T>::value]{};
+inline constexpr T kZeroes[zero_limit<T>::value]{};
 
 template <class T, size_t N>
 constexpr T const * shared_zeroes()
@@ -223,8 +228,11 @@ public:
                                           std::is_convertible<U, T *>::value>>
     explicit FixedSpan(U databuf) : mDataBuf(databuf)
     {
-        VerifyOrDie(databuf != nullptr || N == 0);
+        VerifyOrDie(databuf != nullptr || N == 0); // not constexpr on some platforms
     }
+
+    // FixedSpan does not support an empty / null state.
+    FixedSpan(std::nullptr_t null) = delete;
 
     template <class U, size_t M, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
     constexpr explicit FixedSpan(U (&databuf)[M]) : mDataBuf(databuf)
