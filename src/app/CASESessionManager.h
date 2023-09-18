@@ -117,7 +117,7 @@ public:
      */
     void FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                 Callback::Callback<OnDeviceConnectionFailure> * onFailure,
-                                Callback::Callback<OnExtendedDeviceConnectionFailure> * onExtendedConnectionFailure
+                                Callback::Callback<OperationalSessionSetup::OnExtendedSetupFailure> * onExtendedConnectionFailure
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                 ,
                                 uint8_t attemptCount = 1, Callback::Callback<OnDeviceConnectionRetry> * onRetry = nullptr

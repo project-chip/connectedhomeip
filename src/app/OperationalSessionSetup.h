@@ -109,29 +109,6 @@ private:
     ScopedNodeId mPeerScopedNodeId;
 };
 
-enum class CaseSessionState : uint8_t
-{
-    Uninitialized,    // Error state: OperationalSessionSetup is useless
-    NeedsAddress,     // No address known, lookup not started yet.
-    ResolvingAddress, // Address lookup in progress.
-    HasAddress,       // Have an address, CASE handshake not started yet.
-    Connecting,       // CASE handshake in progress.
-    SecureConnected,  // CASE session established.
-    WaitingForRetry,  // No address known, but a retry is pending.  Added at
-                      // end to make logs easier to understand.
-};
-
-struct ConnnectionFailureInfo
-{
-    const ScopedNodeId & peerId;
-    CHIP_ERROR error;
-    CaseSessionState sessionState;
-
-    ConnnectionFailureInfo(const ScopedNodeId & peer, CHIP_ERROR err, CaseSessionState state) :
-        peerId(peer), error(err), sessionState(state)
-    {}
-};
-
 /**
  * @brief Callback prototype when secure session is established.
  *
@@ -145,11 +122,6 @@ typedef void (*OnDeviceConnected)(void * context, Messaging::ExchangeManager & e
  * Callback prototype when secure session establishment fails.
  */
 typedef void (*OnDeviceConnectionFailure)(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
-
-/**
- * Callback prototype when secure session establishment fails.
- */
-typedef void (*OnExtendedDeviceConnectionFailure)(void * context, const ConnnectionFailureInfo & failureInfo);
 
 /**
  * Callback prototype when secure session establishement has failed and will be
@@ -183,6 +155,34 @@ typedef void (*OnDeviceConnectionRetry)(void * context, const ScopedNodeId & pee
 class DLL_EXPORT OperationalSessionSetup : public SessionEstablishmentDelegate, public AddressResolve::NodeListener
 {
 public:
+    enum class State : uint8_t
+    {
+        Uninitialized,    // Error state: OperationalSessionSetup is useless
+        NeedsAddress,     // No address known, lookup not started yet.
+        ResolvingAddress, // Address lookup in progress.
+        HasAddress,       // Have an address, CASE handshake not started yet.
+        Connecting,       // CASE handshake in progress.
+        SecureConnected,  // CASE session established.
+        WaitingForRetry,  // No address known, but a retry is pending.  Added at
+                          // end to make logs easier to understand.
+    };
+
+    struct ConnnectionFailureInfo
+    {
+        const ScopedNodeId & peerId;
+        CHIP_ERROR error;
+        OperationalSessionSetup::State sessionState;
+
+        ConnnectionFailureInfo(const ScopedNodeId & peer, CHIP_ERROR err, OperationalSessionSetup::State state) :
+            peerId(peer), error(err), sessionState(state)
+        {}
+    };
+
+    using OnSetupSuccessful      = OnDeviceConnected;
+    using OnSetupFailure         = OnDeviceConnectionFailure;
+    using OnSetupRetry           = OnDeviceConnectionRetry;
+    using OnExtendedSetupFailure = void (*)(void * context, const ConnnectionFailureInfo & failureInfo);
+
     ~OperationalSessionSetup() override;
 
     OperationalSessionSetup(const CASEClientInitParams & params, CASEClientPoolDelegate * clientPool, ScopedNodeId peerId,
@@ -191,14 +191,14 @@ public:
         mInitParams = params;
         if (params.Validate() != CHIP_NO_ERROR || clientPool == nullptr || releaseDelegate == nullptr)
         {
-            mState = CaseSessionState::Uninitialized;
+            mState = State::Uninitialized;
             return;
         }
 
         mClientPool      = clientPool;
         mPeerId          = peerId;
         mReleaseDelegate = releaseDelegate;
-        mState           = CaseSessionState::NeedsAddress;
+        mState           = State::NeedsAddress;
         mAddressLookupHandle.SetListener(this);
     }
 
@@ -218,7 +218,7 @@ public:
      * cases that are detected synchronously (e.g. inability to start an address
      * lookup).
      */
-    void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure);
+    void Connect(Callback::Callback<OnSetupSuccessful> * onConnection, Callback::Callback<OnSetupFailure> * onFailure);
 
     /*
      * This function can be called to establish a secure session with the device.
@@ -236,8 +236,8 @@ public:
      * cases that are detected synchronously (e.g. inability to start an address
      * lookup).
      */
-    void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure,
-                 Callback::Callback<OnExtendedDeviceConnectionFailure> * onExtendedConnectionFailure);
+    void Connect(Callback::Callback<OnSetupSuccessful> * onConnection, Callback::Callback<OnSetupFailure> * onFailure,
+                 Callback::Callback<OnExtendedSetupFailure> * onExtendedConnectionFailure);
 
     bool IsForAddressUpdate() const { return mPerformingAddressUpdate; }
 
@@ -247,7 +247,7 @@ public:
 
     ScopedNodeId GetPeerId() const { return mPeerId; }
 
-    CaseSessionState GetCaseSessionState() const { return mState; }
+    State GetOperationalSessionSetupState() const { return mState; }
 
     static Transport::PeerAddress ToPeerAddress(const Dnssd::ResolvedNodeData & nodeData)
     {
@@ -282,15 +282,15 @@ public:
     void UpdateAttemptCount(uint8_t attemptCount);
 
     // Add a retry handler for this session setup.
-    void AddRetryHandler(Callback::Callback<OnDeviceConnectionRetry> * onRetry);
+    void AddRetryHandler(Callback::Callback<OnSetupRetry> * onRetry);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
 private:
     CASEClientInitParams mInitParams;
     CASEClientPoolDelegate * mClientPool = nullptr;
 
-    // mCASEClient is only non-null if we are in CaseSessionState::Connecting or just
-    // allocated it as part of an attempt to enter CaseSessionState::Connecting.
+    // mCASEClient is only non-null if we are in State::Connecting or just
+    // allocated it as part of an attempt to enter State::Connecting.
     CASEClient * mCASEClient = nullptr;
 
     ScopedNodeId mPeerId;
@@ -308,7 +308,7 @@ private:
     /// This is used when a node address is required.
     chip::AddressResolve::NodeLookupHandle mAddressLookupHandle;
 
-    CaseSessionState mState = CaseSessionState::Uninitialized;
+    State mState = State::Uninitialized;
 
     bool mPerformingAddressUpdate = false;
 
@@ -321,7 +321,7 @@ private:
     Callback::CallbackDeque mConnectionRetry;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
-    void MoveToState(CaseSessionState aTargetState);
+    void MoveToState(State aTargetState);
 
     CHIP_ERROR EstablishConnection(const ReliableMessageProtocolConfig & config);
 
@@ -336,9 +336,9 @@ private:
 
     void CleanupCASEClient();
 
-    void EnqueueConnectionCallbacks(Callback::Callback<OnDeviceConnected> * onConnection,
-                                    Callback::Callback<OnDeviceConnectionFailure> * onFailure,
-                                    Callback::Callback<OnExtendedDeviceConnectionFailure> * onExtendedConnectionFailure);
+    void EnqueueConnectionCallbacks(Callback::Callback<OnSetupSuccessful> * onConnection,
+                                    Callback::Callback<OnSetupFailure> * onFailure,
+                                    Callback::Callback<OnExtendedSetupFailure> * onExtendedConnectionFailure);
 
     enum class ReleaseBehavior
     {
@@ -367,7 +367,7 @@ private:
      * being released.
      */
     static void NotifyConnectionCallbacks(Callback::Cancelable & failureReady, Callback::Cancelable & extendedFailureReady,
-                                          Callback::Cancelable & successReady, CHIP_ERROR error, CaseSessionState state,
+                                          Callback::Cancelable & successReady, CHIP_ERROR error, State state,
                                           const ScopedNodeId & peerId, bool performingAddressUpdate,
                                           Messaging::ExchangeManager * exchangeMgr,
                                           const Optional<SessionHandle> & optionalSessionHandle);

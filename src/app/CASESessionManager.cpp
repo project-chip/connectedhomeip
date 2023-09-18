@@ -46,7 +46,7 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
 
 void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                                 Callback::Callback<OnDeviceConnectionFailure> * onFailure,
-                                                Callback::Callback<OnExtendedDeviceConnectionFailure> * onExtendedConnectionFailure
+                                                Callback::Callback<OperationalSessionSetup::OnExtendedSetupFailure> * onExtendedConnectionFailure
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                                 ,
                                                 uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry
@@ -80,7 +80,7 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
             else if (onExtendedConnectionFailure != nullptr)
             {
                 // Initialize the ConnnectionFailureInfo object
-                ConnnectionFailureInfo failureInfo(peerId, CHIP_ERROR_NO_MEMORY, CaseSessionState::Uninitialized);
+                OperationalSessionSetup::ConnnectionFailureInfo failureInfo(peerId, CHIP_ERROR_NO_MEMORY, OperationalSessionSetup::State::Uninitialized);
                 onExtendedConnectionFailure->mCall(onExtendedConnectionFailure->mContext, failureInfo);
             }
 

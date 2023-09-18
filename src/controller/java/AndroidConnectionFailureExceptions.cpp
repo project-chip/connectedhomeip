@@ -25,7 +25,7 @@
 namespace chip {
 
 CHIP_ERROR AndroidConnectionFailureExceptions::CreateAndroidConnectionFailureException(JNIEnv * env, const char * message,
-                                                                                       uint32_t errorCode, CaseSessionState state,
+                                                                                       uint32_t errorCode, OperationalSessionSetup::State state,
                                                                                        jthrowable & outEx)
 {
     jclass controllerExceptionCls;

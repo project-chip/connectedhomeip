@@ -232,7 +232,7 @@ public:
      */
     CHIP_ERROR GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
                                   chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure,
-                                  chip::Callback::Callback<OnExtendedDeviceConnectionFailure> * onExtendedConnectionFailure)
+                                  chip::Callback::Callback<OperationalSessionSetup::OnExtendedSetupFailure> * onExtendedConnectionFailure)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
@@ -251,7 +251,7 @@ public:
     }
 
     CHIP_ERROR GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                  chip::Callback::Callback<OnExtendedDeviceConnectionFailure> * onExtendedDeviceConnectionFailure)
+                                  chip::Callback::Callback<OperationalSessionSetup::OnExtendedSetupFailure> * onExtendedDeviceConnectionFailure)
     {
         return GetConnectedDevice(peerNodeId, onConnection, nullptr, onExtendedDeviceConnectionFailure);
     }

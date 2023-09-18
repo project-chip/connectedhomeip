@@ -38,10 +38,10 @@ struct GetConnectedDeviceCallback
     ~GetConnectedDeviceCallback();
 
     static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
-    static void OnDeviceConnectionFailureFn(void * context, const ConnnectionFailureInfo & failureInfo);
+    static void OnDeviceConnectionFailureFn(void * context, const OperationalSessionSetup::ConnnectionFailureInfo & failureInfo);
 
     Callback::Callback<OnDeviceConnected> mOnSuccess;
-    Callback::Callback<OnExtendedDeviceConnectionFailure> mOnFailure;
+    Callback::Callback<OperationalSessionSetup::OnExtendedSetupFailure> mOnFailure;
     jobject mWrapperCallbackRef = nullptr;
     jobject mJavaCallbackRef    = nullptr;
 };
