@@ -415,7 +415,6 @@
               - ActiveRadioFaults
               - ActiveNetworkFaults
               - TestEventTriggersEnabled
-              - AverageWearCount
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
