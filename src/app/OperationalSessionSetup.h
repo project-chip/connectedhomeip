@@ -109,7 +109,7 @@ private:
     ScopedNodeId mPeerScopedNodeId;
 };
 
-enum class CaseConnectionState : uint8_t
+enum class CaseSessionState : uint8_t
 {
     Uninitialized,    // Error state: OperationalSessionSetup is useless
     NeedsAddress,     // No address known, lookup not started yet.
