@@ -35,9 +35,7 @@ rs911x_inc_plat = [
 
   # network_manager component
   "${wifi_sdk_root}/components/service/network_manager/inc",
-
-  # nvm3
-  "${wifi_sdk_root}/components/siwx917_soc/drivers/middleware/nvm3/inc",
+  
   "${wifi_sdk_root}/components/protocol/wifi/si91x",
 ]
 
