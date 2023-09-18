@@ -38,7 +38,7 @@ template("gdbus_library") {
   config("${library_name}_compile_config") {
     # dbus code generation may generate some code detected as unreacheable
     # by recent enough clang
-    cflags = [ "-Wno-unreachable-code"]
+    cflags = [ "-Wno-unreachable-code" ]
   }
 
   dbus_sources = []
