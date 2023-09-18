@@ -36,7 +36,7 @@ class Global
 {
 public:
     /// Returns the global object, initializing it if necessary.
-    /// NOT threads-safe, external synchronization is required.
+    /// NOT thread-safe, external synchronization is required.
     T & get() { return _get(); }
     T * operator->() { return &_get(); }
 
