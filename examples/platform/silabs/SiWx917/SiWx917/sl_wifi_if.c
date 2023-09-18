@@ -94,10 +94,7 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
     ap->chan           = wfx_rsi.ap_chan;
     memcpy(&ap->bssid[0], &wfx_rsi.ap_mac.octet[0], BSSID_MAX_STR_LEN);
     sl_wifi_get_signal_strength(SL_WIFI_CLIENT_INTERFACE, &rssi);
-    if (status == SL_STATUS_OK)
-    {
-        ap->rssi = rssi;
-    }
+    ap->rssi = rssi;
     return status;
 }
 
@@ -476,6 +473,7 @@ static void wfx_rsi_do_join(void)
         status = sl_net_set_credential(id, SL_NET_WIFI_PSK, &wfx_rsi.sec.passkey[0], strlen(wfx_rsi.sec.passkey));
         if (SL_STATUS_OK != status)
         {
+            SILABS_LOG("wfx_rsi_do_join: RSI callback register join failed with status: %02x", status);
             return;
         }
 
@@ -750,7 +748,6 @@ void * wfx_rsi_alloc_pkt(uint16_t data_length)
 
     status = sl_si91x_allocate_command_buffer(&buffer, (void **) &packet, sizeof(sl_si91x_packet_t) + data_length,
                                               SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME_MS);
-    //    VERIFY_STATUS_AND_RETURN(status);
     if (packet == NULL)
     {
         return SL_STATUS_ALLOCATION_FAILED;
