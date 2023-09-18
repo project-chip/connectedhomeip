@@ -37,7 +37,9 @@ public:
     {
         DemoScreen = 0,
         StatusScreen,
+#ifdef QR_CODE_ENABLED
         QRCodeScreen,
+#endif
         InvalidScreen,
     } Screen_e;
 
