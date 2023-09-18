@@ -486,12 +486,12 @@ endforeach()
 set(components_to_link esp_event hal esp_system soc efuse vfs driver esp_coex freertos)
 idf_build_get_property(build_components BUILD_COMPONENTS)
 foreach(component ${components_to_link})
-	# Some of the components are not present in IDF v4.x
-        # So, Check if the component is in the list of build components
-   	if("${component}" IN_LIST build_components)
+    # Some of the components are not present in IDF v4.x
+    # So, Check if the component is in the list of build components
+    if("${component}" IN_LIST build_components)
         idf_component_get_property(lib_name ${component} COMPONENT_LIB)
+        list(APPEND chip_libraries $<TARGET_FILE:${lib_name}>)
     endif()
-    list(APPEND chip_libraries $<TARGET_FILE:${lib_name}>)
 endforeach()
 
 target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
