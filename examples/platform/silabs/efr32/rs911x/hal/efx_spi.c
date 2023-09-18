@@ -54,7 +54,6 @@
 #ifdef CHIP_9117
 #include "cmsis_os2.h"
 #include "sl_board_configuration.h"
-#include "sl_wifi_types.h"
 #include "sl_net.h"
 #include "sl_si91x_driver.h"
 #include "sl_si91x_types.h"

@@ -42,7 +42,7 @@ rs911x_inc_plat = [
 ]
 
 rs911x_cflags = [ "-Wno-empty-body" ]
- rs911x_src_sapi = [
+rs911x_src_sapi = [
   "${wifi_sdk_root}/components/si91x/src/sl_si91x_driver.c",
   "${wifi_sdk_root}/components/si91x/spi_interface/sl_si91x_spi_driver.c",
   "${wifi_sdk_root}/components/si91x/src/sl_rsi_utility.c",
@@ -71,6 +71,3 @@ rs911x_cflags = [ "-Wno-empty-body" ]
   "${wifi_sdk_root}/components/service/network_manager/src/sl_net.c",
   "${wifi_sdk_root}/components/si91x/platforms/efx32/efx32_ncp_host.c",
 ]
-
-
-
