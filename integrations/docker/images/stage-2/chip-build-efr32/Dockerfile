@@ -33,6 +33,14 @@ RUN wget https://www.silabs.com/documents/login/software/slc_cli_linux.zip && \
 
 ENV PATH="${PATH}:/slc_cli/"
 
+#Clone Wiseconnect SDK 3.1.0-MatterCert (f84bf66)
+RUN git clone --depth=1 --branch=MatterCert https://github.com/SiliconLabs/wiseconnect.git wifi_sdk && \
+    cd wifi_sdk && \
+    rm -rf .git \
+    && : # last line
+
+ENV WISECONNECT_PATH=/wifi_sdk/
+
 # Install Python Packages
 
 # codegen.py build requirements
