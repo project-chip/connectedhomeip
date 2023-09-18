@@ -71,6 +71,8 @@ enum class MsgType : uint8_t
     CASE_Sigma2Resume = 0x33,
 
     StatusReport = 0x40,
+
+    ICD_CheckIn = 0X50,
 };
 
 // Placeholder value for the ProtocolCode field when the GeneralCode is Success or Continue.
