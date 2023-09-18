@@ -99,9 +99,9 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #include "wfx_msgs.h"
 
 #if (SIWX_917 | EXP_BOARD)
-#include "sl_wifi_constants.h"
 #include "sl_si91x_types.h"
 #include "sl_status.h"
+#include "sl_wifi_constants.h"
 
 #define SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME 1000
 #endif
@@ -361,7 +361,6 @@ void wfx_ipv6_notify(int got_ip);
 #if !(SIWX_917 | EXP_BOARD)
 void * wfx_rsi_alloc_pkt(void);
 #endif
-
 
 #ifdef RS911X_WIFI
 /* RSI Power Save */

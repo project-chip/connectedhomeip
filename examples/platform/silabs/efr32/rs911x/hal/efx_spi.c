@@ -52,14 +52,15 @@
 #include "wfx_rsi.h"
 
 #ifdef CHIP_9117
-#include "sl_si91x_driver.h"
 #include "cmsis_os2.h"
-#include "sl_net.h"
 #include "sl_board_configuration.h"
 #include "sl_wifi_types.h"
+#include "sl_net.h"
+#include "sl_si91x_driver.h"
 #include "sl_si91x_types.h"
 #include "sl_wifi_callback_framework.h"
 #include "sl_wifi_constants.h"
+#include "sl_wifi_types.h"
 #else
 #include "rsi_board_configuration.h"
 #include "rsi_driver.h"
@@ -200,9 +201,8 @@ sl_status_t sl_si91x_host_bus_init(void)
 
 void sl_si91x_host_enable_high_speed_bus()
 {
-   //dummy function for wifi-sdk
+    // dummy function for wifi-sdk
 }
-
 
 #if defined(EFR32MG24)
 
@@ -372,8 +372,8 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     */
     if (xlen <= MIN_XLEN || (tx_buf == NULL && rx_buf == NULL))
     {
-        rx_buf = (uint8_t *)&dummy_buffer;
-        tx_buf = (uint8_t *)&dummy_buffer;
+        rx_buf = (uint8_t *) &dummy_buffer;
+        tx_buf = (uint8_t *) &dummy_buffer;
     }
 
     (void) mode; // currently not used;
@@ -430,7 +430,6 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     return rsiError;
 }
 
-
 /*********************************************************************
  * @fn   int16_t rsi_spi_transfer(uint8_t *tx_buf, uint8_t *rx_buf, uint16_t xlen, uint8_t mode)
  * @brief
@@ -442,7 +441,7 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
  * @return
  *        None
  **************************************************************************/
-sl_status_t sl_si91x_host_spi_transfer(const void *tx_buf, void *rx_buf, uint16_t xlen)
+sl_status_t sl_si91x_host_spi_transfer(const void * tx_buf, void * rx_buf, uint16_t xlen)
 {
-    return(rsi_spi_transfer((uint8_t *)tx_buf, rx_buf, xlen, DEFAULT_SPI_TRASFER_MODE));
+    return (rsi_spi_transfer((uint8_t *) tx_buf, rx_buf, xlen, DEFAULT_SPI_TRASFER_MODE));
 }

@@ -18,7 +18,6 @@
 #ifndef RSI_BLE_CONFIG_H
 #define RSI_BLE_CONFIG_H
 
-
 #include "rsi_ble_apis.h"
 #if (SIWX_917 | EXP_BOARD)
 #include "rsi_user.h"

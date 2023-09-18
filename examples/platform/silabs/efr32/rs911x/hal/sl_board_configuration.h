@@ -24,11 +24,8 @@ typedef struct
     unsigned char pin;
 } sl_pin_t;
 
-#define PIN(port_id, pin_id)                 \
-  (sl_pin_t)                                 \
-  {                                          \
-    .port = gpioPort##port_id, .pin = pin_id \
-  }
+#define PIN(port_id, pin_id)                                                                                                       \
+    (sl_pin_t) { .port = gpioPort##port_id, .pin = pin_id }
 
 #define PACKET_PENDING_INT_PRI 3
 
@@ -47,6 +44,5 @@ typedef struct
 #endif
 
 
-#define NETWORK_INTERFACE_VALID(x) \
-  (x == SL_NET_DEFAULT_WIFI_CLIENT_INTERFACE) || (x == SL_NET_DEFAULT_WIFI_AP_INTERFACE)
+#define NETWORK_INTERFACE_VALID(x) (x == SL_NET_DEFAULT_WIFI_CLIENT_INTERFACE) || (x == SL_NET_DEFAULT_WIFI_AP_INTERFACE)
 #endif /* _RSI_BOARD_CONFIGURATION_H_ */
