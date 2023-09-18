@@ -49,7 +49,11 @@ controlled by the `chip_enable_ota_requestor` compile flag.
     OTA file created in the previous step:
 
     ```shell
-    $ rm -r /tmp/chip_* ./out/debug/chip-ota-provider-app -f chip-efr32-lighting-example.ota
+    $ rm -r /tmp/chip_kvs_provider
+    ```
+
+    ```shell
+    $ ./out/debug/chip-ota-provider-app --KVS /tmp/chip_kvs_provider -f chip-efr32-lighting-example.ota
     ```
 
 -   In a separate terminal run the chip-tool commands to provision the Provider:
@@ -75,7 +79,7 @@ where operationalDataset is obtained from the OpenThread Border Router.
 -   Once the commissioning process completes enter:
 
     ```shell
-    $ ./out/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+    $ ./out/chip-tool otasoftwareupdaterequestor announce-otaprovider 1 0 0 0 2 0
     ```
 
 -   The application device will connect to the Provider and start the image
