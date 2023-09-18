@@ -224,7 +224,7 @@ void SilabsLCD::CycleScreens(void)
 {
 #ifdef QR_CODE_ENABLED
     if (mCurrentScreen < QRCodeScreen)
-#elif
+#else
     if (mCurrentScreen < StatusScreen)
 #endif
     {
