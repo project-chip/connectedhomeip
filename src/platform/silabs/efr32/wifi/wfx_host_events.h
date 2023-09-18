@@ -103,7 +103,7 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #include "sl_status.h"
 #include "sl_wifi_constants.h"
 
-#define SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME 1000
+#define SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME_MS 1000
 #endif
 
 /* Wi-Fi events*/

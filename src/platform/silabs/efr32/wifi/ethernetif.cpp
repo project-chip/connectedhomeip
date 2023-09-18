@@ -378,7 +378,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     /* Confirm if packet is allocated */
 #if (SIWX_917 | EXP_BOARD)
     status = sl_si91x_allocate_command_buffer(&buffer, (void **) &packet, sizeof(sl_si91x_packet_t) + p->len,
-                                              SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME);
+                                              SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME_MS);
     VERIFY_STATUS_AND_RETURN(status);
     if (packet == NULL)
 #else  // RS9116
