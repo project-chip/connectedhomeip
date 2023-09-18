@@ -125,10 +125,10 @@ struct ConnnectionFailureInfo
 {
     const ScopedNodeId & peerId;
     CHIP_ERROR error;
-    CaseConnectionState connectionState;
+    CaseSessionState sessionState;
 
-    ConnnectionFailureInfo(const ScopedNodeId & peer, CHIP_ERROR err, CaseConnectionState state) :
-        peerId(peer), error(err), connectionState(state)
+    ConnnectionFailureInfo(const ScopedNodeId & peer, CHIP_ERROR err, CaseSessionState state) :
+        peerId(peer), error(err), sessionState(state)
     {}
 };
 
@@ -191,14 +191,14 @@ public:
         mInitParams = params;
         if (params.Validate() != CHIP_NO_ERROR || clientPool == nullptr || releaseDelegate == nullptr)
         {
-            mState = CaseConnectionState::Uninitialized;
+            mState = CaseSessionState::Uninitialized;
             return;
         }
 
         mClientPool      = clientPool;
         mPeerId          = peerId;
         mReleaseDelegate = releaseDelegate;
-        mState           = CaseConnectionState::NeedsAddress;
+        mState           = CaseSessionState::NeedsAddress;
         mAddressLookupHandle.SetListener(this);
     }
 
@@ -247,7 +247,7 @@ public:
 
     ScopedNodeId GetPeerId() const { return mPeerId; }
 
-    CaseConnectionState GetCaseConnectionState() const { return mState; }
+    CaseSessionState GetCaseSessionState() const { return mState; }
 
     static Transport::PeerAddress ToPeerAddress(const Dnssd::ResolvedNodeData & nodeData)
     {
@@ -289,8 +289,8 @@ private:
     CASEClientInitParams mInitParams;
     CASEClientPoolDelegate * mClientPool = nullptr;
 
-    // mCASEClient is only non-null if we are in CaseConnectionState::Connecting or just
-    // allocated it as part of an attempt to enter CaseConnectionState::Connecting.
+    // mCASEClient is only non-null if we are in CaseSessionState::Connecting or just
+    // allocated it as part of an attempt to enter CaseSessionState::Connecting.
     CASEClient * mCASEClient = nullptr;
 
     ScopedNodeId mPeerId;
@@ -308,7 +308,7 @@ private:
     /// This is used when a node address is required.
     chip::AddressResolve::NodeLookupHandle mAddressLookupHandle;
 
-    CaseConnectionState mState = CaseConnectionState::Uninitialized;
+    CaseSessionState mState = CaseSessionState::Uninitialized;
 
     bool mPerformingAddressUpdate = false;
 
@@ -321,7 +321,7 @@ private:
     Callback::CallbackDeque mConnectionRetry;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
-    void MoveToState(CaseConnectionState aTargetState);
+    void MoveToState(CaseSessionState aTargetState);
 
     CHIP_ERROR EstablishConnection(const ReliableMessageProtocolConfig & config);
 
@@ -367,7 +367,7 @@ private:
      * being released.
      */
     static void NotifyConnectionCallbacks(Callback::Cancelable & failureReady, Callback::Cancelable & extendedFailureReady,
-                                          Callback::Cancelable & successReady, CHIP_ERROR error, CaseConnectionState state,
+                                          Callback::Cancelable & successReady, CHIP_ERROR error, CaseSessionState state,
                                           const ScopedNodeId & peerId, bool performingAddressUpdate,
                                           Messaging::ExchangeManager * exchangeMgr,
                                           const Optional<SessionHandle> & optionalSessionHandle);

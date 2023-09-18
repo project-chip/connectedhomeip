@@ -179,7 +179,7 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, con
 
     jthrowable exception;
     CHIP_ERROR err = AndroidConnectionFailureExceptions::GetInstance().CreateAndroidConnectionFailureException(
-        env, ErrorStr(failureInfo.error), failureInfo.error.AsInteger(), failureInfo.connectionState, exception);
+        env, ErrorStr(failureInfo.error), failureInfo.error.AsInteger(), failureInfo.sessionState, exception);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         ChipLogError(Controller,

@@ -80,7 +80,7 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
             else if (onExtendedConnectionFailure != nullptr)
             {
                 // Initialize the ConnnectionFailureInfo object
-                ConnnectionFailureInfo failureInfo(peerId, CHIP_ERROR_NO_MEMORY, CaseConnectionState::Uninitialized);
+                ConnnectionFailureInfo failureInfo(peerId, CHIP_ERROR_NO_MEMORY, CaseSessionState::Uninitialized);
                 onExtendedConnectionFailure->mCall(onExtendedConnectionFailure->mContext, failureInfo);
             }
 

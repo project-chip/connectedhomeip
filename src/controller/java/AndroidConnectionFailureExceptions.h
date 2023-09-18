@@ -39,7 +39,7 @@ public:
      * Creates a Java ConnectionFailureException object in outEx.
      */
     CHIP_ERROR CreateAndroidConnectionFailureException(JNIEnv * env, const char * message, uint32_t errorCode,
-                                                       CaseConnectionState state, jthrowable & outEx);
+                                                       CaseSessionState state, jthrowable & outEx);
 
 private:
     AndroidConnectionFailureExceptions() {}
