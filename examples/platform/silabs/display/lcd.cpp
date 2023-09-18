@@ -212,9 +212,11 @@ void SilabsLCD::SetScreen(Screen_e screen)
     case StatusScreen:
         WriteStatus();
         break;
+#ifdef QR_CODE_ENABLED
     case QRCodeScreen:
         WriteQRCode();
         break;
+#endif
     default:
         break;
     }
@@ -286,9 +288,9 @@ void SilabsLCD::SetQRCode(uint8_t * str, uint32_t size)
 void SilabsLCD::ShowQRCode(bool show)
 {
     if (mCurrentScreen != QRCodeScreen)
-    {
-        mCurrentScreen = QRCodeScreen;
-    }
+        {
+            mCurrentScreen = QRCodeScreen;
+        }
 
     WriteQRCode();
 }

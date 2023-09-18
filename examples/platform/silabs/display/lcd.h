@@ -74,7 +74,9 @@ private:
         bool protocol1 = false; /* data */
     } DemoState_t;
 
+#ifdef QR_CODE_ENABLED
     void WriteQRCode();
+#endif
     void WriteDemoUI();
     void WriteStatus();
 #ifdef QR_CODE_ENABLED
