@@ -58,9 +58,12 @@ class MatterMdnsListener(ServiceListener):
             name: str,
             delta_type: str) -> None:
         info = zc.get_service_info(type_, name)
-        to_log = f"SERVICE {delta_type}\n"
-        to_log += f"{name}\n"
-        to_log += f"{info.properties}\n"
+        to_log = f"{name}\n"
+        if info.properties is not None:
+            for name, value in info.properties.items():
+                to_log += f"{name}:\t{value}\n"
+        update_str = f"\nSERVICE {delta_type}\n"
+        to_log += ("*" * (len(update_str) - 2)) + update_str
         to_log += _MDNS_TYPES[type_]
         to_log += self.log_vid_pid(info)
         to_log += self.log_addr(info)
