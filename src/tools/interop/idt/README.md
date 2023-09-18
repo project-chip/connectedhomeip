@@ -84,7 +84,7 @@ environment.
 
 1. On your admin computer, source the `alias` script from the parent directory
    of `idt` to get `idt` commands in your current shell.
-    ```bash
+    ```
      source idt/scripts/alias.sh
     ```
     - To avoid having to repeat this step for each session, optionally configure
@@ -92,7 +92,7 @@ environment.
     - **_NOTE:_** Once run, `idt` commands will be globally and automatically
       available. If you need to remove the installation, edit the `.rc` files
       mentioned in `setup_shell`.
-    ```bash
+    ```
     source idt/scripts/setup_shell.sh
     ```
 1. Send `idt` to the RPi:
