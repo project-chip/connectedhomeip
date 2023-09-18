@@ -163,7 +163,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     ef_set_env_blob(APP_REBOOT_RESET_COUNT_KEY, &resetCnt, sizeof(resetCnt));
 #endif
 
-    GetAppTask().sTimer = xTimerCreate("lightTmr", pdMS_TO_TICKS(1000), false, NULL, AppTask::TimerCallback);
+    GetAppTask().sTimer = xTimerCreate("lightTmr", pdMS_TO_TICKS(APP_TIMER_EVENT_DEFAULT_ITVL), false, NULL, AppTask::TimerCallback);
     if (GetAppTask().sTimer == NULL)
     {
         ChipLogError(NotSpecified, "Failed to create timer task");
@@ -311,7 +311,7 @@ bool AppTask::StartTimer(void)
 
     if (GetAppTask().mTimerIntvl == 0)
     {
-        GetAppTask().mTimerIntvl = 1000;
+        GetAppTask().mTimerIntvl = APP_TIMER_EVENT_DEFAULT_ITVL;
     }
 
     if (xTimerChangePeriod(GetAppTask().sTimer, pdMS_TO_TICKS(GetAppTask().mTimerIntvl), pdMS_TO_TICKS(100)) != pdPASS)
@@ -334,26 +334,46 @@ void AppTask::TimerCallback(TimerHandle_t xTimer)
 
 void AppTask::TimerEventHandler(app_event_t event)
 {
+    uint32_t pressedTime = 0;
+
     if (GetAppTask().mButtonPressedTime)
     {
+        pressedTime = System::SystemClock().GetMonotonicMilliseconds64().count() - GetAppTask().mButtonPressedTime;
 #ifdef BOOT_PIN_RESET
-        if (System::SystemClock().GetMonotonicMilliseconds64().count() - GetAppTask().mButtonPressedTime > APP_BUTTON_PRESS_LONG)
-        {
-            GetAppTask().PostEvent(APP_EVENT_BTN_LONG);
-        }
-        else if (System::SystemClock().GetMonotonicMilliseconds64().count() - GetAppTask().mButtonPressedTime >=
-                 APP_BUTTON_PRESS_SHORT)
-        {
+        if (ButtonPressed()) {
+            if (pressedTime > APP_BUTTON_PRESS_LONG)
+            {
+                GetAppTask().PostEvent(APP_EVENT_BTN_LONG);
+            }
+            else if (pressedTime >= APP_BUTTON_PRESS_SHORT)
+            {
 #if defined(BL602_NIGHT_LIGHT) || defined(BL706_NIGHT_LIGHT)
-            /** change color to indicate to wait factory reset confirm */
-            sLightLED.SetColor(254, 0, 210);
+                /** change color to indicate to wait factory reset confirm */
+                sLightLED.SetColor(254, 0, 210);
 #else
-            /** toggle led to indicate to wait factory reset confirm */
-            sLightLED.Toggle();
+                /** toggle led to indicate to wait factory reset confirm */
+                sLightLED.Toggle();
 #endif
+            }
+        }
+        else {
+            if (pressedTime >= APP_BUTTON_PRESS_LONG)
+            {
+                GetAppTask().PostEvent(APP_EVENT_FACTORY_RESET);
+            }
+            else if (APP_BUTTON_PRESS_SHORT >= pressedTime && pressedTime >= APP_BUTTON_PRESS_JITTER)
+            {
+                GetAppTask().PostEvent(APP_EVENT_BTN_SHORT);
+            }
+            else {
+                GetAppTask().PostEvent(APP_EVENT_LIGHTING_MASK);
+            }
+
+            GetAppTask().mTimerIntvl        = APP_BUTTON_PRESSED_ITVL;
+            GetAppTask().mButtonPressedTime = 0;
         }
 #else
-        if (System::SystemClock().GetMonotonicMilliseconds64().count() - GetAppTask().mButtonPressedTime > APP_BUTTON_PRESS_LONG)
+        if (pressedTime > APP_BUTTON_PRESS_LONG)
         {
             /** factory reset confirm timeout */
             GetAppTask().mButtonPressedTime = 0;
@@ -371,6 +391,14 @@ void AppTask::TimerEventHandler(app_event_t event)
         }
 #endif
     }
+#ifdef BOOT_PIN_RESET
+    else {
+        if (ButtonPressed()) {
+            GetAppTask().mTimerIntvl        = APP_BUTTON_PRESSED_ITVL;
+            GetAppTask().mButtonPressedTime = System::SystemClock().GetMonotonicMilliseconds64().count();
+        }
+    }
+#endif
 
     StartTimer();
 }
@@ -434,49 +462,10 @@ bool AppTask::ButtonPressed(void)
     return val == 1;
 }
 
-void AppTask::ButtonEventHandler(void * arg)
+void AppTask::ButtonEventHandler(void * arg) 
 {
-    uint32_t presstime;
-
-    if (ButtonPressed())
-    {
-#if BL702L_ENABLE
-        bl_set_gpio_intmod(gpio_key.port, HOSAL_IRQ_TRIG_NEG_LEVEL);
-#else
-        bl_set_gpio_intmod(gpio_key.port, 1, HOSAL_IRQ_TRIG_NEG_LEVEL);
-#endif
-        GetAppTask().mButtonPressedTime = System::SystemClock().GetMonotonicMilliseconds64().count();
-        GetAppTask().mTimerIntvl        = APP_BUTTON_PRESS_JITTER;
-        GetAppTask().PostEvent(APP_EVENT_TIMER);
-    }
-    else
-    {
-#if BL702L_ENABLE
-        bl_set_gpio_intmod(gpio_key.port, HOSAL_IRQ_TRIG_POS_PULSE);
-#else
-        bl_set_gpio_intmod(gpio_key.port, 1, HOSAL_IRQ_TRIG_POS_PULSE);
-#endif
-
-        if (GetAppTask().mButtonPressedTime)
-        {
-            presstime = System::SystemClock().GetMonotonicMilliseconds64().count() - GetAppTask().mButtonPressedTime;
-            if (presstime >= APP_BUTTON_PRESS_LONG)
-            {
-                GetAppTask().PostEvent(APP_EVENT_FACTORY_RESET);
-            }
-            else if (presstime <= APP_BUTTON_PRESS_SHORT && presstime >= APP_BUTTON_PRESS_JITTER)
-            {
-                GetAppTask().mTimerIntvl = 1000;
-                GetAppTask().PostEvent(APP_EVENT_BTN_SHORT);
-            }
-            else
-            {
-                GetAppTask().mTimerIntvl = 1000;
-                GetAppTask().PostEvent(APP_EVENT_LIGHTING_MASK);
-            }
-        }
-
-        GetAppTask().mButtonPressedTime = 0;
+    if (ButtonPressed()) {
+        GetAppTask().PostEvent(APP_EVENT_BTN_ISR);
     }
 }
 #endif
