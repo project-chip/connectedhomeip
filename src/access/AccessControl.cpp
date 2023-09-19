@@ -23,18 +23,19 @@
 
 #include "AccessControl.h"
 
+#include <lib/core/Global.h>
+
 namespace chip {
 namespace Access {
 
 using chip::CATValues;
 using chip::FabricIndex;
 using chip::NodeId;
-using namespace chip::Access;
 
 namespace {
 
-AccessControl defaultAccessControl;
-AccessControl * globalAccessControl = &defaultAccessControl;
+Global<AccessControl> defaultAccessControl;
+AccessControl * globalAccessControl = nullptr; // lazily defaulted to defaultAccessControl in GetAccessControl
 
 static_assert(((unsigned(Privilege::kAdminister) & unsigned(Privilege::kManage)) == 0) &&
                   ((unsigned(Privilege::kAdminister) & unsigned(Privilege::kOperate)) == 0) &&
@@ -174,8 +175,8 @@ char GetPrivilegeStringForLogging(Privilege privilege)
 
 } // namespace
 
-AccessControl::Entry::Delegate AccessControl::Entry::mDefaultDelegate;
-AccessControl::EntryIterator::Delegate AccessControl::EntryIterator::mDefaultDelegate;
+Global<AccessControl::Entry::Delegate> AccessControl::Entry::mDefaultDelegate;
+Global<AccessControl::EntryIterator::Delegate> AccessControl::EntryIterator::mDefaultDelegate;
 
 CHIP_ERROR AccessControl::Init(AccessControl::Delegate * delegate, DeviceTypeResolver & deviceTypeResolver)
 {
@@ -631,7 +632,7 @@ void AccessControl::NotifyEntryChanged(const SubjectDescriptor * subjectDescript
 
 AccessControl & GetAccessControl()
 {
-    return *globalAccessControl;
+    return (globalAccessControl) ? *globalAccessControl : defaultAccessControl.get();
 }
 
 void SetAccessControl(AccessControl & accessControl)
@@ -642,7 +643,7 @@ void SetAccessControl(AccessControl & accessControl)
 
 void ResetAccessControlToDefault()
 {
-    globalAccessControl = &defaultAccessControl;
+    globalAccessControl = nullptr;
 }
 
 } // namespace Access
