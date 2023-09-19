@@ -72,7 +72,7 @@ enum class MsgType : uint8_t
 
     StatusReport = 0x40,
 
-    ICD_CheckIn = 0X50,
+    ICD_CheckIn = 0x50,
 };
 
 // Placeholder value for the ProtocolCode field when the GeneralCode is Success or Continue.
