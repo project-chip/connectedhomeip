@@ -14,16 +14,37 @@
 
 import itertools
 import logging
-from enum import Enum, auto
-from typing import List, Optional
+import enum
+from typing import Callable, Dict, List, Optional, Protocol, TypeVar
 
 from matter_idl.matter_idl_types import Bitmap, Cluster, ClusterSide, Command, Enum, Event, Idl, Struct
 
 
-class Compatibility(Enum):
-    UNKNOWN = auto()
-    COMPATIBLE = auto()
-    INCOMPATIBLE = auto()
+class Compatibility(enum.Enum):
+    UNKNOWN = enum.auto()
+    COMPATIBLE = enum.auto()
+    INCOMPATIBLE = enum.auto()
+
+
+T = TypeVar('T')
+
+
+class HasName(Protocol):
+    name: str
+
+
+NAMED = TypeVar('NAMED', bound=HasName)
+
+
+def GroupList(items: List[T], get_id: Callable[[T], str]) -> Dict[str, T]:
+    result = {}
+    for item in items:
+        result[get_id(item)] = item
+    return result
+
+
+def GroupListByName(items: List[NAMED]) -> Dict[str, NAMED]:
+    return GroupList(items, lambda x: x.name)
 
 
 def FullClusterName(cluster: Cluster) -> str:
@@ -83,9 +104,7 @@ class CompatibilityChecker:
                     f"Bitmap {original.name} changed code for entry {entry.name} from {entry.code} to {existing[0].code}")
 
     def CheckEnumListCompatible(self, original: List[Enum], updated: List[Enum]):
-        updated_enums = {}
-        for item in updated:
-            updated_enums[item.name] = item
+        updated_enums = GroupListByName(updated)
 
         for original_enum in original:
             updated_enum = updated_enums.get(original_enum.name)
@@ -101,27 +120,19 @@ class CompatibilityChecker:
             self.CheckBitmapCompatible(original_bitmap, updated_bitmap)
 
     def CheckStructListCompatible(self, original: List[Struct], updated: List[Struct]):
-        updated_structs = {}
-        for item in updated:
-            updated_structs[item.name] = item
+        updated_structs = GroupListByName(updated)
         # TODO: implement
 
     def CheckCommandListCompatible(self, original: List[Command], updated: List[Command]):
-        updated_commands = {}
-        for item in updated:
-            updated_commands[item.name] = item
+        updated_commands = GroupListByName(updated)
         # TODO: implement
 
     def CheckEventListCompatible(self, original: List[Event], updated: List[Event]):
-        updated_events = {}
-        for item in updated:
-            updated_events[item.name] = item
+        updated_events = GroupListByName(updated)
         # TODO: implement
 
     def CheckClusterListCompatible(self, original: List[Cluster], updated: List[Cluster]):
-        updated_clusters = {}
-        for item in updated:
-            updated_clusters[FullClusterName(item)] = item
+        updated_clusters = GroupList(updated, FullClusterName)
 
         for original_cluster in original:
             updated_cluster = updated_clusters.get(FullClusterName(original_cluster))
