@@ -95,26 +95,26 @@ int32_t UartGetJsonStruct(char *pBuffer, int32_t BufLen)
 {
     char cChar = '\0';
     int16_t depth = 0;
-    int32_t buffIdx = 0; 
+    int32_t buffIdx = 0;
     uint8_t complete = 0;
-    while (1) 
+    while (1)
     {
         cChar = getch();
-        if (cChar == '{') 
+        if (cChar == '{')
         {
             depth++;
-        } 
-        else if (cChar == '}') 
+        }
+        else if (cChar == '}')
         {
             depth--;
-            if (depth == 0) 
+            if (depth == 0)
             {
                 //got to the closing brackets from the current structure.
                 //exit loop and return
                 complete = 1;
                 //break;
-            } 
-            else if (depth < 0) 
+            }
+            else if (depth < 0)
             {
                 //malformed json structure
                 //reset depth and continue looking for a '{'
@@ -122,13 +122,13 @@ int32_t UartGetJsonStruct(char *pBuffer, int32_t BufLen)
                 buffIdx = 0;
                 return -2;
             }
-        } 
+        }
         //once we have found a json structure, start storing it in the buffer
         if(depth > 0 || complete)
         {
             if(buffIdx < (BufLen - 1))
             {
-                pBuffer[buffIdx++] = cChar;                
+                pBuffer[buffIdx++] = cChar;
                 if(complete)
                 {
                     pBuffer[buffIdx] = '\0';
@@ -164,4 +164,3 @@ char getch(void)
     UART2_read(uartHandle, &ch, 1, NULL);
     return(ch);
 }
-

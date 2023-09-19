@@ -32,7 +32,7 @@ AirQualitySensorAppAttrUpdateDelegate::AirQualitySensorAppAttrUpdateDelegate(voi
     char uartBuff[BUFFER_SIZE];
     //char *json;
     int32_t jsonStructLen = 0;
-    
+
     while(1)
     {
         jsonStructLen = UartGetJsonStruct(uartBuff, BUFFER_SIZE);

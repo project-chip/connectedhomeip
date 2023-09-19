@@ -173,7 +173,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     AppEvent event;
 
     sAppTask.Init();
-    
+
 
     while (true)
     {
