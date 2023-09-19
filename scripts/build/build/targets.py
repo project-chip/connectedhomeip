@@ -522,7 +522,7 @@ def Buildcc32xxTarget():
     # apps
     target.AppendFixedTargets([
         TargetPart('lock', app=cc32xxApp.LOCK),
-
+        TargetPart('air-quality-sensor', app=cc32xxApp.AIRQUALITY_SENSOR),
     ])
 
     return target

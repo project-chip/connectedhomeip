@@ -20,16 +20,21 @@ from .gn import GnBuilder
 
 class cc32xxApp(Enum):
     LOCK = auto()
+    AIRQUALITY_SENSOR = auto()
 
     def ExampleName(self):
         if self == cc32xxApp.LOCK:
             return 'lock-app'
+        if self == cc32xxApp.AIRQUALITY_SENSOR:
+            return 'air-quality-sensor-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
         if self == cc32xxApp.LOCK:
             return 'chip-CC3235SF_LAUNCHXL-lock-example'
+        if self == cc32xxApp.AIRQUALITY_SENSOR:
+            return 'chip-CC3220SF_LAUNCHXL-air-quality-sensor-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -58,7 +63,8 @@ class cc32xxBuilder(GnBuilder):
 
     def build_outputs(self):
         items = {}
-        if (self.app == cc32xxApp.LOCK):
+        if (self.app == cc32xxApp.LOCK
+                or self.app == cc32xxApp.AIRQUALITY_SENSOR):
             extensions = [".out", ".bin", ".out.map"]
 
         else:
