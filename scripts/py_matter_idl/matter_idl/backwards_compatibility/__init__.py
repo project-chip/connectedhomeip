@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import enum
 import itertools
 import logging
-import enum
 from typing import Callable, Dict, List, Optional, Protocol, TypeVar
 
 from matter_idl.matter_idl_types import Bitmap, Cluster, ClusterSide, Command, Enum, Event, Idl, Struct
@@ -113,7 +113,6 @@ class CompatibilityChecker:
 
         if event.fields != updated_event.fields:
             self._MarkIncompatible(f"Event {event.name} has had fields changed")
-
 
     def CheckEnumListCompatible(self, original: List[Enum], updated: List[Enum]):
         updated_enums = GroupListByName(updated)

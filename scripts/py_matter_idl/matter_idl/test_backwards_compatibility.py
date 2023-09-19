@@ -31,8 +31,8 @@ from matter_idl.matter_idl_types import Idl
 
 
 class Compatibility(Flag):
-    ALL_OK        = auto()  # placeholder allowing anything
-    FORWARD_FAIL  = auto()  # old -> new is wrong
+    ALL_OK = auto()  # placeholder allowing anything
+    FORWARD_FAIL = auto()  # old -> new is wrong
     BACKWARD_FAIL = auto()  # new -> old is wrong
 
 
@@ -171,6 +171,7 @@ class TestCompatibilityChecks(unittest.TestCase):
             "client Cluster X = 1 { info event A = 1 { int8u x = 1; } }",
             "client Cluster X = 1 { critical event A = 1 { int8u x = 1; } }",
             Compatibility.ALL_OK)
+
 
 if __name__ == '__main__':
     unittest.main()
