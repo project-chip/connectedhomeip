@@ -164,10 +164,10 @@ If you disabled QR Codes, you may use the `chip-tool` for commissioning the devi
 If you disabled the LCD and need to debug with QR Codes, the URL to display the QR Code will be printed in the device logs.
 
 Disable LCD and enable CHIP Logging:
-`./scripts/examples/gn_efr32_example.sh examples/lock-app/efr32 out/wf200_lock_app BRD4161A is_debug=false disable_lcd=true --wifi wf200 |& tee out/wf200_lock_app.log`
+`./scripts/examples/gn_silabs_example.sh examples/lock-app/silabs out/wf200_lock_app BRD4161A is_debug=false disable_lcd=true --wifi wf200 |& tee out/wf200_lock_app.log`
 
 Disable QR Code and enable CHIP Logging:
-`./scripts/examples/gn_efr32_example.sh examples/lock-app/efr32 out/wf200_lock_app BRD4161A is_debug=false show_qr_code=false --wifi wf200 |& tee out/wf200_lock.log`
+`./scripts/examples/gn_silabs_example.sh examples/lock-app/silabs out/wf200_lock_app BRD4161A is_debug=false show_qr_code=false --wifi wf200 |& tee out/wf200_lock.log`
 
 ### 11. MG24 device sometimes loses its connection to Ozone during OTA Update with RS9116:
 

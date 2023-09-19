@@ -96,7 +96,7 @@ In the following examples, the ZAP file for the lock-app has been chosen.
 
 ZAP files for the various sample applications are included in the sample applications `data_model` directory such as
 
-`./examples/lighting-app/silabs/efr32/data_model/lighting-thread-app.zap`.
+`./examples/lighting-app/silabs/data_model/lighting-thread-app.zap`.
 
 This shows the output of the run_zaptool script with no arguments. To load a new
 zap file, click the application menu for Electron (Upper left corner of the

@@ -96,10 +96,22 @@ The default values for the defines previously shown are located `third_party/sil
   sl_active_mode_threshold_ms = 500  # 500ms Active Mode Threshold
 ```
 
+In some cases, as with the light-switch-app, these default values are overridden as in: `examples/light-switch-app/silabs/openthread.gni`
+```bash
+  # Openthread Configuration flags
+  sl_ot_idle_interval_ms = 30000  # 30s Idle Intervals
+  sl_ot_active_interval_ms = 500  # 500ms Active Intervals
+
+  # ICD Matter Configuration flags
+  sl_idle_mode_interval_ms = 3600000  # 60min Idle Mode Interval
+  sl_active_mode_interval_ms = 60000  # 60s Active Mode Interval
+  sl_active_mode_threshold_ms = 1000  # 1s Active Mode Threshold
+```
+
 There are two methods with which you can change these defaults values.
 
 The first method is by adding these defines to `CHIPProjectConfig.h` file of your project.
-For the lighting-app, the file is `examples/lighting-app/silabs/efr32/include/CHIPProjectConfig.h`.
+For the lighting-app, the file is `examples/lighting-app/silabs/include/CHIPProjectConfig.h`.
 
 ```c++
 #define CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL chip::System::Clock::Milliseconds32(<value_ms>)
@@ -111,7 +123,7 @@ For the lighting-app, the file is `examples/lighting-app/silabs/efr32/include/CH
 
 The second method is by adding arguments to the build command. Here is an example building the EFR32MG24 BRD4186C with different values.
 ```bash
-./scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32 out/lighting-app BRD41686C sl_ot_idle_interval_ms=10000 sl_ot_active_interval_ms=200 sl_idle_mode_interval_ms = 300000 sl_active_mode_interval_ms=5000 sl_active_mode_threshold_ms=1000 --icd
+./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs out/lighting-app BRD41686C sl_ot_idle_interval_ms=10000 sl_ot_active_interval_ms=200 sl_idle_mode_interval_ms = 300000 sl_active_mode_interval_ms=5000 sl_active_mode_threshold_ms=1000 --icd
 ```
 
 If both methods of changing the default values are used, the defines added to the `CHIPProjectConfig.h` take precedence on the build arguments.
@@ -131,7 +143,7 @@ Adding the preset `--icd` to your build command will ensure that conditions 2 an
 Here is an example to build the light-switch-app as an ICD for the EFR32MG24 BRD4186C.
 
 ```bash
-./scripts/examples/gn_efr32_example.sh ./examples/light-switch-app/efr32/ ./out/light-switch-app_SED BRD4186C --icd
+./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs ./out/light-switch-app_SED BRD4186C --icd
 ```
 
 ### Minimal Power Consumption
@@ -147,5 +159,5 @@ The following set of features increase power consumption.
 To achieve the most power-efficient build, add the following build arguments to the build command to disable all power-consuming features.
 
 ```bash
-./scripts/examples/gn_efr32_example.sh ./examples/light-switch-app/efr32/ ./out/light-switch-app_ICD BRD4186C --icd --low-power
+./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs ./out/light-switch-app_ICD BRD4186C --icd --low-power
 ```

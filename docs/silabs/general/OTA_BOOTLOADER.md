@@ -146,7 +146,7 @@ on BRD4186C.
 -   Build the application disabling all optional features
 
     ```shell
-    $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32/ out lighting-app BRD4186A chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false is_debug=false show_qr_code=false chip_build_libshell=false enable_openthread_cli=false chip_openthread_ftd=true
+    $ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs out lighting-app BRD4186A chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false is_debug=false show_qr_code=false chip_build_libshell=false enable_openthread_cli=false chip_openthread_ftd=true
     ```
 
 -   Build the GBL file for the update image and note its size

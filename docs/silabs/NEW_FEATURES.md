@@ -29,7 +29,7 @@
   - Optimized the subscription reports by synchronizing all client’s subscriptions with the ICD idle mode interval. This ensures the minimal amount of wake ups possible due to subscription reports
   - The previous `--sed` build preset has been replaced by `--icd`. This goes in line with previous sleepy end device behavior being deprecated and replaced by the ICD behavior.
   - Silicon Labs' Light Switch and Door Lock apps support the ICD implementation and have the ICD cluster enabled. To build those apps as ICDs, use the aforementioned prefix `--icd` in your usual build command.
-    - e.g.: `./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs/efr32/ ./out/light-switch-app_ICD BRD4187C --icd`
+    - e.g.: `./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs ./out/light-switch-app_ICD BRD4187C --icd`
 ## New Features for v2.1.0-1.1
 - ### Update to GSDK Version 4.2.3
 
