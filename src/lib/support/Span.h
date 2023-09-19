@@ -330,7 +330,6 @@ using MutableCharSpan = Span<char>;
 
 inline CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan & out_buf)
 {
-    VerifyOrReturnError(!span_to_copy.empty(), CHIP_ERROR_INVALID_ARGUMENT); // why?
     VerifyOrReturnError(out_buf.size() >= span_to_copy.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     memcpy(out_buf.data(), span_to_copy.data(), span_to_copy.size());
@@ -341,7 +340,6 @@ inline CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan &
 
 inline CHIP_ERROR CopyCharSpanToMutableCharSpan(CharSpan cspan_to_copy, MutableCharSpan & out_buf)
 {
-    VerifyOrReturnError(!cspan_to_copy.empty(), CHIP_ERROR_INVALID_ARGUMENT); // why?
     VerifyOrReturnError(out_buf.size() >= cspan_to_copy.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     memcpy(out_buf.data(), cspan_to_copy.data(), cspan_to_copy.size());
