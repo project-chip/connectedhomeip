@@ -205,6 +205,7 @@ Generate event `CarbonDioxideConcentrationMeasurement`, to change the CO2 value.
 ```
 {"Name":"CarbonDioxideConcentrationMeasurement","NewValue":400}
 ```
+
 ## TI Support
 
 For technical support, please consider creating a post on TI's [E2E forum][e2e].
