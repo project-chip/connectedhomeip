@@ -25,7 +25,9 @@
 #include "dmd.h"
 #include "glib.h"
 
+#if (SIWX_917)
 #include "rsi_chip.h"
+#endif
 
 #ifdef QR_CODE_ENABLED
 #include "qrcodegen.h"

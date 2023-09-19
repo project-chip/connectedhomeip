@@ -125,6 +125,7 @@ template("siwx917_sdk") {
         "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen",
         "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/config",
         "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/support/inc",
+        "${wifi_sdk_root}/components/siwx917_soc/core/config",
       ]
 
     } else {
@@ -181,11 +182,11 @@ template("siwx917_sdk") {
       "TA_DEEP_SLEEP_COMMON_FLASH",
       "SL_WIFI_COMPONENT_INCLUDED",
       "CHIP_917=1",
-      "ROMDRIVER_PRESENT",
+      "ROMDRIVER_PRESENT=1",
       "SL_CATALOG_FREERTOS_KERNEL_PRESENT=1",
       "SL_PLATFORM_EXAMPLES_ENABLE",
-      "SI91X_DEVICE",
-      "SI917_RADIO_BOARD",
+      "SI91X_DEVICE=1",
+      "SI917_RADIO_BOARD=1",
       "FLASH_PAGE_SIZE",
       "SL_NVM3_PRESENT",
       "ROM_WIRELESS",
@@ -201,7 +202,18 @@ template("siwx917_sdk") {
         "EXECUTION_FROM_RAM",
       ]
       if (silabs_board == "BRD4338A") {
-        defines += [ "SI917_RADIO_BOARD_V2=1" ]
+        defines += [
+         "SI917_RADIO_BOARD_V2=1",
+         "SL_BOARD_NAME=\"BRD4338A\"",
+         "SL_BOARD_REV=\"A00\"",
+         "SPI_MULTI_SLAVE=1",
+         "SYSCALLS_WRITE=1",
+         "SI91X_PLATFORM=1",
+         "SI91X_SYSRTC_COUNT=1",
+         "SI91X_SYSRTC_PRESENT=1",
+         "SSI_ULP_MASTER=1",
+         "SL_MEMLCD_EXTCOMIN_PORT=0",
+        ]
       }
     }
 
@@ -455,6 +467,7 @@ template("siwx917_sdk") {
         "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen/sl_event_handler.c",
         "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/support/hal/rsi_hal_mcu_m4.c",
         "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/support/hal/rsi_hal_mcu_platform_init.c",
+        "${wifi_sdk_root}/components/siwx917_soc/core/config/src/rsi_nvic_priorities_config.c",
       ]
     } else {
       sources += [
