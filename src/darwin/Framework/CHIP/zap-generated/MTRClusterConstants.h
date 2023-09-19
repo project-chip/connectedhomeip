@@ -2056,10 +2056,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
         "Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTestEventTriggersEnabledID", ios(16.1, 16.4),
         macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x00000008,
-    MTRClusterGeneralDiagnosticsAttributeAverageWearCountID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAverageWearCountID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000009,
     MTRClusterGeneralDiagnosticsAttributeGeneratedCommandListID MTR_DEPRECATED(
         "Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeGeneratedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -2107,9 +2103,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTestEventTriggersEnabledID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000008,
-    MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAverageWearCountID API_AVAILABLE(
-        ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = 0x00000009,
+    MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAverageWearCountID MTR_NEWLY_AVAILABLE = 0x00000009,
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeGeneratedCommandListID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
