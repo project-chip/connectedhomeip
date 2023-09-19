@@ -26,7 +26,7 @@ except ImportError:
         os.path.join(os.path.dirname(__file__), '..')))
     from matter_idl.matter_idl_parser import CreateParser
 
-from matter_idl.backwards_compatibility import IsBackwardsCompatible
+from matter_idl.backwards_compatibility import CompatibilityChecker, IsBackwardsCompatible
 from matter_idl.matter_idl_types import Idl
 
 
@@ -42,6 +42,10 @@ class TestCompatibilityChecks(unittest.TestCase):
         if expect_compatible == IsBackwardsCompatible(old_idl, new_idl):
             return
 
+        # re-run to figure out reasons:
+        checker = CompatibilityChecker(old_idl, new_idl)
+        checker.Check()
+
         if expect_compatible:
             reason = "EXPECTED COMPATIBLE, but failed"
         else:
@@ -53,7 +57,8 @@ class TestCompatibilityChecks(unittest.TestCase):
 {old}
 --------------------- NEW -----------------
 {new}
--------------------------------------------""")
+-------------------------------------------
+Reasons:"""+"\n  - ".join([""] + checker.errors))
 
     def ValidateUpdate(self, name: str, old: str, new: str, flags: Compatibility):
         old_idl = CreateParser(skip_meta=True).parse(old)
@@ -170,6 +175,49 @@ class TestCompatibilityChecks(unittest.TestCase):
             "Changing event type is ok",
             "client Cluster X = 1 { info event A = 1 { int8u x = 1; } }",
             "client Cluster X = 1 { critical event A = 1 { int8u x = 1; } }",
+            Compatibility.ALL_OK)
+
+    def test_commands(self):
+        self.ValidateUpdate(
+            "Removing commands is not ok",
+            "client Cluster X = 1 { command A() : DefaulSuccess = 0; command B() : DefaultSuccess = 1; }",
+            "client Cluster X = 1 { command A() : DefaulSuccess = 0; }",
+            Compatibility.FORWARD_FAIL)
+
+        self.ValidateUpdate(
+            "Changing command IDs is never ok",
+            "client Cluster X = 1 { command A() : DefaulSuccess = 1; }",
+            "client Cluster X = 1 { command A() : DefaulSuccess = 2; }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+        self.ValidateUpdate(
+            "Changing command Inputs is never ok",
+            "client Cluster X = 1 { command A() : DefaulSuccess = 1; }",
+            "client Cluster X = 1 { command A(ARequest) : DefaulSuccess = 1; }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+        self.ValidateUpdate(
+            "Changing command Outputs is never ok",
+            "client Cluster X = 1 { command A() : DefaultSuccess = 1; }",
+            "client Cluster X = 1 { timed command A() : DefaultSuccess = 1; }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+        self.ValidateUpdate(
+            "Changing command Outputs is never ok",
+            "client Cluster X = 1 { command A() : DefaultSuccess = 1; }",
+            "client Cluster X = 1 { fabric command A() : DefaultSuccess = 1; }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+        self.ValidateUpdate(
+            "Changing command qualities is never ok",
+            "client Cluster X = 1 { fabric command A() : DefaultSuccess = 1; }",
+            "client Cluster X = 1 { fabric timed command A() : DefaultSuccess = 1; }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+        self.ValidateUpdate(
+            "Switching access is ok",
+            "client Cluster X = 1 { command A() : DefaultSuccess = 1; }",
+            "client Cluster X = 1 { command access(invoke: administer) A() : DefaultSuccess = 1; }",
             Compatibility.ALL_OK)
 
 

@@ -60,9 +60,11 @@ class CompatibilityChecker:
         self._original_idl = original
         self._updated_idl = updated
         self.compatible = Compatibility.UNKNOWN
+        self.errors = []
 
     def _MarkIncompatible(self, reason: str):
         logging.error(reason)
+        self.errors.append(reason)
         self.compatible = Compatibility.INCOMPATIBLE
 
     def CheckEnumCompatible(self, original: Enum, updated: Optional[Enum]):
@@ -114,6 +116,26 @@ class CompatibilityChecker:
         if event.fields != updated_event.fields:
             self._MarkIncompatible(f"Event {event.name} has had fields changed")
 
+    def CheckCommandsCompatible(self, command: Command, updated_command: Optional[Command]):
+        if not updated_command:
+            self._MarkIncompatible(f"Command {command.name} was removed")
+            return
+
+        if command.code != updated_command.code:
+            self._MarkIncompatible(f"Command {command.name} code changed from {command.code} to {updated_command.code}")
+
+        if command.input_param != updated_command.input_param:
+            self._MarkIncompatible(
+                f"Command {command.name} input changed from {command.input_param} to {updated_command.input_param}")
+
+        if command.output_param != updated_command.output_param:
+            self._MarkIncompatible(
+                f"Command {command.name} output changed from {command.output_param} to {updated_command.output_param}")
+
+        if command.qualities != updated_command.qualities:
+            self._MarkIncompatible(
+                f"Command {command.name} qualities changed from {command.qualities} to {updated_command.qualities}")
+
     def CheckEnumListCompatible(self, original: List[Enum], updated: List[Enum]):
         updated_enums = GroupListByName(updated)
 
@@ -136,7 +158,10 @@ class CompatibilityChecker:
 
     def CheckCommandListCompatible(self, original: List[Command], updated: List[Command]):
         updated_commands = GroupListByName(updated)
-        # TODO: implement
+
+        for command in original:
+            updated_command = updated_commands.get(command.name)
+            self.CheckCommandsCompatible(command, updated_command)
 
     def CheckEventListCompatible(self, original: List[Event], updated: List[Event]):
         updated_events = GroupListByName(updated)
