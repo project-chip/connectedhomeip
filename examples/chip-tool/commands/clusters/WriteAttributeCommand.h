@@ -23,9 +23,9 @@
 #include "DataModelLogger.h"
 #include "ModelCommand.h"
 
-constexpr const char * kWriteCommandKey      = "write";
-constexpr const char * kWriteByIdCommandKey  = "write-by-id";
-constexpr const char * kForceWriteCommandKey = "force-write";
+inline constexpr const char * kWriteCommandKey      = "write";
+inline constexpr const char * kWriteByIdCommandKey  = "write-by-id";
+inline constexpr const char * kForceWriteCommandKey = "force-write";
 
 enum class WriteCommandType
 {
