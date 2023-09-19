@@ -50,6 +50,7 @@ source_set("commands") {
 
   if (chip_device_platform != "none") {
     sources += [ "Dns.cpp" ]
+    public_deps += [ "${chip_root}/src/lib/address_resolve" ]
   }
 
   if (chip_enable_ota_requestor && chip_device_platform != "none" &&

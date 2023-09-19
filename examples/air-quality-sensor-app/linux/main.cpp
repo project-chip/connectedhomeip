@@ -19,6 +19,7 @@
 #include <air-quality-sensor-manager.h>
 #include "AirQualitySensorAppAttrUpdateDelegate.h"
 #include <AppMain.h>
+#include <air-quality-sensor-manager.h>
 
 #include <app/util/af.h>
 #include <platform/CHIPDeviceBuildConfig.h>

@@ -30,7 +30,8 @@ public:
     /**
      * @brief Get an Air Quality Manager object - this class acts as a singleton device manager for the air quality device
      * @param[in] aEndpointId    Endpoint that the air quality is on
-     * @return mInstance    The AirQualitySensorManager instance, note this this could be nullptr if InitInstance has not been called
+     * @return mInstance    The AirQualitySensorManager instance, note this this could be nullptr if InitInstance has not been
+     * called
      */
     static AirQualitySensorManager * GetInstance() { return mInstance; };
 
@@ -104,7 +105,7 @@ public:
      * @brief Handles changes in Formaldehyde concentration measurement.
      * @param[in] newValue The new air value to be applied.
      */
-    void OnFormaldehydeMeasurementChangeHandler(float newValue);  
+    void OnFormaldehydeMeasurementChangeHandler(float newValue);
 
     /**
      * @brief Handles changes in Temperature measurement.
@@ -167,6 +168,7 @@ private:
         mRadonConcentrationMeasurementInstance(mEndpointId, RadonConcentrationMeasurement::Id,
                                               ConcentrationMeasurement::MeasurementMediumEnum::kAir,
                                               ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
+
         mTotalVolatileOrganicCompoundsConcentrationMeasurementInstance(
             mEndpointId, TotalVolatileOrganicCompoundsConcentrationMeasurement::Id,
             ConcentrationMeasurement::MeasurementMediumEnum::kAir, ConcentrationMeasurement::MeasurementUnitEnum::kPpm),

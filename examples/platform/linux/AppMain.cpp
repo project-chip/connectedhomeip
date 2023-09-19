@@ -137,6 +137,18 @@ DeviceLayer::NetworkCommissioning::DarwinWiFiDriver sWiFiDriver;
 DeviceLayer::NetworkCommissioning::DarwinEthernetDriver sEthernetDriver;
 #endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 
+#ifndef CHIP_APP_MAIN_HAS_THREAD_DRIVER
+#define CHIP_APP_MAIN_HAS_THREAD_DRIVER 0
+#endif // CHIP_APP_MAIN_HAS_THREAD_DRIVER
+
+#ifndef CHIP_APP_MAIN_HAS_WIFI_DRIVER
+#define CHIP_APP_MAIN_HAS_WIFI_DRIVER 0
+#endif // CHIP_APP_MAIN_HAS_WIFI_DRIVER
+
+#ifndef CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
+#define CHIP_APP_MAIN_HAS_ETHERNET_DRIVER 0
+#endif // CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
+
 #if CHIP_APP_MAIN_HAS_THREAD_DRIVER
 app::Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(kRootEndpointId, &sThreadDriver);
 #endif // CHIP_APP_MAIN_HAS_THREAD_DRIVER

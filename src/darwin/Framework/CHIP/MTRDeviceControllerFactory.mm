@@ -26,7 +26,6 @@
 #endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #import "MTRCertificates.h"
-#import "MTRControllerAccessControl.h"
 #import "MTRDemuxingStorage.h"
 #import "MTRDeviceController.h"
 #import "MTRDeviceControllerStartupParams.h"
@@ -45,6 +44,7 @@
 
 #import <os/lock.h>
 
+#include <app/dynamic_server/AccessControl.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/FabricTable.h>
@@ -405,7 +405,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
             return;
         }
 
-        [MTRControllerAccessControl init];
+        app::dynamic_server::InitAccessControl();
 
         if (startupParams.hasStorage) {
             _persistentStorageDelegate = new (std::nothrow) MTRPersistentStorageDelegateBridge(startupParams.storage);

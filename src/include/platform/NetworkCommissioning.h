@@ -47,7 +47,7 @@ namespace DeviceLayer {
  */
 namespace NetworkCommissioning {
 
-constexpr size_t kMaxNetworkIDLen = 32;
+inline constexpr size_t kMaxNetworkIDLen = 32;
 
 // TODO: This is exactly the same as the one in GroupDataProvider, this could be moved to src/lib/support
 template <typename T>
