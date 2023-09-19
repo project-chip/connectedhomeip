@@ -15,10 +15,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <lib/support/CHIPMem.h>
 #include "AirQualitySensorAppAttrUpdateDelegate.h"
 #include "AirQualitySensorAttrUpdateHandler.h"
 #include "UartHelper.h"
+#include <lib/support/CHIPMem.h>
 
 #include <platform/PlatformManager.h>
 
@@ -26,23 +26,22 @@
 
 using namespace chip;
 
-
 AirQualitySensorAppAttrUpdateDelegate::AirQualitySensorAppAttrUpdateDelegate(void)
 {
     char uartBuff[BUFFER_SIZE];
-    //char *json;
+    // char *json;
     int32_t jsonStructLen = 0;
 
-    while(1)
+    while (1)
     {
         jsonStructLen = UartGetJsonStruct(uartBuff, BUFFER_SIZE);
 
-        if(jsonStructLen > 0)
+        if (jsonStructLen > 0)
         {
-            //json = Platform::MemoryAlloc((size_t)jsonStructLen);
+            // json = Platform::MemoryAlloc((size_t)jsonStructLen);
             // memcpy(json, uartBuff, jsonStructureLen);
-            //Assuming OnEventCommandReceived makes a copy of buffer
-            //Otherwise need to allocate memory and set up an event to free memory once schedulework is done
+            // Assuming OnEventCommandReceived makes a copy of buffer
+            // Otherwise need to allocate memory and set up an event to free memory once schedulework is done
             OnEventCommandReceived(uartBuff);
         }
     }

@@ -24,12 +24,12 @@
  *
  */
 
+#include "UartHelper.h"
 #include "ti_drivers_config.h"
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <pthread.h>
 #include <ti/drivers/UART2.h>
-#include "UartHelper.h"
 
 #include <stdio.h>
 
@@ -44,7 +44,7 @@ static char sDebugUartBuffer[DEVICE_LAYER_LOG_BUFFER_SIZE];
 
 extern "C" int cc32xxLogInit(void)
 {
-    sDebugUartHandle    = InitUart();
+    sDebugUartHandle = InitUart();
 
     return 0;
 }

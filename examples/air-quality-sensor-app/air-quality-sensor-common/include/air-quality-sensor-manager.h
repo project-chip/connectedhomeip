@@ -14,8 +14,8 @@ class AirQualitySensorManager
 {
 public:
     // Delete copy constructor and assignment operator.
-    AirQualitySensorManager(const AirQualitySensorManager &)             = delete;
-    AirQualitySensorManager(const AirQualitySensorManager &&)            = delete;
+    AirQualitySensorManager(const AirQualitySensorManager &)  = delete;
+    AirQualitySensorManager(const AirQualitySensorManager &&) = delete;
     AirQualitySensorManager & operator=(const AirQualitySensorManager &) = delete;
 
     static void InitInstance(EndpointId aEndpointId = 1)
@@ -144,42 +144,41 @@ private:
     AirQualitySensorManager(EndpointId aEndpointId) :
         mEndpointId(aEndpointId),
         mAirQualityInstance(mEndpointId,
-                           BitMask<AirQuality::Feature, uint32_t>(AirQuality::Feature::kModerate, AirQuality::Feature::kFair,
-                                                                  AirQuality::Feature::kVeryPoor,
-                                                                  AirQuality::Feature::kExtremelyPoor)),
+                            BitMask<AirQuality::Feature, uint32_t>(AirQuality::Feature::kModerate, AirQuality::Feature::kFair,
+                                                                   AirQuality::Feature::kVeryPoor,
+                                                                   AirQuality::Feature::kExtremelyPoor)),
         mCarbonDioxideConcentrationMeasurementInstance(mEndpointId, CarbonDioxideConcentrationMeasurement::Id,
-                                                      ConcentrationMeasurement::MeasurementMediumEnum::kAir,
-                                                      ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
-        mCarbonMonoxideConcentrationMeasurementInstance(mEndpointId, CarbonMonoxideConcentrationMeasurement::Id,
                                                        ConcentrationMeasurement::MeasurementMediumEnum::kAir,
                                                        ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
-        mNitrogenDioxideConcentrationMeasurementInstance(mEndpointId, NitrogenDioxideConcentrationMeasurement::Id,
+        mCarbonMonoxideConcentrationMeasurementInstance(mEndpointId, CarbonMonoxideConcentrationMeasurement::Id,
                                                         ConcentrationMeasurement::MeasurementMediumEnum::kAir,
                                                         ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
+        mNitrogenDioxideConcentrationMeasurementInstance(mEndpointId, NitrogenDioxideConcentrationMeasurement::Id,
+                                                         ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                                                         ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
         mPm1ConcentrationMeasurementInstance(mEndpointId, Pm1ConcentrationMeasurement::Id,
-                                            ConcentrationMeasurement::MeasurementMediumEnum::kAir,
-                                            ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
+                                             ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                                             ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
         mPm10ConcentrationMeasurementInstance(mEndpointId, Pm10ConcentrationMeasurement::Id,
-                                             ConcentrationMeasurement::MeasurementMediumEnum::kAir,
-                                             ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
-        mPm25ConcentrationMeasurementInstance(mEndpointId, Pm25ConcentrationMeasurement::Id,
-                                             ConcentrationMeasurement::MeasurementMediumEnum::kAir,
-                                             ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
-        mRadonConcentrationMeasurementInstance(mEndpointId, RadonConcentrationMeasurement::Id,
                                               ConcentrationMeasurement::MeasurementMediumEnum::kAir,
                                               ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
+        mPm25ConcentrationMeasurementInstance(mEndpointId, Pm25ConcentrationMeasurement::Id,
+                                              ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                                              ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
+        mRadonConcentrationMeasurementInstance(mEndpointId, RadonConcentrationMeasurement::Id,
+                                               ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                                               ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
 
         mTotalVolatileOrganicCompoundsConcentrationMeasurementInstance(
             mEndpointId, TotalVolatileOrganicCompoundsConcentrationMeasurement::Id,
             ConcentrationMeasurement::MeasurementMediumEnum::kAir, ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
         mOzoneConcentrationMeasurementInstance(mEndpointId, OzoneConcentrationMeasurement::Id,
-                                              ConcentrationMeasurement::MeasurementMediumEnum::kAir,
-                                              ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
+                                               ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                                               ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
         mFormaldehydeConcentrationMeasurementInstance(mEndpointId, FormaldehydeConcentrationMeasurement::Id,
-                                                     ConcentrationMeasurement::MeasurementMediumEnum::kAir,
-                                                     ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
-        mTemperatureSensorManager(mEndpointId),
-        mHumiditySensorManager(mEndpointId){};
+                                                      ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                                                      ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
+        mTemperatureSensorManager(mEndpointId), mHumiditySensorManager(mEndpointId){};
 };
 
 } // namespace Clusters

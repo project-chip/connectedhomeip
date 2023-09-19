@@ -37,7 +37,6 @@ public:
     static void AppTaskMain(void * pvParameter);
     static void AirQualityTaskMain(void * pvParameter);
 
-
     void PostEvent(const AppEvent * event);
 
 private:

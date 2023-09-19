@@ -21,9 +21,9 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 
+#include <air-quality-sensor-manager.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
-#include <air-quality-sensor-manager.h>
 
 #include "FreeRTOS.h"
 
@@ -97,8 +97,8 @@ int AppTask::StartAppTask()
     }
 
     // Start App task.
-    if (xTaskCreate(AirQualityTaskMain, "AIR-APP", APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, APP_TASK_PRIORITY, &sAppTaskHandle) !=
-        pdPASS)
+    if (xTaskCreate(AirQualityTaskMain, "AIR-APP", APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, APP_TASK_PRIORITY,
+                    &sAppTaskHandle) != pdPASS)
     {
         PLAT_LOG("Failed to create app task");
         while (true)
@@ -174,7 +174,6 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     sAppTask.Init();
 
-
     while (true)
     {
         /* Task pend until we have stuff to do */
@@ -188,7 +187,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 void AppTask::AirQualityTaskMain(void * pvParameter)
 {
     AirQualitySensorAppAttrUpdateDelegate runDelegate;
-    //this function should never return
+    // this function should never return
 }
 
 void AppTask::PostEvent(const AppEvent * aEvent)

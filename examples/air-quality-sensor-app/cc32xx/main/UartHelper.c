@@ -30,7 +30,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
- /*
+/*
  *  Terminal
  */
 
@@ -41,11 +41,9 @@
 
 #include "UartHelper.h"
 
-
 //*****************************************************************************
 //                          LOCAL DEFINES
 //*****************************************************************************
-
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES
@@ -71,13 +69,12 @@ UART2_Handle InitUart(void)
     UART2_Params_init(&uartParams);
 
     uartParams.readReturnMode = UART2_ReadReturnMode_FULL;
-    uartParams.baudRate = 115200;
+    uartParams.baudRate       = 115200;
 
     uartHandle = UART2_open(CONFIG_UART2_0, &uartParams);
 
     return uartHandle;
 }
-
 
 //*****************************************************************************
 //
@@ -91,11 +88,11 @@ UART2_Handle InitUart(void)
 //!
 //*****************************************************************************
 
-int32_t UartGetJsonStruct(char *pBuffer, int32_t BufLen)
+int32_t UartGetJsonStruct(char * pBuffer, int32_t BufLen)
 {
-    char cChar = '\0';
-    int16_t depth = 0;
-    int32_t buffIdx = 0;
+    char cChar       = '\0';
+    int16_t depth    = 0;
+    int32_t buffIdx  = 0;
     uint8_t complete = 0;
     while (1)
     {
@@ -109,27 +106,27 @@ int32_t UartGetJsonStruct(char *pBuffer, int32_t BufLen)
             depth--;
             if (depth == 0)
             {
-                //got to the closing brackets from the current structure.
-                //exit loop and return
+                // got to the closing brackets from the current structure.
+                // exit loop and return
                 complete = 1;
-                //break;
+                // break;
             }
             else if (depth < 0)
             {
-                //malformed json structure
-                //reset depth and continue looking for a '{'
-                depth = 0;
+                // malformed json structure
+                // reset depth and continue looking for a '{'
+                depth   = 0;
                 buffIdx = 0;
                 return -2;
             }
         }
-        //once we have found a json structure, start storing it in the buffer
-        if(depth > 0 || complete)
+        // once we have found a json structure, start storing it in the buffer
+        if (depth > 0 || complete)
         {
-            if(buffIdx < (BufLen - 1))
+            if (buffIdx < (BufLen - 1))
             {
                 pBuffer[buffIdx++] = cChar;
-                if(complete)
+                if (complete)
                 {
                     pBuffer[buffIdx] = '\0';
                     break;
@@ -137,7 +134,7 @@ int32_t UartGetJsonStruct(char *pBuffer, int32_t BufLen)
             }
             else
             {
-                //structure is too long, buffer is full
+                // structure is too long, buffer is full
                 return -1;
             }
         }
@@ -145,8 +142,6 @@ int32_t UartGetJsonStruct(char *pBuffer, int32_t BufLen)
 
     return buffIdx;
 }
-
-
 
 //*****************************************************************************
 //
@@ -162,5 +157,5 @@ char getch(void)
     char ch;
 
     UART2_read(uartHandle, &ch, 1, NULL);
-    return(ch);
+    return (ch);
 }
