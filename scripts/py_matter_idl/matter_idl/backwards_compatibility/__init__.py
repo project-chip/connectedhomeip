@@ -60,7 +60,7 @@ class CompatibilityChecker:
         self._original_idl = original
         self._updated_idl = updated
         self.compatible = Compatibility.UNKNOWN
-        self.errors = []
+        self.errors: List[str] = []
         self.logger = logging.getLogger(__name__)
 
     def _MarkIncompatible(self, reason: str):
