@@ -158,23 +158,29 @@ Then from the admin computer:
 idt_push
 ```
 
-## Debian installation
+## Single host installation (no Raspberry Pi)
 
-This package should also work on most other Debian (/based) systems.
+Follow the steps below to execute capture and discovery without a Raspberry Pi.
 
-The machine running `idt` should be connected to the same Wi-Fi network used for
-testing.
+### Linux installation
+
+#### Requirements
+
+-   This package should work on most Debian (/based) systems.
+-   `idt` is currently tested on `Python 3.11`.
+-   `adb` and `tcpdump` are required.
+-   The machine running `idt` should be connected to the same Wi-Fi network used for
+    testing.
+
+#### Setup
 
 -   From the parent directory of `idt`, run `source idt/scripts/alias.sh`.
 -   Optionally, run `source idt/scripts/setup_shell.sh` to install aliases
     permanently.
 
-> You may use `idt` natively (Python virtual environment) OR via Docker.
+> You may use `idt` in a Python virtual environment OR using a container from the idt image.
 
-### Python virtual environment
-
--   `idt` is currently tested on `Python 3.11`.
--   `adb` and `tcpdump` are required.
+#### Python virtual environment
 
 Setup a virtual environment and install python dependencies:
 
@@ -188,17 +194,17 @@ pip install -r requirements.txt
 
 Remember to re-enter the virtual environment as needed. [TODO] script
 
-### Docker
+#### Docker
 
--   Run `idt_build` and `idt_activate` to enter the `idt` environment.
+-   Run `idt_build` and `idt_activate` to enter the `idt` container.
 
 [TODO] Podman
 
-## macOS installation
+### macOS installation
 
 Most features other than BLE should work on macOS.
 
-Follow the Debian installation steps above, but do not use Docker.
+Follow the Linux installation steps above, but do not use Docker.
 
 [TODO] macOS BLE support
 
@@ -291,7 +297,7 @@ idt discover -t b
 There is a per device log for ble scanning in `ble` subdirectory of the root
 artifact dir.
 
-[TODO] mDNS per device log
+[TODO] per device log
 
 ## Contributing
 
