@@ -52,11 +52,7 @@
 #include "sl_spidrv_exp_config.h"
 #include "sl_spidrv_instances.h"
 #include "spi_multiplex.h"
-#if (defined(EFR32MG12) || defined(EFR32MG24))
 #define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
-#else
-#error "Unknown platform"
-#endif
 
 #define USART SL_WFX_HOST_PINOUT_SPI_PERIPHERAL
 
