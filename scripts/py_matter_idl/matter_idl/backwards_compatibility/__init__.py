@@ -181,7 +181,6 @@ class CompatibilityChecker:
             # read/write/subscribe/timed status
             self._MarkIncompatible(f"Attribute {original.definition.name} changed its qualities.")
 
-
     def CheckEnumListCompatible(self, original: List[Enum], updated: List[Enum]):
         updated_enums = GroupListByName(updated)
 
