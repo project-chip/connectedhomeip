@@ -92,9 +92,9 @@ static TaskHandle_t spiInitiatorTaskHandle = NULL;
 static uint32_t dummy_buffer; /* Used for DMA - when results don't matter */
 
 #include "sl_spidrv_instances.h"
-#if defined(EFR32MG12)
+#if defined(SL_CATALOG_UARTDRV_USART_PRESENT)
 #define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
-#elif defined(EFR32MG24)
+#elif defined(SL_CATALOG_UARTDRV_EUSART_PRESENT)
 #define SL_SPIDRV_HANDLE sl_spidrv_eusart_exp_handle
 #else
 #error "Unknown platform"
