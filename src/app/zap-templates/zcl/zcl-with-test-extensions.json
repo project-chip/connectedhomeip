@@ -73,6 +73,7 @@
         "low-power-cluster.xml",
         "media-input-cluster.xml",
         "media-playback-cluster.xml",
+        "messages-cluster.xml",
         "mode-base-cluster.xml",
         "mode-select-cluster.xml",
         "mode-select-extensions.xml",
@@ -263,6 +264,9 @@
             "RegisteredClients",
             "ICDCounter",
             "ClientsSupportedPerFabric"
+        ],
+        "Messages": [
+            "Messages"
         ],
         "Operational Credentials": [
             "SupportedFabrics",
