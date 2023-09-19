@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unittest
 import logging
+import unittest
 from enum import Flag, auto
 
 try:
@@ -36,22 +36,25 @@ class Compatibility(Flag):
     FORWARD_FAIL = auto()  # old -> new is wrong
     BACKWARD_FAIL = auto()  # new -> old is wrong
 
+
 class DisableLogger():
     def __enter__(self):
-       logging.disable(logging.CRITICAL)
+        logging.disable(logging.CRITICAL)
+
     def __exit__(self, exit_type, exit_value, exit_traceback):
-       logging.disable(logging.NOTSET)
+        logging.disable(logging.NOTSET)
+
 
 class TestCompatibilityChecks(unittest.TestCase):
 
     def _AssumeCompatiblity(self, old: str, new: str, old_idl: Idl, new_idl: Idl, expect_compatible: bool):
         with DisableLogger():
-          if expect_compatible == IsBackwardsCompatible(old_idl, new_idl):
-              return
+            if expect_compatible == IsBackwardsCompatible(old_idl, new_idl):
+                return
 
-          # re-run to figure out reasons:
-          checker = CompatibilityChecker(old_idl, new_idl)
-          checker.Check()
+            # re-run to figure out reasons:
+            checker = CompatibilityChecker(old_idl, new_idl)
+            checker.Check()
 
         if expect_compatible:
             reason = "EXPECTED COMPATIBLE, but failed"
