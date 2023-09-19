@@ -61,6 +61,8 @@ matter_add_cxxflags("${ZEPHYR_CFLAGS_CC}")
 zephyr_get_gnu_cpp_standard(ZEPHYR_GNU_CPP_STD)
 matter_add_cxxflags(${ZEPHYR_GNU_CPP_STD})
 
+matter_add_flags(-DMBEDTLS_USER_CONFIG_FILE=<telink-mbedtls-config.h>)
+
 # Set up custom OpenThread configuration
 
 if (CONFIG_CHIP_OPENTHREAD_CONFIG)

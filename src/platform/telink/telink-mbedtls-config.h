@@ -31,4 +31,6 @@
 #define MBEDTLS_AES_ALT
 #define MBEDTLS_ECP_ALT
 
+#undef MBEDTLS_ERROR_C
+
 #endif /* MBEDTLS_TSLR9_CONF_H */
