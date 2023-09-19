@@ -185,11 +185,25 @@ Reasons:"""+"\n  - ".join([""] + checker.errors))
             "client Cluster X = 1 { info event A = 2 {} }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
-    def test_events_struct(self):
+    def test_events_struct_content_change(self):
         self.ValidateUpdate(
             "Changing event struct is never ok",
             "client Cluster X = 1 { info event A = 1 { int8u x = 1; } }",
             "client Cluster X = 1 { info event A = 1 { int8u x = 1; int8u y = 2; } }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+    def test_events_struct_type_change(self):
+        self.ValidateUpdate(
+            "Changing event struct is never ok",
+            "client Cluster X = 1 { info event A = 1 { int8u x = 1; } }",
+            "client Cluster X = 1 { info event A = 1 { int16u x = 1; } }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+    def test_events_struct_id_change(self):
+        self.ValidateUpdate(
+            "Changing event struct is never ok",
+            "client Cluster X = 1 { info event A = 1 { int8u x = 1; } }",
+            "client Cluster X = 1 { info event A = 1 { int8u x = 2; } }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
     def test_events_severity(self):
