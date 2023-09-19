@@ -304,6 +304,55 @@ Reasons:"""+"\n  - ".join([""] + checker.errors))
             "client Cluster X = 1 { response struct Foo = 2 { int32u x = 1; } }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
+    def test_attribute_add_remove(self):
+        self.ValidateUpdate(
+            "Attribute removal is not ok.",
+            "client Cluster X = 1 { readonly attribute int8u a = 1; readonly attribute int8u b = 2; }",
+            "client Cluster X = 1 { readonly attribute int8u a = 1; }",
+            Compatibility.FORWARD_FAIL)
+
+    def test_attribute_change_type(self):
+        self.ValidateUpdate(
+            "Attribute type cannot be changed.",
+            "client Cluster X = 1 { readonly attribute int8u a = 1; }",
+            "client Cluster X = 1 { readonly attribute int32u a = 1; }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+    def test_attribute_change_code(self):
+        self.ValidateUpdate(
+            "Attribute codes cannot be changed.",
+            "client Cluster X = 1 { readonly attribute int8u a = 1; }",
+            "client Cluster X = 1 { readonly attribute int8u a = 2; }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+    def test_attribute_change_optionality(self):
+        self.ValidateUpdate(
+            "Attribute optionality must stay the same",
+            "client Cluster X = 1 { readonly attribute int8u a = 1; }",
+            "client Cluster X = 1 { readonly attribute optional int8u a = 1; }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+    def test_attribute_change_list(self):
+        self.ValidateUpdate(
+            "Attribute list type must stay the same",
+            "client Cluster X = 1 { readonly attribute int8u a = 1; }",
+            "client Cluster X = 1 { readonly attribute int8u a[] = 1; }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+    def test_attribute_change_rw(self):
+        self.ValidateUpdate(
+            "Attribute read/write status must stay the same",
+            "client Cluster X = 1 { readonly attribute int8u a = 1; }",
+            "client Cluster X = 1 { attribute int8u a = 1; }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+    def test_attribute_type(self):
+        self.ValidateUpdate(
+            "Attribute data type must stay the same",
+            "client Cluster X = 1 { attribute int8u a = 1; }",
+            "client Cluster X = 1 { attribute char_string a = 1; }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
 
 if __name__ == '__main__':
     unittest.main()

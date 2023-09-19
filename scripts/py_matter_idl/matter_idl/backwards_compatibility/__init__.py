@@ -17,7 +17,7 @@ import itertools
 import logging
 from typing import Callable, Dict, List, Optional, Protocol, TypeVar
 
-from matter_idl.matter_idl_types import Bitmap, Cluster, ClusterSide, Command, Enum, Event, Idl, Struct
+from matter_idl.matter_idl_types import Attribute, Bitmap, Cluster, ClusterSide, Command, Enum, Event, Idl, Struct
 
 
 class Compatibility(enum.Enum):
@@ -53,6 +53,11 @@ def FullClusterName(cluster: Cluster) -> str:
         return f"{cluster.name}/client"
     else:
         return f"{cluster.name}/server"
+
+
+def AttributeName(attribute: Attribute) -> str:
+    """Get the name of an attribute."""
+    return attribute.definition.name
 
 
 class CompatibilityChecker:
@@ -154,6 +159,29 @@ class CompatibilityChecker:
         if original.qualities != updated.qualities:
             self._MarkIncompatible(f"Struct {original.name} has modified qualities")
 
+    def CheckAttributeCompatible(self, original: Attribute, updated: Optional[Attribute]):
+        if not updated:
+            self._MarkIncompatible(f"Attribute {original.definition.name} has been deleted.")
+            return
+
+        if original.definition.code != updated.definition.code:
+            self._MarkIncompatible(f"Attribute {original.definition.name} changed its code.")
+
+        if original.definition.data_type != updated.definition.data_type:
+            self._MarkIncompatible(f"Attribute {original.definition.name} changed its data type.")
+
+        if original.definition.is_list != updated.definition.is_list:
+            self._MarkIncompatible(f"Attribute {original.definition.name} changed its list status.")
+
+        if original.definition.qualities != updated.definition.qualities:
+            # optional/nullable
+            self._MarkIncompatible(f"Attribute {original.definition.name} changed its data type qualities.")
+
+        if original.qualities != updated.qualities:
+            # read/write/subscribe/timed status
+            self._MarkIncompatible(f"Attribute {original.definition.name} changed its qualities.")
+
+
     def CheckEnumListCompatible(self, original: List[Enum], updated: List[Enum]):
         updated_enums = GroupListByName(updated)
 
@@ -190,6 +218,12 @@ class CompatibilityChecker:
             updated_event = updated_events.get(event.name)
             self.CheckEventsCompatible(event, updated_event)
 
+    def CheckAttributeListCompatible(self, original: List[Attribute], updated: List[Attribute]):
+        updated_attributes = GroupList(updated, AttributeName)
+
+        for attribute in original:
+            self.CheckAttributeCompatible(attribute, updated_attributes.get(AttributeName(attribute)))
+
     def CheckClusterListCompatible(self, original: List[Cluster], updated: List[Cluster]):
         updated_clusters = GroupList(updated, FullClusterName)
 
@@ -211,6 +245,7 @@ class CompatibilityChecker:
         self.CheckBitmapListCompatible(original_cluster.bitmaps, updated_cluster.bitmaps)
         self.CheckCommandListCompatible(original_cluster.commands, updated_cluster.commands)
         self.CheckEventListCompatible(original_cluster.events, updated_cluster.events)
+        self.CheckAttributeListCompatible(original_cluster.attributes, updated_cluster.attributes)
 
     def Check(self):
         # assume ok, and then validate
