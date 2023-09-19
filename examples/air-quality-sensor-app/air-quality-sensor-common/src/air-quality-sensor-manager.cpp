@@ -3,6 +3,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
+using namespace chip::Protocols::InteractionModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ConcentrationMeasurement;
 using namespace chip::app::Clusters::AirQuality;
@@ -136,78 +137,87 @@ void AirQualitySensorManager::Init()
 
 void AirQualitySensorManager::OnAirQualityChangeHandler(AirQualityEnum newValue)
 {
-    mAirQualityInstance.UpdateAirQuality(static_cast<AirQualityEnum>(newValue));
-    ChipLogDetail(NotSpecified, "Updated AirQuality value: %huu", (uint8_t) newValue);
+    Status status = mAirQualityInstance.UpdateAirQuality(static_cast<AirQualityEnum>(newValue));
+    VerifyOrReturn(Status::Success == status,
+                ChipLogError(NotSpecified, "Failed to set AirQuality attribute"));
 }
 
 void AirQualitySensorManager::OnCarbonDioxideMeasurementChangeHandler(float newValue)
 {
-    mCarbonDioxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    ChipLogDetail(NotSpecified, "Updated Carbon Dioxide: %f", newValue);
+    ChipError chipError = mCarbonDioxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
+    VerifyOrReturn(CHIP_NO_ERROR == chipError,
+                ChipLogError(NotSpecified, "Failed to set CarbonDioxide MeasuredValue attribute"));
 }
 
 void AirQualitySensorManager::OnCarbonMonoxideMeasurementChangeHandler(float newValue)
 {
-    mCarbonMonoxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    ChipLogDetail(NotSpecified, "Updated Carbon Monoxide value: %f", newValue);
+    ChipError chipError = mCarbonMonoxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
+    VerifyOrReturn(CHIP_NO_ERROR == chipError,
+                ChipLogError(NotSpecified, "Failed to set CarbonMonoxide MeasuredValue attribute"));
 }
 
 void AirQualitySensorManager::OnNitrogenDioxideMeasurementChangeHandler(float newValue)
 {
-    mNitrogenDioxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    ChipLogDetail(NotSpecified, "Updated Nitrogen Dioxide value: %f", newValue);
+    ChipError chipError = mNitrogenDioxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
+    VerifyOrReturn(CHIP_NO_ERROR == chipError,
+                ChipLogError(NotSpecified, "Failed to set NitrogenDioxide MeasuredValue attribute"));
 }
 
 void AirQualitySensorManager::OnPm1MeasurementChangeHandler(float newValue)
 {
-    mPm1ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    ChipLogDetail(NotSpecified, "Updated PM1 value: %f", newValue);
+    ChipError chipError = mPm1ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
+    VerifyOrReturn(CHIP_NO_ERROR == chipError,
+                ChipLogError(NotSpecified, "Failed to set Pm1 MeasuredValue attribute"));
 }
 
 void AirQualitySensorManager::OnPm10MeasurementChangeHandler(float newValue)
 {
-    mPm10ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    ChipLogDetail(NotSpecified, "Updated PM10 value: %f", newValue);
+    ChipError chipError = mPm10ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
+    VerifyOrReturn(CHIP_NO_ERROR == chipError,
+                ChipLogError(NotSpecified, "Failed to set Pm10 MeasuredValue attribute"));
 }
 
 void AirQualitySensorManager::OnPm25MeasurementChangeHandler(float newValue)
 {
-    mPm25ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    ChipLogDetail(NotSpecified, "Updated PM2.5 value: %f", newValue);
+    ChipError chipError = mPm25ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
+    VerifyOrReturn(CHIP_NO_ERROR == chipError,
+                ChipLogError(NotSpecified, "Failed to set Pm25 MeasuredValue attribute"));
 }
 
 void AirQualitySensorManager::OnRadonMeasurementChangeHandler(float newValue)
 {
-    mRadonConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    ChipLogDetail(NotSpecified, "Updated Radon value: %f", newValue);
+    ChipError chipError = mRadonConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
+    VerifyOrReturn(CHIP_NO_ERROR == chipError,
+                ChipLogError(NotSpecified, "Failed to set Radon MeasuredValue attribute"));
 }
 
 void AirQualitySensorManager::OnTotalVolatileOrganicCompoundsMeasurementChangeHandler(float newValue)
 {
-    mTotalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    ChipLogDetail(NotSpecified, "Updated Total Volatile Organic Compounds value: %f", newValue);
+    ChipError chipError = mTotalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
+    VerifyOrReturn(CHIP_NO_ERROR == chipError,
+                ChipLogError(NotSpecified, "Failed to set TotalVolatileOrganicCompounds MeasuredValue attribute"));
 }
 
 void AirQualitySensorManager::OnOzoneMeasurementChangeHandler(float newValue)
 {
-    mOzoneConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    ChipLogDetail(NotSpecified, "Updated Ozone value: %f", newValue);
+    ChipError chipError = mOzoneConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
+    VerifyOrReturn(CHIP_NO_ERROR == chipError,
+                ChipLogError(NotSpecified, "Failed to set Ozone MeasuredValue attribute"));
 }
 
 void AirQualitySensorManager::OnFormaldehydeMeasurementChangeHandler(float newValue)
 {
-    mFormaldehydeConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    ChipLogDetail(NotSpecified, "Updated Formaldehyde value: %f", newValue);
+    ChipError chipError = mFormaldehydeConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
+    VerifyOrReturn(CHIP_NO_ERROR == chipError,
+                ChipLogError(NotSpecified, "Failed to set Formaldehyde MeasuredValue attribute"));
 }
 
 void AirQualitySensorManager::OnTemperatureMeasurementChangeHandler(int16_t newValue)
 {
     mTemperatureSensorManager.OnTemperatureChangeHandler(newValue);
-    ChipLogDetail(NotSpecified, "Updated Temperature value: %hu", newValue);
 }
 
 void AirQualitySensorManager::OnHumidityMeasurementChangeHandler(uint16_t newValue)
 {
     mHumiditySensorManager.OnHumidityChangeHandler(newValue);
-    ChipLogDetail(NotSpecified, "Updated Humidity value: %hu", newValue);
 }

@@ -25,7 +25,6 @@ public:
         EmberAfStatus status = RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(mEndpointId, newValue);
         VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
                        ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement MeasuredValue attribute"));
-        ChipLogDetail(NotSpecified, "The new RelativeHumidityMeasurement value: %d", newValue);
     }
 
 private:

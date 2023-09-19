@@ -21,10 +21,9 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <air-quality-sensor-manager.h>
 
 #include "FreeRTOS.h"
 
@@ -43,9 +42,6 @@
 
 #include "AirQualitySensorAppAttrUpdateDelegate.h"
 
-#include <ti/drivers/apps/Button.h>
-#include <ti/drivers/apps/LED.h>
-
 /* syscfg */
 #include <ti_drivers_config.h>
 
@@ -58,6 +54,8 @@ extern void DisplayBanner();
 #define APP_TASK_PRIORITY 4
 #define APP_EVENT_QUEUE_SIZE 10
 
+#define AIR_QUALITY_SENSOR_ENDPOINT 1
+
 // Added the below three for DNS Server Initialization
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -67,11 +65,11 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceManager;
 
+using namespace chip::app;
+using namespace chip::app::Clusters;
+
 static TaskHandle_t sAppTaskHandle;
 static QueueHandle_t sAppEventQueue;
-
-extern LED_Handle gLedGreenHandle, gLedRedHandle;
-static Button_Handle gButtonRightHandle;
 
 AppTask AppTask::sAppTask;
 
@@ -112,8 +110,6 @@ int AppTask::StartAppTask()
 int AppTask::Init()
 {
     CHIP_ERROR ret;
-    LED_Params ledParams;
-    Button_Params buttonParams;
 
     cc32xxLogInit();
 
@@ -123,28 +119,6 @@ int AppTask::Init()
     // Init Chip memory management before the stack
     PLAT_LOG("Initialize Memory");
     chip::Platform::MemoryInit();
-
-    // Initialize LEDs
-    PLAT_LOG("Initialize LEDs");
-    LED_init();
-
-    LED_Params_init(&ledParams); // default PWM LED
-    gLedRedHandle = LED_open(CONFIG_LED_RED, &ledParams);
-    LED_setOff(gLedRedHandle);
-
-    LED_Params_init(&ledParams); // default PWM LED
-    gLedGreenHandle = LED_open(CONFIG_LED_GREEN, &ledParams);
-    LED_setOff(gLedGreenHandle);
-
-    // Initialize buttons
-    PLAT_LOG("Initialize buttons");
-    Button_init();
-
-    Button_Params_init(&buttonParams);
-    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
-    buttonParams.longPressDuration = 1000U; // ms
-    gButtonRightHandle             = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
-    Button_setCallback(gButtonRightHandle, ButtonRightEventHandler);
 
     PLAT_LOG("Initialize Wi-Fi");
     WiFi_init();
@@ -189,6 +163,8 @@ int AppTask::Init()
             ;
     }
 
+    AirQualitySensorManager::InitInstance(EndpointId(AIR_QUALITY_SENSOR_ENDPOINT));
+
     return 0;
 }
 
@@ -215,26 +191,6 @@ void AppTask::AirQualityTaskMain(void * pvParameter)
     //this function should never return
 }
 
-void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask events)
-{
-    AppEvent event;
-    event.Type = AppEvent::kEventType_ButtonRight;
-
-    if (events & Button_EV_CLICKED)
-    {
-        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_Clicked;
-    }
-    else if (events & Button_EV_LONGCLICKED)
-    {
-        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongClicked;
-    }
-    // button callbacks are in ISR context
-    if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
-    {
-        /* Failed to post the message */
-    }
-}
-
 void AppTask::PostEvent(const AppEvent * aEvent)
 {
     if (xQueueSend(sAppEventQueue, aEvent, 0) != pdPASS)
@@ -247,13 +203,6 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 {
     switch (aEvent->Type)
     {
-    case AppEvent::kEventType_ButtonRight:
-        if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
-        {
-            // Handle right button press
-        }
-        break;
-
     case AppEvent::kEventType_AppEvent:
         if (NULL != aEvent->Handler)
         {

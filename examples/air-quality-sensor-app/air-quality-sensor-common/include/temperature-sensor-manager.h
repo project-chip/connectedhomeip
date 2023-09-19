@@ -25,7 +25,6 @@ public:
         EmberAfStatus status = TemperatureMeasurement::Attributes::MeasuredValue::Set(mEndpointId, newValue);
         VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
                        ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MeasuredValue attribute"));
-        ChipLogDetail(NotSpecified, "The new TemperatureMeasurement value: %d", newValue);
     }
 
 private:

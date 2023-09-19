@@ -166,6 +166,45 @@ the device is connected to the local AP, commissioning can be triggered using
 
 BLE provisioning is not supported currently.
 
+### Trigger event using air-quality-sensor-app events over Application/User UART
+
+You can send a command to air-quality-sensor-app to a trigger specific event
+through the Application/User UART interface.
+
+#### Trigger air quality change event
+
+Generate event `AirQuality`, to change the air quality value.
+
+```
+{"Name":"AirQuality","NewValue":3}
+```
+
+#### Trigger Temperature change event
+
+Generate event `TemperatureMeasurement`, to change the temperate value.
+
+```
+{"Name":"TemperatureMeasurement","NewValue":18}
+```
+
+#### Trigger Humidity change event
+
+Generate event `RelativeHumidityMeasurement`, to change the temperate value.
+
+```
+{"Name":"RelativeHumidityMeasurement","NewValue":60}
+```
+
+#### Trigger concentration change event
+
+Concentration change events can be trigger on the concentration measurement
+clusters.
+
+Generate event `CarbonDioxideConcentrationMeasurement`, to change the CO2 value.
+
+```
+{"Name":"CarbonDioxideConcentrationMeasurement","NewValue":400}
+```
 ## TI Support
 
 For technical support, please consider creating a post on TI's [E2E forum][e2e].
