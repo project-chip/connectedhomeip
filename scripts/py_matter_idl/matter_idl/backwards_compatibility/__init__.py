@@ -137,6 +137,24 @@ class CompatibilityChecker:
             self._MarkIncompatible(
                 f"Command {command.name} qualities changed from {command.qualities} to {updated_command.qualities}")
 
+    def CheckStructsCompatible(self, original: Struct, updated: Optional[Struct]):
+        if not updated:
+            self._MarkIncompatible(f"Struct {original.name} has been deleted.")
+            return
+
+        if original.fields != updated.fields:
+            self._MarkIncompatible(f"Struct {original.name} has modified fields.")
+
+        if original.tag != updated.tag:
+            self._MarkIncompatible(f"Struct {original.name} has modified tags")
+
+        if original.code != updated.code:
+            self._MarkIncompatible(f"Struct {original.name} has modified code (likely resnopse difference)")
+
+        if original.qualities != updated.qualities:
+            self._MarkIncompatible(f"Struct {original.name} has modified qualities")
+
+
     def CheckEnumListCompatible(self, original: List[Enum], updated: List[Enum]):
         updated_enums = GroupListByName(updated)
 
@@ -155,7 +173,9 @@ class CompatibilityChecker:
 
     def CheckStructListCompatible(self, original: List[Struct], updated: List[Struct]):
         updated_structs = GroupListByName(updated)
-        # TODO: implement
+
+        for struct in original:
+            self.CheckStructsCompatible(struct, updated_structs.get(struct.name))
 
     def CheckCommandListCompatible(self, original: List[Command], updated: List[Command]):
         updated_commands = GroupListByName(updated)

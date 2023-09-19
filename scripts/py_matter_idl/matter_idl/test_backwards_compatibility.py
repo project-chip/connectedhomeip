@@ -262,6 +262,48 @@ Reasons:"""+"\n  - ".join([""] + checker.errors))
             "client Cluster X = 1 { command access(invoke: administer) A() : DefaultSuccess = 1; }",
             Compatibility.ALL_OK)
 
+    def test_struct_removal(self):
+        self.ValidateUpdate(
+            "Structure removal is not ok, but adding is ok",
+            "client Cluster X = 1 { struct Foo {} struct Bar {} }",
+            "client Cluster X = 1 { struct Foo {} }",
+            Compatibility.FORWARD_FAIL)
+
+    def test_struct_content_type_change(self):
+        self.ValidateUpdate(
+            "Structure removal is not ok, but adding is ok",
+            "client Cluster X = 1 { struct Foo { int32u x = 1; } }",
+            "client Cluster X = 1 { struct Foo { int64u x = 1; } }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+    def test_struct_content_add_remove(self):
+        self.ValidateUpdate(
+            "Structure content change is not ok.",
+            "client Cluster X = 1 { struct Foo { int32u x = 1; } }",
+            "client Cluster X = 1 { struct Foo { int32u x = 1; int8u y = 2; } }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+    def test_struct_tag_change_request(self):
+        self.ValidateUpdate(
+            "Structure type (request/regular) change is not ok",
+            "client Cluster X = 1 { struct Foo { int32u x = 1; } }",
+            "client Cluster X = 1 { request struct Foo { int32u x = 1; } }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+    def test_struct_tag_change_response(self):
+        self.ValidateUpdate(
+            "Structure type (request/response) change is not ok",
+            "client Cluster X = 1 { request struct Foo { int32u x = 1; } }",
+            "client Cluster X = 1 { response struct Foo = 1 { int32u x = 1; } }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+    def test_struct_code(self):
+        self.ValidateUpdate(
+            "Changing struct code is not ok",
+            "client Cluster X = 1 { response struct Foo = 1 { int32u x = 1; } }",
+            "client Cluster X = 1 { response struct Foo = 2 { int32u x = 1; } }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
 
 if __name__ == '__main__':
     unittest.main()
