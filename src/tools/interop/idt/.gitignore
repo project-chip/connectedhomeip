@@ -6,3 +6,4 @@ OUT/
 __pycache__/
 .zip
 IDT_ARTIFACTS/
+pycache/
