@@ -34,6 +34,7 @@
 #include <credentials/GroupDataProvider.h>
 #include <inttypes.h>
 #include <lib/core/CHIPKeyIds.h>
+#include <lib/core/Global.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -47,14 +48,16 @@
 #include <transport/TracingStructs.h>
 #include <transport/TransportMgr.h>
 
-// Global object
-chip::Transport::GroupPeerTable mGroupPeerMsgCounter;
-
 namespace chip {
 
 using System::PacketBufferHandle;
+using Transport::GroupPeerTable;
 using Transport::PeerAddress;
 using Transport::SecureSession;
+
+namespace {
+Global<GroupPeerTable> gGroupPeerTable;
+} // namespace
 
 uint32_t EncryptedPacketBufferHandle::GetMessageCounter() const
 {
@@ -139,7 +142,7 @@ void SessionManager::Shutdown()
  */
 void SessionManager::FabricRemoved(FabricIndex fabricIndex)
 {
-    mGroupPeerMsgCounter.FabricRemoved(fabricIndex);
+    gGroupPeerTable->FabricRemoved(fabricIndex);
 }
 
 CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, PayloadHeader & payloadHeader,
@@ -954,8 +957,8 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
     Transport::PeerMessageCounter * counter = nullptr;
 
     if (CHIP_NO_ERROR ==
-        mGroupPeerMsgCounter.FindOrAddPeer(groupContext.fabric_index, packetHeaderCopy.GetSourceNodeId().Value(),
-                                           packetHeaderCopy.IsSecureSessionControlMsg(), counter))
+        gGroupPeerTable->FindOrAddPeer(groupContext.fabric_index, packetHeaderCopy.GetSourceNodeId().Value(),
+                                       packetHeaderCopy.IsSecureSessionControlMsg(), counter))
     {
 
         if (Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst == groupContext.security_policy)

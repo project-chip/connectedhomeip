@@ -23,6 +23,9 @@
 namespace chip {
 namespace TestCerts {
 
+// Root CA certs for chip::Credentials::GetTestAttestationTrustStore()
+extern const Span<const ByteSpan> kTestAttestationTrustStoreRoots;
+
 extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert;
 extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_SKID;
 extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_PublicKey;

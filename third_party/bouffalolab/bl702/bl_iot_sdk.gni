@@ -260,6 +260,11 @@ template("bl_iot_sdk") {
       "DISABLE_PRINT=1",
     ]
 
+    if (defined(invoker.chip_config_network_layer_ble) &&
+        invoker.chip_config_network_layer_ble) {
+      defines += [ "CFG_BLE_ENABLE" ]
+    }
+
     sources = [
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_adc.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_boot2.c",
@@ -331,6 +336,12 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_utils",
       ":${sdk_target_name}_config_freertos",
     ]
+
+    if (defined(invoker.chip_config_network_layer_ble) &&
+        invoker.chip_config_network_layer_ble) {
+      configs += [ ":${sdk_target_name}_config_ble" ]
+    }
+
     public_configs = [
       ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_hosal",
@@ -752,6 +763,8 @@ template("bl_iot_sdk") {
     include_dirs = [
       "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_ethernet/Inc",
     ]
+
+    cflags_cc = [ "-Wno-conversion" ]
   }
 
   source_set("${sdk_target_name}_ethernet") {
@@ -813,7 +826,6 @@ template("bl_iot_sdk") {
     public_configs = [
       ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_wifi",
-      ":${sdk_target_name}_config_lwip",
     ]
 
     cflags = [

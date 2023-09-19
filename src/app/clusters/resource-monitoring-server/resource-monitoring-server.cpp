@@ -370,8 +370,7 @@ Status Delegate::OnResetCondition()
     if (emberAfContainsAttribute(mInstance->GetEndpointId(), mInstance->GetClusterId(), Attributes::LastChangedTime::Id))
     {
         System::Clock::Milliseconds64 currentUnixTimeMS;
-        System::Clock::ClockImpl clock;
-        CHIP_ERROR err = clock.GetClock_RealTimeMS(currentUnixTimeMS);
+        CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(currentUnixTimeMS);
         if (err == CHIP_NO_ERROR)
         {
             System::Clock::Seconds32 currentUnixTime = std::chrono::duration_cast<System::Clock::Seconds32>(currentUnixTimeMS);

@@ -1,5 +1,7 @@
-/**
- *    Copyright (c) 2022 Project CHIP Authors
+/*
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,26 +15,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
 
-#import <Foundation/Foundation.h>
-#import <Matter/MTRDefines.h>
+// ---- Air Quality Example App Config ----
 
-NS_ASSUME_NONNULL_BEGIN
-
-MTR_HIDDEN
-@interface MTRControllerAccessControl : NSObject
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-+ (instancetype)alloc NS_UNAVAILABLE;
-
-/**
- * Initialize the access control module. Must be called on the Matter task
- * queue.
- */
-+ (void)init;
-
-@end
-
-NS_ASSUME_NONNULL_END
+#define APP_USE_EXAMPLE_START_BUTTON 0
+#define APP_USE_THREAD_START_BUTTON 0
+#define APP_SET_DEVICE_INFO_PROVIDER 1
+#define APP_SET_NETWORK_COMM_ENDPOINT_SEC 0
+#define APP_USE_IDENTIFY_PWM 1

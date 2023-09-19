@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#import "MTRControllerAccessControl.h"
+#include "AccessControl.h"
 
 #include <access/AccessControl.h>
 #include <access/Privilege.h>
@@ -23,6 +23,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/InteractionModelEngine.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/Global.h>
 
 using namespace chip;
 using namespace chip::Access;
@@ -30,34 +31,39 @@ using namespace chip::app::Clusters;
 
 namespace {
 // TODO: Maybe consider making this configurable?  See also
-// CHIPIMDispatch.mm.
+// DynamicDispatch.cpp.
 constexpr EndpointId kSupportedEndpoint = 0;
 
-class DeviceTypeResolver : public Access::AccessControl::DeviceTypeResolver {
+class DeviceTypeResolver : public Access::AccessControl::DeviceTypeResolver
+{
 public:
     bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override
     {
         return app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
     }
-} gDeviceTypeResolver;
+};
 
 // TODO: Make the policy more configurable by consumers.
-class AccessControlDelegate : public Access::AccessControl::Delegate {
-    CHIP_ERROR Check(
-        const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege requestPrivilege) override
+class AccessControlDelegate : public Access::AccessControl::Delegate
+{
+    CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
+                     Privilege requestPrivilege) override
     {
-        if (requestPath.endpoint != kSupportedEndpoint || requestPath.cluster != OtaSoftwareUpdateProvider::Id) {
+        if (requestPath.endpoint != kSupportedEndpoint || requestPath.cluster != OtaSoftwareUpdateProvider::Id)
+        {
             // We only allow access to OTA software update provider.
             return CHIP_ERROR_ACCESS_DENIED;
         }
 
-        if (requestPrivilege != Privilege::kOperate) {
+        if (requestPrivilege != Privilege::kOperate)
+        {
             // The commands on OtaSoftwareUpdateProvider all require
             // Operate; we should not be asked for anything else.
             return CHIP_ERROR_ACCESS_DENIED;
         }
 
-        if (subjectDescriptor.authMode != AuthMode::kCase && subjectDescriptor.authMode != AuthMode::kPase) {
+        if (subjectDescriptor.authMode != AuthMode::kCase && subjectDescriptor.authMode != AuthMode::kPase)
+        {
             // No idea who is asking; deny for now.
             return CHIP_ERROR_ACCESS_DENIED;
         }
@@ -68,17 +74,24 @@ class AccessControlDelegate : public Access::AccessControl::Delegate {
     }
 };
 
-AccessControlDelegate gDelegate;
+struct ControllerAccessControl
+{
+    DeviceTypeResolver mDeviceTypeResolver;
+    AccessControlDelegate mDelegate;
+    ControllerAccessControl() { GetAccessControl().Init(&mDelegate, mDeviceTypeResolver); }
+};
+
+Global<ControllerAccessControl> gControllerAccessControl;
+
 } // anonymous namespace
 
-@implementation MTRControllerAccessControl
-
-+ (void)init
+namespace chip {
+namespace app {
+namespace dynamic_server {
+void InitAccessControl()
 {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        GetAccessControl().Init(&gDelegate, gDeviceTypeResolver);
-    });
+    gControllerAccessControl.get(); // force initialization
 }
-
-@end
+} // namespace dynamic_server
+} // namespace app
+} // namespace chip

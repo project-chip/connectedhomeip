@@ -41,7 +41,7 @@ const char basePath[] = "./src/app/tests/suites/commands/delay/scripts/";
 const char * getScriptsFolder() { return basePath; }
 } // namespace
 
-constexpr const char * kDefaultKey = "default";
+inline constexpr const char * kDefaultKey = "default";
 
 @interface TestDeviceControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property TestCommandBridge * commandBridge;
@@ -58,7 +58,7 @@ constexpr const char * kDefaultKey = "default";
 
 NS_ASSUME_NONNULL_END
 
-constexpr uint16_t kTimeoutInSeconds = 90;
+inline constexpr uint16_t kTimeoutInSeconds = 90;
 
 class TestCommandBridge : public CHIPCommandBridge,
                           public ValueChecker,

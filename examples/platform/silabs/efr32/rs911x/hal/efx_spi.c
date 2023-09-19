@@ -51,11 +51,26 @@
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
+#ifdef CHIP_9117
+#include "cmsis_os2.h"
+#include "sl_board_configuration.h"
+#include "sl_net.h"
+#include "sl_si91x_driver.h"
+#include "sl_si91x_types.h"
+#include "sl_wifi_callback_framework.h"
+#include "sl_wifi_constants.h"
+#include "sl_wifi_types.h"
+#else
 #include "rsi_board_configuration.h"
 #include "rsi_driver.h"
+#endif
+
 #include "sl_device_init_dpll.h"
 #include "sl_device_init_hfxo.h"
 
+#define DEFAULT_SPI_TRASFER_MODE 0
+// Macro to drive semaphore block minimun timer in milli seconds
+#define RSI_SEM_BLOCK_MIN_TIMER_VALUE_MS (50)
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #include "sl_power_manager.h"
 #endif
@@ -71,6 +86,8 @@ SemaphoreHandle_t spi_sem_sync_hdl;
 StaticSemaphore_t xEfxSpiIntfSemaBuffer;
 static SemaphoreHandle_t spiTransferLock;
 static TaskHandle_t spiInitiatorTaskHandle = NULL;
+
+static uint32_t dummy_buffer; /* Used for DMA - when results don't matter */
 
 #if defined(EFR32MG12)
 #include "sl_spidrv_exp_config.h"
@@ -172,6 +189,18 @@ void rsi_hal_board_init(void)
 
     /* Reset of Wifi chip */
     sl_wfx_host_reset_chip();
+}
+
+// wifi-sdk
+sl_status_t sl_si91x_host_bus_init(void)
+{
+    rsi_hal_board_init();
+    return SL_STATUS_OK;
+}
+
+void sl_si91x_host_enable_high_speed_bus()
+{
+    // dummy function for wifi-sdk
 }
 
 #if defined(EFR32MG24)
@@ -342,11 +371,12 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     */
     if (xlen <= MIN_XLEN || (tx_buf == NULL && rx_buf == NULL))
     {
-        return RSI_ERROR_INVALID_PARAM;
+        rx_buf = (uint8_t *) &dummy_buffer;
+        tx_buf = (uint8_t *) &dummy_buffer;
     }
 
     (void) mode; // currently not used;
-    rsi_error_t rsiError = RSI_ERROR_NONE;
+    error_t rsiError = RSI_ERROR_NONE;
 
     xSemaphoreTake(spiTransferLock, portMAX_DELAY);
 
@@ -397,4 +427,20 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     sl_wfx_host_spi_cs_deassert();
 #endif /* EFR32MG24 */
     return rsiError;
+}
+
+/*********************************************************************
+ * @fn   int16_t rsi_spi_transfer(uint8_t *tx_buf, uint8_t *rx_buf, uint16_t xlen, uint8_t mode)
+ * @brief
+ *       Do a SPI transfer - Mode is 8/16 bit - But every 8 bit is aligned
+ * @param[in] tx_buf:
+ * @param[in] rx_buf:
+ * @param[in] xlen:
+ * @param[in] mode:
+ * @return
+ *        None
+ **************************************************************************/
+sl_status_t sl_si91x_host_spi_transfer(const void * tx_buf, void * rx_buf, uint16_t xlen)
+{
+    return (rsi_spi_transfer((uint8_t *) tx_buf, rx_buf, xlen, DEFAULT_SPI_TRASFER_MODE));
 }
