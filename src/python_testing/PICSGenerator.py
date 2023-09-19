@@ -45,7 +45,8 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     try:
         # Open the XML PICS template file
         print(f"Open \"{xmlPath}{fileName}\"")
-        tree = ET.parse(f"{xmlPath}{fileName}")
+        parser = ET.XMLParser(target=ET.TreeBuilder(insert_comments=True))
+        tree = ET.parse(f"{xmlPath}{fileName}", parser)
         root = tree.getroot()
     except ET.ParseError:
         print(f"[red]Could not find \"{fileName}\"")
@@ -162,8 +163,21 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
                 print("Event is mandated without a condition")
                 continue
 
-    # Write XML file
-    tree.write(f"{outputPathStr}/{fileName}")
+    # Grabbing the header from the XML templates
+    inputFile = open(f"{xmlPath}{fileName}", "r")
+    outputFile = open(f"{outputPathStr}/{fileName}", "ab")
+    xmlHeader = ""
+    inputLine = inputFile.readline().lstrip()
+
+    while 'clusterPICS' not in inputLine:
+        xmlHeader += inputLine
+        inputLine = inputFile.readline().lstrip()
+
+    # Write the PICS XML header
+    outputFile.write(xmlHeader.encode())
+
+    # Write the PICS XML data
+    tree.write(outputFile)
 
 
 async def DeviceMapping(devCtrl, nodeID, outputPathStr):
