@@ -61,9 +61,10 @@ class CompatibilityChecker:
         self._updated_idl = updated
         self.compatible = Compatibility.UNKNOWN
         self.errors = []
+        self.logger = logging.getLogger(__name__)
 
     def _MarkIncompatible(self, reason: str):
-        logging.error(reason)
+        self.logger.error(reason)
         self.errors.append(reason)
         self.compatible = Compatibility.INCOMPATIBLE
 
