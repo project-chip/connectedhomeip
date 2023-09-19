@@ -87,7 +87,7 @@ ti_simplelink_executable("air_quality_sensor_app") {
     "${project_dir}/main/AppTask.cpp",
     "${project_dir}/main/CHIPDeviceManager.cpp",
 
-    # This causes redefinitions of excpetion handler, alread defined in libstdc++_nano.a. Maybe a complier version issue.
+    # This causes redefinitions of exception handler, alread defined in libstdc++_nano.a. Maybe a compiler version issue.
     #   "${project_dir}/main/CXXExceptionStubs.cpp",
     "${project_dir}/main/DeviceCallbacks.cpp",
     "${project_dir}/main/UartHelper.c",
