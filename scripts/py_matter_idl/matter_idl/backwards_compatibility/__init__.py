@@ -154,7 +154,6 @@ class CompatibilityChecker:
         if original.qualities != updated.qualities:
             self._MarkIncompatible(f"Struct {original.name} has modified qualities")
 
-
     def CheckEnumListCompatible(self, original: List[Enum], updated: List[Enum]):
         updated_enums = GroupListByName(updated)
 
