@@ -107,7 +107,7 @@ CHIP_ERROR AppTask::Init()
     if (!ConnectivityMgr().IsThreadProvisioned())
 #endif /* !SL_WIFI */
     {
-        GetLCD().ShowQRCode(true, true);
+        GetLCD().ShowQRCode(true);
     }
 #endif // QR_CODE_ENABLED
 #endif

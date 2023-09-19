@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -33,10 +33,9 @@
   ],
   "endpointTypes": [
     {
-      "id": 13,
+      "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 2,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 2,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        2
       ],
       "deviceVersions": [
         1
@@ -4087,10 +4082,9 @@
       ]
     },
     {
-      "id": 14,
+      "id": 2,
       "name": "MA-dimmablelight",
       "deviceTypeRef": {
-        "id": 23,
         "code": 263,
         "profileId": 259,
         "label": "MA-occupancysensor",
@@ -4098,15 +4092,11 @@
       },
       "deviceTypes": [
         {
-          "id": 23,
           "code": 263,
           "profileId": 259,
           "label": "MA-occupancysensor",
           "name": "MA-occupancysensor"
         }
-      ],
-      "deviceTypeRefs": [
-        23
       ],
       "deviceVersions": [
         1

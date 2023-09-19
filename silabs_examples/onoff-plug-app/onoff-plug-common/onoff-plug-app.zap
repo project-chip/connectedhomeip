@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -36,7 +36,6 @@
       "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 2,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 2,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        2
       ],
       "deviceVersions": [
         1
@@ -5320,7 +5315,6 @@
       "id": 2,
       "name": "MA-dimmablelight",
       "deviceTypeRef": {
-        "id": 13,
         "code": 267,
         "profileId": 259,
         "label": "MA-dimmablepluginunit",
@@ -5328,15 +5322,11 @@
       },
       "deviceTypes": [
         {
-          "id": 13,
           "code": 267,
           "profileId": 259,
           "label": "MA-dimmablepluginunit",
           "name": "MA-dimmablepluginunit"
         }
-      ],
-      "deviceTypeRefs": [
-        13
       ],
       "deviceVersions": [
         2

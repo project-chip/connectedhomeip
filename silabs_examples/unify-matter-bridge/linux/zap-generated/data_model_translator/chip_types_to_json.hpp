@@ -912,6 +912,26 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::UserTypeEnum&
 }
 /***************************** Bitmap Converter FIXME**************/
 
+template <>
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::BarrierControl::BarrierControlCapabilities>& value)
+{
+    using namespace chip::app::Clusters::BarrierControl;
+    nlohmann::json obj;
+    obj["PartialBarrier"] = static_cast<bool>(value.GetField(BarrierControlCapabilities::kPartialBarrier));
+    return obj;
+}
+template <>
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::BarrierControl::BarrierControlSafetyStatus>& value)
+{
+    using namespace chip::app::Clusters::BarrierControl;
+    nlohmann::json obj;
+    obj["RemoteLockout"] = static_cast<bool>(value.GetField(BarrierControlSafetyStatus::kRemoteLockout));
+    obj["TamperDetected"] = static_cast<bool>(value.GetField(BarrierControlSafetyStatus::kTemperDetected));
+    obj["FailedCommunication"] = static_cast<bool>(value.GetField(BarrierControlSafetyStatus::kFailedCommunication));
+    obj["PositionFailure"] = static_cast<bool>(value.GetField(BarrierControlSafetyStatus::kPositionFailure));
+    return obj;
+}
+
 /***************************** Bitmap Converter FIXME**************/
 
 template <>

@@ -473,6 +473,10 @@ server cluster TimeFormatLocalization = 44 {
     k24hr = 1;
   }
 
+  bitmap Feature : BITMAP32 {
+    kCalendarFormat = 0x1;
+  }
+
   attribute HourFormatEnum hourFormat = 0;
   attribute CalendarTypeEnum activeCalendarType = 1;
   readonly attribute CalendarTypeEnum supportedCalendarTypes[] = 2;

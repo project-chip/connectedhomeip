@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -33,10 +33,9 @@
   ],
   "endpointTypes": [
     {
-      "id": 19,
+      "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 2,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 2,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        2
       ],
       "deviceVersions": [
         1
@@ -4801,10 +4796,9 @@
       ]
     },
     {
-      "id": 20,
+      "id": 2,
       "name": "MA-dimmablelight",
       "deviceTypeRef": {
-        "id": 24,
         "code": 770,
         "profileId": 259,
         "label": "MA-tempsensor",
@@ -4812,15 +4806,11 @@
       },
       "deviceTypes": [
         {
-          "id": 24,
           "code": 770,
           "profileId": 259,
           "label": "MA-tempsensor",
           "name": "MA-tempsensor"
         }
-      ],
-      "deviceTypeRefs": [
-        24
       ],
       "deviceVersions": [
         1

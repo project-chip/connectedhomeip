@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -33,10 +33,9 @@
   ],
   "endpointTypes": [
     {
-      "id": 9,
+      "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 2,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 2,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        2
       ],
       "deviceVersions": [
         1
@@ -4087,10 +4082,9 @@
       ]
     },
     {
-      "id": 10,
+      "id": 2,
       "name": "MA-dimmablelight",
       "deviceTypeRef": {
-        "id": 21,
         "code": 21,
         "profileId": 259,
         "label": "MA-contactsensor",
@@ -4098,15 +4092,11 @@
       },
       "deviceTypes": [
         {
-          "id": 21,
           "code": 21,
           "profileId": 259,
           "label": "MA-contactsensor",
           "name": "MA-contactsensor"
         }
-      ],
-      "deviceTypeRefs": [
-        21
       ],
       "deviceVersions": [
         1

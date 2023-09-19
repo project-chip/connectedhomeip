@@ -846,6 +846,23 @@ inline std::optional<DoorLock::UserTypeEnum> from_json(const nlohmann::json& val
     }
 }
 /***************************** Bitmap Converters **************/
+template <>
+inline std::optional<chip::BitMask<BarrierControl::BarrierControlCapabilities>> from_json(const nlohmann::json& obj)
+{
+    chip::BitMask<BarrierControl::BarrierControlCapabilities> r;
+    r.SetField(BarrierControl::BarrierControlCapabilities::kPartialBarrier, obj.value("PartialBarrier", false));
+    return r;
+}
+template <>
+inline std::optional<chip::BitMask<BarrierControl::BarrierControlSafetyStatus>> from_json(const nlohmann::json& obj)
+{
+    chip::BitMask<BarrierControl::BarrierControlSafetyStatus> r;
+    r.SetField(BarrierControl::BarrierControlSafetyStatus::kRemoteLockout, obj.value("RemoteLockout", false));
+    r.SetField(BarrierControl::BarrierControlSafetyStatus::kTemperDetected, obj.value("TamperDetected", false));
+    r.SetField(BarrierControl::BarrierControlSafetyStatus::kFailedCommunication, obj.value("FailedCommunication", false));
+    r.SetField(BarrierControl::BarrierControlSafetyStatus::kPositionFailure, obj.value("PositionFailure", false));
+    return r;
+}
 
 /***************************** Bitmap Converters **************/
 template <>

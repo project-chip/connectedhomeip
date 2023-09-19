@@ -129,7 +129,8 @@ namespace app {
             { "AccountLogin", AccountLogin::Id },
             { "ElectricalMeasurement", ElectricalMeasurement::Id },
             { "UnitTesting", UnitTesting::Id },
-            { "FaultInjection", FaultInjection::Id }
+            { "FaultInjection", FaultInjection::Id },
+            { "SampleMei", SampleMei::Id }
         };
 
         // Attribute mapping Matter
@@ -2271,6 +2272,11 @@ namespace app {
                 };
             } // namespace Attributes
         } // namespace FaultInjection
+        namespace SampleMei {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace SampleMei
 
         // Global map of each clusters attributes
         static const std::unordered_map<std::string, std::unordered_map<std::string, chip::AttributeId>> matter_attribute_id_map {
@@ -2370,7 +2376,8 @@ namespace app {
             { "AccountLogin", AccountLogin::Attributes::matter_attribute_id_cluster_map },
             { "ElectricalMeasurement", ElectricalMeasurement::Attributes::matter_attribute_id_cluster_map },
             { "UnitTesting", UnitTesting::Attributes::matter_attribute_id_cluster_map },
-            { "FaultInjection", FaultInjection::Attributes::matter_attribute_id_cluster_map }
+            { "FaultInjection", FaultInjection::Attributes::matter_attribute_id_cluster_map },
+            { "SampleMei", SampleMei::Attributes::matter_attribute_id_cluster_map }
         };
 
         // Command mapping Matter
@@ -3196,6 +3203,11 @@ namespace app {
                 };
             } // namespace Commands
         } // namespace FaultInjection
+        namespace SampleMei {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace SampleMei
 
         // Global map of each clusters commands
         static const std::unordered_map<std::string, std::unordered_map<std::string, chip::CommandId>> matter_command_id_map {
@@ -3295,7 +3307,8 @@ namespace app {
             { "AccountLogin", AccountLogin::Commands::matter_command_id_cluster_map },
             { "ElectricalMeasurement", ElectricalMeasurement::Commands::matter_command_id_cluster_map },
             { "UnitTesting", UnitTesting::Commands::matter_command_id_cluster_map },
-            { "FaultInjection", FaultInjection::Commands::matter_command_id_cluster_map }
+            { "FaultInjection", FaultInjection::Commands::matter_command_id_cluster_map },
+            { "SampleMei", SampleMei::Commands::matter_command_id_cluster_map }
         };
 
     } // namespace Clusters
