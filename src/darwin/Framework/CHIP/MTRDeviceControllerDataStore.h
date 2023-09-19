@@ -17,7 +17,11 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
+#else
+#import "MTRDeviceControllerStorageDelegate_Wrapper.h"
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #include <lib/core/CHIPError.h>
 

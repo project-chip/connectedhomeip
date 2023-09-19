@@ -48,8 +48,7 @@ class QRCodeTest {
     generator.setAllowInvalidPayload(allowInvalidPayload)
     var result = generator.payloadBase38Representation()
 
-    var outPayload = OnboardingPayload()
-    QRCodeOnboardingPayloadParser(result).populatePayload(outPayload)
+    var outPayload = QRCodeOnboardingPayloadParser(result).populatePayload()
 
     return inPayload == outPayload
   }
@@ -223,10 +222,8 @@ class QRCodeTest {
     var invalidString = kDefaultPayloadQRCode
     invalidString = invalidString.dropLast(1) + " " // space is not contained in the base38 alphabet
 
-    var payload = OnboardingPayload()
-
     try {
-      QRCodeOnboardingPayloadParser(invalidString).populatePayload(payload)
+      QRCodeOnboardingPayloadParser(invalidString).populatePayload()
       assertThat(false)
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
@@ -241,10 +238,8 @@ class QRCodeTest {
     var invalidString = kDefaultPayloadQRCode
     invalidString = invalidString.dropLast(1)
 
-    var payload = OnboardingPayload()
-
     try {
-      QRCodeOnboardingPayloadParser(invalidString).populatePayload(payload)
+      QRCodeOnboardingPayloadParser(invalidString).populatePayload()
       assertThat(false)
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
@@ -284,8 +279,7 @@ class QRCodeTest {
     var generator = QRCodeOnboardingPayloadGenerator(payload)
     var base38Rep = generator.payloadBase38Representation()
 
-    var resultingPayload = OnboardingPayload()
-    QRCodeOnboardingPayloadParser(base38Rep).populatePayload(resultingPayload)
+    var resultingPayload = QRCodeOnboardingPayloadParser(base38Rep).populatePayload()
 
     assertEquals(true, resultingPayload.isValidQRCodePayload())
     assertEquals(true, payload == resultingPayload)

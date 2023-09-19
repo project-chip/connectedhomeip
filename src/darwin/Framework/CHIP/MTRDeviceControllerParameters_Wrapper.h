@@ -1,5 +1,4 @@
-/*
- *
+/**
  *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,19 +14,12 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include <Matter/MTRDefines.h>
 
-#include <app/ReadHandler.h>
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+#error Should be including Matter/MTRDeviceControllerParameters.h
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
-class ICDUtil : public chip::app::ReadHandler::ApplicationCallback
-{
-    CHIP_ERROR OnSubscriptionRequested(chip::app::ReadHandler & aReadHandler,
-                                       chip::Transport::SecureSession & aSecureSession) override;
-    friend ICDUtil & GetICDUtil();
-    static ICDUtil sICDUtil;
-};
-
-inline ICDUtil & GetICDUtil()
-{
-    return ICDUtil::sICDUtil;
-}
+#define MTR_INTERNAL_INCLUDE
+#import <Matter/MTRDeviceControllerParameters.h>
+#undef MTR_INTERNAL_INCLUDE

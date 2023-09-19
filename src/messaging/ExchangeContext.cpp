@@ -500,11 +500,18 @@ void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
     // evicted.
     if (mSession)
     {
-        if (mSession->IsSecureSession() && mSession->AsSecureSession()->IsCASESession())
+        // If we timed out _after_ getting an ack for the message, that means
+        // the session is probably fine (since our message and the ack got
+        // through), so don't mark the session defunct unless we have an
+        // un-acked message here.
+        if (IsMessageNotAcked())
         {
-            mSession->AsSecureSession()->MarkAsDefunct();
+            if (mSession->IsSecureSession() && mSession->AsSecureSession()->IsCASESession())
+            {
+                mSession->AsSecureSession()->MarkAsDefunct();
+            }
+            mSession->DispatchSessionEvent(&SessionDelegate::OnSessionHang);
         }
-        mSession->DispatchSessionEvent(&SessionDelegate::OnSessionHang);
     }
 
     ExchangeDelegate * delegate = GetDelegate();

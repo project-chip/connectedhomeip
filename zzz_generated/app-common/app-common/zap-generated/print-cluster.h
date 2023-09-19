@@ -659,6 +659,12 @@
 #define CHIP_PRINTCLUSTER_FAULT_INJECTION_CLUSTER
 #endif
 
+#if defined(ZCL_USING_SAMPLE_MEI_CLUSTER_SERVER) || defined(ZCL_USING_SAMPLE_MEI_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_SAMPLE_MEI_CLUSTER { chip::app::Clusters::SampleMei::Id, "Sample MEI" },
+#else
+#define CHIP_PRINTCLUSTER_SAMPLE_MEI_CLUSTER
+#endif
+
 #define CLUSTER_IDS_TO_NAMES                                                                                                       \
     CHIP_PRINTCLUSTER_IDENTIFY_CLUSTER                                                                                             \
     CHIP_PRINTCLUSTER_GROUPS_CLUSTER                                                                                               \
@@ -756,6 +762,7 @@
     CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_UNIT_TESTING_CLUSTER                                                                                         \
-    CHIP_PRINTCLUSTER_FAULT_INJECTION_CLUSTER
+    CHIP_PRINTCLUSTER_FAULT_INJECTION_CLUSTER                                                                                      \
+    CHIP_PRINTCLUSTER_SAMPLE_MEI_CLUSTER
 
 #define MAX_CLUSTER_NAME_LENGTH 58

@@ -3660,7 +3660,7 @@ PICS:
       id: GRPKEY.S.C01.Rsp
 
     - label: "Does the device implement the KeySetReadResponse command}?"
-      id: GRPKEY.S.C02.Rsp
+      id: GRPKEY.S.C02.Tx
 
     - label: "Does the device implement the KeySetRemove command}?"
       id: GRPKEY.S.C03.Rsp
@@ -3670,7 +3670,7 @@ PICS:
 
     - label:
           "Does the device implement the KeySetReadAllIndicesResponse command}?"
-      id: GRPKEY.S.C05.Rsp
+      id: GRPKEY.S.C05.Tx
 
     #
     # client / attributes
@@ -7074,10 +7074,10 @@ PICS:
       id: LTIME.S.A0002
 
     - label: "Does the DUT (Server) support 12 Hr Hour Format ?"
-      id: LTIME.S.A0000.12HR
+      id: LTIME.S.M.12HR
 
     - label: "Does the DUT (Server) support 24 Hr Hour Format ?"
-      id: LTIME.S.A0000.24HR
+      id: LTIME.S.M.24HR
 
     #
     # client / attributes
@@ -8902,15 +8902,6 @@ PICS:
       id: SMOKECO.S.A0009
 
     - label: "Does the device implement the ContaminationState attribute?"
-      id: SMOKECO.S.A0010
-
-    - label: "Does the device implement the SensitivityLevel attribute?"
-      id: SMOKECO.S.A0011
-
-    - label: "Does the device implement the ExpiryDate attribute?"
-      id: SMOKECO.S.A0012
-
-    - label: "Does the device implement the ContaminationState attribute?"
       id: SMOKECO.S.A000a
 
     - label: "Does the device implement the SensitivityLevel attribute?"
@@ -8953,7 +8944,7 @@ PICS:
       id: SMOKECO.S.E09
 
     - label: "Does the device implement the AllClear event?"
-      id: SMOKECO.S.E10
+      id: SMOKECO.S.E0a
 
     #
     # server / manually

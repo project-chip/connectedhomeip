@@ -132,7 +132,33 @@ Status BLWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCh
 CHIP_ERROR BLWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
     ChipLogProgress(NetworkProvisioning, "ConnectWiFiNetwork");
-    wifiInterface_connect((char *) ssid, (char *) key);
+    // Valid Credentials length are:
+    // - 0 bytes: Unsecured (open) connection
+    // - 5 bytes: WEP-64 passphrase
+    // - 10 hexadecimal ASCII characters: WEP-64 40-bit hex raw PSK
+    // - 13 bytes: WEP-128 passphrase
+    // - 26 hexadecimal ASCII characters: WEP-128 104-bit hex raw PSK
+    // - 8..63 bytes: WPA/WPA2/WPA3 passphrase
+    // - 64 bytes: WPA/WPA2/WPA3 raw hex PSK
+    // Note 10 hex WEP64 and 13 bytes / 26 hex WEP128 passphrase are covered by 8~63 bytes WPA passphrase, so we don't check WEP64
+    // hex and WEP128 passphrase.
+    if (keyLen == BLWiFiDriver::WiFiCredentialLength::kOpen || keyLen == BLWiFiDriver::WiFiCredentialLength::kWEP64 ||
+        (keyLen >= BLWiFiDriver::WiFiCredentialLength::kMinWPAPSK && keyLen <= BLWiFiDriver::WiFiCredentialLength::kMaxWPAPSK))
+    {
+
+        if (keyLen == BLWiFiDriver::WiFiCredentialLength::kOpen)
+        {
+            wifiInterface_connect((char *) ssid, NULL);
+        }
+        else
+        {
+            wifiInterface_connect((char *) ssid, (char *) key);
+        }
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_STRING_LENGTH;
+    }
     ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManager::kWiFiStationState_Connecting);
     return CHIP_NO_ERROR;
 }

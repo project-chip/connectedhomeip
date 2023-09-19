@@ -57,5 +57,7 @@ jobs:
                         --target asr-asr582x-bridge-factory \
                         --target asr-asr582x-temperature-measurement-rotating_id \
                         --target asr-asr582x-thermostat-rio \
+                        --target asr-asr582x-dishwasher \
+                        --target asr-asr582x-refrigerator \
                         build \
                      "

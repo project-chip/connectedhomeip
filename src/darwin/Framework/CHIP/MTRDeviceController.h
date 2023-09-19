@@ -23,6 +23,10 @@
 
 @class MTRBaseDevice;
 
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+@class MTRDeviceControllerParameters;
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+
 NS_ASSUME_NONNULL_BEGIN
 
 MTR_DEPRECATED("Please use MTRBaseDevice deviceWithNodeID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -37,20 +41,38 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 @interface MTRDeviceController : NSObject
 
 /**
- * Controllers are created via the MTRDeviceControllerFactory object.
+ * Controllers are created via the MTRDeviceControllerFactory object or
+ * initialized via initWithParameters:error:.
  */
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+/**
+ * Initialize a device controller with the provided parameters.  This will:
+ *
+ * 1) Auto-start the MTRDeviceControllerFactory in storage-per-controller mode
+ *    if it has not already been started.
+ * 2) Return nil or a running controller.
+ *
+ * Once this returns non-nil, it's the caller's resposibility to call shutdown
+ * on the controller to avoid leaking it.
+ */
+- (nullable instancetype)initWithParameters:(MTRDeviceControllerParameters *)parameters
+                                      error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 /**
  * If true, the controller has not been shut down yet.
  */
 @property (readonly, nonatomic, getter=isRunning) BOOL running;
 
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 /**
  * The ID assigned to this controller at creation time.
  */
 @property (readonly, nonatomic) NSUUID * uniqueIdentifier MTR_NEWLY_AVAILABLE;
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 /**
  * Return the Node ID assigned to the controller.  Will return nil if the
