@@ -106,28 +106,25 @@ public:
 
     /**
      * @brief Obtain the number of times the node has rebooted.
+     *        The reboot count value will be reset only upon a factory reset of the node.
      *
      * @param[out] rebootCount Reference to location where the reboot count integer will be copied.
-     * @returns CHIP_NO_ERROR on success or another CHIP_ERROR from the underlying implementation
-     *          if access fails.
      */
     virtual CHIP_ERROR GetRebootCount(uint16_t & rebootCount);
 
     /**
-     * @brief Obtain the time since the node's last reboot.
+     * @brief Obtain the time (in seconds) since the node's last reboot.
+     *        The up time value will be reset upon a node reboot.
      *
      * @param[out] upTime Reference to location where the up time integer will be copied.
-     * @returns CHIP_NO_ERROR on success or another CHIP_ERROR from the underlying implementation
-     *          if access fails.
      */
     virtual CHIP_ERROR GetUpTime(uint64_t & upTime);
 
     /**
-     * @brief Obtain the time (in hours) the node has been operational.
+     * @brief Obtain the total time (in hours) the node has been operational.
+     *        The total operational hours value will be reset only upon a factory reset of the node.
      *
      * @param[out] totalOperationalHours Reference to location where the total operation hours integer will be copied.
-     * @returns CHIP_NO_ERROR on success or another CHIP_ERROR from the underlying implementation
-     *          if access fails.
      */
     virtual CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
 
@@ -135,8 +132,6 @@ public:
      * @brief Obtain the reason for the node's most recent reboot.
      *
      * @param[out] bootReason Reference to location where the boot reason enum value will be copied.
-     * @returns CHIP_NO_ERROR on success or another CHIP_ERROR from the underlying implementation
-     *          if access fails.
      */
     virtual CHIP_ERROR GetBootReason(BootReasonType & bootReason);
 
@@ -145,8 +140,6 @@ public:
      *
      * @param[out] hardwareFaults Reference to location of a GeneralFaults instance.
      *                            The instance can be populated by sequentially calling add method.
-     * @returns CHIP_NO_ERROR on success or another CHIP_ERROR from the underlying implementation
-     *          if access fails.
      */
     virtual CHIP_ERROR GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults);
 
@@ -155,8 +148,6 @@ public:
      *
      * @param[out] radioFaults Reference to location of a GeneralFaults instance.
      *                         The instance can be populated by sequentially calling add method.
-     * @returns CHIP_NO_ERROR on success or another CHIP_ERROR from the underlying implementation
-     *          if access fails.
      */
     virtual CHIP_ERROR GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults);
 
@@ -165,8 +156,6 @@ public:
      *
      * @param[out] networkFaults Reference to location of a GeneralFaults instance.
      *                           The instance can be populated by sequentially calling add method.
-     * @returns CHIP_NO_ERROR on success or another CHIP_ERROR from the underlying implementation
-     *          if access fails.
      */
     virtual CHIP_ERROR GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults);
 
@@ -174,8 +163,6 @@ public:
      * @brief Obtain the average wear count of the node's persistent storage backend.
      *
      * @param[out] averageWearCount Reference to location where the average wear count integer will be copied.
-     * @returns CHIP_NO_ERROR on success or another CHIP_ERROR from the underlying implementation
-     *          if access fails.
      */
     virtual CHIP_ERROR GetAverageWearCount(uint32_t & averageWearCount);
 
