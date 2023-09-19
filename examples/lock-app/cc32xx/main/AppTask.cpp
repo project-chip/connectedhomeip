@@ -80,8 +80,6 @@ int AppTask::StartAppTask()
     int ret = 0;
 
     sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
-
-    VerifyOrReturn(!ret, ChipLogError(NotSpecified, "GetAppTask().StartAppTask() failed"));
     if (sAppEventQueue == NULL)
     {
         PLAT_LOG("Failed to allocate app event queue");
