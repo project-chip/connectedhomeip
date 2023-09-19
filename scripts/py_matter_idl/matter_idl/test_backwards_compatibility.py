@@ -87,143 +87,161 @@ Reasons:"""+"\n  - ".join([""] + checker.errors))
             with self.subTest(direction="OLD-to-OLD"):
                 self._AssumeCompatiblity(old, old, old_idl, old_idl, True)
 
-    def test_top_level_enums(self):
+    def test_top_level_enums_delete(self):
         self.ValidateUpdate(
             "delete a top level enum",
             "enum A: ENUM8{} enum B: ENUM8{}",
             "enum A: ENUM8{}",
             Compatibility.FORWARD_FAIL)
 
+    def test_top_level_enums_change(self):
         self.ValidateUpdate(
             "change an enum type",
             "enum A: ENUM8{}",
             "enum A: ENUM16{}",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
+    def test_top_level_enums_add_remove(self):
         self.ValidateUpdate(
             "Adding enum values is ok, removing values is not",
             "enum A: ENUM8 {A = 1; B = 2;}",
             "enum A: ENUM8 {A = 1; }",
             Compatibility.FORWARD_FAIL)
 
+    def test_top_level_enums_code(self):
         self.ValidateUpdate(
             "Switching enum codes is never ok",
             "enum A: ENUM8 {A = 1; B = 2; }",
             "enum A: ENUM8 {A = 1; B = 3; }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
-    def test_basic_clusters(self):
+    def test_basic_clusters_code(self):
         self.ValidateUpdate(
             "Switching cluster codes is never ok",
             "client cluster A = 1 {}",
             "client cluster A = 2 {}",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
+    def test_basic_clusters_remove(self):
         self.ValidateUpdate(
             "Removing a cluster is not ok",
             "client cluster A = 1 {} client cluster B = 2 {}",
             "client cluster A = 1 {}",
             Compatibility.FORWARD_FAIL)
 
+    def test_basic_clusters_enum(self):
         self.ValidateUpdate(
             "Adding an enum is ok. Also validates code formatting",
             "server cluster A = 16 {}",
             "server cluster A = 0x10 { enum X : ENUM8 {} }",
             Compatibility.BACKWARD_FAIL)
 
+    def test_basic_clusters_side(self):
         self.ValidateUpdate(
             "Detects side switch for clusters",
             "client cluster A = 1 {}",
             "server cluster A = 1 {}",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
-    def test_bitmaps(self):
+    def test_bitmaps_delete(self):
         self.ValidateUpdate(
             "Deleting a bitmap is not ok",
             "client Cluster X = 1 { bitmap A: BITMAP8{} bitmap B: BITMAP8{} }",
             "client Cluster X = 1 { bitmap A: BITMAP8{} }",
             Compatibility.FORWARD_FAIL)
 
+    def test_bitmaps_type(self):
         self.ValidateUpdate(
             "Changing a bitmap type is never ok",
             " client cluster X = 1 { bitmap A: BITMAP8{} }",
             " client cluster X = 1 { bitmap A: BITMAP16{} }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
+    def test_bitmaps_values(self):
         self.ValidateUpdate(
             "Adding bitmap values is ok, removing values is not",
             " client cluster X = 1 { bitmap A: BITMAP8 { kA = 0x01; kB = 0x02; } }",
             " client cluster X = 1 { bitmap A: BITMAP8 { kA = 0x01; } }",
             Compatibility.FORWARD_FAIL)
 
+    def test_bitmaps_code(self):
         self.ValidateUpdate(
             "Switching bitmap codes is never ok",
             " client cluster X = 1 { bitmap A: BITMAP8 { kA = 0x01; kB = 0x02; } }",
             " client cluster X = 1 { bitmap A: BITMAP8 { kA = 0x01; kB = 0x04; } }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
-    def test_events(self):
+    def test_events_delete(self):
         self.ValidateUpdate(
             "Deleting an event is not ok",
             "client Cluster X = 1 { info event A = 1 {} info event B = 2 {} }",
             "client Cluster X = 1 { info event B = 2 {} }",
             Compatibility.FORWARD_FAIL)
 
+    def test_events_code(self):
         self.ValidateUpdate(
             "Changing event code is never ok",
             "client Cluster X = 1 { info event A = 1 {} }",
             "client Cluster X = 1 { info event A = 2 {} }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
+    def test_events_struct(self):
         self.ValidateUpdate(
             "Changing event struct is never ok",
             "client Cluster X = 1 { info event A = 1 { int8u x = 1; } }",
             "client Cluster X = 1 { info event A = 1 { int8u x = 1; int8u y = 2; } }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
+    def test_events_severity(self):
         self.ValidateUpdate(
-            "Changing event type is ok",
+            "Changing event severity is ok",
             "client Cluster X = 1 { info event A = 1 { int8u x = 1; } }",
             "client Cluster X = 1 { critical event A = 1 { int8u x = 1; } }",
             Compatibility.ALL_OK)
 
-    def test_commands(self):
+    def test_commands_remove(self):
         self.ValidateUpdate(
             "Removing commands is not ok",
             "client Cluster X = 1 { command A() : DefaulSuccess = 0; command B() : DefaultSuccess = 1; }",
             "client Cluster X = 1 { command A() : DefaulSuccess = 0; }",
             Compatibility.FORWARD_FAIL)
 
+    def test_commands_id(self):
         self.ValidateUpdate(
             "Changing command IDs is never ok",
             "client Cluster X = 1 { command A() : DefaulSuccess = 1; }",
             "client Cluster X = 1 { command A() : DefaulSuccess = 2; }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
+    def test_commands_input(self):
         self.ValidateUpdate(
             "Changing command Inputs is never ok",
             "client Cluster X = 1 { command A() : DefaulSuccess = 1; }",
             "client Cluster X = 1 { command A(ARequest) : DefaulSuccess = 1; }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
+    def test_commands_output(self):
         self.ValidateUpdate(
             "Changing command Outputs is never ok",
             "client Cluster X = 1 { command A() : DefaultSuccess = 1; }",
             "client Cluster X = 1 { timed command A() : DefaultSuccess = 1; }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
+    def test_commands_quality_fabric(self):
         self.ValidateUpdate(
-            "Changing command Outputs is never ok",
+            "Changing command quality is not ok",
             "client Cluster X = 1 { command A() : DefaultSuccess = 1; }",
             "client Cluster X = 1 { fabric command A() : DefaultSuccess = 1; }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
+    def test_commands_quality_timed(self):
         self.ValidateUpdate(
             "Changing command qualities is never ok",
             "client Cluster X = 1 { fabric command A() : DefaultSuccess = 1; }",
             "client Cluster X = 1 { fabric timed command A() : DefaultSuccess = 1; }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
+    def test_commands_change_acl(self):
         self.ValidateUpdate(
             "Switching access is ok",
             "client Cluster X = 1 { command A() : DefaultSuccess = 1; }",
