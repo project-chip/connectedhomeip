@@ -31,7 +31,8 @@ from matter_idl.matter_idl_types import Idl
 
 
 class Compatibility(Flag):
-    FORWARD_FAIL = auto()  # old -> new is wrong
+    ALL_OK        = auto()  # placeholder allowing anything
+    FORWARD_FAIL  = auto()  # old -> new is wrong
     BACKWARD_FAIL = auto()  # new -> old is wrong
 
 
@@ -146,6 +147,30 @@ class TestCompatibilityChecks(unittest.TestCase):
             " client cluster X = 1 { bitmap A: BITMAP8 { kA = 0x01; kB = 0x04; } }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
+    def test_events(self):
+        self.ValidateUpdate(
+            "Deleting an event is not ok",
+            "client Cluster X = 1 { info event A = 1 {} info event B = 2 {} }",
+            "client Cluster X = 1 { info event B = 2 {} }",
+            Compatibility.FORWARD_FAIL)
+
+        self.ValidateUpdate(
+            "Changing event code is never ok",
+            "client Cluster X = 1 { info event A = 1 {} }",
+            "client Cluster X = 1 { info event A = 2 {} }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+        self.ValidateUpdate(
+            "Changing event struct is never ok",
+            "client Cluster X = 1 { info event A = 1 { int8u x = 1; } }",
+            "client Cluster X = 1 { info event A = 1 { int8u x = 1; int8u y = 2; } }",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+        self.ValidateUpdate(
+            "Changing event type is ok",
+            "client Cluster X = 1 { info event A = 1 { int8u x = 1; } }",
+            "client Cluster X = 1 { critical event A = 1 { int8u x = 1; } }",
+            Compatibility.ALL_OK)
 
 if __name__ == '__main__':
     unittest.main()

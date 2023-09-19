@@ -103,6 +103,18 @@ class CompatibilityChecker:
                 self._MarkIncompatible(
                     f"Bitmap {original.name} changed code for entry {entry.name} from {entry.code} to {existing[0].code}")
 
+    def CheckEventsCompatible(self, event: Event, updated_event: Optional[Event]):
+        if not updated_event:
+            self._MarkIncompatible(f"Event {event.name} was removed")
+            return
+
+        if event.code != updated_event.code:
+            self._MarkIncompatible(f"Event {event.name} code changed from {event.code} to {updated_event.code}")
+
+        if event.fields != updated_event.fields:
+            self._MarkIncompatible(f"Event {event.name} has had fields changed")
+
+
     def CheckEnumListCompatible(self, original: List[Enum], updated: List[Enum]):
         updated_enums = GroupListByName(updated)
 
@@ -129,7 +141,10 @@ class CompatibilityChecker:
 
     def CheckEventListCompatible(self, original: List[Event], updated: List[Event]):
         updated_events = GroupListByName(updated)
-        # TODO: implement
+
+        for event in original:
+            updated_event = updated_events.get(event.name)
+            self.CheckEventsCompatible(event, updated_event)
 
     def CheckClusterListCompatible(self, original: List[Cluster], updated: List[Cluster]):
         updated_clusters = GroupList(updated, FullClusterName)
