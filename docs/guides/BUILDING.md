@@ -31,19 +31,14 @@ To check out the Matter repository, run the following command:
 git clone --recurse-submodules git@github.com:project-chip/connectedhomeip.git
 ```
 
-## Synchronizing submodules
+## Updating Matter code
 
-If you already have the Matter code checked out, run the following command to
+If you already have the Matter code checked out, run the following command to update the repository and 
 synchronize submodules:
 
 ```
-git submodule update --init
-```
-
-After synchronizing the modules you need to pull the latest changes:
-
-```
 git pull
+git submodule update --init
 ```
 
 ## Prerequisites
