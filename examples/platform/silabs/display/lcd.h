@@ -37,7 +37,9 @@ public:
     {
         DemoScreen = 0,
         StatusScreen,
+#ifdef QR_CODE_ENABLED
         QRCodeScreen,
+#endif
         InvalidScreen,
     } Screen_e;
 
@@ -74,13 +76,15 @@ private:
         bool protocol1 = false; /* data */
     } DemoState_t;
 
-    void WriteQRCode();
     void WriteDemoUI();
     void WriteStatus();
+
 #ifdef QR_CODE_ENABLED
+    void WriteQRCode();
     void LCDFillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h);
     char mQRCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
 #endif
+
     GLIB_Context_t glibContext;
 
 #ifdef SL_DEMO_NAME

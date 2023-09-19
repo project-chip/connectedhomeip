@@ -35,6 +35,12 @@ template("gdbus_library") {
     include_dirs = [ "${root_gen_dir}/include" ]
   }
 
+  config("${library_name}_compile_config") {
+    # dbus code generation may generate some code detected as unreacheable
+    # by recent enough clang
+    cflags = [ "-Wno-unreachable-code" ]
+  }
+
   dbus_sources = []
   foreach(xml, invoker.sources) {
     name = get_path_info(xml, "name")
@@ -94,6 +100,7 @@ template("gdbus_library") {
     sources = dbus_sources
     deps = [ ":${library_name}_gen" ]
 
+    configs += [ ":${library_name}_compile_config" ]
     public_configs = [
       ":${library_name}_config",
       glib_config,
