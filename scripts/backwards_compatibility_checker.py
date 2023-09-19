@@ -75,8 +75,8 @@ def main(log_level, old_idl, new_idl):
     logging.info("Parsing OLD idl from %s" % old_idl)
     old_tree = CreateParser().parse(open(old_idl, "rt").read())
 
-    logging.info("Parsing NEW idl from %s" % old_idl)
-    new_tree = CreateParser().parse(open(old_idl, "rt").read())
+    logging.info("Parsing NEW idl from %s" % new_idl)
+    new_tree = CreateParser().parse(open(new_idl, "rt").read())
 
     if not IsBackwardsCompatible(original=old_tree, updated=new_tree):
         sys.exit(1)

@@ -123,6 +123,7 @@ class CompatibilityChecker:
             self._MarkIncompatible(f"Event {event.name} has had fields changed")
 
     def CheckCommandsCompatible(self, command: Command, updated_command: Optional[Command]):
+        self.logger.debug(f"  Checking command {command.name}")
         if not updated_command:
             self._MarkIncompatible(f"Command {command.name} was removed")
             return
@@ -143,6 +144,7 @@ class CompatibilityChecker:
                 f"Command {command.name} qualities changed from {command.qualities} to {updated_command.qualities}")
 
     def CheckStructsCompatible(self, original: Struct, updated: Optional[Struct]):
+        self.logger.debug(f"  Checking struct {original.name}")
         if not updated:
             self._MarkIncompatible(f"Struct {original.name} has been deleted.")
             return
@@ -160,6 +162,7 @@ class CompatibilityChecker:
             self._MarkIncompatible(f"Struct {original.name} has modified qualities")
 
     def CheckAttributeCompatible(self, original: Attribute, updated: Optional[Attribute]):
+        self.logger.debug(f"  Checking attribute {original.definition.name}")
         if not updated:
             self._MarkIncompatible(f"Attribute {original.definition.name} has been deleted.")
             return
@@ -231,6 +234,7 @@ class CompatibilityChecker:
             self.CheckClusterCompatible(original_cluster, updated_cluster)
 
     def CheckClusterCompatible(self, original_cluster: Cluster, updated_cluster: Optional[Cluster]):
+        self.logger.debug(f"Checking cluster {FullClusterName(original_cluster)}")
         if not updated_cluster:
             self._MarkIncompatible(f"Cluster {FullClusterName(original_cluster)} not found in updated list")
             return
