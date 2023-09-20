@@ -22,7 +22,7 @@ if [[ -d idt/venv ]]; then
 fi
 if [[ -d "idt/$IDT_OUTPUT_DIR" ]] ; then
   echo "TEMP MOVING IDT_OUTPUT_DIR"
-  mv "idt/$IDT_OUTPUT_DIR" "TEMP"$IDT_OUTPUT_DIR
+  mv "idt/$IDT_OUTPUT_DIR" "TEMP""$IDT_OUTPUT_DIR"
 fi
 if [[ -d idt/pycache ]] ; then
   echo "TEMP moving pycache"
@@ -36,7 +36,7 @@ if [[ -d TEMPvenv ]]; then
   echo "venv restored"
 fi
 if [[ -d "TEMP"$IDT_OUTPUT_DIR ]]; then
-  mv "TEMP"$IDT_OUTPUT_DIR "idt/$IDT_OUTPUT_DIR"
+  mv "TEMP""$IDT_OUTPUT_DIR" "idt/$IDT_OUTPUT_DIR"
   echo "IDT_OUTPUT_DIR restored"
 fi
 if [[ -d "idt/$IDT_OUTPUT_DIR" ]] ; then

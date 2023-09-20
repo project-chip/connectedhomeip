@@ -42,8 +42,8 @@ alias idt_clean_artifacts="idt_go && source idt/scripts/clean_artifacts.sh"
 alias idt_clean_all="idt_go && source idt/scripts/clean_all.sh"
 
 alias idt="idt_go && \
-if [ -z "${PYTHONPYCACHEPREFIX}" ]; then export PYTHONPYCACHEPREFIX="$IDT_SRC_PARENT/idt/pycache"; fi && \
-if [ -z "${VIRTUAL_ENV}"]; then source idt/scripts/py_venv.sh; fi && \
+if [ -z ""$PYTHONPYCACHEPREFIX ]; then export PYTHONPYCACHEPREFIX=""$IDT_SRC_PARENT/idt/pycache; fi && \
+if [ -z ""$VIRTUAL_ENV]; then source idt/scripts/py_venv.sh; fi && \
 python3 idt "
 
 echo "idt commands available! type idt and press tab twice to see available commands."
