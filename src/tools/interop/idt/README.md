@@ -49,12 +49,11 @@ This directory contains tools for use on both the admin computer and the RPi.
 
 ### Environment details
 
-1. `idt` will be used on both the admin computer and the RPi. 
-1. `scripts` only points to one installation location at a time. It is ideal
-   to maintain a single `idt` directory on each (admin and RPi) system 
-   accordingly.
-1. The expected install location on the RPi is the home directory
-   of the user specified in `idt/scripts/vars.sh`. Default values are:
+1. `idt` will be used on both the admin computer and the RPi.
+1. `scripts` only points to one installation location at a time. It is ideal to
+   maintain a single `idt` directory on each (admin and RPi) system accordingly.
+1. The expected install location on the RPi is the home directory of the user
+   specified in `idt/scripts/vars.sh`. Default values are:
     ```
     PIHOST="kali-raspberry-pi"
     PIUSER="kali"
@@ -169,8 +168,8 @@ Follow the steps below to execute capture and discovery without a Raspberry Pi.
 -   This package should work on most Debian (/based) systems.
 -   `idt` is currently tested on `Python 3.11`.
 -   `adb` and `tcpdump` are required.
--   The machine running `idt` should be connected to the same Wi-Fi network used for
-    testing.
+-   The machine running `idt` should be connected to the same Wi-Fi network used
+    for testing.
 
 #### Setup
 
@@ -178,12 +177,14 @@ Follow the steps below to execute capture and discovery without a Raspberry Pi.
 -   Optionally, run `source idt/scripts/setup_shell.sh` to install aliases
     permanently.
 
-> You may use `idt` in a Python virtual environment OR using a container from the idt image.
+> You may use `idt` in a Python virtual environment OR using a container from
+> the idt image.
 
 #### Python virtual environment
 
--   After `idt` aliases are available in your environment, calling any `idt` command will automatically create a new
-    virtual environment and install dependencies.
+-   After `idt` aliases are available in your environment, calling any `idt`
+    command will automatically create a new virtual environment and install
+    dependencies.
 
 #### Docker
 
