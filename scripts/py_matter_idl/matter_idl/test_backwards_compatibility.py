@@ -286,7 +286,7 @@ class TestCompatibilityChecks(unittest.TestCase):
 
     def test_struct_content_type_change(self):
         self.ValidateUpdate(
-            "Structure removal is not ok, but adding is ok",
+            "Changing structure data types is never ok",
             "client Cluster X = 1 { struct Foo { int32u x = 1; } }",
             "client Cluster X = 1 { struct Foo { int64u x = 1; } }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
