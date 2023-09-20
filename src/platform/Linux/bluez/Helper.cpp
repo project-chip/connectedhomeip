@@ -111,10 +111,10 @@ static BluezLEAdvertisement1 * BluezAdvertisingCreate(BluezEndpoint * apEndpoint
     BluezObjectSkeleton * object;
     GVariant * serviceData;
     GVariant * serviceUUID;
-    gchar * localName = nullptr;
+    GAutoPtr<char> localName;
     GVariantBuilder serviceDataBuilder;
     GVariantBuilder serviceUUIDsBuilder;
-    char * debugStr;
+    GAutoPtr<char> debugStr;
 
     VerifyOrExit(apEndpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
     if (apEndpoint->mpAdvPath == nullptr)
@@ -134,16 +134,15 @@ static BluezLEAdvertisement1 * BluezAdvertisingCreate(BluezEndpoint * apEndpoint
     g_variant_builder_add(&serviceUUIDsBuilder, "s", apEndpoint->mpAdvertisingUUID);
 
     if (apEndpoint->mpAdapterName != nullptr)
-        localName = g_strdup_printf("%s", apEndpoint->mpAdapterName);
+        localName = GAutoPtr<char>(g_strdup_printf("%s", apEndpoint->mpAdapterName));
     else
-        localName = g_strdup_printf("%s%04x", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, getpid() & 0xffff);
+        localName = GAutoPtr<char>(g_strdup_printf("%s%04x", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, getpid() & 0xffff));
 
     serviceData = g_variant_builder_end(&serviceDataBuilder);
     serviceUUID = g_variant_builder_end(&serviceUUIDsBuilder);
 
-    debugStr = g_variant_print(serviceData, TRUE);
-    ChipLogDetail(DeviceLayer, "SET service data to %s", StringOrNullMarker(debugStr));
-    g_free(debugStr);
+    debugStr = GAutoPtr<char>(g_variant_print(serviceData, TRUE));
+    ChipLogDetail(DeviceLayer, "SET service data to %s", StringOrNullMarker(MakeUniquePointerReceiver(debugStr).Get()));
 
     bluez_leadvertisement1_set_type_(adv, (apEndpoint->mType & BLUEZ_ADV_TYPE_CONNECTABLE) ? "peripheral" : "broadcast");
     // empty manufacturer data
@@ -159,7 +158,7 @@ static BluezLEAdvertisement1 * BluezAdvertisingCreate(BluezEndpoint * apEndpoint
         bluez_leadvertisement1_set_discoverable_timeout(adv, UINT16_MAX);
 
     // advertising name corresponding to the PID and object path, for debug purposes
-    bluez_leadvertisement1_set_local_name(adv, localName);
+    bluez_leadvertisement1_set_local_name(adv, MakeUniquePointerReceiver(localName).Get());
     bluez_leadvertisement1_set_service_uuids(adv, serviceUUID);
 
     // 0xffff means no appearance
@@ -179,7 +178,6 @@ static BluezLEAdvertisement1 * BluezAdvertisingCreate(BluezEndpoint * apEndpoint
     BLEManagerImpl::NotifyBLEPeripheralAdvConfiguredComplete(true, nullptr);
 
 exit:
-    g_free(localName);
     return adv;
 }
 
