@@ -29,6 +29,7 @@
 
 #include "access/RequestPath.h"
 #include "access/SubjectDescriptor.h"
+#include <app/AppBuildConfig.h>
 #include <app/RequiredPrivilege.h>
 #include <app/util/af-types.h>
 #include <app/util/endpoint-config-api.h>
@@ -336,10 +337,10 @@ void InteractionModelEngine::OnDone(ReadHandler & apReadObj)
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     if (!mSubscriptionResumptionScheduled && HasSubscriptionsToResume())
     {
-        mSubscriptionResumptionScheduled    = true;
-        auto timeTillNextResubscriptionSecs = ComputeTimeSecondsTillNextSubscriptionResumption();
-        mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(System::Clock::Seconds32(timeTillNextResubscriptionSecs),
-                                                                      ResumeSubscriptionsTimerCallback, this);
+        mSubscriptionResumptionScheduled            = true;
+        auto timeTillNextSubscriptionResumptionSecs = ComputeTimeSecondsTillNextSubscriptionResumption();
+        mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(
+            System::Clock::Seconds32(timeTillNextSubscriptionResumptionSecs), ResumeSubscriptionsTimerCallback, this);
         mNumSubscriptionResumptionRetries++;
     }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS

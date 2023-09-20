@@ -727,7 +727,7 @@ Here, _<payload\>_ is the ID of the payload to be parsed.
 To parse additional data payload, use the following command pattern:
 
 ```
-$ ./chip-tool parse-additional-data-payload <payload>
+$ ./chip-tool payload parse-additional-data-payload <payload>
 ```
 
 In this command:
