@@ -304,15 +304,40 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         snprintf(ackBuf, sizeof(ackBuf), " (Ack:" ChipLogFormatMessageCounter ")", payloadHeader.GetAckMessageCounter().Value());
     }
 
+    char addressStr[Transport::PeerAddress::kMaxToStringSize] = { 0 };
+    switch (sessionHandle->GetSessionType())
+    {
+    case Transport::Session::SessionType::kGroupOutgoing: {
+        // We already checked above that we have a fabric entry for our fabric
+        // index.
+        auto * groupSession   = sessionHandle->AsOutgoingGroupSession();
+        auto * fabricInfo     = mFabricTable->FindFabricWithIndex(fabricIndex);
+        auto multicastAddress = Transport::PeerAddress::Multicast(fabricInfo->GetFabricId(), groupSession->GetGroupId());
+        multicastAddress.ToString(addressStr);
+        break;
+    }
+    case Transport::Session::SessionType::kSecure: {
+        sessionHandle->AsSecureSession()->GetPeerAddress().ToString(addressStr);
+        break;
+    }
+    case Transport::Session::SessionType::kUnauthenticated: {
+        sessionHandle->AsUnauthenticatedSession()->GetPeerAddress().ToString(addressStr);
+        break;
+    }
+    default:
+        // Note: We checked above that we are one of these three session types.
+        break;
+    }
+
     //
     // Legend that can be used to decode this log line can be found in messaging/README.md
     //
     ChipLogProgress(ExchangeManager,
                     "<<< [E:" ChipLogFormatExchangeId " S:%u M:" ChipLogFormatMessageCounter
-                    "%s] (%s) Msg TX to %u:" ChipLogFormatX64 " [%04X] --- Type %04X:%02X (%s:%s)",
+                    "%s] (%s) Msg TX to %u:" ChipLogFormatX64 " [%04X] [%s] --- Type %04X:%02X (%s:%s)",
                     ChipLogValueExchangeIdFromSentHeader(payloadHeader), sessionHandle->SessionIdForLogging(),
                     packetHeader.GetMessageCounter(), ackBuf, Transport::GetSessionTypeString(sessionHandle), fabricIndex,
-                    ChipLogValueX64(destination), static_cast<uint16_t>(compressedFabricId),
+                    ChipLogValueX64(destination), static_cast<uint16_t>(compressedFabricId), addressStr,
                     payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType(), protocolName, msgTypeName);
 #endif
 
@@ -341,11 +366,6 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
         multicastAddress = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
         destination      = &multicastAddress;
-        char addressStr[Transport::PeerAddress::kMaxToStringSize];
-        multicastAddress.ToString(addressStr, Transport::PeerAddress::kMaxToStringSize);
-
-        ChipLogProgress(Inet, "(G) Sending msg " ChipLogFormatMessageCounter " to Multicast IPV6 address '%s'",
-                        preparedMessage.GetMessageCounter(), addressStr);
     }
     break;
     case Transport::Session::SessionType::kSecure: {
@@ -356,23 +376,12 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
         secure->MarkActive();
 
         destination = &secure->GetPeerAddress();
-
-        ChipLogProgress(Inet, "(S) Sending msg " ChipLogFormatMessageCounter " on secure session with LSID: %u",
-                        preparedMessage.GetMessageCounter(), secure->GetLocalSessionId());
     }
     break;
     case Transport::Session::SessionType::kUnauthenticated: {
         auto unauthenticated = sessionHandle->AsUnauthenticatedSession();
         unauthenticated->MarkActive();
         destination = &unauthenticated->GetPeerAddress();
-
-#if CHIP_PROGRESS_LOGGING
-        char addressStr[Transport::PeerAddress::kMaxToStringSize];
-        destination->ToString(addressStr);
-
-        ChipLogProgress(Inet, "(U) Sending msg " ChipLogFormatMessageCounter " to IP address '%s'",
-                        preparedMessage.GetMessageCounter(), addressStr);
-#endif
     }
     break;
     default:
