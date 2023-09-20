@@ -18,6 +18,9 @@
 
 #ifndef MPC_SENDABLE_COMMAND
 #define MPC_SENDABLE_COMMAND
+
+#define MPC_MAX_COMMAND_RETRY   1
+
 namespace mpc {
 using namespace chip;
 
@@ -102,13 +105,25 @@ private:
             }
             Platform::Delete(ctx);
         };
-        Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, ctx->m_endpoint_id, ctx->mCommand, onSuccess, onFailure);
+        auto err = Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, ctx->m_endpoint_id, ctx->mCommand, 
+                                                    onSuccess, onFailure);
+        // Retry immediately in-case of synchronous send failure (possibly internal failure such as stale session)
+        if (err != CHIP_NO_ERROR && ctx->mRetryCount++ < MPC_MAX_COMMAND_RETRY) {
+            Server::GetInstance().GetCASESessionManager()->FindOrEstablishSession(sessionHandle->GetPeer(), 
+                                                    &ctx->mOnConnectedCallback, &ctx->mOnConnectionFailureCallback);
+        }
     };
 
     static void onConnectFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
     {
         SendableCommand<T> * ctx = static_cast<SendableCommand<T> *>(context);
         ChipLogError(NotSpecified, "Connection Failed: %" CHIP_ERROR_FORMAT, error.Format());
+        
+        if (ctx->mRetryCount++ < MPC_MAX_COMMAND_RETRY) {
+            Server::GetInstance().GetCASESessionManager()->FindOrEstablishSession(peerId, 
+                                                    &ctx->mOnConnectedCallback, &ctx->mOnConnectionFailureCallback);
+            return;
+        }
         if (ctx->mSendDone.HasValue())
         {
             ctx->mSendDone.Value()(error, peerId);
@@ -118,6 +133,7 @@ private:
 
     T mCommand;
     EndpointId m_endpoint_id;
+    uint8_t mRetryCount = 0;
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
     Optional<SendDoneCallback> mSendDone;
