@@ -33,7 +33,6 @@ except ImportError:
     from matter_idl.matter_idl_parser import CreateParser
 
 from matter_idl.backwards_compatibility import is_backwards_compatible
-from matter_idl.matter_idl_types import Idl
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
