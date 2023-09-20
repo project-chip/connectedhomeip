@@ -20,12 +20,6 @@ from pathlib import Path
 from typing import TextIO
 
 
-def warn_if_file_not_growing() -> None:
-    # TODO
-    """Used to verify streamed files are growing in size and warn if not"""
-    pass
-
-
 def add_border(to_print: str) -> str:
     """Add star borders to important strings"""
     return '\n' + '*' * len(to_print) + '\n' + to_print

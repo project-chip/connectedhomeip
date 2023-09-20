@@ -22,12 +22,12 @@ from .factory import CaptureEcosystems, CapturePlatforms, EcosystemCapture, Plat
 from .shell_utils import BashRunner
 
 __all__ = [
-    'PlatformLogStreamer',
-    'EcosystemCapture',
-    'CapturePlatforms',
-    'CaptureEcosystems',
-    'platform',
-    'ecosystem',
     'BashRunner',
+    'CaptureEcosystems',
+    'CapturePlatforms',
+    'EcosystemCapture',
     'PacketCaptureRunner',
+    'PlatformLogStreamer',
+    'ecosystem',
+    'platform',
 ]
