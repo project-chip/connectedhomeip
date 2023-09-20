@@ -22,7 +22,7 @@ class K32WBoard(Enum):
     K32W0 = auto()
     K32W1 = auto()
 
-    def AppName(self):
+    def Name(self):
         if self == K32WBoard.K32W0:
             return 'k32w0x'
         elif self == K32WBoard.K32W1:
@@ -32,17 +32,17 @@ class K32WBoard(Enum):
 
     def FolderName(self):
         if self == K32WBoard.K32W0:
-            return 'k32w0'
+            return 'k32w/k32w0'
         elif self == K32WBoard.K32W1:
-            return 'k32w1'
+            return 'k32w/k32w1'
         else:
             raise Exception('Unknown board type: %r' % self)
 
-    def Extensions(self):
+    def BinaryTextExtension(self):
         if self == K32WBoard.K32W0:
-            return ["", ".map", ".hex"]
+            return ".hex"
         elif self == K32WBoard.K32W1:
-            return ["", ".map", ".srec"]
+            return ".srec"
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -78,7 +78,7 @@ class K32WApp(Enum):
             raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root, board):
-        return os.path.join(root, 'examples', self.ExampleName(), 'nxp', 'k32w', board.FolderName())
+        return os.path.join(root, 'examples', self.ExampleName(), 'nxp', board.FolderName())
 
 
 class K32WBuilder(GnBuilder):
@@ -157,8 +157,9 @@ class K32WBuilder(GnBuilder):
 
     def build_outputs(self):
         items = {}
-        for extension in self.board.Extensions():
-            name = 'chip-%s-%s%s' % (self.board.AppName(), self.app.NameSuffix(), extension)
+        app_name = 'chip-%s-%s' % (self.board.Name(), self.app.NameSuffix())
+        for extension in [".map", self.board.BinaryTextExtension()]:
+            name = '%s.%s' % (app_name, extension)
             items[name] = os.path.join(self.output_dir, name)
 
         return items
