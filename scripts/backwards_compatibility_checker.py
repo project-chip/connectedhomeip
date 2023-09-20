@@ -58,8 +58,11 @@ __LOG_LEVELS__ = {
     type=click.Path(exists=True))
 def main(log_level, old_idl, new_idl):
     """
-    Parses MATTER IDL files (.matter) and validates that <new_idl> contains only
-    additions when compared to <old_idl>
+    Parses MATTER IDL files (.matter) and validates that <new_idl> is backwards compatible
+    when compared to <old_idl>.
+
+    Generally additions are safe, but not deletes or id changes. Actual set of rules
+    defined in `backwards_compatibility` module.
     """
     if _has_coloredlogs:
         coloredlogs.install(level=__LOG_LEVELS__[
