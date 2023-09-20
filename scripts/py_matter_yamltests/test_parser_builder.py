@@ -72,19 +72,19 @@ class TestHooks(TestParserHooks):
         self.test_failure_count = 0
         self.test_success_count = 0
 
-    def start(self, count):
+    def parsing_start(self, count):
         self.start_count += 1
 
-    def stop(self, duration):
+    def parsing_stop(self, duration):
         self.stop_count += 1
 
-    def test_start(self, name):
+    def test_parsing_start(self, name):
         self.test_start_count += 1
 
-    def test_success(self, duration):
+    def test_parsing_success(self, duration):
         self.test_success_count += 1
 
-    def test_failure(self, exception, duration):
+    def test_parsing_failure(self, exception, duration):
         self.test_failure_count += 1
 
 

@@ -30,7 +30,7 @@ jobs:
 
         runs-on: ubuntu-20.04
         container:
-            image: connectedhomeip/chip-build:0.7.3
+            image: ghcr.io/project-chip/chip-build:1
         defaults:
             run:
                 shell: sh
@@ -48,21 +48,7 @@ jobs:
 
             - name: Generate all
               run: ./scripts/run_in_build_env.sh scripts/tools/zap_regen_all.py
-            - name: Ensure git works in current working directory
-              run: git config --global --add safe.directory `pwd`
-            - name: Add uncommitted changes
-              run: git add .
-            - name: Fix upstream
-              run: |
-                  git remote set-url origin https://x-access-token:$COMMITTER_TOKEN@github.com/$GITHUB_REPOSITORY.git
-                  git config --global user.email "$USER_EMAIL"
-                  git config --global user.name "$USER_NAME"
-              env:
-                  COMMITTER_TOKEN: ${{ secrets.MATTER_PAT }}
-                  USER_EMAIL: ${{ secrets.MATTER_PAT_EMAIL }}
-                  USER_NAME: ${{ secrets.MATTER_PAT_NAME }}
-                  GITHUB_REPOSITORY: ${{ github.GITHUB_REPOSITORY }}
-            - name: Commit
-              run: git commit -a -m "Regenerating ZAP"
-            - name: Push
-              run: git push
+            - uses: EndBug/add-and-commit@v9
+              with:
+                default_author: github_actions
+                message: Regenerating ZAP

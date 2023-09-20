@@ -12,23 +12,26 @@ WeakEnums:
     - RadioFaultEnum
     - StepMode
 
-DefineBitmaps:
-    # Allow-list of bitmaps that we generates as #define as well as enum classes.
-    # The goal is to drive this down to 0.
-    - BarrierControlCapabilities
-    - BarrierControlSafetyStatus
-
 CommandHandlerInterfaceOnlyClusters:
     # List of clusters that are implemented entirely with
     # CommandHandlerInterface and hence do not need generated command dispatch.
     # This uses asUpperCamelCase versions of the cluster name.
-    - NetworkCommissioning
+    - Network Commissioning
     - Scenes
+    - RVC Run Mode
+    - RVC Clean Mode
+    - Dishwasher Mode
+    - Laundry Washer Mode
+    - Refrigerator And Temperature Controlled Cabinet Mode
+    - Operational State
+    - Activated Carbon Filter Monitoring
+    - HEPA Filter Monitoring
+    - RVC Operational State
+    - Sample MEI
 
 # We need a more configurable way of deciding which clusters have which init functions....
 # See https://github.com/project-chip/connectedhomeip/issues/4369
 ClustersWithInitFunctions:
-    - Basic
     - Color Control
     - Groups
     - Identify
@@ -40,6 +43,7 @@ ClustersWithInitFunctions:
     - Time Format Localization
     - Thermostat
     - Mode Select
+    - Sample MEI
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic
@@ -55,6 +59,7 @@ ClustersWithShutdownFunctions:
     - Door Lock
     - Level Control
     - Color Control
+    - Sample MEI
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock
@@ -65,3 +70,4 @@ ClustersWithPreAttributeChangeFunctions:
     - Mode Select
     - Fan Control
     - Thermostat
+    - Laundry Washer Controls

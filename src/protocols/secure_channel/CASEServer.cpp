@@ -48,6 +48,9 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
     // Set up the group state provider that persists across all handshakes.
     GetSession().SetGroupDataProvider(mGroupDataProvider);
 
+    ChipLogProgress(Inet, "CASE Server enabling CASE session setups");
+    mExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1, this);
+
     PrepareForSessionEstablishment();
 
     return CHIP_NO_ERROR;
@@ -81,10 +84,17 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
         bool watchdogFired = GetSession().InvokeBackgroundWorkWatchdog();
         if (!watchdogFired)
         {
-            // Handshake wasn't stuck, let it continue its work
-            // TODO: Send Busy response, #27473
-            ChipLogError(Inet, "CASE session is in establishing state, returning without responding");
-            return CHIP_NO_ERROR;
+            // Handshake wasn't stuck, send the busy status report and let the existing handshake continue.
+
+            // A successful CASE handshake can take several seconds and some may time out (30 seconds or more).
+            // TODO: Come up with better estimate: https://github.com/project-chip/connectedhomeip/issues/28288
+            // For now, setting minimum wait time to 5000 milliseconds.
+            CHIP_ERROR err = SendBusyStatusReport(ec, System::Clock::Milliseconds16(5000));
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Inet, "Failed to send the busy status report, err:%" CHIP_ERROR_FORMAT, err.Format());
+            }
+            return err;
         }
     }
 
@@ -113,11 +123,6 @@ exit:
 
 void CASEServer::PrepareForSessionEstablishment(const ScopedNodeId & previouslyEstablishedPeer)
 {
-    // Let's re-register for CASE Sigma1 message, so that the next CASE session setup request can be processed.
-    // https://github.com/project-chip/connectedhomeip/issues/8342
-    ChipLogProgress(Inet, "CASE Server enabling CASE session setups");
-    mExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1, this);
-
     GetSession().Clear();
 
     //
@@ -183,4 +188,16 @@ void CASEServer::OnSessionEstablished(const SessionHandle & session)
                     ChipLogValueScopedNodeId(session->GetPeer()));
     PrepareForSessionEstablishment(session->GetPeer());
 }
+
+CHIP_ERROR CASEServer::SendBusyStatusReport(Messaging::ExchangeContext * ec, System::Clock::Milliseconds16 minimumWaitTime)
+{
+    ChipLogProgress(Inet, "Already in the middle of CASE handshake, sending busy status report");
+
+    System::PacketBufferHandle handle = Protocols::SecureChannel::StatusReport::MakeBusyStatusReportMessage(minimumWaitTime);
+    VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+    ChipLogProgress(Inet, "Sending status report, exchange " ChipLogFormatExchange, ChipLogValueExchange(ec));
+    return ec->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(handle));
+}
+
 } // namespace chip

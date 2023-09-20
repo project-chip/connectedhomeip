@@ -15,7 +15,7 @@
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidApp, AndroidBoard, AndroidBuilder, AndroidProfile
 from builders.asr import ASRApp, ASRBoard, ASRBuilder
-from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
+from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder, BouffalolabMfd
 from builders.cc32xx import cc32xxApp, cc32xxBuilder
 from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
 from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
@@ -30,6 +30,7 @@ from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder, OpenIotSdkCryptoBackend
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
+from builders.stm32 import stm32App, stm32Board, stm32Builder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.ti import TIApp, TIBoard, TIBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
@@ -129,6 +130,9 @@ def BuildHostTarget():
         TargetPart('chip-cert', app=HostApp.CERT_TOOL),
         TargetPart('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE),
         TargetPart('contact-sensor', app=HostApp.CONTACT_SENSOR),
+        TargetPart('dishwasher', app=HostApp.DISHWASHER),
+        TargetPart('refrigerator', app=HostApp.REFRIGERATOR),
+        TargetPart('rvc', app=HostApp.RVC),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -230,13 +234,14 @@ def BuildEfr32Target():
         TargetPart('unit-test', app=Efr32App.UNIT_TEST),
         TargetPart('light', app=Efr32App.LIGHT),
         TargetPart('lock', app=Efr32App.LOCK),
-        TargetPart('thermostat', app=Efr32App.THERMOSTAT)
+        TargetPart('thermostat', app=Efr32App.THERMOSTAT),
+        TargetPart('pump', app=Efr32App.PUMP)
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('with-ota-requestor', enable_ota_requestor=True)
-    target.AppendModifier('sed', enable_sed=True)
-    target.AppendModifier('low-power', enable_low_power=True).OnlyIfRe('-sed')
+    target.AppendModifier('icd', enable_icd=True)
+    target.AppendModifier('low-power', enable_low_power=True).OnlyIfRe('-icd')
     target.AppendModifier('shell', chip_build_libshell=True)
     target.AppendModifier('no_logging', chip_logging=False)
     target.AppendModifier('openthread_mtd', chip_openthread_ftd=False)
@@ -326,6 +331,8 @@ def BuildAndroidTarget():
         TargetPart('tv-casting-app', app=AndroidApp.TV_CASTING_APP),
         TargetPart('java-matter-controller',
                    app=AndroidApp.JAVA_MATTER_CONTROLLER),
+        TargetPart('virtual-device-app',
+                   app=AndroidApp.VIRTUAL_DEVICE_APP),
     ])
 
     # Modifiers
@@ -415,6 +422,7 @@ def BuildASRTarget():
     target.AppendFixedTargets([
         TargetPart('asr582x', board=ASRBoard.ASR582X),
         TargetPart('asr595x', board=ASRBoard.ASR595X),
+        TargetPart('asr550x', board=ASRBoard.ASR550X),
     ])
 
     # apps
@@ -428,6 +436,8 @@ def BuildASRTarget():
         TargetPart('temperature-measurement', app=ASRApp.TEMPERATURE_MEASUREMENT),
         TargetPart('thermostat', app=ASRApp.THERMOSTAT),
         TargetPart('ota-requestor', app=ASRApp.OTA_REQUESTOR),
+        TargetPart('dishwasher', app=ASRApp.DISHWASHER),
+        TargetPart('refrigerator', app=ASRApp.REFRIGERATOR),
     ])
 
     # modifiers
@@ -436,6 +446,7 @@ def BuildASRTarget():
     target.AppendModifier('no_logging', chip_logging=False)
     target.AppendModifier('factory', enable_factory=True)
     target.AppendModifier('rotating_id', enable_rotating_device_id=True)
+    target.AppendModifier('rio', enable_lwip_ip6_hook=True)
 
     return target
 
@@ -554,6 +565,22 @@ def BuildQorvoTarget():
     return target
 
 
+def BuildStm32Target():
+    target = BuildTarget('stm32', stm32Builder)
+
+    # board
+    target.AppendFixedTargets([
+        TargetPart('STM32WB5MM-DK', board=stm32Board.STM32WB55XX),
+    ])
+
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('light', app=stm32App.LIGHT),
+    ])
+
+    return target
+
+
 def BuildTizenTarget():
     target = BuildTarget('tizen', TizenBuilder)
 
@@ -585,13 +612,17 @@ def BuildBouffalolabTarget():
 
     # Boards
     target.AppendFixedTargets([
-        TargetPart('BL602-IoT-Matter-V1', board=BouffalolabBoard.BL602_IoT_Matter_V1, module_type="BL602"),
-        TargetPart('BL602-IOT-DVK-3S', board=BouffalolabBoard.BL602_IOT_DVK_3S, module_type="BL602"),
-        TargetPart('BL602-NIGHT-LIGHT', board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602"),
-        TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.XT_ZB6_DevKit, module_type="BL706C-22"),
-        TargetPart('BL706-IoT-DVK', board=BouffalolabBoard.BL706_IoT_DVK, module_type="BL706C-22"),
-        TargetPart('BL706-NIGHT-LIGHT', board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22"),
-        TargetPart('BL704L-DVK', board=BouffalolabBoard.BL704L_DVK, module_type="BL704L"),
+        TargetPart('BL602-IoT-Matter-V1',
+                   board=BouffalolabBoard.BL602_IoT_Matter_V1, module_type="BL602"),
+        TargetPart('BL602-NIGHT-LIGHT',
+                   board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602"),
+        TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.XT_ZB6_DevKit,
+                   module_type="BL706C-22"),
+        TargetPart('BL706-NIGHT-LIGHT',
+                   board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22"),
+        TargetPart('BL706DK',
+                   board=BouffalolabBoard.BL706DK, module_type="BL706C-22"),
+        TargetPart('BL704LDK', board=BouffalolabBoard.BL704LDK, module_type="BL704L"),
     ])
 
     # Apps
@@ -603,6 +634,14 @@ def BuildBouffalolabTarget():
     target.AppendModifier('115200', baudrate=115200)
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('cdc', enable_cdc=True)
+    target.AppendModifier('resetCnt', enable_resetCnt=True)
+    target.AppendModifier('rotating_device_id', enable_rotating_device_id=True)
+    target.AppendModifier('mfd', function_mfd=BouffalolabMfd.MFD_RELEASE)
+    target.AppendModifier('mfdtest', function_mfd=BouffalolabMfd.MFD_TEST)
+    target.AppendModifier('ethernet', enable_ethernet=True)
+    target.AppendModifier('wifi', enable_wifi=True)
+    target.AppendModifier('thread', enable_thread=True)
+    target.AppendModifier('fp', enable_frame_ptr=True)
 
     return target
 
@@ -640,8 +679,11 @@ def BuildGenioTarget():
 
 def BuildTelinkTarget():
     target = BuildTarget('telink', TelinkBuilder)
-    target.AppendFixedTargets(
-        [TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D)])
+
+    target.AppendFixedTargets([
+        TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D),
+        TargetPart('tlsr9528a', board=TelinkBoard.TLSR9528A),
+    ])
 
     target.AppendFixedTargets([
         TargetPart('all-clusters', app=TelinkApp.ALL_CLUSTERS),
@@ -654,6 +696,9 @@ def BuildTelinkTarget():
         TargetPart('ota-requestor', app=TelinkApp.OTA_REQUESTOR),
         TargetPart('pump', app=TelinkApp.PUMP),
         TargetPart('pump-controller', app=TelinkApp.PUMP_CONTROLLER),
+        TargetPart('resource-monitoring', app=TelinkApp.RESOURCE_MONITORING),
+        TargetPart('shell', app=TelinkApp.SHELL),
+        TargetPart('smoke-co-alarm', app=TelinkApp.SMOKE_CO_ALARM),
         TargetPart('temperature-measurement',
                    app=TelinkApp.TEMPERATURE_MEASUREMENT),
         TargetPart('thermostat', app=TelinkApp.THERMOSTAT),
@@ -705,6 +750,7 @@ BUILD_TARGETS = [
     BuildNrfTarget(),
     BuildNrfNativeTarget(),
     BuildQorvoTarget(),
+    BuildStm32Target(),
     BuildTizenTarget(),
     BuildTelinkTarget(),
     BuildOpenIotSdkTargets(),

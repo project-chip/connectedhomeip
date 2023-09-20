@@ -18,12 +18,14 @@
 
 #pragma once
 
+#include <app/AppBuildConfig.h>
 #include <app/BufferedReadCallback.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Decode.h>
 #include <functional>
 #include <lib/support/CHIPMem.h>
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
 namespace chip {
 namespace Controller {
 
@@ -290,3 +292,4 @@ private:
 
 } // namespace Controller
 } // namespace chip
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT

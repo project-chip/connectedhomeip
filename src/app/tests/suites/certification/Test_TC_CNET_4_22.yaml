@@ -36,13 +36,22 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ScanNetworks command to the DUT with the SSID field omitted
-          and the Breadcrumb field set to 1"
+          "Step 1: TH sends ScanNetworks command to the DUT with the SSID field
+          omitted and the Breadcrumb field set to 1"
       PICS: CNET.S.C00.Rsp && CNET.S.C01.Tx
       verification: |
           ./chip-tool networkcommissioning scan-networks 54 0 --Breadcrumb 1
 
-          Verify  "ScanNetworksResponse and its arguments" on the TH(Chip-tool) Log:
+          Via the TH (all-clusters-app), verify:
+          -the NetworkingStatus value as 0 that mentions success.
+          -the PanId value is in the range of 0 to 65534.
+          -the ExtendedPanId value is type of uint64.
+          -the NetworkName value is type of string with a size of 1 to 16 bytes.
+          -the Channel is type of uint16 with range 0 to 65535.
+          -the version value is type of uint8(0 to 255).
+          -the ExtendedAddress is a hwaddr with a size of 8 bytes
+          -the RSSI is of type int8 with a range of -120 to 0.
+          -the LQI is type of uint8(0 to 255).
 
           [1658297246.000815][7679:7684] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0001
           [1658297246.001029][7679:7684] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0001
@@ -65,11 +74,12 @@ tests:
       disabled: true
 
     - label:
-          "TH reads Breadcumb attribute from the General Commissioning Cluster"
+          "Step 2: TH reads Breadcrumb attribute from the General Commissioning
+          Cluster"
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 54 0
 
-          Verify Breadcrumb: 1 on the TH/All-cluster-app Log:
+          Via the TH (chip-tool), verify the Breadcumb attribute that contains value as 1.
 
           [1657688310.986593][1613:1618] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 829017612
           [1657688310.989412][1613:1618] CHIP:TOO:   Breadcrumb: 1
@@ -77,13 +87,22 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ScanNetworks command to the DUT with the SSID field set to
-          null and the Breadcrumb field set to 2"
+          "Step 3: TH sends ScanNetworks command to the DUT with the SSID field
+          set to null and the Breadcrumb field set to 2"
       PICS: CNET.S.C00.Rsp && CNET.S.C01.Tx
       verification: |
           ./chip-tool networkcommissioning scan-networks 54 0 --Breadcrumb 2
 
-          Verify  ScanNetworksResponse and its arguments on the TH/All-cluster-app Log:
+          Via the TH (all-clusters-app), verify:
+          -the NetworkingStatus value as 0 that mentions success.
+          -the PanId value is in the range of 0 to 65534.
+          -the ExtendedPanId value is type of uint64.
+          -the NetworkName value is type of string with a size of 1 to 16 bytes.
+          -the Channel is type of uint16 with range 0 to 65535.
+          -the version value is type of uint8(0 to 255).
+          -the ExtendedAddress is a hwaddr with a size of 8 bytes
+          -the RSSI is of type int8 with a range of -120 to 0.
+          -the LQI is type of uint8(0 to 255).
 
           [1658297283.141075][7695:7700] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0001
           [1658297283.141183][7695:7700] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0001
@@ -116,12 +135,12 @@ tests:
       disabled: true
 
     - label:
-          "TH reads Breadcumb attribute from the General Commissioning Cluster"
+          "Step 4: TH reads Breadcrumb attribute from the General Commissioning
+          Cluster"
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 54 0
 
-          Verify "Breadcrumb: 2" on the TH(Chip-tool)  Log:
-
+          Via the TH (chip-tool), verify the Breadcumb attribute that contains value as 2.
 
           [1657688397.398564][1626:1631] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 829017613
           [1657688397.398697][1626:1631] CHIP:TOO:   Breadcrumb: 2
@@ -129,14 +148,23 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ScanNetworks command to the DUT with the SSID field set to a
-          random string of ASCII characters with a size of between 1 and 31
-          characters and the Breadcrumb field set to 3"
+          "Step 5: TH sends ScanNetworks command to the DUT with the SSID field
+          set to a random string of ASCII characters with a size of between 1
+          and 31 characters and the Breadcrumb field set to 3"
       PICS: CNET.S.C00.Rsp && CNET.S.C01.Tx
       verification: |
           ./chip-tool networkcommissioning scan-networks 54 0 --Breadcrumb 3
 
-          Verify  "ScanNetworksResponse and its arguments" on the TH(Chip-tool)  Log:
+          Via the TH (all-clusters-app), verify:
+          -the NetworkingStatus value should be as 0 that mentions success.
+          -the PanId value should be with in the range of 0 to 65534.
+          -the ExtendedPanId value is type of uint64.
+          -the NetworkName value is type of string with a size of 1 to 16 bytes.
+          -the Channel is type of uint16 with range 0 to 65535.
+          -the version value is type of uint8(0 to 255).
+          -the ExtendedAddress is a hwaddr with a size of 8 bytes
+          -the RSSI is of type int8 with a range of -120 to 0.
+          -the LQI is type of uint8(0 to 255).
 
           [1658297312.201709][7708:7713] CHIP:DMG: },
           [1658297312.201898][7708:7713] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0001
@@ -160,11 +188,12 @@ tests:
       disabled: true
 
     - label:
-          "TH reads Breadcumb attribute from the General Commissioning Cluster"
+          "Step 6: TH reads Breadcrumb attribute from the General Commissioning
+          Cluster"
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 54 0
 
-          Verify "Breadcrumb: 3" on the TH(Chip-tool)  Log:
+          Via the TH (chip-tool), verify the Breadcumb attribute that contains value as 3.
 
           [1657688489.553742][1639:1644] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 829017614
           [1657688489.553897][1639:1644] CHIP:TOO:   Breadcrumb: 3

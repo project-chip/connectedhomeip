@@ -14,5 +14,8 @@
 
 group("check") {
   testonly = true
-  deps = [ "integration_tests/lighting-app:check" ]
+  deps = [
+    "chip_tests:check",
+    "integration_tests/lighting-app:check",
+  ]
 }

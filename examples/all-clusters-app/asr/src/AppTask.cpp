@@ -40,6 +40,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+#include <static-supported-temperature-levels.h>
 
 using namespace ::chip;
 using namespace ::chip::Credentials;
@@ -60,6 +61,7 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointMain /* Endpoint Id */,
                                       &(NetworkCommissioning::ASRWiFiDriver::GetInstance()));
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 } // namespace
 
 AppTask AppTask::sAppTask;
@@ -123,6 +125,8 @@ CHIP_ERROR AppTask::Init()
 #else
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kOnNetwork));
 #endif /* CONFIG_NETWORK_LAYER_BLE */
+
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 
     return CHIP_NO_ERROR;
 }

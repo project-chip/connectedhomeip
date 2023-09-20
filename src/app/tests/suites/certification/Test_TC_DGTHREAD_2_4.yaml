@@ -24,7 +24,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -32,11 +32,11 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Sends ResetCounts command"
+    - label: "Step 2: Sends ResetCounts command"
       command: "ResetCounts"
       PICS: DGTHREAD.S.C00.Rsp
 
-    - label: "Read the Overruncount attribute"
+    - label: "Step 3: Read the Overruncount attribute"
       PICS: DGTHREAD.S.A0006
       command: "readAttribute"
       attribute: "OverrunCount"

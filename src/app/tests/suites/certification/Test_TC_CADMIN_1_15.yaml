@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    30.1.15. [TC-CADMIN-1.15] Removing Fabrics from DUT and Fabric index
+    4.1.15. [TC-CADMIN-1.15] Removing Fabrics from DUT and Fabric index
     enumeration using ECM [DUT - Commissionee]
 
 PICS:
@@ -31,7 +31,7 @@ tests:
           Reset Devices to factory defaults
       disabled: true
 
-    - label: "TH_CR1 starts a commissioning process with DUT_CE"
+    - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
       PICS: CADMIN.S
       verification: |
           "1. Provision the device using TH_CR1 (Chip-tool as controller)
@@ -39,8 +39,8 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+          "Step 2: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.S.C00.Rsp
       verification: |
           On TH_CR1 chip tool, open commissioning window using ECM
@@ -62,7 +62,7 @@ tests:
           [1635925713.973178][9695:9700] CHIP:EM: Sending Standalone Ack for MessageCounter:1964916542 on exchange 31055i
       disabled: true
 
-    - label: "TH_CR2 starts a commissioning process with DUT_CE"
+    - label: "Step 3: TH_CR2 starts a commissioning process with DUT_CE"
       PICS: CADMIN.S
       verification: |
           On TH_CR2 using chip tool connect to the accessory
@@ -75,8 +75,8 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+          "Step 4: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.S.C00.Rsp
       verification: |
           On TH_CR1 chip tool, open commissioning window using ECM
@@ -98,7 +98,7 @@ tests:
           [1635925713.973178][9695:9700] CHIP:EM: Sending Standalone Ack for MessageCounter:1964916542 on exchange 31055i
       disabled: true
 
-    - label: "TH_CR3 starts a commissioning process with DUT_CE"
+    - label: "Step 5: TH_CR3 starts a commissioning process with DUT_CE"
       PICS: CADMIN.S
       verification: |
           On TH_CR3  using chip tool connect to the accessory
@@ -109,7 +109,7 @@ tests:
           Device commissioning completed with success
       disabled: true
 
-    - label: "TH_CR2 reads the list of Fabrics on DUT_CE"
+    - label: "Step 6: TH_CR2 reads the list of Fabrics on DUT_CE"
       PICS: OPCREDS.S.A0001
       verification: |
           On TH_CR2  using chip tool, read fabrics list
@@ -147,7 +147,9 @@ tests:
           CHIP:EM: Sending Standalone Ack for MessageCounter:9143157 on exchange 1147i
       disabled: true
 
-    - label: "TH_CR2 sends RemoveFabric with FabricIndex = 2 command to DUT_CE"
+    - label:
+          "Step 7: TH_CR2 sends RemoveFabric with FabricIndex = 2 command to
+          DUT_CE"
       PICS: OPCREDS.S.C0a.Rsp
       verification: |
           on TH_CR2  using chip tool, remove fabric with FabricIndex=2
@@ -166,8 +168,8 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR2 writes and reads the Basic Information Clusters NodeLabel
-          mandatory attribute of DUT_CE"
+          "Step 8: TH_CR2 writes and reads the Basic Information Clusters
+          NodeLabel mandatory attribute of DUT_CE"
       PICS: BINFO.S.A0005
       verification: |
           Using TH_CR2 , write attribute and read attribute
@@ -188,7 +190,7 @@ tests:
           [1678875950.655316][713499:713501] CHIP:-: ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1727: CHIP Error 0x000000C9: No shared trusted root at ../../commands/clusters/ModelCommand.cpp:62
       disabled: true
 
-    - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
+    - label: "Step 9: TH_CR1 reads the list of Fabrics on DUT_CE"
       PICS: OPCREDS.S.A0001
       verification: |
           On TH_CR1 using chip tool, read fabrics list
@@ -219,8 +221,8 @@ tests:
       disabled: true
 
     - label:
-          "Verify DUT_CE is now discoverable over DNS-SD with 2 Operational
-          service records (_matter._tcp SRV records)."
+          "Step 10: Verify DUT_CE is now discoverable over DNS-SD with 2
+          Operational service records (_matter._tcp SRV records)."
       PICS: CADMIN.S.C00.Rsp
       verification: |
           Execute the below command in any linux platform or in TH_CR1
@@ -241,8 +243,8 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+          "Step 11: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.S.C00.Rsp
       verification: |
           On TH_CR1 chip tool, open commissioning window using ECM
@@ -264,7 +266,7 @@ tests:
           [1635925713.973178][9695:9700] CHIP:EM: Sending Standalone Ack for MessageCounter:1964916542 on exchange 31055i
       disabled: true
 
-    - label: "TH_CR2 starts a commissioning process with DUT_CE"
+    - label: "Step 12: TH_CR2 starts a commissioning process with DUT_CE"
       PICS: CADMIN.S
       verification: |
           On TH_CR2 using chip tool connect to the accessory
@@ -275,7 +277,7 @@ tests:
           Device commissioning completed with success
       disabled: true
 
-    - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
+    - label: "Step 13: TH_CR1 reads the list of Fabrics on DUT_CE"
       PICS: OPCREDS.S.A0001
       verification: |
           On TH_CR1 , read fabrics list

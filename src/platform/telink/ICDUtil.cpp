@@ -36,5 +36,5 @@ CHIP_ERROR ICDUtil::OnSubscriptionRequested(chip::app::ReadHandler & aReadHandle
         agreedMaxInterval = kSubscriptionMaxIntervalPublisherLimit;
     }
 
-    return aReadHandler.SetReportingIntervals(agreedMaxInterval);
+    return aReadHandler.SetMaxReportingInterval(agreedMaxInterval);
 }

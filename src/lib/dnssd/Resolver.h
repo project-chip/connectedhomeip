@@ -50,6 +50,7 @@ struct CommonResolutionData
     bool supportsTcp                      = false;
     Optional<System::Clock::Milliseconds32> mrpRetryIntervalIdle;
     Optional<System::Clock::Milliseconds32> mrpRetryIntervalActive;
+    Optional<System::Clock::Milliseconds16> mrpRetryActiveThreshold;
 
     CommonResolutionData() { Reset(); }
 
@@ -59,10 +60,12 @@ struct CommonResolutionData
     {
         const ReliableMessageProtocolConfig defaultConfig = GetDefaultMRPConfig();
         return ReliableMessageProtocolConfig(GetMrpRetryIntervalIdle().ValueOr(defaultConfig.mIdleRetransTimeout),
-                                             GetMrpRetryIntervalActive().ValueOr(defaultConfig.mActiveRetransTimeout));
+                                             GetMrpRetryIntervalActive().ValueOr(defaultConfig.mActiveRetransTimeout),
+                                             GetMrpRetryActiveThreshold().ValueOr(defaultConfig.mActiveThresholdTime));
     }
     Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalIdle() const { return mrpRetryIntervalIdle; }
     Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalActive() const { return mrpRetryIntervalActive; }
+    Optional<System::Clock::Milliseconds16> GetMrpRetryActiveThreshold() const { return mrpRetryActiveThreshold; }
 
     bool IsDeviceTreatedAsSleepy(const ReliableMessageProtocolConfig * defaultMRPConfig) const
     {
@@ -136,9 +139,9 @@ struct OperationalNodeData
     void Reset() { peerId = PeerId(); }
 };
 
-constexpr size_t kMaxDeviceNameLen         = 32;
-constexpr size_t kMaxRotatingIdLen         = 50;
-constexpr size_t kMaxPairingInstructionLen = 128;
+inline constexpr size_t kMaxDeviceNameLen         = 32;
+inline constexpr size_t kMaxRotatingIdLen         = 50;
+inline constexpr size_t kMaxPairingInstructionLen = 128;
 
 /// Data that is specific to commisionable/commissioning node discovery
 struct CommissionNodeData

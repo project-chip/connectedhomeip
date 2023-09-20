@@ -33,7 +33,7 @@ tests:
           QR Code/ Manual Pairing Code is printed on the Commissionee device or in additional provided materials (ex: manual, companion app, web service).
       disabled: true
 
-    - label: "Scan the DUTs QR code using the TH."
+    - label: "Step 1: Scan the DUTs QR code using the TH."
       verification: |
           1. Run DUT. Example for DUT=all-clusters-app
           ./chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 0 --capabilities 4 --discriminator 3840 --passcode 20202021
@@ -66,13 +66,13 @@ tests:
           [1657214153060] [29000:16610528] CHIP: [SPL] Passcode:      20202021
       disabled: true
 
-    - label: "Reboot the DUT device."
+    - label: "Step 2: Reboot the DUT device."
       verification: |
           1. Verify DUT is advertising in commissioning mode. On DUT, verify through commissioning
 
           Verify in TH (CHIP-TOOL)
 
-          ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
+           ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
 
           ...
           [1657214364908] [29006:16612760] CHIP: [CTL] Starting commissioning discovery over DNS-SD

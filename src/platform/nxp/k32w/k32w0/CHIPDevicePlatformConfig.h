@@ -37,6 +37,16 @@
 #define CHIP_DEVICE_CHIP0BLE_DEBUG 0
 #endif
 
+/**
+ * @def CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
+ *
+ * Set unique id to maximum length if not defined to ensure the actual unique
+ * id is retrieved instead of the default one (if factory data read fails).
+ */
+#ifndef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
+#define CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH 32
+#endif
+
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to the K32W platform.

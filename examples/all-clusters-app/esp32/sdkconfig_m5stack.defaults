@@ -70,3 +70,6 @@ CONFIG_MBEDTLS_HKDF_C=y
 
 # Build chip tests
 CONFIG_BUILD_CHIP_TESTS=y
+
+# Move functions from IRAM to flash
+CONFIG_FREERTOS_PLACE_FUNCTIONS_INTO_FLASH=y

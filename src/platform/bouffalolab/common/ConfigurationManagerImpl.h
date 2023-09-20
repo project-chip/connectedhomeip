@@ -36,6 +36,7 @@ public:
     CHIP_ERROR StoreRebootCount(uint32_t rebootCount);
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
     CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours);
+    bool IsFullyProvisioned();
 
 private:
     // ===== Members that implement the ConfigurationManager private interface.
@@ -62,6 +63,10 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+    CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override;
 #endif
 
     static void DoFactoryReset(intptr_t arg);

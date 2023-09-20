@@ -147,7 +147,7 @@ endif #CHIP_FACTORY_DATA_BUILD
 # See config/zephyr/Kconfig for full definition
 config CHIP_FACTORY_RESET_ERASE_NVS
 	bool
-	default y
+	default n
 
 config CHIP_LOG_SIZE_OPTIMIZATION
 	bool "Disable some detailed logs to decrease flash usage"
@@ -207,3 +207,11 @@ config CHIP_MAX_PREFERRED_SUBSCRIPTION_REPORT_INTERVAL
 	  the initiator device to detect the publisher absence reasonably fast due to not sending
 	  the reports too rarely. The current algorithm is to select bigger value from the one
 	  requested by the initiator and the one preferred by the publisher.
+
+config CHIP_ENABLE_POWER_ON_FACTORY_RESET
+	bool "Enable power on factory reset sequence"
+	default n
+	help
+	  Enable power on factory reset sequence. If device power triggered off during
+	  first 5 seconds after power on and this sequence repeated 5 times - factory
+	  reset will be involved.

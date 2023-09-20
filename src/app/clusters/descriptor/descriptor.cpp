@@ -31,6 +31,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::Descriptor;
 using namespace chip::app::Clusters::Descriptor::Attributes;
 
 namespace {
@@ -44,15 +45,49 @@ public:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
-    static constexpr uint16_t ClusterRevision = 1;
+    static constexpr uint16_t ClusterRevision = 2;
 
+    CHIP_ERROR ReadTagListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadClientServerAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder, bool server);
     CHIP_ERROR ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadFeatureMap(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 };
 
 constexpr uint16_t DescriptorAttrAccess::ClusterRevision;
+
+CHIP_ERROR DescriptorAttrAccess::ReadFeatureMap(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    Clusters::Descriptor::Structs::SemanticTagStruct::Type tag;
+    size_t index = 0;
+    BitFlags<Feature> featureFlags;
+
+    if (GetSemanticTagForEndpointAtIndex(endpoint, index, tag) == CHIP_NO_ERROR)
+    {
+        featureFlags.Set(Feature::kTagList);
+    }
+    return aEncoder.Encode(featureFlags);
+}
+
+CHIP_ERROR DescriptorAttrAccess::ReadTagListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
+        Clusters::Descriptor::Structs::SemanticTagStruct::Type tag;
+        size_t index   = 0;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        while ((err = GetSemanticTagForEndpointAtIndex(endpoint, index, tag)) == CHIP_NO_ERROR)
+        {
+            ReturnErrorOnFailure(encoder.Encode(tag));
+            index++;
+        }
+        if (err == CHIP_ERROR_NOT_FOUND)
+        {
+            return CHIP_NO_ERROR;
+        }
+        return err;
+    });
+}
 
 CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
@@ -76,7 +111,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
             return CHIP_NO_ERROR;
         });
     }
-    else
+    else if (IsFlatCompositionForEndpoint(endpoint))
     {
         err = aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
             for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
@@ -98,6 +133,24 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
                     }
 
                     childIndex = emberAfIndexFromEndpoint(parentEndpointId);
+                }
+            }
+
+            return CHIP_NO_ERROR;
+        });
+    }
+    else if (IsTreeCompositionForEndpoint(endpoint))
+    {
+        err = aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
+            for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+            {
+                if (!emberAfEndpointIndexIsEnabled(index))
+                    continue;
+
+                EndpointId parentEndpointId = emberAfParentEndpointFromIndex(index);
+                if (parentEndpointId == endpoint)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(emberAfEndpointFromIndex(index)));
                 }
             }
 
@@ -172,8 +225,14 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     case PartsList::Id: {
         return ReadPartsAttribute(aPath.mEndpointId, aEncoder);
     }
+    case TagList::Id: {
+        return ReadTagListAttribute(aPath.mEndpointId, aEncoder);
+    }
     case ClusterRevision::Id: {
         return ReadClusterRevision(aPath.mEndpointId, aEncoder);
+    }
+    case FeatureMap::Id: {
+        return ReadFeatureMap(aPath.mEndpointId, aEncoder);
     }
     default: {
         break;

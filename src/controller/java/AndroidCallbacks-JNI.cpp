@@ -59,24 +59,6 @@ JNI_METHOD(void, ReportCallbackJni, deleteCallback)(JNIEnv * env, jobject self, 
     chip::Platform::Delete(reportCallback);
 }
 
-JNI_METHOD(jlong, ReportEventCallbackJni, newCallback)
-(JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava, jobject reportCallbackJava,
- jobject resubscriptionAttemptCallbackJava)
-{
-    chip::DeviceLayer::StackLock lock;
-    ReportEventCallback * reportCallback = chip::Platform::New<ReportEventCallback>(
-        self, subscriptionEstablishedCallbackJava, reportCallbackJava, resubscriptionAttemptCallbackJava);
-    return reinterpret_cast<jlong>(reportCallback);
-}
-
-JNI_METHOD(void, ReportEventCallbackJni, deleteCallback)(JNIEnv * env, jobject self, jlong callbackHandle)
-{
-    chip::DeviceLayer::StackLock lock;
-    ReportEventCallback * reportCallback = reinterpret_cast<ReportEventCallback *>(callbackHandle);
-    VerifyOrReturn(reportCallback != nullptr, ChipLogError(Controller, "ReportCallback handle is nullptr"));
-    delete reportCallback;
-}
-
 JNI_METHOD(jlong, WriteAttributesCallbackJni, newCallback)
 (JNIEnv * env, jobject self, jobject writeAttributesCallbackJava)
 {

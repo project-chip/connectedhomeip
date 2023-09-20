@@ -17,6 +17,8 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
+import("${chip_root}/src/platform/bouffalolab/common/args.gni")
+
 assert(chip_device_platform == "bl602")
 
 static_library("BL602") {
@@ -29,17 +31,13 @@ static_library("BL602") {
     "wifi_mgmr_portable.c",
   ]
 
-  common_sources = [
-    "${chip_root}/src/credentials/CHIPCert.h",
-    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+  sources += [
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
     "../common/BLConfig.cpp",
     "../common/ConfigurationManagerImpl.cpp",
     "../common/ConnectivityManagerImpl.cpp",
     "../common/DiagnosticDataProviderImpl.cpp",
-    "../common/FactoryDataProvider.cpp",
-    "../common/FactoryDataProvider.h",
     "../common/KeyValueStoreManagerImpl.cpp",
     "../common/Logging.cpp",
     "../common/PlatformManagerImpl.cpp",
@@ -58,8 +56,19 @@ static_library("BL602") {
       "../common/BLEManagerImpl.h",
     ]
   }
-  sources += common_sources
 
-  deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
+  defines =
+      [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
+  if (chip_enable_factory_data || chip_enable_factory_data_test) {
+    sources += [
+      "../common/FactoryDataProvider.cpp",
+      "../common/FactoryDataProvider.h",
+    ]
+  }
+
+  deps = [
+    "${chip_root}/src/credentials:credentials_header",
+    "${chip_root}/src/lib/dnssd:platform_header",
+  ]
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 }

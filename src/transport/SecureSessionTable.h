@@ -26,8 +26,8 @@
 namespace chip {
 namespace Transport {
 
-constexpr uint16_t kMaxSessionID       = UINT16_MAX;
-constexpr uint16_t kUnsecuredSessionId = 0;
+inline constexpr uint16_t kMaxSessionID       = UINT16_MAX;
+inline constexpr uint16_t kUnsecuredSessionId = 0;
 
 /**
  * Handles a set of sessions.

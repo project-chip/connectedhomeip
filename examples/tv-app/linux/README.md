@@ -55,6 +55,21 @@ Try the "commission-onnetwork <pincode> <disc> <IP> <port>" command
     $ controller commission-onnetwork 34567890 2976 192.168.65.3 5540 -or-
     $ controller commission-onnetwork 34567890 2976 fe80::50:ff:fe00:1 5540
 
+When the tv-app receives a UDC request from a commissionable node (like a
+tv-casting-app), it will print out
+
+```
+CHIP:SVR: UserDirectedCommissioningServer::OnMessageReceived
+CHIP:SVR: UDC instance=F879911BF17129AA
+CHIP:SVR: OnCommissionableNodeFound instance: name=F879911BF17129AA old_state=1 new_state=3
+CHIP:CTL: ------PROMPT USER: Test TV casting app is requesting permission to cast to this TV, approve? [0x0000_FFF1,0x0000_8001,F879911BF17129AA,01005DD9BB0990AF18F19C35C30C670532BC]
+CHIP:CTL: ------Via Shell Enter: controller ux ok|cancel
+```
+
+Begin commissioning it by running
+
+    $ controller ux ok
+
 -   User Directed Commissioning (UDC)
 
 Print out the cached list of UDC sessions

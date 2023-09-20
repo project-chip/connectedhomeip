@@ -30,8 +30,8 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner and Commissionee discover each other and connect via the
-          discovery mode applicable for the DUT."
+          "Step 1: Commissioner and Commissionee discover each other and connect
+          via the discovery mode applicable for the DUT."
       verification: |
           1. Place the DUT commissionee into a commissioning mode
           For example DUT=chip-all-clusters-app: ./chip-all-clusters-app --wifi --discriminator 3841
@@ -49,7 +49,7 @@ tests:
       disabled: true
 
     - label:
-          "Establish encryption keys with Password Authenticated Session
+          "Step 2: Establish encryption keys with Password Authenticated Session
           Establishment on the commissioning channel"
       verification: |
           Verify that the responder receives the PBKDFParamRequest message
@@ -61,8 +61,9 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner SHALL re-arm Fail-safe timer on Commissionee within 60s
-          (the autonomously Fail-safe timer length set by Commissionee)"
+          "Step 3: Commissioner SHALL re-arm Fail-safe timer on Commissionee
+          within 60s (the autonomously Fail-safe timer length set by
+          Commissionee)"
       verification: |
           Verify in TH as commissioner side
 
@@ -72,7 +73,7 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner SHALL configure regulatory information in the
+          "Step 4: Commissioner SHALL configure regulatory information in the
           Commissionee."
       PICS: MCORE.COM.WIRELESS
       verification: |
@@ -83,7 +84,7 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner requests operational CSR from Commissionee with
+          "Step 5: Commissioner requests operational CSR from Commissionee with
           OperationalCSRRequest command"
       verification: |
           Verify in TH as commissioner side after commissioning
@@ -95,7 +96,7 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner configures operational credentials on DUT if not
+          "Step 6: Commissioner configures operational credentials on DUT if not
           previously installed"
       verification: |
           Verify in TH as commissioner side
@@ -106,8 +107,8 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner configures itself as administrator in ACL on DUT if
-          needed"
+          "Step 7: Commissioner configures itself as administrator in ACL on DUT
+          if needed"
       verification: |
           Verify in TH as commissioner side after commissioning
 
@@ -116,8 +117,8 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner configures operational network on DUT if DUT both
-          supports and requires"
+          "Step 8: Commissioner configures operational network on DUT if DUT
+          both supports and requires"
       verification: |
           Verify in TH as commissioner side after commissioning
 
@@ -128,8 +129,8 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner instructs Commissionee to connect to operational network
-          if not already connected"
+          "Step 9: Commissioner instructs Commissionee to connect to operational
+          network if not already connected"
       verification: |
           Verify in TH as commissioner side after commissioning
 
@@ -142,7 +143,9 @@ tests:
           [1674603453417] [70108:12435695] [CTL] Successfully finished commissioning step 'WiFiNetworkEnable'
       disabled: true
 
-    - label: "Commissioner starts discovery of DUT using Operational Discovery"
+    - label:
+          "Step 10: Commissioner starts discovery of DUT using Operational
+          Discovery"
       verification: |
           Verify in TH as commissioner side
 
@@ -150,14 +153,15 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner opens a CASE session with DUT over operational network"
+          "Step 11: Commissioner opens a CASE session with DUT over operational
+          network"
       verification: |
           Verify in TH as commissioner side
 
           [1674603448950] [70108:12435206] [TOO] CASE establishment successful
       disabled: true
 
-    - label: "Commissioner sends CommissioningComplete command"
+    - label: "Step 12: Commissioner sends CommissioningComplete command"
       verification: |
           Verify in TH as commissioner side
 
@@ -167,8 +171,8 @@ tests:
       disabled: true
 
     - label:
-          "Commissioning channel between the Commissioner and Commissionee is
-          terminated."
+          "Step 13: Commissioning channel between the Commissioner and
+          Commissionee is terminated."
       verification: |
           Verify in TH as commissioner side
 

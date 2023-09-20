@@ -20,12 +20,17 @@
 #import "MTRBaseDevice_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
+#import "NSDataSpanConversion.h"
 #import "zap-generated/MTRBaseClusters.h"
+#import "zap-generated/MTRCommandPayloads_Internal.h"
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/NullObject.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <transport/Session.h>
+
+#include <type_traits>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -147,7 +152,23 @@ using MTRActionBlockT = CHIP_ERROR (^)(chip::Messaging::ExchangeManager & exchan
 template <typename SuccessCallback>
 using MTRLocalActionBlockT = CHIP_ERROR (^)(SuccessCallback successCb, MTRErrorCallback failureCb);
 
-template <class T> class MTRCallbackBridge : public MTRCallbackBridgeBase {
+class NoAttestationChallenge {
+};
+
+class HaveAttestationChallenge {
+protected:
+    NSData * mAttestationChallenge;
+};
+
+namespace detail {
+using AttestationResponseCallback
+    = void (*)(void *, const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType &);
+} // namespace detail
+
+template <class T>
+class MTRCallbackBridge : public MTRCallbackBridgeBase,
+                          protected std::conditional<std::is_same_v<T, detail::AttestationResponseCallback>,
+                              HaveAttestationChallenge, NoAttestationChallenge>::type {
 public:
     using MTRActionBlock = MTRActionBlockT<T>;
     using MTRLocalActionBlock = MTRLocalActionBlockT<T>;
@@ -232,6 +253,10 @@ public:
             return;
         }
 
+        if constexpr (HaveAttestationChallenge()) {
+            this->mAttestationChallenge = AsData(session.Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge());
+        }
+
         CHIP_ERROR err = action(*exchangeManager, session.Value(), mSuccess, mFailure, this);
         if (err != CHIP_NO_ERROR) {
             ChipLogError(Controller, "Failure performing action. C++-mangled success callback type: '%s', error: %s",
@@ -252,7 +277,17 @@ protected:
 
     static void DispatchFailure(void * context, NSError * error) { DispatchCallbackResult(context, error, nil); }
 
+    template <typename ResponseType> static void SetAttestationChallengeIfNeeded(void * context, ResponseType * _Nonnull response)
+    {
+        if constexpr (HaveAttestationChallenge()) {
+            auto * self = static_cast<MTRCallbackBridge *>(context);
+            response.attestationChallenge = self->mAttestationChallenge;
+        }
+    }
+
 private:
+    static constexpr bool HaveAttestationChallenge() { return std::is_same_v<T, detail::AttestationResponseCallback>; }
+
     static void DispatchCallbackResult(void * context, NSError * _Nullable error, id _Nullable value)
     {
         MTRCallbackBridge * callbackBridge = static_cast<MTRCallbackBridge *>(context);

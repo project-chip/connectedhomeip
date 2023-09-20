@@ -361,3 +361,32 @@ DNS resolve for 000000014A77CBB3-0000000000BC5C01 succeeded:
    IP address: fd08:b65e:db8e:f9c7:8052:1a8e:4dd4:e1f3
    Port: 5540
 ```
+
+### `stat` command group
+
+Handles a group of commands that are used to get and reset the peak usage of
+critical system resources used by Matter. These commands are only available when
+the `CONFIG_CHIP_STATISTICS=y` Kconfig option is set.
+
+#### `peak` subcommand
+
+Prints the peak usage of system resources.
+
+```shell
+uart:~$ matter stat peak
+Packet Buffers: 1
+Timers: 2
+TCP endpoints: 0
+UDP endpoints: 1
+Exchange contexts: 0
+Unsolicited message handlers: 5
+Platform events: 2
+```
+
+#### `reset` subcommand
+
+Resets the peak usage of system resources.
+
+```shell
+uart:~$ matter stat reset
+```

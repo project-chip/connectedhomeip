@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,16 +27,6 @@
 
 #pragma once
 
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
- *
- * Enables the use of a hard-coded default Chip device id and credentials if no device id
- * is found in Chip NV storage.
- *
- * This option is for testing only and should be disabled in production releases.
- */
-#define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 34
-
 // Use a default pairing code if one hasn't been provisioned in flash.
 #ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
@@ -54,7 +43,6 @@
 //    including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
 //
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
-#define CHIP_CONFIG_REQUIRE_AUTH 1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
@@ -100,13 +88,6 @@
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 0x0001
 #endif
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
- *
- * Enable support for Chip-over-BLE (CHIPoBLE).
- */
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
 
 /**
  * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER

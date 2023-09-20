@@ -53,6 +53,7 @@ tests:
           value: "XX"
 
     - label: "Read AttributeList value"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -80,6 +81,39 @@ tests:
                   0xFFF8, # GeneratedCommandList
                   0xFFF9, # AcceptedCommandList
                   0xFFFA, # EventList
+                  0xFFFB, # AttributeList
+                  0xFFFC, # FeatureMap
+                  0xFFFD, # ClusterRevision
+              ]
+
+    - label: "Read AttributeList value"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          value: [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  18,
+                  19,
+                  20,
+                  0xFFF8, # GeneratedCommandList
+                  0xFFF9, # AcceptedCommandList
                   0xFFFB, # AttributeList
                   0xFFFC, # FeatureMap
                   0xFFFD, # ClusterRevision

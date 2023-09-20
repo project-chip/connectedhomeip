@@ -32,7 +32,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads NameSupport attribute from DUT"
+    - label: "Step 1a: TH reads NameSupport attribute from DUT"
       PICS: G.S.A0000 && G.S.F00
       command: "readAttribute"
       attribute: "NameSupport"
@@ -40,7 +40,7 @@ tests:
           value: 128
           saveAs: NameSupportFeatureSupportedValue
 
-    - label: "TH reads NameSupport attribute from DUT"
+    - label: "Step 1b: TH reads NameSupport attribute from DUT"
       PICS: G.S.A0000 && !G.S.F00
       command: "readAttribute"
       attribute: "NameSupport"
@@ -49,8 +49,8 @@ tests:
           saveAs: NameSupportValue
 
     - label:
-          "TH writes NameSupport attribute as 0x80 EXOR the value as read in
-          step 1"
+          "Step 2a: TH writes NameSupport attribute as 0x80 EXOR the value as
+          read in step 1"
       PICS: G.S.A0000
       command: "writeAttribute"
       attribute: "NameSupport"
@@ -59,14 +59,14 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH reads NameSupport attribute from DUT"
+    - label: "Step 2b: TH reads NameSupport attribute from DUT"
       PICS: G.S.A0000 && G.S.F00
       command: "readAttribute"
       attribute: "NameSupport"
       response:
           value: NameSupportFeatureSupportedValue
 
-    - label: "TH reads NameSupport attribute from DUT"
+    - label: "Step 3: TH reads NameSupport attribute from DUT"
       PICS: G.S.A0000 && !G.S.F00
       command: "readAttribute"
       attribute: "NameSupport"

@@ -344,7 +344,11 @@ CHIP_ERROR BasicAttrAccess::WriteLocation(AttributeValueDecoder & aDecoder)
     ReturnErrorOnFailure(aDecoder.Decode(location));
 
     bool isValidLength = location.size() == DeviceLayer::ConfigurationManager::kMaxLocationLength;
-    VerifyOrReturnError(isValidLength, StatusIB(Protocols::InteractionModel::Status::InvalidValue).ToChipError());
+    if (!isValidLength)
+    {
+        ChipLogError(Zcl, "Invalid country code: '%.*s'", static_cast<int>(location.size()), location.data());
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
 
     return DeviceLayer::ConfigurationMgr().StoreCountryCode(location.data(), location.size());
 }
@@ -438,8 +442,6 @@ bool IsLocalConfigDisabled()
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-void emberAfBasicInformationClusterServerInitCallback(chip::EndpointId endpoint) {}
 
 void MatterBasicInformationPluginServerInitCallback()
 {

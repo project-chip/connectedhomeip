@@ -46,13 +46,14 @@ tests:
     #Issue 13029
     #This step implicitly validating the attribute(Lineup)constraints, as long as the payload is being parsed successfully
     - label:
-          "TH reads the Lineup attribute from the DUT to show list of Inputs
-          available and Verify that the response contains a lineup info object"
+          "Step 1: TH reads the Lineup attribute from the DUT to show list of
+          Inputs available and Verify that the response contains a lineup info
+          object"
       PICS: CHANNEL.S.A0001
       command: "readAttribute"
       attribute: "Lineup"
 
-    - label: "TH reads the ChannelList attribute from the DUT"
+    - label: "Step 2: TH reads the ChannelList attribute from the DUT"
       PICS: CHANNEL.S.A0000
       command: "readAttribute"
       attribute: "ChannelList"
@@ -60,14 +61,15 @@ tests:
           constraints:
               type: list
 
-    - label: "TH reads the CurrentChannel attribute from the DUT"
+    - label: "Step 3: TH reads the CurrentChannel attribute from the DUT"
       PICS: CHANNEL.S.A0002
       command: "readAttribute"
       attribute: "CurrentChannel"
       response:
           value: { MajorNumber: majornumber, MinorNumber: minornumber }
 
-    - label: "TH sends a SkipChannel command to the DUT with a value of 1"
+    - label:
+          "Step 4: TH sends a SkipChannel command to the DUT with a value of 1"
       PICS: CHANNEL.S.C03.Rsp
       command: "SkipChannel"
       arguments:
@@ -75,7 +77,7 @@ tests:
               - name: "Count"
                 value: 1
 
-    - label: "Verify that the channel has changed on the device"
+    - label: "Step 4a: Verify that the channel has changed on the device"
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT && CHANNEL.S.C03.Rsp
@@ -86,7 +88,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads the CurrentChannel attribute from the DUT"
+    - label: "Step 5: TH reads the CurrentChannel attribute from the DUT"
       PICS: CHANNEL.S.A0002 && CHANNEL.S.C03.Rsp
       command: "readAttribute"
       attribute: "CurrentChannel"

@@ -27,6 +27,8 @@ static_library("jni") {
     "AndroidAppServerWrapper.cpp",
     "AndroidAppServerWrapper.h",
     "CHIPAppServer-JNI.cpp",
+    "ChipAppServerDelegate.cpp",
+    "ChipAppServerDelegate.h",
     "ChipFabricProvider-JNI.cpp",
     "ChipFabricProvider-JNI.h",
     "ChipThreadWork.cpp",
@@ -62,6 +64,7 @@ android_library("java") {
 
   sources = [
     "src/chip/appserver/ChipAppServer.java",
+    "src/chip/appserver/ChipAppServerDelegate.java",
     "src/chip/appserver/ChipAppServerException.java",
     "src/chip/appserver/ChipFabricProvider.java",
     "src/chip/appserver/Fabric.java",

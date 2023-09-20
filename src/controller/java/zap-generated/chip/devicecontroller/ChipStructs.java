@@ -105,6 +105,45 @@ public Integer revision;
   }
 }
 
+public static class DescriptorClusterSemanticTagStruct {
+public @Nullable Integer mfgCode;
+public Integer namespaceID;
+public Integer tag;
+public @Nullable Optional<String> label;
+
+  public DescriptorClusterSemanticTagStruct(
+    @Nullable Integer mfgCode
+      , Integer namespaceID
+      , Integer tag
+      , @Nullable Optional<String> label
+  ) {
+    this.mfgCode = mfgCode;
+    this.namespaceID = namespaceID;
+    this.tag = tag;
+    this.label = label;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DescriptorClusterSemanticTagStruct {\n");
+    output.append("\tmfgCode: ");
+    output.append(mfgCode);
+        output.append("\n");
+    output.append("\tnamespaceID: ");
+    output.append(namespaceID);
+        output.append("\n");
+    output.append("\ttag: ");
+    output.append(tag);
+        output.append("\n");
+    output.append("\tlabel: ");
+    output.append(label);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
 public static class BindingClusterTargetStruct {
 public Optional<Long> node;
 public Optional<Integer> group;
@@ -2065,276 +2104,6 @@ public String productIdentifierValue;
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("ActivatedCarbonFilterMonitoringClusterReplacementProductStruct {\n");
-    output.append("\tproductIdentifierType: ");
-    output.append(productIdentifierType);
-        output.append("\n");
-    output.append("\tproductIdentifierValue: ");
-    output.append(productIdentifierValue);
-        output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-
-public static class CeramicFilterMonitoringClusterReplacementProductStruct {
-public Integer productIdentifierType;
-public String productIdentifierValue;
-
-  public CeramicFilterMonitoringClusterReplacementProductStruct(
-    Integer productIdentifierType
-      , String productIdentifierValue
-  ) {
-    this.productIdentifierType = productIdentifierType;
-    this.productIdentifierValue = productIdentifierValue;
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("CeramicFilterMonitoringClusterReplacementProductStruct {\n");
-    output.append("\tproductIdentifierType: ");
-    output.append(productIdentifierType);
-        output.append("\n");
-    output.append("\tproductIdentifierValue: ");
-    output.append(productIdentifierValue);
-        output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-
-public static class ElectrostaticFilterMonitoringClusterReplacementProductStruct {
-public Integer productIdentifierType;
-public String productIdentifierValue;
-
-  public ElectrostaticFilterMonitoringClusterReplacementProductStruct(
-    Integer productIdentifierType
-      , String productIdentifierValue
-  ) {
-    this.productIdentifierType = productIdentifierType;
-    this.productIdentifierValue = productIdentifierValue;
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("ElectrostaticFilterMonitoringClusterReplacementProductStruct {\n");
-    output.append("\tproductIdentifierType: ");
-    output.append(productIdentifierType);
-        output.append("\n");
-    output.append("\tproductIdentifierValue: ");
-    output.append(productIdentifierValue);
-        output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-
-public static class UvFilterMonitoringClusterReplacementProductStruct {
-public Integer productIdentifierType;
-public String productIdentifierValue;
-
-  public UvFilterMonitoringClusterReplacementProductStruct(
-    Integer productIdentifierType
-      , String productIdentifierValue
-  ) {
-    this.productIdentifierType = productIdentifierType;
-    this.productIdentifierValue = productIdentifierValue;
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("UvFilterMonitoringClusterReplacementProductStruct {\n");
-    output.append("\tproductIdentifierType: ");
-    output.append(productIdentifierType);
-        output.append("\n");
-    output.append("\tproductIdentifierValue: ");
-    output.append(productIdentifierValue);
-        output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-
-public static class IonizingFilterMonitoringClusterReplacementProductStruct {
-public Integer productIdentifierType;
-public String productIdentifierValue;
-
-  public IonizingFilterMonitoringClusterReplacementProductStruct(
-    Integer productIdentifierType
-      , String productIdentifierValue
-  ) {
-    this.productIdentifierType = productIdentifierType;
-    this.productIdentifierValue = productIdentifierValue;
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("IonizingFilterMonitoringClusterReplacementProductStruct {\n");
-    output.append("\tproductIdentifierType: ");
-    output.append(productIdentifierType);
-        output.append("\n");
-    output.append("\tproductIdentifierValue: ");
-    output.append(productIdentifierValue);
-        output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-
-public static class ZeoliteFilterMonitoringClusterReplacementProductStruct {
-public Integer productIdentifierType;
-public String productIdentifierValue;
-
-  public ZeoliteFilterMonitoringClusterReplacementProductStruct(
-    Integer productIdentifierType
-      , String productIdentifierValue
-  ) {
-    this.productIdentifierType = productIdentifierType;
-    this.productIdentifierValue = productIdentifierValue;
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("ZeoliteFilterMonitoringClusterReplacementProductStruct {\n");
-    output.append("\tproductIdentifierType: ");
-    output.append(productIdentifierType);
-        output.append("\n");
-    output.append("\tproductIdentifierValue: ");
-    output.append(productIdentifierValue);
-        output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-
-public static class OzoneFilterMonitoringClusterReplacementProductStruct {
-public Integer productIdentifierType;
-public String productIdentifierValue;
-
-  public OzoneFilterMonitoringClusterReplacementProductStruct(
-    Integer productIdentifierType
-      , String productIdentifierValue
-  ) {
-    this.productIdentifierType = productIdentifierType;
-    this.productIdentifierValue = productIdentifierValue;
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("OzoneFilterMonitoringClusterReplacementProductStruct {\n");
-    output.append("\tproductIdentifierType: ");
-    output.append(productIdentifierType);
-        output.append("\n");
-    output.append("\tproductIdentifierValue: ");
-    output.append(productIdentifierValue);
-        output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-
-public static class WaterTankMonitoringClusterReplacementProductStruct {
-public Integer productIdentifierType;
-public String productIdentifierValue;
-
-  public WaterTankMonitoringClusterReplacementProductStruct(
-    Integer productIdentifierType
-      , String productIdentifierValue
-  ) {
-    this.productIdentifierType = productIdentifierType;
-    this.productIdentifierValue = productIdentifierValue;
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("WaterTankMonitoringClusterReplacementProductStruct {\n");
-    output.append("\tproductIdentifierType: ");
-    output.append(productIdentifierType);
-        output.append("\n");
-    output.append("\tproductIdentifierValue: ");
-    output.append(productIdentifierValue);
-        output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-
-public static class FuelTankMonitoringClusterReplacementProductStruct {
-public Integer productIdentifierType;
-public String productIdentifierValue;
-
-  public FuelTankMonitoringClusterReplacementProductStruct(
-    Integer productIdentifierType
-      , String productIdentifierValue
-  ) {
-    this.productIdentifierType = productIdentifierType;
-    this.productIdentifierValue = productIdentifierValue;
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("FuelTankMonitoringClusterReplacementProductStruct {\n");
-    output.append("\tproductIdentifierType: ");
-    output.append(productIdentifierType);
-        output.append("\n");
-    output.append("\tproductIdentifierValue: ");
-    output.append(productIdentifierValue);
-        output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-
-public static class InkCartridgeMonitoringClusterReplacementProductStruct {
-public Integer productIdentifierType;
-public String productIdentifierValue;
-
-  public InkCartridgeMonitoringClusterReplacementProductStruct(
-    Integer productIdentifierType
-      , String productIdentifierValue
-  ) {
-    this.productIdentifierType = productIdentifierType;
-    this.productIdentifierValue = productIdentifierValue;
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("InkCartridgeMonitoringClusterReplacementProductStruct {\n");
-    output.append("\tproductIdentifierType: ");
-    output.append(productIdentifierType);
-        output.append("\n");
-    output.append("\tproductIdentifierValue: ");
-    output.append(productIdentifierValue);
-        output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-
-public static class TonerCartridgeMonitoringClusterReplacementProductStruct {
-public Integer productIdentifierType;
-public String productIdentifierValue;
-
-  public TonerCartridgeMonitoringClusterReplacementProductStruct(
-    Integer productIdentifierType
-      , String productIdentifierValue
-  ) {
-    this.productIdentifierType = productIdentifierType;
-    this.productIdentifierValue = productIdentifierValue;
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("TonerCartridgeMonitoringClusterReplacementProductStruct {\n");
     output.append("\tproductIdentifierType: ");
     output.append(productIdentifierType);
         output.append("\n");

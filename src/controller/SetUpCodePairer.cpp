@@ -60,6 +60,7 @@ CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, 
                                        DiscoveryType discoveryType, Optional<Dnssd::CommonResolutionData> resolutionData)
 {
     VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(remoteId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
 
     SetupPayload payload;
     ReturnErrorOnFailure(GetPayload(setUpCode, payload));
@@ -405,9 +406,19 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::CommonRe
     ConnectToDiscoveredDevice();
 }
 
-void SetUpCodePairer::CommissionerShuttingDown()
+bool SetUpCodePairer::StopPairing(NodeId remoteId)
 {
+    VerifyOrReturnValue(mRemoteId != kUndefinedNodeId, false);
+    VerifyOrReturnValue(remoteId == kUndefinedNodeId || remoteId == mRemoteId, false);
+
+    if (mWaitingForPASE)
+    {
+        PASEEstablishmentComplete();
+    }
+
     ResetDiscoveryState();
+    mRemoteId = kUndefinedNodeId;
+    return true;
 }
 
 bool SetUpCodePairer::TryNextRendezvousParameters()
@@ -452,32 +463,26 @@ void SetUpCodePairer::ResetDiscoveryState()
         waiting = false;
     }
 
-    while (!mDiscoveredParameters.empty())
-    {
-        mDiscoveredParameters.pop_front();
-    }
-
+    mDiscoveredParameters.clear();
     mCurrentPASEParameters.ClearValue();
     mLastPASEError = CHIP_NO_ERROR;
+
+    mSystemLayer->CancelTimer(OnDeviceDiscoveredTimeoutCallback, this);
 }
 
 void SetUpCodePairer::ExpectPASEEstablishment()
 {
+    VerifyOrDie(!mWaitingForPASE);
     mWaitingForPASE = true;
     auto * delegate = mCommissioner->GetPairingDelegate();
-    if (this == delegate)
-    {
-        // This should really not happen, but if it does, do nothing, to avoid
-        // delegate loops.
-        return;
-    }
-
+    VerifyOrDie(delegate != this);
     mPairingDelegate = delegate;
     mCommissioner->RegisterPairingDelegate(this);
 }
 
 void SetUpCodePairer::PASEEstablishmentComplete()
 {
+    VerifyOrDie(mWaitingForPASE);
     mWaitingForPASE = false;
     mCommissioner->RegisterPairingDelegate(mPairingDelegate);
     mPairingDelegate = nullptr;
@@ -524,9 +529,9 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
 
     if (CHIP_NO_ERROR == error)
     {
-        mSystemLayer->CancelTimer(OnDeviceDiscoveredTimeoutCallback, this);
-
+        ChipLogProgress(Controller, "Pairing with commissionee successful, stopping discovery");
         ResetDiscoveryState();
+        mRemoteId = kUndefinedNodeId;
         if (pairingDelegate != nullptr)
         {
             pairingDelegate->OnPairingComplete(error);

@@ -27,9 +27,11 @@ config:
     applicationId:
         type: char_string
         defaultValue: "exampleid"
+    #ApplicationBasic cluster endpoint
+    ApplicationBasic.Endpoint: 3
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -37,7 +39,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH sends HideApp command to DUT"
+    - label: "Step 1: TH sends HideApp command to DUT"
       PICS: APPLAUNCHER.S.C02.Rsp
       command: "HideApp"
       arguments:
@@ -49,24 +51,11 @@ tests:
                         ApplicationID: applicationId,
                     }
 
-    #Expected status attribute response ACTIVE_HIDDEN or STOPPED 'OR' condition is not supported in YAML
-    - label: "Reads the Status attribute"
-      verification: |
-          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
-          ./chip-tool applicationbasic read status 1 3
-          ./chip-tool applicationbasic read status 1 3
-
-          On TH verify that the Status attribute  value as 0
-          [1658209002.942766][2442:2447] CHIP:DMG: }
-          [1658209002.942976][2442:2447] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_050D Attribute 0x0000_0005 DataVersion: 3850684771
-          [1658209002.943067][2442:2447] CHIP:TOO:   Status: 0
-          [1658209002.943177][2442:2447] CHIP:EM: Sending Standalone Ack for MessageCounter:54939405 on exchange 63408i"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Step 2: Reads the Status attribute"
+      endpoint: ApplicationBasic.Endpoint
+      cluster: "Application Basic"
+      command: "readAttribute"
+      attribute: "Status"
+      response:
+          constraints:
+              anyOf: [0, 2]

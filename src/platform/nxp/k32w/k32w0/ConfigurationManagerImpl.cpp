@@ -40,8 +40,6 @@ namespace DeviceLayer {
 
 using namespace ::chip::DeviceLayer::Internal;
 
-// TODO: Define a Singleton instance of CHIP Group Key Store here
-
 ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 {
     static ConfigurationManagerImpl sInstance;
@@ -51,47 +49,38 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
-    uint32_t rebootCount = 0;
+    uint8_t rebootCause = POWER_GetResetCause();
 
     if (K32WConfig::ConfigValueExists(K32WConfig::kCounterKey_RebootCount))
     {
-        err = GetRebootCount(rebootCount);
-        SuccessOrExit(err);
-
-        err = StoreRebootCount(rebootCount + 1);
-        SuccessOrExit(err);
+        uint32_t rebootCount = 0;
+        SuccessOrExit(err = GetRebootCount(rebootCount));
+        SuccessOrExit(err = StoreRebootCount(rebootCount + 1));
     }
     else
     {
         // The first boot after factory reset of the Node.
-        err = StoreRebootCount(0);
-        SuccessOrExit(err);
+        SuccessOrExit(err = StoreRebootCount(0));
     }
 
     if (!K32WConfig::ConfigValueExists(K32WConfig::kCounterKey_TotalOperationalHours))
     {
-        err = StoreTotalOperationalHours(0);
-        SuccessOrExit(err);
+        SuccessOrExit(err = StoreTotalOperationalHours(0));
     }
 
-    if (!K32WConfig::ConfigValueExists(K32WConfig::kCounterKey_BootReason))
-    {
-        err = StoreBootReason(to_underlying(BootReasonType::kUnspecified));
-        SuccessOrExit(err);
-    }
-
-    rebootCause = POWER_GetResetCause();
+    SuccessOrExit(err = DetermineBootReason(rebootCause));
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<K32WConfig>::Init();
     SuccessOrExit(err);
 
-    // TODO: Initialize the global GroupKeyStore object here
-
-    err = CHIP_NO_ERROR;
-
 exit:
     return err;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareUpdateCompleted()
+{
+    return WriteConfigValue(K32WConfig::kConfigKey_SoftwareUpdateCompleted, true);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
@@ -116,31 +105,7 @@ CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOp
 
 CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 {
-    bootReason = to_underlying(BootReasonType::kUnspecified);
-    // rebootCause is obtained at bootup.
-    if (rebootCause == RESET_UNDEFINED)
-    {
-        bootReason = to_underlying(BootReasonType::kUnspecified);
-    }
-    else if ((rebootCause == RESET_POR) || (rebootCause == RESET_EXT_PIN))
-    {
-        bootReason = to_underlying(BootReasonType::kPowerOnReboot);
-    }
-    else if (rebootCause == RESET_BOR)
-    {
-        bootReason = to_underlying(BootReasonType::kBrownOutReset);
-    }
-    else if (rebootCause == RESET_SW_REQ)
-    {
-        bootReason = to_underlying(BootReasonType::kSoftwareReset);
-    }
-    else if (rebootCause == RESET_WDT)
-    {
-        bootReason = to_underlying(BootReasonType::kSoftwareWatchdogReset);
-        /* Reboot can be due to hardware or software watchdog */
-    }
-
-    return CHIP_NO_ERROR;
+    return ReadConfigValue(K32WConfig::kCounterKey_BootReason, bootReason);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
@@ -274,6 +239,40 @@ CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t 
 }
 
 void ConfigurationManagerImpl::RunConfigUnitTest(void) {}
+
+CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint8_t rebootCause)
+{
+    BootReasonType bootReason = BootReasonType::kUnspecified;
+
+    if ((rebootCause & RESET_POR) || (rebootCause & RESET_EXT_PIN))
+    {
+        bootReason = BootReasonType::kPowerOnReboot;
+    }
+    else if (rebootCause & RESET_BOR)
+    {
+        bootReason = BootReasonType::kBrownOutReset;
+    }
+    else if (rebootCause & RESET_WDT)
+    {
+        /* Reboot can be due to hardware or software watchdog */
+        bootReason = BootReasonType::kHardwareWatchdogReset;
+    }
+    else if (rebootCause & RESET_SW_REQ)
+    {
+        if (K32WConfig::ConfigValueExists(K32WConfig::kConfigKey_SoftwareUpdateCompleted))
+        {
+            bootReason = BootReasonType::kSoftwareUpdateCompleted;
+        }
+        else
+        {
+            bootReason = BootReasonType::kSoftwareReset;
+        }
+    }
+
+    K32WConfig::ClearConfigValue(K32WConfig::kConfigKey_SoftwareUpdateCompleted);
+
+    return StoreBootReason(to_underlying(bootReason));
+}
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {

@@ -130,6 +130,19 @@ void AttributeValueEncoder::EnsureListEnded()
 
     AttributeReportBuilder builder;
     VerifyOrDie(builder.FinishAttribute(mAttributeReportIBsBuilder) == CHIP_NO_ERROR);
+
+    if (!mEncodedAtLeastOneListItem)
+    {
+        // If we have not managed to encode any list items, we don't actually
+        // want to output the single "empty list" IB that will then be followed
+        // by one-IB-per-item in the next packet.  Just have the reporting
+        // engine roll back our entire attribute and put us in the next packet.
+        //
+        // If we succeeded at encoding the whole list (i.e. the list is in fact
+        // empty and we fit in the packet), mAllowPartialData will be ignored,
+        // so it's safe to set it to false even if encoding succeeded.
+        mEncodeState.mAllowPartialData = false;
+    }
 }
 
 } // namespace app

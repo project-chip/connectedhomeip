@@ -18,13 +18,16 @@
 
 #pragma once
 
+#include <app/AppBuildConfig.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/DataVersionFilter.h>
 #include <app/util/basic-types.h>
 
 namespace chip {
 namespace app {
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
 class ReadClient;
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 struct AttributePathParams
 {
     //

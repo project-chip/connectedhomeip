@@ -76,7 +76,7 @@ enum class DiscoveryType : uint8_t
 class DLL_EXPORT SetUpCodePairer : public DevicePairingDelegate
 {
 public:
-    SetUpCodePairer(DeviceCommissioner * commissioner) : mCommissioner(commissioner) { ResetDiscoveryState(); }
+    SetUpCodePairer(DeviceCommissioner * commissioner) : mCommissioner(commissioner) {}
     virtual ~SetUpCodePairer() {}
 
     CHIP_ERROR PairDevice(chip::NodeId remoteId, const char * setUpCode,
@@ -93,9 +93,9 @@ public:
     void SetBleLayer(Ble::BleLayer * bleLayer) { mBleLayer = bleLayer; };
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-    // Called to notify us that the DeviceCommissioner is shutting down and we
-    // should not try to do any more new work.
-    void CommissionerShuttingDown();
+    // Stop ongoing discovery / pairing of the specified node, or of
+    // whichever node we're pairing if kUndefinedNodeId is passed.
+    bool StopPairing(NodeId remoteId = kUndefinedNodeId);
 
 private:
     // DevicePairingDelegate implementation.
@@ -177,9 +177,9 @@ private:
     uint16_t mPayloadVendorID               = kNotAvailable;
     uint16_t mPayloadProductID              = kNotAvailable;
 
-    DeviceCommissioner * mCommissioner = nullptr;
-    System::Layer * mSystemLayer       = nullptr;
-    chip::NodeId mRemoteId;
+    DeviceCommissioner * mCommissioner       = nullptr;
+    System::Layer * mSystemLayer             = nullptr;
+    chip::NodeId mRemoteId                   = kUndefinedNodeId;
     uint32_t mSetUpPINCode                   = 0;
     SetupCodePairerBehaviour mConnectionType = SetupCodePairerBehaviour::kCommission;
     DiscoveryType mDiscoveryType             = DiscoveryType::kAll;

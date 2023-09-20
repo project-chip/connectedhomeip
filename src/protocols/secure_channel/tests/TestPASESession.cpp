@@ -363,7 +363,7 @@ void SecurePairingHandshakeWithCommissionerMRPTest(nlTestSuite * inSuite, void *
     PASESession pairingCommissioner;
     auto & loopback = ctx.GetLoopback();
     loopback.Reset();
-    ReliableMessageProtocolConfig config(1000_ms32, 10000_ms32);
+    ReliableMessageProtocolConfig config(1000_ms32, 10000_ms32, 4000_ms16);
     SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
                                      Optional<ReliableMessageProtocolConfig>::Value(config),
                                      Optional<ReliableMessageProtocolConfig>::Missing(), delegateCommissioner);
@@ -378,7 +378,7 @@ void SecurePairingHandshakeWithDeviceMRPTest(nlTestSuite * inSuite, void * inCon
     PASESession pairingCommissioner;
     auto & loopback = ctx.GetLoopback();
     loopback.Reset();
-    ReliableMessageProtocolConfig config(1000_ms32, 10000_ms32);
+    ReliableMessageProtocolConfig config(1000_ms32, 10000_ms32, 4000_ms16);
     SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
                                      Optional<ReliableMessageProtocolConfig>::Missing(),
                                      Optional<ReliableMessageProtocolConfig>::Value(config), delegateCommissioner);
@@ -393,8 +393,8 @@ void SecurePairingHandshakeWithAllMRPTest(nlTestSuite * inSuite, void * inContex
     PASESession pairingCommissioner;
     auto & loopback = ctx.GetLoopback();
     loopback.Reset();
-    ReliableMessageProtocolConfig commissionerConfig(1000_ms32, 10000_ms32);
-    ReliableMessageProtocolConfig deviceConfig(2000_ms32, 7000_ms32);
+    ReliableMessageProtocolConfig commissionerConfig(1000_ms32, 10000_ms32, 4000_ms16);
+    ReliableMessageProtocolConfig deviceConfig(2000_ms32, 7000_ms32, 4000_ms16);
     SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
                                      Optional<ReliableMessageProtocolConfig>::Value(commissionerConfig),
                                      Optional<ReliableMessageProtocolConfig>::Value(deviceConfig), delegateCommissioner);

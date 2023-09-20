@@ -39,8 +39,8 @@ tests:
       disabled: true
 
     - label:
-          "Place TH into commissioning mode using the TH manufacturers means to
-          be discovered by the DUT Commissioner"
+          "Step 1: Place TH into commissioning mode using the TH manufacturers
+          means to be discovered by the DUT Commissioner"
       verification: |
           ./chip-all-clusters-app --discriminator 3840
           Verify on TH (All-cluster-app):
@@ -58,7 +58,7 @@ tests:
           [1651109580.413525][31207:31207] CHIP:SVR: SetupQRCode: [MT:-24J0AFN00KA0648G00]
       disabled: true
 
-    - label: "Scan THs QR code using the DUT Commissioner."
+    - label: "Step 2a: Scan THs QR code using the DUT Commissioner."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           1. Verify the QR code is scanned by DUT
@@ -66,7 +66,7 @@ tests:
       disabled: true
 
     - label:
-          "DUT parses THs QR code. Follow any steps needed for the
+          "Step 2b: DUT parses THs QR code. Follow any steps needed for the
           Commissioner/Commissionee to complete the commissioning process over
           the TH Commissionees method of device discovery"
       verification: |
@@ -78,16 +78,16 @@ tests:
            ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
 
           [1651109784376] [95553:65657838] CHIP: [CTL] Received CommissioningComplete response
-          [1651109784376] [95553:65657838] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
-          [1651109784376] [95553:65657838] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
-          [1651109784376] [95553:65657838] CHIP: [CTL] Performing next commissioning step "Cleanup"
-          [1651109784376] [95553:65657838] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
+          [1651109784376] [95553:65657838] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1651109784376] [95553:65657838] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1651109784376] [95553:65657838] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1651109784376] [95553:65657838] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
           [1651109784376] [95553:65657838] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
     - label:
-          "Using DUT Commissioner, unpair the TH Commissionee from the Matter
-          network."
+          "Step 3: Using DUT Commissioner, unpair the TH Commissionee from the
+          Matter network."
       verification: |
           ./chip-tool operationalcredentials remove-fabric 1 1 0
           Verify on DUT (Chip-tool):
@@ -102,8 +102,8 @@ tests:
       disabled: true
 
     - label:
-          "Place TH Commissionee back into commissioning mode using the TH
-          manufacturers means to be discovered by the DUT Commissioner"
+          "Step 4: Place TH Commissionee back into commissioning mode using the
+          TH manufacturers means to be discovered by the DUT Commissioner"
       verification: |
           1. Place the TH into commissioning mode by launching the app again
 
@@ -123,7 +123,7 @@ tests:
           [1651110721.112838][31791:31791] CHIP:SVR: SetupQRCode: [MT:-24J0AFN00KA0648G00]
       disabled: true
 
-    - label: "Scan THs QR code using the DUT Commissioner."
+    - label: "Step 5a: Scan THs QR code using the DUT Commissioner."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           1. Verify the QR code is scanned by DUT
@@ -131,7 +131,7 @@ tests:
       disabled: true
 
     - label:
-          "DUT parses THs QR code. Follow any steps needed for the
+          "Step 5b: DUT parses THs QR code. Follow any steps needed for the
           Commissioner/Commissionee to complete the commissioning process over
           the TH Commissionees method of device discovery"
       verification: |
@@ -143,9 +143,9 @@ tests:
            ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
 
           [1651110724689] [95810:65669790] CHIP: [CTL] Received CommissioningComplete response
-          [1651110724689] [95810:65669790] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
-          [1651110724689] [95810:65669790] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
-          [1651110724689] [95810:65669790] CHIP: [CTL] Performing next commissioning step "Cleanup"
-          [1651110724689] [95810:65669790] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
+          [1651110724689] [95810:65669790] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1651110724689] [95810:65669790] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1651110724689] [95810:65669790] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1651110724689] [95810:65669790] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
           [1651110724689] [95810:65669790] CHIP: [TOO] Device commissioning completed with success
       disabled: true

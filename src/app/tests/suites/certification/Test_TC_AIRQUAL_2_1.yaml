@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads from the DUT the AirQuality attribute."
+    - label: "Step 2: TH reads from the DUT the AirQuality attribute."
       PICS: AIRQUAL.S.A0000
       command: "readAttribute"
       attribute: "AirQuality"

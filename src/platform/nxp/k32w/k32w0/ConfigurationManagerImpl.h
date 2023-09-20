@@ -39,10 +39,9 @@ class ConfigurationManagerImpl final : public Internal::GenericConfigurationMana
 public:
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
+    CHIP_ERROR StoreSoftwareUpdateCompleted();
 
-private:
     // ===== Members that implement the ConfigurationManager public interface.
-
     CHIP_ERROR Init(void) override;
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
     bool CanFactoryReset(void) override;
@@ -59,8 +58,8 @@ private:
     CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen) override;
     CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize) override;
 
+private:
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
-
     // ===== Members that implement the GenericConfigurationManagerImpl protected interface.
     CHIP_ERROR ReadConfigValue(Key key, bool & val) override;
     CHIP_ERROR ReadConfigValue(Key key, uint32_t & val) override;
@@ -76,7 +75,7 @@ private:
     void RunConfigUnitTest(void) override;
 
     // ===== Private members reserved for use by this class only.
-    uint8_t rebootCause;
+    CHIP_ERROR DetermineBootReason(uint8_t rebootCause);
     static void DoFactoryReset(intptr_t arg);
 };
 

@@ -46,6 +46,7 @@ public:
     CHIP_ERROR Connect(const char * ssid, const char * key,
                        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * apCallback = nullptr);
     CHIP_ERROR Disconnect(const char * ssid);
+    CHIP_ERROR StartWiFiScan(ByteSpan ssid, NetworkCommissioning::WiFiDriver::ScanCallback * callback);
     CHIP_ERROR RemoveAllConfigs();
 
     CHIP_ERROR GetDeviceMACAddress(uint8_t * macAddress, size_t macAddressLen);
@@ -55,6 +56,8 @@ public:
     CHIP_ERROR GetConnectionState(wifi_manager_connection_state_e * connectionState);
     CHIP_ERROR GetBssId(uint8_t * bssId);
     CHIP_ERROR GetSecurityType(wifi_manager_security_type_e * securityType);
+    CHIP_ERROR GetConfiguredNetwork(NetworkCommissioning::Network & network);
+    bool IsWiFiStationConnected();
 
 private:
     static void _DeviceStateChangedCb(wifi_manager_device_state_e deviceState, void * userData);
@@ -66,15 +69,21 @@ private:
     static void _IPConflictCb(char * mac, wifi_manager_ip_conflict_state_e ipConflictState, void * userData);
     static void _ActivateCb(wifi_manager_error_e wifiErr, void * userData);
     static void _DeactivateCb(wifi_manager_error_e wifiErr, void * userData);
-    static void _ScanFinishedCb(wifi_manager_error_e wifiErr, void * userData);
+    static void _ScanToConnectFinishedCb(wifi_manager_error_e wifiErr, void * userData);
+    static void _SpecificScanFinishedCb(wifi_manager_error_e wifiErr, void * userData);
+    static void _FullScanFinishedCb(wifi_manager_error_e wifiErr, void * userData);
+    static bool _FoundAPOnScanCb(wifi_manager_ap_h ap, void * userData);
     static bool _FoundAPCb(wifi_manager_ap_h ap, void * userData);
     static void _ConnectedCb(wifi_manager_error_e wifiErr, void * userData);
     static bool _ConfigListCb(const wifi_manager_config_h config, void * userData);
+    static void _UpdateScanCallback(void * scanCbData);
 
     static CHIP_ERROR _WiFiInitialize(gpointer userData);
     static CHIP_ERROR _WiFiActivate(gpointer userData);
     static CHIP_ERROR _WiFiDeactivate(gpointer userData);
-    static CHIP_ERROR _WiFiScan(gpointer userData);
+    static CHIP_ERROR _WiFiSpecificScan(gpointer userData);
+    static CHIP_ERROR _WiFiFullScan(gpointer userData);
+    static CHIP_ERROR _WiFiScanToConnect(gpointer userData);
     static CHIP_ERROR _WiFiConnect(wifi_manager_ap_h ap);
 
     void _WiFiDeinitialize();
@@ -99,8 +108,10 @@ private:
     uint8_t mWiFiBSSID[kWiFiBSSIDLength];
     char mWiFiSSID[kMaxWiFiSSIDLength + 1];
     char mWiFiKey[kMaxWiFiKeyLength + 1];
+    char mInterestedSSID[kMaxWiFiSSIDLength + 1];
 
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
+    NetworkCommissioning::WiFiDriver::ScanCallback * mpScanCallback;
 };
 
 inline WiFiManager & WiFiMgr()

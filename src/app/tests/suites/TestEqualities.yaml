@@ -18,8 +18,12 @@ config:
     nodeId: 0x12344321
     cluster: "EqualityCommands"
     endpoint: 1
-    expectedValue: 20003
-    unexpectedValue: 20004
+    expectedValue:
+        type: INT16U
+        defaultValue: 20003
+    unexpectedValue:
+        type: INT16U
+        defaultValue: 20004
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"

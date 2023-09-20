@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 41.3.2. [TC-TSTAT-3.2] Functionality with client as DUT
+name: 42.3.1. [TC-TSTAT-3.2] Functionality with client as DUT
 
 PICS:
     - TSTAT.C
@@ -30,9 +30,9 @@ tests:
       disabled: true
 
     - label:
-          "DUT increases the temperature by sending a SetpointRaiseLower command
-          to the Test Harness, with a valid Mode argument (0, 1 or 2) and a
-          reasonable positive value that is supported by the DUT."
+          "Step 1: DUT increases the temperature by sending a SetpointRaiseLower
+          command to the Test Harness, with a valid Mode argument (0, 1 or 2)
+          and a reasonable positive value that is supported by the DUT."
       PICS: TSTAT.C.C00.Tx
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
@@ -122,9 +122,9 @@ tests:
       disabled: true
 
     - label:
-          "DUT lowers the temperature by sending a SetpointRaiseLower command to
-          the Test Harness, with a valid Mode argument (0, 1 or 2) and a
-          reasonable negative value that is supported by the DUT."
+          "Step 2: DUT lowers the temperature by sending a SetpointRaiseLower
+          command to the Test Harness, with a valid Mode argument (0, 1 or 2)
+          and a reasonable negative value that is supported by the DUT."
       PICS: TSTAT.C.C00.Tx
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
@@ -212,7 +212,8 @@ tests:
           [1666952478.428206][5547:5547] CHIP:DMG:                 },
       disabled: true
 
-    - label: "DUT sends a GetRelayStatusLog command to the Test Harness."
+    - label:
+          "Step 3: DUT sends a GetRelayStatusLog command to the Test Harness."
       PICS: TSTAT.C.C04.Tx
       verification: |
           The GetRelayStatusLogResponse command may not supported in Matter 1.0.

@@ -24,6 +24,8 @@ runs:
       uses: ./.github/actions/bootstrap-cache
     - name: Bootstrap
       uses: ./.github/actions/bootstrap
+      with:
+        platform: ${{ inputs.platform }}
     - name: Upload Bootstrap Logs
       uses: ./.github/actions/upload-bootstrap-logs
       with:

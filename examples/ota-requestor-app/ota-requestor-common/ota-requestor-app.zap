@@ -1,5 +1,5 @@
 {
-  "featureLevel": 96,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -33,7 +33,28 @@
   ],
   "endpointTypes": [
     {
+      "id": 1,
       "name": "MA-rootdevice",
+      "deviceTypeRef": {
+        "code": 22,
+        "profileId": 259,
+        "label": "MA-rootdevice",
+        "name": "MA-rootdevice"
+      },
+      "deviceTypes": [
+        {
+          "code": 22,
+          "profileId": 259,
+          "label": "MA-rootdevice",
+          "name": "MA-rootdevice"
+        }
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        22
+      ],
       "deviceTypeName": "MA-rootdevice",
       "deviceTypeCode": 22,
       "deviceTypeProfileId": 259,
@@ -552,7 +573,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "4",
+              "defaultValue": "5",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -594,7 +615,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "4",
+              "defaultValue": "5",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -4121,7 +4142,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -4947,7 +4968,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -5058,7 +5079,28 @@
       ]
     },
     {
+      "id": 2,
       "name": "Anonymous Endpoint Type",
+      "deviceTypeRef": {
+        "code": 259,
+        "profileId": 259,
+        "label": "MA-onofflightswitch",
+        "name": "MA-onofflightswitch"
+      },
+      "deviceTypes": [
+        {
+          "code": 259,
+          "profileId": 259,
+          "label": "MA-onofflightswitch",
+          "name": "MA-onofflightswitch"
+        }
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        259
+      ],
       "deviceTypeName": "MA-onofflightswitch",
       "deviceTypeCode": 259,
       "deviceTypeProfileId": 259,
@@ -5945,7 +5987,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "4",
+              "defaultValue": "5",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -6115,7 +6157,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "4",
+              "defaultValue": "5",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65534,
@@ -6900,7 +6942,28 @@
       ]
     },
     {
+      "id": 3,
       "name": "Anonymous Endpoint Type",
+      "deviceTypeRef": {
+        "code": 61442,
+        "profileId": 259,
+        "label": "MA-secondary-network-commissioning",
+        "name": "MA-secondary-network-commissioning"
+      },
+      "deviceTypes": [
+        {
+          "code": 61442,
+          "profileId": 259,
+          "label": "MA-secondary-network-commissioning",
+          "name": "MA-secondary-network-commissioning"
+        }
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        61442
+      ],
       "deviceTypeName": "MA-secondary-network-commissioning",
       "deviceTypeCode": 61442,
       "deviceTypeProfileId": 259,
@@ -7446,27 +7509,21 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 22
+      "networkId": 0
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 259
+      "networkId": 0
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 2,
       "profileId": 259,
       "endpointId": 65534,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 61442
+      "networkId": 0
     }
   ]
 }

@@ -31,559 +31,411 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends the Read Request Message to the TH to read one attribute on
-          a given cluster and endpoint. AttributePath = [[Endpoint = Specific
-          Endpoint, Cluster = Specific ClusterID, Attribute = Specific
-          Attribute]] On receipt of this message, TH should send a report data
-          action with the attribute value to the DUT."
+          "Step 1: DUT sends the Read Request Message to the TH to read one
+          attribute on a given cluster and endpoint. AttributePath = [[Endpoint
+          = Specific Endpoint, Cluster = Specific ClusterID, Attribute =
+          Specific Attribute]] On receipt of this message, TH should send a
+          report data action with the attribute value to the DUT."
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool identify read identify-time 1 1
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
 
-          [1655720917.720293][10909:10909] CHIP:IM: Received Read request
-          [1655720917.720414][10909:10909] CHIP:DMG: ReadRequestMessage =
-          [1655720917.720461][10909:10909] CHIP:DMG: {
-          [1655720917.720501][10909:10909] CHIP:DMG:         AttributePathIBs =
-          [1655720917.720548][10909:10909] CHIP:DMG:         [
-          [1655720917.720592][10909:10909] CHIP:DMG:                 AttributePathIB =
-          [1655720917.720642][10909:10909] CHIP:DMG:                 {
-          [1655720917.720694][10909:10909] CHIP:DMG:                         Endpoint = 0x1,
-          [1655720917.720752][10909:10909] CHIP:DMG:                         Cluster = 0x3,
-          [1655720917.720805][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0000,
-          [1655720917.720858][10909:10909] CHIP:DMG:                 }
-          [1655720917.720909][10909:10909] CHIP:DMG:
-          [1655720917.720956][10909:10909] CHIP:DMG:         ],
-          [1655720917.721006][10909:10909] CHIP:DMG:
-          [1655720917.721055][10909:10909] CHIP:DMG:         isFabricFiltered = true,
-          [1655720917.721101][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
-          [1655720917.721144][10909:10909] CHIP:DMG: },
-          [1655720917.721267][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
-
-          If the DUT has to provision to verify the logs,  verify that TH all-clusters-app sent success response
-
-          [1657881522.001890][2575:2580] CHIP:DMG: }
-          [1657881522.002053][2575:2580] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3999381333
-          [1657881522.002133][2575:2580] CHIP:TOO:   identify time: 0
-          [1657881522.002227][2575:2580] CHIP:EM: Sending Standalone Ack for MessageCounter:54477998 on exchange 6586i
+          [1686225528.599132][92910:92910] CHIP:SC: Allocated SecureSession (0x5592c1144790) - waiting for Sigma1 msg
+          [1686225528.600604][92910:92910] CHIP:EM: >>> [E:4135r S:64880 M:267902204] (S) Msg RX from 1:000000000001B669 [58B9] --- Type 0001:02 (IM:ReadRequest)
+          [1686225528.600637][92910:92910] CHIP:EM: Handling via exchange: 4135r, Delegate: 0x5592c0755fc8
+          [1686225528.600656][92910:92910] CHIP:IM: Received Read request
+          [1686225528.600677][92910:92910] CHIP:DMG: ReadRequestMessage =
+          [1686225528.600684][92910:92910] CHIP:DMG: {
+          [1686225528.600690][92910:92910] CHIP:DMG:         AttributePathIBs =
+          [1686225528.600698][92910:92910] CHIP:DMG:         [
+          [1686225528.600704][92910:92910] CHIP:DMG:                 AttributePathIB =
+          [1686225528.600712][92910:92910] CHIP:DMG:                 {
+          [1686225528.600719][92910:92910] CHIP:DMG:                         Endpoint = 0x1,
+          [1686225528.600726][92910:92910] CHIP:DMG:                         Cluster = 0x3,
+          [1686225528.600733][92910:92910] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1686225528.600739][92910:92910] CHIP:DMG:                 }
+          [1686225528.600747][92910:92910] CHIP:DMG:
+          [1686225528.600753][92910:92910] CHIP:DMG:         ],
+          [1686225528.600763][92910:92910] CHIP:DMG:
+          [1686225528.600770][92910:92910] CHIP:DMG:         isFabricFiltered = true,
+          [1686225528.600776][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
+          [1686225528.600782][92910:92910] CHIP:DMG: },
+          [1686225528.600837][92910:92910] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686225528.600871][92910:92910] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686225528.600880][92910:92910] CHIP:DMG: <RE:Run> Cluster 3, Attribute 0 is dirty
       disabled: true
 
     - label:
-          "DUT sends the Read Request Message to the TH to read all attributes
-          on a given cluster and Endpoint AttributePath = [[Endpoint = Specific
-          Endpoint, Cluster = Specific ClusterID]] On receipt of this message,
-          TH should send a report data action with the attribute value to the
-          DUT."
+          "Step 2: DUT sends the Read Request Message to the TH to read all
+          attributes on a given cluster and Endpoint AttributePath = [[Endpoint
+          = Specific Endpoint, Cluster = Specific ClusterID]] On receipt of this
+          message, TH should send a report data action with the attribute value
+          to the DUT."
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any read-by-id 0x3 0xFFFFFFFF 1 0
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
 
-          On TH
-          [1655721163.411757][10909:10909] CHIP:EM: Handling via exchange: 9428r, Delegate: 0xaaaac37ce418
-          [1655721163.411801][10909:10909] CHIP:IM: Received Read request
-          [1655721163.411878][10909:10909] CHIP:DMG: ReadRequestMessage =
-          [1655721163.411905][10909:10909] CHIP:DMG: {
-          [1655721163.411927][10909:10909] CHIP:DMG:         AttributePathIBs =
-          [1655721163.411950][10909:10909] CHIP:DMG:         [
-          [1655721163.411970][10909:10909] CHIP:DMG:                 AttributePathIB =
-          [1655721163.411994][10909:10909] CHIP:DMG:                 {
-          [1655721163.412018][10909:10909] CHIP:DMG:                         Endpoint = 0x0,
-          [1655721163.412051][10909:10909] CHIP:DMG:                         Cluster = 0x3,
-          [1655721163.412078][10909:10909] CHIP:DMG:                 }
-          [1655721163.412107][10909:10909] CHIP:DMG:
-          [1655721163.412132][10909:10909] CHIP:DMG:         ],
-          [1655721163.412160][10909:10909] CHIP:DMG:
-          [1655721163.412187][10909:10909] CHIP:DMG:         isFabricFiltered = true,
-          [1655721163.412212][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
-          [1655721163.412236][10909:10909] CHIP:DMG: },
-          [1655721163.412312][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
-
-
-
-          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
-
-          [1657881584.166241][2584:2589] CHIP:DMG: }
-          [1657881584.166599][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 4079829024
-          [1657881584.166672][2584:2589] CHIP:TOO:   identify time: 0
-          [1657881584.166734][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 4079829024
-          [1657881584.166761][2584:2589] CHIP:TOO:   identify type: 2
-          [1657881584.166817][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFC DataVersion: 4079829024
-          [1657881584.166844][2584:2589] CHIP:TOO:   FeatureMap: 0
-          [1657881584.166900][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 4079829024
-          [1657881584.166940][2584:2589] CHIP:TOO:   ClusterRevision: 4
-          [1657881584.167054][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 4079829024
-          [1657881584.167101][2584:2589] CHIP:TOO:   GeneratedCommandList: 0 entries
-          [1657881584.167276][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFF9 DataVersion: 4079829024
-          [1657881584.167309][2584:2589] CHIP:TOO:   AcceptedCommandList: 2 entries
-          [1657881584.167337][2584:2589] CHIP:TOO:     [1]: 0
-          [1657881584.167362][2584:2589] CHIP:TOO:     [2]: 64
-          [1657881584.167690][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 4079829024
-          [1657881584.167725][2584:2589] CHIP:TOO:   AttributeList: 7 entries
-          [1657881584.167752][2584:2589] CHIP:TOO:     [1]: 0
-          [1657881584.167777][2584:2589] CHIP:TOO:     [2]: 1
-          [1657881584.167801][2584:2589] CHIP:TOO:     [3]: 65528
-          [1657881584.167825][2584:2589] CHIP:TOO:     [4]: 65529
-          [1657881584.167850][2584:2589] CHIP:TOO:     [5]: 65531
-          [1657881584.167874][2584:2589] CHIP:TOO:     [6]: 65532
-          [1657881584.167898][2584:2589] CHIP:TOO:     [7]: 65533
-          [1657881584.168029][2584:2589] CHIP:EM: Sending Standalone Ack for MessageCounter:84499870 on exchange 45190i
+          [1686225683.369605][92910:92910] CHIP:SC: Allocated SecureSession (0x5592c1148ef0) - waiting for Sigma1 msg
+          [1686225683.370856][92910:92910] CHIP:EM: >>> [E:54241r S:64882 M:235143934] (S) Msg RX from 1:000000000001B669 [58B9] --- Type 0001:02 (IM:ReadRequest)
+          [1686225683.370882][92910:92910] CHIP:EM: Handling via exchange: 54241r, Delegate: 0x5592c0755fc8
+          [1686225683.370904][92910:92910] CHIP:IM: Received Read request
+          [1686225683.370926][92910:92910] CHIP:DMG: ReadRequestMessage =
+          [1686225683.370935][92910:92910] CHIP:DMG: {
+          [1686225683.370942][92910:92910] CHIP:DMG:         AttributePathIBs =
+          [1686225683.370952][92910:92910] CHIP:DMG:         [
+          [1686225683.370959][92910:92910] CHIP:DMG:                 AttributePathIB =
+          [1686225683.370970][92910:92910] CHIP:DMG:                 {
+          [1686225683.370980][92910:92910] CHIP:DMG:                         Endpoint = 0x0,
+          [1686225683.370989][92910:92910] CHIP:DMG:                         Cluster = 0x3,
+          [1686225683.370998][92910:92910] CHIP:DMG:                 }
+          [1686225683.371010][92910:92910] CHIP:DMG:
+          [1686225683.371016][92910:92910] CHIP:DMG:         ],
+          [1686225683.371029][92910:92910] CHIP:DMG:
+          [1686225683.371037][92910:92910] CHIP:DMG:         isFabricFiltered = true,
+          [1686225683.371046][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
+          [1686225683.371053][92910:92910] CHIP:DMG: },
+          [1686225683.371107][92910:92910] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686225683.371141][92910:92910] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686225683.371151][92910:92910] CHIP:DMG: <RE:Run> Cluster 3, Attribute 0 is dirty
       disabled: true
 
     - label:
-          "DUT sends the Read Request Message to the TH to read all attributes
-          in all clusters and all endpoints Path = [[ ]] On receipt of this
-          message, TH should send a report data action with the attribute values
-          to the DUT."
+          "Step 3: DUT sends the Read Request Message to the TH to read all
+          attributes in all clusters and all endpoints Path = [[ ]] On receipt
+          of this message, TH should send a report data action with the
+          attribute values to the DUT."
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF  1 0xFFFF
-
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command and
-          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
+          On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
+          [1686225824.262856][92910:92910] CHIP:SC: Allocated SecureSession (0x5592c114b150) - waiting for Sigma1 msg
+          [1686225824.264205][92910:92910] CHIP:EM: >>> [E:34791r S:64883 M:91848948] (S) Msg RX from 1:000000000001B669 [58B9] --- Type 0001:02 (IM:ReadRequest)
+          [1686225824.264240][92910:92910] CHIP:EM: Handling via exchange: 34791r, Delegate: 0x5592c0755fc8
+          [1686225824.264258][92910:92910] CHIP:IM: Received Read request
+          [1686225824.264276][92910:92910] CHIP:DMG: ReadRequestMessage =
+          [1686225824.264284][92910:92910] CHIP:DMG: {
+          [1686225824.264289][92910:92910] CHIP:DMG:         AttributePathIBs =
+          [1686225824.264295][92910:92910] CHIP:DMG:         [
+          [1686225824.264300][92910:92910] CHIP:DMG:                 AttributePathIB =
+          [1686225824.264307][92910:92910] CHIP:DMG:                 {
+          [1686225824.264313][92910:92910] CHIP:DMG:                 }
+          [1686225824.264318][92910:92910] CHIP:DMG:
+          [1686225824.264323][92910:92910] CHIP:DMG:         ],
+          [1686225824.264335][92910:92910] CHIP:DMG:
+          [1686225824.264344][92910:92910] CHIP:DMG:         isFabricFiltered = true,
+          [1686225824.264351][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
+          [1686225824.264356][92910:92910] CHIP:DMG: },
+          [1686225824.264400][92910:92910] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686225824.264432][92910:92910] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686225824.264440][92910:92910] CHIP:DMG: <RE:Run> Cluster 3, Attribute 0 is dirty
       disabled: true
 
     - label:
-          "DUT sends the Read Request Message to the TH to read a specific
-          attribute from all endpoints and all clusters. AttributePath = [[
-          Attribute = Specific Attribute]] On receipt of this message, TH should
-          send a report data action with the attribute value to the DUT."
+          "Step 4: DUT sends the Read Request Message to the TH to read a
+          specific attribute from all endpoints and all clusters. AttributePath
+          = [[ Attribute = Specific Attribute]] On receipt of this message, TH
+          should send a report data action with the attribute value to the DUT."
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFD  1 0xFFFF
+          On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
-
-          [1684327544.654910][138835:138837] CHIP:DMG: ReportDataMessage =
-          [1684327544.654915][138835:138837] CHIP:DMG: {
-          [1684327544.654920][138835:138837] CHIP:DMG: 	AttributeReportIBs =
-          [1684327544.654926][138835:138837] CHIP:DMG: 	[
-          [1684327544.654929][138835:138837] CHIP:DMG: 		AttributeReportIB =
-          [1684327544.654940][138835:138837] CHIP:DMG: 		{
-          [1684327544.654949][138835:138837] CHIP:DMG: 			AttributeDataIB =
-          [1684327544.654956][138835:138837] CHIP:DMG: 			{
-          [1684327544.654964][138835:138837] CHIP:DMG: 				DataVersion = 0x91861588,
-          [1684327544.654970][138835:138837] CHIP:DMG: 				AttributePathIB =
-          [1684327544.654978][138835:138837] CHIP:DMG: 				{
-          [1684327544.654995][138835:138837] CHIP:DMG: 					Attribute = 0x0000_FFFD,
-          [1684327544.655002][138835:138837] CHIP:DMG: 				}
-
-
-          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
+          [1686225928.892595][92910:92910] CHIP:EM: >>> [E:30698r S:64884 M:221692686] (S) Msg RX from 1:000000000001B669 [58B9] --- Type 0001:02 (IM:ReadRequest)
+          [1686225928.892624][92910:92910] CHIP:EM: Handling via exchange: 30698r, Delegate: 0x5592c0755fc8
+          [1686225928.892641][92910:92910] CHIP:IM: Received Read request
+          [1686225928.892661][92910:92910] CHIP:DMG: ReadRequestMessage =
+          [1686225928.892668][92910:92910] CHIP:DMG: {
+          [1686225928.892674][92910:92910] CHIP:DMG:         AttributePathIBs =
+          [1686225928.892681][92910:92910] CHIP:DMG:         [
+          [1686225928.892687][92910:92910] CHIP:DMG:                 AttributePathIB =
+          [1686225928.892695][92910:92910] CHIP:DMG:                 {
+          [1686225928.892703][92910:92910] CHIP:DMG:                         Attribute = 0x0000_FFFD,
+          [1686225928.892709][92910:92910] CHIP:DMG:                 }
+          [1686225928.892717][92910:92910] CHIP:DMG:
+          [1686225928.892722][92910:92910] CHIP:DMG:         ],
+          [1686225928.892731][92910:92910] CHIP:DMG:
+          [1686225928.892738][92910:92910] CHIP:DMG:         isFabricFiltered = true,
+          [1686225928.892745][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
+          [1686225928.892750][92910:92910] CHIP:DMG: },
+          [1686225928.892801][92910:92910] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686225928.892833][92910:92910] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686225928.892843][92910:92910] CHIP:DMG: <RE:Run> Cluster 3, Attribute fffd is dirty
       disabled: true
 
     - label:
-          "DUT sends the Read Request Message to the TH to read all attributes
-          from a specific cluster on all endpoints AttributePath = [[ Cluster =
-          Specific ClusterID]] On receipt of this message, TH should send a
-          report data action with the attribute value to the DUT."
+          "Step 5: DUT sends the Read Request Message to the TH to read all
+          attributes from a specific cluster on all endpoints AttributePath = [[
+          Cluster = Specific ClusterID]] On receipt of this message, TH should
+          send a report data action with the attribute value to the DUT."
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any read-by-id 0x03 0xFFFFFFFF  1 0xFFFF
-
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
-
-          [1655721586.587649][10909:10909] CHIP:EM: Handling via exchange: 14559r, Delegate: 0xaaaac37ce418
-          [1655721586.587708][10909:10909] CHIP:IM: Received Read request
-          [1655721586.587805][10909:10909] CHIP:DMG: ReadRequestMessage =
-          [1655721586.587843][10909:10909] CHIP:DMG: {
-          [1655721586.587876][10909:10909] CHIP:DMG:         AttributePathIBs =
-          [1655721586.587914][10909:10909] CHIP:DMG:         [
-          [1655721586.587949][10909:10909] CHIP:DMG:                 AttributePathIB =
-          [1655721586.587998][10909:10909] CHIP:DMG:                 {
-          [1655721586.588041][10909:10909] CHIP:DMG:                         Cluster = 0x3,
-          [1655721586.588085][10909:10909] CHIP:DMG:                 }
-          [1655721586.588125][10909:10909] CHIP:DMG:
-          [1655721586.588162][10909:10909] CHIP:DMG:         ],
-          [1655721586.588201][10909:10909] CHIP:DMG:
-          [1655721586.588239][10909:10909] CHIP:DMG:         isFabricFiltered = true,
-          [1655721586.588276][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
-          [1655721586.588310][10909:10909] CHIP:DMG: },
-          [1655721586.588403][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1655721586.588510][10909:10909] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
-
-          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
-          [1657881729.900518][2608:2613] CHIP:DMG: }
-          [1657881729.901108][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 4079829024
-          [1657881729.901182][2608:2613] CHIP:TOO:   identify time: 0
-          [1657881729.901245][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 4079829024
-          [1657881729.901273][2608:2613] CHIP:TOO:   identify type: 2
-          [1657881729.901331][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFC DataVersion: 4079829024
-          [1657881729.901359][2608:2613] CHIP:TOO:   FeatureMap: 0
-          [1657881729.901431][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 4079829024
-          [1657881729.901472][2608:2613] CHIP:TOO:   ClusterRevision: 4
-          [1657881729.901586][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 4079829024
-          [1657881729.901632][2608:2613] CHIP:TOO:   GeneratedCommandList: 0 entries
-          [1657881729.901806][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFF9 DataVersion: 4079829024
-          [1657881729.901840][2608:2613] CHIP:TOO:   AcceptedCommandList: 2 entries
-          [1657881729.901868][2608:2613] CHIP:TOO:     [1]: 0
-          [1657881729.901893][2608:2613] CHIP:TOO:     [2]: 64
-          [1657881729.902242][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 4079829024
-          [1657881729.902279][2608:2613] CHIP:TOO:   AttributeList: 7 entries
-          [1657881729.902305][2608:2613] CHIP:TOO:     [1]: 0
-          [1657881729.902329][2608:2613] CHIP:TOO:     [2]: 1
-          [1657881729.902354][2608:2613] CHIP:TOO:     [3]: 65528
-          [1657881729.902378][2608:2613] CHIP:TOO:     [4]: 65529
-          [1657881729.902402][2608:2613] CHIP:TOO:     [5]: 65531
-          [1657881729.902426][2608:2613] CHIP:TOO:     [6]: 65532
-          [1657881729.902451][2608:2613] CHIP:TOO:     [7]: 65533
-          [1657881729.902474][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3999381333
-          [1657881729.902500][2608:2613] CHIP:TOO:   identify time: 0
-          [1657881729.902556][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3999381333
-          [1657881729.902583][2608:2613] CHIP:TOO:   identify type: 2
-          [1657881729.902640][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFC DataVersion: 3999381333
-          [1657881729.902665][2608:2613] CHIP:TOO:   FeatureMap: 0
-          [1657881729.902721][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 3999381333
-          [1657881729.902746][2608:2613] CHIP:TOO:   ClusterRevision: 4
-          [1657881729.902843][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 3999381333
-          [1657881729.902872][2608:2613] CHIP:TOO:   GeneratedCommandList: 0 entries
-          [1657881729.903021][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF9 DataVersion: 3999381333
-          [1657881729.903053][2608:2613] CHIP:TOO:   AcceptedCommandList: 2 entries
-          [1657881729.903079][2608:2613] CHIP:TOO:     [1]: 0
-          [1657881729.903104][2608:2613] CHIP:TOO:     [2]: 64
-          [1657881729.903427][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 3999381333
-          [1657881729.903462][2608:2613] CHIP:TOO:   AttributeList: 7 entries
-          [1657881729.903488][2608:2613] CHIP:TOO:     [1]: 0
-          [1657881729.903513][2608:2613] CHIP:TOO:     [2]: 1
-          [1657881729.903537][2608:2613] CHIP:TOO:     [3]: 65528
-          [1657881729.903561][2608:2613] CHIP:TOO:     [4]: 65529
-          [1657881729.903586][2608:2613] CHIP:TOO:     [5]: 65531
-          [1657881729.903610][2608:2613] CHIP:TOO:     [6]: 65532
-          [1657881729.903634][2608:2613] CHIP:TOO:     [7]: 65533
-          [1657881729.903843][2608:2613] CHIP:EM: Sending Standalone Ack for MessageCounter:174033086 on exchange 10540i
+          On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
+          [1686226185.511406][92910:92910] CHIP:EM: Handling via exchange: 42616r, Delegate: 0x5592c0755fc8
+          [1686226185.511424][92910:92910] CHIP:IM: Received Read request
+          [1686226185.511444][92910:92910] CHIP:DMG: ReadRequestMessage =
+          [1686226185.511452][92910:92910] CHIP:DMG: {
+          [1686226185.511458][92910:92910] CHIP:DMG:         AttributePathIBs =
+          [1686226185.511467][92910:92910] CHIP:DMG:         [
+          [1686226185.511473][92910:92910] CHIP:DMG:                 AttributePathIB =
+          [1686226185.511482][92910:92910] CHIP:DMG:                 {
+          [1686226185.511489][92910:92910] CHIP:DMG:                         Cluster = 0x3,
+          [1686226185.511496][92910:92910] CHIP:DMG:                 }
+          [1686226185.511505][92910:92910] CHIP:DMG:
+          [1686226185.511511][92910:92910] CHIP:DMG:         ],
+          [1686226185.511520][92910:92910] CHIP:DMG:
+          [1686226185.511527][92910:92910] CHIP:DMG:         isFabricFiltered = true,
+          [1686226185.511533][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
+          [1686226185.511539][92910:92910] CHIP:DMG: },
+          [1686226185.511586][92910:92910] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686226185.511617][92910:92910] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686226185.511627][92910:92910] CHIP:DMG: <RE:Run> Cluster 3, Attribute 0 is dirty
+          [1686226185.511633][92910:92910] CHIP:DMG: Reading attribute: Cluster=0x0000_0003 Endpoint=0 AttributeId=0x0000_0000 (expanded=1)
       disabled: true
 
     - label:
-          "DUT sends the Read Request Message to the TH to read a specific
-          attribute from a given cluster on all endpoints. AttributePath = [[
-          Cluster = Specific Cluster, Attribute = specific attribute]] On
-          receipt of this message, TH should send a report data action with the
-          attribute value to the DUT."
-      verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
-
-          ./chip-tool any read-by-id 0x03 0x01  1 0xFFFF
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
-
-          [1655721699.304979][10909:10909] CHIP:IM: Received Read request
-          [1655721699.305100][10909:10909] CHIP:DMG: ReadRequestMessage =
-          [1655721699.305170][10909:10909] CHIP:DMG: {
-          [1655721699.305211][10909:10909] CHIP:DMG:         AttributePathIBs =
-          [1655721699.305277][10909:10909] CHIP:DMG:         [
-          [1655721699.305322][10909:10909] CHIP:DMG:                 AttributePathIB =
-          [1655721699.305391][10909:10909] CHIP:DMG:                 {
-          [1655721699.305442][10909:10909] CHIP:DMG:                         Cluster = 0x3,
-          [1655721699.305516][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0001,
-          [1655721699.305568][10909:10909] CHIP:DMG:                 }
-          [1655721699.305635][10909:10909] CHIP:DMG:
-          [1655721699.305682][10909:10909] CHIP:DMG:         ],
-          [1655721699.305733][10909:10909] CHIP:DMG:
-          [1655721699.305780][10909:10909] CHIP:DMG:         isFabricFiltered = true,
-          [1655721699.305827][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
-          [1655721699.305870][10909:10909] CHIP:DMG: },
-          [1655721699.305990][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
-
-
-          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
-          [1657881792.350417][2616:2621] CHIP:DMG: }
-          [1657881792.350641][2616:2621] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 4079829024
-          [1657881792.350742][2616:2621] CHIP:TOO:   identify type: 2
-          [1657881792.350845][2616:2621] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3999381333
-          [1657881792.350891][2616:2621] CHIP:TOO:   identify type: 2
-          [1657881792.351000][2616:2621] CHIP:EM: Sending Standalone Ack for MessageCounter:222990264 on exchange 23721i
-      disabled: true
-
-    - label:
-          "DUT sends the Read Request Message to the TH to read all attributes
-          from all clusters at a given endpoint. AttributePath = [[ Endpoint =
-          Specific Endpoint]] On receipt of this message, TH should send a
-          report data action with the attribute value to the DUT."
-      verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
-
-          ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF  1 1
-
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
-
-          [1655721846.893983][10909:10909] CHIP:EM: Handling via exchange: 50021r, Delegate: 0xaaaac37ce418
-          [1655721846.894041][10909:10909] CHIP:IM: Received Read request
-          [1655721846.894136][10909:10909] CHIP:DMG: ReadRequestMessage =
-          [1655721846.894174][10909:10909] CHIP:DMG: {
-          [1655721846.894206][10909:10909] CHIP:DMG:         AttributePathIBs =
-          [1655721846.894245][10909:10909] CHIP:DMG:         [
-          [1655721846.894280][10909:10909] CHIP:DMG:                 AttributePathIB =
-          [1655721846.894320][10909:10909] CHIP:DMG:                 {
-          [1655721846.894360][10909:10909] CHIP:DMG:                         Endpoint = 0x1,
-          [1655721846.894403][10909:10909] CHIP:DMG:                 }
-          [1655721846.894443][10909:10909] CHIP:DMG:
-          [1655721846.894479][10909:10909] CHIP:DMG:         ],
-          [1655721846.894519][10909:10909] CHIP:DMG:
-          [1655721846.894557][10909:10909] CHIP:DMG:         isFabricFiltered = true,
-          [1655721846.894594][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
-          [1655721846.894628][10909:10909] CHIP:DMG: },
-          [1655721846.894724][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
-
-
-
-          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
-      disabled: true
-
-    - label:
-          "DUT sends the Read Request Message to the TH to a specific endpoint
-          to read a particular attribute from all the clusters at that endpoint
-          AttributePath = [[ Endpoint = Specific Endpoint, Attribute = specific
+          "Step 6: DUT sends the Read Request Message to the TH to read a
+          specific attribute from a given cluster on all endpoints.
+          AttributePath = [[ Cluster = Specific Cluster, Attribute = specific
           attribute]] On receipt of this message, TH should send a report data
           action with the attribute value to the DUT."
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
-          ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFD  1 0
-
-          verify TH(reference app) receives the right Read Request Message for the data sent in the above command
-
-          [1655721935.483404][10909:10909] CHIP:EM: Handling via exchange: 59853r, Delegate: 0xaaaac37ce418
-          [1655721935.483474][10909:10909] CHIP:IM: Received Read request
-          [1655721935.483595][10909:10909] CHIP:DMG: ReadRequestMessage =
-          [1655721935.483660][10909:10909] CHIP:DMG: {
-          [1655721935.483701][10909:10909] CHIP:DMG:         AttributePathIBs =
-          [1655721935.483767][10909:10909] CHIP:DMG:         [
-          [1655721935.483813][10909:10909] CHIP:DMG:                 AttributePathIB =
-          [1655721935.483881][10909:10909] CHIP:DMG:                 {
-          [1655721935.483934][10909:10909] CHIP:DMG:                         Endpoint = 0x0,
-          [1655721935.484022][10909:10909] CHIP:DMG:                         Attribute = 0x0000_FFFD,
-          [1655721935.484095][10909:10909] CHIP:DMG:                 }
-          [1655721935.484156][10909:10909] CHIP:DMG:
-          [1655721935.484225][10909:10909] CHIP:DMG:         ],
-          [1655721935.484279][10909:10909] CHIP:DMG:
-          [1655721935.484344][10909:10909] CHIP:DMG:         isFabricFiltered = true,
-          [1655721935.484392][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
-          [1655721935.484450][10909:10909] CHIP:DMG: },
-          [1655721935.484595][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
-
-
-          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
-          [1657881935.225146][2631:2636] CHIP:DMG: }
-          [1657881935.225620][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 4079829024
-          [1657881935.225700][2631:2636] CHIP:TOO:   ClusterRevision: 4
-          [1657881935.225763][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Attribute 0x0000_FFFD DataVersion: 130355893
-          [1657881935.225790][2631:2636] CHIP:TOO:   ClusterRevision: 4
-          [1657881935.225846][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_FFFD DataVersion: 2043826222
-          [1657881935.225872][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.225928][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001E Attribute 0x0000_FFFD DataVersion: 539126375
-          [1657881935.225954][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.226010][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_FFFD DataVersion: 821022762
-          [1657881935.226037][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.226093][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFFD DataVersion: 745595402
-          [1657881935.226120][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.226175][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002A Attribute 0x0000_FFFD DataVersion: 2914015802
-          [1657881935.226201][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.226258][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_FFFD DataVersion: 2733214794
-          [1657881935.226284][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.226340][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFFD DataVersion: 3273895737
-          [1657881935.226365][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.226420][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_FFFD DataVersion: 2449855749
-          [1657881935.226447][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.226504][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002E Attribute 0x0000_FFFD DataVersion: 2597243070
-          [1657881935.226530][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.226586][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002F Attribute 0x0000_FFFD DataVersion: 714742425
-          [1657881935.226611][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.226667][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_FFFD DataVersion: 3643421834
-          [1657881935.226693][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.226747][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFD DataVersion: 3610511831
-          [1657881935.226773][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.226831][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0032 Attribute 0x0000_FFFD DataVersion: 3399712075
-          [1657881935.226857][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.226916][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_FFFD DataVersion: 4165139953
-          [1657881935.226941][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.226996][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_FFFD DataVersion: 3623073226
-          [1657881935.227022][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.227077][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_FFFD DataVersion: 3137436487
-          [1657881935.227103][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.227159][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFFD DataVersion: 1172053040
-          [1657881935.227185][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.227241][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_FFFD DataVersion: 3832336232
-          [1657881935.227267][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.227325][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_FFFD DataVersion: 4072501061
-          [1657881935.227350][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.227407][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_FFFD DataVersion: 1112172817
-          [1657881935.227433][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.227488][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_FFFD DataVersion: 2917149142
-          [1657881935.227515][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.227572][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0040 Attribute 0x0000_FFFD DataVersion: 1676181270
-          [1657881935.227611][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.227669][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0041 Attribute 0x0000_FFFD DataVersion: 4002139741
-          [1657881935.227695][2631:2636] CHIP:TOO:   ClusterRevision: 1
-          [1657881935.227752][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0405 Attribute 0x0000_FFFD DataVersion: 2945088432
-          [1657881935.227778][2631:2636] CHIP:TOO:   ClusterRevision: 3
-          [1657881935.227936][2631:2636] CHIP:EM: Sending Standalone Ack for MessageCounter:199380325 on exchange 6370i
+          ./chip-tool any read-by-id 0x03 0x01  1 0xFFFF
+          On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
+          [1686226228.381581][92910:92910] CHIP:SC: Allocated SecureSession (0x5592c114a190) - waiting for Sigma1 msg
+          [1686226228.383047][92910:92910] CHIP:EM: >>> [E:14054r S:64886 M:240745911] (S) Msg RX from 1:000000000001B669 [58B9] --- Type 0001:02 (IM:ReadRequest)
+          [1686226228.383084][92910:92910] CHIP:EM: Handling via exchange: 14054r, Delegate: 0x5592c0755fc8
+          [1686226228.383107][92910:92910] CHIP:IM: Received Read request
+          [1686226228.383139][92910:92910] CHIP:DMG: ReadRequestMessage =
+          [1686226228.383150][92910:92910] CHIP:DMG: {
+          [1686226228.383160][92910:92910] CHIP:DMG:         AttributePathIBs =
+          [1686226228.383170][92910:92910] CHIP:DMG:         [
+          [1686226228.383180][92910:92910] CHIP:DMG:                 AttributePathIB =
+          [1686226228.383191][92910:92910] CHIP:DMG:                 {
+          [1686226228.383202][92910:92910] CHIP:DMG:                         Cluster = 0x3,
+          [1686226228.383213][92910:92910] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1686226228.383224][92910:92910] CHIP:DMG:                 }
+          [1686226228.383234][92910:92910] CHIP:DMG:
+          [1686226228.383242][92910:92910] CHIP:DMG:         ],
+          [1686226228.383253][92910:92910] CHIP:DMG:
+          [1686226228.383263][92910:92910] CHIP:DMG:         isFabricFiltered = true,
+          [1686226228.383271][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
+          [1686226228.383279][92910:92910] CHIP:DMG: },
+          [1686226228.383378][92910:92910] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686226228.383421][92910:92910] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686226228.383431][92910:92910] CHIP:DMG: <RE:Run> Cluster 3, Attribute 1 is dirty
       disabled: true
 
     - label:
-          "DUT sends the Read Request Message to the TH to read an attribute of
-          data type bool."
+          "Step 7: DUT sends the Read Request Message to the TH to read all
+          attributes from all clusters at a given endpoint. AttributePath = [[
+          Endpoint = Specific Endpoint]] On receipt of this message, TH should
+          send a report data action with the attribute value to the DUT."
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF  1 1
+          On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
+          [1686226295.956172][92910:92910] CHIP:SC: Allocated SecureSession (0x5592c1141cd0) - waiting for Sigma1 msg
+          [1686226295.957552][92910:92910] CHIP:EM: >>> [E:39621r S:64888 M:136668914] (S) Msg RX from 1:000000000001B669 [58B9] --- Type 0001:02 (IM:ReadRequest)
+          [1686226295.957583][92910:92910] CHIP:EM: Handling via exchange: 39621r, Delegate: 0x5592c0755fc8
+          [1686226295.957601][92910:92910] CHIP:IM: Received Read request
+          [1686226295.957620][92910:92910] CHIP:DMG: ReadRequestMessage =
+          [1686226295.957628][92910:92910] CHIP:DMG: {
+          [1686226295.957634][92910:92910] CHIP:DMG:         AttributePathIBs =
+          [1686226295.957642][92910:92910] CHIP:DMG:         [
+          [1686226295.957648][92910:92910] CHIP:DMG:                 AttributePathIB =
+          [1686226295.957659][92910:92910] CHIP:DMG:                 {
+          [1686226295.957666][92910:92910] CHIP:DMG:                         Endpoint = 0x1,
+          [1686226295.957673][92910:92910] CHIP:DMG:                 }
+          [1686226295.957681][92910:92910] CHIP:DMG:
+          [1686226295.957686][92910:92910] CHIP:DMG:         ],
+          [1686226295.957696][92910:92910] CHIP:DMG:
+          [1686226295.957703][92910:92910] CHIP:DMG:         isFabricFiltered = true,
+          [1686226295.957712][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
+          [1686226295.957718][92910:92910] CHIP:DMG: },
+          [1686226295.957773][92910:92910] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686226295.957806][92910:92910] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686226295.957815][92910:92910] CHIP:DMG: <RE:Run> Cluster 3, Attribute 0 is dirty
+      disabled: true
+
+    - label:
+          "Step 8: DUT sends the Read Request Message to the TH to a specific
+          endpoint to read a particular attribute from all the clusters at that
+          endpoint AttributePath = [[ Endpoint = Specific Endpoint, Attribute =
+          specific attribute]] On receipt of this message, TH should send a
+          report data action with the attribute value to the DUT."
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFD  1 0
+          On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
+          [1686226336.606276][92910:92910] CHIP:EM: >>> [E:29124r S:64889 M:25401402] (S) Msg RX from 1:000000000001B669 [58B9] --- Type 0001:02 (IM:ReadRequest)
+          [1686226336.606300][92910:92910] CHIP:EM: Handling via exchange: 29124r, Delegate: 0x5592c0755fc8
+          [1686226336.606318][92910:92910] CHIP:IM: Received Read request
+          [1686226336.606344][92910:92910] CHIP:DMG: ReadRequestMessage =
+          [1686226336.606355][92910:92910] CHIP:DMG: {
+          [1686226336.606363][92910:92910] CHIP:DMG:         AttributePathIBs =
+          [1686226336.606374][92910:92910] CHIP:DMG:         [
+          [1686226336.606383][92910:92910] CHIP:DMG:                 AttributePathIB =
+          [1686226336.606394][92910:92910] CHIP:DMG:                 {
+          [1686226336.606405][92910:92910] CHIP:DMG:                         Endpoint = 0x0,
+          [1686226336.606417][92910:92910] CHIP:DMG:                         Attribute = 0x0000_FFFD,
+          [1686226336.606426][92910:92910] CHIP:DMG:                 }
+          [1686226336.606438][92910:92910] CHIP:DMG:
+          [1686226336.606447][92910:92910] CHIP:DMG:         ],
+          [1686226336.606461][92910:92910] CHIP:DMG:
+          [1686226336.606471][92910:92910] CHIP:DMG:         isFabricFiltered = true,
+          [1686226336.606481][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
+          [1686226336.606489][92910:92910] CHIP:DMG: },
+          [1686226336.606580][92910:92910] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686226336.606617][92910:92910] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686226336.606631][92910:92910] CHIP:DMG: <RE:Run> Cluster 3, Attribute fffd is dirty
+      disabled: true
+
+    - label:
+          "Step 9: DUT sends the Read Request Message to the TH to read an
+          attribute of data type bool."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Bool
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            ./chip-tool onoff read on-off 1 1
-
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
-
-          [1655722298.458183][10909:10909] CHIP:EM: Handling via exchange: 9588r, Delegate: 0xaaaac37ce418
-          [1655722298.458279][10909:10909] CHIP:IM: Received Read request
-          [1655722298.458481][10909:10909] CHIP:DMG: ReadRequestMessage =
-          [1655722298.458544][10909:10909] CHIP:DMG: {
-          [1655722298.458617][10909:10909] CHIP:DMG:         AttributePathIBs =
-          [1655722298.458680][10909:10909] CHIP:DMG:         [
-          [1655722298.458740][10909:10909] CHIP:DMG:                 AttributePathIB =
-          [1655722298.458827][10909:10909] CHIP:DMG:                 {
-          [1655722298.458936][10909:10909] CHIP:DMG:                         Endpoint = 0x1,
-          [1655722298.459034][10909:10909] CHIP:DMG:                         Cluster = 0x6,
-          [1655722298.459114][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0000,
-          [1655722298.459208][10909:10909] CHIP:DMG:                 }
-          [1655722298.459283][10909:10909] CHIP:DMG:
-          [1655722298.459366][10909:10909] CHIP:DMG:         ],
-          [1655722298.459435][10909:10909] CHIP:DMG:
-          [1655722298.459519][10909:10909] CHIP:DMG:         isFabricFiltered = true,
-          [1655722298.459581][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
-          [1655722298.459659][10909:10909] CHIP:DMG: },
-          [1655722298.459820][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
-
-
-          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
-          [1657881978.415828][2640:2645] CHIP:DMG: }
-          [1657881978.416014][2640:2645] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 4019194565
-          [1657881978.416091][2640:2645] CHIP:TOO:   OnOff: FALSE
-          [1657881978.416245][2640:2645] CHIP:EM: Sending Standalone Ack for MessageCounter:144208215 on exchange 38107i
+          On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
+          [1686226378.552745][92910:92910] CHIP:EM: Handling via exchange: 15302r, Delegate: 0x5592c0755fc8
+          [1686226378.552758][92910:92910] CHIP:IM: Received Read request
+          [1686226378.552776][92910:92910] CHIP:DMG: ReadRequestMessage =
+          [1686226378.552782][92910:92910] CHIP:DMG: {
+          [1686226378.552788][92910:92910] CHIP:DMG:         AttributePathIBs =
+          [1686226378.552797][92910:92910] CHIP:DMG:         [
+          [1686226378.552803][92910:92910] CHIP:DMG:                 AttributePathIB =
+          [1686226378.552811][92910:92910] CHIP:DMG:                 {
+          [1686226378.552818][92910:92910] CHIP:DMG:                         Endpoint = 0x1,
+          [1686226378.552825][92910:92910] CHIP:DMG:                         Cluster = 0x6,
+          [1686226378.552833][92910:92910] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1686226378.552839][92910:92910] CHIP:DMG:                 }
+          [1686226378.552847][92910:92910] CHIP:DMG:
+          [1686226378.552853][92910:92910] CHIP:DMG:         ],
+          [1686226378.552861][92910:92910] CHIP:DMG:
+          [1686226378.552868][92910:92910] CHIP:DMG:         isFabricFiltered = true,
+          [1686226378.552875][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
+          [1686226378.552881][92910:92910] CHIP:DMG: },
+          [1686226378.552936][92910:92910] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686226378.552963][92910:92910] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686226378.552971][92910:92910] CHIP:DMG: <RE:Run> Cluster 6, Attribute 0 is dirty
       disabled: true
 
     - label:
-          "DUT sends the Read Request Message to the TH to read an attribute of
-          data type string."
+          "Step 10: DUT sends the Read Request Message to the TH to read an
+          attribute of data type string."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_String
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool modeselect read description  1 1
-
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
-
-          [1655722750.452237][10909:10909] CHIP:EM: Handling via exchange: 31886r, Delegate: 0xaaaac37ce418
-          [1655722750.452324][10909:10909] CHIP:IM: Received Read request
-          [1655722750.452462][10909:10909] CHIP:DMG: ReadRequestMessage =
-          [1655722750.452515][10909:10909] CHIP:DMG: {
-          [1655722750.452560][10909:10909] CHIP:DMG:         AttributePathIBs =
-          [1655722750.452614][10909:10909] CHIP:DMG:         [
-          [1655722750.452664][10909:10909] CHIP:DMG:                 AttributePathIB =
-          [1655722750.452729][10909:10909] CHIP:DMG:                 {
-          [1655722750.452789][10909:10909] CHIP:DMG:                         Endpoint = 0x1,
-          [1655722750.452854][10909:10909] CHIP:DMG:                         Cluster = 0x50,
-          [1655722750.452926][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0000,
-          [1655722750.452986][10909:10909] CHIP:DMG:                 }
-          [1655722750.453049][10909:10909] CHIP:DMG:
-          [1655722750.453102][10909:10909] CHIP:DMG:         ],
-          [1655722750.453160][10909:10909] CHIP:DMG:
-          [1655722750.453215][10909:10909] CHIP:DMG:         isFabricFiltered = true,
-          [1655722750.453268][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
-          [1655722750.453316][10909:10909] CHIP:DMG: },
-          [1655722750.453457][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
-
-
-          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
-          [1657882077.867099][2655:2660] CHIP:DMG: }
-          [1657882077.867278][2655:2660] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000 DataVersion: 321966114
-          [1657882077.867352][2655:2660] CHIP:TOO:   Description: Coffee
-          [1657882077.867466][2655:2660] CHIP:EM: Sending Standalone Ack for MessageCounter:62608362 on exchange 57811i
+          On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
+          [1686226406.253784][92910:92910] CHIP:EM: Handling via exchange: 31624r, Delegate: 0x5592c0755fc8
+          [1686226406.253789][92910:92910] CHIP:IM: Received Read request
+          [1686226406.253796][92910:92910] CHIP:DMG: ReadRequestMessage =
+          [1686226406.253798][92910:92910] CHIP:DMG: {
+          [1686226406.253800][92910:92910] CHIP:DMG:         AttributePathIBs =
+          [1686226406.253802][92910:92910] CHIP:DMG:         [
+          [1686226406.253804][92910:92910] CHIP:DMG:                 AttributePathIB =
+          [1686226406.253806][92910:92910] CHIP:DMG:                 {
+          [1686226406.253809][92910:92910] CHIP:DMG:                         Endpoint = 0x1,
+          [1686226406.253811][92910:92910] CHIP:DMG:                         Cluster = 0x50,
+          [1686226406.253813][92910:92910] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1686226406.253815][92910:92910] CHIP:DMG:                 }
+          [1686226406.253817][92910:92910] CHIP:DMG:
+          [1686226406.253819][92910:92910] CHIP:DMG:         ],
+          [1686226406.253822][92910:92910] CHIP:DMG:
+          [1686226406.253824][92910:92910] CHIP:DMG:         isFabricFiltered = true,
+          [1686226406.253826][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
+          [1686226406.253827][92910:92910] CHIP:DMG: },
+          [1686226406.253847][92910:92910] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686226406.253859][92910:92910] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686226406.253861][92910:92910] CHIP:DMG: <RE:Run> Cluster 50, Attribute 0 is dirty
       disabled: true
 
     - label:
-          "DUT sends the Read Request Message to the TH to read an attribute of
-          data type unsigned integer."
+          "Step 11: DUT sends the Read Request Message to the TH to read an
+          attribute of data type unsigned integer."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_UnsignedInteger
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any read-by-id 0x3 0x1 1 0
+          On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
-
-          [1655722980.956846][10909:10909] CHIP:IM: Received Read request
-          [1655722980.956933][10909:10909] CHIP:DMG: ReadRequestMessage =
-          [1655722980.956978][10909:10909] CHIP:DMG: {
-          [1655722980.957006][10909:10909] CHIP:DMG:         AttributePathIBs =
-          [1655722980.957037][10909:10909] CHIP:DMG:         [
-          [1655722980.957078][10909:10909] CHIP:DMG:                 AttributePathIB =
-          [1655722980.957112][10909:10909] CHIP:DMG:                 {
-          [1655722980.957157][10909:10909] CHIP:DMG:                         Endpoint = 0x0,
-          [1655722980.957207][10909:10909] CHIP:DMG:                         Cluster = 0x3,
-          [1655722980.957245][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0001,
-          [1655722980.957282][10909:10909] CHIP:DMG:                 }
-          [1655722980.957328][10909:10909] CHIP:DMG:
-          [1655722980.957359][10909:10909] CHIP:DMG:         ],
-          [1655722980.957404][10909:10909] CHIP:DMG:
-          [1655722980.957436][10909:10909] CHIP:DMG:         isFabricFiltered = true,
-          [1655722980.957477][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
-          [1655722980.957506][10909:10909] CHIP:DMG: },
-          [1655722980.957605][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
-
-
-
-          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
-          [1657882043.053353][2648:2653] CHIP:DMG: }
-          [1657882043.053561][2648:2653] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 4079829024
-          [1657882043.053662][2648:2653] CHIP:TOO:   identify type: 2
-          [1657882043.053774][2648:2653] CHIP:EM: Sending Standalone Ack for MessageCounter:228608905 on exchange 11019i
+          [1686226432.788003][92910:92910] CHIP:EM: Handling via exchange: 43574r, Delegate: 0x5592c0755fc8
+          [1686226432.788021][92910:92910] CHIP:IM: Received Read request
+          [1686226432.788041][92910:92910] CHIP:DMG: ReadRequestMessage =
+          [1686226432.788049][92910:92910] CHIP:DMG: {
+          [1686226432.788054][92910:92910] CHIP:DMG:         AttributePathIBs =
+          [1686226432.788062][92910:92910] CHIP:DMG:         [
+          [1686226432.788068][92910:92910] CHIP:DMG:                 AttributePathIB =
+          [1686226432.788076][92910:92910] CHIP:DMG:                 {
+          [1686226432.788083][92910:92910] CHIP:DMG:                         Endpoint = 0x0,
+          [1686226432.788090][92910:92910] CHIP:DMG:                         Cluster = 0x3,
+          [1686226432.788098][92910:92910] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1686226432.788104][92910:92910] CHIP:DMG:                 }
+          [1686226432.788113][92910:92910] CHIP:DMG:
+          [1686226432.788118][92910:92910] CHIP:DMG:         ],
+          [1686226432.788127][92910:92910] CHIP:DMG:
+          [1686226432.788134][92910:92910] CHIP:DMG:         isFabricFiltered = true,
+          [1686226432.788141][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
+          [1686226432.788147][92910:92910] CHIP:DMG: },
+          [1686226432.788200][92910:92910] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686226432.788233][92910:92910] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686226432.788242][92910:92910] CHIP:DMG: <RE:Run> Cluster 3, Attribute 1 is dirty
       disabled: true
 
     - label:
-          "DUT sends the Read Request Message to the TH to read an attribute of
-          data type signed integer."
+          "Step 12: DUT sends the Read Request Message to the TH to read an
+          attribute of data type signed integer."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_SignedInteger
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool pressuremeasurement read measured-value 1 1
-
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
-
-          [1655723021.112808][10909:10909] CHIP:IM: Received Read request
-          [1655723021.112912][10909:10909] CHIP:DMG: ReadRequestMessage =
-          [1655723021.112942][10909:10909] CHIP:DMG: {
-          [1655723021.112963][10909:10909] CHIP:DMG:         AttributePathIBs =
-          [1655723021.112990][10909:10909] CHIP:DMG:         [
-          [1655723021.113013][10909:10909] CHIP:DMG:                 AttributePathIB =
-          [1655723021.113038][10909:10909] CHIP:DMG:                 {
-          [1655723021.113068][10909:10909] CHIP:DMG:                         Endpoint = 0x1,
-          [1655723021.113096][10909:10909] CHIP:DMG:                         Cluster = 0x403,
-          [1655723021.113125][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0000,
-          [1655723021.113166][10909:10909] CHIP:DMG:                 }
-          [1655723021.113195][10909:10909] CHIP:DMG:
-          [1655723021.113228][10909:10909] CHIP:DMG:         ],
-          [1655723021.113257][10909:10909] CHIP:DMG:
-          [1655723021.113292][10909:10909] CHIP:DMG:         isFabricFiltered = true,
-          [1655723021.113318][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
-          [1655723021.113349][10909:10909] CHIP:DMG: },
-          [1655723021.113441][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
-
-
-
-          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
-          [1657882152.821695][2665:2670] CHIP:DMG: }
-          [1657882152.821886][2665:2670] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0403 Attribute 0x0000_0000 DataVersion: 1184750328
-          [1657882152.821981][2665:2670] CHIP:TOO:   MeasuredValue: 0
-          [1657882152.822099][2665:2670] CHIP:EM: Sending Standalone Ack for MessageCounter:178527554 on exchange 52092i
+          On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
+          [1686226460.249020][92910:92910] CHIP:EM: Handling via exchange: 37364r, Delegate: 0x5592c0755fc8
+          [1686226460.249037][92910:92910] CHIP:IM: Received Read request
+          [1686226460.249056][92910:92910] CHIP:DMG: ReadRequestMessage =
+          [1686226460.249063][92910:92910] CHIP:DMG: {
+          [1686226460.249069][92910:92910] CHIP:DMG:         AttributePathIBs =
+          [1686226460.249076][92910:92910] CHIP:DMG:         [
+          [1686226460.249082][92910:92910] CHIP:DMG:                 AttributePathIB =
+          [1686226460.249089][92910:92910] CHIP:DMG:                 {
+          [1686226460.249096][92910:92910] CHIP:DMG:                         Endpoint = 0x1,
+          [1686226460.249103][92910:92910] CHIP:DMG:                         Cluster = 0x403,
+          [1686226460.249110][92910:92910] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1686226460.249116][92910:92910] CHIP:DMG:                 }
+          [1686226460.249124][92910:92910] CHIP:DMG:
+          [1686226460.249129][92910:92910] CHIP:DMG:         ],
+          [1686226460.249136][92910:92910] CHIP:DMG:
+          [1686226460.249143][92910:92910] CHIP:DMG:         isFabricFiltered = true,
+          [1686226460.249149][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
+          [1686226460.249154][92910:92910] CHIP:DMG: },
+          [1686226460.249205][92910:92910] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686226460.249236][92910:92910] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686226460.249244][92910:92910] CHIP:DMG: <RE:Run> Cluster 403, Attribute 0 is dirty
       disabled: true
 
     - label:
-          "DUT sends the Read Request Message to the TH to read an attribute of
-          data type floating point."
+          "Step 13: DUT sends the Read Request Message to the TH to read an
+          attribute of data type floating point."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_FloatingPoint
       verification: |
           DUT implementation required to verify read an attribute of data type Float
@@ -592,276 +444,254 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends the Read Request Message to the TH to read an attribute of
-          data type Octet String."
+          "Step 14: DUT sends the Read Request Message to the TH to read an
+          attribute of data type Octet String."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_OctetString
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool operationalcredentials read trusted-root-certificates 1 0
+          On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
-
-          [1655723062.690255][10909:10909] CHIP:EM: Handling via exchange: 36548r, Delegate: 0xaaaac37ce418
-          [1655723062.690334][10909:10909] CHIP:IM: Received Read request
-          [1655723062.690471][10909:10909] CHIP:DMG: ReadRequestMessage =
-          [1655723062.690549][10909:10909] CHIP:DMG: {
-          [1655723062.690596][10909:10909] CHIP:DMG:         AttributePathIBs =
-          [1655723062.690667][10909:10909] CHIP:DMG:         [
-          [1655723062.690719][10909:10909] CHIP:DMG:                 AttributePathIB =
-          [1655723062.690792][10909:10909] CHIP:DMG:                 {
-          [1655723062.690888][10909:10909] CHIP:DMG:                         Endpoint = 0x0,
-          [1655723062.690980][10909:10909] CHIP:DMG:                         Cluster = 0x3e,
-          [1655723062.691047][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0004,
-          [1655723062.691123][10909:10909] CHIP:DMG:                 }
-          [1655723062.691186][10909:10909] CHIP:DMG:
-          [1655723062.691257][10909:10909] CHIP:DMG:         ],
-          [1655723062.691317][10909:10909] CHIP:DMG:
-          [1655723062.691389][10909:10909] CHIP:DMG:         isFabricFiltered = true,
-          [1655723062.691441][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
-          [1655723062.691494][10909:10909] CHIP:DMG: },
-          [1655723062.691635][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
-
-          If the DUT has to provision to verify the logs , verify that TH all-clusters-app sent success response with attribute values
-          [1657882197.831561][2673:2678] CHIP:DMG: }
-          [1657882197.831802][2673:2678] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 1112172817
-          [1657882197.831892][2673:2678] CHIP:TOO:   TrustedRootCertificates: 1 entries
-          [1657882197.831940][2673:2678] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A37062414001824070124080130094104EC98F1D5F8E4FF3B2B1B23B154C016A02843600C0D3073EFA38123BBFC62056CA4C90C591C80D1D66206DB31F3C0FA2E2A3B11377C28D1A2D5E3ED9C79B3DD75370A3501290118240260300414D3A7631B0D05BF3D059263A09502826A7E02768F300514D3A7631B0D05BF3D059263A09502826A7E02768F18300B401A2FD4DAE286A0C0E7F2A54014D19C3AA7F8A814664B14D4EDFE6D6366746B5EF86A677807BCCE30A71A1C112FF843B88044D4212197281859CED7D21D39A42418
-          [1657882197.832044][2673:2678] CHIP:EM: Sending Standalone Ack for MessageCounter:182457329 on exchange 8706i
+          [1686226515.137562][92910:92910] CHIP:EM: Handling via exchange: 28684r, Delegate: 0x5592c0755fc8
+          [1686226515.137581][92910:92910] CHIP:IM: Received Read request
+          [1686226515.137606][92910:92910] CHIP:DMG: ReadRequestMessage =
+          [1686226515.137617][92910:92910] CHIP:DMG: {
+          [1686226515.137625][92910:92910] CHIP:DMG:         AttributePathIBs =
+          [1686226515.137636][92910:92910] CHIP:DMG:         [
+          [1686226515.137642][92910:92910] CHIP:DMG:                 AttributePathIB =
+          [1686226515.137650][92910:92910] CHIP:DMG:                 {
+          [1686226515.137657][92910:92910] CHIP:DMG:                         Endpoint = 0x0,
+          [1686226515.137664][92910:92910] CHIP:DMG:                         Cluster = 0x3e,
+          [1686226515.137672][92910:92910] CHIP:DMG:                         Attribute = 0x0000_0004,
+          [1686226515.137678][92910:92910] CHIP:DMG:                 }
+          [1686226515.137686][92910:92910] CHIP:DMG:
+          [1686226515.137692][92910:92910] CHIP:DMG:         ],
+          [1686226515.137701][92910:92910] CHIP:DMG:
+          [1686226515.137708][92910:92910] CHIP:DMG:         isFabricFiltered = true,
+          [1686226515.137714][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
+          [1686226515.137720][92910:92910] CHIP:DMG: },
+          [1686226515.137778][92910:92910] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686226515.137809][92910:92910] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686226515.137818][92910:92910] CHIP:DMG: <RE:Run> Cluster 3e, Attribute 4 is dirty
       disabled: true
 
     - label:
-          "DUT sends the Read Request Message to the TH to read an attribute of
-          data type Struct."
+          "Step 15: DUT sends the Read Request Message to the TH to read an
+          attribute of data type Struct."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Struct
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            ./chip-tool  generalcommissioning read  basic-commissioning-info   1 0
-
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
-
-          [1655723112.901814][10909:10909] CHIP:EM: Handling via exchange: 47730r, Delegate: 0xaaaac37ce418
-          [1655723112.901870][10909:10909] CHIP:IM: Received Read request
-          [1655723112.901972][10909:10909] CHIP:DMG: ReadRequestMessage =
-          [1655723112.902025][10909:10909] CHIP:DMG: {
-          [1655723112.902057][10909:10909] CHIP:DMG:         AttributePathIBs =
-          [1655723112.902106][10909:10909] CHIP:DMG:         [
-          [1655723112.902136][10909:10909] CHIP:DMG:                 AttributePathIB =
-          [1655723112.902187][10909:10909] CHIP:DMG:                 {
-          [1655723112.902229][10909:10909] CHIP:DMG:                         Endpoint = 0x0,
-          [1655723112.902291][10909:10909] CHIP:DMG:                         Cluster = 0x30,
-          [1655723112.902339][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0001,
-          [1655723112.902395][10909:10909] CHIP:DMG:                 }
-          [1655723112.902437][10909:10909] CHIP:DMG:
-          [1655723112.902487][10909:10909] CHIP:DMG:         ],
-          [1655723112.902529][10909:10909] CHIP:DMG:
-          [1655723112.902580][10909:10909] CHIP:DMG:         isFabricFiltered = true,
-          [1655723112.902618][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
-          [1655723112.902664][10909:10909] CHIP:DMG: },
-          [1655723112.902782][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
-
-
-          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
-          [1657882247.469521][2681:2686] CHIP:DMG:         InteractionModelRevision = 1
-          [1657882247.469553][2681:2686] CHIP:DMG: }
-          [1657882247.469732][2681:2686] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0001 DataVersion: 3643421834
-          [1657882247.469825][2681:2686] CHIP:TOO:   BasicCommissioningInfo: {
-          [1657882247.469886][2681:2686] CHIP:TOO:     FailSafeExpiryLengthSeconds: 60
-          [1657882247.469921][2681:2686] CHIP:TOO:     MaxCumulativeFailsafeSeconds: 900
-          [1657882247.469952][2681:2686] CHIP:TOO:    }
-          [1657882247.470043][2681:2686] CHIP:EM: Sending Standalone Ack for MessageCounter:52322886 on exchange 1487i
+          On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
+          [1686226552.178768][92910:92910] CHIP:EM: Handling via exchange: 24439r, Delegate: 0x5592c0755fc8
+          [1686226552.178784][92910:92910] CHIP:IM: Received Read request
+          [1686226552.178802][92910:92910] CHIP:DMG: ReadRequestMessage =
+          [1686226552.178810][92910:92910] CHIP:DMG: {
+          [1686226552.178815][92910:92910] CHIP:DMG:         AttributePathIBs =
+          [1686226552.178822][92910:92910] CHIP:DMG:         [
+          [1686226552.178828][92910:92910] CHIP:DMG:                 AttributePathIB =
+          [1686226552.178835][92910:92910] CHIP:DMG:                 {
+          [1686226552.178842][92910:92910] CHIP:DMG:                         Endpoint = 0x0,
+          [1686226552.178848][92910:92910] CHIP:DMG:                         Cluster = 0x30,
+          [1686226552.178855][92910:92910] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1686226552.178861][92910:92910] CHIP:DMG:                 }
+          [1686226552.178868][92910:92910] CHIP:DMG:
+          [1686226552.178874][92910:92910] CHIP:DMG:         ],
+          [1686226552.178882][92910:92910] CHIP:DMG:
+          [1686226552.178888][92910:92910] CHIP:DMG:         isFabricFiltered = true,
+          [1686226552.178894][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
+          [1686226552.178899][92910:92910] CHIP:DMG: },
+          [1686226552.178951][92910:92910] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686226552.178983][92910:92910] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686226552.178991][92910:92910] CHIP:DMG: <RE:Run> Cluster 30, Attribute 1 is dirty
       disabled: true
 
     - label:
-          "DUT sends the Read Request Message to the TH to read an attribute of
-          data type List."
+          "Step 16: DUT sends the Read Request Message to the TH to read an
+          attribute of data type List."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_List
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            ./chip-tool modeselect read  supported-modes 1 1
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
 
-          [1655723151.159473][10909:10909] CHIP:EM: Handling via exchange: 9349r, Delegate: 0xaaaac37ce418
-          [1655723151.159520][10909:10909] CHIP:IM: Received Read request
-          [1655723151.159615][10909:10909] CHIP:DMG: ReadRequestMessage =
-          [1655723151.159646][10909:10909] CHIP:DMG: {
-          [1655723151.159670][10909:10909] CHIP:DMG:         AttributePathIBs =
-          [1655723151.159697][10909:10909] CHIP:DMG:         [
-          [1655723151.159731][10909:10909] CHIP:DMG:                 AttributePathIB =
-          [1655723151.159764][10909:10909] CHIP:DMG:                 {
-          [1655723151.159808][10909:10909] CHIP:DMG:                         Endpoint = 0x1,
-          [1655723151.159847][10909:10909] CHIP:DMG:                         Cluster = 0x50,
-          [1655723151.159892][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0002,
-          [1655723151.159934][10909:10909] CHIP:DMG:                 }
-          [1655723151.159967][10909:10909] CHIP:DMG:
-          [1655723151.160007][10909:10909] CHIP:DMG:         ],
-          [1655723151.160039][10909:10909] CHIP:DMG:
-          [1655723151.160081][10909:10909] CHIP:DMG:         isFabricFiltered = true,
-          [1655723151.160110][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
-          [1655723151.160147][10909:10909] CHIP:DMG: },
-          [1655723151.160243][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
-
-
-          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
-
-          [1657882339.679133][2701:2706] CHIP:DMG: }
-          [1657882339.679605][2701:2706] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 321966114
-          [1657882339.679722][2701:2706] CHIP:TOO:   SupportedModes: 3 entries
-          [1657882339.679786][2701:2706] CHIP:TOO:     [1]: {
-          [1657882339.679813][2701:2706] CHIP:TOO:       Label: Black
-          [1657882339.679852][2701:2706] CHIP:TOO:       Mode: 0
-          [1657882339.679883][2701:2706] CHIP:TOO:       SemanticTags: 1 entries
-          [1657882339.679918][2701:2706] CHIP:TOO:         [1]: {
-          [1657882339.679943][2701:2706] CHIP:TOO:           MfgCode: 0
-          [1657882339.679966][2701:2706] CHIP:TOO:           Value: 0
-          [1657882339.679986][2701:2706] CHIP:TOO:          }
-          [1657882339.680006][2701:2706] CHIP:TOO:      }
-          [1657882339.680040][2701:2706] CHIP:TOO:     [2]: {
-          [1657882339.680065][2701:2706] CHIP:TOO:       Label: Cappuccino
-          [1657882339.680088][2701:2706] CHIP:TOO:       Mode: 4
-          [1657882339.680131][2701:2706] CHIP:TOO:       SemanticTags: 1 entries
-          [1657882339.680163][2701:2706] CHIP:TOO:         [1]: {
-          [1657882339.680188][2701:2706] CHIP:TOO:           MfgCode: 0
-          [1657882339.680212][2701:2706] CHIP:TOO:           Value: 0
-          [1657882339.680236][2701:2706] CHIP:TOO:          }
-          [1657882339.680261][2701:2706] CHIP:TOO:      }
-          [1657882339.680296][2701:2706] CHIP:TOO:     [3]: {
-          [1657882339.680320][2701:2706] CHIP:TOO:       Label: Espresso
-          [1657882339.680344][2701:2706] CHIP:TOO:       Mode: 7
-          [1657882339.680371][2701:2706] CHIP:TOO:       SemanticTags: 1 entries
-          [1657882339.680402][2701:2706] CHIP:TOO:         [1]: {
-          [1657882339.680427][2701:2706] CHIP:TOO:           MfgCode: 0
-          [1657882339.680451][2701:2706] CHIP:TOO:           Value: 0
-          [1657882339.680474][2701:2706] CHIP:TOO:          }
-          [1657882339.680499][2701:2706] CHIP:TOO:      }
-          [1657882339.680600][2701:2706] CHIP:EM: Sending Standalone Ack for MessageCounter:207994304 on exchange 48282i
+          [1686226583.374314][92910:92910] CHIP:EM: >>> [E:55450r S:64896 M:236034717] (S) Msg RX from 1:000000000001B669 [58B9] --- Type 0001:02 (IM:ReadRequest)
+          [1686226583.374344][92910:92910] CHIP:EM: Handling via exchange: 55450r, Delegate: 0x5592c0755fc8
+          [1686226583.374362][92910:92910] CHIP:IM: Received Read request
+          [1686226583.374381][92910:92910] CHIP:DMG: ReadRequestMessage =
+          [1686226583.374389][92910:92910] CHIP:DMG: {
+          [1686226583.374395][92910:92910] CHIP:DMG:         AttributePathIBs =
+          [1686226583.374403][92910:92910] CHIP:DMG:         [
+          [1686226583.374409][92910:92910] CHIP:DMG:                 AttributePathIB =
+          [1686226583.374417][92910:92910] CHIP:DMG:                 {
+          [1686226583.374424][92910:92910] CHIP:DMG:                         Endpoint = 0x1,
+          [1686226583.374431][92910:92910] CHIP:DMG:                         Cluster = 0x50,
+          [1686226583.374439][92910:92910] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1686226583.374445][92910:92910] CHIP:DMG:                 }
+          [1686226583.374453][92910:92910] CHIP:DMG:
+          [1686226583.374459][92910:92910] CHIP:DMG:         ],
+          [1686226583.374467][92910:92910] CHIP:DMG:
+          [1686226583.374474][92910:92910] CHIP:DMG:         isFabricFiltered = true,
+          [1686226583.374481][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
+          [1686226583.374487][92910:92910] CHIP:DMG: },
+          [1686226583.374543][92910:92910] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686226583.374576][92910:92910] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686226583.374584][92910:92910] CHIP:DMG: <RE:Run> Cluster 50, Attribute 2 is dirty
       disabled: true
 
     - label:
-          "DUT sends the Read Request Message to the TH to read an attribute of
-          data type enum."
+          "Step 17: DUT sends the Read Request Message to the TH to read an
+          attribute of data type enum."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Enum
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool  occupancysensing read   occupancy-sensor-type 1 1
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
-
-          [1655723234.547912][10909:10909] CHIP:EM: Handling via exchange: 21800r, Delegate: 0xaaaac37ce418
-          [1655723234.547981][10909:10909] CHIP:IM: Received Read request
-          [1655723234.548103][10909:10909] CHIP:DMG: ReadRequestMessage =
-          [1655723234.548168][10909:10909] CHIP:DMG: {
-          [1655723234.548209][10909:10909] CHIP:DMG:         AttributePathIBs =
-          [1655723234.548270][10909:10909] CHIP:DMG:         [
-          [1655723234.548323][10909:10909] CHIP:DMG:                 AttributePathIB =
-          [1655723234.548387][10909:10909] CHIP:DMG:                 {
-          [1655723234.548439][10909:10909] CHIP:DMG:                         Endpoint = 0x1,
-          [1655723234.548510][10909:10909] CHIP:DMG:                         Cluster = 0x406,
-          [1655723234.548566][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0001,
-          [1655723234.548634][10909:10909] CHIP:DMG:                 }
-          [1655723234.548687][10909:10909] CHIP:DMG:
-          [1655723234.548749][10909:10909] CHIP:DMG:         ],
-          [1655723234.548800][10909:10909] CHIP:DMG:
-          [1655723234.548988][10909:10909] CHIP:DMG:         isFabricFiltered = true,
-          [1655723234.549038][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
-          [1655723234.549097][10909:10909] CHIP:DMG: },
-          [1655723234.549241][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
-
-          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
-          [1657882403.876372][2715:2720] CHIP:DMG: }
-          [1657882403.876514][2715:2720] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001 DataVersion: 737072536
-          [1657882403.876595][2715:2720] CHIP:TOO:   occupancy sensor type: 0
-          [1657882403.876679][2715:2720] CHIP:EM: Sending Standalone Ack for MessageCounter:153370776 on exchange 37640i
+          On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
+          [1686226611.149856][92910:92910] CHIP:EM: Handling via exchange: 60503r, Delegate: 0x5592c0755fc8
+          [1686226611.149867][92910:92910] CHIP:IM: Received Read request
+          [1686226611.149886][92910:92910] CHIP:DMG: ReadRequestMessage =
+          [1686226611.149894][92910:92910] CHIP:DMG: {
+          [1686226611.149900][92910:92910] CHIP:DMG:         AttributePathIBs =
+          [1686226611.149909][92910:92910] CHIP:DMG:         [
+          [1686226611.149916][92910:92910] CHIP:DMG:                 AttributePathIB =
+          [1686226611.149925][92910:92910] CHIP:DMG:                 {
+          [1686226611.149932][92910:92910] CHIP:DMG:                         Endpoint = 0x1,
+          [1686226611.149942][92910:92910] CHIP:DMG:                         Cluster = 0x406,
+          [1686226611.149948][92910:92910] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1686226611.149953][92910:92910] CHIP:DMG:                 }
+          [1686226611.149959][92910:92910] CHIP:DMG:
+          [1686226611.149966][92910:92910] CHIP:DMG:         ],
+          [1686226611.149975][92910:92910] CHIP:DMG:
+          [1686226611.149982][92910:92910] CHIP:DMG:         isFabricFiltered = true,
+          [1686226611.149988][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
+          [1686226611.149994][92910:92910] CHIP:DMG: },
+          [1686226611.150038][92910:92910] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686226611.150062][92910:92910] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686226611.150069][92910:92910] CHIP:DMG: <RE:Run> Cluster 406, Attribute 1 is dirty
       disabled: true
 
     - label:
-          "DUT sends the Read Request Message to the TH to read an attribute of
-          data type bitmap."
+          "Step 18: DUT sends the Read Request Message to the TH to read an
+          attribute of data type bitmap."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Bitmap
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool levelcontrol read options 1 1
-
-          verify TH(Reference app) receives the right Read Request Message for the data sent in the above command
-
-          [1655723282.097665][10909:10909] CHIP:IM: Received Read request
-          [1655723282.097741][10909:10909] CHIP:DMG: ReadRequestMessage =
-          [1655723282.097767][10909:10909] CHIP:DMG: {
-          [1655723282.097789][10909:10909] CHIP:DMG:         AttributePathIBs =
-          [1655723282.097814][10909:10909] CHIP:DMG:         [
-          [1655723282.097838][10909:10909] CHIP:DMG:                 AttributePathIB =
-          [1655723282.097865][10909:10909] CHIP:DMG:                 {
-          [1655723282.097893][10909:10909] CHIP:DMG:                         Endpoint = 0x1,
-          [1655723282.097923][10909:10909] CHIP:DMG:                         Cluster = 0x8,
-          [1655723282.097954][10909:10909] CHIP:DMG:                         Attribute = 0x0000_000F,
-          [1655723282.097982][10909:10909] CHIP:DMG:                 }
-          [1655723282.098009][10909:10909] CHIP:DMG:
-          [1655723282.098034][10909:10909] CHIP:DMG:         ],
-          [1655723282.098061][10909:10909] CHIP:DMG:
-          [1655723282.098087][10909:10909] CHIP:DMG:         isFabricFiltered = true,
-          [1655723282.098112][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
-          [1655723282.098134][10909:10909] CHIP:DMG: },
-          [1655723282.098206][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
-
-
-          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
-          [1657882440.996840][2725:2730] CHIP:DMG:         InteractionModelRevision = 1
-          [1657882440.996862][2725:2730] CHIP:DMG: }
-          [1657882440.997003][2725:2730] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_000F DataVersion: 3900213102
-          [1657882440.997084][2725:2730] CHIP:TOO:   options: 0
-          [1657882440.997170][2725:2730] CHIP:EM: Sending Standalone Ack for MessageCounter:250919190 on exchange 53994i
+          On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
+          02 (IM:ReadRequest)
+          [1686226637.039290][92910:92910] CHIP:EM: Handling via exchange: 26755r, Delegate: 0x5592c0755fc8
+          [1686226637.039328][92910:92910] CHIP:IM: Received Read request
+          [1686226637.039353][92910:92910] CHIP:DMG: ReadRequestMessage =
+          [1686226637.039363][92910:92910] CHIP:DMG: {
+          [1686226637.039371][92910:92910] CHIP:DMG:         AttributePathIBs =
+          [1686226637.039383][92910:92910] CHIP:DMG:         [
+          [1686226637.039391][92910:92910] CHIP:DMG:                 AttributePathIB =
+          [1686226637.039403][92910:92910] CHIP:DMG:                 {
+          [1686226637.039414][92910:92910] CHIP:DMG:                         Endpoint = 0x1,
+          [1686226637.039424][92910:92910] CHIP:DMG:                         Cluster = 0x8,
+          [1686226637.039436][92910:92910] CHIP:DMG:                         Attribute = 0x0000_000F,
+          [1686226637.039445][92910:92910] CHIP:DMG:                 }
+          [1686226637.039458][92910:92910] CHIP:DMG:
+          [1686226637.039466][92910:92910] CHIP:DMG:         ],
+          [1686226637.039480][92910:92910] CHIP:DMG:
+          [1686226637.039489][92910:92910] CHIP:DMG:         isFabricFiltered = true,
+          [1686226637.039499][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
+          [1686226637.039507][92910:92910] CHIP:DMG: },
+          [1686226637.039567][92910:92910] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686226637.039606][92910:92910] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686226637.039616][92910:92910] CHIP:DMG: <RE:Run> Cluster 8, Attribute f is dirty
       disabled: true
 
     - label:
-          "DUT sends the Read Request Message to the TH to read an attribute
-          Repeat the above steps 3 times."
+          "Step 19: DUT sends the Read Request Message to the TH to read an
+          attribute Repeat the above steps 3 times."
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            ./chip-tool  occupancysensing read occupancy    1 1
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
-          [1655723372.328144][10909:10909] CHIP:EM: Handling via exchange: 10813r, Delegate: 0xaaaac37ce418
-          [1655723372.328201][10909:10909] CHIP:IM: Received Read request
-          [1655723372.328305][10909:10909] CHIP:DMG: ReadRequestMessage =
-          [1655723372.328360][10909:10909] CHIP:DMG: {
-          [1655723372.328392][10909:10909] CHIP:DMG:         AttributePathIBs =
-          [1655723372.328431][10909:10909] CHIP:DMG:         [
-          [1655723372.328480][10909:10909] CHIP:DMG:                 AttributePathIB =
-          [1655723372.328530][10909:10909] CHIP:DMG:                 {
-          [1655723372.328588][10909:10909] CHIP:DMG:                         Endpoint = 0x1,
-          [1655723372.328644][10909:10909] CHIP:DMG:                         Cluster = 0x406,
-          [1655723372.328707][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0000,
-          [1655723372.328763][10909:10909] CHIP:DMG:                 }
-          [1655723372.328808][10909:10909] CHIP:DMG:
-          [1655723372.328861][10909:10909] CHIP:DMG:         ],
-          [1655723372.328903][10909:10909] CHIP:DMG:
-          [1655723372.328954][10909:10909] CHIP:DMG:         isFabricFiltered = true,
-          [1655723372.328994][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
-          [1655723372.329041][10909:10909] CHIP:DMG: },
-          [1655723372.329162][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
-
-
-          If the DUT has to provision to verify the logs verify that TH all-clusters-app sent success response with attribute values
-          [1657883628.582877][2780:2785] CHIP:DMG:         InteractionModelRevision = 1
-          [1657883628.582909][2780:2785] CHIP:DMG: }
-          [1657883628.583066][2780:2785] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0000 DataVersion: 737072536
-          [1657883628.583146][2780:2785] CHIP:TOO:   occupancy: 0
-          [1657883628.583225][2780:2785] CHIP:EM: Sending Standalone Ack for MessageCounter:68376422 on exchange 7437i
+          On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
+          [1686226665.453133][92910:92910] CHIP:EM: Handling via exchange: 16385r, Delegate: 0x5592c0755fc8
+          [1686226665.453147][92910:92910] CHIP:IM: Received Read request
+          [1686226665.453164][92910:92910] CHIP:DMG: ReadRequestMessage =
+          [1686226665.453172][92910:92910] CHIP:DMG: {
+          [1686226665.453177][92910:92910] CHIP:DMG:         AttributePathIBs =
+          [1686226665.453186][92910:92910] CHIP:DMG:         [
+          [1686226665.453195][92910:92910] CHIP:DMG:                 AttributePathIB =
+          [1686226665.453206][92910:92910] CHIP:DMG:                 {
+          [1686226665.453217][92910:92910] CHIP:DMG:                         Endpoint = 0x1,
+          [1686226665.453228][92910:92910] CHIP:DMG:                         Cluster = 0x406,
+          [1686226665.453240][92910:92910] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1686226665.453249][92910:92910] CHIP:DMG:                 }
+          [1686226665.453262][92910:92910] CHIP:DMG:
+          [1686226665.453270][92910:92910] CHIP:DMG:         ],
+          [1686226665.453284][92910:92910] CHIP:DMG:
+          [1686226665.453293][92910:92910] CHIP:DMG:         isFabricFiltered = true,
+          [1686226665.453302][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
+          [1686226665.453310][92910:92910] CHIP:DMG: },
+          [1686226665.453370][92910:92910] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686226665.453402][92910:92910] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686226665.453413][92910:92910] CHIP:DMG: <RE:Run> Cluster 406, Attribute 0 is dirty
 
 
            ./chip-tool  occupancysensing read occupancy    1 1
-          verify TH receives the right Read Request Message for the data sent in the above command
+          On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
+          [1686226666.412296][92910:92910] CHIP:EM: Handling via exchange: 46567r, Delegate: 0x5592c0755fc8
+          [1686226666.412312][92910:92910] CHIP:IM: Received Read request
+          [1686226666.412331][92910:92910] CHIP:DMG: ReadRequestMessage =
+          [1686226666.412338][92910:92910] CHIP:DMG: {
+          [1686226666.412344][92910:92910] CHIP:DMG:         AttributePathIBs =
+          [1686226666.412351][92910:92910] CHIP:DMG:         [
+          [1686226666.412356][92910:92910] CHIP:DMG:                 AttributePathIB =
+          [1686226666.412363][92910:92910] CHIP:DMG:                 {
+          [1686226666.412370][92910:92910] CHIP:DMG:                         Endpoint = 0x1,
+          [1686226666.412376][92910:92910] CHIP:DMG:                         Cluster = 0x406,
+          [1686226666.412383][92910:92910] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1686226666.412389][92910:92910] CHIP:DMG:                 }
+          [1686226666.412396][92910:92910] CHIP:DMG:
+          [1686226666.412402][92910:92910] CHIP:DMG:         ],
+          [1686226666.412410][92910:92910] CHIP:DMG:
+          [1686226666.412416][92910:92910] CHIP:DMG:         isFabricFiltered = true,
+          [1686226666.412422][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
+          [1686226666.412427][92910:92910] CHIP:DMG: },
+          [1686226666.412478][92910:92910] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686226666.412509][92910:92910] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686226666.412517][92910:92910] CHIP:DMG: <RE:Run> Cluster 406, Attribute 0 is dirty
+
+
 
            ./chip-tool  occupancysensing read occupancy    1 1
-          verify TH receives the right Read Request Message for the data sent in the above command
+          On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
+          [1686226667.318600][92910:92910] CHIP:EM: Handling via exchange: 25390r, Delegate: 0x5592c0755fc8
+          [1686226667.318616][92910:92910] CHIP:IM: Received Read request
+          [1686226667.318640][92910:92910] CHIP:DMG: ReadRequestMessage =
+          [1686226667.318647][92910:92910] CHIP:DMG: {
+          [1686226667.318657][92910:92910] CHIP:DMG:         AttributePathIBs =
+          [1686226667.318667][92910:92910] CHIP:DMG:         [
+          [1686226667.318675][92910:92910] CHIP:DMG:                 AttributePathIB =
+          [1686226667.318687][92910:92910] CHIP:DMG:                 {
+          [1686226667.318697][92910:92910] CHIP:DMG:                         Endpoint = 0x1,
+          [1686226667.318708][92910:92910] CHIP:DMG:                         Cluster = 0x406,
+          [1686226667.318720][92910:92910] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1686226667.318729][92910:92910] CHIP:DMG:                 }
+          [1686226667.318742][92910:92910] CHIP:DMG:
+          [1686226667.318749][92910:92910] CHIP:DMG:         ],
+          [1686226667.318764][92910:92910] CHIP:DMG:
+          [1686226667.318773][92910:92910] CHIP:DMG:         isFabricFiltered = true,
+          [1686226667.318783][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
+          [1686226667.318791][92910:92910] CHIP:DMG: },
+          [1686226667.318851][92910:92910] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686226667.318883][92910:92910] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686226667.318892][92910:92910] CHIP:DMG: <RE:Run> Cluster 406, Attribute 0 is dirty
       disabled: true
 
     - label:
-          "DUT sends the Read Request Message to the TH to read
+          "Step 20: DUT sends the Read Request Message to the TH to read
           something(Attribute) which is larger than 1 MTU(1280 bytes) and per
           spec can be chunked. For every chunked data message received, except
           the last one, DUT sends a status response."
@@ -936,14 +766,37 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends the Read Request Message to the TH with Manufacturer
-          specific clusters and attributes to read all attributes in all
-          clusters and all endpoints Path = [[ ]]. On receipt of this message,
-          TH should send a report data action with the attribute values to the
-          DUT."
+          "Step 21: DUT sends the Read Request Message to the TH with
+          Manufacturer specific clusters and attributes to read all attributes
+          in all clusters and all endpoints Path = [[ ]]. On receipt of this
+          message, TH should send a report data action with the attribute values
+          to the DUT."
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF --timeout 40
-          On TH(Reference app) verify that Read Request Message received from DUT(chip-tool)
+          On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
+          [1686226782.460404][92910:92910] CHIP:SC: Allocated SecureSession (0x5592c114f040) - waiting for Sigma1 msg
+          [1686226782.460986][92910:92910] CHIP:EM: >>> [E:22319r S:64903 M:14178699] (S) Msg RX from 1:000000000001B669 [58B9] --- Type 0001:02 (IM:ReadRequest)
+          [1686226782.460999][92910:92910] CHIP:EM: Handling via exchange: 22319r, Delegate: 0x5592c0755fc8
+          [1686226782.461006][92910:92910] CHIP:IM: Received Read request
+          [1686226782.461016][92910:92910] CHIP:DMG: ReadRequestMessage =
+          [1686226782.461018][92910:92910] CHIP:DMG: {
+          [1686226782.461021][92910:92910] CHIP:DMG:         AttributePathIBs =
+          [1686226782.461023][92910:92910] CHIP:DMG:         [
+          [1686226782.461025][92910:92910] CHIP:DMG:                 AttributePathIB =
+          [1686226782.461027][92910:92910] CHIP:DMG:                 {
+          [1686226782.461029][92910:92910] CHIP:DMG:                 }
+          [1686226782.461032][92910:92910] CHIP:DMG:
+          [1686226782.461034][92910:92910] CHIP:DMG:         ],
+          [1686226782.461037][92910:92910] CHIP:DMG:
+          [1686226782.461039][92910:92910] CHIP:DMG:         isFabricFiltered = true,
+          [1686226782.461041][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
+          [1686226782.461043][92910:92910] CHIP:DMG: },
+          [1686226782.461062][92910:92910] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686226782.461074][92910:92910] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686226782.461077][92910:92910] CHIP:DMG: <RE:Run> Cluster 3, Attribute 0 is dirty
+          [1686226782.461079][92910:92910] CHIP:DMG: Reading attribute: Cluster=0x0000_0003 Endpoint=0 AttributeId=0x0000_0000 (expanded=1)
+          [1686226782.461083][92910:92910] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0003 e=0 p=v
+          [1686226782.461088][92910:92910] CHIP:DMG: AccessControl: allowed
       disabled: true

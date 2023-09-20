@@ -23,6 +23,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
+#include <lib/support/TypeTraits.h>
 
 #include <assert.h>
 
@@ -99,7 +100,7 @@ bool emAfPluginBarrierControlServerIsPartialBarrierSupported(EndpointId endpoint
     uint8_t bitmap;
     EmberAfStatus status = Attributes::BarrierCapabilities::Get(endpoint, &bitmap);
     assert(status == EMBER_ZCL_STATUS_SUCCESS);
-    return READBITS(bitmap, EMBER_AF_BARRIER_CONTROL_CAPABILITIES_PARTIAL_BARRIER);
+    return (bitmap & to_underlying(BarrierControlCapabilities::kPartialBarrier)) != 0;
 }
 
 static uint16_t getOpenOrClosePeriod(EndpointId endpoint, bool open)
@@ -139,7 +140,7 @@ uint16_t emAfPluginBarrierControlServerGetSafetyStatus(EndpointId endpoint)
 static bool isRemoteLockoutOn(EndpointId endpoint)
 {
     uint16_t safetyStatus = emAfPluginBarrierControlServerGetSafetyStatus(endpoint);
-    return READBITS(safetyStatus, EMBER_AF_BARRIER_CONTROL_SAFETY_STATUS_REMOTE_LOCKOUT);
+    return (safetyStatus & to_underlying(BarrierControlSafetyStatus::kRemoteLockout)) != 0;
 }
 
 void emAfPluginBarrierControlServerIncrementEvents(EndpointId endpoint, bool open, bool command)
@@ -286,10 +287,7 @@ void emberAfBarrierControlClusterServerTickCallback(EndpointId endpoint)
 
 static void sendDefaultResponse(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, Status status)
 {
-    if (commandObj->AddStatus(commandPath, status) != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(Zcl, "Failed to send default response");
-    }
+    commandObj->AddStatus(commandPath, status);
 }
 
 bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(

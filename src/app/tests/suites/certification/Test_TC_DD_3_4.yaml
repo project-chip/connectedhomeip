@@ -36,7 +36,8 @@ tests:
           1 - User must indicate the intention for commissioning using a display or other UI elements."
       disabled: true
 
-    - label: "DUT is instructed to advertise Commissioner Discovery service"
+    - label:
+          "Step 1: DUT is instructed to advertise Commissioner Discovery service"
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
@@ -48,13 +49,13 @@ tests:
 
           CHIP:DL: Using wifi MAC for hostname
           CHIP:DIS: Advertise operational node DFC28FF9FE811EF2-FFFFFFEFFFFFFFFF
-          CHIP:DIS: CHIP minimal mDNS configured as "Operational device".
+          CHIP:DIS: CHIP minimal mDNS configured as 'Operational device'.
           CHIP:DIS: Broadcasting mDns reply for query from
       disabled: true
 
     - label:
-          "TH starts scanning for available commissioners using Commissioner
-          Discovery"
+          "Step 2: TH starts scanning for available commissioners using
+          Commissioner Discovery"
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
@@ -118,18 +119,18 @@ tests:
       disabled: true
 
     - label:
-          "TH is instructed to start the commissioning procedure with the DUT
-          found at Step 2"
+          "Step 3: TH is instructed to start the commissioning procedure with
+          the DUT found at Step 2"
       verification: |
-          Out of scope for V1.0
+          Out of scope
       disabled: true
 
-    - label: "DUT verifies the Identification Declaration message"
+    - label: "Step 4: DUT verifies the Identification Declaration message"
       verification: |
-          Out of scope for V1.0
+          Out of scope
       disabled: true
 
-    - label: "By any means, DUT prompts user for onboarding payload"
+    - label: "Step 5: By any means, DUT prompts user for onboarding payload"
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
@@ -138,7 +139,7 @@ tests:
           > cast request 1 [1653179218011] [47890:1899175] CHIP: [DL] request [1653179218011] [47890:1899175] CHIP: [SVR] ------- PrepareForCommissioning [1653179218011] [47890:1899175] CHIP: [SVR] Server initializing...
       disabled: true
 
-    - label: "DUT starts the commissioning procedure with TH"
+    - label: "Step 6: DUT starts the commissioning procedure with TH"
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 

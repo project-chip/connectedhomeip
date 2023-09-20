@@ -23,7 +23,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the ClusterRevision from DUT"
+    - label: "Step 2: TH reads the ClusterRevision from DUT"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -39,7 +39,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "TH reads the FeatureMap from DUT"
+    - label: "Step 3: TH reads the FeatureMap from DUT"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -47,7 +47,8 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "TH reads AttributeList from DUT"
+    - label: "Step 4: TH reads AttributeList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -55,7 +56,17 @@ tests:
               type: list
               contains: [0, 1, 65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label: "Read the global attribute: EventList"
+    - label: "Step 4: TH reads AttributeList from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 65528, 65529, 65531, 65532, 65533]
+
+    - label: "Step 5: Read the global attribute: EventList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -63,7 +74,7 @@ tests:
           constraints:
               type: list
 
-    - label: "TH reads AcceptedCommandList from DUT"
+    - label: "Step 6: TH reads AcceptedCommandList from DUT"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -71,7 +82,7 @@ tests:
           constraints:
               type: list
 
-    - label: "TH reads GeneratedCommandList from DUT"
+    - label: "Step 7: TH reads GeneratedCommandList from DUT"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

@@ -300,5 +300,14 @@ void KeyValueStoreManagerImpl::KvsMapMigration(void)
 }
 
 } // namespace PersistedStorage
+
+namespace Silabs {
+
+void MigrateKvsMap(void)
+{
+    PersistedStorage::KeyValueStoreMgrImpl().KvsMapMigration();
+}
+
+} // namespace Silabs
 } // namespace DeviceLayer
 } // namespace chip

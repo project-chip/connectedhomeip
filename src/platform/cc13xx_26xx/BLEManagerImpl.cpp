@@ -266,9 +266,7 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
     void * pMsg = (void *) ICall_malloc(sizeof(void *));
     pMsg        = (void *) conId;
 
-    EnqueueEvtHdrMsg(BLEManagerIMPL_CHIPOBLE_CLOSE_CONN_EVT, (void *) pMsg);
-
-    return false;
+    return (EnqueueEvtHdrMsg(BLEManagerIMPL_CHIPOBLE_CLOSE_CONN_EVT, (void *) pMsg) == true);
 }
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const

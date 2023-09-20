@@ -34,15 +34,21 @@ public:
     CHIP_ERROR Init();
 
     /**
-     * @brief Execute the self-test process and attribute changes
+     * @brief Execute the self-test process
      *
      */
-    bool StartSelfTesting();
+    void SelfTestingEventHandler();
 
 private:
     friend SmokeCoAlarmManager & AlarmMgr(void);
 
-    chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum mExpressedState;
+    bool mEndSelfTesting;
+
+    void CancelTimer(void);
+    void StartTimer(uint32_t aTimeoutMs);
+
+    static void TimerEventHandler(TimerHandle_t xTimer);
+    static void EndSelfTestingEventHandler(AppEvent * aEvent);
 
     static SmokeCoAlarmManager sAlarm;
 };

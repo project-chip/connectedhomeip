@@ -20,12 +20,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sl_status.h"
-
-#include "silabs_utils.h"
-
 #include "FreeRTOS.h"
 #include "event_groups.h"
+#include "silabs_utils.h"
+#include "sl_status.h"
 #include "task.h"
 
 #include "wfx_host_events.h"
@@ -67,11 +65,6 @@ sl_status_t wfx_wifi_start(void)
         return SL_STATUS_FAIL;
     }
     return SL_STATUS_OK;
-}
-
-int32_t wfx_rsi_platform()
-{
-    return wfx_rsi_init_platform();
 }
 
 /*********************************************************************
@@ -196,6 +189,25 @@ sl_status_t wfx_connect_to_ap(void)
     }
     return SL_STATUS_OK;
 }
+
+#if SL_ICD_ENABLED
+/*********************************************************************
+ * @fn  sl_status_t wfx_power_save()
+ * @brief
+ *      Implements the power save in sleepy application
+ * @param[in]  None
+ * @return  SL_STATUS_OK if successful,
+ *          SL_STATUS_FAIL otherwise
+ ***********************************************************************/
+sl_status_t wfx_power_save()
+{
+    if (wfx_rsi_power_save() != SL_STATUS_OK)
+    {
+        return SL_STATUS_FAIL;
+    }
+    return SL_STATUS_OK;
+}
+#endif /* SL_ICD_ENABLED */
 
 /*********************************************************************
  * @fn  void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)

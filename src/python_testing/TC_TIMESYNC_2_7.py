@@ -49,7 +49,8 @@ class TC_TIMESYNC_2_7(MatterBaseTest):
     @async_test_body
     async def test_TC_TIMESYNC_2_7(self):
 
-        self.endpoint = self.user_params.get("endpoint", 0)
+        # Time sync is required to be on endpoint 0 if it is present
+        self.endpoint = 0
 
         self.print_step(0, "Commissioning, already done")
         time_cluster = Clusters.Objects.TimeSynchronization
@@ -108,6 +109,8 @@ class TC_TIMESYNC_2_7(MatterBaseTest):
         if tz_list_size > 1:
             th_utc = utc_time_in_matter_epoch()
             tz = [tz_struct(offset=3600, validAt=0), tz_struct(offset=7200, validAt=th_utc+1e+7)]
+            ret = await self.send_set_time_zone_cmd(tz)
+            asserts.assert_true(ret.DSTOffsetRequired, "DSTOffsetRequired not set to true")
 
         self.print_step(12, "Send SetDSTOffset command")
         if tz_list_size > 1:

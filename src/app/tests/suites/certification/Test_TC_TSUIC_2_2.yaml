@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,9 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Writes a value of 0 to TemperatureDisplayMode attribute of DUT"
+    - label:
+          "Step 2a: Writes a value of 0 to TemperatureDisplayMode attribute of
+          DUT"
       PICS: TSUIC.S.A0000
       command: "writeAttribute"
       attribute: "TemperatureDisplayMode"
@@ -49,14 +51,16 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads the TemperatureDisplayMode attribute of DUT"
+    - label: "Step 2b: TH reads the TemperatureDisplayMode attribute of DUT"
       PICS: TSUIC.S.A0000
       command: "readAttribute"
       attribute: "TemperatureDisplayMode"
       response:
           value: 0
 
-    - label: "Writes a value of 1 to TemperatureDisplayMode attribute of DUT"
+    - label:
+          "Step 2c: Writes a value of 1 to TemperatureDisplayMode attribute of
+          DUT"
       PICS: TSUIC.S.A0000
       command: "writeAttribute"
       attribute: "TemperatureDisplayMode"
@@ -74,7 +78,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads the TemperatureDisplayMode attribute of DUT"
+    - label: "Step 2d: TH reads the TemperatureDisplayMode attribute of DUT"
       PICS: TSUIC.S.A0000
       command: "readAttribute"
       attribute: "TemperatureDisplayMode"
@@ -82,8 +86,8 @@ tests:
           value: 1
 
     - label:
-          "Writes a value of greater than 1 to TemperatureDisplayMode attribute
-          of DUT"
+          "Step 2e: Writes a value of greater than 1 to TemperatureDisplayMode
+          attribute of DUT"
       PICS: TSUIC.S.A0000
       command: "writeAttribute"
       attribute: "TemperatureDisplayMode"
@@ -92,14 +96,14 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
-    - label: "TH reads the TemperatureDisplayMode attribute of DUT"
+    - label: "Step 2f: TH reads the TemperatureDisplayMode attribute of DUT"
       PICS: TSUIC.S.A0000
       command: "readAttribute"
       attribute: "TemperatureDisplayMode"
       response:
           value: 1
 
-    - label: "Writes a value of 0 to KeypadLockout attribute of DUT"
+    - label: "Step 3a: Writes a value of 0 to KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "writeAttribute"
       attribute: "KeypadLockout"
@@ -117,14 +121,14 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads the KeypadLockout attribute of DUT"
+    - label: "Step 3b: TH reads the KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "readAttribute"
       attribute: "KeypadLockout"
       response:
           value: 0
 
-    - label: "Writes a value of 1 to KeypadLockout attribute of DUT"
+    - label: "Step 3c: Writes a value of 1 to KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "writeAttribute"
       attribute: "KeypadLockout"
@@ -142,14 +146,14 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads the KeypadLockout attribute of DUT"
+    - label: "Step 3d: TH reads the KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "readAttribute"
       attribute: "KeypadLockout"
       response:
           value: 1
 
-    - label: "Writes a value of 2 to KeypadLockout attribute of DUT"
+    - label: "Step 3e: Writes a value of 2 to KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "writeAttribute"
       attribute: "KeypadLockout"
@@ -167,14 +171,14 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads the KeypadLockout attribute of DUT"
+    - label: "Step 3f: TH reads the KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "readAttribute"
       attribute: "KeypadLockout"
       response:
           value: 2
 
-    - label: "Writes a value of 3 to KeypadLockout attribute of DUT"
+    - label: "Step 3g: Writes a value of 3 to KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "writeAttribute"
       attribute: "KeypadLockout"
@@ -192,14 +196,14 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads the KeypadLockout attribute of DUT"
+    - label: "Step 3h: TH reads the KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "readAttribute"
       attribute: "KeypadLockout"
       response:
           value: 3
 
-    - label: "Writes a value of 4 to KeypadLockout attribute of DUT"
+    - label: "Step 3i: Writes a value of 4 to KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "writeAttribute"
       attribute: "KeypadLockout"
@@ -217,14 +221,14 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads the KeypadLockout attribute of DUT"
+    - label: "Step 3j: TH reads the KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "readAttribute"
       attribute: "KeypadLockout"
       response:
           value: 4
 
-    - label: "Writes a value of 5 to KeypadLockout attribute of DUT"
+    - label: "Step 3k: Writes a value of 5 to KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "writeAttribute"
       attribute: "KeypadLockout"
@@ -242,7 +246,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads the KeypadLockout attribute of DUT"
+    - label: "Step 3l: TH reads the KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "readAttribute"
       attribute: "KeypadLockout"
@@ -250,7 +254,8 @@ tests:
           value: 5
 
     - label:
-          "Writes a value of greater than 5 to KeypadLockout attribute of DUT"
+          "Step 3m: Writes a value of greater than 5 to KeypadLockout attribute
+          of DUT"
       PICS: TSUIC.S.A0001
       command: "writeAttribute"
       attribute: "KeypadLockout"
@@ -259,7 +264,7 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
-    - label: "TH reads the KeypadLockout attribute of DUT"
+    - label: "Step 3n: TH reads the KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "readAttribute"
       attribute: "KeypadLockout"
@@ -267,7 +272,8 @@ tests:
           value: 5
 
     - label:
-          "Writes a value of 0 to ScheduleProgrammingVisibility attribute of DUT"
+          "Step 4a: Writes a value of 0 to ScheduleProgrammingVisibility
+          attribute of DUT"
       PICS: TSUIC.S.A0002
       command: "writeAttribute"
       attribute: "ScheduleProgrammingVisibility"
@@ -287,7 +293,8 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads the ScheduleProgrammingVisibility attribute of DUT"
+    - label:
+          "Step 4b: TH reads the ScheduleProgrammingVisibility attribute of DUT"
       PICS: TSUIC.S.A0002
       command: "readAttribute"
       attribute: "ScheduleProgrammingVisibility"
@@ -295,7 +302,8 @@ tests:
           value: 0
 
     - label:
-          "Writes a value of 1 to ScheduleProgrammingVisibility attribute of DUT"
+          "Step 4c: Writes a value of 1 to ScheduleProgrammingVisibility
+          attribute of DUT"
       PICS: TSUIC.S.A0002
       command: "writeAttribute"
       attribute: "ScheduleProgrammingVisibility"
@@ -315,7 +323,8 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads the ScheduleProgrammingVisibility attribute of DUT"
+    - label:
+          "Step 4d: TH reads the ScheduleProgrammingVisibility attribute of DUT"
       PICS: TSUIC.S.A0002
       command: "readAttribute"
       attribute: "ScheduleProgrammingVisibility"
@@ -323,8 +332,8 @@ tests:
           value: 1
 
     - label:
-          "Writes a value of greater than 1 to ScheduleProgrammingVisibility
-          attribute of DUT"
+          "Step 4e: Writes a value of greater than 1 to
+          ScheduleProgrammingVisibility attribute of DUT"
       PICS: TSUIC.S.A0002
       command: "writeAttribute"
       attribute: "ScheduleProgrammingVisibility"
@@ -333,7 +342,8 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
-    - label: "TH reads the ScheduleProgrammingVisibility attribute of DUT"
+    - label:
+          "Step 4f: TH reads the ScheduleProgrammingVisibility attribute of DUT"
       PICS: TSUIC.S.A0002
       command: "readAttribute"
       attribute: "ScheduleProgrammingVisibility"

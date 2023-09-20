@@ -14,11 +14,12 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    15.4.10. [TC-SC-4.10] Operational Discovery - Sleepy Node [DUT as
-    Commissionee]
+    15.4.10. [TC-SC-4.10] Operational Discovery - SIT ICD Node
+    [{DUT_Commissionee}]
 
 PICS:
     - MCORE.ROLE.COMMISSIONEE
+    - MCORE.SC.SED
 
 config:
     nodeId: 0x12344321
@@ -26,22 +27,31 @@ config:
     endpoint: 0
 
 tests:
-    - label: "DUT is instructed to advertise its service"
+    - label: "Precondition"
+      verification: |
+          1. Nodes are joined in the same Fabric
+          2. DUT is a sleepy device (MCORE.SC.SED)
+      disabled: true
+
+    - label: "Step 1: DUT is instructed to advertise its service"
       verification: |
           1. Provision the DUT by TH (Chip-tool)
       disabled: true
 
-    - label: "TH scans for DNS-SD advertising"
+    - label: "Step 2: TH scans for DNS-SD advertising"
       verification: |
           avahi-browse -rt _matter._tcp
-          Verify on the TH(Chip-tool) Log:
+          On the TH(Chip-tool) Log: Verify the DUT is advertising for:
+          -SII key is higher than the SLEEPY_IDLE_INTERVAL default value (> 300 milliseconds)
+          - SII key and SAI key is less than 3600000 (1hour in milliseconds)
+
           +   eth0 IPv6 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
           +   eth0 IPv4 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
           =   eth0 IPv4 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
              hostname = [D21165B5F440B033.local]
              address = [fd11:22::4b31:9932:cffe:b41a]
              port = [5540]
-             txt = ["T=0" "SAI=300" "SII=5000"]
+             txt = ["T=0" "SAI=300" "SII=5000" "SAT=4000"]
           =   eth0 IPv6 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
              hostname = [D21165B5F440B033.local]
              address = [fd11:22::4b31:9932:cffe:b41a]

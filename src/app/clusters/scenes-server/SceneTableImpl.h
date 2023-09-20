@@ -39,6 +39,18 @@ using clusterId = chip::ClusterId;
 ///        (Color control cluster), the Extension Field Set's value pair list TLV occupies 99 bytes of memory
 class DefaultSceneHandlerImpl : public scenes::SceneHandler
 {
+
+    template <typename T>
+    using List = chip::app::DataModel::List<T>;
+
+    template <typename T>
+    using DecodableList = chip::app::DataModel::DecodableList<T>;
+
+    using AttributeValuePairType          = chip::app::Clusters::Scenes::Structs::AttributeValuePair::Type;
+    using AttributeValuePairDecodableType = chip::app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType;
+    using ExtensionFieldSetDecodableType  = chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType;
+    using ExtensionFieldSetType           = chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::Type;
+
 public:
     static constexpr uint8_t kMaxAvPair = CHIP_CONFIG_SCENES_MAX_AV_PAIRS_EFS;
 
@@ -49,18 +61,15 @@ public:
     /// @param aVlist[in] Attribute value list to encode
     /// @param serializedBytes[out] Buffer to fill from the Attribute value list in a TLV format
     /// @return CHIP_ERROR
-    virtual CHIP_ERROR
-    EncodeAttributeValueList(const app::DataModel::List<app::Clusters::Scenes::Structs::AttributeValuePair::Type> & aVlist,
-                             MutableByteSpan & serializedBytes);
+    virtual CHIP_ERROR EncodeAttributeValueList(const List<AttributeValuePairType> & aVlist, MutableByteSpan & serializedBytes);
 
     /// @brief Decodes an attribute value list from a TLV structure and ensure it fits the member pair buffer
     /// @param serializedBytes [in] Buffer to read from
     /// @param aVlist [out] Attribute value list to fill from the TLV structure.  Only valid while the buffer backing
     /// serializedBytes exists and its contents are not modified.
     /// @return CHIP_ERROR
-    virtual CHIP_ERROR DecodeAttributeValueList(
-        const ByteSpan & serializedBytes,
-        app::DataModel::DecodableList<app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType> & aVlist);
+    virtual CHIP_ERROR DecodeAttributeValueList(const ByteSpan & serializedBytes,
+                                                DecodableList<AttributeValuePairDecodableType> & aVlist);
 
     /// @brief From command AddScene, allows handler to filter through clusters in command to serialize only the supported ones.
     /// @param endpoint[in] Endpoint ID
@@ -68,8 +77,7 @@ public:
     /// @param serializedBytes[out] Buffer to fill from the ExtensionFieldSet in command
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR_INVALID_ARGUMENT if the cluster is not supported, CHIP_ERROR value
     /// otherwise
-    virtual CHIP_ERROR SerializeAdd(EndpointId endpoint,
-                                    const app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet,
+    virtual CHIP_ERROR SerializeAdd(EndpointId endpoint, const ExtensionFieldSetDecodableType & extensionFieldSet,
                                     MutableByteSpan & serializedBytes) override;
 
     /// @brief Simulates taking data from nvm and loading it in a command object if the cluster is supported by the endpoint
@@ -79,10 +87,10 @@ public:
     /// @return CHIP_NO_ERROR if Extension Field Set was successfully populated, CHIP_ERROR_INVALID_ARGUMENT if the cluster is not
     /// supported, specific CHIP_ERROR otherwise
     virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
-                                   app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & extensionFieldSet) override;
+                                   ExtensionFieldSetType & extensionFieldSet) override;
 
 private:
-    app::Clusters::Scenes::Structs::AttributeValuePair::Type mAVPairs[kMaxAvPair];
+    AttributeValuePairType mAVPairs[kMaxAvPair];
 };
 
 /**

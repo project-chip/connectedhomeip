@@ -56,7 +56,7 @@ chip_data_model("chef-common") {
 efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${examples_plat_dir}/FreeRTOSConfig.h",
+    "${examples_common_plat_dir}/FreeRTOSConfig.h",
   ]
 
   include_dirs = [
@@ -133,7 +133,7 @@ silabs_executable("chef_app") {
       "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",
-      "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
+      "${examples_common_plat_dir}/pw_sys_io:pw_sys_io_silabs",
     ]
 
     deps += pw_build_LINK_DEPS
@@ -144,7 +144,7 @@ silabs_executable("chef_app") {
     ]
   }
 
-  ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
+  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
 

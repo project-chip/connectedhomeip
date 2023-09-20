@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     24.1.23. [TC-CADMIN-1.23] Open commissioning window - durations max and
@@ -45,7 +44,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH_CR1 starts a commissioning process with DUT_CE"
+    - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       PICS: CADMIN.S.C01.Rsp
@@ -54,7 +53,9 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+    - label:
+          "Step 2: TH_CR1 opens a commissioning window on DUT_CE using BCM with
+          a value of 180 seconds"
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       PICS: CADMIN.S.C01.Rsp
@@ -64,7 +65,8 @@ tests:
               - name: "CommissioningTimeout"
                 value: 180
 
-    - label: "Wait for commissioning Window to 181 seconds"
+    - label:
+          "Step 3: Wait for 181 seconds for commissioning Window to be closed"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -73,7 +75,8 @@ tests:
                 value: 181000
 
     - label:
-          "TH_CR1 reads the window status to verify the DUT_CE window is closed"
+          "Step 4: TH_CR1 reads the window status to verify the DUT_CE window is
+          closed"
       cluster: "Administrator Commissioning"
       command: "readAttribute"
       attribute: "WindowStatus"
@@ -81,7 +84,9 @@ tests:
       response:
           value: 0
 
-    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+    - label:
+          "Step 5: TH_CR1 opens a commissioning window on DUT_CE using BCM with
+          a value of 179 seconds"
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       PICS: CADMIN.S.C01.Rsp
@@ -94,7 +99,8 @@ tests:
           error: INVALID_COMMAND
 
     - label:
-          "TH_CR1 reads the window status to verify the DUT_CE window is closed"
+          "Step 6: TH_CR1 reads the window status to verify the DUT_CE window is
+          closed"
       cluster: "Administrator Commissioning"
       command: "readAttribute"
       attribute: "WindowStatus"

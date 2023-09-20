@@ -201,13 +201,34 @@ const EmberAfCluster * emberAfGetClusterByIndex(chip::EndpointId endpoint, uint8
 //
 chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::EndpointId endpoint, CHIP_ERROR & err);
 
+/**
+ * Get the semantic tags of the endpoint.
+ * Fills in the provided SemanticTagStruct with tag at index `index` if there is one,
+ * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of tag,
+ * or returns CHIP_ERROR_NOT_FOUND if the endpoint is invalid.
+ * @param endpoint The target endpoint.
+ * @param index The index of the tag, with 0 representing the first tag.
+ * @param tag  The SemanticTagStruct is filled.
+ */
+CHIP_ERROR GetSemanticTagForEndpointAtIndex(chip::EndpointId endpoint, size_t index,
+                                            chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & tag);
+
 //
-// Over-ride the device type list current associated with an endpoint with a user-provided list. The buffers backing
+// Override the device type list current associated with an endpoint with a user-provided list. The buffers backing
 // that list have to live as long as the endpoint is enabled.
 //
 // NOTE: It is the application's responsibility to free the existing list that is being replaced if needed.
 //
 CHIP_ERROR emberAfSetDeviceTypeList(chip::EndpointId endpoint, chip::Span<const EmberAfDeviceType> deviceTypeList);
+
+//
+// Override the tag list current associated with an endpoint with a user-provided list. The buffers backing
+// that list have to live as long as the endpoint is enabled.
+//
+// NOTE: It is the application's responsibility to free the existing list that is being replaced if needed.
+//
+CHIP_ERROR SetTagList(chip::EndpointId endpoint,
+                      chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList);
 
 // Register a dynamic endpoint. This involves registering descriptors that describe
 // the composition of the endpoint (encapsulated in the 'ep' argument) as well as providing
@@ -248,13 +269,20 @@ chip::Optional<chip::AttributeId> emberAfGetServerAttributeIdByIndex(chip::Endpo
                                                                      uint16_t attributeIndex);
 
 /**
- * Register an attribute access override.  It will remain registered until
- * the endpoint it's registered for is disabled (or until shutdown if it's
- * registered for all endpoints).  Registration will fail if there is an
- * already-registered override for the same set of attributes.
+ * Register an attribute access override.  It will remain registered until the
+ * endpoint it's registered for is disabled (or until shutdown if it's
+ * registered for all endpoints) or until it is explicitly unregistered.
+ * Registration will fail if there is an already-registered override for the
+ * same set of attributes.
  *
  * @return false if there is an existing override that the new one would
  *               conflict with.  In this case the override is not registered.
  * @return true if registration was successful.
  */
 bool registerAttributeAccessOverride(chip::app::AttributeAccessInterface * attrOverride);
+
+/**
+ * Unregister an attribute access override (for example if the object
+ * implementing AttributeAccessInterface is being destroyed).
+ */
+void unregisterAttributeAccessOverride(chip::app::AttributeAccessInterface * attrOverride);

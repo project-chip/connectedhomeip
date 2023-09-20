@@ -54,6 +54,13 @@
 #              Please examine codegen carefully when using "removed" to make
 #              sure all the things that should have been removed have been.
 #
+# * "swiftUnavailable": Can contain clusters, commands, attributes, etc as
+#                       described above for "introduced" and "deprecated".  This
+#                       can be used to mark APIs with NS_SWIFT_UNAVAILABLE,
+#                       typically when an API was renamed between two names that
+#                       map to the same Swift name and then both names were
+#                       deprecated.
+#
 # * "provisional": Can contain clusters, commands, attributes, etc as described
 #                  above for "introduced" and "deprecated".  Items can be
 #                  defined as provisional to prevent code generation for them.
@@ -4132,13 +4139,6 @@
                   - ValueA
                   - ValueB
                   - ValueC
-          FaultInjection:
-              FaultType:
-                  - Unspecified
-                  - SystemFault
-                  - InetFault
-                  - ChipFault
-                  - CertFault
       bitmaps:
           Groups:
               - GroupClusterFeature
@@ -4663,10 +4663,6 @@
           clusters:
               - PulseWidthModulation
               - TimeSynchronization
-              - ProxyConfiguration
-              - ProxyDiscovery
-              - ProxyValid
-              - FaultInjection
           attributes:
               PulseWidthModulation:
                   - GeneratedCommandList
@@ -4690,40 +4686,10 @@
                   - LocalTime
                   - TimeZoneDatabase
                   - NtpServerPort
-              ProxyConfiguration:
-                  - GeneratedCommandList
-                  - AcceptedCommandList
-                  - AttributeList
-                  - FeatureMap
-                  - ClusterRevision
-              ProxyDiscovery:
-                  - GeneratedCommandList
-                  - AcceptedCommandList
-                  - AttributeList
-                  - FeatureMap
-                  - ClusterRevision
-              ProxyValid:
-                  - GeneratedCommandList
-                  - AcceptedCommandList
-                  - AttributeList
-                  - FeatureMap
-                  - ClusterRevision
-              FaultInjection:
-                  - GeneratedCommandList
-                  - AcceptedCommandList
-                  - AttributeList
-                  - FeatureMap
-                  - ClusterRevision
           commands:
-              FaultInjection:
-                  - FailAtFault
-                  - FailRandomlyAtFault
               TimeSynchronization:
                   - SetUtcTime
       command payloads:
-          FaultInjection:
-              - FailAtFault
-              - FailRandomlyAtFault
           TimeSynchronization:
               - SetUtcTime
       global attributes:
@@ -4739,10 +4705,6 @@
       clusters:
           - PulseWidthModulation
           - TimeSynchronization
-          - ProxyConfiguration
-          - ProxyDiscovery
-          - ProxyValid
-          - FaultInjection
 
 - release: "First dot-release"
   versions:
@@ -7394,6 +7356,18 @@
           ModeSelect:
               Feature:
                   OnOff: DEPONOFF
+  swiftUnavailable:
+      bitmap values:
+          NetworkCommissioning:
+              WiFiSecurity:
+                  # The bitmap got renamed to WiFiSecurityBitmap, so now both
+                  # the Wpa* and WPA* names on WiFiSecurity are deprecated.
+                  # They get mapped to Swift with identical names, which leads
+                  # to the names being ambiguous.  Mark the "Wpa*" as
+                  # unavailable to Swift to work around this.
+                  - WpaPersonal
+                  - Wpa2Personal
+                  - Wpa3Personal
   provisional:
       clusters:
           ## Not ready at cutoff
@@ -7416,44 +7390,6 @@
           - RefrigeratorAlarm
           - TemperatureControl
           - SmokeCOAlarm
-          ## Officially marked provisional: many concentration measurement clusters
-          - BromateConcentrationMeasurement
-          - BromodichloromethaneConcentrationMeasurement
-          - BromoformConcentrationMeasurement
-          - ChloraminesConcentrationMeasurement
-          - ChlorineConcentrationMeasurement
-          - ChlorodibromomethaneConcentrationMeasurement
-          - ChloroformConcentrationMeasurement
-          - CopperConcentrationMeasurement
-          - DissolvedOxygenConcentrationMeasurement
-          - EthyleneConcentrationMeasurement
-          - EthyleneOxideConcentrationMeasurement
-          - FecalColiformEColiConcentrationMeasurement
-          - FluorideConcentrationMeasurement
-          - HaloaceticAcidsConcentrationMeasurement
-          - HydrogenConcentrationMeasurement
-          - HydrogenSulfideConcentrationMeasurement
-          - LeadConcentrationMeasurement
-          - ManganeseConcentrationMeasurement
-          - NitricOxideConcentrationMeasurement
-          - OxygenConcentrationMeasurement
-          - SodiumConcentrationMeasurement
-          - SulfateConcentrationMeasurement
-          - SulfurDioxideConcentrationMeasurement
-          - TotalColiformBacteriaConcentrationMeasurement
-          - TotalTrihalomethanesConcentrationMeasurement
-          - TurbidityConcentrationMeasurement
-          ## Officially marked provisional: many replaceable monitoring clusters
-          - CeramicFilterMonitoring
-          - ElectrostaticFilterMonitoring
-          - UVFilterMonitoring
-          - IonizingFilterMonitoring
-          - ZeoliteFilterMonitoring
-          - OzoneFilterMonitoring
-          - WaterTankMonitoring
-          - FuelTankMonitoring
-          - InkCartridgeMonitoring
-          - TonerCartridgeMonitoring
           ## Not ready to be public API yet.
           - ICDManagement
           - LaundryWasherMode
@@ -7464,155 +7400,15 @@
           - LaundryWasherControls
           - RVCOperationalState
           - DishwasherAlarm
+          - SampleMEI
       attributes:
-          # EventList generally not stable yet.
           Scenes:
-              - EventList
               # New scenes bits not stable yet.
               - SceneTableSize
               - RemainingCapacity
-          OnOff:
-              - EventList
-          OnOffSwitchConfiguration:
-              - EventList
-          LevelControl:
-              - EventList
-          BinaryInputBasic:
-              - EventList
-          PulseWidthModulation:
-              - EventList
-          Descriptor:
-              - EventList
-          Binding:
-              - EventList
-          Identify:
-              - EventList
-          AccessControl:
-              - EventList
-          Actions:
-              - EventList
-          OTASoftwareUpdateProvider:
-              - EventList
-          OTASoftwareUpdateRequestor:
-              - EventList
-          LocalizationConfiguration:
-              - EventList
-          TimeFormatLocalization:
-              - EventList
-          UnitLocalization:
-              - EventList
-          PowerSourceConfiguration:
-              - EventList
-          PowerSource:
-              - EventList
-          GeneralCommissioning:
-              - EventList
-          NetworkCommissioning:
-              - EventList
-          DiagnosticLogs:
-              - EventList
-          GeneralDiagnostics:
-              - EventList
-          SoftwareDiagnostics:
-              - EventList
-          ThreadNetworkDiagnostics:
-              - EventList
-          WiFiNetworkDiagnostics:
-              - EventList
-          EthernetNetworkDiagnostics:
-              - EventList
-          TimeSynchronization:
-              - EventList
-          Switch:
-              - EventList
-          AdministratorCommissioning:
-              - EventList
-          OperationalCredentials:
-              - EventList
-          GroupKeyManagement:
-              - EventList
-          FixedLabel:
-              - EventList
-          UserLabel:
-              - EventList
-          ProxyConfiguration:
-              - EventList
-          ProxyDiscovery:
-              - EventList
-          ProxyValid:
-              - EventList
-          BooleanState:
-              - EventList
-          ModeSelect:
-              - EventList
-          DoorLock:
-              - EventList
-          WindowCovering:
-              - EventList
-          BarrierControl:
-              - EventList
-          PumpConfigurationAndControl:
-              - EventList
           FanControl:
-              - EventList
               # New Fan Control bits not stable yet.
               - AirflowDirection
-          ThermostatUserInterfaceConfiguration:
-              - EventList
-          ColorControl:
-              - EventList
-          BallastConfiguration:
-              - EventList
-          IlluminanceMeasurement:
-              - EventList
-          TemperatureMeasurement:
-              - EventList
-          PressureMeasurement:
-              - EventList
-          Thermostat:
-              - EventList
-          FlowMeasurement:
-              - EventList
-          RelativeHumidityMeasurement:
-              - EventList
-          OccupancySensing:
-              - EventList
-          WakeOnLAN:
-              - EventList
-          Channel:
-              - EventList
-          Groups:
-              - EventList
-          TargetNavigator:
-              - EventList
-          MediaPlayback:
-              - EventList
-          MediaInput:
-              - EventList
-          LowPower:
-              - EventList
-          KeypadInput:
-              - EventList
-          ContentLauncher:
-              - EventList
-          AudioOutput:
-              - EventList
-          ApplicationLauncher:
-              - EventList
-          ApplicationBasic:
-              - EventList
-          AccountLogin:
-              - EventList
-          ElectricalMeasurement:
-              - EventList
-          UnitTesting:
-              - EventList
-          FaultInjection:
-              - EventList
-          BasicInformation:
-              - EventList
-          BridgedDeviceBasicInformation:
-              - EventList
       commands:
           FanControl:
               # Not stable yet
@@ -7663,7 +7459,7 @@
                   - AirflowDirection
       global attributes:
           - EventList
-      # Once we actually unmark TimeSynchronization as provisional, all these bits should go away too, and we should instead
+      # Once we actually unmark TimeSynchronization as provisional, all these bits except EventList should go away too, and we should instead
       # mark things as introduced/deprecated as needed.  The "ids" entries should go away, in particular.
       ids:
           attributes:
@@ -7671,6 +7467,15 @@
                   - TimeZoneListMaxSize
                   - DSTOffsetListMaxSize
                   - SupportsDNSResolve
+                  # Because we are special-casing ids for TimeSynchronization
+                  # above, we need to explicitly mark the EventList id
+                  # provisional.
+                  - EventList
+              PulseWidthModulation:
+                  # Because we are special-casing ids for PulseWidthModulation
+                  # above, we need to explicitly mark the EventList id
+                  # provisional.
+                  - EventList
           commands:
               TimeSynchronization:
                   - SetUTCTime
@@ -7687,5 +7492,78 @@
                   - TimeFailure
                   - MissingTrustedTimeSource
 
+- release: "Fall 2023 #2"
+  versions:
+      ios: "17.1"
+      macos: "14.1"
+      watchos: "10.1"
+      tvos: "17.1"
+  introduced:
+      bitmaps:
+          TimeFormatLocalization:
+              - Feature
+      bitmap values:
+          OnOff:
+              Feature:
+                  - DeadFront
+          TimeFormatLocalization:
+              Feature:
+                  - CalendarFormat
+  provisional:
+      attributes:
+          # New things, not quite finalized.
+          PowerSource:
+              - EndpointList
+          Descriptor:
+              - TagList
+      structs:
+          # New things, not quite finalized.
+          Descriptor:
+              - SemanticTagStruct
+      struct fields:
+          # New things, not quite finalized.
+          Descriptor:
+              SemanticTagStruct:
+                  - mfgCode
+                  - namespaceID
+                  - tag
+                  - label
+      bitmaps:
+          # CacheAndSync is provisional in the spec.
+          GroupKeyManagement:
+              - Feature
+          # New things, not quite finalized.
+          Descriptor:
+              - Feature
+      bitmap values:
+          # New things, not quite finalized.
+          Descriptor:
+              Feature:
+                  - TagList
+          # CacheAndSync is provisional in the spec.
+          GroupKeyManagement:
+              Feature:
+                  - CacheAndSync
+          # Scenes are generally provisional for now.
+          Scenes:
+              Feature:
+                  - Explicit
+                  - TableSize
+                  - FabricScenes
+  removed:
+      clusters:
+          # Clusters that really should just not be exposed, even if they're in our XML.
+          - FaultInjection
+          # Clusters that are not going to end up shipping in their current form,
+          # so we should not be exposing the bits we expose now.
+          - ProxyConfiguration
+          - ProxyDiscovery
+          - ProxyValid
+
 - release: "Future"
   versions: "future"
+  provisional:
+      bitmaps:
+          BarrierControl:
+              - BarrierControlCapabilities
+              - BarrierControlSafetyStatus

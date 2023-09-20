@@ -31,6 +31,6 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH sends Sleep command to DUT"
+    - label: "Step 1: TH sends Sleep command to DUT"
       PICS: LOWPOWER.S.C00.Rsp
       command: "Sleep"

@@ -81,7 +81,8 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Create FreeRTOS queue for platform driver messages
-    procQueue = xQueueCreate(16U, sizeof(ThreadStackManagerImpl::procQueueMsg));
+    procQueue       = xQueueCreate(20U, sizeof(ThreadStackManagerImpl::procQueueMsg));
+    procQueue_radio = xQueueCreate(20U, sizeof(ThreadStackManagerImpl::procQueueMsg));
 
 #if OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE != 0
     mbedtls_platform_set_calloc_free(ot_calloc, ot_free);
@@ -116,7 +117,19 @@ bool ThreadStackManagerImpl::IsInitialized()
 
 void ThreadStackManagerImpl::_SendProcMessage(ThreadStackManagerImpl::procQueueMsg & procMsg)
 {
-    xQueueSendFromISR(procQueue, &procMsg, NULL);
+
+    BaseType_t err;
+
+    if (procMsg.cmd == procQueueCmd_radio)
+    {
+        err = xQueueSendFromISR(procQueue_radio, &procMsg, NULL);
+    }
+    else
+    {
+        err = xQueueSendFromISR(procQueue, &procMsg, NULL);
+    }
+
+    (void) err;
 
     // signal processing loop
     SignalThreadActivityPendingFromISR();
@@ -138,17 +151,29 @@ extern "C" void otPlatFree(void * aPtr)
 void ThreadStackManagerImpl::_ProcMessage(otInstance * aInstance)
 {
     procQueueMsg procMsg;
+    procQueueMsg procMsg_radio;
+
+    /* Process Radio events */
+    while (pdTRUE == xQueueReceive(procQueue_radio, &procMsg_radio, 0U))
+    {
+        switch (procMsg_radio.cmd)
+        {
+        case procQueueCmd_radio: {
+            platformRadioProcess(aInstance, procMsg_radio.arg);
+            break;
+        }
+        default: {
+            break;
+        }
+        }
+    }
+
     while (pdTRUE == xQueueReceive(procQueue, &procMsg, 0U))
     {
         switch (procMsg.cmd)
         {
         case procQueueCmd_alarm: {
             platformAlarmProcess(aInstance);
-            break;
-        }
-
-        case procQueueCmd_radio: {
-            platformRadioProcess(aInstance, procMsg.arg);
             break;
         }
 

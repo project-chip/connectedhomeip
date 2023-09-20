@@ -23,9 +23,7 @@ namespace chip {
 namespace scenes {
 
 CHIP_ERROR
-DefaultSceneHandlerImpl::EncodeAttributeValueList(
-    const app::DataModel::List<app::Clusters::Scenes::Structs::AttributeValuePair::Type> & aVlist,
-    MutableByteSpan & serializedBytes)
+DefaultSceneHandlerImpl::EncodeAttributeValueList(const List<AttributeValuePairType> & aVlist, MutableByteSpan & serializedBytes)
 {
     TLV::TLVWriter writer;
     writer.Init(serializedBytes);
@@ -35,9 +33,8 @@ DefaultSceneHandlerImpl::EncodeAttributeValueList(
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DefaultSceneHandlerImpl::DecodeAttributeValueList(
-    const ByteSpan & serializedBytes,
-    app::DataModel::DecodableList<app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType> & aVlist)
+CHIP_ERROR DefaultSceneHandlerImpl::DecodeAttributeValueList(const ByteSpan & serializedBytes,
+                                                             DecodableList<AttributeValuePairDecodableType> & aVlist)
 {
     TLV::TLVReader reader;
 
@@ -49,11 +46,10 @@ CHIP_ERROR DefaultSceneHandlerImpl::DecodeAttributeValueList(
 }
 
 CHIP_ERROR
-DefaultSceneHandlerImpl::SerializeAdd(EndpointId endpoint,
-                                      const app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet,
+DefaultSceneHandlerImpl::SerializeAdd(EndpointId endpoint, const ExtensionFieldSetDecodableType & extensionFieldSet,
                                       MutableByteSpan & serializedBytes)
 {
-    app::Clusters::Scenes::Structs::AttributeValuePair::Type aVPairs[kMaxAvPair];
+    AttributeValuePairType aVPairs[kMaxAvPair];
 
     size_t pairTotal = 0;
     // Verify size of list
@@ -68,15 +64,15 @@ DefaultSceneHandlerImpl::SerializeAdd(EndpointId endpoint,
         pairCount++;
     }
     ReturnErrorOnFailure(pair_iterator.GetStatus());
-    app::DataModel::List<app::Clusters::Scenes::Structs::AttributeValuePair::Type> attributeValueList(aVPairs, pairCount);
+    List<AttributeValuePairType> attributeValueList(aVPairs, pairCount);
 
     return EncodeAttributeValueList(attributeValueList, serializedBytes);
 }
 
 CHIP_ERROR DefaultSceneHandlerImpl::Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
-                                                app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & extensionFieldSet)
+                                                ExtensionFieldSetType & extensionFieldSet)
 {
-    app::DataModel::DecodableList<app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType> attributeValueList;
+    DecodableList<AttributeValuePairDecodableType> attributeValueList;
 
     ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
 
@@ -852,26 +848,22 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
 /// @param scene Scene providing the EFSs (extension field sets)
 CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(const SceneTableEntry & scene)
 {
-    ExtensionFieldSet EFS;
-    TransitionTimeMs time;
-    clusterId cluster;
-
     if (!this->HandlerListEmpty())
     {
         for (uint8_t i = 0; i < scene.mStorageData.mExtensionFieldSets.GetFieldSetCount(); i++)
         {
+            ExtensionFieldSet EFS;
             scene.mStorageData.mExtensionFieldSets.GetFieldSetAtPosition(EFS, i);
-            cluster          = EFS.mID;
-            time             = scene.mStorageData.mSceneTransitionTimeMs;
             ByteSpan EFSSpan = MutableByteSpan(EFS.mBytesBuffer, EFS.mUsedBytes);
 
             if (!EFS.IsEmpty())
             {
                 for (auto & handler : mHandlerList)
                 {
-                    if (handler.SupportsCluster(mEndpointId, cluster))
+                    if (handler.SupportsCluster(mEndpointId, EFS.mID))
                     {
-                        ReturnErrorOnFailure(handler.ApplyScene(mEndpointId, cluster, EFSSpan, time));
+                        ReturnErrorOnFailure(
+                            handler.ApplyScene(mEndpointId, EFS.mID, EFSSpan, scene.mStorageData.mSceneTransitionTimeMs));
                         break;
                     }
                 }

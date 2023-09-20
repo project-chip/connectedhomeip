@@ -1,0 +1,2142 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    36.1.25. [TC-CADMIN-1.25] Subscription to the attributes - verify
+    subscription response [ECM] [DUT - Commissionee]
+
+PICS:
+    - CADMIN.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Precondition"
+      verification: |
+          Reset Devices to factory defaults
+      disabled: true
+
+    - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
+      PICS: CADMIN.S
+      verification: |
+          On TH_CR1 start interactive mode,
+
+          ./chip-tool interactive start
+
+          In the interactive mode of TH_CR1, start commissioning process,
+
+          pairing code 1 34970112332 --commissioner-name alpha
+
+
+
+          [1690218999738] [38865:6571482] [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
+          [1690218999738] [38865:6571482] [CTL] Received CommissioningComplete response, errorCode=0
+          [1690218999738] [38865:6571482] [CTL] Successfully finished commissioning step 'SendComplete'
+          [1690218999738] [38865:6571482] [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1690218999738] [38865:6571482] [CTL] Performing next commissioning step 'Cleanup'
+          [1690218999738] [38865:6571482] [IN] SecureSession[0x6000012bc000]: MarkForEviction Type:1 LSID:35777
+          [1690218999738] [38865:6571482] [SC] SecureSession[0x6000012bc000, LSID:35777]: State change 'kActive' --> 'kPendingEviction'
+          [1690218999738] [38865:6571482] [IN] SecureSession[0x6000012bc000]: Released - Type:1 LSID:35777
+          [1690218999738] [38865:6571482] [CTL] Successfully finished commissioning step 'Cleanup'
+          [1690218999738] [38865:6571482] [TOO] Device commissioning completed with success
+      disabled: true
+
+    - label: "Step 2: TH_CR1 subscribes to WindowStatus attribute on DUT_CE"
+      PICS: CADMIN.S.A0000
+      verification: |
+          In the interactive mode of TH_CR1, subscribe to windowstatus attribute,
+
+          administratorcommissioning subscribe window-status 10 3000 1 0 --keepSubscriptions true --commissioner-name alpha
+
+          On TH_CR1 logs verify for windowstatus subscription notification,
+
+          ReportDataMessage =
+          [1690219196809] [38865:6571482] [DMG] {
+          [1690219196809] [38865:6571482] [DMG]         SubscriptionId = 0xdade5274,
+          [1690219196809] [38865:6571482] [DMG]         AttributeReportIBs =
+          [1690219196809] [38865:6571482] [DMG]         [
+          [1690219196809] [38865:6571482] [DMG]                 AttributeReportIB =
+          [1690219196809] [38865:6571482] [DMG]                 {
+          [1690219196809] [38865:6571482] [DMG]                         AttributeDataIB =
+          [1690219196809] [38865:6571482] [DMG]                         {
+          [1690219196809] [38865:6571482] [DMG]                                 DataVersion = 0x1fddccd8,
+          [1690219196809] [38865:6571482] [DMG]                                 AttributePathIB =
+          [1690219196809] [38865:6571482] [DMG]                                 {
+          [1690219196809] [38865:6571482] [DMG]                                         Endpoint = 0x0,
+          [1690219196809] [38865:6571482] [DMG]                                         Cluster = 0x3c,
+          [1690219196809] [38865:6571482] [DMG]                                         Attribute = 0x0000_0000,
+          [1690219196809] [38865:6571482] [DMG]                                 }
+          [1690219196809] [38865:6571482] [DMG]
+          [1690219196809] [38865:6571482] [DMG]                                 Data = 0,
+          [1690219196809] [38865:6571482] [DMG]                         },
+          [1690219196809] [38865:6571482] [DMG]
+          [1690219196809] [38865:6571482] [DMG]                 },
+          [1690219196809] [38865:6571482] [DMG]
+          [1690219196809] [38865:6571482] [DMG]         ],
+          [1690219196809] [38865:6571482] [DMG]
+          [1690219196809] [38865:6571482] [DMG]         InteractionModelRevision = 1
+          [1690219196809] [38865:6571482] [DMG] }
+          [1690219196809] [38865:6571482] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 534629592
+          [1690219196809] [38865:6571482] [TOO]   WindowStatus: 0
+          [1690219196809] [38865:6571482] [DMG] MoveToState ReadClient[0x13b704b90]: Moving to [AwaitingSu]
+      disabled: true
+
+    - label: "Step 3: TH_CR1 subscribes to AdminFabricIndex attribute on DUT_CE"
+      PICS: CADMIN.S.A0001
+      verification: |
+          In the interactive mode of TH_CR1, subscribe to adminfabricindex attribute,
+
+          administratorcommissioning subscribe admin-fabric-index 10 3000 1 0 --keepSubscriptions true --commissioner-name alpha
+
+          On TH_CR1 logs verify for adminfabricindex subscription notification,
+
+          ReportDataMessage =
+          [1690219390537] [38865:6571482] [DMG] {
+          [1690219390537] [38865:6571482] [DMG]         SubscriptionId = 0x35250b41,
+          [1690219390537] [38865:6571482] [DMG]         AttributeReportIBs =
+          [1690219390537] [38865:6571482] [DMG]         [
+          [1690219390537] [38865:6571482] [DMG]                 AttributeReportIB =
+          [1690219390537] [38865:6571482] [DMG]                 {
+          [1690219390537] [38865:6571482] [DMG]                         AttributeDataIB =
+          [1690219390537] [38865:6571482] [DMG]                         {
+          [1690219390537] [38865:6571482] [DMG]                                 DataVersion = 0x1fddccd8,
+          [1690219390537] [38865:6571482] [DMG]                                 AttributePathIB =
+          [1690219390537] [38865:6571482] [DMG]                                 {
+          [1690219390537] [38865:6571482] [DMG]                                         Endpoint = 0x0,
+          [1690219390537] [38865:6571482] [DMG]                                         Cluster = 0x3c,
+          [1690219390537] [38865:6571482] [DMG]                                         Attribute = 0x0000_0001,
+          [1690219390537] [38865:6571482] [DMG]                                 }
+          [1690219390537] [38865:6571482] [DMG]
+          [1690219390537] [38865:6571482] [DMG]                                 Data = NULL
+          [1690219390537] [38865:6571482] [DMG]                         },
+          [1690219390537] [38865:6571482] [DMG]
+          [1690219390537] [38865:6571482] [DMG]                 },
+          [1690219390537] [38865:6571482] [DMG]
+          [1690219390537] [38865:6571482] [DMG]         ],
+          [1690219390537] [38865:6571482] [DMG]
+          [1690219390537] [38865:6571482] [DMG]         InteractionModelRevision = 1
+          [1690219390537] [38865:6571482] [DMG] }
+          [1690219390537] [38865:6571482] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0001 DataVersion: 534629592
+          [1690219390537] [38865:6571482] [TOO]   AdminFabricIndex: null
+          [1690219390537] [38865:6571482] [DMG] MoveToState ReadClient[0x13b605540]: Moving to [AwaitingSu]
+      disabled: true
+
+    - label: "Step 4: TH_CR1 subscribes to AdminVendorId attribute on DUT_CE"
+      PICS: CADMIN.S.A0002
+      verification: |
+          In the interactive mode of TH_CR1, subscribe to adminvendorid attribute,
+
+          administratorcommissioning subscribe admin-vendor-id 10 3000 1 0 --keepSubscriptions true --commissioner-name alpha
+
+          On TH_CR1 logs, verify for adminvendorid subscription notification
+
+          ReportDataMessage =
+          [1690219472644] [38865:6571482] [DMG] {
+          [1690219472644] [38865:6571482] [DMG]         SubscriptionId = 0xd3c6ff91,
+          [1690219472644] [38865:6571482] [DMG]         AttributeReportIBs =
+          [1690219472644] [38865:6571482] [DMG]         [
+          [1690219472644] [38865:6571482] [DMG]                 AttributeReportIB =
+          [1690219472644] [38865:6571482] [DMG]                 {
+          [1690219472644] [38865:6571482] [DMG]                         AttributeDataIB =
+          [1690219472644] [38865:6571482] [DMG]                         {
+          [1690219472644] [38865:6571482] [DMG]                                 DataVersion = 0x1fddccd8,
+          [1690219472644] [38865:6571482] [DMG]                                 AttributePathIB =
+          [1690219472644] [38865:6571482] [DMG]                                 {
+          [1690219472644] [38865:6571482] [DMG]                                         Endpoint = 0x0,
+          [1690219472644] [38865:6571482] [DMG]                                         Cluster = 0x3c,
+          [1690219472644] [38865:6571482] [DMG]                                         Attribute = 0x0000_0002,
+          [1690219472644] [38865:6571482] [DMG]                                 }
+          [1690219472644] [38865:6571482] [DMG]
+          [1690219472644] [38865:6571482] [DMG]                                 Data = NULL
+          [1690219472644] [38865:6571482] [DMG]                         },
+          [1690219472644] [38865:6571482] [DMG]
+          [1690219472644] [38865:6571482] [DMG]                 },
+          [1690219472644] [38865:6571482] [DMG]
+          [1690219472644] [38865:6571482] [DMG]         ],
+          [1690219472644] [38865:6571482] [DMG]
+          [1690219472644] [38865:6571482] [DMG]         InteractionModelRevision = 1
+          [1690219472644] [38865:6571482] [DMG] }
+          [1690219472644] [38865:6571482] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0002 DataVersion: 534629592
+          [1690219472644] [38865:6571482] [TOO]   AdminVendorId: null
+          [1690219472644] [38865:6571482] [DMG] MoveToState ReadClient[0x12b6042d0]: Moving to [AwaitingSu]
+      disabled: true
+
+    - label:
+          "Step 5: TH_CR1 opens a commissioning window on DUT_CE using ECM with
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds"
+      PICS: CADMIN.S.C00.Rsp
+      verification: |
+          In the interactive mode of TH_CR1, send command to open commissioning window using ECM,
+
+          pairing open-commissioning-window 1 1 180 1000 3840 --commissioner-name alpha
+
+          On TH_CR1 logs, verify for pairing window to be successfully opened
+
+           InvokeResponseMessage =
+          [1690219617069] [38865:6571482] [DMG] {
+          [1690219617069] [38865:6571482] [DMG]         suppressResponse = false,
+          [1690219617069] [38865:6571482] [DMG]         InvokeResponseIBs =
+          [1690219617069] [38865:6571482] [DMG]         [
+          [1690219617069] [38865:6571482] [DMG]                 InvokeResponseIB =
+          [1690219617069] [38865:6571482] [DMG]                 {
+          [1690219617069] [38865:6571482] [DMG]                         CommandStatusIB =
+          [1690219617069] [38865:6571482] [DMG]                         {
+          [1690219617069] [38865:6571482] [DMG]                                 CommandPathIB =
+          [1690219617069] [38865:6571482] [DMG]                                 {
+          [1690219617069] [38865:6571482] [DMG]                                         EndpointId = 0x0,
+          [1690219617069] [38865:6571482] [DMG]                                         ClusterId = 0x3c,
+          [1690219617069] [38865:6571482] [DMG]                                         CommandId = 0x0,
+          [1690219617069] [38865:6571482] [DMG]                                 },
+          [1690219617069] [38865:6571482] [DMG]
+          [1690219617069] [38865:6571482] [DMG]                                 StatusIB =
+          [1690219617069] [38865:6571482] [DMG]                                 {
+          [1690219617069] [38865:6571482] [DMG]                                         status = 0x00 (SUCCESS),
+          [1690219617069] [38865:6571482] [DMG]                                 },
+          [1690219617069] [38865:6571482] [DMG]
+          [1690219617069] [38865:6571482] [DMG]                         },
+          [1690219617069] [38865:6571482] [DMG]
+          [1690219617069] [38865:6571482] [DMG]                 },
+          [1690219617069] [38865:6571482] [DMG]
+          [1690219617069] [38865:6571482] [DMG]         ],
+          [1690219617069] [38865:6571482] [DMG]
+          [1690219617069] [38865:6571482] [DMG]         InteractionModelRevision = 1
+          [1690219617069] [38865:6571482] [DMG] },
+          [1690219617069] [38865:6571482] [DMG] Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
+          [1690219617069] [38865:6571482] [CTL] Successfully opened pairing window on the device
+          [1690219617069] [38865:6571482] [CTL] Manual pairing code: [35092509167]
+          [1690219617069] [38865:6571482] [CTL] SetupQRCode: [MT:-24J0AFN00I.KG02C00]
+          [1690219617069] [38865:6571482] [DMG] ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "Step 6: Verify TH_CR1 receives subscription notifications which show
+          WindowStatus value to be 1, AdminFabricIndex value to be the same as
+          the Fabric Index of the Fabrics attribute list entry corresponding to
+          TH_CR1s fabric, AdminVendorId to be the same as the Vendor ID field of
+          Fabrics attribute list entry corresponding to TH_CR1s fabric"
+      verification: |
+          Verify TH_CR1 logs for subscription notifications which show WindowStatus value to be 1, AdminFabricIndex value to be the same as the Fabric Index of the Fabrics attribute list entry corresponding to TH_CR1’s fabric, AdminVendorId to be the same as the Vendor ID field of Fabrics attribute list entry corresponding to TH_CR1’s fabric
+
+          ReportDataMessage =
+          [1690219617070] [38865:6571482] [DMG] {
+          [1690219617070] [38865:6571482] [DMG]         SubscriptionId = 0xdade5274,
+          [1690219617070] [38865:6571482] [DMG]         AttributeReportIBs =
+          [1690219617070] [38865:6571482] [DMG]         [
+          [1690219617070] [38865:6571482] [DMG]                 AttributeReportIB =
+          [1690219617070] [38865:6571482] [DMG]                 {
+          [1690219617070] [38865:6571482] [DMG]                         AttributeDataIB =
+          [1690219617070] [38865:6571482] [DMG]                         {
+          [1690219617070] [38865:6571482] [DMG]                                 DataVersion = 0x1fddccdb,
+          [1690219617070] [38865:6571482] [DMG]                                 AttributePathIB =
+          [1690219617070] [38865:6571482] [DMG]                                 {
+          [1690219617070] [38865:6571482] [DMG]                                         Endpoint = 0x0,
+          [1690219617070] [38865:6571482] [DMG]                                         Cluster = 0x3c,
+          [1690219617070] [38865:6571482] [DMG]                                         Attribute = 0x0000_0000,
+          [1690219617070] [38865:6571482] [DMG]                                 }
+          [1690219617070] [38865:6571482] [DMG]
+          [1690219617070] [38865:6571482] [DMG]                                 Data = 1,
+          [1690219617070] [38865:6571482] [DMG]                         },
+          [1690219617070] [38865:6571482] [DMG]
+          [1690219617070] [38865:6571482] [DMG]                 },
+          [1690219617070] [38865:6571482] [DMG]
+          [1690219617070] [38865:6571482] [DMG]         ],
+          [1690219617070] [38865:6571482] [DMG]
+          [1690219617070] [38865:6571482] [DMG]         InteractionModelRevision = 1
+          [1690219617070] [38865:6571482] [DMG] }
+          [1690219617070] [38865:6571482] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 534629595
+          [1690219617070] [38865:6571482] [TOO]   WindowStatus: 1
+          [1690219617070] [38865:6571482] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0xdade5274 Peer = 01:0000000000000001
+          [1690219617071] [38865:6571482] [EM] <<< [E:50737r S:35778 M:151592234 (Ack:264355187)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+          [1690219617071] [38865:6571482] [IN] (S) Sending msg 151592234 on secure session with LSID: 35778
+          [1690219617074] [38865:6571482] [EM] >>> [E:50738r S:35778 M:264355188] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0001:05 (IM:ReportData)
+          [1690219617074] [38865:6571482] [EM] Handling via exchange: 50738r, Delegate: 0x1013c4be0
+          [1690219617074] [38865:6571482] [DMG] ReportDataMessage =
+          [1690219617074] [38865:6571482] [DMG] {
+          [1690219617074] [38865:6571482] [DMG]         SubscriptionId = 0x35250b41,
+          [1690219617074] [38865:6571482] [DMG]         AttributeReportIBs =
+          [1690219617074] [38865:6571482] [DMG]         [
+          [1690219617074] [38865:6571482] [DMG]                 AttributeReportIB =
+          [1690219617074] [38865:6571482] [DMG]                 {
+          [1690219617074] [38865:6571482] [DMG]                         AttributeDataIB =
+          [1690219617074] [38865:6571482] [DMG]                         {
+          [1690219617074] [38865:6571482] [DMG]                                 DataVersion = 0x1fddccdb,
+          [1690219617074] [38865:6571482] [DMG]                                 AttributePathIB =
+          [1690219617074] [38865:6571482] [DMG]                                 {
+          [1690219617074] [38865:6571482] [DMG]                                         Endpoint = 0x0,
+          [1690219617074] [38865:6571482] [DMG]                                         Cluster = 0x3c,
+          [1690219617075] [38865:6571482] [DMG]                                         Attribute = 0x0000_0001,
+          [1690219617075] [38865:6571482] [DMG]                                 }
+          [1690219617075] [38865:6571482] [DMG]
+          [1690219617075] [38865:6571482] [DMG]                                 Data = 1,
+          [1690219617075] [38865:6571482] [DMG]                         },
+          [1690219617075] [38865:6571482] [DMG]
+          [1690219617075] [38865:6571482] [DMG]                 },
+          [1690219617075] [38865:6571482] [DMG]
+          [1690219617075] [38865:6571482] [DMG]         ],
+          [1690219617075] [38865:6571482] [DMG]
+          [1690219617075] [38865:6571482] [DMG]         InteractionModelRevision = 1
+          [1690219617075] [38865:6571482] [DMG] }
+          [1690219617075] [38865:6571482] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0001 DataVersion: 534629595
+          [1690219617075] [38865:6571482] [TOO]   AdminFabricIndex: 1
+          [1690219617075] [38865:6571482] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0x35250b41 Peer = 01:0000000000000001
+          [1690219617075] [38865:6571482] [EM] <<< [E:50738r S:35778 M:151592235 (Ack:264355188)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+          [1690219617075] [38865:6571482] [IN] (S) Sending msg 151592235 on secure session with LSID: 35778
+          [1690219617076] [38865:6571482] [EM] >>> [E:50739r S:35778 M:264355189] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0001:05 (IM:ReportData)
+          [1690219617076] [38865:6571482] [EM] Handling via exchange: 50739r, Delegate: 0x1013c4be0
+          [1690219617076] [38865:6571482] [DMG] ReportDataMessage =
+          [1690219617076] [38865:6571482] [DMG] {
+          [1690219617076] [38865:6571482] [DMG]         SubscriptionId = 0xd3c6ff91,
+          [1690219617076] [38865:6571482] [DMG]         AttributeReportIBs =
+          [1690219617076] [38865:6571482] [DMG]         [
+          [1690219617076] [38865:6571482] [DMG]                 AttributeReportIB =
+          [1690219617076] [38865:6571482] [DMG]                 {
+          [1690219617076] [38865:6571482] [DMG]                         AttributeDataIB =
+          [1690219617076] [38865:6571482] [DMG]                         {
+          [1690219617076] [38865:6571482] [DMG]                                 DataVersion = 0x1fddccdb,
+          [1690219617076] [38865:6571482] [DMG]                                 AttributePathIB =
+          [1690219617076] [38865:6571482] [DMG]                                 {
+          [1690219617076] [38865:6571482] [DMG]                                         Endpoint = 0x0,
+          [1690219617076] [38865:6571482] [DMG]                                         Cluster = 0x3c,
+          [1690219617076] [38865:6571482] [DMG]                                         Attribute = 0x0000_0002,
+          [1690219617076] [38865:6571482] [DMG]                                 }
+          [1690219617076] [38865:6571482] [DMG]
+          [1690219617076] [38865:6571482] [DMG]                                 Data = 65521,
+          [1690219617076] [38865:6571482] [DMG]                         },
+          [1690219617076] [38865:6571482] [DMG]
+          [1690219617076] [38865:6571482] [DMG]                 },
+          [1690219617076] [38865:6571482] [DMG]
+          [1690219617076] [38865:6571482] [DMG]         ],
+          [1690219617076] [38865:6571482] [DMG]
+          [1690219617076] [38865:6571482] [DMG]         InteractionModelRevision = 1
+          [1690219617076] [38865:6571482] [DMG] }
+          [1690219617076] [38865:6571482] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0002 DataVersion: 534629595
+          [1690219617076] [38865:6571482] [TOO]   AdminVendorId: 65521
+          [1690219617076] [38865:6571482] [DMG] Refresh LivenessCheckTime for
+      disabled: true
+
+    - label: "Step 7: TH_CR2 starts a commissioning process with DUT_CE"
+      PICS: CADMIN.S
+      verification: |
+          On TH_CR2 start interactive mode,
+
+          ./chip-tool interactive start
+
+          In the interactive mode of TH_CR2, start commissioning process using the pairing code obtained from step 5
+
+          pairing code 1 35092509167 --commissioner-name beta
+
+
+          [1690219788079] [38880:6580427] [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
+          [1690219788079] [38880:6580427] [CTL] Received CommissioningComplete response, errorCode=0
+          [1690219788079] [38880:6580427] [CTL] Successfully finished commissioning step 'SendComplete'
+          [1690219788079] [38880:6580427] [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1690219788079] [38880:6580427] [CTL] Performing next commissioning step 'Cleanup'
+          [1690219788079] [38880:6580427] [IN] SecureSession[0x60000062c0f0]: MarkForEviction Type:1 LSID:15323
+          [1690219788079] [38880:6580427] [SC] SecureSession[0x60000062c0f0, LSID:15323]: State change 'kActive' --> 'kPendingEviction'
+          [1690219788079] [38880:6580427] [IN] SecureSession[0x60000062c0f0]: Released - Type:1 LSID:15323
+          [1690219788079] [38880:6580427] [CTL] Successfully finished commissioning step 'Cleanup'
+          [1690219788079] [38880:6580427] [TOO] Device commissioning completed with success
+          [1690219788079] [38880:6580427] [DMG] ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "Step 8: Verify TH_CR1 receives subscription notifications which show
+          WindowStatus value to be 0, AdminFabricIndex value to be null,
+          AdminVendorId to be null"
+      verification: |
+          Verify TH_CR1 logs for subscription notifications which show WindowStatus value to be 0, AdminFabricIndex value to be null, AdminVendorId to be null
+
+          Handling via exchange: 50740r, Delegate: 0x1013c4be0
+          [1690219788240] [38865:6578589] [DMG] ReportDataMessage =
+          [1690219788240] [38865:6578589] [DMG] {
+          [1690219788240] [38865:6578589] [DMG]         SubscriptionId = 0xdade5274,
+          [1690219788240] [38865:6578589] [DMG]         AttributeReportIBs =
+          [1690219788240] [38865:6578589] [DMG]         [
+          [1690219788240] [38865:6578589] [DMG]                 AttributeReportIB =
+          [1690219788240] [38865:6578589] [DMG]                 {
+          [1690219788240] [38865:6578589] [DMG]                         AttributeDataIB =
+          [1690219788240] [38865:6578589] [DMG]                         {
+          [1690219788240] [38865:6578589] [DMG]                                 DataVersion = 0x1fddccde,
+          [1690219788240] [38865:6578589] [DMG]                                 AttributePathIB =
+          [1690219788240] [38865:6578589] [DMG]                                 {
+          [1690219788240] [38865:6578589] [DMG]                                         Endpoint = 0x0,
+          [1690219788240] [38865:6578589] [DMG]                                         Cluster = 0x3c,
+          [1690219788240] [38865:6578589] [DMG]                                         Attribute = 0x0000_0000,
+          [1690219788240] [38865:6578589] [DMG]                                 }
+          [1690219788240] [38865:6578589] [DMG]
+          [1690219788240] [38865:6578589] [DMG]                                 Data = 0,
+          [1690219788240] [38865:6578589] [DMG]                         },
+          [1690219788240] [38865:6578589] [DMG]
+          [1690219788240] [38865:6578589] [DMG]                 },
+          [1690219788240] [38865:6578589] [DMG]
+          [1690219788240] [38865:6578589] [DMG]         ],
+          [1690219788240] [38865:6578589] [DMG]
+          [1690219788240] [38865:6578589] [DMG]         InteractionModelRevision = 1
+          [1690219788240] [38865:6578589] [DMG] }
+          [1690219788241] [38865:6578589] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 534629598
+          [1690219788241] [38865:6578589] [TOO]   WindowStatus: 0
+          [1690219788241] [38865:6578589] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0xdade5274 Peer = 01:0000000000000001
+          [1690219788241] [38865:6578589] [EM] <<< [E:50740r S:35778 M:151592237 (Ack:264355193)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+          [1690219788241] [38865:6578589] [IN] (S) Sending msg 151592237 on secure session with LSID: 35778
+          [1690219788241] [38865:6578589] [EM] >>> [E:50741r S:35778 M:264355194] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0001:05 (IM:ReportData)
+          [1690219788241] [38865:6578589] [EM] Handling via exchange: 50741r, Delegate: 0x1013c4be0
+          [1690219788241] [38865:6578589] [DMG] ReportDataMessage =
+          [1690219788241] [38865:6578589] [DMG] {
+          [1690219788241] [38865:6578589] [DMG]         SubscriptionId = 0x35250b41,
+          [1690219788241] [38865:6578589] [DMG]         AttributeReportIBs =
+          [1690219788241] [38865:6578589] [DMG]         [
+          [1690219788241] [38865:6578589] [DMG]                 AttributeReportIB =
+          [1690219788241] [38865:6578589] [DMG]                 {
+          [1690219788241] [38865:6578589] [DMG]                         AttributeDataIB =
+          [1690219788241] [38865:6578589] [DMG]                         {
+          [1690219788241] [38865:6578589] [DMG]                                 DataVersion = 0x1fddccde,
+          [1690219788241] [38865:6578589] [DMG]                                 AttributePathIB =
+          [1690219788241] [38865:6578589] [DMG]                                 {
+          [1690219788241] [38865:6578589] [DMG]                                         Endpoint = 0x0,
+          [1690219788241] [38865:6578589] [DMG]                                         Cluster = 0x3c,
+          [1690219788241] [38865:6578589] [DMG]                                         Attribute = 0x0000_0001,
+          [1690219788241] [38865:6578589] [DMG]                                 }
+          [1690219788241] [38865:6578589] [DMG]
+          [1690219788241] [38865:6578589] [DMG]                                 Data = NULL
+          [1690219788241] [38865:6578589] [DMG]                         },
+          [1690219788241] [38865:6578589] [DMG]
+          [1690219788241] [38865:6578589] [DMG]                 },
+          [1690219788241] [38865:6578589] [DMG]
+          [1690219788241] [38865:6578589] [DMG]         ],
+          [1690219788241] [38865:6578589] [DMG]
+          [1690219788241] [38865:6578589] [DMG]         InteractionModelRevision = 1
+          [1690219788241] [38865:6578589] [DMG] }
+          [1690219788241] [38865:6578589] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0001 DataVersion: 534629598
+          [1690219788241] [38865:6578589] [TOO]   AdminFabricIndex: null
+          [1690219788241] [38865:6578589] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0x35250b41 Peer = 01:0000000000000001
+          [1690219788242] [38865:6578589] [EM] <<< [E:50741r S:35778 M:151592238 (Ack:264355194)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+          [1690219788242] [38865:6578589] [IN] (S) Sending msg 151592238 on secure session with LSID: 35778
+          [1690219788242] [38865:6578589] [EM] >>> [E:50742r S:35778 M:264355195] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0001:05 (IM:ReportData)
+          [1690219788242] [38865:6578589] [EM] Handling via exchange: 50742r, Delegate: 0x1013c4be0
+          [1690219788242] [38865:6578589] [DMG] ReportDataMessage =
+          [1690219788242] [38865:6578589] [DMG] {
+          [1690219788242] [38865:6578589] [DMG]         SubscriptionId = 0xd3c6ff91,
+          [1690219788242] [38865:6578589] [DMG]         AttributeReportIBs =
+          [1690219788242] [38865:6578589] [DMG]         [
+          [1690219788242] [38865:6578589] [DMG]                 AttributeReportIB =
+          [1690219788242] [38865:6578589] [DMG]                 {
+          [1690219788242] [38865:6578589] [DMG]                         AttributeDataIB =
+          [1690219788242] [38865:6578589] [DMG]                         {
+          [1690219788242] [38865:6578589] [DMG]                                 DataVersion = 0x1fddccde,
+          [1690219788242] [38865:6578589] [DMG]                                 AttributePathIB =
+          [1690219788242] [38865:6578589] [DMG]                                 {
+          [1690219788242] [38865:6578589] [DMG]                                         Endpoint = 0x0,
+          [1690219788242] [38865:6578589] [DMG]                                         Cluster = 0x3c,
+          [1690219788242] [38865:6578589] [DMG]                                         Attribute = 0x0000_0002,
+          [1690219788242] [38865:6578589] [DMG]                                 }
+          [1690219788242] [38865:6578589] [DMG]
+          [1690219788242] [38865:6578589] [DMG]                                 Data = NULL
+          [1690219788242] [38865:6578589] [DMG]                         },
+          [1690219788242] [38865:6578589] [DMG]
+          [1690219788242] [38865:6578589] [DMG]                 },
+          [1690219788242] [38865:6578589] [DMG]
+          [1690219788242] [38865:6578589] [DMG]         ],
+          [1690219788242] [38865:6578589] [DMG]
+          [1690219788242] [38865:6578589] [DMG]         InteractionModelRevision = 1
+          [1690219788242] [38865:6578589] [DMG] }
+          [1690219788242] [38865:6578589] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0002 DataVersion: 534629598
+          [1690219788242] [38865:6578589] [TOO]   AdminVendorId: null
+          [1690219788242] [38865:6578589] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0xd3c6ff91 Peer = 01:0000000000000001
+          [1690219788242] [38865:6578589] [EM] <<< [E:50742r S:35778 M:151592239 (Ack:264355195)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+      disabled: true
+
+    - label: "Step 9: TH_CR2 subscribes to WindowStatus attribute on DUT_CE"
+      PICS: CADMIN.S.A0000
+      verification: |
+          In the interactive mode of TH_CR2, subscribe to windowstatus attribute,
+
+          administratorcommissioning subscribe window-status 10 3000 1 0 --keepSubscriptions true --commissioner-name beta
+
+          On the TH_CR2 logs, verify for windowstatus subscription notification
+
+          ReportDataMessage =
+          [1690219925605] [38880:6580427] [DMG] {
+          [1690219925605] [38880:6580427] [DMG]         SubscriptionId = 0xfab5d837,
+          [1690219925605] [38880:6580427] [DMG]         AttributeReportIBs =
+          [1690219925605] [38880:6580427] [DMG]         [
+          [1690219925605] [38880:6580427] [DMG]                 AttributeReportIB =
+          [1690219925605] [38880:6580427] [DMG]                 {
+          [1690219925605] [38880:6580427] [DMG]                         AttributeDataIB =
+          [1690219925605] [38880:6580427] [DMG]                         {
+          [1690219925605] [38880:6580427] [DMG]                                 DataVersion = 0x1fddccde,
+          [1690219925605] [38880:6580427] [DMG]                                 AttributePathIB =
+          [1690219925605] [38880:6580427] [DMG]                                 {
+          [1690219925605] [38880:6580427] [DMG]                                         Endpoint = 0x0,
+          [1690219925605] [38880:6580427] [DMG]                                         Cluster = 0x3c,
+          [1690219925605] [38880:6580427] [DMG]                                         Attribute = 0x0000_0000,
+          [1690219925605] [38880:6580427] [DMG]                                 }
+          [1690219925605] [38880:6580427] [DMG]
+          [1690219925605] [38880:6580427] [DMG]                                 Data = 0,
+          [1690219925605] [38880:6580427] [DMG]                         },
+          [1690219925605] [38880:6580427] [DMG]
+          [1690219925605] [38880:6580427] [DMG]                 },
+          [1690219925605] [38880:6580427] [DMG]
+          [1690219925605] [38880:6580427] [DMG]         ],
+          [1690219925605] [38880:6580427] [DMG]
+          [1690219925605] [38880:6580427] [DMG]         InteractionModelRevision = 1
+          [1690219925605] [38880:6580427] [DMG] }
+          [1690219925605] [38880:6580427] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 534629598
+          [1690219925605] [38880:6580427] [TOO]   WindowStatus: 0
+          [1690219925605] [38880:6580427] [DMG] MoveToState ReadClient[0x12af05f80]: Moving to [AwaitingSu]
+      disabled: true
+
+    - label:
+          "Step 10: TH_CR2 subscribes to AdminFabricIndex attribute on DUT_CE"
+      PICS: CADMIN.S.A0001
+      verification: |
+          In the interactive mode of TH_CR2, subscribe to adminfabricindex attribute,
+
+           administratorcommissioning subscribe admin-fabric-index 10 3000 1 0 --keepSubscriptions true --commissioner-name beta
+
+          On the TH_CR2 logs, verify for adminfabricindex subscription notification
+
+           ReportDataMessage =
+          [1690219962624] [38880:6580427] [DMG] {
+          [1690219962624] [38880:6580427] [DMG]         SubscriptionId = 0x5984e13a,
+          [1690219962624] [38880:6580427] [DMG]         AttributeReportIBs =
+          [1690219962624] [38880:6580427] [DMG]         [
+          [1690219962624] [38880:6580427] [DMG]                 AttributeReportIB =
+          [1690219962624] [38880:6580427] [DMG]                 {
+          [1690219962624] [38880:6580427] [DMG]                         AttributeDataIB =
+          [1690219962624] [38880:6580427] [DMG]                         {
+          [1690219962624] [38880:6580427] [DMG]                                 DataVersion = 0x1fddccde,
+          [1690219962624] [38880:6580427] [DMG]                                 AttributePathIB =
+          [1690219962624] [38880:6580427] [DMG]                                 {
+          [1690219962624] [38880:6580427] [DMG]                                         Endpoint = 0x0,
+          [1690219962624] [38880:6580427] [DMG]                                         Cluster = 0x3c,
+          [1690219962624] [38880:6580427] [DMG]                                         Attribute = 0x0000_0001,
+          [1690219962624] [38880:6580427] [DMG]                                 }
+          [1690219962624] [38880:6580427] [DMG]
+          [1690219962624] [38880:6580427] [DMG]                                 Data = NULL
+          [1690219962624] [38880:6580427] [DMG]                         },
+          [1690219962624] [38880:6580427] [DMG]
+          [1690219962624] [38880:6580427] [DMG]                 },
+          [1690219962624] [38880:6580427] [DMG]
+          [1690219962624] [38880:6580427] [DMG]         ],
+          [1690219962624] [38880:6580427] [DMG]
+          [1690219962624] [38880:6580427] [DMG]         InteractionModelRevision = 1
+          [1690219962624] [38880:6580427] [DMG] }
+          [1690219962624] [38880:6580427] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0001 DataVersion: 534629598
+          [1690219962624] [38880:6580427] [TOO]   AdminFabricIndex: null
+      disabled: true
+
+    - label: "Step 11: TH_CR2 subscribes to AdminVendorId attribute on DUT_CE"
+      PICS: CADMIN.S.A0002
+      verification: |
+          In the interactive mode of TH_CR2, subscribe to adminvendorid attribute,
+
+          administratorcommissioning subscribe admin-vendor-id 10 3000 1 0 --keepSubscriptions true --commissioner-name beta
+
+          On the TH_CR2 logs, verify for adminvendorid subscription notification
+
+          ReportDataMessage =
+          [1690220032050] [38880:6580427] [DMG] {
+          [1690220032050] [38880:6580427] [DMG]         SubscriptionId = 0x943b5fc3,
+          [1690220032050] [38880:6580427] [DMG]         AttributeReportIBs =
+          [1690220032050] [38880:6580427] [DMG]         [
+          [1690220032050] [38880:6580427] [DMG]                 AttributeReportIB =
+          [1690220032050] [38880:6580427] [DMG]                 {
+          [1690220032050] [38880:6580427] [DMG]                         AttributeDataIB =
+          [1690220032050] [38880:6580427] [DMG]                         {
+          [1690220032050] [38880:6580427] [DMG]                                 DataVersion = 0x1fddccde,
+          [1690220032050] [38880:6580427] [DMG]                                 AttributePathIB =
+          [1690220032050] [38880:6580427] [DMG]                                 {
+          [1690220032050] [38880:6580427] [DMG]                                         Endpoint = 0x0,
+          [1690220032050] [38880:6580427] [DMG]                                         Cluster = 0x3c,
+          [1690220032050] [38880:6580427] [DMG]                                         Attribute = 0x0000_0002,
+          [1690220032050] [38880:6580427] [DMG]                                 }
+          [1690220032050] [38880:6580427] [DMG]
+          [1690220032050] [38880:6580427] [DMG]                                 Data = NULL
+          [1690220032050] [38880:6580427] [DMG]                         },
+          [1690220032050] [38880:6580427] [DMG]
+          [1690220032050] [38880:6580427] [DMG]                 },
+          [1690220032050] [38880:6580427] [DMG]
+          [1690220032050] [38880:6580427] [DMG]         ],
+          [1690220032050] [38880:6580427] [DMG]
+          [1690220032050] [38880:6580427] [DMG]         InteractionModelRevision = 1
+          [1690220032050] [38880:6580427] [DMG] }
+          [1690220032050] [38880:6580427] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0002 DataVersion: 534629598
+          [1690220032050] [38880:6580427] [TOO]   AdminVendorId: null
+          [1690220032050] [38880:6580427] [DMG] MoveToState ReadClient[0x12c8042d0]: Moving to [AwaitingSu]
+      disabled: true
+
+    - label:
+          "Step 12: TH_CR1 opens a commissioning window on DUT_CE using ECM with
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds"
+      PICS: CADMIN.S.C00.Rsp
+      verification: |
+          In the interactive mode of TH_CR1, send command to open commissioning window using ECM,
+
+          pairing open-commissioning-window 1 1 180 1000 3840 --commissioner-name alpha
+
+          On TH_CR1 logs, verify for pairing window to be successfully opened
+
+
+          InvokeResponseMessage =
+
+          [1690220086788] [38865:6578589] [DMG] {
+          [1690220086788] [38865:6578589] [DMG]         suppressResponse = false,
+          [1690220086788] [38865:6578589] [DMG]         InvokeResponseIBs =
+          [1690220086788] [38865:6578589] [DMG]         [
+          [1690220086788] [38865:6578589] [DMG]                 InvokeResponseIB =
+          [1690220086788] [38865:6578589] [DMG]                 {
+          [1690220086788] [38865:6578589] [DMG]                         CommandStatusIB =
+          [1690220086788] [38865:6578589] [DMG]                         {
+          [1690220086788] [38865:6578589] [DMG]                                 CommandPathIB =
+          [1690220086788] [38865:6578589] [DMG]                                 {
+          [1690220086788] [38865:6578589] [DMG]                                         EndpointId = 0x0,
+          [1690220086788] [38865:6578589] [DMG]                                         ClusterId = 0x3c,
+          [1690220086788] [38865:6578589] [DMG]                                         CommandId = 0x0,
+          [1690220086788] [38865:6578589] [DMG]                                 },
+          [1690220086788] [38865:6578589] [DMG]
+          [1690220086788] [38865:6578589] [DMG]                                 StatusIB =
+          [1690220086788] [38865:6578589] [DMG]                                 {
+          [1690220086788] [38865:6578589] [DMG]                                         status = 0x00 (SUCCESS),
+          [1690220086788] [38865:6578589] [DMG]                                 },
+          [1690220086788] [38865:6578589] [DMG]
+          [1690220086788] [38865:6578589] [DMG]                         },
+          [1690220086788] [38865:6578589] [DMG]
+          [1690220086788] [38865:6578589] [DMG]                 },
+          [1690220086788] [38865:6578589] [DMG]
+          [1690220086788] [38865:6578589] [DMG]         ],
+          [1690220086788] [38865:6578589] [DMG]
+          [1690220086788] [38865:6578589] [DMG]         InteractionModelRevision = 1
+          [1690220086788] [38865:6578589] [DMG] },
+          [1690220086788] [38865:6578589] [DMG] Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
+          [1690220086788] [38865:6578589] [CTL] Successfully opened pairing window on the device
+          [1690220086788] [38865:6578589] [CTL] Manual pairing code: [34983924769]
+          [1690220086788] [38865:6578589] [CTL] SetupQRCode: [MT:-24J0AFN002ZF60MW00]
+          [1690220086788] [38865:6578589] [DMG] ICR moving to [AwaitingDe]
+          [1690220086788] [38865:6578589] [EM] <<< [E:27145i S:35778 M:151592246 (Ack:264355202)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label:
+          "Step 13: Verify TH_CR1 receives subscription notifications which show
+          WindowStatus value to be 1, AdminFabricIndex value to be the same as
+          the Fabric Index of the Fabrics attribute list entry corresponding to
+          TH_CR1s fabric, AdminVendorId to be the same as the Vendor ID field of
+          Fabrics attribute list entry corresponding to TH_CR1s fabric"
+      verification: |
+          Verify TH_CR1 logs for subscription notifications which show WindowStatus value to be 1, AdminFabricIndex value to be the same as the Fabric Index of the Fabrics attribute list entry corresponding to TH_CR1’s fabric, AdminVendorId to be the same as the Vendor ID field of Fabrics attribute list entry corresponding to TH_CR1’s fabric
+
+          ReportDataMessage =
+          [1690220086789] [38865:6578589] [DMG] {
+          [1690220086789] [38865:6578589] [DMG]         SubscriptionId = 0xdade5274,
+          [1690220086789] [38865:6578589] [DMG]         AttributeReportIBs =
+          [1690220086789] [38865:6578589] [DMG]         [
+          [1690220086789] [38865:6578589] [DMG]                 AttributeReportIB =
+          [1690220086789] [38865:6578589] [DMG]                 {
+          [1690220086789] [38865:6578589] [DMG]                         AttributeDataIB =
+          [1690220086789] [38865:6578589] [DMG]                         {
+          [1690220086789] [38865:6578589] [DMG]                                 DataVersion = 0x1fddcce1,
+          [1690220086789] [38865:6578589] [DMG]                                 AttributePathIB =
+          [1690220086789] [38865:6578589] [DMG]                                 {
+          [1690220086789] [38865:6578589] [DMG]                                         Endpoint = 0x0,
+          [1690220086789] [38865:6578589] [DMG]                                         Cluster = 0x3c,
+          [1690220086789] [38865:6578589] [DMG]                                         Attribute = 0x0000_0000,
+          [1690220086789] [38865:6578589] [DMG]                                 }
+          [1690220086789] [38865:6578589] [DMG]
+          [1690220086789] [38865:6578589] [DMG]                                 Data = 1,
+          [1690220086789] [38865:6578589] [DMG]                         },
+          [1690220086789] [38865:6578589] [DMG]
+          [1690220086789] [38865:6578589] [DMG]                 },
+          [1690220086789] [38865:6578589] [DMG]
+          [1690220086789] [38865:6578589] [DMG]         ],
+          [1690220086789] [38865:6578589] [DMG]
+          [1690220086789] [38865:6578589] [DMG]         InteractionModelRevision = 1
+          [1690220086789] [38865:6578589] [DMG] }
+          [1690220086789] [38865:6578589] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 534629601
+          [1690220086789] [38865:6578589] [TOO]   WindowStatus: 1
+          [1690220086789] [38865:6578589] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0xdade5274 Peer = 01:0000000000000001
+          [1690220086789] [38865:6578589] [EM] <<< [E:50743r S:35778 M:151592247 (Ack:264355203)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+          [1690220086789] [38865:6578589] [IN] (S) Sending msg 151592247 on secure session with LSID: 35778
+          [1690220086793] [38865:6578589] [EM] >>> [E:50744r S:35778 M:264355204] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0001:05 (IM:ReportData)
+          [1690220086793] [38865:6578589] [EM] Handling via exchange: 50744r, Delegate: 0x1013c4be0
+          [1690220086793] [38865:6578589] [DMG] ReportDataMessage =
+          [1690220086793] [38865:6578589] [DMG] {
+          [1690220086793] [38865:6578589] [DMG]         SubscriptionId = 0x35250b41,
+          [1690220086793] [38865:6578589] [DMG]         AttributeReportIBs =
+          [1690220086793] [38865:6578589] [DMG]         [
+          [1690220086793] [38865:6578589] [DMG]                 AttributeReportIB =
+          [1690220086793] [38865:6578589] [DMG]                 {
+          [1690220086793] [38865:6578589] [DMG]                         AttributeDataIB =
+          [1690220086793] [38865:6578589] [DMG]                         {
+          [1690220086793] [38865:6578589] [DMG]                                 DataVersion = 0x1fddcce1,
+          [1690220086793] [38865:6578589] [DMG]                                 AttributePathIB =
+          [1690220086794] [38865:6578589] [DMG]                                 {
+          [1690220086794] [38865:6578589] [DMG]                                         Endpoint = 0x0,
+          [1690220086794] [38865:6578589] [DMG]                                         Cluster = 0x3c,
+          [1690220086794] [38865:6578589] [DMG]                                         Attribute = 0x0000_0001,
+          [1690220086794] [38865:6578589] [DMG]                                 }
+          [1690220086794] [38865:6578589] [DMG]
+          [1690220086794] [38865:6578589] [DMG]                                 Data = 1,
+          [1690220086794] [38865:6578589] [DMG]                         },
+          [1690220086794] [38865:6578589] [DMG]
+          [1690220086794] [38865:6578589] [DMG]                 },
+          [1690220086794] [38865:6578589] [DMG]
+          [1690220086794] [38865:6578589] [DMG]         ],
+          [1690220086794] [38865:6578589] [DMG]
+          [1690220086794] [38865:6578589] [DMG]         InteractionModelRevision = 1
+          [1690220086794] [38865:6578589] [DMG] }
+          [1690220086794] [38865:6578589] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0001 DataVersion: 534629601
+          [1690220086794] [38865:6578589] [TOO]   AdminFabricIndex: 1
+          [1690220086794] [38865:6578589] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0x35250b41 Peer = 01:0000000000000001
+          [1690220086794] [38865:6578589] [EM] <<< [E:50744r S:35778 M:151592248 (Ack:264355204)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+          [1690220086794] [38865:6578589] [IN] (S) Sending msg 151592248 on secure session with LSID: 35778
+          [1690220086794] [38865:6578589] [EM] >>> [E:50745r S:35778 M:264355205] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0001:05 (IM:ReportData)
+          [1690220086794] [38865:6578589] [EM] Handling via exchange: 50745r, Delegate: 0x1013c4be0
+          [1690220086794] [38865:6578589] [DMG] ReportDataMessage =
+          [1690220086794] [38865:6578589] [DMG] {
+          [1690220086794] [38865:6578589] [DMG]         SubscriptionId = 0xd3c6ff91,
+          [1690220086794] [38865:6578589] [DMG]         AttributeReportIBs =
+          [1690220086794] [38865:6578589] [DMG]         [
+          [1690220086794] [38865:6578589] [DMG]                 AttributeReportIB =
+          [1690220086794] [38865:6578589] [DMG]                 {
+          [1690220086794] [38865:6578589] [DMG]                         AttributeDataIB =
+          [1690220086794] [38865:6578589] [DMG]                         {
+          [1690220086794] [38865:6578589] [DMG]                                 DataVersion = 0x1fddcce1,
+          [1690220086794] [38865:6578589] [DMG]                                 AttributePathIB =
+          [1690220086794] [38865:6578589] [DMG]                                 {
+          [1690220086794] [38865:6578589] [DMG]                                         Endpoint = 0x0,
+          [1690220086794] [38865:6578589] [DMG]                                         Cluster = 0x3c,
+          [1690220086794] [38865:6578589] [DMG]                                         Attribute = 0x0000_0002,
+          [1690220086794] [38865:6578589] [DMG]                                 }
+          [1690220086794] [38865:6578589] [DMG]
+          [1690220086794] [38865:6578589] [DMG]                                 Data = 65521,
+          [1690220086794] [38865:6578589] [DMG]                         },
+          [1690220086794] [38865:6578589] [DMG]
+          [1690220086794] [38865:6578589] [DMG]                 },
+          [1690220086795] [38865:6578589] [DMG]
+          [1690220086795] [38865:6578589] [DMG]         ],
+          [1690220086795] [38865:6578589] [DMG]
+          [1690220086795] [38865:6578589] [DMG]         InteractionModelRevision = 1
+          [1690220086795] [38865:6578589] [DMG] }
+          [1690220086795] [38865:6578589] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0002 DataVersion: 534629601
+          [1690220086795] [38865:6578589] [TOO]   AdminVendorId: 65521
+          [1690220086795] [38865:6578589] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0xd3c6ff91 Peer = 01:0000000000000001
+          [1690220086795] [38865:6578589] [EM] <<< [E:50745r S:35778 M:151592249 (Ack:264355205)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+      disabled: true
+
+    - label:
+          "Step 14: Verify TH_CR2 receives subscription notifications which show
+          WindowStatus value to be 1, AdminFabricIndex value to be the same as
+          the Fabric Index of the Fabrics attribute list entry corresponding to
+          TH_CR1s fabric, AdminVendorId to be the same as the Vendor ID field of
+          Fabrics attribute list entry corresponding to TH_CR1s fabric"
+      verification: |
+          Verify TH_CR2 logs for subscription notifications which show WindowStatus value to be 1, AdminFabricIndex value to be the same as the Fabric Index of the Fabrics attribute list entry corresponding to TH_CR1’s fabric, AdminVendorId to be the same as the Vendor ID field of Fabrics attribute list entry corresponding to TH_CR1’s fabric
+
+
+          ReportDataMessage =
+          [1690220086799] [38880:6583668] [DMG] {
+          [1690220086799] [38880:6583668] [DMG]         SubscriptionId = 0xfab5d837,
+          [1690220086799] [38880:6583668] [DMG]         AttributeReportIBs =
+          [1690220086799] [38880:6583668] [DMG]         [
+          [1690220086799] [38880:6583668] [DMG]                 AttributeReportIB =
+          [1690220086799] [38880:6583668] [DMG]                 {
+          [1690220086799] [38880:6583668] [DMG]                         AttributeDataIB =
+          [1690220086799] [38880:6583668] [DMG]                         {
+          [1690220086799] [38880:6583668] [DMG]                                 DataVersion = 0x1fddcce1,
+          [1690220086799] [38880:6583668] [DMG]                                 AttributePathIB =
+          [1690220086799] [38880:6583668] [DMG]                                 {
+          [1690220086799] [38880:6583668] [DMG]                                         Endpoint = 0x0,
+          [1690220086799] [38880:6583668] [DMG]                                         Cluster = 0x3c,
+          [1690220086799] [38880:6583668] [DMG]                                         Attribute = 0x0000_0000,
+          [1690220086799] [38880:6583668] [DMG]                                 }
+          [1690220086799] [38880:6583668] [DMG]
+          [1690220086799] [38880:6583668] [DMG]                                 Data = 1,
+          [1690220086799] [38880:6583668] [DMG]                         },
+          [1690220086799] [38880:6583668] [DMG]
+          [1690220086799] [38880:6583668] [DMG]                 },
+          [1690220086799] [38880:6583668] [DMG]
+          [1690220086799] [38880:6583668] [DMG]         ],
+          [1690220086799] [38880:6583668] [DMG]
+          [1690220086799] [38880:6583668] [DMG]         InteractionModelRevision = 1
+          [1690220086799] [38880:6583668] [DMG] }
+          [1690220086800] [38880:6583668] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 534629601
+          [1690220086800] [38880:6583668] [TOO]   WindowStatus: 1
+          [1690220086800] [38880:6583668] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0xfab5d837 Peer = 02:0000000000000001
+          [1690220086800] [38880:6583668] [EM] <<< [E:50746r S:15324 M:785247 (Ack:104911015)] (S) Msg TX to 2:0000000000000001 [40B2] --- Type 0001:01 (IM:StatusResponse)
+          [1690220086800] [38880:6583668] [IN] (S) Sending msg 785247 on secure session with LSID: 15324
+          [1690220086806] [38880:6583668] [EM] >>> [E:50747r S:15324 M:104911016] (S) Msg RX from 2:0000000000000001 [40B2] --- Type 0001:05 (IM:ReportData)
+          [1690220086806] [38880:6583668] [EM] Handling via exchange: 50747r, Delegate: 0x1035c8be0
+          [1690220086806] [38880:6583668] [DMG] ReportDataMessage =
+          [1690220086806] [38880:6583668] [DMG] {
+          [1690220086806] [38880:6583668] [DMG]         SubscriptionId = 0x5984e13a,
+          [1690220086806] [38880:6583668] [DMG]         AttributeReportIBs =
+          [1690220086806] [38880:6583668] [DMG]         [
+          [1690220086806] [38880:6583668] [DMG]                 AttributeReportIB =
+          [1690220086806] [38880:6583668] [DMG]                 {
+          [1690220086806] [38880:6583668] [DMG]                         AttributeDataIB =
+          [1690220086806] [38880:6583668] [DMG]                         {
+          [1690220086806] [38880:6583668] [DMG]                                 DataVersion = 0x1fddcce1,
+          [1690220086806] [38880:6583668] [DMG]                                 AttributePathIB =
+          [1690220086806] [38880:6583668] [DMG]                                 {
+          [1690220086806] [38880:6583668] [DMG]                                         Endpoint = 0x0,
+          [1690220086806] [38880:6583668] [DMG]                                         Cluster = 0x3c,
+          [1690220086806] [38880:6583668] [DMG]                                         Attribute = 0x0000_0001,
+          [1690220086807] [38880:6583668] [DMG]                                 }
+          [1690220086807] [38880:6583668] [DMG]
+          [1690220086807] [38880:6583668] [DMG]                                 Data = 1,
+          [1690220086807] [38880:6583668] [DMG]                         },
+          [1690220086807] [38880:6583668] [DMG]
+          [1690220086807] [38880:6583668] [DMG]                 },
+          [1690220086807] [38880:6583668] [DMG]
+          [1690220086807] [38880:6583668] [DMG]         ],
+          [1690220086807] [38880:6583668] [DMG]
+          [1690220086807] [38880:6583668] [DMG]         InteractionModelRevision = 1
+          [1690220086807] [38880:6583668] [DMG] }
+          [1690220086807] [38880:6583668] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0001 DataVersion: 534629601
+          [1690220086807] [38880:6583668] [TOO]   AdminFabricIndex: 1
+          [1690220086807] [38880:6583668] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0x5984e13a Peer = 02:0000000000000001
+          [1690220086807] [38880:6583668] [EM] <<< [E:50747r S:15324 M:785248 (Ack:104911016)] (S) Msg TX to 2:0000000000000001 [40B2] --- Type 0001:01 (IM:StatusResponse)
+          [1690220086807] [38880:6583668] [IN] (S) Sending msg 785248 on secure session with LSID: 15324
+          [1690220086811] [38880:6583668] [EM] >>> [E:50748r S:15324 M:104911017] (S) Msg RX from 2:0000000000000001 [40B2] --- Type 0001:05 (IM:ReportData)
+          [1690220086811] [38880:6583668] [EM] Handling via exchange: 50748r, Delegate: 0x1035c8be0
+          [1690220086811] [38880:6583668] [DMG] ReportDataMessage =
+          [1690220086811] [38880:6583668] [DMG] {
+          [1690220086811] [38880:6583668] [DMG]         SubscriptionId = 0x943b5fc3,
+          [1690220086811] [38880:6583668] [DMG]         AttributeReportIBs =
+          [1690220086811] [38880:6583668] [DMG]         [
+          [1690220086811] [38880:6583668] [DMG]                 AttributeReportIB =
+          [1690220086811] [38880:6583668] [DMG]                 {
+          [1690220086811] [38880:6583668] [DMG]                         AttributeDataIB =
+          [1690220086811] [38880:6583668] [DMG]                         {
+          [1690220086811] [38880:6583668] [DMG]                                 DataVersion = 0x1fddcce1,
+          [1690220086811] [38880:6583668] [DMG]                                 AttributePathIB =
+          [1690220086811] [38880:6583668] [DMG]                                 {
+          [1690220086811] [38880:6583668] [DMG]                                         Endpoint = 0x0,
+          [1690220086811] [38880:6583668] [DMG]                                         Cluster = 0x3c,
+          [1690220086811] [38880:6583668] [DMG]                                         Attribute = 0x0000_0002,
+          [1690220086811] [38880:6583668] [DMG]                                 }
+          [1690220086811] [38880:6583668] [DMG]
+          [1690220086811] [38880:6583668] [DMG]                                 Data = 65521,
+          [1690220086811] [38880:6583668] [DMG]                         },
+          [1690220086812] [38880:6583668] [DMG]
+          [1690220086812] [38880:6583668] [DMG]                 },
+          [1690220086812] [38880:6583668] [DMG]
+          [1690220086812] [38880:6583668] [DMG]         ],
+          [1690220086812] [38880:6583668] [DMG]
+          [1690220086812] [38880:6583668] [DMG]         InteractionModelRevision = 1
+          [1690220086812] [38880:6583668] [DMG] }
+          [1690220086812] [38880:6583668] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0002 DataVersion: 534629601
+          [1690220086812] [38880:6583668] [TOO]   AdminVendorId: 65521
+          [1690220086812] [38880:6583668] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0x943b5fc3 Peer = 02:0000000000000001
+          [1690220086812] [38880:6583668] [EM] <<< [E:50748r S:15324 M:785249 (Ack:104911017)] (S) Msg TX to 2:0000000000000001 [40B2] --- Type 0001:01 (IM:StatusResponse)
+      disabled: true
+
+    - label:
+          "Step 15: TH_CR1 revokes the commissioning window on DUT_CE using
+          RevokeCommissioning command"
+      PICS: CADMIN.S.C02.Rsp
+      verification: |
+          In interactive mode of TH_CR1, send command to revoke commissioning window
+
+          administratorcommissioning revoke-commissioning 1 0 --commissioner-name alpha --timedInteractionTimeoutMs 1000
+
+          Verify TH_CR1 logs for status code 0 (success),
+
+          InvokeResponseMessage =
+          [1690220246114] [38865:6578589] [DMG] {
+          [1690220246114] [38865:6578589] [DMG]         suppressResponse = false,
+          [1690220246114] [38865:6578589] [DMG]         InvokeResponseIBs =
+          [1690220246114] [38865:6578589] [DMG]         [
+          [1690220246114] [38865:6578589] [DMG]                 InvokeResponseIB =
+          [1690220246114] [38865:6578589] [DMG]                 {
+          [1690220246114] [38865:6578589] [DMG]                         CommandStatusIB =
+          [1690220246114] [38865:6578589] [DMG]                         {
+          [1690220246114] [38865:6578589] [DMG]                                 CommandPathIB =
+          [1690220246114] [38865:6578589] [DMG]                                 {
+          [1690220246114] [38865:6578589] [DMG]                                         EndpointId = 0x0,
+          [1690220246114] [38865:6578589] [DMG]                                         ClusterId = 0x3c,
+          [1690220246114] [38865:6578589] [DMG]                                         CommandId = 0x2,
+          [1690220246114] [38865:6578589] [DMG]                                 },
+          [1690220246114] [38865:6578589] [DMG]
+          [1690220246114] [38865:6578589] [DMG]                                 StatusIB =
+          [1690220246114] [38865:6578589] [DMG]                                 {
+          [1690220246114] [38865:6578589] [DMG]                                         status = 0x00 (SUCCESS),
+          [1690220246114] [38865:6578589] [DMG]                                 },
+          [1690220246114] [38865:6578589] [DMG]
+          [1690220246114] [38865:6578589] [DMG]                         },
+          [1690220246114] [38865:6578589] [DMG]
+          [1690220246114] [38865:6578589] [DMG]                 },
+          [1690220246114] [38865:6578589] [DMG]
+          [1690220246114] [38865:6578589] [DMG]         ],
+          [1690220246114] [38865:6578589] [DMG]
+          [1690220246114] [38865:6578589] [DMG]         InteractionModelRevision = 1
+          [1690220246114] [38865:6578589] [DMG] },
+          [1690220246114] [38865:6578589] [DMG] Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0002 Status=0x0
+          [1690220246114] [38865:6578589] [DMG] ICR moving to [AwaitingDe]
+          [1690220246114] [38865:6578589] [EM] <<< [E:27146i S:35778 M:151592252 (Ack:264355210)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label:
+          "Step 16: Verify TH_CR1 receives subscription notifications which show
+          WindowStatus value to be 0, AdminFabricIndex value to be null,
+          AdminVendorId to be null"
+      verification: |
+          Verify TH_CR1 logs for subscription notifications which show WindowStatus value to be 0, AdminFabricIndex value to be null, AdminVendorId to be null
+
+
+          ReportDataMessage =
+          [1690220246116] [38865:6578589] [DMG] {
+          [1690220246116] [38865:6578589] [DMG]         SubscriptionId = 0xdade5274,
+          [1690220246116] [38865:6578589] [DMG]         AttributeReportIBs =
+          [1690220246116] [38865:6578589] [DMG]         [
+          [1690220246116] [38865:6578589] [DMG]                 AttributeReportIB =
+          [1690220246116] [38865:6578589] [DMG]                 {
+          [1690220246116] [38865:6578589] [DMG]                         AttributeDataIB =
+          [1690220246116] [38865:6578589] [DMG]                         {
+          [1690220246116] [38865:6578589] [DMG]                                 DataVersion = 0x1fddcce4,
+          [1690220246116] [38865:6578589] [DMG]                                 AttributePathIB =
+          [1690220246116] [38865:6578589] [DMG]                                 {
+          [1690220246116] [38865:6578589] [DMG]                                         Endpoint = 0x0,
+          [1690220246116] [38865:6578589] [DMG]                                         Cluster = 0x3c,
+          [1690220246116] [38865:6578589] [DMG]                                         Attribute = 0x0000_0000,
+          [1690220246116] [38865:6578589] [DMG]                                 }
+          [1690220246117] [38865:6578589] [DMG]
+          [1690220246117] [38865:6578589] [DMG]                                 Data = 0,
+          [1690220246117] [38865:6578589] [DMG]                         },
+          [1690220246117] [38865:6578589] [DMG]
+          [1690220246117] [38865:6578589] [DMG]                 },
+          [1690220246117] [38865:6578589] [DMG]
+          [1690220246117] [38865:6578589] [DMG]         ],
+          [1690220246117] [38865:6578589] [DMG]
+          [1690220246117] [38865:6578589] [DMG]         InteractionModelRevision = 1
+          [1690220246117] [38865:6578589] [DMG] }
+          [1690220246117] [38865:6578589] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 534629604
+          [1690220246117] [38865:6578589] [TOO]   WindowStatus: 0
+          [1690220246117] [38865:6578589] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0xdade5274 Peer = 01:0000000000000001
+          [1690220246117] [38865:6578589] [EM] <<< [E:50749r S:35778 M:151592253 (Ack:264355211)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+          [1690220246117] [38865:6578589] [IN] (S) Sending msg 151592253 on secure session with LSID: 35778
+          [1690220246120] [38865:6578589] [EM] >>> [E:50750r S:35778 M:264355212] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0001:05 (IM:ReportData)
+          [1690220246120] [38865:6578589] [EM] Handling via exchange: 50750r, Delegate: 0x1013c4be0
+          [1690220246120] [38865:6578589] [DMG] ReportDataMessage =
+          [1690220246120] [38865:6578589] [DMG] {
+          [1690220246120] [38865:6578589] [DMG]         SubscriptionId = 0x35250b41,
+          [1690220246120] [38865:6578589] [DMG]         AttributeReportIBs =
+          [1690220246120] [38865:6578589] [DMG]         [
+          [1690220246120] [38865:6578589] [DMG]                 AttributeReportIB =
+          [1690220246120] [38865:6578589] [DMG]                 {
+          [1690220246120] [38865:6578589] [DMG]                         AttributeDataIB =
+          [1690220246120] [38865:6578589] [DMG]                         {
+          [1690220246120] [38865:6578589] [DMG]                                 DataVersion = 0x1fddcce4,
+          [1690220246120] [38865:6578589] [DMG]                                 AttributePathIB =
+          [1690220246120] [38865:6578589] [DMG]                                 {
+          [1690220246120] [38865:6578589] [DMG]                                         Endpoint = 0x0,
+          [1690220246120] [38865:6578589] [DMG]                                         Cluster = 0x3c,
+          [1690220246120] [38865:6578589] [DMG]                                         Attribute = 0x0000_0001,
+          [1690220246120] [38865:6578589] [DMG]                                 }
+          [1690220246120] [38865:6578589] [DMG]
+          [1690220246120] [38865:6578589] [DMG]                                 Data = NULL
+          [1690220246120] [38865:6578589] [DMG]                         },
+          [1690220246120] [38865:6578589] [DMG]
+          [1690220246120] [38865:6578589] [DMG]                 },
+          [1690220246120] [38865:6578589] [DMG]
+          [1690220246120] [38865:6578589] [DMG]         ],
+          [1690220246120] [38865:6578589] [DMG]
+          [1690220246120] [38865:6578589] [DMG]         InteractionModelRevision = 1
+          [1690220246120] [38865:6578589] [DMG] }
+          [1690220246120] [38865:6578589] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0001 DataVersion: 534629604
+          [1690220246120] [38865:6578589] [TOO]   AdminFabricIndex: null
+          [1690220246120] [38865:6578589] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0x35250b41 Peer = 01:0000000000000001
+          [1690220246120] [38865:6578589] [EM] <<< [E:50750r S:35778 M:151592254 (Ack:264355212)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+          [1690220246120] [38865:6578589] [IN] (S) Sending msg 151592254 on secure session with LSID: 35778
+          [1690220246123] [38865:6578589] [EM] >>> [E:50751r S:35778 M:264355213] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0001:05 (IM:ReportData)
+          [1690220246123] [38865:6578589] [EM] Handling via exchange: 50751r, Delegate: 0x1013c4be0
+          [1690220246123] [38865:6578589] [DMG] ReportDataMessage =
+          [1690220246123] [38865:6578589] [DMG] {
+          [1690220246123] [38865:6578589] [DMG]         SubscriptionId = 0xd3c6ff91,
+          [1690220246123] [38865:6578589] [DMG]         AttributeReportIBs =
+          [1690220246123] [38865:6578589] [DMG]         [
+          [1690220246123] [38865:6578589] [DMG]                 AttributeReportIB =
+          [1690220246123] [38865:6578589] [DMG]                 {
+          [1690220246123] [38865:6578589] [DMG]                         AttributeDataIB =
+          [1690220246123] [38865:6578589] [DMG]                         {
+          [1690220246123] [38865:6578589] [DMG]                                 DataVersion = 0x1fddcce4,
+          [1690220246123] [38865:6578589] [DMG]                                 AttributePathIB =
+          [1690220246123] [38865:6578589] [DMG]                                 {
+          [1690220246123] [38865:6578589] [DMG]                                         Endpoint = 0x0,
+          [1690220246123] [38865:6578589] [DMG]                                         Cluster = 0x3c,
+          [1690220246123] [38865:6578589] [DMG]                                         Attribute = 0x0000_0002,
+          [1690220246123] [38865:6578589] [DMG]                                 }
+          [1690220246123] [38865:6578589] [DMG]
+          [1690220246123] [38865:6578589] [DMG]                                 Data = NULL
+          [1690220246123] [38865:6578589] [DMG]                         },
+          [1690220246123] [38865:6578589] [DMG]
+          [1690220246123] [38865:6578589] [DMG]                 },
+          [1690220246123] [38865:6578589] [DMG]
+          [1690220246123] [38865:6578589] [DMG]         ],
+          [1690220246123] [38865:6578589] [DMG]
+          [1690220246123] [38865:6578589] [DMG]         InteractionModelRevision = 1
+          [1690220246123] [38865:6578589] [DMG] }
+          [1690220246123] [38865:6578589] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0002 DataVersion: 534629604
+          [1690220246123] [38865:6578589] [TOO]   AdminVendorId: null
+          [1690220246123] [38865:6578589] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0xd3c6ff91 Peer = 01:0000000000000001
+          [1690220246123] [38865:6578589] [EM] <<< [E:50751r S:35778 M:151592255 (Ack:264355213)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+      disabled: true
+
+    - label:
+          "Step 17: Verify TH_CR2 receives subscription notifications which show
+          WindowStatus value to be 0, AdminFabricIndex value to be null,
+          AdminVendorId to be null"
+      verification: |
+          Verify TH_CR2 logs for subscription notifications which show WindowStatus value to be 0, AdminFabricIndex value to be null, AdminVendorId to be null
+
+          ReportDataMessage =
+          [1690220246125] [38880:6584521] [DMG] {
+          [1690220246125] [38880:6584521] [DMG]         SubscriptionId = 0xfab5d837,
+          [1690220246125] [38880:6584521] [DMG]         AttributeReportIBs =
+          [1690220246125] [38880:6584521] [DMG]         [
+          [1690220246125] [38880:6584521] [DMG]                 AttributeReportIB =
+          [1690220246125] [38880:6584521] [DMG]                 {
+          [1690220246125] [38880:6584521] [DMG]                         AttributeDataIB =
+          [1690220246125] [38880:6584521] [DMG]                         {
+          [1690220246125] [38880:6584521] [DMG]                                 DataVersion = 0x1fddcce4,
+          [1690220246125] [38880:6584521] [DMG]                                 AttributePathIB =
+          [1690220246125] [38880:6584521] [DMG]                                 {
+          [1690220246125] [38880:6584521] [DMG]                                         Endpoint = 0x0,
+          [1690220246125] [38880:6584521] [DMG]                                         Cluster = 0x3c,
+          [1690220246125] [38880:6584521] [DMG]                                         Attribute = 0x0000_0000,
+          [1690220246125] [38880:6584521] [DMG]                                 }
+          [1690220246125] [38880:6584521] [DMG]
+          [1690220246125] [38880:6584521] [DMG]                                 Data = 0,
+          [1690220246125] [38880:6584521] [DMG]                         },
+          [1690220246125] [38880:6584521] [DMG]
+          [1690220246125] [38880:6584521] [DMG]                 },
+          [1690220246125] [38880:6584521] [DMG]
+          [1690220246125] [38880:6584521] [DMG]         ],
+          [1690220246125] [38880:6584521] [DMG]
+          [1690220246125] [38880:6584521] [DMG]         InteractionModelRevision = 1
+          [1690220246125] [38880:6584521] [DMG] }
+          [1690220246125] [38880:6584521] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 534629604
+          [1690220246125] [38880:6584521] [TOO]   WindowStatus: 0
+          [1690220246125] [38880:6584521] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0xfab5d837 Peer = 02:0000000000000001
+          [1690220246125] [38880:6584521] [EM] <<< [E:50752r S:15324 M:785250 (Ack:104911021)] (S) Msg TX to 2:0000000000000001 [40B2] --- Type 0001:01 (IM:StatusResponse)
+          [1690220246125] [38880:6584521] [IN] (S) Sending msg 785250 on secure session with LSID: 15324
+          [1690220246148] [38880:6584521] [EM] >>> [E:50753r S:15324 M:104911022] (S) Msg RX from 2:0000000000000001 [40B2] --- Type 0001:05 (IM:ReportData)
+          [1690220246148] [38880:6584521] [EM] Handling via exchange: 50753r, Delegate: 0x1035c8be0
+          [1690220246148] [38880:6584521] [DMG] ReportDataMessage =
+          [1690220246148] [38880:6584521] [DMG] {
+          [1690220246148] [38880:6584521] [DMG]         SubscriptionId = 0x5984e13a,
+          [1690220246148] [38880:6584521] [DMG]         AttributeReportIBs =
+          [1690220246148] [38880:6584521] [DMG]         [
+          [1690220246148] [38880:6584521] [DMG]                 AttributeReportIB =
+          [1690220246148] [38880:6584521] [DMG]                 {
+          [1690220246148] [38880:6584521] [DMG]                         AttributeDataIB =
+          [1690220246148] [38880:6584521] [DMG]                         {
+          [1690220246148] [38880:6584521] [DMG]                                 DataVersion = 0x1fddcce4,
+          [1690220246148] [38880:6584521] [DMG]                                 AttributePathIB =
+          [1690220246148] [38880:6584521] [DMG]                                 {
+          [1690220246148] [38880:6584521] [DMG]                                         Endpoint = 0x0,
+          [1690220246148] [38880:6584521] [DMG]                                         Cluster = 0x3c,
+          [1690220246148] [38880:6584521] [DMG]                                         Attribute = 0x0000_0001,
+          [1690220246148] [38880:6584521] [DMG]                                 }
+          [1690220246148] [38880:6584521] [DMG]
+          [1690220246148] [38880:6584521] [DMG]                                 Data = NULL
+          [1690220246148] [38880:6584521] [DMG]                         },
+          [1690220246148] [38880:6584521] [DMG]
+          [1690220246148] [38880:6584521] [DMG]                 },
+          [1690220246148] [38880:6584521] [DMG]
+          [1690220246148] [38880:6584521] [DMG]         ],
+          [1690220246148] [38880:6584521] [DMG]
+          [1690220246148] [38880:6584521] [DMG]         InteractionModelRevision = 1
+          [1690220246148] [38880:6584521] [DMG] }
+          [1690220246149] [38880:6584521] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0001 DataVersion: 534629604
+          [1690220246149] [38880:6584521] [TOO]   AdminFabricIndex: null
+          [1690220246149] [38880:6584521] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0x5984e13a Peer = 02:0000000000000001
+          [1690220246149] [38880:6584521] [EM] <<< [E:50753r S:15324 M:785251 (Ack:104911022)] (S) Msg TX to 2:0000000000000001 [40B2] --- Type 0001:01 (IM:StatusResponse)
+          [1690220246149] [38880:6584521] [IN] (S) Sending msg 785251 on secure session with LSID: 15324
+          [1690220246155] [38880:6584521] [EM] >>> [E:50754r S:15324 M:104911023] (S) Msg RX from 2:0000000000000001 [40B2] --- Type 0001:05 (IM:ReportData)
+          [1690220246155] [38880:6584521] [EM] Handling via exchange: 50754r, Delegate: 0x1035c8be0
+          [1690220246155] [38880:6584521] [DMG] ReportDataMessage =
+          [1690220246155] [38880:6584521] [DMG] {
+          [1690220246155] [38880:6584521] [DMG]         SubscriptionId = 0x943b5fc3,
+          [1690220246155] [38880:6584521] [DMG]         AttributeReportIBs =
+          [1690220246155] [38880:6584521] [DMG]         [
+          [1690220246155] [38880:6584521] [DMG]                 AttributeReportIB =
+          [1690220246155] [38880:6584521] [DMG]                 {
+          [1690220246155] [38880:6584521] [DMG]                         AttributeDataIB =
+          [1690220246155] [38880:6584521] [DMG]                         {
+          [1690220246155] [38880:6584521] [DMG]                                 DataVersion = 0x1fddcce4,
+          [1690220246155] [38880:6584521] [DMG]                                 AttributePathIB =
+          [1690220246155] [38880:6584521] [DMG]                                 {
+          [1690220246155] [38880:6584521] [DMG]                                         Endpoint = 0x0,
+          [1690220246155] [38880:6584521] [DMG]                                         Cluster = 0x3c,
+          [1690220246155] [38880:6584521] [DMG]                                         Attribute = 0x0000_0002,
+          [1690220246155] [38880:6584521] [DMG]                                 }
+          [1690220246155] [38880:6584521] [DMG]
+          [1690220246155] [38880:6584521] [DMG]                                 Data = NULL
+          [1690220246155] [38880:6584521] [DMG]                         },
+          [1690220246155] [38880:6584521] [DMG]
+          [1690220246155] [38880:6584521] [DMG]                 },
+          [1690220246155] [38880:6584521] [DMG]
+          [1690220246155] [38880:6584521] [DMG]         ],
+          [1690220246155] [38880:6584521] [DMG]
+          [1690220246155] [38880:6584521] [DMG]         InteractionModelRevision = 1
+          [1690220246155] [38880:6584521] [DMG] }
+          [1690220246155] [38880:6584521] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0002 DataVersion: 534629604
+          [1690220246155] [38880:6584521] [TOO]   AdminVendorId: null
+          [1690220246155] [38880:6584521] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0x943b5fc3 Peer = 02:0000000000000001
+          [1690220246155] [38880:6584521] [EM] <<< [E:50754r S:15324 M:785252 (Ack:104911023)] (S) Msg TX to 2:0000000000000001 [40B2] --- Type 0001:01 (IM:StatusResponse)
+      disabled: true
+
+    - label:
+          "Step 18: TH_CR2 opens a commissioning window on DUT_CE using ECM with
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds"
+      PICS: CADMIN.S.C00.Rsp
+      verification: |
+          In interactive mode of TH_CR2, send command to open commissioning window using ECM
+
+          pairing open-commissioning-window 1 1 180 1000 3840 --commissioner-name beta
+
+          On TH_CR2 logs, verify for commissioning window to be open
+
+          InvokeResponseMessage =
+          [1690220435293] [38880:6589609] [DMG] {
+          [1690220435293] [38880:6589609] [DMG]         suppressResponse = false,
+          [1690220435293] [38880:6589609] [DMG]         InvokeResponseIBs =
+          [1690220435293] [38880:6589609] [DMG]         [
+          [1690220435293] [38880:6589609] [DMG]                 InvokeResponseIB =
+          [1690220435293] [38880:6589609] [DMG]                 {
+          [1690220435293] [38880:6589609] [DMG]                         CommandStatusIB =
+          [1690220435293] [38880:6589609] [DMG]                         {
+          [1690220435293] [38880:6589609] [DMG]                                 CommandPathIB =
+          [1690220435293] [38880:6589609] [DMG]                                 {
+          [1690220435293] [38880:6589609] [DMG]                                         EndpointId = 0x0,
+          [1690220435293] [38880:6589609] [DMG]                                         ClusterId = 0x3c,
+          [1690220435293] [38880:6589609] [DMG]                                         CommandId = 0x0,
+          [1690220435293] [38880:6589609] [DMG]                                 },
+          [1690220435293] [38880:6589609] [DMG]
+          [1690220435293] [38880:6589609] [DMG]                                 StatusIB =
+          [1690220435293] [38880:6589609] [DMG]                                 {
+          [1690220435293] [38880:6589609] [DMG]                                         status = 0x00 (SUCCESS),
+          [1690220435293] [38880:6589609] [DMG]                                 },
+          [1690220435293] [38880:6589609] [DMG]
+          [1690220435293] [38880:6589609] [DMG]                         },
+          [1690220435293] [38880:6589609] [DMG]
+          [1690220435293] [38880:6589609] [DMG]                 },
+          [1690220435293] [38880:6589609] [DMG]
+          [1690220435293] [38880:6589609] [DMG]         ],
+          [1690220435293] [38880:6589609] [DMG]
+          [1690220435293] [38880:6589609] [DMG]         InteractionModelRevision = 1
+          [1690220435293] [38880:6589609] [DMG] },
+          [1690220435293] [38880:6589609] [DMG] Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
+          [1690220435293] [38880:6589609] [CTL] Successfully opened pairing window on the device
+          [1690220435293] [38880:6589609] [CTL] Manual pairing code: [35064347684]
+          [1690220435293] [38880:6589609] [CTL] SetupQRCode: [MT:-24J0AFN00Y.YD0SO10]
+          [1690220435293] [38880:6589609] [DMG] ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "Step 19: Verify TH_CR1 receives subscription notifications which show
+          WindowStatus value to be 1, AdminFabricIndex value to be the same as
+          the Fabric Index of the Fabrics attribute list entry corresponding to
+          TH_CR2s fabric, AdminVendorId to be the same as the Vendor ID field of
+          Fabrics attribute list entry corresponding to TH_CR2s fabric"
+      verification: |
+          Verify TH_CR1 logs for subscription notifications which show WindowStatus value to be 1, AdminFabricIndex value to be the same as the Fabric Index of the Fabrics attribute list entry corresponding to TH_CR2’s fabric, AdminVendorId to be the same as the Vendor ID field of Fabrics attribute list entry corresponding to TH_CR2’s fabric
+
+          ReportDataMessage =
+          [1690220515981] [38865:6587066] [DMG] {
+          [1690220515981] [38865:6587066] [DMG]         SubscriptionId = 0xdade5274,
+          [1690220515981] [38865:6587066] [DMG]         AttributeReportIBs =
+          [1690220515981] [38865:6587066] [DMG]         [
+          [1690220515981] [38865:6587066] [DMG]                 AttributeReportIB =
+          [1690220515981] [38865:6587066] [DMG]                 {
+          [1690220515981] [38865:6587066] [DMG]                         AttributeDataIB =
+          [1690220515981] [38865:6587066] [DMG]                         {
+          [1690220515981] [38865:6587066] [DMG]                                 DataVersion = 0x1fddcced,
+          [1690220515981] [38865:6587066] [DMG]                                 AttributePathIB =
+          [1690220515981] [38865:6587066] [DMG]                                 {
+          [1690220515981] [38865:6587066] [DMG]                                         Endpoint = 0x0,
+          [1690220515981] [38865:6587066] [DMG]                                         Cluster = 0x3c,
+          [1690220515981] [38865:6587066] [DMG]                                         Attribute = 0x0000_0000,
+          [1690220515981] [38865:6587066] [DMG]                                 }
+          [1690220515981] [38865:6587066] [DMG]
+          [1690220515981] [38865:6587066] [DMG]                                 Data = 1,
+          [1690220515981] [38865:6587066] [DMG]                         },
+          [1690220515981] [38865:6587066] [DMG]
+          [1690220515981] [38865:6587066] [DMG]                 },
+          [1690220515981] [38865:6587066] [DMG]
+          [1690220515981] [38865:6587066] [DMG]         ],
+          [1690220515981] [38865:6587066] [DMG]
+          [1690220515981] [38865:6587066] [DMG]         InteractionModelRevision = 1
+          [1690220515981] [38865:6587066] [DMG] }
+          [1690220515981] [38865:6587066] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 534629613
+          [1690220515981] [38865:6587066] [TOO]   WindowStatus: 1
+          [1690220515981] [38865:6587066] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0xdade5274 Peer = 01:0000000000000001
+          [1690220515982] [38865:6587066] [EM] <<< [E:50767r S:35778 M:151592262 (Ack:264355229)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+          [1690220515982] [38865:6587066] [IN] (S) Sending msg 151592262 on secure session with LSID: 35778
+          [1690220515991] [38865:6587066] [EM] >>> [E:50768r S:35778 M:264355230] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0001:05 (IM:ReportData)
+          [1690220515991] [38865:6587066] [EM] Handling via exchange: 50768r, Delegate: 0x1013c4be0
+          [1690220515991] [38865:6587066] [DMG] ReportDataMessage =
+          [1690220515991] [38865:6587066] [DMG] {
+          [1690220515991] [38865:6587066] [DMG]         SubscriptionId = 0x35250b41,
+          [1690220515991] [38865:6587066] [DMG]         AttributeReportIBs =
+          [1690220515991] [38865:6587066] [DMG]         [
+          [1690220515991] [38865:6587066] [DMG]                 AttributeReportIB =
+          [1690220515992] [38865:6587066] [DMG]                 {
+          [1690220515992] [38865:6587066] [DMG]                         AttributeDataIB =
+          [1690220515992] [38865:6587066] [DMG]                         {
+          [1690220515992] [38865:6587066] [DMG]                                 DataVersion = 0x1fddcced,
+          [1690220515992] [38865:6587066] [DMG]                                 AttributePathIB =
+          [1690220515992] [38865:6587066] [DMG]                                 {
+          [1690220515992] [38865:6587066] [DMG]                                         Endpoint = 0x0,
+          [1690220515992] [38865:6587066] [DMG]                                         Cluster = 0x3c,
+          [1690220515992] [38865:6587066] [DMG]                                         Attribute = 0x0000_0001,
+          [1690220515992] [38865:6587066] [DMG]                                 }
+          [1690220515992] [38865:6587066] [DMG]
+          [1690220515992] [38865:6587066] [DMG]                                 Data = 2,
+          [1690220515992] [38865:6587066] [DMG]                         },
+          [1690220515992] [38865:6587066] [DMG]
+          [1690220515992] [38865:6587066] [DMG]                 },
+          [1690220515992] [38865:6587066] [DMG]
+          [1690220515992] [38865:6587066] [DMG]         ],
+          [1690220515992] [38865:6587066] [DMG]
+          [1690220515992] [38865:6587066] [DMG]         InteractionModelRevision = 1
+          [1690220515992] [38865:6587066] [DMG] }
+          [1690220515992] [38865:6587066] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0001 DataVersion: 534629613
+          [1690220515992] [38865:6587066] [TOO]   AdminFabricIndex: 2
+          [1690220515992] [38865:6587066] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0x35250b41 Peer = 01:0000000000000001
+          [1690220515992] [38865:6587066] [EM] <<< [E:50768r S:35778 M:151592263 (Ack:264355230)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+          [1690220515993] [38865:6587066] [IN] (S) Sending msg 151592263 on secure session with LSID: 35778
+          [1690220515993] [38865:6587066] [EM] >>> [E:50769r S:35778 M:264355231] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0001:05 (IM:ReportData)
+          [1690220515993] [38865:6587066] [EM] Handling via exchange: 50769r, Delegate: 0x1013c4be0
+          [1690220515993] [38865:6587066] [DMG] ReportDataMessage =
+          [1690220515993] [38865:6587066] [DMG] {
+          [1690220515993] [38865:6587066] [DMG]         SubscriptionId = 0xd3c6ff91,
+          [1690220515993] [38865:6587066] [DMG]         AttributeReportIBs =
+          [1690220515993] [38865:6587066] [DMG]         [
+          [1690220515993] [38865:6587066] [DMG]                 AttributeReportIB =
+          [1690220515993] [38865:6587066] [DMG]                 {
+          [1690220515993] [38865:6587066] [DMG]                         AttributeDataIB =
+          [1690220515993] [38865:6587066] [DMG]                         {
+          [1690220515994] [38865:6587066] [DMG]                                 DataVersion = 0x1fddcced,
+          [1690220515994] [38865:6587066] [DMG]                                 AttributePathIB =
+          [1690220515994] [38865:6587066] [DMG]                                 {
+          [1690220515994] [38865:6587066] [DMG]                                         Endpoint = 0x0,
+          [1690220515994] [38865:6587066] [DMG]                                         Cluster = 0x3c,
+          [1690220515994] [38865:6587066] [DMG]                                         Attribute = 0x0000_0002,
+          [1690220515994] [38865:6587066] [DMG]                                 }
+          [1690220515994] [38865:6587066] [DMG]
+          [1690220515994] [38865:6587066] [DMG]                                 Data = 65521,
+          [1690220515994] [38865:6587066] [DMG]                         },
+          [1690220515994] [38865:6587066] [DMG]
+          [1690220515994] [38865:6587066] [DMG]                 },
+          [1690220515994] [38865:6587066] [DMG]
+          [1690220515994] [38865:6587066] [DMG]         ],
+          [1690220515994] [38865:6587066] [DMG]
+          [1690220515994] [38865:6587066] [DMG]         InteractionModelRevision = 1
+          [1690220515994] [38865:6587066] [DMG] }
+          [1690220515994] [38865:6587066] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0002 DataVersion: 534629613
+          [1690220515994] [38865:6587066] [TOO]   AdminVendorId: 65521
+          [1690220515994] [38865:6587066] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0xd3c6ff91 Peer = 01:0000000000000001
+          [1690220515994] [38865:6587066] [EM] <<< [E:50769r S:35778 M:151592264 (Ack:264355231)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+      disabled: true
+
+    - label:
+          "Step 20: Verify TH_CR2 receives subscription notifications which show
+          WindowStatus value to be 1, AdminFabricIndex value to be the same as
+          the Fabric Index of the Fabrics attribute list entry corresponding to
+          TH_CR2s fabric, AdminVendorId to be the same as the Vendor ID field of
+          Fabrics attribute list entry corresponding to TH_CR2s fabric"
+      verification: |
+          Verify TH_CR2 logs for subscription notifications which show WindowStatus value to be 1, AdminFabricIndex value to be the same as the Fabric Index of the Fabrics attribute list entry corresponding to TH_CR2’s fabric, AdminVendorId to be the same as the Vendor ID field of Fabrics attribute list entry corresponding to TH_CR2’s fabric
+
+          ReportDataMessage =
+          [1690220515997] [38880:6590520] [DMG] {
+          [1690220515997] [38880:6590520] [DMG]         SubscriptionId = 0xfab5d837,
+          [1690220515997] [38880:6590520] [DMG]         AttributeReportIBs =
+          [1690220515997] [38880:6590520] [DMG]         [
+          [1690220515997] [38880:6590520] [DMG]                 AttributeReportIB =
+          [1690220515997] [38880:6590520] [DMG]                 {
+          [1690220515997] [38880:6590520] [DMG]                         AttributeDataIB =
+          [1690220515997] [38880:6590520] [DMG]                         {
+          [1690220515997] [38880:6590520] [DMG]                                 DataVersion = 0x1fddcced,
+          [1690220515997] [38880:6590520] [DMG]                                 AttributePathIB =
+          [1690220515997] [38880:6590520] [DMG]                                 {
+          [1690220515997] [38880:6590520] [DMG]                                         Endpoint = 0x0,
+          [1690220515997] [38880:6590520] [DMG]                                         Cluster = 0x3c,
+          [1690220515997] [38880:6590520] [DMG]                                         Attribute = 0x0000_0000,
+          [1690220515997] [38880:6590520] [DMG]                                 }
+          [1690220515997] [38880:6590520] [DMG]
+          [1690220515997] [38880:6590520] [DMG]                                 Data = 1,
+          [1690220515997] [38880:6590520] [DMG]                         },
+          [1690220515997] [38880:6590520] [DMG]
+          [1690220515997] [38880:6590520] [DMG]                 },
+          [1690220515997] [38880:6590520] [DMG]
+          [1690220515997] [38880:6590520] [DMG]         ],
+          [1690220515997] [38880:6590520] [DMG]
+          [1690220515997] [38880:6590520] [DMG]         InteractionModelRevision = 1
+          [1690220515997] [38880:6590520] [DMG] }
+          [1690220515997] [38880:6590520] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 534629613
+          [1690220515997] [38880:6590520] [TOO]   WindowStatus: 1
+          [1690220515997] [38880:6590520] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0xfab5d837 Peer = 02:0000000000000001
+          [1690220515997] [38880:6590520] [EM] <<< [E:50770r S:15324 M:785276 (Ack:104911049)] (S) Msg TX to 2:0000000000000001 [40B2] --- Type 0001:01 (IM:StatusResponse)
+          [1690220515997] [38880:6590520] [IN] (S) Sending msg 785276 on secure session with LSID: 15324
+          [1690220516007] [38880:6590520] [EM] >>> [E:50770r S:15324 M:104911050 (Ack:785276)] (S) Msg RX from 2:0000000000000001 [40B2] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690220516007] [38880:6590520] [EM] Found matching exchange: 50770r, Delegate: 0x0
+          [1690220516007] [38880:6590520] [EM] Rxd Ack; Removing MessageCounter:785276 from Retrans Table on exchange 50770r
+          [1690220516013] [38880:6590520] [EM] >>> [E:50771r S:15324 M:104911051] (S) Msg RX from 2:0000000000000001 [40B2] --- Type 0001:05 (IM:ReportData)
+          [1690220516013] [38880:6590520] [EM] Handling via exchange: 50771r, Delegate: 0x1035c8be0
+          [1690220516013] [38880:6590520] [DMG] ReportDataMessage =
+          [1690220516013] [38880:6590520] [DMG] {
+          [1690220516013] [38880:6590520] [DMG]         SubscriptionId = 0x5984e13a,
+          [1690220516013] [38880:6590520] [DMG]         AttributeReportIBs =
+          [1690220516013] [38880:6590520] [DMG]         [
+          [1690220516013] [38880:6590520] [DMG]                 AttributeReportIB =
+          [1690220516013] [38880:6590520] [DMG]                 {
+          [1690220516013] [38880:6590520] [DMG]                         AttributeDataIB =
+          [1690220516013] [38880:6590520] [DMG]                         {
+          [1690220516013] [38880:6590520] [DMG]                                 DataVersion = 0x1fddcced,
+          [1690220516013] [38880:6590520] [DMG]                                 AttributePathIB =
+          [1690220516013] [38880:6590520] [DMG]                                 {
+          [1690220516013] [38880:6590520] [DMG]                                         Endpoint = 0x0,
+          [1690220516013] [38880:6590520] [DMG]                                         Cluster = 0x3c,
+          [1690220516013] [38880:6590520] [DMG]                                         Attribute = 0x0000_0001,
+          [1690220516013] [38880:6590520] [DMG]                                 }
+          [1690220516013] [38880:6590520] [DMG]
+          [1690220516013] [38880:6590520] [DMG]                                 Data = 2,
+          [1690220516013] [38880:6590520] [DMG]                         },
+          [1690220516013] [38880:6590520] [DMG]
+          [1690220516013] [38880:6590520] [DMG]                 },
+          [1690220516013] [38880:6590520] [DMG]
+          [1690220516013] [38880:6590520] [DMG]         ],
+          [1690220516013] [38880:6590520] [DMG]
+          [1690220516013] [38880:6590520] [DMG]         InteractionModelRevision = 1
+          [1690220516013] [38880:6590520] [DMG] }
+          [1690220516013] [38880:6590520] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0001 DataVersion: 534629613
+          [1690220516013] [38880:6590520] [TOO]   AdminFabricIndex: 2
+          [1690220516013] [38880:6590520] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0x5984e13a Peer = 02:0000000000000001
+          [1690220516013] [38880:6590520] [EM] <<< [E:50771r S:15324 M:785277 (Ack:104911051)] (S) Msg TX to 2:0000000000000001 [40B2] --- Type 0001:01 (IM:StatusResponse)
+          [1690220516013] [38880:6590520] [IN] (S) Sending msg 785277 on secure session with LSID: 15324
+          [1690220516020] [38880:6590520] [EM] >>> [E:50772r S:15324 M:104911052] (S) Msg RX from 2:0000000000000001 [40B2] --- Type 0001:05 (IM:ReportData)
+          [1690220516020] [38880:6590520] [EM] Handling via exchange: 50772r, Delegate: 0x1035c8be0
+          [1690220516020] [38880:6590520] [DMG] ReportDataMessage =
+          [1690220516020] [38880:6590520] [DMG] {
+          [1690220516020] [38880:6590520] [DMG]         SubscriptionId = 0x943b5fc3,
+          [1690220516020] [38880:6590520] [DMG]         AttributeReportIBs =
+          [1690220516020] [38880:6590520] [DMG]         [
+          [1690220516020] [38880:6590520] [DMG]                 AttributeReportIB =
+          [1690220516020] [38880:6590520] [DMG]                 {
+          [1690220516020] [38880:6590520] [DMG]                         AttributeDataIB =
+          [1690220516020] [38880:6590520] [DMG]                         {
+          [1690220516020] [38880:6590520] [DMG]                                 DataVersion = 0x1fddcced,
+          [1690220516020] [38880:6590520] [DMG]                                 AttributePathIB =
+          [1690220516020] [38880:6590520] [DMG]                                 {
+          [1690220516020] [38880:6590520] [DMG]                                         Endpoint = 0x0,
+          [1690220516020] [38880:6590520] [DMG]                                         Cluster = 0x3c,
+          [1690220516020] [38880:6590520] [DMG]                                         Attribute = 0x0000_0002,
+          [1690220516020] [38880:6590520] [DMG]                                 }
+          [1690220516020] [38880:6590520] [DMG]
+          [1690220516020] [38880:6590520] [DMG]                                 Data = 65521,
+          [1690220516020] [38880:6590520] [DMG]                         },
+          [1690220516020] [38880:6590520] [DMG]
+          [1690220516020] [38880:6590520] [DMG]                 },
+          [1690220516020] [38880:6590520] [DMG]
+          [1690220516020] [38880:6590520] [DMG]         ],
+          [1690220516020] [38880:6590520] [DMG]
+          [1690220516020] [38880:6590520] [DMG]         InteractionModelRevision = 1
+          [1690220516020] [38880:6590520] [DMG] }
+          [1690220516020] [38880:6590520] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0002 DataVersion: 534629613
+          [1690220516020] [38880:6590520] [TOO]   AdminVendorId: 65521
+          [1690220516020] [38880:6590520] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0x943b5fc3 Peer = 02:0000000000000001
+          [1690220516020] [38880:6590520] [EM] <<< [E:50772r S:15324 M:785278 (Ack:104911052)] (S) Msg TX to 2:0000000000000001 [40B2] --- Type 0001:01 (IM:StatusResponse)
+      disabled: true
+
+    - label:
+          "Step 21: Wait for the expiration of PIXIT.CADMIN.CwDuration seconds
+          that is set in step 18"
+      verification: |
+          Wait for the expiration of PIXIT.CADMIN.CwDuration seconds that is set in step 18
+      disabled: true
+
+    - label:
+          "Step 22: Verify TH_CR1 receives subscription notifications which show
+          WindowStatus value to be 0, AdminFabricIndex value to be null,
+          AdminVendorId to be null"
+      verification: |
+          Verify TH_CR1 logs for subscription notifications which show WindowStatus value to be 0, AdminFabricIndex value to be null, AdminVendorId to be null
+
+          [1690220692636] [38865:6590605] [EM] >>> [E:50773r S:35778 M:264355235] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0001:05 (IM:ReportData)
+          [1690220692636] [38865:6590605] [EM] Handling via exchange: 50773r, Delegate: 0x1013c4be0
+          [1690220692636] [38865:6590605] [DMG] ReportDataMessage =
+          [1690220692636] [38865:6590605] [DMG] {
+          [1690220692636] [38865:6590605] [DMG]         SubscriptionId = 0xdade5274,
+          [1690220692636] [38865:6590605] [DMG]         AttributeReportIBs =
+          [1690220692636] [38865:6590605] [DMG]         [
+          [1690220692636] [38865:6590605] [DMG]                 AttributeReportIB =
+          [1690220692636] [38865:6590605] [DMG]                 {
+          [1690220692636] [38865:6590605] [DMG]                         AttributeDataIB =
+          [1690220692636] [38865:6590605] [DMG]                         {
+          [1690220692636] [38865:6590605] [DMG]                                 DataVersion = 0x1fddccf0,
+          [1690220692636] [38865:6590605] [DMG]                                 AttributePathIB =
+          [1690220692636] [38865:6590605] [DMG]                                 {
+          [1690220692636] [38865:6590605] [DMG]                                         Endpoint = 0x0,
+          [1690220692636] [38865:6590605] [DMG]                                         Cluster = 0x3c,
+          [1690220692636] [38865:6590605] [DMG]                                         Attribute = 0x0000_0000,
+          [1690220692636] [38865:6590605] [DMG]                                 }
+          [1690220692636] [38865:6590605] [DMG]
+          [1690220692636] [38865:6590605] [DMG]                                 Data = 0,
+          [1690220692636] [38865:6590605] [DMG]                         },
+          [1690220692636] [38865:6590605] [DMG]
+          [1690220692636] [38865:6590605] [DMG]                 },
+          [1690220692636] [38865:6590605] [DMG]
+          [1690220692636] [38865:6590605] [DMG]         ],
+          [1690220692636] [38865:6590605] [DMG]
+          [1690220692636] [38865:6590605] [DMG]         InteractionModelRevision = 1
+          [1690220692636] [38865:6590605] [DMG] }
+          [1690220692636] [38865:6590605] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 534629616
+          [1690220692636] [38865:6590605] [TOO]   WindowStatus: 0
+          [1690220692636] [38865:6590605] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0xdade5274 Peer = 01:0000000000000001
+          [1690220692636] [38865:6590605] [EM] <<< [E:50773r S:35778 M:151592265 (Ack:264355235)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+          [1690220692636] [38865:6590605] [IN] (S) Sending msg 151592265 on secure session with LSID: 35778
+          [1690220692637] [38865:6590605] [EM] >>> [E:50774r S:35778 M:264355236] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0001:05 (IM:ReportData)
+          [1690220692637] [38865:6590605] [EM] Handling via exchange: 50774r, Delegate: 0x1013c4be0
+          [1690220692637] [38865:6590605] [DMG] ReportDataMessage =
+          [1690220692637] [38865:6590605] [DMG] {
+          [1690220692637] [38865:6590605] [DMG]         SubscriptionId = 0x35250b41,
+          [1690220692637] [38865:6590605] [DMG]         AttributeReportIBs =
+          [1690220692637] [38865:6590605] [DMG]         [
+          [1690220692637] [38865:6590605] [DMG]                 AttributeReportIB =
+          [1690220692637] [38865:6590605] [DMG]                 {
+          [1690220692637] [38865:6590605] [DMG]                         AttributeDataIB =
+          [1690220692637] [38865:6590605] [DMG]                         {
+          [1690220692637] [38865:6590605] [DMG]                                 DataVersion = 0x1fddccf0,
+          [1690220692637] [38865:6590605] [DMG]                                 AttributePathIB =
+          [1690220692637] [38865:6590605] [DMG]                                 {
+          [1690220692637] [38865:6590605] [DMG]                                         Endpoint = 0x0,
+          [1690220692637] [38865:6590605] [DMG]                                         Cluster = 0x3c,
+          [1690220692637] [38865:6590605] [DMG]                                         Attribute = 0x0000_0001,
+          [1690220692637] [38865:6590605] [DMG]                                 }
+          [1690220692637] [38865:6590605] [DMG]
+          [1690220692637] [38865:6590605] [DMG]                                 Data = NULL
+          [1690220692637] [38865:6590605] [DMG]                         },
+          [1690220692637] [38865:6590605] [DMG]
+          [1690220692637] [38865:6590605] [DMG]                 },
+          [1690220692637] [38865:6590605] [DMG]
+          [1690220692637] [38865:6590605] [DMG]         ],
+          [1690220692637] [38865:6590605] [DMG]
+          [1690220692637] [38865:6590605] [DMG]         InteractionModelRevision = 1
+          [1690220692637] [38865:6590605] [DMG] }
+          [1690220692637] [38865:6590605] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0001 DataVersion: 534629616
+          [1690220692637] [38865:6590605] [TOO]   AdminFabricIndex: null
+          [1690220692637] [38865:6590605] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0x35250b41 Peer = 01:0000000000000001
+          [1690220692637] [38865:6590605] [EM] <<< [E:50774r S:35778 M:151592266 (Ack:264355236)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+          [1690220692637] [38865:6590605] [IN] (S) Sending msg 151592266 on secure session with LSID: 35778
+          [1690220692641] [38865:6590605] [EM] >>> [E:50775r S:35778 M:264355237] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0001:05 (IM:ReportData)
+          [1690220692641] [38865:6590605] [EM] Handling via exchange: 50775r, Delegate: 0x1013c4be0
+          [1690220692641] [38865:6590605] [DMG] ReportDataMessage =
+          [1690220692641] [38865:6590605] [DMG] {
+          [1690220692641] [38865:6590605] [DMG]         SubscriptionId = 0xd3c6ff91,
+          [1690220692641] [38865:6590605] [DMG]         AttributeReportIBs =
+          [1690220692641] [38865:6590605] [DMG]         [
+          [1690220692641] [38865:6590605] [DMG]                 AttributeReportIB =
+          [1690220692641] [38865:6590605] [DMG]                 {
+          [1690220692641] [38865:6590605] [DMG]                         AttributeDataIB =
+          [1690220692641] [38865:6590605] [DMG]                         {
+          [1690220692641] [38865:6590605] [DMG]                                 DataVersion = 0x1fddccf0,
+          [1690220692641] [38865:6590605] [DMG]                                 AttributePathIB =
+          [1690220692641] [38865:6590605] [DMG]                                 {
+          [1690220692641] [38865:6590605] [DMG]                                         Endpoint = 0x0,
+          [1690220692641] [38865:6590605] [DMG]                                         Cluster = 0x3c,
+          [1690220692641] [38865:6590605] [DMG]                                         Attribute = 0x0000_0002,
+          [1690220692641] [38865:6590605] [DMG]                                 }
+          [1690220692641] [38865:6590605] [DMG]
+          [1690220692641] [38865:6590605] [DMG]                                 Data = NULL
+          [1690220692641] [38865:6590605] [DMG]                         },
+          [1690220692641] [38865:6590605] [DMG]
+          [1690220692641] [38865:6590605] [DMG]                 },
+          [1690220692641] [38865:6590605] [DMG]
+          [1690220692641] [38865:6590605] [DMG]         ],
+          [1690220692641] [38865:6590605] [DMG]
+          [1690220692641] [38865:6590605] [DMG]         InteractionModelRevision = 1
+          [1690220692641] [38865:6590605] [DMG] }
+          [1690220692641] [38865:6590605] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0002 DataVersion: 534629616
+          [1690220692641] [38865:6590605] [TOO]   AdminVendorId: null
+          [1690220692641] [38865:6590605] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0xd3c6ff91 Peer = 01:0000000000000001
+          [1690220692641] [38865:6590605] [EM] <<< [E:50775r S:35778 M:151592267 (Ack:264355237)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+          [1690220692641] [38865:6590605] [IN] (S) Sending msg 151592267 on secure session with LSID: 35778
+          [1690220692658] [38865:6590605] [EM] >>> [E:50773r S:35778 M:264355238 (Ack:151592265)] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690220692658] [38865:6590605] [EM] Found matching exchange: 50773r, Delegate: 0x0
+          [1690220692658] [38865:6590605] [EM] Rxd Ack; Removing MessageCounter:151592265 from Retrans Table on exchange 50773r
+          [1690220692665] [38865:6590605] [EM] >>> [E:50774r S:35778 M:264355239 (Ack:151592266)] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690220692665] [38865:6590605] [EM] Found matching exchange: 50774r, Delegate: 0x0
+          [1690220692665] [38865:6590605] [EM] Rxd Ack; Removing MessageCounter:151592266 from Retrans Table on exchange 50774r
+          [1690220692672] [38865:6590605] [EM] >>> [E:50775r S:35778 M:264355240 (Ack:151592267)] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690220692672] [38865:6590605] [EM] Found matching exchange: 50775r, Delegate: 0x0
+          [1690220692672] [38865:6590605] [EM] Rxd Ack; Removing MessageCounter:151592267 from Retrans Table on exchange 50775r
+      disabled: true
+
+    - label:
+          "Step 23: Verify TH_CR2 receives subscription notifications which show
+          WindowStatus value to be 0, AdminFabricIndex value to be null,
+          AdminVendorId to be null"
+      verification: |
+          Verify TH_CR2 logs for subscription notifications which show WindowStatus value to be 0, AdminFabricIndex value to be null, AdminVendorId to be null
+
+          [1690220692641] [38880:6590520] [EM] >>> [E:50776r S:15324 M:104911055] (S) Msg RX from 2:0000000000000001 [40B2] --- Type 0001:05 (IM:ReportData)
+          [1690220692641] [38880:6590520] [EM] Handling via exchange: 50776r, Delegate: 0x1035c8be0
+          [1690220692641] [38880:6590520] [DMG] ReportDataMessage =
+          [1690220692641] [38880:6590520] [DMG] {
+          [1690220692641] [38880:6590520] [DMG]         SubscriptionId = 0xfab5d837,
+          [1690220692641] [38880:6590520] [DMG]         AttributeReportIBs =
+          [1690220692641] [38880:6590520] [DMG]         [
+          [1690220692641] [38880:6590520] [DMG]                 AttributeReportIB =
+          [1690220692641] [38880:6590520] [DMG]                 {
+          [1690220692641] [38880:6590520] [DMG]                         AttributeDataIB =
+          [1690220692641] [38880:6590520] [DMG]                         {
+          [1690220692641] [38880:6590520] [DMG]                                 DataVersion = 0x1fddccf0,
+          [1690220692641] [38880:6590520] [DMG]                                 AttributePathIB =
+          [1690220692641] [38880:6590520] [DMG]                                 {
+          [1690220692641] [38880:6590520] [DMG]                                         Endpoint = 0x0,
+          [1690220692641] [38880:6590520] [DMG]                                         Cluster = 0x3c,
+          [1690220692641] [38880:6590520] [DMG]                                         Attribute = 0x0000_0000,
+          [1690220692641] [38880:6590520] [DMG]                                 }
+          [1690220692641] [38880:6590520] [DMG]
+          [1690220692641] [38880:6590520] [DMG]                                 Data = 0,
+          [1690220692641] [38880:6590520] [DMG]                         },
+          [1690220692641] [38880:6590520] [DMG]
+          [1690220692641] [38880:6590520] [DMG]                 },
+          [1690220692641] [38880:6590520] [DMG]
+          [1690220692641] [38880:6590520] [DMG]         ],
+          [1690220692641] [38880:6590520] [DMG]
+          [1690220692641] [38880:6590520] [DMG]         InteractionModelRevision = 1
+          [1690220692641] [38880:6590520] [DMG] }
+          [1690220692641] [38880:6590520] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 534629616
+          [1690220692641] [38880:6590520] [TOO]   WindowStatus: 0
+          [1690220692641] [38880:6590520] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0xfab5d837 Peer = 02:0000000000000001
+          [1690220692641] [38880:6590520] [EM] <<< [E:50776r S:15324 M:785279 (Ack:104911055)] (S) Msg TX to 2:0000000000000001 [40B2] --- Type 0001:01 (IM:StatusResponse)
+          [1690220692641] [38880:6590520] [IN] (S) Sending msg 785279 on secure session with LSID: 15324
+          [1690220692663] [38880:6590520] [EM] >>> [E:50777r S:15324 M:104911056] (S) Msg RX from 2:0000000000000001 [40B2] --- Type 0001:05 (IM:ReportData)
+          [1690220692663] [38880:6590520] [EM] Handling via exchange: 50777r, Delegate: 0x1035c8be0
+          [1690220692663] [38880:6590520] [DMG] ReportDataMessage =
+          [1690220692663] [38880:6590520] [DMG] {
+          [1690220692663] [38880:6590520] [DMG]         SubscriptionId = 0x5984e13a,
+          [1690220692663] [38880:6590520] [DMG]         AttributeReportIBs =
+          [1690220692663] [38880:6590520] [DMG]         [
+          [1690220692663] [38880:6590520] [DMG]                 AttributeReportIB =
+          [1690220692663] [38880:6590520] [DMG]                 {
+          [1690220692663] [38880:6590520] [DMG]                         AttributeDataIB =
+          [1690220692663] [38880:6590520] [DMG]                         {
+          [1690220692663] [38880:6590520] [DMG]                                 DataVersion = 0x1fddccf0,
+          [1690220692663] [38880:6590520] [DMG]                                 AttributePathIB =
+          [1690220692663] [38880:6590520] [DMG]                                 {
+          [1690220692663] [38880:6590520] [DMG]                                         Endpoint = 0x0,
+          [1690220692663] [38880:6590520] [DMG]                                         Cluster = 0x3c,
+          [1690220692663] [38880:6590520] [DMG]                                         Attribute = 0x0000_0001,
+          [1690220692663] [38880:6590520] [DMG]                                 }
+          [1690220692663] [38880:6590520] [DMG]
+          [1690220692663] [38880:6590520] [DMG]                                 Data = NULL
+          [1690220692663] [38880:6590520] [DMG]                         },
+          [1690220692663] [38880:6590520] [DMG]
+          [1690220692663] [38880:6590520] [DMG]                 },
+          [1690220692663] [38880:6590520] [DMG]
+          [1690220692663] [38880:6590520] [DMG]         ],
+          [1690220692663] [38880:6590520] [DMG]
+          [1690220692663] [38880:6590520] [DMG]         InteractionModelRevision = 1
+          [1690220692663] [38880:6590520] [DMG] }
+          [1690220692664] [38880:6590520] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0001 DataVersion: 534629616
+          [1690220692664] [38880:6590520] [TOO]   AdminFabricIndex: null
+          [1690220692664] [38880:6590520] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0x5984e13a Peer = 02:0000000000000001
+          [1690220692664] [38880:6590520] [EM] <<< [E:50777r S:15324 M:785280 (Ack:104911056)] (S) Msg TX to 2:0000000000000001 [40B2] --- Type 0001:01 (IM:StatusResponse)
+          [1690220692664] [38880:6590520] [IN] (S) Sending msg 785280 on secure session with LSID: 15324
+          [1690220692667] [38880:6590520] [EM] >>> [E:50778r S:15324 M:104911057] (S) Msg RX from 2:0000000000000001 [40B2] --- Type 0001:05 (IM:ReportData)
+          [1690220692667] [38880:6590520] [EM] Handling via exchange: 50778r, Delegate: 0x1035c8be0
+          [1690220692667] [38880:6590520] [DMG] ReportDataMessage =
+          [1690220692667] [38880:6590520] [DMG] {
+          [1690220692667] [38880:6590520] [DMG]         SubscriptionId = 0x943b5fc3,
+          [1690220692667] [38880:6590520] [DMG]         AttributeReportIBs =
+          [1690220692667] [38880:6590520] [DMG]         [
+          [1690220692667] [38880:6590520] [DMG]                 AttributeReportIB =
+          [1690220692667] [38880:6590520] [DMG]                 {
+          [1690220692667] [38880:6590520] [DMG]                         AttributeDataIB =
+          [1690220692667] [38880:6590520] [DMG]                         {
+          [1690220692667] [38880:6590520] [DMG]                                 DataVersion = 0x1fddccf0,
+          [1690220692667] [38880:6590520] [DMG]                                 AttributePathIB =
+          [1690220692667] [38880:6590520] [DMG]                                 {
+          [1690220692667] [38880:6590520] [DMG]                                         Endpoint = 0x0,
+          [1690220692667] [38880:6590520] [DMG]                                         Cluster = 0x3c,
+          [1690220692667] [38880:6590520] [DMG]                                         Attribute = 0x0000_0002,
+          [1690220692667] [38880:6590520] [DMG]                                 }
+          [1690220692667] [38880:6590520] [DMG]
+          [1690220692667] [38880:6590520] [DMG]                                 Data = NULL
+          [1690220692667] [38880:6590520] [DMG]                         },
+          [1690220692667] [38880:6590520] [DMG]
+          [1690220692667] [38880:6590520] [DMG]                 },
+          [1690220692667] [38880:6590520] [DMG]
+          [1690220692667] [38880:6590520] [DMG]         ],
+          [1690220692667] [38880:6590520] [DMG]
+          [1690220692667] [38880:6590520] [DMG]         InteractionModelRevision = 1
+          [1690220692667] [38880:6590520] [DMG] }
+          [1690220692668] [38880:6590520] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0002 DataVersion: 534629616
+          [1690220692668] [38880:6590520] [TOO]   AdminVendorId: null
+          [1690220692668] [38880:6590520] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0x943b5fc3 Peer = 02:0000000000000001
+          [1690220692668] [38880:6590520] [EM] <<< [E:50778r S:15324 M:785281 (Ack:104911057)] (S) Msg TX to 2:0000000000000001 [40B2] --- Type 0001:01 (IM:StatusResponse)
+          [1690220692668] [38880:6590520] [IN] (S) Sending msg 785281 on secure session with LSID: 15324
+          [1690220692679] [38880:6590520] [EM] >>> [E:50776r S:15324 M:104911058 (Ack:785279)] (S) Msg RX from 2:0000000000000001 [40B2] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690220692679] [38880:6590520] [EM] Found matching exchange: 50776r, Delegate: 0x0
+          [1690220692679] [38880:6590520] [EM] Rxd Ack; Removing MessageCounter:785279 from Retrans Table on exchange 50776r
+          [1690220692682] [38880:6590520] [EM] >>> [E:50777r S:15324 M:104911059 (Ack:785280)] (S) Msg RX from 2:0000000000000001 [40B2] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690220692682] [38880:6590520] [EM] Found matching exchange: 50777r, Delegate: 0x0
+          [1690220692682] [38880:6590520] [EM] Rxd Ack; Removing MessageCounter:785280 from Retrans Table on exchange 50777r
+          [1690220692720] [38880:6590520] [EM] >>> [E:50778r S:15324 M:104911060 (Ack:785281)] (S) Msg RX from 2:0000000000000001 [40B2] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690220692720] [38880:6590520] [EM] Found matching exchange: 50778r, Delegate: 0x0
+          [1690220692720] [38880:6590520] [EM] Rxd Ack; Removing MessageCounter:785281 from Retrans Table on exchange 50778r
+      disabled: true
+
+    - label:
+          "Step 24: TH_CR2 opens a commissioning window on DUT_CE using ECM with
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds"
+      PICS: CADMIN.S.C00.Rsp
+      verification: |
+          In interactive mode of TH_CR2, send command to open commissioning window using ECM
+
+          pairing open-commissioning-window 1 1 180 1000 3840 --commissioner-name beta
+
+          On TH_CR2 logs, verify for commissioning window to be open
+
+          InvokeResponseMessage =
+          [1690220763945] [38880:6590520] [DMG] {
+          [1690220763945] [38880:6590520] [DMG]         suppressResponse = false,
+          [1690220763945] [38880:6590520] [DMG]         InvokeResponseIBs =
+          [1690220763945] [38880:6590520] [DMG]         [
+          [1690220763945] [38880:6590520] [DMG]                 InvokeResponseIB =
+          [1690220763945] [38880:6590520] [DMG]                 {
+          [1690220763945] [38880:6590520] [DMG]                         CommandStatusIB =
+          [1690220763945] [38880:6590520] [DMG]                         {
+          [1690220763945] [38880:6590520] [DMG]                                 CommandPathIB =
+          [1690220763945] [38880:6590520] [DMG]                                 {
+          [1690220763945] [38880:6590520] [DMG]                                         EndpointId = 0x0,
+          [1690220763945] [38880:6590520] [DMG]                                         ClusterId = 0x3c,
+          [1690220763945] [38880:6590520] [DMG]                                         CommandId = 0x0,
+          [1690220763945] [38880:6590520] [DMG]                                 },
+          [1690220763945] [38880:6590520] [DMG]
+          [1690220763945] [38880:6590520] [DMG]                                 StatusIB =
+          [1690220763945] [38880:6590520] [DMG]                                 {
+          [1690220763945] [38880:6590520] [DMG]                                         status = 0x00 (SUCCESS),
+          [1690220763945] [38880:6590520] [DMG]                                 },
+          [1690220763945] [38880:6590520] [DMG]
+          [1690220763945] [38880:6590520] [DMG]                         },
+          [1690220763945] [38880:6590520] [DMG]
+          [1690220763945] [38880:6590520] [DMG]                 },
+          [1690220763945] [38880:6590520] [DMG]
+          [1690220763945] [38880:6590520] [DMG]         ],
+          [1690220763945] [38880:6590520] [DMG]
+          [1690220763945] [38880:6590520] [DMG]         InteractionModelRevision = 1
+          [1690220763945] [38880:6590520] [DMG] },
+          [1690220763945] [38880:6590520] [DMG] Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
+          [1690220763945] [38880:6590520] [CTL] Successfully opened pairing window on the device
+          [1690220763945] [38880:6590520] [CTL] Manual pairing code: [35598021029]
+          [1690220763945] [38880:6590520] [CTL] SetupQRCode: [MT:-24J0AFN00-CRP1PR00]
+      disabled: true
+
+    - label:
+          "Step 25: Verify TH_CR1 receives subscription notifications which show
+          WindowStatus value to be 1, AdminFabricIndex value to be the same as
+          the Fabric Index of the Fabrics attribute list entry corresponding to
+          TH_CR2s fabric, AdminVendorId to be the same as the Vendor ID field of
+          Fabrics attribute list entry corresponding to TH_CR2s fabric"
+      verification: |
+          Verify TH_CR1 logs for subscription notifications which show WindowStatus value to be 1, AdminFabricIndex value to be the same as the Fabric Index of the Fabrics attribute list entry corresponding to TH_CR2’s fabric, AdminVendorId to be the same as the Vendor ID field of Fabrics attribute list entry corresponding to TH_CR2’s fabric
+
+
+          [1690220763948] [38865:6590605] [EM] >>> [E:50779r S:35778 M:264355241] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0001:05 (IM:ReportData)
+          [1690220763948] [38865:6590605] [EM] Handling via exchange: 50779r, Delegate: 0x1013c4be0
+          [1690220763948] [38865:6590605] [DMG] ReportDataMessage =
+          [1690220763948] [38865:6590605] [DMG] {
+          [1690220763948] [38865:6590605] [DMG]         SubscriptionId = 0xdade5274,
+          [1690220763948] [38865:6590605] [DMG]         AttributeReportIBs =
+          [1690220763948] [38865:6590605] [DMG]         [
+          [1690220763948] [38865:6590605] [DMG]                 AttributeReportIB =
+          [1690220763948] [38865:6590605] [DMG]                 {
+          [1690220763948] [38865:6590605] [DMG]                         AttributeDataIB =
+          [1690220763948] [38865:6590605] [DMG]                         {
+          [1690220763948] [38865:6590605] [DMG]                                 DataVersion = 0x1fddccf3,
+          [1690220763948] [38865:6590605] [DMG]                                 AttributePathIB =
+          [1690220763948] [38865:6590605] [DMG]                                 {
+          [1690220763948] [38865:6590605] [DMG]                                         Endpoint = 0x0,
+          [1690220763948] [38865:6590605] [DMG]                                         Cluster = 0x3c,
+          [1690220763948] [38865:6590605] [DMG]                                         Attribute = 0x0000_0000,
+          [1690220763948] [38865:6590605] [DMG]                                 }
+          [1690220763948] [38865:6590605] [DMG]
+          [1690220763948] [38865:6590605] [DMG]                                 Data = 1,
+          [1690220763948] [38865:6590605] [DMG]                         },
+          [1690220763948] [38865:6590605] [DMG]
+          [1690220763948] [38865:6590605] [DMG]                 },
+          [1690220763948] [38865:6590605] [DMG]
+          [1690220763948] [38865:6590605] [DMG]         ],
+          [1690220763948] [38865:6590605] [DMG]
+          [1690220763948] [38865:6590605] [DMG]         InteractionModelRevision = 1
+          [1690220763948] [38865:6590605] [DMG] }
+          [1690220763948] [38865:6590605] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 534629619
+          [1690220763948] [38865:6590605] [TOO]   WindowStatus: 1
+          [1690220763948] [38865:6590605] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0xdade5274 Peer = 01:0000000000000001
+          [1690220763949] [38865:6590605] [EM] <<< [E:50779r S:35778 M:151592268 (Ack:264355241)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+          [1690220763949] [38865:6590605] [IN] (S) Sending msg 151592268 on secure session with LSID: 35778
+          [1690220763955] [38865:6590605] [EM] >>> [E:50780r S:35778 M:264355242] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0001:05 (IM:ReportData)
+          [1690220763955] [38865:6590605] [EM] Handling via exchange: 50780r, Delegate: 0x1013c4be0
+          [1690220763955] [38865:6590605] [DMG] ReportDataMessage =
+          [1690220763955] [38865:6590605] [DMG] {
+          [1690220763955] [38865:6590605] [DMG]         SubscriptionId = 0x35250b41,
+          [1690220763955] [38865:6590605] [DMG]         AttributeReportIBs =
+          [1690220763955] [38865:6590605] [DMG]         [
+          [1690220763955] [38865:6590605] [DMG]                 AttributeReportIB =
+          [1690220763955] [38865:6590605] [DMG]                 {
+          [1690220763955] [38865:6590605] [DMG]                         AttributeDataIB =
+          [1690220763955] [38865:6590605] [DMG]                         {
+          [1690220763955] [38865:6590605] [DMG]                                 DataVersion = 0x1fddccf3,
+          [1690220763955] [38865:6590605] [DMG]                                 AttributePathIB =
+          [1690220763955] [38865:6590605] [DMG]                                 {
+          [1690220763955] [38865:6590605] [DMG]                                         Endpoint = 0x0,
+          [1690220763955] [38865:6590605] [DMG]                                         Cluster = 0x3c,
+          [1690220763955] [38865:6590605] [DMG]                                         Attribute = 0x0000_0001,
+          [1690220763955] [38865:6590605] [DMG]                                 }
+          [1690220763955] [38865:6590605] [DMG]
+          [1690220763955] [38865:6590605] [DMG]                                 Data = 2,
+          [1690220763955] [38865:6590605] [DMG]                         },
+          [1690220763955] [38865:6590605] [DMG]
+          [1690220763955] [38865:6590605] [DMG]                 },
+          [1690220763955] [38865:6590605] [DMG]
+          [1690220763955] [38865:6590605] [DMG]         ],
+          [1690220763955] [38865:6590605] [DMG]
+          [1690220763955] [38865:6590605] [DMG]         InteractionModelRevision = 1
+          [1690220763955] [38865:6590605] [DMG] }
+          [1690220763955] [38865:6590605] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0001 DataVersion: 534629619
+          [1690220763955] [38865:6590605] [TOO]   AdminFabricIndex: 2
+          [1690220763955] [38865:6590605] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0x35250b41 Peer = 01:0000000000000001
+          [1690220763956] [38865:6590605] [EM] <<< [E:50780r S:35778 M:151592269 (Ack:264355242)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+          [1690220763956] [38865:6590605] [IN] (S) Sending msg 151592269 on secure session with LSID: 35778
+          [1690220763956] [38865:6590605] [EM] >>> [E:50781r S:35778 M:264355243] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0001:05 (IM:ReportData)
+          [1690220763956] [38865:6590605] [EM] Handling via exchange: 50781r, Delegate: 0x1013c4be0
+          [1690220763956] [38865:6590605] [DMG] ReportDataMessage =
+          [1690220763956] [38865:6590605] [DMG] {
+          [1690220763956] [38865:6590605] [DMG]         SubscriptionId = 0xd3c6ff91,
+          [1690220763956] [38865:6590605] [DMG]         AttributeReportIBs =
+          [1690220763957] [38865:6590605] [DMG]         [
+          [1690220763957] [38865:6590605] [DMG]                 AttributeReportIB =
+          [1690220763957] [38865:6590605] [DMG]                 {
+          [1690220763957] [38865:6590605] [DMG]                         AttributeDataIB =
+          [1690220763957] [38865:6590605] [DMG]                         {
+          [1690220763957] [38865:6590605] [DMG]                                 DataVersion = 0x1fddccf3,
+          [1690220763957] [38865:6590605] [DMG]                                 AttributePathIB =
+          [1690220763957] [38865:6590605] [DMG]                                 {
+          [1690220763957] [38865:6590605] [DMG]                                         Endpoint = 0x0,
+          [1690220763957] [38865:6590605] [DMG]                                         Cluster = 0x3c,
+          [1690220763957] [38865:6590605] [DMG]                                         Attribute = 0x0000_0002,
+          [1690220763957] [38865:6590605] [DMG]                                 }
+          [1690220763957] [38865:6590605] [DMG]
+          [1690220763957] [38865:6590605] [DMG]                                 Data = 65521,
+          [1690220763957] [38865:6590605] [DMG]                         },
+          [1690220763957] [38865:6590605] [DMG]
+          [1690220763957] [38865:6590605] [DMG]                 },
+          [1690220763957] [38865:6590605] [DMG]
+          [1690220763957] [38865:6590605] [DMG]         ],
+          [1690220763957] [38865:6590605] [DMG]
+          [1690220763957] [38865:6590605] [DMG]         InteractionModelRevision = 1
+          [1690220763957] [38865:6590605] [DMG] }
+          [1690220763957] [38865:6590605] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0002 DataVersion: 534629619
+          [1690220763957] [38865:6590605] [TOO]   AdminVendorId: 65521
+          [1690220763957] [38865:6590605] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0xd3c6ff91 Peer = 01:0000000000000001
+          [1690220763957] [38865:6590605] [EM] <<< [E:50781r S:35778 M:151592270 (Ack:264355243)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+          [1690220763957] [38865:6590605] [IN] (S) Sending msg 151592270 on secure session with LSID: 35778
+          [1690220763962] [38865:6590605] [EM] >>> [E:50779r S:35778 M:264355244 (Ack:151592268)] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690220763962] [38865:6590605] [EM] Found matching exchange: 50779r, Delegate: 0x0
+          [1690220763962] [38865:6590605] [EM] Rxd Ack; Removing MessageCounter:151592268 from Retrans Table on exchange 50779r
+          [1690220763976] [38865:6590605] [EM] >>> [E:50780r S:35778 M:264355245 (Ack:151592269)] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690220763976] [38865:6590605] [EM] Found matching exchange: 50780r, Delegate: 0x0
+          [1690220763976] [38865:6590605] [EM] Rxd Ack; Removing MessageCounter:151592269 from Retrans Table on exchange 50780r
+          [1690220763981] [38865:6593769] [EM] >>> [E:50781r S:35778 M:264355246 (Ack:151592270)] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690220763981] [38865:6593769] [EM] Found matching exchange: 50781r, Delegate: 0x0
+          [1690220763981] [38865:6593769] [EM] Rxd Ack; Removing MessageCounter:151592270 from Retrans Table on exchange 50781r
+      disabled: true
+
+    - label:
+          "Step 26: Verify TH_CR2 receives subscription notifications which show
+          WindowStatus value to be 1, AdminFabricIndex value to be the same as
+          the Fabric Index of the Fabrics attribute list entry corresponding to
+          TH_CR2s fabric, AdminVendorId to be the same as the Vendor ID field of
+          Fabrics attribute list entry corresponding to TH_CR2s fabric"
+      verification: |
+          Verify TH_CR2 logs for subscription notifications which show WindowStatus value to be 1, AdminFabricIndex value to be the same as the Fabric Index of the Fabrics attribute list entry corresponding to TH_CR2’s fabric, AdminVendorId to be the same as the Vendor ID field of Fabrics attribute list entry corresponding to TH_CR2’s fabric
+
+          ReportDataMessage =
+          [1690220763955] [38880:6590520] [DMG] {
+          [1690220763955] [38880:6590520] [DMG]         SubscriptionId = 0xfab5d837,
+          [1690220763955] [38880:6590520] [DMG]         AttributeReportIBs =
+          [1690220763955] [38880:6590520] [DMG]         [
+          [1690220763955] [38880:6590520] [DMG]                 AttributeReportIB =
+          [1690220763955] [38880:6590520] [DMG]                 {
+          [1690220763955] [38880:6590520] [DMG]                         AttributeDataIB =
+          [1690220763955] [38880:6590520] [DMG]                         {
+          [1690220763955] [38880:6590520] [DMG]                                 DataVersion = 0x1fddccf3,
+          [1690220763955] [38880:6590520] [DMG]                                 AttributePathIB =
+          [1690220763955] [38880:6590520] [DMG]                                 {
+          [1690220763955] [38880:6590520] [DMG]                                         Endpoint = 0x0,
+          [1690220763955] [38880:6590520] [DMG]                                         Cluster = 0x3c,
+          [1690220763955] [38880:6590520] [DMG]                                         Attribute = 0x0000_0000,
+          [1690220763955] [38880:6590520] [DMG]                                 }
+          [1690220763955] [38880:6590520] [DMG]
+          [1690220763955] [38880:6590520] [DMG]                                 Data = 1,
+          [1690220763955] [38880:6590520] [DMG]                         },
+          [1690220763955] [38880:6590520] [DMG]
+          [1690220763955] [38880:6590520] [DMG]                 },
+          [1690220763955] [38880:6590520] [DMG]
+          [1690220763955] [38880:6590520] [DMG]         ],
+          [1690220763955] [38880:6590520] [DMG]
+          [1690220763955] [38880:6590520] [DMG]         InteractionModelRevision = 1
+          [1690220763955] [38880:6590520] [DMG] }
+          [1690220763955] [38880:6590520] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 534629619
+          [1690220763955] [38880:6590520] [TOO]   WindowStatus: 1
+          [1690220763956] [38880:6590520] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0xfab5d837 Peer = 02:0000000000000001
+          [1690220763956] [38880:6590520] [EM] <<< [E:50782r S:15324 M:785289 (Ack:104911065)] (S) Msg TX to 2:0000000000000001 [40B2] --- Type 0001:01 (IM:StatusResponse)
+          [1690220763956] [38880:6590520] [IN] (S) Sending msg 785289 on secure session with LSID: 15324
+          [1690220763972] [38880:6590520] [EM] >>> [E:50783r S:15324 M:104911066] (S) Msg RX from 2:0000000000000001 [40B2] --- Type 0001:05 (IM:ReportData)
+          [1690220763972] [38880:6590520] [EM] Handling via exchange: 50783r, Delegate: 0x1035c8be0
+          [1690220763972] [38880:6590520] [DMG] ReportDataMessage =
+          [1690220763972] [38880:6590520] [DMG] {
+          [1690220763972] [38880:6590520] [DMG]         SubscriptionId = 0x5984e13a,
+          [1690220763972] [38880:6590520] [DMG]         AttributeReportIBs =
+          [1690220763973] [38880:6590520] [DMG]         [
+          [1690220763973] [38880:6590520] [DMG]                 AttributeReportIB =
+          [1690220763973] [38880:6590520] [DMG]                 {
+          [1690220763973] [38880:6590520] [DMG]                         AttributeDataIB =
+          [1690220763973] [38880:6590520] [DMG]                         {
+          [1690220763973] [38880:6590520] [DMG]                                 DataVersion = 0x1fddccf3,
+          [1690220763973] [38880:6590520] [DMG]                                 AttributePathIB =
+          [1690220763973] [38880:6590520] [DMG]                                 {
+          [1690220763973] [38880:6590520] [DMG]                                         Endpoint = 0x0,
+          [1690220763973] [38880:6590520] [DMG]                                         Cluster = 0x3c,
+          [1690220763973] [38880:6590520] [DMG]                                         Attribute = 0x0000_0001,
+          [1690220763973] [38880:6590520] [DMG]                                 }
+          [1690220763973] [38880:6590520] [DMG]
+          [1690220763973] [38880:6590520] [DMG]                                 Data = 2,
+          [1690220763973] [38880:6590520] [DMG]                         },
+          [1690220763973] [38880:6590520] [DMG]
+          [1690220763973] [38880:6590520] [DMG]                 },
+          [1690220763973] [38880:6590520] [DMG]
+          [1690220763973] [38880:6590520] [DMG]         ],
+          [1690220763973] [38880:6590520] [DMG]
+          [1690220763973] [38880:6590520] [DMG]         InteractionModelRevision = 1
+          [1690220763973] [38880:6590520] [DMG] }
+          [1690220763973] [38880:6590520] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0001 DataVersion: 534629619
+          [1690220763973] [38880:6590520] [TOO]   AdminFabricIndex: 2
+          [1690220763973] [38880:6590520] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0x5984e13a Peer = 02:0000000000000001
+          [1690220763973] [38880:6590520] [EM] <<< [E:50783r S:15324 M:785290 (Ack:104911066)] (S) Msg TX to 2:0000000000000001 [40B2] --- Type 0001:01 (IM:StatusResponse)
+          [1690220763973] [38880:6590520] [IN] (S) Sending msg 785290 on secure session with LSID: 15324
+          [1690220763976] [38880:6593761] [EM] >>> [E:50782r S:15324 M:104911067 (Ack:785289)] (S) Msg RX from 2:0000000000000001 [40B2] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690220763976] [38880:6593761] [EM] Found matching exchange: 50782r, Delegate: 0x0
+          [1690220763976] [38880:6593761] [EM] Rxd Ack; Removing MessageCounter:785289 from Retrans Table on exchange 50782r
+          [1690220763976] [38880:6593761] [EM] >>> [E:50784r S:15324 M:104911068] (S) Msg RX from 2:0000000000000001 [40B2] --- Type 0001:05 (IM:ReportData)
+          [1690220763976] [38880:6593761] [EM] Handling via exchange: 50784r, Delegate: 0x1035c8be0
+          [1690220763976] [38880:6593761] [DMG] ReportDataMessage =
+          [1690220763976] [38880:6593761] [DMG] {
+          [1690220763977] [38880:6593761] [DMG]         SubscriptionId = 0x943b5fc3,
+          [1690220763977] [38880:6593761] [DMG]         AttributeReportIBs =
+          [1690220763977] [38880:6593761] [DMG]         [
+          [1690220763977] [38880:6593761] [DMG]                 AttributeReportIB =
+          [1690220763977] [38880:6593761] [DMG]                 {
+          [1690220763977] [38880:6593761] [DMG]                         AttributeDataIB =
+          [1690220763977] [38880:6593761] [DMG]                         {
+          [1690220763977] [38880:6593761] [DMG]                                 DataVersion = 0x1fddccf3,
+          [1690220763977] [38880:6593761] [DMG]                                 AttributePathIB =
+          [1690220763977] [38880:6593761] [DMG]                                 {
+          [1690220763977] [38880:6593761] [DMG]                                         Endpoint = 0x0,
+          [1690220763977] [38880:6593761] [DMG]                                         Cluster = 0x3c,
+          [1690220763977] [38880:6593761] [DMG]                                         Attribute = 0x0000_0002,
+          [1690220763977] [38880:6593761] [DMG]                                 }
+          [1690220763977] [38880:6593761] [DMG]
+          [1690220763977] [38880:6593761] [DMG]                                 Data = 65521,
+          [1690220763977] [38880:6593761] [DMG]                         },
+          [1690220763977] [38880:6593761] [DMG]
+          [1690220763977] [38880:6593761] [DMG]                 },
+          [1690220763977] [38880:6593761] [DMG]
+          [1690220763977] [38880:6593761] [DMG]         ],
+          [1690220763977] [38880:6593761] [DMG]
+          [1690220763977] [38880:6593761] [DMG]         InteractionModelRevision = 1
+          [1690220763977] [38880:6593761] [DMG] }
+          [1690220763977] [38880:6593761] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0002 DataVersion: 534629619
+          [1690220763977] [38880:6593761] [TOO]   AdminVendorId: 65521
+          [1690220763977] [38880:6593761] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0x943b5fc3 Peer = 02:0000000000000001
+          [1690220763977] [38880:6593761] [EM] <<< [E:50784r S:15324 M:785291 (Ack:104911068)] (S) Msg TX to 2:0000000000000001 [40B2] --- Type 0001:01 (IM:StatusResponse)
+      disabled: true
+
+    - label:
+          "Step 27: Before expiration of PIXIT.CADMIN.CwDuration seconds set in
+          step 24, TH_CR1 sends RemoveFabric command to DUT_CE with FabricIndex
+          set to the fabric index of TH_CR2s fabric"
+      PICS: OPCREDS.S.C0a.Rsp
+      verification: |
+          Before expiration of PIXIT.CADMIN.CwDuration seconds set in step 24, from interactive mode of TH_CR1 send RemoveFabric command with FabricIndex set to the fabric index of TH_CR2’s fabric
+
+          operationalcredentials remove-fabric 2 1 0 --commissioner-name alpha --timedInteractionTimeoutMs 1000
+
+          On TH_CR1 logs, verify for NOCResponse with statuscode 0 and fabric index equal to fabric index of TH_CR2's fabric
+
+          InvokeResponseMessage =
+          [1690220880388] [38865:6593769] [DMG] {
+          [1690220880388] [38865:6593769] [DMG]         suppressResponse = false,
+          [1690220880388] [38865:6593769] [DMG]         InvokeResponseIBs =
+          [1690220880388] [38865:6593769] [DMG]         [
+          [1690220880388] [38865:6593769] [DMG]                 InvokeResponseIB =
+          [1690220880388] [38865:6593769] [DMG]                 {
+          [1690220880388] [38865:6593769] [DMG]                         CommandDataIB =
+          [1690220880388] [38865:6593769] [DMG]                         {
+          [1690220880388] [38865:6593769] [DMG]                                 CommandPathIB =
+          [1690220880388] [38865:6593769] [DMG]                                 {
+          [1690220880388] [38865:6593769] [DMG]                                         EndpointId = 0x0,
+          [1690220880388] [38865:6593769] [DMG]                                         ClusterId = 0x3e,
+          [1690220880388] [38865:6593769] [DMG]                                         CommandId = 0x8,
+          [1690220880388] [38865:6593769] [DMG]                                 },
+          [1690220880388] [38865:6593769] [DMG]
+          [1690220880388] [38865:6593769] [DMG]                                 CommandFields =
+          [1690220880388] [38865:6593769] [DMG]                                 {
+          [1690220880388] [38865:6593769] [DMG]                                         0x0 = 0,
+          [1690220880388] [38865:6593769] [DMG]                                         0x1 = 2,
+          [1690220880388] [38865:6593769] [DMG]                                 },
+          [1690220880388] [38865:6593769] [DMG]                         },
+          [1690220880388] [38865:6593769] [DMG]
+          [1690220880388] [38865:6593769] [DMG]                 },
+          [1690220880388] [38865:6593769] [DMG]
+          [1690220880388] [38865:6593769] [DMG]         ],
+          [1690220880388] [38865:6593769] [DMG]
+          [1690220880388] [38865:6593769] [DMG]         InteractionModelRevision = 1
+          [1690220880388] [38865:6593769] [DMG] },
+          [1690220880388] [38865:6593769] [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1690220880388] [38865:6593769] [TOO] Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1690220880388] [38865:6593769] [TOO]   NOCResponse: {
+          [1690220880388] [38865:6593769] [TOO]     statusCode: 0
+          [1690220880388] [38865:6593769] [TOO]     fabricIndex: 2
+          [1690220880388] [38865:6593769] [TOO]    }
+          [1690220880388] [38865:6593769] [DMG] ICR moving to [AwaitingDe]
+          [1690220880389] [38865:6593769] [EM] <<< [E:27147i S:35778 M:151592272 (Ack:264355248)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label:
+          "Step 28: Verify TH_CR1 receives subscription notifications which show
+          AdminFabricIndex value to be null"
+      verification: |
+          Verify TH_CR1 logs for subscription notifications which show AdminFabricIndex value to be null
+
+          ReportDataMessage =
+          [1690221347664] [38912:6599713] [DMG] {
+          [1690221347664] [38912:6599713] [DMG]         SubscriptionId = 0x7dc4ea87,
+          [1690221347664] [38912:6599713] [DMG]         AttributeReportIBs =
+          [1690221347664] [38912:6599713] [DMG]         [
+          [1690221347664] [38912:6599713] [DMG]                 AttributeReportIB =
+          [1690221347664] [38912:6599713] [DMG]                 {
+          [1690221347664] [38912:6599713] [DMG]                         AttributeDataIB =
+          [1690221347664] [38912:6599713] [DMG]                         {
+          [1690221347664] [38912:6599713] [DMG]                                 DataVersion = 0x1404feca,
+          [1690221347664] [38912:6599713] [DMG]                                 AttributePathIB =
+          [1690221347665] [38912:6599713] [DMG]                                 {
+          [1690221347665] [38912:6599713] [DMG]                                         Endpoint = 0x0,
+          [1690221347665] [38912:6599713] [DMG]                                         Cluster = 0x3c,
+          [1690221347665] [38912:6599713] [DMG]                                         Attribute = 0x0000_0001,
+          [1690221347665] [38912:6599713] [DMG]                                 }
+          [1690221347665] [38912:6599713] [DMG]
+          [1690221347665] [38912:6599713] [DMG]                                 Data = NULL
+          [1690221347665] [38912:6599713] [DMG]                         },
+          [1690221347665] [38912:6599713] [DMG]
+          [1690221347665] [38912:6599713] [DMG]                 },
+          [1690221347665] [38912:6599713] [DMG]
+          [1690221347665] [38912:6599713] [DMG]         ],
+          [1690221347665] [38912:6599713] [DMG]
+          [1690221347665] [38912:6599713] [DMG]         InteractionModelRevision = 1
+          [1690221347665] [38912:6599713] [DMG] }
+          [1690221347665] [38912:6599713] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0001 DataVersion: 335871690
+          [1690221347665] [38912:6599713] [TOO]   AdminFabricIndex: null
+          [1690221347665] [38912:6599713] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0x7dc4ea87 Peer = 01:0000000000000001
+          [1690221347666] [38912:6599713] [EM] <<< [E:41212r S:64671 M:91208151 (Ack:135000952)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+      disabled: true
+
+    - label: "Step 29: TH_CR1 reads WindowStatus attribute from DUT_CE"
+      PICS: CADMIN.S.A0000
+      verification: |
+          In interactive mode of TH_CR1, read windowstatus attribute,
+
+          administratorcommissioning read window-status 1 0 --commissioner-name alpha
+
+          Verify TH_CR1 logs for windowstatus to be 1
+
+          ReportDataMessage =
+          [1690221400622] [38912:6600376] [DMG] {
+          [1690221400622] [38912:6600376] [DMG]         AttributeReportIBs =
+          [1690221400622] [38912:6600376] [DMG]         [
+          [1690221400622] [38912:6600376] [DMG]                 AttributeReportIB =
+          [1690221400622] [38912:6600376] [DMG]                 {
+          [1690221400622] [38912:6600376] [DMG]                         AttributeDataIB =
+          [1690221400622] [38912:6600376] [DMG]                         {
+          [1690221400622] [38912:6600376] [DMG]                                 DataVersion = 0x1404feca,
+          [1690221400622] [38912:6600376] [DMG]                                 AttributePathIB =
+          [1690221400622] [38912:6600376] [DMG]                                 {
+          [1690221400622] [38912:6600376] [DMG]                                         Endpoint = 0x0,
+          [1690221400622] [38912:6600376] [DMG]                                         Cluster = 0x3c,
+          [1690221400622] [38912:6600376] [DMG]                                         Attribute = 0x0000_0000,
+          [1690221400622] [38912:6600376] [DMG]                                 }
+          [1690221400622] [38912:6600376] [DMG]
+          [1690221400622] [38912:6600376] [DMG]                                 Data = 1,
+          [1690221400622] [38912:6600376] [DMG]                         },
+          [1690221400622] [38912:6600376] [DMG]
+          [1690221400622] [38912:6600376] [DMG]                 },
+          [1690221400622] [38912:6600376] [DMG]
+          [1690221400622] [38912:6600376] [DMG]         ],
+          [1690221400622] [38912:6600376] [DMG]
+          [1690221400622] [38912:6600376] [DMG]         SuppressResponse = true,
+          [1690221400622] [38912:6600376] [DMG]         InteractionModelRevision = 1
+          [1690221400622] [38912:6600376] [DMG] }
+          [1690221400622] [38912:6600376] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 335871690
+          [1690221400622] [38912:6600376] [TOO]   WindowStatus: 1
+          [1690221400622] [38912:6600376] [EM] <<< [E:30395i S:64671 M:91208153 (Ack:135000954)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label: "Step 30: TH_CR1 reads AdminVendorID attribute from DUT_CE"
+      PICS: CADMIN.S.A0002
+      verification: |
+          In interactive mode of TH_CR1, read adminvendorid attribute,
+
+          administratorcommissioning read admin-vendor-id 1 0 --commissioner-name alpha
+
+          On TH_CR1 logs, verify the value of adminvendorid to be the same as the Fabric Index of the Fabrics attribute list entry corresponding to TH_CR2’s fabric
+
+          ReportDataMessage =
+          [1690221461458] [38912:6600376] [DMG] {
+          [1690221461458] [38912:6600376] [DMG]         AttributeReportIBs =
+          [1690221461458] [38912:6600376] [DMG]         [
+          [1690221461458] [38912:6600376] [DMG]                 AttributeReportIB =
+          [1690221461458] [38912:6600376] [DMG]                 {
+          [1690221461458] [38912:6600376] [DMG]                         AttributeDataIB =
+          [1690221461458] [38912:6600376] [DMG]                         {
+          [1690221461458] [38912:6600376] [DMG]                                 DataVersion = 0x1404feca,
+          [1690221461458] [38912:6600376] [DMG]                                 AttributePathIB =
+          [1690221461458] [38912:6600376] [DMG]                                 {
+          [1690221461458] [38912:6600376] [DMG]                                         Endpoint = 0x0,
+          [1690221461458] [38912:6600376] [DMG]                                         Cluster = 0x3c,
+          [1690221461458] [38912:6600376] [DMG]                                         Attribute = 0x0000_0002,
+          [1690221461458] [38912:6600376] [DMG]                                 }
+          [1690221461458] [38912:6600376] [DMG]
+          [1690221461458] [38912:6600376] [DMG]                                 Data = 65521,
+          [1690221461458] [38912:6600376] [DMG]                         },
+          [1690221461458] [38912:6600376] [DMG]
+          [1690221461458] [38912:6600376] [DMG]                 },
+          [1690221461458] [38912:6600376] [DMG]
+          [1690221461458] [38912:6600376] [DMG]         ],
+          [1690221461458] [38912:6600376] [DMG]
+          [1690221461458] [38912:6600376] [DMG]         SuppressResponse = true,
+          [1690221461458] [38912:6600376] [DMG]         InteractionModelRevision = 1
+          [1690221461458] [38912:6600376] [DMG] }
+          [1690221461458] [38912:6600376] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0002 DataVersion: 335871690
+          [1690221461458] [38912:6600376] [TOO]   AdminVendorId: 65521
+          [1690221461458] [38912:6600376] [EM] <<< [E:30396i S:64671 M:91208155 (Ack:135000955)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690221461458] [38912:6600376] [IN] (S) Sending msg 91208155 on secure session with LSID: 64671
+          [1690221461458] [38912:6600376] [EM] Flushed pending ack for MessageCounter:135000955 on exchange 30396i
+          >>>
+      disabled: true
+
+    - label:
+          "Step 31: Wait for the expiration of PIXIT.CADMIN.CwDuration seconds
+          that is set in step 24"
+      verification: |
+          Wait for the expiration of PIXIT.CADMIN.CwDuration seconds that is set in step 24
+      disabled: true
+
+    - label:
+          "Step 32: Verify TH_CR1 receives subscription notifications which show
+          WindowStatus value to be 0, AdminVendorId to be null"
+      verification: |
+          Verify TH_CR1 logs for subscription notifications which show WindowStatus value to be 0, AdminVendorId to be null
+
+          [1690221509585] [38912:6600376] [EM] >>> [E:41213r S:64671 M:135000956] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0001:05 (IM:ReportData)
+          [1690221509585] [38912:6600376] [EM] Handling via exchange: 41213r, Delegate: 0x101e84be0
+          [1690221509586] [38912:6600376] [DMG] ReportDataMessage =
+          [1690221509586] [38912:6600376] [DMG] {
+          [1690221509586] [38912:6600376] [DMG]         SubscriptionId = 0xdd7ad0b4,
+          [1690221509586] [38912:6600376] [DMG]         AttributeReportIBs =
+          [1690221509586] [38912:6600376] [DMG]         [
+          [1690221509586] [38912:6600376] [DMG]                 AttributeReportIB =
+          [1690221509586] [38912:6600376] [DMG]                 {
+          [1690221509586] [38912:6600376] [DMG]                         AttributeDataIB =
+          [1690221509586] [38912:6600376] [DMG]                         {
+          [1690221509586] [38912:6600376] [DMG]                                 DataVersion = 0x1404fecc,
+          [1690221509586] [38912:6600376] [DMG]                                 AttributePathIB =
+          [1690221509586] [38912:6600376] [DMG]                                 {
+          [1690221509586] [38912:6600376] [DMG]                                         Endpoint = 0x0,
+          [1690221509586] [38912:6600376] [DMG]                                         Cluster = 0x3c,
+          [1690221509586] [38912:6600376] [DMG]                                         Attribute = 0x0000_0000,
+          [1690221509586] [38912:6600376] [DMG]                                 }
+          [1690221509586] [38912:6600376] [DMG]
+          [1690221509586] [38912:6600376] [DMG]                                 Data = 0,
+          [1690221509586] [38912:6600376] [DMG]                         },
+          [1690221509586] [38912:6600376] [DMG]
+          [1690221509586] [38912:6600376] [DMG]                 },
+          [1690221509586] [38912:6600376] [DMG]
+          [1690221509586] [38912:6600376] [DMG]         ],
+          [1690221509586] [38912:6600376] [DMG]
+          [1690221509586] [38912:6600376] [DMG]         InteractionModelRevision = 1
+          [1690221509586] [38912:6600376] [DMG] }
+          [1690221509586] [38912:6600376] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 335871692
+          [1690221509586] [38912:6600376] [TOO]   WindowStatus: 0
+          [1690221509586] [38912:6600376] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0xdd7ad0b4 Peer = 01:0000000000000001
+          [1690221509587] [38912:6600376] [EM] <<< [E:41213r S:64671 M:91208156 (Ack:135000956)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+          [1690221509587] [38912:6600376] [IN] (S) Sending msg 91208156 on secure session with LSID: 64671
+          [1690221509587] [38912:6600376] [EM] >>> [E:41214r S:64671 M:135000957] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0001:05 (IM:ReportData)
+          [1690221509587] [38912:6600376] [EM] Handling via exchange: 41214r, Delegate: 0x101e84be0
+          [1690221509588] [38912:6600376] [DMG] ReportDataMessage =
+          [1690221509588] [38912:6600376] [DMG] {
+          [1690221509588] [38912:6600376] [DMG]         SubscriptionId = 0xe3771580,
+          [1690221509588] [38912:6600376] [DMG]         AttributeReportIBs =
+          [1690221509588] [38912:6600376] [DMG]         [
+          [1690221509588] [38912:6600376] [DMG]                 AttributeReportIB =
+          [1690221509588] [38912:6600376] [DMG]                 {
+          [1690221509588] [38912:6600376] [DMG]                         AttributeDataIB =
+          [1690221509588] [38912:6600376] [DMG]                         {
+          [1690221509588] [38912:6600376] [DMG]                                 DataVersion = 0x1404fecc,
+          [1690221509588] [38912:6600376] [DMG]                                 AttributePathIB =
+          [1690221509588] [38912:6600376] [DMG]                                 {
+          [1690221509588] [38912:6600376] [DMG]                                         Endpoint = 0x0,
+          [1690221509588] [38912:6600376] [DMG]                                         Cluster = 0x3c,
+          [1690221509588] [38912:6600376] [DMG]                                         Attribute = 0x0000_0002,
+          [1690221509588] [38912:6600376] [DMG]                                 }
+          [1690221509588] [38912:6600376] [DMG]
+          [1690221509588] [38912:6600376] [DMG]                                 Data = NULL
+          [1690221509588] [38912:6600376] [DMG]                         },
+          [1690221509588] [38912:6600376] [DMG]
+          [1690221509588] [38912:6600376] [DMG]                 },
+          [1690221509588] [38912:6600376] [DMG]
+          [1690221509588] [38912:6600376] [DMG]         ],
+          [1690221509588] [38912:6600376] [DMG]
+          [1690221509588] [38912:6600376] [DMG]         InteractionModelRevision = 1
+          [1690221509588] [38912:6600376] [DMG] }
+          [1690221509588] [38912:6600376] [TOO] Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0002 DataVersion: 335871692
+          [1690221509588] [38912:6600376] [TOO]   AdminVendorId: null
+          [1690221509588] [38912:6600376] [DMG] Refresh LivenessCheckTime for 3004224 milliseconds with SubscriptionId = 0xe3771580 Peer = 01:0000000000000001
+          [1690221509588] [38912:6600376] [EM] <<< [E:41214r S:64671 M:91208157 (Ack:135000957)] (S) Msg TX to 1:0000000000000001 [4A14] --- Type 0001:01 (IM:StatusResponse)
+          [1690221509589] [38912:6600376] [IN] (S) Sending msg 91208157 on secure session with LSID: 64671
+          [1690221509616] [38912:6600376] [EM] >>> [E:41213r S:64671 M:135000958 (Ack:91208156)] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690221509616] [38912:6600376] [EM] Found matching exchange: 41213r, Delegate: 0x0
+          [1690221509616] [38912:6600376] [EM] Rxd Ack; Removing MessageCounter:91208156 from Retrans Table on exchange 41213r
+          [1690221509619] [38912:6600376] [EM] >>> [E:41214r S:64671 M:135000959 (Ack:91208157)] (S) Msg RX from 1:0000000000000001 [4A14] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1690221509619] [38912:6600376] [EM] Found matching exchange: 41214r, Delegate: 0x0
+          [1690221509619] [38912:6600376] [EM] Rxd Ack; Removing MessageCounter:91208157 from Retrans Table on exchange 41214r
+      disabled: true

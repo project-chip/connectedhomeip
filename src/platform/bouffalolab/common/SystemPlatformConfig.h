@@ -26,5 +26,9 @@ struct ChipDeviceEvent;
 } // namespace chip
 
 // ==================== Platform Adaptations ====================
+#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS 1
 #define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME 1
 #define CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE const struct ::chip::DeviceLayer::ChipDeviceEvent *
+
+//#define CHIP_CONFIG_SHA256_CONTEXT_SIZE sizeof(bl_sha_ctx_t)
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE ((1 + 5 + 18 + 16 + 16) * sizeof(unsigned int))

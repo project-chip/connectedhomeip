@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Reads the CurrentLevel attribute"
+    - label: "Step 1: Reads the CurrentLevel attribute"
       PICS: LVL.S.A0000
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -42,7 +42,7 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "Reads the RemainingTime attribute"
+    - label: "Step 2: Reads the RemainingTime attribute"
       PICS: LVL.S.A0001
       command: "readAttribute"
       attribute: "RemainingTime"
@@ -52,7 +52,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Reads the MinLevel attribute"
+    - label: "Step 3a: Reads the MinLevel attribute"
       PICS: LVL.S.A0002 && LVL.S.F01
       command: "readAttribute"
       attribute: "MinLevel"
@@ -62,7 +62,7 @@ tests:
           constraints:
               type: int8u
 
-    - label: "Reads the MinLevel attribute"
+    - label: "Step 3b: Reads the MinLevel attribute"
       PICS: LVL.S.A0002 && !LVL.S.F01
       command: "readAttribute"
       attribute: "MinLevel"
@@ -73,7 +73,7 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "Reads the MaxLevel attribute"
+    - label: "Step 4: Reads the MaxLevel attribute"
       PICS: LVL.S.A0003 && LVL.S.F01
       command: "readAttribute"
       attribute: "MaxLevel"
@@ -84,7 +84,7 @@ tests:
               type: int8u
               minValue: MinLevelValue
 
-    - label: "Reads the MaxLevel attribute"
+    - label: "Step 4a: Reads the MaxLevel attribute"
       PICS: LVL.S.A0003 && !LVL.S.F01
       command: "readAttribute"
       attribute: "MaxLevel"
@@ -115,7 +115,7 @@ tests:
               minValue: MinLevelFeatureMapNotSupportedValue
               maxValue: MaxLevelFeatureMapNotSupportedValue
 
-    - label: "Reads the CurrentFrequency attribute"
+    - label: "Step 5: Reads the CurrentFrequency attribute"
       PICS: LVL.S.A0004
       command: "readAttribute"
       attribute: "CurrentFrequency"
@@ -125,7 +125,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Reads the MinFrequency attribute"
+    - label: "Step 6: Reads the MinFrequency attribute"
       PICS: LVL.S.A0005
       command: "readAttribute"
       attribute: "MinFrequency"
@@ -136,7 +136,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Reads the MaxFrequency attribute"
+    - label: "Step 7: Reads the MaxFrequency attribute"
       PICS: LVL.S.A0006
       command: "readAttribute"
       attribute: "MaxFrequency"
@@ -157,7 +157,7 @@ tests:
               minValue: MinFrequencyValue
               maxValue: MaxFrequencyValue
 
-    - label: "Reads the OnOffTransitionTime attribute"
+    - label: "Step 8: Reads the OnOffTransitionTime attribute"
       PICS: LVL.S.A0010
       command: "readAttribute"
       attribute: "OnOffTransitionTime"
@@ -167,7 +167,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Reads the OnLevel attribute "
+    - label: "Step 9a: Reads the OnLevel attribute "
       PICS: LVL.S.F01 && LVL.S.A0011
       command: "readAttribute"
       attribute: "OnLevel"
@@ -177,7 +177,7 @@ tests:
               minValue: MinLevelValue
               maxValue: MaxLevelValue
 
-    - label: "Reads the OnLevel attribute "
+    - label: "Step 9b: Reads the OnLevel attribute "
       PICS: LVL.S.A0011 && !LVL.S.F01
       command: "readAttribute"
       attribute: "OnLevel"
@@ -187,7 +187,7 @@ tests:
               minValue: MinLevelFeatureMapNotSupportedValue
               maxValue: MaxLevelFeatureMapNotSupportedValue
 
-    - label: "Reads the OnTransitionTime attribute "
+    - label: "Step 10: Reads the OnTransitionTime attribute "
       PICS: LVL.S.A0012
       command: "readAttribute"
       attribute: "OnTransitionTime"
@@ -197,7 +197,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Reads the OffTransitionTime attribute "
+    - label: "Step 11: Reads the OffTransitionTime attribute "
       PICS: LVL.S.A0013
       command: "readAttribute"
       attribute: "OffTransitionTime"
@@ -207,7 +207,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Reads the DefaultMoveRate attribute "
+    - label: "Step 12: Reads the DefaultMoveRate attribute "
       PICS: LVL.S.A0014
       command: "readAttribute"
       attribute: "DefaultMoveRate"
@@ -217,7 +217,7 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "Reads the Options attribute "
+    - label: "Step 13: Reads the Options attribute "
       PICS: LVL.S.A000f
       command: "readAttribute"
       attribute: "Options"
@@ -225,7 +225,7 @@ tests:
           constraints:
               type: bitmap8
 
-    - label: "Reads the StartUpCurrentLevel attribute "
+    - label: "Step 14: Reads the StartUpCurrentLevel attribute "
       PICS: LVL.S.A4000
       command: "readAttribute"
       attribute: "StartUpCurrentLevel"

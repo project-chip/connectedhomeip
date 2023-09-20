@@ -177,7 +177,7 @@ CHIP_ERROR AccessControlAttribute::ReadAcl(AttributeValueEncoder & aEncoder)
         {
             auto fabric = info.GetFabricIndex();
             ReturnErrorOnFailure(GetAccessControl().Entries(fabric, iterator));
-            CHIP_ERROR err;
+            CHIP_ERROR err = CHIP_NO_ERROR;
             while ((err = iterator.Next(entry)) == CHIP_NO_ERROR)
             {
                 ReturnErrorOnFailure(encoder.Encode(encodableEntry));

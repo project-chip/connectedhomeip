@@ -30,17 +30,24 @@ tests:
           This test can be verified using TC-SU-2.3 from the OTA Software Update section. Pls refer to OTA section for steps.
       disabled: true
 
-    - label: "DUT sends a ReceiveInit message to TH"
+    - label: "Step 1: DUT sends a ReceiveInit message to TH."
       verification: |
-          1. Verify that the OTA Reference Provider App logs show ReceiveInit message from DUT
+          On OTA Reference Provider App logs, Verify that the ReceiveInit message has the following mandatory fields.
+          -  Proposed Transfer Control - At least one of the PTC[RECEIVER_DRIVE] or PTC[SENDER_DRIVE] field bits shall be set.
+           - Range Control.
+           - Proposed Max Block Size.
+           - Start Offset - Optional.
+           - Proposed Max Length - Optional.
+           - File Designator Length.
+           - File Designator.
+           - Metadata - Optional.
 
-          [1636410921473] [59203:62969336] CHIP: [ATM] Handling received BDX Message
-          [1636410921473] [59203:62969336] CHIP: [ATM] ReceiveInit
-          [1636410921473] [59203:62969336] CHIP: [ATM]   Proposed Transfer Control: 0x20
-          [1636410921473] [59203:62969336] CHIP: [ATM]   Range Control: 0x0
-          [1636410921473] [59203:62969336] CHIP: [ATM]   Proposed Max Block Size: 1024
-          [1636410921473] [59203:62969336] CHIP: [ATM]   Start Offset: 0x0000000000000000
-          [1636410921473] [59203:62969336] CHIP: [ATM]   Proposed Max Length: 0x0000000000000000
-          [1636410921473] [59203:62969336] CHIP: [ATM]   File Designator Length: 8
-          [1636410921473] [59203:62969336] CHIP: [ATM]   File Designator: test.txt
+          [1687335217.824270][14728:14728] CHIP:ATM: ReceiveInit
+          [1687335217.824272][14728:14728] CHIP:ATM:   Proposed Transfer Control: 0x20
+          [1687335217.824275][14728:14728] CHIP:ATM:   Range Control: 0x0
+          [1687335217.824279][14728:14728] CHIP:ATM:   Proposed Max Block Size: 1024
+          [1687335217.824282][14728:14728] CHIP:ATM:   Start Offset: 0x0000000000000000
+          [1687335217.824285][14728:14728] CHIP:ATM:   Proposed Max Length: 0x0000000000000000
+          [1687335217.824288][14728:14728] CHIP:ATM:   File Designator Length: 21
+          [1687335217.824292][14728:14728] CHIP:ATM:   File Designator: ota-requestor-app.ota
       disabled: true

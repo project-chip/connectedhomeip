@@ -37,7 +37,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the ChannelList attribute from the DUT"
+    - label: "Step 1: TH reads the ChannelList attribute from the DUT"
       PICS: CHANNEL.S.A0000
       command: "readAttribute"
       attribute: "ChannelList"
@@ -46,8 +46,8 @@ tests:
               type: list
 
     - label:
-          "TH sends a ChangeChannelByNumber command to the DUT with channel
-          information (major and minor numbers) from the list in step 1"
+          "Step 2: TH sends a ChangeChannelByNumber command to the DUT with
+          channel information (major and minor numbers) from the list in step 1"
       PICS: CHANNEL.S.C02.Rsp
       command: "ChangeChannelByNumber"
       arguments:
@@ -57,7 +57,7 @@ tests:
               - name: "MinorNumber"
                 value: minornumber
 
-    - label: "Verify that the channel has changed on the device"
+    - label: "Step 2a: Verify that the channel has changed on the device"
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT && CHANNEL.S.C02.Rsp
@@ -68,7 +68,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads the CurrentChannel attribute from the DUT"
+    - label: "Step 3: TH reads the CurrentChannel attribute from the DUT"
       PICS: CHANNEL.S.A0002 && CHANNEL.S.C02.Rsp
       command: "readAttribute"
       attribute: "CurrentChannel"

@@ -31,6 +31,9 @@ class TelinkApp(Enum):
     OTA_REQUESTOR = auto()
     PUMP = auto()
     PUMP_CONTROLLER = auto()
+    RESOURCE_MONITORING = auto()
+    SHELL = auto()
+    SMOKE_CO_ALARM = auto()
     TEMPERATURE_MEASUREMENT = auto()
     THERMOSTAT = auto()
     WINDOW_COVERING = auto()
@@ -56,6 +59,12 @@ class TelinkApp(Enum):
             return 'pump-app'
         elif self == TelinkApp.PUMP_CONTROLLER:
             return 'pump-controller-app'
+        elif self == TelinkApp.RESOURCE_MONITORING:
+            return 'resource-monitoring-app'
+        elif self == TelinkApp.SHELL:
+            return 'shell'
+        elif self == TelinkApp.SMOKE_CO_ALARM:
+            return 'smoke-co-alarm-app'
         elif self == TelinkApp.TEMPERATURE_MEASUREMENT:
             return 'temperature-measurement-app'
         elif self == TelinkApp.THERMOSTAT:
@@ -86,6 +95,12 @@ class TelinkApp(Enum):
             return 'chip-telink-pump-example'
         elif self == TelinkApp.PUMP_CONTROLLER:
             return 'chip-telink-pump-controller-example'
+        elif self == TelinkApp.RESOURCE_MONITORING:
+            return 'chip-telink-resource-monitoring-example'
+        elif self == TelinkApp.SHELL:
+            return 'chip-telink-shell-example'
+        elif self == TelinkApp.SMOKE_CO_ALARM:
+            return 'chip-telink-smoke-co-alarm-example'
         elif self == TelinkApp.TEMPERATURE_MEASUREMENT:
             return 'chip-telink-temperature-measurement-example'
         elif self == TelinkApp.THERMOSTAT:
@@ -98,10 +113,13 @@ class TelinkApp(Enum):
 
 class TelinkBoard(Enum):
     TLSR9518ADK80D = auto()
+    TLSR9528A = auto()
 
     def GnArgName(self):
         if self == TelinkBoard.TLSR9518ADK80D:
             return 'tlsr9518adk80d'
+        elif self == TelinkBoard.TLSR9528A:
+            return 'tlsr9528a'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -112,7 +130,7 @@ class TelinkBuilder(Builder):
                  root,
                  runner,
                  app: TelinkApp = TelinkApp,
-                 board: TelinkBoard = TelinkBoard.TLSR9518ADK80D,
+                 board: TelinkBoard = TelinkBoard,
                  enable_shell: bool = False,
                  enable_rpcs: bool = False,
                  enable_factory_data: bool = False):

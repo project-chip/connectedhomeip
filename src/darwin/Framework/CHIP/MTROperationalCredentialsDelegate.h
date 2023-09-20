@@ -41,8 +41,7 @@ public:
     MTROperationalCredentialsDelegate(MTRDeviceController * deviceController);
     ~MTROperationalCredentialsDelegate() {}
 
-    CHIP_ERROR Init(MTRPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner, NSData * ipk, NSData * rootCert,
-        NSData * _Nullable icaCert);
+    CHIP_ERROR Init(ChipP256KeypairPtr nocSigner, NSData * ipk, NSData * rootCert, NSData * _Nullable icaCert);
 
     CHIP_ERROR GenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
         const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
@@ -136,8 +135,6 @@ private:
     ChipP256KeypairPtr mIssuerKey;
 
     chip::Crypto::IdentityProtectionKey mIPK;
-
-    MTRPersistentStorageDelegateBridge * mStorage;
 
     chip::NodeId mDeviceBeingPaired = chip::kUndefinedNodeId;
 

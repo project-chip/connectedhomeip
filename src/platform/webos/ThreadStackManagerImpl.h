@@ -22,10 +22,10 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <lib/support/ThreadOperationalDataset.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/NetworkCommissioning.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-#include <platform/webos/GlibTypeDeleter.h>
 #include <platform/webos/dbus/openthread/introspect.h>
 
 namespace chip {
@@ -85,12 +85,6 @@ public:
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType();
 
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR _GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig);
-    CHIP_ERROR _SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig);
-    CHIP_ERROR _RequestSEDFastPollingMode(bool onOff);
-#endif
 
     bool _HaveMeshConnectivity();
 

@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/python.gni")
 
@@ -21,15 +23,13 @@ static_library("controller") {
 
   sources = [ "CHIPCluster.h" ]
 
-  if (chip_controller) {
+  if (chip_controller && chip_build_controller) {
     sources += [
       "AbstractDnssdDiscoveryController.cpp",
       "AutoCommissioner.cpp",
       "AutoCommissioner.h",
       "CHIPCommissionableNodeController.cpp",
       "CHIPCommissionableNodeController.h",
-      "CHIPDeviceController.cpp",
-      "CHIPDeviceController.h",
       "CHIPDeviceControllerFactory.cpp",
       "CHIPDeviceControllerFactory.h",
       "CommissioneeDeviceProxy.cpp",
@@ -37,10 +37,6 @@ static_library("controller") {
       "CommissionerDiscoveryController.cpp",
       "CommissionerDiscoveryController.h",
       "CommissioningDelegate.cpp",
-      "CommissioningWindowOpener.cpp",
-      "CommissioningWindowOpener.h",
-      "CurrentFabricRemover.cpp",
-      "CurrentFabricRemover.h",
       "DeviceDiscoveryDelegate.h",
       "DevicePairingDelegate.h",
       "EmptyDataModelHandler.cpp",
@@ -49,6 +45,16 @@ static_library("controller") {
       "SetUpCodePairer.cpp",
       "SetUpCodePairer.h",
     ]
+    if (chip_enable_read_client) {
+      sources += [
+        "CHIPDeviceController.cpp",
+        "CHIPDeviceController.h",
+        "CommissioningWindowOpener.cpp",
+        "CommissioningWindowOpener.h",
+        "CurrentFabricRemover.cpp",
+        "CurrentFabricRemover.h",
+      ]
+    }
   }
 
   cflags = [ "-Wconversion" ]

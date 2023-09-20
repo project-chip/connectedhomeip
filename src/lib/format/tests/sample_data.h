@@ -46,5 +46,9 @@ extern const SamplePayload im_protocol_report_data_acl;
 extern const SamplePayload im_protocol_report_data_window_covering;
 extern const SamplePayload im_protocol_invoke_request_change_channel;
 
+// different event reports
+extern const SamplePayload im_protocol_event_software_fault;
+extern const SamplePayload im_protocol_event_multipress;
+
 } // namespace TestData
 } // namespace chip

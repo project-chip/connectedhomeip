@@ -78,6 +78,8 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+static_assert(OPENTHREAD_API_VERSION >= 219, "OpenThread version too old");
+
 // Network commissioning
 namespace {
 #ifndef _NO_NETWORK_COMMISSIONING_DRIVER_
@@ -189,17 +191,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
 {
     if (event->Type == DeviceEventType::kThreadStateChange)
     {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && (OPENTHREAD_API_VERSION < 218)
-        if (event->ThreadStateChange.AddressChanged)
-        {
-            const otSrpClientHostInfo * hostInfo = otSrpClientGetHostInfo(Impl()->OTInstance());
-            if (hostInfo && hostInfo->mName)
-            {
-                Impl()->_SetupSrpHost(hostInfo->mName);
-            }
-        }
-#endif
-
         bool isThreadAttached = Impl()->_IsThreadAttached();
         // Avoid sending muliple events if the attachement state didn't change (Child->router or disable->Detached)
         if (event->ThreadStateChange.RoleChanged && (isThreadAttached != mIsAttached))
@@ -385,7 +376,7 @@ CHIP_ERROR
 GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-#if CHIP_DEVICE_CONFIG_ENABLE_SED || CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     otLinkModeConfig linkMode;
 #endif
     // If there is another ongoing scan request, reject the new one.
@@ -401,7 +392,7 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCom
         SuccessOrExit(error = MapOpenThreadError(otIp6SetEnabled(mOTInst, true)));
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED || CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Thread network discovery makes Sleepy End Devices detach from a network, so temporarily disable the SED mode.
     linkMode = otThreadGetLinkMode(mOTInst);
 
@@ -439,7 +430,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
 {
     if (aResult == nullptr) // scan completed
     {
-#if CHIP_DEVICE_CONFIG_ENABLE_SED || CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
         if (mTemporaryRxOnWhenIdle)
         {
             otLinkModeConfig linkMode = otThreadGetLinkMode(mOTInst);
@@ -1568,12 +1559,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
         otOperationalDataset activeDataset;
         otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
         VerifyOrReturnError(otErr == OT_ERROR_NONE, MapOpenThreadError(otErr));
-#if OPENTHREAD_API_VERSION >= 219
         uint64_t activeTimestamp = (activeDataset.mActiveTimestamp.mSeconds << 16) | (activeDataset.mActiveTimestamp.mTicks << 1) |
             activeDataset.mActiveTimestamp.mAuthoritative;
-#else
-        uint64_t activeTimestamp  = activeDataset.mActiveTimestamp;
-#endif
         err = encoder.Encode(activeTimestamp);
     }
     break;
@@ -1582,12 +1569,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
         otOperationalDataset activeDataset;
         otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
         VerifyOrReturnError(otErr == OT_ERROR_NONE, MapOpenThreadError(otErr));
-#if OPENTHREAD_API_VERSION >= 219
         uint64_t pendingTimestamp = (activeDataset.mPendingTimestamp.mSeconds << 16) |
             (activeDataset.mPendingTimestamp.mTicks << 1) | activeDataset.mPendingTimestamp.mAuthoritative;
-#else
-        uint64_t pendingTimestamp = activeDataset.mPendingTimestamp;
-#endif
         err = encoder.Encode(pendingTimestamp);
     }
     break;
@@ -1695,19 +1678,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPollPeriod(u
 }
 
 template <class ImplClass>
-void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetRouterPromotion(bool val)
-{
-#if CHIP_DEVICE_CONFIG_THREAD_FTD
-    Impl()->LockThreadStack();
-    if (otThreadGetDeviceRole(DeviceLayer::ThreadStackMgrImpl().OTInstance()) != OT_DEVICE_ROLE_ROUTER)
-    {
-        otThreadSetRouterEligible(DeviceLayer::ThreadStackMgrImpl().OTInstance(), val);
-    }
-    Impl()->UnlockThreadStack();
-#endif
-}
-
-template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1731,19 +1701,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
 #endif
 
     mOTInst = otInst;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    ConnectivityManager::SEDIntervalsConfig sedIntervalsConfig;
-    using namespace System::Clock::Literals;
-    sedIntervalsConfig.ActiveIntervalMS = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
-    sedIntervalsConfig.IdleIntervalMS   = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
-    err                                 = _SetSEDIntervalsConfig(sedIntervalsConfig);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to set sleepy end device intervals: %s", ErrorStr(err));
-    }
-    SuccessOrExit(err);
-#endif
 
     // Arrange for OpenThread to call the OnOpenThreadStateChange method whenever a
     // state change occurs.  Note that we reference the OnOpenThreadStateChange method
@@ -1797,172 +1754,6 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadInterfaceUpNoL
     return otIp6IsEnabled(mOTInst);
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetSEDIntervalsConfig(
-    ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
-{
-    intervalsConfig = mIntervalsConfig;
-    return CHIP_NO_ERROR;
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetSEDIntervalsConfig(
-    const ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
-{
-    using namespace System::Clock::Literals;
-    if ((intervalsConfig.IdleIntervalMS < intervalsConfig.ActiveIntervalMS) || (intervalsConfig.IdleIntervalMS == 0_ms32) ||
-        (intervalsConfig.ActiveIntervalMS == 0_ms32))
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    mIntervalsConfig = intervalsConfig;
-
-    CHIP_ERROR err = SetSEDIntervalMode(mIntervalsMode);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        ChipDeviceEvent event;
-        event.Type = DeviceEventType::kICDPollingIntervalChange;
-        err        = chip::DeviceLayer::PlatformMgr().PostEvent(&event);
-    }
-
-    return err;
-}
-
-template <class ImplClass>
-CHIP_ERROR
-GenericThreadStackManagerImpl_OpenThread<ImplClass>::SetSEDIntervalMode(ConnectivityManager::SEDIntervalMode intervalType)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    System::Clock::Milliseconds32 interval;
-
-    if (intervalType == ConnectivityManager::SEDIntervalMode::Idle)
-    {
-        interval = mIntervalsConfig.IdleIntervalMS;
-    }
-    else if (intervalType == ConnectivityManager::SEDIntervalMode::Active)
-    {
-        interval = mIntervalsConfig.ActiveIntervalMS;
-    }
-    else
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    Impl()->LockThreadStack();
-
-    mIntervalsMode = intervalType;
-
-// For Thread devices, the intervals are defined as:
-// * poll period for SED devices that poll the parent for data
-// * CSL period for SSED devices that listen for messages in scheduled time slots.
-#if CHIP_DEVICE_CONFIG_THREAD_SSED
-    // Get CSL period in units of 10 symbols, convert it to microseconds and divide by 1000 to get milliseconds.
-    uint32_t curIntervalMS = otLinkCslGetPeriod(mOTInst) * OT_US_PER_TEN_SYMBOLS / 1000;
-#else
-    uint32_t curIntervalMS = otLinkGetPollPeriod(mOTInst);
-#endif
-    otError otErr = OT_ERROR_NONE;
-    if (interval.count() != curIntervalMS)
-    {
-#if CHIP_DEVICE_CONFIG_THREAD_SSED
-        // Set CSL period in units of 10 symbols, convert it to microseconds and divide by 1000 to get milliseconds.
-        otErr         = otLinkCslSetPeriod(mOTInst, interval.count() * 1000 / OT_US_PER_TEN_SYMBOLS);
-        curIntervalMS = otLinkCslGetPeriod(mOTInst) * OT_US_PER_TEN_SYMBOLS / 1000;
-#else
-        otErr         = otLinkSetPollPeriod(mOTInst, interval.count());
-        curIntervalMS = otLinkGetPollPeriod(mOTInst);
-#endif
-        err = MapOpenThreadError(otErr);
-    }
-
-    Impl()->UnlockThreadStack();
-
-    if (otErr != OT_ERROR_NONE)
-    {
-        ChipLogError(DeviceLayer, "Failed to set SED interval to %" PRId32 "ms. Defaulting to %" PRId32 "ms", interval.count(),
-                     curIntervalMS);
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "OpenThread SED interval is %" PRId32 "ms", curIntervalMS);
-    }
-
-    return err;
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDActiveMode(bool onOff, bool delayIdle)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    if (onOff)
-    {
-        mActiveModeConsumers++;
-    }
-    else
-    {
-        if (mActiveModeConsumers > 0)
-            mActiveModeConsumers--;
-    }
-
-    if (!onOff && delayIdle && CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD.count() != 0)
-    {
-        // StartTimer will cancel a timer if the same callback & context is used.
-        // This will have the effect of canceling the previous one (if any) and starting
-        // a new timer of the same duration. This effectively prolongs the active threshold
-        // without consuming additional resources.
-        err = DeviceLayer::SystemLayer().StartTimer(CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD, RequestSEDModeUpdate, this);
-        if (CHIP_NO_ERROR == err)
-        {
-            if (!mDelayIdleTimerRunning)
-            {
-                mDelayIdleTimerRunning = true;
-                mActiveModeConsumers++;
-            }
-            return err;
-        }
-
-        ChipLogError(DeviceLayer, "Failed to postpone Idle Mode with error %" CHIP_ERROR_FORMAT, err.Format());
-    }
-
-    return SEDUpdateMode();
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::SEDUpdateMode()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    ConnectivityManager::SEDIntervalMode mode;
-
-    mode = mActiveModeConsumers > 0 ? ConnectivityManager::SEDIntervalMode::Active : ConnectivityManager::SEDIntervalMode::Idle;
-
-    if (mIntervalsMode != mode)
-        err = SetSEDIntervalMode(mode);
-
-    return err;
-}
-
-template <class ImplClass>
-void GenericThreadStackManagerImpl_OpenThread<ImplClass>::RequestSEDModeUpdate(chip::System::Layer * apSystemLayer,
-                                                                               void * apAppState)
-{
-    if (apAppState != nullptr)
-    {
-        GenericThreadStackManagerImpl_OpenThread * obj = static_cast<GenericThreadStackManagerImpl_OpenThread *>(apAppState);
-        if (obj->mActiveModeConsumers > 0)
-        {
-            obj->mActiveModeConsumers--;
-        }
-
-        obj->mDelayIdleTimerRunning = false;
-
-        obj->SEDUpdateMode();
-    }
-}
-#endif
-
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
@@ -1999,10 +1790,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetPollingInter
     {
         ChipLogError(DeviceLayer, "Failed to set SED interval to %" PRId32 "ms. Defaulting to %" PRId32 "ms",
                      pollingInterval.count(), curIntervalMS);
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "OpenThread SED interval is %" PRId32 "ms", curIntervalMS);
     }
 
     return err;
@@ -2121,8 +1908,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_UpdateNetworkStatus()
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-
-static_assert(OPENTHREAD_API_VERSION >= 156, "SRP Client requires a more recent OpenThread version");
 
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientNotification(otError aError,
@@ -2463,9 +2248,6 @@ template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(const char * aHostName)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-#if OPENTHREAD_API_VERSION < 218
-    Inet::IPAddress hostAddress;
-#endif
 
     VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
 
@@ -2481,20 +2263,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
         error = MapOpenThreadError(otSrpClientSetHostName(mOTInst, mSrpClient.mHostName));
         SuccessOrExit(error);
 
-#if OPENTHREAD_API_VERSION >= 218
         error = MapOpenThreadError(otSrpClientEnableAutoHostAddress(mOTInst));
-#endif
     }
-
-#if OPENTHREAD_API_VERSION < 218
-    // Check if device has any external IPv6 assigned. If not, host will be set without IPv6 addresses
-    // and updated later on.
-    if (ThreadStackMgr().GetExternalIPv6Address(hostAddress) == CHIP_NO_ERROR)
-    {
-        memcpy(&mSrpClient.mHostAddress.mFields.m32, hostAddress.Addr, sizeof(hostAddress.Addr));
-        error = MapOpenThreadError(otSrpClientSetHostAddresses(mOTInst, &mSrpClient.mHostAddress, 1));
-    }
-#endif
 
 exit:
     Impl()->UnlockThreadStack();

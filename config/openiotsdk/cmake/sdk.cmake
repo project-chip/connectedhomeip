@@ -300,6 +300,42 @@ function(sdk_post_build target)
         VERBATIM
     )
     iotsdk_tf_m_merge_images(${target} 0x10000000 0x38000000 0x28060000)
+if(CONFIG_CHIP_OPEN_IOT_SDK_OTA_ENABLE)
+    add_custom_command(
+        TARGET
+            ${target}
+        POST_BUILD
+        DEPENDS
+            $<TARGET_FILE_DIR:${target}>/${target}.bin
+        COMMAND
+            # Sign the update image
+            python3 ${BINARY_DIR}/install/image_signing/scripts/wrapper/wrapper.py
+                --layout ${BINARY_DIR}/install/image_signing/layout_files/signing_layout_ns.o
+                -v ${MCUBOOT_IMAGE_VERSION_NS}
+                -k ${BINARY_DIR}/install/image_signing/keys/root-RSA-3072_1.pem
+                --public-key-format full
+                --align 1 --pad-header -H 0x400 -s auto -d "(0, 0.0.0+0)"
+                $<TARGET_FILE_DIR:${target}>/${target}.bin
+                --overwrite-only
+                --measured-boot-record
+                $<TARGET_FILE_DIR:${target}>/${target}_signed.ota
+        COMMAND
+            # Create OTA udpate file
+            ${CHIP_ROOT}/src/app/ota_image_tool.py
+                create
+                -v 0xfff1 -p 0x8001
+                -vn ${CONFIG_CHIP_OPEN_IOT_SDK_SOFTWARE_VERSION}
+                -vs "${CONFIG_CHIP_OPEN_IOT_SDK_SOFTWARE_VERSION_STRING}"
+                -da sha256
+                $<TARGET_FILE_DIR:${target}>/${target}_signed.ota
+                $<TARGET_FILE_DIR:${target}>/${APP_NAME}.ota
+        # Cleanup
+        COMMAND rm
+        ARGS -Rf
+                $<TARGET_FILE_DIR:${target}>/${target}_signed.ota
+        VERBATIM
+    )
+endif()
     # Cleanup
     add_custom_command(
         TARGET

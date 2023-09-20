@@ -42,6 +42,7 @@ chip_data_model("chef-data-model") {
 
 executable("${sample_name}") {
   sources = [
+    "${project_dir}/common/chef-channel-manager.cpp",
     "${project_dir}/common/stubs.cpp",
     "${project_dir}/linux/main.cpp",
   ]
@@ -53,7 +54,10 @@ executable("${sample_name}") {
     "${project_dir}/shell_common:shell_common",
   ]
 
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${project_dir}/common",
+  ]
 
   if (chip_enable_pw_rpc) {
     defines = [

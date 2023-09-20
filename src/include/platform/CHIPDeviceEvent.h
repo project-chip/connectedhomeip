@@ -275,6 +275,16 @@ enum PublicEventTypes
     kChipMsgRxEventHandled,
 
     /**
+     * This event is used to sync the ICD with any Reliable Message exchange
+     * expecting an ack. The ICD shall stay in active Mode
+     * until the Reliable Message exchange post this event again
+     * informing the ICD that it is no longer awaiting the ack.
+     *
+     * This event contains an AckSync structure.
+     */
+    kICDMsgAckSyncEvent,
+
+    /**
      * An application event occured that should wake up the system/device
      */
     kAppWakeUpEvent,
@@ -580,6 +590,15 @@ struct ChipDeviceEvent final
             bool wasReceived;
             bool clearsExpectedResponse;
         } RxEventContext;
+
+        struct
+        {
+            /*
+             * Set to true when a Reliable Message Context is awaiting for a ack to a message sent
+             * Set to false when the Reliable Message Context is no longer awaiting for a ack
+             */
+            bool awaitingAck;
+        } AckSync;
     };
 
     void Clear() { memset(this, 0, sizeof(*this)); }

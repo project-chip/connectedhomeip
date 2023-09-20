@@ -133,6 +133,17 @@ class TestStepGroupResponseError(TestStepError):
         self.tag_key_with_error(content, 'response')
 
 
+class TestStepGroupEndPointError(TestStepError):
+    """Raise when a test step targeting a group of nodes targets an endpoint."""
+
+    def __init__(self, content):
+        message = 'Group command should not target an endpoint'
+        super().__init__(message)
+
+        self.tag_key_with_error(content, 'groupId')
+        self.tag_key_with_error(content, 'endpoint')
+
+
 class TestStepVerificationStandaloneError(TestStepError):
     """Raise when a test step with a verification key is enabled and not interactive."""
 
@@ -187,3 +198,27 @@ class TestStepResponseVariableError(TestStepError):
         super().__init__(message)
 
         self.tag_key_with_error(content, 'response')
+
+
+class TestStepArgumentsValueError(TestStepError):
+    """Raise when a test step arguments use the 'value' keyword but the command is not trying to write to an attribute"""
+
+    def __init__(self, content):
+        message = 'The "value" key can not be used in conjuction with a command that is not "writeAttribute"'
+        super().__init__(message)
+
+        self.tag_key_with_error(content, 'command')
+        arguments = content.get('arguments')
+        self.tag_key_with_error(arguments, 'value')
+
+
+class TestStepSaveAsNameError(TestStepError):
+    """Raise when a test step response save an attribute response with the same name than the attribute itself"""
+
+    def __init__(self, content):
+        message = 'The "saveAs" key can not be the same than the "attribute" key'
+        super().__init__(message)
+
+        self.tag_key_with_error(content, 'attribute')
+        response = content.get('response')
+        self.tag_key_with_error(response, 'saveAs')

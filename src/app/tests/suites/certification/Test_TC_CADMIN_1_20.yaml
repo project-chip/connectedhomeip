@@ -15,7 +15,7 @@
 
 name:
     4.1.20. [TC-CADMIN-1.20] max number of Commissioned Fabrics and
-    SupportedFabrics rollover using    BCM [DUT - Commissionee]
+    SupportedFabrics rollover using BCM [DUT - Commissionee]
 
 PICS:
     - CADMIN.S
@@ -32,7 +32,7 @@ tests:
           Reset Devices to factory defaults
       disabled: true
 
-    - label: "TH_CR1 starts a commissioning process with DUT_CE"
+    - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
       PICS: CADMIN.S
       verification: |
           "1. Provision the device using TH_CR1 - chip tool(use above instructions) ,
@@ -40,8 +40,8 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+          "Step 2: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
       PICS: CADMIN.S.C01.Rsp
       verification: |
           On TH_CR1 (chip tool), open commissioning window using BCM
@@ -83,7 +83,7 @@ tests:
           [1649756654.930801][3385:3390] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
-    - label: "THn starts a commissioning process with DUT_CE"
+    - label: "Step 3: THn starts a commissioning process with DUT_CE"
       PICS: CADMIN.S
       verification: |
           On TH_CR1+1 controller using chip tool connect to the accessory
@@ -95,8 +95,8 @@ tests:
       disabled: true
 
     - label:
-          "Repeat Step 3 and Step 4 an additional (SupportedFabrics - 2) times
-          to reach an index value of SupportedFabrics on DUT_CE"
+          "Step 4: Repeat Step 3 and Step 4 an additional (SupportedFabrics - 2)
+          times to reach an index value of SupportedFabrics on DUT_CE"
       PICS: CADMIN.S.C01.Rsp
       verification: |
           Repeat step 3 until  CommissionedFabrics=SupportedFabrics  (Supported fabrics value obtained in the precondition)
@@ -109,8 +109,8 @@ tests:
       disabled: true
 
     - label:
-          "THn_1 starts a commissioning process and opens a commissioning window
-          with DUT_CE"
+          "Step 5: THn_1 starts a commissioning process and opens a
+          commissioning window with DUT_CE"
       PICS: CADMIN.S.C01.Rsp
       verification: |
           On THnth controller using chip tool connect to the accessory
@@ -125,7 +125,7 @@ tests:
           [1649756670.402241][10794:10799] CHIP:CTL: Failed to perform commissioning step 13
       disabled: true
 
-    - label: "TH_CR1 removes FabricIndex1"
+    - label: "Step 6: TH_CR1 removes FabricIndex1"
       PICS: OPCREDS.S.C0a.Rsp
       verification: |
           on TH_CR1 using chip tool, remove fabric with FabricIndex=1

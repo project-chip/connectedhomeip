@@ -32,7 +32,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads LabelList from the DUT"
+    - label: "Step 1: TH reads LabelList from the DUT"
       PICS: FLABEL.S.A0000
       command: "readAttribute"
       attribute: "LabelList"
@@ -41,8 +41,8 @@ tests:
               type: list
 
     - label:
-          "TH tries to write LabelList attribute of the DUT by setting Label =
-          Test_Label, Value= Test_Value"
+          "Step 2: TH tries to write LabelList attribute of the DUT by setting
+          Label = Test_Label, Value= Test_Value"
       PICS: FLABEL.S.A0000
       command: "writeAttribute"
       attribute: "LabelList"
@@ -51,7 +51,7 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH reads LabelList from the DUT"
+    - label: "Step 3: TH reads LabelList from the DUT"
       verification: |
           ./chip-tool fixedlabel read label-list 1 0
           Verify that the LabelList value is same as value from step 1 On TH(all-clusters-app) :

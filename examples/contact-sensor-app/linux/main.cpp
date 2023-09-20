@@ -33,6 +33,8 @@ using namespace chip::app::Clusters;
 
 void ApplicationInit() {}
 
+void ApplicationShutdown() {}
+
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);

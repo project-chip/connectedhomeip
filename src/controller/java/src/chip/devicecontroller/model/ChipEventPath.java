@@ -22,8 +22,8 @@ import java.util.Objects;
 
 /** An event path that should be used for requests. */
 public class ChipEventPath {
-  private ChipPathId endpointId, clusterId, eventId;
-  private boolean isUrgent;
+  private final ChipPathId endpointId, clusterId, eventId;
+  private final boolean isUrgent;
 
   private ChipEventPath(
       ChipPathId endpointId, ChipPathId clusterId, ChipPathId eventId, boolean isUrgent) {
@@ -83,7 +83,7 @@ public class ChipEventPath {
   }
 
   /** Create a new {@link ChipEventPath} with only concrete ids. */
-  public static ChipEventPath newInstance(long endpointId, long clusterId, long eventId) {
+  public static ChipEventPath newInstance(int endpointId, long clusterId, long eventId) {
     return new ChipEventPath(
         ChipPathId.forId(endpointId),
         ChipPathId.forId(clusterId),

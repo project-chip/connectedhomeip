@@ -52,6 +52,8 @@ void ApplicationInit()
 #endif
 }
 
+void ApplicationShutdown() {}
+
 int main(int argc, char * argv[])
 {
     TizenServiceAppMain app;

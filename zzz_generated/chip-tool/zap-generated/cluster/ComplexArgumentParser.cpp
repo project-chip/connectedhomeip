@@ -315,6 +315,52 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Descriptor::Structs::D
     ComplexArgumentParser::Finalize(request.revision);
 }
 
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("SemanticTagStruct.mfgCode", "mfgCode", value.isMember("mfgCode")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("SemanticTagStruct.namespaceID", "namespaceID", value.isMember("namespaceID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SemanticTagStruct.tag", "tag", value.isMember("tag")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "mfgCode");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.mfgCode, value["mfgCode"]));
+    valueCopy.removeMember("mfgCode");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "namespaceID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.namespaceID, value["namespaceID"]));
+    valueCopy.removeMember("namespaceID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "tag");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.tag, value["tag"]));
+    valueCopy.removeMember("tag");
+
+    if (value.isMember("label"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "label");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.label, value["label"]));
+    }
+    valueCopy.removeMember("label");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.mfgCode);
+    ComplexArgumentParser::Finalize(request.namespaceID);
+    ComplexArgumentParser::Finalize(request.tag);
+    ComplexArgumentParser::Finalize(request.label);
+}
+
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Binding::Structs::TargetStruct::Type & request,
                                         Json::Value & value)
 {
@@ -2101,358 +2147,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(
 
 void ComplexArgumentParser::Finalize(
     chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.productIdentifierType);
-    ComplexArgumentParser::Finalize(request.productIdentifierValue);
-}
-
-CHIP_ERROR
-ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::CeramicFilterMonitoring::Structs::ReplacementProductStruct::Type & request,
-                             Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "ReplacementProductStruct.productIdentifierType", "productIdentifierType", value.isMember("productIdentifierType")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "ReplacementProductStruct.productIdentifierValue", "productIdentifierValue", value.isMember("productIdentifierValue")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productIdentifierType");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.productIdentifierType, value["productIdentifierType"]));
-    valueCopy.removeMember("productIdentifierType");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productIdentifierValue");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.productIdentifierValue, value["productIdentifierValue"]));
-    valueCopy.removeMember("productIdentifierValue");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(
-    chip::app::Clusters::CeramicFilterMonitoring::Structs::ReplacementProductStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.productIdentifierType);
-    ComplexArgumentParser::Finalize(request.productIdentifierValue);
-}
-
-CHIP_ERROR
-ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::ElectrostaticFilterMonitoring::Structs::ReplacementProductStruct::Type & request,
-                             Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "ReplacementProductStruct.productIdentifierType", "productIdentifierType", value.isMember("productIdentifierType")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "ReplacementProductStruct.productIdentifierValue", "productIdentifierValue", value.isMember("productIdentifierValue")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productIdentifierType");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.productIdentifierType, value["productIdentifierType"]));
-    valueCopy.removeMember("productIdentifierType");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productIdentifierValue");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.productIdentifierValue, value["productIdentifierValue"]));
-    valueCopy.removeMember("productIdentifierValue");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(
-    chip::app::Clusters::ElectrostaticFilterMonitoring::Structs::ReplacementProductStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.productIdentifierType);
-    ComplexArgumentParser::Finalize(request.productIdentifierValue);
-}
-
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::UvFilterMonitoring::Structs::ReplacementProductStruct::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "ReplacementProductStruct.productIdentifierType", "productIdentifierType", value.isMember("productIdentifierType")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "ReplacementProductStruct.productIdentifierValue", "productIdentifierValue", value.isMember("productIdentifierValue")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productIdentifierType");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.productIdentifierType, value["productIdentifierType"]));
-    valueCopy.removeMember("productIdentifierType");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productIdentifierValue");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.productIdentifierValue, value["productIdentifierValue"]));
-    valueCopy.removeMember("productIdentifierValue");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::UvFilterMonitoring::Structs::ReplacementProductStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.productIdentifierType);
-    ComplexArgumentParser::Finalize(request.productIdentifierValue);
-}
-
-CHIP_ERROR
-ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::IonizingFilterMonitoring::Structs::ReplacementProductStruct::Type & request,
-                             Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "ReplacementProductStruct.productIdentifierType", "productIdentifierType", value.isMember("productIdentifierType")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "ReplacementProductStruct.productIdentifierValue", "productIdentifierValue", value.isMember("productIdentifierValue")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productIdentifierType");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.productIdentifierType, value["productIdentifierType"]));
-    valueCopy.removeMember("productIdentifierType");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productIdentifierValue");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.productIdentifierValue, value["productIdentifierValue"]));
-    valueCopy.removeMember("productIdentifierValue");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(
-    chip::app::Clusters::IonizingFilterMonitoring::Structs::ReplacementProductStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.productIdentifierType);
-    ComplexArgumentParser::Finalize(request.productIdentifierValue);
-}
-
-CHIP_ERROR
-ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::ZeoliteFilterMonitoring::Structs::ReplacementProductStruct::Type & request,
-                             Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "ReplacementProductStruct.productIdentifierType", "productIdentifierType", value.isMember("productIdentifierType")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "ReplacementProductStruct.productIdentifierValue", "productIdentifierValue", value.isMember("productIdentifierValue")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productIdentifierType");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.productIdentifierType, value["productIdentifierType"]));
-    valueCopy.removeMember("productIdentifierType");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productIdentifierValue");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.productIdentifierValue, value["productIdentifierValue"]));
-    valueCopy.removeMember("productIdentifierValue");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(
-    chip::app::Clusters::ZeoliteFilterMonitoring::Structs::ReplacementProductStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.productIdentifierType);
-    ComplexArgumentParser::Finalize(request.productIdentifierValue);
-}
-
-CHIP_ERROR
-ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::OzoneFilterMonitoring::Structs::ReplacementProductStruct::Type & request,
-                             Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "ReplacementProductStruct.productIdentifierType", "productIdentifierType", value.isMember("productIdentifierType")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "ReplacementProductStruct.productIdentifierValue", "productIdentifierValue", value.isMember("productIdentifierValue")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productIdentifierType");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.productIdentifierType, value["productIdentifierType"]));
-    valueCopy.removeMember("productIdentifierType");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productIdentifierValue");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.productIdentifierValue, value["productIdentifierValue"]));
-    valueCopy.removeMember("productIdentifierValue");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::OzoneFilterMonitoring::Structs::ReplacementProductStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.productIdentifierType);
-    ComplexArgumentParser::Finalize(request.productIdentifierValue);
-}
-
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::WaterTankMonitoring::Structs::ReplacementProductStruct::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "ReplacementProductStruct.productIdentifierType", "productIdentifierType", value.isMember("productIdentifierType")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "ReplacementProductStruct.productIdentifierValue", "productIdentifierValue", value.isMember("productIdentifierValue")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productIdentifierType");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.productIdentifierType, value["productIdentifierType"]));
-    valueCopy.removeMember("productIdentifierType");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productIdentifierValue");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.productIdentifierValue, value["productIdentifierValue"]));
-    valueCopy.removeMember("productIdentifierValue");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::WaterTankMonitoring::Structs::ReplacementProductStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.productIdentifierType);
-    ComplexArgumentParser::Finalize(request.productIdentifierValue);
-}
-
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::FuelTankMonitoring::Structs::ReplacementProductStruct::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "ReplacementProductStruct.productIdentifierType", "productIdentifierType", value.isMember("productIdentifierType")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "ReplacementProductStruct.productIdentifierValue", "productIdentifierValue", value.isMember("productIdentifierValue")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productIdentifierType");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.productIdentifierType, value["productIdentifierType"]));
-    valueCopy.removeMember("productIdentifierType");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productIdentifierValue");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.productIdentifierValue, value["productIdentifierValue"]));
-    valueCopy.removeMember("productIdentifierValue");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::FuelTankMonitoring::Structs::ReplacementProductStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.productIdentifierType);
-    ComplexArgumentParser::Finalize(request.productIdentifierValue);
-}
-
-CHIP_ERROR
-ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::InkCartridgeMonitoring::Structs::ReplacementProductStruct::Type & request,
-                             Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "ReplacementProductStruct.productIdentifierType", "productIdentifierType", value.isMember("productIdentifierType")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "ReplacementProductStruct.productIdentifierValue", "productIdentifierValue", value.isMember("productIdentifierValue")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productIdentifierType");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.productIdentifierType, value["productIdentifierType"]));
-    valueCopy.removeMember("productIdentifierType");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productIdentifierValue");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.productIdentifierValue, value["productIdentifierValue"]));
-    valueCopy.removeMember("productIdentifierValue");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::InkCartridgeMonitoring::Structs::ReplacementProductStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.productIdentifierType);
-    ComplexArgumentParser::Finalize(request.productIdentifierValue);
-}
-
-CHIP_ERROR
-ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::TonerCartridgeMonitoring::Structs::ReplacementProductStruct::Type & request,
-                             Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "ReplacementProductStruct.productIdentifierType", "productIdentifierType", value.isMember("productIdentifierType")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "ReplacementProductStruct.productIdentifierValue", "productIdentifierValue", value.isMember("productIdentifierValue")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productIdentifierType");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.productIdentifierType, value["productIdentifierType"]));
-    valueCopy.removeMember("productIdentifierType");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productIdentifierValue");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.productIdentifierValue, value["productIdentifierValue"]));
-    valueCopy.removeMember("productIdentifierValue");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(
-    chip::app::Clusters::TonerCartridgeMonitoring::Structs::ReplacementProductStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.productIdentifierType);
     ComplexArgumentParser::Finalize(request.productIdentifierValue);

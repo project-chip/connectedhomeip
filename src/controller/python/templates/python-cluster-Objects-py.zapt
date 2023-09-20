@@ -23,7 +23,7 @@ from .Types import Nullable, NullValue
 
 @dataclass
 class {{asUpperCamelCase name}}(Cluster):
-    id: typing.ClassVar[int] = {{asHex code 4}}
+    id: typing.ClassVar[int] = {{asMEI manufacturerCode code}}
 
     @ChipUtility.classproperty
     def descriptor(cls) -> ClusterObjectDescriptor:
@@ -99,7 +99,7 @@ class {{asUpperCamelCase name}}(Cluster):
 {{/first}}
         @dataclass
         class {{asUpperCamelCase name}}(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = {{ asHex parent.code 4 }}
+            cluster_id: typing.ClassVar[int] = {{ asMEI parent.manufacturerCode parent.code }}
             command_id: typing.ClassVar[int] = {{ asMEI manufacturerCode code }}
 {{#if (isServer source)}}
             is_client: typing.ClassVar[bool] = False
@@ -142,7 +142,7 @@ class {{asUpperCamelCase name}}(Cluster):
         class {{asUpperCamelCase label}}(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return {{ asHex parent.code 4 }}
+                return {{ asMEI parent.manufacturerCode parent.code }}
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -177,7 +177,7 @@ class {{asUpperCamelCase name}}(Cluster):
         class {{asUpperCamelCase name}}(ClusterEvent):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return {{ asHex parent.code 4 }}
+                return {{ asMEI parent.manufacturerCode parent.code }}
 
             @ChipUtility.classproperty
             def event_id(cls) -> int:

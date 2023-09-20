@@ -8,6 +8,25 @@ and refer
 [building and commissioning](../../../docs/guides/esp32/build_app_and_commission.md)
 guides to get started.
 
+### Enabling ESP-Insights:
+
+-   Before building the app, enable the option: ESP_INSIGHTS_ENABLED through
+    menuconfig.
+
+-   Create a file named insights_auth_key.txt in the main directory of the
+    example.
+
+-   Follow the steps
+    present[here](https://github.com/espressif/esp-insights/blob/main/examples/README.md#set-up-esp-insights-account)
+    to set up an insights_account and the auth key created while setting it up
+    will be used in the example.
+
+-   Download the auth key and copy Auth Key to the example
+
+```
+cp /path/to/auth/key.txt path/to/connectedhomeip/examples/lighting-app/esp32/main/insights_auth_key.txt
+```
+
 ---
 
 -   [Cluster Control](#cluster-control)

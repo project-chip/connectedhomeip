@@ -37,7 +37,7 @@ tests:
           Reset Devices to factory defaults
       disabled: true
 
-    - label: "DUT_CR1 starts a commissioning process with TH_CE"
+    - label: "Step 1: DUT_CR1 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
           "1. Provision the device using DUT_CR1 (Chip-tool as DUT controller)
@@ -45,8 +45,9 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
-          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+          "Step 2: DUT_CR1 sends command to TH_CE to open a commissioning window
+          with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using
+          ECM"
       PICS: CADMIN.C.C00.Tx
       verification: |
           On DUT_CR1 , open commissioning window using ECM
@@ -62,7 +63,7 @@ tests:
           [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
-    - label: "TH_CR2 starts a commissioning process with TH_CE"
+    - label: "Step 3: TH_CR2 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
           On TH_CR2  using chip tool connect to the accessory
@@ -77,8 +78,9 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
-          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+          "Step 4: DUT_CR1 sends command to TH_CE to open a commissioning window
+          with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using
+          ECM"
       PICS: CADMIN.C.C00.Tx
       verification: |
           On DUT_CR1, open commissioning window using ECM
@@ -94,7 +96,7 @@ tests:
           [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
-    - label: "TH_CR3 starts a commissioning process with TH_CE"
+    - label: "Step 5: TH_CR3 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
           On TH_CR3 using chip tool connect to the accessory
@@ -107,7 +109,8 @@ tests:
           Commissioning completed successfully
       disabled: true
 
-    - label: "DUT_CR1 sends command to TH_CE to read the list of Fabrics"
+    - label:
+          "Step 6: DUT_CR1 sends command to TH_CE to read the list of Fabrics"
       PICS: OPCREDS.C.A0001
       verification: |
           On DUT_CR1  using chip tool, read fabrics list
@@ -210,7 +213,9 @@ tests:
           [1661484795.153752][6993:6993] CHIP:DMG: }
       disabled: true
 
-    - label: "DUT_CR1 sends RemoveFabric with FabricIndex = 2 command to TH_CE"
+    - label:
+          "Step 7: DUT_CR1 sends RemoveFabric with FabricIndex = 2 command to
+          TH_CE"
       PICS: OPCREDS.C.C0a.Tx
       verification: |
           on DUT_CR1  using chip tool, remove fabric with FabricIndex=2
@@ -232,8 +237,8 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR2 sends command to TH_CE to write and read the Basic Information
-          Clusters NodeLabel mandatory attribute"
+          "Step 8: TH_CR2 sends command to TH_CE to write and read the Basic
+          Information Clusters NodeLabel mandatory attribute"
       PICS: BINFO.C.A0005
       verification: |
           Using TH_CR2 , write attribute and read attribute to and from TH_CE
@@ -256,7 +261,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR1 sends command to TH_CE to read the list of Fabrics on TH_CE"
+          "Step 9: DUT_CR1 sends command to TH_CE to read the list of Fabrics on
+          TH_CE"
       PICS: OPCREDS.C.A0001
       verification: |
           On DUT_CR1 , read fabrics list
@@ -352,8 +358,8 @@ tests:
       disabled: true
 
     - label:
-          "Verify TH_CE is now discoverable over DNS-SD with 2 Operational
-          service records (_matter._tcp SRV records)."
+          "Step 10: Verify TH_CE is now discoverable over DNS-SD with 2
+          Operational service records (_matter._tcp SRV records)."
       verification: |
           On any Linux platform execute this command or in TH_CR2
 
@@ -376,8 +382,9 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
-          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+          "Step 11: DUT_CR1 sends command to TH_CE to open a commissioning
+          window with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds
+          using ECM"
       PICS: CADMIN.C.C00.Tx
       verification: |
           On DUT_CR1 (chip tool) , open commissioning window using ECM
@@ -394,7 +401,7 @@ tests:
           [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
-    - label: "TH_CR2 starts a commissioning process with TH_CE"
+    - label: "Step 12: TH_CR2 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
           On TH_CR2  using chip tool connect to the accessory
@@ -409,7 +416,8 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR2 sends command to TH_CE to read the list of Fabrics on TH_CE"
+          "Step 13: TH_CR2 sends command to TH_CE to read the list of Fabrics on
+          TH_CE"
       PICS: OPCREDS.C.A0001
       verification: |
           On TH_CR2 , read fabrics list

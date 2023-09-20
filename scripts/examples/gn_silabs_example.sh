@@ -98,6 +98,12 @@ if [ "$#" == "0" ]; then
             Periodic query timeout variable for OTA in seconds
         rs91x_wpa3_transition
             Support for WPA3 transition mode on RS91x
+        slc_gen_path
+            Allow users to define a path where slc generates board files. (requires --slc_generate or --slc_reuse_files)
+            (default: /third_party/silabs/slc_gen/<board>/)
+        sl_pre_gen_path
+            Allow users to define a path to pre-generated board files
+            (default: /third_party/silabs/matter_support/matter/<family>/<board>/)
         sl_matter_version
             Use provided software version at build time
         sl_matter_version_str
@@ -108,12 +114,12 @@ if [ "$#" == "0" ]; then
         siwx917_commissionable_data
             Build with the commissionable data given in DeviceConfig.h (only for SiWx917)
         Presets
-        --sed
-            enable sleepy end device, set thread mtd
+        --icd
+            enable ICD features, set thread mtd
             For minimum consumption, add --low-power
         --low-power
             disables all power consuming features for the most power efficient build
-            This flag is to be used with --sed
+            This flag is to be used with --icd
         --wifi <wf200 | rs9116>
             build wifi example variant for given exansion board
         --additional_data_advertising
@@ -175,7 +181,7 @@ else
                 shift
                 shift
                 ;;
-            --sed)
+            --icd)
                 optArgs+="chip_enable_icd_server=true chip_openthread_ftd=false "
                 shift
                 ;;
@@ -266,7 +272,7 @@ else
     fi
 
     # 917 exception. TODO find a more generic way
-    if [ "$SILABS_BOARD" == "BRD4325B" ]; then
+    if [ "$SILABS_BOARD" == "BRD4325B" ] || [ "$SILABS_BOARD" == "BRD4325C" ] || [ "$SILABS_BOARD" == "BRD4338A" ]; then
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
         optArgs+="chip_device_platform =\"SiWx917\" "
@@ -281,7 +287,6 @@ else
     fi
 
     if [ "$USE_SLC" == true ]; then
-        PYTHON_PATH="/usr/bin/python3"
         if [ "$GN_PATH_PROVIDED" == false ]; then
             GN_PATH=./.environment/cipd/packages/pigweed/gn
         fi
@@ -289,9 +294,9 @@ else
         # Activation needs to be after SLC generation which is done in gn gen.
         # Zap generation requires activation and is done in the build phase
         source "$CHIP_ROOT/scripts/activate.sh"
-        PYTHON_PATH=$VIRTUAL_ENV"/bin/python3"
     fi
 
+    PYTHON_PATH="$(which python3)"
     BUILD_DIR=$OUTDIR/$SILABS_BOARD
     echo BUILD_DIR="$BUILD_DIR"
 

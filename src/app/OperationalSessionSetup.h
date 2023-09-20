@@ -301,6 +301,12 @@ private:
     void EnqueueConnectionCallbacks(Callback::Callback<OnDeviceConnected> * onConnection,
                                     Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
+    enum class ReleaseBehavior
+    {
+        Release,
+        DoNotRelease
+    };
+
     /*
      * This dequeues all failure and success callbacks and appropriately
      * invokes either set depending on the value of error.
@@ -308,17 +314,23 @@ private:
      * If error == CHIP_NO_ERROR, only success callbacks are invoked.
      * Otherwise, only failure callbacks are invoked.
      *
-     * This uses mReleaseDelegate to release ourselves (aka `this`). As a
-     * result any caller should return right away without touching `this`.
+     * If releaseBehavior is Release, this uses mReleaseDelegate to release
+     * ourselves (aka `this`). As a result any caller should return right away
+     * without touching `this`.
      *
+     * Setting releaseBehavior to DoNotRelease is meant for use from the destructor
      */
-    void DequeueConnectionCallbacks(CHIP_ERROR error);
+    void DequeueConnectionCallbacks(CHIP_ERROR error, ReleaseBehavior releaseBehavior = ReleaseBehavior::Release);
 
-    /*
-     * Like DequeueConnectionCallbacks but does not release ourselves.  For use
-     * from our destructor.
+    /**
+     * Helper for DequeueConnectionCallbacks that handles the actual callback
+     * notifications. This happens after the object has been released, if it's
+     * being released.
      */
-    void DequeueConnectionCallbacksWithoutReleasing(CHIP_ERROR error);
+    static void NotifyConnectionCallbacks(Callback::Cancelable & failureReady, Callback::Cancelable & successReady,
+                                          CHIP_ERROR error, const ScopedNodeId & peerId, bool performingAddressUpdate,
+                                          Messaging::ExchangeManager * exchangeMgr,
+                                          const Optional<SessionHandle> & optionalSessionHandle);
 
     /**
      * Triggers a DNSSD lookup to find a usable peer address.

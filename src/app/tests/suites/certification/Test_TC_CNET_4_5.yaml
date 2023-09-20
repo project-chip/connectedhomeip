@@ -26,23 +26,18 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission TH and DUT over BLE to setup the Wi-Fi"
+    - label: "Preconditions"
       verification: |
+          1.Commission TH and DUT over BLE to setup the Wi-Fi
 
-      disabled: true
+          2.The cluster Identifier 49 (0x0031) is present in the ServerList
+          attribute
 
-    - label:
-          "The cluster Identifier 49 (0x0031) is present in the ServerList
-          attribute"
-      verification: |
+          3.The FeatureMap attribute value is 1
 
-      disabled: true
-
-    - label: "The FeatureMap attribute value is 1"
-      verification: |
           ./chip-tool networkcommissioning read feature-map 1 0
 
-          Verify the "feature-map" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify that FeatureMap attribute value as 1 for WiFiNetworkInterface.
 
           [1653474932.055513][29920:29925] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFC DataVersion: 1600858167
           [1653474932.055578][29920:29925] CHIP:TOO:   FeatureMap: 1
@@ -50,8 +45,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the AddOrUpdateWiFiNetwork command to the DUT with the
-          following fields: 1. SSID field set to PIXIT.CNET.WIFI_1S
+          "Step 1: TH sends the AddOrUpdateWiFiNetwork command to the DUT with
+          the following fields: 1. SSID field set to PIXIT.CNET.WIFI_1S
           T_ACCESSPOINT_SSI D 2. Credentials field set to PIXIT.CNET.WIFI_1S
           T_ACCESSPOINT_CRE DENTIALS 3. Breadcrumb field set to 1"
       PICS: CNET.S.C02.Rsp
@@ -62,7 +57,7 @@ tests:
 
           ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivatewifi092010 1 0
 
-          Verify  "FAILSAFE_REQUIRED status code"  on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the FAILSAFE_REQUIRED response for sending the AddOrUpdateWiFiNetwork command.
 
           [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
           [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
@@ -70,8 +65,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends RemoveNetwork command to the DUT with NetworkID field set to
-          PIXIT.CNET.WIFI_1ST_ACCE SSPOINT_SSID and Breadcrumb field set to 1"
+          "Step 2: TH sends RemoveNetwork command to the DUT with NetworkID
+          field set to PIXIT.CNET.WIFI_1ST_ACCE SSPOINT_SSID and Breadcrumb
+          field set to 1"
       PICS: CNET.S.C02.Rsp
       verification: |
           ./chip-tool networkcommissioning remove hex:<your network id in hex> 1 0
@@ -80,7 +76,7 @@ tests:
 
           ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
 
-          Verify  "FAILSAFE_REQUIRED status code"  on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the FAILSAFE_REQUIRED response for sending the RemoveNetwork command.
 
           [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
           [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
@@ -88,9 +84,10 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ConnectNetwork command to the DUT with NetworkID field set
-          to PIXIT.CNET.WIFI_1ST_ACCE SSPOINT_SSID and Breadcrumb field set to 1"
-      PICS: CNET.S.C06.Rsp
+          "Step 3: TH sends ConnectNetwork command to the DUT with NetworkID
+          field set to PIXIT.CNET.WIFI_1ST_ACCE SSPOINT_SSID and Breadcrumb
+          field set to 1"
+      PICS: CNET.S.C02.Rsp
       verification: |
           ./chip-tool networkcommissioning connect hex:<your network id in hex> 1 0
 
@@ -98,7 +95,7 @@ tests:
 
           ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
 
-          Verify  "FAILSAFE_REQUIRED status code"  on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the FAILSAFE_REQUIRED response for sending the ConnectNetwork command.
 
           [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
           [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)

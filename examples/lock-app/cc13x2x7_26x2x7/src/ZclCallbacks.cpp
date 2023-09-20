@@ -27,10 +27,13 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/data-model/Nullable.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip::app::Clusters;
 using namespace ::chip::DeviceLayer::Internal;
+using ::chip::app::DataModel::Nullable;
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
@@ -56,7 +59,8 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  */
 void emberAfDoorLockClusterInitCallback(EndpointId endpoint) {}
 
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                            const Nullable<chip::NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
                                             OperationErrorEnum & err)
 {
     ChipLogProgress(Zcl, "Door Lock App: Lock Command endpoint=%d", endpointId);
@@ -68,7 +72,8 @@ bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const O
     return status;
 }
 
-bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
+bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                              const Nullable<chip::NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
                                               OperationErrorEnum & err)
 {
     ChipLogProgress(Zcl, "Door Lock App: Unlock Command endpoint=%d", endpointId);

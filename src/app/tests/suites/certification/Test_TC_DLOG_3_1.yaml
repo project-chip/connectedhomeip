@@ -35,12 +35,12 @@ tests:
           TH supports BDX
       disabled: true
 
-    - label: "Commission DUT to TH"
+    - label: "Step 1: Commission DUT to TH"
       verification: |
 
       disabled: true
 
-    - label: "DUT sends RetrieveLogsRequest Command to TH"
+    - label: "Step 2: DUT sends RetrieveLogsRequest Command to TH"
       PICS: DLOG.C.C00.Tx
       verification: |
           ./chip-tool diagnosticlogs retrieve-logs-request 0 0 "test.txt" 1 0
@@ -63,7 +63,7 @@ tests:
           [1646215088532] [15387:2221674] CHIP: [DMG] Received Command Response Status for Endpoint=0 Cluster=0x0000_0032 Command=0x0000_0000 Status=0x0
       disabled: true
 
-    - label: "In case TH initiates a BDX Transfer"
+    - label: "Step 3: In case TH initiates a BDX Transfer"
       verification: |
           grl_matter@GRL-Matters-MacBook-Air debug % sudo ./chip-tool diagnosticlogs retrieve-logs-request 0 1 "test.txt" 1 0
 
@@ -85,7 +85,7 @@ tests:
           [1646208340.192744][3171:3176] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0032 Command=0x0000_0000 Status=0x0
       disabled: true
 
-    - label: "In case TH does not initiate BDX Transfer"
+    - label: "Step 4: In case TH does not initiate BDX Transfer"
       verification: |
           ./chip-tool diagnosticlogs retrieve-logs-request 0 0 "test.txt" 1 0
 

@@ -17,13 +17,32 @@
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
-#include "init_ccpPlatform.h"
 #include <FreeRTOS.h>
 #include <task.h>
 
+#if SILABS_LOG_ENABLED
+#include "silabs_utils.h"
+#endif
+
 // TODO add includes ?
-extern "C" void RSI_Board_LED_Set(int, bool);
-extern "C" void RSI_Board_LED_Toggle(int);
+extern "C" {
+#include "em_core.h"
+#include "sl_event_handler.h"
+
+void RSI_Board_LED_Set(int, bool);
+void RSI_Board_LED_Toggle(int);
+void RSI_Wakeupsw_config(void);
+void RSI_Wakeupsw_config_gpio0(void);
+#ifdef SI917_RADIO_BOARD_V2
+void RSI_Wakeupsw_config_gpio11(void);
+#endif
+void sl_system_init(void);
+void soc_pll_config(void);
+}
+
+#if SILABS_LOG_ENABLED
+#include "silabs_utils.h"
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -35,7 +54,26 @@ SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 CHIP_ERROR SilabsPlatform::Init(void)
 {
     mButtonCallback = nullptr;
-    init_ccpPlatform();
+
+    sl_system_init();
+
+    // TODO: Setting the highest priority for SVCall_IRQn to avoid the HardFault issue
+    NVIC_SetPriority(SVCall_IRQn, CORE_INTERRUPT_HIGHEST_PRIORITY);
+
+    // Configuration the clock rate
+    soc_pll_config();
+
+    // BTN0 and BTN1 init
+    RSI_Wakeupsw_config();
+#ifdef SI917_RADIO_BOARD_V2
+    RSI_Wakeupsw_config_gpio11();
+#else
+    RSI_Wakeupsw_config_gpio0();
+#endif
+
+#if SILABS_LOG_ENABLED
+    silabsInitLog();
+#endif
     return CHIP_NO_ERROR;
 }
 

@@ -29,7 +29,7 @@ tests:
           Commission TH to DUT, if not done so already. In some cases, such as with a Casting Video Player, the TH commissions the DUT.
       disabled: true
 
-    - label: "DUT sends ShowInputStatus command to TH"
+    - label: "Step 1: DUT sends ShowInputStatus command to TH"
       PICS: MEDIAINPUT.C.C01.Tx
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
@@ -38,7 +38,7 @@ tests:
           ./chip-tv-casting-app mediainput show-input-status 1 1
 
 
-          The log below shows the resulting log on the TH (tv-app or all-clusters-app):
+          On TH (tv-app), Verify the showinputstatus command is received successfully.
 
           [1658530640755] [21882:316283] CHIP: [DMG] InvokeRequestMessage =
           [1658530640755] [21882:316283] CHIP: [DMG] {

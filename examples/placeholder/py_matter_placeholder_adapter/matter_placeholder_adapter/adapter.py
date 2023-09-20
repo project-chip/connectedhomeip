@@ -72,6 +72,8 @@ class PlaceholderDecoder:
                 clusterId = json_response[_CLUSTER_ID]
                 decoded_response[_COMMAND] = self.__definitions.get_response_name(
                     clusterId, value)
+                if not decoded_response[_COMMAND]:
+                    decoded_response[_COMMAND] = self.__definitions.get_command_name(clusterId, value)
             elif key == _ATTRIBUTE_ID:
                 clusterId = json_response[_CLUSTER_ID]
                 decoded_response[_ATTRIBUTE] = self.__definitions.get_attribute_name(

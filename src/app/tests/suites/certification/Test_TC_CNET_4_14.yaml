@@ -94,8 +94,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends  ArmFailSafe  command to the  DUT
-          with  ExpiryLengthSeco  nds set to 900"
+          "Step 1: TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco
+          nds set to 900"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 900 0 1 0
 
@@ -104,8 +104,8 @@ tests:
       disabled: true
 
     - label:
-          "TH reads Networks attribute from the DUT and saves the number of
-          entries as NumNetworks"
+          "Step 2: TH reads Networks attribute from the DUT and saves the number
+          of entries as 'NumNetworks'"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool network-commissioning read networks 1 0
@@ -115,16 +115,17 @@ tests:
       disabled: true
 
     - label:
-          "TH calculates the number of remaining network slots as MaxNetworksVal
-          ue NumNetworks and saves as RemainingNetworkSlots"
+          "Step 3: TH calculates the number of remaining network slots as
+          'MaxNetworksValue' - 'NumNetworks' and saves as 'RemainingNetwor
+          kSlots'"
       verification: |
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
     - label:
-          "TH calculates the midpoint of the network list as floor((MaxNetwor
-          ksValue + 1)/2) and saves as Midpoint"
+          "Step 4: TH calculates the midpoint of the network list as
+          floor(('MaxNetwor ksValue' + 1)/2) and saves as 'Midpoint'"
       verification: |
           ./chip-tool networkcommissioning add-or-update-thread-network hex:1011101122222229 1 0 --Breadcrumb 1
 
@@ -133,8 +134,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ArmFailSafe command to the DUT with the ExpiryLengthSeco nds
-          field set to 900"
+          "Step 5: TH sends ArmFailSafe command to the DUT with the
+          ExpiryLengthSeco nds field set to 900"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 900 0 1 0
 
@@ -144,8 +145,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends AddOrUpdateThre adNetwork command to the DUT. This step
-          should be repeated RemainingNetwor kSlots times using DIFFERENT
+          "Step 5: TH sends AddOrUpdateThre adNetwork command to the DUT. This
+          step should be repeated 'RemainingNetwor kSlots' times using DIFFERENT
           OperationalDatase t values and Breadcrumb set to 1. Note that these
           credentials are NOT required to be connectable."
       PICS: CNET.S.C03.Rsp && CNET.S.C05.Tx
@@ -157,8 +158,8 @@ tests:
       disabled: true
 
     - label:
-          "TH reads Networks attribute from the DUT and saves the list as
-          OriginalNetworkList"
+          "Step 6: TH reads Networks attribute from the DUT and saves the list
+          as 'OriginalNetworkList'"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
@@ -168,10 +169,10 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ReorderNetwo rk Command to the DUT with the following
-          fields: 1. NetworkID is the extended PAN ID of PIXIT.CNET .THREAD_1
-          ST_OPERA TIONALDA TASET 2. NetworkIn dex is MaxNetwo rksValue 3.
-          Breadcrum b is 2"
+          "Step 7: TH sends ReorderNetwo rk Command to the DUT with the
+          following fields: 1. NetworkID is the extended PAN ID of PIXIT.CNET
+          .THREAD_1 ST_OPERA TIONALDA TASET 2. NetworkIn dex is 'MaxNetwo
+          rksValue' 3. Breadcrum b is 2"
       PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
       verification: |
           ./chip-tool network-commissioning read networks 1 0
@@ -181,7 +182,8 @@ tests:
       disabled: true
 
     - label:
-          "TH reads Breadcumb attribute from the General Commissioning Cluster"
+          "Step 8: TH reads Breadcumb attribute from the General Commissioning
+          Cluster"
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
 
@@ -190,9 +192,10 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ReorderNetwo rk Command to the DUT with the following
-          fields: 1. NetworkID is a NetworkID value NOT present in OriginalNe
-          tworkList 2. NetworkIndex is Midpoint 3. Breadcrum b is 2"
+          "Step 9: TH sends ReorderNetwo rk Command to the DUT with the
+          following fields: 1. NetworkID is a NetworkID value NOT present in
+          'OriginalNe tworkList' 2. NetworkIndex is 'Midpoint' 3. Breadcrum b is
+          2"
       PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
       verification: |
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
@@ -200,7 +203,8 @@ tests:
       disabled: true
 
     - label:
-          "TH reads Breadcumb attribute from the General Commissioning Cluster"
+          "Step 10: TH reads Breadcumb attribute from the General Commissioning
+          Cluster"
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
 
@@ -209,10 +213,10 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ReorderNetwo rk Command to the DUT with the following
-          fields: 1. NetworkID is the extended PAN ID of PIXIT.CNET .THREAD_1
-          ST_OPERA TIONALDA TASET 2.NetworkIn dex is Midpoint 3. Breadcrum b is
-          2"
+          "Step 11: TH sends ReorderNetwo rk Command to the DUT with the
+          following fields: 1. NetworkID is the extended PAN ID of PIXIT.CNET
+          .THREAD_1 ST_OPERA TIONALDA TASET 2.NetworkIn dex is 'Midpoint' 3.
+          Breadcrum b is 2"
       PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
       verification: |
           ./chip-tool  networkcommissioning reorder-network  hex:1011101122222229 1 0 --Breadcrumb 1
@@ -222,7 +226,8 @@ tests:
       disabled: true
 
     - label:
-          "TH reads Breadcumb attribute from the General Commissioning Cluster"
+          "Step 12: TH reads Breadcumb attribute from the General Commissioning
+          Cluster"
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
 
@@ -230,7 +235,7 @@ tests:
           ( Pre-Condition)
       disabled: true
 
-    - label: "TH reads Networks attribute list from the DUT"
+    - label: "Step 13: TH reads Networks attribute list from the DUT"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool network-commissioning read networks 1 0
@@ -240,8 +245,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
-          to 0"
+          "Step 14: TH sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeco nds set to 0"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 0 0 1 0
 
@@ -249,7 +254,7 @@ tests:
           ( Pre-Condition)
       disabled: true
 
-    - label: "TH reads Networks attribute list from the DUT"
+    - label: "Step 15: TH reads Networks attribute list from the DUT"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool network-commissioning read networks 1 0
@@ -259,8 +264,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
-          to 900"
+          "Step 16: TH sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeco nds set to 900"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 900 0 1 0
 
@@ -270,8 +275,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends AddOrUpdateThre adNetwork command to the DUT. This step
-          should be repeated RemainingNetwor kSlots times using DIFFERENT
+          "Step 17: TH sends AddOrUpdateThre adNetwork command to the DUT. This
+          step should be repeated 'RemainingNetwor kSlots' times using DIFFERENT
           OperationalDatase t values and Breadcrumb set to 1. Note that these
           credentials are NOT required to be connectable"
       PICS: CNET.S.C03.Rsp && CNET.S.C05.Tx
@@ -281,17 +286,17 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ReorderNetwo rk Command to the DUT with the following
-          fields: 1. NetworkID is the extended PAN ID of PIXIT.CNET .THREAD_1
-          ST_OPERA TIONALDA TASET 2. NetworkIn dex is Midpoint 3. Breadcrum b is
-          2"
+          "Step 18: TH sends ReorderNetwo rk Command to the DUT with the
+          following fields: 1. NetworkID is the extended PAN ID of PIXIT.CNET
+          .THREAD_1 ST_OPERA TIONALDA TASET 2. NetworkIn dex is 'Midpoint' 3.
+          Breadcrum b is 2"
       PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
       verification: |
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
-    - label: "TH sends the CommissioningCo mplete command to the DUT"
+    - label: "Step 19: TH sends the CommissioningCo mplete command to the DUT"
       verification: |
           ./chip-tool generalcommissioning CommissioningComplete 1 0
 
@@ -300,8 +305,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
-          to 0"
+          "Step 20: TH sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeco nds set to 0"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 0 0 1 0
 
@@ -309,7 +314,7 @@ tests:
           ( Pre-Condition)
       disabled: true
 
-    - label: "TH reads Networks attribute list from the DUT"
+    - label: "Step 21: TH reads Networks attribute list from the DUT"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool network-commissioning read networks 1 0

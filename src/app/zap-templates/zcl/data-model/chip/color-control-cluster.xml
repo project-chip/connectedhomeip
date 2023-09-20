@@ -105,7 +105,7 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <globalAttribute side="either" code="0xFFFD" value="5"/>
+    <globalAttribute side="either" code="0xFFFD" value="6"/>
 
     <attribute side="server" code="0x0000" define="COLOR_CONTROL_CURRENT_HUE" type="INT8U" min="0x00" max="0xFE" writable="false" reportable="true" default="0x00" optional="true">CurrentHue</attribute>
     <!-- CURRENT_HUE -->

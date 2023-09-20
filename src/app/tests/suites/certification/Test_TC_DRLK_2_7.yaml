@@ -34,7 +34,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Create new user"
+    - label: "Precondition: Create new user"
       command: "SetUser"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -54,7 +54,7 @@ tests:
               - name: "CredentialRule"
                 value: 0
 
-    - label: "Read the user back and verify its fields"
+    - label: "Precondition: Read the user back and verify its fields"
       command: "GetUser"
       arguments:
           values:
@@ -83,27 +83,28 @@ tests:
               - name: "NextUserIndex"
                 value: null
 
-    - label: "TH reads NumberOfYearDay SchedulesSupportedPerUser attribute"
+    - label:
+          "Step 1: TH reads NumberOfYearDay SchedulesSupportedPerUser attribute"
       PICS: DRLK.S.F0a && DRLK.S.A0015
       command: "readAttribute"
       attribute: "NumberOfYearDaySchedulesSupportedPerUser"
       response:
-          saveAs: NumberOfYearDaySchedulesSupportedPerUser
+          saveAs: NumberOfYearDaySchedulesSupportedPerUserValue
           constraints:
               minValue: 0
               maxValue: 255
 
-    - label: "TH reads NumberOfTotalUsers Supported attribute"
+    - label: "Step 2: TH reads NumberOfTotalUsers Supported attribute"
       PICS: DRLK.S.F08 && DRLK.S.A0011
       command: "readAttribute"
       attribute: "NumberOfTotalUsersSupported"
       response:
-          saveAs: NumberOfTotalUsersSupported
+          saveAs: NumberOfTotalUsersSupportedValue
           constraints:
               minValue: 0
               maxValue: 65534
 
-    - label: "TH sends Set Year Day Schedule Command to DUT"
+    - label: "Step 3: TH sends Set Year Day Schedule Command to DUT"
       PICS: DRLK.S.F0a && DRLK.S.C0e.Rsp
       command: "SetYearDaySchedule"
       arguments:
@@ -117,8 +118,7 @@ tests:
               - name: "LocalEndTime"
                 value: 1980
 
-    #issue #18591
-    - label: "TH sends Get Year Day Schedule Command to DUT"
+    - label: "Step 4a & 4b: TH sends Get Year Day Schedule Command to DUT"
       PICS: DRLK.S.F0a && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
       command: "GetYearDaySchedule"
       arguments:
@@ -142,7 +142,7 @@ tests:
                 constraints:
                     minValue: 961
 
-    - label: "TH send Set Year Day Schedule Command to DUT"
+    - label: "Step 5: TH send Set Year Day Schedule Command to DUT"
       PICS: DRLK.S.C0e.Rsp
       command: "SetYearDaySchedule"
       arguments:
@@ -158,7 +158,7 @@ tests:
       response:
           error: INVALID_COMMAND
 
-    - label: "TH sends Get Year Day Schedule Command to DUT"
+    - label: "Step 6: TH sends Get Year Day Schedule Command to DUT"
       PICS: DRLK.S.F0a && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
       command: "GetYearDaySchedule"
       arguments:
@@ -182,7 +182,7 @@ tests:
                 constraints:
                     hasValue: false
 
-    - label: "Create a user with userIndex as 5"
+    - label: "Step 7a: Create a user with userIndex as 5"
       command: "SetUser"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -202,19 +202,19 @@ tests:
               - name: "CredentialRule"
                 value: 0
 
-    - label: "TH sends Get Year Day Schedule Command to DUT"
+    - label: "Step 7b: TH sends Get Year Day Schedule Command to DUT"
       PICS: DRLK.S.F0a && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
       command: "GetYearDaySchedule"
       arguments:
           values:
               - name: "YearDayIndex"
-                value: NumberOfYearDaySchedulesSupportedPerUser
+                value: NumberOfYearDaySchedulesSupportedPerUserValue
               - name: "UserIndex"
                 value: 5
       response:
           values:
               - name: "YearDayIndex"
-                value: NumberOfYearDaySchedulesSupportedPerUser
+                value: NumberOfYearDaySchedulesSupportedPerUserValue
               - name: "UserIndex"
                 value: 5
               - name: "Status"
@@ -226,7 +226,7 @@ tests:
                 constraints:
                     hasValue: false
 
-    - label: "TH sends Clear Year Day Schedule to DUT"
+    - label: "Step 8: TH sends Clear Year Day Schedule to DUT"
       PICS: DRLK.S.C10.Rsp
       command: "ClearYearDaySchedule"
       arguments:
@@ -236,7 +236,7 @@ tests:
               - name: "UserIndex"
                 value: 1
 
-    - label: "TH sends Get Year Day Schedule Command to DUT"
+    - label: "Step 9: TH sends Get Year Day Schedule Command to DUT"
       PICS: DRLK.S.F0a && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx && DRLK.S.C10.Rsp
       command: "GetYearDaySchedule"
       arguments:
@@ -260,7 +260,7 @@ tests:
                 constraints:
                     hasValue: false
 
-    - label: "TH sends Set Year Day Schedule Command to DUT"
+    - label: "Step 10: TH sends Set Year Day Schedule Command to DUT"
       PICS: DRLK.S.C0e.Rsp
       command: "SetYearDaySchedule"
       arguments:
@@ -274,7 +274,7 @@ tests:
               - name: "LocalEndTime"
                 value: 2100
 
-    - label: "TH sends Get Year Day Schedule Command to DUT"
+    - label: "Step 11: TH sends Get Year Day Schedule Command to DUT"
       PICS: DRLK.S.F0a && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
       command: "GetYearDaySchedule"
       arguments:
@@ -298,7 +298,33 @@ tests:
                 constraints:
                     minValue: 1081
 
-    - label: "TH sends Clear Year Day Schedule to DUT"
+    - label:
+          "Step 12: TH sends Get Year Day Schedule Command to DUT for
+          non-existent User"
+      PICS: DRLK.S.F0a && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
+      command: "GetYearDaySchedule"
+      arguments:
+          values:
+              - name: "YearDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 2
+      response:
+          values:
+              - name: "YearDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 2
+              - name: "Status"
+                value: 0x8B
+              - name: "LocalStartTime"
+                constraints:
+                    hasValue: false
+              - name: "LocalEndTime"
+                constraints:
+                    hasValue: false
+
+    - label: "Step 13: TH sends Clear Year Day Schedule to DUT"
       PICS: DRLK.S.F0a && DRLK.S.C10.Rsp
       command: "ClearYearDaySchedule"
       arguments:

@@ -149,7 +149,7 @@ Thread thread;
 #endif // defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
 
 #if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
-pw::trace::TraceService trace_service;
+pw::trace::TraceService trace_service(pw::trace::GetTokenizedTracer());
 #endif // defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
 
 void RegisterServices(pw::rpc::Server & server)

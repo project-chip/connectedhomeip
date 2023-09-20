@@ -34,7 +34,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Create new user with default parameters"
+    - label: "Precondition: Create new user with default parameters"
       command: "SetUser"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -54,7 +54,7 @@ tests:
               - name: "CredentialRule"
                 value: 0
 
-    - label: "Read the user back and verify its fields"
+    - label: "Precondition: Read the user back and verify its fields"
       command: "GetUser"
       arguments:
           values:
@@ -84,18 +84,18 @@ tests:
                 value: null
 
     - label:
-          "TH reads NumberOfTotalUsersSupported attribute and saves for future
-          use."
+          "Step 1: TH reads NumberOfTotalUsersSupported attribute and saves for
+          future use."
       PICS: DRLK.S.F08 && DRLK.S.A0011
       command: "readAttribute"
       attribute: "NumberOfTotalUsersSupported"
       response:
-          saveAs: NumberOfTotalUsersSupported
+          saveAs: NumberOfTotalUsersSupportedValue
           constraints:
               minValue: 0
               maxValue: 65534
 
-    - label: "TH sends Set Credential Command to DUT"
+    - label: "Step 2: TH sends Set Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -122,7 +122,7 @@ tests:
               - name: "NextCredentialIndex"
                 value: 2
 
-    - label: "TH sends Get Credential Status Command"
+    - label: "Step 3: TH sends Get Credential Status Command"
       PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
@@ -143,7 +143,7 @@ tests:
               - name: "NextCredentialIndex"
                 value: null
 
-    - label: "TH sends Set Credential Command to DUT"
+    - label: "Step 4: TH sends Set Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -168,7 +168,7 @@ tests:
               - name: "UserIndex"
                 value: null
 
-    - label: "TH sends Set Credential Command to DUT"
+    - label: "Step 5: TH sends Set Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -194,8 +194,9 @@ tests:
                 value: null
 
     - label:
-          "TH sends Set Credential Command to DUT and Verify that the DUT sends
-          Set Credential Response command with status as DUPLICATE or OCCUPIED"
+          "Step 6a: TH sends Set Credential Command to DUT and Verify that the
+          DUT sends Set Credential Response command with status as DUPLICATE or
+          OCCUPIED"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -218,122 +219,62 @@ tests:
               - name: "Status"
                 constraints:
                     anyOf: [0x2, 0x3]
+
+    - label:
+          "Step 6b: TH sends Set Credential Command to DUT and Verify that the
+          DUT sends Set Credential Response command with status as DUPLICATE or
+          OCCUPIED."
+      PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+              - name: "CredentialData"
+                value: "123457"
               - name: "UserIndex"
+                value: 1
+              - name: "UserStatus"
                 value: null
+              - name: "UserType"
+                value: null
+      response:
+          values:
+              - name: "Status"
+                constraints:
+                    anyOf: [0x2, 0x3]
 
     - label:
-          "TH sends Set Credential Command to DUT and Verify that the DUT sends
-          Set Credential Response command with response as OCCUPIED if the
-          CredentialIndex is repeated"
-      verification: |
-          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1, "credentialIndex" : 1}' 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
-
-          Verify "DUT sends Set Credential Response command with response as DUPLICATE or OCCUPIED" on the TH(Chip-tool) Log:
-
-          [1660216276.191641][71849:71854] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0023
-          [1660216276.191673][71849:71854] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_0023
-          [1660216276.191725][71849:71854] CHIP:TOO:   SetCredentialResponse: {
-          [1660216276.191752][71849:71854] CHIP:TOO:     status: 2
-          [1660216276.191764][71849:71854] CHIP:TOO:     userIndex: null
-          [1660216276.191776][71849:71854] CHIP:TOO:     nextCredentialIndex: 2
-          [1660216276.191798][71849:71854] CHIP:TOO:    }
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
+          "Step 7: TH sends Set Credential Command to DUT and Verify that the
+          DUT sends Set Credential Response command with status
+          INVALID_COMMAND(0x85) if the CredentialIndex is not associated with
+          the UserIndex."
+      PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    #- label:
-    #      "TH sends Set Credential Command to DUT and Verify that the DUT sends
-    #      Set Credential Response command with response as OCCUPIED if the
-    #      CredentialIndex is repeated"
-    #  PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
-    #  command: "SetCredential"
-    #  timedInteractionTimeoutMs: 10000
-    #  arguments:
-    #      values:
-    #          - name: "OperationType"
-    #            value: 0
-    #          - name: "Credential"
-    #            value: { CredentialType: 1, CredentialIndex: 1 }
-    #          - name: "CredentialData"
-    #            value: "123456"
-    #          - name: "UserIndex"
-    #            value: 1
-    #          - name: "UserStatus"
-    #            value: null
-    #          - name: "UserType"
-    #            value: null
-    #  response:
-    #      values:
-    #          - name: "Status"
-    #            constraints:
-    #                anyOf: [0x2, 0x3]
-    #          - name: "UserIndex"
-    #            value: null
-
-    #Issue 19990 expected response OCCUPIED, but CHIP Tool Verification Steps shows status: 2 fix script once the issue is fixed.
-    - label:
-          "TH sends Set Credential Command to DUT and Verify that the DUT sends
-          Set Credential Response command with response as OCCUPIED if the
-          CredentialIndex is repeated"
-      PICS: PICS_USER_PROMPT && DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
-      verification: |
-          Mark as not applicable and proceed to next step
-
-          ./chip-tool doorlock set-credential 2 '{ "credentialType" : 1, "credentialIndex" : 3 }' 1234567 1 null null 1 1 --timedInteractionTimeoutMs 1000
-          Verify "DUT sends Set Credential Response command with response as OCCUPIED" on the TH(Chip-tool) Log:
-
-          [1658473055.384297][2667:2672] CHIP:DMG: },
-          [1658473055.384374][2667:2672] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0023
-          [1658473055.384433][2667:2672] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_0023
-          [1658473055.384516][2667:2672] CHIP:TOO:   SetCredentialResponse: {
-          [1658473055.384571][2667:2672] CHIP:TOO:     status: 2
-          [1658473055.384602][2667:2672] CHIP:TOO:     userIndex: null
-          [1658473055.384632][2667:2672] CHIP:TOO:     nextCredentialIndex: 4
-          [1658473055.384660][2667:2672] CHIP:TOO:    }
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
+              - name: "OperationType"
+                value: 2
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 3 }
+              - name: "CredentialData"
+                value: "1234567"
+              - name: "UserIndex"
+                value: 1
+              - name: "UserStatus"
+                value: null
+              - name: "UserType"
+                value: null
+      response:
           values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+              - name: "Status"
+                value: 0x85
 
-    #- label:
-    #      "TH sends Set Credential Command to DUT and Verify that the DUT sends
-    #      Set Credential Response command with response as OCCUPIED if the
-    #      CredentialIndex is repeated"
-    #  PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
-    #  command: "SetCredential"
-    #  timedInteractionTimeoutMs: 10000
-    #  arguments:
-    #      values:
-    #          - name: "OperationType"
-    #            value: 2
-    #          - name: "Credential"
-    #            value: { CredentialType: 1, CredentialIndex: 3 }
-    #          - name: "CredentialData"
-    #            value: "123456"
-    #          - name: "UserIndex"
-    #            value: 1
-    #          - name: "UserStatus"
-    #            value: null
-    #          - name: "UserType"
-    #            value: null
-    #  response:
-    #      values:
-    #          - name: "Status"
-    #            value: 0x3
-    #          - name: "UserIndex"
-    #            value: null
-
-    - label: "TH sends Clear Credential Command to DUT"
+    - label: "Step 8: TH sends Clear Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 10000
@@ -342,7 +283,7 @@ tests:
               - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
 
-    - label: "TH sends Get Credential Status Command to DUT"
+    - label: "Step 9: TH sends Get Credential Status Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
@@ -362,7 +303,7 @@ tests:
               - name: "NextCredentialIndex"
                 value: null
 
-    - label: "TH sends Set User Command to DUT"
+    - label: "Step 10: TH sends Set User Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
       command: "SetUser"
       timedInteractionTimeoutMs: 10000
@@ -383,7 +324,7 @@ tests:
               - name: "CredentialRule"
                 value: 0
 
-    - label: "TH sends Set Credential Command to DUT"
+    - label: "Step 11: TH sends Set Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -408,7 +349,7 @@ tests:
               - name: "UserIndex"
                 value: null
 
-    - label: "TH sends Clear Credential Command to DUT"
+    - label: "Step 12a: TH sends Clear Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 10000
@@ -417,7 +358,7 @@ tests:
               - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 65534 }
 
-    - label: "TH sends Get Credential Status Command"
+    - label: "Step 12b: TH sends Get Credential Status Command"
       PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
@@ -437,7 +378,7 @@ tests:
               - name: "NextCredentialIndex"
                 value: null
 
-    - label: "TH sends Get Credential Status Command"
+    - label: "Step 13: TH sends Get Credential Status Command"
       PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
@@ -457,7 +398,7 @@ tests:
               - name: "NextCredentialIndex"
                 value: null
 
-    - label: "TH sends Clear Credential Command to DUT"
+    - label: "Step 14: TH sends Clear Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 10000

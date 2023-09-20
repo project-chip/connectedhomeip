@@ -41,21 +41,21 @@ tests:
               - name: "Status"
                 value: 0
 
-    - label: "Reads the CurrentState attribute from the DUT"
+    - label: "Step 1: Reads the CurrentState attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 1
 
-    - label: "Reads the PlaybackSpeed attribute from the DUT"
+    - label: "Step 2: Reads the PlaybackSpeed attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C01.Rsp
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       response:
           value: 0
 
-    - label: "Sends a FastForward command"
+    - label: "Step 3: Sends a FastForward command"
       PICS: MEDIAPLAYBACK.S.C07.Rsp
       command: "FastForward"
       response:
@@ -74,21 +74,21 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads the CurrentState attribute"
+    - label: "Step 4: Reads the CurrentState attribute"
       PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 0
 
-    - label: "Reads the PlaybackSpeed attribute from the DUT"
+    - label: "Step 5: Reads the PlaybackSpeed attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C07.Rsp
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       response:
           value: 1
 
-    - label: "Sends a FastForward command"
+    - label: "Step 6: Sends a FastForward command"
       PICS: MEDIAPLAYBACK.S.C07.Rsp
       command: "FastForward"
       response:
@@ -107,14 +107,14 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads the PlaybackSpeed attribute from the DUT"
+    - label: "Step 7: Reads the PlaybackSpeed attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C07.Rsp
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       response:
           value: 2
 
-    - label: "Sends a Rewind command to the DUT"
+    - label: "Step 8: Sends a Rewind command to the DUT"
       PICS: MEDIAPLAYBACK.S.C06.Rsp
       command: "Rewind"
       response:
@@ -133,22 +133,21 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads the CurrentState attribute"
+    - label: "Step 9: Reads the CurrentState attribute"
       PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C06.Rsp
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 0
 
-    #Issue 19800
-    - label: "Reads the PlaybackSpeed attribute from the DUT"
+    - label: "Step 10: Reads the PlaybackSpeed attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C06.Rsp
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       response:
           value: -1
 
-    - label: "Sends a Rewind command to the DUT"
+    - label: "Step 11: Sends a Rewind command to the DUT"
       PICS: MEDIAPLAYBACK.S.C06.Rsp
       command: "Rewind"
       response:
@@ -172,14 +171,14 @@ tests:
                 value: "y"
 
     #Issue 19800
-    - label: "Reads the PlaybackSpeed attribute from the DUT"
+    - label: "Step 12: Reads the PlaybackSpeed attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C06.Rsp
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       response:
           value: -2
 
-    - label: "Sends a Play command"
+    - label: "Step 13: Sends a Play command"
       PICS: MEDIAPLAYBACK.S.C00.Rsp
       command: "Play"
       response:
@@ -202,7 +201,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads the PlaybackSpeed attribute from the DUT"
+    - label: "Step 14: Reads the PlaybackSpeed attribute from the DUT"
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C00.Rsp
@@ -210,10 +209,15 @@ tests:
           value: 1
 
     #Issue 10988
-    - label: "Sends consecutive FastForward commands"
+    - label: "Step 15: Sends consecutive FastForward commands"
       verification: |
           Send below command consecutively multiple times to get error code as 4
+
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool mediaplayback fast-forward 1 3
+          ./chip-tv-casting-app mediaplayback fast-forward 1 3
+
+          On TH(chip-tool),  Verify that a SPEED_OUT_OF_RANGE (status 4) response is received.
           [1655460522.133486][12273:12278] CHIP:DMG: },
           [1655460522.133550][12273:12278] CHIP:DMG: Received Command Response Data, Endpoint=3 Cluster=0x0000_0506 Command=0x0000_000A
           [1655460522.133603][12273:12278] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0506 Command 0x0000_000A
@@ -231,10 +235,16 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Sends consecutive Rewind commands"
+    - label: "Step 16: Sends consecutive Rewind commands"
       verification: |
           Send below command consecutively multiple times to get error code as 4
+
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool mediaplayback rewind 1 3
+          ./chip-tv-casting-app mediaplayback rewind 1 3
+
+          On TH(chip-tool),  Verify that a SPEED_OUT_OF_RANGE (status 4) response is received.
+
           [1655460483.177033][12225:12230] CHIP:DMG: Received Command Response Data, Endpoint=3 Cluster=0x0000_0506 Command=0x0000_000A
           [1655460483.177083][12225:12230] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0506 Command 0x0000_000A
           [1655460483.177146][12225:12230] CHIP:TOO:   PlaybackResponse: {

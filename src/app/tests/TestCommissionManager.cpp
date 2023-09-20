@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include <app/TimerDelegates.h>
+#include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
 #include <lib/dnssd/Advertiser.h>
@@ -92,6 +94,10 @@ void InitializeChip(nlTestSuite * suite)
     chip::DeviceLayer::SetCommissionableDataProvider(&commissionableDataProvider);
 
     static chip::CommonCaseDeviceServerInitParams initParams;
+    // Report scheduler and timer delegate instance
+    static chip::app::DefaultTimerDelegate sTimerDelegate;
+    static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
+    initParams.reportScheduler = &sReportScheduler;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     err = chip::Server::GetInstance().Init(initParams);
 

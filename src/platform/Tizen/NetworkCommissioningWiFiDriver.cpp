@@ -161,19 +161,41 @@ exit:
 
 void TizenWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
 {
-    ChipLogError(NetworkProvisioning, "Not implemented");
+    CHIP_ERROR err = DeviceLayer::Internal::WiFiMgr().StartWiFiScan(ssid, callback);
+    if (err != CHIP_NO_ERROR)
+    {
+        callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
+    }
 }
 
 size_t TizenWiFiDriver::WiFiNetworkIterator::Count()
 {
-    ChipLogError(NetworkProvisioning, "Not implemented");
-    return 0;
+    return driver->mStagingNetwork.ssidLen == 0 ? 0 : 1;
 }
 
 bool TizenWiFiDriver::WiFiNetworkIterator::Next(Network & item)
 {
-    ChipLogError(NetworkProvisioning, "Not implemented");
-    return false;
+    if (exhausted || driver->mStagingNetwork.ssidLen == 0)
+    {
+        return false;
+    }
+    memcpy(item.networkID, driver->mStagingNetwork.ssid, driver->mStagingNetwork.ssidLen);
+    item.networkIDLen = driver->mStagingNetwork.ssidLen;
+    item.connected    = false;
+    exhausted         = true;
+
+    Network configuredNetwork;
+    CHIP_ERROR err = DeviceLayer::Internal::WiFiMgr().GetConfiguredNetwork(configuredNetwork);
+    if (err == CHIP_NO_ERROR)
+    {
+        if (DeviceLayer::Internal::WiFiMgr().IsWiFiStationConnected() && configuredNetwork.networkIDLen == item.networkIDLen &&
+            memcmp(configuredNetwork.networkID, item.networkID, item.networkIDLen) == 0)
+        {
+            item.connected = true;
+        }
+    }
+
+    return true;
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI

@@ -22,7 +22,7 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR DefaultAttributePersistenceProvider::WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue)
+CHIP_ERROR DefaultAttributePersistenceProvider::InternalWriteValue(const StorageKeyName & aKey, const ByteSpan & aValue)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -33,20 +33,16 @@ CHIP_ERROR DefaultAttributePersistenceProvider::WriteValue(const ConcreteAttribu
     {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
-    return mStorage->SyncSetKeyValue(
-        DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId).KeyName(),
-        aValue.data(), static_cast<uint16_t>(aValue.size()));
+    return mStorage->SyncSetKeyValue(aKey.KeyName(), aValue.data(), static_cast<uint16_t>(aValue.size()));
 }
 
-CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType,
-                                                          size_t aSize, MutableByteSpan & aValue)
+CHIP_ERROR DefaultAttributePersistenceProvider::InternalReadValue(const StorageKeyName & aKey, EmberAfAttributeType aType,
+                                                                  size_t aSize, MutableByteSpan & aValue)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     uint16_t size = static_cast<uint16_t>(min(aValue.size(), static_cast<size_t>(UINT16_MAX)));
-    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(
-        DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId).KeyName(),
-        aValue.data(), size));
+    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(aKey.KeyName(), aValue.data(), size));
     EmberAfAttributeType type = aType;
     if (emberAfIsStringAttributeType(type))
     {
@@ -71,12 +67,45 @@ CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttribut
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DefaultAttributePersistenceProvider::WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue)
+{
+    return InternalWriteValue(DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
+                              aValue);
+}
+
+CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & aPath,
+                                                          const EmberAfAttributeMetadata * aMetadata, MutableByteSpan & aValue)
+{
+    return InternalReadValue(DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
+                             aMetadata->attributeType, aMetadata->size, aValue);
+}
+
+CHIP_ERROR DefaultAttributePersistenceProvider::SafeWriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue)
+{
+    return InternalWriteValue(
+        DefaultStorageKeyAllocator::SafeAttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId), aValue);
+}
+
+CHIP_ERROR DefaultAttributePersistenceProvider::SafeReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue)
+{
+    return InternalReadValue(
+        DefaultStorageKeyAllocator::SafeAttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId), 0x20,
+        aValue.size(), aValue);
+}
+
 namespace {
 
 AttributePersistenceProvider * gAttributeSaver = nullptr;
 
 } // anonymous namespace
 
+/**
+ * Gets the global attribute saver.
+ *
+ * Note: When storing cluster attributes that are managed via AttributeAccessInterface, it is recommended to
+ * use SafeAttributePersistenceProvider. See AttributePersistenceProvider and SafeAttributePersistenceProvider
+ * class documentation for more information.
+ */
 AttributePersistenceProvider * GetAttributePersistenceProvider()
 {
     return gAttributeSaver;
@@ -87,6 +116,28 @@ void SetAttributePersistenceProvider(AttributePersistenceProvider * aProvider)
     if (aProvider != nullptr)
     {
         gAttributeSaver = aProvider;
+    }
+}
+
+namespace {
+
+SafeAttributePersistenceProvider * gSafeAttributeSaver = nullptr;
+
+} // anonymous namespace
+
+/**
+ * Gets the global attribute safe saver.
+ */
+SafeAttributePersistenceProvider * GetSafeAttributePersistenceProvider()
+{
+    return gSafeAttributeSaver;
+}
+
+void SetSafeAttributePersistenceProvider(SafeAttributePersistenceProvider * aProvider)
+{
+    if (aProvider != nullptr)
+    {
+        gSafeAttributeSaver = aProvider;
     }
 }
 

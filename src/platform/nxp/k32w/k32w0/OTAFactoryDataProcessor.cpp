@@ -27,8 +27,6 @@
 
 namespace chip {
 
-static OtaUtils_EEPROM_ReadData pFunctionEepromRead = (OtaUtils_EEPROM_ReadData) FactoryProvider::ReadDataMemcpy;
-
 CHIP_ERROR OTAFactoryDataProcessor::Init()
 {
     mAccumulator.Init(mLength);
@@ -81,7 +79,7 @@ CHIP_ERROR OTAFactoryDataProcessor::ApplyAction()
     SuccessOrExit(error = Update((uint8_t) Tags::kPaiCertificateId, mPayload.mCertPai));
     SuccessOrExit(error = Update((uint8_t) Tags::kCertDeclarationId, mPayload.mCertDeclaration));
 
-    error = FactoryProvider::GetDefaultInstance().UpdateData(mFactoryData);
+    error = FactoryProviderImpl::UpdateData(mFactoryData);
 
 exit:
     if (error != CHIP_NO_ERROR)
@@ -99,7 +97,7 @@ exit:
 CHIP_ERROR OTAFactoryDataProcessor::AbortAction()
 {
     ReturnErrorOnFailure(Restore());
-    ReturnErrorOnFailure(FactoryProvider::GetDefaultInstance().UpdateData(mFactoryData));
+    ReturnErrorOnFailure(FactoryProviderImpl::UpdateData(mFactoryData));
 
     PDM_vDeleteDataRecord(kNvmId_FactoryDataBackup);
 
@@ -158,20 +156,12 @@ CHIP_ERROR OTAFactoryDataProcessor::Update(uint8_t tag, Optional<ByteSpan> & opt
 CHIP_ERROR OTAFactoryDataProcessor::Read()
 {
     FactoryProvider::Header header;
-    auto status = OtaUtils_ReadFromInternalFlash(sizeof(FactoryProvider::Header), FactoryProvider::kFactoryDataStart,
-                                                 (uint8_t *) &header, NULL, pFunctionEepromRead);
+    memcpy(&header, (void *) FactoryProvider::kFactoryDataStart, sizeof(FactoryProvider::Header));
 
     mFactoryData = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(FactoryProvider::kFactoryDataSize));
     ReturnErrorCodeIf(mFactoryData == nullptr, CHIP_FACTORY_DATA_NULL);
     memset(mFactoryData, 0, FactoryProvider::kFactoryDataSize);
-
-    status = OtaUtils_ReadFromInternalFlash(sizeof(FactoryProvider::Header) + header.size, FactoryProvider::kFactoryDataStart,
-                                            mFactoryData, NULL, pFunctionEepromRead);
-    if (status != gOtaUtilsSuccess_c)
-    {
-        ClearBuffer();
-        return CHIP_FACTORY_DATA_INTERNAL_FLASH_READ;
-    }
+    memcpy(mFactoryData, (void *) FactoryProvider::kFactoryDataStart, sizeof(FactoryProvider::Header) + header.size);
 
     return CHIP_NO_ERROR;
 }

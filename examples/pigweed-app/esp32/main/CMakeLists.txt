@@ -14,6 +14,12 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+if (${IDF_VERSION_MAJOR} LESS 5)
+    set(freertos_include_path "${IDF_PATH}/components/freertos/include/freertos")
+else()
+    set(freertos_include_path "${IDF_PATH}/components/freertos/FreeRTOS-Kernel/include/freertos")
+endif()
+
 idf_component_register(INCLUDE_DIRS
                      "${CMAKE_CURRENT_LIST_DIR}"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/pw_sys_io/public"
@@ -21,7 +27,7 @@ idf_component_register(INCLUDE_DIRS
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed/esp32"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/lib/support"
-                     "${IDF_PATH}/components/freertos/include/freertos"
+                     "${freertos_include_path}"
 
                       SRC_DIRS
                      "${CMAKE_CURRENT_LIST_DIR}"

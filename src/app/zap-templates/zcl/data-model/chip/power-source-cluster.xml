@@ -58,6 +58,7 @@ limitations under the License.
     <attribute side="server" code="0x001C" define="POWER_SOURCE_BAT_FUNCTIONAL_WHILE_CHARGING" type="BOOLEAN" writable="false" optional="true">BatFunctionalWhileCharging</attribute>
     <attribute side="server" code="0x001D" define="POWER_SOURCE_BAT_CHARGING_CURRENT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">BatChargingCurrent</attribute>
     <attribute side="server" code="0x001E" define="POWER_SOURCE_ACTIVE_BAT_CHARGE_FAULTS" type="ARRAY" entryType="BatChargeFaultEnum" length="16" writable="false" optional="true">ActiveBatChargeFaults</attribute>
+    <attribute side="server" code="0x001F" define="POWER_SOURCE_ENDPOINT_LIST" type="ARRAY" entryType="endpoint_no" writable="false">EndpointList</attribute>
 
     <event code="0x0000" name="WiredFaultChange" priority="info" side="server" optional="true">
       <description>The WiredFaultChange Event SHALL indicate a change in the set of wired faults currently detected by the Node on this wired power source.</description>

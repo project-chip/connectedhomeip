@@ -26,7 +26,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -34,7 +34,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads TemperatureUnit attribute from DUT"
+    - label: "Step 1: TH reads TemperatureUnit attribute from DUT"
       PICS: LUNIT.S.A0000
       command: "readAttribute"
       attribute: "TemperatureUnit"
@@ -42,7 +42,7 @@ tests:
           constraints:
               type: enum8
 
-    - label: "TH writes 0 (Fahrenheit) to TemperatureUnit attribute"
+    - label: "Step 2: TH writes 0 (Fahrenheit) to TemperatureUnit attribute"
       PICS: LUNIT.S.A0000 && LUNIT.TempUnit.Fahrenheit
       cluster: "Unit Localization"
       command: "writeAttribute"
@@ -50,14 +50,14 @@ tests:
       arguments:
           value: 0
 
-    - label: "TH reads TemperatureUnit attribute"
+    - label: "Step 3: TH reads TemperatureUnit attribute"
       PICS: LUNIT.S.A0000 && LUNIT.TempUnit.Fahrenheit
       command: "readAttribute"
       attribute: "TemperatureUnit"
       response:
           value: 0
 
-    - label: "TH writes 1 (Celsius) to TemperatureUnit attribute"
+    - label: "Step 4: TH writes 1 (Celsius) to TemperatureUnit attribute"
       PICS: LUNIT.S.A0000 && LUNIT.TempUnit.Celsius
       cluster: "Unit Localization"
       command: "writeAttribute"
@@ -65,14 +65,14 @@ tests:
       arguments:
           value: 1
 
-    - label: "TH reads TemperatureUnit attribute"
+    - label: "Step 5: TH reads TemperatureUnit attribute"
       PICS: LUNIT.S.A0000 && LUNIT.TempUnit.Celsius
       command: "readAttribute"
       attribute: "TemperatureUnit"
       response:
           value: 1
 
-    - label: "TH writes 2 (Kelvin) to TemperatureUnit attribute"
+    - label: "Step 6: TH writes 2 (Kelvin) to TemperatureUnit attribute"
       PICS: LUNIT.S.A0000 && LUNIT.TempUnit.Kelvin
       cluster: "Unit Localization"
       command: "writeAttribute"
@@ -80,14 +80,14 @@ tests:
       arguments:
           value: 2
 
-    - label: "TH reads TemperatureUnit attribute"
+    - label: "Step 7: TH reads TemperatureUnit attribute"
       PICS: LUNIT.S.A0000 && LUNIT.TempUnit.Kelvin
       command: "readAttribute"
       attribute: "TemperatureUnit"
       response:
           value: 2
 
-    - label: "TH writes 5 to TemperatureUnit attribute"
+    - label: "Step 8: TH writes 5 to TemperatureUnit attribute"
       PICS: LUNIT.S.A0000
       cluster: "Unit Localization"
       command: "writeAttribute"

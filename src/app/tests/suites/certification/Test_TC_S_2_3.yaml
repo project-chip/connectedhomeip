@@ -25,6 +25,7 @@ config:
     G1:
         type: int16u
         defaultValue: 0x0001
+    GroupKeyManagement.Endpoint: 0
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -43,13 +44,12 @@ tests:
           values:
               - name: "SceneTableSize"
                 saveAs: maxScenes
-          constraints:
-              type: uint16
 
     - label:
-          "preparation step for using commands from Groups cluster: Add KeySet"
+          "Step 0a: preparation step for using commands from Groups cluster: Add
+          KeySet"
       cluster: "Group Key Management"
-      endpoint: 0
+      endpoint: GroupKeyManagement.Endpoint
       command: "KeySetWrite"
       arguments:
           values:
@@ -58,26 +58,27 @@ tests:
                     {
                         GroupKeySetID: 0x01a1,
                         GroupKeySecurityPolicy: 0,
-                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
-                        EpochStartTime0: 0,
-                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
-                        EpochStartTime1: 0,
-                        EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
-                        EpochStartTime2: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 2220000,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: 2220001,
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: 2220002,
                     }
 
     - label:
-          "Preparation step for using commands from Groups cluster: Write Group
-          Keys"
+          "Step 0b: Preparation step for using commands from Groups cluster:
+          Write Group Keys"
       cluster: "Group Key Management"
-      endpoint: 0
+      endpoint: GroupKeyManagement.Endpoint
       command: "writeAttribute"
       attribute: "GroupKeyMap"
       arguments:
           value: [{ FabricIndex: 1, GroupId: G1, GroupKeySetID: 0x01a1 }]
 
     - label:
-          "TH sends a AddGroup command to DUT with the GroupID field set to G1."
+          "Step 1a: TH sends a AddGroup command to DUT with the GroupID field
+          set to G1."
       PICS: G.S.C00.Rsp
       cluster: "Groups"
       command: "AddGroup"
@@ -95,8 +96,8 @@ tests:
                 value: G1
 
     - label:
-          "TH sends a RemoveAllScenes command to DUT with the GroupID field set
-          to G1."
+          "Step 1b: TH sends a RemoveAllScenes command to DUT with the GroupID
+          field set to G1."
       PICS: S.S.C03.Rsp
       command: "RemoveAllScenes"
       arguments:
@@ -111,8 +112,8 @@ tests:
                 value: G1
 
     - label:
-          "TH sends a GetSceneMembership command to DUT with the GroupID field
-          set to G1."
+          "Step 1c: TH sends a GetSceneMembership command to DUT with the
+          GroupID field set to G1."
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"
       arguments:
@@ -131,9 +132,10 @@ tests:
                 value: []
 
     - label:
-          "TH sends a EnhancedAddScene command to DUT with the GroupID field set
-          to G1, the SceneID field set to 0x01, the TransitionTime field set to
-          0x000a (1s) and a set of extension fields appropriate to AC1."
+          "Step 2a: TH sends a EnhancedAddScene command to DUT with the GroupID
+          field set to G1, the SceneID field set to 0x01, the TransitionTime
+          field set to 0x000a (1s) and a set of extension fields appropriate to
+          AC1."
       PICS: S.S.C40.Rsp && PICS_SDK_CI_ONLY
       command: "EnhancedAddScene"
       arguments:
@@ -179,10 +181,10 @@ tests:
                 value: 0x01
 
     - label:
-          "TH sends a AddScene command to DUT with the GroupID field set to G1,
-          the SceneID field set to 0x01, the TransitionTime field set to 0x0001
-          (1s) and a set of extension fields appropriate to AC1."
-      PICS: (!S.S.C40.Rsp) && PICS_SDK_CI_ONLY
+          "Step 2b: TH sends a AddScene command to DUT with the GroupID field
+          set to G1, the SceneID field set to 0x01, the TransitionTime field set
+          to 0x0001 (1s) and a set of extension fields appropriate to AC1."
+      PICS: S.S.C40.Rsp && PICS_SDK_CI_ONLY
       command: "AddScene"
       arguments:
           values:
@@ -227,9 +229,9 @@ tests:
                 value: 0x01
 
     - label:
-          "TH sends a EnhancedAddScene command to DUT with the GroupID field set
-          to G1, the SceneID field set to 0x01, the TransitionTime field set to
-          0x000a and a set of extension fields appropriate to AC1."
+          "Step 2a: TH sends a EnhancedAddScene command to DUT with the GroupID
+          field set to G1, the SceneID field set to 0x01, the TransitionTime
+          field set to 0x000a and a set of extension fields appropriate to AC1."
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
 
@@ -289,9 +291,9 @@ tests:
                 value: "y"
 
     - label:
-          "TH sends a AddScene command to DUT with the GroupID field set to G1,
-          the SceneID field set to 0x01, the TransitionTime field set to 0x0001
-          and a set of extension fields appropriate to AC1."
+          "Step 2b: TH sends a AddScene command to DUT with the GroupID field
+          set to G1, the SceneID field set to 0x01, the TransitionTime field set
+          to 0x0001 and a set of extension fields appropriate to AC1."
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
 
@@ -351,8 +353,8 @@ tests:
                 value: "y"
 
     - label:
-          "TH sends a EnhancedViewScene command to DUT with the GroupID field
-          set to G1 and the SceneID field set to 0x01."
+          "Step 3a: TH sends a EnhancedViewScene command to DUT with the GroupID
+          field set to G1 and the SceneID field set to 0x01."
       PICS: S.S.C41.Rsp && PICS_SDK_CI_ONLY
       command: "EnhancedViewScene"
       arguments:
@@ -396,9 +398,9 @@ tests:
                     ]
 
     - label:
-          "TH sends a ViewScene command to DUT with the GroupID field set to G1
-          and the SceneID field set to 0x01."
-      PICS: (!S.S.C41.Rsp) && PICS_SDK_CI_ONLY
+          "Step 3b: TH sends a ViewScene command to DUT with the GroupID field
+          set to G1 and the SceneID field set to 0x01."
+      PICS: S.S.C41.Rsp && PICS_SDK_CI_ONLY
       command: "ViewScene"
       arguments:
           values:
@@ -441,8 +443,8 @@ tests:
                     ]
 
     - label:
-          "TH sends a EnhancedViewScene command to DUT with the GroupID field
-          set to G1 and the SceneID field set to 0x01."
+          "Step 3a: TH sends a EnhancedViewScene command to DUT with the GroupID
+          field set to G1 and the SceneID field set to 0x01."
       PICS: S.S.C41.Rsp && PICS_SKIP_SAMPLE_APP
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
@@ -469,8 +471,8 @@ tests:
               - name: "expectedValue"
                 value: "y"
     - label:
-          "TH sends a ViewScene command to DUT with the GroupID field set to G1
-          and the SceneID field set to 0x01."
+          "Step 3b: TH sends a ViewScene command to DUT with the GroupID field
+          set to G1 and the SceneID field set to 0x01."
       PICS: (!S.S.C41.Rsp) && PICS_SKIP_SAMPLE_APP
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
@@ -498,8 +500,8 @@ tests:
                 value: "y"
 
     - label:
-          "TH sends a GetSceneMembership command to DUT with the GroupID field
-          set to G1."
+          "Step 4: TH sends a GetSceneMembership command to DUT with the GroupID
+          field set to G1."
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"
       arguments:
@@ -518,8 +520,8 @@ tests:
                 value: [0x01]
 
     - label:
-          "TH configures AC2 on DUT for all implemented application clusters
-          supporting scenes."
+          "Step 5a: TH configures AC2 on DUT for all implemented application
+          clusters supporting scenes."
       cluster: "Level Control"
       PICS: PICS_SDK_CI_ONLY
       command: "MoveToLevelWithOnOff"
@@ -535,8 +537,8 @@ tests:
                 value: 0
 
     - label:
-          "TH configures AC2 on DUT for all implemented application clusters
-          supporting scenes."
+          "Step 5a: TH configures AC2 on DUT for all implemented application
+          clusters supporting scenes."
       verification: |
           Is DUT configured with AC2?
       cluster: "LogCommands"
@@ -552,8 +554,8 @@ tests:
                 value: "y"
 
     - label:
-          "TH sends a RecallScene command to group G1 with the GroupID field set
-          to G1 and the scene ID field set to 0x01."
+          "Step 5b: TH sends a RecallScene command to group G1 with the GroupID
+          field set to G1 and the scene ID field set to 0x01."
       PICS: S.S.C05.Rsp
       command: "RecallScene"
       groupId: 0x0001
@@ -575,7 +577,7 @@ tests:
 
     - label:
           "TH confirm the DUT reached AC1 (on level control cluster) after 1s"
-      PICS: PICS_SDK_CI_ONLY
+      PICS: S.S.C40.Rsp
       cluster: "Level Control"
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -596,13 +598,11 @@ tests:
                 value: "y"
 
     - label:
-          "TH sends a CopyScene command to DUT with the mode field set to 0x00,
-          the group identifier from field set to G1, the scene identifier from
-          field set to 0x01, the group identifier to field set to G1 and the
-          scene identifier to field set to 0x02."
+          "Step 6a: TH sends a CopyScene command to DUT with the mode field set
+          to 0x00, the group identifier from field set to G1, the scene
+          identifier from field set to 0x01, the group identifier to field set
+          to G1 and the scene identifier to field set to 0x02."
       PICS: S.S.C42.Rsp
-      verification: |
-          DUT sends a CopySceneResponse command to TH with the Status field set to 0x00 (SUCCESS), the group identifier from field set to G1 and the scene identifier from field set to 0x01.
       command: "CopyScene"
       arguments:
           values:
@@ -626,8 +626,8 @@ tests:
                 value: 0x01
 
     - label:
-          "TH sends a GetSceneMembership command to DUT with the GroupID field
-          set to G1."
+          "Step 6b: TH sends a GetSceneMembership command to DUT with the
+          GroupID field set to G1."
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"
       arguments:
@@ -644,3 +644,15 @@ tests:
                 value: G1
               - name: "SceneList"
                 value: [0x01, 0x02]
+
+    - label:
+          "Step 7: TH removes the Group key set that was added by sending a
+          KeySetRemove command to the GroupKeyManagement cluster with the
+          GroupKeySetID field set to 0x01a1"
+      cluster: "Group Key Management"
+      endpoint: GroupKeyManagement.Endpoint
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: GroupKeySetID
+                value: 0x01a1

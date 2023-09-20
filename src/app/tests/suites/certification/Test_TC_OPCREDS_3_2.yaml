@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    12.3.2. [TC-OPCREDS-3.2] Attribute-CurrentFabricIndex validation
+    15.2.2. [TC-OPCREDS-3.2] Attribute-CurrentFabricIndex validation
     [DUT-Server]
 
 PICS:
@@ -31,15 +31,15 @@ tests:
           This test case assumes that during Commissioning AddNOC will be sent with ICACValue
       disabled: true
 
-    - label: "Factory Reset DUT"
+    - label: "Step 1: Factory Reset DUT"
       verification: |
           On both DUT and TH side use the below command
           sudo rm -rf /tmp/chip_*
       disabled: true
 
     - label:
-          "Commission DUT to TH1s Fabric When DUT sends NOC response save
-          FabricIndex as FabricIndex_TH1"
+          "Step 2: Commission DUT to TH1s Fabric When DUT sends NOC response
+          save FabricIndex as FabricIndex_TH1"
       verification: |
           DUT side:
           sudo ./chip-all-clusters-app --wifi
@@ -52,7 +52,7 @@ tests:
 
           After commissioning DUT to TH1's fabric read nocs
 
-          Verify the FabricIndex  value during commissioning in TH Log
+          Save the FabricIndex  and NOC value during commissioning in TH Log
 
           [1673248033.951950][1706:1708] CHIP:CTL: OperationalSessionSetup[1:0000000000000001]: State change 2 --> 3
           [1673248033.952156][1706:1708] CHIP:IN: SecureSession[0xffffa803fa40]: Allocated Type:2 LSID:14065
@@ -94,20 +94,20 @@ tests:
           [1679562607.576155][126855:126857] CHIP:DMG:                                 ] (241 bytes)
       disabled: true
 
-    - label: "Save TH1s Fabric ID as FabricID1"
+    - label: "Step 3: Save TH1s Fabric ID as FabricID1"
       verification: |
           Refer the above step
       disabled: true
 
     - label:
-          "Commission DUT to TH2s Fabric When DUT sends NOC response save
-          FabricIndex as FabricIndex_TH2"
+          "Step 4: Commission DUT to TH2s Fabric When DUT sends NOC response
+          save FabricIndex as FabricIndex_TH2"
       verification: |
           To commission DUT to TH2 follow below procedure
 
           ./chip-tool  pairing open-commissioning-window 1 1 400 2000 3841
 
-          Verify in TH2 Log:
+          Verify in TH1 Log:
 
           CHIP:IN: Sending encrypted msg 0xaaaad3464d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 5805157 msec
           [1635691999.946536][3822:3827] CHIP:DMG: ICR moving to [CommandSen]
@@ -128,7 +128,7 @@ tests:
 
           After commissioning DUT to TH2's fabric read nocs
 
-          Verify the FabricIndex  value during commissioning in TH2 Log
+          Save the the FabricIndex and NOC  value during commissioning in TH2 Log
 
 
           [1673249259.166158][1742:1744] CHIP:DIS: Keeping DNSSD lookup active
@@ -171,35 +171,35 @@ tests:
           [1681213277.147347][2983:2985] CHIP:DMG: 				] (241 bytes)
       disabled: true
 
-    - label: "Save TH2s Fabric ID as FabricID2"
+    - label: "Step 5: Save TH2s Fabric ID as FabricID2"
       verification: |
           Refer the above step
       disabled: true
 
-    - label: "From TH1 read the CurrentFabricIndex"
+    - label: "Step 6: From TH1 read the CurrentFabricIndex"
       PICS: OPCREDS.S.A0005
       verification: |
           ./chip-tool operationalcredentials read   current-fabric-index   1 0
 
-          Verify the current fabric index in TH Log
+          Verify the current fabric index in TH1 Log
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 2445178920
           CHIP:TOO:   CurrentFabricIndex: 1
           CHIP:EM: Sending Standalone Ack for MessageCounter:7141893 on exchange 26909i
       disabled: true
 
-    - label: "Verify that CurrentFabricIndex = FabricIndex_TH1"
+    - label: "Step 7: Verify that CurrentFabricIndex = FabricIndex_TH1"
       verification: |
           Verify that CurrentFabricIndex = FabricIndex_TH1
       disabled: true
 
     - label:
-          "From TH1 read the entire NOCs List attribute with a
+          "Step 8: From TH1 read the entire NOCs List attribute with a
           non-fabric-filtered read"
       verification: |
           ./chip-tool operationalcredentials read nocs 1 0
 
-          Verify the NOCs List in TH Log
+          Verify the NOCs List in TH1 Log
 
           [1658819541.245848][8318:8323] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 2645922631
           [1658819541.245960][8318:8323] CHIP:TOO:   NOCs: 1 entries
@@ -211,8 +211,8 @@ tests:
       disabled: true
 
     - label:
-          "Verify that there is only data for the entry whose FabricIndex field
-          is equal to FabricIndex_TH1"
+          "Step 9: Verify that there is only data for the entry whose
+          FabricIndex field is equal to FabricIndex_TH1"
       verification: |
           Verify that Noc"s list has only data for FabricIndex_TH1
 
@@ -226,12 +226,12 @@ tests:
       disabled: true
 
     - label:
-          "From TH1 read the entire NOCs List attribute with a fabric-filtered
-          read"
+          "Step 10: From TH1 read the entire NOCs List attribute with a
+          fabric-filtered read"
       verification: |
           ./chip-tool operationalcredentials read nocs 1 0 --fabric-filtered 1
 
-          Verify the NOCs List in TH Log
+          Verify the NOCs List in TH1 Log
 
           [1658819590.504973][8327:8332] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 2645922631
           [1658819590.505058][8327:8332] CHIP:TOO:   NOCs: 1 entries
@@ -243,8 +243,8 @@ tests:
       disabled: true
 
     - label:
-          "Verify that there is only data for the entry whose FabricIndex field
-          is equal to FabricIndex_TH1"
+          "Step 11: Verify that there is only data for the entry whose
+          FabricIndex field is equal to FabricIndex_TH1"
       verification: |
           Verify that Noc"s list has only data for FabricIndex_TH1
 
@@ -257,11 +257,11 @@ tests:
           [1658819590.505292][8327:8332] CHIP:TOO:      }
       disabled: true
 
-    - label: "Read NOCStruct values from entry at index 0"
+    - label: "Step 12: Read NOCStruct values from entry at index 0"
       verification: |
           ./chip-tool operationalcredentials read nocs 1 0 --fabric-filtered 1
 
-          Verify FabricIndex field equal to FabricIndex_TH1 in TH Log
+          Verify FabricIndex field equal to FabricIndex_TH1 in TH1 Log
 
           [1658819590.504973][8327:8332] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 2645922631
           [1658819590.505058][8327:8332] CHIP:TOO:   NOCs: 1 entries
@@ -273,9 +273,9 @@ tests:
       disabled: true
 
     - label:
-          "From the NOCStruct values verify the following: NOC matches the NOC
-          sent to the DUT during commissioning process ICAC matches the ICAC
-          sent to the DUT during commissioning process from AddNOC in
+          "Step 13: From the NOCStruct values verify the following: NOC matches
+          the NOC sent to the DUT during commissioning process ICAC matches the
+          ICAC sent to the DUT during commissioning process from AddNOC in
           pre-condition"
       verification: |
           Verify NOC and ICAC value in step 12 and 2 matches
@@ -289,12 +289,12 @@ tests:
       disabled: true
 
     - label:
-          "Read the Fabrics List and get the FabricDescriptorStruct for the
-          entry where FabricIndex = FabricIndex_TH1 from DUT"
+          "Step 14: Read the Fabrics List and get the FabricDescriptorStruct for
+          the entry where FabricIndex = FabricIndex_TH1 from DUT"
       verification: |
           ./chip-tool operationalcredentials read fabrics 1 0
 
-          Verify FabricIndex = FabricIndex_TH1 in TH Log
+          Verify FabricIndex = FabricIndex_TH1 in TH1 Log
 
           [1657693240.722099][15129:15134] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 908345149
           [1657693240.722200][15129:15134] CHIP:TOO:   Fabrics: 1 entries
@@ -309,8 +309,8 @@ tests:
       disabled: true
 
     - label:
-          "Verify that TH1 is able to read the FabricDescriptorStruct values
-          Verify that Fabrics list does not have any entry as FabricID =
+          "Step 15: Verify that TH1 is able to read the FabricDescriptorStruct
+          values Verify that Fabrics list does not have any entry as FabricID =
           FabricID2"
       verification: |
           Verify the FabricDescriptorStruct values has no entry log FabricID2 on TH1
@@ -327,7 +327,7 @@ tests:
           [1657693240.722522][15129:15134] CHIP:TOO:      }
       disabled: true
 
-    - label: "From TH2 read the CurrentFabricIndex"
+    - label: "Step 16: From TH2 read the CurrentFabricIndex"
       verification: |
           ./chip-tool operationalcredentials read   current-fabric-index 2 0 --commissioner-name beta
 
@@ -338,13 +338,13 @@ tests:
           CHIP:EM: Sending Standalone Ack for MessageCounter:8900122 on exchange 26519i
       disabled: true
 
-    - label: "Verify that CurrentFabricIndex = FabricIndex_TH2"
+    - label: "Step 17: Verify that CurrentFabricIndex = FabricIndex_TH2"
       verification: |
           Verify that CurrentFabricIndex = FabricIndex_TH2
       disabled: true
 
     - label:
-          "From TH2 read the entire NOCs List attribute with a
+          "Step 18: From TH2 read the entire NOCs List attribute with a
           non-fabric-filtered read"
       verification: |
           ./chip-tool operationalcredentials read nocs 2 0 --commissioner-name beta
@@ -362,8 +362,8 @@ tests:
       disabled: true
 
     - label:
-          "Verify that there is only data for the entry whose FabricIndex field
-          is equal to FabricIndex_TH2"
+          "Step 19: Verify that there is only data for the entry whose
+          FabricIndex field is equal to FabricIndex_TH2"
       verification: |
           ./chip-tool operationalcredentials read   current-fabric-index 2 0 --commissioner-name beta
 
@@ -375,8 +375,8 @@ tests:
       disabled: true
 
     - label:
-          "From TH2 read the entire NOCs List attribute with a fabric-filtered
-          read"
+          "Step 20: From TH2 read the entire NOCs List attribute with a
+          fabric-filtered read"
       verification: |
           ./chip-tool operationalcredentials read nocs 2 0 --fabric-filtered 1  --commissioner-name beta
 
@@ -393,8 +393,8 @@ tests:
       disabled: true
 
     - label:
-          "Verify that there is only data for the entry whose FabricIndex field
-          is equal to FabricIndex_TH2"
+          "Step 21: Verify that there is only data for the entry whose
+          FabricIndex field is equal to FabricIndex_TH2"
       verification: |
           Verify that Noc"s list has only data for FabricIndex_TH2
 
@@ -407,7 +407,7 @@ tests:
           [1658819643.546478][8397:8402] CHIP:TOO:      }
       disabled: true
 
-    - label: "Read NOCStruct values from entry at index 1"
+    - label: "Step 22: Read NOCStruct values from entry at index 1"
       verification: |
           ./chip-tool operationalcredentials read nocs 2 0  --commissioner-name beta
 
@@ -423,9 +423,9 @@ tests:
       disabled: true
 
     - label:
-          "From the NOCStruct values verify the following: NOC matches the NOC
-          sent to the DUT during commissioning process ICAC matches the ICAC
-          sent to the DUT during commissioning process from AddNOC in
+          "Step 23: From the NOCStruct values verify the following: NOC matches
+          the NOC sent to the DUT during commissioning process ICAC matches the
+          ICAC sent to the DUT during commissioning process from AddNOC in
           pre-condition"
       verification: |
           Verify the value of NOC and ICAC are same in step 22 and 4 are same

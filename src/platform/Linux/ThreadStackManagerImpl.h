@@ -22,13 +22,20 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <lib/support/ThreadOperationalDataset.h>
-#include <platform/Linux/GlibTypeDeleter.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/openthread/introspect.h>
 #include <platform/NetworkCommissioning.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
 namespace chip {
+
+template <>
+struct GAutoPtrDeleter<OpenthreadIoOpenthreadBorderRouter>
+{
+    using deleter = GObjectDeleter;
+};
+
 namespace DeviceLayer {
 
 class ThreadStackManagerImpl : public ThreadStackManager
@@ -86,11 +93,6 @@ public:
 
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR _GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
-    CHIP_ERROR _SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
-    CHIP_ERROR _RequestSEDActiveMode(bool onOff, bool delayIdle = false);
-#endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
@@ -110,8 +112,6 @@ public:
     CHIP_ERROR _GetPollPeriod(uint32_t & buf);
 
     CHIP_ERROR _JoinerStart();
-
-    void _SetRouterPromotion(bool val);
 
     void _ResetThreadNetworkDiagnosticsCounts();
 
@@ -148,7 +148,7 @@ private:
         uint8_t lqi;
     };
 
-    std::unique_ptr<OpenthreadIoOpenthreadBorderRouter, GObjectDeleter> mProxy;
+    GAutoPtr<OpenthreadIoOpenthreadBorderRouter> mProxy;
 
     static CHIP_ERROR GLibMatterContextInitThreadStack(ThreadStackManagerImpl * self);
     static CHIP_ERROR GLibMatterContextCallAttach(ThreadStackManagerImpl * self);

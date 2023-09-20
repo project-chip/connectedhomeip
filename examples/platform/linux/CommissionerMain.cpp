@@ -248,6 +248,7 @@ public:
     void OnCommissioningStatusUpdate(PeerId peerId, CommissioningStage stageCompleted, CHIP_ERROR error) override;
 
     void OnReadCommissioningInfo(const ReadCommissioningInfo & info) override;
+    void OnFabricCheck(NodeId matchingNodeId) override;
 
 private:
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
@@ -344,10 +345,13 @@ void PairingCommand::OnReadCommissioningInfo(const ReadCommissioningInfo & info)
 {
     ChipLogProgress(AppServer, "OnReadCommissioningInfo - vendorId=0x%04X productId=0x%04X", info.basic.vendorId,
                     info.basic.productId);
+}
 
-    if (info.nodeId != kUndefinedNodeId)
+void PairingCommand::OnFabricCheck(NodeId matchingNodeId)
+{
+    if (matchingNodeId != kUndefinedNodeId)
     {
-        ChipLogProgress(AppServer, "ALREADY ON FABRIC WITH nodeId=0x" ChipLogFormatX64, ChipLogValueX64(info.nodeId));
+        ChipLogProgress(AppServer, "ALREADY ON FABRIC WITH nodeId=0x" ChipLogFormatX64, ChipLogValueX64(matchingNodeId));
         // wait until attestation verification before cancelling so we can validate vid/pid
     }
 }

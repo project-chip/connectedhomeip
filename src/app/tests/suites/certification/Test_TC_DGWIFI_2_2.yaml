@@ -24,13 +24,13 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
+    - label: "Step 1: Commission DUT to TH"
       verification: |
 
       disabled: true
 
     - label:
-          "Disconnect node WiFi as a result of de-authentication or
+          "Step 2: Disconnect node WiFi as a result of de-authentication or
           dis-association."
       PICS: DGWIFI.S.E00
       verification: |
@@ -38,7 +38,7 @@ tests:
 
           ./chip-tool wifinetworkdiagnostics read-event disconnection 1 0
 
-          Verify  Disconnection event on the TH Log:
+          Via the TH (chip-tool), verify that the Disconnection event contains Reason code is in the type of uint16.
 
           [1655734228.476828][18708:18713] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Event 0x0000_0000
           [1655734228.476890][18708:18713] CHIP:TOO:          Event number: 2
@@ -50,7 +50,7 @@ tests:
       disabled: true
 
     - label:
-          "Disconnect node WiFi as a result of de-authentication or
+          "Step 3: Disconnect node WiFi as a result of de-authentication or
           dis-association. DUT exhausts all internal retries."
       PICS: DGWIFI.S.E01
       verification: |
@@ -58,7 +58,10 @@ tests:
 
           ./chip-tool wifinetworkdiagnostics read-event association-failure 1 0
 
-          VerifyAssociationFailure event on the TH Log:
+          Via the TH (chip-tool), verify:
+          -that the AssociationFailure event contains AssociationFailure cause and status field values.
+          -that AssociationFailure cause value is match with AssociationFailure cause(0 to 3) enum table.
+          -that Status field value is match with spec.
 
            CHIP:DMG: ReportDataMessage =
           [1651574380.297222][8941:8946] CHIP:DMG: {
@@ -68,14 +71,16 @@ tests:
           [1651574380.297374][8941:8946] CHIP:EM: Sending Standalone Ack for MessageCounter:12534430 on exchange 15170i
       disabled: true
 
-    - label: "Disconnect and reconnect node WiFi."
+    - label: "Step 4: Disconnect and reconnect node WiFi."
       PICS: DGWIFI.S.E02
       verification: |
           ConnectionStatus is an Optional event so its not compulsory to get the expected outcome, Below is the log of RPI the result may be vary on the basis of dut implementation.
 
           ./chip-tool wifinetworkdiagnostics read-event connection-status 1 0
 
-          Verify ConnectionStatus event on the TH Log:
+          Via the TH (chip-tool), verify:
+          -that the ConnectionStatus event contains ConnectionStatus value.
+          -that value either 0 or 1 as per ConnectionStatus ENUM table.
 
           [1655734276.513474][18731:18736] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Event 0x0000_0002
           [1655734276.513504][18731:18736] CHIP:TOO:          Event number: 3

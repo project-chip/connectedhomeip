@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads from the DUT the Condition attribute."
+    - label: "Step 2: TH reads from the DUT the Condition attribute."
       PICS: ACFREMON.S.A0000
       command: "readAttribute"
       attribute: "Condition"
@@ -41,7 +41,8 @@ tests:
               minValue: 0
               maxValue: 100
 
-    - label: "TH reads from the DUT the DegradationDirection attribute.."
+    - label:
+          "Step 3: TH reads from the DUT the DegradationDirection attribute.."
       PICS: ACFREMON.S.A0001
       command: "readAttribute"
       attribute: "DegradationDirection"
@@ -51,7 +52,7 @@ tests:
               minValue: 0
               maxValue: 1
 
-    - label: "TH reads from the DUT the ChangeIndication attribute."
+    - label: "Step 4: TH reads from the DUT the ChangeIndication attribute."
       PICS: ACFREMON.S.A0002
       command: "readAttribute"
       attribute: "ChangeIndication"
@@ -61,10 +62,27 @@ tests:
               minValue: 0
               maxValue: 2
 
-    - label: "TH reads from the DUT the InPlaceIndicator attribute"
+    - label: "Step 5: TH reads from the DUT the InPlaceIndicator attribute"
       PICS: ACFREMON.S.A0003
       command: "readAttribute"
       attribute: "InPlaceIndicator"
       response:
           constraints:
               type: boolean
+
+    - label: "Step 6: TH reads from the DUT the LastChangedTime attribute"
+      PICS: ACFREMON.S.A0004
+      command: "readAttribute"
+      attribute: "LastChangedTime"
+      response:
+          constraints:
+              type: epoch_s
+
+    - label:
+          "Step 7: TH reads from the DUT the ReplacementProductList attribute"
+      PICS: ACFREMON.S.A0005
+      command: "readAttribute"
+      attribute: "ReplacementProductList"
+      response:
+          constraints:
+              type: list

@@ -35,10 +35,10 @@ cd "$CHIP_ROOT"
 
 restyle-paths() {
     if hash restyle-path 2>/dev/null; then
-        command restyle-path "$@"
+        echo "$@" | xargs restyle-path
     else
         url=https://github.com/restyled-io/restyler/raw/main/bin/restyle-path
-        sh <(curl --location --proto "=https" --tlsv1.2 "$url" -sSf) "$@"
+        echo "$@" | xargs sh <(curl --location --proto "=https" --tlsv1.2 "$url" -sSf)
     fi
 }
 

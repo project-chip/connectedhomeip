@@ -31,8 +31,8 @@ tests:
       disabled: true
 
     - label:
-          "Using the TH Onboarding payload reader, scan or read the Onboarding
-          payload from DUT1"
+          "Step 1a: Using the TH Onboarding payload reader, scan or read the
+          Onboarding payload from DUT1"
       verification: |
           1.Run DUT. Example for DUT=all-clusters app
           ./chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 2 --capabilities 4 --discriminator 3840 --passcode 20202021
@@ -53,16 +53,17 @@ tests:
       disabled: true
 
     - label:
-          "Using the TH, parse the Onboarding payload from previous step and
-          verify that the Discriminator and Passcode for DUT1 are present."
+          "Step 1b: Using the TH, parse the Onboarding payload from previous
+          step and verify that the Discriminator and Passcode for DUT1 are
+          present."
       verification: |
           DUT1 Descriminator: 3840
           DUT1 Passcode: 20202021
       disabled: true
 
     - label:
-          "Using the TH Onboarding payload reader, scan or read the Onboarding
-          payload from DUT2"
+          "Step 2a: Using the TH Onboarding payload reader, scan or read the
+          Onboarding payload from DUT2"
       verification: |
           1.Run DUT. Example for DUT=all-clusters app
           ./chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 2 --capabilities 4 --discriminator 3841 --passcode 20202022
@@ -83,22 +84,24 @@ tests:
       disabled: true
 
     - label:
-          "Using the TH, parse the Onboarding payload from previous step and
-          verify that the Discriminator and Passcode for DUT2 are present."
+          "Step 2b: Using the TH, parse the Onboarding payload from previous
+          step and verify that the Discriminator and Passcode for DUT2 are
+          present."
       verification: |
           DUT2 Descriminator: 3841
           DUT2 Passcode: 20212022
       disabled: true
 
     - label:
-          "Compare the Discriminator values for DUT1 (Step 1.b) and DUT2 (Step
-          2.b)"
+          "Step 3: Compare the Discriminator values for DUT1 (Step 1.b) and DUT2
+          (Step 2b)"
       verification: |
           1. Verify DUT1 Descriminator in Step 1.b is NOT equal to DUT2 Descriminator in Step 2.b
       disabled: true
 
     - label:
-          "Compare the Passcode values for DUT1 (Step 1.b) and DUT2 (Step 2.b)"
+          "Step 4: Compare the Passcode values for DUT1 (Step 1.b) and DUT2
+          (Step 2b)"
       verification: |
           Verify DUT1 Passcode in step 1b is not equal DUT2 Passcode in step 2b
       disabled: true

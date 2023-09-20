@@ -32,6 +32,7 @@
 #include <lib/support/FibonacciUtils.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
+#include <platform/LockTracker.h>
 
 namespace chip {
 namespace app {
@@ -44,9 +45,9 @@ ReadClient::ReadClient(InteractionModelEngine * apImEngine, Messaging::ExchangeM
     mpCallback(apCallback), mOnConnectedCallback(HandleDeviceConnected, this),
     mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {
-    // Error if already initialized.
+    assertChipStackLockedByCurrentThread();
+
     mpExchangeMgr    = apExchangeMgr;
-    mpCallback       = apCallback;
     mInteractionType = aInteractionType;
 
     mpImEngine = apImEngine;
@@ -91,6 +92,8 @@ void ReadClient::StopResubscription()
 
 ReadClient::~ReadClient()
 {
+    assertChipStackLockedByCurrentThread();
+
     if (IsSubscriptionType())
     {
         StopResubscription();
@@ -833,7 +836,7 @@ CHIP_ERROR ReadClient::ComputeLivenessCheckTimerTimeout(System::Clock::Timeout *
     const auto & ourMrpConfig = GetDefaultMRPConfig();
     auto publisherTransmissionTimeout =
         GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
-                                 System::SystemClock().GetMonotonicTimestamp(), Transport::kMinActiveTime);
+                                 System::SystemClock().GetMonotonicTimestamp(), ourMrpConfig.mActiveThresholdTime);
     *aTimeout = System::Clock::Seconds16(mMaxInterval) + publisherTransmissionTimeout;
     return CHIP_NO_ERROR;
 }
@@ -935,6 +938,19 @@ CHIP_ERROR ReadClient::SendAutoResubscribeRequest(ReadPrepareParams && aReadPrep
     CHIP_ERROR err     = SendSubscribeRequest(mReadPrepareParams);
     if (err != CHIP_NO_ERROR)
     {
+        StopResubscription();
+    }
+    return err;
+}
+
+CHIP_ERROR ReadClient::SendAutoResubscribeRequest(const ScopedNodeId & aPublisherId, ReadPrepareParams && aReadPrepareParams)
+{
+    mPeer              = aPublisherId;
+    mReadPrepareParams = std::move(aReadPrepareParams);
+    CHIP_ERROR err     = EstablishSessionToPeer();
+    if (err != CHIP_NO_ERROR)
+    {
+        // Make sure we call our callback's OnDeallocatePaths.
         StopResubscription();
     }
     return err;
@@ -1081,6 +1097,9 @@ void ReadClient::HandleDeviceConnected(void * context, Messaging::ExchangeManage
 
     ChipLogProgress(DataManagement, "HandleDeviceConnected");
     _this->mReadPrepareParams.mSessionHolder.Grab(sessionHandle);
+    _this->mpExchangeMgr = &exchangeMgr;
+
+    _this->mpCallback.OnCASESessionEstablished(sessionHandle, _this->mReadPrepareParams);
 
     auto err = _this->SendSubscribeRequest(_this->mReadPrepareParams);
     if (err != CHIP_NO_ERROR)
@@ -1118,12 +1137,8 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * /* If this starts be
     {
         // We don't have an active CASE session.  We need to go ahead and set
         // one up, if we can.
-        ChipLogProgress(DataManagement, "Trying to establish a CASE session");
-        auto * caseSessionManager = InteractionModelEngine::GetInstance()->GetCASESessionManager();
-        if (caseSessionManager)
+        if (_this->EstablishSessionToPeer() == CHIP_NO_ERROR)
         {
-            caseSessionManager->FindOrEstablishSession(_this->mPeer, &_this->mOnConnectedCallback,
-                                                       &_this->mOnConnectionFailureCallback);
             return;
         }
 
@@ -1175,7 +1190,12 @@ CHIP_ERROR ReadClient::GetMinEventNumber(const ReadPrepareParams & aReadPrepareP
     }
     else
     {
-        return mpCallback.GetHighestReceivedEventNumber(aEventMin);
+        ReturnErrorOnFailure(mpCallback.GetHighestReceivedEventNumber(aEventMin));
+        if (aEventMin.HasValue())
+        {
+            // We want to start with the first event _after_ the last one we received.
+            aEventMin.SetValue(aEventMin.Value() + 1);
+        }
     }
     return CHIP_NO_ERROR;
 }
@@ -1207,6 +1227,15 @@ Optional<System::Clock::Timeout> ReadClient::GetSubscriptionTimeout()
     }
 
     return MakeOptional(timeout);
+}
+
+CHIP_ERROR ReadClient::EstablishSessionToPeer()
+{
+    ChipLogProgress(DataManagement, "Trying to establish a CASE session for subscription");
+    auto * caseSessionManager = InteractionModelEngine::GetInstance()->GetCASESessionManager();
+    VerifyOrReturnError(caseSessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    caseSessionManager->FindOrEstablishSession(mPeer, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    return CHIP_NO_ERROR;
 }
 
 } // namespace app

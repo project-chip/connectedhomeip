@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH writes LabelList attribute from the DUT"
+    - label: "Step 1: TH writes LabelList attribute from the DUT"
       PICS: ULABEL.S.A0000
       command: "writeAttribute"
       attribute: "LabelList"
@@ -44,7 +44,7 @@ tests:
                   { Label: "roomType", Value: "bedroom" },
               ]
 
-    - label: "TH reads LabelList attribute from the DUT"
+    - label: "Step 2: TH reads LabelList attribute from the DUT"
       PICS: ULABEL.S.A0000
       command: "readAttribute"
       attribute: "LabelList"

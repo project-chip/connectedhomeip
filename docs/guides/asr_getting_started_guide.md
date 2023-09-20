@@ -24,6 +24,7 @@ The ASR platform is supported on:
 
 -   [ASR582X](http://www.asrmicro.com/en/goods/proinfo/36.html)
 -   [ASR595X](http://www.asrmicro.com/en/goods/proinfo/42.html)
+-   [ASR550X](http://www.asrmicro.com/en/goods/proinfo/14.html)
 
 ## Matter Example Applications
 
@@ -35,9 +36,8 @@ to speed up development. You can find them in the samples with `/asr` subfolder.
 -   [Setup Matter Environment](./BUILDING.md)
 
 -   Setup toolchain
-    -   for ASR582X
+    -   for ASR582X and ASR550X
         ```
-        cd toolchain
         wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2
         tar -jxvf gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2
         export ASR_TOOLCHAIN_PATH={abs-path-to-toolchain}/gcc-arm-none-eabi-9-2019-q4-major/bin/
@@ -59,6 +59,10 @@ to speed up development. You can find them in the samples with `/asr` subfolder.
     -   for ASR595X:
         ```
         export ASR_BOARD=asr595x
+        ```
+    -   for ASR550X:
+        ```
+        export ASR_BOARD=asr550x
         ```
 -   Building the Application
 
@@ -91,6 +95,7 @@ There are two commissioning modes supported by ASR platform:
     ```
     ./chip-tool pairing ble-wifi <node_id> <ssid> <password> <pin_code> <discriminator>
     ```
+5. Only ASR582X and ASR595X support BLE
 
 ### IP mode
 

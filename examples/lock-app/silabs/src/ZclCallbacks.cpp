@@ -27,10 +27,17 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/data-model/Nullable.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/CHIPLogging.h>
+
+#ifdef DIC_ENABLE
+#include "dic.h"
+#endif // DIC_ENABLE
 
 using namespace ::chip::app::Clusters;
 using namespace ::chip::DeviceLayer::Internal;
+using ::chip::app::DataModel::Nullable;
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
@@ -44,6 +51,9 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         DoorLock::DlLockState lockState = *(reinterpret_cast<DoorLock::DlLockState *>(value));
         ChipLogProgress(Zcl, "Door lock cluster: " ChipLogFormatMEI " state %d", ChipLogValueMEI(clusterId),
                         to_underlying(lockState));
+#ifdef DIC_ENABLE
+        dic_sendmsg("lock/state", (const char *) (lockState == DoorLock::DlLockState::kLocked ? "lock" : "unlock"));
+#endif // DIC_ENABLE
     }
 }
 
@@ -58,11 +68,12 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  */
 void emberAfDoorLockClusterInitCallback(EndpointId endpoint) {}
 
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                            const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pinCode,
                                             OperationErrorEnum & err)
 {
     ChipLogProgress(Zcl, "Door Lock App: Lock Command endpoint=%d", endpointId);
-    bool status = LockMgr().Lock(endpointId, pinCode, err);
+    bool status = LockMgr().Lock(endpointId, fabricIdx, nodeId, pinCode, err);
     if (status == true)
     {
         LockMgr().InitiateAction(AppEvent::kEventType_Lock, LockManager::LOCK_ACTION);
@@ -70,11 +81,26 @@ bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const O
     return status;
 }
 
-bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
+bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                              const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pinCode,
                                               OperationErrorEnum & err)
 {
     ChipLogProgress(Zcl, "Door Lock App: Unlock Command endpoint=%d", endpointId);
-    bool status = LockMgr().Unlock(endpointId, pinCode, err);
+    bool status = LockMgr().Unlock(endpointId, fabricIdx, nodeId, pinCode, err);
+    if (status == true)
+    {
+        LockMgr().InitiateAction(AppEvent::kEventType_Lock, LockManager::UNLOCK_ACTION);
+    }
+
+    return status;
+}
+// TODO : Add helper function to call from the Unlock command if we establish Unbolt doesn't need a different behaviour than Unlock
+bool emberAfPluginDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                              const Nullable<chip::NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
+                                              OperationErrorEnum & err)
+{
+    ChipLogProgress(Zcl, "Door Lock App: Unbolt Command endpoint=%d", endpointId);
+    bool status = LockMgr().Unlock(endpointId, fabricIdx, nodeId, pinCode, err);
     if (status == true)
     {
         LockMgr().InitiateAction(AppEvent::kEventType_Lock, LockManager::UNLOCK_ACTION);

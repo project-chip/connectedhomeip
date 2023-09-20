@@ -21,15 +21,7 @@
 
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
-#include <lib/core/CHIPVendorIdentifiers.hpp>
-#include <platform/DiagnosticDataProvider.h>
-
-#include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
-
-extern "C" {
-#include <bl_sys.h>
-}
+extern "C" void hal_reboot(void);
 
 namespace chip {
 namespace DeviceLayer {
@@ -40,11 +32,20 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
     static ConfigurationManagerImpl sInstance;
     return sInstance;
 }
-
+bool ConfigurationManagerImpl::IsFullyProvisioned()
+{
+    return
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+        ConnectivityMgr().IsWiFiStationProvisioned() &&
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        ConnectivityMgr().IsThreadProvisioned() &&
+#endif
+        true;
+}
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
-    bool failSafeArmed;
     uint32_t rebootCount = 0;
 
     err = Internal::GenericConfigurationManagerImpl<BLConfig>::Init();
@@ -68,12 +69,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
-    // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
-    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
-    {
-        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
-        InitiateFactoryReset();
-    }
     err = CHIP_NO_ERROR;
 
 exit:
@@ -203,7 +198,8 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
-    bl_sys_reset_por();
+
+    hal_reboot();
 }
 
 ConfigurationManager & ConfigurationMgrImpl()

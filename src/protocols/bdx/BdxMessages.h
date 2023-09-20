@@ -33,9 +33,9 @@
 namespace chip {
 namespace bdx {
 
-constexpr uint16_t kMaxFileDesignatorLen = 0xFF;
+inline constexpr uint16_t kMaxFileDesignatorLen = 0xFF;
 
-constexpr const char * kProtocolName = "BDX";
+inline constexpr const char * kProtocolName = "BDX";
 
 enum class MessageType : uint8_t
 {

@@ -61,10 +61,10 @@ tests:
       disabled: true
 
     - label:
-          "Standard Commissioning Flow: Use a Commissionee with a QR code that
-          has the Custom Flow field set to 0 and supports BLE for its Discovery
-          Capability. Ensure the Version bit string follows the current Matter
-          spec. documentation."
+          "Step 1a: Standard Commissioning Flow: Use a Commissionee with a QR
+          code that has the Custom Flow field set to 0 and supports BLE for its
+          Discovery Capability. Ensure the Version bit string follows the
+          current Matter spec. documentation."
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
           Verifiy on TH(ALL-CLUSTER-APP):
@@ -88,7 +88,7 @@ tests:
           [1667888323.981832][3151:3153] CHIP:DL: TRACE: Bus acquired for name MATTER-3840
       disabled: true
 
-    - label: "Scan the QR code from the previous step using the DUT."
+    - label: "Step 1b: Scan the QR code from the previous step using the DUT."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           1. Verify the QR code is scanned by DUT.
@@ -96,9 +96,9 @@ tests:
       disabled: true
 
     - label:
-          "Using the DUT, parse the THs QR code and follow any steps needed for
-          the Commissioner/Commissionee to complete the commissioning process
-          using BLE"
+          "Step 1c: Using the DUT, parse the THs QR code and follow any steps
+          needed for the Commissioner/Commissionee to complete the commissioning
+          process using BLE"
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
           Verify on the DUT (CHIP-TOOL):
@@ -119,11 +119,11 @@ tests:
       disabled: true
 
     - label:
-          "Standard Commissioning Flow: Use a Commissionee with a QR code that
-          has the Custom Flow field set to 0, supports IP Network for its
-          Discovery Capability and is already on the same IP network as the DUT
-          commissioner. Ensure the Version bit string follows the current Matter
-          spec. documentation."
+          "Step 2a: Standard Commissioning Flow: Use a Commissionee with a QR
+          code that has the Custom Flow field set to 0, supports IP Network for
+          its Discovery Capability and is already on the same IP network as the
+          DUT commissioner. Ensure the Version bit string follows the current
+          Matter spec. documentation."
       PICS: MCORE.DD.DISCOVERY_IP
       verification: |
           ./chip-all-clusters-app --custom-flow 0 --capabilities 4
@@ -142,7 +142,7 @@ tests:
           [1651105420.610962][27312:27312] CHIP:SVR: SetupQRCode: [MT:-24J0AFN00KA0648G00]
       disabled: true
 
-    - label: "Scan the QR code from the previous step using the DUT."
+    - label: "Step 2b: Scan the QR code from the previous step using the DUT."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           1. Verify the QR code is scanned by DUT
@@ -151,9 +151,9 @@ tests:
       disabled: true
 
     - label:
-          "Using the DUT, parse the THs QR code and follow any steps needed for
-          the Commissioner/Commissionee to complete the commissioning process
-          using IP Network"
+          "Step 2c: Using the DUT, parse the THs QR code and follow any steps
+          needed for the Commissioner/Commissionee to complete the commissioning
+          process using IP Network"
       PICS: MCORE.DD.DISCOVERY_IP
       verification: |
           Verify on the DUT (CHIP-TOOL):
@@ -173,30 +173,30 @@ tests:
       disabled: true
 
     - label:
-          "Standard Commissioning Flow: Use a Commissionee with a QR code that
-          has the Custom Flow field set to 0 and supports SoftAP for its
-          Discovery Capability. Ensure the Version bit string follows the
+          "Step 3a: Standard Commissioning Flow: Use a Commissionee with a QR
+          code that has the Custom Flow field set to 0 and supports SoftAP for
+          its Discovery Capability. Ensure the Version bit string follows the
           current Matter spec. documentation."
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          Out of Scope for V1.0
+          Out of Scope
           SoftAP commissioning not currently supported
       disabled: true
 
-    - label: "Scan the QR code from the previous step using the DUT."
+    - label: "Step 3b: Scan the QR code from the previous step using the DUT."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
-          Out of Scope for V1.0
+          Out of Scope
           SoftAP commissioning not currently supported
           1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
       disabled: true
 
     - label:
-          "Using the DUT, parse the THs QR code and follow any steps needed for
-          the Commissioner/Commissionee to complete the commissioning process
-          using SoftAP"
+          "Step 3c: Using the DUT, parse the THs QR code and follow any steps
+          needed for the Commissioner/Commissionee to complete the commissioning
+          process using SoftAP"
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          Out of Scope for V1.0
+          Out of Scope
           SoftAP commissioning not currently supported
       disabled: true

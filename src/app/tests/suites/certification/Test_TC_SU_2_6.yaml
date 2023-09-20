@@ -25,10 +25,12 @@ config:
 
 tests:
     - label:
-          "DUT sends the NotifyUpdateApplied Command to the OTA-P after
+          "Step 1: DUT sends the NotifyUpdateApplied Command to the OTA-P after
           installing the software update."
       PICS: OTAR.C.M.NotifyUpdateApplied
       verification: |
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
           Verify that the NotifyUpdateApplied message received on the OTA Provider with UpdateToken and SoftwareVersion fields from DUT
 
           [1673956344.449775][17737:17737] CHIP:ZCL: OTA Provider received NotifyUpdateApplied

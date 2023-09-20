@@ -25,6 +25,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly, nonatomic) NSData * publicKeyData;
 
+// Count of how many times this keypair has been used to signMessageECDSA_DER.
+@property (readonly, nonatomic, assign) unsigned signatureCount;
+
 - (instancetype)init;
 
 @end

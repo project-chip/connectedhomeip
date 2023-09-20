@@ -78,12 +78,13 @@ CHIP_ERROR FabricInfo::Init(const FabricInfo::InitParams & initParams)
 
     Reset();
 
-    mNodeId             = initParams.nodeId;
-    mFabricId           = initParams.fabricId;
-    mFabricIndex        = initParams.fabricIndex;
-    mCompressedFabricId = initParams.compressedFabricId;
-    mRootPublicKey      = initParams.rootPublicKey;
-    mVendorId           = static_cast<VendorId>(initParams.vendorId);
+    mNodeId                  = initParams.nodeId;
+    mFabricId                = initParams.fabricId;
+    mFabricIndex             = initParams.fabricIndex;
+    mCompressedFabricId      = initParams.compressedFabricId;
+    mRootPublicKey           = initParams.rootPublicKey;
+    mVendorId                = static_cast<VendorId>(initParams.vendorId);
+    mShouldAdvertiseIdentity = initParams.advertiseIdentity;
 
     // Deal with externally injected keys
     if (initParams.operationalKeypair != nullptr)
@@ -105,12 +106,13 @@ void FabricInfo::operator=(FabricInfo && other)
 {
     Reset();
 
-    mNodeId             = other.mNodeId;
-    mFabricId           = other.mFabricId;
-    mFabricIndex        = other.mFabricIndex;
-    mCompressedFabricId = other.mCompressedFabricId;
-    mRootPublicKey      = other.mRootPublicKey;
-    mVendorId           = other.mVendorId;
+    mNodeId                  = other.mNodeId;
+    mFabricId                = other.mFabricId;
+    mFabricIndex             = other.mFabricIndex;
+    mCompressedFabricId      = other.mCompressedFabricId;
+    mRootPublicKey           = other.mRootPublicKey;
+    mVendorId                = other.mVendorId;
+    mShouldAdvertiseIdentity = other.mShouldAdvertiseIdentity;
 
     SetFabricLabel(other.GetFabricLabel());
 
@@ -508,6 +510,11 @@ FabricInfo * FabricTable::GetMutableFabricByIndex(FabricIndex fabricIndex)
 
 const FabricInfo * FabricTable::FindFabricWithIndex(FabricIndex fabricIndex) const
 {
+    if (fabricIndex == kUndefinedFabricIndex)
+    {
+        return nullptr;
+    }
+
     // Try to match pending fabric first if available
     if (HasPendingFabricUpdate() && (mPendingFabric.GetFabricIndex() == fabricIndex))
     {
@@ -768,7 +775,7 @@ CHIP_ERROR FabricTable::NotifyFabricCommitted(FabricIndex fabricIndex)
 
 CHIP_ERROR
 FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, bool isAddition, Crypto::P256Keypair * existingOpKey,
-                              bool isExistingOpKeyExternallyOwned, uint16_t vendorId)
+                              bool isExistingOpKeyExternallyOwned, uint16_t vendorId, AdvertiseIdentity advertiseIdentity)
 {
     // All parameters pre-validated before we get here
 
@@ -866,6 +873,8 @@ FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, bool isAddition, Crypto::
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
+
+    newFabricInfo.advertiseIdentity = (advertiseIdentity == AdvertiseIdentity::Yes);
 
     // Update local copy of fabric data. For add it's a new entry, for update, it's `mPendingFabric` shadow entry.
     ReturnErrorOnFailure(fabricEntry->Init(newFabricInfo));
@@ -1531,7 +1540,7 @@ CHIP_ERROR FabricTable::AllocatePendingOperationalKey(Optional<FabricIndex> fabr
     // We can only allocate a pending key if no pending state (NOC, ICAC) already present,
     // since there can only be one pending state per fail-safe.
     VerifyOrReturnError(!mStateFlags.Has(StateFlags::kIsPendingFabricDataPresent), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(outputCsr.size() >= Crypto::kMAX_CSR_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(outputCsr.size() >= Crypto::kMIN_CSR_Buffer_Size, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     EnsureNextAvailableFabricIndexUpdated();
     FabricIndex fabricIndexToUse = kUndefinedFabricIndex;
@@ -1642,7 +1651,7 @@ CHIP_ERROR FabricTable::FindExistingFabricByNocChaining(FabricIndex pendingFabri
 
 CHIP_ERROR FabricTable::AddNewPendingFabricCommon(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId,
                                                   Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
-                                                  FabricIndex * outNewFabricIndex)
+                                                  AdvertiseIdentity advertiseIdentity, FabricIndex * outNewFabricIndex)
 {
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(outNewFabricIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -1692,8 +1701,8 @@ CHIP_ERROR FabricTable::AddNewPendingFabricCommon(const ByteSpan & noc, const By
     ReturnErrorOnFailure(mOpCertStore->AddNewOpCertsForFabric(fabricIndexToUse, noc, icac));
     VerifyOrReturnError(SetPendingDataFabricIndex(fabricIndexToUse), CHIP_ERROR_INCORRECT_STATE);
 
-    CHIP_ERROR err =
-        AddOrUpdateInner(fabricIndexToUse, /* isAddition = */ true, existingOpKey, isExistingOpKeyExternallyOwned, vendorId);
+    CHIP_ERROR err = AddOrUpdateInner(fabricIndexToUse, /* isAddition = */ true, existingOpKey, isExistingOpKeyExternallyOwned,
+                                      vendorId, advertiseIdentity);
     if (err != CHIP_NO_ERROR)
     {
         // Revert partial state added on error
@@ -1712,7 +1721,8 @@ CHIP_ERROR FabricTable::AddNewPendingFabricCommon(const ByteSpan & noc, const By
 }
 
 CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
-                                                  Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned)
+                                                  Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
+                                                  AdvertiseIdentity advertiseIdentity)
 {
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1751,7 +1761,7 @@ CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const
     VerifyOrReturnError(SetPendingDataFabricIndex(fabricIndex), CHIP_ERROR_INCORRECT_STATE);
 
     CHIP_ERROR err = AddOrUpdateInner(fabricIndex, /* isAddition = */ false, existingOpKey, isExistingOpKeyExternallyOwned,
-                                      fabricInfo->GetVendorId());
+                                      fabricInfo->GetVendorId(), advertiseIdentity);
     if (err != CHIP_NO_ERROR)
     {
         // Revert partial state added on error
@@ -2077,6 +2087,21 @@ CHIP_ERROR FabricTable::GetFabricLabel(FabricIndex fabricIndex, CharSpan & outFa
     VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     outFabricLabel = fabricInfo->GetFabricLabel();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FabricTable::PeekFabricIndexForNextAddition(FabricIndex & outIndex)
+{
+    EnsureNextAvailableFabricIndexUpdated();
+    if (!mNextAvailableFabricIndex.HasValue())
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    FabricIndex index = mNextAvailableFabricIndex.Value();
+    VerifyOrReturnError(IsValidFabricIndex(index), CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+    outIndex = index;
     return CHIP_NO_ERROR;
 }
 

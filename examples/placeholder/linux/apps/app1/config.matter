@@ -200,6 +200,9 @@ server cluster Groups = 4 {
 server cluster Scenes = 5 {
   bitmap Feature : BITMAP32 {
     kSceneNames = 0x1;
+    kExplicit = 0x2;
+    kTableSize = 0x4;
+    kFabricScenes = 0x8;
   }
 
   bitmap ScenesCopyMode : BITMAP8 {
@@ -338,6 +341,7 @@ client cluster OnOff = 6 {
 
   bitmap Feature : BITMAP32 {
     kLighting = 0x1;
+    kDeadFront = 0x2;
   }
 
   bitmap OnOffControl : BITMAP8 {
@@ -406,6 +410,7 @@ server cluster OnOff = 6 {
 
   bitmap Feature : BITMAP32 {
     kLighting = 0x1;
+    kDeadFront = 0x2;
   }
 
   bitmap OnOffControl : BITMAP8 {
@@ -676,9 +681,20 @@ server cluster LevelControl = 8 {
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
+  bitmap Feature : BITMAP32 {
+    kTagList = 0x1;
+  }
+
   struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
+  }
+
+  struct SemanticTagStruct {
+    nullable vendor_id mfgCode = 0;
+    enum8 namespaceID = 1;
+    enum8 tag = 2;
+    optional nullable char_string label = 3;
   }
 
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
@@ -754,6 +770,7 @@ server cluster AccessControl = 31 {
   }
 
   attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
+  attribute access(read: administer, write: administer) AccessControlExtensionStruct extension[] = 1;
   readonly attribute int16u subjectsPerAccessControlEntry = 2;
   readonly attribute int16u targetsPerAccessControlEntry = 3;
   readonly attribute int16u accessControlEntriesPerFabric = 4;
@@ -995,6 +1012,10 @@ server cluster TimeFormatLocalization = 44 {
     k24hr = 1;
   }
 
+  bitmap Feature : BITMAP32 {
+    kCalendarFormat = 0x1;
+  }
+
   attribute HourFormatEnum hourFormat = 0;
   attribute CalendarTypeEnum activeCalendarType = 1;
   readonly attribute CalendarTypeEnum supportedCalendarTypes[] = 2;
@@ -1046,17 +1067,6 @@ server cluster UnitLocalization = 45 {
   }
 
   attribute TempUnitEnum temperatureUnit = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** This cluster is used to describe the configuration and capabilities of a Device's power system. */
-server cluster PowerSourceConfiguration = 46 {
-  readonly attribute INT8U sources[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1313,6 +1323,7 @@ server cluster PowerSource = 47 {
   readonly attribute boolean batFunctionalWhileCharging = 28;
   readonly attribute nullable int32u batChargingCurrent = 29;
   readonly attribute BatChargeFaultEnum activeBatChargeFaults[] = 30;
+  readonly attribute endpoint_no endpointList[] = 31;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2558,6 +2569,7 @@ server cluster OperationalCredentials = 62 {
     fabric_idx fabricIndex = 254;
   }
 
+  readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
   readonly attribute FabricDescriptorStruct fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
@@ -2636,6 +2648,78 @@ server cluster OperationalCredentials = 62 {
   fabric command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
+}
+
+/** The Group Key Management Cluster is the mechanism by which group keys are managed. */
+server cluster GroupKeyManagement = 63 {
+  enum GroupKeySecurityPolicyEnum : ENUM8 {
+    kTrustFirst = 0;
+    kCacheAndSync = 1;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kCacheAndSync = 0x1;
+  }
+
+  fabric_scoped struct GroupInfoMapStruct {
+    group_id groupId = 1;
+    endpoint_no endpoints[] = 2;
+    optional char_string<16> groupName = 3;
+    fabric_idx fabricIndex = 254;
+  }
+
+  fabric_scoped struct GroupKeyMapStruct {
+    group_id groupId = 1;
+    int16u groupKeySetID = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
+  struct GroupKeySetStruct {
+    int16u groupKeySetID = 0;
+    GroupKeySecurityPolicyEnum groupKeySecurityPolicy = 1;
+    nullable octet_string<16> epochKey0 = 2;
+    nullable epoch_us epochStartTime0 = 3;
+    nullable octet_string<16> epochKey1 = 4;
+    nullable epoch_us epochStartTime1 = 5;
+    nullable octet_string<16> epochKey2 = 6;
+    nullable epoch_us epochStartTime2 = 7;
+  }
+
+  attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
+  readonly attribute GroupInfoMapStruct groupTable[] = 1;
+  readonly attribute int16u maxGroupsPerFabric = 2;
+  readonly attribute int16u maxGroupKeysPerFabric = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct KeySetWriteRequest {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  request struct KeySetReadRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  request struct KeySetRemoveRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  response struct KeySetReadResponse = 2 {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  response struct KeySetReadAllIndicesResponse = 5 {
+    INT16U groupKeySetIDs[] = 0;
+  }
+
+  fabric command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
+  fabric command access(invoke: administer) KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
+  fabric command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
+  fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 
 /** The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
@@ -6439,7 +6523,9 @@ server cluster AccountLogin = 1294 {
 }
 
 endpoint 0 {
-  device type anonymousEndpointType = 65280, version 1;
+  device type ma_rootdevice = 22, version 1;
+  device type ma_powersource = 17, version 1;
+
   binding cluster GeneralCommissioning;
   binding cluster ThreadNetworkDiagnostics;
   binding cluster Switch;
@@ -6467,6 +6553,10 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
@@ -6474,6 +6564,7 @@ endpoint 0 {
   server cluster AccessControl {
     emits event AccessControlEntryChanged;
     callback attribute acl;
+    callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
@@ -6516,6 +6607,21 @@ endpoint 0 {
     persist  attribute localConfigDisabled default = 0;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster LocalizationConfiguration {
+    ram      attribute activeLocale;
+    callback attribute supportedLocales;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -6524,12 +6630,19 @@ endpoint 0 {
     callback attribute hourFormat;
     callback attribute activeCalendarType;
     callback attribute supportedCalendarTypes;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster PowerSourceConfiguration {
-    callback attribute sources;
+  server cluster UnitLocalization {
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -6566,8 +6679,13 @@ endpoint 0 {
     ram      attribute batFunctionalWhileCharging;
     ram      attribute batChargingCurrent;
     callback attribute activeBatChargeFaults;
+    callback attribute endpointList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster GeneralCommissioning {
@@ -6578,6 +6696,7 @@ endpoint 0 {
     callback attribute supportsConcurrentConnection default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -6592,6 +6711,10 @@ endpoint 0 {
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
   }
@@ -6607,6 +6730,10 @@ endpoint 0 {
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -6761,16 +6888,38 @@ endpoint 0 {
     callback attribute windowStatus default = 0;
     callback attribute adminFabricIndex default = 1;
     callback attribute adminVendorId default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster OperationalCredentials {
+    callback attribute NOCs;
     callback attribute fabrics;
     callback attribute supportedFabrics;
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster GroupKeyManagement {
+    callback attribute groupKeyMap;
+    callback attribute groupTable;
+    callback attribute maxGroupsPerFabric;
+    callback attribute maxGroupKeysPerFabric;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -6791,7 +6940,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster DoorLock {
@@ -7092,7 +7241,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 257, version 1;
+  device type ma_dimmablelight = 257, version 1;
+
   binding cluster Identify;
   binding cluster OnOff;
   binding cluster LevelControl;
@@ -7106,7 +7256,6 @@ endpoint 1 {
     ram      attribute identifyType default = 0x0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
@@ -7116,7 +7265,6 @@ endpoint 1 {
     ram      attribute nameSupport;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
@@ -7130,7 +7278,6 @@ endpoint 1 {
     ram      attribute nameSupport;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 5;
@@ -7144,10 +7291,9 @@ endpoint 1 {
     ram      attribute startUpOnOff default = 0xFF;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0001;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster LevelControl {
@@ -7167,7 +7313,6 @@ endpoint 1 {
     ram      attribute startUpCurrentLevel;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 5;
@@ -7180,7 +7325,6 @@ endpoint 1 {
     callback attribute partsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -7289,7 +7433,7 @@ endpoint 1 {
     ram      attribute coupleColorTempToLevelMinMireds;
     ram      attribute startUpColorTemperatureMireds;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
   }
 
   server cluster OccupancySensing {

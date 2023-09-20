@@ -140,6 +140,7 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
+            Fabrics(0L),
             SomeBytes(123L),;
             private final long id;
             Attribute(long id) {

@@ -53,7 +53,7 @@ limitations under the License.
     <code>0x0006</code>
     <define>ON_OFF_CLUSTER</define>
     <description>Attributes and commands for switching devices between 'On' and 'Off' states.</description>
-    <globalAttribute side="either" code="0xFFFD" value="4"/>
+    <globalAttribute side="either" code="0xFFFD" value="5"/>
 
     <attribute side="server" code="0x0000" define="ON_OFF"               type="boolean" default="0" reportable="true"              >OnOff</attribute>
     <attribute side="server" code="0x4000" define="GLOBAL_SCENE_CONTROL" type="boolean" default="1"                 optional="true">GlobalSceneControl</attribute>
@@ -98,5 +98,6 @@ limitations under the License.
   <bitmap name="Feature" type="BITMAP32">
     <cluster code="0x0006" />
     <field name="Lighting" mask="0x01" />
+    <field name="DeadFront" mask="0x02" />
   </bitmap>
 </configurator>

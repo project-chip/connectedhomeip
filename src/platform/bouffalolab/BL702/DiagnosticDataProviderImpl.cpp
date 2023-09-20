@@ -15,13 +15,16 @@
  *    limitations under the License.
  */
 
-#include <platform/DiagnosticDataProvider.h>
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <platform/bouffalolab/BL702/wifi_mgmr_portable.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 extern "C" {
 #include <bl_sys.h>
 }
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -52,34 +55,122 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 {
-    NetworkInterface * ifp = new NetworkInterface();
+    struct bflbwifi_ap_record * pApInfo = wifiInterface_getApInfo();
 
-    const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
-    ifp->name                      = Span<const char>(threadNetworkName, strlen(threadNetworkName));
-    ifp->isOperational             = true;
-    ifp->offPremiseServicesReachableIPv4.SetNull();
-    ifp->offPremiseServicesReachableIPv6.SetNull();
-    ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD;
-    uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
-    ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
-    ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
+    if (NULL == pApInfo)
+    {
+        ChipLogError(DeviceLayer, "Failed to get ap info.");
+        return CHIP_ERROR_INTERNAL;
+    }
 
-    *netifpp = ifp;
+    return CopySpanToMutableSpan(ByteSpan(pApInfo->bssid), BssId);
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
+{
+    using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
+    struct bflbwifi_ap_record * pApInfo = wifiInterface_getApInfo();
+
+    if (NULL == pApInfo)
+    {
+        ChipLogError(DeviceLayer, "Failed to get ap info.");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if (pApInfo->auth_mode < (uint8_t)(SecurityTypeEnum::kUnknownEnumValue))
+    {
+        securityType = (SecurityTypeEnum)(pApInfo->auth_mode);
+    }
+    else
+    {
+        securityType = SecurityTypeEnum::kUnknownEnumValue;
+    }
 
     return CHIP_NO_ERROR;
 }
 
-void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * netifp)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion)
 {
-    while (netifp)
-    {
-        NetworkInterface * del = netifp;
-        netifp                 = netifp->Next;
-        delete del;
-    }
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
+{
+    struct bflbwifi_ap_record * pApInfo = wifiInterface_getApInfo();
+
+    if (NULL == pApInfo)
+    {
+        ChipLogError(DeviceLayer, "Failed to get ap info.");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    channelNumber = pApInfo->channel;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
+{
+    struct bflbwifi_ap_record * pApInfo = wifiInterface_getApInfo();
+
+    if (NULL == pApInfo)
+    {
+        ChipLogError(DeviceLayer, "Failed to get ap info.");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    rssi = pApInfo->rssi;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 } // namespace DeviceLayer
 } // namespace chip

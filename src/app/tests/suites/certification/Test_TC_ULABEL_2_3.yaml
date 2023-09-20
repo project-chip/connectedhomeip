@@ -34,7 +34,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH writes LabelList attribute of the DUT"
+    - label: "Step 1: TH writes LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "writeAttribute"
       attribute: "LabelList"
@@ -49,7 +49,7 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
-    - label: "TH writes LabelList attribute of the DUT"
+    - label: "Step 2: TH writes LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "writeAttribute"
       attribute: "LabelList"

@@ -40,7 +40,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#if (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(BRD4325B))
+#if (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917))
 #define LIGHT_LED 1
 #else
 #define LIGHT_LED 0
@@ -101,7 +101,7 @@ CHIP_ERROR AppTask::Init()
     if (!ConnectivityMgr().IsThreadProvisioned())
 #endif /* !SL_WIFI */
     {
-        GetLCD().ShowQRCode(true, true);
+        GetLCD().ShowQRCode(true);
     }
 #endif // QR_CODE_ENABLED
 #endif

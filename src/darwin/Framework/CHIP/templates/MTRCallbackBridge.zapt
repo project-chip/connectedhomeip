@@ -1,6 +1,7 @@
 {{> header excludeZapComment=true}}
 
 #import <Foundation/Foundation.h>
+#import <Matter/MTRDefines.h>
 #import "MTRCallbackBridgeBase.h"
 
 #include <app/data-model/DecodableList.h>
@@ -83,13 +84,13 @@ typedef void (*{{asUpperCamelCase parent.name preserveAcronyms=true}}{{asUpperCa
 {{#zcl_attributes_server removeKeys='isOptional'}}
 {{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
 {{#if isArray}}
-{{#>MTRCallbackBridge header="1" ns=parent.name                                }}{{asUpperCamelCase ../../name preserveAcronyms=true}}{{asUpperCamelCase ../name preserveAcronyms=true}}ListAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" ns=parent.name provisional=(isProvisional (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}{{asUpperCamelCase ../../name preserveAcronyms=true}}{{asUpperCamelCase ../name preserveAcronyms=true}}ListAttributeCallback{{/MTRCallbackBridge}}
 {{else}}
   {{#if_is_struct type}}
-  {{#>MTRCallbackBridge header="1" ns=parent.name                              }}{{asUpperCamelCase ../../name preserveAcronyms=true}}{{asUpperCamelCase ../name preserveAcronyms=true}}StructAttributeCallback{{/MTRCallbackBridge}}
+  {{#>MTRCallbackBridge header="1" ns=parent.name provisional=(isProvisional (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}{{asUpperCamelCase ../../name preserveAcronyms=true}}{{asUpperCamelCase ../name preserveAcronyms=true}}StructAttributeCallback{{/MTRCallbackBridge}}
   {{/if_is_struct}}
   {{#if_is_strongly_typed_bitmap type}}
-  {{#>MTRCallbackBridge header="1" ns=parent.name                              }}{{asUpperCamelCase ../../name preserveAcronyms=true}}{{asUpperCamelCase ../name preserveAcronyms=true}}AttributeCallback{{/MTRCallbackBridge}}
+  {{#>MTRCallbackBridge header="1" ns=parent.name provisional=(isProvisional (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}{{asUpperCamelCase ../../name preserveAcronyms=true}}{{asUpperCamelCase ../name preserveAcronyms=true}}AttributeCallback{{/MTRCallbackBridge}}
   {{/if_is_strongly_typed_bitmap}}
 {{/if}}
 {{/if}}
@@ -99,7 +100,7 @@ typedef void (*{{asUpperCamelCase parent.name preserveAcronyms=true}}{{asUpperCa
 {{#zcl_clusters}}
 {{#zcl_command_responses}}
 {{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
-{{#>MTRCallbackBridge header="1" partial-type="Command"                        }}{{asUpperCamelCase ../../name preserveAcronyms=true}}Cluster{{asUpperCamelCase ../name preserveAcronyms=true}}Callback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" partial-type="Command" provisional=(isProvisional (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}{{asUpperCamelCase ../../name preserveAcronyms=true}}Cluster{{asUpperCamelCase ../name preserveAcronyms=true}}Callback{{/MTRCallbackBridge}}
 {{/if}}
 {{/zcl_command_responses}}
 {{/zcl_clusters}}
@@ -107,8 +108,8 @@ typedef void (*{{asUpperCamelCase parent.name preserveAcronyms=true}}{{asUpperCa
 {{#zcl_clusters}}
 {{#zcl_enums}}
 {{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) enum=(asUpperCamelCase name preserveAcronyms=true))}}
-{{#>MTRCallbackBridge header="1" type=(asType label) isNullable=false ns=parent.name}}{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}AttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type=(asType label) isNullable=true  ns=parent.name}}Nullable{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}AttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type=(asType label) isNullable=false ns=parent.name provisional=(isProvisional (asUpperCamelCase parent.name preserveAcronyms=true) enum=(asUpperCamelCase name preserveAcronyms=true))}}{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}AttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type=(asType label) isNullable=true  ns=parent.name provisional=(isProvisional (asUpperCamelCase parent.name preserveAcronyms=true) enum=(asUpperCamelCase name preserveAcronyms=true))}}Nullable{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}AttributeCallback{{/MTRCallbackBridge}}
 {{/if}}
 {{/zcl_enums}}
 {{/zcl_clusters}}

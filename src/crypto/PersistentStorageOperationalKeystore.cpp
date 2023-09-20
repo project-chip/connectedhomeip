@@ -197,7 +197,7 @@ CHIP_ERROR PersistentStorageOperationalKeystore::NewOpKeypairForFabric(FabricInd
     {
         return CHIP_ERROR_INVALID_FABRIC_INDEX;
     }
-    VerifyOrReturnError(outCertificateSigningRequest.size() >= Crypto::kMAX_CSR_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(outCertificateSigningRequest.size() >= Crypto::kMIN_CSR_Buffer_Size, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Replace previous pending keypair, if any was previously allocated
     ResetPendingKey();

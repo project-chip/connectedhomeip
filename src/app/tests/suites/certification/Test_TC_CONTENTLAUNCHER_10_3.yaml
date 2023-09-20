@@ -35,7 +35,7 @@ config:
         defaultValue: "value"
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -44,8 +44,8 @@ tests:
                 value: nodeId
 
     - label:
-          "TH sends a LaunchContent command to the DUT with a search parameter
-          and string, and AutoPlay flag set to false"
+          "Step 1: TH sends a LaunchContent command to the DUT with a search
+          parameter and string, and AutoPlay flag set to false"
       PICS: CONTENTLAUNCHER.S.C00.Rsp
       command: "LaunchContent"
       arguments:
@@ -95,8 +95,8 @@ tests:
                 value: "y"
 
     - label:
-          "TH sends a LaunchContent command to the DUT with a search parameter
-          and string, and AutoPlay flag set to true"
+          "Step 2: TH sends a LaunchContent command to the DUT with a search
+          parameter and string, and AutoPlay flag set to true"
       PICS: CONTENTLAUNCHER.S.C00.Rsp
       command: "LaunchContent"
       arguments:

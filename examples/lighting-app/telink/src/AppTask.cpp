@@ -17,6 +17,7 @@
  */
 
 #include "AppTask.h"
+#include <app/server/Server.h>
 
 #include "ColorFormat.h"
 #include "PWMDevice.h"
@@ -40,6 +41,17 @@ CtColor_t sCT;
 } // namespace
 
 AppTask AppTask::sAppTask;
+
+#ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
+void AppTask::PowerOnFactoryReset(void)
+{
+    LOG_INF("Lighting App Power On Factory Reset");
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_Lighting;
+    event.Handler = PowerOnFactoryResetEventHandler;
+    GetAppTask().PostEvent(&event);
+}
+#endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
 
 CHIP_ERROR AppTask::Init(void)
 {
@@ -284,3 +296,42 @@ void AppTask::SetInitiateAction(PWMDevice::Action_t aAction, int32_t aActor, uin
     }
 #endif
 }
+
+#ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
+static constexpr uint32_t kPowerOnFactoryResetIndicationMax    = 4;
+static constexpr uint32_t kPowerOnFactoryResetIndicationTimeMs = 1000;
+
+unsigned int AppTask::sPowerOnFactoryResetTimerCnt;
+k_timer AppTask::sPowerOnFactoryResetTimer;
+
+void AppTask::PowerOnFactoryResetEventHandler(AppEvent * aEvent)
+{
+    LOG_INF("Lighting App Power On Factory Reset Handler");
+    sPowerOnFactoryResetTimerCnt = 1;
+    sAppTask.mPwmRgbBlueLed.Set(sPowerOnFactoryResetTimerCnt % 2);
+#if USE_RGB_PWM
+    sAppTask.mPwmRgbRedLed.Set(sPowerOnFactoryResetTimerCnt % 2);
+    sAppTask.mPwmRgbGreenLed.Set(sPowerOnFactoryResetTimerCnt % 2);
+#endif
+    k_timer_init(&sPowerOnFactoryResetTimer, PowerOnFactoryResetTimerEvent, nullptr);
+    k_timer_start(&sPowerOnFactoryResetTimer, K_MSEC(kPowerOnFactoryResetIndicationTimeMs),
+                  K_MSEC(kPowerOnFactoryResetIndicationTimeMs));
+}
+
+void AppTask::PowerOnFactoryResetTimerEvent(struct k_timer * timer)
+{
+    sPowerOnFactoryResetTimerCnt++;
+    LOG_INF("Lighting App Power On Factory Reset Handler %u", sPowerOnFactoryResetTimerCnt);
+    sAppTask.mPwmRgbBlueLed.Set(sPowerOnFactoryResetTimerCnt % 2);
+#if USE_RGB_PWM
+    sAppTask.mPwmRgbRedLed.Set(sPowerOnFactoryResetTimerCnt % 2);
+    sAppTask.mPwmRgbGreenLed.Set(sPowerOnFactoryResetTimerCnt % 2);
+#endif
+    if (sPowerOnFactoryResetTimerCnt > kPowerOnFactoryResetIndicationMax)
+    {
+        k_timer_stop(timer);
+        LOG_INF("schedule factory reset");
+        chip::Server::GetInstance().ScheduleFactoryReset();
+    }
+}
+#endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */

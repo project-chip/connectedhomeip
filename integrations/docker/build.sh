@@ -25,7 +25,8 @@
 me=$(basename "$0")
 cd "$(dirname "$0")"
 
-ORG=${DOCKER_BUILD_ORG:-connectedhomeip}
+GHCR_ORG="ghcr.io"
+ORG=${DOCKER_BUILD_ORG:-project-chip}
 
 # directory name is
 IMAGE=${DOCKER_BUILD_IMAGE:-$(basename "$(pwd)")}
@@ -73,7 +74,7 @@ if [ -f "$DOCKER_VOLUME_PATH" ]; then
 fi
 
 # go find and build any CHIP images this image is "FROM"
-awk -F/ '/^FROM connectedhomeip/ {print $2}' Dockerfile | while read -r dep; do
+awk -F/ '/^FROM project-chip/ {print $2}' Dockerfile | while read -r dep; do
     dep=${dep%:*}
     (cd "../$dep" && ./build.sh "$@")
 done
@@ -84,27 +85,35 @@ if [[ ${*/--no-cache//} != "${*}" ]]; then
 fi
 
 [[ ${*/--skip-build//} != "${*}" ]] || {
-    docker build "${BUILD_ARGS[@]}" --build-arg TARGETPLATFORM="$TARGET_PLATFORM_TYPE" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$VERSION" .
+    docker build "${BUILD_ARGS[@]}" --build-arg TARGETPLATFORM="$TARGET_PLATFORM_TYPE" --build-arg VERSION="$VERSION" -t "$GHCR_ORG/$ORG/$IMAGE:$VERSION" .
     docker image prune --force
 }
 
 [[ ${*/--latest//} != "${*}" ]] && {
-    docker tag "$ORG"/"$IMAGE":"$VERSION" "$ORG"/"$IMAGE":latest
+    docker tag "$GHCR_ORG"/"$ORG"/"$IMAGE":"$VERSION" "$GHCR_ORG"/"$ORG"/"$IMAGE":latest
 }
 
 [[ ${*/--squash//} != "${*}" ]] && {
     command -v docker-squash >/dev/null &&
-        docker-squash "$ORG"/"$IMAGE":"$VERSION" -t "$ORG"/"$IMAGE":latest
+        docker-squash "$GHCR_ORG"/"$ORG"/"$IMAGE":"$VERSION" -t "$GHCR_ORG"/"$ORG"/"$IMAGE":latest
 }
 
 [[ ${*/--push//} != "${*}" ]] && {
-    docker push "$ORG"/"$IMAGE":"$VERSION"
+    docker push "$GHCR_ORG"/"$ORG"/"$IMAGE":"$VERSION"
     [[ ${*/--latest//} != "${*}" ]] && {
-        docker push "$ORG"/"$IMAGE":latest
+        docker push "$GHCR_ORG"/"$ORG"/"$IMAGE":latest
     }
 }
 
-docker images --filter=reference="$ORG/*"
+[[ ${*/--clear//} != "${*}" ]] && {
+    docker rmi -f "$GHCR_ORG"/"$ORG"/"$IMAGE":"$VERSION"
+    [[ ${*/--latest//} != "${*}" ]] && {
+        docker rmi -f "$GHCR_ORG"/"$ORG"/"$IMAGE":latest
+    }
+}
+
+docker images --filter=reference="$GHCR_ORG/$ORG/*"
+
 if [ -f "$DOCKER_VOLUME_PATH" ]; then
     df -h "$DOCKER_VOLUME_PATH"
     mb_space_after=$(df -m "$DOCKER_VOLUME_PATH" | awk 'FNR==2{print $3}')

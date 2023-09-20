@@ -19,19 +19,17 @@
 
 #include <stdint.h>
 
-// ==================== General Platform Adaptations ====================
-#define ChipDie() abort()
+extern "C" void bflb_assert(void);
+#define CHIP_CONFIG_ABORT() bflb_assert()
 
+// ==================== General Platform Adaptations ====================
 #define CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE const char *
 #define CHIP_CONFIG_PERSISTED_STORAGE_ENC_MSG_CNTR_ID 1
 #define CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH 2
 
-#define CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY 0x01
+#define CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY BLConfig::kConfigKey_LifeTimeCounter
 
 // ==================== Security Adaptations ====================
-//#define CHIP_CONFIG_SHA256_CONTEXT_SIZE sizeof(bl_sha_ctx_t)
-#define CHIP_CONFIG_SHA256_CONTEXT_SIZE ((1 + 5 + 18 + 16 + 16) * sizeof(unsigned int))
-
 #define CHIP_CONFIG_AES_IMPLEMENTATION_OPENSSL 0
 #define CHIP_CONFIG_AES_IMPLEMENTATION_AESNI 0
 #define CHIP_CONFIG_AES_IMPLEMENTATION_MBEDTLS 1
@@ -90,12 +88,3 @@
 #ifndef CHIP_CONFIG_DEBUG_CERT_VALIDATION
 #define CHIP_CONFIG_DEBUG_CERT_VALIDATION 0
 #endif // CHIP_CONFIG_DEBUG_CERT_VALIDATION
-
-// ==================== FreeRTOS Configuration Overrides ====================
-#ifndef CHIP_CONFIG_FREERTOS_USE_STATIC_TASK
-#define CHIP_CONFIG_FREERTOS_USE_STATIC_TASK 1
-#endif
-
-#ifndef CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE
-#define CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE 1
-#endif

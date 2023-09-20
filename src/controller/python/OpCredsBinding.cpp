@@ -160,6 +160,14 @@ public:
                 mCompletionError = err;
             }
         }
+        if (report.stageCompleted == chip::Controller::CommissioningStage::kReadCommissioningInfo)
+        {
+            mReadCommissioningInfo = report.Get<chip::Controller::ReadCommissioningInfo>();
+        }
+        if (report.stageCompleted == chip::Controller::CommissioningStage::kConfigureTimeZone)
+        {
+            mNeedsDST = report.Get<chip::Controller::TimeZoneResponseInfo>().requiresDSTOffsets;
+        }
 
         return chip::Controller::AutoCommissioner::CommissioningStepFinished(err, report);
     }
@@ -233,6 +241,7 @@ public:
 
         return paseShouldBeOpen == paseIsOpen;
     }
+    bool CheckStageSuccessful(uint8_t stage) { return mReceivedStageSuccess[stage]; }
     void Reset()
     {
         mTestCommissionerUsed              = false;
@@ -246,6 +255,8 @@ public:
         mSimulateFailureOnStage = chip::Controller::CommissioningStage::kError;
         mFailOnReportAfterStage = chip::Controller::CommissioningStage::kError;
         mPrematureCompleteAfter = chip::Controller::CommissioningStage::kError;
+        mReadCommissioningInfo  = chip::Controller::ReadCommissioningInfo();
+        mNeedsDST               = false;
     }
     bool GetTestCommissionerUsed() { return mTestCommissionerUsed; }
     void OnCommissioningSuccess(chip::PeerId peerId) { mReceivedCommissioningSuccess = true; }
@@ -293,27 +304,39 @@ private:
     bool mIsWifi                = false;
     bool mIsThread              = false;
     CHIP_ERROR mCompletionError = CHIP_NO_ERROR;
+    // Contains information about whether the device needs time sync
+    chip::Controller::ReadCommissioningInfo mReadCommissioningInfo;
+    bool mNeedsDST = false;
     bool ValidStage(chip::Controller::CommissioningStage stage)
     {
-        if (!mIsWifi &&
-            (stage == chip::Controller::CommissioningStage::kWiFiNetworkEnable ||
-             stage == chip::Controller::CommissioningStage::kFailsafeBeforeWiFiEnable ||
-             stage == chip::Controller::CommissioningStage::kWiFiNetworkSetup))
+        switch (stage)
         {
+        case chip::Controller::CommissioningStage::kCheckForMatchingFabric:
+            return mParams.GetCheckForMatchingFabric();
+        case chip::Controller::CommissioningStage::kWiFiNetworkEnable:
+        case chip::Controller::CommissioningStage::kFailsafeBeforeWiFiEnable:
+        case chip::Controller::CommissioningStage::kWiFiNetworkSetup:
+            return mIsWifi;
+        case chip::Controller::CommissioningStage::kThreadNetworkEnable:
+        case chip::Controller::CommissioningStage::kFailsafeBeforeThreadEnable:
+        case chip::Controller::CommissioningStage::kThreadNetworkSetup:
+            return mIsThread;
+        case chip::Controller::CommissioningStage::kConfigureUTCTime:
+            return mReadCommissioningInfo.requiresUTC;
+        case chip::Controller::CommissioningStage::kConfigureTimeZone:
+            return mReadCommissioningInfo.requiresTimeZone && mParams.GetTimeZone().HasValue();
+        case chip::Controller::CommissioningStage::kConfigureTrustedTimeSource:
+            return mReadCommissioningInfo.requiresTrustedTimeSource && mParams.GetTrustedTimeSource().HasValue();
+        case chip::Controller::CommissioningStage::kConfigureDefaultNTP:
+            return mReadCommissioningInfo.requiresDefaultNTP && mParams.GetDefaultNTP().HasValue();
+        case chip::Controller::CommissioningStage::kConfigureDSTOffset:
+            return mNeedsDST && mParams.GetDSTOffsets().HasValue();
+        case chip::Controller::CommissioningStage::kError:
+        case chip::Controller::CommissioningStage::kSecurePairing:
             return false;
+        default:
+            return true;
         }
-        if (!mIsThread &&
-            (stage == chip::Controller::CommissioningStage::kThreadNetworkEnable ||
-             stage == chip::Controller::CommissioningStage::kFailsafeBeforeThreadEnable ||
-             stage == chip::Controller::CommissioningStage::kThreadNetworkSetup))
-        {
-            return false;
-        }
-        if (stage == chip::Controller::CommissioningStage::kError || stage == chip::Controller::CommissioningStage::kSecurePairing)
-        {
-            return false;
-        }
-        return true;
     }
     bool StatusUpdatesOk(chip::Controller::CommissioningStage failedStage)
     {
@@ -610,6 +633,11 @@ bool pychip_TestCommissionerUsed()
 bool pychip_TestCommissioningCallbacks()
 {
     return sTestCommissioner.CheckCallbacks();
+}
+
+bool pychip_TestCommissioningStageSuccessful(uint8_t stage)
+{
+    return sTestCommissioner.CheckStageSuccessful(stage);
 }
 
 bool pychip_TestPaseConnection(NodeId nodeId)

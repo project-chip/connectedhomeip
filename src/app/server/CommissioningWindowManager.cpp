@@ -25,10 +25,6 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceControlServer.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_THREAD_FTD
-using namespace chip::DeviceLayer;
-#endif
-
 using namespace chip::app::Clusters;
 using namespace chip::System::Clock;
 
@@ -102,24 +98,7 @@ void CommissioningWindowManager::ResetState()
     mECMIterations    = 0;
     mECMSaltLength    = 0;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    if (mSEDActiveModeEnabled)
-    {
-        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(false);
-        mSEDActiveModeEnabled = false;
-    }
-#endif
-
     UpdateWindowStatus(CommissioningWindowStatusEnum::kWindowNotOpen);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_THREAD_FTD
-    // Recover Router device role.
-    if (mRecoverRouterDeviceRole)
-    {
-        ThreadStackMgr().SetRouterPromotion(true);
-        mRecoverRouterDeviceRole = false;
-    }
-#endif
 
     UpdateOpenerFabricIndex(NullNullable);
     UpdateOpenerVendorId(NullNullable);
@@ -129,6 +108,8 @@ void CommissioningWindowManager::ResetState()
 
     DeviceLayer::SystemLayer().CancelTimer(HandleCommissioningWindowTimeout, this);
     mCommissioningTimeoutTimerArmed = false;
+
+    DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
 }
 
 void CommissioningWindowManager::Cleanup()
@@ -150,11 +131,18 @@ void CommissioningWindowManager::HandleFailedAttempt(CHIP_ERROR err)
 #if CONFIG_NETWORK_LAYER_BLE
     mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
+
+    CHIP_ERROR prevErr = err;
     if (mFailedCommissioningAttempts < kMaxFailedCommissioningAttempts)
     {
         // If the number of commissioning attempts has not exceeded maximum
         // retries, let's start listening for commissioning connections again.
         err = AdvertiseAndListenForPASE();
+    }
+
+    if (mAppDelegate != nullptr)
+    {
+        mAppDelegate->OnCommissioningSessionEstablishmentError(prevErr);
     }
 
     if (err != CHIP_NO_ERROR)
@@ -175,6 +163,12 @@ void CommissioningWindowManager::OnSessionEstablishmentStarted()
     // As per specifications, section 5.5: Commissioning Flows
     constexpr System::Clock::Timeout kPASESessionEstablishmentTimeout = System::Clock::Seconds16(60);
     DeviceLayer::SystemLayer().StartTimer(kPASESessionEstablishmentTimeout, HandleSessionEstablishmentTimeout, this);
+
+    ChipLogProgress(AppServer, "Commissioning session establishment step started");
+    if (mAppDelegate != nullptr)
+    {
+        mAppDelegate->OnCommissioningSessionEstablishmentStarted();
+    }
 }
 
 void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & session)
@@ -234,17 +228,6 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds16 commiss
 
     mCommissioningTimeoutTimerArmed = true;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_THREAD_FTD
-    // Block device role changing into Router if commissioning window opened and device not yet Router.
-    // AdvertiseAndListenForPASE fails doesn't matter, because if it does the callers of OpenCommissioningWindow
-    // will end up calling ResetState, which will reset the boolean.
-    if (ConnectivityManagerImpl().GetThreadDeviceType() == ConnectivityManager::kThreadDeviceType_Router)
-    {
-        ThreadStackMgr().SetRouterPromotion(false);
-        mRecoverRouterDeviceRole = true;
-    }
-#endif
-
     return AdvertiseAndListenForPASE();
 }
 
@@ -253,14 +236,6 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
     VerifyOrReturnError(mCommissioningTimeoutTimerArmed, CHIP_ERROR_INCORRECT_STATE);
 
     mPairingSession.Clear();
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    if (!mSEDActiveModeEnabled)
-    {
-        mSEDActiveModeEnabled = true;
-        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(true);
-    }
-#endif
 
     ReturnErrorOnFailure(mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
         Protocols::SecureChannel::MsgType::PBKDFParamRequest, this));

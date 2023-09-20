@@ -42,11 +42,12 @@ tests:
           otherwise if your DUT is advertising over BLE , pls use the "/chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1" command to discover and provision the device (BTW the SSID , passwd, descriminator ..etc are configurable parameters for your DUT)
       disabled: true
 
-    - label: "TH starts matter announcement procedure using BLE transport"
+    - label:
+          "Step 1a: TH starts matter announcement procedure using BLE transport"
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
           ./chip-all-clusters-app --wifi  --discriminator 3841
-          Verify in DUT (ALL-CLUSTER-APP):
+          Verify in TH as commissionee side:
 
           [1657221603.350406][368108:368108] CHIP:DL: Device Configuration:
           [1657221603.350445][368108:368108] CHIP:DL:   Serial Number: TEST_SN
@@ -67,8 +68,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT starts BLE scan across all three advertising channels with a
-          sufficient dwell time, interval, and overall duration of scan"
+          "Step 1b: DUT starts BLE scan across all three advertising channels
+          with a sufficient dwell time, interval, and overall duration of scan"
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
           1. Discover commissionables over BLE using DUT=chip-tool pairing
@@ -78,7 +79,7 @@ tests:
           [1651743348.446962][5072:5072] CHIP:SVR: Commissioning completed session establishment step
       disabled: true
 
-    - label: "DUT starts scan in background using BLE transport"
+    - label: "Step 2a: DUT starts scan in background using BLE transport"
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
           1. Discover commissionables over BLE using DUT=chip-tool pairing command
@@ -88,7 +89,7 @@ tests:
           [1651743348.446962][5072:5072] CHIP:SVR: Commissioning completed session establishment step
       disabled: true
 
-    - label: "TH starts matter announcement using BLE transport"
+    - label: "Step 2b: TH starts matter announcement using BLE transport"
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
           $ ./out/all-clusters-app/chip-all-clusters-app --wifi --discriminator 3841
@@ -112,8 +113,9 @@ tests:
       disabled: true
 
     - label:
-          "DUT must find TH and provide onboarding data for validation.Pass
-          Criteria: DUT is able to report the Onboarding payload as set on TH"
+          "Step 2c: DUT must find TH and provide onboarding data for
+          validation.Pass Criteria: DUT is able to report the Onboarding payload
+          as set on TH"
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
           1. Discover commissionables over BLE using DUT=chip-tool pairing command
@@ -164,48 +166,50 @@ tests:
           [1651743348.446962][5072:5072] CHIP:SVR: Commissioning completed session establishment step
       disabled: true
 
-    - label: "TH starts SoftAP and begin matter announcement procedure"
+    - label: "Step 3a: TH starts SoftAP and begin matter announcement procedure"
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          Out of Scope V1.0
+          Out of Scope
           SoftAP commissioning not currently supported on TH=all-clusters-app
       disabled: true
 
     - label:
-          "DUT starts Wi-Fi scan of all 2.4 GHz Wi-Fi channels allowed per its
-          operational regulatory domain (channels 1, 6, and 11 are preferred)"
+          "Step 3b: DUT starts Wi-Fi scan of all 2.4 GHz Wi-Fi channels allowed
+          per its operational regulatory domain (channels 1, 6, and 11 are
+          preferred)"
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          Out of Scope V1.0
+          Out of Scope
           SoftAP commissioning not currently supported on TH=all-clusters-app
       disabled: true
 
-    - label: "DUT scans using Wi-Fi in background"
+    - label: "Step 4a: DUT scans using Wi-Fi in background"
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          Out of Scope V1.0
+          Out of Scope
           SoftAP commissioning not currently supported on TH=all-clusters-app
       disabled: true
 
-    - label: "TH starts SoftAP and begin matter announcement procedure"
+    - label: "Step 4b: TH starts SoftAP and begin matter announcement procedure"
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          Out of Scope V1.0
-          SoftAP commissioning not currently supported on TH=all-clusters-app
-      disabled: true
-
-    - label:
-          "DUT must find TH and provide onboarding data for validation.Pass
-          Criteria: DUT is able to report the Onboarding payload as set on TH"
-      PICS: MCORE.DD.DISCOVERY_SOFTAP
-      verification: |
-          Out of Scope V1.0
+          Out of Scope
           SoftAP commissioning not currently supported on TH=all-clusters-app
       disabled: true
 
     - label:
-          "With DUT and TH connected to the same network over IP, DUT performs
-          service discovery using DNS-SD"
+          "Step 4c: DUT must find TH and provide onboarding data for
+          validation.Pass Criteria: DUT is able to report the Onboarding payload
+          as set on TH"
+      PICS: MCORE.DD.DISCOVERY_SOFTAP
+      verification: |
+          Out of Scope
+          SoftAP commissioning not currently supported on TH=all-clusters-app
+      disabled: true
+
+    - label:
+          "Step 5: With DUT and TH connected to the same network over IP, DUT
+          performs service discovery using DNS-SD"
       verification: |
           1. TH is in commissioning mode and discoverable by DUT over IP through DNS-SD advertisements. This can also be verified using through the DUT's pairing command over IP.
 

@@ -34,8 +34,8 @@ tests:
                 value: nodeId
 
     - label:
-          "TH reads NumberOfTotalUsers Supported attribute and saves for future
-          use."
+          "Step 1: TH reads NumberOfTotalUsers Supported attribute and saves for
+          future use."
       PICS: DRLK.S.F08 && DRLK.S.A0011
       command: "readAttribute"
       attribute: "NumberOfTotalUsersSupported"
@@ -46,7 +46,7 @@ tests:
               maxValue: 65534
 
     - label:
-          "TH sends Set User Command to DUT with the following values:
+          "Step 2: TH sends Set User Command to DUT with the following values:
           OperationType as 0 UserIndex as 1 UserName as xxx UserUniqueID as 6452
           UserStatus as 1 UserType as 0 CredentialRule as 0"
       PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
@@ -69,7 +69,7 @@ tests:
               - name: "CredentialRule"
                 value: 0
 
-    - label: "TH sends Get User Command to DUT with UserIndex as 1"
+    - label: "Step 3: TH sends Get User Command to DUT with UserIndex as 1"
       PICS: DRLK.S.F08 && DRLK.S.C1b.Rsp && DRLK.S.C1c.Tx
       command: "GetUser"
       arguments:
@@ -100,7 +100,7 @@ tests:
                 value: null
 
     - label:
-          "TH sends Set User Command to DUT with the following values:
+          "Step 4: TH sends Set User Command to DUT with the following values:
           OperationType as 0 UserIndex as 2 UserName as xxx UserUniqueID as 6452
           UserStatus as 1 UserType as 10 (Invalid value) CredentialRule as 3"
       PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
@@ -126,7 +126,7 @@ tests:
           error: INVALID_COMMAND
 
     - label:
-          "TH sends Set User Command to DUT with the following values:
+          "Step 5: TH sends Set User Command to DUT with the following values:
           OperationType as 0 UserIndex as 1 (Same as step 2) UserName as xxx
           UserUniqueID as 8965 UserStatus as 1 UserType as 0 CredentialRule as 0"
       PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
@@ -153,7 +153,7 @@ tests:
           clusterError: 0x3
 
     - label:
-          "TH sends Set User Command to DUT with the following values:
+          "Step 6a: TH sends Set User Command to DUT with the following values:
           OperationType as 0 UserIndex as 2 UserName as NULL UserUniqueID as
           NULL UserStatus as NULL UserType as NULL CredentialRule as NULL"
       PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
@@ -176,7 +176,7 @@ tests:
               - name: "CredentialRule"
                 value: null
 
-    - label: "TH sends Get User Command to DUT with UserIndex as 2"
+    - label: "Step 6b: TH sends Get User Command to DUT with UserIndex as 2"
       PICS: DRLK.S.C1a.Rsp && DRLK.S.C1b.Rsp && DRLK.S.C1c.Tx
       command: "GetUser"
       arguments:
@@ -207,7 +207,7 @@ tests:
                 value: null
 
     - label:
-          "TH sends Set User Command to DUT with the following values:
+          "Step 7: TH sends Set User Command to DUT with the following values:
           OperationType as 2 UserIndex as 2 UserName as NULL UserUniqueID as
           NULL UserStatus as NULL UserType as NULL CredentialRule as NULL"
       PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
@@ -230,7 +230,7 @@ tests:
               - name: "CredentialRule"
                 value: null
 
-    - label: "TH sends Get User Command to DUT with the UserIndex as 2"
+    - label: "Step 8: TH sends Get User Command to DUT with the UserIndex as 2"
       PICS: DRLK.S.F08 && DRLK.S.C1b.Rsp && DRLK.S.C1c.Tx
       command: "GetUser"
       arguments:
@@ -260,7 +260,8 @@ tests:
               - name: "NextUserIndex"
                 value: null
 
-    - label: "TH sends Clear User Command to DUT with the UserIndex as 1"
+    - label:
+          "Step 9: TH sends Clear User Command to DUT with the UserIndex as 1"
       PICS: DRLK.S.F08 && DRLK.S.C1d.Rsp
       command: "ClearUser"
       timedInteractionTimeoutMs: 10000
@@ -269,7 +270,7 @@ tests:
               - name: "UserIndex"
                 value: 1
 
-    - label: "TH sends Get User Command to DUT with the UserIndex as 1"
+    - label: "Step 10: TH sends Get User Command to DUT with the UserIndex as 1"
       PICS: DRLK.S.F08 && DRLK.S.C1b.Rsp && DRLK.S.C1c.Tx
       command: "GetUser"
       arguments:
@@ -298,3 +299,46 @@ tests:
                 value: null
               - name: "NextUserIndex"
                 value: 2
+
+    - label:
+          "Test cleanup: TH sends Clear User Command to DUT with the UserIndex
+          as 2"
+      PICS: DRLK.S.F08 && DRLK.S.C1d.Rsp
+      command: "ClearUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 2
+
+    - label:
+          "Test cleanup: TH sends Get User Command to DUT with the UserIndex as
+          2"
+      PICS: DRLK.S.F08 && DRLK.S.C1b.Rsp && DRLK.S.C1c.Tx
+      command: "GetUser"
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 2
+      response:
+          values:
+              - name: "UserIndex"
+                value: 2
+              - name: "UserName"
+                value: null
+              - name: "UserUniqueID"
+                value: null
+              - name: "UserStatus"
+                value: null
+              - name: "UserType"
+                value: null
+              - name: "CredentialRule"
+                value: null
+              - name: "Credentials"
+                value: null
+              - name: "CreatorFabricIndex"
+                value: null
+              - name: "LastModifiedFabricIndex"
+                value: null
+              - name: "NextUserIndex"
+                value: null

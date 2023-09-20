@@ -267,7 +267,8 @@ class TestYamlLoader(unittest.TestCase):
         load = YamlLoader().load
 
         content = ('tests:\n'
-                   '  - {key}: {value}')
+                   '  - command: writeAttribute\n'
+                   '    {key}: {value}')
         keys = [
             'arguments',
         ]
@@ -278,7 +279,8 @@ class TestYamlLoader(unittest.TestCase):
         for key in keys:
             _, _, _, _, tests = load(
                 content.format(key=key, value=valid_value))
-            self.assertEqual(tests, [{key: {'value': True}}])
+            self.assertEqual(
+                tests, [{'command': 'writeAttribute', key: {'value': True}}])
 
             for value in wrong_values:
                 x = content.format(key=key, value=value)

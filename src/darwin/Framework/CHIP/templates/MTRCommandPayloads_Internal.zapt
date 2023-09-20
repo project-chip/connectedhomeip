@@ -6,6 +6,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface MTROperationalCredentialsClusterAttestationResponseParams ()
+@property (nonatomic, strong) NSData * attestationChallenge;
+@end
+
 {{#zcl_clusters}}
 {{#zcl_commands}}
 {{! We only need to generate conversion functions for the server-generated commands }}

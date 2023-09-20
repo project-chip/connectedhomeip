@@ -128,9 +128,16 @@ class TestReadCallback : public app::ClusterStateCache::Callback
 {
 public:
     TestReadCallback() : mClusterCacheAdapter(*this, Optional<EventNumber>::Missing(), false /*cacheData*/) {}
-    void OnDone(app::ReadClient *) {}
+    void OnDone(app::ReadClient *) override {}
+
+    void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override
+    {
+        ++mEventsSeen;
+    }
 
     app::ClusterStateCache mClusterCacheAdapter;
+
+    size_t mEventsSeen = 0;
 };
 
 namespace {
@@ -178,6 +185,7 @@ void TestReadEvents::TestEventNumberCaching(nlTestSuite * apSuite, void * apCont
     chip::EventNumber lastEventNumber;
 
     GenerateEvents(apSuite, firstEventNumber, lastEventNumber);
+    NL_TEST_ASSERT(apSuite, lastEventNumber > firstEventNumber);
 
     app::EventPathParams eventPath;
     eventPath.mEndpointId = kTestEndpointId;
@@ -201,23 +209,22 @@ void TestReadEvents::TestEventNumberCaching(nlTestSuite * apSuite, void * apCont
 
         ctx.DrainAndServiceIO();
 
-        readCallback.mClusterCacheAdapter.ForEachEventData([&apSuite, &readCallback](const app::EventHeader & header) {
-            NL_TEST_ASSERT(apSuite, header.mPath.mClusterId == Clusters::UnitTesting::Id);
-            NL_TEST_ASSERT(apSuite, header.mPath.mEventId == Clusters::UnitTesting::Events::TestEvent::Id);
-            NL_TEST_ASSERT(apSuite, header.mPath.mEndpointId == kTestEndpointId);
+        NL_TEST_ASSERT(apSuite, readCallback.mEventsSeen == lastEventNumber - firstEventNumber + 1);
 
-            Clusters::UnitTesting::Events::TestEvent::DecodableType eventData;
-            NL_TEST_ASSERT(apSuite, readCallback.mClusterCacheAdapter.Get(header.mEventNumber, eventData) != CHIP_NO_ERROR);
+        readCallback.mClusterCacheAdapter.ForEachEventData([&apSuite](const app::EventHeader & header) {
+            // We are not caching data.
+            NL_TEST_ASSERT(apSuite, false);
+
             return CHIP_NO_ERROR;
         });
 
         readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber);
-        NL_TEST_ASSERT(apSuite, highestEventNumber.HasValue() && highestEventNumber.Value() == 4);
+        NL_TEST_ASSERT(apSuite, highestEventNumber.HasValue() && highestEventNumber.Value() == lastEventNumber);
     }
 
     //
     // Clear out the event cache and set its highest received event number to a non zero value. Validate that
-    // we don't receive events lower than that value.
+    // we don't receive events except ones larger than that value.
     //
     {
         app::ReadClient readClient(engine, &ctx.GetExchangeManager(), readCallback.mClusterCacheAdapter.GetBufferedCallback(),
@@ -227,24 +234,32 @@ void TestReadEvents::TestEventNumberCaching(nlTestSuite * apSuite, void * apCont
         Optional<EventNumber> highestEventNumber;
         readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber);
         NL_TEST_ASSERT(apSuite, !highestEventNumber.HasValue());
-        readCallback.mClusterCacheAdapter.SetHighestReceivedEventNumber(3);
 
+        const EventNumber kHighestEventNumberSeen = lastEventNumber - 1;
+        NL_TEST_ASSERT(apSuite, kHighestEventNumberSeen < lastEventNumber);
+
+        readCallback.mClusterCacheAdapter.SetHighestReceivedEventNumber(kHighestEventNumberSeen);
+
+        readCallback.mEventsSeen = 0;
+
+        readParams.mEventNumber.ClearValue();
+        NL_TEST_ASSERT(apSuite, !readParams.mEventNumber.HasValue());
         NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
 
         ctx.DrainAndServiceIO();
 
-        readCallback.mClusterCacheAdapter.ForEachEventData([&apSuite, &readCallback](const app::EventHeader & header) {
-            NL_TEST_ASSERT(apSuite, header.mPath.mClusterId == Clusters::UnitTesting::Id);
-            NL_TEST_ASSERT(apSuite, header.mPath.mEventId == Clusters::UnitTesting::Events::TestEvent::Id);
-            NL_TEST_ASSERT(apSuite, header.mPath.mEndpointId == kTestEndpointId);
+        // We should only get events with event numbers larger than kHighestEventNumberSeen.
+        NL_TEST_ASSERT(apSuite, readCallback.mEventsSeen == lastEventNumber - kHighestEventNumberSeen);
 
-            Clusters::UnitTesting::Events::TestEvent::DecodableType eventData;
-            NL_TEST_ASSERT(apSuite, readCallback.mClusterCacheAdapter.Get(header.mEventNumber, eventData) != CHIP_NO_ERROR);
+        readCallback.mClusterCacheAdapter.ForEachEventData([&apSuite](const app::EventHeader & header) {
+            // We are not caching data.
+            NL_TEST_ASSERT(apSuite, false);
+
             return CHIP_NO_ERROR;
         });
 
         readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber);
-        NL_TEST_ASSERT(apSuite, highestEventNumber.HasValue() && highestEventNumber.Value() == 4);
+        NL_TEST_ASSERT(apSuite, highestEventNumber.HasValue() && highestEventNumber.Value() == lastEventNumber);
     }
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 

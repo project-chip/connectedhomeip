@@ -155,6 +155,11 @@ else
     _install_additional_pip_requirements "none" "$@"
 fi
 
+# Load bash completion helper if running bash
+if [ -n "$BASH" ]; then
+    . "$_CHIP_ROOT/scripts/helpers/bash-completion.sh"
+fi
+
 unset -f _bootstrap_or_activate
 unset -f _install_additional_pip_requirements
 
@@ -169,6 +174,6 @@ unset PW_DOCTOR_SKIP_CIPD_CHECKS
 
 unset -f _chip_bootstrap_banner
 
-if ! [ -z "$_ORIGINAL_PW_ENVIRONMENT_ROOT" ]; then
+if [ -n "$_ORIGINAL_PW_ENVIRONMENT_ROOT" ]; then
     export PW_ENVIRONMENT_ROOT="$_ORIGINAL_PW_ENVIRONMENT_ROOT"
 fi

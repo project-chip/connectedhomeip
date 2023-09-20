@@ -17,11 +17,13 @@ import chip.devicecontroller.model.InvokeElement
 import chip.devicecontroller.model.NodeState
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.OpCredClientFragmentBinding
+import com.google.chip.chiptool.util.toAny
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -113,13 +115,14 @@ class OpCredClientFragment : Fragment() {
           }
 
           override fun onReport(nodeState: NodeState?) {
-            val value =
+            val tlv =
               nodeState
                 ?.getEndpointState(endpointId)
                 ?.getClusterState(clusterId)
                 ?.getAttributeState(attributeId)
-                ?.value
-                ?: "null"
+                ?.tlv
+
+            val value = tlv?.let { TlvReader(it).toAny() }
             Log.i(TAG, "OpCred $attributeName value: $value")
             showMessage("OpCred $attributeName value: $value")
           }

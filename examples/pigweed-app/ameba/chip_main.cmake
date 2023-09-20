@@ -100,9 +100,9 @@ list(
     APPEND chip_main_cpp_flags
 
 	-Wno-unused-parameter
-	-std=gnu++17
+	-std=c++17
 	-fno-rtti
-  -fno-use-cxa-atexit
+    -fno-use-cxa-atexit
 )
 target_compile_definitions(${chip_main} PRIVATE ${chip_main_flags} )
 target_compile_options(${chip_main} PRIVATE ${chip_main_cpp_flags})

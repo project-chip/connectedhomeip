@@ -30,10 +30,10 @@
 
 namespace chip {
 namespace Test {
-constexpr EndpointId kMockEndpoint1   = 0xFFFE;
-constexpr EndpointId kMockEndpoint2   = 0xFFFD;
-constexpr EndpointId kMockEndpoint3   = 0xFFFC;
-constexpr EndpointId kMockEndpointMin = 0xFFF1;
+inline constexpr EndpointId kMockEndpoint1   = 0xFFFE;
+inline constexpr EndpointId kMockEndpoint2   = 0xFFFD;
+inline constexpr EndpointId kMockEndpoint3   = 0xFFFC;
+inline constexpr EndpointId kMockEndpointMin = 0xFFF1;
 
 constexpr AttributeId MockAttributeId(const uint16_t & id)
 {

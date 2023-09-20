@@ -37,6 +37,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <static-supported-temperature-levels.h>
 #include <support/CHIPMem.h>
 
 #if CONFIG_ENABLE_PW_RPC
@@ -60,6 +61,8 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointMain /* Endpoint Id */,
                                       &(NetworkCommissioning::AmebaWiFiDriver::GetInstance()));
+
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 } // namespace
 
 void NetWorkCommissioningInstInit()
@@ -141,6 +144,7 @@ static void InitServer(intptr_t context)
 #if CONFIG_ENABLE_CHIP_SHELL
     InitBindingHandler();
 #endif
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 extern "C" void ChipTest(void)

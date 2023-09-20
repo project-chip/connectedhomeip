@@ -69,7 +69,7 @@ else()
 endif()
 
 # find chip cert tool
-find_program(chip_cert_exe NAMES chip-cert PATHS ${CHIP_ROOT}/out/telink REQUIRED)
+find_program(chip_cert_exe NAMES chip-cert PATHS ${CHIP_ROOT}/out REQUIRED)
 string(APPEND script_args "--chip-cert-path ${chip_cert_exe}\n")
 
 # for development purpose user can use default certs instead of generating or providing them
@@ -99,7 +99,7 @@ else()
 endif()
 
 # find chip tool requied for generating QRCode
-find_program(chip_tool_exe NAMES chip-tool PATHS ${CHIP_ROOT}/out/telink REQUIRED)
+find_program(chip_tool_exe NAMES chip-tool PATHS ${CHIP_ROOT}/out REQUIRED)
 string(APPEND script_args "--chip-tool-path ${chip_tool_exe}\n")
 
 # add Password-Authenticated Key Exchange parameters
@@ -108,7 +108,7 @@ string(APPEND script_args "--discriminator ${CONFIG_CHIP_DEVICE_DISCRIMINATOR}\n
 string(APPEND script_args "--passcode ${CONFIG_CHIP_DEVICE_SPAKE2_PASSCODE}\n")
 
 # request spake2p to generate a new spake2_verifier
-find_program(spake_exe NAMES spake2p PATHS ${CHIP_ROOT}/out/telink REQUIRED)
+find_program(spake_exe NAMES spake2p PATHS ${CHIP_ROOT}/out REQUIRED)
 string(APPEND script_args "--spake2-path ${spake_exe}\n")
 
 if(CONFIG_CHIP_DEVICE_ENABLE_KEY)

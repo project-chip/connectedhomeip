@@ -17,3 +17,4 @@ example on ESP32 series of SoCs
 -   [RPC Console and Device Tracing](rpc_console.md)
 -   [Matter OTA](ota.md)
 -   [Generating and Using ESP Secure Cert Partition](secure_cert_partition.md)
+-   [BLE Settings](ble_settings.md)

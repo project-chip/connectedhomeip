@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 12.3.4. [TC-OPCREDS-3.4] UpdateNOC-Error Condition [DUT-Server]
+name: 15.2.3. [TC-OPCREDS-3.4] UpdateNOC-Error Condition [DUT-Server]
 
 PICS:
     - OPCREDS.S
@@ -29,7 +29,7 @@ tests:
           TH and DUT are commissioned
       disabled: true
 
-    - label: "TH1 fully commissions the DUT"
+    - label: "Step 1: TH1 fully commissions the DUT"
       verification: |
           "DUT side:
           sudo ./chip-all-clusters-app --wifi
@@ -41,8 +41,8 @@ tests:
       disabled: true
 
     - label:
-          "TH1 reads the NOCs attribute from the Node Operational Credentials
-          cluster using a fabric-filtered read"
+          "Step 2: TH1 reads the NOCs attribute from the Node Operational
+          Credentials cluster using a fabric-filtered read"
       verification: |
           ./chip-tool operationalcredentials read nocs 1 0 --fabric-filtered 1
 
@@ -58,7 +58,7 @@ tests:
       disabled: true
 
     - label:
-          "TH1 reads the TrustedRootCertificates attribute from the Node
+          "Step 3: TH1 reads the TrustedRootCertificates attribute from the Node
           Operational Credentials cluster"
       verification: |
           ./chip-tool operationalcredentials read trusted-root-certificates    1 0
@@ -71,9 +71,9 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends the UpdateNOC command to the Node Operational Credentials
-          cluster with the following fields: NOCValue is set to noc_original
-          ICACValue is to set icac_original"
+          "Step 4: TH1 sends the UpdateNOC command to the Node Operational
+          Credentials cluster with the following fields: NOCValue is set to
+          noc_original ICACValue is to set icac_original"
       PICS: OPCREDS.S.C07.Rsp
       verification: |
           Verify that the DUT responds with FAILSAFE_REQUIRED
@@ -115,8 +115,8 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
-          field set to 900"
+          "Step 5: TH1 sends ArmFailSafe command to the DUT with the
+          ExpiryLengthSeconds field set to 900"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 900 0 1 0
 
@@ -132,9 +132,9 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends the UpdateNOC command to the Node Operational Credentials
-          cluster with the following fields: NOCValue is set to noc_original
-          ICACValue is to set icac_original"
+          "Step 6: TH1 sends the UpdateNOC command to the Node Operational
+          Credentials cluster with the following fields: NOCValue is set to
+          noc_original ICACValue is to set icac_original"
       PICS: OPCREDS.S.C07.Rsp
       verification: |
           Verify that the DUT responds with a NOCResponse with the StatusCode field set to MissingCsr that is status code 4
@@ -149,8 +149,8 @@ tests:
       disabled: true
 
     - label:
-          "TH1 Sends CSRRequest command with the IsForUpdateNOC field set to
-          false"
+          "Step 7: TH1 Sends CSRRequest command with the IsForUpdateNOC field
+          set to false"
       PICS: OPCREDS.S.C04.Rsp
       verification: |
           Verify that the DUT returns a CSRResponse and save as csr_not_update
@@ -169,7 +169,7 @@ tests:
       disabled: true
 
     - label:
-          "TH1 generates a new NOC chain with ICAC with the following
+          "Step 8: TH1 generates a new NOC chain with ICAC with the following
           properties: new NOC is generated from the NOCSR returned in
           csr_not_for_update and is signed by ICA. Save as noc_not_for_update
           ICAC must be signed by the original key for trusted_root_original.
@@ -179,8 +179,8 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends the UpdateNOC command to the Node Operational Credentials
-          cluster with the following fields: NOCValue is set to
+          "Step 9: TH1 sends the UpdateNOC command to the Node Operational
+          Credentials cluster with the following fields: NOCValue is set to
           noc_not_for_update ICACValue is to set icac_not_for_update"
       PICS: OPCREDS.S.C07.Rsp
       verification: |
@@ -188,42 +188,42 @@ tests:
       disabled: true
 
     - label:
-          "TH1 Sends CSRRequest command with the IsForUpdateNOC field set to
-          true"
+          "Step 10: TH1 Sends CSRRequest command with the IsForUpdateNOC field
+          set to true"
       PICS: OPCREDS.S.C04.Rsp
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends the UpdateNOC command to the Node Operational Credentials
-          cluster with the following fields: NOCValue is set to noc_original
-          ICACValue is to set icac_original"
+          "Step 11: TH1 sends the UpdateNOC command to the Node Operational
+          Credentials cluster with the following fields: NOCValue is set to
+          noc_original ICACValue is to set icac_original"
       PICS: OPCREDS.S.C07.Rsp
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 generates a new Trusted Root Certificate and Private Key and
-          saves as new_root_cert and new_root_key so that TH can generate an NOC
-          for UpdateNOC that doesnt chain to the original root"
+          "Step 12: TH1 generates a new Trusted Root Certificate and Private Key
+          and saves as new_root_cert and new_root_key so that TH can generate an
+          NOC for UpdateNOC that doesnt chain to the original root"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 generates a new NOC and ICAC with the following properties: new
-          NOC is generated from the NOCSR returned in csr_update and is signed
-          by new ICA. Save as noc_update_new_root new ICAC is generated and
-          signed by new_root_key. Save as icac_update_new_root"
+          "Step 13: TH1 generates a new NOC and ICAC with the following
+          properties: new NOC is generated from the NOCSR returned in csr_update
+          and is signed by new ICA. Save as noc_update_new_root new ICAC is
+          generated and signed by new_root_key. Save as icac_update_new_root"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends the UpdateNOC command to the Node Operational Credentials
-          cluster with the following fields: NOCValue is set to
+          "Step 14: TH1 sends the UpdateNOC command to the Node Operational
+          Credentials cluster with the following fields: NOCValue is set to
           noc_update_new_root ICACValue is to set icac_update_new_root"
       PICS: OPCREDS.S.C07.Rsp
       verification: |
@@ -231,20 +231,20 @@ tests:
       disabled: true
 
     - label:
-          "TH1 generates a new NOC and ICAC with the following properties: new
-          NOC is generated from the NOCSR returned in csr_update with the
-          matter-fabric-id set to a different value than noc_original. The NOC
-          is signed by new ICA. Save as noc_update_bad_fabric_on_noc new ICAC is
-          generated with the and matter-fabric-id omitted. ICAC is signed by the
-          original key for trusted_root_original. Save as
+          "Step 15: TH1 generates a new NOC and ICAC with the following
+          properties: new NOC is generated from the NOCSR returned in csr_update
+          with the matter-fabric-id set to a different value than noc_original.
+          The NOC is signed by new ICA. Save as noc_update_bad_fabric_on_noc new
+          ICAC is generated with the and matter-fabric-id omitted. ICAC is
+          signed by the original key for trusted_root_original. Save as
           icac_update_bad_fabric_on_noc"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends the UpdateNOC command to the Node Operational Credentials
-          cluster with the following fields: NOCValue is set to
+          "Step 16: TH1 sends the UpdateNOC command to the Node Operational
+          Credentials cluster with the following fields: NOCValue is set to
           noc_update_bad_fabric_on_noc ICACValue is to set
           icac_update_bad_fabric_on_noc"
       PICS: OPCREDS.S.C07.Rsp
@@ -253,20 +253,20 @@ tests:
       disabled: true
 
     - label:
-          "TH1 generates a new NOC and ICAC with the following properties: new
-          NOC is generated from the NOCSR returned in csr_update with the
-          matter-fabric-id set to the same value as noc_original. The NOC is
-          signed by new ICA. Save as noc_update_bad_fabric_on_icac new ICAC is
-          generated with the and matter-fabric-id included as set to a different
-          value than noc_original. ICAC is signed by the original key for
-          trusted_root_original. Save as icac_update_bad_fabric_on_icac"
+          "Step 17: TH1 generates a new NOC and ICAC with the following
+          properties: new NOC is generated from the NOCSR returned in csr_update
+          with the matter-fabric-id set to the same value as noc_original. The
+          NOC is signed by new ICA. Save as noc_update_bad_fabric_on_icac new
+          ICAC is generated with the and matter-fabric-id included as set to a
+          different value than noc_original. ICAC is signed by the original key
+          for trusted_root_original. Save as icac_update_bad_fabric_on_icac"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends the UpdateNOC command to the Node Operational Credentials
-          cluster with the following fields: NOCValue is set to
+          "Step 18: TH1 sends the UpdateNOC command to the Node Operational
+          Credentials cluster with the following fields: NOCValue is set to
           noc_update_bad_fabric_on_icac ICACValue is to set
           icac_update_bad_fabric_on_icac"
       PICS: OPCREDS.S.C07.Rsp
@@ -275,16 +275,16 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends AddTrustedRootCertificate command to DUT again with the
-          RootCACertificate field set to new_root_cert"
+          "Step 19: TH1 sends AddTrustedRootCertificate command to DUT again
+          with the RootCACertificate field set to new_root_cert"
       PICS: OPCREDS.S.C0b.Rsp
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends the UpdateNOC command to the Node Operational Credentials
-          cluster with the following fields: NOCValue is set to
+          "Step 20: TH1 sends the UpdateNOC command to the Node Operational
+          Credentials cluster with the following fields: NOCValue is set to
           noc_update_new_root ICACValue is to set icac_update_new_root"
       PICS: OPCREDS.S.C07.Rsp
       verification: |
@@ -292,35 +292,35 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
-          field set to 0"
+          "Step 21: TH1 sends ArmFailSafe command to the DUT with the
+          ExpiryLengthSeconds field set to 0"
       verification: |
 
       disabled: true
 
-    - label: "TH1 sends an OpenCommissioningWindow command to the DUT"
-      verification: |
-
-      disabled: true
-
-    - label:
-          "TH1 connects to the DUT over PASE and sends ArmFailSafe command to
-          the DUT with the ExpiryLengthSeconds field set to 900. Steps 24-26 are
-          all performed over the PASE connection."
+    - label: "Step 22: TH1 sends an OpenCommissioningWindow command to the DUT"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 Sends CSRRequest command over PASE with the IsForUpdateNOC field
-          set to true"
+          "Step 23: TH1 connects to the DUT over PASE and sends ArmFailSafe
+          command to the DUT with the ExpiryLengthSeconds field set to 900.
+          Steps 24-26 are all performed over the PASE connection."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 24: TH1 Sends CSRRequest command over PASE with the
+          IsForUpdateNOC field set to true"
       PICS: OPCREDS.S.C04.Rsp
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 generates a new NOC chain with ICAC with the following
+          "Step 25: TH1 generates a new NOC chain with ICAC with the following
           properties: new NOC is generated from the NOCSR returned in csr_pase
           and is signed by ICA. Save as noc_pase ICAC must be signed by the
           original key for trusted_root_original. Save as icac_pase"
@@ -329,9 +329,9 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends the UpdateNOC command to the Node Operational Credentials
-          cluster over PASE with the following fields: NOCValue is set to
-          noc_pase ICACValue is to set icac_pase"
+          "Step 26: TH1 sends the UpdateNOC command to the Node Operational
+          Credentials cluster over PASE with the following fields: NOCValue is
+          set to noc_pase ICACValue is to set icac_pase"
       PICS: OPCREDS.S.C07.Rsp
       verification: |
 

@@ -55,10 +55,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     CHIP_ERROR err;
     TaskHandle_t backup_eventLoopTask;
 
-    // Initialize the configuration system.
-    err = Internal::BLConfig::Init();
-    SuccessOrExit(err);
-
     otRadio_opt_t opt;
 
     opt.byte            = 0;
@@ -71,9 +67,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     ot_radioInit(opt);
 
     ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
-
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
     // Initialize LwIP.
     tcpip_init(NULL, NULL);

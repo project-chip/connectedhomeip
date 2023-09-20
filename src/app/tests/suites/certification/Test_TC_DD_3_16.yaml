@@ -55,8 +55,8 @@ tests:
       disabled: true
 
     - label:
-          "Provide the 11-digit Manual Pairing Code from the Commissionee to the
-          DUT in any format supported by DUT"
+          "Step 1: Provide the 11-digit Manual Pairing Code from the
+          Commissionee to the DUT in any format supported by DUT"
       verification: |
           Verify on the TH (All-cluster-app)
           ./chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 0 --capabilities 4 --discriminator 3840 --passcode 20202021
@@ -78,9 +78,9 @@ tests:
       disabled: true
 
     - label:
-          "VERSION: Using the manual code from Step 1, generate a new manual
-          code but substituting out the current VERSION with an invalid VERSION:
-          2"
+          "Step 2a: VERSION: Using the manual code from Step 1, generate a new
+          manual code but substituting out the current VERSION with an invalid
+          VERSION: 2"
       verification: |
           1. Use chip-tool's "payload verhoeff-generate" command to help generate the new, invalid Manual code
           Verify on the DUT (Chip-tool):
@@ -93,8 +93,8 @@ tests:
       disabled: true
 
     - label:
-          "Provide the Manual Pairing Code, generated in the previous step, to
-          the DUT in any format supported by the DUT"
+          "Step 2b: Provide the Manual Pairing Code, generated in the previous
+          step, to the DUT in any format supported by the DUT"
       verification: |
           ./chip-tool pairing code 1 84970112331
 
@@ -104,9 +104,9 @@ tests:
       disabled: true
 
     - label:
-          "VID_PID_PRESENT: Using the manual code from Step 1, generate a new
-          manual code but substituting out the current VID_PID_PRESENT with an
-          invalid VID_PID_PRESENT set to 1"
+          "Step 3a: VID_PID_PRESENT: Using the manual code from Step 1, generate
+          a new manual code but substituting out the current VID_PID_PRESENT
+          with an invalid VID_PID_PRESENT set to 1"
       verification: |
           1. Use chip-tool's "payload generate-manualcode" command to help generate the new, invalid Manual code
 
@@ -117,8 +117,8 @@ tests:
       disabled: true
 
     - label:
-          "Provide the Manual Pairing Code, generated in the previous step, to
-          the DUT in any format supported by the DUT"
+          "Step 3b: Provide the Manual Pairing Code, generated in the previous
+          step, to the DUT in any format supported by the DUT"
       verification: |
           ./chip-tool pairing code 1 74970112334
 
@@ -129,13 +129,13 @@ tests:
       disabled: true
 
     - label:
-          "SHORT DISCRIMINATOR: Using the manual code from Step 1, generate a
-          new manual code but substituting out the current SHORT DISCRIMINATOR
-          string with a discriminator value that makes the generated manual code
-          differ from Step 1s manual code (i.e. Choose a discriminator value
-          that changes any of the 4 most-significant bits of Step 1s 12-bit
-          discriminator value and adheres to rules of section 5.1.1.5.
-          'Discriminator value')"
+          "Step 4a: SHORT DISCRIMINATOR: Using the manual code from Step 1,
+          generate a new manual code but substituting out the current SHORT
+          DISCRIMINATOR string with a discriminator value that makes the
+          generated manual code differ from Step 1s manual code (i.e. Choose a
+          discriminator value that changes any of the 4 most-significant bits of
+          Step 1s 12-bit discriminator value and adheres to rules of section
+          5.1.1.5. 'Discriminator value')"
       verification: |
           1. Use chip-tool's "payload generate-manualcode" command to help generate the new, invalid Manual code
           Verify on the DUT (Chip-tool):
@@ -145,8 +145,8 @@ tests:
       disabled: true
 
     - label:
-          "Provide the Manual Pairing Code, generated in the previous step, to
-          the DUT in any format supported by the DUT"
+          "Step 4b: Provide the Manual Pairing Code, generated in the previous
+          step, to the DUT in any format supported by the DUT"
       verification: |
           Verify on the DUT (Chip-tool):
             ./chip-tool pairing code 1 33331712336
@@ -157,13 +157,14 @@ tests:
       disabled: true
 
     - label:
-          "Passcode: Using the manual code from Step 1, generate a new manual
-          code using all the same Onboarding Payload components except for the
-          Passcode. For each Passcode in the following list, set the Passcode
-          component to one of the invalid Passcode and generate a new manual
-          code using all the same Onboarding Payload components and one Passcode
-          from the list: 00000000, 11111111, 22222222, 33333333, 44444444,
-          55555555, 66666666, 77777777, 88888888, 99999999, 12345678, 87654321"
+          "Step 5a: Passcode: Using the manual code from Step 1, generate a new
+          manual code using all the same Onboarding Payload components except
+          for the Passcode. For each Passcode in the following list, set the
+          Passcode component to one of the invalid Passcode and generate a new
+          manual code using all the same Onboarding Payload components and one
+          Passcode from the list: 00000000, 11111111, 22222222, 33333333,
+          44444444, 55555555, 66666666, 77777777, 88888888, 99999999, 12345678,
+          87654321"
       verification: |
           1. Use these as examples of how to generate manual codes with invalid passcodes
           Verify on the DUT (Chip-tool):
@@ -218,8 +219,8 @@ tests:
       disabled: true
 
     - label:
-          "Provide each of the Manual Pairing Codes, generated in the previous
-          step, to the DUT in any format supported by the DUT"
+          "Step 5b: Provide each of the Manual Pairing Codes, generated in the
+          previous step, to the DUT in any format supported by the DUT"
       verification: |
           Verify on the DUT (Chip-tool):
           No applicable TH logs
@@ -274,11 +275,11 @@ tests:
       disabled: true
 
     - label:
-          "CHECK_DIGIT: Using the manual code from Step 1, generate a new manual
-          code but substituting out the current CHECK_DIGIT with an invalid
-          CHECK_DIGIT (i.e. Any different CHECK_DIGIT than the commissionees
-          CHECK_DIGIT while following Table 38. Encoding Method without Vendor
-          and Product IDs (VID_PID_Present == 0))"
+          "Step 6a: CHECK_DIGIT: Using the manual code from Step 1, generate a
+          new manual code but substituting out the current CHECK_DIGIT with an
+          invalid CHECK_DIGIT (i.e. Any different CHECK_DIGIT than the
+          commissionees CHECK_DIGIT while following Table 38. Encoding Method
+          without Vendor and Product IDs (VID_PID_Present == 0))"
       verification: |
           1. Manually change the last digit of the manual pairing code to a different digit
           No applicable DUT or TH logs
@@ -287,8 +288,8 @@ tests:
       disabled: true
 
     - label:
-          "Provide the Manual Pairing Code, generated in the previous step, to
-          the DUT in any format supported by the DUT"
+          "Step 6b: Provide the Manual Pairing Code, generated in the previous
+          step, to the DUT in any format supported by the DUT"
       verification: |
           Verify on the DUT (Chip-tool):
            ./chip-tool pairing code 1 34970112331

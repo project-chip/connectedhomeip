@@ -1,0 +1,189 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 81.2.2. [TC-MOD-2.2] ChangeToMode Verification (DUT as Client)
+
+PICS:
+    - MOD.C.C00.Tx
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Step 1: DUT reads the SupportedModes attribute from the TH"
+      PICS: MOD.C.A0002
+      verification: |
+          ./chip-tool modeselect read supported-modes 1 1
+
+          Verify that the TH response provides a list of supported modes and Record the mode numbers for usage in steps 2 on the TH (all-cluster-app) log:
+
+          [1666941141.001603][9718:9718] CHIP:DMG:
+          [1666941141.001625][9718:9718] CHIP:DMG: ReportDataMessage =
+          [1666941141.001627][9718:9718] CHIP:DMG: {
+          [1666941141.001629][9718:9718] CHIP:DMG:         AttributeReportIBs =
+          [1666941141.001632][9718:9718] CHIP:DMG:         [
+          [1666941141.001634][9718:9718] CHIP:DMG:                 AttributeReportIB =
+          [1666941141.001637][9718:9718] CHIP:DMG:                 {
+          [1666941141.001639][9718:9718] CHIP:DMG:                         AttributeDataIB =
+          [1666941141.001642][9718:9718] CHIP:DMG:                         {
+          [1666941141.001644][9718:9718] CHIP:DMG:                                 DataVersion = 0xb4a9126f,
+          [1666941141.001646][9718:9718] CHIP:DMG:                                 AttributePathIB =
+          [1666941141.001648][9718:9718] CHIP:DMG:                                 {
+          [1666941141.001650][9718:9718] CHIP:DMG:                                         Endpoint = 0x1,
+          [1666941141.001653][9718:9718] CHIP:DMG:                                         Cluster = 0x50,
+          [1666941141.001655][9718:9718] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1666941141.001657][9718:9718] CHIP:DMG:                                 }
+          [1666941141.001659][9718:9718] CHIP:DMG:
+          [1666941141.001662][9718:9718] CHIP:DMG:                                 Data = [
+          [1666941141.001664][9718:9718] CHIP:DMG:
+          [1666941141.001666][9718:9718] CHIP:DMG:                                 ],
+          [1666941141.001668][9718:9718] CHIP:DMG:                         },
+          [1666941141.001671][9718:9718] CHIP:DMG:
+          [1666941141.001673][9718:9718] CHIP:DMG:                 },
+          [1666941141.001677][9718:9718] CHIP:DMG:
+          [1666941141.001679][9718:9718] CHIP:DMG:                 AttributeReportIB =
+          [1666941141.001683][9718:9718] CHIP:DMG:                 {
+          [1666941141.001684][9718:9718] CHIP:DMG:                         AttributeDataIB =
+          [1666941141.001687][9718:9718] CHIP:DMG:                         {
+          [1666941141.001689][9718:9718] CHIP:DMG:                                 DataVersion = 0xb4a9126f,
+          [1666941141.001691][9718:9718] CHIP:DMG:                                 AttributePathIB =
+          [1666941141.001693][9718:9718] CHIP:DMG:                                 {
+          [1666941141.001695][9718:9718] CHIP:DMG:                                         Endpoint = 0x1,
+          [1666941141.001697][9718:9718] CHIP:DMG:                                         Cluster = 0x50,
+          [1666941141.001699][9718:9718] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1666941141.001701][9718:9718] CHIP:DMG:                                         ListIndex = Null,
+          [1666941141.001704][9718:9718] CHIP:DMG:                                 }
+          [1666941141.001706][9718:9718] CHIP:DMG:
+          [1666941141.001708][9718:9718] CHIP:DMG:                                 Data =
+          [1666941141.001710][9718:9718] CHIP:DMG:                                 {
+          [1666941141.001713][9718:9718] CHIP:DMG:                                         0x0 = "Black" (5 chars),
+          [1666941141.001715][9718:9718] CHIP:DMG:                                         0x1 = 0,
+          [1666941141.001718][9718:9718] CHIP:DMG:                                         0x2 = [
+          [1666941141.001720][9718:9718] CHIP:DMG:
+          [1666941141.001722][9718:9718] CHIP:DMG:                                                 {
+          [1666941141.001725][9718:9718] CHIP:DMG:                                                         0x0 = 0,
+          [1666941141.001727][9718:9718] CHIP:DMG:                                                         0x1 = 0,
+          [1666941141.001730][9718:9718] CHIP:DMG:                                                 },
+          [1666941141.001732][9718:9718] CHIP:DMG:                                         ],
+          [1666941141.001734][9718:9718] CHIP:DMG:                                 },
+          [1666941141.001736][9718:9718] CHIP:DMG:                         },
+          [1666941141.001739][9718:9718] CHIP:DMG:
+          [1666941141.001741][9718:9718] CHIP:DMG:                 },
+          [1666941141.001747][9718:9718] CHIP:DMG:
+          [1666941141.001748][9718:9718] CHIP:DMG:                 AttributeReportIB =
+          [1666941141.001752][9718:9718] CHIP:DMG:                 {
+          [1666941141.001754][9718:9718] CHIP:DMG:                         AttributeDataIB =
+          [1666941141.001756][9718:9718] CHIP:DMG:                         {
+          [1666941141.001758][9718:9718] CHIP:DMG:                                 DataVersion = 0xb4a9126f,
+          [1666941141.001760][9718:9718] CHIP:DMG:                                 AttributePathIB =
+          [1666941141.001762][9718:9718] CHIP:DMG:                                 {
+          [1666941141.001764][9718:9718] CHIP:DMG:                                         Endpoint = 0x1,
+          [1666941141.001767][9718:9718] CHIP:DMG:                                         Cluster = 0x50,
+          [1666941141.001769][9718:9718] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1666941141.001771][9718:9718] CHIP:DMG:                                         ListIndex = Null,
+          [1666941141.001773][9718:9718] CHIP:DMG:                                 }
+          [1666941141.001775][9718:9718] CHIP:DMG:
+          [1666941141.001777][9718:9718] CHIP:DMG:                                 Data =
+          [1666941141.001780][9718:9718] CHIP:DMG:                                 {
+          [1666941141.001782][9718:9718] CHIP:DMG:                                         0x0 = "Cappuccino" (10 chars),
+          [1666941141.001784][9718:9718] CHIP:DMG:                                         0x1 = 4,
+          [1666941141.001787][9718:9718] CHIP:DMG:                                         0x2 = [
+          [1666941141.001789][9718:9718] CHIP:DMG:
+          [1666941141.001791][9718:9718] CHIP:DMG:                                                 {
+          [1666941141.001794][9718:9718] CHIP:DMG:                                                         0x0 = 0,
+          [1666941141.001796][9718:9718] CHIP:DMG:                                                         0x1 = 0,
+          [1666941141.001799][9718:9718] CHIP:DMG:                                                 },
+          [1666941141.001801][9718:9718] CHIP:DMG:                                         ],
+          [1666941141.001803][9718:9718] CHIP:DMG:                                 },
+          [1666941141.001805][9718:9718] CHIP:DMG:                         },
+          [1666941141.001808][9718:9718] CHIP:DMG:
+          [1666941141.001810][9718:9718] CHIP:DMG:                 },
+          [1666941141.001815][9718:9718] CHIP:DMG:
+          [1666941141.001817][9718:9718] CHIP:DMG:                 AttributeReportIB =
+          [1666941141.001820][9718:9718] CHIP:DMG:                 {
+          [1666941141.001822][9718:9718] CHIP:DMG:                         AttributeDataIB =
+          [1666941141.001824][9718:9718] CHIP:DMG:                         {
+          [1666941141.001826][9718:9718] CHIP:DMG:                                 DataVersion = 0xb4a9126f,
+          [1666941141.001828][9718:9718] CHIP:DMG:                                 AttributePathIB =
+          [1666941141.001831][9718:9718] CHIP:DMG:                                 {
+          [1666941141.001833][9718:9718] CHIP:DMG:                                         Endpoint = 0x1,
+          [1666941141.001835][9718:9718] CHIP:DMG:                                         Cluster = 0x50,
+          [1666941141.001837][9718:9718] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1666941141.001839][9718:9718] CHIP:DMG:                                         ListIndex = Null,
+          [1666941141.001841][9718:9718] CHIP:DMG:                                 }
+          [1666941141.001844][9718:9718] CHIP:DMG:
+          [1666941141.001846][9718:9718] CHIP:DMG:                                 Data =
+          [1666941141.001848][9718:9718] CHIP:DMG:                                 {
+          [1666941141.001850][9718:9718] CHIP:DMG:                                         0x0 = "Espresso" (8 chars),
+          [1666941141.001853][9718:9718] CHIP:DMG:                                         0x1 = 7,
+          [1666941141.001855][9718:9718] CHIP:DMG:                                         0x2 = [
+          [1666941141.001857][9718:9718] CHIP:DMG:
+          [1666941141.001860][9718:9718] CHIP:DMG:                                                 {
+          [1666941141.001862][9718:9718] CHIP:DMG:                                                         0x0 = 0,
+          [1666941141.001864][9718:9718] CHIP:DMG:                                                         0x1 = 0,
+          [1666941141.001867][9718:9718] CHIP:DMG:                                                 },
+          [1666941141.001870][9718:9718] CHIP:DMG:                                         ],
+          [1666941141.001872][9718:9718] CHIP:DMG:                                 },
+          [1666941141.001874][9718:9718] CHIP:DMG:                         },
+          [1666941141.001878][9718:9718] CHIP:DMG:
+          [1666941141.001880][9718:9718] CHIP:DMG:                 },
+          [1666941141.001883][9718:9718] CHIP:DMG:
+          [1666941141.001885][9718:9718] CHIP:DMG:         ],
+          [1666941141.001891][9718:9718] CHIP:DMG:
+          [1666941141.001893][9718:9718] CHIP:DMG:         SuppressResponse = true,
+          [1666941141.001895][9718:9718] CHIP:DMG:         InteractionModelRevision = 1
+          [1666941141.001897][9718:9718] CHIP:DMG: }
+      disabled: true
+
+    - label:
+          "Step 2: DUT sends a ChangeToMode command to the TH with an integer
+          from the list in step 1."
+      PICS: MOD.C.C00.Tx
+      verification: |
+          ./chip-tool modeselect change-to-mode 4 1 1
+
+          Verify TH responds with a successful (value 0x00) status response on the TH (all-cluster-app) log:
+
+          [1666941165.052169][9718:9718] CHIP:DMG: InvokeResponseMessage =
+          [1666941165.052172][9718:9718] CHIP:DMG: {
+          [1666941165.052174][9718:9718] CHIP:DMG:         suppressResponse = false,
+          [1666941165.052177][9718:9718] CHIP:DMG:         InvokeResponseIBs =
+          [1666941165.052179][9718:9718] CHIP:DMG:         [
+          [1666941165.052181][9718:9718] CHIP:DMG:                 InvokeResponseIB =
+          [1666941165.052185][9718:9718] CHIP:DMG:                 {
+          [1666941165.052187][9718:9718] CHIP:DMG:                         CommandStatusIB =
+          [1666941165.052190][9718:9718] CHIP:DMG:                         {
+          [1666941165.052192][9718:9718] CHIP:DMG:                                 CommandPathIB =
+          [1666941165.052195][9718:9718] CHIP:DMG:                                 {
+          [1666941165.052197][9718:9718] CHIP:DMG:                                         EndpointId = 0x1,
+          [1666941165.052200][9718:9718] CHIP:DMG:                                         ClusterId = 0x50,
+          [1666941165.052202][9718:9718] CHIP:DMG:                                         CommandId = 0x0,
+          [1666941165.052205][9718:9718] CHIP:DMG:                                 },
+          [1666941165.052208][9718:9718] CHIP:DMG:
+          [1666941165.052210][9718:9718] CHIP:DMG:                                 StatusIB =
+          [1666941165.052213][9718:9718] CHIP:DMG:                                 {
+          [1666941165.052216][9718:9718] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1666941165.052218][9718:9718] CHIP:DMG:                                 },
+          [1666941165.052220][9718:9718] CHIP:DMG:
+          [1666941165.052223][9718:9718] CHIP:DMG:                         },
+          [1666941165.052226][9718:9718] CHIP:DMG:
+          [1666941165.052227][9718:9718] CHIP:DMG:                 },
+          [1666941165.052231][9718:9718] CHIP:DMG:
+          [1666941165.052233][9718:9718] CHIP:DMG:         ],
+          [1666941165.052235][9718:9718] CHIP:DMG:
+          [1666941165.052237][9718:9718] CHIP:DMG:         InteractionModelRevision = 1
+      disabled: true

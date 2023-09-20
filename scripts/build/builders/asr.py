@@ -28,6 +28,8 @@ class ASRApp(Enum):
     TEMPERATURE_MEASUREMENT = auto()
     THERMOSTAT = auto()
     OTA_REQUESTOR = auto()
+    DISHWASHER = auto()
+    REFRIGERATOR = auto()
 
     def ExampleName(self):
         if self == ASRApp.ALL_CLUSTERS:
@@ -48,6 +50,10 @@ class ASRApp(Enum):
             return 'thermostat'
         elif self == ASRApp.OTA_REQUESTOR:
             return 'ota-requestor-app'
+        elif self == ASRApp.DISHWASHER:
+            return 'dishwasher-app'
+        elif self == ASRApp.REFRIGERATOR:
+            return 'refrigerator-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -70,6 +76,10 @@ class ASRApp(Enum):
             return 'chip-asr-thermostat-example'
         elif self == ASRApp.OTA_REQUESTOR:
             return 'chip-asr-ota-requestor-example'
+        elif self == ASRApp.DISHWASHER:
+            return 'chip-asr-dishwasher-example'
+        elif self == ASRApp.REFRIGERATOR:
+            return 'chip-asr-refrigerator-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -80,12 +90,15 @@ class ASRApp(Enum):
 class ASRBoard(Enum):
     ASR582X = auto()
     ASR595X = auto()
+    ASR550X = auto()
 
     def GetIC(self):
         if self == ASRBoard.ASR582X:
             return 'asr582x'
         elif self == ASRBoard.ASR595X:
             return 'asr595x'
+        elif self == ASRBoard.ASR550X:
+            return 'asr550x'
         else:
             raise Exception('Unknown board #: %r' % self)
 
@@ -101,7 +114,8 @@ class ASRBuilder(GnBuilder):
                  chip_logging: bool = True,
                  enable_factory: bool = False,
                  enable_rotating_device_id: bool = False,
-                 enable_ota_requestor: bool = False):
+                 enable_ota_requestor: bool = False,
+                 enable_lwip_ip6_hook: bool = False):
         super(ASRBuilder, self).__init__(
             root=app.BuildRoot(root),
             runner=runner)
@@ -118,6 +132,9 @@ class ASRBuilder(GnBuilder):
         elif asr_chip == "asr595x":
             ASR_ARCH = "riscv"
             ASR_SDK_ROOT = "//third_party/connectedhomeip/third_party/asr/asr595x"
+        elif asr_chip == "asr550x":
+            ASR_ARCH = "arm"
+            ASR_SDK_ROOT = "//third_party/connectedhomeip/third_party/asr/asr550x"
         self.extra_gn_options.append('target_cpu="%s"' % ASR_ARCH)
 
         toolchain = os.path.join(root, os.path.split(os.path.realpath(__file__))[0], '../../../config/asr/toolchain')
@@ -131,6 +148,9 @@ class ASRBuilder(GnBuilder):
         if (asr_chip == "asr582x"
                 or asr_chip == "asr595x"):
             self.extra_gn_options.append('chip_config_network_layer_ble=true')
+
+        if (asr_chip == "asr550x"):
+            self.extra_gn_options.append('chip_config_network_layer_ble=false')
 
         if enable_ota_requestor:
             self.extra_gn_options.append('chip_enable_ota_requestor=true')
@@ -148,6 +168,9 @@ class ASRBuilder(GnBuilder):
         if enable_rotating_device_id:
             self.extra_gn_options.append('chip_enable_additional_data_advertising=true')
             self.extra_gn_options.append('chip_enable_rotating_device_id=true')
+
+        if enable_lwip_ip6_hook:
+            self.extra_gn_options.append('chip_lwip_ip6_hook=true')
 
         self.extra_gn_options.append('asr_toolchain_root="%s"' % os.environ['ASR_TOOLCHAIN_PATH'])
 

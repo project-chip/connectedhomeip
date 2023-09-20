@@ -85,6 +85,12 @@ public:
 
     /**
      * @brief
+     * Called when MatchingFabricInfo returned from target
+     */
+    virtual void OnFabricCheck(NodeId matchingNodeId) {}
+
+    /**
+     * @brief
      *  Called with the NetworkScanResponse returned from the target.
      *
      * The DeviceCommissioner will be waiting in the kNeedsNetworkCreds step and not advancing the commissioning process.

@@ -308,13 +308,6 @@ void BleLayer::Shutdown()
 
 void BleLayer::CloseAllBleConnections()
 {
-    // Cancel any ongoing attempt to establish new BLE connection
-    CHIP_ERROR err = CancelBleIncompleteConnection();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Ble, "CancelBleIncompleteConnection() failed, err = %" CHIP_ERROR_FORMAT, err.Format());
-    }
-
     // Close and free all BLE end points.
     for (size_t i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
     {

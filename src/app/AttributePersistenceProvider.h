@@ -16,19 +16,17 @@
 #pragma once
 
 #include <app/ConcreteAttributePath.h>
-#include <app/data-model/Nullable.h>
 #include <app/util/attribute-metadata.h>
-#include <cstring>
-#include <inttypes.h>
-#include <lib/support/BufferReader.h>
-#include <lib/support/BufferWriter.h>
 #include <lib/support/Span.h>
 
 namespace chip {
 namespace app {
 
 /**
- * Interface for persisting attribute values.
+ * Interface for persisting attribute values. This will write attributes in storage with platform endianness for scalars
+ * and uses a different key space from SafeAttributePersistenceProvider.
+ * When storing cluster attributes that are managed via the AttributeAccessInterface, it is recommended to
+ * use SafeAttributePersistenceProvider.
  */
 
 class AttributePersistenceProvider
@@ -61,171 +59,17 @@ public:
      * Read an attribute value from non-volatile memory.
      *
      * @param [in]     aPath the attribute path for the data being persisted.
-     * @param [in]     aType the attribute type.
-     * @param [in]     aSize the attribute size.
+     * @param [in]     aMetadata the attribute metadata, as a convenience.
      * @param [in,out] aValue where to place the data.  The size of the buffer
-     *                 will be equal to `size`.
+     *                 will be equal to `size` member of aMetadata.
      *
      *                 The data is expected to be in native endianness for
      *                 integers and floats.  For strings, see the string
      *                 representation description in the WriteValue
      *                 documentation.
      */
-    virtual CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType, size_t aSize,
+    virtual CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, const EmberAfAttributeMetadata * aMetadata,
                                  MutableByteSpan & aValue) = 0;
-
-    /**
-     * Get the KVS representation of null for the given type.
-     * @tparam T The type for which the null representation should be returned.
-     * @return A value of type T that in the KVS represents null.
-     */
-    template <typename T, std::enable_if_t<std::is_same<bool, T>::value, bool> = true>
-    static uint8_t GetNullValueForNullableType()
-    {
-        return 0xff;
-    }
-
-    /**
-     * Get the KVS representation of null for the given type.
-     * @tparam T The type for which the null representation should be returned.
-     * @return A value of type T that in the KVS represents null.
-     */
-    template <typename T, std::enable_if_t<std::is_unsigned<T>::value && !std::is_same<bool, T>::value, bool> = true>
-    static T GetNullValueForNullableType()
-    {
-        T nullValue = 0;
-        nullValue   = T(~nullValue);
-        return nullValue;
-    }
-
-    /**
-     * Get the KVS representation of null for the given type.
-     * @tparam T The type for which the null representation should be returned.
-     * @return A value of type T that in the KVS represents null.
-     */
-    template <typename T, std::enable_if_t<std::is_signed<T>::value && !std::is_same<bool, T>::value, bool> = true>
-    static T GetNullValueForNullableType()
-    {
-        T shiftBit = 1;
-        return T(shiftBit << ((sizeof(T) * 8) - 1));
-    }
-
-    // The following API provides helper functions to simplify the access of commonly used types.
-    // The API may not be complete.
-    // Currently implemented write and read types are: uint8_t, uint16_t, uint32_t, unit64_t and
-    // their nullable varieties, and bool.
-
-    /**
-     * Write an attribute value of type intX, uintX or bool to non-volatile memory.
-     *
-     * @param [in] aPath the attribute path for the data being written.
-     * @param [in] aValue the data to write.
-     */
-    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-    CHIP_ERROR WriteScalarValue(const ConcreteAttributePath & aPath, T & aValue)
-    {
-        uint8_t value[sizeof(T)];
-        auto w = Encoding::LittleEndian::BufferWriter(value, sizeof(T));
-        w.EndianPut(uint64_t(aValue), sizeof(T));
-
-        return WriteValue(aPath, ByteSpan(value));
-    }
-
-    /**
-     * Read an attribute of type intX, uintX or bool from non-volatile memory.
-     *
-     * @param [in]     aPath the attribute path for the data being persisted.
-     * @param [in,out] aValue where to place the data.
-     */
-    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-    CHIP_ERROR ReadScalarValue(const ConcreteAttributePath & aPath, T & aValue)
-    {
-        uint8_t attrData[sizeof(T)];
-        MutableByteSpan tempVal(attrData);
-        // **Note** aType in the ReadValue function is only used to check if the value is of a string type. Since this template
-        // function is only enabled for integral values, we know that this case will not occur, so we can pass the enum of an
-        // arbitrary integral type. 0x20 is the ZCL enum type for ZCL_INT8U_ATTRIBUTE_TYPE.
-        auto err = ReadValue(aPath, 0x20, sizeof(T), tempVal);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-
-        chip::Encoding::LittleEndian::Reader r(tempVal.data(), tempVal.size());
-        r.RawReadLowLevelBeCareful(&aValue);
-        return r.StatusCode();
-    }
-
-    /**
-     * Write an attribute value of type nullable intX, uintX or bool to non-volatile memory.
-     *
-     * @param [in] aPath the attribute path for the data being written.
-     * @param [in] aValue the data to write.
-     */
-    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-    CHIP_ERROR WriteScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
-    {
-        if (aValue.IsNull())
-        {
-            auto nullVal = GetNullValueForNullableType<T>();
-            return WriteScalarValue(aPath, nullVal);
-        }
-        return WriteScalarValue(aPath, aValue.Value());
-    }
-
-    /**
-     * Read an attribute of type nullable intX, uintX from non-volatile memory.
-     *
-     * @param [in]     aPath the attribute path for the data being persisted.
-     * @param [in,out] aValue where to place the data.
-     */
-    template <typename T, std::enable_if_t<std::is_integral<T>::value && !std::is_same<bool, T>::value, bool> = true>
-    CHIP_ERROR ReadScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
-    {
-        T tempIntegral;
-
-        CHIP_ERROR err = ReadScalarValue(aPath, tempIntegral);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-
-        if (tempIntegral == GetNullValueForNullableType<T>())
-        {
-            aValue.SetNull();
-            return CHIP_NO_ERROR;
-        }
-
-        aValue.SetNonNull(tempIntegral);
-        return CHIP_NO_ERROR;
-    }
-
-    /**
-     * Read an attribute of type nullable bool from non-volatile memory.
-     *
-     * @param [in]     aPath the attribute path for the data being persisted.
-     * @param [in,out] aValue where to place the data.
-     */
-    template <typename T, std::enable_if_t<std::is_same<bool, T>::value, bool> = true>
-    CHIP_ERROR ReadScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
-    {
-        uint8_t tempIntegral;
-
-        CHIP_ERROR err = ReadScalarValue(aPath, tempIntegral);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-
-        if (tempIntegral == GetNullValueForNullableType<T>())
-        {
-            aValue.SetNull();
-            return CHIP_NO_ERROR;
-        }
-
-        aValue.SetNonNull(tempIntegral);
-        return CHIP_NO_ERROR;
-    }
 };
 
 /**

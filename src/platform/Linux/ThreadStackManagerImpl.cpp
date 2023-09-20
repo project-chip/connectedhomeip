@@ -21,6 +21,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #include <platform/PlatformManager.h>
 #include <platform/ThreadStackManager.h>
@@ -65,10 +66,10 @@ CHIP_ERROR GLibMatterContextSetActiveDataset(SetActiveDatasetContext * context)
     // all D-Bus signals will be delivered to the GLib global default main context.
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
 
-    std::unique_ptr<GBytes, GBytesDeleter> bytes(g_bytes_new(context->netInfo.data(), context->netInfo.size()));
+    GAutoPtr<GBytes> bytes(g_bytes_new(context->netInfo.data(), context->netInfo.size()));
     if (!bytes)
         return CHIP_ERROR_NO_MEMORY;
-    std::unique_ptr<GVariant, GVariantDeleter> value(g_variant_new_from_bytes(G_VARIANT_TYPE_BYTESTRING, bytes.release(), true));
+    GAutoPtr<GVariant> value(g_variant_new_from_bytes(G_VARIANT_TYPE_BYTESTRING, bytes.release(), true));
     if (!value)
         return CHIP_ERROR_NO_MEMORY;
     openthread_io_openthread_border_router_set_active_dataset_tlvs(context->proxy, value.release());
@@ -85,7 +86,7 @@ CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextInitThreadStack(ThreadStackM
     // all D-Bus signals will be delivered to the GLib global default main context.
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
 
-    std::unique_ptr<GError, GErrorDeleter> err;
+    GAutoPtr<GError> err;
     self->mProxy.reset(openthread_io_openthread_border_router_proxy_new_for_bus_sync(
         G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kDBusOpenThreadService, kDBusOpenThreadObjectPath, nullptr,
         &MakeUniquePointerReceiver(err).Get()));
@@ -107,7 +108,7 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 
     // If get property is called inside dbus thread (we are going to make it so), XXX_get_XXX can be used instead of XXX_dup_XXX
     // which is a little bit faster and the returned object doesn't need to be freed. Same for all following get properties.
-    std::unique_ptr<gchar, GFree> role(openthread_io_openthread_border_router_dup_device_role(mProxy.get()));
+    GAutoPtr<char> role(openthread_io_openthread_border_router_dup_device_role(mProxy.get()));
     if (role)
     {
         ThreadDeviceRoleChangedHandler(role.get());
@@ -125,7 +126,7 @@ void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorde
         const gchar * key;
         GVariant * value;
 
-        std::unique_ptr<GVariantIter, GVariantIterDeleter> iter;
+        GAutoPtr<GVariantIter> iter;
         g_variant_get(changed_properties, "a{sv}", &MakeUniquePointerReceiver(iter).Get());
         if (!iter)
             return;
@@ -189,13 +190,13 @@ bool ThreadStackManagerImpl::_HaveRouteToAddress(const Inet::IPAddress & destAdd
         return true;
     }
 
-    std::unique_ptr<GVariant, GVariantDeleter> routes(openthread_io_openthread_border_router_dup_external_routes(mProxy.get()));
+    GAutoPtr<GVariant> routes(openthread_io_openthread_border_router_dup_external_routes(mProxy.get()));
     if (!routes)
         return false;
 
     if (g_variant_n_children(routes.get()) > 0)
     {
-        std::unique_ptr<GVariantIter, GVariantIterDeleter> iter;
+        GAutoPtr<GVariantIter> iter;
         g_variant_get(routes.get(), "av", &MakeUniquePointerReceiver(iter).Get());
         if (!iter)
             return false;
@@ -205,7 +206,7 @@ bool ThreadStackManagerImpl::_HaveRouteToAddress(const Inet::IPAddress & destAdd
         {
             if (route == nullptr)
                 continue;
-            std::unique_ptr<GVariant, GVariantDeleter> prefix;
+            GAutoPtr<GVariant> prefix;
             guint16 rloc16;
             guchar preference;
             gboolean stable;
@@ -215,7 +216,7 @@ bool ThreadStackManagerImpl::_HaveRouteToAddress(const Inet::IPAddress & destAdd
             if (!prefix)
                 continue;
 
-            std::unique_ptr<GVariant, GVariantDeleter> address;
+            GAutoPtr<GVariant> address;
             guchar prefixLength;
             g_variant_get(prefix.get(), "(&vy)", &MakeUniquePointerReceiver(address).Get(), &prefixLength);
             if (!address)
@@ -273,12 +274,11 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(Thread::OperationalDatase
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
 
     {
-        std::unique_ptr<GError, GErrorDeleter> err;
-
-        std::unique_ptr<GVariant, GVariantDeleter> response(
-            g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
-                                   g_variant_new("(ss)", "io.openthread.BorderRouter", "ActiveDatasetTlvs"), G_DBUS_CALL_FLAGS_NONE,
-                                   -1, nullptr, &MakeUniquePointerReceiver(err).Get()));
+        GAutoPtr<GError> err;
+        GAutoPtr<GVariant> response(g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
+                                                           g_variant_new("(ss)", "io.openthread.BorderRouter", "ActiveDatasetTlvs"),
+                                                           G_DBUS_CALL_FLAGS_NONE, -1, nullptr,
+                                                           &MakeUniquePointerReceiver(err).Get()));
 
         if (err)
         {
@@ -293,14 +293,14 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(Thread::OperationalDatase
             return CHIP_ERROR_KEY_NOT_FOUND;
         }
 
-        std::unique_ptr<GVariant, GVariantDeleter> tupleContent(g_variant_get_child_value(response.get(), 0));
+        GAutoPtr<GVariant> tupleContent(g_variant_get_child_value(response.get(), 0));
 
         if (tupleContent == nullptr)
         {
             return CHIP_ERROR_KEY_NOT_FOUND;
         }
 
-        std::unique_ptr<GVariant, GVariantDeleter> value(g_variant_get_variant(tupleContent.get()));
+        GAutoPtr<GVariant> value(g_variant_get_variant(tupleContent.get()));
 
         if (value == nullptr)
         {
@@ -331,12 +331,10 @@ bool ThreadStackManagerImpl::_IsThreadEnabled()
 {
     VerifyOrReturnError(mProxy, false);
 
-    std::unique_ptr<GError, GErrorDeleter> err;
-
-    std::unique_ptr<GVariant, GVariantDeleter> response(
-        g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
-                               g_variant_new("(ss)", "io.openthread.BorderRouter", "DeviceRole"), G_DBUS_CALL_FLAGS_NONE, -1,
-                               nullptr, &MakeUniquePointerReceiver(err).Get()));
+    GAutoPtr<GError> err;
+    GAutoPtr<GVariant> response(g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
+                                                       g_variant_new("(ss)", "io.openthread.BorderRouter", "DeviceRole"),
+                                                       G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &MakeUniquePointerReceiver(err).Get()));
 
     if (err)
     {
@@ -349,14 +347,14 @@ bool ThreadStackManagerImpl::_IsThreadEnabled()
         return false;
     }
 
-    std::unique_ptr<GVariant, GVariantDeleter> tupleContent(g_variant_get_child_value(response.get(), 0));
+    GAutoPtr<GVariant> tupleContent(g_variant_get_child_value(response.get(), 0));
 
     if (tupleContent == nullptr)
     {
         return false;
     }
 
-    std::unique_ptr<GVariant, GVariantDeleter> value(g_variant_get_variant(tupleContent.get()));
+    GAutoPtr<GVariant> value(g_variant_get_variant(tupleContent.get()));
 
     if (value == nullptr)
     {
@@ -395,7 +393,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     }
     else
     {
-        std::unique_ptr<GError, GErrorDeleter> err;
+        GAutoPtr<GError> err;
         gboolean result =
             openthread_io_openthread_border_router_call_reset_sync(mProxy.get(), nullptr, &MakeUniquePointerReceiver(err).Get());
         if (err)
@@ -416,8 +414,8 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
 void ThreadStackManagerImpl::_OnThreadBrAttachFinished(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
     ThreadStackManagerImpl * this_ = reinterpret_cast<ThreadStackManagerImpl *>(user_data);
-    std::unique_ptr<GVariant, GVariantDeleter> attachRes;
-    std::unique_ptr<GError, GErrorDeleter> err;
+    GAutoPtr<GVariant> attachRes;
+    GAutoPtr<GError> err;
     {
         gboolean result = openthread_io_openthread_border_router_call_attach_finish(this_->mProxy.get(), res,
                                                                                     &MakeUniquePointerReceiver(err).Get());
@@ -457,7 +455,7 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
     }
 
-    std::unique_ptr<gchar, GFree> role(openthread_io_openthread_border_router_dup_device_role(mProxy.get()));
+    GAutoPtr<char> role(openthread_io_openthread_border_router_dup_device_role(mProxy.get()));
     if (!role)
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
     if (strcmp(role.get(), kOpenthreadDeviceRoleDetached) == 0 || strcmp(role.get(), kOpenthreadDeviceRoleDisabled) == 0)
@@ -466,7 +464,7 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
     }
     if (strcmp(role.get(), kOpenthreadDeviceRoleChild) == 0)
     {
-        std::unique_ptr<GVariant, GVariantDeleter> linkMode(openthread_io_openthread_border_router_dup_link_mode(mProxy.get()));
+        GAutoPtr<GVariant> linkMode(openthread_io_openthread_border_router_dup_link_mode(mProxy.get()));
         if (!linkMode)
             return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
         gboolean rx_on_when_idle;
@@ -511,7 +509,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadDeviceType(ConnectivityManager::Thr
 
     if (!network_data)
     {
-        std::unique_ptr<GVariant, GVariantDeleter> linkMode(g_variant_new("(bbb)", rx_on_when_idle, device_type, network_data));
+        GAutoPtr<GVariant> linkMode(g_variant_new("(bbb)", rx_on_when_idle, device_type, network_data));
         if (!linkMode)
             return CHIP_ERROR_NO_MEMORY;
         openthread_io_openthread_border_router_set_link_mode(mProxy.get(), linkMode.release());
@@ -520,32 +518,6 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadDeviceType(ConnectivityManager::Thr
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-CHIP_ERROR ThreadStackManagerImpl::_GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
-{
-    (void) intervalsConfig;
-
-    ChipLogError(DeviceLayer, "SED intervals config is not supported on linux");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
-{
-    (void) intervalsConfig;
-
-    ChipLogError(DeviceLayer, "SED intervals config is not supported on linux");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_RequestSEDActiveMode(bool onOff, bool delayIdle)
-{
-    (void) onOff;
-    (void) delayIdle;
-
-    ChipLogError(DeviceLayer, "SED intervals config is not supported on linux");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-#endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 CHIP_ERROR ThreadStackManagerImpl::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
 {
@@ -616,11 +588,6 @@ CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-void ThreadStackManagerImpl::_SetRouterPromotion(bool val)
-{
-    // Set Router Promotion is not supported on linux
-}
-
 CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextCallScan(ThreadStackManagerImpl * self)
 {
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
@@ -646,8 +613,8 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GObject * source_object, GAs
 
 void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
 {
-    std::unique_ptr<GVariant, GVariantDeleter> scan_result;
-    std::unique_ptr<GError, GErrorDeleter> err;
+    GAutoPtr<GVariant> scan_result;
+    GAutoPtr<GError> err;
     {
         gboolean result = openthread_io_openthread_border_router_call_scan_finish(
             mProxy.get(), &MakeUniquePointerReceiver(scan_result).Get(), res, &MakeUniquePointerReceiver(err).Get());
@@ -671,8 +638,8 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
 
     if (g_variant_n_children(scan_result.get()) > 0)
     {
-        std::unique_ptr<GVariantIter, GVariantIterDeleter> iter;
-        g_variant_get(scan_result.get(), "a(tstayqqyyyybb)", &MakeUniquePointerReceiver(iter).Get());
+        GAutoPtr<GVariantIter> iter;
+        g_variant_get(scan_result.get(), "a(tstayqqynyybb)", &MakeUniquePointerReceiver(iter).Get());
         if (!iter)
         {
             delete scanResult;
@@ -686,17 +653,17 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
         guint16 panid;
         guint16 joiner_udp_port;
         guint8 channel;
-        guint8 rssi;
+        gint16 rssi;
         guint8 lqi;
         guint8 version;
         gboolean is_native;
         gboolean is_joinable;
 
-        while (g_variant_iter_loop(iter.get(), "(tstayqqyyyybb)", &ext_address, &network_name, &ext_panid, &steering_data, &panid,
+        while (g_variant_iter_loop(iter.get(), "(tstayqqynyybb)", &ext_address, &network_name, &ext_panid, &steering_data, &panid,
                                    &joiner_udp_port, &channel, &rssi, &lqi, &version, &is_native, &is_joinable))
         {
             ChipLogProgress(DeviceLayer,
-                            "Thread Network: %s (%016" PRIx64 ") ExtPanId(%016" PRIx64 ") RSSI %u LQI %u"
+                            "Thread Network: %s (%016" PRIx64 ") ExtPanId(%016" PRIx64 ") RSSI %d LQI %u"
                             " Version %u",
                             network_name, ext_address, ext_panid, rssi, lqi, version);
             NetworkCommissioning::ThreadScanResponse networkScanned;
@@ -713,8 +680,19 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
             networkScanned.channel         = channel;
             networkScanned.version         = version;
             networkScanned.extendedAddress = 0;
-            networkScanned.rssi            = rssi;
-            networkScanned.lqi             = lqi;
+            if (rssi > std::numeric_limits<int8_t>::max())
+            {
+                networkScanned.rssi = std::numeric_limits<int8_t>::max();
+            }
+            else if (rssi < std::numeric_limits<int8_t>::min())
+            {
+                networkScanned.rssi = std::numeric_limits<int8_t>::min();
+            }
+            else
+            {
+                networkScanned.rssi = static_cast<int8_t>(rssi);
+            }
+            networkScanned.lqi = lqi;
 
             scanResult->push_back(networkScanned);
         }

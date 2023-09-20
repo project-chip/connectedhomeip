@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,15 +31,15 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the global attribute: ClusterRevision"
+    - label: "Step 2: read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 5
+          value: 6
           constraints:
               type: int16u
 
-    - label: "Read the global attribute: FeatureMap"
+    - label: "Step 3a: Read the global attribute: FeatureMap"
       PICS: ( !CC.S.F00 && !CC.S.F01 && !CC.S.F02 && !CC.S.F03 && !CC.S.F04 )
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -48,7 +48,8 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Given CC.S.F00(HS) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3b: Given CC.S.F00(HS) ensure featuremap has the correct bit set"
       PICS: CC.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -57,7 +58,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x1]
 
-    - label: "Given CC.S.F01(EHue) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3c: Given CC.S.F01(EHue) ensure featuremap has the correct bit
+          set"
       PICS: CC.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -66,7 +69,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x2]
 
-    - label: "Given CC.S.F02(CL) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3d: Given CC.S.F02(CL) ensure featuremap has the correct bit set"
       PICS: CC.S.F02
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -75,7 +79,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x4]
 
-    - label: "Given CC.S.F03(XY) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3e: Given CC.S.F03(XY) ensure featuremap has the correct bit set"
       PICS: CC.S.F03
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -84,7 +89,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x8]
 
-    - label: "Given CC.S.F04(CT) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3f: Given CC.S.F04(CT) ensure featuremap has the correct bit set"
       PICS: CC.S.F04
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -93,7 +99,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x10]
 
-    - label: "Read the global attribute: AttributeList"
+    - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -113,7 +120,16 @@ tests:
                       65533,
                   ]
 
-    - label: "Read the optional attribute(CurrentHue) in AttributeList"
+    - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [8, 15, 16385, 16394, 65528, 65529, 65531, 65532, 65533]
+
+    - label: "Step 4b: Read the optional attribute(CurrentHue) in AttributeList"
       PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "AttributeList"
@@ -122,7 +138,9 @@ tests:
               type: list
               contains: [0]
 
-    - label: "Read the optional attribute(CurrentSaturation) in AttributeList"
+    - label:
+          "Step 4c: Read the optional attribute(CurrentSaturation) in
+          AttributeList"
       PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
@@ -131,7 +149,8 @@ tests:
               type: list
               contains: [1]
 
-    - label: "Read the optional attribute(RemainingTime) in AttributeList"
+    - label:
+          "Step 4d: Read the optional attribute(RemainingTime) in AttributeList"
       PICS: CC.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"
@@ -140,7 +159,7 @@ tests:
               type: list
               contains: [2]
 
-    - label: "Read the optional attribute(CurrentX) in AttributeList"
+    - label: "Step 4e: Read the optional attribute(CurrentX) in AttributeList"
       PICS: CC.S.A0003
       command: "readAttribute"
       attribute: "AttributeList"
@@ -149,7 +168,7 @@ tests:
               type: list
               contains: [3]
 
-    - label: "Read the optional attribute(CurrentY) in AttributeList"
+    - label: "Step 4f: Read the optional attribute(CurrentY) in AttributeList"
       PICS: CC.S.A0004
       command: "readAttribute"
       attribute: "AttributeList"
@@ -158,7 +177,9 @@ tests:
               type: list
               contains: [4]
 
-    - label: "Read the optional attribute(DriftCompensation) in AttributeList"
+    - label:
+          "Step 4g: Read the optional attribute(DriftCompensation) in
+          AttributeList"
       PICS: CC.S.A0005
       command: "readAttribute"
       attribute: "AttributeList"
@@ -167,7 +188,9 @@ tests:
               type: list
               contains: [5]
 
-    - label: "Read the optional attribute(CompensationText) in AttributeList"
+    - label:
+          "Step 4h: Read the optional attribute(CompensationText) in
+          AttributeList"
       PICS: CC.S.A0006
       command: "readAttribute"
       attribute: "AttributeList"
@@ -177,7 +200,8 @@ tests:
               contains: [6]
 
     - label:
-          "Read the optional attribute(ColorTemperatureMireds) in AttributeList"
+          "Step 4i: Read the optional attribute(ColorTemperatureMireds) in
+          AttributeList"
       PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "AttributeList"
@@ -186,7 +210,9 @@ tests:
               type: list
               contains: [7]
 
-    - label: "Read the optional attribute(NumberOfPrimaries) in AttributeList"
+    - label:
+          "Step 4j: Read the optional attribute(NumberOfPrimaries) in
+          AttributeList"
       PICS: CC.S.A0010
       command: "readAttribute"
       attribute: "AttributeList"
@@ -195,7 +221,7 @@ tests:
               type: list
               contains: [16]
 
-    - label: "Read the optional attribute(Primary1X) in AttributeList"
+    - label: "Step 4k: Read the optional attribute(Primary1X) in AttributeList"
       PICS: CC.S.A0011
       command: "readAttribute"
       attribute: "AttributeList"
@@ -204,7 +230,7 @@ tests:
               type: list
               contains: [17]
 
-    - label: "Read the optional attribute(Primary1Y) in AttributeList"
+    - label: "Step 4l: Read the optional attribute(Primary1Y) in AttributeList"
       PICS: CC.S.A0012
       command: "readAttribute"
       attribute: "AttributeList"
@@ -213,7 +239,9 @@ tests:
               type: list
               contains: [18]
 
-    - label: "Read the optional attribute(Primary1Intensity) in AttributeList"
+    - label:
+          "Step 4m: Read the optional attribute(Primary1Intensity) in
+          AttributeList"
       PICS: CC.S.A0013
       command: "readAttribute"
       attribute: "AttributeList"
@@ -222,7 +250,7 @@ tests:
               type: list
               contains: [19]
 
-    - label: "Read the optional attribute(Primary2X) in AttributeList"
+    - label: "Step 4n: Read the optional attribute(Primary2X) in AttributeList"
       PICS: CC.S.A0015
       command: "readAttribute"
       attribute: "AttributeList"
@@ -231,7 +259,7 @@ tests:
               type: list
               contains: [21]
 
-    - label: "Read the optional attribute(Primary2Y) in AttributeList"
+    - label: "Step 4o: Read the optional attribute(Primary2Y) in AttributeList"
       PICS: CC.S.A0016
       command: "readAttribute"
       attribute: "AttributeList"
@@ -240,7 +268,9 @@ tests:
               type: list
               contains: [22]
 
-    - label: "Read the optional attribute(Primary2Intensity) in AttributeList"
+    - label:
+          "Step 4p: Read the optional attribute(Primary2Intensity) in
+          AttributeList"
       PICS: CC.S.A0017
       command: "readAttribute"
       attribute: "AttributeList"
@@ -249,7 +279,7 @@ tests:
               type: list
               contains: [23]
 
-    - label: "Read the optional attribute(Primary3X) in AttributeList"
+    - label: "Step 4q: Read the optional attribute(Primary3X) in AttributeList"
       PICS: CC.S.A0019
       command: "readAttribute"
       attribute: "AttributeList"
@@ -258,7 +288,7 @@ tests:
               type: list
               contains: [25]
 
-    - label: "Read the optional attribute(Primary3Y) in AttributeList"
+    - label: "Step 4r: Read the optional attribute(Primary3Y) in AttributeList"
       PICS: CC.S.A001a
       command: "readAttribute"
       attribute: "AttributeList"
@@ -267,7 +297,9 @@ tests:
               type: list
               contains: [26]
 
-    - label: "Read the optional attribute(Primary3Intensity) in AttributeList"
+    - label:
+          "Step 4s: Read the optional attribute(Primary3Intensity) in
+          AttributeList"
       PICS: CC.S.A001b
       command: "readAttribute"
       attribute: "AttributeList"
@@ -276,7 +308,7 @@ tests:
               type: list
               contains: [27]
 
-    - label: "Read the optional attribute(Primary4X) in AttributeList"
+    - label: "Step 4t: Read the optional attribute(Primary4X) in AttributeList"
       PICS: CC.S.A0020
       command: "readAttribute"
       attribute: "AttributeList"
@@ -285,7 +317,7 @@ tests:
               type: list
               contains: [32]
 
-    - label: "Read the optional attribute(Primary4Y) in AttributeList"
+    - label: "Step 4u: Read the optional attribute(Primary4Y) in AttributeList"
       PICS: CC.S.A0021
       command: "readAttribute"
       attribute: "AttributeList"
@@ -294,7 +326,9 @@ tests:
               type: list
               contains: [33]
 
-    - label: "Read the optional attribute(Primary4Intensity) in AttributeList"
+    - label:
+          "Step 4v: Read the optional attribute(Primary4Intensity) in
+          AttributeList"
       PICS: CC.S.A0022
       command: "readAttribute"
       attribute: "AttributeList"
@@ -303,7 +337,7 @@ tests:
               type: list
               contains: [34]
 
-    - label: "Read the optional attribute(Primary5X) in AttributeList"
+    - label: "Step 4w: Read the optional attribute(Primary5X) in AttributeList"
       PICS: CC.S.A0024
       command: "readAttribute"
       attribute: "AttributeList"
@@ -312,7 +346,7 @@ tests:
               type: list
               contains: [36]
 
-    - label: "Read the optional attribute(Primary5Y) in AttributeList"
+    - label: "Step 4x: Read the optional attribute(Primary5Y) in AttributeList"
       PICS: CC.S.A0025
       command: "readAttribute"
       attribute: "AttributeList"
@@ -321,7 +355,9 @@ tests:
               type: list
               contains: [37]
 
-    - label: "Read the optional attribute(Primary5Intensity) in AttributeList"
+    - label:
+          "Step 4y: Read the optional attribute(Primary5Intensity) in
+          AttributeList"
       PICS: CC.S.A0026
       command: "readAttribute"
       attribute: "AttributeList"
@@ -330,7 +366,7 @@ tests:
               type: list
               contains: [38]
 
-    - label: "Read the optional attribute(Primary6X) in AttributeList"
+    - label: "Step 4z: Read the optional attribute(Primary6X) in AttributeList"
       PICS: CC.S.A0028
       command: "readAttribute"
       attribute: "AttributeList"
@@ -339,7 +375,7 @@ tests:
               type: list
               contains: [40]
 
-    - label: "Read the optional attribute(Primary6Y) in AttributeList"
+    - label: "Step 4a1: Read the optional attribute(Primary6Y) in AttributeList"
       PICS: CC.S.A0029
       command: "readAttribute"
       attribute: "AttributeList"
@@ -348,7 +384,9 @@ tests:
               type: list
               contains: [41]
 
-    - label: "Read the optional attribute(Primary6Intensity) in AttributeList"
+    - label:
+          "Step 4a2: Read the optional attribute(Primary6Intensity) in
+          AttributeList"
       PICS: CC.S.A002a
       command: "readAttribute"
       attribute: "AttributeList"
@@ -357,7 +395,8 @@ tests:
               type: list
               contains: [42]
 
-    - label: "Read the optional attribute(WhitePointX) in AttributeList"
+    - label:
+          "Step 4a3: Read the optional attribute(WhitePointX) in AttributeList"
       PICS: CC.S.A0030
       command: "readAttribute"
       attribute: "AttributeList"
@@ -366,7 +405,8 @@ tests:
               type: list
               contains: [48]
 
-    - label: "Read the optional attribute(WhitePointY) in AttributeList"
+    - label:
+          "Step 4a4: Read the optional attribute(WhitePointY) in AttributeList"
       PICS: CC.S.A0031
       command: "readAttribute"
       attribute: "AttributeList"
@@ -375,7 +415,8 @@ tests:
               type: list
               contains: [49]
 
-    - label: "Read the optional attribute(ColorPointRX) in AttributeList"
+    - label:
+          "Step 4a5: Read the optional attribute(ColorPointRX) in AttributeList"
       PICS: CC.S.A0032
       command: "readAttribute"
       attribute: "AttributeList"
@@ -384,7 +425,8 @@ tests:
               type: list
               contains: [50]
 
-    - label: "Read the optional attribute(ColorPointRY) in AttributeList"
+    - label:
+          "Step 4a6: Read the optional attribute(ColorPointRY) in AttributeList"
       PICS: CC.S.A0033
       command: "readAttribute"
       attribute: "AttributeList"
@@ -394,7 +436,8 @@ tests:
               contains: [51]
 
     - label:
-          "Read the optional attribute(ColorPointRIntensity) in AttributeList"
+          "Step 4a7: Read the optional attribute(ColorPointRIntensity) in
+          AttributeList"
       PICS: CC.S.A0034
       command: "readAttribute"
       attribute: "AttributeList"
@@ -403,7 +446,8 @@ tests:
               type: list
               contains: [52]
 
-    - label: "Read the optional attribute(ColorPointGX) in AttributeList"
+    - label:
+          "Step 4a8: Read the optional attribute(ColorPointGX) in AttributeList"
       PICS: CC.S.A0036
       command: "readAttribute"
       attribute: "AttributeList"
@@ -412,7 +456,8 @@ tests:
               type: list
               contains: [54]
 
-    - label: "Read the optional attribute(ColorPointGY) in AttributeList"
+    - label:
+          "Step 4a9: Read the optional attribute(ColorPointGY) in AttributeList"
       PICS: CC.S.A0037
       command: "readAttribute"
       attribute: "AttributeList"
@@ -422,7 +467,8 @@ tests:
               contains: [55]
 
     - label:
-          "Read the optional attribute(ColorPointGIntensity) in AttributeList"
+          "Step 4a10: Read the optional attribute(ColorPointGIntensity) in
+          AttributeList"
       PICS: CC.S.A0038
       command: "readAttribute"
       attribute: "AttributeList"
@@ -431,7 +477,8 @@ tests:
               type: list
               contains: [56]
 
-    - label: "Read the optional attribute(ColorPointBX) in AttributeList"
+    - label:
+          "Step 4a11: Read the optional attribute(ColorPointBX) in AttributeList"
       PICS: CC.S.A003a
       command: "readAttribute"
       attribute: "AttributeList"
@@ -440,7 +487,8 @@ tests:
               type: list
               contains: [58]
 
-    - label: "Read the optional attribute(ColorPointBY) in AttributeList"
+    - label:
+          "Step 4a12: Read the optional attribute(ColorPointBY) in AttributeList"
       PICS: CC.S.A003b
       command: "readAttribute"
       attribute: "AttributeList"
@@ -450,7 +498,8 @@ tests:
               contains: [59]
 
     - label:
-          "Read the optional attribute(ColorPointBIntensity) in AttributeList"
+          "Step 4a13: Read the optional attribute(ColorPointBIntensity) in
+          AttributeList"
       PICS: CC.S.A003c
       command: "readAttribute"
       attribute: "AttributeList"
@@ -459,7 +508,9 @@ tests:
               type: list
               contains: [60]
 
-    - label: "Read the optional attribute(EnhancedCurrentHue) in AttributeList"
+    - label:
+          "Step 4a14: Read the optional attribute(EnhancedCurrentHue) in
+          AttributeList"
       PICS: CC.S.A4000
       command: "readAttribute"
       attribute: "AttributeList"
@@ -468,7 +519,9 @@ tests:
               type: list
               contains: [16384]
 
-    - label: "Read the optional attribute(ColorLoopActive) in AttributeList"
+    - label:
+          "Step 4a15: Read the optional attribute(ColorLoopActive) in
+          AttributeList"
       PICS: CC.S.A4002
       command: "readAttribute"
       attribute: "AttributeList"
@@ -477,7 +530,9 @@ tests:
               type: list
               contains: [16386]
 
-    - label: "Read the optional attribute(ColorLoopDirection) in AttributeList"
+    - label:
+          "Step 4a16: Read the optional attribute(ColorLoopDirection) in
+          AttributeList"
       PICS: CC.S.A4003
       command: "readAttribute"
       attribute: "AttributeList"
@@ -486,7 +541,9 @@ tests:
               type: list
               contains: [16387]
 
-    - label: "Read the optional attribute(ColorLoopTime) in AttributeList"
+    - label:
+          "Step 4a17: Read the optional attribute(ColorLoopTime) in
+          AttributeList"
       PICS: CC.S.A4004
       command: "readAttribute"
       attribute: "AttributeList"
@@ -496,7 +553,7 @@ tests:
               contains: [16388]
 
     - label:
-          "Read the optional attribute(ColorLoopStartEnhancedHue) in
+          "Step 4a18: Read the optional attribute(ColorLoopStartEnhancedHue) in
           AttributeList"
       PICS: CC.S.A4005
       command: "readAttribute"
@@ -507,7 +564,7 @@ tests:
               contains: [16389]
 
     - label:
-          "Read the optional attribute(ColorLoopStoredEnhancedHue) in
+          "Step 4a19: Read the optional attribute(ColorLoopStoredEnhancedHue) in
           AttributeList"
       PICS: CC.S.A4006
       command: "readAttribute"
@@ -518,7 +575,7 @@ tests:
               contains: [16390]
 
     - label:
-          "Read the optional attribute(ColorTempPhysicalMinMireds) in
+          "Step 4a20: Read the optional attribute(ColorTempPhysicalMinMireds) in
           AttributeList"
       PICS: CC.S.A400b
       command: "readAttribute"
@@ -529,7 +586,7 @@ tests:
               contains: [16395]
 
     - label:
-          "Read the optional attribute(ColorTempPhysicalMaxMireds) in
+          "Step 4a21: Read the optional attribute(ColorTempPhysicalMaxMireds) in
           AttributeList"
       PICS: CC.S.A400c
       command: "readAttribute"
@@ -540,8 +597,8 @@ tests:
               contains: [16396]
 
     - label:
-          "Read the optional attribute(CoupleColorTempToLevelMinMireds) in
-          AttributeList"
+          "Step 4a22: Read the optional
+          attribute(CoupleColorTempToLevelMinMireds) in AttributeList"
       PICS: CC.S.A400d
       command: "readAttribute"
       attribute: "AttributeList"
@@ -551,8 +608,8 @@ tests:
               contains: [16397]
 
     - label:
-          "Read the optional attribute(StartUpColorTemperatureMireds) in
-          AttributeList"
+          "Step 4a23: Read the optional attribute(StartUpColorTemperatureMireds)
+          in AttributeList"
       PICS: CC.S.A4010
       command: "readAttribute"
       attribute: "AttributeList"
@@ -561,7 +618,8 @@ tests:
               type: list
               contains: [16400]
 
-    - label: "Read the global attribute: EventList"
+    - label: "Step 5: Read the global attribute: EventList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -569,7 +627,8 @@ tests:
           constraints:
               type: list
 
-    - label: "Read the optional command(MoveToHue) in AcceptedCommandList"
+    - label:
+          "Step 6a: Read the optional command(MoveToHue) in AcceptedCommandList"
       PICS: CC.S.C00.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -578,7 +637,8 @@ tests:
               type: list
               contains: [0]
 
-    - label: "Read the optional command(MoveHue) in AcceptedCommandList"
+    - label:
+          "Step 6b: Read the optional command(MoveHue) in AcceptedCommandList"
       PICS: CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -587,7 +647,8 @@ tests:
               type: list
               contains: [1]
 
-    - label: "Read the optional command(StepHue) in AcceptedCommandList"
+    - label:
+          "Step 6c: Read the optional command(StepHue) in AcceptedCommandList"
       PICS: CC.S.C02.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -597,7 +658,8 @@ tests:
               contains: [2]
 
     - label:
-          "Read the optional command(MoveToSaturation) in AcceptedCommandList"
+          "Step 6d: Read the optional command(MoveToSaturation) in
+          AcceptedCommandList"
       PICS: CC.S.C03.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -606,7 +668,9 @@ tests:
               type: list
               contains: [3]
 
-    - label: "Read the optional command(MoveSaturation) in AcceptedCommandList"
+    - label:
+          "Step 6e: Read the optional command(MoveSaturation) in
+          AcceptedCommandList"
       PICS: CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -615,7 +679,9 @@ tests:
               type: list
               contains: [4]
 
-    - label: "Read the optional command(StepSaturation) in AcceptedCommandList"
+    - label:
+          "Step 6f: Read the optional command(StepSaturation) in
+          AcceptedCommandList"
       PICS: CC.S.C05.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -625,7 +691,7 @@ tests:
               contains: [5]
 
     - label:
-          "Read the optional command(MoveToHueAndSaturation) in
+          "Step 6g: Read the optional command(MoveToHueAndSaturation) in
           AcceptedCommandList"
       PICS: CC.S.C06.Rsp
       command: "readAttribute"
@@ -635,7 +701,9 @@ tests:
               type: list
               contains: [6]
 
-    - label: "Read the optional command(MoveToColor) in AcceptedCommandList"
+    - label:
+          "Step 6h: Read the optional command(MoveToColor) in
+          AcceptedCommandList"
       PICS: CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -644,7 +712,8 @@ tests:
               type: list
               contains: [7]
 
-    - label: "Read the optional command(MoveColor) in AcceptedCommandList"
+    - label:
+          "Step 6i: Read the optional command(MoveColor) in AcceptedCommandList"
       PICS: CC.S.C08.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -653,7 +722,8 @@ tests:
               type: list
               contains: [8]
 
-    - label: "Read the optional command(StepColor) in AcceptedCommandList"
+    - label:
+          "Step 6j: Read the optional command(StepColor) in AcceptedCommandList"
       PICS: CC.S.C09.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -663,7 +733,7 @@ tests:
               contains: [9]
 
     - label:
-          "Read the optional command(MoveToColorTemperature) in
+          "Step 6k: Read the optional command(MoveToColorTemperature) in
           AcceptedCommandList"
       PICS: CC.S.C0a.Rsp
       command: "readAttribute"
@@ -674,7 +744,8 @@ tests:
               contains: [10]
 
     - label:
-          "Read the optional command(EnhancedMoveToHue) in AcceptedCommandList"
+          "Step 6l: Read the optional command(EnhancedMoveToHue) in
+          AcceptedCommandList"
       PICS: CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -683,7 +754,9 @@ tests:
               type: list
               contains: [64]
 
-    - label: "Read the optional command(EnhancedMoveHue) in AcceptedCommandList"
+    - label:
+          "Step 6m: Read the optional command(EnhancedMoveHue) in
+          AcceptedCommandList"
       PICS: CC.S.C41.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -692,7 +765,9 @@ tests:
               type: list
               contains: [65]
 
-    - label: "Read the optional command(EnhancedStepHue) in AcceptedCommandList"
+    - label:
+          "Step 6n: Read the optional command(EnhancedStepHue) in
+          AcceptedCommandList"
       PICS: CC.S.C42.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -702,7 +777,7 @@ tests:
               contains: [66]
 
     - label:
-          "Read the optional command(EnhancedMoveToHueAndSaturation) in
+          "Step 6o: Read the optional command(EnhancedMoveToHueAndSaturation) in
           AcceptedCommandList"
       PICS: CC.S.C43.Rsp
       command: "readAttribute"
@@ -712,7 +787,9 @@ tests:
               type: list
               contains: [67]
 
-    - label: "Read the optional command(ColorLoopSet) in AcceptedCommandList"
+    - label:
+          "Step 6p: Read the optional command(ColorLoopSet) in
+          AcceptedCommandList"
       PICS: CC.S.C44.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -721,7 +798,9 @@ tests:
               type: list
               contains: [68]
 
-    - label: "Read the optional command(StopMoveStep) in AcceptedCommandList"
+    - label:
+          "Step 6q: Read the optional command(StopMoveStep) in
+          AcceptedCommandList"
       PICS: CC.S.C47.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -731,7 +810,7 @@ tests:
               contains: [71]
 
     - label:
-          "Read the optional command(MoveColorTemperature) in
+          "Step 6r: Read the optional command(MoveColorTemperature) in
           AcceptedCommandList"
       PICS: CC.S.C4b.Rsp
       command: "readAttribute"
@@ -742,7 +821,7 @@ tests:
               contains: [75]
 
     - label:
-          "Read the optional command(StepColorTemperature) in
+          "Step 6s: Read the optional command(StepColorTemperature) in
           AcceptedCommandList"
       PICS: CC.S.C4c.Rsp
       command: "readAttribute"
@@ -752,7 +831,7 @@ tests:
               type: list
               contains: [76]
 
-    - label: "Read the global attribute: GeneratedCommandList"
+    - label: "Step 7: Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

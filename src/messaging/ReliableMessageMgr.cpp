@@ -131,19 +131,22 @@ void ReliableMessageMgr::ExecuteActions()
 
         if (sendCount == CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS)
         {
+            // Make sure our exchange stays alive until we are done working with it.
+            ExchangeHandle ec(entry->ec);
+
             ChipLogError(ExchangeManager,
                          "Failed to Send CHIP MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange
                          " sendCount: %u max retries: %d",
-                         messageCounter, ChipLogValueExchange(&entry->ec.Get()), sendCount, CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
+                         messageCounter, ChipLogValueExchange(&ec.Get()), sendCount, CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
 
             // Don't check whether the session in the exchange is valid, because when the session is released, the retrans entry is
             // cleared inside ExchangeContext::OnSessionReleased, so the session must be valid if the entry exists.
-            SessionHandle session = entry->ec->GetSessionHandle();
+            SessionHandle session = ec->GetSessionHandle();
 
             // If the exchange is expecting a response, it will handle sending
             // this notification once it detects that it has not gotten a
             // response.  Otherwise, we need to do it.
-            if (!entry->ec->IsResponseExpected())
+            if (!ec->IsResponseExpected())
             {
                 if (session->IsSecureSession() && session->AsSecureSession()->IsCASESession())
                 {
@@ -154,6 +157,13 @@ void ReliableMessageMgr::ExecuteActions()
 
             // Do not StartTimer, we will schedule the timer at the end of the timer handler.
             mRetransTable.ReleaseObject(entry);
+
+            // Dropping our entry marked the exchange as not having an un-acked
+            // message... but of course it _does_ have an un-acked message and
+            // we have just given up on waiting for the ack.
+
+            ec->GetReliableMessageContext()->SetMessageNotAcked(true);
+
             return Loop::Continue;
         }
 
@@ -258,13 +268,6 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
     //   "An ICD sender SHOULD increase t to also account for its own sleepy interval
     //   required to receive the acknowledgment"
     mrpBackoffTime += app::ICDManager::GetFastPollingInterval();
-#elif CHIP_DEVICE_CONFIG_ENABLE_SED
-    DeviceLayer::ConnectivityManager::SEDIntervalsConfig sedIntervals;
-
-    if (DeviceLayer::ConnectivityMgr().GetSEDIntervalsConfig(sedIntervals) == CHIP_NO_ERROR)
-    {
-        mrpBackoffTime += System::Clock::Timestamp(sedIntervals.ActiveIntervalMS);
-    }
 #endif
 
     mrpBackoffTime += CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
@@ -323,6 +326,19 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
 
     if (err == CHIP_NO_ERROR)
     {
+#if CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
+        DeviceLayer::ChipDeviceEvent event;
+        // Here always set ExpectResponse to false.
+        // The Initial message sent from the Exchange Context will have set ExpectResponse to the correct value.
+        // If we are expecting a Response, the ICD will already be in a state waiting for the response (or timeout).
+        event.Type                       = DeviceLayer::DeviceEventType::kChipMsgSentEvent;
+        event.MessageSent.ExpectResponse = false;
+        CHIP_ERROR status                = DeviceLayer::PlatformMgr().PostEvent(&event);
+        if (status != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to post retransmit message sent event %" CHIP_ERROR_FORMAT, status.Format());
+        }
+#endif // CONFIG_DEVICE_LAYER
 #if CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
         const ExchangeManager * exchangeMgr = entry->ec->GetExchangeMgr();
         // TODO: investigate why in ReliableMessageMgr::CheckResendApplicationMessageWithPeerExchange unit test released exchange

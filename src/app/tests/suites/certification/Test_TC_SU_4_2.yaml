@@ -26,8 +26,8 @@ config:
 
 tests:
     - label:
-          "DUT sends a write request for the DefaultOTAProviders Attribute to
-          the TH."
+          "Step 1: DUT sends a write request for the DefaultOTAProviders
+          Attribute to the TH."
       verification: |
           Verify that the OTA Requestor App receives the write command and does not reject the value as invalid.
 
@@ -85,11 +85,10 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends a read request to read the DefaultOTAProviders Attribute to
-          the TH."
+          "Step 2: DUT sends a read request to read the DefaultOTAProviders
+          Attribute to the TH."
       verification: |
           Verify that the OTA Requestor App responds to the read command
-
 
           ./chip-tool otasoftwareupdaterequestor read default-otaproviders 321 0
 
@@ -109,19 +108,11 @@ tests:
           [1662651381.709127][30167:30167] CHIP:DMG:         ],
           [1662651381.709159][30167:30167] CHIP:DMG:
           [1662651381.709189][30167:30167] CHIP:DMG:         isFabricFiltered = true,
-          [1662651381.709216][30167:30167] CHIP:DMG:         InteractionModelRevision = 1
-          [1662651381.709240][30167:30167] CHIP:DMG: },
-          [1662651381.709323][30167:30167] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1662651381.709451][30167:30167] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
-          [1662651381.709485][30167:30167] CHIP:DMG: <RE:Run> Cluster 2a, Attribute 0 is dirty
-          [1662651381.709507][30167:30167] CHIP:DMG: Reading attribute: Cluster=0x0000_002A Endpoint=0 AttributeId=0x0000_0000 (expanded=0)
-          [1662651381.709537][30167:30167] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_002A e=0 p=v
-          [1662651381.709572][30167:30167] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label:
-          "DUT sends a read request to read the UpdatePossible attribute from
-          the TH."
+          "Step 3: DUT sends a read request to read the UpdatePossible attribute
+          from the TH."
       verification: |
           Verify that the OTA Requestor App responds to the read command
 
@@ -143,18 +134,11 @@ tests:
           [1662651426.055654][30167:30167] CHIP:DMG:
           [1662651426.055701][30167:30167] CHIP:DMG:         ],
           [1662651426.055747][30167:30167] CHIP:DMG:
-          [1662651426.055828][30167:30167] CHIP:DMG:         isFabricFiltered = true,
-          [1662651426.055877][30167:30167] CHIP:DMG:         InteractionModelRevision = 1
-          [1662651426.055918][30167:30167] CHIP:DMG: },
-          [1662651426.056030][30167:30167] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1662651426.056216][30167:30167] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
-          [1662651426.056270][30167:30167] CHIP:DMG: <RE:Run> Cluster 2a, Attribute 1 is dirty
-          [1662651426.056307][30167:30167] CHIP:DMG: Reading attribute: Cluster=0x0000_002A Endpoint=0 AttributeId=0x0000_0001 (expanded=0)
       disabled: true
 
     - label:
-          "DUT sends a read request to read the UpdateState Attribute from the
-          TH."
+          "Step 4: DUT sends a read request to read the UpdateState Attribute
+          from the TH."
       verification: |
           Verify that the OTA Requestor App responds to the read command
 
@@ -176,24 +160,21 @@ tests:
           [1662651459.325138][30167:30167] CHIP:DMG:
           [1662651459.325188][30167:30167] CHIP:DMG:         ],
           [1662651459.325240][30167:30167] CHIP:DMG:
-          [1662651459.325292][30167:30167] CHIP:DMG:         isFabricFiltered = true,
-          [1662651459.325341][30167:30167] CHIP:DMG:         InteractionModelRevision = 1
-          [1662651459.325386][30167:30167] CHIP:DMG: },
-          [1662651459.325513][30167:30167] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1662651459.325681][30167:30167] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
-          [1662651459.325737][30167:30167] CHIP:DMG: <RE:Run> Cluster 2a, Attribute 2 is dirty
-          [1662651459.325778][30167:30167] CHIP:DMG: Reading attribute: Cluster=0x0000_002A Endpoint=0 AttributeId=0x0000_0002 (expanded=0)
-          [1662651459.325829][30167:30167] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_002A e=0 p=v
       disabled: true
 
     - label:
-          "TH should start initiating the Software update process. While the TH
-          is downloading the image, DUT sends a read request to read the
+          "Step 5: TH should start initiating the Software update process. While
+          the TH is downloading the image, DUT sends a read request to read the
           UpdateStateProgress attribute from the TH."
       verification: |
           Write the acl entry to allow the software update:
 
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [321], "targets": null}]' 123 0
+
+          [1686306394.095355][30543:30545] CHIP:DMG:                         StatusIB =
+          [1686306394.095380][30543:30545] CHIP:DMG:                         {
+          [1686306394.095404][30543:30545] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1686306394.095436][30543:30545] CHIP:DMG:                         },
 
           Run the announce ota provider command to start the software update and check the UpdateStateProgress
 

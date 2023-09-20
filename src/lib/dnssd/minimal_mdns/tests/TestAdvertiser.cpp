@@ -80,7 +80,8 @@ OperationalAdvertisingParameters operationalParams1 =
         .SetPort(CHIP_PORT)
         .EnableIpV4(true)
         .SetTcpSupported(chip::Optional<bool>(false))
-        .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(32_ms32, 30_ms32)); // Match SII, SAI below
+        .SetLocalMRPConfig(chip::Optional<ReliableMessageProtocolConfig>::Value(
+            32_ms32, 30_ms32)); // Match SII, SAI. SAT not provided so it uses default 4000ms
 OperationalAdvertisingParameters operationalParams2 =
     OperationalAdvertisingParameters().SetPeerId(kPeerId2).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
 OperationalAdvertisingParameters operationalParams3 =
@@ -91,7 +92,7 @@ OperationalAdvertisingParameters operationalParams5 =
     OperationalAdvertisingParameters().SetPeerId(kPeerId5).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
 OperationalAdvertisingParameters operationalParams6 =
     OperationalAdvertisingParameters().SetPeerId(kPeerId6).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
-const QNamePart txtOperational1Parts[]  = { "SII=32", "SAI=30", "T=0" };
+const QNamePart txtOperational1Parts[]  = { "SII=32", "SAI=30", "SAT=4000", "T=0" };
 PtrResourceRecord ptrOperationalService = PtrResourceRecord(kDnsSdQueryName, kMatterOperationalQueryName);
 PtrResourceRecord ptrOperational1       = PtrResourceRecord(kMatterOperationalQueryName, kInstanceName1);
 SrvResourceRecord srvOperational1       = SrvResourceRecord(kInstanceName1, kHostnameName, CHIP_PORT);
@@ -181,10 +182,10 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeEnhanced =
         .SetRotatingDeviceId(chip::Optional<const char *>("id_that_spins"))
         .SetTcpSupported(chip::Optional<bool>(true))
         // 3600005 is more than the max so should be adjusted down
-        .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(3600000_ms32, 3600005_ms32));
+        .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(3600000_ms32, 3600005_ms32, 65535_ms16));
 QNamePart txtCommissionableNodeParamsLargeEnhancedParts[] = { "D=22",          "VP=555+897",       "CM=2",       "DT=70000",
                                                               "DN=testy-test", "RI=id_that_spins", "PI=Pair me", "PH=3",
-                                                              "SAI=3600000",   "SII=3600000",      "T=1" };
+                                                              "SAI=3600000",   "SII=3600000",      "SAT=65535",  "T=1" };
 FullQName txtCommissionableNodeParamsLargeEnhancedName    = FullQName(txtCommissionableNodeParamsLargeEnhancedParts);
 TxtResourceRecord txtCommissionableNodeParamsLargeEnhanced =
     TxtResourceRecord(instanceName, txtCommissionableNodeParamsLargeEnhancedName);

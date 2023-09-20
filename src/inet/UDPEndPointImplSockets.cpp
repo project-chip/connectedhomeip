@@ -469,7 +469,14 @@ CHIP_ERROR UDPEndPointImplSockets::GetSocket(IPAddressType addressType)
         {
             return CHIP_ERROR_POSIX(errno);
         }
-        ReturnErrorOnFailure(static_cast<System::LayerSockets *>(&GetSystemLayer())->StartWatchingSocket(mSocket, &mWatch));
+        CHIP_ERROR err = static_cast<System::LayerSockets *>(&GetSystemLayer())->StartWatchingSocket(mSocket, &mWatch);
+        if (err != CHIP_NO_ERROR)
+        {
+            // Our mWatch is not valid; make sure we never use it.
+            close(mSocket);
+            mSocket = kInvalidSocketFd;
+            return err;
+        }
 
         mAddrType = addressType;
 

@@ -58,7 +58,7 @@ template("asr_executable") {
         "REMAPPING",
         "-r",
       ]
-    } else {
+    } else if (asr_ic_family == "asr582x") {
       args = [
         _ota_tool_path,
         _image_path,
@@ -67,6 +67,15 @@ template("asr_executable") {
         "-b",
         "REMAPPING",
         "-r",
+      ]
+    } else {
+      args = [
+        _ota_tool_path,
+        _image_path,
+        "-d",
+        "LEGA_A0V2",
+        "-b",
+        "COMPRESS",
       ]
     }
 

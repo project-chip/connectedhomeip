@@ -37,11 +37,11 @@
 // Use hard-coded test certificates already embedded in generic chip code => set it to 0
 // Use real/development certificates => set it to 1 + file the provisioning section from
 //                                      the internal flash
-#ifndef CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
-#define CONFIG_CHIP_K32W0_REAL_FACTORY_DATA 0
+#ifndef CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+#define CONFIG_CHIP_LOAD_REAL_FACTORY_DATA 0
 #endif
 
-#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
 
 // Enable usage of custom factory data provider
 #ifndef CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
@@ -96,9 +96,6 @@
 // Use a default setup PIN code if one hasn't been provisioned in flash.
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
-
-// Use a default pairing code if one hasn't been provisioned in flash.
-#define CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE "CHIPUS"
 
 /**
  * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
@@ -221,6 +218,18 @@
 #endif // BUILD_RELEASE
 
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_SET_PHY_2M_REQ
+ *
+ * This define enables/disables the Gap_LeSetPhy request to switch to 2M.
+ * It is disabled here for interoperability reasons just to be extra cautious.
+ * Both devices may send a Link Layer control procedure in parallel resulting in a
+ * LPM Error Transaction Collision.
+ * If the peer device doesn't accept our reject command, this can result in a BLE
+ * connection timeout.
+ */
+#define CHIP_DEVICE_CONFIG_BLE_SET_PHY_2M_REQ 0
 
 /**
  * CHIP_DEVICE_CONFIG_INIT_OTA_DELAY

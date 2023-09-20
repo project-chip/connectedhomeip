@@ -1087,45 +1087,63 @@ public Long mask;
 }
 
 public static class SmokeCoAlarmClusterSmokeAlarmEvent {
+public Integer alarmSeverityLevel;
 
   public SmokeCoAlarmClusterSmokeAlarmEvent(
-) {
+    Integer alarmSeverityLevel
+  ) {
+    this.alarmSeverityLevel = alarmSeverityLevel;
   }
 
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("SmokeCoAlarmClusterSmokeAlarmEvent {\n");
+    output.append("\talarmSeverityLevel: ");
+    output.append(alarmSeverityLevel);
+        output.append("\n");
     output.append("}\n");
     return output.toString();
   }
 }
 
 public static class SmokeCoAlarmClusterCOAlarmEvent {
+public Integer alarmSeverityLevel;
 
   public SmokeCoAlarmClusterCOAlarmEvent(
-) {
+    Integer alarmSeverityLevel
+  ) {
+    this.alarmSeverityLevel = alarmSeverityLevel;
   }
 
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("SmokeCoAlarmClusterCOAlarmEvent {\n");
+    output.append("\talarmSeverityLevel: ");
+    output.append(alarmSeverityLevel);
+        output.append("\n");
     output.append("}\n");
     return output.toString();
   }
 }
 
 public static class SmokeCoAlarmClusterLowBatteryEvent {
+public Integer alarmSeverityLevel;
 
   public SmokeCoAlarmClusterLowBatteryEvent(
-) {
+    Integer alarmSeverityLevel
+  ) {
+    this.alarmSeverityLevel = alarmSeverityLevel;
   }
 
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("SmokeCoAlarmClusterLowBatteryEvent {\n");
+    output.append("\talarmSeverityLevel: ");
+    output.append(alarmSeverityLevel);
+        output.append("\n");
     output.append("}\n");
     return output.toString();
   }
@@ -1207,30 +1225,42 @@ public static class SmokeCoAlarmClusterMuteEndedEvent {
 }
 
 public static class SmokeCoAlarmClusterInterconnectSmokeAlarmEvent {
+public Integer alarmSeverityLevel;
 
   public SmokeCoAlarmClusterInterconnectSmokeAlarmEvent(
-) {
+    Integer alarmSeverityLevel
+  ) {
+    this.alarmSeverityLevel = alarmSeverityLevel;
   }
 
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("SmokeCoAlarmClusterInterconnectSmokeAlarmEvent {\n");
+    output.append("\talarmSeverityLevel: ");
+    output.append(alarmSeverityLevel);
+        output.append("\n");
     output.append("}\n");
     return output.toString();
   }
 }
 
 public static class SmokeCoAlarmClusterInterconnectCOAlarmEvent {
+public Integer alarmSeverityLevel;
 
   public SmokeCoAlarmClusterInterconnectCOAlarmEvent(
-) {
+    Integer alarmSeverityLevel
+  ) {
+    this.alarmSeverityLevel = alarmSeverityLevel;
   }
 
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("SmokeCoAlarmClusterInterconnectCOAlarmEvent {\n");
+    output.append("\talarmSeverityLevel: ");
+    output.append(alarmSeverityLevel);
+        output.append("\n");
     output.append("}\n");
     return output.toString();
   }

@@ -42,8 +42,8 @@
 #include <ble/BleConfig.h>
 #include <system/SystemConfig.h>
 
-/* COMING SOON: making the INET Layer optional entails making this inclusion optional. */
-// #include "InetConfig.h"
+#include <inet/InetConfig.h>
+
 /*
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL <= 0
 #error "chip SDK requires INET_TCP_IDLE_CHECK_INTERVAL > 0"
@@ -164,6 +164,30 @@
 #endif // CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 
 /**
+ *  @def CHIP_CONFIG_GLOBALS_LAZY_INIT
+ *
+ *  @brief
+ *    Whether to perform chip::Global initialization lazily (1) or eagerly (0).
+ *
+ *    The default is standard (eager) C++ global initialization behavior.
+ */
+#ifndef CHIP_CONFIG_GLOBALS_LAZY_INIT
+#define CHIP_CONFIG_GLOBALS_LAZY_INIT 0
+#endif // CHIP_CONFIG_GLOBALS_LAZY_INIT
+
+/**
+ *  @def CHIP_CONFIG_GLOBALS_NO_DESTRUCT
+ *
+ *  @brief
+ *    Whether to omit calling destructors for chip::Global objects.
+ *
+ *    The default is to call destructors.
+ */
+#ifndef CHIP_CONFIG_GLOBALS_NO_DESTRUCT
+#define CHIP_CONFIG_GLOBALS_NO_DESTRUCT 0
+#endif // CHIP_CONFIG_GLOBALS_NO_DESTRUCT
+
+/**
  *  @def CHIP_CONFIG_SHA256_CONTEXT_SIZE
  *
  *  @brief
@@ -184,6 +208,15 @@
 #ifndef CHIP_CONFIG_SHA256_CONTEXT_SIZE
 #define CHIP_CONFIG_SHA256_CONTEXT_SIZE ((sizeof(unsigned int) * (8 + 2 + 16 + 2)) + sizeof(uint64_t))
 #endif // CHIP_CONFIG_SHA256_CONTEXT_SIZE
+
+/**
+ *  @def CHIP_CONFIG_SHA256_CONTEXT_ALIGN
+ *
+ * @brief The alignment of SHA256 context buffer.
+ */
+#ifndef CHIP_CONFIG_SHA256_CONTEXT_ALIGN
+#define CHIP_CONFIG_SHA256_CONTEXT_ALIGN size_t
+#endif // CHIP_CONFIG_SHA256_CONTEXT_ALIGN
 
 /**
  *  @def CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
@@ -919,6 +952,10 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @}
+ */
+
+/**
  * @def CONFIG_BUILD_FOR_HOST_UNIT_TEST
  *
  * @brief Defines whether we're currently building for unit testing, which enables a set of features
@@ -1474,6 +1511,109 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES
 #define CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES 0
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL
+ *
+ * @brief Default value for the ICD Management cluster IdleModeInterval attribute, in seconds
+ */
+#ifndef CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL
+#define CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL 2
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL
+ *
+ * @brief Default value for the ICD Management cluster ActiveModeInterval attribute, in milliseconds
+ */
+#ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL 300
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD
+ *
+ * @brief Default value for the ICD Management cluster ActiveModeThreshold attribute, in milliseconds
+ */
+#ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD 300
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC
+ *
+ * @brief Default value for the ICD Management cluster ClientsSupportedPerFabric attribute
+ */
+#ifndef CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC
+#define CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC 2
+#endif
+
+/**
+ *  @name Configuation for resuming subscriptions that timed out
+ *
+ *  @brief
+ *    The following definitions sets the parameters for subscription resumption in the case of subscription timeout.
+ *      * #CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_FIBONACCI_STEP_INDEX
+ *      * #CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MIN_RETRY_INTERVAL_SECS
+ *      * #CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_WAIT_TIME_MULTIPLIER_SECS
+ *      * #CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_RETRY_INTERVAL_SECS
+ *
+ *  @{
+ */
+
+/**
+ *  @def CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_FIBONACCI_STEP_INDEX
+ *
+ *  @brief
+ *    If subscription timeout resumption is enabled, specify the max fibonacci step index.
+ *
+ *    This index must satisfy below conditions (for readability "CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_" prefix is omitted):
+ *      * MIN_RETRY_INTERVAL_SECS + Fibonacci(MAX_FIBONACCI_STEP_INDEX + 1) * WAIT_TIME_MULTIPLIER_SECS > MAX_RETRY_INTERVAL_SECS
+ *      * MIN_RETRY_INTERVAL_SECS + Fibonacci(MAX_FIBONACCI_STEP_INDEX) * WAIT_TIME_MULTIPLIER_SECS < MAX_RETRY_INTERVAL_SECS
+ *
+ */
+#ifndef CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_FIBONACCI_STEP_INDEX
+#define CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_FIBONACCI_STEP_INDEX 10
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_FIBONACCI_STEP_INDEX
+
+/**
+ *  @def CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MIN_RETRY_INTERVAL_SECS
+ *
+ *  @brief The minimum interval before resuming a subsciption that timed out.
+ */
+#ifndef CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MIN_RETRY_INTERVAL_SECS
+#define CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MIN_RETRY_INTERVAL_SECS 300
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MIN_RETRY_INTERVAL_SECS
+
+/**
+ *  @def CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_WAIT_TIME_MULTIPLIER_SECS
+ *
+ *  @brief The multiplier per step in the calculation of retry interval.
+ */
+#ifndef CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_WAIT_TIME_MULTIPLIER_SECS
+#define CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_WAIT_TIME_MULTIPLIER_SECS 300
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_WAIT_TIME_MULTIPLIER_SECS
+
+/**
+ *  @def CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_RETRY_INTERVAL_SECS
+ *
+ *  @brief The maximum interval before resuming a subsciption that timed out.
+ */
+#ifndef CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_RETRY_INTERVAL_SECS
+#define CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_RETRY_INTERVAL_SECS (3600 * 6)
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_RETRY_INTERVAL_SECS
+
+/**
+ * @def CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
+ *
+ * @brief Controls whether the synchronized report scheduler is used.
+ *
+ * The use of the synchronous reports feature aims to reduce the number of times an ICD needs to wake up to emit reports to its
+ * various subscribers.
+ */
+#ifndef CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
+#define CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED 0
 #endif
 
 /**

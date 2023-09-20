@@ -48,6 +48,7 @@ private:
      */
     static void ICDEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     static uint8_t expectedMsgCount;
+    static uint8_t awaitingAckCount;
     ICDManager * mICDManager;
 };
 

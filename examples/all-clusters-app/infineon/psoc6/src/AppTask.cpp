@@ -40,6 +40,7 @@
 #include <DeviceInfoProviderImpl.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/Infineon/PSOC6/NetworkCommissioningDriver.h>
+#include <static-supported-temperature-levels.h>
 
 /* OTA related includes */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -95,6 +96,7 @@ BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 #endif
 
+chip::app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 } // namespace
 
 using namespace ::chip;
@@ -137,6 +139,7 @@ static void InitServer(intptr_t context)
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     GetAppTask().InitOTARequestor();
 #endif
+    chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 CHIP_ERROR AppTask::StartAppTask()

@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read the global attribute: ClusterRevision"
+    - label: "Step 1: Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -39,7 +39,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Read the global attribute: FeatureMap"
+    - label: "Step 2a: Read the global attribute: FeatureMap"
       PICS: " !LVL.S.F00 && !LVL.S.F01 && !LVL.S.F02 "
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -48,7 +48,9 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Given LVL.S.F00(OO) ensure featuremap has the correct bit set"
+    - label:
+          "Step 2b: Given LVL.S.F00(OO) ensure featuremap has the correct bit
+          set"
       PICS: LVL.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -57,7 +59,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x1]
 
-    - label: "Given LVL.S.F01(LT) ensure featuremap has the correct bit set"
+    - label:
+          "Step 2c: Given LVL.S.F01(LT) ensure featuremap has the correct bit
+          set"
       PICS: LVL.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -66,7 +70,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x2]
 
-    - label: "Given LVL.S.F02(FQ) ensure featuremap has the correct bit set"
+    - label:
+          "Step 2d: Given LVL.S.F02(FQ) ensure featuremap has the correct bit
+          set"
       PICS: LVL.S.F02
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -75,7 +81,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x4]
 
-    - label: "Read the global attribute: AttributeList"
+    - label: "Step 3a: Read the global attribute: AttributeList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -83,9 +90,18 @@ tests:
               type: list
               contains: [0, 15, 17, 65528, 65529, 65530, 65531, 65532, 65533]
 
+    - label: "Step 3a: Read the global attribute: AttributeList"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 15, 17, 65528, 65529, 65531, 65532, 65533]
+
     - label:
-          "Read the optional attribute(StartUpCurrentLevel and RemainingTime) in
-          AttributeList"
+          "Step 3b: Read the optional attribute(StartUpCurrentLevel and
+          RemainingTime) in AttributeList"
       PICS: LVL.S.F01
       command: "readAttribute"
       attribute: "AttributeList"
@@ -95,8 +111,8 @@ tests:
               contains: [1, 16384]
 
     - label:
-          "Read the optional attribute(CurrentFrequency, MinFrequency and
-          MinFrequency) in AttributeList"
+          "Step 3c: Read the optional attribute(CurrentFrequency, MinFrequency
+          and MinFrequency) in AttributeList"
       PICS: LVL.S.F02
       command: "readAttribute"
       attribute: "AttributeList"
@@ -105,7 +121,7 @@ tests:
               type: list
               contains: [4, 5, 6]
 
-    - label: "Read the optional attribute(MinLevel) in AttributeList"
+    - label: "Step 3d: Read the optional attribute(MinLevel) in AttributeList"
       PICS: LVL.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"
@@ -114,7 +130,7 @@ tests:
               type: list
               contains: [2]
 
-    - label: "Read the optional attribute(MaxLevel) in AttributeList"
+    - label: "Step 3e: Read the optional attribute(MaxLevel) in AttributeList"
       PICS: LVL.S.A0003
       command: "readAttribute"
       attribute: "AttributeList"
@@ -123,7 +139,9 @@ tests:
               type: list
               contains: [3]
 
-    - label: "Read the optional attribute(OnOffTransitionTime) in AttributeList"
+    - label:
+          "Step 3f: Read the optional attribute(OnOffTransitionTime) in
+          AttributeList"
       PICS: LVL.S.A0010
       command: "readAttribute"
       attribute: "AttributeList"
@@ -132,7 +150,9 @@ tests:
               type: list
               contains: [16]
 
-    - label: "Read the optional attribute(OnTransitionTime) in AttributeList"
+    - label:
+          "Step 3g: Read the optional attribute(OnTransitionTime) in
+          AttributeList"
       PICS: LVL.S.A0012
       command: "readAttribute"
       attribute: "AttributeList"
@@ -141,7 +161,9 @@ tests:
               type: list
               contains: [18]
 
-    - label: "Read the optional attribute(OffTransitionTime) in AttributeList"
+    - label:
+          "Step 3h: Read the optional attribute(OffTransitionTime) in
+          AttributeList"
       PICS: LVL.S.A0013
       command: "readAttribute"
       attribute: "AttributeList"
@@ -150,7 +172,9 @@ tests:
               type: list
               contains: [19]
 
-    - label: "Read the optional attribute(DefaultMoveRate) in AttributeList"
+    - label:
+          "Step 3i: Read the optional attribute(DefaultMoveRate) in
+          AttributeList"
       PICS: LVL.S.A0014
       command: "readAttribute"
       attribute: "AttributeList"
@@ -159,7 +183,7 @@ tests:
               type: list
               contains: [20]
 
-    - label: "Read the global attribute: AcceptedCommandList"
+    - label: "Step 4a: Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -168,7 +192,8 @@ tests:
               contains: [0, 1, 2, 3, 4, 5, 6, 7]
 
     - label:
-          "Read the Feature-dependent(LVL.S.F02) command in AcceptedCommandList"
+          "Step 4a.1: Read the Feature-dependent(LVL.S.F02) command in
+          AcceptedCommandList"
       PICS: LVL.S.F02
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -177,7 +202,7 @@ tests:
               type: list
               contains: [8]
 
-    - label: "Read the global attribute: GeneratedCommandList"
+    - label: "Step 4b: Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
@@ -185,7 +210,8 @@ tests:
           constraints:
               type: list
 
-    - label: "Read the global attribute: EventList"
+    - label: "Step 5: Read the global attribute: EventList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:

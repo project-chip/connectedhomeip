@@ -151,9 +151,6 @@ public final class ControllerParams {
     private Builder() {}
 
     public Builder setFabricId(long fabricId) {
-      if (fabricId < 1) {
-        throw new IllegalArgumentException("fabricId must be > 0");
-      }
       this.fabricId = fabricId;
       return this;
     }

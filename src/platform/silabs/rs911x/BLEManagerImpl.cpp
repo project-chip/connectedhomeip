@@ -26,8 +26,8 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include "cmsis_os2.h"
 #include <platform/internal/BLEManager.h>
-
 #ifndef SIWX_917
 #include "rail.h"
 #endif
@@ -42,7 +42,9 @@ extern "C" {
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 #include "wfx_sl_ble_init.h"
+#if !(SIWX_917 | EXP_BOARD)
 #include <rsi_driver.h>
+#endif
 #include <rsi_utils.h>
 #include <stdbool.h>
 #ifdef __cplusplus
@@ -60,13 +62,12 @@ extern "C" {
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
-extern uint16_t rsi_ble_measurement_hndl;
-extern rsi_ble_event_conn_status_t conn_event_to_app;
 extern sl_wfx_msg_t event_msg;
 
 StaticTask_t rsiBLETaskStruct;
-rsi_semaphore_handle_t sl_rs_ble_init_sem;
-rsi_semaphore_handle_t sl_ble_event_sem;
+
+osSemaphoreId_t sl_ble_event_sem;
+osSemaphoreId_t sl_rs_ble_init_sem;
 
 /* wfxRsi Task will use as its stack */
 StackType_t wfxBLETaskStack[WFX_RSI_TASK_SZ] = { 0 };
@@ -105,7 +106,7 @@ void sl_ble_event_handling_task(void)
     int32_t event_id;
 
     //! This semaphore is waiting for wifi module initialization.
-    rsi_semaphore_wait(&sl_rs_ble_init_sem, 0);
+    osSemaphoreAcquire(sl_rs_ble_init_sem, osWaitForever);
 
     // This function initialize BLE and start BLE advertisement.
     sl_ble_init();
@@ -113,11 +114,14 @@ void sl_ble_event_handling_task(void)
     // Application event map
     while (1)
     {
-        //! This semaphore is waiting for next ble event task
-        rsi_semaphore_wait(&sl_ble_event_sem, 0);
-
         // checking for events list
         event_id = rsi_ble_app_get_event();
+        if (event_id == -1)
+        {
+            //! This semaphore is waiting for next ble event task
+            osSemaphoreAcquire(sl_ble_event_sem, osWaitForever);
+            continue;
+        }
         switch (event_id)
         {
         case RSI_BLE_CONN_EVENT: {
@@ -126,6 +130,7 @@ void sl_ble_event_handling_task(void)
             // Requests the connection parameters change with the remote device
             rsi_ble_conn_params_update(event_msg.resp_enh_conn.dev_addr, BLE_MIN_CONNECTION_INTERVAL_MS,
                                        BLE_MAX_CONNECTION_INTERVAL_MS, BLE_SLAVE_LATENCY_MS, BLE_TIMEOUT_MS);
+            rsi_ble_set_data_len(event_msg.resp_enh_conn.dev_addr, RSI_BLE_TX_OCTETS, RSI_BLE_TX_TIME);
         }
         break;
         case RSI_BLE_DISCONN_EVENT: {
@@ -223,8 +228,9 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
-    rsi_semaphore_create(&sl_rs_ble_init_sem, 0);
-    rsi_semaphore_create(&sl_ble_event_sem, 0);
+
+    sl_rs_ble_init_sem = osSemaphoreNew(1, 0, NULL);
+    sl_ble_event_sem   = osSemaphoreNew(1, 0, NULL);
 
     wfx_rsi.ble_task = xTaskCreateStatic((TaskFunction_t) sl_ble_event_handling_task, "rsi_ble", WFX_RSI_TASK_SZ, NULL, 1,
                                          wfxBLETaskStack, &rsiBLETaskStruct);
@@ -589,8 +595,21 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     {
         ChipLogError(DeviceLayer, "rsi_ble_set_advertise_data() success: %ld", result);
     }
+    index                 = 0;
+    responseData[index++] = 0x02;                     // length
+    responseData[index++] = CHIP_ADV_DATA_TYPE_FLAGS; // AD type : flags
+    responseData[index++] = CHIP_ADV_DATA_FLAGS;
+    responseData[index++] = CHIP_ADV_SHORT_UUID_LEN + 1;  // AD length
+    responseData[index++] = CHIP_ADV_DATA_TYPE_UUID;      // AD type : uuid
+    responseData[index++] = ShortUUID_CHIPoBLEService[0]; // AD value
+    responseData[index++] = ShortUUID_CHIPoBLEService[1];
 
-    // err = MapBLEError(result);
+    responseData[index++] = static_cast<uint8_t>(mDeviceNameLength + 1); // length
+    responseData[index++] = CHIP_ADV_DATA_TYPE_NAME;                     // AD type : name
+    memcpy(&responseData[index], mDeviceName, mDeviceNameLength);        // AD value
+    index += mDeviceNameLength;
+
+    rsi_ble_set_scan_response_data(responseData, index);
 
     ChipLogProgress(DeviceLayer, "ConfigureAdvertisingData End");
 exit:
@@ -659,8 +678,16 @@ int32_t BLEManagerImpl::SendBLEAdvertisementCommand(void)
     ble_adv.filter_type      = RSI_BLE_ADV_FILTER_TYPE;
     ble_adv.direct_addr_type = RSI_BLE_ADV_DIR_ADDR_TYPE;
     rsi_ascii_dev_address_to_6bytes_rev(ble_adv.direct_addr, (int8_t *) RSI_BLE_ADV_DIR_ADDR);
-    ble_adv.adv_int_min     = RSI_BLE_ADV_INT_MIN;
-    ble_adv.adv_int_max     = RSI_BLE_ADV_INT_MAX;
+    if (mFlags.Has(Flags::kFastAdvertisingEnabled))
+    {
+        ble_adv.adv_int_min = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN;
+        ble_adv.adv_int_max = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX;
+    }
+    else
+    {
+        ble_adv.adv_int_min = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
+        ble_adv.adv_int_max = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
+    }
     ble_adv.own_addr_type   = LE_RANDOM_ADDRESS;
     ble_adv.adv_channel_map = RSI_BLE_ADV_CHANNEL_MAP;
     return rsi_ble_start_advertising_with_values(&ble_adv);
@@ -781,6 +808,10 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(rsi_ble_event_write_t * evt)
     CHIP_ERROR err           = CHIP_NO_ERROR;
     bool isIndicationEnabled = false;
     ChipDeviceEvent event;
+    CHIPoBLEConState * bleConnState;
+
+    bleConnState = GetConnectionState(event_msg.connectionHandle);
+    VerifyOrExit(bleConnState != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     // Determine if the client is enabling or disabling notification/indication.
     if (evt->att_value[0] != 0)
@@ -792,9 +823,12 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(rsi_ble_event_write_t * evt)
 
     if (isIndicationEnabled)
     {
-        // Post an event to the CHIP queue to process either a CHIPoBLE Subscribe or Unsubscribe based on
-        // whether the client is enabling or disabling indications.
+        // If indications are not already enabled for the connection...
+        if (!bleConnState->subscribed)
         {
+            bleConnState->subscribed = 1;
+            // Post an event to the CHIP queue to process either a CHIPoBLE Subscribe or Unsubscribe based on
+            // whether the client is enabling or disabling indications.
             event.Type                    = DeviceEventType::kCHIPoBLESubscribe;
             event.CHIPoBLESubscribe.ConId = 1; // TODO:: To be replaced by device mac address
             err                           = PlatformMgr().PostEvent(&event);
@@ -802,9 +836,15 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(rsi_ble_event_write_t * evt)
     }
     else
     {
+        bleConnState->subscribed      = 0;
         event.Type                    = DeviceEventType::kCHIPoBLEUnsubscribe;
         event.CHIPoBLESubscribe.ConId = 1; // TODO:: To be replaced by device mac address
         err                           = PlatformMgr().PostEvent(&event);
+    }
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %s", ErrorStr(err));
     }
 }
 

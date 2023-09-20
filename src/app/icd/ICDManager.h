@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <app/icd/ICDStateObserver.h>
+#include <credentials/FabricTable.h>
 #include <lib/support/BitFlags.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -23,6 +25,10 @@
 
 namespace chip {
 namespace app {
+
+// Forward declaration of TestICDManager to allow it to be friend with ICDManager
+// Used in unit tests
+class TestICDManager;
 
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
@@ -47,29 +53,41 @@ public:
         kCommissioningWindowOpen = 0x01,
         kFailSafeArmed           = 0x02,
         kExpectingMsgResponse    = 0x03,
+        kAwaitingMsgAck          = 0x04,
     };
 
     ICDManager() {}
-    void Init();
+    void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ICDStateObserver * stateObserver);
     void Shutdown();
     void UpdateIcdMode();
     void UpdateOperationState(OperationalState state);
     void SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state);
     bool IsKeepActive() { return mKeepActiveFlags.HasAny(); }
-    ICDMode GetIcdMode() { return mIcdMode; }
+    ICDMode GetICDMode() { return mICDMode; }
     OperationalState GetOperationalState() { return mOperationalState; }
 
+    static System::Clock::Milliseconds32 GetSITPollingThreshold() { return kSITPollingThreshold; }
     static System::Clock::Milliseconds32 GetSlowPollingInterval() { return kSlowPollingInterval; }
     static System::Clock::Milliseconds32 GetFastPollingInterval() { return kFastPollingInterval; }
 
 protected:
+    friend class TestICDManager;
+
     static void OnIdleModeDone(System::Layer * aLayer, void * appState);
     static void OnActiveModeDone(System::Layer * aLayer, void * appState);
+    /**
+     * @brief Callback function called shortly before the device enters idle mode to allow checks to be made. This is currently only
+     * called once to prevent entering in a loop if some events re-trigger this check (for instance if a check for subscription
+     * before entering idle mode leads to emiting a report, we will re-enter UpdateOperationState and check again for subscription,
+     * etc.)
+     */
+    static void OnTransitionToIdle(System::Layer * aLayer, void * appState);
 
 private:
-    static constexpr System::Clock::Milliseconds32 kICDSitModePollingThreashold = System::Clock::Milliseconds32(15000);
-    static constexpr System::Clock::Milliseconds32 kSlowPollingInterval         = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
-    static constexpr System::Clock::Milliseconds32 kFastPollingInterval         = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
+    // SIT ICDs should have a SlowPollingThreshold shorter than or equal to 15s (spec 9.16.1.5)
+    static constexpr System::Clock::Milliseconds32 kSITPollingThreshold = System::Clock::Milliseconds32(15000);
+    static constexpr System::Clock::Milliseconds32 kSlowPollingInterval = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
+    static constexpr System::Clock::Milliseconds32 kFastPollingInterval = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
 
     // Minimal constraint value of the the ICD attributes.
     static constexpr uint32_t kMinIdleModeInterval    = 500;
@@ -79,8 +97,12 @@ private:
     bool SupportsCheckInProtocol();
 
     BitFlags<KeepActiveFlags> mKeepActiveFlags{ 0 };
-    OperationalState mOperationalState = OperationalState::IdleMode;
-    ICDMode mIcdMode                   = ICDMode::SIT;
+    OperationalState mOperationalState   = OperationalState::IdleMode;
+    ICDMode mICDMode                     = ICDMode::SIT;
+    PersistentStorageDelegate * mStorage = nullptr;
+    FabricTable * mFabricTable           = nullptr;
+    ICDStateObserver * mStateObserver    = nullptr;
+    bool mTransitionToIdleCalled         = false;
 };
 
 } // namespace app

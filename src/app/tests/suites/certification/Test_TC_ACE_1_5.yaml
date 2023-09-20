@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 42.1.5. [TC-ACE-1.5] Multi-fabric
 
@@ -37,7 +36,7 @@ config:
         defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved for TH1"
+    - label: "Step 1: Wait for the commissioned device to be retrieved for TH1"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -82,7 +81,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Open Commissioning Window from alpha"
+    - label: "Step 2: Open Commissioning Window from alpha"
       cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
@@ -109,7 +108,7 @@ tests:
               - name: "ms"
                 value: waitAfterCommissioning
 
-    - label: "Commission from TH2"
+    - label: "Step 3: Commission from TH2"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -131,7 +130,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH2 reads the fabric index"
+    - label: "Step 4: TH2 reads the fabric index"
       identity: "beta"
       PICS: PICS_SDK_CI_ONLY
       cluster: "Operational Credentials"
@@ -141,7 +140,7 @@ tests:
           saveAs: th2FabricIndex
 
     #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
-    - label: "TH2 reads the fabric index"
+    - label: "Step 4: TH2 reads the fabric index"
       verification: |
           ./chip-tool operationalcredentials read current-fabric-index 2 0 --commissioner-name beta
 
@@ -169,7 +168,8 @@ tests:
               - name: "nodeId"
                 saveAs: commissionerNodeIdAlpha
 
-    - label: "TH1 writes ACL giving view privilege for descriptor cluster"
+    - label:
+          "Step 5: TH1 writes ACL giving view privilege for descriptor cluster"
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
@@ -202,7 +202,7 @@ tests:
               - name: "nodeId"
                 saveAs: commissionerNodeIdBeta
 
-    - label: "TH2 writes ACL giving view privilge for basic cluster"
+    - label: "Step 6: TH2 writes ACL giving view privilge for basic cluster"
       identity: beta
       PICS: PICS_SDK_CI_ONLY
       command: "writeAttribute"
@@ -228,7 +228,7 @@ tests:
               ]
 
     #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
-    - label: "TH2 writes ACL giving view privilge for basic cluster"
+    - label: "Step 6: TH2 writes ACL giving view privilge for basic cluster"
       verification: |
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 2, "privilege": 5, "authMode": 2, "subjects": [223344], "targets": [{ "cluster": 31, "endpoint": 0, "deviceType": null }]}, {"fabricIndex": 2, "privilege": 1, "authMode": 2, "subjects": null, "targets": [{ "cluster": 40, "endpoint": 0, "deviceType": null }]}]' 2 0 --commissioner-name beta
 
@@ -249,19 +249,19 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH1 reads descriptor cluster - expect SUCCESS"
+    - label: "Step 7: TH1 reads descriptor cluster - expect SUCCESS"
       command: "readAttribute"
       cluster: "Descriptor"
       attribute: "DeviceTypeList"
 
-    - label: "TH1 reads basic cluster - expect UNSUPPORTED_ACCESS"
+    - label: "Step 8: TH1 reads basic cluster - expect UNSUPPORTED_ACCESS"
       command: "readAttribute"
       cluster: "Basic Information"
       attribute: "VendorID"
       response:
           error: UNSUPPORTED_ACCESS
 
-    - label: "TH2 reads descriptor cluster - expect UNSUPPORTED_ACCESS"
+    - label: "Step 9: TH2 reads descriptor cluster - expect UNSUPPORTED_ACCESS"
       identity: "beta"
       PICS: PICS_SDK_CI_ONLY
       command: "readAttribute"
@@ -271,7 +271,7 @@ tests:
           error: UNSUPPORTED_ACCESS
 
     #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
-    - label: "TH2 reads descriptor cluster - expect UNSUPPORTED_ACCESS"
+    - label: "Step 9: TH2 reads descriptor cluster - expect UNSUPPORTED_ACCESS"
       verification: |
           ./chip-tool descriptor read device-type-list 2 0 --commissioner-name beta
 
@@ -291,7 +291,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH2 reads basic cluster - expect SUCCESS"
+    - label: "Step 10: TH2 reads basic cluster - expect SUCCESS"
       identity: "beta"
       PICS: PICS_SDK_CI_ONLY
       command: "readAttribute"
@@ -299,7 +299,7 @@ tests:
       attribute: "VendorID"
 
     #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
-    - label: "TH2 writes Extension attribute value as empty list"
+    - label: "Step 10: TH2 reads basic cluster - expect SUCCESS"
       verification: |
           ./chip-tool basicinformation read vendor-id 2 0 --commissioner-name beta
 
@@ -318,7 +318,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH1 resets ACL to default"
+    - label: "Step 11: TH1 resets ACL to default"
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
@@ -332,7 +332,7 @@ tests:
                   },
               ]
 
-    - label: "TH1 sends RemoveFabric command for TH2"
+    - label: "Step 12: TH1 sends RemoveFabric command for TH2"
       cluster: "Operational Credentials"
       PICS: PICS_SDK_CI_ONLY
       command: "RemoveFabric"
@@ -342,7 +342,7 @@ tests:
                 value: th2FabricIndex
 
     #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
-    - label: "TH1 sends RemoveFabric command for TH2"
+    - label: "Step 12: TH1 sends RemoveFabric command for TH2"
       verification: |
           ./chip-tool operationalcredentials remove-fabric 2 1 0
 

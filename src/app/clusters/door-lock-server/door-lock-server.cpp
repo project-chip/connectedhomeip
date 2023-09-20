@@ -104,12 +104,10 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
 }
 
 bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLockState, OperationSourceEnum opSource,
-                                  const Nullable<uint16_t> & userIndex, const Nullable<List<const LockOpCredentials>> & credentials)
+                                  const Nullable<uint16_t> & userIndex, const Nullable<List<const LockOpCredentials>> & credentials,
+                                  const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId)
 {
     bool success = SetLockState(endpointId, newLockState);
-
-    // Remote operations are handled separately as they use more data unavailable here
-    VerifyOrReturnError(OperationSourceEnum::kRemote != opSource, success);
 
     // DlLockState::kNotFullyLocked has no appropriate event to send. Also it is unclear whether
     // it should schedule auto-relocking. So skip it here. Check for supported states explicitly
@@ -130,8 +128,13 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
         opType = LockOperationTypeEnum::kUnlatch;
     }
 
-    SendLockOperationEvent(endpointId, opType, opSource, OperationErrorEnum::kUnspecified, userIndex, Nullable<chip::FabricIndex>(),
-                           Nullable<chip::NodeId>(), credentials, success);
+    if (OperationSourceEnum::kRemote == opSource && (fabricIdx.IsNull() || nodeId.IsNull()))
+    {
+        ChipLogError(Zcl, "Received SetLockState for remote operation without fabricIdx or nodeId");
+    }
+
+    SendLockOperationEvent(endpointId, opType, opSource, OperationErrorEnum::kUnspecified, userIndex, fabricIdx, nodeId,
+                           credentials, success);
 
     // Reset wrong entry attempts (in case there were any incorrect credentials presented before) if lock/unlock was a success
     // and a valid credential was presented.
@@ -1043,7 +1046,7 @@ void DoorLockServer::getWeekDayScheduleCommandHandler(chip::app::CommandHandler 
     {
         ChipLogProgress(Zcl, "[GetWeekDaySchedule] User does not exist [endpointId=%d,weekDayIndex=%d,userIndex=%d]", endpointId,
                         weekDayIndex, userIndex);
-        sendGetWeekDayScheduleResponse(commandObj, commandPath, weekDayIndex, userIndex, DlStatus::kFailure);
+        sendGetWeekDayScheduleResponse(commandObj, commandPath, weekDayIndex, userIndex, DlStatus::kNotFound);
         return;
     }
 
@@ -1243,7 +1246,7 @@ void DoorLockServer::getYearDayScheduleCommandHandler(chip::app::CommandHandler 
     {
         ChipLogProgress(Zcl, "[GetYearDaySchedule] User does not exist [endpointId=%d,yearDayIndex=%d,userIndex=%d]", endpointId,
                         yearDayIndex, userIndex);
-        sendGetYearDayScheduleResponse(commandObj, commandPath, yearDayIndex, userIndex, DlStatus::kFailure);
+        sendGetYearDayScheduleResponse(commandObj, commandPath, yearDayIndex, userIndex, DlStatus::kNotFound);
         return;
     }
 
@@ -1350,12 +1353,13 @@ bool DoorLockServer::OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIn
     ChipLogProgress(Zcl, "[OnFabricRemoved] Handling a fabric removal from the door lock server [endpointId=%d,fabricIndex=%d]",
                     endpointId, fabricIndex);
 
+    bool status{ true };
     // Iterate over all the users and clean up the deleted fabric
     if (!clearFabricFromUsers(endpointId, fabricIndex))
     {
         ChipLogError(Zcl, "[OnFabricRemoved] Unable to cleanup fabric from users - internal error [endpointId=%d,fabricIndex=%d]",
                      endpointId, fabricIndex);
-        return false;
+        status = false;
     }
 
     // Iterate over all the credentials and clean up the fabrics
@@ -1364,10 +1368,15 @@ bool DoorLockServer::OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIn
         ChipLogError(Zcl,
                      "[OnFabricRemoved] Unable to cleanup fabric from credentials - internal error [endpointId=%d,fabricIndex=%d]",
                      endpointId, fabricIndex);
-        return false;
+        status = false;
     }
 
-    return true;
+    if (mOnFabricRemovedCustomCallback)
+    {
+        mOnFabricRemovedCustomCallback(endpointId, fabricIndex);
+    }
+
+    return status;
 }
 
 /**********************************************************
@@ -3305,23 +3314,20 @@ bool DoorLockServer::RemoteOperationEnabled(chip::EndpointId endpointId) const
         mode != OperatingModeEnum::kPrivacy && mode != OperatingModeEnum::kNoRemoteLockUnlock;
 }
 
-CHIP_ERROR DoorLockServer::sendClusterResponse(chip::app::CommandHandler * commandObj,
-                                               const chip::app::ConcreteCommandPath & commandPath, EmberAfStatus status)
+void DoorLockServer::sendClusterResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                         EmberAfStatus status)
 {
     VerifyOrDie(nullptr != commandObj);
 
-    auto err             = CHIP_NO_ERROR;
     auto statusAsInteger = to_underlying(status);
     if (statusAsInteger == to_underlying(DlStatus::kOccupied) || statusAsInteger == to_underlying(DlStatus::kDuplicate))
     {
-        err = commandObj->AddClusterSpecificFailure(commandPath, static_cast<chip::ClusterStatus>(status));
+        VerifyOrDie(commandObj->AddClusterSpecificFailure(commandPath, static_cast<chip::ClusterStatus>(status)) == CHIP_NO_ERROR);
     }
     else
     {
-        err = commandObj->AddStatus(commandPath, ToInteractionModelStatus(status));
+        commandObj->AddStatus(commandPath, ToInteractionModelStatus(status));
     }
-
-    return err;
 }
 
 EmberAfDoorLockEndpointContext * DoorLockServer::getContext(chip::EndpointId endpointId)
@@ -3428,7 +3434,7 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
     }
 
     // credentials check succeeded, try to lock/unlock door
-    success = opHandler(endpoint, pinCode, reason);
+    success = opHandler(endpoint, MakeNullable(getFabricIndex(commandObj)), MakeNullable(getNodeId(commandObj)), pinCode, reason);
     // The app should trigger the lock state change as it may take a while before the lock actually locks/unlocks
 exit:
     if (!success && reason == OperationErrorEnum::kInvalidCredential)
@@ -3464,23 +3470,15 @@ exit:
         credentials.SetNonNull(foundCred);
     }
 
-    // Failed Unlatch requests SHALL generate only a LockOperationError event with LockOperationType set to Unlock
-    if (LockOperationTypeEnum::kUnlatch == opType && !success)
+    if (!success)
     {
-        opType = LockOperationTypeEnum::kUnlock;
-    }
+        // Failed Unlatch requests SHALL generate only a LockOperationError event with LockOperationType set to Unlock
+        if (LockOperationTypeEnum::kUnlatch == opType)
+        {
+            opType = LockOperationTypeEnum::kUnlock;
+        }
 
-    SendLockOperationEvent(endpoint, opType, OperationSourceEnum::kRemote, reason, pinUserIdx,
-                           Nullable<chip::FabricIndex>(getFabricIndex(commandObj)), Nullable<chip::NodeId>(getNodeId(commandObj)),
-                           credentials, success);
-
-    // SHALL generate a LockOperation event with LockOperationType set to Unlatch when the unlatched state is reached and a
-    // LockOperation event with LockOperationType set to Unlock when the lock successfully completes the unlock. But as the current
-    // implementation here is sending LockOperation events immediately we're sending both events immediately.
-    // https://github.com/project-chip/connectedhomeip/issues/26925
-    if (LockOperationTypeEnum::kUnlatch == opType && success)
-    {
-        SendLockOperationEvent(endpoint, LockOperationTypeEnum::kUnlock, OperationSourceEnum::kRemote, reason, pinUserIdx,
+        SendLockOperationEvent(endpoint, opType, OperationSourceEnum::kRemote, reason, pinUserIdx,
                                Nullable<chip::FabricIndex>(getFabricIndex(commandObj)),
                                Nullable<chip::NodeId>(getNodeId(commandObj)), credentials, success);
     }

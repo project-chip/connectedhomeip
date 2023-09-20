@@ -39,10 +39,8 @@
 #include <app/InteractionModelEngine.h>
 #endif
 
-#ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_NVS
 #include <zephyr/fs/nvs.h>
 #include <zephyr/settings/settings.h>
-#endif
 
 using namespace chip::app;
 
@@ -103,10 +101,11 @@ Button sThreadStartButton;
 k_timer sFactoryResetTimer;
 uint8_t sFactoryResetCntr = 0;
 
-bool sIsThreadProvisioned = false;
-bool sIsThreadEnabled     = false;
-bool sIsThreadAttached    = false;
-bool sHaveBLEConnections  = false;
+bool sIsCommissioningFailed = false;
+bool sIsThreadProvisioned   = false;
+bool sIsThreadEnabled       = false;
+bool sIsThreadAttached      = false;
+bool sHaveBLEConnections    = false;
 
 #if APP_SET_DEVICE_INFO_PROVIDER
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
@@ -138,8 +137,10 @@ class AppCallbacks : public AppDelegate
     bool isComissioningStarted;
 
 public:
+    void OnCommissioningSessionEstablishmentStarted() override { sIsCommissioningFailed = false; }
     void OnCommissioningSessionStarted() override { isComissioningStarted = true; }
     void OnCommissioningSessionStopped() override { isComissioningStarted = false; }
+    void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) override { sIsCommissioningFailed = true; }
     void OnCommissioningWindowClosed() override
     {
         if (!isComissioningStarted)
@@ -158,40 +159,39 @@ class AppFabricTableDelegate : public FabricTable::Delegate
         {
             ChipLogProgress(DeviceLayer, "Performing erasing of settings partition");
 
-#ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_NVS
-            void * storage = nullptr;
-            int status     = settings_storage_get(&storage);
-
-            if (status == 0)
+            // Do FactoryReset in case of failed commissioning to allow new pairing via BLE
+            if (sIsCommissioningFailed)
             {
-                status = nvs_clear(static_cast<nvs_fs *>(storage));
+                chip::Server::GetInstance().ScheduleFactoryReset();
             }
-
-            if (!status)
+            // TC-OPCREDS-3.6 (device doesn't need to reboot automatically after the last fabric is removed) can't use FactoryReset
+            else
             {
-                status = nvs_mount(static_cast<nvs_fs *>(storage));
-            }
+                void * storage = nullptr;
+                int status     = settings_storage_get(&storage);
 
-            if (status)
-            {
-                ChipLogError(DeviceLayer, "Storage clearance failed: %d", status);
-            }
-#else
-            const CHIP_ERROR err = PersistedStorage::KeyValueStoreMgrImpl().DoFactoryReset();
+                if (!status)
+                {
+                    status = nvs_clear(static_cast<nvs_fs *>(storage));
+                }
 
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(DeviceLayer, "Factory reset failed: %" CHIP_ERROR_FORMAT, err.Format());
-            }
+                if (!status)
+                {
+                    status = nvs_mount(static_cast<nvs_fs *>(storage));
+                }
 
-            ConnectivityMgr().ErasePersistentInfo();
-#endif
+                if (status)
+                {
+                    ChipLogError(DeviceLayer, "Storage clearance failed: %d", status);
+                }
+            }
         }
     }
 };
 
 class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
 {
+    // Disable openthread before reset to prevent writing to NVS
     void OnShutDown() override
     {
         if (ThreadStackManagerImpl().IsThreadEnabled())
@@ -202,8 +202,8 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
 };
 
 #if CONFIG_CHIP_LIB_SHELL
-#include <sys.h>
 #include <zephyr/shell/shell.h>
+#include <zephyr/sys/reboot.h>
 
 static int cmd_telink_reboot(const struct shell * shell, size_t argc, char ** argv)
 {
@@ -211,7 +211,7 @@ static int cmd_telink_reboot(const struct shell * shell, size_t argc, char ** ar
     ARG_UNUSED(argv);
 
     shell_print(shell, "Performing board reboot...");
-    sys_reboot();
+    sys_reboot(0);
 
     return 0;
 }
@@ -220,6 +220,14 @@ SHELL_STATIC_SUBCMD_SET_CREATE(sub_telink, SHELL_CMD(reboot, NULL, "Reboot board
                                SHELL_SUBCMD_SET_END);
 SHELL_CMD_REGISTER(telink, &sub_telink, "Telink commands", NULL);
 #endif // CONFIG_CHIP_LIB_SHELL
+
+#ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
+void AppTaskCommon::PowerOnFactoryReset(void)
+{
+    LOG_INF("schedule factory reset");
+    chip::Server::GetInstance().ScheduleFactoryReset();
+}
+#endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
 
 CHIP_ERROR AppTaskCommon::StartApp(void)
 {

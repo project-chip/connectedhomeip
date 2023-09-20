@@ -255,6 +255,21 @@ static void TestBufferReader_LittleEndianScalars(nlTestSuite * inSuite, void * i
         NL_TEST_ASSERT(inSuite, val2 == true);
         NL_TEST_ASSERT(inSuite, val3 == true);
     }
+
+    // Chars
+    {
+        uint8_t test_buf2[5] = { 'a', '\0', static_cast<uint8_t>('\xff'), 'b', 'c' };
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf2 } };
+        char val1 = 'z';
+        char val2 = 'z';
+        char val3 = 'z';
+
+        NL_TEST_ASSERT(inSuite, reader.ReadChar(&val1).ReadChar(&val2).ReadChar(&val3).IsSuccess());
+        NL_TEST_ASSERT(inSuite, reader.Remaining() == 2);
+        NL_TEST_ASSERT(inSuite, val1 == 'a');
+        NL_TEST_ASSERT(inSuite, val2 == '\0');
+        NL_TEST_ASSERT(inSuite, val3 == '\xff');
+    }
 }
 
 #define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)

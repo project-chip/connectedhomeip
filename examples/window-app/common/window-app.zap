@@ -1,5 +1,5 @@
 {
-  "featureLevel": 96,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -33,9 +33,38 @@
   ],
   "endpointTypes": [
     {
+      "id": 1,
       "name": "MA-windowcovering",
-      "deviceTypeName": "MA-rootdevice",
-      "deviceTypeCode": 22,
+      "deviceTypeRef": {
+        "code": 17,
+        "profileId": 259,
+        "label": "MA-powersource",
+        "name": "MA-powersource"
+      },
+      "deviceTypes": [
+        {
+          "code": 17,
+          "profileId": 259,
+          "label": "MA-powersource",
+          "name": "MA-powersource"
+        },
+        {
+          "code": 22,
+          "profileId": 259,
+          "label": "MA-rootdevice",
+          "name": "MA-rootdevice"
+        }
+      ],
+      "deviceVersions": [
+        1,
+        1
+      ],
+      "deviceIdentifiers": [
+        17,
+        22
+      ],
+      "deviceTypeName": "MA-powersource",
+      "deviceTypeCode": 17,
       "deviceTypeProfileId": 259,
       "clusters": [
         {
@@ -754,7 +783,7 @@
               "mfgCode": null,
               "side": "client",
               "type": "bitmap32",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -855,6 +884,22 @@
               "reportableChange": 0
             },
             {
+              "name": "TagList",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 0,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
@@ -873,6 +918,22 @@
             {
               "name": "AcceptedCommandList",
               "code": 65529,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "EventList",
+              "code": 65530,
               "mfgCode": null,
               "side": "server",
               "type": "array",
@@ -950,7 +1011,7 @@
               "mfgCode": null,
               "side": "client",
               "type": "bitmap32",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -1099,6 +1160,22 @@
               "reportableChange": 0
             },
             {
+              "name": "EventList",
+              "code": 65530,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "AttributeList",
               "code": 65531,
               "mfgCode": null,
@@ -1178,7 +1255,7 @@
               "mfgCode": null,
               "side": "client",
               "type": "bitmap32",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 1,
               "bounded": 0,
@@ -1535,6 +1612,22 @@
               "reportableChange": 0
             },
             {
+              "name": "ProductAppearance",
+              "code": 20,
+              "mfgCode": null,
+              "side": "server",
+              "type": "ProductAppearanceStruct",
+              "included": 0,
+              "storageOption": "External",
+              "singleton": 1,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
@@ -1553,6 +1646,22 @@
             {
               "name": "AcceptedCommandList",
               "code": 65529,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 1,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "EventList",
+              "code": 65530,
               "mfgCode": null,
               "side": "server",
               "type": "array",
@@ -1962,7 +2071,7 @@
               "mfgCode": null,
               "side": "client",
               "type": "bitmap32",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -2063,6 +2172,22 @@
               "reportableChange": 0
             },
             {
+              "name": "EventList",
+              "code": 65530,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "AttributeList",
               "code": 65531,
               "mfgCode": null,
@@ -2126,7 +2251,7 @@
               "mfgCode": null,
               "side": "client",
               "type": "bitmap32",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -2243,6 +2368,22 @@
               "reportableChange": 0
             },
             {
+              "name": "EventList",
+              "code": 65530,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "AttributeList",
               "code": 65531,
               "mfgCode": null,
@@ -2306,7 +2447,7 @@
               "mfgCode": null,
               "side": "client",
               "type": "bitmap32",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -2391,6 +2532,22 @@
               "reportableChange": 0
             },
             {
+              "name": "EventList",
+              "code": 65530,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "AttributeList",
               "code": 65531,
               "mfgCode": null,
@@ -2427,6 +2584,48 @@
               "code": 65533,
               "mfgCode": null,
               "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Power Source",
+          "code": 47,
+          "mfgCode": null,
+          "define": "POWER_SOURCE_CLUSTER",
+          "side": "client",
+          "enabled": 0,
+          "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
               "type": "int16u",
               "included": 1,
               "storageOption": "RAM",
@@ -2497,6 +2696,134 @@
               "reportableChange": 0
             },
             {
+              "name": "WiredAssessedInputVoltage",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int32u",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "WiredAssessedInputFrequency",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "WiredCurrentType",
+              "code": 5,
+              "mfgCode": null,
+              "side": "server",
+              "type": "WiredCurrentTypeEnum",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "WiredAssessedCurrent",
+              "code": 6,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int32u",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "WiredNominalVoltage",
+              "code": 7,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int32u",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "WiredMaximumCurrent",
+              "code": 8,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int32u",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "WiredPresent",
+              "code": 9,
+              "mfgCode": null,
+              "side": "server",
+              "type": "boolean",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ActiveWiredFaults",
+              "code": 10,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 0,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "BatVoltage",
               "code": 11,
               "mfgCode": null,
@@ -2561,6 +2888,54 @@
               "reportableChange": 0
             },
             {
+              "name": "BatReplacementNeeded",
+              "code": 15,
+              "mfgCode": null,
+              "side": "server",
+              "type": "boolean",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "BatReplaceability",
+              "code": 16,
+              "mfgCode": null,
+              "side": "server",
+              "type": "BatReplaceabilityEnum",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "BatPresent",
+              "code": 17,
+              "mfgCode": null,
+              "side": "server",
+              "type": "boolean",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "ActiveBatFaults",
               "code": 18,
               "mfgCode": null,
@@ -2577,6 +2952,118 @@
               "reportableChange": 0
             },
             {
+              "name": "BatReplacementDescription",
+              "code": 19,
+              "mfgCode": null,
+              "side": "server",
+              "type": "char_string",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "BatCommonDesignation",
+              "code": 20,
+              "mfgCode": null,
+              "side": "server",
+              "type": "BatCommonDesignationEnum",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "BatANSIDesignation",
+              "code": 21,
+              "mfgCode": null,
+              "side": "server",
+              "type": "char_string",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "BatIECDesignation",
+              "code": 22,
+              "mfgCode": null,
+              "side": "server",
+              "type": "char_string",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "BatApprovedChemistry",
+              "code": 23,
+              "mfgCode": null,
+              "side": "server",
+              "type": "BatApprovedChemistryEnum",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "BatCapacity",
+              "code": 24,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int32u",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "BatQuantity",
+              "code": 25,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8u",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "BatChargeState",
               "code": 26,
               "mfgCode": null,
@@ -2590,6 +3077,150 @@
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "BatTimeToFullCharge",
+              "code": 27,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int32u",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "BatFunctionalWhileCharging",
+              "code": 28,
+              "mfgCode": null,
+              "side": "server",
+              "type": "boolean",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "BatChargingCurrent",
+              "code": 29,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int32u",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ActiveBatChargeFaults",
+              "code": 30,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 0,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "EndpointList",
+              "code": 31,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "GeneratedCommandList",
+              "code": 65528,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AcceptedCommandList",
+              "code": 65529,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "EventList",
+              "code": 65530,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AttributeList",
+              "code": 65531,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
               "reportableChange": 0
             },
             {
@@ -2618,7 +3249,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "2",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -2666,7 +3297,7 @@
               "mfgCode": null,
               "side": "client",
               "type": "bitmap32",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -2841,6 +3472,22 @@
               "reportableChange": 0
             },
             {
+              "name": "EventList",
+              "code": 65530,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "AttributeList",
               "code": 65531,
               "mfgCode": null,
@@ -2954,7 +3601,7 @@
               "mfgCode": null,
               "side": "client",
               "type": "bitmap32",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -3177,6 +3824,22 @@
               "reportableChange": 0
             },
             {
+              "name": "EventList",
+              "code": 65530,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "AttributeList",
               "code": 65531,
               "mfgCode": null,
@@ -3233,6 +3896,16 @@
           "define": "GENERAL_DIAGNOSTICS_CLUSTER",
           "side": "client",
           "enabled": 0,
+          "commands": [
+            {
+              "name": "TestEventTrigger",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            }
+          ],
           "attributes": [
             {
               "name": "FeatureMap",
@@ -3240,7 +3913,7 @@
               "mfgCode": null,
               "side": "client",
               "type": "bitmap32",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -3449,6 +4122,22 @@
             {
               "name": "AcceptedCommandList",
               "code": 65529,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "EventList",
+              "code": 65530,
               "mfgCode": null,
               "side": "server",
               "type": "array",
@@ -5368,7 +6057,7 @@
               "mfgCode": null,
               "side": "client",
               "type": "bitmap32",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -5471,6 +6160,22 @@
             {
               "name": "AcceptedCommandList",
               "code": 65529,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "EventList",
+              "code": 65530,
               "mfgCode": null,
               "side": "server",
               "type": "array",
@@ -5614,7 +6319,7 @@
               "mfgCode": null,
               "side": "client",
               "type": "bitmap32",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -5813,6 +6518,22 @@
               "reportableChange": 0
             },
             {
+              "name": "EventList",
+              "code": 65530,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "AttributeList",
               "code": 65531,
               "mfgCode": null,
@@ -5910,7 +6631,7 @@
               "mfgCode": null,
               "side": "client",
               "type": "bitmap32",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -6047,6 +6768,22 @@
             {
               "name": "AcceptedCommandList",
               "code": 65529,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "EventList",
+              "code": 65530,
               "mfgCode": null,
               "side": "server",
               "type": "array",
@@ -6245,7 +6982,28 @@
       ]
     },
     {
+      "id": 2,
       "name": "MA-windowcovering",
+      "deviceTypeRef": {
+        "code": 514,
+        "profileId": 259,
+        "label": "MA-windowcovering",
+        "name": "MA-windowcovering"
+      },
+      "deviceTypes": [
+        {
+          "code": 514,
+          "profileId": 259,
+          "label": "MA-windowcovering",
+          "name": "MA-windowcovering"
+        }
+      ],
+      "deviceVersions": [
+        2
+      ],
+      "deviceIdentifiers": [
+        514
+      ],
       "deviceTypeName": "MA-windowcovering",
       "deviceTypeCode": 514,
       "deviceTypeProfileId": 259,
@@ -6728,7 +7486,7 @@
           "mfgCode": null,
           "define": "SCENES_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "AddSceneResponse",
@@ -7781,7 +8539,28 @@
       ]
     },
     {
+      "id": 3,
       "name": "MA-windowcovering",
+      "deviceTypeRef": {
+        "code": 514,
+        "profileId": 259,
+        "label": "MA-windowcovering",
+        "name": "MA-windowcovering"
+      },
+      "deviceTypes": [
+        {
+          "code": 514,
+          "profileId": 259,
+          "label": "MA-windowcovering",
+          "name": "MA-windowcovering"
+        }
+      ],
+      "deviceVersions": [
+        2
+      ],
+      "deviceIdentifiers": [
+        514
+      ],
       "deviceTypeName": "MA-windowcovering",
       "deviceTypeCode": 514,
       "deviceTypeProfileId": 259,
@@ -8264,7 +9043,7 @@
           "mfgCode": null,
           "define": "SCENES_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "AddSceneResponse",
@@ -9323,27 +10102,21 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 22
+      "networkId": 0
     },
     {
       "endpointTypeName": "MA-windowcovering",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0,
-      "endpointVersion": 2,
-      "deviceIdentifier": 514
+      "networkId": 0
     },
     {
       "endpointTypeName": "MA-windowcovering",
       "endpointTypeIndex": 2,
       "profileId": 259,
       "endpointId": 2,
-      "networkId": 0,
-      "endpointVersion": 2,
-      "deviceIdentifier": 514
+      "networkId": 0
     }
   ]
 }

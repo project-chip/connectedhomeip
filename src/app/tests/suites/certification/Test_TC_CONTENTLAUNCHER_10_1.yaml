@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the AcceptHeader attribute from the DUT"
+    - label: "Step 1: TH reads the AcceptHeader attribute from the DUT"
       PICS: CONTENTLAUNCHER.S.A0000
       command: "readAttribute"
       attribute: "AcceptHeader"
@@ -39,7 +39,9 @@ tests:
           constraints:
               type: list
 
-    - label: "TH reads the SupportedStreamingProtocols attribute from the DUT"
+    - label:
+          "Step 2: TH reads the SupportedStreamingProtocols attribute from the
+          DUT"
       PICS: CONTENTLAUNCHER.S.A0001
       command: "readAttribute"
       attribute: "SupportedStreamingProtocols"

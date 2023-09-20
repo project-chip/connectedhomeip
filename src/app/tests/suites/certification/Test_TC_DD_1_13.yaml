@@ -37,7 +37,7 @@ tests:
           otherwise if your DUT is advertising over BLE , pls use the '/chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1' command to discover and provision the device (BTW the SSID , passwd, descriminator ..etc are configurable parameters for your DUT)
       disabled: true
 
-    - label: "Power on the DUT device."
+    - label: "Step 1: Power on the DUT device."
       verification: |
           1. Verify DUT is NOT advertising in commissioning mode. On DUT, the DUT should not show up
 
@@ -53,7 +53,8 @@ tests:
           TH Commissioner should not discover the DUT here
       disabled: true
 
-    - label: "Scan the DUTs QR code from the previous step using the TH."
+    - label:
+          "Step 2: Scan the DUTs QR code from the previous step using the TH."
       verification: |
           1. Run DUT. Example for DUT=all-clusters app
           ./chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 0 --capabilities 4 --discriminator 3840 --passcode 20202021
@@ -73,8 +74,8 @@ tests:
       disabled: true
 
     - label:
-          "Follow any DUT-specific steps for putting the DUT Commissionee into
-          commissioning mode"
+          "Step 3: Follow any DUT-specific steps for putting the DUT
+          Commissionee into commissioning mode"
       verification: |
           1. Follow vendor-specific steps from the pairing hint to put DUT into commissioning mode
           2. Verify DUT is advertising in commissioning mode. On DUT,

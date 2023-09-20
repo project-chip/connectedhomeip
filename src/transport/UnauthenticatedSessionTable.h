@@ -89,7 +89,7 @@ public:
         {
         case Transport::Type::kUdp:
             return GetRetransmissionTimeout(mRemoteMRPConfig.mActiveRetransTimeout, mRemoteMRPConfig.mIdleRetransTimeout,
-                                            GetLastPeerActivityTime(), kMinActiveTime);
+                                            GetLastPeerActivityTime(), mRemoteMRPConfig.mActiveThresholdTime);
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
         case Transport::Type::kBle:
@@ -117,7 +117,8 @@ public:
 
     bool IsPeerActive() const
     {
-        return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) < kMinActiveTime);
+        return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) <
+                GetRemoteMRPConfig().mActiveThresholdTime);
     }
 
     System::Clock::Timestamp GetMRPBaseTimeout() const override

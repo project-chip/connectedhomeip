@@ -18,11 +18,28 @@
 
 #include "Esp32AppServer.h"
 #include "CHIPDeviceManager.h"
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
+#if CONFIG_ENABLE_ICD_SERVER
+#include <ICDSubscriptionCallback.h>
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if CONFIG_BT_ENABLED
+#include "esp_bt.h"
+#if CONFIG_BT_NIMBLE_ENABLED
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
+#include "esp_nimble_hci.h"
+#endif // ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
+#include "nimble/nimble_port.h"
+#endif // CONFIG_BT_NIMBLE_ENABLED
+#endif // CONFIG_BT_ENABLED
+#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+
 #include <string.h>
 
 using namespace chip;
@@ -49,6 +66,9 @@ static app::Clusters::NetworkCommissioning::Instance
 static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
                                                                                           0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
                                                                                           0xcc, 0xdd, 0xee, 0xff };
+#endif
+#if CONFIG_ENABLE_ICD_SERVER
+static ICDSubscriptionCallback sICDSubscriptionHandler;
 #endif
 } // namespace
 
@@ -93,6 +113,50 @@ static size_t hex_string_to_binary(const char * hex_string, uint8_t * buf, size_
 }
 #endif // CONFIG_TEST_EVENT_TRIGGER_ENABLED
 
+void Esp32AppServer::DeInitBLEIfCommissioned(void)
+{
+#if CONFIG_BT_ENABLED && CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
+    if (chip::Server::GetInstance().GetFabricTable().FabricCount() > 0)
+    {
+        esp_err_t err = ESP_OK;
+
+#if CONFIG_BT_NIMBLE_ENABLED
+        if (!ble_hs_is_enabled())
+        {
+            ESP_LOGI(TAG, "BLE already deinited");
+            return;
+        }
+        if (nimble_port_stop() != 0)
+        {
+            ESP_LOGE(TAG, "nimble_port_stop() failed");
+            return;
+        }
+        vTaskDelay(100);
+        nimble_port_deinit();
+
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
+        err = esp_nimble_hci_and_controller_deinit();
+#endif
+#endif /* CONFIG_BT_NIMBLE_ENABLED */
+
+#if CONFIG_IDF_TARGET_ESP32
+        err |= esp_bt_mem_release(ESP_BT_MODE_BTDM);
+#elif CONFIG_IDF_TARGET_ESP32C2 || CONFIG_IDF_TARGET_ESP32C3 || CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32H2
+        err |= esp_bt_mem_release(ESP_BT_MODE_BLE);
+#endif
+
+        if (err != ESP_OK)
+        {
+            ESP_LOGE(TAG, "BLE deinit failed");
+        }
+        else
+        {
+            ESP_LOGI(TAG, "BLE deinit successful and memory reclaimed");
+        }
+    }
+#endif /* CONFIG_BT_ENABLED && CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING */
+}
+
 void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 {
     // Init ZCL Data Model and CHIP App Server
@@ -113,6 +177,10 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
         initParams.appDelegate = sAppDelegate;
     }
     chip::Server::GetInstance().Init(initParams);
+#if CONFIG_ENABLE_ICD_SERVER
+    // Register ICD subscription callback to match subscription max intervals to its idle time interval
+    chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&sICDSubscriptionHandler);
+#endif // CONFIG_ENABLE_ICD_SERVER
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     sWiFiNetworkCommissioningInstance.Init();
@@ -125,4 +193,5 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
         chip::app::DnssdServer::Instance().StartServer();
     }
 #endif
+    DeInitBLEIfCommissioned();
 }

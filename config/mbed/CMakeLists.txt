@@ -106,9 +106,7 @@ matter_get_compiler_flags_from_targets("${CONFIG_CHIP_EXTERNAL_TARGETS}")
 matter_add_flags(-D__LINUX_ERRNO_EXTENSIONS__=1)
 matter_add_flags(-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>)
 
-if (CONFIG_CHIP_PW_RPC)
-    matter_add_gnu_cpp_standard("17")
-endif()
+matter_add_gnu_cpp_standard("17")
 
 if (CONFIG_MBED_BSD_SOCKET_TRACE)
     matter_add_flags(-DMBED_BSD_SOCKET_TRACE=1)

@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    50.2.5. [TC-DGTHREAD-2.5] Thread Network Diagnostics Cluster
-    Events[DUT-Server]
+    50.2.5. [TC-DGTHREAD-2.5] Thread Network Diagnostics Cluster Events [DUT-
+    Server]
 
 PICS:
     - DGTHREAD.S
@@ -31,56 +31,56 @@ tests:
           Commission TH to DUT
       disabled: true
 
-    - label: "Induce a DUT by an Unspecified failure"
+    - label: "Step 1: Induce a DUT by an Unspecified failure"
       PICS: DGTHREAD.S.E01
       verification: |
           There is no implementation in TH (chip-tool) to read these optional events. Pls mark as Not Applicable
       disabled: true
 
-    - label: "Induce a DUT by LinkDown failure"
+    - label: "Step 2: Induce a DUT by LinkDown failure"
       PICS: DGTHREAD.S.E01
       verification: |
           There is no implementation in TH (chip-tool) to read these optional events. Pls mark as Not Applicable
       disabled: true
 
-    - label: "Induce a DUT by HardwareFailure"
+    - label: "Step 3: Induce a DUT by HardwareFailure"
       PICS: DGTHREAD.S.E01
       verification: |
           There is no implementation in TH (chip-tool) to read these optional events. Pls mark as Not Applicable
       disabled: true
 
-    - label: "Induce a DUT by NetworkJammed Failure"
+    - label: "Step 4: Induce a DUT by NetworkJammed Failure"
       PICS: DGTHREAD.S.E01
       verification: |
           There is no implementation in TH (chip-tool) to read these optional events. Pls mark as Not Applicable
       disabled: true
 
-    - label: "Induce a DUT by an Unspecified failure"
+    - label: "Step 5: Induce a DUT by an Unspecified failure"
       PICS: DGTHREAD.S.E01
       verification: |
           There is no implementation in TH (chip-tool) to read these optional events. Pls mark as Not Applicable
       disabled: true
 
-    - label: "Induce a DUT by LinkDown failure"
+    - label: "Step 6: Induce a DUT by LinkDown failure"
       PICS: DGTHREAD.S.E01
       verification: |
           There is no implementation in TH (chip-tool) to read these optional events. Pls mark as Not Applicable
       disabled: true
 
-    - label: "Induce a DUT by HardwareFailure"
+    - label: "Step 7: Induce a DUT by HardwareFailure"
       PICS: DGTHREAD.S.E01
       verification: |
           There is no implementation in TH (chip-tool) to read these optional events. Pls mark as Not Applicable
       disabled: true
 
-    - label: "Induce a DUT by NetworkJammed Failure"
+    - label: "Step 8: Induce a DUT by NetworkJammed Failure"
       PICS: DGTHREAD.S.E01
       verification: |
           There is no implementation in TH (chip-tool) to read these optional events. Pls mark as Not Applicable
       disabled: true
 
-    - label: "Disconnect and reconnect a node to a Thread network"
+    - label: "Step 9: Disconnect and reconnect a node to a Thread network"
       PICS: DGTHREAD.S.E00
       verification: |
-          Optional Event so it is not mandatory to verify in v1.0. Pls mark as Not Applicable.
+          There is no implementation in TH (chip-tool) to read these optional events. Pls mark as Not Applicable
       disabled: true

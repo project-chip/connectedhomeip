@@ -112,7 +112,7 @@ void freertos_mbedtls_mutex_free(void)
     mbedtls_threading_free_alt();
 }
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode) && (configUSE_TICKLESS_IDLE != 0)
+#if (configUSE_TICKLESS_IDLE != 0)
 
 /*
  * Setup the systick timer to generate the tick interrupts at the required
@@ -239,7 +239,7 @@ void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
 
     OSA_InterruptEnable();
 }
-#endif /*  (cPWR_UsePowerDownMode) && (configUSE_TICKLESS_IDLE != 0) */
+#endif /* (configUSE_TICKLESS_IDLE != 0) */
 
 static void BOARD_ActionOnIdle(void)
 {

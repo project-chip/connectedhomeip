@@ -19,10 +19,7 @@ import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/lib/lib.gni")
 
 declare_args() {
-  # TODO: cpp_standard check is not ideal, it should be >= 17,
-  #       however for now this is what we use in compilations
-  matter_commandline_enable_perfetto_tracing =
-      current_os == "linux" && cpp_standard == "gnu++17"
+  matter_commandline_enable_perfetto_tracing = current_os == "linux"
 }
 
 config("default_config") {

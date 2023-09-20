@@ -154,6 +154,7 @@ blocklist
 blockquote
 bluetoothd
 bluez
+BOOL
 BooleanState
 bootable
 Bootloader
@@ -590,6 +591,7 @@ getManualTests
 getstarted
 getTests
 GH
+ghcr
 ghp
 githubusercontent
 gitignore
@@ -631,6 +633,7 @@ hci
 hciattach
 hciconfig
 hdlc
+HEPA
 HKDF
 HMAC
 hoc
@@ -650,6 +653,7 @@ IasWd
 iaszone
 ibb
 ICA
+ICD
 iCloud
 ICMP
 IDF
@@ -845,6 +849,7 @@ MDNS
 MediaInput
 MediaPlayback
 MediaTek
+MEI
 mem
 memdf
 MemMonitoring
@@ -956,6 +961,7 @@ OnOff
 OnOffClusterTest
 OnOffSwitchConfiguration
 OnPlatformEvent
+onwards
 OO
 openiotsdk
 openjdk
@@ -1172,6 +1178,7 @@ rtld
 RTOS
 RTT
 RTX
+runArgs
 RUNAS
 RunMain
 runtime
@@ -1270,6 +1277,9 @@ StatusCode
 stderr
 stdout
 sterm
+stmicroelectronics
+stm
+stlink
 storagepath
 str
 strcpy
@@ -1346,6 +1356,7 @@ ThreadNetworkDiagnostics
 threadOperationalDataset
 ThreadStackManager
 ThreadStackManagerImpl
+thread
 ths
 Thunderboard
 timedInteractionTimeoutMs
@@ -1419,6 +1430,7 @@ UnitLocalization
 unpair
 unprovisioned
 Unsecure
+Unselect
 untrusted
 updateAvailable
 updateNotAvailable
@@ -1550,3 +1562,5 @@ zhengyaohan
 Zigbee
 zigbeealliance
 zigbeethread
+PIXIT
+RVC

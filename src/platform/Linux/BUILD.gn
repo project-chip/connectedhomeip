@@ -41,10 +41,8 @@ static_library("Linux") {
   sources = [
     "../DeviceSafeQueue.cpp",
     "../DeviceSafeQueue.h",
+    "../GLibTypeDeleter.h",
     "../SingletonConfigurationManager.cpp",
-    "BLEManagerImpl.cpp",
-    "BLEManagerImpl.h",
-    "BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "CHIPLinuxStorage.cpp",
@@ -85,6 +83,9 @@ static_library("Linux") {
 
   if (chip_enable_ble) {
     sources += [
+      "BLEManagerImpl.cpp",
+      "BLEManagerImpl.h",
+      "BlePlatformConfig.h",
       "bluez/AdapterIterator.cpp",
       "bluez/AdapterIterator.h",
       "bluez/ChipDeviceScanner.cpp",
@@ -125,7 +126,6 @@ static_library("Linux") {
 
   if (chip_enable_openthread) {
     sources += [
-      "GlibTypeDeleter.h",
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
@@ -138,10 +138,7 @@ static_library("Linux") {
   }
 
   if (chip_enable_wifi) {
-    sources += [
-      "GlibTypeDeleter.h",
-      "NetworkCommissioningWiFiDriver.cpp",
-    ]
+    sources += [ "NetworkCommissioningWiFiDriver.cpp" ]
 
     public_deps += [ "dbus/wpa" ]
   }

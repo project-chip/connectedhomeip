@@ -29,7 +29,13 @@ cp {out}/android-arm64-chip-tool/lib/src/controller/java/OnboardingPayload.jar {
 
 cp {out}/android-arm64-chip-tool/lib/src/platform/android/AndroidPlatform.jar {root}/examples/android/CHIPTool/app/libs/AndroidPlatform.jar
 
+cp {out}/android-arm64-chip-tool/lib/src/controller/java/libCHIPJson.jar {root}/examples/android/CHIPTool/app/libs/libCHIPJson.jar
+
 cp {out}/android-arm64-chip-tool/lib/src/controller/java/libCHIPTlv.jar {root}/examples/android/CHIPTool/app/libs/libCHIPTlv.jar
+
+cp {out}/android-arm64-chip-tool/lib/src/controller/java/CHIPClusters.jar {root}/examples/android/CHIPTool/app/libs/CHIPClusters.jar
+
+cp {out}/android-arm64-chip-tool/lib/src/controller/java/CHIPClusterID.jar {root}/examples/android/CHIPTool/app/libs/CHIPClusterID.jar
 
 # Building APP android-arm64-chip-tool
 {root}/examples/android/CHIPTool/gradlew -p {root}/examples/android/CHIPTool -PmatterBuildSrcDir={out}/android-arm64-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-tool assembleDebug

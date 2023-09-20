@@ -19,8 +19,8 @@ name:
 PICS:
     - DRLK.S
     - DRLK.S.F00
+    - DRLK.S.F01
     - DRLK.S.F02
-    - DRLK.S.F03
 
 config:
     nodeId: 0x12344321
@@ -31,10 +31,10 @@ config:
         defaultValue: "123456"
     RFIDCredentialData:
         type: octet_string
-        defaultValue: "RFIDTESTDATA"
+        defaultValue: "123456789A"
     FingerVeinCredentialData:
         type: octet_string
-        defaultValue: "123456"
+        defaultValue: "123456789A"
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -45,7 +45,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Create new user with default parameters"
+    - label: "Precondition: Create new user with default parameters"
       command: "SetUser"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -65,7 +65,7 @@ tests:
               - name: "CredentialRule"
                 value: 0
 
-    - label: "Read the user back and verify its fields"
+    - label: "Precondition: Read the user back and verify its fields"
       command: "GetUser"
       arguments:
           values:
@@ -94,7 +94,9 @@ tests:
               - name: "NextUserIndex"
                 value: null
 
-    - label: "TH reads NumberOfTotalUsersSupported and saves for future use."
+    - label:
+          "Step 1a: TH reads NumberOfTotalUsersSupported and saves for future
+          use."
       PICS: DRLK.S.F08 && DRLK.S.A0011
       command: "readAttribute"
       attribute: "NumberOfTotalUsersSupported"
@@ -103,7 +105,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "TH reads MinPINCodeLength and saves for future use."
+    - label: "Step 1b: TH reads MinPINCodeLength and saves for future use."
       PICS: DRLK.S.F08 && DRLK.S.F00
       command: "readAttribute"
       attribute: "MinPINCodeLength"
@@ -112,7 +114,7 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "TH reads MaxPINCodeLength and saves for future use."
+    - label: "Step 1c: TH reads MaxPINCodeLength and saves for future use."
       PICS: DRLK.S.F08 && DRLK.S.F00
       command: "readAttribute"
       attribute: "MaxPINCodeLength"
@@ -121,7 +123,7 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "TH reads MinRFIDCodeLength and saves for future use."
+    - label: "Step 1d: TH reads MinRFIDCodeLength and saves for future use."
       PICS: DRLK.S.F08 && DRLK.S.F01 && DRLK.S.A001a
       command: "readAttribute"
       attribute: "MinRFIDCodeLength"
@@ -130,7 +132,7 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "TH reads MaxRFIDCodeLength and saves for future use."
+    - label: "Step 1e: TH reads MaxRFIDCodeLength and saves for future use."
       PICS: DRLK.S.F08 && DRLK.S.F01 && DRLK.S.A0019
       command: "readAttribute"
       attribute: "MaxRFIDCodeLength"
@@ -139,7 +141,7 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "TH sends Set Credential Command to DUT with type PIN"
+    - label: "Step 2a: TH sends Set Credential Command to DUT with type PIN"
       PICS: DRLK.S.F00 && DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -166,7 +168,7 @@ tests:
               - name: "NextCredentialIndex"
                 value: 2
 
-    - label: "TH sends Set Credential Command to DUT with type RFID"
+    - label: "Step 2b: TH sends Set Credential Command to DUT with type RFID"
       PICS: DRLK.S.F01 && DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -193,7 +195,8 @@ tests:
               - name: "NextCredentialIndex"
                 value: 2
 
-    - label: "TH sends Set Credential Command to DUT with type FingerVein"
+    - label:
+          "Step 2c: TH sends Set Credential Command to DUT with type FingerVein"
       PICS: DRLK.S.F02 && DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -220,7 +223,7 @@ tests:
               - name: "NextCredentialIndex"
                 value: 2
 
-    - label: "TH sends Get Credential Status Command with type PIN"
+    - label: "Step 3a: TH sends Get Credential Status Command with type PIN"
       PICS: DRLK.S.F00 && DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
@@ -242,7 +245,7 @@ tests:
               - name: "NextCredentialIndex"
                 value: null
 
-    - label: "TH sends Get Credential Status Command with type RFID"
+    - label: "Step 3b: TH sends Get Credential Status Command with type RFID"
       PICS: DRLK.S.F08 && DRLK.S.F01 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
@@ -264,7 +267,8 @@ tests:
               - name: "NextCredentialIndex"
                 value: null
 
-    - label: "TH sends Get Credential Status Command with type FingerVein"
+    - label:
+          "Step 3c: TH sends Get Credential Status Command with type FingerVein"
       PICS: DRLK.S.F08 && DRLK.S.F02 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
@@ -286,7 +290,7 @@ tests:
               - name: "NextCredentialIndex"
                 value: null
 
-    - label: "TH sends Clear Credential Command to DUT with type PIN"
+    - label: "Step 4a: TH sends Clear Credential Command to DUT with type PIN"
       PICS: DRLK.S.F00 && DRLK.S.F08 && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 10000
@@ -295,7 +299,7 @@ tests:
               - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
 
-    - label: "TH sends Get Credential Status Command with type RFID"
+    - label: "Step 4b: TH sends Get Credential Status Command with type RFID"
       PICS: DRLK.S.F08 && DRLK.S.F01 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
@@ -317,7 +321,8 @@ tests:
               - name: "NextCredentialIndex"
                 value: null
 
-    - label: "TH sends Get Credential Status Command with type FingerVein"
+    - label:
+          "Step 4c: TH sends Get Credential Status Command with type FingerVein"
       PICS: DRLK.S.F08 && DRLK.S.F02 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
@@ -339,7 +344,7 @@ tests:
               - name: "NextCredentialIndex"
                 value: null
 
-    - label: "TH sends Clear Credential Command to DUT with type RFID"
+    - label: "Step 4d: TH sends Clear Credential Command to DUT with type RFID"
       PICS: DRLK.S.F01 && DRLK.S.F08 && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 10000
@@ -348,7 +353,8 @@ tests:
               - name: "Credential"
                 value: { CredentialType: 2, CredentialIndex: 1 }
 
-    - label: "TH sends Get Credential Status Command with type FingerVein"
+    - label:
+          "Step 4e: TH sends Get Credential Status Command with type FingerVein"
       PICS: DRLK.S.F08 && DRLK.S.F02 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
@@ -370,7 +376,9 @@ tests:
               - name: "NextCredentialIndex"
                 value: null
 
-    - label: "TH sends Clear Credential Command to DUT with type FingerVein"
+    - label:
+          "Step 4f: TH sends Clear Credential Command to DUT with type
+          FingerVein"
       PICS: DRLK.S.F02 && DRLK.S.F08 && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 10000
@@ -379,7 +387,8 @@ tests:
               - name: "Credential"
                 value: { CredentialType: 4, CredentialIndex: 1 }
 
-    - label: "TH sends Get Credential Status Command to DUT with type PIN"
+    - label:
+          "Step 5a: TH sends Get Credential Status Command to DUT with type PIN"
       PICS: DRLK.S.F00 && DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
@@ -399,7 +408,8 @@ tests:
               - name: "NextCredentialIndex"
                 value: null
 
-    - label: "TH sends Get Credential Status Command to DUT with type RFID"
+    - label:
+          "Step 5b: TH sends Get Credential Status Command to DUT with type RFID"
       PICS: DRLK.S.F01 && DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
@@ -420,7 +430,8 @@ tests:
                 value: null
 
     - label:
-          "TH sends Get Credential Status Command to DUT with type FingerVein"
+          "Step 5c: TH sends Get Credential Status Command to DUT with type
+          FingerVein"
       PICS: DRLK.S.F02 && DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:

@@ -23,6 +23,60 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: Read PHYRate attribute constraints"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              anyOf: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, null]
+
+    - label: "Step 3: Read FullDuplex attribute constraints"
+      PICS: DGETH.S.A0001
+      command: "readAttribute"
+      attribute: "FullDuplex"
+      response:
+          constraints:
+              type: boolean
+              anyOf: [0, 1, null]
+
+    - label: "Step 4a: Read PacketRxCount attribute constraints"
+      PICS: DGETH.S.A0002
+      command: "readAttribute"
+      attribute: "PacketRxCount"
+      response:
+          constraints:
+              type: int64u
+              minValue: 0
+              maxValue: "18446744073709551615"
+
+    - label: "Step 4b: Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Step 4c: Reboot target device(DUT)"
+      verification: |
+          Did the DUT successfully reboot?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -31,43 +85,12 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read PHYRate attribute constraints"
-      PICS: DGETH.S.A0000
-      command: "readAttribute"
-      attribute: "PHYRate"
-      response:
-          constraints:
-              type: enum8
-              minValue: 0
-              maxValue: 9
-
-    - label: "Read FullDuplex attribute constraints"
-      PICS: DGETH.S.A0001
-      command: "readAttribute"
-      attribute: "FullDuplex"
-      response:
-          constraints:
-              type: boolean
-
-    #issue #13648
-    - label: "Read PacketRxCount attribute constraints"
-      PICS: DGETH.S.A0002
-      command: "readAttribute"
-      attribute: "PacketRxCount"
-      response:
-          constraints:
-              type: int64u
-
+    #Test-plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3413
     - label:
-          "Read PacketRxCount value from DUT and verify the number of packets
-          received on ethernet network interface"
+          "Step 4d: Upon a node reboot, PacketRxCount attribute value will be
+          reset to 0"
       verification: |
-          ./chip-tool ethernetnetworkdiagnostics read packet-rx-count 1 0
-
-          Verify the value of PacketRxCount is in range uint64 on TH(chip-tool) log
-
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0002 DataVersion: 3872576452
-          [1649663623.009973][8103:8108] CHIP:TOO:   PacketRxCount: 3322
+          Upon a node reboot, the value will be reset to 0.
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT && DGETH.S.A0002
@@ -78,24 +101,22 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Read PacketTxCount attribute constraints"
+    - label: "Step 5a: Read PacketTxCount attribute constraints"
       PICS: DGETH.S.A0003
       command: "readAttribute"
       attribute: "PacketTxCount"
       response:
           constraints:
               type: int64u
+              minValue: 0
+              maxValue: "18446744073709551615"
 
+    #Test-plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3413
     - label:
-          "Read PacketTxCount value from DUT and verify the number of packets
-          received on ethernet network interface"
+          "Step 5b: Read PacketTxCount attribute constraints, Upon a node
+          reboot, the value will be reset to 0"
       verification: |
-          ./chip-tool ethernetnetworkdiagnostics read packet-tx-count 1 0
-
-          Verify the value of PacketTxCount is in range uint64 on TH(chip-tool) Log
-
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0003 DataVersion: 3872576452
-          [1649663793.192934][8117:8122] CHIP:TOO:   PacketTxCount: 3220
+          Upon a node reboot, the value will be reset to 0.
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT && DGETH.S.A0003
@@ -106,145 +127,52 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Read TxErrCount attribute constraints"
+    - label:
+          "Step 6: Read TxErrCount attribute constraints, Upon a node reboot,
+          the value will be reset to 0"
       PICS: DGETH.S.A0004
       command: "readAttribute"
       attribute: "TxErrCount"
       response:
+          value: 0
           constraints:
               type: int64u
 
     - label:
-          "Read TxErrCount value from DUT and verify value indicates the number
-          of failed packet transmission on ethernet network interface"
-      verification: |
-          ./chip-tool ethernetnetworkdiagnostics read tx-err-count 1 0
-
-          Verify the value of TxErrCount is in range uint64 on TH(chip-tool) Log
-
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0004 DataVersion: 3872576452
-          [1649663843.295395][8123:8128] CHIP:TOO:   TxErrCount: 0
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGETH.S.A0004
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Read CollisionCount attribute constraints"
+          "Step 7: Read CollisionCount attribute , Upon a node reboot, the value
+          will be reset to 0"
       PICS: DGETH.S.A0005
       command: "readAttribute"
       attribute: "CollisionCount"
       response:
+          value: 0
           constraints:
               type: int64u
 
-    - label:
-          "Read CollisionCount value from DUT and verify value indicates the
-          number of collision occurred while transmitting packets on ethernet
-          network interface"
-      verification: |
-          ./chip-tool ethernetnetworkdiagnostics read collision-count 1 0
-
-          Verify the value of  CollisionCount is in range uint64 on TH(chip-tool) Log
-
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0005 DataVersion: 3872576452
-          [1649663870.221742][8133:8138] CHIP:TOO:   CollisionCount: 0
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGETH.S.A0005
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Read OverrunCount attribute constraints"
+    - label: "Step 8: Read OverrunCount attribute constraints"
       PICS: DGETH.S.A0006
       command: "readAttribute"
       attribute: "OverrunCount"
       response:
+          value: 0
           constraints:
               type: int64u
 
-    - label:
-          "Read OverrunCount value from DUT and verify value indicates the
-          number of packets dropped due to lack of buffer memory on ethernet
-          network interface"
-      verification: |
-          ./chip-tool ethernetnetworkdiagnostics read overrun-count 1 0
-
-          Verify the value of OverrunCount is in range uint64 on TH(chip-tool) Log
-
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0006 DataVersion: 3872576452
-          [1649663948.738274][8142:8147] CHIP:TOO:   OverrunCount: 0
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGETH.S.A0006
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Read CarrierDetect attribute constraints"
+    - label: "Step 9: Read CarrierDetect attribute constraints"
       PICS: DGETH.S.A0007
       command: "readAttribute"
       attribute: "CarrierDetect"
       response:
           constraints:
               type: boolean
+              anyOf: [0, 1, null]
 
-    - label:
-          "Read CarrierDetect value from DUT and verify value indicates the
-          presence of carrier detect control signal on ethernet network
-          interface"
-      verification: |
-          ./chip-tool ethernetnetworkdiagnostics read carrier-detect 1 0
-
-          Verify the value of CarrierDetect is either bool or if the interface is not configured or operational, NULL should be read,  this is optional attribute implemented in RPI, may vary based on DUT implementation  on TH(chip-tool) Log:
-
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0007 DataVersion: 3872576452
-          [1649663972.829304][8149:8154] CHIP:TOO:   CarrierDetect: null
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGETH.S.A0007
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Read TimeSinceReset attribute constraints"
+    - label: "Step 10: Read TimeSinceReset attribute constraints"
       PICS: DGETH.S.A0008
       command: "readAttribute"
       attribute: "TimeSinceReset"
       response:
           constraints:
               type: int64u
-
-    - label:
-          "Read TimeSinceReset value from DUT and verify the value indicates the
-          duration of time, in minutes"
-      verification: |
-          ./chip-tool ethernetnetworkdiagnostics read  time-since-reset 1 0
-
-          Verify the value of TimeSinceReset is in range uint64, If the interface is not configured or operational, NULL should be read, this is optional attribute implemented in RPI, may vary based on DUT implementation  on TH(chip-tool) Log:
-
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0008 DataVersion: 3872576452
-          [1649664046.010810][8158:8163] CHIP:TOO:   TimeSinceReset: 5219
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGETH.S.A0008
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+              minValue: 0
+              maxValue: "18446744073709551615"

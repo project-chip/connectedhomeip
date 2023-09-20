@@ -62,12 +62,13 @@ using Microseconds32 = std::chrono::duration<uint32_t, std::micro>;
 
 using Milliseconds64 = std::chrono::duration<uint64_t, std::milli>;
 using Milliseconds32 = std::chrono::duration<uint32_t, std::milli>;
+using Milliseconds16 = std::chrono::duration<uint16_t, std::milli>;
 
 using Seconds64 = std::chrono::duration<uint64_t>;
 using Seconds32 = std::chrono::duration<uint32_t>;
 using Seconds16 = std::chrono::duration<uint16_t>;
 
-constexpr Seconds16 kZero{ 0 };
+inline constexpr Seconds16 kZero{ 0 };
 
 namespace Literals {
 
@@ -95,6 +96,10 @@ constexpr Milliseconds64 operator""_ms64(unsigned long long int ms)
 constexpr Milliseconds32 operator""_ms32(unsigned long long int ms)
 {
     return Milliseconds32(ms);
+}
+constexpr Milliseconds16 operator""_ms16(unsigned long long int ms)
+{
+    return Milliseconds16(ms);
 }
 
 constexpr Seconds64 operator""_s(unsigned long long int s)

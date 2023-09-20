@@ -21,10 +21,16 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/att-storage.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
+#include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
 #include <platform/PlatformManager.h>
+
+#include <air-quality-instance.h>
+#include <dishwasher-mode.h>
+#include <laundry-washer-mode.h>
+#include <rvc-modes.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -141,6 +147,36 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     else if (name == "SoftwareReset")
     {
         self->OnRebootSignalHandler(BootReasonType::kSoftwareReset);
+    }
+    else if (name == "ModeChange")
+    {
+        using chip::app::DataModel::MakeNullable;
+        std::string device   = self->mJsonValue["Device"].asString();
+        std::string type     = self->mJsonValue["Type"].asString();
+        Json::Value jsonMode = self->mJsonValue["Mode"];
+        DataModel::Nullable<uint8_t> mode;
+        if (!jsonMode.isNull())
+        {
+            mode = MakeNullable(static_cast<uint8_t>(jsonMode.asUInt()));
+        }
+        else
+        {
+            mode.SetNull();
+        }
+        self->OnModeChangeHandler(device, type, mode);
+    }
+    else if (name == "SetAirQuality")
+    {
+        Json::Value jsonAirQualityEnum = self->mJsonValue["NewValue"];
+
+        if (jsonAirQualityEnum.isNull())
+        {
+            ChipLogError(NotSpecified, "The SetAirQuality command requires the NewValue key.");
+        }
+        else
+        {
+            self->OnAirQualityChange(static_cast<uint32_t>(jsonAirQualityEnum.asUInt()));
+        }
     }
     else
     {
@@ -286,6 +322,9 @@ void AllClustersAppCommandHandler::OnSwitchLongPressedHandler(uint8_t newPositio
     ChipLogDetail(NotSpecified, "The new position when the momentary switch has been pressed for a long time:%d", newPosition);
 
     Clusters::SwitchServer::Instance().OnLongPress(endpoint, newPosition);
+
+    // Long press to trigger smokeco self-test
+    SmokeCoAlarmServer::Instance().RequestSelfTest(endpoint);
 }
 
 void AllClustersAppCommandHandler::OnSwitchShortReleasedHandler(uint8_t previousPosition)
@@ -338,6 +377,67 @@ void AllClustersAppCommandHandler::OnSwitchMultiPressCompleteHandler(uint8_t pre
     ChipLogDetail(NotSpecified, "%d times the momentary switch has been pressed", count);
 
     Clusters::SwitchServer::Instance().OnMultiPressComplete(endpoint, previousPosition, count);
+}
+
+void AllClustersAppCommandHandler::OnModeChangeHandler(std::string device, std::string type, DataModel::Nullable<uint8_t> mode)
+{
+    ModeBase::Instance * modeInstance = nullptr;
+    if (device == "DishWasher")
+    {
+        modeInstance = DishwasherMode::Instance();
+    }
+    else if (device == "LaundryWasher")
+    {
+        modeInstance = LaundryWasherMode::Instance();
+    }
+    else if (device == "RvcClean")
+    {
+        modeInstance = RvcCleanMode::Instance();
+    }
+    else if (device == "RvcRun")
+    {
+        modeInstance = RvcRunMode::Instance();
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Invalid device type : %s", device.c_str());
+        return;
+    }
+
+    if (type == "Current")
+    {
+        if (mode.IsNull())
+        {
+            ChipLogDetail(NotSpecified, "Invalid value : null");
+            return;
+        }
+        modeInstance->UpdateCurrentMode(mode.Value());
+    }
+    else if (type == "StartUp")
+    {
+        modeInstance->UpdateStartUpMode(mode);
+    }
+    else if (type == "On")
+    {
+        modeInstance->UpdateOnMode(mode);
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Invalid mode type : %s", type.c_str());
+        return;
+    }
+}
+
+void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aNewValue)
+{
+    AirQuality::Instance * airQualityInstance = AirQuality::GetInstance();
+    Protocols::InteractionModel::Status status =
+        airQualityInstance->UpdateAirQuality(static_cast<AirQuality::AirQualityEnum>(aNewValue));
+
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        ChipLogDetail(NotSpecified, "Invalid value: %u", aNewValue);
+    }
 }
 
 void AllClustersCommandDelegate::OnEventCommandReceived(const char * json)

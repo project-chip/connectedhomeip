@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/setup_nav_graph"
+    app:startDestination="@id/setupFragment">
+
+    <fragment
+        android:id="@+id/setupFragment"
+        android:name="com.matter.virtual.device.app.feature.setup.SetupFragment"
+        android:label="SetupFragment"
+        tools:layout="@layout/fragment_setup">
+        <argument
+            android:name="setting"
+            app:argType="string" />
+        <deepLink app:uri="android-app://com.matter.virtual.device.app.feature.setup/setupFragment/{setting}" />
+    </fragment>
+</navigation>

@@ -17,19 +17,24 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
+import("${chip_root}/src/platform/bouffalolab/common/args.gni")
+
 assert(chip_device_platform == "bl702")
+assert(chip_enable_factory_data == false)
 
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
 }
 
 static_library("BL702") {
+  defines = []
+
   sources = [
     "DiagnosticDataProviderImpl.cpp",
     "PlatformManagerImpl.cpp",
   ]
 
-  common_sources = [
+  sources += [
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
     "../common/BLConfig.cpp",
@@ -39,12 +44,6 @@ static_library("BL702") {
     "../common/KeyValueStoreManagerImpl.cpp",
     "../common/Logging.cpp",
     "../common/PlatformManagerImpl.cpp",
-
-    # "${chip_root}/src/credentials/CHIPCert.h",
-    # "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
-
-    # "../common/FactoryDataProvider.cpp",
-    # "../common/FactoryDataProvider.h",
   ]
 
   if (chip_enable_ota_requestor) {
@@ -60,7 +59,26 @@ static_library("BL702") {
       "../common/BLEManagerImpl.h",
     ]
   }
-  sources += common_sources
+
+  defines =
+      [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
+  if (chip_enable_factory_data || chip_enable_factory_data_test) {
+    sources += [
+      "../common/FactoryDataProvider.cpp",
+      "../common/FactoryDataProvider.h",
+    ]
+  }
+
+  if (chip_enable_wifi) {
+    sources += [
+      "ConfigurationManagerImpl.cpp",
+      "ConnectivityManagerImpl.cpp",
+      "NetworkCommissioningDriver.cpp",
+      "wifi_mgmr_portable.c",
+    ]
+
+    deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
+  }
 
   if (chip_enable_openthread) {
     # needed for MTD/FTD
@@ -84,5 +102,16 @@ static_library("BL702") {
     }
   }
 
+  if (chip_enable_ethernet) {
+    sources += [
+      "ConfigurationManagerImpl.cpp",
+      "ConnectivityManagerImpl.cpp",
+      "EthernetInterface.c",
+    ]
+
+    deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
+  }
+
+  deps += [ "${chip_root}/src/credentials:credentials_header" ]
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 }

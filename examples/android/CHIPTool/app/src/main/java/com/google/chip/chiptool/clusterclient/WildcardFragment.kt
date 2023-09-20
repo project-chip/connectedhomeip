@@ -27,13 +27,14 @@ import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.ChipPathId
 import chip.devicecontroller.model.InvokeElement
 import chip.devicecontroller.model.NodeState
+import chip.jsontlv.putJsonString
 import chip.tlv.AnonymousTag
-import chip.tlv.ContextSpecificTag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.WildcardFragmentBinding
+import com.google.chip.chiptool.util.toAny
 import java.lang.StringBuilder
 import java.util.Optional
 import kotlin.coroutines.resume
@@ -219,16 +220,19 @@ class WildcardFragment : Fragment() {
         stringBuilder.append("\t${ChipIdLookup.clusterIdToName(clusterId)}Cluster: {\n")
         clusterState.attributeStates.forEach { (attributeId, attributeState) ->
           val attributeName = ChipIdLookup.attributeIdToName(clusterId, attributeId)
-          stringBuilder.append("\t\t$attributeName: ${attributeState.value}\n")
+          val tlv = attributeState.tlv
+          stringBuilder.append("\t\t$attributeName: ${TlvReader(tlv).toAny()}\n")
         }
         clusterState.eventStates.forEach { (eventId, events) ->
           for (event in events) {
             stringBuilder.append("\t\teventNumber: ${event.eventNumber}\n")
             stringBuilder.append("\t\tpriorityLevel: ${event.priorityLevel}\n")
-            stringBuilder.append("\t\tsystemTimeStamp: ${event.systemTimeStamp}\n")
+            stringBuilder.append("\t\ttimestampType: ${event.timestampType}\n")
+            stringBuilder.append("\t\ttimestampValue: ${event.timestampValue}\n")
 
             val eventName = ChipIdLookup.eventIdToName(clusterId, eventId)
-            stringBuilder.append("\t\t$eventName: ${event.value}\n")
+            val tlv = event.tlv
+            stringBuilder.append("\t\t$eventName: ${TlvReader(tlv).toAny()}\n")
           }
         }
         stringBuilder.append("\t}\n")
@@ -304,19 +308,6 @@ class WildcardFragment : Fragment() {
     val endpointId = getChipPathIdForText(binding.endpointIdEd.text.toString())
     val clusterId = getChipPathIdForText(binding.clusterIdEd.text.toString())
     val attributeId = getChipPathIdForText(binding.attributeIdEd.text.toString())
-    val tlvWriter = TlvWriter()
-    val values = writeValue.split(",")
-
-    if (values.size > 1) tlvWriter.startArray(AnonymousTag)
-    for (value in values) {
-      try {
-        TLV_MAP[writeValueType]?.generate(tlvWriter, value.trim())
-      } catch (ex: Exception) {
-        Log.e(TAG, "Invalid Data Type", ex)
-        return
-      }
-    }
-    if (values.size > 1) tlvWriter.endArray()
 
     val version =
       if (dataVersion == null) {
@@ -325,14 +316,36 @@ class WildcardFragment : Fragment() {
         Optional.of(dataVersion)
       }
 
-    val writeRequest =
-      AttributeWriteRequest.newInstance(
-        endpointId,
-        clusterId,
-        attributeId,
-        tlvWriter.getEncoded(),
-        version
-      )
+    lateinit var writeRequest: AttributeWriteRequest
+
+    if (writeValueType == "json") {
+      writeRequest =
+        AttributeWriteRequest.newInstance(endpointId, clusterId, attributeId, writeValue, version)
+    } else {
+      val tlvWriter = TlvWriter()
+      val values = writeValue.split(",")
+
+      if (values.size > 1) tlvWriter.startArray(AnonymousTag)
+      for (value in values) {
+        try {
+          TLV_MAP[writeValueType]?.generate(tlvWriter, value.trim())
+        } catch (ex: Exception) {
+          Log.e(TAG, "Invalid Data Type", ex)
+          return
+        }
+      }
+      if (values.size > 1) tlvWriter.endArray()
+
+      writeRequest =
+        AttributeWriteRequest.newInstance(
+          endpointId,
+          clusterId,
+          attributeId,
+          tlvWriter.getEncoded(),
+          version
+        )
+    }
+
     deviceController.write(
       writeAttributeCallback,
       ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
@@ -342,35 +355,14 @@ class WildcardFragment : Fragment() {
     )
   }
 
-  private suspend fun invoke(invokeField: String, timedRequestTimeoutMs: Int, imTimeoutMs: Int) {
+  private suspend fun invoke(invokeJson: String, timedRequestTimeoutMs: Int, imTimeoutMs: Int) {
     val endpointId = getChipPathIdForText(binding.endpointIdEd.text.toString())
     val clusterId = getChipPathIdForText(binding.clusterIdEd.text.toString())
     val commandId = getChipPathIdForText(binding.commandIdEd.text.toString())
 
-    val tlvWriter = TlvWriter()
-    val fields =
-      if (invokeField.isEmpty()) {
-        listOf()
-      } else {
-        invokeField.split(",")
-      }
-    var count = 0
-    tlvWriter.startStructure(AnonymousTag)
-    for (field in fields) {
-      try {
-        val type = field.split(":")[0]
-        val value = field.split(":")[1]
-
-        Log.d(TAG, "value : $type - $value")
-        TLV_MAP[type]?.generate(tlvWriter, value.trim(), ContextSpecificTag(count++))
-      } catch (ex: Exception) {
-        Log.e(TAG, "Invalid value", ex)
-        return
-      }
-    }
-    tlvWriter.endStructure()
+    val jsonString = invokeJson.ifEmpty { "{}" }
     val invokeElement =
-      InvokeElement.newInstance(endpointId, clusterId, commandId, tlvWriter.getEncoded(), null)
+      InvokeElement.newInstance(endpointId, clusterId, commandId, null, jsonString)
     deviceController.invoke(
       invokeCallback,
       ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
@@ -651,6 +643,12 @@ class WildcardFragment : Fragment() {
 
     private val TLV_MAP =
       mapOf(
+        "json" to
+          object : TlvWriterInterface {
+            override fun generate(writer: TlvWriter, value: String, tag: chip.tlv.Tag) {
+              writer.putJsonString(tag, value)
+            }
+          },
         "UnsignedInt" to
           object : TlvWriterInterface {
             override fun generate(writer: TlvWriter, value: String, tag: chip.tlv.Tag) {

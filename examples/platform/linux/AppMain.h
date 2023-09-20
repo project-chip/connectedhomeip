@@ -103,3 +103,6 @@ CommissionerDiscoveryController * GetCommissionerDiscoveryController();
 
 // For extra init calls, the function will be called right before running Matter main loop.
 void ApplicationInit();
+
+// For extra shutdown calls, the function will be called before any of the core Matter objects are shut down.
+void ApplicationShutdown();

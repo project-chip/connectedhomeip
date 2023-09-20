@@ -40,10 +40,6 @@ ZAP is generally installed as a third-party tool via CIPD during the build
 environment bootstrap (see `scripts/setup/zap.json`), which makes `zap-cli`
 available in `$PATH` when running in a build environment.
 
-**NOTE**: zap packages are currently NOT available for `arm64` (like when
-compiling on Raspberry PI.). In these cases one should check out zap from source
-and set `$ZAP_DEVELOPMENT_PATH` as described below.
-
 When matter scripts need to invoke `zap-cli` (for code generation) or `zap` (to
 start the UI tool), they make use of the following environment variables to
 figure out where the zap tool is located (in order of precedence):

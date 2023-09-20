@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 15.4.7. [TC-SC-4.7] Commissioner Discovery [DUT as Commissionee]
+name: 3.4.7.[TC-SC-4.7] Commissioner Discovery [DUT as Commissionee]
 
 PICS:
     - MCORE.ROLE.COMMISSIONEE
@@ -25,14 +25,20 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Precondition"
+      verification: |
+          1. DUT is connected to the IP network
+          2. DUT and TH support Commissioner Discovery
+      disabled: true
+
     - label:
-          "TH is instructed to start advertising its presence as a commissioner
-          in the network"
+          "Step 1: TH is instructed to start advertising its presence as a
+          commissioner in the network"
       verification: |
           To verify this test case use TV Reference app
       disabled: true
 
-    - label: "Scan for DNS-SD commissioner advertisements from TH"
+    - label: "Step 2: Scan for DNS-SD commissioner advertisements from TH"
       PICS:
           MCORE.SC.DEVTYPE_SUBTYPE && MCORE.SC.VP_KEY && MCORE.SC.DT_KEY &&
           MCORE.SC.DN_KEY
@@ -61,7 +67,7 @@ tests:
           +;eth0;IPv6;_matterd;_udp;local
       disabled: true
 
-    - label: "Scan for DNS-SD commissioner advertisements from TH"
+    - label: "Step 3: Scan for DNS-SD commissioner advertisements from TH"
       verification: |
           Verify the DUT is able to discover the TH.
 

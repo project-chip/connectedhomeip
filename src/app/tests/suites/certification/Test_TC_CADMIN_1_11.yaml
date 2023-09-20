@@ -32,15 +32,15 @@ tests:
           Reset Devices to factory defaults
       disabled: true
 
-    - label: "TH_CR1 starts a commissioning process with DUT_CE"
+    - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
       PICS: CADMIN.S
       verification: |
           "1. Provision the DUT_CE (all-cluster-app) device using TH_CR1 (chip-tool ) on the raspi"
       disabled: true
 
     - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+          "Step 2: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.S.C00.Rsp
       verification: |
           On TH_CR1 send the below command
@@ -62,7 +62,7 @@ tests:
           [1635864513.699685][3850:3855] CHIP:IN: Prepared plaintext message 0xffff8a7cd960 to 0x0000000000000000 of type
       disabled: true
 
-    - label: "DNS-SD records shows DUT_CE advertising"
+    - label: "Step 3: DNS-SD records shows DUT_CE advertising"
       verification: |
           On TH_CR1 send the below command
 
@@ -82,7 +82,7 @@ tests:
           grl@grl-ThinkPad-L480:~/2nd_cntrl/connectedhomeip/examples/chip-tool/out/debug$ On TH_CR1 send the below command
       disabled: true
 
-    - label: "TH_CR3 Commissions with DUT_CE"
+    - label: "Step 4: TH_CR3 Commissions with DUT_CE"
       PICS: CADMIN.S
       verification: |
           On TH_CR3 send the below command
@@ -94,9 +94,9 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT.CADMIN.CwDuration seconds using ECM and TH_CR2
-          Commissions with DUT_CE"
+          "Step 5: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM and
+          TH_CR2 Commissions with DUT_CE"
       PICS: CADMIN.S.C00.Rsp
       verification: |
           On TH_CR1 send the below command
@@ -119,8 +119,8 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+          "Step 6: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.S.C00.Rsp
       verification: |
           On TH_CR1 send the below command
@@ -142,9 +142,10 @@ tests:
       disabled: true
 
     - label:
-          "Before the expiration of PIXIT.CADMIN.CwDuration seconds which was
-          set in step 5, TH_CR1 opens a 2nd commissioning window on DUT_CE using
-          a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+          "Step 7: Before the expiration of PIXIT.CADMIN.CwDuration seconds
+          which was set in step 5, TH_CR1 opens a 2nd commissioning window on
+          DUT_CE using a commissioning timeout of PIXIT.CADMIN.CwDuration
+          seconds using ECM"
       PICS: CADMIN.S.C00.Rsp
       verification: |
           On TH_CR1 send the below command
@@ -167,7 +168,7 @@ tests:
           [1650527291.952634][8566:8571] CHIP:DMG:                         },
       disabled: true
 
-    - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
+    - label: "Step 8: TH_CR1 reads the list of Fabrics on DUT_CE"
       PICS: OPCREDS.S.A0001
       verification: |
           On TH_CR1 send the below command
@@ -205,14 +206,14 @@ tests:
       disabled: true
 
     - label:
-          "Wait for the expiration of PIXIT.CADMIN.CwDuration seconds that was
-          set in step 6"
+          "Step 9: Wait for the expiration of PIXIT.CADMIN.CwDuration seconds
+          that was set in step 6"
       verification: |
           Wait for the expiration of PIXIT.CADMIN.CwDuration seconds that was set in step 6
       disabled: true
 
     - label:
-          "TH_CR1 re-opens a commissioning window on DUT_CE using a
+          "Step 10: TH_CR1 re-opens a commissioning window on DUT_CE using a
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
       PICS: CADMIN.S.C01.Rsp
       verification: |
@@ -237,7 +238,7 @@ tests:
           [1650278416.249823][11064:11069] CHIP:DMG:
       disabled: true
 
-    - label: "DNS-SD records shows DUT_CE advertising"
+    - label: "Step 11: DNS-SD records shows DUT_CE advertising"
       verification: |
           On TH_CR1 send the below command
            avahi-browse -rt _matterc._udp
@@ -251,9 +252,10 @@ tests:
       disabled: true
 
     - label:
-          "Before the expiration of PIXIT.CADMIN.CwDuration seconds that was set
-          in step 10, TH_CR3 opens a 2nd commissioning window on DUT_CE using a
-          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+          "Step 12: Before the expiration of PIXIT.CADMIN.CwDuration seconds
+          that was set in step 10, TH_CR3 opens a 2nd commissioning window on
+          DUT_CE using a commissioning timeout of PIXIT.CADMIN.CwDuration
+          seconds using BCM"
       PICS: CADMIN.S.C01.Rsp
       verification: |
           On TH_CR3 send the below command
@@ -282,13 +284,13 @@ tests:
       disabled: true
 
     - label:
-          "Wait for the expiration of PIXIT.CADMIN.CwDuration seconds that was
-          set in step 11"
+          "Step 13: Wait for the expiration of PIXIT.CADMIN.CwDuration seconds
+          that was set in step 11"
       verification: |
-          Wait for the expiration of PIXIT.CADMIN.CwDuration seconds that was set in step 11
+          Wait for the expiration of PIXIT.CADMIN.CwDuration seconds that was set in step 10
       disabled: true
 
-    - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
+    - label: "Step 14: TH_CR1 reads the list of Fabrics on DUT_CE"
       PICS: OPCREDS.S.A0001
       verification: |
           On TH_CR1 send the below command
@@ -326,8 +328,8 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+          "Step 15: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
       PICS: CADMIN.S.C01.Rsp
       verification: |
           On TH_CR1 send the below command
@@ -347,9 +349,10 @@ tests:
       disabled: true
 
     - label:
-          "Before the expiration of PIXIT.CADMIN.CwDuration seconds that was set
-          in step 14, TH_CR2 opens a second commissioning window on DUT_CE using
-          a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+          "Step 16: Before the expiration of PIXIT.CADMIN.CwDuration seconds
+          that was set in step 14, TH_CR2 opens a second commissioning window on
+          DUT_CE using a commissioning timeout of PIXIT.CADMIN.CwDuration
+          seconds using BCM"
       PICS: CADMIN.S.C01.Rsp
       verification: |
           On TH_CR2 send the below command
@@ -358,6 +361,8 @@ tests:
 
 
           Verify that the DUT_CE is rejecting the opening of second commissioning session  with  the response status 0x01 failure
+
+
 
           [1650527622.374682][15824:15829] CHIP:DMG:                                 },
           [1650527622.374799][15824:15829] CHIP:DMG:

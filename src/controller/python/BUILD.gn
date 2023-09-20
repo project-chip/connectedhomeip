@@ -20,6 +20,7 @@ import("$dir_pw_build/python.gni")
 
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/platform/python.gni")
+import("${chip_root}/src/system/system.gni")
 import("${dir_pw_unit_test}/test.gni")
 
 if (current_os == "mac") {
@@ -33,6 +34,7 @@ config("controller_wno_deprecate") {
 declare_args() {
   chip_python_version = "0.0"
   chip_python_package_prefix = "chip"
+  chip_python_supports_stack_locking = chip_system_config_locking != "none"
 }
 
 shared_library("ChipDeviceCtrl") {
@@ -77,11 +79,19 @@ shared_library("ChipDeviceCtrl") {
       "chip/internal/ChipThreadWork.h",
       "chip/internal/CommissionerImpl.cpp",
       "chip/logging/LoggingRedirect.cpp",
+      "chip/native/ChipMainLoopWork.h",
       "chip/native/PyChipError.cpp",
+      "chip/tracing/TracingSetup.cpp",
       "chip/utils/DeviceProxyUtils.cpp",
     ]
     defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
     defines += [ "CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC=50" ]
+
+    if (chip_python_supports_stack_locking) {
+      sources += [ "chip/native/ChipMainLoopWork_StackLock.cpp" ]
+    } else {
+      sources += [ "chip/native/ChipMainLoopWork_WorkSchedule.cpp" ]
+    }
   } else {
     sources += [
       "chip/server/Options.cpp",
@@ -120,7 +130,15 @@ shared_library("ChipDeviceCtrl") {
     public_deps += [
       "${chip_root}/src/controller/data_model",
       "${chip_root}/src/credentials:file_attestation_trust_store",
+      "${chip_root}/src/tracing/json",
+      "${chip_root}/src/tracing/perfetto",
+      "${chip_root}/src/tracing/perfetto:file_output",
       "${chip_root}/third_party/jsoncpp",
+    ]
+
+    deps = [
+      "${chip_root}/src/tracing/perfetto:event_storage",
+      "${chip_root}/src/tracing/perfetto:simple_initialization",
     ]
   } else {
     public_deps += [ "$chip_data_model" ]
@@ -238,6 +256,7 @@ chip_python_wheel_action("chip-core") {
         "chip/setup_payload/__init__.py",
         "chip/setup_payload/setup_payload.py",
         "chip/storage/__init__.py",
+        "chip/tracing/__init__.py",
         "chip/utils/CommissioningBuildingBlocks.py",
         "chip/utils/__init__.py",
         "chip/yaml/__init__.py",
@@ -292,6 +311,7 @@ chip_python_wheel_action("chip-core") {
     "chip.clusters",
     "chip.setup_payload",
     "chip.storage",
+    "chip.tracing",
   ]
 
   if (!chip_controller) {

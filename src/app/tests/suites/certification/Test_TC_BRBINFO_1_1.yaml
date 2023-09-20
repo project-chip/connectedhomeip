@@ -26,7 +26,7 @@ config:
     endpoint: 3
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -34,15 +34,15 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the ClusterRevision from DUT"
+    - label: "Step 2: TH reads the ClusterRevision from DUT"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 1
+          value: 2
           constraints:
               type: int16u
 
-    - label: "TH reads the FeatureMap from DUT"
+    - label: "Step 3: TH reads the FeatureMap from DUT"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -50,7 +50,17 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "TH reads AttributeList from DUT"
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [17, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: " !PICS_EVENT_LIST_ENABLED "
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -58,7 +68,7 @@ tests:
               type: list
               contains: [17, 65528, 65529, 65531, 65532, 65533]
 
-    - label: "TH reads optional attribute(VendorName) in AttributeList"
+    - label: "Step 4b: TH reads optional attribute(VendorName) in AttributeList"
       PICS: BRBINFO.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
@@ -67,7 +77,7 @@ tests:
               type: list
               contains: [1]
 
-    - label: "TH reads optional attribute(VendorID) in AttributeList"
+    - label: "Step 4c: TH reads optional attribute(VendorID) in AttributeList"
       PICS: BRBINFO.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"
@@ -76,7 +86,8 @@ tests:
               type: list
               contains: [2]
 
-    - label: "TH reads optional attribute(ProductName) in AttributeList"
+    - label:
+          "Step 4d: TH reads optional attribute(ProductName) in AttributeList"
       PICS: BRBINFO.S.A0003
       command: "readAttribute"
       attribute: "AttributeList"
@@ -85,7 +96,7 @@ tests:
               type: list
               contains: [3]
 
-    - label: "TH reads optional attribute(NodeLabel) in AttributeList"
+    - label: "Step 4e: TH reads optional attribute(NodeLabel) in AttributeList"
       PICS: BRBINFO.S.A0005
       command: "readAttribute"
       attribute: "AttributeList"
@@ -94,7 +105,9 @@ tests:
               type: list
               contains: [5]
 
-    - label: "TH reads optional attribute(HardwareVersion) in AttributeList"
+    - label:
+          "Step 4f: TH reads optional attribute(HardwareVersion) in
+          AttributeList"
       PICS: BRBINFO.S.A0007
       command: "readAttribute"
       attribute: "AttributeList"
@@ -104,7 +117,8 @@ tests:
               contains: [7]
 
     - label:
-          "TH reads optional attribute(HardwareVersionString) in AttributeList"
+          "Step 4g: TH reads optional attribute(HardwareVersionString) in
+          AttributeList"
       PICS: BRBINFO.S.A0008
       command: "readAttribute"
       attribute: "AttributeList"
@@ -113,7 +127,9 @@ tests:
               type: list
               contains: [8]
 
-    - label: "TH reads optional attribute(SoftwareVersion) in AttributeList"
+    - label:
+          "Step 4h: TH reads optional attribute(SoftwareVersion) in
+          AttributeList"
       PICS: BRBINFO.S.A0009
       command: "readAttribute"
       attribute: "AttributeList"
@@ -123,7 +139,8 @@ tests:
               contains: [9]
 
     - label:
-          "TH reads optional attribute(SoftwareVersionString) in AttributeList"
+          "Step 4i: TH reads optional attribute(SoftwareVersionString) in
+          AttributeList"
       PICS: BRBINFO.S.A000a
       command: "readAttribute"
       attribute: "AttributeList"
@@ -132,7 +149,9 @@ tests:
               type: list
               contains: [10]
 
-    - label: "TH reads optional attribute(ManufacturingDate) in AttributeList"
+    - label:
+          "Step 4j: TH reads optional attribute(ManufacturingDate) in
+          AttributeList"
       PICS: BRBINFO.S.A000b
       command: "readAttribute"
       attribute: "AttributeList"
@@ -141,7 +160,7 @@ tests:
               type: list
               contains: [11]
 
-    - label: "TH reads optional attribute(PartNumber) in AttributeList"
+    - label: "Step 4k: TH reads optional attribute(PartNumber) in AttributeList"
       PICS: BRBINFO.S.A000c
       command: "readAttribute"
       attribute: "AttributeList"
@@ -150,7 +169,7 @@ tests:
               type: list
               contains: [12]
 
-    - label: "TH reads optional attribute(ProductURL) in AttributeList"
+    - label: "Step 4l: TH reads optional attribute(ProductURL) in AttributeList"
       PICS: BRBINFO.S.A000d
       command: "readAttribute"
       attribute: "AttributeList"
@@ -159,7 +178,8 @@ tests:
               type: list
               contains: [13]
 
-    - label: "TH reads optional attribute(ProductLabel) in AttributeList"
+    - label:
+          "Step 4m: TH reads optional attribute(ProductLabel) in AttributeList"
       PICS: BRBINFO.S.A000e
       command: "readAttribute"
       attribute: "AttributeList"
@@ -168,7 +188,8 @@ tests:
               type: list
               contains: [14]
 
-    - label: "TH reads optional attribute(SerialNumber) in AttributeList"
+    - label:
+          "Step 4n: TH reads optional attribute(SerialNumber) in AttributeList"
       PICS: BRBINFO.S.A000f
       command: "readAttribute"
       attribute: "AttributeList"
@@ -177,7 +198,7 @@ tests:
               type: list
               contains: [15]
 
-    - label: "TH reads optional attribute(UniqueID) in AttributeList"
+    - label: "Step 4o: TH reads optional attribute(UniqueID) in AttributeList"
       PICS: BRBINFO.S.A0012
       command: "readAttribute"
       attribute: "AttributeList"
@@ -186,8 +207,8 @@ tests:
               type: list
               contains: [18]
 
-    - label: "TH reads optional event(StartUp) in EventList"
-      PICS: BRBINFO.S.E00
+    - label: "Step 5a: TH reads optional event(StartUp) in EventList"
+      PICS: BRBINFO.S.E00 && PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -195,8 +216,8 @@ tests:
               type: list
               contains: [0]
 
-    - label: "TH reads optional attribute(ShutDown) in EventList"
-      PICS: BRBINFO.S.E01
+    - label: "Step 5b: TH reads optional attribute(ShutDown) in EventList"
+      PICS: BRBINFO.S.E01 && PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -204,8 +225,8 @@ tests:
               type: list
               contains: [1]
 
-    - label: "TH reads optional attribute(Leave) in EventList"
-      PICS: BRBINFO.S.E02
+    - label: "Step 5c: TH reads optional attribute(Leave) in EventList"
+      PICS: BRBINFO.S.E02 && PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -213,29 +234,7 @@ tests:
               type: list
               contains: [2]
 
-    #EventList failure Mandatory event ReachableChanged(0x3) not in list
-    - label:
-          "Read EventList attribute from the DUT and Verify that the DUT
-          response provides a list of supported events."
-      verification: |
-          ./chip-tool bridgeddevicebasicinformation read event-list 1 3
-
-          On TH(chip-tool), Verify that DUT response contains list of supported events, for this cluster the list is empty(0 enties)
-
-          1676439985.362352][22002:22004] CHIP:DMG: }
-          [1676439985.362396][22002:22004] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_FFFA DataVersion: 266846256
-          [1676439985.362407][22002:22004] CHIP:TOO:   EventList: 0 entries
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "TH1 reads AcceptedCommandList from DUT"
+    - label: "Step 6: TH reads AcceptedCommandList from DUT"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -243,7 +242,7 @@ tests:
           constraints:
               type: list
 
-    - label: "TH1 reads GeneratedCommandList from DUT"
+    - label: "Step 7: TH1 reads GeneratedCommandList from DUT"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

@@ -158,6 +158,11 @@ CHIP_ERROR AppTask::Init()
     GetDFUOverSMP().ConfirmNewImage();
 #endif
 
+#ifdef CONFIG_CHIP_OTA_REQUESTOR
+    /* OTA image confirmation must be done before the factory data init. */
+    OtaConfirmNewImage();
+#endif
+
     // Initialize CHIP server
 #if CONFIG_CHIP_FACTORY_DATA
     ReturnErrorOnFailure(mFactoryDataProvider.Init());

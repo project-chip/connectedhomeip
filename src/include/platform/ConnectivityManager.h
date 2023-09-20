@@ -204,28 +204,6 @@ public:
     void ResetThreadNetworkDiagnosticsCounts();
     CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
-// Sleepy end device methods
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR GetSEDIntervalsConfig(SEDIntervalsConfig & intervalsConfig);
-
-    /**
-     * Sets Sleepy End Device intervals configuration and posts kSEDIntervalChange event to inform other software
-     * modules about the change.
-     *
-     * @param[in]  intervalsConfig intervals configuration to be set
-     */
-    CHIP_ERROR SetSEDIntervalsConfig(const SEDIntervalsConfig & intervalsConfig);
-
-    /**
-     * Requests setting Sleepy End Device active interval on or off.
-     * Every method call with onOff parameter set to true or false results in incrementing or decrementing the active mode
-     * consumers counter. Active mode is set if the consumers counter is bigger than 0.
-     *
-     * @param[in]  onOff  true if active mode should be enabled and false otherwise.
-     */
-    CHIP_ERROR RequestSEDActiveMode(bool onOff, bool delayIdle = false);
-#endif
-
     CHIP_ERROR SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 
     // CHIPoBLE service methods
@@ -469,23 +447,6 @@ inline CHIP_ERROR ConnectivityManager::SetThreadDeviceType(ThreadDeviceType devi
 {
     return static_cast<ImplClass *>(this)->_SetThreadDeviceType(deviceType);
 }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-inline CHIP_ERROR ConnectivityManager::GetSEDIntervalsConfig(SEDIntervalsConfig & intervalsConfig)
-{
-    return static_cast<ImplClass *>(this)->_GetSEDIntervalsConfig(intervalsConfig);
-}
-
-inline CHIP_ERROR ConnectivityManager::SetSEDIntervalsConfig(const SEDIntervalsConfig & intervalsConfig)
-{
-    return static_cast<ImplClass *>(this)->_SetSEDIntervalsConfig(intervalsConfig);
-}
-
-inline CHIP_ERROR ConnectivityManager::RequestSEDActiveMode(bool onOff, bool delayIdle)
-{
-    return static_cast<ImplClass *>(this)->_RequestSEDActiveMode(onOff, delayIdle);
-}
-#endif
 
 inline CHIP_ERROR ConnectivityManager::SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
 {

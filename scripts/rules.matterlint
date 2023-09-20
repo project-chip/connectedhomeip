@@ -66,6 +66,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/relative-humidity-measurement
 load "../src/app/zap-templates/zcl/data-model/chip/rvc-clean-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/rvc-run-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/scene.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/smoke-co-alarm-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/software-diagnostics-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/switch-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/target-navigator-cluster.xml";
@@ -90,7 +91,7 @@ load "../src/app/zap-templates/zcl/data-model/draft/input-output-value-clusters.
 load "../src/app/zap-templates/zcl/data-model/draft/onoff-switch-configuration-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/air-quality-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/resource-monitoring-cluster.xml";
-
+load "../src/app/zap-templates/zcl/data-model/chip/sample-mei-cluster.xml";
 
 all endpoints {
     // These attributes follow a different code path and do not have to be
@@ -121,7 +122,7 @@ endpoint 0 {
   // reject server cluster Scenes;
   // reject server cluster Groups;
 
-  // Required only if !CustomNetworkConfig. 
+  // Required only if !CustomNetworkConfig.
   // require server cluster NetworkCommissioning;
 
   // If Ethernet

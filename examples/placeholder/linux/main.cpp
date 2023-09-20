@@ -22,6 +22,8 @@
 
 void ApplicationInit() {}
 
+void ApplicationShutdown() {}
+
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv, AppOptions::GetOptions()) == 0);

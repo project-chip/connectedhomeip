@@ -3,6 +3,15 @@
 The Matter SDK provides examples of Matter devices for different development
 platforms.
 
+## Air Quality Sensor example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+air-quality-sensor-app/**/README
+```
+
 ## All clusters example
 
 ```{toctree}
@@ -76,6 +85,15 @@ darwin-framework-tool/README
 :maxdepth: 1
 
 java-matter-controller/README
+```
+
+## Virtual Device App example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+virtual-device-app/**/README
 ```
 
 ## Lighting example
@@ -183,6 +201,15 @@ pump-controller-app/**/README
 pump-controller-app/cc13x2x7_26x2x7/doc/programming*
 ```
 
+## Refrigerator example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+refrigerator-app/**/README
+```
+
 ## Shell example
 
 ```{toctree}
@@ -200,6 +227,15 @@ shell/**/README
 :maxdepth: 1
 
 smoke-co-alarm-app/**/README
+```
+
+## Dishwasher example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+dishwasher-app/**/README
 ```
 
 ## Temperature measurement example
@@ -246,4 +282,22 @@ tv-casting-app/**/README
 :maxdepth: 1
 
 window-app/**/README
+```
+
+## Resource monitoring example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+resource-monitoring-app/**/README
+```
+
+## Air Quality Sensor example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+rvc-app/README
 ```

@@ -275,6 +275,17 @@ void DevicePowerSource::SetDescription(std::string aDescription)
     }
 }
 
+void DevicePowerSource::SetEndpointList(std::vector<chip::EndpointId> aEndpointList)
+{
+    bool changed  = aEndpointList != mEndpointList;
+    mEndpointList = aEndpointList;
+
+    if (changed && mChanged_CB)
+    {
+        mChanged_CB(this, kChanged_EndpointList);
+    }
+}
+
 EndpointListInfo::EndpointListInfo(uint16_t endpointListId, std::string name, EndpointListTypeEnum type)
 {
     mEndpointListId = endpointListId;

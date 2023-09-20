@@ -14,7 +14,9 @@
 
 import base64
 import json
+import os
 import re
+import sys
 
 _ANY_COMMANDS_LIST = [
     'ReadById',
@@ -22,7 +24,9 @@ _ANY_COMMANDS_LIST = [
     'SubscribeById',
     'ReadEventById',
     'SubscribeEventById',
+    'ReadNone',
     'ReadAll',
+    'SubscribeNone',
     'SubscribeAll',
 ]
 
@@ -79,6 +83,9 @@ _ALIASES = {
                     'EventId': 'event-id',
                 },
             },
+            'ReadNone': {
+                'alias': 'read-none',
+            },
             'ReadAll': {
                 'alias': 'read-all',
                 'arguments': {
@@ -86,6 +93,9 @@ _ALIASES = {
                     'AttributeId': 'attribute-ids',
                     'EventId': 'event-ids',
                 },
+            },
+            'SubscribeNone': {
+                'alias': 'subscribe-none',
             },
             'SubscribeAll': {
                 'alias': 'subscribe-all',
@@ -99,6 +109,14 @@ _ALIASES = {
     },
     'AnyCommands': {
         'alias': 'any',
+        'commands': {
+            'ReadNone': {
+                'has_endpoint': False,
+            },
+            'SubscribeNone': {
+                'has_endpoint': False,
+            }
+        }
     },
     'CommissionerCommands': {
         'alias': 'pairing',
@@ -192,12 +210,18 @@ class Encoder:
     def __init__(self, specifications):
         self.__specs = specifications
 
+        # This is not the best way to toggle this flag. But for now it prevents having
+        # to build a new adapter for the very small differences that exists...
+        is_darwin_framework_tool = os.path.basename(
+            sys.argv[0]) == 'darwinframeworktool.py'
+        self.__is_darwin_framework_tool = is_darwin_framework_tool
+
     def encode(self, request):
         cluster = self.__get_cluster_name(request)
         command, command_specifier = self.__get_command_name(request)
 
         if command == 'wait-for-report':
-            return ''
+            return str(request.timeout) if request.timeout is not None else ''
 
         arguments = self.__get_arguments(request)
         base64_arguments = base64.b64encode(
@@ -268,8 +292,12 @@ class Encoder:
             arguments, request.min_interval, "min-interval")
         arguments = self.__maybe_add(
             arguments, request.max_interval, "max-interval")
+        arguments = self.__maybe_add(
+            arguments, request.keep_subscriptions, "keepSubscriptions")
         arguments = self.__maybe_add(arguments, request.timed_interaction_timeout_ms,
                                      "timedInteractionTimeoutMs")
+        arguments = self.__maybe_add(
+            arguments, request.timeout, "timeout")
         arguments = self.__maybe_add(
             arguments, request.event_number, "event-min")
         arguments = self.__maybe_add(
@@ -285,7 +313,10 @@ class Encoder:
         if not self._supports_destination(request):
             return rv
 
-        destination_argument_name = 'destination-id'
+        if self.__is_darwin_framework_tool:
+            destination_argument_name = 'node-id'
+        else:
+            destination_argument_name = 'destination-id'
         destination_argument_value = None
 
         if request.group_id:
@@ -307,9 +338,14 @@ class Encoder:
 
         endpoint_argument_name = 'endpoint-id-ignored-for-group-commands'
         endpoint_argument_value = request.endpoint
+        if endpoint_argument_value == '*':
+            endpoint_argument_value = 0xFFFF
 
         if (request.is_attribute and not request.command == "writeAttribute") or request.is_event or (request.command in _ANY_COMMANDS_LIST and not request.command == "WriteById"):
             endpoint_argument_name = 'endpoint-ids'
+
+        if self.__is_darwin_framework_tool:
+            endpoint_argument_name = 'endpoint-id'
 
         if rv:
             rv += ', '
@@ -356,7 +392,10 @@ class Encoder:
 
         if request.is_attribute:
             if command_name == 'writeAttribute':
-                argument_name = 'attribute-values'
+                if self.__is_darwin_framework_tool:
+                    argument_name = 'attr-value'
+                else:
+                    argument_name = 'attribute-values'
             else:
                 argument_name = 'value'
 

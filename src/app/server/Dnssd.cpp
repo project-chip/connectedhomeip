@@ -152,6 +152,11 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
 
     for (const FabricInfo & fabricInfo : *mFabricTable)
     {
+        if (!fabricInfo.ShouldAdvertiseIdentity())
+        {
+            continue;
+        }
+
         uint8_t macBuffer[DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength];
         MutableByteSpan mac(macBuffer);
         if (chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac) != CHIP_NO_ERROR)

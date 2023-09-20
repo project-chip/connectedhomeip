@@ -69,11 +69,15 @@
     }
     _publicKey = SecKeyCopyPublicKey(_privateKey);
 
+    _signatureCount = 0;
+
     return self;
 }
 
 - (NSData *)signMessageECDSA_DER:(NSData *)message
 {
+    ++_signatureCount;
+
     CFErrorRef error = NULL;
     CFDataRef outData
         = SecKeyCreateSignature(_privateKey, kSecKeyAlgorithmECDSASignatureMessageX962SHA256, (__bridge CFDataRef) message, &error);

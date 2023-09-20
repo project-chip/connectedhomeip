@@ -26,21 +26,21 @@ config:
     endpoint: 0
 
 tests:
-    - label: ""
+    - label: "Preconditions"
       verification: |
-          Preconditions
           1 - User must indicate the intention for commissioning using a display or other UI elements.
           2 - TH is not advertising Commissioner Discovery Service at start
       disabled: true
 
     - label:
-          "DUT start scanning for available commissioners using Commissioner
-          Discovery"
+          "Step 1: DUT start scanning for available commissioners using
+          Commissioner Discovery"
       verification: |
           DUT should make 4 retries with 100ms timeout
       disabled: true
 
-    - label: "TH is instructed to advertise Commissioner Discovery service"
+    - label:
+          "Step 2: TH is instructed to advertise Commissioner Discovery service"
       verification: |
           chip-tv-app is used as dut
 
@@ -55,13 +55,13 @@ tests:
           [1667820688.782240][13245:13245] CHIP:DIS: Responding with E45F016961B10000.local
           [1667820688.782259][13245:13245] CHIP:DIS: Responding with E45F016961B10000.local
           [1667820688.782284][13245:13245] CHIP:DIS: Responding with _I43D06D09FCEEDF78._sub._matter._tcp.local
-          [1667820688.782301][13245:13245] CHIP:DIS: CHIP minimal mDNS configured as "Operational device"; instance name: 43D06D09FCEEDF78-FFFFFFEFFFFFFFFF.
+          [1667820688.782301][13245:13245] CHIP:DIS: CHIP minimal mDNS configured as 'Operational device'; instance name: 43D06D09FCEEDF78-FFFFFFEFFFFFFFFF.
           [1667820688.824041][13245:13245] CHIP:DIS: mDNS service published: _matter._tcp
       disabled: true
 
     - label:
-          "DUT start scanning for available commissioners using Commissioner
-          Discovery"
+          "Step 3: DUT start scanning for available commissioners using
+          Commissioner Discovery"
       verification: |
           In certification QA we are using chip-tv-casting-app as a reference app, In case of certification testing, DUT (app) vendor to provide instructions on how to scan for commissioners
            ./chip-tv-casting-app
@@ -99,18 +99,18 @@ tests:
       disabled: true
 
     - label:
-          "DUT is instructed to start the commissioning procedure with the TH
-          found at Step 3"
+          "Step 4: DUT is instructed to start the commissioning procedure with
+          the TH found at Step 3"
       verification: |
-          Out of scope for V1.0
+          Out of scope
       disabled: true
 
-    - label: "TH verifies the Identification Declaration message"
+    - label: "Step 5: TH verifies the Identification Declaration message"
       verification: |
-          Out of scope for V1.0
+          Out of scope
       disabled: true
 
-    - label: "TH start the commissioning procedure with DUT"
+    - label: "Step 6: TH start the commissioning procedure with DUT"
       verification: |
           Into the shell, enter "cast request 0" to send a user-directed-commissioning request to the DUT on tv-casting-app side
 

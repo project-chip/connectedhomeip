@@ -126,10 +126,10 @@ Silicon Labs platform.
           $ rm -rf out/
           ```
 
-*   Build the example as Sleepy End Device (SED)
+*   Build the example as Intermittently Connected Device (ICD)
 
           ```
-          $ ./scripts/examples/gn_silabs_example.sh ./examples/smoke-co-alarm-app/silabs ./out/smoke-co-alarm-app_SED BRD4187C --sed
+          $ ./scripts/examples/gn_silabs_example.sh ./examples/smoke-co-alarm-app/silabs ./out/smoke-co-alarm-app_ICD BRD4187C --icd
           ```
 
     or use gn as previously mentioned but adding the following arguments:
@@ -330,7 +330,7 @@ To track memory usage you can set `enable_heap_monitoring = true` either in the
 BUILD.gn file or pass it as a build argument to gn. This will print on the RTT
 console the RAM usage of each individual task and the number of Memory
 allocation and Free. While this is not extensive monitoring you're welcome to
-modify `examples/platform/silabs/efr32/MemMonitoring.cpp` to add your own memory
+modify `examples/platform/silabs/MemMonitoring.cpp` to add your own memory
 tracking code inside the `trackAlloc` and `trackFree` function
 
 ## OTA Software Update
@@ -378,4 +378,14 @@ features can easily be toggled on or off. Here is a short list of options :
     Thresholds: 30 <= kvs_max_entries <= 255
 
     $ ./scripts/examples/gn_silabs_example.sh ./examples/smoke-co-alarm-app/silabs ./out/smoke-co-alarm-app BRD4164A kvs_max_entries=50
+    ```
+
+### Enabling test event trigger
+
+`silabs_test_event_trigger_enabled, silabs_test_event_trigger_enable_key`
+
+    ```
+    The value of silabs_test_event_trigger_enable_key is specific to each device manufacturer
+
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/smoke-co-alarm-app/silabs ./out/smoke-co-alarm-app BRD4164A silabs_test_event_trigger_enabled=true silabs_test_event_trigger_enable_key=\"00112233445566778899aabbccddeeff\"
     ```

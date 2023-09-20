@@ -203,7 +203,7 @@ def ishex(s):
 
 # get_fixed_label_dict() converts the list of strings to per endpoint dictionaries.
 # example input  : ['0/orientation/up', '1/orientation/down', '2/orientation/down']
-# example outout : {'0': [{'orientation': 'up'}], '1': [{'orientation': 'down'}], '2': [{'orientation': 'down'}]}
+# example output : {'0': [{'orientation': 'up'}], '1': [{'orientation': 'down'}], '2': [{'orientation': 'down'}]}
 
 
 def get_fixed_label_dict(fixed_labels):
@@ -227,8 +227,13 @@ def get_fixed_label_dict(fixed_labels):
     return fl_dict
 
 # get_supported_modes_dict() converts the list of strings to per endpoint dictionaries.
-# example input  : ['0/label1/1/"1\0x8000, 2\0x8000",  1/label2/1/"1\0x8000, 2\0x8000"']
-# example outout : {'1': [{'Label': 'label1', 'Mode': 0, 'Semantic_Tag': [{'value': 1, 'mfgCode': 32768}, {'value': 2, 'mfgCode': 32768}]}, {'Label': 'label2', 'Mode': 1, 'Semantic_Tag': [{'value': 1, 'mfgCode': 32768}, {'value': 2, 'mfgCode': 32768}]}]}
+# example with semantic tags
+# input  : ['0/label1/1/"1\0x8000, 2\0x8000" 1/label2/1/"1\0x8000, 2\0x8000"']
+# output : {'1': [{'Label': 'label1', 'Mode': 0, 'Semantic_Tag': [{'value': 1, 'mfgCode': 32768}, {'value': 2, 'mfgCode': 32768}]}, {'Label': 'label2', 'Mode': 1, 'Semantic_Tag': [{'value': 1, 'mfgCode': 32768}, {'value': 2, 'mfgCode': 32768}]}]}
+
+# example without semantic tags
+# input  : ['0/label1/1 1/label2/1']
+# output : {'1': [{'Label': 'label1', 'Mode': 0, 'Semantic_Tag': []}, {'Label': 'label2', 'Mode': 1, 'Semantic_Tag': []}]}
 
 
 def get_supported_modes_dict(supported_modes):
@@ -240,8 +245,10 @@ def get_supported_modes_dict(supported_modes):
         label = mode_label_strs[1]
         ep = mode_label_strs[2]
 
-        semantic_tag_strs = mode_label_strs[3].split(', ')
-        semantic_tags = [{"value": int(v.split('\\')[0]), "mfgCode": int(v.split('\\')[1], 16)} for v in semantic_tag_strs]
+        semantic_tags = ''
+        if (len(mode_label_strs) == 4):
+            semantic_tag_strs = mode_label_strs[3].split(', ')
+            semantic_tags = [{"value": int(v.split('\\')[0]), "mfgCode": int(v.split('\\')[1], 16)} for v in semantic_tag_strs]
 
         mode_dict = {"Label": label, "Mode": int(mode), "Semantic_Tag": semantic_tags}
 

@@ -241,11 +241,6 @@ inline void ReliableMessageContext::SetAckPending(bool inAckPending)
     mFlags.Set(Flags::kFlagAckPending, inAckPending);
 }
 
-inline void ReliableMessageContext::SetMessageNotAcked(bool messageNotAcked)
-{
-    mFlags.Set(Flags::kFlagMessageNotAcked, messageNotAcked);
-}
-
 inline void ReliableMessageContext::SetRequestingActiveMode(bool activeMode)
 {
     mFlags.Set(Flags::kFlagActiveMode, activeMode);

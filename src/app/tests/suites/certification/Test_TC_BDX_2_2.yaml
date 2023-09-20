@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 32.2.2. [TC-BDX-2.2] Synchronous File Receiving
+name: 32.2.2. [TC-BDX-2.2] Synchronous file receiving
 
 PICS:
     - MCORE.BDX.SynchronousReceiver
@@ -31,18 +31,19 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the first Block message to DUT + DUT sends a BlockAck
-          message back to TH."
+          "Step 1: TH sends the first Block message to DUT + DUT sends a
+          BlockAck message back to TH."
       verification: |
-          Out of scope for V1.0
+          Out of scope
       disabled: true
 
     - label:
-          "DUT sends the first BlockQuery message to TH + TH sends a Block
-          message back to DUT."
+          "Step 2: DUT sends the first BlockQuery message to TH + TH sends a
+          Block message back to DUT."
       PICS: MCORE.BDX.Driver
       verification: |
-          1. Verify that the OTA Reference Provider App logs show BlockQuery message from DUT
+          On OTA Reference Provider App logs, Verify that the BlockQuery message has the following mandatory fields.
+           - Block Counter - Must start at 0 at the start of the transfer.
 
           [1636410922974] [59203:62969336] CHIP: [ATM] Handling received BDX Message
           [1636410922974] [59203:62969336] CHIP: [ATM] BlockQuery
@@ -50,11 +51,11 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends further BlockQuery messages to TH + TH sends further Block
-          messages back to DUT."
+          "Step 3: DUT sends further BlockQuery messages to TH + TH sends
+          further Block messages back to DUT."
       PICS: MCORE.BDX.Driver
       verification: |
-          1. Verify from the OTA Reference Provider App logs that the BlockQuery messages are sent in ascending and sequential block counter order.
+          On OTA Reference Provider App logs, Verify that the BlockQuery messages are sent in ascending and sequential block counter order.
 
           [1636410924476] [59203:62969337] CHIP: [ATM] BlockQuery
           [1636410924476] [59203:62969337] CHIP: [ATM]   Block Counter: 1
@@ -66,18 +67,19 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends a BlockQueryWithSkip message to TH + TH sends a Block
-          message back to DUT"
+          "Step 4: DUT sends a BlockQueryWithSkip message to TH + TH sends a
+          Block message back to DUT."
       PICS: MCORE.BDX.BlockQueryWithSkip
       verification: |
-          Out of scope for V1.0
+          Out of scope
       disabled: true
 
     - label:
-          "TH sends a BlockEOF message to DUT + DUT sends a BlockAckEOF message
-          back to TH"
+          "Step 5: TH sends a BlockEOF message to DUT + DUT sends a BlockAckEOF
+          message back to TH"
       verification: |
-          1. Verify that the OTA Reference App logs show BlockAckEOF message from DUT
+          On OTA Reference App logs,  Verify that the BlockAckEOF message has the following mandatory fields.
+           Block Counter - Must correspond to the Block Counter which was embedded in the BlockEOF being acknowledged
 
           [1636410936486] [59203:62969336] CHIP: [ATM] Handling received BDX Message
           [1636410936486] [59203:62969336] CHIP: [ATM] BlockAckEOF

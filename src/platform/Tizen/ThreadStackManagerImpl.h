@@ -100,8 +100,6 @@ public:
 
     CHIP_ERROR _JoinerStart();
 
-    void _SetRouterPromotion(bool val);
-
     void _ResetThreadNetworkDiagnosticsCounts();
 
     CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);

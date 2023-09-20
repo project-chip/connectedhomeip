@@ -78,11 +78,11 @@ public:
 
     void SetScanner(std::unique_ptr<ChipDeviceScanner> scanner) { mScanner = std::move(scanner); }
 
-    void OnDeviceScanned(BluezDevice1 * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override
+    void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override
     {
         if (mScanCallback)
         {
-            mScanCallback(mContext, bluez_device1_get_address(device), info.GetDeviceDiscriminator(), info.GetProductId(),
+            mScanCallback(mContext, bluez_device1_get_address(&device), info.GetDeviceDiscriminator(), info.GetProductId(),
                           info.GetVendorId());
         }
     }

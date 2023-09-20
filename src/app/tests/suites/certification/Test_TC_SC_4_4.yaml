@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 15.4.4. [TC-SC-4.4] Discovery [DUT as Controller]
+name: 3.4.4.[TC-SC-4.4] Discovery [DUT as Controller]
 
 PICS:
     - MCORE.ROLE.CONTROLLER
@@ -29,12 +29,17 @@ tests:
           Chip-tool command used below are an example to verify the  DUT as controller test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
-    - label: "TH starts commissioning process with DUT"
+    - label: "Precondition"
+      verification: |
+          1. Nodes are joined in the same Fabric
+      disabled: true
+
+    - label: "Step 1: TH starts commissioning process with DUT"
       verification: |
           1. Provision the DUT by TH (Chip-tool)
       disabled: true
 
-    - label: "DUT reads Vendor Id attribute from TH"
+    - label: "Step 2: DUT reads Vendor Id attribute from TH"
       PICS: BINFO.C.A0002
       verification: |
           ./chip-tool  basicinformation read vendor-id  1 0
@@ -71,12 +76,14 @@ tests:
           [1660776352.803699][3357:3357] CHIP:DMG:
       disabled: true
 
-    - label: "Change the IP address of TH by any means within the same network"
+    - label:
+          "Step 3: Change the IP address of TH by any means within the same
+          network"
       verification: |
           Connect the raspi running the TH to another router which is on the same network. Make sure that the DUT and TH are on the same network and can ping to each other. Observe that the TH gets a new IP address. Perform Step 4
       disabled: true
 
-    - label: "DUT reads Vendor Id attribute from TH"
+    - label: "Step 4: DUT reads Vendor Id attribute from TH"
       PICS: BINFO.C.A0002
       verification: |
           ./chip-tool  basicinformation read vendor-id  1 0

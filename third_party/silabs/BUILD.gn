@@ -18,7 +18,7 @@ import("//build_overrides/jlink.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${efr32_sdk_build_root}/silabs_board.gni")
 
-if (silabs_board == "BRD4325B") {  # CCP board
+if (wifi_soc == true) {  # CCP board
   import("${efr32_sdk_build_root}/SiWx917_sdk.gni")
 } else {
   import("${efr32_sdk_build_root}/efr32_sdk.gni")
@@ -28,7 +28,6 @@ declare_args() {
   # Build target to use for efr32 SDK. Use this to set global SDK defines.
   silabs_sdk_target = ""
 
-  use_thread_coap_lib = false
   sl_matter_version_str = ""
   sl_matter_version = 1
   sl_hardware_version = 1
@@ -53,7 +52,7 @@ group("efr32_sdk") {
   public_configs = [ ":silabs_config" ]
 }
 
-if (silabs_board != "BRD4325B") {  # CCP board
+if (wifi_soc != true) {  # CCP board
   # Openthread GSDK libraries configurations
   if (use_silabs_thread_lib) {
     config("libopenthread-platform_config") {
@@ -125,6 +124,10 @@ if (silabs_board != "BRD4325B") {  # CCP board
           "${sl_openthread_root}/examples/apps/cli/cli_uart.cpp",
           "${sl_openthread_root}/src/cli/cli.cpp",
           "${sl_openthread_root}/src/cli/cli.hpp",
+          "${sl_openthread_root}/src/cli/cli_bbr.cpp",
+          "${sl_openthread_root}/src/cli/cli_bbr.hpp",
+          "${sl_openthread_root}/src/cli/cli_br.cpp",
+          "${sl_openthread_root}/src/cli/cli_br.hpp",
           "${sl_openthread_root}/src/cli/cli_coap.cpp",
           "${sl_openthread_root}/src/cli/cli_coap.hpp",
           "${sl_openthread_root}/src/cli/cli_coap_secure.cpp",
@@ -134,10 +137,14 @@ if (silabs_board != "BRD4325B") {  # CCP board
           "${sl_openthread_root}/src/cli/cli_config.h",
           "${sl_openthread_root}/src/cli/cli_dataset.cpp",
           "${sl_openthread_root}/src/cli/cli_dataset.hpp",
+          "${sl_openthread_root}/src/cli/cli_dns.cpp",
+          "${sl_openthread_root}/src/cli/cli_dns.hpp",
           "${sl_openthread_root}/src/cli/cli_history.cpp",
           "${sl_openthread_root}/src/cli/cli_history.hpp",
           "${sl_openthread_root}/src/cli/cli_joiner.cpp",
           "${sl_openthread_root}/src/cli/cli_joiner.hpp",
+          "${sl_openthread_root}/src/cli/cli_mac_filter.cpp",
+          "${sl_openthread_root}/src/cli/cli_mac_filter.hpp",
           "${sl_openthread_root}/src/cli/cli_network_data.cpp",
           "${sl_openthread_root}/src/cli/cli_network_data.hpp",
           "${sl_openthread_root}/src/cli/cli_output.cpp",

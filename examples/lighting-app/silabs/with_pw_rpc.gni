@@ -25,7 +25,5 @@ app_data_model = "${chip_root}/examples/lighting-app/lighting-common"
 chip_enable_pw_rpc = true
 chip_enable_openthread = true
 
-cpp_standard = "gnu++17"
-
 # Light app on EFR enables tracing server
 pw_trace_BACKEND = "$dir_pw_trace_tokenized"

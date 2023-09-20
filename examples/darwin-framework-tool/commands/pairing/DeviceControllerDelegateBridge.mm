@@ -23,7 +23,7 @@
 @end
 
 @implementation CHIPToolDeviceControllerDelegate
-- (void)onStatusUpdate:(MTRCommissioningStatus)status
+- (void)controller:(MTRDeviceController *)controller statusUpdate:(MTRCommissioningStatus)status
 {
     NSLog(@"Pairing Status Update: %tu", status);
     switch (status) {

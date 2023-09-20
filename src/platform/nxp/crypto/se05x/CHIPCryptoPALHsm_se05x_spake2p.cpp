@@ -351,7 +351,7 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::ComputeRoundOne(const uint8_t * pab
     constexpr bool sw_rollback_verifier = false;
 #endif
 
-#if ((CHIP_CRYPTO_HSM) && (!ENABLE_SE05X_SPAKE_PROVER))
+#if !ENABLE_SE05X_SPAKE_PROVER
     const bool sw_rollback_prover = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::PROVER);
 #else
     constexpr bool sw_rollback_prover   = false;

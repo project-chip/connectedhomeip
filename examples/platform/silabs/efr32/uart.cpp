@@ -28,7 +28,9 @@ extern "C" {
 #include "assert.h"
 #include "em_core.h"
 #include "em_usart.h"
+#ifdef SL_BOARD_NAME
 #include "sl_board_control.h"
+#endif
 #include "sl_uartdrv_instances.h"
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
 #include "sl_uartdrv_eusart_vcom_config.h"
@@ -252,7 +254,9 @@ void uartConsoleInit(void)
         return;
     }
 
+#ifdef SL_BOARD_NAME
     sl_board_enable_vcom();
+#endif
     // Init a fifo for the data received on the uart
     InitFifo(&sReceiveFifo, sRxFifoBuffer, MAX_BUFFER_SIZE);
 

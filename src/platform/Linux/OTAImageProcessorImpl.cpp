@@ -127,6 +127,8 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     unlink(imageProcessor->mImageFile);
 
+    imageProcessor->mParams.downloadedBytes = 0;
+    imageProcessor->mParams.totalFileBytes  = 0;
     imageProcessor->mHeaderParser.Init();
     imageProcessor->mOfs.open(imageProcessor->mImageFile, std::ofstream::out | std::ofstream::ate | std::ofstream::app);
     if (!imageProcessor->mOfs.good())

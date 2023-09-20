@@ -38,15 +38,15 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner has regulatory and fabric information available and has
-          accurate date, time and timezone"
+          "Step 1: Commissioner has regulatory and fabric information available
+          and has accurate date, time and timezone"
       verification: |
           1. Manually verify that the time, date and timezone is accurate for the DUT Commissioner
       disabled: true
 
     - label:
-          "Commissioner and Commissionee discover each other and connect via the
-          discovery mode applicable for the DUT."
+          "Step 2: Commissioner and Commissionee discover each other and connect
+          via the discovery mode applicable for the DUT."
       verification: |
           Verify in TH as server side: start BLE Advertising by specific DUT implementation
 
@@ -56,7 +56,7 @@ tests:
       disabled: true
 
     - label:
-          "Establish encryption keys with Password Authenticated Session
+          "Step 3: Establish encryption keys with Password Authenticated Session
           Establishment on the commissioning channel"
       verification: |
           Verify in DUT as client side
@@ -65,8 +65,9 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner SHALL re-arm Fail-safe timer on Commissionee within 60s
-          (the autonomously Fail-safe timer length set by Commissionee)"
+          "Step 4: Commissioner SHALL re-arm Fail-safe timer on Commissionee
+          within 60s (the autonomously Fail-safe timer length set by
+          Commissionee)"
       verification: |
           Verify in DUT as client side
 
@@ -74,13 +75,13 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner SHALL configure regulatory information in the
+          "Step 5: Commissioner SHALL configure regulatory information in the
           Commissionee."
       PICS: MCORE.COM.WIRELESS
       verification: |
           Verify in DUT as client side
 
-          Performing next commissioning step "ConfigRegulatory"
+          Performing next commissioning step 'ConfigRegulatory'
           [1653471968.202645][30157:30162] CHIP:CTL: Setting Regulatory Config
           [1653471968.202666][30157:30162] CHIP:CTL: No regulatory config supplied by controller, leaving as device default (0)
 
@@ -89,7 +90,7 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner requests operational CSR from Commissionee with
+          "Step 6: Commissioner requests operational CSR from Commissionee with
           OperationalCSRRequest command"
       verification: |
           Verify in DUT as client side
@@ -153,7 +154,7 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner configures operational credentials on DUT if not
+          "Step 7: Commissioner configures operational credentials on DUT if not
           previously installed"
       verification: |
           Verify in DUT as client side
@@ -207,8 +208,8 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner configures itself as administrator in ACL on TH if
-          needed"
+          "Step 8: Commissioner configures itself as administrator in ACL on TH
+          if needed"
       verification: |
           Verify in DUT as client side
 
@@ -263,8 +264,8 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner configures operational network on TH if TH both supports
-          and requires"
+          "Step 9: Commissioner configures operational network on TH if TH both
+          supports and requires"
       verification: |
           Verify in DUT as client side
 
@@ -315,8 +316,8 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner instructs Commissionee to connect to operational network
-          if not already connected"
+          "Step 10: Commissioner instructs Commissionee to connect to
+          operational network if not already connected"
       verification: |
           Verify in DUT as client side
 
@@ -368,26 +369,26 @@ tests:
       disabled: true
 
     - label:
-          "Commissioning channel between the Commissioner and Commissionee is
-          terminated."
+          "Step 11: Commissioning channel between the Commissioner and
+          Commissionee is terminated."
       verification: |
           1. Verify the channel was terminated on DUT=chip-tool
           [1651271753284] [23287:743790] CHIP: [CTL] Received CommissioningComplete response
-          [1651271753284] [23287:743790] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
-          [1651271753284] [23287:743790] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
-          [1651271753284] [23287:743790] CHIP: [CTL] Performing next commissioning step "Cleanup"
-          [1651271753284] [23287:743790] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
+          [1651271753284] [23287:743790] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1651271753284] [23287:743790] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1651271753284] [23287:743790] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1651271753284] [23287:743790] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
           [1651271753284] [23287:743790] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
-    - label: "Reboot TH and prepare for commissioning"
+    - label: "Step 12: Reboot TH and prepare for commissioning"
       verification: |
           1. Using TH=all-clusters-app, exit the app, re-launch app
       disabled: true
 
     - label:
-          "Establish encryption keys with Password Authenticated Session
-          Establishment on the commissioning channel"
+          "Step 13: Establish encryption keys with Password Authenticated
+          Session Establishment on the commissioning channel"
       verification: |
           Verify in DUT as client side
 
@@ -395,8 +396,8 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner re-arms Fail-safe timer on Commissionee within 60s (the
-          autonomously Fail-safe timer length set by Commissionee)"
+          "Step 14: Commissioner re-arms Fail-safe timer on Commissionee within
+          60s (the autonomously Fail-safe timer length set by Commissionee)"
       verification: |
           Verify in DUT as client side
 
@@ -404,14 +405,14 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner SHALL configure regulatory information in the
+          "Step 15: Commissioner SHALL configure regulatory information in the
           Commissionee."
       PICS: MCORE.COM.WIRELESS
       verification: |
           Verify in DUT as client side
 
 
-          Performing next commissioning step "ConfigRegulatory"
+          Performing next commissioning step 'ConfigRegulatory'
           [1653471968.202645][30157:30162] CHIP:CTL: Setting Regulatory Config
           [1653471968.202666][30157:30162] CHIP:CTL: No regulatory config supplied by controller, leaving as device default (0)
 
@@ -420,7 +421,7 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner requests operational CSR from Commissionee with
+          "Step 16: Commissioner requests operational CSR from Commissionee with
           OperationalCSRRequest command"
       verification: |
           Verify in DUT as client side
@@ -484,8 +485,8 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner configures operational credentials on DUT if not
-          previously installed"
+          "Step 17: Commissioner configures operational credentials on DUT if
+          not previously installed"
       verification: |
           Verify in DUT as client side
 
@@ -538,8 +539,8 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner configures itself as administrator in ACL on TH if
-          needed"
+          "Step 18: Commissioner configures itself as administrator in ACL on TH
+          if needed"
       verification: |
           Verify in DUT as client side
 
@@ -594,8 +595,8 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner configures operational network on TH if TH both supports
-          and requires"
+          "Step 19: Commissioner configures operational network on TH if TH both
+          supports and requires"
       verification: |
           Verify in DUT as client side
 
@@ -646,8 +647,8 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner instructs Commissionee to connect to operational network
-          if not already connected"
+          "Step 20: Commissioner instructs Commissionee to connect to
+          operational network if not already connected"
       verification: |
           Verify in DUT as client side
 
@@ -699,19 +700,21 @@ tests:
       disabled: true
 
     - label:
-          "Commissioning channel between the Commissioner and Commissionee is
-          terminated."
+          "Step 21: Commissioning channel between the Commissioner and
+          Commissionee is terminated."
       verification: |
           1. Verify the channel was terminated on DUT=chip-tool
           [1651271753284] [23287:743790] CHIP: [CTL] Received CommissioningComplete response
-          [1651271753284] [23287:743790] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
-          [1651271753284] [23287:743790] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
-          [1651271753284] [23287:743790] CHIP: [CTL] Performing next commissioning step "Cleanup"
-          [1651271753284] [23287:743790] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
+          [1651271753284] [23287:743790] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1651271753284] [23287:743790] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1651271753284] [23287:743790] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1651271753284] [23287:743790] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
           [1651271753284] [23287:743790] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
-    - label: "Commissioner starts discovery of TH using Operational Discovery"
+    - label:
+          "Step 22: Commissioner starts discovery of TH using Operational
+          Discovery"
       verification: |
           Verify in DUT as client side
 
@@ -722,7 +725,8 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner opens a CASE session with TH over operational network"
+          "Step 23: Commissioner opens a CASE session with TH over operational
+          network"
       verification: |
           Verify in DUT as client side
 
@@ -761,7 +765,7 @@ tests:
           CHIP:IN: New secure session created for device 0x0000000000000001, LSID:2 PSID:2!
       disabled: true
 
-    - label: "Commissioner sends CommissioningComplete command"
+    - label: "Step 24: Commissioner sends CommissioningComplete command"
       verification: |
           Verify in DUT as client side
 

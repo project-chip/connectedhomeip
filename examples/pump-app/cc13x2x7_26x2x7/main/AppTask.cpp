@@ -33,7 +33,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <examples/platform/cc13x2_26x2/CC13X2_26X2DeviceAttestationCreds.h>
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
@@ -81,7 +81,7 @@ AppTask AppTask::sAppTask;
 
 static DeviceCallbacks sDeviceCallbacks;
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 static DefaultOTARequestor sRequestorCore;
 static DefaultOTARequestorStorage sRequestorStorage;
 static DefaultOTARequestorDriver sRequestorUser;
@@ -156,13 +156,14 @@ int AppTask::Init()
             ;
     }
 
-#ifdef CONFIG_OPENTHREAD_MTD_SED
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
-#elif CONFIG_OPENTHREAD_MTD
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
-#else
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+#elif CONFIG_OPENTHREAD_MTD_SED
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+#else
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 #endif
+
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
@@ -230,7 +231,7 @@ int AppTask::Init()
 
     ConfigurationMgr().LogDeviceConfig();
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     InitializeOTARequestor();
 #endif
 

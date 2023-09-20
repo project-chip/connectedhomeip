@@ -111,6 +111,7 @@ public:
 
     // TODO: Once there is MCSP support, this may need to change.
     static constexpr bool IsMCSPSupported() { return false; }
+    static constexpr uint16_t kImplementedClusterRevision = 2;
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override
     {
@@ -119,7 +120,7 @@ public:
         switch (aPath.mAttributeId)
         {
         case GroupKeyManagement::Attributes::ClusterRevision::Id:
-            return ReadClusterRevision(aPath.mEndpointId, aEncoder);
+            return aEncoder.Encode(kImplementedClusterRevision);
         case Attributes::FeatureMap::Id: {
             uint32_t features = 0;
             if (IsMCSPSupported())
@@ -285,7 +286,149 @@ private:
     }
 };
 
-constexpr uint16_t GroupKeyManagementAttributeAccess::kClusterRevision;
+Status
+ValidateKeySetWriteArguments(const chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData)
+{
+    // SPEC: If the EpochKey0 field is null or its associated EpochStartTime0 field is null, then this command SHALL fail with an
+    // INVALID_COMMAND status code responded to the client.
+    if (commandData.groupKeySet.epochKey0.IsNull() || commandData.groupKeySet.epochStartTime0.IsNull())
+    {
+        return Status::InvalidCommand;
+    }
+
+    // SPEC: If the EpochStartTime0 is set to 0, then this command SHALL fail with an INVALID_COMMAND status code responded to the
+    // client.
+    if (0 == commandData.groupKeySet.epochStartTime0.Value())
+    {
+        return Status::InvalidCommand;
+    }
+
+    // By now we at least have epochKey0.
+    static_assert(GroupDataProvider::EpochKey::kLengthBytes == 16,
+                  "Expect EpochKey internal data structure to have a length of 16 bytes.");
+
+    // SPEC: If the EpochKey0 field's length is not exactly 16 bytes, then this command SHALL fail with a CONSTRAINT_ERROR status
+    // code responded to the client.
+    if (commandData.groupKeySet.epochKey0.Value().size() != GroupDataProvider::EpochKey::kLengthBytes)
+    {
+        return Status::ConstraintError;
+    }
+
+    // Already known to be false by now
+    bool epoch_key0_is_null    = false;
+    uint64_t epoch_start_time0 = commandData.groupKeySet.epochStartTime0.Value();
+
+    bool epoch_key1_is_null        = commandData.groupKeySet.epochKey1.IsNull();
+    bool epoch_start_time1_is_null = commandData.groupKeySet.epochStartTime1.IsNull();
+
+    uint64_t epoch_start_time1 = 0; // Will be overridden when known to be present.
+
+    // SPEC: If exactly one of the EpochKey1 or EpochStartTime1 is null, rather than both being null, or neither being null, then
+    // this command SHALL fail with an INVALID_COMMAND status code responded to the client.
+    if (epoch_key1_is_null != epoch_start_time1_is_null)
+    {
+        return Status::InvalidCommand;
+    }
+
+    if (!epoch_key1_is_null)
+    {
+        // SPEC: If the EpochKey1 field is not null, then the EpochKey0 field SHALL NOT be null. Otherwise this command SHALL fail
+        // with an INVALID_COMMAND status code responded to the client.
+        if (epoch_key0_is_null)
+        {
+            return Status::InvalidCommand;
+        }
+
+        // SPEC: If the EpochKey1 field is not null, and the field's length is not exactly 16 bytes, then this command SHALL fail
+        // with a CONSTRAINT_ERROR status code responded to the client.
+        if (commandData.groupKeySet.epochKey1.Value().size() != GroupDataProvider::EpochKey::kLengthBytes)
+        {
+            return Status::ConstraintError;
+        }
+
+        // By now, if EpochKey1 was present, we know EpochStartTime1 was also present.
+        epoch_start_time1 = commandData.groupKeySet.epochStartTime1.Value();
+
+        // SPEC: If the EpochKey1 field is not null, its associated EpochStartTime1 field SHALL NOT be null and SHALL contain a
+        // later epoch start time than the epoch start time found in the EpochStartTime0 field. Otherwise this command SHALL fail
+        // with an INVALID_COMMAND status code responded to the client.
+        bool epoch1_later_than_epoch0 = epoch_start_time1 > epoch_start_time0;
+        if (!epoch1_later_than_epoch0)
+        {
+            return Status::InvalidCommand;
+        }
+    }
+
+    bool epoch_key2_is_null        = commandData.groupKeySet.epochKey2.IsNull();
+    bool epoch_start_time2_is_null = commandData.groupKeySet.epochStartTime2.IsNull();
+
+    // SPEC: If exactly one of the EpochKey2 or EpochStartTime2 is null, rather than both being null, or neither being null, then
+    // this command SHALL fail with an INVALID_COMMAND status code responded to the client.
+    if (epoch_key2_is_null != epoch_start_time2_is_null)
+    {
+        return Status::InvalidCommand;
+    }
+
+    if (!epoch_key2_is_null)
+    {
+        // SPEC: If the EpochKey2 field is not null, then the EpochKey1 and EpochKey0 fields SHALL NOT be null. Otherwise this
+        // command SHALL fail with an INVALID_COMMAND status code responded to the client.
+        if (epoch_key0_is_null || epoch_key1_is_null)
+        {
+            return Status::InvalidCommand;
+        }
+
+        // SPEC: If the EpochKey2 field is not null, and the field's length is not exactly 16 bytes, then this command SHALL fail
+        // with a CONSTRAINT_ERROR status code responded to the client.
+        if (commandData.groupKeySet.epochKey2.Value().size() != GroupDataProvider::EpochKey::kLengthBytes)
+        {
+            return Status::ConstraintError;
+        }
+
+        // By now, if EpochKey2 was present, we know EpochStartTime2 was also present.
+        uint64_t epoch_start_time2 = commandData.groupKeySet.epochStartTime2.Value();
+
+        // SPEC: If the EpochKey2 field is not null, its associated EpochStartTime2 field SHALL NOT be null and SHALL contain a
+        // later epoch start time than the epoch start time found in the EpochStartTime1 field. Otherwise this command SHALL fail
+        // with an INVALID_COMMAND status code responded to the client.
+        bool epoch2_later_than_epoch1 = epoch_start_time2 > epoch_start_time1;
+        if (!epoch2_later_than_epoch1)
+        {
+            return Status::InvalidCommand;
+        }
+    }
+
+    return Status::Success;
+}
+
+bool GetProviderAndFabric(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                          Credentials::GroupDataProvider ** outGroupDataProvider, const FabricInfo ** outFabricInfo)
+{
+    VerifyOrDie(commandObj != nullptr);
+    VerifyOrDie(outGroupDataProvider != nullptr);
+    VerifyOrDie(outFabricInfo != nullptr);
+
+    // Internal failures on internal inconsistencies.
+    auto provider = GetGroupDataProvider();
+    auto fabric   = Server::GetInstance().GetFabricTable().FindFabricWithIndex(commandObj->GetAccessingFabricIndex());
+
+    if (nullptr == provider)
+    {
+        commandObj->AddStatus(commandPath, Status::Failure, "Internal consistency error on provider!");
+        return false;
+    }
+
+    if (nullptr == fabric)
+    {
+        commandObj->AddStatus(commandPath, Status::Failure, "Internal consistency error on access fabric!");
+        return false;
+    }
+
+    *outGroupDataProvider = provider;
+    *outFabricInfo        = fabric;
+
+    return true;
+}
 
 GroupKeyManagementAttributeAccess gAttribute;
 
@@ -300,18 +443,24 @@ void MatterGroupKeyManagementPluginServerInitCallback()
 // Commands
 //
 
-void emberAfGroupKeyManagementClusterServerInitCallback(chip::EndpointId endpoint) {}
-
 bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData)
 {
-    if (commandData.groupKeySet.epochKey0.IsNull() || commandData.groupKeySet.epochStartTime0.IsNull() ||
-        commandData.groupKeySet.epochKey0.Value().empty() || (0 == commandData.groupKeySet.epochStartTime0.Value()))
+    Credentials::GroupDataProvider * provider = nullptr;
+    const FabricInfo * fabric                 = nullptr;
+
+    if (!GetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
     {
-        // If the EpochKey0 field is null or its associated EpochStartTime0 field is null,
-        // then this command SHALL fail with an INVALID_COMMAND
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        // Command will already have status populated from validation.
+        return true;
+    }
+
+    // Pre-validate all complex data dependency assumptions about the epoch keys
+    Status status = ValidateKeySetWriteArguments(commandData);
+    if (status != Status::Success)
+    {
+        commandObj->AddStatus(commandPath, status, "Failure to validate KeySet data dependencies.");
         return true;
     }
 
@@ -321,7 +470,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
         // supported by the server, because it is ... a new value unrecognized
         // by a legacy server, then the server SHALL generate a general
         // constraint error
-        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        commandObj->AddStatus(commandPath, Status::ConstraintError, "Received unknown GroupKeySecurityPolicyEnum value");
         return true;
     }
 
@@ -332,28 +481,25 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
         // any action attempting to set CacheAndSync in the
         // GroupKeySecurityPolicy field SHALL fail with an INVALID_COMMAND
         // error.
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand,
+                              "Received a CacheAndSync GroupKeySecurityPolicyEnum when MCSP not supported");
         return true;
     }
 
+    // All flight checks completed: by now we know that non-null keys are all valid and correct size.
+    bool epoch_key1_present = !commandData.groupKeySet.epochKey1.IsNull();
+    bool epoch_key2_present = !commandData.groupKeySet.epochKey2.IsNull();
+
     GroupDataProvider::KeySet keyset(commandData.groupKeySet.groupKeySetID, commandData.groupKeySet.groupKeySecurityPolicy, 0);
 
-    // Epoch Key 0
+    // Epoch Key 0 always present
     keyset.epoch_keys[0].start_time = commandData.groupKeySet.epochStartTime0.Value();
     memcpy(keyset.epoch_keys[0].key, commandData.groupKeySet.epochKey0.Value().data(), GroupDataProvider::EpochKey::kLengthBytes);
     keyset.num_keys_used++;
 
     // Epoch Key 1
-    if (!commandData.groupKeySet.epochKey1.IsNull())
+    if (epoch_key1_present)
     {
-        if (commandData.groupKeySet.epochStartTime1.IsNull() ||
-            commandData.groupKeySet.epochStartTime1.Value() <= commandData.groupKeySet.epochStartTime0.Value())
-        {
-            // If the EpochKey1 field is not null, its associated EpochStartTime1 field SHALL contain
-            // a later epoch start time than the epoch start time found in the EpochStartTime0 field.
-            commandObj->AddStatus(commandPath, Status::InvalidCommand);
-            return true;
-        }
         keyset.epoch_keys[1].start_time = commandData.groupKeySet.epochStartTime1.Value();
         memcpy(keyset.epoch_keys[1].key, commandData.groupKeySet.epochKey1.Value().data(),
                GroupDataProvider::EpochKey::kLengthBytes);
@@ -361,31 +507,12 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     }
 
     // Epoch Key 2
-    if (!commandData.groupKeySet.epochKey2.IsNull())
+    if (epoch_key2_present)
     {
-        if (commandData.groupKeySet.epochKey1.IsNull() || commandData.groupKeySet.epochStartTime2.IsNull() ||
-            commandData.groupKeySet.epochStartTime2.Value() <= commandData.groupKeySet.epochStartTime1.Value())
-        {
-            // If the EpochKey2 field is not null then:
-            // * The EpochKey1 field SHALL NOT be null
-            // * Its associated EpochStartTime1 field SHALL contain a later epoch start time
-            //   than the epoch start time found in the EpochStartTime0 field.
-            commandObj->AddStatus(commandPath, Status::InvalidCommand);
-            return true;
-        }
         keyset.epoch_keys[2].start_time = commandData.groupKeySet.epochStartTime2.Value();
         memcpy(keyset.epoch_keys[2].key, commandData.groupKeySet.epochKey2.Value().data(),
                GroupDataProvider::EpochKey::kLengthBytes);
         keyset.num_keys_used++;
-    }
-
-    auto provider = GetGroupDataProvider();
-    auto fabric   = Server::GetInstance().GetFabricTable().FindFabricWithIndex(commandObj->GetAccessingFabricIndex());
-
-    if (nullptr == provider || nullptr == fabric)
-    {
-        commandObj->AddStatus(commandPath, Status::Failure);
-        return true;
     }
 
     uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
@@ -399,21 +526,23 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
 
     // Set KeySet
     err = provider->SetKeySet(fabric->GetFabricIndex(), compressed_fabric_id, keyset);
+    if (CHIP_ERROR_INVALID_LIST_LENGTH == err)
+    {
+        commandObj->AddStatus(commandPath, Status::ResourceExhausted, "Not enough space left to add a new KeySet");
+        return true;
+    }
+
     if (CHIP_NO_ERROR == err)
     {
         ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetWrite OK");
     }
     else
     {
-        ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetWrite: %s", err.AsString());
+        ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetWrite: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     // Send response
-    err = commandObj->AddStatus(commandPath, StatusIB(err).mStatus);
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetWrite failed: %" CHIP_ERROR_FORMAT, err.Format());
-    }
+    commandObj->AddStatus(commandPath, StatusIB(err).mStatus);
     return true;
 }
 
@@ -421,20 +550,21 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::DecodableType & commandData)
 {
-    auto fabric     = commandObj->GetAccessingFabricIndex();
-    auto * provider = GetGroupDataProvider();
+    Credentials::GroupDataProvider * provider = nullptr;
+    const FabricInfo * fabric                 = nullptr;
 
-    if (nullptr == provider)
+    if (!GetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
     {
-        commandObj->AddStatus(commandPath, Status::Failure);
+        // Command will already have status populated from validation.
         return true;
     }
 
+    FabricIndex fabricIndex = fabric->GetFabricIndex();
     GroupDataProvider::KeySet keyset;
-    if (CHIP_NO_ERROR != provider->GetKeySet(fabric, commandData.groupKeySetID, keyset))
+    if (CHIP_NO_ERROR != provider->GetKeySet(fabricIndex, commandData.groupKeySetID, keyset))
     {
         // KeySet ID not found
-        commandObj->AddStatus(commandPath, Status::NotFound);
+        commandObj->AddStatus(commandPath, Status::NotFound, "Keyset ID not found in KeySetRead");
         return true;
     }
 
@@ -485,30 +615,39 @@ bool emberAfGroupKeyManagementClusterKeySetRemoveCallback(
     const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::DecodableType & commandData)
 
 {
-    auto fabric     = commandObj->GetAccessingFabricIndex();
-    auto * provider = GetGroupDataProvider();
-    Status status   = Status::Failure;
+    Credentials::GroupDataProvider * provider = nullptr;
+    const FabricInfo * fabric                 = nullptr;
 
-    if (nullptr != provider)
+    if (!GetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
     {
-        // Remove keyset
-        CHIP_ERROR err = provider->RemoveKeySet(fabric, commandData.groupKeySetID);
-        if (CHIP_ERROR_KEY_NOT_FOUND == err)
-        {
-            status = Status::NotFound;
-        }
-        else if (CHIP_NO_ERROR == err)
-        {
-            status = Status::Success;
-        }
+        // Command will already have status populated from validation.
+        return true;
     }
 
-    // Send response
-    CHIP_ERROR send_err = commandObj->AddStatus(commandPath, status);
-    if (CHIP_NO_ERROR != send_err)
+    if (commandData.groupKeySetID == GroupDataProvider::kIdentityProtectionKeySetId)
     {
-        ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetRemove failed: %" CHIP_ERROR_FORMAT, send_err.Format());
+        // SPEC: This command SHALL fail with an INVALID_COMMAND status code back to the initiator if the GroupKeySetID being
+        // removed is 0, which is the Key Set associated with the Identity Protection Key (IPK).
+        commandObj->AddStatus(commandPath, Status::InvalidCommand, "Attempted to KeySetRemove the identity protection key!");
+        return true;
     }
+
+    // Remove keyset
+    FabricIndex fabricIndex = fabric->GetFabricIndex();
+    CHIP_ERROR err          = provider->RemoveKeySet(fabricIndex, commandData.groupKeySetID);
+
+    Status status = Status::Success;
+    if (CHIP_ERROR_NOT_FOUND == err || CHIP_ERROR_KEY_NOT_FOUND == err)
+    {
+        status = Status::NotFound;
+    }
+    else if (CHIP_NO_ERROR != err)
+    {
+        status = Status::Failure;
+    }
+
+    // Send status response.
+    commandObj->AddStatus(commandPath, status, "KeySetRemove failed");
     return true;
 }
 
@@ -547,19 +686,20 @@ bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::DecodableType & commandData)
 {
-    auto fabric     = commandObj->GetAccessingFabricIndex();
-    auto * provider = GetGroupDataProvider();
+    Credentials::GroupDataProvider * provider = nullptr;
+    const FabricInfo * fabric                 = nullptr;
 
-    if (nullptr == provider)
+    if (!GetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
     {
-        commandObj->AddStatus(commandPath, Status::Failure);
+        // Command will already have status populated from validation.
         return true;
     }
 
-    auto keysIt = provider->IterateKeySets(fabric);
+    FabricIndex fabricIndex = fabric->GetFabricIndex();
+    auto keysIt             = provider->IterateKeySets(fabricIndex);
     if (nullptr == keysIt)
     {
-        commandObj->AddStatus(commandPath, Status::Failure);
+        commandObj->AddStatus(commandPath, Status::Failure, "Failed iteration of key set indices!");
         return true;
     }
 

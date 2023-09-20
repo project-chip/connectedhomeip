@@ -18,10 +18,12 @@ limitations under the License.
   <domain name="Closures"/>
 
   <bitmap name="BarrierControlCapabilities" type="BITMAP8">
+    <cluster code="0x0103"/>
     <field name="partialBarrier" mask="0x01"/>
   </bitmap>
 
   <bitmap name="BarrierControlSafetyStatus" type="BITMAP16">
+    <cluster code="0x0103"/>
     <field name="remoteLockout" mask="0x01"/>
     <field name="temperDetected" mask="0x02"/>
     <field name="failedCommunication" mask="0x04"/>

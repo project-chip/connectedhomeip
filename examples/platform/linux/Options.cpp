@@ -83,6 +83,7 @@ enum
     kDeviceOption_TestEventTriggerEnableKey             = 0x101f,
     kCommissionerOption_FabricID                        = 0x1020,
     kTraceTo                                            = 0x1021,
+    kOptionSimulateNoInternalTime                       = 0x1022,
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -136,6 +137,7 @@ OptionDef sDeviceOptionDefs[] = {
 #if ENABLE_TRACING
     { "trace-to", kArgumentRequired, kTraceTo },
 #endif
+    { "simulate-no-internal-time", kNoArgument, kOptionSimulateNoInternalTime },
     {}
 };
 
@@ -250,6 +252,8 @@ const char * sDeviceOptionHelp =
     "  --trace-to <destination>\n"
     "       Trace destinations, comma separated (" SUPPORTED_COMMAND_LINE_TRACING_TARGETS ")\n"
 #endif
+    "  --simulate-no-internal-time\n"
+    "       Time cluster does not use internal platform time\n"
     "\n";
 
 bool Base64ArgToVector(const char * arg, size_t maxSize, std::vector<uint8_t> & outVector)
@@ -500,6 +504,9 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().traceTo.push_back(aValue);
         break;
 #endif
+    case kOptionSimulateNoInternalTime:
+        LinuxDeviceOptions::GetInstance().mSimulateNoInternalTime = true;
+        break;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;

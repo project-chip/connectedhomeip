@@ -57,9 +57,10 @@ tests:
       disabled: true
 
     - label:
-          "Verify the THs 11-digit Manual Pairing Code meets the following
-          criteria: - VERSION bit string string up to date with the current
-          Matter spec. documentation - VID_PID_PRESENT bit string set to 0"
+          "Step 1a: Verify the THs 11-digit Manual Pairing Code meets the
+          following criteria: - VERSION bit string string up to date with the
+          current Matter spec. documentation - VID_PID_PRESENT bit string set to
+          0"
       PICS: MCORE.DD.11_MANUAL_PC
       verification: |
           Verify on the TH (All-cluster-app)
@@ -81,9 +82,9 @@ tests:
       disabled: true
 
     - label:
-          "Provide the Manual Pairing Code, generated in the previous step, to
-          the DUT in any format supported by the DUT. Follow any steps needed
-          for the Commissioner/Commissionee to complete the commissioning
+          "Step 1b: Provide the Manual Pairing Code, generated in the previous
+          step, to the DUT in any format supported by the DUT. Follow any steps
+          needed for the Commissioner/Commissionee to complete the commissioning
           process."
       PICS: MCORE.DD.11_MANUAL_PC
       verification: |
@@ -103,12 +104,12 @@ tests:
       disabled: true
 
     - label:
-          "Verify the THs 21-digit Manual Pairing Code meets the following
-          criteria: - A VERSION bit string string up-to-date with the current
-          Matter spec. documentation - A VID_PID_PRESENT bit string set to 1 - A
-          VENDOR_ID present (as defined in section 2.5.2. 'Vendor Identifier') -
-          A PRODUCT_ID present (as defined in section 2.5.3. 'Product
-          Identifier')"
+          "Step 2a: Verify the THs 21-digit Manual Pairing Code meets the
+          following criteria: - A VERSION bit string string up-to-date with the
+          current Matter spec. documentation - A VID_PID_PRESENT bit string set
+          to 1 - A VENDOR_ID present (as defined in section 2.5.2. 'Vendor
+          Identifier') - A PRODUCT_ID present (as defined in section 2.5.3.
+          'Product Identifier')"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
           Verify on the TH (All-cluster-app)
@@ -136,9 +137,9 @@ tests:
       disabled: true
 
     - label:
-          "Provide the Manual Pairing Code, generated in the previous step, to
-          the DUT in any format supported by the DUT. Follow any steps needed
-          for the Commissioner/Commissionee to complete the commissioning
+          "Step 2b: Provide the Manual Pairing Code, generated in the previous
+          step, to the DUT in any format supported by the DUT. Follow any steps
+          needed for the Commissioner/Commissionee to complete the commissioning
           process."
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |

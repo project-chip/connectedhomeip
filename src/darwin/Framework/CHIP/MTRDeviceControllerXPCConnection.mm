@@ -170,9 +170,12 @@
                     [handle.proxy stopReportsWithController:controller
                                                      nodeId:nodeID.unsignedLongLongValue
                                                  completion:^{
+                                                     // Make sure handle stays alive until we get to this
+                                                     // completion (in particular while we are working
+                                                     // with handle.proxy).
                                                      __auto_type handleRetainer = handle;
                                                      (void) handleRetainer;
-                                                     clearRegistry();
+                                                     dispatch_async(queue, clearRegistry);
                                                  }];
                 } else {
                     MTR_LOG_ERROR("CHIP XPC connection failed to stop reporting");

@@ -27,6 +27,7 @@ import chip.logging
 import click
 import coloredlogs
 from base import BaseTestHelper, FailIfNot, SetTestSet, TestFail, TestTimeout, logger
+from chip.tracing import TracingContext
 from cluster_objects import ClusterObjectTests
 from network_commissioning import NetworkCommissioningTests
 
@@ -246,8 +247,12 @@ def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, 
               default='',
               type=str,
               help="Path that contains valid and trusted PAA Root Certificates.")
+@click.option('--trace-to',
+              multiple=True,
+              default=[],
+              help="Trace location")
 def run(controller_nodeid, device_nodeid, address, timeout, discriminator, setup_pin, enable_test, disable_test, log_level,
-        log_format, print_test_list, paa_trust_store_path):
+        log_format, print_test_list, paa_trust_store_path, trace_to):
     coloredlogs.install(level=log_level, fmt=log_format, logger=logger)
 
     if print_test_list:
@@ -267,8 +272,12 @@ def run(controller_nodeid, device_nodeid, address, timeout, discriminator, setup
     logger.info(f"\tEnabled Tests:     {enable_test}")
     logger.info(f"\tDisabled Tests:    {disable_test}")
     SetTestSet(enable_test, disable_test)
-    do_tests(controller_nodeid, device_nodeid, address, timeout,
-             discriminator, setup_pin, paa_trust_store_path)
+    with TracingContext() as tracing_ctx:
+        for destination in trace_to:
+            tracing_ctx.StartFromString(destination)
+
+        do_tests(controller_nodeid, device_nodeid, address, timeout,
+                 discriminator, setup_pin, paa_trust_store_path)
 
 
 if __name__ == "__main__":

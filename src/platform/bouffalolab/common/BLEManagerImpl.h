@@ -23,8 +23,6 @@
 #include <bluetooth/conn.h>
 #include <bluetooth/gatt.h>
 
-#include <lib/support/logging/CHIPLogging.h>
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -46,7 +44,7 @@ private:
         std::conditional_t<std::is_same<bt_gatt_indicate_func_t, void (*)(bt_conn *, bt_gatt_indicate_params *, uint8_t)>::value,
                            bt_gatt_indicate_params *, const bt_gatt_attr *>;
     CHIP_ERROR _Init(void);
-    void _Shutdown() {}
+    void _Shutdown();
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
@@ -87,6 +85,7 @@ private:
         kAdvertisingRefreshNeeded =
             0x0010, /**< The advertising state/configuration has changed, but the SoftDevice has yet to be updated. */
         kChipoBleGattServiceRegister = 0x0020, /**< The system has currently CHIPoBLE GATT service registered. */
+        kChipoBleShutDown            = 0x0040, /**< The system has disable ble stack. */
     };
 
     struct ServiceData;

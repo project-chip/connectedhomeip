@@ -33,10 +33,6 @@ namespace PersistedStorage {
 
 class KeyValueStoreManagerImpl final : public KeyValueStoreManager
 {
-    // Allow the KeyValueStoreManager interface class to delegate method calls to
-    // the implementation methods provided by this class.
-    friend class KeyValueStoreManager;
-
 public:
     CHIP_ERROR Init(void);
     CHIP_ERROR _Put(const char * key, const void * value, size_t value_size);

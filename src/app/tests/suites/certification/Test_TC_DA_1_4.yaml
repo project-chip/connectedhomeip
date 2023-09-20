@@ -38,7 +38,7 @@ tests:
           3. TH1 should be known about Commissioner based error condition/warning
       disabled: true
 
-    - label: "Start the commissioning process of TH1 on DUT"
+    - label: "Step 1: Start the commissioning process of TH1 on DUT"
       verification: |
           To perform Factory reset on TH1(all-clusters-app)  follow the below commands in RPI platform , Pls use equivalent command on the respective platform
           sudo rm -rf /tmp/chip_*
@@ -51,7 +51,7 @@ tests:
            ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
       disabled: true
 
-    - label: "DUT generates 32-byte AttestationNonce"
+    - label: "Step 2: DUT generates 32-byte AttestationNonce"
       verification: |
           During provision, DUT sends AttestationRequest Command with AttestationNonce
 
@@ -71,8 +71,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends AttestationRequest Command with AttestationNonce as field
-          to the TH1."
+          "Step 3: DUT sends AttestationRequest Command with AttestationNonce as
+          field to the TH1."
       verification: |
           During provision, DUT sends AttestationRequest Command with AttestationNonce as field to the TH. verify the below log in TH(all-clusters-app). As the current TH ref app (all-clusters-app) doesnot decode the received request message, nonce value has been shown from the TH ref app response message , as TH ref app use the same nonce value in the response message
 
@@ -147,9 +147,9 @@ tests:
       disabled: true
 
     - label:
-          "TH1 responds to the DUT with an invalid AttestationResponse Command
-          by setting the following error condition: Commissionee is not yet
-          certified"
+          "Step 4: TH1 responds to the DUT with an invalid AttestationResponse
+          Command by setting the following error condition: Commissionee is not
+          yet certified"
       verification: |
           "The all-cluster-app in the sample application is not a certified commissionee (Certification Declaration has certification_type 0). Launch all-cluster-app on TH raspi and provision the app using the DUT
           "
@@ -166,19 +166,19 @@ tests:
           Verify if DUT reports any warning stating that the commissionee is not a fully trusted device. However per Matter spec, Commissioners SHOULD warn the user (its not a SHALL requirement) and commissioners choose their implementation and May give the user a choice to authorize or deny commissioning
       disabled: true
 
-    - label: "Factory Reset TH1 so that it is commissionable again"
+    - label: "Step 6: Factory Reset TH1 so that it is commissionable again"
       verification: |
           To perform Factory reset on TH1(all-clusters-app)  follow the below step in RPI platform , Pls use equivalent command on the respective platform
           sudo rm -rf /tmp/chip_*
       disabled: true
 
     - label:
-          "Repeat step 1 to step 7 and for step 5 set different error condition
-          as below: Commissionees PAA is not in the Commissioners trusted set.
-          Commissionee provides an invalid DAC and PAI chain as validated by TH
-          against the RFC5280 certificate Basic path validation algorithm
-          Commissionee provides DAC with validity period that is not in range of
-          PAA/PAI"
+          "Step 7: Repeat step 1 to step 7 and for step 5 set different error
+          condition as below: Commissionees PAA is not in the Commissioners
+          trusted set. Commissionee provides an invalid DAC and PAI chain as
+          validated by TH against the RFC5280 certificate Basic path validation
+          algorithm Commissionee provides DAC with validity period that is not
+          in range of PAA/PAI"
       verification: |
           For each error scenario  Factory reset on TH1(all-clusters-app)  as explained in step 6
 
@@ -188,7 +188,7 @@ tests:
           ./chip-all-clusters-app --trace_decode 1
 
           Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
-          ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1 --paa-trust-store-path  ~/connectedhomeip/credentials/development/attestation
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1 --paa-trust-store-path  ~/connectedhomeip/credentials/development/attestation
 
           If the DUT(chip-tool) has to provision to verify the logs:- verify the below mentioned same behaviour log on the DUT (chip-tool):
           [1662455580.725445][31980:31985] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
@@ -214,10 +214,10 @@ tests:
 
 
           execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
-          ./chip-all-clusters-app  --trace_decode 1   --dac_provider ~/connectedhomeip/credentials/development/commissioner_dut/struct_dac_sig_algo_ecdsa_with_sha1/test_case_vector.json
+           ./chip-all-clusters-app  --trace_decode 1   --dac_provider ~/connectedhomeip/credentials/development/commissioner_dut/struct_dac_sig_algo_ecdsa_with_sha1/test_case_vector.json
 
           Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
-          ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
 
           If the DUT(chip-tool) has to provision to verify the logs:- verify the below mentioned same behaviour log on the DUT (chip-tool):
           [1684494307.862989][176412:176414] CHIP:CTL: Commissioning stage next step: 'SendAttestationRequest' -> 'AttestationVerification'
@@ -240,16 +240,16 @@ tests:
           3. Similarly for condition 3 Commissionee provides DAC with validity period that is not in range of PAA/PAI follow below steps
 
           Commissionee provides DAC with validity period that is not in range of PAA/PAI
-          Use the folder  - connectedhomeip/credentials/development/commissioner_dut/struct_dac_valid_in_past & use the sample json test_case_vector.json
+           Use the folder  - connectedhomeip/credentials/development/commissioner_dut/struct_dac_valid_in_past & use the sample json test_case_vector.json
 
           Commission TH to DUT by using --dac_provider parameter
 
 
           execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
-          ./chip-all-clusters-app  --trace_decode 1 --dac_provider ~/connectedhomeip/credentials/development/commissioner_dut/struct_dac_valid_in_past/test_case_vector.json
+           ./chip-all-clusters-app  --trace_decode 1 --dac_provider ~/connectedhomeip/credentials/development/commissioner_dut/struct_dac_valid_in_past/test_case_vector.json
 
           Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
-          ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
 
 
           If the DUT(chip-tool) has to provision to verify the logs:- verify the below mentioned same behaviour log on the DUT (chip-tool):
@@ -268,14 +268,14 @@ tests:
       disabled: true
 
     - label:
-          "Repeat step 1 to step 7 and for step 5 set different error condition:
-          Certification Declaration has only one of the following fields
-          dac_origin_vendor_id dac_origin_product_id vendor_id field in the
-          Certification Declaration does not match with the VendorID attribute
-          found in the Basic Information cluster The Vendor ID in the DAC does
-          not match the vendor_id field in the Certification Declaration. The
-          Product ID (PID) the DAC is not present in the product_id_array field
-          in the Certification Declaration"
+          "Step 8: Repeat step 1 to step 7 and for step 5 set different error
+          condition: Certification Declaration has only one of the following
+          fields dac_origin_vendor_id dac_origin_product_id vendor_id field in
+          the Certification Declaration does not match with the VendorID
+          attribute found in the Basic Information cluster The Vendor ID in the
+          DAC does not match the vendor_id field in the Certification
+          Declaration. The Product ID (PID) the DAC is not present in the
+          product_id_array field in the Certification Declaration"
       verification: |
           For each error scenario  Factory reset on TH1(all-clusters-app)  as explained in step 6
 

@@ -24,9 +24,19 @@
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 #include <lwip/tcpip.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <platform/bouffalolab/BL702/wifi_mgmr_portable.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread_port.h>
 #include <utils_list.h>
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+#include <platform/bouffalolab/BL702/EthernetInterface.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+
 extern "C" {
 #include <bl_sec.h>
 }
@@ -51,25 +61,20 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
     TaskHandle_t backup_eventLoopTask;
+
+    // Initialize LwIP.
+    tcpip_init(NULL, NULL);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     otRadio_opt_t opt;
-
-    // Initialize the configuration system.
-    err = Internal::BLConfig::Init();
-    SuccessOrExit(err);
-
-    opt.byte            = 0;
+    opt.bf.isFtd        = true;
     opt.bf.isCoexEnable = true;
 
     ot_alarmInit();
     ot_radioInit(opt);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
-
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
-
-    // Initialize LwIP.
-    tcpip_init(NULL, NULL);
 
     err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16);
     SuccessOrExit(err);
@@ -81,6 +86,14 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err                  = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::mEventLoopTask = backup_eventLoopTask;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    wifi_start_firmware_task();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+    ethernetInterface_init();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 
 exit:
     return err;

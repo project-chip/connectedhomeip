@@ -18,29 +18,48 @@
 #include "LockEndpoint.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <cstring>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using chip::to_underlying;
 using chip::app::DataModel::MakeNullable;
 
-bool LockEndpoint::Lock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
+struct LockActionData
 {
-    return setLockState(DlLockState::kLocked, pin, err, opSource);
+    chip::EndpointId endpointId;
+    DlLockState lockState;
+    OperationSourceEnum opSource;
+    Nullable<uint16_t> userIndex;
+    uint16_t credentialIndex;
+    Nullable<chip::FabricIndex> fabricIdx;
+    Nullable<chip::NodeId> nodeId;
+    bool moving = false;
+};
+
+static LockActionData gCurrentAction;
+
+bool LockEndpoint::Lock(const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
+                        const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
+{
+    return setLockState(fabricIdx, nodeId, DlLockState::kLocked, pin, err, opSource);
 }
 
-bool LockEndpoint::Unlock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
+bool LockEndpoint::Unlock(const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
+                          const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
 {
     if (DoorLockServer::Instance().SupportsUnbolt(mEndpointId))
     {
         // If Unbolt is supported Unlock is supposed to pull the latch
-        setLockState(DlLockState::kUnlatched, pin, err, opSource);
+        return setLockState(fabricIdx, nodeId, DlLockState::kUnlatched, pin, err, opSource);
     }
 
-    return setLockState(DlLockState::kUnlocked, pin, err, opSource);
+    return setLockState(fabricIdx, nodeId, DlLockState::kUnlocked, pin, err, opSource);
 }
 
-bool LockEndpoint::Unbolt(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
+bool LockEndpoint::Unbolt(const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
+                          const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
 {
-    return setLockState(DlLockState::kUnlocked, pin, err, opSource);
+    return setLockState(fabricIdx, nodeId, DlLockState::kUnlocked, pin, err, opSource);
 }
 
 bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const
@@ -388,7 +407,8 @@ DlStatus LockEndpoint::SetSchedule(uint8_t holidayIndex, DlScheduleStatus status
     return DlStatus::kSuccess;
 }
 
-bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
+bool LockEndpoint::setLockState(const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
+                                DlLockState lockState, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
                                 OperationSourceEnum opSource)
 {
     // Assume pin is required until told otherwise
@@ -406,13 +426,30 @@ bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::Byte
             ChipLogProgress(Zcl, "Door Lock App: setting door lock state to \"%s\" [endpointId=%d]", lockStateToString(lockState),
                             mEndpointId);
 
-            DoorLockServer::Instance().SetLockState(mEndpointId, lockState);
+            if (gCurrentAction.moving == true)
+            {
+                ChipLogProgress(Zcl, "Lock App: not executing lock action as another lock action is already active [endpointId=%d]",
+                                mEndpointId);
+                return false;
+            }
+
+            gCurrentAction.moving     = true;
+            gCurrentAction.endpointId = mEndpointId;
+            gCurrentAction.lockState  = lockState;
+            gCurrentAction.opSource   = opSource;
+            gCurrentAction.userIndex  = NullNullable;
+            gCurrentAction.fabricIdx  = fabricIdx;
+            gCurrentAction.nodeId     = nodeId;
+
+            // Do this async as a real lock would do too but use 0s delay to speed up CI tests
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0), OnLockActionCompleteCallback, nullptr);
 
             return true;
         }
 
         ChipLogError(Zcl, "Door Lock App: PIN code is not specified, but it is required [endpointId=%d]", mEndpointId);
 
+        err = OperationErrorEnum::kInvalidCredential;
         return false;
     }
 
@@ -470,13 +507,58 @@ bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::Byte
         "Lock App: specified PIN code was found in the database, setting door lock state to \"%s\" [endpointId=%d,userIndex=%u]",
         lockStateToString(lockState), mEndpointId, userIndex);
 
-    mLockState                         = lockState;
-    LockOpCredentials userCredential[] = { { CredentialTypeEnum::kPin, uint16_t(credentialIndex) } };
-    auto userCredentials               = MakeNullable<List<const LockOpCredentials>>(userCredential);
-    DoorLockServer::Instance().SetLockState(mEndpointId, mLockState, opSource, MakeNullable(static_cast<uint16_t>(userIndex + 1)),
-                                            userCredentials);
+    if (gCurrentAction.moving == true)
+    {
+        ChipLogProgress(Zcl,
+                        "Lock App: not executing lock action as another lock action is already active [endpointId=%d,userIndex=%u]",
+                        mEndpointId, userIndex);
+        return false;
+    }
+
+    gCurrentAction.moving          = true;
+    gCurrentAction.endpointId      = mEndpointId;
+    gCurrentAction.lockState       = lockState;
+    gCurrentAction.opSource        = opSource;
+    gCurrentAction.userIndex       = MakeNullable(static_cast<uint16_t>(userIndex + 1));
+    gCurrentAction.credentialIndex = static_cast<uint16_t>(credentialIndex);
+    gCurrentAction.fabricIdx       = fabricIdx;
+    gCurrentAction.nodeId          = nodeId;
+
+    // Do this async as a real lock would do too but use 0s delay to speed up CI tests
+    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0), OnLockActionCompleteCallback, nullptr);
 
     return true;
+}
+
+void LockEndpoint::OnLockActionCompleteCallback(chip::System::Layer *, void * callbackContext)
+{
+    if (gCurrentAction.userIndex.IsNull())
+    {
+        DoorLockServer::Instance().SetLockState(gCurrentAction.endpointId, gCurrentAction.lockState, gCurrentAction.opSource,
+                                                NullNullable, NullNullable, gCurrentAction.fabricIdx, gCurrentAction.nodeId);
+    }
+    else
+    {
+        LockOpCredentials userCredential[] = { { CredentialTypeEnum::kPin, gCurrentAction.credentialIndex } };
+        auto userCredentials               = MakeNullable<List<const LockOpCredentials>>(userCredential);
+
+        DoorLockServer::Instance().SetLockState(gCurrentAction.endpointId, gCurrentAction.lockState, gCurrentAction.opSource,
+                                                gCurrentAction.userIndex, userCredentials, gCurrentAction.fabricIdx,
+                                                gCurrentAction.nodeId);
+    }
+
+    // move back to Unlocked after Unlatch
+    if (gCurrentAction.lockState == DlLockState::kUnlatched)
+    {
+        gCurrentAction.lockState = DlLockState::kUnlocked;
+
+        // Do this async as a real lock would do too but use 0s delay to speed up CI tests
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0), OnLockActionCompleteCallback, nullptr);
+    }
+    else
+    {
+        gCurrentAction.moving = false;
+    }
 }
 
 bool LockEndpoint::weekDayScheduleInAction(uint16_t userIndex) const

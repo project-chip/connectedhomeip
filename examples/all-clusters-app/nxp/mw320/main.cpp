@@ -41,6 +41,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <static-supported-temperature-levels.h>
 
 #include <app/InteractionModelEngine.h>
 
@@ -118,6 +119,8 @@ static const char * TAG = "mw320";
 static SemaphoreHandle_t aesLock;
 static struct wlan_network sta_network;
 static struct wlan_network uap_network;
+
+chip::app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 
 const int TASK_MAIN_PRIO         = OS_PRIO_3;
 const int TASK_MAIN_STACK_SIZE   = 800;
@@ -1078,6 +1081,8 @@ static void run_chip_srv(System::Layer * aSystemLayer, void * aAppState)
     // binding ++
     InitBindingHandlers();
     // binding --
+
+    chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 
     return;
 }

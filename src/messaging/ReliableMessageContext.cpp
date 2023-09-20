@@ -27,14 +27,18 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ReliableMessageContext.h>
 
+#include <app/AppConfig.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Defer.h>
 #include <messaging/ErrorCategory.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageMgr.h>
+#include <platform/PlatformManager.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
+
+using namespace chip::DeviceLayer;
 
 namespace chip {
 namespace Messaging {
@@ -49,6 +53,22 @@ ExchangeContext * ReliableMessageContext::GetExchangeContext()
 ReliableMessageMgr * ReliableMessageContext::GetReliableMessageMgr()
 {
     return static_cast<ExchangeContext *>(this)->GetExchangeMgr()->GetReliableMessageMgr();
+}
+
+void ReliableMessageContext::SetMessageNotAcked(bool messageNotAcked)
+{
+    mFlags.Set(Flags::kFlagMessageNotAcked, messageNotAcked);
+
+#if CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
+    DeviceLayer::ChipDeviceEvent event;
+    event.Type                = DeviceLayer::DeviceEventType::kICDMsgAckSyncEvent;
+    event.AckSync.awaitingAck = messageNotAcked;
+    CHIP_ERROR status         = DeviceLayer::PlatformMgr().PostEvent(&event);
+    if (status != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to post AckSync event %" CHIP_ERROR_FORMAT, status.Format());
+    }
+#endif
 }
 
 CHIP_ERROR ReliableMessageContext::FlushAcks()

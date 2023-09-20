@@ -53,3 +53,20 @@ target_link_libraries(openiotsdk-app
     PUBLIC
         chip
 )
+
+if(CONFIG_CHIP_OPEN_IOT_SDK_OTA_ENABLE)
+    target_include_directories(openiotsdk-app
+        PUBLIC
+            dfu
+    )
+
+    target_sources(openiotsdk-app
+        PUBLIC
+            dfu/openiotsdk_dfu_manager.cpp
+    )
+
+    target_compile_definitions(openiotsdk-app
+        PUBLIC
+            CHIP_OPEN_IOT_SDK_OTA_ENABLE
+    )
+endif()

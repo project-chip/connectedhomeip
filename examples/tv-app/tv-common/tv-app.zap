@@ -1,5 +1,5 @@
 {
-  "featureLevel": 96,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -33,7 +33,28 @@
   ],
   "endpointTypes": [
     {
+      "id": 1,
       "name": "MA-rootdevice",
+      "deviceTypeRef": {
+        "code": 22,
+        "profileId": 259,
+        "label": "MA-rootdevice",
+        "name": "MA-rootdevice"
+      },
+      "deviceTypes": [
+        {
+          "code": 22,
+          "profileId": 259,
+          "label": "MA-rootdevice",
+          "name": "MA-rootdevice"
+        }
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        22
+      ],
       "deviceTypeName": "MA-rootdevice",
       "deviceTypeCode": 22,
       "deviceTypeProfileId": 259,
@@ -552,7 +573,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "4",
+              "defaultValue": "5",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -594,7 +615,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "4",
+              "defaultValue": "5",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -5934,7 +5955,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -6760,7 +6781,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -7411,7 +7432,28 @@
       ]
     },
     {
+      "id": 2,
       "name": "MA-videoplayer",
+      "deviceTypeRef": {
+        "code": 35,
+        "profileId": 259,
+        "label": "MA-casting-videoplayer",
+        "name": "MA-casting-videoplayer"
+      },
+      "deviceTypes": [
+        {
+          "code": 35,
+          "profileId": 259,
+          "label": "MA-casting-videoplayer",
+          "name": "MA-casting-videoplayer"
+        }
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        35
+      ],
       "deviceTypeName": "MA-casting-videoplayer",
       "deviceTypeCode": 35,
       "deviceTypeProfileId": 259,
@@ -7460,7 +7502,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "4",
+              "defaultValue": "5",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -7518,7 +7560,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "4",
+              "defaultValue": "5",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -9741,7 +9783,28 @@
       ]
     },
     {
+      "id": 3,
       "name": "MA-speaker",
+      "deviceTypeRef": {
+        "code": 34,
+        "profileId": 259,
+        "label": "MA-speaker",
+        "name": "MA-speaker"
+      },
+      "deviceTypes": [
+        {
+          "code": 34,
+          "profileId": 259,
+          "label": "MA-speaker",
+          "name": "MA-speaker"
+        }
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        34
+      ],
       "deviceTypeName": "MA-speaker",
       "deviceTypeCode": 34,
       "deviceTypeProfileId": 259,
@@ -9790,7 +9853,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "4",
+              "defaultValue": "5",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -9848,7 +9911,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "4",
+              "defaultValue": "5",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -10515,7 +10578,28 @@
       ]
     },
     {
+      "id": 4,
       "name": "MA-contentapplication",
+      "deviceTypeRef": {
+        "code": 36,
+        "profileId": 259,
+        "label": "MA-contentapp",
+        "name": "MA-contentapp"
+      },
+      "deviceTypes": [
+        {
+          "code": 36,
+          "profileId": 259,
+          "label": "MA-contentapp",
+          "name": "MA-contentapp"
+        }
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        36
+      ],
       "deviceTypeName": "MA-contentapp",
       "deviceTypeCode": 36,
       "deviceTypeProfileId": 259,
@@ -12429,36 +12513,28 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 22
+      "networkId": 0
     },
     {
       "endpointTypeName": "MA-videoplayer",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 35
+      "networkId": 0
     },
     {
       "endpointTypeName": "MA-speaker",
       "endpointTypeIndex": 2,
       "profileId": 259,
       "endpointId": 2,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 34
+      "networkId": 0
     },
     {
       "endpointTypeName": "MA-contentapplication",
       "endpointTypeIndex": 3,
       "profileId": 259,
       "endpointId": 3,
-      "networkId": 0,
-      "endpointVersion": 1,
-      "deviceIdentifier": 36
+      "networkId": 0
     }
   ]
 }

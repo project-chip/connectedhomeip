@@ -35,12 +35,12 @@ public:
 
     bool SendLockAlarm(chip::EndpointId endpointId, AlarmCodeEnum alarmCode);
 
-    bool Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
-              OperationSourceEnum opSource);
-    bool Unlock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
-                OperationSourceEnum opSource);
-    bool Unbolt(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
-                OperationSourceEnum opSource);
+    bool Lock(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
+              const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource);
+    bool Unlock(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
+                const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource);
+    bool Unbolt(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
+                const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource);
 
     bool GetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user);
     bool SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
