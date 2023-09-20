@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import dataclasses
 import enum
 import itertools
 import logging
 from typing import Callable, Dict, List, Optional, Protocol, TypeVar
 
-from matter_idl.matter_idl_types import Attribute, Bitmap, Cluster, ClusterSide, Command, Enum, Event, Idl, Struct
+from matter_idl.matter_idl_types import Attribute, Bitmap, Cluster, ClusterSide, Command, Enum, Event, Field, Idl, Struct
 
 
 class Compatibility(enum.Enum):
@@ -59,7 +60,6 @@ def AttributeName(attribute: Attribute) -> str:
     """Get the name of an attribute."""
     return attribute.definition.name
 
-
 class CompatibilityChecker:
     def __init__(self, original: Idl, updated: Idl):
         self._original_idl = original
@@ -72,6 +72,28 @@ class CompatibilityChecker:
         self.logger.error(reason)
         self.errors.append(reason)
         self.compatible = Compatibility.INCOMPATIBLE
+
+    def CheckFieldListsAreTheSame(self, location: str, original: List[Field], updated: List[Field]):
+        """Validates no compatibility changes in a list of fields.
+
+        Specifically no changes are allowed EXCEPT names of fields.
+        """
+
+        # Every field MUST be the same except that
+        # name does not matter and order does not matter
+        #
+        # Comparison is done on a dict (so order does not matter)
+        # and replacing names with a fixed name based on code.
+        a = {}
+        for item in original:
+            a[item.code] = dataclasses.replace(item, name=f"entry{item.code}")
+
+        b = {}
+        for item in updated:
+            b[item.code] = dataclasses.replace(item, name=f"entry{item.code}")
+
+        if a != b:
+            self._MarkIncompatible(f"{location} has field changes")
 
     def CheckEnumCompatible(self, original: Enum, updated: Optional[Enum]):
         if not updated:
@@ -119,8 +141,7 @@ class CompatibilityChecker:
         if event.code != updated_event.code:
             self._MarkIncompatible(f"Event {event.name} code changed from {event.code} to {updated_event.code}")
 
-        if event.fields != updated_event.fields:
-            self._MarkIncompatible(f"Event {event.name} has had fields changed")
+        self.CheckFieldListsAreTheSame(f"Event {event.name}", event.fields, updated_event.fields)
 
     def CheckCommandsCompatible(self, command: Command, updated_command: Optional[Command]):
         self.logger.debug(f"  Checking command {command.name}")
@@ -149,8 +170,7 @@ class CompatibilityChecker:
             self._MarkIncompatible(f"Struct {original.name} has been deleted.")
             return
 
-        if original.fields != updated.fields:
-            self._MarkIncompatible(f"Struct {original.name} has modified fields.")
+        self.CheckFieldListsAreTheSame(f"Struct {original.name}", original.fields, updated.fields)
 
         if original.tag != updated.tag:
             self._MarkIncompatible(f"Struct {original.name} has modified tags")
