@@ -20,7 +20,8 @@ ti_simplelink_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 ti_simplelink_sysconfig_target =
     get_label_info(":sysconfig", "label_no_toolchain")
 
-ti_simplelink_board = "LP_EM_CC1354P10_6"
+ti_simplelink_board = "CC2674"
+ti_simplelink_device = "CC2674R10RGZ"
 
 # Size Optimizations
 # use -Os instead of -Og, LWIP release build

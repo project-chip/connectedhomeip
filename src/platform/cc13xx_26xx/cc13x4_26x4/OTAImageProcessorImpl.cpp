@@ -35,6 +35,8 @@
 using namespace chip::DeviceLayer;
 using namespace chip::DeviceLayer::PersistedStorage;
 
+uint64_t totalBytesWrittenNvs = 0;
+
 namespace chip {
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
@@ -146,10 +148,19 @@ static bool writeExtFlashImgPages(NVS_Handle handle, ssize_t offset, MutableByte
         }
     }
     status = NVS_write(handle, imageOffset, data, dataSize, NVS_WRITE_POST_VERIFY);
+    ChipLogProgress(SoftwareUpdate, "block written into flash: %s", data);
     if (status != NVS_STATUS_SUCCESS)
     {
         ChipLogError(SoftwareUpdate, "NVS_write failed status: %d", status);
         return false;
+    }
+    else
+    {
+        totalBytesWrittenNvs += dataSize;
+        ChipLogProgress(SoftwareUpdate, "Total written bytes: %d", (size_t) totalBytesWrittenNvs);
+        uint8_t buf[1024] = {0};
+        status = NVS_read(handle, imageOffset, buf, dataSize);
+        ChipLogProgress(SoftwareUpdate, "block read out of flash: %s", buf);
     }
     return true;
 }
