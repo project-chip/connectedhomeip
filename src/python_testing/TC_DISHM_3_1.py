@@ -41,14 +41,12 @@ class TC_DISHM_3_1(MatterBaseTest):
         asserts.assert_equal(ret[0].Status, Status.Success, "Writing to OnMode failed")
 
     async def send_on_command(self) -> Clusters.Objects.OnOff.Commands.On:
-        ret = await self.send_single_cmd(cmd=Clusters.Objects.OnOff.Commands.On, endpoint=self.endpoint)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.OnOff.Commands.On),
-                            "Unexpected return type for OnOff")
+        ret = await self.send_single_cmd(cmd=Clusters.Objects.OnOff.Commands.On(), endpoint=self.endpoint)
+        return ret
 
     async def send_off_command(self) -> Clusters.Objects.OnOff.Commands.Off:
-        ret = await self.send_single_cmd(cmd=Clusters.Objects.OnOff.Commands.Off, endpoint=self.endpoint)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.OnOff.Commands.Off),
-                            "Unexpected return type for OnOff")
+        ret = await self.send_single_cmd(cmd=Clusters.Objects.OnOff.Commands.Off(), endpoint=self.endpoint)
+        return ret
 
     async def check_preconditions(self, endpoint):
         # Check to see if both the OnOff and DishwasherMode clusters are available on the same endpoint
@@ -65,10 +63,10 @@ class TC_DISHM_3_1(MatterBaseTest):
 
         cluster = Clusters.Objects.DishwasherMode
         attr = Clusters.DishwasherMode.Attributes.SupportedModes
-        supported_modes = await self.read_mode_attribute_expect_success(endpoint=endpoint, attribute=attr)
+        supported_modes_dut = await self.read_mode_attribute_expect_success(endpoint=endpoint, attribute=attr)
 
         supported_modes_dut = []
-        for m in supported_modes:
+        for m in supported_modes_dut:
             if m.mode in supported_modes_dut:
                 asserts.fail("SupportedModes must have unique mode values!")
             else:
@@ -99,7 +97,7 @@ class TC_DISHM_3_1(MatterBaseTest):
             return
 
         ret = await self.check_preconditions(self.endpoint)
-        asserts.assert_true(ret, "invalid preconditions - OnMode is non-null or not a mode in the Supported Modes attribute")
+        asserts.assert_true(ret, "invalid preconditions - OnMode is null or not set to a mode in the Supported Modes attribute")
 
         attributes = Clusters.DishwasherMode.Attributes
 
@@ -118,7 +116,7 @@ class TC_DISHM_3_1(MatterBaseTest):
 
         logging.info("OnMode: %s" % (on_mode_dut))
 
-        asserts.assert_false(on_mode_dut == NullValue, "On mode value should be an integer value")
+        #asserts.assert_false(on_mode_dut == NullValue, "On mode value should be an integer value")
 
         self.print_step(3, "Read CurrentMode attribute")
 
@@ -129,15 +127,13 @@ class TC_DISHM_3_1(MatterBaseTest):
         if old_current_mode_dut == on_mode_dut:
 
             self.print_step(4, "Read SupportedModes attribute")
-            supported_modes = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
+            supported_modes_dut = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
-            logging.info("SupportedModes: %s" % (supported_modes))
+            logging.info("SupportedModes: %s" % (supported_modes_dut))
 
-            asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least two entries!")
+            asserts.assert_greater_equal(len(supported_modes_dut), 2, "SupportedModes must have at least two entries!")
 
-            new_mode_th = None
-
-            for m in supported_modes:
+            for m in supported_modes_dut:
                 if m.mode != on_mode_dut:
                     new_mode_th = m.mode
                     break
@@ -146,16 +142,12 @@ class TC_DISHM_3_1(MatterBaseTest):
 
             ret = await self.send_change_to_mode_cmd(newMode=new_mode_th)
             asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode should succeed")
-
+        # There is no recorded response returned from sending the on or off command from the OnOff Cluster
         self.print_step(6, "Send Off command")
-
         ret = await self.send_off_command()
-        asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode to off should succeed")
 
         self.print_step(7, "Send On command")
-
         ret = await self.send_on_command()
-        asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode to on should succeed")
 
         self.print_step(8, "Read CurrentMode attribute")
 

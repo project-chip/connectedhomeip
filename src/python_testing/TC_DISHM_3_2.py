@@ -18,6 +18,7 @@
 import logging
 
 import chip.clusters as Clusters
+from chip.tlv import uint
 from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
@@ -101,47 +102,69 @@ class TC_DISHM_3_2(MatterBaseTest):
 
         logging.info("StartUpMode: %s" % (startup_mode_dut))
 
-        asserts.assert_false(startup_mode_dut == NullValue, "Startup mode value should be an integer value")
+        asserts.assert_true(type_matches(startup_mode_dut, uint) or startup_mode_dut == NullValue, "Startup mode value should be an integer value or null")
 
-        self.print_step(3, "Read CurrentMode attribute")
+        if startup_mode_dut == NullValue:
 
-        old_current_mode_dut = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
-
-        logging.info("CurrentMode: %s" % (old_current_mode_dut))
-
-        if old_current_mode_dut == startup_mode_dut:
-
-            self.print_step(4, "Read SupportedModes attribute")
+            self.print_step(3, "Read SupportedModes attribute")
             supported_modes_dut = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
             logging.info("SupportedModes: %s" % (supported_modes_dut))
 
             asserts.assert_greater_equal(len(supported_modes_dut), 2, "SupportedModes must have at least two entries!")
 
-            new_mode_th = None
+            for m in supported_modes_dut:
+                new_start_up_mode_th = m.mode
+                break
+
+            self.print_step(4, "Write to the StartUpMode Attribute")
+
+            ret = await self.write_start_up_mode(newMode=new_start_up_mode_th)
+            # There is no recorded response returned from StartUpMode when writing to StartUpMode.
+            logging.info("Write StartUpMode Return: %s" % ret)
+
+        else:
+            new_start_up_mode_th = startup_mode_dut
+
+        self.print_step(5, "Read CurrentMode attribute")
+
+        old_current_mode_dut = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        self.default_controller.ExpireSessions(self.dut_node_id)
+
+        if old_current_mode_dut == startup_mode_dut:
+            self.print_step(6, "Read SupportedModes attribute")
+            supported_modes_dut = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
+
+            logging.info("SupportedModes: %s" % (supported_modes_dut))
+
+            asserts.assert_greater_equal(len(supported_modes_dut), 2, "SupportedModes must have at least two entries!")
 
             for m in supported_modes_dut:
                 if m.mode != startup_mode_dut:
                     new_mode_th = m.mode
                     break
 
-            self.print_step(5, "Send ChangeToMode command with NewMode set to %d" % (new_mode_th))
+            self.print_step(7, "Send ChangeToMode command with NewMode set to %d" % (new_mode_th))
 
             ret = await self.send_change_to_mode_cmd(newMode=new_mode_th)
             asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode should succeed")
-
-        self.default_controller.ExpireSessions(self.dut_node_id)
-
-        self.print_step(6, "Physically power cycle the device")
+           
+        self.print_step(8, "Physically power cycle the device")
         input("Press Enter when done.\n")
 
-        self.print_step(7, "Read CurrentMode attribute")
+        self.print_step(9, "Read StartUpMode attribute")
 
+        new_start_up_mode_dut = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.StartUpMode)
+
+        logging.info("StartUpMode: %s" % (new_start_up_mode_dut))
+        asserts.assert_true(type_matches(new_start_up_mode_dut, uint), "StartUpMode must be an integer type")
+        asserts.assert_true(new_start_up_mode_dut == new_start_up_mode_th, "CurrentMode must match StartUpMode after a power cycle")
+
+        self.print_step(10, "Read CurrentMode attribute")
+       
         current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
-
         logging.info("CurrentMode: %s" % (current_mode))
-
-        asserts.assert_true(startup_mode_dut == current_mode, "CurrentMode must match StartUpMode after a power cycle")
+        asserts.assert_true(new_start_up_mode_dut == current_mode, "CurrentMode must match StartUpMode after a power cycle")
 
 
 if __name__ == "__main__":

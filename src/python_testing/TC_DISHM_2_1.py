@@ -47,8 +47,8 @@ class TC_DISHM_2_1(MatterBaseTest):
         self.endpoint = self.user_params.get("endpoint", 1)
         logging.info("This test expects to find this cluster on endpoint 1")
 
-        self.modeok = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_OK']
-        self.can_test_mode_failure = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_FAIL']
+        self.modeOk = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_OK']
+        self.modeFail= self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_FAIL']
 
         asserts.assert_true(self.check_pics("DISHM.S.A0000"), "DISHM.S.A0000 must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.A0001"), "DISHM.S.A0001 must be supported")
@@ -84,8 +84,8 @@ class TC_DISHM_2_1(MatterBaseTest):
             UNSUPPORTED_MODE = 0x01
             GENERIC_FAILURE = 0x02
 
-        DishwasherModeCodes = [code.value for code in Clusters.DishwasherMode.Enums.StatusCode
-                               if code is not Clusters.DishwasherMode.Enums.StatusCode.kUnknownEnumValue]
+        DishwasherModeCodes = [code.value for code in Clusters.DishwasherMode.Enums.ModeTag
+                               if code is not Clusters.DishwasherMode.Enums.ModeTag.kUnknownEnumValue]
 
         self.print_step(4, "Send ChangeToMode command with NewMode set to %d" % (old_current_mode_dut))
 
@@ -93,7 +93,7 @@ class TC_DISHM_2_1(MatterBaseTest):
         asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode to the current mode should be a no-op")
 
         if self.check_pics("DISHM.S.M.CAN_TEST_MODE_FAILURE"):
-            self.print_step(5, "Manually put the device in a state from which it will FAIL to transition to mode %d" % (self.modefail))
+            self.print_step(5, "Manually put the device in a state from which it will FAIL to transition to mode %d" % (self.modeFail))
             input("Press Enter when done.\n")
 
             self.print_step(6, "Read CurrentMode attribute")
@@ -101,16 +101,18 @@ class TC_DISHM_2_1(MatterBaseTest):
 
             logging.info("CurrentMode: %s" % (old_current_mode_dut))
 
-            self.print_step(7, "Send ChangeToMode command with NewMode set to %d" % (self.modefail))
+            self.print_step(7, "Send ChangeToMode command with NewMode set to %d" % (self.modeFail))
 
-            ret = await self.send_change_to_mode_cmd(newMode=self.modefail)
+            ret = await self.send_change_to_mode_cmd(newMode=self.modeFail)
             st = ret.status
             is_mfg_code = st in range(0x80, 0xC0)
             is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st in DishwasherModeCodes) or is_mfg_code
             asserts.assert_true(
-                is_err_code, "Changing to mode %d must fail due to the current state of the device" % (self.modefail))
-            st_text_len = len(ret.statusText)
-            asserts.assert_true(st_text_len in range(1, 65), "StatusText length (%d) must be between 1 and 64" % (st_text_len))
+                is_err_code, "Changing to mode %d must fail due to the current state of the device" % (self.modeFail))
+            # Status text is an optional string which may not always be included
+            if ret.statusText:
+                st_text_len = len(ret.statusText)
+                asserts.assert_true(st_text_len in range(1, 65), "StatusText length (%d) must be between 1 and 64" % (st_text_len))
 
             self.print_step(8, "Read CurrentMode attribute")
             current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
@@ -119,7 +121,7 @@ class TC_DISHM_2_1(MatterBaseTest):
 
             asserts.assert_true(current_mode == old_current_mode_dut, "CurrentMode changed after failed ChangeToMode command!")
 
-        self.print_step(9, "Manually put the device in a state from which it will SUCCESSFULLY transition to mode %d" % (self.modeok))
+        self.print_step(9, "Manually put the device in a state from which it will SUCCESSFULLY transition to mode %d" % (self.modeOk))
         input("Press Enter when done.\n")
 
         self.print_step(10, "Read CurrentMode attribute")
@@ -127,18 +129,18 @@ class TC_DISHM_2_1(MatterBaseTest):
 
         logging.info("CurrentMode: %s" % (old_current_mode_dut))
 
-        self.print_step(11, "Send ChangeToMode command with NewMode set to %d" % (self.modeok))
+        self.print_step(11, "Send ChangeToMode command with NewMode set to %d" % (self.modeOk))
 
-        ret = await self.send_change_to_mode_cmd(newMode=self.modeok)
+        ret = await self.send_change_to_mode_cmd(newMode=self.modeOk)
         asserts.assert_true(ret.status == CommonCodes.SUCCESS.value,
-                            "Changing to mode %d must succeed due to the current state of the device" % (self.modeok))
+                            "Changing to mode %d must succeed due to the current state of the device" % (self.modeOk))
 
         self.print_step(12, "Read CurrentMode attribute")
         current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
         logging.info("CurrentMode: %s" % (current_mode))
 
-        asserts.assert_true(current_mode == self.modeok,
+        asserts.assert_true(current_mode == self.modeOk,
                             "CurrentMode doesn't match the argument of the successful ChangeToMode command!")
 
         self.print_step(13, "Send ChangeToMode command with NewMode set to %d" % (invalid_mode_th))
@@ -152,7 +154,7 @@ class TC_DISHM_2_1(MatterBaseTest):
 
         logging.info("CurrentMode: %s" % (current_mode))
 
-        asserts.assert_true(current_mode == self.modeok, "CurrentMode changed after failed ChangeToMode command!")
+        asserts.assert_true(current_mode == self.modeOk, "CurrentMode changed after failed ChangeToMode command!")
 
 
 if __name__ == "__main__":
