@@ -33,7 +33,7 @@ git clone --recurse-submodules git@github.com:project-chip/connectedhomeip.git
 
 ## Updating Matter code
 
-If you already have the Matter code checked out, run the following command to update the repository and 
+If you already have the Matter code checked out, run the following commands to update the repository and 
 synchronize submodules:
 
 ```
