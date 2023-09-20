@@ -132,12 +132,10 @@ template("siwx917_sdk") {
       "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/support/inc",
     ]
 
-    if(silabs_board == "BRD4338A") {
-      _include_dirs += [
-        "${wifi_sdk_root}/components/siwx917_soc/core/config",
-      ]
-
+    if (silabs_board == "BRD4338A") {
+      _include_dirs += [ "${wifi_sdk_root}/components/siwx917_soc/core/config" ]
     }
+
     # Note that we're setting the mbedTLS and PSA configuration files through a
     # define. This means the build system by default does not pick up changes in
     # the content of these, only when changing the filename itself.
@@ -206,16 +204,16 @@ template("siwx917_sdk") {
       ]
       if (silabs_board == "BRD4338A") {
         defines += [
-         "SI917_RADIO_BOARD_V2=1",
-         "SL_BOARD_NAME=\"BRD4338A\"",
-         "SL_BOARD_REV=\"A00\"",
-         "SPI_MULTI_SLAVE=1",
-         "SYSCALLS_WRITE=1",
-         "SI91X_PLATFORM=1",
-         "SI91X_SYSRTC_COUNT=1",
-         "SI91X_SYSRTC_PRESENT=1",
-         "SSI_ULP_MASTER=1",
-         "SL_MEMLCD_EXTCOMIN_PORT=0",
+          "SI917_RADIO_BOARD_V2=1",
+          "SL_BOARD_NAME=\"BRD4338A\"",
+          "SL_BOARD_REV=\"A00\"",
+          "SPI_MULTI_SLAVE=1",
+          "SYSCALLS_WRITE=1",
+          "SI91X_PLATFORM=1",
+          "SI91X_SYSRTC_COUNT=1",
+          "SI91X_SYSRTC_PRESENT=1",
+          "SSI_ULP_MASTER=1",
+          "SL_MEMLCD_EXTCOMIN_PORT=0",
         ]
       }
     }
@@ -470,13 +468,6 @@ template("siwx917_sdk") {
 
     if (!disable_lcd) {
       sources += [
-        "${wifi_sdk_root}/components/siwx917_soc/drivers/cmsis_driver/SPI.c",
-        "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/memlcd/src/sl_memlcd.c",
-        "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/memlcd/src/sl_memlcd_display.c",
-        "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/memlcd/src/memlcd_917/sl_memlcd_spi.c",
-        "${wifi_sdk_root}/components/siwx917_soc/drivers/service/sleeptimer/src/sl_sleeptimer_hal_si91x_sysrtc.c",
-        "${wifi_sdk_root}/components/siwx917_soc/drivers/peripheral_drivers/src/rsi_sysrtc.c",
-        "${wifi_sdk_root}/components/siwx917_soc/drivers/unified_api/src/sl_si91x_ulp_timer.c",
         "${efr32_sdk_root}/platform/middleware/glib/dmd/display/dmd_memlcd.c",
         "${efr32_sdk_root}/platform/middleware/glib/fonts/glib_font_narrow_6x8.c",
         "${efr32_sdk_root}/platform/middleware/glib/fonts/glib_font_normal_8x8.c",
@@ -490,6 +481,13 @@ template("siwx917_sdk") {
         "${efr32_sdk_root}/platform/middleware/glib/glib/glib_rectangle.c",
         "${efr32_sdk_root}/platform/middleware/glib/glib/glib_string.c",
         "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
+        "${wifi_sdk_root}/components/siwx917_soc/drivers/cmsis_driver/SPI.c",
+        "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/memlcd/src/memlcd_917/sl_memlcd_spi.c",
+        "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/memlcd/src/sl_memlcd.c",
+        "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/memlcd/src/sl_memlcd_display.c",
+        "${wifi_sdk_root}/components/siwx917_soc/drivers/peripheral_drivers/src/rsi_sysrtc.c",
+        "${wifi_sdk_root}/components/siwx917_soc/drivers/service/sleeptimer/src/sl_sleeptimer_hal_si91x_sysrtc.c",
+        "${wifi_sdk_root}/components/siwx917_soc/drivers/unified_api/src/sl_si91x_ulp_timer.c",
       ]
     }
 
