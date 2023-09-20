@@ -36,18 +36,18 @@ class HasName(Protocol):
 NAMED = TypeVar('NAMED', bound=HasName)
 
 
-def GroupList(items: List[T], get_id: Callable[[T], str]) -> Dict[str, T]:
+def group_list(items: List[T], get_id: Callable[[T], str]) -> Dict[str, T]:
     result = {}
     for item in items:
         result[get_id(item)] = item
     return result
 
 
-def GroupListByName(items: List[NAMED]) -> Dict[str, NAMED]:
-    return GroupList(items, lambda x: x.name)
+def group_list_by_name(items: List[NAMED]) -> Dict[str, NAMED]:
+    return group_list(items, lambda x: x.name)
 
 
-def FullClusterName(cluster: Cluster) -> str:
+def full_cluster_name(cluster: Cluster) -> str:
     "Builds a unique cluster name considering the side as well"
     if cluster.side == ClusterSide.CLIENT:
         return f"{cluster.name}/client"
@@ -55,7 +55,7 @@ def FullClusterName(cluster: Cluster) -> str:
         return f"{cluster.name}/server"
 
 
-def AttributeName(attribute: Attribute) -> str:
+def attribute_name(attribute: Attribute) -> str:
     """Get the name of an attribute."""
     return attribute.definition.name
 
@@ -206,7 +206,7 @@ class CompatibilityChecker:
             self._MarkIncompatible(f"Attribute {cluster_name}::{original.definition.name} changed its qualities.")
 
     def CheckEnumListCompatible(self, cluster_name: str, original: List[Enum], updated: List[Enum]):
-        updated_enums = GroupListByName(updated)
+        updated_enums = group_list_by_name(updated)
 
         for original_enum in original:
             updated_enum = updated_enums.get(original_enum.name)
@@ -222,47 +222,47 @@ class CompatibilityChecker:
             self.CheckBitmapCompatible(cluster_name, original_bitmap, updated_bitmap)
 
     def CheckStructListCompatible(self, cluster_name: str, original: List[Struct], updated: List[Struct]):
-        updated_structs = GroupListByName(updated)
+        updated_structs = group_list_by_name(updated)
 
         for struct in original:
             self.CheckStructsCompatible(cluster_name, struct, updated_structs.get(struct.name))
 
     def CheckCommandListCompatible(self, cluster_name: str, original: List[Command], updated: List[Command]):
-        updated_commands = GroupListByName(updated)
+        updated_commands = group_list_by_name(updated)
 
         for command in original:
             updated_command = updated_commands.get(command.name)
             self.CheckCommandsCompatible(cluster_name, command, updated_command)
 
     def CheckEventListCompatible(self, cluster_name: str, original: List[Event], updated: List[Event]):
-        updated_events = GroupListByName(updated)
+        updated_events = group_list_by_name(updated)
 
         for event in original:
             updated_event = updated_events.get(event.name)
             self.CheckEventsCompatible(cluster_name, event, updated_event)
 
     def CheckAttributeListCompatible(self, cluster_name: str, original: List[Attribute], updated: List[Attribute]):
-        updated_attributes = GroupList(updated, AttributeName)
+        updated_attributes = group_list(updated, attribute_name)
 
         for attribute in original:
-            self.CheckAttributeCompatible(cluster_name, attribute, updated_attributes.get(AttributeName(attribute)))
+            self.CheckAttributeCompatible(cluster_name, attribute, updated_attributes.get(attribute_name(attribute)))
 
     def CheckClusterListCompatible(self, original: List[Cluster], updated: List[Cluster]):
-        updated_clusters = GroupList(updated, FullClusterName)
+        updated_clusters = group_list(updated, full_cluster_name)
 
         for original_cluster in original:
-            updated_cluster = updated_clusters.get(FullClusterName(original_cluster))
+            updated_cluster = updated_clusters.get(full_cluster_name(original_cluster))
             self.CheckClusterCompatible(original_cluster, updated_cluster)
 
     def CheckClusterCompatible(self, original_cluster: Cluster, updated_cluster: Optional[Cluster]):
-        self.logger.debug(f"Checking cluster {FullClusterName(original_cluster)}")
+        self.logger.debug(f"Checking cluster {full_cluster_name(original_cluster)}")
         if not updated_cluster:
-            self._MarkIncompatible(f"Cluster {FullClusterName(original_cluster)} was deleted")
+            self._MarkIncompatible(f"Cluster {full_cluster_name(original_cluster)} was deleted")
             return
 
         if original_cluster.code != updated_cluster.code:
             self._MarkIncompatible(
-                f"Cluster {FullClusterName(original_cluster)} has different codes {original_cluster.code} != {updated_cluster.code}")
+                f"Cluster {full_cluster_name(original_cluster)} has different codes {original_cluster.code} != {updated_cluster.code}")
 
         self.CheckEnumListCompatible(original_cluster.name, original_cluster.enums, updated_cluster.enums)
         self.CheckStructListCompatible(original_cluster.name, original_cluster.structs, updated_cluster.structs)
