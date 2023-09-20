@@ -1287,7 +1287,8 @@ JNI_METHOD(jlong, getGroupDevicePointer)(JNIEnv * env, jobject self, jlong handl
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    GroupDeviceProxy * device = new GroupDeviceProxy(static_cast<GroupId>(groupId), wrapper->Controller()->GetFabricIndex(), wrapper->Controller()->ExchangeMgr());
+    GroupDeviceProxy * device = new GroupDeviceProxy(static_cast<GroupId>(groupId), wrapper->Controller()->GetFabricIndex(),
+                                                     wrapper->Controller()->ExchangeMgr());
     return reinterpret_cast<jlong>(device);
 }
 
@@ -1306,9 +1307,9 @@ JNI_METHOD(jobject, getAvailableGroupIds)(JNIEnv * env, jobject self, jlong hand
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                                           = CHIP_NO_ERROR;
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
-    auto it                                                  = groupDataProvider->IterateGroupInfo(wrapper->Controller()->GetFabricIndex());
+    auto it = groupDataProvider->IterateGroupInfo(wrapper->Controller()->GetFabricIndex());
 
     jobject groupIds;
     err = chip::JniReferences::GetInstance().CreateArrayList(groupIds);
@@ -1320,7 +1321,8 @@ JNI_METHOD(jobject, getAvailableGroupIds)(JNIEnv * env, jobject self, jlong hand
         while (it->Next(group))
         {
             jobject jGroupId;
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", static_cast<jint>(group.group_id), jGroupId);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
+                                                                       static_cast<jint>(group.group_id), jGroupId);
             chip::JniReferences::GetInstance().AddToList(groupIds, jGroupId);
         }
     }
@@ -1334,7 +1336,7 @@ JNI_METHOD(jstring, getGroupName)(JNIEnv * env, jobject self, jlong handle, jint
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
-    auto it                                                  = groupDataProvider->IterateGroupInfo(wrapper->Controller()->GetFabricIndex());
+    auto it = groupDataProvider->IterateGroupInfo(wrapper->Controller()->GetFabricIndex());
 
     GroupId groupId = static_cast<GroupId>(jGroupId);
     chip::Credentials::GroupDataProvider::GroupInfo group;
@@ -1343,7 +1345,8 @@ JNI_METHOD(jstring, getGroupName)(JNIEnv * env, jobject self, jlong handle, jint
     {
         while (it->Next(group))
         {
-            if (group.group_id == groupId) {
+            if (group.group_id == groupId)
+            {
                 return env->NewStringUTF(group.name);
             }
         }
@@ -1358,18 +1361,20 @@ JNI_METHOD(jobject, findKeySetId)(JNIEnv * env, jobject self, jlong handle, jint
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
-    auto iter                                                = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
+    auto iter = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
     chip::Credentials::GroupDataProvider::GroupKey groupKey;
     GroupId groupId = static_cast<GroupId>(jGroupId);
     jobject wrapperKeyId;
 
-    if (iter) {
+    if (iter)
+    {
         while (iter->Next(groupKey))
         {
             if (groupKey.group_id == groupId)
             {
                 jobject jKeyId;
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", static_cast<jint>(groupKey.keyset_id), jKeyId);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
+                                                                           static_cast<jint>(groupKey.keyset_id), jKeyId);
                 chip::JniReferences::GetInstance().CreateOptional(jKeyId, wrapperKeyId);
                 iter->Release();
                 return wrapperKeyId;
@@ -1414,7 +1419,7 @@ JNI_METHOD(jobject, getKeySetIds)(JNIEnv * env, jobject self, jlong handle)
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                                           = CHIP_NO_ERROR;
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
     auto it = groupDataProvider->IterateKeySets(wrapper->Controller()->GetFabricIndex());
 
@@ -1428,7 +1433,8 @@ JNI_METHOD(jobject, getKeySetIds)(JNIEnv * env, jobject self, jlong handle)
         while (it->Next(keySet))
         {
             jobject jKeySetId;
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", static_cast<jint>(keySet.keyset_id), jKeySetId);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
+                                                                       static_cast<jint>(keySet.keyset_id), jKeySetId);
             chip::JniReferences::GetInstance().AddToList(keySetIds, jKeySetId);
         }
         it->Release();
@@ -1457,7 +1463,8 @@ JNI_METHOD(jobject, getKeySecurityPolicy)(JNIEnv * env, jobject self, jlong hand
             if (keySet.keyset_id == keySetId)
             {
                 jobject jKeyPolicy;
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", static_cast<jint>(keySet.policy), jKeyPolicy);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
+                                                                           static_cast<jint>(keySet.policy), jKeyPolicy);
                 chip::JniReferences::GetInstance().CreateOptional(jKeyPolicy, wrapperKeyPolicy);
                 it->Release();
                 return wrapperKeyPolicy;
@@ -1475,11 +1482,13 @@ JNI_METHOD(jboolean, bindKeySet)(JNIEnv * env, jobject self, jlong handle, jint 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
-    auto iter                                                = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
-    size_t current_count                                     = iter->Count();
+    auto iter            = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
+    size_t current_count = iter->Count();
 
     iter->Release();
-    CHIP_ERROR err = groupDataProvider->SetGroupKeyAt(wrapper->Controller()->GetFabricIndex(), current_count, chip::Credentials::GroupDataProvider::GroupKey(static_cast<uint16_t>(jGroupId), static_cast<uint16_t>(jKeySetId)));
+    CHIP_ERROR err = groupDataProvider->SetGroupKeyAt(
+        wrapper->Controller()->GetFabricIndex(), current_count,
+        chip::Credentials::GroupDataProvider::GroupKey(static_cast<uint16_t>(jGroupId), static_cast<uint16_t>(jKeySetId)));
     return err == CHIP_NO_ERROR ? JNI_TRUE : JNI_FALSE;
 }
 
@@ -1490,11 +1499,11 @@ JNI_METHOD(jboolean, unbindKeySet)(JNIEnv * env, jobject self, jlong handle, jin
 
     size_t index                                             = 0;
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
-    auto iter                                                = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
-    size_t maxCount                                     = iter->Count();
+    auto iter       = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
+    size_t maxCount = iter->Count();
     chip::Credentials::GroupDataProvider::GroupKey groupKey;
 
-    GroupId groupId = static_cast<GroupId>(jGroupId);
+    GroupId groupId   = static_cast<GroupId>(jGroupId);
     uint16_t keysetId = static_cast<uint16_t>(jKeySetId);
 
     while (iter->Next(groupKey))
@@ -1516,7 +1525,8 @@ JNI_METHOD(jboolean, unbindKeySet)(JNIEnv * env, jobject self, jlong handle, jin
     return err == CHIP_NO_ERROR ? JNI_TRUE : JNI_FALSE;
 }
 
-JNI_METHOD(jboolean, addKeySet)(JNIEnv * env, jobject self, jlong handle, jint jKeySetId, jint jKeyPolicy, jlong validityTime, jbyteArray epochKey)
+JNI_METHOD(jboolean, addKeySet)
+(JNIEnv * env, jobject self, jlong handle, jint jKeySetId, jint jKeyPolicy, jlong validityTime, jbyteArray epochKey)
 {
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
@@ -1526,11 +1536,12 @@ JNI_METHOD(jboolean, addKeySet)(JNIEnv * env, jobject self, jlong handle, jint j
     chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
     VerifyOrReturnValue(wrapper->Controller()->GetCompressedFabricIdBytes(compressed_fabric_id_span) == CHIP_NO_ERROR, JNI_FALSE);
 
-    chip::Credentials::GroupDataProvider::SecurityPolicy keyPolicy = static_cast<chip::Credentials::GroupDataProvider::SecurityPolicy>(jKeyPolicy);
+    chip::Credentials::GroupDataProvider::SecurityPolicy keyPolicy =
+        static_cast<chip::Credentials::GroupDataProvider::SecurityPolicy>(jKeyPolicy);
     chip::JniByteArray jniEpochKey(env, epochKey);
     size_t epochKeySize = static_cast<size_t>(jniEpochKey.size());
     if ((keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kCacheAndSync &&
-            keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst) ||
+         keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst) ||
         epochKeySize != chip::Credentials::GroupDataProvider::EpochKey::kLengthBytes)
     {
         return JNI_FALSE;
@@ -1542,7 +1553,9 @@ JNI_METHOD(jboolean, addKeySet)(JNIEnv * env, jobject self, jlong handle, jint j
     memcpy(epoch_key.key, jniEpochKey.byteSpan().data(), chip::Credentials::GroupDataProvider::EpochKey::kLengthBytes);
     memcpy(keySet.epoch_keys, &epoch_key, sizeof(chip::Credentials::GroupDataProvider::EpochKey));
 
-    VerifyOrReturnValue(groupDataProvider->SetKeySet(wrapper->Controller()->GetFabricIndex(), compressed_fabric_id_span, keySet) == CHIP_NO_ERROR, JNI_FALSE);
+    VerifyOrReturnValue(groupDataProvider->SetKeySet(wrapper->Controller()->GetFabricIndex(), compressed_fabric_id_span, keySet) ==
+                            CHIP_NO_ERROR,
+                        JNI_FALSE);
 
     return JNI_TRUE;
 }
@@ -1552,14 +1565,15 @@ JNI_METHOD(jboolean, removeKeySet)(JNIEnv * env, jobject self, jlong handle, jin
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                                           = CHIP_NO_ERROR;
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
 
-    size_t index = 0;
-    auto iter    = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
+    size_t index      = 0;
+    auto iter         = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
     uint16_t keysetId = static_cast<uint16_t>(jKeySetId);
     chip::Credentials::GroupDataProvider::GroupKey groupKey;
-    if (iter) {
+    if (iter)
+    {
         while (iter->Next(groupKey))
         {
             if (groupKey.keyset_id == keysetId)
@@ -1573,7 +1587,8 @@ JNI_METHOD(jboolean, removeKeySet)(JNIEnv * env, jobject self, jlong handle, jin
             index++;
         }
         iter->Release();
-        if (err == CHIP_NO_ERROR) {
+        if (err == CHIP_NO_ERROR)
+        {
             err = groupDataProvider->RemoveKeySet(wrapper->Controller()->GetFabricIndex(), keysetId);
         }
         return err == CHIP_NO_ERROR ? JNI_TRUE : JNI_FALSE;
@@ -2441,7 +2456,12 @@ JNI_METHOD(void, invoke)
                                                          ? Optional<uint16_t>(convertedTimedRequestTimeoutMs)
                                                          : Optional<uint16_t>::Missing()));
 
-    SuccessOrExit(err = device->GetSecureSession().Value()->IsGroupSession() ? commandSender->SendGroupCommandRequest(device->GetSecureSession().Value()) : commandSender->SendCommandRequest(device->GetSecureSession().Value(), imTimeoutMs != 0 ? MakeOptional(System::Clock::Milliseconds32(imTimeoutMs)) : Optional<System::Clock::Timeout>::Missing()));
+    SuccessOrExit(err = device->GetSecureSession().Value()->IsGroupSession()
+                      ? commandSender->SendGroupCommandRequest(device->GetSecureSession().Value())
+                      : commandSender->SendCommandRequest(device->GetSecureSession().Value(),
+                                                          imTimeoutMs != 0
+                                                              ? MakeOptional(System::Clock::Milliseconds32(imTimeoutMs))
+                                                              : Optional<System::Clock::Timeout>::Missing()));
 
     callback->mCommandSender = commandSender;
 

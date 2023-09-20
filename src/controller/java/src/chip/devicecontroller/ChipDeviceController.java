@@ -345,7 +345,8 @@ public class ChipDeviceController {
   }
 
   public enum GroupKeySecurityPolicy {
-    TrustFirst(0), CacheAndSync(1);
+    TrustFirst(0),
+    CacheAndSync(1);
 
     private int id;
 
@@ -356,7 +357,6 @@ public class ChipDeviceController {
     int getID() {
       return id;
     }
-
 
     public static GroupKeySecurityPolicy value(int id) {
       for (GroupKeySecurityPolicy policy : GroupKeySecurityPolicy.values()) {
@@ -399,7 +399,8 @@ public class ChipDeviceController {
   }
 
   public Optional<GroupKeySecurityPolicy> getKeySecurityPolicy(int keySetId) {
-    return getKeySecurityPolicy(deviceControllerPtr, keySetId).map(id -> GroupKeySecurityPolicy.value(id));
+    return getKeySecurityPolicy(deviceControllerPtr, keySetId)
+        .map(id -> GroupKeySecurityPolicy.value(id));
   }
 
   public boolean bindKeySet(int groupId, int keySetId) {
@@ -410,7 +411,8 @@ public class ChipDeviceController {
     return unbindKeySet(deviceControllerPtr, groupId, keySetId);
   }
 
-  public boolean addKeySet(int keySetId, GroupKeySecurityPolicy keyPolicy, long validityTime, byte[] epochKey) {
+  public boolean addKeySet(
+      int keySetId, GroupKeySecurityPolicy keyPolicy, long validityTime, byte[] epochKey) {
     return addKeySet(deviceControllerPtr, keySetId, keyPolicy.getID(), validityTime, epochKey);
   }
 
@@ -1247,7 +1249,8 @@ public class ChipDeviceController {
 
   private native boolean unbindKeySet(long deviceControllerPtr, int groupId, int keySetId);
 
-  private native boolean addKeySet(long deviceControllerPtr, int keySetId, int keyPolicy, long validityTime, byte[] epochKey);
+  private native boolean addKeySet(
+      long deviceControllerPtr, int keySetId, int keyPolicy, long validityTime, byte[] epochKey);
 
   private native boolean removeKeySet(long deviceControllerPtr, int keySetId);
 

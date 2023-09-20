@@ -1,8 +1,8 @@
 #pragma once
 
 #include <app/DeviceProxy.h>
-#include <messaging/ExchangeMgr.h>
 #include <lib/core/GroupId.h>
+#include <messaging/ExchangeMgr.h>
 #include <transport/SessionManager.h>
 
 namespace chip {
@@ -14,7 +14,7 @@ public:
         mGroupId(groupId), mExchangeMgr(exchangeMgr)
     {
         chip::Transport::OutgoingGroupSession * session = new chip::Transport::OutgoingGroupSession(groupId, fabricIndex);
-        mSecureSession = chip::SessionHandle(*session);
+        mSecureSession                                  = chip::SessionHandle(*session);
     }
     GroupDeviceProxy() {}
 
@@ -32,4 +32,4 @@ private:
     SessionHolder mSecureSession;
 };
 
-}
+} // namespace chip
