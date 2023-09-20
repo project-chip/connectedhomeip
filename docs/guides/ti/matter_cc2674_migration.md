@@ -108,7 +108,6 @@ should be addressed from a SysConfig Editor.
    `RF_cmdIeeeRadioSetup` and add the following functions from the drop-down:
    `CMD_TX_TEST`,`CMD_IEEE_ED_SCAN`, `CMD_IEEE_CSMA`, and `CMD_IEEE_RX_ACK`.
 
-
 ## Building examples for the CC1354P10-1
 
 To migrate the CC1354P10-6 examples to the CC1354P10-1 platform, there are only
@@ -117,7 +116,7 @@ two steps:
 1. `examples/[application]/cc13x4_26x4/args.gni` should have
    `ti_simplelink_board` as `CC1354P10-1`
 2. `examples/[application]/cc13x4_26x4/chip.syscfg` opened with a Text Editor
-    should change `ble.radioConfig.codeExportConfig.$name` to
+   should change `ble.radioConfig.codeExportConfig.$name` to
    `ti_devices_radioconfig_code_export_param2` and `ble.rfDesign` to
    `LP_EM_CC1354P10_1`
 
