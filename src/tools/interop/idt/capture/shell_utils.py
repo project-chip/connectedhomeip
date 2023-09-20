@@ -54,13 +54,14 @@ class BashRunner:
 
     def get_captured_output(self) -> str:
         """Return captured output when the relevant instance var is set"""
-        if not self.capture_output or not self.sync:
-            return ""
-        return self.proc.stdout.decode().strip()
+        return "" if not self.capture_output or not self.sync \
+            else self.proc.stdout.decode().strip()
 
     def start_command(self) -> None:
         if not self.sync and not self.command_is_running():
             self.proc = subprocess.Popen(self.args)
+        else:
+            print(f' WARNING {self.command} start requested while running')
 
     def stop_command(self, soft: bool = False) -> None:
         # TODO: Make this uniform

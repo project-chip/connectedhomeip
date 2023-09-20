@@ -184,7 +184,9 @@ class Android(PlatformLogStreamer):
             self.check_screen_command, capture_output=True)
         return "true" in screen_cmd_output.get_captured_output()
 
-    def ensure_screen_is_on(self) -> None:
+    def prepare_screen_recording(self) -> None:
+        if self.screen_proc.command_is_running():
+            return True
         screen_on = self.check_screen()
         while not screen_on:
             input(
@@ -192,16 +194,13 @@ class Android(PlatformLogStreamer):
             screen_on = self.check_screen()
             if not screen_on:
                 print("Screen is still not on for recording!")
+        self.screen_recording_already_pulled = False
 
     def start_streaming(self) -> None:
-        if not self.screen_proc.command_is_running():
-            self.ensure_screen_is_on()
-            self.screen_proc.start_command()
-            print(f'Screen recording started {self.screen_cap_output_path}')
-            self.screen_recording_already_pulled = False
-        if not self.logcat_proc.command_is_running():
-            self.logcat_proc.start_command()
-            print(f'logcat started {self.logcat_output_path}')
+        self.prepare_screen_recording()
+        self.screen_proc.start_command()
+        self.logcat_proc.start_command()
+        print(f'logcat started {self.logcat_output_path}')
 
     def pull_screen_recording(self) -> None:
         self.run_adb_command(self.screen_pull_command)
