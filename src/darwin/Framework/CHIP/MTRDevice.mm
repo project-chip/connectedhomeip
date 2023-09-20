@@ -1527,25 +1527,24 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
     }
 
     MTREventPath * eventPath = [[MTREventPath alloc] initWithPath:aEventHeader.mPath];
+    NSDictionary * eventReport;
     if (apStatus != nullptr) {
         [mEventReports addObject:@ { MTREventPathKey : eventPath, MTRErrorKey : [MTRError errorForIMStatus:*apStatus] }];
     } else if (apData == nullptr) {
-        [mEventReports addObject:@ {
-            MTREventPathKey : eventPath,
-            MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]
-        }];
+        eventReport = @ { MTREventPathKey : eventPath, MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT] };
     } else {
         id value = MTRDecodeDataValueDictionaryFromCHIPTLV(apData);
         if (value == nil) {
             MTR_LOG_ERROR("Failed to decode event data for path %@", eventPath);
-            [mEventReports addObject:@ {
+            eventReport = @ {
                 MTREventPathKey : eventPath,
                 MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_DECODE_FAILED],
-            }];
+            };
         } else {
-            [mEventReports addObject:[MTRBaseDevice eventReportForHeader:aEventHeader andData:value]];
+            eventReport = [MTRBaseDevice eventReportForHeader:aEventHeader andData:value];
         }
     }
+    ReportEvents(@[ eventReport ]);
 }
 
 void SubscriptionCallback::OnAttributeData(
@@ -1563,24 +1562,25 @@ void SubscriptionCallback::OnAttributeData(
     }
 
     MTRAttributePath * attributePath = [[MTRAttributePath alloc] initWithPath:aPath];
+    NSDictionary * attributeReport;
     if (aStatus.mStatus != Status::Success) {
-        [mAttributeReports addObject:@ { MTRAttributePathKey : attributePath, MTRErrorKey : [MTRError errorForIMStatus:aStatus] }];
+        attributeReport = @ { MTRAttributePathKey : attributePath, MTRErrorKey : [MTRError errorForIMStatus:aStatus] };
     } else if (apData == nullptr) {
-        [mAttributeReports addObject:@ {
-            MTRAttributePathKey : attributePath,
-            MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]
-        }];
+        attributeReport =
+            @ { MTRAttributePathKey : attributePath, MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT] };
     } else {
         id value = MTRDecodeDataValueDictionaryFromCHIPTLV(apData);
         if (value == nil) {
             MTR_LOG_ERROR("Failed to decode attribute data for path %@", attributePath);
-            [mAttributeReports addObject:@ {
+            attributeReport = @ {
                 MTRAttributePathKey : attributePath,
                 MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_DECODE_FAILED],
-            }];
+            };
         } else {
-            [mAttributeReports addObject:@ { MTRAttributePathKey : attributePath, MTRDataKey : value }];
+            attributeReport = @ { MTRAttributePathKey : attributePath, MTRDataKey : value };
         }
     }
+
+    ReportAttributes(@[ attributeReport ]);
 }
 } // anonymous namespace

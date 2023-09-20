@@ -37,15 +37,25 @@ void MTRBaseSubscriptionCallback::ReportData()
 {
     __block NSArray * attributeReports = mAttributeReports;
     mAttributeReports = nil;
-    auto attributeCallback = mAttributeReportCallback;
 
     __block NSArray * eventReports = mEventReports;
     mEventReports = nil;
-    auto eventCallback = mEventReportCallback;
 
+    ReportAttributes(attributeReports);
+    ReportEvents(eventReports);
+}
+
+void MTRBaseSubscriptionCallback::ReportAttributes(NSArray * attributeReports)
+{
+    auto attributeCallback = mAttributeReportCallback;
     if (attributeCallback != nil && attributeReports.count) {
         attributeCallback(attributeReports);
     }
+}
+
+void MTRBaseSubscriptionCallback::ReportEvents(NSArray * eventReports)
+{
+    auto eventCallback = mEventReportCallback;
     if (eventCallback != nil && eventReports.count) {
         eventCallback(eventReports);
     }

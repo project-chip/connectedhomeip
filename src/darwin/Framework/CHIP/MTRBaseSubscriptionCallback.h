@@ -103,6 +103,10 @@ protected:
     // be immediately followed by OnDone and we want to do the deletion there.
     void ReportError(CHIP_ERROR aError, bool aCancelSubscription = true);
 
+    void ReportAttributes(NSArray * attributeReports);
+
+    void ReportEvents(NSArray * eventReports);
+
 private:
     void OnReportBegin() override;
 
