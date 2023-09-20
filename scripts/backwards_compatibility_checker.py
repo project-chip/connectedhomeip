@@ -32,7 +32,7 @@ except ImportError:
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'py_matter_idl')))
     from matter_idl.matter_idl_parser import CreateParser
 
-from matter_idl.backwards_compatibility import IsBackwardsCompatible
+from matter_idl.backwards_compatibility import is_backwards_compatible
 from matter_idl.matter_idl_types import Idl
 
 # Supported log levels, mapping string values required for argument
@@ -78,7 +78,7 @@ def main(log_level, old_idl, new_idl):
     logging.info("Parsing NEW idl from %s" % new_idl)
     new_tree = CreateParser().parse(open(new_idl, "rt").read())
 
-    if not IsBackwardsCompatible(original=old_tree, updated=new_tree):
+    if not is_backwards_compatible(original=old_tree, updated=new_tree):
         sys.exit(1)
 
     sys.exit(0)

@@ -27,7 +27,7 @@ except ImportError:
         os.path.join(os.path.dirname(__file__), '..')))
     from matter_idl.matter_idl_parser import CreateParser
 
-from matter_idl.backwards_compatibility import CompatibilityChecker, IsBackwardsCompatible
+from matter_idl.backwards_compatibility import CompatibilityChecker, is_backwards_compatible
 from matter_idl.matter_idl_types import Idl
 
 
@@ -49,12 +49,12 @@ class TestCompatibilityChecks(unittest.TestCase):
 
     def _AssumeCompatiblity(self, old: str, new: str, old_idl: Idl, new_idl: Idl, expect_compatible: bool):
         with DisableLogger():
-            if expect_compatible == IsBackwardsCompatible(old_idl, new_idl):
+            if expect_compatible == is_backwards_compatible(old_idl, new_idl):
                 return
 
             # re-run to figure out reasons:
             checker = CompatibilityChecker(old_idl, new_idl)
-            checker.Check()
+            checker.check()
 
         if expect_compatible:
             reason = "EXPECTED COMPATIBLE, but failed"
