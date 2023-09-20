@@ -38,15 +38,6 @@ class K32WBoard(Enum):
         else:
             raise Exception('Unknown board type: %r' % self)
 
-    def BinaryTextExtension(self):
-        if self == K32WBoard.K32W0:
-            return ".hex"
-        elif self == K32WBoard.K32W1:
-            return ".srec"
-        else:
-            raise Exception('Unknown app type: %r' % self)
-
-
 class K32WApp(Enum):
     LIGHT = auto()
     LOCK = auto()
@@ -156,10 +147,8 @@ class K32WBuilder(GnBuilder):
         super(K32WBuilder, self).generate()
 
     def build_outputs(self):
-        items = {}
-        app_name = 'chip-%s-%s' % (self.board.Name(), self.app.NameSuffix())
-        for extension in [".map", self.board.BinaryTextExtension()]:
-            name = '%s.%s' % (app_name, extension)
-            items[name] = os.path.join(self.output_dir, name)
-
-        return items
+        name = 'chip-%s-%s' % (self.board.Name(), self.app.NameSuffix())
+        return {
+            '%s.elf' % name: os.path.join(self.output_dir, '%s.elf' % name),
+            '%s.map' % name: os.path.join(self.output_dir, '%s.map' % name)
+        }
