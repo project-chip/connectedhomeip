@@ -121,4 +121,4 @@ only two steps:
     `ti_devices_radioconfig_code_export_param2` and `ble.rfDesign` to
     `LP_EM_CC1354P10_1`
 
-After this, the example's readme can be followed to produce the executable needed.
+After this, the example's `README.md` instructions can be followed to produce the executable needed.
