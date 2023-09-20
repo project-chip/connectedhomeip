@@ -192,6 +192,13 @@ Reasons:"""+"\n  - ".join([""] + checker.errors))
             "client Cluster X = 1 { info event A = 1 { int8u x = 1; int8u y = 2; } }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
+    def test_events_struct_renames(self):
+        self.ValidateUpdate(
+            "Renaming struct content is ok",
+            "client Cluster X = 1 { info event A = 1 { int8u a = 1; int8u b = 2; } }",
+            "client Cluster X = 1 { info event A = 1 { int8u x = 1; int8u y = 2; } }",
+            Compatibility.ALL_OK)
+
     def test_events_struct_type_change(self):
         self.ValidateUpdate(
             "Changing event struct is never ok",
