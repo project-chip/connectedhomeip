@@ -162,6 +162,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
     FabricIndex fabricIndex;
 #endif // CHIP_PROGRESS_LOGGING
 
+    PeerAddress destination_address;
+
     switch (sessionHandle->GetSessionType())
     {
     case Transport::Session::SessionType::kGroupOutgoing: {
@@ -184,7 +186,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             return CHIP_ERROR_INTERNAL;
         }
 
-        PeerAddress destination_address = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
+        destination_address = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
 
         // Trace before any encryption
         MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kGroupMessage, &payloadHeader, &packetHeader,
@@ -224,7 +226,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             .SetSessionId(session->GetPeerSessionId()) //
             .SetSessionType(Header::SessionType::kUnicastSession);
 
-        PeerAddress destination_address = session->GetPeerAddress();
+        destination_address = session->GetPeerAddress();
 
         // Trace before any encryption
         MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kSecureSession, &payloadHeader, &packetHeader,
@@ -259,8 +261,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             break;
         }
 
-        auto unauthenticated            = sessionHandle->AsUnauthenticatedSession();
-        PeerAddress destination_address = unauthenticated->GetPeerAddress();
+        auto unauthenticated = sessionHandle->AsUnauthenticatedSession();
+        destination_address  = unauthenticated->GetPeerAddress();
 
         // Trace after all headers are settled.
         MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kUnauthenticated, &payloadHeader, &packetHeader,
@@ -305,29 +307,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
     }
 
     char addressStr[Transport::PeerAddress::kMaxToStringSize] = { 0 };
-    switch (sessionHandle->GetSessionType())
-    {
-    case Transport::Session::SessionType::kGroupOutgoing: {
-        // We already checked above that we have a fabric entry for our fabric
-        // index.
-        auto * groupSession   = sessionHandle->AsOutgoingGroupSession();
-        auto * fabricInfo     = mFabricTable->FindFabricWithIndex(fabricIndex);
-        auto multicastAddress = Transport::PeerAddress::Multicast(fabricInfo->GetFabricId(), groupSession->GetGroupId());
-        multicastAddress.ToString(addressStr);
-        break;
-    }
-    case Transport::Session::SessionType::kSecure: {
-        sessionHandle->AsSecureSession()->GetPeerAddress().ToString(addressStr);
-        break;
-    }
-    case Transport::Session::SessionType::kUnauthenticated: {
-        sessionHandle->AsUnauthenticatedSession()->GetPeerAddress().ToString(addressStr);
-        break;
-    }
-    default:
-        // Note: We checked above that we are one of these three session types.
-        break;
-    }
+    destination_address.ToString(addressStr);
 
     //
     // Legend that can be used to decode this log line can be found in messaging/README.md
