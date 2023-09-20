@@ -48,7 +48,7 @@ class TC_DISHM_2_1(MatterBaseTest):
         logging.info("This test expects to find this cluster on endpoint 1")
 
         self.modeOk = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_OK']
-        self.modeFail= self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_FAIL']
+        self.modeFail = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_FAIL']
 
         asserts.assert_true(self.check_pics("DISHM.S.A0000"), "DISHM.S.A0000 must be supported")
         asserts.assert_true(self.check_pics("DISHM.S.A0001"), "DISHM.S.A0001 must be supported")

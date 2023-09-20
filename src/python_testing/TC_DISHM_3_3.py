@@ -84,7 +84,8 @@ class TC_DISHM_3_3(MatterBaseTest):
 
         logging.info("StartUpMode: %s" % (startup_mode_dut))
 
-        asserts.assert_true(type_matches(startup_mode_dut, uint) or startup_mode_dut == NullValue, "Startup mode value should be an integer value or null")
+        asserts.assert_true(type_matches(startup_mode_dut, uint) or startup_mode_dut ==
+                            NullValue, "Startup mode value should be an integer value or null")
 
         if startup_mode_dut == NullValue:
 
@@ -140,7 +141,7 @@ class TC_DISHM_3_3(MatterBaseTest):
         new_on_mode_dut = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.OnMode)
 
         logging.info("OnMode: %s" % (new_on_mode_dut))
-        # There is an issue with the test plan here as new_mode_th cannot be read if step 7 is not executed so I've changed 
+        # There is an issue with the test plan here as new_mode_th cannot be read if step 7 is not executed so I've changed
         # from comparing against new_mode_th to comparing against startup_mode_dut instead to ensure that it runs.
         # Will make issue
         asserts.assert_true(startup_mode_dut != new_on_mode_dut, "OnMode must match the mode written in previous step")
@@ -158,7 +159,8 @@ class TC_DISHM_3_3(MatterBaseTest):
 
         logging.info("StartUpMode: %s" % (startup_mode_dut))
 
-        asserts.assert_true(type_matches(startup_mode_dut, uint) or startup_mode_dut == new_start_up_mode_th, "Startup mode value should be an integer value or null")
+        asserts.assert_true(type_matches(startup_mode_dut, uint) or startup_mode_dut ==
+                            new_start_up_mode_th, "Startup mode value should be an integer value or null")
 
         self.print_step(12, "Read CurrentMode attribute")
         current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
