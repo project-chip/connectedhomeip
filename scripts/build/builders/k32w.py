@@ -38,6 +38,7 @@ class K32WBoard(Enum):
         else:
             raise Exception('Unknown board type: %r' % self)
 
+
 class K32WApp(Enum):
     LIGHT = auto()
     LOCK = auto()
