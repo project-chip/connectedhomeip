@@ -24,8 +24,7 @@ from capture.file_utils import create_standard_log_name
 from capture.platform.android import Android
 
 from .analysis import PlayServicesAnalysis
-from .command_map import props
-from .command_map import dumpsys
+from .command_map import dumpsys, props
 
 
 class PlayServices(EcosystemCapture):
