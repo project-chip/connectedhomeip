@@ -58,17 +58,18 @@ class TestCompatibilityChecks(unittest.TestCase):
 
         if expect_compatible:
             reason = "EXPECTED COMPATIBLE, but failed"
+            fail_reasons = "\nREASONS:" + "\n  - ".join([""] + checker.errors)
         else:
             reason = "EXPECTED NOT COMPATIBLE, but succeeded"
+            fail_reasons = ""
 
         self.fail(f"""Failed compatibility test
 {reason}:
---------------------- OLD -----------------
+/-------------------- OLD ----------------/
 {old}
---------------------- NEW -----------------
+/-------------------- NEW ----------------/
 {new}
--------------------------------------------
-Reasons:"""+"\n  - ".join([""] + checker.errors))
+/-----------------------------------------/{fail_reasons}""")
 
     def ValidateUpdate(self, name: str, old: str, new: str, flags: Compatibility):
         old_idl = CreateParser(skip_meta=True).parse(old)
@@ -199,6 +200,13 @@ Reasons:"""+"\n  - ".join([""] + checker.errors))
             "client Cluster X = 1 { info event A = 1 { int8u x = 1; int8u y = 2; } }",
             Compatibility.ALL_OK)
 
+    def test_events_struct_reorders_renames(self):
+        self.ValidateUpdate(
+            "Renaming struct content is ok",
+            "client Cluster X = 1 { info event A = 1 { int8u a = 1; int16u b = 2; } }",
+            "client Cluster X = 1 { info event A = 1 { int16u x = 2; int8u a = 1; } }",
+            Compatibility.ALL_OK)
+
     def test_events_struct_type_change(self):
         self.ValidateUpdate(
             "Changing event struct is never ok",
@@ -282,6 +290,13 @@ Reasons:"""+"\n  - ".join([""] + checker.errors))
             "client Cluster X = 1 { struct Foo { int32u x = 1; } }",
             "client Cluster X = 1 { struct Foo { int64u x = 1; } }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+    def test_struct_content_rename_reorder(self):
+        self.ValidateUpdate(
+            "Structure content renames and reorder is ok.",
+            "client Cluster X = 1 { struct Foo { int32u x = 1; int8u y = 2; } }",
+            "client Cluster X = 1 { struct Foo { int8u a = 2; int32u y = 1; } }",
+            Compatibility.ALL_OK)
 
     def test_struct_content_add_remove(self):
         self.ValidateUpdate(
