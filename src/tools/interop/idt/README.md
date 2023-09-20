@@ -98,7 +98,7 @@ This directory contains tools for use on both the admin computer and the RPi.
     ```
     idt_push
     ```
-1. `ssh` to the PRi (the default password for Kali is `kali`):
+1. `ssh` to the RPi (the default password for Kali is `kali`):
     - **_NOTE:_** You may need to wait a few minutes after boot for the `ssh`
       server to be available on the RPi. Retry if needed!
     ```

@@ -1170,6 +1170,7 @@ rootfs
 RPC
 RPCs
 RPi
+RPi's
 RPis
 RSA
 rsn
