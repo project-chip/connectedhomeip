@@ -135,7 +135,7 @@ config BT_DEVICE_NAME_GATT_WRITABLE
     default n
 
 config B9X_BLE_CTRL_THREAD_STACK_SIZE
-    default 484
+    default 576
 
 config B9X_BLE_CTRL_MASTER_MAX_NUM
     default 0
