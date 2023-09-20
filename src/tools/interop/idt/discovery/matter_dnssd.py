@@ -27,7 +27,7 @@ _MDNS_TYPES = {
 }
 
 
-class MatterMdnsListener(ServiceListener):
+class MatterDnssdListener(ServiceListener):
 
     def __init__(self, artifact_dir: str) -> None:
         super().__init__()

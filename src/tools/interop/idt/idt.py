@@ -25,7 +25,7 @@ from pathlib import Path
 from capture import CaptureEcosystems, CapturePlatforms, PacketCaptureRunner
 from capture.file_utils import border_print, create_file_timestamp, safe_mkdir
 from discovery.matter_ble import MatterBleScanner
-from discovery.matter_mdns import MatterMdnsListener
+from discovery.matter_dnssd import MatterDnssdListener
 
 # TODO argument for log level
 logging.basicConfig(
@@ -92,7 +92,7 @@ class InteropDebuggingTool:
         self.pcap_artifact_dir = os.path.join(self.artifact_dir, "pcap")
 
         self.ble_artifact_dir = os.path.join(self.artifact_dir, "ble")
-        self.mdns_artifact_dir = os.path.join(self.artifact_dir, "mdns")
+        self.dnssd_artifact_dir = os.path.join(self.artifact_dir, "dnssd")
 
         self.process_args()
 
@@ -114,8 +114,8 @@ class InteropDebuggingTool:
             choices=[
                 "ble",
                 "b",
-                "mdns",
-                "m"])
+                "dnssd",
+                "d"])
 
         capture_parser = subparsers.add_parser(
             "capture",
@@ -158,17 +158,6 @@ class InteropDebuggingTool:
             choices=self.available_net_interfaces,
             default=self.available_net_interfaces_default)
 
-        # TODO: Implement
-        capture_parser.add_argument(
-            "--additional",
-            "-a",
-            help="Run ble and mdns scanners in the background while capturing (default t)",
-            required=False,
-            choices=[
-                't',
-                'f'],
-            default='t')
-
         capture_parser.set_defaults(func=self.command_capture)
 
         args, unknown = parser.parse_known_args()
@@ -182,8 +171,8 @@ class InteropDebuggingTool:
             safe_mkdir(self.ble_artifact_dir)
             MatterBleScanner(self.ble_artifact_dir).browse_interactive()
         else:
-            safe_mkdir(self.mdns_artifact_dir)
-            MatterMdnsListener(self.mdns_artifact_dir).browse_interactive()
+            safe_mkdir(self.dnssd_artifact_dir)
+            MatterDnssdListener(self.dnssd_artifact_dir).browse_interactive()
 
     def zip_artifacts(self) -> None:
         zip_basename = os.path.basename(self.artifact_dir)

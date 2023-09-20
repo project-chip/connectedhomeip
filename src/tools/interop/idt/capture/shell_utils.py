@@ -61,7 +61,7 @@ class BashRunner:
         if not self.sync and not self.command_is_running():
             self.proc = subprocess.Popen(self.args)
         else:
-            print(f' WARNING {self.command} start requested while running')
+            print(f'WARNING {self.command} start requested while running')
 
     def stop_command(self, soft: bool = False) -> None:
         # TODO: Make this uniform

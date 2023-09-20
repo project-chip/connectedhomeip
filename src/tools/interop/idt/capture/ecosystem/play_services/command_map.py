@@ -15,24 +15,27 @@
 #    limitations under the License.
 #
 
-properties_and_commands = {
-    'android_model': 'shell getprop ro.product.model',
-    'android_version': 'shell getprop ro.build.version.release',
-    'android_api': 'shell getprop ro.build.version.sdk',
+# adb shell getprop
+props = {
+    'ro.product.model':               'android_model',
+    'ro.build.version.release':       'android_version',
+    'ro.build.version.sdk':           'android_api',
+    'ro.build.fingerprint':           'build_fingerprint',
+    'ro.odm.build.fingerprint':       'odm_build_fingerprint',
+    'ro.product.build.fingerprint':   'product_build_fingerprint',
+    'ro.ecosystem.build.fingerprint': 'vendor_build_fingerprint',
+}
 
-    'build_fingerprint': 'shell getprop ro.build.fingerprint',
-    'odm_build_fingerprint': 'shell getprop ro.odm.build.fingerprint',
-    'product_build_fingerprint': 'shell getprop ro.product.build.fingerprint',
-    'vendor_build_fingerprint': 'shell getprop ro.ecosystem.build.fingerprint',
-
-    'display_width': 'shell dumpsys display | grep StableDisplayWidth | awk -F\'=\' \'{print $2}\'',
-    'display_height': 'shell dumpsys display | grep StableDisplayHeight | awk -F\'=\' \'{print $2}\'',
-
-    'container_info': 'shell dumpsys package com.google.android.gms | grep "versionName"',
-    'home_module_info': 'shell dumpsys activity provider com.google.android.gms.chimera.container.GmsModuleProvider | grep "com.google.android.gms.home"',
-    'optional_home_module_info': 'shell dumpsys activity provider com.google.android.gms.chimera.container.GmsModuleProvider | grep "com.google.android.gms.optional_home"',
-    'policy_home_module_info': 'shell dumpsys activity provider com.google.android.gms.chimera.container.GmsModuleProvider | grep "com.google.android.gms.policy_home"',
-    'thread_info': 'shell dumpsys activity provider com.google.android.gms.chimera.container.GmsModuleProvider | grep "com.google.android.gms.threadnetwork"',
-    'mdns_info': 'shell dumpsys activity provider com.google.android.gms.chimera.container.GmsModuleProvider | grep -i com.google.android.gms.mdns',
-    'gha_info': 'shell dumpsys package com.google.android.apps.chromecast.app | grep versionName',
+# adb shell dumpsys
+_ap = 'activity provider com.google.android.gms.chimera.container.GmsModuleProvider'
+dumpsys = {
+    'display_width': 'display | grep StableDisplayWidth | awk -F\'=\' \'{print $2}\'',
+    'display_height': 'display | grep StableDisplayHeight | awk -F\'=\' \'{print $2}\'',
+    'container_info': 'package com.google.android.gms | grep "versionName"',
+    'home_module_info': f'{_ap} | grep "com.google.android.gms.home" | grep -v graph',
+    'optional_home_module_info': f'{_ap} | grep "com.google.android.gms.optional_home" | grep -v graph',
+    'policy_home_module_info': f'{_ap} | grep "com.google.android.gms.policy_home" | grep -v graph',
+    'thread_info': f'{_ap} | grep "com.google.android.gms.threadnetwork"',
+    'mdns_info': f'{_ap} | grep -i com.google.android.gms.mdns',
+    'gha_info': ' package com.google.android.apps.chromecast.app | grep versionName',
 }

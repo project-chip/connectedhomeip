@@ -24,7 +24,8 @@ from capture.file_utils import create_standard_log_name
 from capture.platform.android import Android
 
 from .analysis import PlayServicesAnalysis
-from .command_map import properties_and_commands
+from .command_map import props
+from .command_map import dumpsys
 
 
 class PlayServices(EcosystemCapture):
@@ -44,7 +45,7 @@ class PlayServices(EcosystemCapture):
         self.standard_info_file_path = os.path.join(
             self.artifact_dir, create_standard_log_name(
                 'phone_info', 'json'))
-        self.standard_info_data: Dict[str, str] | None = None
+        self.standard_info_data: Dict[str, str] = {}
 
         self.analysis = PlayServicesAnalysis(self.platform, self.artifact_dir)
 
@@ -58,20 +59,34 @@ class PlayServices(EcosystemCapture):
 
     def _write_standard_info_file(self) -> None:
         """Write env details to json file"""
+        for k, v in self.standard_info_data.items():
+            print(f"{k}: {v}")
         standard_info_data_json = json.dumps(self.standard_info_data, indent=2)
         with open(self.standard_info_file_path, mode='w+') as standard_info_file:
             standard_info_file.write(standard_info_data_json)
 
+    def _parse_get_prop(self) -> None:
+        prop_cmd = self.platform.run_adb_command("shell getprop",
+                                                 capture_output=True)
+        full_get_prop = prop_cmd.get_captured_output()
+        for output in full_get_prop.split("\n"):
+            for prop in props:
+                if prop in output:
+                    self.standard_info_data[prop] = output[output.rindex("["):]
+
+    def _parse_dumpsys(self) -> None:
+        for attr_name, command in dumpsys.items():
+            command = f"shell dumpsys {command}"
+            command_r = self.platform.run_adb_command(
+                command,
+                capture_output=True)
+            command_output = command_r.get_captured_output()
+            self.standard_info_data[attr_name] = command_output
+
     def _get_standard_info(self) -> None:
         """Fetch helpful env details"""
-        standard_info_data = {}
-        for attr_name, command in properties_and_commands.items():
-            command_r = self.platform.run_adb_command(
-                command, capture_output=True)
-            command_output = command_r.get_captured_output()
-            standard_info_data[attr_name] = command_output
-            print(f'{attr_name}: {command_output}')
-        self.standard_info_data = standard_info_data
+        self._parse_get_prop()
+        self._parse_dumpsys()
         self._write_standard_info_file()
 
     def start_capture(self) -> None:

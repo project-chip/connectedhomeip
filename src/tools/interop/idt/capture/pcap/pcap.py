@@ -33,7 +33,7 @@ class PacketCaptureRunner:
                 create_standard_log_name(
                     "pcap",
                     "cap")))
-        self.start_delay_seconds = 3
+        self.start_delay_seconds = 2
         self.interface = interface
         self.pcap_command = f"tcpdump -i {self.interface} -n -w {self.output_path}"
         self.pcap_proc = BashRunner(self.pcap_command)
