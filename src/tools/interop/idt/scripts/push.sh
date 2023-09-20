@@ -17,29 +17,29 @@
 
 source idt/scripts/vars.sh
 if [[ -d idt/venv ]]; then
-  echo "TEMP MOVING venv"
-  mv idt/venv TEMPvenv
+    echo "TEMP MOVING venv"
+    mv idt/venv TEMPvenv
 fi
-if [[ -d "idt/$IDT_OUTPUT_DIR" ]] ; then
-  echo "TEMP MOVING IDT_OUTPUT_DIR"
-  mv "idt/$IDT_OUTPUT_DIR" "TEMP""$IDT_OUTPUT_DIR"
+if [[ -d "idt/$IDT_OUTPUT_DIR" ]]; then
+    echo "TEMP MOVING IDT_OUTPUT_DIR"
+    mv "idt/$IDT_OUTPUT_DIR" "TEMP""$IDT_OUTPUT_DIR"
 fi
-if [[ -d idt/pycache ]] ; then
-  echo "TEMP moving pycache"
-  mv idt/pycache TEMPpycache
+if [[ -d idt/pycache ]]; then
+    echo "TEMP moving pycache"
+    mv idt/pycache TEMPpycache
 fi
 
 scp -r ./idt/* "$PIUSER@$PIHOST:/home/$PIUSER"/idt
 
 if [[ -d TEMPvenv ]]; then
-  mv  TEMPvenv idt/venv
-  echo "venv restored"
+    mv TEMPvenv idt/venv
+    echo "venv restored"
 fi
 if [[ -d "TEMP"$IDT_OUTPUT_DIR ]]; then
-  mv "TEMP""$IDT_OUTPUT_DIR" "idt/$IDT_OUTPUT_DIR"
-  echo "IDT_OUTPUT_DIR restored"
+    mv "TEMP""$IDT_OUTPUT_DIR" "idt/$IDT_OUTPUT_DIR"
+    echo "IDT_OUTPUT_DIR restored"
 fi
-if [[ -d "idt/$IDT_OUTPUT_DIR" ]] ; then
-  echo "pycache restored"
-  mv TEMPpycache idt/pycache
+if [[ -d "idt/$IDT_OUTPUT_DIR" ]]; then
+    echo "pycache restored"
+    mv TEMPpycache idt/pycache
 fi
