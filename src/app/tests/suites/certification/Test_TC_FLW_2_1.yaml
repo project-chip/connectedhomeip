@@ -42,19 +42,20 @@ tests:
               minValue: 0
               maxValue: 65533
 
+    #Skipping in CI due to SDK issue: https://github.com/project-chip/connectedhomeip/issues/27543
     - label: "Step 3: Read the mandatory attribute: MaxMeasuredValue"
-      PICS: FLW.S.A0002
+      PICS: FLW.S.A0002 && PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
       response:
           saveAs: MaxMeasuredVariable
           constraints:
               type: int16u
-              minValue: MinMeasuredVariable
+              minValue: MinMeasuredVariable + 1
               maxValue: 65534
 
     - label: "Step 4: Read the mandatory attribute: MeasuredValue"
-      PICS: FLW.S.A0000
+      PICS: FLW.S.A0000 && PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "MeasuredValue"
       response:

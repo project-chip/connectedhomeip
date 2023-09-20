@@ -269,12 +269,8 @@
     "OperationalState": ["Test_TC_OPSTATE_2_2"],
     "RelativeHumidityMeasurement": ["Test_TC_RH_2_2"],
     "SmokeCOAlarm": [],
-    "RefrigeratorAlarm": [
-        "Test_TC_REFALM_2_1",
-        "Test_TC_REFALM_2_2",
-        "Test_TC_REFALM_2_3"
-    ],
-    "RVCCleanMode": ["Test_TC_RVCCLEANM_3_3"],
+    "RefrigeratorAlarm": ["Test_TC_REFALM_2_2", "Test_TC_REFALM_2_3"],
+    "RVCCleanMode": [],
     "RVCOperationalState": ["Test_TC_RVCOPSTATE_2_2"],
     "RVCRunMode": ["Test_TC_RVCRUNM_3_3"],
     "TemperatureControlledCabinetMode": [

@@ -47,7 +47,14 @@ tests:
     - label: "Step 1a: Reset Devices to factory defaults"
       PICS: PICS_USER_PROMPT
       verification: |
-          Reset Devices to factory defaults
+          To perform Factory reset on DUT(all-clusters-app)  follow the below step in RPI platform , Pls use equivalent command on the respective platform
+          sudo rm -rf /tmp/chip_*
+
+          execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
+
+          step-1:  create a file using touch command , something like touch mytest.txt
+          step-2:  chmod 777 mytest.txt
+          step-3:  launch the app  ./chip-all-clusters-app --KVS ./mytest.txt
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -57,7 +64,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 1b: Wait for the commissioned device to be retrieved"
+    - label: "Step 1b: Recommission the DUT after a factory reset"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -84,7 +91,9 @@ tests:
     - label: "Step 2b: Reboot target device(DUT)"
       PICS: PICS_USER_PROMPT
       verification: |
-          Did the DUT successfully reboot?
+          execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
+
+          After reboot launch the app  ./chip-all-clusters-app --KVS ./mytest.txt
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -94,7 +103,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Recommission the DUT after a reboot"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -220,7 +229,9 @@ tests:
     - label: "Step 4c:Reboot target device(DUT)"
       PICS: PICS_USER_PROMPT
       verification: |
-          Did the DUT successfully reboot?
+          execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
+
+          After reboot launch the app  ./chip-all-clusters-app --KVS ./mytest.txt
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -230,7 +241,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Recommission the DUT after a reboot"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -258,7 +269,9 @@ tests:
     - label: "Step 5a: Reboot target device(DUT)"
       PICS: PICS_USER_PROMPT
       verification: |
-          Did the DUT successfully reboot?
+          execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
+
+          After reboot launch the app  ./chip-all-clusters-app --KVS ./mytest.txt
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -268,7 +281,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Recommission the DUT after a reboot"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -426,7 +439,15 @@ tests:
     - label: "Step 10b: Reset Devices to factory defaults"
       PICS: PICS_USER_PROMPT
       verification: |
-          Reset Devices to factory defaults
+          To perform Factory reset on DUT(all-clusters-app)  follow the below step in RPI platform , Pls use equivalent command on the respective platform
+
+          sudo rm -rf /tmp/chip_*
+
+          execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
+
+          step-1:  create a file using touch command , something like touch mytest.txt
+          step-2:  chmod 777 mytest.txt
+          step-3:  launch the app  ./chip-all-clusters-app --KVS ./mytest.txt
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -436,7 +457,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 10b: Recommission the DUT after a factory reset"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -483,7 +504,9 @@ tests:
     - label: "Step 10d: Reboot target device(DUT)"
       PICS: PICS_USER_PROMPT
       verification: |
-          Did the DUT successfully reboot?
+          execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
+
+          After reboot launch the app  ./chip-all-clusters-app --KVS ./mytest.txt
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -493,7 +516,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Recommission the DUT after a reboot"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
