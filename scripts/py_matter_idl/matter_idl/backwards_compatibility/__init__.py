@@ -151,7 +151,8 @@ class CompatibilityChecker:
             return
 
         if command.code != updated_command.code:
-            self._MarkIncompatible(f"Command {cluster_name}::{command.name} code changed from {command.code} to {updated_command.code}")
+            self._MarkIncompatible(
+                f"Command {cluster_name}::{command.name} code changed from {command.code} to {updated_command.code}")
 
         if command.input_param != updated_command.input_param:
             self._MarkIncompatible(
