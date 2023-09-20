@@ -376,16 +376,17 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
     char * errStr;
 #endif // CHIP_ERROR_LOGGING
     BluezConnection * conn = nullptr;
-    GVariantDict * options = nullptr;
+    GAutoPtr<GVariantDict> options;
     GAutoPtr<GVariant> option_mtu;
-    bool isSuccess = false;
 
     BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apEndpoint);
-    VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
+
+    VerifyOrReturnValue(endpoint != nullptr, FALSE, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
 
     conn = GetBluezConnectionViaDevice(endpoint);
-    VerifyOrExit(conn != nullptr,
-                 g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No Chipoble connection"));
+    VerifyOrReturnValue(
+        conn != nullptr, FALSE,
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No Chipoble connection"));
 
     ChipLogDetail(DeviceLayer, "BluezCharacteristicAcquireWrite is called, conn: %p", conn);
 
@@ -396,13 +397,14 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
 #endif // CHIP_ERROR_LOGGING
         ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", StringOrNullMarker(errStr), __func__);
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "FD creation failed");
-        goto exit;
+        return FALSE;
     }
 
-    options    = g_variant_dict_new(aOptions);
-    option_mtu = GAutoPtr<GVariant>(g_variant_dict_lookup_value(options, "mtu", G_VARIANT_TYPE_UINT16));
-    VerifyOrExit(
-        option_mtu != nullptr, ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
+    options = GAutoPtr<GVariantDict>(g_variant_dict_new(aOptions));
+    option_mtu =
+        GAutoPtr<GVariant>(g_variant_dict_lookup_value(MakeUniquePointerReceiver(options).Get(), "mtu", G_VARIANT_TYPE_UINT16));
+    VerifyOrReturnValue(
+        option_mtu != nullptr, FALSE, ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed"));
     conn->mMtu = g_variant_get_uint16(MakeUniquePointerReceiver(option_mtu).Get());
 
@@ -421,15 +423,8 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
 
     Bluez_gatt_characteristic1_complete_acquire_write_with_fd(aInvocation, fds[1], conn->mMtu);
     close(fds[1]);
-    isSuccess = true;
 
-exit:
-    if (options != nullptr)
-    {
-        g_variant_dict_unref(options);
-    }
-
-    return isSuccess ? TRUE : FALSE;
+    return TRUE;
 }
 
 static gboolean BluezCharacteristicAcquireWriteError(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
@@ -451,28 +446,30 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
     char * errStr;
 #endif // CHIP_ERROR_LOGGING
     BluezConnection * conn = nullptr;
-    GVariantDict * options = nullptr;
+    GAutoPtr<GVariantDict> options;
     GAutoPtr<GVariant> option_mtu;
-    bool isSuccess = false;
 
     BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apEndpoint);
-    VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
+    VerifyOrReturnValue(endpoint != nullptr, FALSE, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
 
     if (bluez_gatt_characteristic1_get_notifying(aChar))
     {
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.NotPermitted", "Already notifying");
-        goto exit;
+        return FALSE;
     }
 
     conn = GetBluezConnectionViaDevice(endpoint);
-    VerifyOrExit(conn != nullptr,
-                 g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No Chipoble connection"));
+    VerifyOrReturnValue(
+        conn != nullptr, FALSE,
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No Chipoble connection"));
 
-    options    = g_variant_dict_new(aOptions);
-    option_mtu = GAutoPtr<GVariant>(g_variant_dict_lookup_value(options, "mtu", G_VARIANT_TYPE_UINT16));
-    VerifyOrExit(
-        option_mtu != nullptr, ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed"));
+    options = GAutoPtr<GVariantDict>(g_variant_dict_new(aOptions));
+    option_mtu =
+        GAutoPtr<GVariant>(g_variant_dict_lookup_value(MakeUniquePointerReceiver(options).Get(), "mtu", G_VARIANT_TYPE_UINT16));
+    VerifyOrReturnValue(option_mtu != nullptr, FALSE, {
+        ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed");
+    });
     conn->mMtu = g_variant_get_uint16(MakeUniquePointerReceiver(option_mtu).Get());
 
     if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, fds) < 0)
@@ -482,7 +479,7 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
 #endif // CHIP_ERROR_LOGGING
         ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", StringOrNullMarker(errStr), __func__);
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "FD creation failed");
-        goto exit;
+        return FALSE;
     }
 
     channel = g_io_channel_unix_new(fds[0]);
@@ -504,15 +501,8 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
 
     conn->mIsNotify = true;
     BLEManagerImpl::HandleTXCharCCCDWrite(conn);
-    isSuccess = true;
 
-exit:
-    if (options != nullptr)
-    {
-        g_variant_dict_unref(options);
-    }
-
-    return isSuccess ? TRUE : FALSE;
+    return TRUE;
 }
 
 static gboolean BluezCharacteristicAcquireNotifyError(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,

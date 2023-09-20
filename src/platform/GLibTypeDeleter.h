@@ -65,6 +65,11 @@ struct GVariantDeleter
     void operator()(GVariant * object) { g_variant_unref(object); }
 };
 
+struct GVariantDictDeleter
+{
+    void operator()(GVariantDict * object) { g_variant_dict_unref(object); }
+};
+
 struct GVariantIterDeleter
 {
     void operator()(GVariantIter * object) { g_variant_iter_free(object); }
@@ -114,6 +119,12 @@ template <>
 struct GAutoPtrDeleter<GVariant>
 {
     using deleter = GVariantDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<GVariantDict>
+{
+    using deleter = GVariantDictDeleter;
 };
 
 template <>
