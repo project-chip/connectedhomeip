@@ -46,18 +46,18 @@ class Android(PlatformLogStreamer):
         self.logcat_output_path = os.path.join(
             self.artifact_dir, create_standard_log_name(
                 'logcat', 'txt'))
-        self.logcat_proc: BashRunner | None = None
         self.logcat_command = f'adb -s {self.device_id} logcat -T 1 >> {self.logcat_output_path}'
+        self.logcat_proc = BashRunner(self.logcat_command)
 
         # TODO: BT Logs
 
         screen_cast_name = create_standard_log_name('screencast', 'mp4')
         self.screen_cap_output_path = os.path.join(
             self.artifact_dir, screen_cast_name)
-        self.screen_proc: BashRunner | None = None
         self.check_screen_command = "shell dumpsys deviceidle | grep mScreenOn"
         self.screen_path = f'/sdcard/Movies/{screen_cast_name}'
         self.screen_command = f'adb -s {self.device_id} shell screenrecord {self.screen_path}'
+        self.screen_proc = BashRunner(self.screen_command)
         self.screen_recording_already_pulled = False
         self.screen_pull_command = f'pull {self.screen_path} {self.screen_cap_output_path}'
 
@@ -194,13 +194,13 @@ class Android(PlatformLogStreamer):
                 print("Screen is still not on for recording!")
 
     def start_streaming(self) -> None:
-        if self.screen_proc is None or not self.screen_proc.command_is_running():
+        if not self.screen_proc.command_is_running():
             self.ensure_screen_is_on()
-            self.screen_proc = BashRunner(self.screen_command)
+            self.screen_proc.start_command()
             print(f'Screen recording started {self.screen_cap_output_path}')
             self.screen_recording_already_pulled = False
-        if self.logcat_proc is None or not self.logcat_proc.command_is_running():
-            self.logcat_proc = BashRunner(self.logcat_command)
+        if not self.logcat_proc.command_is_running():
+            self.logcat_proc.start_command()
             print(f'logcat started {self.logcat_output_path}')
 
     def pull_screen_recording(self) -> None:

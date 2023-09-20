@@ -41,13 +41,7 @@ class BashRunner:
 
         self.args: list[str] = []
         self._init_args()
-        self.proc: subprocess.Popen[bytes] | subprocess.CompletedProcess[bytes] | None = None
-
-        if self.sync:
-            self.proc = subprocess.run(
-                self.args, capture_output=capture_output)
-        else:
-            self.proc = subprocess.Popen(self.args)
+        self.proc = subprocess.run(self.args, capture_output=capture_output) if self.sync else None
 
     def _init_args(self) -> None:
         """Escape quotes, call bash, and prep command for subprocess args"""
@@ -63,6 +57,10 @@ class BashRunner:
         if not self.capture_output or not self.sync:
             return ""
         return self.proc.stdout.decode().strip()
+
+    def start_command(self) -> None:
+        if not self.sync and not self.command_is_running():
+            self.proc = subprocess.Popen(self.args)
 
     def stop_command(self, soft: bool = False) -> None:
         # TODO: Make this uniform

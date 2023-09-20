@@ -182,17 +182,8 @@ Follow the steps below to execute capture and discovery without a Raspberry Pi.
 
 #### Python virtual environment
 
-Setup a virtual environment and install python dependencies:
-
-```
-idt_go
-cd idt
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
-
-Remember to re-enter the virtual environment as needed. [TODO] script
+-   After `idt` aliases are available in your environment, calling any `idt` command will automatically create a new
+    virtual environment and install dependencies.
 
 #### Docker
 

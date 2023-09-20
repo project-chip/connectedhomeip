@@ -35,12 +35,12 @@ class PacketCaptureRunner:
                     "cap")))
         self.start_delay_seconds = 3
         self.interface = interface
-        self.pcap_proc: BashRunner | None = None
         self.pcap_command = f"tcpdump -i {self.interface} -n -w {self.output_path}"
+        self.pcap_proc = BashRunner(self.pcap_command)
 
     def start_pcap(self) -> None:
-        if self.pcap_proc is None or not self.pcap_proc.command_is_running():
-            self.pcap_proc = BashRunner(self.pcap_command)
+        if not self.pcap_proc.command_is_running():
+            self.pcap_proc.start_command()
             print("Pausing to check if pcap started...")
             time.sleep(self.start_delay_seconds)
             if not self.pcap_proc.command_is_running():
@@ -50,6 +50,7 @@ class PacketCaptureRunner:
                 print("Retrying pcap with sudo...")
                 self.pcap_command = f"sudo {self.pcap_command}"
                 self.pcap_proc = BashRunner(self.pcap_command)
+                self.pcap_proc.start_command()
                 time.sleep(self.start_delay_seconds)
             if not self.pcap_proc.command_is_running():
                 print("WARNING Failed to start pcap!")
