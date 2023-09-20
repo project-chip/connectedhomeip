@@ -143,8 +143,9 @@ config B9X_BLE_CTRL_MASTER_MAX_NUM
 config B9X_BLE_CTRL_SLAVE_MAX_NUM
     default 1
 
-config B9X_BLE_CTRL_MAC_FLASH_ADDR
-    default 0x1FE000
+choice B9X_BLE_CTRL_MAC_TYPE
+    default B9X_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
+endchoice
 
 # Config dynamic interrupts to have posibility to switch between BLE/Thread radio drivers
 config DYNAMIC_INTERRUPTS
