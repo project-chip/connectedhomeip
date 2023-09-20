@@ -1983,7 +1983,7 @@ JNI_METHOD(void, write)
             size_t length = jsonUtfJniString.size();
             VerifyOrExit(tlvBytes.Calloc(length), err = CHIP_ERROR_NO_MEMORY);
             MutableByteSpan data(tlvBytes.Get(), tlvBytes.AllocatedSize());
-            SuccessOrExit(err = JsonToTlvWithoutStruct(jsonString, data));
+            SuccessOrExit(err = SingleAttributeJsonToTlv(jsonString, data));
             SuccessOrExit(err = PutPreencodedWriteAttribute(*writeClient, path, data));
         }
     }

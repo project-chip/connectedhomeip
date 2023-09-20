@@ -383,12 +383,12 @@ std::string MakeJsonSingleLine(const std::string & jsonString)
     return str;
 }
 
-CHIP_ERROR TlvToJsonWithStruct(uint32_t id, const TLV::TLVReader & data, std::string & jsonString)
+CHIP_ERROR SingleElementTlvToJson(uint32_t id, const TLV::TLVReader & tlv, std::string & jsonString)
 {
     TLV::TLVWriter writer;
     TLV::TLVReader readerForTLV;
-    size_t bufferLen = data.GetTotalLength() + kExtraSpaceForStructTag;
-    readerForTLV.Init(data);
+    size_t bufferLen = tlv.GetTotalLength() + kExtraSpaceForStructTag;
+    readerForTLV.Init(tlv);
     Platform::ScopedMemoryBufferWithSize<uint8_t> buffer;
     VerifyOrReturnError(buffer.Calloc(bufferLen), CHIP_ERROR_NO_MEMORY);
     writer.Init(buffer.Get(), buffer.AllocatedSize());

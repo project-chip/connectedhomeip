@@ -467,7 +467,7 @@ CHIP_ERROR ConvertTlvTag(const uint64_t tagNumber, TLV::Tag & tag)
     return InternalConvertTlvTag(tagNumber, tag);
 }
 
-CHIP_ERROR JsonToTlvWithoutStruct(const std::string & jsonString, MutableByteSpan & tlv)
+CHIP_ERROR SingleAttributeJsonToTlv(const std::string & jsonString, MutableByteSpan & tlv)
 {
     Platform::ScopedMemoryBufferWithSize<uint8_t> buf;
     VerifyOrReturnError(buf.Calloc(tlv.size()), CHIP_ERROR_NO_MEMORY);

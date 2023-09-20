@@ -286,7 +286,7 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
 
     // Convert TLV to JSON
     std::string json;
-    err = TlvToJsonWithStruct(static_cast<uint32_t>(aPath.mAttributeId), *apData, json);
+    err = SingleElementTlvToJson(static_cast<uint32_t>(aPath.mAttributeId), *apData, json);
     VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(attributePathObj, nullptr, err));
     UtfString jsonString(env, json.c_str());
 
@@ -416,7 +416,7 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
 
     // Convert TLV to JSON
     std::string json;
-    err = TlvToJsonWithStruct(static_cast<uint32_t>(aEventHeader.mPath.mEventId), *apData, json);
+    err = SingleElementTlvToJson(static_cast<uint32_t>(aEventHeader.mPath.mEventId), *apData, json);
     VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(eventPathObj, nullptr, err));
     UtfString jsonString(env, json.c_str());
 
