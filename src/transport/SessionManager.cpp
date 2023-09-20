@@ -309,16 +309,21 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
     char addressStr[Transport::PeerAddress::kMaxToStringSize] = { 0 };
     destination_address.ToString(addressStr);
 
+    // Work around pigweed not allowing more than 14 format args in a log
+    // message when using tokenized logs.
+    char typeStr[4 + 1 + 2 + 1];
+    snprintf(typeStr, sizeof(typeStr), "%04X:%02X", payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType());
+
     //
     // Legend that can be used to decode this log line can be found in messaging/README.md
     //
     ChipLogProgress(ExchangeManager,
                     "<<< [E:" ChipLogFormatExchangeId " S:%u M:" ChipLogFormatMessageCounter
-                    "%s] (%s) Msg TX to %u:" ChipLogFormatX64 " [%04X] [%s] --- Type %04X:%02X (%s:%s)",
+                    "%s] (%s) Msg TX to %u:" ChipLogFormatX64 " [%04X] [%s] --- Type %s (%s:%s)",
                     ChipLogValueExchangeIdFromSentHeader(payloadHeader), sessionHandle->SessionIdForLogging(),
                     packetHeader.GetMessageCounter(), ackBuf, Transport::GetSessionTypeString(sessionHandle), fabricIndex,
-                    ChipLogValueX64(destination), static_cast<uint16_t>(compressedFabricId), addressStr,
-                    payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType(), protocolName, msgTypeName);
+                    ChipLogValueX64(destination), static_cast<uint16_t>(compressedFabricId), addressStr, typeStr, protocolName,
+                    msgTypeName);
 #endif
 
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
