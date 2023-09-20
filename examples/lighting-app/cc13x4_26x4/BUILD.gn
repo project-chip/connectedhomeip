@@ -34,7 +34,7 @@ ti_simplelink_sdk("sdk") {
 }
 
 ti_sysconfig("sysconfig") {
-  sources = [ "${project_dir}/chip.syscfg" ]
+  sources = [ "${project_dir}/chip_cc2674r10.syscfg" ]
 
   outputs = [
     "ti_radio_config.c",

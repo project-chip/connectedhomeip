@@ -66,6 +66,7 @@ extern "C" void vQueueUnregisterQueueWrapper(QueueHandle_t xQueue)
 {
     /* This function is intentionally left empty as the Queue Registry is disabled */
 }
+extern "C" void rfDriverCallbackAntennaSwitching (RF_Handle client, RF_GlobalEvent events, void *arg) {}
 
 // ================================================================================
 // Main Code
