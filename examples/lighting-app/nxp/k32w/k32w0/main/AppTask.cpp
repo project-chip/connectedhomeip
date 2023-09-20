@@ -52,9 +52,6 @@
 #include "LEDWidget.h"
 #include "app_config.h"
 
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
 #include "DeviceAttestationSe05xCredsExample.h"
 #endif

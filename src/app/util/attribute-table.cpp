@@ -25,6 +25,7 @@
 #include <app/util/error-mapping.h>
 #include <app/util/generic-callbacks.h>
 #include <app/util/odd-sized-integers.h>
+#include <lib/core/CHIPConfig.h>
 
 #include <app/reporting/reporting.h>
 #include <protocols/interaction_model/Constants.h>
@@ -208,13 +209,13 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
             minBytes = reinterpret_cast<const uint8_t *>(&(minv.defaultValue));
             maxBytes = reinterpret_cast<const uint8_t *>(&(maxv.defaultValue));
 // On big endian cpu with length 1 only the second byte counts
-#if (BIGENDIAN_CPU)
+#if (CHIP_CONFIG_BIG_ENDIAN_TARGET)
             if (dataLen == 1)
             {
                 minBytes++;
                 maxBytes++;
             }
-#endif // BIGENDIAN_CPU
+#endif // CHIP_CONFIG_BIG_ENDIAN_TARGET
         }
         else
         {

@@ -103,7 +103,7 @@ namespace DeviceLayer {
             // Make a copy of the device discriminator for the block to capture.
             SetupDiscriminator deviceDiscriminator = inDeviceDiscriminator;
 
-            ChipLogProgress(Ble, "%s", __FUNCTION__);
+            ChipLogProgress(Ble, "ConnectionDelegate NewConnection with discriminator");
             if (!bleWorkQueue) {
                 bleWorkQueue = dispatch_queue_create(kBleWorkQueueName, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
             }
@@ -134,12 +134,13 @@ namespace DeviceLayer {
         {
             assertChipStackLockedByCurrentThread();
 
-            ChipLogProgress(Ble, "%s", __FUNCTION__);
+            ChipLogProgress(Ble, "ConnectionDelegate NewConnection with conn obj: %p", connObj);
 
             if (!bleWorkQueue) {
                 bleWorkQueue = dispatch_queue_create(kBleWorkQueueName, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
             }
 
+            CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj; // bridge (and retain) before dispatching
             dispatch_async(bleWorkQueue, ^{
                 // The BLE_CONNECTION_OBJECT represent a CBPeripheral object. In order for it to be valid the central
                 // manager needs to still be running.
@@ -157,7 +158,7 @@ namespace DeviceLayer {
                 ble.appState = appState;
                 ble.onConnectionComplete = OnConnectionComplete;
                 ble.onConnectionError = OnConnectionError;
-                [ble updateWithPeripheral:(__bridge CBPeripheral *) connObj];
+                [ble updateWithPeripheral:peripheral];
             });
         }
 
@@ -165,7 +166,7 @@ namespace DeviceLayer {
         {
             assertChipStackLockedByCurrentThread();
 
-            ChipLogProgress(Ble, "%s", __FUNCTION__);
+            ChipLogProgress(Ble, "ConnectionDelegate StartScan%s", (delegate ? " with delegate" : ""));
 
             if (!bleWorkQueue) {
                 bleWorkQueue = dispatch_queue_create(kBleWorkQueueName, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
@@ -191,15 +192,19 @@ namespace DeviceLayer {
 
         void BleConnectionDelegateImpl::StopScan()
         {
-            assertChipStackLockedByCurrentThread();
-            CancelConnection();
+            ChipLogProgress(Ble, "ConnectionDelegate StopScan");
+            DoCancel();
         }
 
         CHIP_ERROR BleConnectionDelegateImpl::CancelConnection()
         {
-            assertChipStackLockedByCurrentThread();
+            ChipLogProgress(Ble, "ConnectionDelegate CancelConnection");
+            return DoCancel();
+        }
 
-            ChipLogProgress(Ble, "%s", __FUNCTION__);
+        CHIP_ERROR BleConnectionDelegateImpl::DoCancel()
+        {
+            assertChipStackLockedByCurrentThread();
             if (bleWorkQueue == nil) {
                 return CHIP_NO_ERROR;
             }
@@ -284,6 +289,7 @@ namespace DeviceLayer {
 
     _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, _workQueue);
     dispatch_source_set_event_handler(_timer, ^{
+        ChipLogProgress(Ble, "ConnectionDelegate timeout");
         [self stop];
         [self dispatchConnectionError:BLE_ERROR_APP_CLOSED_CONNECTION];
     });
@@ -374,7 +380,7 @@ namespace DeviceLayer {
     }
 
     const uint8_t * bytes = (const uint8_t *) [serviceData bytes];
-    if ([serviceData length] != 8) {
+    if ([serviceData length] != sizeof(ChipBLEDeviceIdentificationInfo)) {
         NSMutableString * hexString = [NSMutableString stringWithCapacity:([serviceData length] * 2)];
         for (NSUInteger i = 0; i < [serviceData length]; i++) {
             [hexString appendString:[NSString stringWithFormat:@"%02lx", (unsigned long) bytes[i]]];
@@ -521,10 +527,11 @@ namespace DeviceLayer {
         chip::Ble::ChipBleUUID svcId;
         chip::Ble::ChipBleUUID charId;
         [BleConnection fillServiceWithCharacteristicUuids:characteristic svcId:&svcId charId:&charId];
+        auto * value = characteristic.value; // read immediately before dispatching
 
         dispatch_async(_chipWorkQueue, ^{
             // build a inet buffer from the rxEv and send to blelayer.
-            auto msgBuf = chip::System::PacketBufferHandle::NewWithData(characteristic.value.bytes, characteristic.value.length);
+            auto msgBuf = chip::System::PacketBufferHandle::NewWithData(value.bytes, value.length);
 
             if (msgBuf.IsNull()) {
                 ChipLogError(Ble, "Failed at allocating buffer for incoming BLE data");
@@ -583,7 +590,9 @@ namespace DeviceLayer {
             _centralManager.delegate = nil;
             _centralManager = nil;
             _peripheral = nil;
-            chip::DeviceLayer::Internal::ble = nil;
+            if (chip::DeviceLayer::Internal::ble == self) {
+                chip::DeviceLayer::Internal::ble = nil;
+            }
         });
     });
 }

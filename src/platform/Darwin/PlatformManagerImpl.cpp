@@ -40,7 +40,7 @@
 namespace chip {
 namespace DeviceLayer {
 
-PlatformManagerImpl PlatformManagerImpl::sInstance;
+Global<PlatformManagerImpl> PlatformManagerImpl::sInstance;
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
@@ -163,9 +163,23 @@ bool PlatformManagerImpl::_IsChipStackLockedByCurrentThread() const
 };
 #endif
 
+static int sPlatformManagerKey; // We use pointer to this as key.
+
+dispatch_queue_t PlatformManagerImpl::GetWorkQueue()
+{
+    if (mWorkQueue == nullptr)
+    {
+        mWorkQueue = dispatch_queue_create(CHIP_CONTROLLER_QUEUE, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        dispatch_suspend(mWorkQueue);
+        dispatch_queue_set_specific(mWorkQueue, &sPlatformManagerKey, this, nullptr);
+        mIsWorkQueueSuspended = true;
+    }
+    return mWorkQueue;
+}
+
 bool PlatformManagerImpl::IsWorkQueueCurrentQueue() const
 {
-    return dispatch_get_current_queue() == mWorkQueue;
+    return dispatch_get_specific(&sPlatformManagerKey) == this;
 }
 
 CHIP_ERROR PlatformManagerImpl::StartBleScan(BleScannerDelegate * delegate)

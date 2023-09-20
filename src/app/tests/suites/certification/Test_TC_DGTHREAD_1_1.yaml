@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 50.1.1. [TC-DGTHREAD-1.1] Global Attributes [DUT-Server]
 
@@ -292,38 +291,7 @@ tests:
               type: list
               contains: [1]
 
-    - label:
-          "Step 5d: TH reads from the DUT the EventList attribute. 1.The list
-          SHALL NOT contain any additional values in the standard or scoped
-          range: (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE) 2.
-          The list MAY contain values in the Manufacturer Extensible Identifier
-          (MEI) range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed
-          MEI range (0x0001 - 0xFFF1), these values SHALL be ignored. 3. The
-          list SHALL NOT contain any values in the Test Vendor or invalid range:
-          (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 -
-          0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
-          allowed MEI range (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool  threadnetworkdiagnostics read event-list 54 0
-
-          Verify "  EventList attribute " consists the list of supported events, on TH(chip-tool)
-
-          1676459946.528321][25797:25799] CHIP:DMG: }
-          [1676459946.528472][25797:25799] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_FFFA DataVersion: 3757870882
-          [1676459946.528508][25797:25799] CHIP:TOO:   EventList: 0 entries
-          [1676459946.528588][25797:25799] CHIP:EM: <<< [E:39264i S:15932 M:176950481 (Ack:89396356)] (S) Msg TX to 1:0000000000000001 [110F] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1676459946.528602][25797:25799] CHIP:IN: (S) Sending msg 176950481 on secure session with LSID: 15932
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Step 6a: TH reads AcceptedCommandList from DUT"
+    - label: "Step 6: TH reads AcceptedCommandList from DUT"
       PICS: " !DGTHREAD.S.F01 "
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -332,7 +300,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 6b: TH reads AcceptedCommandList from DUT"
+    - label: "Step 6: TH reads AcceptedCommandList from DUT"
       PICS: DGTHREAD.S.F01
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -341,71 +309,10 @@ tests:
               type: list
               contains: [0]
 
-    # List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
-    - label:
-          "Step 6c: TH reads AcceptedCommandList attribute from DUT. 1.The list
-          MAY contain values in the Manufacturer Extensible Identifier (MEI)
-          range: (0xXXXX_0000 - 0xXXXX_00FF), where XXXX is the allowed MEI
-          range (0x0001 - 0xFFF1), these values SHALL be ignored. 2.The list
-          SHALL NOT contain any values in the Test Vendor or invalid range:
-          (0x0000_0100 - 0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and
-          (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the allowed MEI range
-          (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool threadnetworkdiagnostics read accepted-command-list 54 0
-
-          Verify "AcceptedCommandList: 1 entries" on the TH(Chip-tool)  Log:
-
-          [1649748231.835572][9579:9584] CHIP:DMG:         SuppressResponse = true,
-          [1649748231.835633][9579:9584] CHIP:DMG:         InteractionModelRevision = 1
-          [1649748231.835690][9579:9584] CHIP:DMG: }
-          [1649748231.836192][9579:9584] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_FFF9 DataVersion: 1406212801
-          [1649748231.836344][9579:9584] CHIP:TOO:   AcceptedCommandList: 1 entries
-          [1649748231.836420][9579:9584] CHIP:TOO:     [1]: 0
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Step 7a: TH reads GeneratedCommandList from DUT"
+    - label: "Step 7: TH reads GeneratedCommandList from DUT"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
           value: []
           constraints:
               type: list
-
-    # List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
-    - label:
-          "Step 7b: TH reads GeneratedCommandList attribute from DUT. 1.The list
-          MAY contain values in the Manufacturer Extensible Identifier (MEI)
-          range: (0xXXXX_0000 - 0xXXXX_00FF), where XXXX is the allowed MEI
-          range (0x0001 - 0xFFF1), these values SHALL be ignored. 2.The list
-          SHALL NOT contain any values in the Test Vendor or invalid range:
-          (0x0000_0100 - 0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and
-          (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the allowed MEI range
-          (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool threadnetworkdiagnostics read generated-command-list 54 0
-
-          Verify "GeneratedCommandList: 0 entries" on the TH(Chip-tool)  Log:
-
-          [1649748201.118100][9570:9575] CHIP:DMG:         SuppressResponse = true,
-          [1649748201.118163][9570:9575] CHIP:DMG:         InteractionModelRevision = 1
-          [1649748201.118221][9570:9575] CHIP:DMG: }
-          [1649748201.118561][9570:9575] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_FFF8 DataVersion: 1406212801
-          [1649748201.118707][9570:9575] CHIP:TOO:   GeneratedCommandList: 0 entries
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"

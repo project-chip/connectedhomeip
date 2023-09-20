@@ -202,7 +202,7 @@ const EmberAfCluster * emberAfGetClusterByIndex(chip::EndpointId endpoint, uint8
 chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::EndpointId endpoint, CHIP_ERROR & err);
 
 /**
- * Get the tag list of endpoint.
+ * Get the semantic tags of the endpoint.
  * Fills in the provided SemanticTagStruct with tag at index `index` if there is one,
  * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of tag,
  * or returns CHIP_ERROR_NOT_FOUND if the endpoint is invalid.
@@ -210,11 +210,11 @@ chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::Endp
  * @param index The index of the tag, with 0 representing the first tag.
  * @param tag  The SemanticTagStruct is filled.
  */
-CHIP_ERROR GetTagListFromEndpointAtIndex(chip::EndpointId endpoint, size_t index,
-                                         chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & tag);
+CHIP_ERROR GetSemanticTagForEndpointAtIndex(chip::EndpointId endpoint, size_t index,
+                                            chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & tag);
 
 //
-// Over-ride the device type list current associated with an endpoint with a user-provided list. The buffers backing
+// Override the device type list current associated with an endpoint with a user-provided list. The buffers backing
 // that list have to live as long as the endpoint is enabled.
 //
 // NOTE: It is the application's responsibility to free the existing list that is being replaced if needed.
@@ -222,7 +222,7 @@ CHIP_ERROR GetTagListFromEndpointAtIndex(chip::EndpointId endpoint, size_t index
 CHIP_ERROR emberAfSetDeviceTypeList(chip::EndpointId endpoint, chip::Span<const EmberAfDeviceType> deviceTypeList);
 
 //
-// Over-ride the tag list current associated with an endpoint with a user-provided list. The buffers backing
+// Override the tag list current associated with an endpoint with a user-provided list. The buffers backing
 // that list have to live as long as the endpoint is enabled.
 //
 // NOTE: It is the application's responsibility to free the existing list that is being replaced if needed.

@@ -28,13 +28,12 @@ riscv_platform_config = "${bouffalolab_iot_sdk_build_root}/common/rsicv.gni"
 
 mbedtls_target = "${bouffalolab_iot_sdk_build_root}/bl702l:bl_iot_sdk"
 
-chip_inet_config_enable_ipv4 = false
 chip_inet_config_enable_tcp_endpoint = false
 
 chip_build_tests = false
 
 openthread_external_mbedtls = mbedtls_target
-openthread_project_core_config_file = "bl702l-openthread-core-bl-config.h"
+
 openthread_core_config_platform_check_file =
     "bl702l-openthread-core-bl-config-check.h"
 openthread_project_include_dirs =

@@ -55,6 +55,7 @@
         "MEDIA_PLAYBACK_CLUSTER": [],
         "MODE_SELECT_CLUSTER": [],
         "NETWORK_COMMISSIONING_CLUSTER": [],
+        "SAMPLE_MEI_CLUSTER": [],
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "OCCUPANCY_SENSING_CLUSTER": ["occupancy-sensor-server"],
         "ON_OFF_CLUSTER": [],
@@ -115,14 +116,14 @@
     "ServerDirectories": {
         "ACCESS_CONTROL_CLUSTER": ["access-control-server"],
         "ACCOUNT_LOGIN_CLUSTER": ["account-login-server"],
-        "ACTIONS_CLUSTER": ["air-quality-server"],
+        "ACTIONS_CLUSTER": [],
         "ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER": [
             "resource-monitoring-server"
         ],
         "ADMINISTRATOR_COMMISSIONING_CLUSTER": [
             "administrator-commissioning-server"
         ],
-        "AIR_QUALITY_CLUSTER": [],
+        "AIR_QUALITY_CLUSTER": ["air-quality-server"],
         "ALARM_CLUSTER": [],
         "APPLICATION_BASIC_CLUSTER": ["application-basic-server"],
         "APPLICATION_LAUNCHER_CLUSTER": ["application-launcher-server"],
@@ -186,6 +187,7 @@
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
+        "SAMPLE_MEI_CLUSTER": ["sample-mei-server"],
         "OCCUPANCY_SENSING_CLUSTER": ["occupancy-sensor-server"],
         "ON_OFF_CLUSTER": ["on-off-server"],
         "ON_OFF_SWITCH_CONFIGURATION_CLUSTER": [],

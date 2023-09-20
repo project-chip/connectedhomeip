@@ -41,21 +41,23 @@ if (chip_link_tests) {
     group(_test_name + "_lib") {
     }
 
-    pw_python_action(_test_name + "_run") {
-      deps = [ ":${_test_name}" ]
-      inputs = [ pw_unit_test_AUTOMATIC_RUNNER ]
-      module = "pw_unit_test.test_runner"
-      python_deps = [
-        "$dir_pw_cli/py",
-        "$dir_pw_unit_test/py",
-      ]
-      args = [
-        "--runner",
-        rebase_path(pw_unit_test_AUTOMATIC_RUNNER, root_build_dir),
-        "--test",
-        rebase_path("$_test_output_dir/$_test_name", root_build_dir),
-      ]
-      stamp = true
+    if (chip_pw_run_tests) {
+      pw_python_action(_test_name + "_run") {
+        deps = [ ":${_test_name}" ]
+        inputs = [ pw_unit_test_AUTOMATIC_RUNNER ]
+        module = "pw_unit_test.test_runner"
+        python_deps = [
+          "$dir_pw_cli/py",
+          "$dir_pw_unit_test/py",
+        ]
+        args = [
+          "--runner",
+          rebase_path(pw_unit_test_AUTOMATIC_RUNNER, root_build_dir),
+          "--test",
+          rebase_path("$_test_output_dir/$_test_name", root_build_dir),
+        ]
+        stamp = true
+      }
     }
   }
 } else {

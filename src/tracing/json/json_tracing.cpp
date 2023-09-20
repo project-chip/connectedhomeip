@@ -22,6 +22,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/StringBuilder.h>
+#include <lib/support/StringSplitter.h>
 #include <transport/TracingStructs.h>
 
 #include <log_json/log_json_build_config.h>
@@ -444,7 +445,15 @@ void JsonBackend::OutputValue(::Json::Value & value)
     {
         std::stringstream output;
         writer->write(value, &output);
-        ChipLogProgress(Automation, "%s", output.str().c_str());
+        // For pretty-printing, output each log line individually.
+        std::string data_string = output.str();
+        chip::StringSplitter splitter(data_string.c_str(), '\n');
+
+        chip::CharSpan line;
+        while (splitter.Next(line))
+        {
+            ChipLogProgress(Automation, "%.*s", static_cast<int>(line.size()), line.data());
+        }
     }
 }
 

@@ -29,9 +29,11 @@
 
 #include "access/RequestPath.h"
 #include "access/SubjectDescriptor.h"
+#include <app/AppBuildConfig.h>
 #include <app/RequiredPrivilege.h>
 #include <app/util/af-types.h>
 #include <app/util/endpoint-config-api.h>
+#include <lib/core/Global.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FibonacciUtils.h>
@@ -41,13 +43,13 @@ namespace app {
 
 using Protocols::InteractionModel::Status;
 
-InteractionModelEngine sInteractionModelEngine;
+Global<InteractionModelEngine> sInteractionModelEngine;
 
 InteractionModelEngine::InteractionModelEngine() {}
 
 InteractionModelEngine * InteractionModelEngine::GetInstance()
 {
-    return &sInteractionModelEngine;
+    return &sInteractionModelEngine.get();
 }
 
 CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
@@ -452,7 +454,7 @@ static bool HasValidEventPathForEndpointAndCluster(EndpointId aEndpoint, const E
     if (aEventPath.HasWildcardEventId())
     {
 #if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        for (decltype(aCluster->eventCount) idx = 0; idx > aCluster->eventCount; ++idx)
+        for (decltype(aCluster->eventCount) idx = 0; idx < aCluster->eventCount; ++idx)
         {
             ConcreteEventPath path(aEndpoint, aCluster->clusterId, aCluster->eventList[idx]);
             // If we get here, the path exists.  We just have to do an ACL check for it.

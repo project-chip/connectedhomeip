@@ -234,6 +234,7 @@ class AndroidBuilder(Builder):
             "CHIPController.jar": "src/controller/java/CHIPController.jar",
             "OnboardingPayload.jar": "src/controller/java/OnboardingPayload.jar",
             "AndroidPlatform.jar": "src/platform/android/AndroidPlatform.jar",
+            "libCHIPJson.jar": "src/controller/java/libCHIPJson.jar",
             "libCHIPTlv.jar": "src/controller/java/libCHIPTlv.jar",
             "CHIPClusters.jar": "src/controller/java/CHIPClusters.jar",
             "CHIPClusterID.jar": "src/controller/java/CHIPClusterID.jar",

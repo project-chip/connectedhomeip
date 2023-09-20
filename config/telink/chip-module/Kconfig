@@ -147,7 +147,7 @@ endif #CHIP_FACTORY_DATA_BUILD
 # See config/zephyr/Kconfig for full definition
 config CHIP_FACTORY_RESET_ERASE_NVS
 	bool
-	default y
+	default n
 
 config CHIP_LOG_SIZE_OPTIMIZATION
 	bool "Disable some detailed logs to decrease flash usage"

@@ -121,46 +121,6 @@ tests:
               type: list
               contains: [3]
 
-    #List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
-    - label:
-          "Step 4f: TH reads AttributeList attribute from DUT. 1.The list SHALL
-          NOT contain any additional values in the standard or scoped range:
-          (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE) 2.The list
-          MAY contain values in the Manufacturer Extensible Identifier (MEI)
-          range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed MEI
-          range (0x0001 - 0xFFF1), these values SHALL be ignored. 3.The list
-          SHALL NOT contain any values in the Test Vendor or invalid range:
-          (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 -
-          0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
-          allowed MEI range (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool softwarediagnostics read attribute-list 1 0
-
-          Verify a list of supported attributes in TH(chip-tool) Log
-          Below is the example value which is observed in the RPI platform the value may be differ based on the dut implementation.
-
-          [1676280804.650422][4258:4260] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_FFFB DataVersion: 2742393629
-          [1676280804.650447][4258:4260] CHIP:TOO:   AttributeList: 10 entries
-          [1676280804.650456][4258:4260] CHIP:TOO:     [1]: 0
-          [1676280804.650464][4258:4260] CHIP:TOO:     [2]: 1
-          [1676280804.650471][4258:4260] CHIP:TOO:     [3]: 2
-          [1676280804.650478][4258:4260] CHIP:TOO:     [4]: 3
-          [1676280804.650485][4258:4260] CHIP:TOO:     [5]: 65528
-          [1676280804.650493][4258:4260] CHIP:TOO:     [6]: 65529
-          [1676280804.650500][4258:4260] CHIP:TOO:     [7]: 65530
-          [1676280804.650507][4258:4260] CHIP:TOO:     [8]: 65531
-          [1676280804.650514][4258:4260] CHIP:TOO:     [9]: 65532
-          [1676280804.650522][4258:4260] CHIP:TOO:     [10]: 65533
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
     - label: "Step 5a: TH reads EventList from DUT"
       PICS: DGSW.S.E00 && PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
@@ -179,36 +139,7 @@ tests:
           constraints:
               type: list
 
-    - label:
-          "Step 5c: TH reads from the DUT the EventList attribute. 1.The list
-          SHALL NOT contain any additional values in the standard or scoped
-          range: (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE) 2.
-          The list MAY contain values in the Manufacturer Extensible Identifier
-          (MEI) range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed
-          MEI range (0x0001 - 0xFFF1), these values SHALL be ignored. 3. The
-          list SHALL NOT contain any values in the Test Vendor or invalid range:
-          (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 -
-          0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
-          allowed MEI range (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool  softwarediagnostics read event-list 1 0
-
-          [1676459464.108583][25294:25296] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_FFFA DataVersion: 650337896
-          [1676459464.108607][25294:25296] CHIP:TOO:   EventList: 1 entries
-          [1676459464.108612][25294:25296] CHIP:TOO:     [1]: 0
-          [1676459464.108635][25294:25296] CHIP:EM: <<< [E:23624i S:46243 M:182610763 (Ack:167177651)] (S) Msg TX to 1:0000000000000001 [110F] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1676459464.108640][25294:25296] CHIP:IN: (S) Sending msg 182610763 on secure session with LSID: 46243
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Step 6a: TH reads AcceptedCommandList from DUT"
+    - label: "Step 6: TH reads AcceptedCommandList from DUT"
       PICS: DGSW.S.F00
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -217,7 +148,7 @@ tests:
               type: list
               contains: [0]
 
-    - label: "Step 6b: TH reads AcceptedCommandList from DUT"
+    - label: "Step 6: TH reads AcceptedCommandList from DUT"
       PICS: " !DGSW.S.F00 "
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -225,58 +156,11 @@ tests:
           value: []
           constraints:
               type: list
-    # List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
-    - label:
-          "Step 6c: TH reads AcceptedCommandList attribute from DUT. 1.The list
-          SHALL NOT contain any additional values in the standard or scoped
-          range: (0x0000_0000 - 0x0000_00FF). 2.The list MAY contain values in
-          the Manufacturer Extensible Identifier (MEI) range: (0xXXXX_0000 -
-          0xXXXX_00FF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1),
-          these values SHALL be ignored.3.The list SHALL NOT contain any values
-          in the Test Vendor or invalid range: (0x0000_0100 - 0x0000_FFFF),
-          (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where
-          XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool softwarediagnostics read accepted-command-list 1 0
 
-          Verify a list of Accepted Command that DUT implemented in TH(chip-tool) Log, This list SHALL have one entry and its value of 0 if WTRMRK feature is supported by DUT.
-
-          [1651787861.534707][241117:241122] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_FFF9 DataVersion: 1343666373
-          [1651787861.534769][241117:241122] CHIP:TOO:   AcceptedCommandList: 1 entries
-          [1651787861.534793][241117:241122] CHIP:TOO:     [1]: 0
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    # List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
-    - label:
-          "Step 7: TH reads GeneratedCommandList attribute from DUT. 1.The list
-          MAY contain values in the Manufacturer Extensible Identifier (MEI)
-          range: (0xXXXX_0000 - 0xXXXX_00FF), where XXXX is the allowed MEI
-          range (0x0001 - 0xFFF1), these values SHALL be ignored. 2.The list
-          SHALL NOT contain any values in the Test Vendor or invalid range:
-          (0x0000_0100 - 0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and
-          (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the allowed MEI range
-          (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool softwarediagnostics read generated-command-list 1 0
-
-          Verify a list of Generated Command, this list SHALL be empty in TH(chip-tool) Log
-
-          [1651787918.020673][241128:241133] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_FFF8 DataVersion: 1343666373
-          [1651787918.020734][241128:241133] CHIP:TOO:   GeneratedCommandList: 0 entries
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Step 7: TH reads GeneratedCommandList from DUT"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list

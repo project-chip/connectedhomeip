@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -33,10 +33,9 @@
   ],
   "endpointTypes": [
     {
-      "id": 7,
+      "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 55,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 55,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        55
       ],
       "deviceVersions": [
         1
@@ -7029,10 +7024,9 @@
       ]
     },
     {
-      "id": 8,
+      "id": 2,
       "name": "MA-videoplayer",
       "deviceTypeRef": {
-        "id": 61,
         "code": 256,
         "profileId": 259,
         "label": "MA-onofflight",
@@ -7040,15 +7034,11 @@
       },
       "deviceTypes": [
         {
-          "id": 61,
           "code": 256,
           "profileId": 259,
           "label": "MA-onofflight",
           "name": "MA-onofflight"
         }
-      ],
-      "deviceTypeRefs": [
-        61
       ],
       "deviceVersions": [
         1
@@ -15802,6 +15792,5 @@
       "endpointId": 1,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

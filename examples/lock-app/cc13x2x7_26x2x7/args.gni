@@ -36,7 +36,7 @@ openthread_external_platform = "${chip_root}/third_party/openthread/platforms/cc
 chip_progress_logging = false
 
 #chip_detail_logging = false
-chip_automation_logging = false
+#chip_automation_logging = false
 
 # BLE options
 chip_config_network_layer_ble = true

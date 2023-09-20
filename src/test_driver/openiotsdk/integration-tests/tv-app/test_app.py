@@ -86,7 +86,7 @@ def test_commissioning(device, controller):
 
 SHELL_MAIN_COMMANDS_NAME = ["base64", "exit", "help", "version",
                             "config", "device", "onboardingcodes", "dns",
-                            "app"]
+                            "app", "stat"]
 
 SHELL_APP_COMMANDS_NAME = ["help", "add", "remove", "setpin",
                            "add-admin-vendor"]

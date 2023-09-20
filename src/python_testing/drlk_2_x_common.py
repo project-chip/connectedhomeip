@@ -148,7 +148,7 @@ class DRLK_COMMON:
             requirePinForRemoteOperation_dut = False
             self.print_step("1", "TH writes the RequirePINforRemoteOperation attribute value as false on the DUT")
             attribute = attributes.RequirePINforRemoteOperation(False)
-            if self.check_pics("DRLK.S.A0033.Write"):
+            if self.check_pics("DRLK.S.M.RequirePINForRemoteOperationAttributeWritable"):
                 await self.write_drlk_attribute_expect_success(attribute=attribute)
             else:
                 await self.write_drlk_attribute_expect_error(attribute=attribute, error=Status.UnsupportedWrite)
@@ -158,7 +158,7 @@ class DRLK_COMMON:
                 requirePinForRemoteOperation_dut = await self.read_drlk_attribute_expect_success(attribute=attributes.RequirePINforRemoteOperation)
                 logging.info("Current RequirePINforRemoteOperation value is %s" % (requirePinForRemoteOperation_dut))
 
-                if self.check_pics("DRLK.S.A0033.Write"):
+                if self.check_pics("DRLK.S.M.RequirePINForRemoteOperationAttributeWritable"):
                     self.print_step("2a", "TH verifies that RequirePINforRemoteOperation is FALSE")
                     asserts.assert_false(requirePinForRemoteOperation_dut, "RequirePINforRemoteOperation is expected to be FALSE")
             else:
@@ -182,7 +182,7 @@ class DRLK_COMMON:
         if self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F07"):
             self.print_step("5", "TH writes the RequirePINforRemoteOperation attribute value as true on the DUT")
             attribute = attributes.RequirePINforRemoteOperation(True)
-            if self.check_pics("DRLK.S.A0033.Write"):
+            if self.check_pics("DRLK.S.M.RequirePINForRemoteOperationAttributeWritable"):
                 await self.write_drlk_attribute_expect_success(attribute=attribute)
             else:
                 await self.write_drlk_attribute_expect_error(attribute=attribute, error=Status.UnsupportedWrite)
@@ -192,7 +192,7 @@ class DRLK_COMMON:
                 requirePinForRemoteOperation_dut = await self.read_drlk_attribute_expect_success(attribute=attributes.RequirePINforRemoteOperation)
                 logging.info("Current RequirePINforRemoteOperation value is %s" % (requirePinForRemoteOperation_dut))
 
-                if self.check_pics("DRLK.S.A0033.Write"):
+                if self.check_pics("DRLK.S.M.RequirePINForRemoteOperationAttributeWritable"):
                     self.print_step("6a", "TH verifies that RequirePINforRemoteOperation is TRUE")
                     asserts.assert_true(requirePinForRemoteOperation_dut, "RequirePINforRemoteOperation is expected to be TRUE")
 
@@ -216,7 +216,7 @@ class DRLK_COMMON:
         if self.check_pics("DRLK.S.F00") or self.check_pics("DRLK.S.F01"):
             self.print_step("10a", "TH writes the WrongCodeEntryLimit to any value between 1 and 255")
             attribute = attributes.WrongCodeEntryLimit(wrongCodeEntryLimit)
-            if self.check_pics("DRLK.S.A0030.Write"):
+            if self.check_pics("DRLK.S.M.WrongCodeEntryLimitAttributeWritable"):
                 await self.write_drlk_attribute_expect_success(attribute=attribute)
             else:
                 await self.write_drlk_attribute_expect_error(attribute=attribute, error=Status.UnsupportedWrite)
@@ -228,7 +228,7 @@ class DRLK_COMMON:
 
             self.print_step("11a", "TH writes the UserCodeTemporaryDisableTime to any value between 1 and 255")
             attribute = attributes.UserCodeTemporaryDisableTime(userCodeTemporaryDisableTime)
-            if self.check_pics("DRLK.S.A0031.Write"):
+            if self.check_pics("DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable"):
                 await self.write_drlk_attribute_expect_success(attribute=attribute)
             else:
                 await self.write_drlk_attribute_expect_error(attribute=attribute, error=Status.UnsupportedWrite)
@@ -262,7 +262,7 @@ class DRLK_COMMON:
             if self.check_pics("DRLK.S.A0023"):
                 self.print_step("15", "TH writes the AutoRelockTime attribute value on the DUT")
                 attribute = attributes.AutoRelockTime(autoRelockTime)
-                if self.check_pics("DRLK.S.A0023.Write"):
+                if self.check_pics("DRLK.S.M.AutoRelockTimeAttributeWritable"):
                     await self.write_drlk_attribute_expect_success(attribute=attribute)
                 else:
                     await self.write_drlk_attribute_expect_error(attribute=attribute, error=Status.UnsupportedWrite)

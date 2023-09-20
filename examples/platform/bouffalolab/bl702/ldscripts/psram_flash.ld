@@ -227,6 +227,12 @@ SECTIONS
     KEEP(*libMatterDeviceInfoProviderExample.a:*(.bss.*))
 
     . = ALIGN(16);
+    KEEP(*libopenthread-ftd.a:*(.sbss.*))
+    KEEP(*libopenthread-ftd.a:*(.bss.*))
+    KEEP(*libopenthread-mtd.a:*(.sbss.*))
+    KEEP(*libopenthread-mtd.a:*(.bss.*))
+    
+    . = ALIGN(16);
     KEEP(*src/app/clusters/*/bouffalolab*.cpp.o(.sbss.*))
     KEEP(*src/app/clusters/*/bouffalolab*.cpp.o(.bss.*))
 
@@ -245,6 +251,18 @@ SECTIONS
     . = ALIGN(16);
     KEEP(*sdk_lwip.*.c.o(.sbss.*))
     KEEP(*sdk_lwip.*.c.o(.bss.*))
+
+    . = ALIGN(16);
+    KEEP(*sdk_lwip.*.c.o(.sbss.*))
+    KEEP(*sdk_lwip.*.c.o(.bss.*))
+
+    . = ALIGN(16);
+    KEEP(*libopenthread_br.a:*(.sbss.*))
+    KEEP(*libopenthread_br.a:*(.bss.*))
+    
+    . = ALIGN(16);
+    KEEP(*third_party/tcplp*.c.o(.bss.*))
+    KEEP(*third_party/tcplp*.c.o(.bss.*))
 
     . = ALIGN(16);
     KEEP(*stack_main.o(.bss.*))

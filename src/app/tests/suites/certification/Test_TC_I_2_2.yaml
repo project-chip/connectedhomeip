@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 58.2.2. [TC-I-2.2] Primary functionality with server as DUT
 
@@ -24,13 +23,42 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label: "Step 1a: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
           values:
               - name: "nodeId"
                 value: nodeId
+
+    - label: "Step 1b: TH reads the IdentifyType attribute from the DUT."
+      PICS: I.S.A0001
+      command: "readAttribute"
+      attribute: "IdentifyType"
+      response:
+          saveAs: IdentifyTypeValue
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 5
+
+    - label:
+          "Verify that the device enters its identification state using the
+          IdentifyType from Step 1b, in order to indicate to an observer which
+          of several nodes and/or endpoints it is."
+      verification: |
+          Verify that the device enters its identification state using the IdentifyType from step1b,
+          Here the Identifytype is 2(VisibleIndicator) which can be a small led that indicates the device is in identification state.
+          This IdentifyType can vary to device ref: 1.2.5.1 in spec for the IdentifyTypeEnum of the particular DUT
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && I.S.A0001
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Step 2a: TH sends Identify command to DUT, with the IdentifyTime
@@ -70,21 +98,21 @@ tests:
               minValue: 42
               maxValue: 58
 
-    - label:
-          "Step 3: TH sends IdentifyQuery command to DUT and Verify
-          IdentifyQueryResponse command to TH,with the Timeout field set to a
-          value in the range 0x0000 to 0x0032"
-      verification: |
-          IdentifyQuery is not supported by Matter
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && I.S.C01.Rsp && I.S.C00.Tx
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    # - label:
+    #       "Step 3: TH sends IdentifyQuery command to DUT and Verify
+    #       IdentifyQueryResponse command to TH,with the Timeout field set to a
+    #       value in the range 0x0000 to 0x0032"
+    #   verification: |
+    #       IdentifyQuery is not supported by Matter
+    #   cluster: "LogCommands"
+    #   command: "UserPrompt"
+    #   PICS: PICS_USER_PROMPT && I.S.C01.Rsp && I.S.C00.Tx
+    #   arguments:
+    #       values:
+    #           - name: "message"
+    #             value: "Please enter 'y' for success"
+    #           - name: "expectedValue"
+    #             value: "y"
 
     - label:
           "Step 4a: TH sends Identify command to DUT, with the IdentifyTime
@@ -126,21 +154,39 @@ tests:
       arguments:
           value: 15
 
-    - label: "Wait 5000ms"
+    - label: "Wait 15000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 5000
+                value: 15000
 
     - label:
-          "Step 6b: After 5 seconds, the TH reads IdentifyTime attribute from
+          "Step 6b: After 15 seconds, the TH reads IdentifyTime attribute from
           DUT"
       PICS: I.S.A0000
       command: "readAttribute"
       attribute: "IdentifyTime"
       response:
           constraints:
-              minValue: 5
-              maxValue: 15
+              minValue: 0
+              maxValue: 5
+
+    - label:
+          "Verify that the device enters its identification state using the
+          IdentifyType from Step 1b, in order to indicate to an observer which
+          of several nodes and/or endpoints it is."
+      verification: |
+          Verify that the identification state is terminated in the DUT.
+          Here the Identifytype is 2(VisibleIndicator) which can be a small led that indicates the device is in identification state.
+          This IdentifyType can vary to device ref: 1.2.5.1 in spec for the IdentifyTypeEnum of the particular DUT
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && I.S.A0001
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

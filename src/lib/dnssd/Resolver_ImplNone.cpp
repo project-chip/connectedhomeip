@@ -68,13 +68,6 @@ ResolverProxy::~ResolverProxy()
     Shutdown();
 }
 
-CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-void ResolverProxy::NodeIdResolutionNoLongerNeeded(const PeerId & peerId) {}
-
 CHIP_ERROR ResolverProxy::DiscoverCommissionableNodes(DiscoveryFilter filter)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;

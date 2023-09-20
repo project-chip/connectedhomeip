@@ -26,8 +26,8 @@ config:
 tests:
     - label: "Note"
       verification: |
-          Please use Interactive mode to Verify subscription test cases
-          Here the command to enter interactive mode:--   ./chip-tool interactive start
+          1. The Cluster and Commands should be based on the cluster implementation on the DUT.
+          2. The cluster used in the below test steps is an example, User can use any supported chip cluster/attribute/command.
       disabled: true
 
     - label: "Precondition"
@@ -59,6 +59,10 @@ tests:
 
           *Provision the device using chip tool on 5th  controller(RD5)
           ./chip-tool pairing code 5 35358158796(mannualcode) --commissioner-name 5
+
+
+          Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
       disabled: true
 
     - label:
@@ -342,161 +346,191 @@ tests:
       disabled: true
 
     - label:
-          "Step 2: RD1, RD2, RD3, RD4, RD5 send 3 Subscribe Request Messages to
+          "Step 2a: Factory Reset the DUT and recommission it onto all fabrics.
+          RD1, RD2, RD3, RD4, RD5 should be on separate, distinct fabrics. RD1
+          and RD1A should be on the same fabric."
+      verification: |
+          To perform Factory reset on DUT follow the below commands in RPI, And use equivalent command on the respective DUT sudo rm -rf /tmp/chip_*
+
+          After performing a factory reset on the DUT, please follow the preconditioning steps to provision both the DUT and the RDs
+      disabled: true
+
+    - label:
+          "Step 2b: RD1, RD2, RD3, RD4, RD5 send 3 Subscribe Request Messages to
           DUT.(Total - 15 active subscriptions) Each subscribe requests should
           contain 3 different paths. The subscription request from RD1 should
           contain 4 paths. +"
       verification: |
-          After provisioning again the values are been set to default values such as node label= " ". so in VS mentioned as node-label="", location=XX and local-config-disabled=FALSE but if your going to verify 3 steps contentiously you will get the attribute value as node-label="newlabel", location=in and local-config-disabled=TRUE.
+          RD1, RD2, RD3, RD4, RD5 send 3 Subscribe Request Messages to DUT.(Total - 15 active subscriptions) Each subscribe requests should contain 3 different paths and  The subscription request from RD1 should contain 4 paths.
 
           #1. on the first reference device(RD1) send a Subscribe Request Messages to DUT. (Below is the example command to send a subscribe requests with 3 different paths in a single command )
 
           any subscribe-by-id '0x0028,0x0028,0x0028' '5,6,16' 100 1000 1 '0,0,0' --keepSubscriptions true
-          [1684321430.691985][136393:136395] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3947588725
-          [1684321430.691998][136393:136395] CHIP:TOO:   LocalConfigDisabled: TRUE
-          [1684321430.692025][136393:136395] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3947588725
-          [1684321430.692034][136393:136395] CHIP:TOO:   Location: in
-          [1684321430.692062][136393:136395] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3947588725
-          [1684321430.692069][136393:136395] CHIP:TOO:   NodeLabel: "newnode"
-          [1684321430.692091][136393:136395] CHIP:DMG: MoveToState ReadClient[0x7fb510017ca0]: Moving to [AwaitingSu]
-          [1684321430.692138][136393:136395] CHIP:EM: <<< [E:41660i S:42488 M:180349712 (Ack:108042002)] (S) Msg TX to 1:0000000000000001 [E777] --- Type 0001:01 (IM:StatusResponse)
-          [1684321430.692153][136393:136395] CHIP:IN: (S) Sending msg 180349712 on secure session with LSID: 42488
-          [1684321430.692466][136393:136395] CHIP:EM: >>> [E:41660i S:42488 M:108042003 (Ack:180349712)] (S) Msg RX from 1:0000000000000001 [E777] --- Type 0001:04 (IM:SubscribeResponse)
-          [1684321430.692478][136393:136395] CHIP:EM: Found matching exchange: 41660i, Delegate: 0x7fb510017cb0
-          [1684321430.692492][136393:136395] CHIP:EM: Rxd Ack; Removing MessageCounter:180349712 from Retrans Table on exchange 41660i
-          [1684321430.692504][136393:136395] CHIP:DMG: SubscribeResponse is received
-          [1684321430.692519][136393:136395] CHIP:DMG: SubscribeResponseMessage =
-          [1684321430.692526][136393:136395] CHIP:DMG: {
-          [1684321430.692534][136393:136395] CHIP:DMG:         SubscriptionId = 0x46bedde0,
-          [1684321430.692542][136393:136395] CHIP:DMG:         MaxInterval = 0x3e8,
-          [1684321430.692547][136393:136395] CHIP:DMG:         InteractionModelRevision = 1
-          [1684321430.692552][136393:136395] CHIP:DMG: }
-          [1684321430.692564][136393:136395] CHIP:DMG: Subscription established with SubscriptionID = 0x46bedde0 MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000001
-          [1684321430.692575][136393:136395] CHIP:DMG: MoveToState ReadClient[0x7fb510017ca0]: Moving to [Subscripti]
+          [1692947895.936603][3660:3662] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3887771962
+          [1692947895.936715][3660:3662] CHIP:TOO:   LocalConfigDisabled: FALSE
+          [1692947895.938821][3660:3662] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3887771962
+          [1692947895.938880][3660:3662] CHIP:TOO:   Location: XX
+          [1692947895.938958][3660:3662] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3887771962
+          [1692947895.938992][3660:3662] CHIP:TOO:   NodeLabel:
+          [1692947895.939046][3660:3662] CHIP:DMG: MoveToState ReadClient[0xaaab1353f000]: Moving to [AwaitingSu]
+          [1692947895.939291][3660:3662] CHIP:EM: <<< [E:14761i S:58740 M:219359653 (Ack:56803011)] (S) Msg TX to 1:0000000000000001 [3E67] --- Type 0001:01 (IM:StatusResponse)
+          [1692947895.939345][3660:3662] CHIP:IN: (S) Sending msg 219359653 on secure session with LSID: 58740
+          [1692947895.939585][3660:3662] CHIP:DL: HandlePlatformSpecificBLEEvent 32793
+          [1692947895.939626][3660:3662] CHIP:DL: HandlePlatformSpecificBLEEvent 32793
+          [1692947895.940625][3660:3662] CHIP:EM: >>> [E:14761i S:58740 M:56803012 (Ack:219359653)] (S) Msg RX from 1:0000000000000001 [3E67] --- Type 0001:04 (IM:SubscribeResponse)
+          [1692947895.940670][3660:3662] CHIP:EM: Found matching exchange: 14761i, Delegate: 0xaaab1353f010
+          [1692947895.940726][3660:3662] CHIP:EM: Rxd Ack; Removing MessageCounter:219359653 from Retrans Table on exchange 14761i
+          [1692947895.940775][3660:3662] CHIP:DMG: SubscribeResponse is received
+          [1692947895.940828][3660:3662] CHIP:DMG: SubscribeResponseMessage =
+          [1692947895.940867][3660:3662] CHIP:DMG: {
+          [1692947895.940899][3660:3662] CHIP:DMG:         SubscriptionId = 0x334c58be,
+          [1692947895.940933][3660:3662] CHIP:DMG:         MaxInterval =0x64,
+          [1692947895.940982][3660:3662] CHIP:DMG:         InteractionModelRevision = 10
+          [1692947895.941010][3660:3662] CHIP:DMG: }
+          [1692947895.941055][3660:3662] CHIP:DMG: Subscription established with SubscriptionID = 0x334c58be MinInterval = 100s MaxInterval = 100s Peer = 01:0000000000000001
+          [1692947895.941089][3660:3662] CHIP:DMG: MoveToState ReadClient[0xaaab1353f000]: Moving to [Subscripti]
 
           #2. on the 2nd reference device(RD2) send a Subscribe Request Messages to DUT.(Below is the example command to send a subscribe requests with 3 different paths in a single command )
           any subscribe-by-id '0x0028,0x0028,0x0028' '5,6,16' 100 1000 2 '0,0,0' --commissioner-name beta --keepSubscriptions true
-          [1684321446.066373][136396:136398] CHIP:DMG: }
-          [1684321446.066395][136396:136398] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3947588725
-          [1684321446.066400][136396:136398] CHIP:TOO:   LocalConfigDisabled: TRUE
-          [1684321446.066409][136396:136398] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3947588725
-          [1684321446.066412][136396:136398] CHIP:TOO:   Location: in
-          [1684321446.066420][136396:136398] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3947588725
-          [1684321446.066423][136396:136398] CHIP:TOO:   NodeLabel: "newnode"
-          [1684321446.066429][136396:136398] CHIP:DMG: MoveToState ReadClient[0x7f6a0000aa80]: Moving to [AwaitingSu]
-          [1684321446.066443][136396:136398] CHIP:EM: <<< [E:35583i S:50848 M:252532045 (Ack:201846716)] (S) Msg TX to 2:0000000000000002 [8559] --- Type 0001:01 (IM:StatusResponse)
-          [1684321446.066447][136396:136398] CHIP:IN: (S) Sending msg 252532045 on secure session with LSID: 50848
-          [1684321446.066549][136396:136398] CHIP:EM: >>> [E:35583i S:50848 M:201846717 (Ack:252532045)] (S) Msg RX from 2:0000000000000002 [8559] --- Type 0001:04 (IM:SubscribeResponse)
-          [1684321446.066553][136396:136398] CHIP:EM: Found matching exchange: 35583i, Delegate: 0x7f6a0000aa90
-          [1684321446.066556][136396:136398] CHIP:EM: Rxd Ack; Removing MessageCounter:252532045 from Retrans Table on exchange 35583i
-          [1684321446.066559][136396:136398] CHIP:DMG: SubscribeResponse is received
-          [1684321446.066563][136396:136398] CHIP:DMG: SubscribeResponseMessage =
-          [1684321446.066565][136396:136398] CHIP:DMG: {
-          [1684321446.066567][136396:136398] CHIP:DMG:         SubscriptionId = 0x9d9e9791,
-          [1684321446.066569][136396:136398] CHIP:DMG:         MaxInterval = 0x3e8,
-          [1684321446.066571][136396:136398] CHIP:DMG:         InteractionModelRevision = 1
-          [1684321446.066573][136396:136398] CHIP:DMG: }
-          [1684321446.066576][136396:136398] CHIP:DMG: Subscription established with SubscriptionID = 0x9d9e9791 MinInterval = 100s MaxInterval = 1000s Peer = 02:0000000000000002
-          [1684321446.066579][136396:136398] CHIP:DMG: MoveToState ReadClient[0x7f6a0000aa80]: Moving to [Subscripti]
+          [1692947905.050195][3664:3666] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3887771962
+          [1692947905.050260][3664:3666] CHIP:TOO:   LocalConfigDisabled: FALSE
+          [1692947905.050348][3664:3666] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3887771962
+          [1692947905.050394][3664:3666] CHIP:TOO:   Location: XX
+          [1692947905.050477][3664:3666] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3887771962
+          [1692947905.050507][3664:3666] CHIP:TOO:   NodeLabel:
+          [1692947905.050567][3664:3666] CHIP:DMG: MoveToState ReadClient[0xffff9c01c7e0]: Moving to [AwaitingSu]
+          [1692947905.050737][3664:3666] CHIP:EM: <<< [E:21944i S:55100 M:11845939 (Ack:24916694)] (S) Msg TX to 2:0000000000000002 [74F2] --- Type 0001:01 (IM:StatusResponse)
+          [1692947905.050784][3664:3666] CHIP:IN: (S) Sending msg 11845939 on secure session with LSID: 55100
+          [1692947905.051031][3664:3666] CHIP:DL: HandlePlatformSpecificBLEEvent 32793
+          [1692947905.051069][3664:3666] CHIP:DL: HandlePlatformSpecificBLEEvent 32793
+          [1692947905.051915][3664:3666] CHIP:EM: >>> [E:21944i S:55100 M:24916695 (Ack:11845939)] (S) Msg RX from 2:0000000000000002 [74F2] --- Type 0001:04 (IM:SubscribeResponse)
+          [1692947905.051958][3664:3666] CHIP:EM: Found matching exchange: 21944i, Delegate: 0xffff9c01c7f0
+          [1692947905.052004][3664:3666] CHIP:EM: Rxd Ack; Removing MessageCounter:11845939 from Retrans Table on exchange 21944i
+          [1692947905.052052][3664:3666] CHIP:DMG: SubscribeResponse is received
+          [1692947905.052097][3664:3666] CHIP:DMG: SubscribeResponseMessage =
+          [1692947905.052124][3664:3666] CHIP:DMG: {
+          [1692947905.052149][3664:3666] CHIP:DMG:         SubscriptionId = 0xf382c6ba,
+          [1692947905.052184][3664:3666] CHIP:DMG:         MaxInterval = 0x64,
+          [1692947905.052217][3664:3666] CHIP:DMG:         InteractionModelRevision = 10
+          [1692947905.052247][3664:3666] CHIP:DMG: }
+          [1692947905.052279][3664:3666] CHIP:DMG: Subscription established with SubscriptionID = 0xf382c6ba MinInterval = 100s MaxInterval = 100s Peer = 02:0000000000000002
+          [1692947905.052311][3664:3666] CHIP:DMG: MoveToState ReadClient[0xffff9c01c7e0]: Moving to [Subscripti]
+
 
           #3. on the 3rd reference device(RD3) send a Subscribe Request Messages to DUT..(Below is the example command to send a subscribe requests with 3 different paths in a single command )
           any subscribe-by-id '0x0028,0x0028,0x0028' '5,6,16' 100 1000 3 '0,0,0' --commissioner-name gamma --keepSubscriptions true
-          1684321460.706260][136409:136411] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3947588725
-          [1684321460.706265][136409:136411] CHIP:TOO:   LocalConfigDisabled: TRUE
-          [1684321460.706275][136409:136411] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3947588725
-          [1684321460.706279][136409:136411] CHIP:TOO:   Location: in
-          [1684321460.706289][136409:136411] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3947588725
-          [1684321460.706292][136409:136411] CHIP:TOO:   NodeLabel: "newnode"
-          [1684321460.706300][136409:136411] CHIP:DMG: MoveToState ReadClient[0x7f53dc00f140]: Moving to [AwaitingSu]
-          [1684321460.706312][136409:136411] CHIP:EM: <<< [E:42345i S:52489 M:199100311 (Ack:174085425)] (S) Msg TX to 3:0000000000000003 [5371] --- Type 0001:01 (IM:StatusResponse)
-          [1684321460.706317][136409:136411] CHIP:IN: (S) Sending msg 199100311 on secure session with LSID: 52489
-          [1684321460.706424][136409:136411] CHIP:EM: >>> [E:42345i S:52489 M:174085426 (Ack:199100311)] (S) Msg RX from 3:0000000000000003 [5371] --- Type 0001:04 (IM:SubscribeResponse)
-          [1684321460.706428][136409:136411] CHIP:EM: Found matching exchange: 42345i, Delegate: 0x7f53dc00f150
-          [1684321460.706432][136409:136411] CHIP:EM: Rxd Ack; Removing MessageCounter:199100311 from Retrans Table on exchange 42345i
-          [1684321460.706436][136409:136411] CHIP:DMG: SubscribeResponse is received
-          [1684321460.706441][136409:136411] CHIP:DMG: SubscribeResponseMessage =
-          [1684321460.706443][136409:136411] CHIP:DMG: {
-          [1684321460.706446][136409:136411] CHIP:DMG:         SubscriptionId = 0x1387ade2,
-          [1684321460.706449][136409:136411] CHIP:DMG:         MaxInterval = 0x3e8,
-          [1684321460.706452][136409:136411] CHIP:DMG:         InteractionModelRevision = 1
-          [1684321460.706455][136409:136411] CHIP:DMG: }
-          [1684321460.706458][136409:136411] CHIP:DMG: Subscription established with SubscriptionID = 0x1387ade2 MinInterval = 100s MaxInterval = 1000s Peer = 03:0000000000000003
-          [1684321460.706462][136409:136411] CHIP:DMG: MoveToState ReadClient[0x7f53dc00f140]: Moving to [Subscripti]
-
+          [1692947914.490222][3667:3669] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3887771962
+          [1692947914.490275][3667:3669] CHIP:TOO:   LocalConfigDisabled: FALSE
+          [1692947914.490344][3667:3669] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3887771962
+          [1692947914.490373][3667:3669] CHIP:TOO:   Location: XX
+          [1692947914.490430][3667:3669] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3887771962
+          [1692947914.490454][3667:3669] CHIP:TOO:   NodeLabel:
+          [1692947914.490495][3667:3669] CHIP:DMG: MoveToState ReadClient[0xaaaafcb72000]: Moving to [AwaitingSu]
+          [1692947914.490639][3667:3669] CHIP:EM: <<< [E:55121i S:1001 M:174934504 (Ack:146433685)] (S) Msg TX to 3:0000000000000003 [CACB] --- Type 0001:01 (IM:StatusResponse)
+          [1692947914.490680][3667:3669] CHIP:IN: (S) Sending msg 174934504 on secure session with LSID: 1001
+          [1692947914.490921][3667:3669] CHIP:DL: HandlePlatformSpecificBLEEvent 32793
+          [1692947914.490955][3667:3669] CHIP:DL: HandlePlatformSpecificBLEEvent 32793
+          [1692947914.491675][3667:3669] CHIP:EM: >>> [E:55121i S:1001 M:146433686 (Ack:174934504)] (S) Msg RX from 3:0000000000000003 [CACB] --- Type 0001:04 (IM:SubscribeResponse)
+          [1692947914.491712][3667:3669] CHIP:EM: Found matching exchange: 55121i, Delegate: 0xaaaafcb72010
+          [1692947914.491761][3667:3669] CHIP:EM: Rxd Ack; Removing MessageCounter:174934504 from Retrans Table on exchange 55121i
+          [1692947914.491796][3667:3669] CHIP:DMG: SubscribeResponse is received
+          [1692947914.491838][3667:3669] CHIP:DMG: SubscribeResponseMessage =
+          [1692947914.491862][3667:3669] CHIP:DMG: {
+          [1692947914.491884][3667:3669] CHIP:DMG:         SubscriptionId = 0xc14ac289,
+          [1692947914.491909][3667:3669] CHIP:DMG:         MaxInterval = 0x64,
+          [1692947914.491931][3667:3669] CHIP:DMG:         InteractionModelRevision = 10
+          [1692947914.491953][3667:3669] CHIP:DMG: }
+          [1692947914.491978][3667:3669] CHIP:DMG: Subscription established with SubscriptionID = 0xc14ac289 MinInterval = 100s MaxInterval = 100s Peer = 03:0000000000000003
+          [1692947914.492003][3667:3669] CHIP:DMG: MoveToState ReadClient[0xaaaafcb72000]: Moving to [Subscripti]
 
 
           #4. on the 4th reference device(RD4) send a Subscribe Request Messages to DUT. (Below is the example command to send a subscribe requests with 3 different paths in a single command )
           any subscribe-by-id '0x0028,0x0028,0x0028' '5,6,16' 100 1000 4 '0,0,0' --commissioner-name 4 --keepSubscriptions true
-          [1684321487.408563][136403:136405] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3947588725
-          [1684321487.408572][136403:136405] CHIP:TOO:   LocalConfigDisabled: TRUE
-          [1684321487.408590][136403:136405] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3947588725
-          [1684321487.408595][136403:136405] CHIP:TOO:   Location: in
-          [1684321487.408612][136403:136405] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3947588725
-          [1684321487.408616][136403:136405] CHIP:TOO:   NodeLabel: "newnode"
-          [1684321487.408631][136403:136405] CHIP:DMG: MoveToState ReadClient[0x7ff4cc015b50]: Moving to [AwaitingSu]
-          [1684321487.408657][136403:136405] CHIP:EM: <<< [E:28543i S:21311 M:202084353 (Ack:249111937)] (S) Msg TX to 4:0000000000000004 [8451] --- Type 0001:01 (IM:StatusResponse)
-          [1684321487.408665][136403:136405] CHIP:IN: (S) Sending msg 202084353 on secure session with LSID: 21311
-          [1684321487.408861][136403:136405] CHIP:EM: >>> [E:28543i S:21311 M:249111938 (Ack:202084353)] (S) Msg RX from 4:0000000000000004 [8451] --- Type 0001:04 (IM:SubscribeResponse)
-          [1684321487.408868][136403:136405] CHIP:EM: Found matching exchange: 28543i, Delegate: 0x7ff4cc015b60
-          [1684321487.408875][136403:136405] CHIP:EM: Rxd Ack; Removing MessageCounter:202084353 from Retrans Table on exchange 28543i
-          [1684321487.408881][136403:136405] CHIP:DMG: SubscribeResponse is received
-          [1684321487.408888][136403:136405] CHIP:DMG: SubscribeResponseMessage =
-          [1684321487.408891][136403:136405] CHIP:DMG: {
-          [1684321487.408895][136403:136405] CHIP:DMG:         SubscriptionId = 0x54356760,
-          [1684321487.408899][136403:136405] CHIP:DMG:         MaxInterval = 0x3e8,
-          [1684321487.408902][136403:136405] CHIP:DMG:         InteractionModelRevision = 1
-          [1684321487.408906][136403:136405] CHIP:DMG: }
-          [1684321487.408910][136403:136405] CHIP:DMG: Subscription established with SubscriptionID = 0x54356760 MinInterval = 100s MaxInterval = 1000s Peer = 04:0000000000000004
-          [1684321487.408916][136403:136405] CHIP:DMG: MoveToState ReadClient[0x7ff4cc015b50]: Moving to [Subscripti]
-
+          [1692947922.587132][3670:3672] CHIP:DMG: }
+          [1692947922.587347][3670:3672] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3887771962
+          [1692947922.587408][3670:3672] CHIP:TOO:   LocalConfigDisabled: FALSE
+          [1692947922.587488][3670:3672] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3887771962
+          [1692947922.587561][3670:3672] CHIP:TOO:   Location: XX
+          [1692947922.587643][3670:3672] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3887771962
+          [1692947922.587682][3670:3672] CHIP:TOO:   NodeLabel:
+          [1692947922.587738][3670:3672] CHIP:DMG: MoveToState ReadClient[0xaaaaf8a11000]: Moving to [AwaitingSu]
+          [1692947922.587934][3670:3672] CHIP:EM: <<< [E:4602i S:44011 M:43975317 (Ack:79148204)] (S) Msg TX to 4:0000000000000004 [FF58] --- Type 0001:01 (IM:StatusResponse)
+          [1692947922.587980][3670:3672] CHIP:IN: (S) Sending msg 43975317 on secure session with LSID: 44011
+          [1692947922.588211][3670:3672] CHIP:DL: HandlePlatformSpecificBLEEvent 32793
+          [1692947922.588245][3670:3672] CHIP:DL: HandlePlatformSpecificBLEEvent 32793
+          [1692947922.589071][3670:3672] CHIP:EM: >>> [E:4602i S:44011 M:79148205 (Ack:43975317)] (S) Msg RX from 4:0000000000000004 [FF58] --- Type 0001:04 (IM:SubscribeResponse)
+          [1692947922.589107][3670:3672] CHIP:EM: Found matching exchange: 4602i, Delegate: 0xaaaaf8a11010
+          [1692947922.589155][3670:3672] CHIP:EM: Rxd Ack; Removing MessageCounter:43975317 from Retrans Table on exchange 4602i
+          [1692947922.589199][3670:3672] CHIP:DMG: SubscribeResponse is received
+          [1692947922.589246][3670:3672] CHIP:DMG: SubscribeResponseMessage =
+          [1692947922.589277][3670:3672] CHIP:DMG: {
+          [1692947922.589304][3670:3672] CHIP:DMG:         SubscriptionId = 0xc9e797c6,
+          [1692947922.589334][3670:3672] CHIP:DMG:         MaxInterval = 0x64,
+          [1692947922.589361][3670:3672] CHIP:DMG:         InteractionModelRevision = 10
+          [1692947922.589385][3670:3672] CHIP:DMG: }
+          [1692947922.589413][3670:3672] CHIP:DMG: Subscription established with SubscriptionID = 0xc9e797c6 MinInterval = 100s MaxInterval = 100s Peer = 04:0000000000000004
+          [1692947922.589442][3670:3672] CHIP:DMG: MoveToState ReadClient[0xaaaaf8a11000]: Moving to [Subscripti]
 
 
           #5. on the 5th reference device(RD5) send a Subscribe Request Messages to DUT. (Below is the example command to send a subscribe requests with 3 different paths in a single command )
           any subscribe-by-id '0x0028,0x0028,0x0028' '5,6,16' 100 1000 5 '0,0,0' --commissioner-name 5 --keepSubscriptions true
-          [1684321505.359231][136414:136416] CHIP:DMG: }
-          [1684321505.359291][136414:136416] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3947588725
-          [1684321505.359298][136414:136416] CHIP:TOO:   LocalConfigDisabled: TRUE
-          [1684321505.359312][136414:136416] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3947588725
-          [1684321505.359316][136414:136416] CHIP:TOO:   Location: in
-          [1684321505.359331][136414:136416] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3947588725
-          [1684321505.359334][136414:136416] CHIP:TOO:   NodeLabel: "newnode"
-          [1684321505.359345][136414:136416] CHIP:DMG: MoveToState ReadClient[0x7f58a4009230]: Moving to [AwaitingSu]
-          [1684321505.359365][136414:136416] CHIP:EM: <<< [E:5170i S:40695 M:166661002 (Ack:81061549)] (S) Msg TX to 5:0000000000000005 [D311] --- Type 0001:01 (IM:StatusResponse)
-          [1684321505.359370][136414:136416] CHIP:IN: (S) Sending msg 166661002 on secure session with LSID: 40695
-          [1684321505.359510][136414:136416] CHIP:EM: >>> [E:5170i S:40695 M:81061550 (Ack:166661002)] (S) Msg RX from 5:0000000000000005 [D311] --- Type 0001:04 (IM:SubscribeResponse)
-          [1684321505.359515][136414:136416] CHIP:EM: Found matching exchange: 5170i, Delegate: 0x7f58a4009240
-          [1684321505.359519][136414:136416] CHIP:EM: Rxd Ack; Removing MessageCounter:166661002 from Retrans Table on exchange 5170i
-          [1684321505.359524][136414:136416] CHIP:DMG: SubscribeResponse is received
-          [1684321505.359530][136414:136416] CHIP:DMG: SubscribeResponseMessage =
-          [1684321505.359533][136414:136416] CHIP:DMG: {
-          [1684321505.359536][136414:136416] CHIP:DMG:         SubscriptionId = 0xd52f8dad,
-          [1684321505.359539][136414:136416] CHIP:DMG:         MaxInterval = 0x3e8,
-          [1684321505.359542][136414:136416] CHIP:DMG:         InteractionModelRevision = 1
-          [1684321505.359545][136414:136416] CHIP:DMG: }
-          [1684321505.359548][136414:136416] CHIP:DMG: Subscription established with SubscriptionID = 0xd52f8dad MinInterval = 100s MaxInterval = 1000s Peer = 05:0000000000000005
-          [1684321505.359553][136414:136416] CHIP:DMG: MoveToState ReadClient[0x7f58a4009230]: Moving to [Subscripti]
+          [1692947931.880011][3673:3675] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3887771962
+          [1692947931.880075][3673:3675] CHIP:TOO:   LocalConfigDisabled: FALSE
+          [1692947931.880186][3673:3675] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3887771962
+          [1692947931.880217][3673:3675] CHIP:TOO:   Location: XX
+          [1692947931.880277][3673:3675] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3887771962
+          [1692947931.880303][3673:3675] CHIP:TOO:   NodeLabel:
+          [1692947931.880345][3673:3675] CHIP:DMG: MoveToState ReadClient[0xaaaac479e000]: Moving to [AwaitingSu]
+          [1692947931.880521][3673:3675] CHIP:EM: <<< [E:53665i S:45655 M:227315674 (Ack:12948537)] (S) Msg TX to 5:0000000000000005 [B2A3] --- Type 0001:01 (IM:StatusResponse)
+          [1692947931.880570][3673:3675] CHIP:IN: (S) Sending msg 227315674 on secure session with LSID: 45655
+          [1692947931.880835][3673:3675] CHIP:DL: HandlePlatformSpecificBLEEvent 32793
+          [1692947931.880872][3673:3675] CHIP:DL: HandlePlatformSpecificBLEEvent 32793
+          [1692947931.881852][3673:3675] CHIP:EM: >>> [E:53665i S:45655 M:12948538 (Ack:227315674)] (S) Msg RX from 5:0000000000000005 [B2A3] --- Type 0001:04 (IM:SubscribeResponse)
+          [1692947931.881889][3673:3675] CHIP:EM: Found matching exchange: 53665i, Delegate: 0xaaaac479e010
+          [1692947931.881965][3673:3675] CHIP:EM: Rxd Ack; Removing MessageCounter:227315674 from Retrans Table on exchange 53665i
+          [1692947931.882003][3673:3675] CHIP:DMG: SubscribeResponse is received
+          [1692947931.882045][3673:3675] CHIP:DMG: SubscribeResponseMessage =
+          [1692947931.882070][3673:3675] CHIP:DMG: {
+          [1692947931.882092][3673:3675] CHIP:DMG:         SubscriptionId = 0x7963fdff,
+          [1692947931.882118][3673:3675] CHIP:DMG:         MaxInterval = 0x64,
+          [1692947931.882141][3673:3675] CHIP:DMG:         InteractionModelRevision = 10
+          [1692947931.882239][3673:3675] CHIP:DMG: }
+          [1692947931.882284][3673:3675] CHIP:DMG: Subscription established with SubscriptionID = 0x7963fdff MinInterval = 100s MaxInterval = 100s Peer = 05:0000000000000005
+          [1692947931.882310][3673:3675] CHIP:DMG: MoveToState ReadClient[0xaaaac479e000]: Moving to [Subscripti]
 
           Once all 15 subscriptions are active send one more subscriptiopn command in RD1 and Verify that the subscriptions from RD2, RD3, RD4 and RD5 are not affected.
 
           On the 1st reference device(RD1) send a Subscribe Request Messages to DUT.
           basicinformation subscribe product-id 100 1000 1 0 --keepSubscriptions true
-          [1684321545.164738][136393:136395] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0004 DataVersion: 3947588725
-          [1684321545.164763][136393:136395] CHIP:TOO:   ProductID: 32769
-          [1684321545.164787][136393:136395] CHIP:DMG: MoveToState ReadClient[0x7fb51001bcc0]: Moving to [AwaitingSu]
-          [1684321545.164851][136393:136395] CHIP:EM: <<< [E:41661i S:42488 M:180349715 (Ack:108042004)] (S) Msg TX to 1:0000000000000001 [E777] --- Type 0001:01 (IM:StatusResponse)
-          [1684321545.164868][136393:136395] CHIP:IN: (S) Sending msg 180349715 on secure session with LSID: 42488
-          [1684321545.165191][136393:136395] CHIP:EM: >>> [E:41661i S:42488 M:108042005 (Ack:180349715)] (S) Msg RX from 1:0000000000000001 [E777] --- Type 0001:04 (IM:SubscribeResponse)
-          [1684321545.165201][136393:136395] CHIP:EM: Found matching exchange: 41661i, Delegate: 0x7fb51001bcd0
-          [1684321545.165210][136393:136395] CHIP:EM: Rxd Ack; Removing MessageCounter:180349715 from Retrans Table on exchange 41661i
-          [1684321545.165218][136393:136395] CHIP:DMG: SubscribeResponse is received
-          [1684321545.165229][136393:136395] CHIP:DMG: SubscribeResponseMessage =
-          [1684321545.165234][136393:136395] CHIP:DMG: {
-          [1684321545.165238][136393:136395] CHIP:DMG:         SubscriptionId = 0xe9abeae7,
-          [1684321545.165253][136393:136395] CHIP:DMG:         MaxInterval = 0x3e8,
-          [1684321545.165263][136393:136395] CHIP:DMG:         InteractionModelRevision = 1
-          [1684321545.165271][136393:136395] CHIP:DMG: }
-          [1684321545.165282][136393:136395] CHIP:DMG: Subscription established with SubscriptionID = 0xe9abeae7 MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000001
-          [1684321545.165295][136393:136395] CHIP:DMG: MoveToState ReadClient[0x7fb51001bcc0]: Moving to [Subscripti]
+          [1692947944.399278][3660:3662] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0004 DataVersion: 3887771962
+          [1692947944.399322][3660:3662] CHIP:TOO:   ProductID: 32769
+          [1692947944.399364][3660:3662] CHIP:DMG: MoveToState ReadClient[0xffffb0011910]: Moving to [AwaitingSu]
+          [1692947944.399540][3660:3662] CHIP:EM: <<< [E:14762i S:58740 M:219359656 (Ack:56803013)] (S) Msg TX to 1:0000000000000001 [3E67] --- Type 0001:01 (IM:StatusResponse)
+          [1692947944.399597][3660:3662] CHIP:IN: (S) Sending msg 219359656 on secure session with LSID: 58740
+          [1692947944.399821][3660:3662] CHIP:DL: HandlePlatformSpecificBLEEvent 32793
+          [1692947944.399858][3660:3662] CHIP:DL: HandlePlatformSpecificBLEEvent 32793
+          [1692947944.400702][3660:3662] CHIP:EM: >>> [E:14762i S:58740 M:56803014 (Ack:219359656)] (S) Msg RX from 1:0000000000000001 [3E67] --- Type 0001:04 (IM:SubscribeResponse)
+          [1692947944.400745][3660:3662] CHIP:EM: Found matching exchange: 14762i, Delegate: 0xffffb0011920
+          [1692947944.400797][3660:3662] CHIP:EM: Rxd Ack; Removing MessageCounter:219359656 from Retrans Table on exchange 14762i
+          [1692947944.400844][3660:3662] CHIP:DMG: SubscribeResponse is received
+          [1692947944.400895][3660:3662] CHIP:DMG: SubscribeResponseMessage =
+          [1692947944.400927][3660:3662] CHIP:DMG: {
+          [1692947944.400958][3660:3662] CHIP:DMG:         SubscriptionId = 0xf148f53c,
+          [1692947944.400991][3660:3662] CHIP:DMG:         MaxInterval = 0x64,
+          [1692947944.401022][3660:3662] CHIP:DMG:         InteractionModelRevision = 10
+          [1692947944.401050][3660:3662] CHIP:DMG: }
+          [1692947944.401081][3660:3662] CHIP:DMG: Subscription established with SubscriptionID = 0xf148f53c MinInterval = 100s MaxInterval = 100s Peer = 01:0000000000000001
+          [1692947944.401112][3660:3662] CHIP:DMG: MoveToState ReadClient[0xffffb0011910]: Moving to [Subscripti]
+      disabled: true
+
+    - label:
+          "Step 3a: Factory Reset the DUT and recommission it onto all fabrics.
+          RD1, RD2, RD3, RD4, RD5 should be on separate, distinct fabrics. RD1
+          and RD1A should be on the same fabric."
+      verification: |
+          To perform Factory reset on DUT follow the below commands in RPI, And use equivalent command on the respective DUT sudo rm -rf /tmp/chip_*
+
+          After performing a factory reset on the DUT, please follow the preconditioning steps to provision both the DUT and the RDs
       disabled: true
 
     - label:
@@ -506,6 +540,8 @@ tests:
           all the Subscription Requests are activated, RD1 sends 6 subscription
           request messages with each of them having 3 different paths."
       verification: |
+          RD2, RD3, RD4, RD5 send 3 Subscribe request messages each with each of them having 3 different paths. Verify that the subscription request messages from all reference devices succeed. Once all the Subscription Requests are activated, RD1 sends 6 subscription request messages with each of them having 3 different paths.
+
           #1. on the 2nd reference device(RD2) send a Subscribe Request Messages to DUT.(Below is the example command to send a subscribe requests with 3 different paths in a single command )
           any subscribe-by-id '0x0028,0x0028,0x0028' '5,6,16' 100 1000 2 '0,0,0' --commissioner-name beta --keepSubscriptions true
           [1684322787.342206][136396:136398] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3947588725
@@ -645,12 +681,26 @@ tests:
       disabled: true
 
     - label:
-          "Step 4: RD1, RD2, RD3, RD4, RD5 send 3 Subscribe request messages
+          "Step 4a: Factory Reset the DUT and recommission it onto all fabrics.
+          RD1, RD2, RD3, RD4, RD5 should be on separate, distinct fabrics. RD1
+          and RD1A should be on the same fabric."
+      verification: |
+          To perform Factory reset on DUT follow the below commands in RPI, And use equivalent command on the respective DUT sudo rm -rf /tmp/chip_*
+
+          After performing a factory reset on the DUT, please follow the preconditioning steps to provision both the DUT and the RDs
+      disabled: true
+
+    - label:
+          "Step 4b: RD1, RD2, RD3, RD4, RD5 send 3 Subscribe request messages
           each with each of them having 3 different paths. Verify that the
           subscription request messages from RD1, RD2, RD3, RD4 and RD5 succeed.
           Once all the Subscription Requests are activated, send a Subscribe
           request messages having 3 different paths from RD1A to the DUT."
       verification: |
+          RD1, RD2, RD3, RD4, RD5 send 3 Subscribe request messages each with each of them having 3 different paths.
+          Verify that the subscription request messages from RD1, RD2, RD3, RD4 and RD5 succeed.
+          Once all the Subscription Requests are activated, send a Subscribe request messages having 3 different paths from RD1A to the DUT
+
           #1. on the first reference device(RD1) send a Subscribe Request Messages to DUT. (Below is the example command to send a subscribe requests with 3 different paths in a single command )
           any subscribe-by-id '0x0028,0x0028,0x0028' '5,6,16' 100 1000 1 '0,0,0' --keepSubscriptions true
           [1684323009.937251][136393:136395] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3947588725

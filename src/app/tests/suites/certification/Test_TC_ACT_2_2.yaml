@@ -46,22 +46,23 @@ tests:
           Via the TH (chip-tool), verify the EndpointLists attribute that contains EndpointListStructs.
 
           [1658426570.716289][16527:16532] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 3768747568
-          [1658426570.716404][16527:16532] CHIP:TOO:   endpoint list: 2 entries
-          [1658426570.716465][16527:16532] CHIP:TOO:     [1]: {
-          [1658426570.716507][16527:16532] CHIP:TOO:       EndpointListID: 0
-          [1658426570.716534][16527:16532] CHIP:TOO:       Name: living_room
-          [1658426570.716559][16527:16532] CHIP:TOO:       Type: 1
-          [1658426570.716588][16527:16532] CHIP:TOO:       Endpoints: 2 entries
-          [1658426570.716617][16527:16532] CHIP:TOO:         [1]: 2
-          [1658426570.716646][16527:16532] CHIP:TOO:         [2]: 3
-          [1658426570.716673][16527:16532] CHIP:TOO:      }
-          [1658426570.717133][16527:16532] CHIP:TOO:     [2]: {
-          [1658426570.717160][16527:16532] CHIP:TOO:       EndpointListID: 2
-          [1658426570.717185][16527:16532] CHIP:TOO:       Name: office
-          [1658426570.717209][16527:16532] CHIP:TOO:       Type: 1
-          [1658426570.717236][16527:16532] CHIP:TOO:       Endpoints: 1 entries
-          [1658426570.717265][16527:16532] CHIP:TOO:         [1]: 9
-          [1658426570.717292][16527:16532] CHIP:TOO:      }
+          [1692262148.439645][3623:3625] CHIP:TOO:   EndpointLists: 2 entries
+          [1692262148.439718][3623:3625] CHIP:TOO:     [1]: {
+          [1692262148.439742][3623:3625] CHIP:TOO:       EndpointListID: 57345
+          [1692262148.439765][3623:3625] CHIP:TOO:       Name: Room 1
+          [1692262148.439785][3623:3625] CHIP:TOO:       Type: 1
+          [1692262148.439808][3623:3625] CHIP:TOO:       Endpoints: 2 entries
+          [1692262148.439833][3623:3625] CHIP:TOO:         [1]: 9
+          [1692262148.439857][3623:3625] CHIP:TOO:         [2]: 10
+          [1692262148.439879][3623:3625] CHIP:TOO:      }
+          [1692262148.439908][3623:3625] CHIP:TOO:     [2]: {
+          [1692262148.439930][3623:3625] CHIP:TOO:       EndpointListID: 57346
+          [1692262148.439950][3623:3625] CHIP:TOO:       Name: Room 2
+          [1692262148.439968][3623:3625] CHIP:TOO:       Type: 1
+          [1692262148.439990][3623:3625] CHIP:TOO:       Endpoints: 2 entries
+          [1692262148.440013][3623:3625] CHIP:TOO:         [1]: 11
+          [1692262148.440036][3623:3625] CHIP:TOO:         [2]: 12
+          [1692262148.440056][3623:3625] CHIP:TOO:      }
       disabled: true
 
     - label:
@@ -70,7 +71,7 @@ tests:
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
           press r in bridge-app to rename
-          (in the example, renamed "office" to "kitchen")
+          (in the example, renamed "Room 1" to "Room 1 renamed")
       disabled: true
 
     - label: "Step 2d: Read EndpointLists attribute again"
@@ -81,22 +82,23 @@ tests:
           Via the TH (chip-tool), verify the EndpointLists attribute that contains EndpointListStructs.
 
           [1658408033.786811][14495:14500] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 3742844648
-          [1658408033.786954][14495:14500] CHIP:TOO:   endpoint list: 2 entries
-          [1658408033.787044][14495:14500] CHIP:TOO:     [1]: {
-          [1658408033.787100][14495:14500] CHIP:TOO:       EndpointListID: 0
-          [1658408033.787135][14495:14500] CHIP:TOO:       Name: living_room
-          [1658408033.787183][14495:14500] CHIP:TOO:       Type: 1
-          [1658408033.787220][14495:14500] CHIP:TOO:       Endpoints: 2 entries
-          [1658408033.787274][14495:14500] CHIP:TOO:         [1]: 2
-          [1658408033.787312][14495:14500] CHIP:TOO:         [2]: 3
-          [1658408033.787343][14495:14500] CHIP:TOO:      }
-          [1658408033.787407][14495:14500] CHIP:TOO:     [2]: {
-          [1658408033.788089][14495:14500] CHIP:TOO:       EndpointListID: 2
-          [1658408033.788123][14495:14500] CHIP:TOO:       Name: kitchen
-          [1658408033.788156][14495:14500] CHIP:TOO:       Type: 1
-          [1658408033.788191][14495:14500] CHIP:TOO:       Endpoints: 1 entries
-          [1658408033.788243][14495:14500] CHIP:TOO:         [1]: 9
-          [1658408033.788278][14495:14500] CHIP:TOO:      }
+          [1692262230.546573][3626:3628] CHIP:TOO:   EndpointLists: 2 entries
+          [1692262230.546738][3626:3628] CHIP:TOO:     [1]: {
+          [1692262230.546826][3626:3628] CHIP:TOO:       EndpointListID: 57345
+          [1692262230.546884][3626:3628] CHIP:TOO:       Name: Room 1 renamed
+          [1692262230.546937][3626:3628] CHIP:TOO:       Type: 1
+          [1692262230.547022][3626:3628] CHIP:TOO:       Endpoints: 2 entries
+          [1692262230.547206][3626:3628] CHIP:TOO:         [1]: 9
+          [1692262230.547270][3626:3628] CHIP:TOO:         [2]: 10
+          [1692262230.547327][3626:3628] CHIP:TOO:      }
+          [1692262230.547595][3626:3628] CHIP:TOO:     [2]: {
+          [1692262230.547658][3626:3628] CHIP:TOO:       EndpointListID: 57346
+          [1692262230.547783][3626:3628] CHIP:TOO:       Name: Room 2
+          [1692262230.547901][3626:3628] CHIP:TOO:       Type: 1
+          [1692262230.547966][3626:3628] CHIP:TOO:       Endpoints: 2 entries
+          [1692262230.548027][3626:3628] CHIP:TOO:         [1]: 11
+          [1692262230.548156][3626:3628] CHIP:TOO:         [2]: 12
+          [1692262230.548218][3626:3628] CHIP:TOO:      }
       disabled: true
 
     - label: "Step 2e: compare result of step 2d to what was read in step 2b"
@@ -108,43 +110,45 @@ tests:
           Via the TH (chip-tool), verify the EndpointLists attribute that contains EndpointListStructs.
 
           [1658408033.786811][14495:14500] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 3742844648
-          [1658408033.786954][14495:14500] CHIP:TOO:   endpoint list: 2 entries
-          [1658408033.787044][14495:14500] CHIP:TOO:     [1]: {
-          [1658408033.787100][14495:14500] CHIP:TOO:       EndpointListID: 0
-          [1658408033.787135][14495:14500] CHIP:TOO:       Name: living_room
-          [1658408033.787183][14495:14500] CHIP:TOO:       Type: 1
-          [1658408033.787220][14495:14500] CHIP:TOO:       Endpoints: 2 entries
-          [1658408033.787274][14495:14500] CHIP:TOO:         [1]: 2
-          [1658408033.787312][14495:14500] CHIP:TOO:         [2]: 3
-          [1658408033.787343][14495:14500] CHIP:TOO:      }
-          [1658408033.787407][14495:14500] CHIP:TOO:     [2]: {
-          [1658408033.788089][14495:14500] CHIP:TOO:       EndpointListID: 2
-          [1658408033.788123][14495:14500] CHIP:TOO:       Name: kitchen
-          [1658408033.788156][14495:14500] CHIP:TOO:       Type: 1
-          [1658408033.788191][14495:14500] CHIP:TOO:       Endpoints: 1 entries
-          [1658408033.788243][14495:14500] CHIP:TOO:         [1]: 9
-          [1658408033.788278][14495:14500] CHIP:TOO:      }
+          [1692262230.546573][3626:3628] CHIP:TOO:   EndpointLists: 2 entries
+          [1692262230.546738][3626:3628] CHIP:TOO:     [1]: {
+          [1692262230.546826][3626:3628] CHIP:TOO:       EndpointListID: 57345
+          [1692262230.546884][3626:3628] CHIP:TOO:       Name: Room 1 renamed
+          [1692262230.546937][3626:3628] CHIP:TOO:       Type: 1
+          [1692262230.547022][3626:3628] CHIP:TOO:       Endpoints: 2 entries
+          [1692262230.547206][3626:3628] CHIP:TOO:         [1]: 9
+          [1692262230.547270][3626:3628] CHIP:TOO:         [2]: 10
+          [1692262230.547327][3626:3628] CHIP:TOO:      }
+          [1692262230.547595][3626:3628] CHIP:TOO:     [2]: {
+          [1692262230.547658][3626:3628] CHIP:TOO:       EndpointListID: 57346
+          [1692262230.547783][3626:3628] CHIP:TOO:       Name: Room 2
+          [1692262230.547901][3626:3628] CHIP:TOO:       Type: 1
+          [1692262230.547966][3626:3628] CHIP:TOO:       Endpoints: 2 entries
+          [1692262230.548027][3626:3628] CHIP:TOO:         [1]: 11
+          [1692262230.548156][3626:3628] CHIP:TOO:         [2]: 12
+          [1692262230.548218][3626:3628] CHIP:TOO:      }
 
           Step 2b log:
           Via the TH (chip-tool), verify the EndpointLists attribute that contains EndpointListStructs.
 
           [1658426570.716289][16527:16532] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 3768747568
-          [1658426570.716404][16527:16532] CHIP:TOO:   endpoint list: 2 entries
-          [1658426570.716465][16527:16532] CHIP:TOO:     [1]: {
-          [1658426570.716507][16527:16532] CHIP:TOO:       EndpointListID: 0
-          [1658426570.716534][16527:16532] CHIP:TOO:       Name: living_room
-          [1658426570.716559][16527:16532] CHIP:TOO:       Type: 1
-          [1658426570.716588][16527:16532] CHIP:TOO:       Endpoints: 2 entries
-          [1658426570.716617][16527:16532] CHIP:TOO:         [1]: 2
-          [1658426570.716646][16527:16532] CHIP:TOO:         [2]: 3
-          [1658426570.716673][16527:16532] CHIP:TOO:      }
-          [1658426570.717133][16527:16532] CHIP:TOO:     [2]: {
-          [1658426570.717160][16527:16532] CHIP:TOO:       EndpointListID: 2
-          [1658426570.717185][16527:16532] CHIP:TOO:       Name: office
-          [1658426570.717209][16527:16532] CHIP:TOO:       Type: 1
-          [1658426570.717236][16527:16532] CHIP:TOO:       Endpoints: 1 entries
-          [1658426570.717265][16527:16532] CHIP:TOO:         [1]: 9
-          [1658426570.717292][16527:16532] CHIP:TOO:      }
+          [1692262230.546573][3626:3628] CHIP:TOO:   EndpointLists: 2 entries
+          [1692262230.546738][3626:3628] CHIP:TOO:     [1]: {
+          [1692262230.546826][3626:3628] CHIP:TOO:       EndpointListID: 57345
+          [1692262230.546884][3626:3628] CHIP:TOO:       Name: Room 1
+          [1692262230.546937][3626:3628] CHIP:TOO:       Type: 1
+          [1692262230.547022][3626:3628] CHIP:TOO:       Endpoints: 2 entries
+          [1692262230.547206][3626:3628] CHIP:TOO:         [1]: 9
+          [1692262230.547270][3626:3628] CHIP:TOO:         [2]: 10
+          [1692262230.547327][3626:3628] CHIP:TOO:      }
+          [1692262230.547595][3626:3628] CHIP:TOO:     [2]: {
+          [1692262230.547658][3626:3628] CHIP:TOO:       EndpointListID: 57346
+          [1692262230.547783][3626:3628] CHIP:TOO:       Name: Room 2
+          [1692262230.547901][3626:3628] CHIP:TOO:       Type: 1
+          [1692262230.547966][3626:3628] CHIP:TOO:       Endpoints: 2 entries
+          [1692262230.548027][3626:3628] CHIP:TOO:         [1]: 11
+          [1692262230.548156][3626:3628] CHIP:TOO:         [2]: 12
+          [1692262230.548218][3626:3628] CHIP:TOO:      }
       disabled: true
 
     - label:
@@ -154,7 +158,7 @@ tests:
       verification: |
           Press f in bridge app  to move one of the bridged devices (one endpoint) from one group to another group
 
-          (in the example, light at ep 3 was moved to kitchen)
+          (in the example, light at EP 11 was moved to Room 1 renamed)
       disabled: true
 
     - label: "Step 2g: Read EndpointLists attribute again"
@@ -165,22 +169,23 @@ tests:
           Via the TH (chip-tool), verify the EndpointLists attribute that contains EndpointListStructs.
 
           [1658408033.786811][14495:14500] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 3742844648
-          [1658408033.786954][14495:14500] CHIP:TOO:   endpoint list: 2 entries
-          [1658408033.787044][14495:14500] CHIP:TOO:     [1]: {
-          [1658408033.787100][14495:14500] CHIP:TOO:       EndpointListID: 0
-          [1658408033.787135][14495:14500] CHIP:TOO:       Name: living_room
-          [1658408033.787183][14495:14500] CHIP:TOO:       Type: 1
-          [1658408033.787220][14495:14500] CHIP:TOO:       Endpoints: 2 entries
-          [1658408033.787274][14495:14500] CHIP:TOO:         [1]: 2
-          [1658408033.787343][14495:14500] CHIP:TOO:      }
-          [1658408033.787407][14495:14500] CHIP:TOO:     [2]: {
-          [1658408033.788089][14495:14500] CHIP:TOO:       EndpointListID: 2
-          [1658408033.788123][14495:14500] CHIP:TOO:       Name: kitchen
-          [1658408033.788156][14495:14500] CHIP:TOO:       Type: 1
-          [1658408033.788191][14495:14500] CHIP:TOO:       Endpoints: 2 entries
-          [1658408033.788243][14495:14500] CHIP:TOO:         [1]: 9
-          [1658408033.787312][14495:14500] CHIP:TOO:         [2]: 3
-          [1658408033.788278][14495:14500] CHIP:TOO:      }
+          [1692262498.402393][3670:3672] CHIP:TOO:   EndpointLists: 2 entries
+          [1692262498.402483][3670:3672] CHIP:TOO:     [1]: {
+          [1692262498.402526][3670:3672] CHIP:TOO:       EndpointListID: 57345
+          [1692262498.402555][3670:3672] CHIP:TOO:       Name: Room 1 renamed
+          [1692262498.402582][3670:3672] CHIP:TOO:       Type: 1
+          [1692262498.402625][3670:3672] CHIP:TOO:       Endpoints: 3 entries
+          [1692262498.402658][3670:3672] CHIP:TOO:         [1]: 9
+          [1692262498.402689][3670:3672] CHIP:TOO:         [2]: 10
+          [1692262498.402764][3670:3672] CHIP:TOO:         [3]: 11
+          [1692262498.402806][3670:3672] CHIP:TOO:      }
+          [1692262498.402847][3670:3672] CHIP:TOO:     [2]: {
+          [1692262498.402888][3670:3672] CHIP:TOO:       EndpointListID: 57346
+          [1692262498.402950][3670:3672] CHIP:TOO:       Name: Room 2
+          [1692262498.402988][3670:3672] CHIP:TOO:       Type: 1
+          [1692262498.403017][3670:3672] CHIP:TOO:       Endpoints: 1 entries
+          [1692262498.403061][3670:3672] CHIP:TOO:         [1]: 12
+          [1692262498.403124][3670:3672] CHIP:TOO:      }
       disabled: true
 
     - label: "Step 2h: compare result of step 2g to what was read in step 2d"
@@ -207,14 +212,16 @@ tests:
           Via the TH (chip-tool), verify the EndpointLists attribute that contains EndpointListStructs.
 
           [1658426959.409374][16560:16565] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 3768747568
-          [1658426959.409476][16560:16565] CHIP:TOO:   endpoint list: 1 entries
-          [1658426959.409543][16560:16565] CHIP:TOO:     [1]: {
-          [1658426959.409580][16560:16565] CHIP:TOO:       EndpointListID: 0
-          [1658426959.409604][16560:16565] CHIP:TOO:       Name: living_room
-          [1658426959.409636][16560:16565] CHIP:TOO:       Type: 1
-          [1658426959.409691][16560:16565] CHIP:TOO:       Endpoints: 1 entries
-          [1658426959.409730][16560:16565] CHIP:TOO:         [1]: 2
-          [1658426959.409755][16560:16565] CHIP:TOO:      }
+          [1692262693.254145][3691:3693] CHIP:TOO:   EndpointLists: 1 entries
+          [1692262693.254220][3691:3693] CHIP:TOO:     [1]: {
+          [1692262693.254246][3691:3693] CHIP:TOO:       EndpointListID: 57345
+          [1692262693.254268][3691:3693] CHIP:TOO:       Name: Room 1 renamed
+          [1692262693.254290][3691:3693] CHIP:TOO:       Type: 1
+          [1692262693.254315][3691:3693] CHIP:TOO:       Endpoints: 3 entries
+          [1692262693.254342][3691:3693] CHIP:TOO:         [1]: 9
+          [1692262693.254366][3691:3693] CHIP:TOO:         [2]: 10
+          [1692262693.254390][3691:3693] CHIP:TOO:         [3]: 11
+          [1692262693.254414][3691:3693] CHIP:TOO:      }
       disabled: true
 
     - label: "Step 2k: compare result of step 2j to what was read in step 2g"
@@ -230,7 +237,7 @@ tests:
       PICS: ACT.S.A0001 && ACT.S.M.OverlappingEndpointLists
       verification: |
           press l in bridge-app
-          in this example, a zone was created with same light (ep 2)
+          in this example, a zone was created with same light (ep 10)
       disabled: true
 
     - label: "Step 2m: Read EndpointLists attribute again"
@@ -240,22 +247,23 @@ tests:
 
           Via the TH (chip-tool), verify the EndpointLists attribute that contains EndpointListStructs.
 
-          1658427088.316681][16578:16583] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 3768747568
-          [1658427088.316792][16578:16583] CHIP:TOO:   endpoint list: 2 entries
-          [1658427088.316850][16578:16583] CHIP:TOO:     [1]: {
-          [1658427088.316890][16578:16583] CHIP:TOO:       EndpointListID: 0
-          [1658427088.316915][16578:16583] CHIP:TOO:       Name: living_room
-          [1658427088.316939][16578:16583] CHIP:TOO:       Type: 1
-          [1658427088.316965][16578:16583] CHIP:TOO:       Endpoints: 1 entries
-          [1658427088.316993][16578:16583] CHIP:TOO:         [1]: 2
-          [1658427088.317019][16578:16583] CHIP:TOO:      }
-          [1658427088.317558][16578:16583] CHIP:TOO:     [2]: {
-          [1658427088.317583][16578:16583] CHIP:TOO:       EndpointListID: 2
-          [1658427088.317606][16578:16583] CHIP:TOO:       Name: dining
-          [1658427088.317628][16578:16583] CHIP:TOO:       Type: 2
-          [1658427088.317652][16578:16583] CHIP:TOO:       Endpoints: 1 entries
-          [1658427088.317679][16578:16583] CHIP:TOO:         [1]: 2
-          [1658427088.317705][16578:16583] CHIP:TOO:      }
+          [1692262731.405553][3694:3696] CHIP:TOO:   EndpointLists: 2 entries
+          [1692262731.405627][3694:3696] CHIP:TOO:     [1]: {
+          [1692262731.405653][3694:3696] CHIP:TOO:       EndpointListID: 57345
+          [1692262731.405676][3694:3696] CHIP:TOO:       Name: Room 1 renamed
+          [1692262731.405697][3694:3696] CHIP:TOO:       Type: 1
+          [1692262731.405723][3694:3696] CHIP:TOO:       Endpoints: 3 entries
+          [1692262731.405749][3694:3696] CHIP:TOO:         [1]: 9
+          [1692262731.405774][3694:3696] CHIP:TOO:         [2]: 10
+          [1692262731.405797][3694:3696] CHIP:TOO:         [3]: 11
+          [1692262731.405820][3694:3696] CHIP:TOO:      }
+          [1692262731.405851][3694:3696] CHIP:TOO:     [2]: {
+          [1692262731.405874][3694:3696] CHIP:TOO:       EndpointListID: 57347
+          [1692262731.405895][3694:3696] CHIP:TOO:       Name: Zone 3
+          [1692262731.405915][3694:3696] CHIP:TOO:       Type: 2
+          [1692262731.405938][3694:3696] CHIP:TOO:       Endpoints: 1 entries
+          [1692262731.405962][3694:3696] CHIP:TOO:         [1]: 10
+          [1692262731.405985][3694:3696] CHIP:TOO:      }
       disabled: true
 
     - label: "Step 2n: compare result of step 2m to what was read in step 2j"
@@ -281,14 +289,14 @@ tests:
           Via the TH (chip-tool), verify the ActionList attribute that contains ActionListStructs.
 
           [1658479958.699434][26130:26135] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 198994220
-          [1658479958.699494][26130:26135] CHIP:TOO:   action list: 2 entries
+          [1658479958.699494][26130:26135] CHIP:TOO:   ActionList: 2 entries
           [1658479958.699549][26130:26135] CHIP:TOO:     [1]: {
           [1658479958.699582][26130:26135] CHIP:TOO:       ActionID: 4097
           [1658479958.699597][26130:26135] CHIP:TOO:       Name: Room 1 On
           [1658479958.699611][26130:26135] CHIP:TOO:       Type: 3
           [1658479958.699624][26130:26135] CHIP:TOO:       EndpointListID: 57345
           [1658479958.699638][26130:26135] CHIP:TOO:       SupportedCommands: 1
-          [1658479958.699652][26130:26135] CHIP:TOO:       Status: 0
+          [1658479958.699652][26130:26135] CHIP:TOO:       State: 0
           [1658479958.699665][26130:26135] CHIP:TOO:      }
           [1658479958.699689][26130:26135] CHIP:TOO:     [2]: {
           [1658479958.699702][26130:26135] CHIP:TOO:       ActionID: 4098
@@ -296,7 +304,7 @@ tests:
           [1658479958.699727][26130:26135] CHIP:TOO:       Type: 3
           [1658479958.699740][26130:26135] CHIP:TOO:       EndpointListID: 57346
           [1658479958.699753][26130:26135] CHIP:TOO:       SupportedCommands: 1
-          [1658479958.699765][26130:26135] CHIP:TOO:       Status: 0
+          [1658479958.699765][26130:26135] CHIP:TOO:       State: 0
           [1658479958.699777][26130:26135] CHIP:TOO:      }
       disabled: true
 
@@ -316,14 +324,14 @@ tests:
           Via the TH (chip-tool), verify the ActionList attribute that contains ActionListStructs.
 
           [1658480004.064867][26153:26158] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 198994220
-          [1658480004.064928][26153:26158] CHIP:TOO:   action list: 2 entries
+          [1658480004.064928][26153:26158] CHIP:TOO:   ActionList: 2 entries
           [1658480004.064992][26153:26158] CHIP:TOO:     [1]: {
           [1658480004.065024][26153:26158] CHIP:TOO:       ActionID: 4097
           [1658480004.065041][26153:26158] CHIP:TOO:       Name: Turn On Room 1
           [1658480004.065057][26153:26158] CHIP:TOO:       Type: 3
           [1658480004.065073][26153:26158] CHIP:TOO:       EndpointListID: 57345
           [1658480004.065090][26153:26158] CHIP:TOO:       SupportedCommands: 1
-          [1658480004.065105][26153:26158] CHIP:TOO:       Status: 0
+          [1658480004.065105][26153:26158] CHIP:TOO:       State: 0
           [1658480004.065120][26153:26158] CHIP:TOO:      }
           [1658480004.065148][26153:26158] CHIP:TOO:     [2]: {
           [1658480004.065165][26153:26158] CHIP:TOO:       ActionID: 4098
@@ -331,7 +339,7 @@ tests:
           [1658480004.065194][26153:26158] CHIP:TOO:       Type: 3
           [1658480004.065209][26153:26158] CHIP:TOO:       EndpointListID: 57346
           [1658480004.065223][26153:26158] CHIP:TOO:       SupportedCommands: 1
-          [1658480004.065238][26153:26158] CHIP:TOO:       Status: 0
+          [1658480004.065238][26153:26158] CHIP:TOO:       State: 0
           [1658480004.065252][26153:26158] CHIP:TOO:      }
       disabled: true
 
@@ -344,7 +352,7 @@ tests:
           Via the TH (chip-tool), verify the ActionList attribute that contains ActionListStructs.
 
           [1658480004.064867][26153:26158] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 198994220
-          [1658480004.064928][26153:26158] CHIP:TOO:   action list: 2 entries
+          [1658480004.064928][26153:26158] CHIP:TOO:   ActionList: 2 entries
           [1658480004.064992][26153:26158] CHIP:TOO:     [1]: {
           [1658480004.065024][26153:26158] CHIP:TOO:       ActionID: 4097
           [1658480004.065041][26153:26158] CHIP:TOO:       Name: Turn On Room 1
@@ -359,14 +367,14 @@ tests:
           [1658480004.065194][26153:26158] CHIP:TOO:       Type: 3
           [1658480004.065209][26153:26158] CHIP:TOO:       EndpointListID: 57346
           [1658480004.065223][26153:26158] CHIP:TOO:       SupportedCommands: 1
-          [1658480004.065238][26153:26158] CHIP:TOO:       Status: 0
+          [1658480004.065238][26153:26158] CHIP:TOO:       State: 0
           [1658480004.065252][26153:26158] CHIP:TOO:      }
 
           Step 3b Log:
           Via the TH (chip-tool), verify the ActionList attribute that contains ActionListStructs.
 
           [1658479958.699434][26130:26135] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 198994220
-          [1658479958.699494][26130:26135] CHIP:TOO:   action list: 2 entries
+          [1658479958.699494][26130:26135] CHIP:TOO:   ActionList: 2 entries
           [1658479958.699549][26130:26135] CHIP:TOO:     [1]: {
           [1658479958.699582][26130:26135] CHIP:TOO:       ActionID: 4097
           [1658479958.699597][26130:26135] CHIP:TOO:       Name: Room 1 On
@@ -381,7 +389,7 @@ tests:
           [1658479958.699727][26130:26135] CHIP:TOO:       Type: 3
           [1658479958.699740][26130:26135] CHIP:TOO:       EndpointListID: 57346
           [1658479958.699753][26130:26135] CHIP:TOO:       SupportedCommands: 1
-          [1658479958.699765][26130:26135] CHIP:TOO:       Status: 0
+          [1658479958.699765][26130:26135] CHIP:TOO:       State: 0
           [1658479958.699777][26130:26135] CHIP:TOO:      }
       disabled: true
 
@@ -399,14 +407,14 @@ tests:
           Via the TH (chip-tool), verify the ActionList attribute that contains ActionListStructs.
 
           [1658480039.164683][26172:26177] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 198994220
-          [1658480039.164758][26172:26177] CHIP:TOO:   action list: 1 entries
+          [1658480039.164758][26172:26177] CHIP:TOO:   ActionList: 1 entries
           [1658480039.164815][26172:26177] CHIP:TOO:     [1]: {
           [1658480039.164846][26172:26177] CHIP:TOO:       ActionID: 4097
           [1658480039.164872][26172:26177] CHIP:TOO:       Name: Turn On Room 1
           [1658480039.164897][26172:26177] CHIP:TOO:       Type: 3
           [1658480039.164920][26172:26177] CHIP:TOO:       EndpointListID: 57345
           [1658480039.164948][26172:26177] CHIP:TOO:       SupportedCommands: 1
-          [1658480039.164974][26172:26177] CHIP:TOO:       Status: 0
+          [1658480039.164974][26172:26177] CHIP:TOO:       State: 0
           [1658480039.164997][26172:26177] CHIP:TOO:      }
       disabled: true
 
@@ -430,14 +438,14 @@ tests:
           Via the TH (chip-tool), verify the ActionList attribute that contains ActionListStructs.
 
           [1658480059.199268][26178:26183] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 198994220
-          [1658480059.199349][26178:26183] CHIP:TOO:   action list: 2 entries
+          [1658480059.199349][26178:26183] CHIP:TOO:   ActionList: 2 entries
           [1658480059.199410][26178:26183] CHIP:TOO:     [1]: {
           [1658480059.199440][26178:26183] CHIP:TOO:       ActionID: 4097
           [1658480059.199457][26178:26183] CHIP:TOO:       Name: Turn On Room 1
           [1658480059.199473][26178:26183] CHIP:TOO:       Type: 3
           [1658480059.199488][26178:26183] CHIP:TOO:       EndpointListID: 57345
           [1658480059.199505][26178:26183] CHIP:TOO:       SupportedCommands: 1
-          [1658480059.199520][26178:26183] CHIP:TOO:       Status: 0
+          [1658480059.199520][26178:26183] CHIP:TOO:       State: 0
           [1658480059.199534][26178:26183] CHIP:TOO:      }
           [1658480059.199562][26178:26183] CHIP:TOO:     [2]: {
           [1658480059.199578][26178:26183] CHIP:TOO:       ActionID: 4099
@@ -445,7 +453,7 @@ tests:
           [1658480059.199607][26178:26183] CHIP:TOO:       Type: 3
           [1658480059.199622][26178:26183] CHIP:TOO:       EndpointListID: 57347
           [1658480059.199636][26178:26183] CHIP:TOO:       SupportedCommands: 1
-          [1658480059.199651][26178:26183] CHIP:TOO:       Status: 0
+          [1658480059.199651][26178:26183] CHIP:TOO:       State: 0
           [1658480059.199665][26178:26183] CHIP:TOO:      }
       disabled: true
 
@@ -471,14 +479,14 @@ tests:
           Via the TH (chip-tool), verify the ActionList attribute that contains ActionListStructs.
 
           [1658480080.135069][26185:26190] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 198994220
-          [1658480080.135130][26185:26190] CHIP:TOO:   action list: 2 entries
+          [1658480080.135130][26185:26190] CHIP:TOO:   ActionList: 2 entries
           [1658480080.135191][26185:26190] CHIP:TOO:     [1]: {
           [1658480080.135222][26185:26190] CHIP:TOO:       ActionID: 4097
           [1658480080.135238][26185:26190] CHIP:TOO:       Name: Turn On Room 1
           [1658480080.135253][26185:26190] CHIP:TOO:       Type: 3
           [1658480080.135269][26185:26190] CHIP:TOO:       EndpointListID: 57345
           [1658480080.135285][26185:26190] CHIP:TOO:       SupportedCommands: 1
-          [1658480080.135300][26185:26190] CHIP:TOO:       Status: 0
+          [1658480080.135300][26185:26190] CHIP:TOO:       State: 0
           [1658480080.135315][26185:26190] CHIP:TOO:      }
           [1658480080.135342][26185:26190] CHIP:TOO:     [2]: {
           [1658480080.135357][26185:26190] CHIP:TOO:       ActionID: 4099
@@ -486,7 +494,7 @@ tests:
           [1658480080.135386][26185:26190] CHIP:TOO:       Type: 3
           [1658480080.135400][26185:26190] CHIP:TOO:       EndpointListID: 57347
           [1658480080.135415][26185:26190] CHIP:TOO:       SupportedCommands: 1
-          [1658480080.135430][26185:26190] CHIP:TOO:       Status: 0
+          [1658480080.135430][26185:26190] CHIP:TOO:       State: 0
           [1658480080.135443][26185:26190] CHIP:TOO:      }
       disabled: true
 

@@ -85,29 +85,14 @@ tests:
               type: list
               contains: [4]
 
-    #Manufacturer specific event IDs check not possible
-    - label:
-          "Step 5: Read EventList attribute from the DUT.For this cluster the
-          list is usually empty but it can contain manufacturer specific event
-          IDs."
-      verification: |
-          ./chip-tool illuminancemeasurement read event-list 1 1
-
-           On TH(chip-tool), Verify that the DUT response provides a list of supported events. For this cluster the list is usually empty but it can contain manufacturer specific event IDs.
-           [1676460615.124432][26109:26111] CHIP:DMG: }
-           [1676460615.124515][26109:26111] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0400 Attribute 0x0000_FFFA DataVersion: 3234297781
-           [1676460615.124549][26109:26111] CHIP:TOO:   EventList: 0 entries
-           [1676460615.124602][26109:26111] CHIP:EM: <<< [E:27336i S:46366 M:151273397 (Ack:143578317)] (S) Msg TX to 1:0000000000000001 [110F] --- Type 0000:10 (SecureChannel:StandaloneAck)
-           [1676460615.124616][26109:26111] CHIP:IN: (S) Sending msg 151273397 on secure session with LSID: 46366
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Step 5: Read EventList attribute from the DUT."
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
 
     - label: "Step 6: Read the global attribute: AcceptedCommandList"
       command: "readAttribute"

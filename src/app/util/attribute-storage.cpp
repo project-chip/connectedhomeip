@@ -23,6 +23,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <app/util/generic-callbacks.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/LockTracker.h>
@@ -1088,8 +1089,8 @@ chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::Endp
     return emAfEndpoints[endpointIndex].deviceTypeList;
 }
 
-CHIP_ERROR GetTagListFromEndpointAtIndex(EndpointId endpoint, size_t index,
-                                         Clusters::Descriptor::Structs::SemanticTagStruct::Type & tag)
+CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
+                                            Clusters::Descriptor::Structs::SemanticTagStruct::Type & tag)
 {
     uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
 
@@ -1312,7 +1313,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                         // At this point, ptr either points to a default value, or is NULL, in which case
                         // it should be treated as if it is pointing to an array of all zeroes.
 
-#if (BIGENDIAN_CPU)
+#if (CHIP_CONFIG_BIG_ENDIAN_TARGET)
                         // The default values for attributes that are less than or equal to
                         // defaultValueSizeForBigEndianNudger in bytes are stored in an
                         // uint32_t.  On big-endian platforms, a pointer to the default value

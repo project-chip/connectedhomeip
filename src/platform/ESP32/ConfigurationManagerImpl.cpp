@@ -118,6 +118,15 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         err = MapConfigError(esp_err);
         SuccessOrExit(err);
     }
+
+    esp_err = nvs_flash_secure_init_partition(CHIP_DEVICE_CONFIG_CHIP_KVS_NAMESPACE_PARTITION, &cfg);
+    if (esp_err == ESP_ERR_NVS_NO_FREE_PAGES || esp_err == ESP_ERR_NVS_NEW_VERSION_FOUND)
+    {
+        ChipLogError(DeviceLayer, "Failed to initialize NVS partition %s err:0x%02x",
+                     CHIP_DEVICE_CONFIG_CHIP_KVS_NAMESPACE_PARTITION, esp_err);
+        err = MapConfigError(esp_err);
+        SuccessOrExit(err);
+    }
 #else
     // Initialize the nvs partitions,
     // nvs_flash_init_partition() will initialize the partition only if it is not already initialized.

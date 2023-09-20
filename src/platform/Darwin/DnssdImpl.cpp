@@ -131,7 +131,7 @@ std::shared_ptr<uint32_t> GetCounterHolder(const char * name)
 namespace chip {
 namespace Dnssd {
 
-MdnsContexts MdnsContexts::sInstance;
+Global<MdnsContexts> MdnsContexts::sInstance;
 
 namespace {
 
@@ -152,7 +152,7 @@ CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t inte
                     StringOrNullMarker(name), StringOrNullMarker(hostname), port, StringOrNullMarker(type), interfaceId);
 
     RegisterContext * sdCtx = nullptr;
-    if (CHIP_NO_ERROR == MdnsContexts::GetInstance().GetRegisterContextOfType(type, &sdCtx))
+    if (CHIP_NO_ERROR == MdnsContexts::GetInstance().GetRegisterContextOfTypeAndName(type, name, &sdCtx))
     {
         auto err = DNSServiceUpdateRecord(sdCtx->serviceRef, nullptr, kRegisterFlags, record.size(), record.data(), 0 /* ttl */);
         VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));

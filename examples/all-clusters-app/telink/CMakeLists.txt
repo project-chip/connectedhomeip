@@ -15,8 +15,6 @@
 #
 cmake_minimum_required(VERSION 3.13.1)
 
-set(BOARD tlsr9518adk80d)
-
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(TELINK_COMMON ${CHIP_ROOT}/examples/platform/telink REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
@@ -76,9 +74,10 @@ target_sources(app PRIVATE
                ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-temperature-levels.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
-               ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-instances.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp

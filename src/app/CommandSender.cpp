@@ -26,6 +26,7 @@
 #include "InteractionModelEngine.h"
 #include "StatusResponse.h"
 #include <app/TimedRequest.h>
+#include <platform/LockTracker.h>
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
 
@@ -36,7 +37,14 @@ CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager *
                              bool aSuppressResponse) :
     mExchangeCtx(*this),
     mpCallback(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse), mTimedRequest(aIsTimedRequest)
-{}
+{
+    assertChipStackLockedByCurrentThread();
+}
+
+CommandSender::~CommandSender()
+{
+    assertChipStackLockedByCurrentThread();
+}
 
 CHIP_ERROR CommandSender::AllocateBuffer()
 {

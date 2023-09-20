@@ -31,11 +31,8 @@
 #include <credentials/OperationalCertificateStore.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/OperationalKeystore.h>
-#include <lib/core/CHIPPersistentStorageDelegate.h>
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
 #include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/Optional.h>
 #include <lib/core/ScopedNodeId.h>
@@ -712,7 +709,7 @@ public:
      * @param fabricIndex - Existing FabricIndex for which a new keypair must be made available. If it
      *                      doesn't have a value, the key will be marked pending for the next available
      *                      fabric index that would apply for `AddNewFabric`.
-     * @param outputCsr - Buffer to contain the CSR. Must be at least `kMAX_CSR_Length` large.
+     * @param outputCsr - Buffer to contain the CSR. Must be at least `kMIN_CSR_Buffer_Size` large.
      *
      * @retval CHIP_NO_ERROR on success
      * @retval CHIP_ERROR_BUFFER_TOO_SMALL if `outputCsr` buffer is too small

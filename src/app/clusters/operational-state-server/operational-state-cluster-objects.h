@@ -27,10 +27,10 @@ namespace app {
 namespace Clusters {
 namespace OperationalState {
 
-constexpr size_t kOperationalStateLabelMaxSize   = 64u;
-constexpr size_t kOperationalErrorLabelMaxSize   = 64u;
-constexpr size_t kOperationalErrorDetailsMaxSize = 64u;
-constexpr size_t kOperationalPhaseNameMaxSize    = 64u;
+inline constexpr size_t kOperationalStateLabelMaxSize   = 64u;
+inline constexpr size_t kOperationalErrorLabelMaxSize   = 64u;
+inline constexpr size_t kOperationalErrorDetailsMaxSize = 64u;
+inline constexpr size_t kOperationalPhaseNameMaxSize    = 64u;
 
 /**
  * A class which represents the operational state of an Operational State cluster derivation instance.
@@ -138,7 +138,7 @@ struct GenericOperationalError : public app::Clusters::detail::Structs::ErrorSta
         }
     }
 
-    bool IsEqual(const Structs::ErrorStateStruct::Type & rhs)
+    bool IsEqual(const Structs::ErrorStateStruct::Type & rhs) const
     {
         if (errorStateID != rhs.errorStateID)
         {

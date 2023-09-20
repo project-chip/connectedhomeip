@@ -26,6 +26,8 @@ sealed class Value {
   internal abstract fun toType(): Type
 
   internal abstract fun encode(): ByteArray
+
+  open fun toAny(): Any? = null
 }
 
 /** Represents a signed integer value of a TLV element. */
@@ -33,6 +35,8 @@ data class IntValue(val value: Long) : Value() {
   override fun toType() = SignedIntType(signedIntSize(value))
 
   override fun encode() = value.toByteArrayLittleEndian(toType().valueSize)
+
+  override fun toAny() = value
 }
 
 /** Represents an unsigned integer value of a TLV element. */
@@ -40,6 +44,8 @@ data class UnsignedIntValue(val value: Long) : Value() {
   override fun toType() = UnsignedIntType(unsignedIntSize(value.toULong()))
 
   override fun encode() = value.toByteArrayLittleEndian(toType().valueSize)
+
+  override fun toAny() = value
 }
 
 /** Represents a boolean value of a TLV element. */
@@ -47,6 +53,8 @@ data class BooleanValue(val value: Boolean) : Value() {
   override fun toType() = BooleanType(value)
 
   override fun encode() = ByteArray(0)
+
+  override fun toAny() = value
 }
 
 /** Represents a floating-point Float value of a TLV element. */
@@ -54,6 +62,8 @@ data class FloatValue(val value: Float) : Value() {
   override fun toType() = FloatType()
 
   override fun encode() = floatToIntBits(value).toByteArrayLittleEndian(4)
+
+  override fun toAny() = value
 }
 
 /** Represents a floating-point DoubleFloat value of a TLV element. */
@@ -61,6 +71,8 @@ data class DoubleValue(val value: Double) : Value() {
   override fun toType() = DoubleType()
 
   override fun encode() = doubleToLongBits(value).toByteArrayLittleEndian(8)
+
+  override fun toAny() = value
 }
 
 /** Represents a UTF8 string value of a TLV element. */
@@ -69,6 +81,8 @@ data class Utf8StringValue(val value: String) : Value() {
 
   override fun encode() =
     value.toByteArray().size.toByteArrayLittleEndian(toType().lengthSize) + value.toByteArray()
+
+  override fun toAny() = value
 }
 
 /** Represents an octet string value of a TLV element. */
@@ -76,6 +90,8 @@ data class ByteStringValue(val value: ByteArray) : Value() {
   override fun toType() = ByteStringType(unsignedIntSize(value.size.toULong()))
 
   override fun encode() = value.size.toByteArrayLittleEndian(toType().lengthSize) + value
+
+  override fun toAny() = value
 }
 
 /** Represents a null value in a TLV element. */

@@ -207,7 +207,7 @@ bool OTAImageProcessorImpl::IsFirstImageRun()
 CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 {
     PostOTAStateChangeEvent(DeviceLayer::kOtaApplyComplete);
-    return System::MapErrorZephyr(boot_write_img_confirmed());
+    return mImageConfirmed ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & aBlock)

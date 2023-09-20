@@ -64,6 +64,8 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_CONFIG_TRANSPORT_PW_TRACE_ENABLED=${chip_enable_transport_pw_trace}",
     "CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST=${chip_config_minmdns_dynamic_operational_responder_list}",
     "CHIP_CONFIG_MINMDNS_MAX_PARALLEL_RESOLVES=${chip_config_minmdns_max_parallel_resolves}",
+    "CHIP_CONFIG_CANCELABLE_HAS_INFO_STRING_FIELD=${chip_config_cancelable_has_info_string_field}",
+    "CHIP_CONFIG_BIG_ENDIAN_TARGET=${chip_target_is_big_endian}",
   ]
 }
 
@@ -75,6 +77,7 @@ source_set("chip_config_header") {
   public_deps = [
     ":chip_buildconfig",
     "${chip_root}/src/ble:ble_config_header",
+    "${chip_root}/src/inet:inet_config_header",
     "${chip_root}/src/system:system_config_header",
   ]
 

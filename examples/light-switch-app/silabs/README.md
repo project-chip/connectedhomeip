@@ -106,7 +106,7 @@ Silicon Labs platform.
 *   Build the example application:
 
           cd ~/connectedhomeip
-          ./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs/efr32/ ./out/light-switch-app BRD4187C
+          ./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs/ ./out/light-switch-app BRD4187C
 
 -   To delete generated executable, libraries and object files use:
 
@@ -115,7 +115,7 @@ Silicon Labs platform.
 
     OR use GN/Ninja directly
 
-          $ cd ~/connectedhomeip/examples/light-switch-app/silabs/efr32
+          $ cd ~/connectedhomeip/examples/light-switch-app/silabs
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export SILABS_BOARD=BRD4187C
@@ -124,16 +124,16 @@ Silicon Labs platform.
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/light-switch-app/silabs/efr32
+          $ cd ~/connectedhomeip/examples/light-switch-app/silabs
           $ rm -rf out/
 
 *   Build the example with Matter shell
 
-          ./scripts/examples/gn_silabs_example.sh examples/light-switch-app/silabs/efr32/ out/light-switch-app BRD4187C chip_build_libshell=true
+          ./scripts/examples/gn_silabs_example.sh examples/light-switch-app/silabs/ out/light-switch-app BRD4187C chip_build_libshell=true
 
 *   Build the example as Intermittently Connected Device (ICD)
 
-          $ ./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs/efr32/ ./out/light-switch-app_ICD BRD4187C --icd
+          $ ./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs/ ./out/light-switch-app_ICD BRD4187C --icd
 
     or use gn as previously mentioned but adding the following arguments:
 
@@ -141,11 +141,11 @@ Silicon Labs platform.
 
 *   Build the example with pigweed RCP
 
-          $ ./scripts/examples/gn_silabs_example.sh examples/light-switch-app/silabs/efr32/ out/light-switch-app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
+          $ ./scripts/examples/gn_silabs_example.sh examples/light-switch-app/silabs/ out/light-switch-app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
 
     or use GN/Ninja Directly
 
-          $ cd ~/connectedhomeip/examples/light-switch-app/silabs/efr32
+          $ cd ~/connectedhomeip/examples/light-switch-app/silabs
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export SILABS_BOARD=BRD4187C
@@ -161,7 +161,7 @@ arguments
 
 -   On the command line:
 
-          $ cd ~/connectedhomeip/examples/light-switch-app/silabs/efr32
+          $ cd ~/connectedhomeip/examples/light-switch-app/silabs
           $ python3 out/debug/matter-silabs-light-switch-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
@@ -172,7 +172,6 @@ Releases page on
 [Silabs Matter Github](https://github.com/SiliconLabs/matter/releases).
 
 -   On the command line:
-
 
           $ commander flash bootloader_binaries/bootloader-storage-internal-single-512k-BRD4187C-gsdk4.1.s37
 
@@ -216,11 +215,9 @@ combination with JLinkRTTClient as follows:
 
           $ JLinkExe -device EFR32MG12PXXXF1024 -if JTAG -speed 4000 -autoconnect 1
 
-
     For MG21 use:
 
           $ JLinkExe -device EFR32MG21AXXXF1024 -if SWD -speed 4000 -autoconnect 1
-
 
     For MG24 use:
 
@@ -315,7 +312,7 @@ combination with JLinkRTTClient as follows:
     ```
     chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
 
-    chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [<chip-tool-node-id>], "targets": null }{"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": null }]' <lighting-node-id> 0
+    chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [<chip-tool-node-id>], "targets": null },{"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": null }]' <lighting-node-id> 0
 
     chip-tool binding write binding '[{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster":6}]' 1 1
     ```
@@ -402,7 +399,7 @@ To track memory usage you can set `enable_heap_monitoring = true` either in the
 BUILD.gn file or pass it as a build argument to gn. This will print on the RTT
 console the RAM usage of each individual task and the number of Memory
 allocation and Free. While this is not extensive monitoring you're welcome to
-modify `examples/platform/silabs/efr32/MemMonitoring.cpp` to add your own memory
+modify `examples/platform/silabs/MemMonitoring.cpp` to add your own memory
 tracking code inside the `trackAlloc` and `trackFree` function
 
 ## OTA Software Update
@@ -421,19 +418,19 @@ features can easily be toggled on or off. Here is a short list of options :
 
 chip_progress_logging, chip_detail_logging, chip_automation_logging
 
-    $ ./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs/efr32 ./out/light-switch-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs ./out/light-switch-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
 
 ### Debug build / release build
 
 is_debug
 
-    $ ./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs/efr32 ./out/light-switch-app BRD4164A "is_debug=false"
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs ./out/light-switch-app BRD4164A "is_debug=false"
 
 ### Disabling LCD
 
 show_qr_code
 
-    $ ./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs/efr32 ./out/light-switch-app BRD4164A "show_qr_code=false"
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs ./out/light-switch-app BRD4164A "show_qr_code=false"
 
 ### KVS maximum entry count
 
@@ -442,4 +439,4 @@ kvs_max_entries
     Set the maximum Kvs entries that can be stored in NVM (Default 75)
     Thresholds: 30 <= kvs_max_entries <= 255
 
-    $ ./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs/efr32 ./out/light-switch-app BRD4164A kvs_max_entries=50
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs ./out/light-switch-app BRD4164A kvs_max_entries=50

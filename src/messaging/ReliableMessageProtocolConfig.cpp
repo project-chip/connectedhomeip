@@ -76,16 +76,6 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
     config.mIdleRetransTimeout += app::ICDManager::GetSlowPollingInterval();
     config.mActiveRetransTimeout += app::ICDManager::GetFastPollingInterval();
     config.mActiveThresholdTime = System::Clock::Milliseconds16(IcdManagementServer::GetInstance().GetActiveModeThreshold());
-#elif CHIP_DEVICE_CONFIG_ENABLE_SED
-    DeviceLayer::ConnectivityManager::SEDIntervalsConfig sedIntervalsConfig;
-
-    if (DeviceLayer::ConnectivityMgr().GetSEDIntervalsConfig(sedIntervalsConfig) == CHIP_NO_ERROR)
-    {
-        // Increase local MRP retry intervals by SED intervals. That is, intervals for
-        // which the device can be at sleep and not be able to receive any messages).
-        config.mIdleRetransTimeout += sedIntervalsConfig.IdleIntervalMS;
-        config.mActiveRetransTimeout += sedIntervalsConfig.ActiveIntervalMS;
-    }
 #endif
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST

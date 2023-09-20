@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -33,10 +33,9 @@
   ],
   "endpointTypes": [
     {
-      "id": 2,
+      "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 3,
         "code": 17,
         "profileId": 259,
         "label": "MA-powersource",
@@ -44,23 +43,17 @@
       },
       "deviceTypes": [
         {
-          "id": 3,
           "code": 17,
           "profileId": 259,
           "label": "MA-powersource",
           "name": "MA-powersource"
         },
         {
-          "id": 2,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        3,
-        2
       ],
       "deviceVersions": [
         1,
@@ -9777,10 +9770,9 @@
       ]
     },
     {
-      "id": 3,
+      "id": 2,
       "name": "MA-onofflight",
       "deviceTypeRef": {
-        "id": 8,
         "code": 256,
         "profileId": 259,
         "label": "MA-onofflight",
@@ -9788,23 +9780,17 @@
       },
       "deviceTypes": [
         {
-          "id": 8,
           "code": 256,
           "profileId": 259,
           "label": "MA-onofflight",
           "name": "MA-onofflight"
         },
         {
-          "id": 3,
           "code": 17,
           "profileId": 259,
           "label": "MA-powersource",
           "name": "MA-powersource"
         }
-      ],
-      "deviceTypeRefs": [
-        8,
-        3
       ],
       "deviceVersions": [
         1,
@@ -14067,7 +14053,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "2",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -14253,7 +14239,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "2",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -22502,10 +22488,9 @@
       ]
     },
     {
-      "id": 1,
+      "id": 3,
       "name": "MA-onofflight",
       "deviceTypeRef": {
-        "id": 8,
         "code": 256,
         "profileId": 259,
         "label": "MA-onofflight",
@@ -22513,23 +22498,17 @@
       },
       "deviceTypes": [
         {
-          "id": 8,
           "code": 256,
           "profileId": 259,
           "label": "MA-onofflight",
           "name": "MA-onofflight"
         },
         {
-          "id": 3,
           "code": 17,
           "profileId": 259,
           "label": "MA-powersource",
           "name": "MA-powersource"
         }
-      ],
-      "deviceTypeRefs": [
-        8,
-        3
       ],
       "deviceVersions": [
         1,
@@ -26789,7 +26768,6 @@
       "id": 4,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
-        "id": 53,
         "code": 61442,
         "profileId": 259,
         "label": "MA-secondary-network-commissioning",
@@ -26797,15 +26775,11 @@
       },
       "deviceTypes": [
         {
-          "id": 53,
           "code": 61442,
           "profileId": 259,
           "label": "MA-secondary-network-commissioning",
           "name": "MA-secondary-network-commissioning"
         }
-      ],
-      "deviceTypeRefs": [
-        53
       ],
       "deviceVersions": [
         1
@@ -27317,6 +27291,5 @@
       "endpointId": 65534,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

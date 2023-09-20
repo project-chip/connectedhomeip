@@ -40,7 +40,7 @@
 #include <controller/CHIPCommissionableNodeController.h>
 #include <functional>
 
-constexpr chip::System::Clock::Seconds16 kCommissioningWindowTimeout = chip::System::Clock::Seconds16(3 * 60);
+inline constexpr chip::System::Clock::Seconds16 kCommissioningWindowTimeout = chip::System::Clock::Seconds16(3 * 60);
 
 /**
  * @brief Represents a TV Casting server that can get the casting app commissioned

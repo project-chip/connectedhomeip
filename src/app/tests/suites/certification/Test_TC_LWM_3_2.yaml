@@ -16,7 +16,7 @@
 name: 183.3.2. [TC-LWM-3.2] Startup Mode functionality with DUT as Server
 
 PICS:
-    - LWM.S
+    - LWM.S.A0002
 
 config:
     nodeId: 0x12344321
@@ -24,6 +24,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          !LWM.S.F00(DEPONOFF) | OnOff cluster’s StartUpOnOff attribute is NULL | StartUpOnOff is 0 | OnMode is NULL
+      disabled: true
+
     - label: "Note"
       verification: |
           To Execute the TC-LWM-3.2 test case using reboot in raspi device we followed the below suggested way:
@@ -51,6 +56,8 @@ tests:
 
           On TH(chip-tool), Verify StartUpMode attribute value is an integer or null
           - Save the value as startup_mode_dut and below is the sample log provided for the raspi platform, Here StartUpMode value is null
+
+          NOTE: if startup_mode_dut is null proceed to step 3. Else save startup_mode_dut as new_start_up_mode_th and proceed to step 5.
 
           [1690185689.626227][15652:15654] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0051 Attribute 0x0000_0002 DataVersion: 869931348
           [1690185689.626269][15652:15654] CHIP:TOO:   StartUpMode: null
@@ -124,6 +131,13 @@ tests:
           [1690185636.156870][15647:15649] CHIP:DMG:                         {
           [1690185636.156881][15647:15649] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1690185636.156892][15647:15649] CHIP:DMG:                         },
+
+          ./chip-tool laundrywashermode read start-up-mode 1 1
+
+          On TH(chip-tool), Verify StartUpMode attribute value is 0 and below is the sample log provided for the raspi platform
+
+          [1692168304.773793][2920:2922] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0051 Attribute 0x0000_0002 DataVersion: 3179897959
+          [1692168304.773865][2920:2922] CHIP:TOO:   StartUpMode: 0
       disabled: true
 
     - label: "Step 5: TH reads from the DUT the CurrentMode attribute."
@@ -132,7 +146,7 @@ tests:
           ./chip-tool laundrywashermode read current-mode 1 1
 
           On TH(chip-tool), Verify CurrentMode attribute value is an integer,
-          - Save the value as old_current_mode_dut and below is the sample log provided for the raspi platform:
+          - Save the value as old_current_mode_dut and below is the sample log provided for the raspi platform, Here CurrentMode value is 0
 
           NOTE: If startup_mode_dut is equal to old_current_mode_dut proceed to step 6. Else proceed to step 8.
 

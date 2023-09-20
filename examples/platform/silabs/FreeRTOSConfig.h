@@ -181,7 +181,12 @@ to all Cortex-M ports, and do not rely on any particular library functions. */
 #define configKERNEL_INTERRUPT_PRIORITY (255)
 /* !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
+#ifdef SIWX_917
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY 20
+#else
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY 48
+#endif // SIWX_917
+
 #define configENABLE_FPU 0
 #define configENABLE_MPU 0
 /* FreeRTOS Secure Side Only and TrustZone Security Extension */
@@ -218,18 +223,24 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configSUPPORT_STATIC_ALLOCATION (1)
 #define configSUPPORT_DYNAMIC_ALLOCATION (1)
 
+#ifdef PW_RPC_ENABLED
+#define EXTRA_HEAP_k 10
+#else
+#define EXTRA_HEAP_k 0
+#endif
+
 #ifndef configTOTAL_HEAP_SIZE
 #ifdef SL_WIFI
 #ifdef DIC_ENABLE
-#define configTOTAL_HEAP_SIZE ((size_t)(68 * 1024))
+#define configTOTAL_HEAP_SIZE ((size_t)((68 + EXTRA_HEAP_k) * 1024))
 #else
-#define configTOTAL_HEAP_SIZE ((size_t)(42 * 1024))
+#define configTOTAL_HEAP_SIZE ((size_t)((42 + EXTRA_HEAP_k) * 1024))
 #endif // DIC
 #else  // SL_WIFI
 #if SL_CONFIG_OPENTHREAD_LIB == 1
-#define configTOTAL_HEAP_SIZE ((size_t)(31 * 1024))
+#define configTOTAL_HEAP_SIZE ((size_t)((40 + EXTRA_HEAP_k) * 1024))
 #else
-#define configTOTAL_HEAP_SIZE ((size_t)(29 * 1024))
+#define configTOTAL_HEAP_SIZE ((size_t)((38 + EXTRA_HEAP_k) * 1024))
 #endif // SL_CONFIG_OPENTHREAD_LIB
 #endif // configTOTAL_HEAP_SIZE
 #endif // configTOTAL_HEAP_SIZE
@@ -280,9 +291,19 @@ standard names. */
 #define SysTick_Handler xPortSysTickHandler
 
 /* Thread local storage pointers used by the SDK */
+#ifdef PERFORMANCE_TEST_ENABLED
+// ot_debug_channel component uses thread-local storage
+#define configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS 2
+#ifndef configNUM_USER_THREAD_LOCAL_STORAGE_POINTERS
+#define configNUM_USER_THREAD_LOCAL_STORAGE_POINTERS 0
+#define configNUM_THREAD_LOCAL_STORAGE_POINTERS                                                                                    \
+    (configNUM_USER_THREAD_LOCAL_STORAGE_POINTERS + configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS)
+#endif
+#else /* PERFORMANCE_TEST_ENABLED */
 #ifndef configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS
 #define configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS 0
 #endif
+#endif /* PERFORMANCE_TEST_ENABLED */
 
 #if defined(__GNUC__)
 /* For the linker. */

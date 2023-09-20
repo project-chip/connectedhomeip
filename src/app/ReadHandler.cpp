@@ -899,6 +899,16 @@ void ReadHandler::HandleDeviceConnected(void * context, Messaging::ExchangeManag
 
     _this->mSessionHandle.Grab(sessionHandle);
 
+    _this->SetStateFlag(ReadHandlerFlags::ActiveSubscription);
+
+    auto * appCallback = _this->mManagementCallback.GetAppCallback();
+    if (appCallback)
+    {
+        appCallback->OnSubscriptionEstablished(*_this);
+    }
+    // Notify the observer that a subscription has been resumed
+    _this->mObserver->OnSubscriptionEstablished(_this);
+
     _this->MoveToState(HandlerState::CanStartReporting);
 
     ObjectList<AttributePathParams> * attributePath = _this->mpAttributePathList;

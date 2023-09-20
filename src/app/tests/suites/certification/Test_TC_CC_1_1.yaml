@@ -31,25 +31,13 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Issue: https://github.com/project-chip/connectedhomeip/issues/26598
     - label: "Step 2: read the global attribute: ClusterRevision"
-      verification: |
-          ./chip-tool colorcontrol read cluster-revision 1 1
-
-          Verify "ClusterRevision" value is of unit16 and reflects the highest revision number, in RPI the value of ClusterRevision is 6 on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
-
-          [1649660967.485745][7940:7945] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_FFFD DataVersion: 4087274515
-          [1649660967.485839][7940:7945] CHIP:TOO:   ClusterRevision:5
-          [1649660967.485946][7940:7945] CHIP:EM: Sending Standalone Ack for MessageCounter:1573389 on exchange 13361i
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 6
+          constraints:
+              type: int16u
 
     - label: "Step 3a: Read the global attribute: FeatureMap"
       PICS: ( !CC.S.F00 && !CC.S.F01 && !CC.S.F02 && !CC.S.F03 && !CC.S.F04 )

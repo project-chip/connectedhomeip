@@ -90,7 +90,11 @@ template("ti_sysconfig") {
         "-fno-exceptions",
         "-fno-unwind-tables",
       ]
-      defines += [ "DeviceFamily_CC13X4" ]
+      if (ti_simplelink_device == "") {
+        defines += [ "DeviceFamily_CC13X4" ]
+      } else {
+        defines += [ "DeviceFamily_CC26X4" ]
+      }
     } else if (ti_simplelink_device_family == "cc32xx") {
       ldflags += [ "-nostartfiles" ]
       defines += [ "CC32XXWARE" ]
@@ -108,20 +112,37 @@ template("ti_sysconfig") {
     sources = invoker.sources
     outputs = gen_outputs
 
-    args = [
-      ti_sysconfig_root,
-      "-s",
-      rebase_path(ti_simplelink_sdk_root + "/.metadata/product.json",
-                  root_build_dir),
-      "-o",
-      rebase_path(output_dir, root_build_dir),
-      "--compiler",
-      "gcc",
-      "--board",
-      "/ti/boards/" + ti_simplelink_board,
-      "--rtos",
-      "freertos",
-    ]
+    if (ti_simplelink_device == "") {
+      args = [
+        ti_sysconfig_root,
+        "-s",
+        rebase_path(ti_simplelink_sdk_root + "/.metadata/product.json",
+                    root_build_dir),
+        "-o",
+        rebase_path(output_dir, root_build_dir),
+        "--compiler",
+        "gcc",
+        "--board",
+        "/ti/boards/" + ti_simplelink_board,
+        "--rtos",
+        "freertos",
+      ]
+    } else {
+      args = [
+        ti_sysconfig_root,
+        "-s",
+        rebase_path(ti_simplelink_sdk_root + "/.metadata/product.json",
+                    root_build_dir),
+        "-o",
+        rebase_path(output_dir, root_build_dir),
+        "--compiler",
+        "gcc",
+        "--device",
+        ti_simplelink_device,
+        "--rtos",
+        "freertos",
+      ]
+    }
 
     foreach(source, sources) {
       args += [ rebase_path(source, root_build_dir) ]
@@ -205,7 +226,17 @@ template("ti_simplelink_sdk") {
       defines += [ "DeviceFamily_CC13X2X7_CC26X2X7" ]
       libs += [ "${ti_simplelink_sdk_root}/source/ti/devices/cc13x2x7_cc26x2x7/driverlib/bin/gcc/driverlib.lib" ]
     } else if (ti_simplelink_device_family == "cc13x4_26x4") {
-      defines += [ "DeviceFamily_CC13X4" ]
+      if (ti_simplelink_device == "") {
+        defines += [ "DeviceFamily_CC13X4" ]
+      } else {
+        defines += [ "DeviceFamily_CC26X4" ]
+      }
+      if (ti_simplelink_board == "LP_EM_CC1354P10_1" ||
+          (ti_simplelink_board == "CC2674" &&
+           ti_simplelink_device == "CC2674R10RGZ")) {
+        defines += [ "EM_CC1354P10_1_LP" ]
+      }
+      defines += [ "FLASH_ONLY_BUILD" ]
       libs += [ "${ti_simplelink_sdk_root}/source/ti/devices/cc13x4_cc26x4/driverlib/bin/gcc/driverlib.lib" ]
     }
 
@@ -247,6 +278,7 @@ template("ti_simplelink_sdk") {
         "${ti_simplelink_sdk_root}/kernel/freertos/dpl/PowerCC26X2_freertos.c",
         "${ti_simplelink_sdk_root}/kernel/freertos/dpl/TimerPCC26XX_freertos.c",
         "${ti_simplelink_sdk_root}/kernel/freertos/startup/startup_cc13x2_cc26x2_gcc.c",
+        "${ti_simplelink_sdk_root}/source/ti/drivers/sha2/SHA2CC26X2.c",
       ]
     } else if (ti_simplelink_device_family == "cc13x4_26x4") {
       sources += [
@@ -255,6 +287,7 @@ template("ti_simplelink_sdk") {
         "${ti_simplelink_sdk_root}/kernel/freertos/dpl/PowerCC26X2_freertos.c",
         "${ti_simplelink_sdk_root}/kernel/freertos/dpl/TimerPCC26XX_freertos.c",
         "${ti_simplelink_sdk_root}/kernel/freertos/startup/startup_cc13x4_cc26x4_gcc.c",
+        "${ti_simplelink_sdk_root}/source/ti/drivers/sha2/SHA2CC26X2.c",
       ]
     } else if (ti_simplelink_device_family == "cc32xx") {
       sources += [
@@ -437,11 +470,23 @@ template("ti_simplelink_sdk") {
         "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/freertos/",
       ]
     } else if (ti_simplelink_device_family == "cc13x4_26x4") {
-      libs += [
-        "${ti_simplelink_sdk_root}/source/ti/dmm/lib/gcc/m4f/libdmmlib_freertos.a",
-        "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_6/OneLib.a",
-        "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_6/StackWrapper.a",
-      ]
+      libs += [ "${ti_simplelink_sdk_root}/source/ti/dmm/lib/gcc/m4f/libdmmlib_freertos.a" ]
+      if (ti_simplelink_board == "LP_EM_CC1354P10_1" ||
+          (ti_simplelink_board == "CC2674" &&
+           ti_simplelink_device == "CC2674R10RGZ")) {
+        libs += [
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_1/OneLib.a",
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_1/StackWrapper.a",
+        ]
+      } else if (ti_simplelink_board == "LP_EM_CC1354P10_6" ||
+                 (ti_simplelink_board == "CC2674" &&
+                  ti_simplelink_device == "CC2674P10RGZ")) {
+        libs += [
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_6/OneLib.a",
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_6/StackWrapper.a",
+        ]
+      }
+
       defines += [
         "ONE_BLE_LIB_SIZE_OPTIMIZATION",
         "NVOCMP_NVPAGES=3",

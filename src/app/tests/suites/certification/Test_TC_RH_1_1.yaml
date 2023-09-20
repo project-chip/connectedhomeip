@@ -90,24 +90,11 @@ tests:
           constraints:
               type: list
 
-    #Manufacturer specific event IDs check not possible
-    - label:
-          "Step 7: Read EventList attribute from the DUT.For this cluster the
-          list is usually empty but it can contain manufacturer specific event
-          IDs."
-      verification: |
-          ./chip-tool relativehumiditymeasurement read event-list 1 1
-
-            Verify " EventList " consists the list of supported events, in this cluster in RPI the value is 0 on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
-            [1676357956.011759][8095:8097] CHIP:DMG: }
-            [1676357956.011914][8095:8097] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0405 Attribute 0x0000_FFFA DataVersion: 3619476420
-            [1676357956.011967][8095:8097] CHIP:TOO:   EventList: 0 entries
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Step 7: Read the global attribute: EventList"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list

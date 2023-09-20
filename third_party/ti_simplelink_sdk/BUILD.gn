@@ -76,6 +76,15 @@ mbedtls_target("mbedtls") {
       "${chip_root}/src/platform/cc13xx_26xx/cc13x2_26x2/crypto/sha256_alt.c",
     ]
   }
+  if (ti_simplelink_device_family == "cc13x4_26x4") {
+    sources = [
+      "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/crypto/aes_alt.c",
+      "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/crypto/ecdh_alt.c",
+      "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/crypto/ecdsa_alt.c",
+      "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/crypto/ecjpake_alt.c",
+      "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/crypto/sha256_alt.c",
+    ]
+  }
 
   public_configs = [ ":ti_simplelink_mbedtls_config" ]
 

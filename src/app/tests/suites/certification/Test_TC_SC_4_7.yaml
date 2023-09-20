@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 15.4.7. [TC-SC-4.7] Commissioner Discovery [DUT as Commissionee]
+name: 3.4.7.[TC-SC-4.7] Commissioner Discovery [DUT as Commissionee]
 
 PICS:
     - MCORE.ROLE.COMMISSIONEE
@@ -25,6 +25,12 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Precondition"
+      verification: |
+          1. DUT is connected to the IP network
+          2. DUT and TH support Commissioner Discovery
+      disabled: true
+
     - label:
           "Step 1: TH is instructed to start advertising its presence as a
           commissioner in the network"

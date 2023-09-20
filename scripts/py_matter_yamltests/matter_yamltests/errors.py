@@ -210,3 +210,15 @@ class TestStepArgumentsValueError(TestStepError):
         self.tag_key_with_error(content, 'command')
         arguments = content.get('arguments')
         self.tag_key_with_error(arguments, 'value')
+
+
+class TestStepSaveAsNameError(TestStepError):
+    """Raise when a test step response save an attribute response with the same name than the attribute itself"""
+
+    def __init__(self, content):
+        message = 'The "saveAs" key can not be the same than the "attribute" key'
+        super().__init__(message)
+
+        self.tag_key_with_error(content, 'attribute')
+        response = content.get('response')
+        self.tag_key_with_error(response, 'saveAs')

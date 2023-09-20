@@ -99,7 +99,7 @@ tests:
     - label:
           "Step 5: Manually put the device in a state from which it will FAIL to
           transition to PIXIT.TCCM.MODE_CHANGE_FAIL"
-      PICS: PIXIT.TCCM.CAN_TEST_MODE_FAILURE
+      PICS: TCCM.S.M.CAN_TEST_MODE_FAILURE
       verification: |
           Manual operation required
       disabled: true
@@ -119,7 +119,7 @@ tests:
     - label:
           "Step 7: TH sends a ChangeToMode command to the DUT with NewMode set
           to PIXIT.TCCM.MODE_CHANGE_FAIL"
-      PICS: PIXIT.TCCM.CAN_TEST_MODE_FAILURE && TCCM.S.C00.Rsp
+      PICS: TCCM.S.M.CAN_TEST_MODE_FAILURE && TCCM.S.C00.Rsp
       verification: |
           Note : Please skip this step as SDK is not enabled with this failure response
 

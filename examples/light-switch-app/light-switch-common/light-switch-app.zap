@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -36,7 +36,6 @@
       "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 2,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 2,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        2
       ],
       "deviceVersions": [
         1
@@ -6092,10 +6087,9 @@
       ]
     },
     {
-      "id": 3,
+      "id": 2,
       "name": "MA-onofflightswitch",
       "deviceTypeRef": {
-        "id": 15,
         "code": 259,
         "profileId": 259,
         "label": "MA-onofflightswitch",
@@ -6103,15 +6097,11 @@
       },
       "deviceTypes": [
         {
-          "id": 15,
           "code": 259,
           "profileId": 259,
           "label": "MA-onofflightswitch",
           "name": "MA-onofflightswitch"
         }
-      ],
-      "deviceTypeRefs": [
-        15
       ],
       "deviceVersions": [
         1
@@ -8766,10 +8756,9 @@
       ]
     },
     {
-      "id": 2,
+      "id": 3,
       "name": "MA-genericswitch",
       "deviceTypeRef": {
-        "id": 20,
         "code": 15,
         "profileId": 259,
         "label": "MA-genericswitch",
@@ -8777,15 +8766,11 @@
       },
       "deviceTypes": [
         {
-          "id": 20,
           "code": 15,
           "profileId": 259,
           "label": "MA-genericswitch",
           "name": "MA-genericswitch"
         }
-      ],
-      "deviceTypeRefs": [
-        20
       ],
       "deviceVersions": [
         1
@@ -10105,6 +10090,5 @@
       "endpointId": 2,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

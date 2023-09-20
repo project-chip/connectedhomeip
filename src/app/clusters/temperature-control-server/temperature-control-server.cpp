@@ -172,7 +172,13 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
             emberAfStatus = TemperatureSetpoint::Set(endpoint, targetTemperature.Value());
             if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
             {
-                status = app::ToInteractionModelStatus(emberAfStatus);
+                /**
+                 * If the server is unable to execute the command at the time the command is received
+                 * by the server (e.g. due to the design of a device it cannot accept a change in its
+                 * temperature setting after it has begun operation), then the server SHALL respond
+                 * with a status code of INVALID_IN_STATE, and discard the command.
+                 **/
+                status = Status::InvalidInState;
             }
         }
         else
@@ -200,7 +206,13 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
                 emberAfStatus = SelectedTemperatureLevel::Set(endpoint, targetTemperatureLevel.Value());
                 if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
                 {
-                    status = app::ToInteractionModelStatus(emberAfStatus);
+                    /**
+                     * If the server is unable to execute the command at the time the command is received
+                     * by the server (e.g. due to the design of a device it cannot accept a change in its
+                     * temperature setting after it has begun operation), then the server SHALL respond
+                     * with a status code of INVALID_IN_STATE, and discard the command.
+                     **/
+                    status = Status::InvalidInState;
                 }
             }
             else

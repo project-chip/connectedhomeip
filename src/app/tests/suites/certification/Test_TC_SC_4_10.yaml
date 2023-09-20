@@ -19,7 +19,7 @@ name:
 
 PICS:
     - MCORE.ROLE.COMMISSIONEE
-    - MCORE.SC.SIT_ICD
+    - MCORE.SC.SED
 
 config:
     nodeId: 0x12344321
@@ -27,15 +27,24 @@ config:
     endpoint: 0
 
 tests:
-    - label: "DUT is instructed to advertise its service"
+    - label: "Precondition"
+      verification: |
+          1. Nodes are joined in the same Fabric
+          2. DUT is a sleepy device (MCORE.SC.SED)
+      disabled: true
+
+    - label: "Step 1: DUT is instructed to advertise its service"
       verification: |
           1. Provision the DUT by TH (Chip-tool)
       disabled: true
 
-    - label: "TH scans for DNS-SD advertising"
+    - label: "Step 2: TH scans for DNS-SD advertising"
       verification: |
           avahi-browse -rt _matter._tcp
-          Verify on the TH(Chip-tool) Log:
+          On the TH(Chip-tool) Log: Verify the DUT is advertising for:
+          -SII key is higher than the SLEEPY_IDLE_INTERVAL default value (> 300 milliseconds)
+          - SII key and SAI key is less than 3600000 (1hour in milliseconds)
+
           +   eth0 IPv6 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
           +   eth0 IPv4 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
           =   eth0 IPv4 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
@@ -48,7 +57,4 @@ tests:
              address = [fd11:22::4b31:9932:cffe:b41a]
              port = [5540]
              txt = ["T=0" "SAI=300" "SII=5000"]
-
-           - SII key is higher than the SESSION_IDLE_INTERVAL default value (> 300 milliseconds)
-           - SII key and SAI key is less than 3600000 (1hour in milliseconds)
       disabled: true

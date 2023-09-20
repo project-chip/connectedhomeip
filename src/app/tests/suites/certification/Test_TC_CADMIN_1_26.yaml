@@ -17,6 +17,10 @@ name:
     36.1.26. [TC-CADMIN-1.26] Subscription to the attributes - verify
     subscription response [BCM] [DUT - Commissionee]
 
+PICS:
+    - CADMIN.S
+    - CADMIN.S.F00
+
 config:
     nodeId: 0x12344321
     cluster: "Basic Information"
@@ -1967,7 +1971,7 @@ tests:
 
           administratorcommissioning read window-status 1 0 --commissioner-name alpha
 
-          Verify TH_CR1 logs for windowstatus to be 1
+          Verify TH_CR1 logs for windowstatus to be 2
 
 
           ReportDataMessage =
