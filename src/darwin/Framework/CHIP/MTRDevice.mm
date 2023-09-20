@@ -187,6 +187,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 @end
 
+@protocol MTRDeviceUnitTestDelegate <MTRDeviceDelegate>
+- (void)unitTestReportEndForDevice:(MTRDevice *)device;
+@end
+
 @implementation MTRDevice
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -429,6 +433,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_lock(&self->_lock);
     _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
+// For unit testing only
+#ifdef DEBUG
+    id delegate = _weakDelegate.strongObject;
+    if (delegate && [delegate respondsToSelector:@selector(unitTestReportEndForDevice:)]) {
+        dispatch_async(_delegateQueue, ^{
+            [delegate unitTestReportEndForDevice:self];
+        });
+    }
+#endif
     os_unfair_lock_unlock(&self->_lock);
 }
 
@@ -1527,24 +1540,27 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
     }
 
     MTREventPath * eventPath = [[MTREventPath alloc] initWithPath:aEventHeader.mPath];
-    NSDictionary * eventReport;
     if (apStatus != nullptr) {
         [mEventReports addObject:@ { MTREventPathKey : eventPath, MTRErrorKey : [MTRError errorForIMStatus:*apStatus] }];
     } else if (apData == nullptr) {
-        eventReport = @ { MTREventPathKey : eventPath, MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT] };
+        [mEventReports addObject:@ {
+            MTREventPathKey : eventPath,
+            MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]
+        }];
     } else {
         id value = MTRDecodeDataValueDictionaryFromCHIPTLV(apData);
         if (value == nil) {
             MTR_LOG_ERROR("Failed to decode event data for path %@", eventPath);
-            eventReport = @ {
+            [mEventReports addObject:@ {
                 MTREventPathKey : eventPath,
                 MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_DECODE_FAILED],
-            };
+            }];
         } else {
-            eventReport = [MTRBaseDevice eventReportForHeader:aEventHeader andData:value];
+            [mEventReports addObject:[MTRBaseDevice eventReportForHeader:aEventHeader andData:value]];
         }
     }
-    ReportEvents(@[ eventReport ]);
+
+    QueueInterimReport();
 }
 
 void SubscriptionCallback::OnAttributeData(
@@ -1562,25 +1578,26 @@ void SubscriptionCallback::OnAttributeData(
     }
 
     MTRAttributePath * attributePath = [[MTRAttributePath alloc] initWithPath:aPath];
-    NSDictionary * attributeReport;
     if (aStatus.mStatus != Status::Success) {
-        attributeReport = @ { MTRAttributePathKey : attributePath, MTRErrorKey : [MTRError errorForIMStatus:aStatus] };
+        [mAttributeReports addObject:@ { MTRAttributePathKey : attributePath, MTRErrorKey : [MTRError errorForIMStatus:aStatus] }];
     } else if (apData == nullptr) {
-        attributeReport =
-            @ { MTRAttributePathKey : attributePath, MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT] };
+        [mAttributeReports addObject:@ {
+            MTRAttributePathKey : attributePath,
+            MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]
+        }];
     } else {
         id value = MTRDecodeDataValueDictionaryFromCHIPTLV(apData);
         if (value == nil) {
             MTR_LOG_ERROR("Failed to decode attribute data for path %@", attributePath);
-            attributeReport = @ {
+            [mAttributeReports addObject:@ {
                 MTRAttributePathKey : attributePath,
                 MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_DECODE_FAILED],
-            };
+            }];
         } else {
-            attributeReport = @ { MTRAttributePathKey : attributePath, MTRDataKey : value };
+            [mAttributeReports addObject:@ { MTRAttributePathKey : attributePath, MTRDataKey : value }];
         }
     }
 
-    ReportAttributes(@[ attributeReport ]);
+    QueueInterimReport();
 }
 } // anonymous namespace

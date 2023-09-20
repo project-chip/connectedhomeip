@@ -37,32 +37,55 @@ void MTRBaseSubscriptionCallback::ReportData()
 {
     __block NSArray * attributeReports = mAttributeReports;
     mAttributeReports = nil;
+    auto attributeCallback = mAttributeReportCallback;
 
     __block NSArray * eventReports = mEventReports;
     mEventReports = nil;
+    auto eventCallback = mEventReportCallback;
 
-    ReportAttributes(attributeReports);
-    ReportEvents(eventReports);
-}
-
-void MTRBaseSubscriptionCallback::ReportAttributes(NSArray * attributeReports)
-{
-    auto attributeCallback = mAttributeReportCallback;
     if (attributeCallback != nil && attributeReports.count) {
         attributeCallback(attributeReports);
     }
-}
 
-void MTRBaseSubscriptionCallback::ReportEvents(NSArray * eventReports)
-{
-    auto eventCallback = mEventReportCallback;
     if (eventCallback != nil && eventReports.count) {
         eventCallback(eventReports);
     }
 }
 
+void MTRBaseSubscriptionCallback::QueueInterimReport()
+{
+    if (mInterimReportBlock) {
+        return;
+    }
+
+    //    __block auto * myself = this;
+    mInterimReportBlock = dispatch_block_create(DISPATCH_BLOCK_INHERIT_QOS_CLASS, ^{
+        mInterimReportBlock = nil;
+        ReportData();
+        // Allocate reports arrays to continue accumulation
+        mAttributeReports = [NSMutableArray new];
+        mEventReports = [NSMutableArray new];
+        //            myself->ReportCurrentData();
+    });
+
+    dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), mInterimReportBlock);
+}
+
+void MTRBaseSubscriptionCallback::ReportCurrentData()
+{
+    mInterimReportBlock = nil;
+    ReportData();
+    // Allocate reports arrays to continue accumulation
+    mAttributeReports = [NSMutableArray new];
+    mEventReports = [NSMutableArray new];
+}
+
 void MTRBaseSubscriptionCallback::OnReportEnd()
 {
+    if (mInterimReportBlock) {
+        dispatch_block_cancel(mInterimReportBlock);
+        mInterimReportBlock = nil;
+    }
     ReportData();
     if (mReportEndHandler) {
         mReportEndHandler();
