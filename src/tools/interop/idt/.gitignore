@@ -5,5 +5,5 @@ IDT_ARTIFACTS/
 OUT/
 __pycache__/
 pycache/
-./venv/
+venv/
 .zip
