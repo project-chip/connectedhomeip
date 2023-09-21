@@ -90,7 +90,8 @@ class BouffalolabBuilder(GnBuilder):
                  enable_ethernet: bool = False,
                  enable_wifi: bool = False,
                  enable_thread: bool = False,
-                 enable_frame_ptr: bool = False
+                 enable_frame_ptr: bool = False,
+                 enable_heap_monitoring: bool = False
                  ):
 
         if 'BL602' == module_type:
@@ -137,19 +138,16 @@ class BouffalolabBuilder(GnBuilder):
 
         # hardware connectivity support check
         if bouffalo_chip == "bl602":
-
             if enable_ethernet or enable_thread:
                 raise Exception('SoC %s doesn\'t support connectivity Ethernet/Thread.' % bouffalo_chip)
 
         elif bouffalo_chip == "bl702":
-
             self.argsOpt.append('module_type=\"{}\"'.format(module_type))
             if board != BouffalolabBoard.BL706DK:
                 if enable_ethernet or enable_wifi:
                     raise Exception('Board %s doesn\'t support connectivity Ethernet/Wi-Fi.' % board)
 
         elif bouffalo_chip == "bl702l":
-
             if enable_ethernet or enable_wifi:
                 raise Exception('SoC %s doesn\'t support connectivity Ethernet/Wi-Fi currently.' % bouffalo_chip)
 
@@ -202,6 +200,8 @@ class BouffalolabBuilder(GnBuilder):
             self.argsOpt.append("enable_debug_frame_ptr=true")
         else:
             self.argsOpt.append("enable_debug_frame_ptr=false")
+
+        self.argsOpt.append("enable_heap_monitoring={}".format(str(enable_heap_monitoring).lower()))
 
         try:
             self.argsOpt.append('bouffalolab_sdk_root="%s"' % os.environ['BOUFFALOLAB_SDK_ROOT'])
@@ -261,4 +261,5 @@ class BouffalolabBuilder(GnBuilder):
         os.system("cp " + ota_images_image + " " + ota_images_dev_image)
 
         logging.info("PostBuild:")
-        logging.info("Bouffalo Lab OTA format image: " + self.app.AppNamePrefix(self.chip_name) + ".bin.xz.hash is generated.")
+        logging.info("Bouffalo Lab OTA format image without signature: " +
+                     self.app.AppNamePrefix(self.chip_name) + ".bin.xz.hash is generated.")
