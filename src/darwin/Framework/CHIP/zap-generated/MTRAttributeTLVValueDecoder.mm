@@ -2772,6 +2772,17 @@ static id _Nullable DecodeAttributeValueForGeneralDiagnosticsCluster(
         value = [NSNumber numberWithBool:cppValue];
         return value;
     }
+    case Attributes::AverageWearCount::Id: {
+        using TypeInfo = Attributes::AverageWearCount::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue];
+        return value;
+    }
     default: {
         break;
     }
