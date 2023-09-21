@@ -202,7 +202,7 @@ class BouffalolabBuilder(GnBuilder):
             self.argsOpt.append("enable_debug_frame_ptr=false")
 
         self.argsOpt.append("enable_heap_monitoring={}".format(str(enable_heap_monitoring).lower()))
-        
+
         try:
             self.argsOpt.append('bouffalolab_sdk_root="%s"' % os.environ['BOUFFALOLAB_SDK_ROOT'])
         except KeyError as err:

@@ -171,11 +171,11 @@ class Flasher(firmware_utils.Flasher):
 
             version_target_str = "1.8.6"
             version_target = version_target_str.split('.')
-            version_target = "".join([ "%03d" % int(var) for var in version_target ])
+            version_target = "".join(["%03d" % int(var) for var in version_target])
 
             version_current_str = importlib.metadata.version("bflb_iot_tool")
             version_current = version_current_str.split('.')
-            version_current = "".join([ "%03d" % int(var) for var in version_current])
+            version_current = "".join(["%03d" % int(var) for var in version_current])
 
             if version_current < version_target:
                 raise Exception("bflb_iot_tool {} version is less than {}".format(version_current_str, version_target_str))
@@ -320,6 +320,7 @@ class Flasher(firmware_utils.Flasher):
                     os.remove(os.path.join(ota_output_folder, img))
 
         return self
+
 
 if __name__ == '__main__':
 
