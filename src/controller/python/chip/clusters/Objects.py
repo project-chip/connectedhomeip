@@ -8144,6 +8144,7 @@ class GeneralDiagnostics(Cluster):
                 ClusterObjectFieldDescriptor(Label="activeRadioFaults", Tag=0x00000006, Type=typing.Optional[typing.List[GeneralDiagnostics.Enums.RadioFaultEnum]]),
                 ClusterObjectFieldDescriptor(Label="activeNetworkFaults", Tag=0x00000007, Type=typing.Optional[typing.List[GeneralDiagnostics.Enums.NetworkFaultEnum]]),
                 ClusterObjectFieldDescriptor(Label="testEventTriggersEnabled", Tag=0x00000008, Type=bool),
+                ClusterObjectFieldDescriptor(Label="averageWearCount", Tag=0x00000009, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -8161,6 +8162,7 @@ class GeneralDiagnostics(Cluster):
     activeRadioFaults: 'typing.Optional[typing.List[GeneralDiagnostics.Enums.RadioFaultEnum]]' = None
     activeNetworkFaults: 'typing.Optional[typing.List[GeneralDiagnostics.Enums.NetworkFaultEnum]]' = None
     testEventTriggersEnabled: 'bool' = None
+    averageWearCount: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -8427,6 +8429,22 @@ class GeneralDiagnostics(Cluster):
                 return ClusterObjectFieldDescriptor(Type=bool)
 
             value: 'bool' = False
+
+        @dataclass
+        class AverageWearCount(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000033
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000009
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

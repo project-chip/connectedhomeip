@@ -1312,6 +1312,10 @@ namespace TestEventTriggersEnabled {
 static constexpr AttributeId Id = 0x00000008;
 } // namespace TestEventTriggersEnabled
 
+namespace AverageWearCount {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace AverageWearCount
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
