@@ -270,7 +270,8 @@
 #define RSI_TCP_IP_FEATURE_BIT_MAP                                                                                                 \
     (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT) //! TCP/IP feature select bitmap for selecting TCP/IP features
 #define RSI_CUSTOM_FEATURE_BIT_MAP SL_SI91X_FEAT_CUSTOM_FEAT_EXTENTION_VALID //! To set custom feature select bit map
-#if WIFI_ENABLE_SECURITY_WPA3_TRANSITION                                     // Adding Support for WPA3 transition#ifdef CHIP_9117
+#if WIFI_ENABLE_SECURITY_WPA3_TRANSITION                                     // Adding Support for WPA3 transition
+#ifdef CHIP_9117
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP                                                                                             \
     (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(1) | RAM_LEVEL_NWP_BASIC_MCU_ADV |                       \
      SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0 | SL_SI91X_EXT_FEAT_IEEE_80211W)
