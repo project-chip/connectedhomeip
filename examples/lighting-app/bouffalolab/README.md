@@ -14,8 +14,8 @@ The steps were verified on `Bouffalo Lab` BL602 and BL706 development board.
 -   `BL706DK`
 -   `BL704LDK`
 
-> Warning: Changing the VID/PID may cause compilation problems, we recommend leaving
-> it as the default while using this example.
+> Warning: Changing the VID/PID may cause compilation problems, we recommend
+> leaving it as the default while using this example.
 
 ## BL602
 
@@ -27,11 +27,15 @@ BL602/BL604 is combo chip-set for Wi-Fi 802.11b/g/n and BLE 5.0 base-band/MAC.
 
 ## BL70x
 
-BL70x is combo chip-set for BLE and IEEE 802.15.4/ZigBee/Thread. 
-- BL702/BL706 has 14dbm tx power and is recommended for routing devices. SDK uses BL702 as a general name.
-- BL702L/BL704L is designed for low power application. SDK uses BL702L as a general name.
+BL70x is combo chip-set for BLE and IEEE 802.15.4/ZigBee/Thread.
 
-BL70x has fully certified with all Thread 1.3 features, included Thread `SSED` and Thread Border Router with `DUA manager`.
+-   BL702/BL706 has 14dbm tx power and is recommended for routing devices. SDK
+    uses BL702 as a general name.
+-   BL702L/BL704L is designed for low power application. SDK uses BL702L as a
+    general name.
+
+BL70x has fully certified with all Thread 1.3 features, included Thread `SSED`
+and Thread Border Router with `DUA manager`.
 
 ### `XT-ZB6-DevKit`
 
@@ -54,9 +58,9 @@ Mac OS.
     source ./scripts/activate.sh -p bouffalolab
     ```
 
-    > After environment setup `Bouffalo Lab` flash tool, `bflb-iot-tool`, imports
-    > under this environment. If not, please try `scripts/bootstrap.sh -p bouffalolab` for
-    > matter environment update.
+    > After environment setup `Bouffalo Lab` flash tool, `bflb-iot-tool`,
+    > imports under this environment. If not, please try
+    > `scripts/bootstrap.sh -p bouffalolab` for matter environment update.
 
 -   Setup build environment for `Bouffalo Lab` SoC
 
@@ -76,8 +80,8 @@ Mac OS.
 
 ## Build CHIP Lighting App example
 
-The following steps take examples for `BL602-IoT-Matter-V1` bl602 board,
-BL706 develop `XT-ZB6-DevKit` and `BL706DK` bl706 board, and `BL704LDK` BL704L board .
+The following steps take examples for `BL602-IoT-Matter-V1` bl602 board, BL706
+develop `XT-ZB6-DevKit` and `BL706DK` bl706 board, and `BL704LDK` BL704L board .
 
 -   Build lighting app with UART baudrate 2000000
 
@@ -102,30 +106,40 @@ BL706 develop `XT-ZB6-DevKit` and `BL706DK` bl706 board, and `BL704LDK` BL704L b
     ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light-rpc build
     ./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light-rpc build
     ```
+
 ### Build options with build_examples.py
 
-- `-shell`, enable UART command line
-- `-115200`, set UART baudrate to 115200 for log and command line
-- `-rpc`, enable Pigweed RPC feature
-- `-cdc`, enable USB CDC feature, only support for BL706, and can't work with Ethernet Board
-- `-resetCnt`, enable feature to do factory reset when continues power cycle is greater than 3
-- `-mfd`, enable Matter factory data feature, which load factory data from `DTS` region and `MFD` partition
-    - Please contact to `Bouffalo Lab` for Matter factory data support.
-- `-mfdtest`, enable Matter factory data module, but only load factory data from `FactoryDataProvider.cpp` file.
-- `-wifi`, to specify that connectivity Wi-Fi is enabled for Matter application.
-- `-ethernet`, to specify that connectivity Ethernet is enabled for Matter application.
-- `-thread`, to specify that connectivity Thread is enabled for Matter application.
-- `-fp`, to specify to enable frame pointer feature to print call stack when hit an exception for debug purpose.
+-   `-shell`, enable UART command line
+-   `-115200`, set UART baudrate to 115200 for log and command line
+-   `-rpc`, enable Pigweed RPC feature
+-   `-cdc`, enable USB CDC feature, only support for BL706, and can't work with
+    Ethernet Board
+-   `-resetCnt`, enable feature to do factory reset when continues power cycle
+    is greater than 3
+-   `-mfd`, enable Matter factory data feature, which load factory data from
+    `DTS` region and `MFD` partition
+    -   Please contact to `Bouffalo Lab` for Matter factory data support.
+-   `-mfdtest`, enable Matter factory data module, but only load factory data
+    from `FactoryDataProvider.cpp` file.
+-   `-wifi`, to specify that connectivity Wi-Fi is enabled for Matter
+    application.
+-   `-ethernet`, to specify that connectivity Ethernet is enabled for Matter
+    application.
+-   `-thread`, to specify that connectivity Thread is enabled for Matter
+    application.
+-   `-fp`, to specify to enable frame pointer feature to print call stack when
+    hit an exception for debug purpose.
 
 ## Download image
 
 -   Using script `*.flash.py`.
 
-    After building gets done, python script `*.flash.py` will generate under build output
-    folder, such as
-    - `chip-bl602-lighting-example.flash.py` for BL602
-    - `chip-bl702-lighting-example.flash.py` for BL702
-    - `chip-bl702l-lighting-example.flash.py` for BL702L
+    After building gets done, python script `*.flash.py` will generate under
+    build output folder, such as
+
+    -   `chip-bl602-lighting-example.flash.py` for BL602
+    -   `chip-bl702-lighting-example.flash.py` for BL702
+    -   `chip-bl702l-lighting-example.flash.py` for BL702L
 
     > Note 1, `*.flash.py` should be ran under Matter build environment; if
     > python module `bflb_iot_tool` is not found, please try to do
@@ -147,8 +161,8 @@ BL706 develop `XT-ZB6-DevKit` and `BL706DK` bl706 board, and `BL704LDK` BL704L b
     -   Type following command for image download. Please set serial port
         accordingly, here we use /dev/ttyACM0 as a serial port example.
 
-        -   `bl602-iot-matter-v1`, `xt-zb6-devkit` and `bl704ldk` without additional build
-            options
+        -   `bl602-iot-matter-v1`, `xt-zb6-devkit` and `bl704ldk` without
+            additional build options
 
             ```shell
             ./out/bouffalolab-bl602-iot-matter-v1-light/chip-bl602-lighting-example.flash.py --port /dev/ttyACM0

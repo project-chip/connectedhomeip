@@ -179,7 +179,8 @@ void vAssertCalled(void)
     portABORT();
 #endif
 
-    while (true);
+    while (true)
+        ;
 }
 #endif
 
@@ -199,7 +200,8 @@ void __attribute__((weak)) user_vAssertCalled(void)
         printf("vAssertCalled, ra = %p in task %s\r\n", (void *) ra, pcTaskGetName(NULL));
     }
 
-    while (true);
+    while (true)
+        ;
 }
 
 void __attribute__((weak)) user_vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)

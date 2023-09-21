@@ -13,14 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import importlib.metadata
+import logging
 import os
 import pathlib
 import re
-import sys
-import logging
-import coloredlogs
 import shutil
-import importlib.metadata
+import sys
+
+import coloredlogs
 import firmware_utils
 
 coloredlogs.install(level='DEBUG')
@@ -182,7 +183,7 @@ class Flasher(firmware_utils.Flasher):
 
         except Exception as e:
 
-            logging.error('Please try the following command to setup or upgrade Bouffalo Lab enviroment:')
+            logging.error('Please try the following command to setup or upgrade Bouffalo Lab environment:')
             logging.error('source scripts/activate.sh -p bouffalolab')
             logging.error('Or')
             logging.error('source scripts/bootstrap.sh -p bouffalolab')
