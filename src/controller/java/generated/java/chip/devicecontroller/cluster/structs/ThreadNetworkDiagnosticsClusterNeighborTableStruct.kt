@@ -57,9 +57,9 @@ class ThreadNetworkDiagnosticsClusterNeighborTableStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_EXT_ADDRESS), extAddress)
       put(ContextSpecificTag(TAG_AGE), age)
       put(ContextSpecificTag(TAG_RLOC16), rloc16)
@@ -103,10 +103,10 @@ class ThreadNetworkDiagnosticsClusterNeighborTableStruct(
     private const val TAG_IS_CHILD = 13
 
     fun fromTlv(
-      tag: Tag,
+      tlvTag: Tag,
       tlvReader: TlvReader
     ): ThreadNetworkDiagnosticsClusterNeighborTableStruct {
-      tlvReader.enterStructure(tag)
+      tlvReader.enterStructure(tlvTag)
       val extAddress = tlvReader.getULong(ContextSpecificTag(TAG_EXT_ADDRESS))
       val age = tlvReader.getULong(ContextSpecificTag(TAG_AGE))
       val rloc16 = tlvReader.getUInt(ContextSpecificTag(TAG_RLOC16))

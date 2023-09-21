@@ -31,9 +31,9 @@ class ActionsClusterStateChangedEvent(val actionID: UInt, val invokeID: ULong, v
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ACTION_I_D), actionID)
       put(ContextSpecificTag(TAG_INVOKE_I_D), invokeID)
       put(ContextSpecificTag(TAG_NEW_STATE), newState)
@@ -46,8 +46,8 @@ class ActionsClusterStateChangedEvent(val actionID: UInt, val invokeID: ULong, v
     private const val TAG_INVOKE_I_D = 1
     private const val TAG_NEW_STATE = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ActionsClusterStateChangedEvent {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ActionsClusterStateChangedEvent {
+      tlvReader.enterStructure(tlvTag)
       val actionID = tlvReader.getUInt(ContextSpecificTag(TAG_ACTION_I_D))
       val invokeID = tlvReader.getULong(ContextSpecificTag(TAG_INVOKE_I_D))
       val newState = tlvReader.getUInt(ContextSpecificTag(TAG_NEW_STATE))

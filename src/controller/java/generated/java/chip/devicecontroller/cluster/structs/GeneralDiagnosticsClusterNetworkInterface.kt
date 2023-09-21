@@ -46,9 +46,9 @@ class GeneralDiagnosticsClusterNetworkInterface(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_NAME), name)
       put(ContextSpecificTag(TAG_IS_OPERATIONAL), isOperational)
       if (offPremiseServicesReachableIPv4 != null) {
@@ -93,8 +93,8 @@ class GeneralDiagnosticsClusterNetworkInterface(
     private const val TAG_I_PV6_ADDRESSES = 6
     private const val TAG_TYPE = 7
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): GeneralDiagnosticsClusterNetworkInterface {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): GeneralDiagnosticsClusterNetworkInterface {
+      tlvReader.enterStructure(tlvTag)
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       val isOperational = tlvReader.getBoolean(ContextSpecificTag(TAG_IS_OPERATIONAL))
       val offPremiseServicesReachableIPv4 =

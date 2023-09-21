@@ -47,9 +47,9 @@ class UnitTestingClusterTestFabricScoped(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_FABRIC_SENSITIVE_INT8U), fabricSensitiveInt8u)
       if (optionalFabricSensitiveInt8u.isPresent) {
         val optoptionalFabricSensitiveInt8u = optionalFabricSensitiveInt8u.get()
@@ -96,8 +96,8 @@ class UnitTestingClusterTestFabricScoped(
     private const val TAG_FABRIC_SENSITIVE_INT8U_LIST = 7
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): UnitTestingClusterTestFabricScoped {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): UnitTestingClusterTestFabricScoped {
+      tlvReader.enterStructure(tlvTag)
       val fabricSensitiveInt8u = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_SENSITIVE_INT8U))
       val optionalFabricSensitiveInt8u =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_OPTIONAL_FABRIC_SENSITIVE_INT8U))) {

@@ -40,9 +40,9 @@ class AccessControlClusterAccessControlEntryStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_PRIVILEGE), privilege)
       put(ContextSpecificTag(TAG_AUTH_MODE), authMode)
       if (subjects != null) {
@@ -75,8 +75,8 @@ class AccessControlClusterAccessControlEntryStruct(
     private const val TAG_TARGETS = 4
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): AccessControlClusterAccessControlEntryStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AccessControlClusterAccessControlEntryStruct {
+      tlvReader.enterStructure(tlvTag)
       val privilege = tlvReader.getUInt(ContextSpecificTag(TAG_PRIVILEGE))
       val authMode = tlvReader.getUInt(ContextSpecificTag(TAG_AUTH_MODE))
       val subjects =

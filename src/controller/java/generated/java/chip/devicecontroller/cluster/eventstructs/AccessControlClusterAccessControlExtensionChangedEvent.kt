@@ -40,9 +40,9 @@ class AccessControlClusterAccessControlExtensionChangedEvent(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       if (adminNodeID != null) {
         put(ContextSpecificTag(TAG_ADMIN_NODE_I_D), adminNodeID)
       } else {
@@ -72,10 +72,10 @@ class AccessControlClusterAccessControlExtensionChangedEvent(
     private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
-      tag: Tag,
+      tlvTag: Tag,
       tlvReader: TlvReader
     ): AccessControlClusterAccessControlExtensionChangedEvent {
-      tlvReader.enterStructure(tag)
+      tlvReader.enterStructure(tlvTag)
       val adminNodeID =
         if (!tlvReader.isNull()) {
           tlvReader.getULong(ContextSpecificTag(TAG_ADMIN_NODE_I_D))

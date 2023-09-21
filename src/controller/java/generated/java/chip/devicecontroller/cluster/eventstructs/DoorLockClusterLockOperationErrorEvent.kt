@@ -46,9 +46,9 @@ class DoorLockClusterLockOperationErrorEvent(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_LOCK_OPERATION_TYPE), lockOperationType)
       put(ContextSpecificTag(TAG_OPERATION_SOURCE), operationSource)
       put(ContextSpecificTag(TAG_OPERATION_ERROR), operationError)
@@ -92,8 +92,8 @@ class DoorLockClusterLockOperationErrorEvent(
     private const val TAG_SOURCE_NODE = 5
     private const val TAG_CREDENTIALS = 6
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): DoorLockClusterLockOperationErrorEvent {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DoorLockClusterLockOperationErrorEvent {
+      tlvReader.enterStructure(tlvTag)
       val lockOperationType = tlvReader.getUInt(ContextSpecificTag(TAG_LOCK_OPERATION_TYPE))
       val operationSource = tlvReader.getUInt(ContextSpecificTag(TAG_OPERATION_SOURCE))
       val operationError = tlvReader.getUInt(ContextSpecificTag(TAG_OPERATION_ERROR))

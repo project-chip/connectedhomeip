@@ -29,9 +29,9 @@ class WiFiNetworkDiagnosticsClusterDisconnectionEvent(val reasonCode: UInt) {
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_REASON_CODE), reasonCode)
       endStructure()
     }
@@ -40,8 +40,11 @@ class WiFiNetworkDiagnosticsClusterDisconnectionEvent(val reasonCode: UInt) {
   companion object {
     private const val TAG_REASON_CODE = 0
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): WiFiNetworkDiagnosticsClusterDisconnectionEvent {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): WiFiNetworkDiagnosticsClusterDisconnectionEvent {
+      tlvReader.enterStructure(tlvTag)
       val reasonCode = tlvReader.getUInt(ContextSpecificTag(TAG_REASON_CODE))
 
       tlvReader.exitContainer()

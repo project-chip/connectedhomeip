@@ -36,9 +36,9 @@ class LaundryWasherModeClusterModeOptionStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_LABEL), label)
       put(ContextSpecificTag(TAG_MODE), mode)
       startArray(ContextSpecificTag(TAG_MODE_TAGS))
@@ -55,8 +55,8 @@ class LaundryWasherModeClusterModeOptionStruct(
     private const val TAG_MODE = 1
     private const val TAG_MODE_TAGS = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): LaundryWasherModeClusterModeOptionStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): LaundryWasherModeClusterModeOptionStruct {
+      tlvReader.enterStructure(tlvTag)
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
       val mode = tlvReader.getUInt(ContextSpecificTag(TAG_MODE))
       val modeTags =

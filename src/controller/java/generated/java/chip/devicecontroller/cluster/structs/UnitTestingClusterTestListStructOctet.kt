@@ -30,9 +30,9 @@ class UnitTestingClusterTestListStructOctet(val member1: ULong, val member2: Byt
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_MEMBER1), member1)
       put(ContextSpecificTag(TAG_MEMBER2), member2)
       endStructure()
@@ -43,8 +43,8 @@ class UnitTestingClusterTestListStructOctet(val member1: ULong, val member2: Byt
     private const val TAG_MEMBER1 = 0
     private const val TAG_MEMBER2 = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): UnitTestingClusterTestListStructOctet {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): UnitTestingClusterTestListStructOctet {
+      tlvReader.enterStructure(tlvTag)
       val member1 = tlvReader.getULong(ContextSpecificTag(TAG_MEMBER1))
       val member2 = tlvReader.getByteArray(ContextSpecificTag(TAG_MEMBER2))
 

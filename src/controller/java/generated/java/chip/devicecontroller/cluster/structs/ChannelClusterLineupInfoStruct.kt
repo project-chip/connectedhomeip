@@ -38,9 +38,9 @@ class ChannelClusterLineupInfoStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_OPERATOR_NAME), operatorName)
       if (lineupName.isPresent) {
         val optlineupName = lineupName.get()
@@ -61,8 +61,8 @@ class ChannelClusterLineupInfoStruct(
     private const val TAG_POSTAL_CODE = 2
     private const val TAG_LINEUP_INFO_TYPE = 3
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ChannelClusterLineupInfoStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ChannelClusterLineupInfoStruct {
+      tlvReader.enterStructure(tlvTag)
       val operatorName = tlvReader.getString(ContextSpecificTag(TAG_OPERATOR_NAME))
       val lineupName =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_LINEUP_NAME))) {

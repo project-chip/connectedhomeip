@@ -33,9 +33,9 @@ class ActivatedCarbonFilterMonitoringClusterReplacementProductStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_TYPE), productIdentifierType)
       put(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_VALUE), productIdentifierValue)
       endStructure()
@@ -47,10 +47,10 @@ class ActivatedCarbonFilterMonitoringClusterReplacementProductStruct(
     private const val TAG_PRODUCT_IDENTIFIER_VALUE = 1
 
     fun fromTlv(
-      tag: Tag,
+      tlvTag: Tag,
       tlvReader: TlvReader
     ): ActivatedCarbonFilterMonitoringClusterReplacementProductStruct {
-      tlvReader.enterStructure(tag)
+      tlvReader.enterStructure(tlvTag)
       val productIdentifierType = tlvReader.getUInt(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_TYPE))
       val productIdentifierValue =
         tlvReader.getString(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_VALUE))

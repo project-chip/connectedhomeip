@@ -30,9 +30,9 @@ class DescriptorClusterDeviceTypeStruct(val deviceType: ULong, val revision: UIn
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_DEVICE_TYPE), deviceType)
       put(ContextSpecificTag(TAG_REVISION), revision)
       endStructure()
@@ -43,8 +43,8 @@ class DescriptorClusterDeviceTypeStruct(val deviceType: ULong, val revision: UIn
     private const val TAG_DEVICE_TYPE = 0
     private const val TAG_REVISION = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): DescriptorClusterDeviceTypeStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DescriptorClusterDeviceTypeStruct {
+      tlvReader.enterStructure(tlvTag)
       val deviceType = tlvReader.getULong(ContextSpecificTag(TAG_DEVICE_TYPE))
       val revision = tlvReader.getUInt(ContextSpecificTag(TAG_REVISION))
 

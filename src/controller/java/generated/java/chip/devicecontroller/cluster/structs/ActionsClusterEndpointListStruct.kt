@@ -38,9 +38,9 @@ class ActionsClusterEndpointListStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D), endpointListID)
       put(ContextSpecificTag(TAG_NAME), name)
       put(ContextSpecificTag(TAG_TYPE), type)
@@ -59,8 +59,8 @@ class ActionsClusterEndpointListStruct(
     private const val TAG_TYPE = 2
     private const val TAG_ENDPOINTS = 3
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ActionsClusterEndpointListStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ActionsClusterEndpointListStruct {
+      tlvReader.enterStructure(tlvTag)
       val endpointListID = tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       val type = tlvReader.getUInt(ContextSpecificTag(TAG_TYPE))

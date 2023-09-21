@@ -36,9 +36,9 @@ class OperationalStateClusterOperationCompletionEvent(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_COMPLETION_ERROR_CODE), completionErrorCode)
       if (totalOperationalTime != null) {
         if (totalOperationalTime.isPresent) {
@@ -65,8 +65,11 @@ class OperationalStateClusterOperationCompletionEvent(
     private const val TAG_TOTAL_OPERATIONAL_TIME = 1
     private const val TAG_PAUSED_TIME = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): OperationalStateClusterOperationCompletionEvent {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): OperationalStateClusterOperationCompletionEvent {
+      tlvReader.enterStructure(tlvTag)
       val completionErrorCode = tlvReader.getUInt(ContextSpecificTag(TAG_COMPLETION_ERROR_CODE))
       val totalOperationalTime =
         if (!tlvReader.isNull()) {

@@ -37,9 +37,9 @@ class IcdManagementClusterMonitoringRegistrationStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CHECK_IN_NODE_I_D), checkInNodeID)
       put(ContextSpecificTag(TAG_MONITORED_SUBJECT), monitoredSubject)
       put(ContextSpecificTag(TAG_KEY), key)
@@ -54,8 +54,11 @@ class IcdManagementClusterMonitoringRegistrationStruct(
     private const val TAG_KEY = 3
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): IcdManagementClusterMonitoringRegistrationStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): IcdManagementClusterMonitoringRegistrationStruct {
+      tlvReader.enterStructure(tlvTag)
       val checkInNodeID = tlvReader.getULong(ContextSpecificTag(TAG_CHECK_IN_NODE_I_D))
       val monitoredSubject = tlvReader.getULong(ContextSpecificTag(TAG_MONITORED_SUBJECT))
       val key = tlvReader.getByteArray(ContextSpecificTag(TAG_KEY))

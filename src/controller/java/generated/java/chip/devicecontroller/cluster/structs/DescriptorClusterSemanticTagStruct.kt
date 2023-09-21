@@ -38,9 +38,9 @@ class DescriptorClusterSemanticTagStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       if (mfgCode != null) {
         put(ContextSpecificTag(TAG_MFG_CODE), mfgCode)
       } else {
@@ -66,8 +66,8 @@ class DescriptorClusterSemanticTagStruct(
     private const val TAG_TAG = 2
     private const val TAG_LABEL = 3
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): DescriptorClusterSemanticTagStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DescriptorClusterSemanticTagStruct {
+      tlvReader.enterStructure(tlvTag)
       val mfgCode =
         if (!tlvReader.isNull()) {
           tlvReader.getUInt(ContextSpecificTag(TAG_MFG_CODE))

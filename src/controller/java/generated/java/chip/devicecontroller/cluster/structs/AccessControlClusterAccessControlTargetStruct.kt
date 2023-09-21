@@ -35,9 +35,9 @@ class AccessControlClusterAccessControlTargetStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       if (cluster != null) {
         put(ContextSpecificTag(TAG_CLUSTER), cluster)
       } else {
@@ -62,8 +62,8 @@ class AccessControlClusterAccessControlTargetStruct(
     private const val TAG_ENDPOINT = 1
     private const val TAG_DEVICE_TYPE = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): AccessControlClusterAccessControlTargetStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AccessControlClusterAccessControlTargetStruct {
+      tlvReader.enterStructure(tlvTag)
       val cluster =
         if (!tlvReader.isNull()) {
           tlvReader.getULong(ContextSpecificTag(TAG_CLUSTER))

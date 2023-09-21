@@ -36,9 +36,9 @@ class RvcOperationalStateClusterErrorStateStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ERROR_STATE_I_D), errorStateID)
       if (errorStateLabel.isPresent) {
         val opterrorStateLabel = errorStateLabel.get()
@@ -57,8 +57,8 @@ class RvcOperationalStateClusterErrorStateStruct(
     private const val TAG_ERROR_STATE_LABEL = 1
     private const val TAG_ERROR_STATE_DETAILS = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): RvcOperationalStateClusterErrorStateStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): RvcOperationalStateClusterErrorStateStruct {
+      tlvReader.enterStructure(tlvTag)
       val errorStateID = tlvReader.getUInt(ContextSpecificTag(TAG_ERROR_STATE_I_D))
       val errorStateLabel =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_STATE_LABEL))) {

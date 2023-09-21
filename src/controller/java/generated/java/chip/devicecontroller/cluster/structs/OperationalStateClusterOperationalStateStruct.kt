@@ -34,9 +34,9 @@ class OperationalStateClusterOperationalStateStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_OPERATIONAL_STATE_I_D), operationalStateID)
       if (operationalStateLabel.isPresent) {
         val optoperationalStateLabel = operationalStateLabel.get()
@@ -50,8 +50,8 @@ class OperationalStateClusterOperationalStateStruct(
     private const val TAG_OPERATIONAL_STATE_I_D = 0
     private const val TAG_OPERATIONAL_STATE_LABEL = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): OperationalStateClusterOperationalStateStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): OperationalStateClusterOperationalStateStruct {
+      tlvReader.enterStructure(tlvTag)
       val operationalStateID = tlvReader.getUInt(ContextSpecificTag(TAG_OPERATIONAL_STATE_I_D))
       val operationalStateLabel =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL))) {

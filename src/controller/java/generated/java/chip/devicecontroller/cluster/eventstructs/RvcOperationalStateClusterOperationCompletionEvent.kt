@@ -36,9 +36,9 @@ class RvcOperationalStateClusterOperationCompletionEvent(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_COMPLETION_ERROR_CODE), completionErrorCode)
       if (totalOperationalTime != null) {
         if (totalOperationalTime.isPresent) {
@@ -66,10 +66,10 @@ class RvcOperationalStateClusterOperationCompletionEvent(
     private const val TAG_PAUSED_TIME = 2
 
     fun fromTlv(
-      tag: Tag,
+      tlvTag: Tag,
       tlvReader: TlvReader
     ): RvcOperationalStateClusterOperationCompletionEvent {
-      tlvReader.enterStructure(tag)
+      tlvReader.enterStructure(tlvTag)
       val completionErrorCode = tlvReader.getUInt(ContextSpecificTag(TAG_COMPLETION_ERROR_CODE))
       val totalOperationalTime =
         if (!tlvReader.isNull()) {

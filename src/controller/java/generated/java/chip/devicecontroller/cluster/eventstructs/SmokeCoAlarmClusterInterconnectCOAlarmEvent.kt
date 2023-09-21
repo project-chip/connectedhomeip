@@ -29,9 +29,9 @@ class SmokeCoAlarmClusterInterconnectCOAlarmEvent(val alarmSeverityLevel: UInt) 
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ALARM_SEVERITY_LEVEL), alarmSeverityLevel)
       endStructure()
     }
@@ -40,8 +40,8 @@ class SmokeCoAlarmClusterInterconnectCOAlarmEvent(val alarmSeverityLevel: UInt) 
   companion object {
     private const val TAG_ALARM_SEVERITY_LEVEL = 0
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): SmokeCoAlarmClusterInterconnectCOAlarmEvent {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): SmokeCoAlarmClusterInterconnectCOAlarmEvent {
+      tlvReader.enterStructure(tlvTag)
       val alarmSeverityLevel = tlvReader.getUInt(ContextSpecificTag(TAG_ALARM_SEVERITY_LEVEL))
 
       tlvReader.exitContainer()

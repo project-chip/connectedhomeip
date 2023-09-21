@@ -37,9 +37,9 @@ class ActionsClusterActionFailedEvent(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ACTION_I_D), actionID)
       put(ContextSpecificTag(TAG_INVOKE_I_D), invokeID)
       put(ContextSpecificTag(TAG_NEW_STATE), newState)
@@ -54,8 +54,8 @@ class ActionsClusterActionFailedEvent(
     private const val TAG_NEW_STATE = 2
     private const val TAG_ERROR = 3
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ActionsClusterActionFailedEvent {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ActionsClusterActionFailedEvent {
+      tlvReader.enterStructure(tlvTag)
       val actionID = tlvReader.getUInt(ContextSpecificTag(TAG_ACTION_I_D))
       val invokeID = tlvReader.getULong(ContextSpecificTag(TAG_INVOKE_I_D))
       val newState = tlvReader.getUInt(ContextSpecificTag(TAG_NEW_STATE))

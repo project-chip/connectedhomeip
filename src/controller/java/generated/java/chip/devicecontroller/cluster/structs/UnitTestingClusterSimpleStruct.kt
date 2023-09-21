@@ -45,9 +45,9 @@ class UnitTestingClusterSimpleStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_A), a)
       put(ContextSpecificTag(TAG_B), b)
       put(ContextSpecificTag(TAG_C), c)
@@ -70,8 +70,8 @@ class UnitTestingClusterSimpleStruct(
     private const val TAG_G = 6
     private const val TAG_H = 7
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): UnitTestingClusterSimpleStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): UnitTestingClusterSimpleStruct {
+      tlvReader.enterStructure(tlvTag)
       val a = tlvReader.getUInt(ContextSpecificTag(TAG_A))
       val b = tlvReader.getBoolean(ContextSpecificTag(TAG_B))
       val c = tlvReader.getUInt(ContextSpecificTag(TAG_C))

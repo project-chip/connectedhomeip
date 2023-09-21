@@ -29,9 +29,9 @@ class SwitchClusterSwitchLatchedEvent(val newPosition: UInt) {
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_NEW_POSITION), newPosition)
       endStructure()
     }
@@ -40,8 +40,8 @@ class SwitchClusterSwitchLatchedEvent(val newPosition: UInt) {
   companion object {
     private const val TAG_NEW_POSITION = 0
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): SwitchClusterSwitchLatchedEvent {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): SwitchClusterSwitchLatchedEvent {
+      tlvReader.enterStructure(tlvTag)
       val newPosition = tlvReader.getUInt(ContextSpecificTag(TAG_NEW_POSITION))
 
       tlvReader.exitContainer()

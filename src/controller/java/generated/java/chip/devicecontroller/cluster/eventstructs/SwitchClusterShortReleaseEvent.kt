@@ -29,9 +29,9 @@ class SwitchClusterShortReleaseEvent(val previousPosition: UInt) {
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_PREVIOUS_POSITION), previousPosition)
       endStructure()
     }
@@ -40,8 +40,8 @@ class SwitchClusterShortReleaseEvent(val previousPosition: UInt) {
   companion object {
     private const val TAG_PREVIOUS_POSITION = 0
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): SwitchClusterShortReleaseEvent {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): SwitchClusterShortReleaseEvent {
+      tlvReader.enterStructure(tlvTag)
       val previousPosition = tlvReader.getUInt(ContextSpecificTag(TAG_PREVIOUS_POSITION))
 
       tlvReader.exitContainer()

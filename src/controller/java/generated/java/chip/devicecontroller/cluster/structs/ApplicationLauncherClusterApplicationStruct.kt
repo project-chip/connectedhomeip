@@ -33,9 +33,9 @@ class ApplicationLauncherClusterApplicationStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CATALOG_VENDOR_I_D), catalogVendorID)
       put(ContextSpecificTag(TAG_APPLICATION_I_D), applicationID)
       endStructure()
@@ -46,8 +46,8 @@ class ApplicationLauncherClusterApplicationStruct(
     private const val TAG_CATALOG_VENDOR_I_D = 0
     private const val TAG_APPLICATION_I_D = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ApplicationLauncherClusterApplicationStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ApplicationLauncherClusterApplicationStruct {
+      tlvReader.enterStructure(tlvTag)
       val catalogVendorID = tlvReader.getUInt(ContextSpecificTag(TAG_CATALOG_VENDOR_I_D))
       val applicationID = tlvReader.getString(ContextSpecificTag(TAG_APPLICATION_I_D))
 

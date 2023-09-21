@@ -29,9 +29,9 @@ class DoorLockClusterDoorLockAlarmEvent(val alarmCode: UInt) {
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ALARM_CODE), alarmCode)
       endStructure()
     }
@@ -40,8 +40,8 @@ class DoorLockClusterDoorLockAlarmEvent(val alarmCode: UInt) {
   companion object {
     private const val TAG_ALARM_CODE = 0
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): DoorLockClusterDoorLockAlarmEvent {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DoorLockClusterDoorLockAlarmEvent {
+      tlvReader.enterStructure(tlvTag)
       val alarmCode = tlvReader.getUInt(ContextSpecificTag(TAG_ALARM_CODE))
 
       tlvReader.exitContainer()

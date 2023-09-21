@@ -37,9 +37,9 @@ class OtaSoftwareUpdateRequestorClusterStateTransitionEvent(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_PREVIOUS_STATE), previousState)
       put(ContextSpecificTag(TAG_NEW_STATE), newState)
       put(ContextSpecificTag(TAG_REASON), reason)
@@ -59,10 +59,10 @@ class OtaSoftwareUpdateRequestorClusterStateTransitionEvent(
     private const val TAG_TARGET_SOFTWARE_VERSION = 3
 
     fun fromTlv(
-      tag: Tag,
+      tlvTag: Tag,
       tlvReader: TlvReader
     ): OtaSoftwareUpdateRequestorClusterStateTransitionEvent {
-      tlvReader.enterStructure(tag)
+      tlvReader.enterStructure(tlvTag)
       val previousState = tlvReader.getUInt(ContextSpecificTag(TAG_PREVIOUS_STATE))
       val newState = tlvReader.getUInt(ContextSpecificTag(TAG_NEW_STATE))
       val reason = tlvReader.getUInt(ContextSpecificTag(TAG_REASON))

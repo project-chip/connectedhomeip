@@ -39,9 +39,9 @@ class GroupKeyManagementClusterGroupInfoMapStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_GROUP_ID), groupId)
       startArray(ContextSpecificTag(TAG_ENDPOINTS))
       for (item in endpoints.iterator()) {
@@ -63,8 +63,8 @@ class GroupKeyManagementClusterGroupInfoMapStruct(
     private const val TAG_GROUP_NAME = 3
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): GroupKeyManagementClusterGroupInfoMapStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): GroupKeyManagementClusterGroupInfoMapStruct {
+      tlvReader.enterStructure(tlvTag)
       val groupId = tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_ID))
       val endpoints =
         buildList<UInt> {

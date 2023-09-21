@@ -35,9 +35,9 @@ class ThermostatClusterThermostatScheduleTransition(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_TRANSITION_TIME), transitionTime)
       if (heatSetpoint != null) {
         put(ContextSpecificTag(TAG_HEAT_SETPOINT), heatSetpoint)
@@ -58,8 +58,8 @@ class ThermostatClusterThermostatScheduleTransition(
     private const val TAG_HEAT_SETPOINT = 1
     private const val TAG_COOL_SETPOINT = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ThermostatClusterThermostatScheduleTransition {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterThermostatScheduleTransition {
+      tlvReader.enterStructure(tlvTag)
       val transitionTime = tlvReader.getUInt(ContextSpecificTag(TAG_TRANSITION_TIME))
       val heatSetpoint =
         if (!tlvReader.isNull()) {

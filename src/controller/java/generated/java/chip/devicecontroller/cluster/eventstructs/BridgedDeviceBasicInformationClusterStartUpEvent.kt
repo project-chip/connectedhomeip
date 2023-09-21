@@ -29,9 +29,9 @@ class BridgedDeviceBasicInformationClusterStartUpEvent(val softwareVersion: ULon
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_SOFTWARE_VERSION), softwareVersion)
       endStructure()
     }
@@ -40,8 +40,11 @@ class BridgedDeviceBasicInformationClusterStartUpEvent(val softwareVersion: ULon
   companion object {
     private const val TAG_SOFTWARE_VERSION = 0
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): BridgedDeviceBasicInformationClusterStartUpEvent {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): BridgedDeviceBasicInformationClusterStartUpEvent {
+      tlvReader.enterStructure(tlvTag)
       val softwareVersion = tlvReader.getULong(ContextSpecificTag(TAG_SOFTWARE_VERSION))
 
       tlvReader.exitContainer()

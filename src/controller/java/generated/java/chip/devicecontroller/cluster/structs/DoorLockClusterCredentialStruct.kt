@@ -30,9 +30,9 @@ class DoorLockClusterCredentialStruct(val credentialType: UInt, val credentialIn
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CREDENTIAL_TYPE), credentialType)
       put(ContextSpecificTag(TAG_CREDENTIAL_INDEX), credentialIndex)
       endStructure()
@@ -43,8 +43,8 @@ class DoorLockClusterCredentialStruct(val credentialType: UInt, val credentialIn
     private const val TAG_CREDENTIAL_TYPE = 0
     private const val TAG_CREDENTIAL_INDEX = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): DoorLockClusterCredentialStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DoorLockClusterCredentialStruct {
+      tlvReader.enterStructure(tlvTag)
       val credentialType = tlvReader.getUInt(ContextSpecificTag(TAG_CREDENTIAL_TYPE))
       val credentialIndex = tlvReader.getUInt(ContextSpecificTag(TAG_CREDENTIAL_INDEX))
 

@@ -34,9 +34,9 @@ class ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       startArray(ContextSpecificTag(TAG_CURRENT))
       for (item in current.iterator()) {
         put(AnonymousTag, item)
@@ -56,10 +56,10 @@ class ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent(
     private const val TAG_PREVIOUS = 1
 
     fun fromTlv(
-      tag: Tag,
+      tlvTag: Tag,
       tlvReader: TlvReader
     ): ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent {
-      tlvReader.enterStructure(tag)
+      tlvReader.enterStructure(tlvTag)
       val current =
         buildList<UInt> {
           tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT))

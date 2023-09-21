@@ -34,9 +34,9 @@ class PowerSourceClusterBatChargeFaultChangeType(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       startArray(ContextSpecificTag(TAG_CURRENT))
       for (item in current.iterator()) {
         put(AnonymousTag, item)
@@ -55,8 +55,8 @@ class PowerSourceClusterBatChargeFaultChangeType(
     private const val TAG_CURRENT = 0
     private const val TAG_PREVIOUS = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): PowerSourceClusterBatChargeFaultChangeType {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PowerSourceClusterBatChargeFaultChangeType {
+      tlvReader.enterStructure(tlvTag)
       val current =
         buildList<UInt> {
           tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT))

@@ -40,9 +40,9 @@ class SoftwareDiagnosticsClusterThreadMetricsStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ID), id)
       if (name.isPresent) {
         val optname = name.get()
@@ -71,8 +71,8 @@ class SoftwareDiagnosticsClusterThreadMetricsStruct(
     private const val TAG_STACK_FREE_MINIMUM = 3
     private const val TAG_STACK_SIZE = 4
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): SoftwareDiagnosticsClusterThreadMetricsStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): SoftwareDiagnosticsClusterThreadMetricsStruct {
+      tlvReader.enterStructure(tlvTag)
       val id = tlvReader.getULong(ContextSpecificTag(TAG_ID))
       val name =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {

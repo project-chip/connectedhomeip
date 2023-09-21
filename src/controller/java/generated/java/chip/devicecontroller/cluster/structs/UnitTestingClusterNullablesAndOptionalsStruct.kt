@@ -55,9 +55,9 @@ class UnitTestingClusterNullablesAndOptionalsStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       if (nullableInt != null) {
         put(ContextSpecificTag(TAG_NULLABLE_INT), nullableInt)
       } else {
@@ -156,8 +156,8 @@ class UnitTestingClusterNullablesAndOptionalsStruct(
     private const val TAG_OPTIONAL_LIST = 10
     private const val TAG_NULLABLE_OPTIONAL_LIST = 11
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): UnitTestingClusterNullablesAndOptionalsStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): UnitTestingClusterNullablesAndOptionalsStruct {
+      tlvReader.enterStructure(tlvTag)
       val nullableInt =
         if (!tlvReader.isNull()) {
           tlvReader.getUInt(ContextSpecificTag(TAG_NULLABLE_INT))

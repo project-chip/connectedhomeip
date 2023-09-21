@@ -29,9 +29,9 @@ class TimeSynchronizationClusterDSTStatusEvent(val DSTOffsetActive: Boolean) {
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_D_S_T_OFFSET_ACTIVE), DSTOffsetActive)
       endStructure()
     }
@@ -40,8 +40,8 @@ class TimeSynchronizationClusterDSTStatusEvent(val DSTOffsetActive: Boolean) {
   companion object {
     private const val TAG_D_S_T_OFFSET_ACTIVE = 0
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): TimeSynchronizationClusterDSTStatusEvent {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): TimeSynchronizationClusterDSTStatusEvent {
+      tlvReader.enterStructure(tlvTag)
       val DSTOffsetActive = tlvReader.getBoolean(ContextSpecificTag(TAG_D_S_T_OFFSET_ACTIVE))
 
       tlvReader.exitContainer()

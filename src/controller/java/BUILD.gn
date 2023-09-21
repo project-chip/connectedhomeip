@@ -314,7 +314,7 @@ kotlin_library("onboardingpayload_qr_code_test") {
 
 kotlin_library("chipcluster") {
   import(
-      "${chip_root}/src/controller/java/src/chip/devicecontroller/cluster/files.gni")
+      "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/files.gni")
 
   output_name = "CHIPClusters.jar"
 

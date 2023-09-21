@@ -36,9 +36,9 @@ class TimeSynchronizationClusterTimeZoneStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_OFFSET), offset)
       put(ContextSpecificTag(TAG_VALID_AT), validAt)
       if (name.isPresent) {
@@ -54,8 +54,8 @@ class TimeSynchronizationClusterTimeZoneStruct(
     private const val TAG_VALID_AT = 1
     private const val TAG_NAME = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): TimeSynchronizationClusterTimeZoneStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): TimeSynchronizationClusterTimeZoneStruct {
+      tlvReader.enterStructure(tlvTag)
       val offset = tlvReader.getLong(ContextSpecificTag(TAG_OFFSET))
       val validAt = tlvReader.getULong(ContextSpecificTag(TAG_VALID_AT))
       val name =

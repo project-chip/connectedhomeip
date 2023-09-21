@@ -33,9 +33,9 @@ class SwitchClusterMultiPressCompleteEvent(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_PREVIOUS_POSITION), previousPosition)
       put(ContextSpecificTag(TAG_TOTAL_NUMBER_OF_PRESSES_COUNTED), totalNumberOfPressesCounted)
       endStructure()
@@ -46,8 +46,8 @@ class SwitchClusterMultiPressCompleteEvent(
     private const val TAG_PREVIOUS_POSITION = 0
     private const val TAG_TOTAL_NUMBER_OF_PRESSES_COUNTED = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): SwitchClusterMultiPressCompleteEvent {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): SwitchClusterMultiPressCompleteEvent {
+      tlvReader.enterStructure(tlvTag)
       val previousPosition = tlvReader.getUInt(ContextSpecificTag(TAG_PREVIOUS_POSITION))
       val totalNumberOfPressesCounted =
         tlvReader.getUInt(ContextSpecificTag(TAG_TOTAL_NUMBER_OF_PRESSES_COUNTED))

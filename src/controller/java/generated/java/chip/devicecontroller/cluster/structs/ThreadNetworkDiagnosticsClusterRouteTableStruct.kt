@@ -49,9 +49,9 @@ class ThreadNetworkDiagnosticsClusterRouteTableStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_EXT_ADDRESS), extAddress)
       put(ContextSpecificTag(TAG_RLOC16), rloc16)
       put(ContextSpecificTag(TAG_ROUTER_ID), routerId)
@@ -78,8 +78,11 @@ class ThreadNetworkDiagnosticsClusterRouteTableStruct(
     private const val TAG_ALLOCATED = 8
     private const val TAG_LINK_ESTABLISHED = 9
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ThreadNetworkDiagnosticsClusterRouteTableStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): ThreadNetworkDiagnosticsClusterRouteTableStruct {
+      tlvReader.enterStructure(tlvTag)
       val extAddress = tlvReader.getULong(ContextSpecificTag(TAG_EXT_ADDRESS))
       val rloc16 = tlvReader.getUInt(ContextSpecificTag(TAG_RLOC16))
       val routerId = tlvReader.getUInt(ContextSpecificTag(TAG_ROUTER_ID))

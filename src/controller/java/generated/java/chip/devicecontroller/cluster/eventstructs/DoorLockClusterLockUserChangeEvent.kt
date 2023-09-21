@@ -43,9 +43,9 @@ class DoorLockClusterLockUserChangeEvent(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_LOCK_DATA_TYPE), lockDataType)
       put(ContextSpecificTag(TAG_DATA_OPERATION_TYPE), dataOperationType)
       put(ContextSpecificTag(TAG_OPERATION_SOURCE), operationSource)
@@ -82,8 +82,8 @@ class DoorLockClusterLockUserChangeEvent(
     private const val TAG_SOURCE_NODE = 5
     private const val TAG_DATA_INDEX = 6
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): DoorLockClusterLockUserChangeEvent {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DoorLockClusterLockUserChangeEvent {
+      tlvReader.enterStructure(tlvTag)
       val lockDataType = tlvReader.getUInt(ContextSpecificTag(TAG_LOCK_DATA_TYPE))
       val dataOperationType = tlvReader.getUInt(ContextSpecificTag(TAG_DATA_OPERATION_TYPE))
       val operationSource = tlvReader.getUInt(ContextSpecificTag(TAG_OPERATION_SOURCE))

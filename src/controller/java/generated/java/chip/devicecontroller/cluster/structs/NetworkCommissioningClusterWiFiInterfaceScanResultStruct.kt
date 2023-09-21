@@ -41,9 +41,9 @@ class NetworkCommissioningClusterWiFiInterfaceScanResultStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_SECURITY), security)
       put(ContextSpecificTag(TAG_SSID), ssid)
       put(ContextSpecificTag(TAG_BSSID), bssid)
@@ -63,10 +63,10 @@ class NetworkCommissioningClusterWiFiInterfaceScanResultStruct(
     private const val TAG_RSSI = 5
 
     fun fromTlv(
-      tag: Tag,
+      tlvTag: Tag,
       tlvReader: TlvReader
     ): NetworkCommissioningClusterWiFiInterfaceScanResultStruct {
-      tlvReader.enterStructure(tag)
+      tlvReader.enterStructure(tlvTag)
       val security = tlvReader.getUInt(ContextSpecificTag(TAG_SECURITY))
       val ssid = tlvReader.getByteArray(ContextSpecificTag(TAG_SSID))
       val bssid = tlvReader.getByteArray(ContextSpecificTag(TAG_BSSID))

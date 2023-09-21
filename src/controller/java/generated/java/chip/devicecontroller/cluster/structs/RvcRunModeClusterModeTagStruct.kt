@@ -31,9 +31,9 @@ class RvcRunModeClusterModeTagStruct(val mfgCode: Optional<UInt>, val value: UIn
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       if (mfgCode.isPresent) {
         val optmfgCode = mfgCode.get()
         put(ContextSpecificTag(TAG_MFG_CODE), optmfgCode)
@@ -47,8 +47,8 @@ class RvcRunModeClusterModeTagStruct(val mfgCode: Optional<UInt>, val value: UIn
     private const val TAG_MFG_CODE = 0
     private const val TAG_VALUE = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): RvcRunModeClusterModeTagStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): RvcRunModeClusterModeTagStruct {
+      tlvReader.enterStructure(tlvTag)
       val mfgCode =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_MFG_CODE))) {
           Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MFG_CODE)))

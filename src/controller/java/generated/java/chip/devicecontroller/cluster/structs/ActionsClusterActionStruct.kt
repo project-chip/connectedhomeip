@@ -41,9 +41,9 @@ class ActionsClusterActionStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ACTION_I_D), actionID)
       put(ContextSpecificTag(TAG_NAME), name)
       put(ContextSpecificTag(TAG_TYPE), type)
@@ -62,8 +62,8 @@ class ActionsClusterActionStruct(
     private const val TAG_SUPPORTED_COMMANDS = 4
     private const val TAG_STATE = 5
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ActionsClusterActionStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ActionsClusterActionStruct {
+      tlvReader.enterStructure(tlvTag)
       val actionID = tlvReader.getUInt(ContextSpecificTag(TAG_ACTION_I_D))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       val type = tlvReader.getUInt(ContextSpecificTag(TAG_TYPE))

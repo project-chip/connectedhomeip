@@ -115,9 +115,9 @@ class {{cluster.name}}Cluster{{struct.name}} (
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       {% for field in struct.fields %}
         {%- set encodable = field | asEncodable(typeLookup) %}
         {%- set tag = contextSpecificTag(field) -%}
@@ -132,8 +132,8 @@ class {{cluster.name}}Cluster{{struct.name}} (
     private const val TAG_{{field.name | constcase}} = {{field.code}}
     {%- endfor %}
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader) : {{cluster.name}}Cluster{{struct.name}} {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : {{cluster.name}}Cluster{{struct.name}} {
+      tlvReader.enterStructure(tlvTag)
       {% for field in struct.fields %}
         {%- set decodable = field | asEncodable(typeLookup) %}
         {%- set tag = contextSpecificTag(field) -%}

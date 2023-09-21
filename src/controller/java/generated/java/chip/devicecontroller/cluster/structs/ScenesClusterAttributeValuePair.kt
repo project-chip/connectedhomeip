@@ -30,9 +30,9 @@ class ScenesClusterAttributeValuePair(val attributeID: ULong, val attributeValue
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ATTRIBUTE_I_D), attributeID)
       put(ContextSpecificTag(TAG_ATTRIBUTE_VALUE), attributeValue)
       endStructure()
@@ -43,8 +43,8 @@ class ScenesClusterAttributeValuePair(val attributeID: ULong, val attributeValue
     private const val TAG_ATTRIBUTE_I_D = 0
     private const val TAG_ATTRIBUTE_VALUE = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ScenesClusterAttributeValuePair {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ScenesClusterAttributeValuePair {
+      tlvReader.enterStructure(tlvTag)
       val attributeID = tlvReader.getULong(ContextSpecificTag(TAG_ATTRIBUTE_I_D))
       val attributeValue = tlvReader.getULong(ContextSpecificTag(TAG_ATTRIBUTE_VALUE))
 

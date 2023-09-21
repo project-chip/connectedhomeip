@@ -40,9 +40,9 @@ class BindingClusterTargetStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       if (node.isPresent) {
         val optnode = node.get()
         put(ContextSpecificTag(TAG_NODE), optnode)
@@ -71,8 +71,8 @@ class BindingClusterTargetStruct(
     private const val TAG_CLUSTER = 4
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): BindingClusterTargetStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): BindingClusterTargetStruct {
+      tlvReader.enterStructure(tlvTag)
       val node =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_NODE))) {
           Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_NODE)))

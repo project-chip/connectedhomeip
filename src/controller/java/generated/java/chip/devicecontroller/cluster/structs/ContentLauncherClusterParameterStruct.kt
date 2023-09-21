@@ -37,9 +37,9 @@ class ContentLauncherClusterParameterStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_TYPE), type)
       put(ContextSpecificTag(TAG_VALUE), value)
       if (externalIDList.isPresent) {
@@ -59,8 +59,8 @@ class ContentLauncherClusterParameterStruct(
     private const val TAG_VALUE = 1
     private const val TAG_EXTERNAL_I_D_LIST = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ContentLauncherClusterParameterStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentLauncherClusterParameterStruct {
+      tlvReader.enterStructure(tlvTag)
       val type = tlvReader.getUInt(ContextSpecificTag(TAG_TYPE))
       val value = tlvReader.getString(ContextSpecificTag(TAG_VALUE))
       val externalIDList =

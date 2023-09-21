@@ -37,9 +37,9 @@ class RefrigeratorAlarmClusterNotifyEvent(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ACTIVE), active)
       put(ContextSpecificTag(TAG_INACTIVE), inactive)
       put(ContextSpecificTag(TAG_STATE), state)
@@ -54,8 +54,8 @@ class RefrigeratorAlarmClusterNotifyEvent(
     private const val TAG_STATE = 2
     private const val TAG_MASK = 3
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): RefrigeratorAlarmClusterNotifyEvent {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): RefrigeratorAlarmClusterNotifyEvent {
+      tlvReader.enterStructure(tlvTag)
       val active = tlvReader.getULong(ContextSpecificTag(TAG_ACTIVE))
       val inactive = tlvReader.getULong(ContextSpecificTag(TAG_INACTIVE))
       val state = tlvReader.getULong(ContextSpecificTag(TAG_STATE))

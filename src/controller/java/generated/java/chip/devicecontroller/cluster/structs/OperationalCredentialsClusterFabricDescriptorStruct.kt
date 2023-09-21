@@ -41,9 +41,9 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ROOT_PUBLIC_KEY), rootPublicKey)
       put(ContextSpecificTag(TAG_VENDOR_I_D), vendorID)
       put(ContextSpecificTag(TAG_FABRIC_I_D), fabricID)
@@ -63,10 +63,10 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
     private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
-      tag: Tag,
+      tlvTag: Tag,
       tlvReader: TlvReader
     ): OperationalCredentialsClusterFabricDescriptorStruct {
-      tlvReader.enterStructure(tag)
+      tlvReader.enterStructure(tlvTag)
       val rootPublicKey = tlvReader.getByteArray(ContextSpecificTag(TAG_ROOT_PUBLIC_KEY))
       val vendorID = tlvReader.getUInt(ContextSpecificTag(TAG_VENDOR_I_D))
       val fabricID = tlvReader.getULong(ContextSpecificTag(TAG_FABRIC_I_D))

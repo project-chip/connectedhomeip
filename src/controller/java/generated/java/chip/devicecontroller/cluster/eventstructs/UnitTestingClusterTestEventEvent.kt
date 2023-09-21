@@ -42,9 +42,9 @@ class UnitTestingClusterTestEventEvent(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ARG1), arg1)
       put(ContextSpecificTag(TAG_ARG2), arg2)
       put(ContextSpecificTag(TAG_ARG3), arg3)
@@ -71,8 +71,8 @@ class UnitTestingClusterTestEventEvent(
     private const val TAG_ARG5 = 5
     private const val TAG_ARG6 = 6
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): UnitTestingClusterTestEventEvent {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): UnitTestingClusterTestEventEvent {
+      tlvReader.enterStructure(tlvTag)
       val arg1 = tlvReader.getUInt(ContextSpecificTag(TAG_ARG1))
       val arg2 = tlvReader.getUInt(ContextSpecificTag(TAG_ARG2))
       val arg3 = tlvReader.getBoolean(ContextSpecificTag(TAG_ARG3))

@@ -45,9 +45,9 @@ class NetworkCommissioningClusterThreadInterfaceScanResultStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_PAN_ID), panId)
       put(ContextSpecificTag(TAG_EXTENDED_PAN_ID), extendedPanId)
       put(ContextSpecificTag(TAG_NETWORK_NAME), networkName)
@@ -71,10 +71,10 @@ class NetworkCommissioningClusterThreadInterfaceScanResultStruct(
     private const val TAG_LQI = 7
 
     fun fromTlv(
-      tag: Tag,
+      tlvTag: Tag,
       tlvReader: TlvReader
     ): NetworkCommissioningClusterThreadInterfaceScanResultStruct {
-      tlvReader.enterStructure(tag)
+      tlvReader.enterStructure(tlvTag)
       val panId = tlvReader.getUInt(ContextSpecificTag(TAG_PAN_ID))
       val extendedPanId = tlvReader.getULong(ContextSpecificTag(TAG_EXTENDED_PAN_ID))
       val networkName = tlvReader.getString(ContextSpecificTag(TAG_NETWORK_NAME))

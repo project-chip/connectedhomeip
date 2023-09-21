@@ -29,9 +29,9 @@ class GeneralDiagnosticsClusterBootReasonEvent(val bootReason: UInt) {
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_BOOT_REASON), bootReason)
       endStructure()
     }
@@ -40,8 +40,8 @@ class GeneralDiagnosticsClusterBootReasonEvent(val bootReason: UInt) {
   companion object {
     private const val TAG_BOOT_REASON = 0
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): GeneralDiagnosticsClusterBootReasonEvent {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): GeneralDiagnosticsClusterBootReasonEvent {
+      tlvReader.enterStructure(tlvTag)
       val bootReason = tlvReader.getUInt(ContextSpecificTag(TAG_BOOT_REASON))
 
       tlvReader.exitContainer()
