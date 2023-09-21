@@ -18,12 +18,12 @@
 #import <dispatch/dispatch.h>
 #import <os/lock.h>
 
+#import "MTRAsyncWorkQueue_Internal.h"
 #import "MTRLogging_Internal.h"
-#import <Matter/MTRAsyncCallbackWorkQueue.h>
 
 #pragma mark - Class extensions
 
-@interface MTRAsyncCallbackWorkQueue ()
+@interface MTRAsyncWorkQueue ()
 // The lock protects the internal state of the work queue so that these may be called from any queue or thread:
 //   -enqueueWorkItem:
 //   -invalidate
@@ -32,19 +32,19 @@
 @property (nonatomic, readonly) os_unfair_lock lock;
 @property (nonatomic, strong, readonly) id context;
 @property (nonatomic, strong, readonly) dispatch_queue_t queue;
-@property (nonatomic, strong, readonly) NSMutableArray<MTRAsyncCallbackQueueWorkItem *> * items;
+@property (nonatomic, strong, readonly) NSMutableArray<MTRAsyncWorkItem *> * items;
 @property (nonatomic, readwrite) NSUInteger runningWorkItemCount;
 
 // For WorkItem's use only - the parameter is for sanity check
-- (void)endWork:(MTRAsyncCallbackQueueWorkItem *)workItem;
-- (void)retryWork:(MTRAsyncCallbackQueueWorkItem *)workItem;
+- (void)endWork:(MTRAsyncWorkItem *)workItem;
+- (void)retryWork:(MTRAsyncWorkItem *)workItem;
 @end
 
-@interface MTRAsyncCallbackQueueWorkItem ()
+@interface MTRAsyncWorkItem ()
 @property (nonatomic, readonly) os_unfair_lock lock;
 @property (nonatomic, strong, readonly) dispatch_queue_t queue;
 @property (nonatomic, readwrite) NSUInteger retryCount;
-@property (nonatomic, strong) MTRAsyncCallbackWorkQueue * workQueue;
+@property (nonatomic, strong) MTRAsyncWorkQueue * workQueue;
 @property (nonatomic, readonly) BOOL enqueued;
 // Called by the queue
 - (void)markedEnqueued;
@@ -54,7 +54,7 @@
 
 #pragma mark - Class implementations
 
-@implementation MTRAsyncCallbackWorkQueue
+@implementation MTRAsyncWorkQueue
 - (instancetype)initWithContext:(id)context queue:(dispatch_queue_t)queue
 {
     if (self = [super init]) {
@@ -62,6 +62,7 @@
         _context = context;
         _queue = queue;
         _items = [NSMutableArray array];
+        MTR_LOG_INFO("MTRAsyncCallbackWorkQueue init for context %@", context);
     }
     return self;
 }
@@ -78,7 +79,7 @@
     return desc;
 }
 
-- (void)enqueueWorkItem:(MTRAsyncCallbackQueueWorkItem *)item
+- (void)enqueueWorkItem:(MTRAsyncWorkItem *)item
 {
     if (item.enqueued) {
         MTR_LOG_ERROR("MTRAsyncCallbackWorkQueue enqueueWorkItem: item cannot be enqueued twice");
@@ -102,14 +103,16 @@
     _items = nil;
     os_unfair_lock_unlock(&_lock);
 
-    for (MTRAsyncCallbackQueueWorkItem * item in invalidateItems) {
+    MTR_LOG_INFO(
+        "MTRAsyncCallbackWorkQueue invalidate for context %@ items count: %lu", _context, (unsigned long) invalidateItems.count);
+    for (MTRAsyncWorkItem * item in invalidateItems) {
         [item cancel];
     }
     [invalidateItems removeAllObjects];
 }
 
 // called after executing a work item
-- (void)_postProcessWorkItem:(MTRAsyncCallbackQueueWorkItem *)workItem retry:(BOOL)retry
+- (void)_postProcessWorkItem:(MTRAsyncWorkItem *)workItem retry:(BOOL)retry
 {
     os_unfair_lock_lock(&_lock);
     // sanity check if running
@@ -122,7 +125,7 @@
 
     // sanity check the same work item is running
     // when "concurrency width" is implemented need to check first N items
-    MTRAsyncCallbackQueueWorkItem * firstWorkItem = self.items.firstObject;
+    MTRAsyncWorkItem * firstWorkItem = self.items.firstObject;
     if (firstWorkItem != workItem) {
         // something is wrong with this work item - should not be currently running
         os_unfair_lock_unlock(&_lock);
@@ -141,12 +144,12 @@
     os_unfair_lock_unlock(&_lock);
 }
 
-- (void)endWork:(MTRAsyncCallbackQueueWorkItem *)workItem
+- (void)endWork:(MTRAsyncWorkItem *)workItem
 {
     [self _postProcessWorkItem:workItem retry:NO];
 }
 
-- (void)retryWork:(MTRAsyncCallbackQueueWorkItem *)workItem
+- (void)retryWork:(MTRAsyncWorkItem *)workItem
 {
     [self _postProcessWorkItem:workItem retry:YES];
 }
@@ -165,14 +168,54 @@
         // when "concurrency width" is implemented this will be incremented instead
         self.runningWorkItemCount = 1;
 
-        MTRAsyncCallbackQueueWorkItem * workItem = self.items.firstObject;
+        MTRAsyncWorkItem * workItem = self.items.firstObject;
+
+        // Check if batching is possible or needed. Only ask work item to batch once for simplicity
+        if (workItem.batchable && workItem.batchingHandler && (workItem.retryCount == 0)) {
+            while (self.items.count >= 2) {
+                MTRAsyncWorkItem * nextWorkItem = self.items[1];
+                if (!nextWorkItem.batchable || (nextWorkItem.batchingID != workItem.batchingID)) {
+                    // next item is not eligible to merge with this one
+                    break;
+                }
+
+                BOOL fullyMerged = NO;
+                workItem.batchingHandler(workItem.batchableData, nextWorkItem.batchableData, &fullyMerged);
+                if (!fullyMerged) {
+                    // We can't remove the next work item, so we can't merge anything else into this one.
+                    break;
+                }
+
+                [self.items removeObjectAtIndex:1];
+            }
+        }
+
         [workItem callReadyHandlerWithContext:self.context];
     }
 }
 
+- (BOOL)isDuplicateForTypeID:(NSUInteger)opaqueDuplicateTypeID workItemData:(id)opaqueWorkItemData
+{
+    os_unfair_lock_lock(&_lock);
+    // Start from the last item
+    for (NSUInteger i = self.items.count; i > 0; i--) {
+        MTRAsyncWorkItem * item = self.items[i - 1];
+        BOOL isDuplicate = NO;
+        BOOL stop = NO;
+        if (item.supportsDuplicateCheck && (item.duplicateTypeID == opaqueDuplicateTypeID) && item.duplicateCheckHandler) {
+            item.duplicateCheckHandler(opaqueWorkItemData, &isDuplicate, &stop);
+            if (stop) {
+                os_unfair_lock_unlock(&_lock);
+                return isDuplicate;
+            }
+        }
+    }
+    os_unfair_lock_unlock(&_lock);
+    return NO;
+}
 @end
 
-@implementation MTRAsyncCallbackQueueWorkItem
+@implementation MTRAsyncWorkItem
 
 - (instancetype)initWithQueue:(dispatch_queue_t)queue
 {
@@ -211,7 +254,7 @@
     os_unfair_lock_unlock(&_lock);
 }
 
-- (void)setReadyHandler:(MTRAsyncCallbackReadyHandler)readyHandler
+- (void)setReadyHandler:(MTRAsyncWorkReadyHandler)readyHandler
 {
     os_unfair_lock_lock(&_lock);
     if (!_enqueued) {
@@ -245,7 +288,7 @@
 {
     dispatch_async(self.queue, ^{
         os_unfair_lock_lock(&self->_lock);
-        MTRAsyncCallbackReadyHandler readyHandler = self->_readyHandler;
+        MTRAsyncWorkReadyHandler readyHandler = self->_readyHandler;
         NSUInteger retryCount = self->_retryCount;
         if (readyHandler) {
             self->_retryCount++;
@@ -274,6 +317,23 @@
             cancelHandler();
         });
     }
+}
+
+- (void)setBatchingID:(NSUInteger)opaqueBatchingID data:(id)opaqueBatchableData handler:(MTRAsyncWorkBatchingHandler)batchingHandler
+{
+    os_unfair_lock_lock(&self->_lock);
+    _batchable = YES;
+    _batchingID = opaqueBatchingID;
+    _batchableData = opaqueBatchableData;
+    _batchingHandler = batchingHandler;
+    os_unfair_lock_unlock(&self->_lock);
+}
+
+- (void)setDuplicateTypeID:(NSUInteger)opaqueDuplicateTypeID handler:(MTRAsyncWorkDuplicateCheckHandler)duplicateCheckHandler
+{
+    _supportsDuplicateCheck = YES;
+    _duplicateTypeID = opaqueDuplicateTypeID;
+    _duplicateCheckHandler = duplicateCheckHandler;
 }
 
 @end

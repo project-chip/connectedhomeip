@@ -34,11 +34,6 @@
 #include "OTAUtil.h"
 #endif
 
-#ifdef CONFIG_CHIP_ICD_SUBSCRIPTION_HANDLING
-#include "ICDUtil.h"
-#include <app/InteractionModelEngine.h>
-#endif
-
 #include <zephyr/fs/nvs.h>
 #include <zephyr/settings/settings.h>
 
@@ -320,10 +315,6 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // Set up a valid Network Commissioning cluster on endpoint 0 is done in
     // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
-#endif
-
-#ifdef CONFIG_CHIP_ICD_SUBSCRIPTION_HANDLING
-    chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&GetICDUtil());
 #endif
 
     // We need to disable OpenThread to prevent writing to the NVS storage when factory reset occurs
