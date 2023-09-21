@@ -50,12 +50,12 @@ std::string MakeJsonSingleLine(const std::string & jsonString);
 
 /*
  *
- * The attribute/event TLV blob from the report during IM read/subscribe Interaction does not have a struct container 
- * and attribute/event tag, but the tlvToJson function expects the struct container and tag Id for the TLV payload. 
- * This convenient function firstly adds the struct container, if id is less than or equal to UINT8_MAX, it would encodes with the context tag, if id is larger than UINT8_MAX and
- * less than or equal to UINT32_MAX, it would encode with the implicit profile tag.
+ * The attribute/event TLV blob from the report during IM read/subscribe Interaction does not have a struct container
+ * and attribute/event tag, but the tlvToJson function expects the struct container and tag Id for the TLV payload.
+ * This convenient function firstly adds the struct container, if id is less than or equal to UINT8_MAX, it would encodes with the
+ * context tag, if id is larger than UINT8_MAX and less than or equal to UINT32_MAX, it would encode with the implicit profile tag.
  * @param[in]   id              a attribute Id or event Id
- * @param[in]   data      a single tlv element from report attribute or event
+ * @param[in]   tlv      a single tlv element from report attribute or event
  * @param[out]  jsonString             a mutable bytespan with data encode by attribute/event Id and struct container
  */
 CHIP_ERROR SingleElementTlvToJson(uint32_t id, const TLV::TLVReader & tlv, std::string & jsonString);

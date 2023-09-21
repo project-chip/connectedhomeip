@@ -478,8 +478,12 @@ CHIP_ERROR SingleAttributeJsonToTlv(const std::string & jsonString, MutableByteS
     tlvReader.Init(dataWithStruct);
     ReturnErrorOnFailure(tlvReader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
     ReturnErrorOnFailure(tlvReader.EnterContainer(outerContainer));
-    ReturnErrorOnFailure(tlvReader.Next());
-
+    CHIP_ERROR err = tlvReader.Next();
+    if (err == CHIP_ERROR_UNKNOWN_IMPLICIT_TLV_TAG)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
     TLV::TLVWriter tlvWrite;
     tlvWrite.Init(tlv);
     ReturnErrorOnFailure(tlvWrite.CopyElement(TLV::AnonymousTag(), tlvReader));
