@@ -832,11 +832,15 @@ void InvokeCallback::OnResponse(app::CommandSender * apCommandSender, const app:
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onError method: %s", ErrorStr(err)));
 
     DeviceLayer::StackUnlock unlock;
-    if (aStatusIB.mClusterStatus.HasValue()) {
-        env->CallVoidMethod(mJavaCallbackRef, onResponseMethod, invokeElementObj, static_cast<jlong>(aStatusIB.mClusterStatus.Value()));
+    if (aStatusIB.mClusterStatus.HasValue())
+    {
+        env->CallVoidMethod(mJavaCallbackRef, onResponseMethod, invokeElementObj,
+                            static_cast<jlong>(aStatusIB.mClusterStatus.Value()));
     }
-    else {
-        env->CallVoidMethod(mJavaCallbackRef, onResponseMethod, invokeElementObj, static_cast<jlong>(Protocols::InteractionModel::Status::Success));
+    else
+    {
+        env->CallVoidMethod(mJavaCallbackRef, onResponseMethod, invokeElementObj,
+                            static_cast<jlong>(Protocols::InteractionModel::Status::Success));
     }
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
