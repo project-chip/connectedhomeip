@@ -3,7 +3,7 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRBaseClusters.h>
 
-#import "MTRAsyncCallbackWorkQueue.h"
+#import "MTRAsyncWorkQueue.h"
 #import "MTRBaseClusterUtils.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRClusterConstants.h"
@@ -28,11 +28,11 @@ using chip::Optional;
 using chip::System::Clock::Timeout;
 using chip::System::Clock::Seconds16;
 
-static void MTRClustersLogEnqueue(NSString *logPrefix, MTRAsyncCallbackWorkQueue *workQueue) {
+static void MTRClustersLogEnqueue(NSString *logPrefix, MTRAsyncWorkQueue *workQueue) {
     MTR_LOG_DEFAULT("%@ enqueueWorkItem %@", logPrefix, workQueue);
 }
 
-static void MTRClustersLogDequeue(NSString *logPrefix, MTRAsyncCallbackWorkQueue *workQueue) {
+static void MTRClustersLogDequeue(NSString *logPrefix, MTRAsyncWorkQueue *workQueue) {
     MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, workQueue);
 }
 
@@ -113,8 +113,8 @@ completionHandler
     NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int){{> clusterId}}, (unsigned int){{> commandId}}];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[{{> baseCluster}} alloc] initWithDevice:baseDevice endpointID:@(self.endpoint) queue:self.device.queue];
