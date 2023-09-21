@@ -18,7 +18,7 @@
 #import <Matter/MTRDefines.h>
 #import <os/lock.h>
 
-#import "MTRAsyncCallbackWorkQueue_Internal.h"
+#import "MTRAsyncWorkQueue_Internal.h"
 #import "MTRAttributeSpecifiedCheck.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRBaseSubscriptionCallback.h"
@@ -200,7 +200,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             = dispatch_queue_create("org.csa-iot.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _readCache = [NSMutableDictionary dictionary];
         _expectedValueCache = [NSMutableDictionary dictionary];
-        _asyncCallbackWorkQueue = [[MTRAsyncCallbackWorkQueue alloc] initWithContext:self queue:_queue];
+        _asyncCallbackWorkQueue = [[MTRAsyncWorkQueue alloc] initWithContext:self queue:_queue];
         _state = MTRDeviceStateUnknown;
         MTR_LOG_INFO("%@ init with hex nodeID 0x%016llX", self, _nodeID.unsignedLongLongValue);
     }
@@ -869,8 +869,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         NSMutableArray<NSArray *> * readRequests = [NSMutableArray arrayWithObject:readRequestData];
 
         // Create work item, set ready handler to perform task, then enqueue the work
-        MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.queue];
-        MTRAsyncCallbackBatchingHandler batchingHandler = ^(id opaqueDataCurrent, id opaqueDataNext, BOOL * fullyMerged) {
+        MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
+        MTRAsyncWorkBatchingHandler batchingHandler = ^(id opaqueDataCurrent, id opaqueDataNext, BOOL * fullyMerged) {
             NSMutableArray<NSArray *> * readRequestsCurrent = opaqueDataCurrent;
             NSMutableArray<NSArray *> * readRequestsNext = opaqueDataNext;
 
@@ -908,7 +908,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 *fullyMerged = YES;
             }
         };
-        MTRAsyncCallbackDuplicateCheckHandler duplicateCheckHandler = ^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
+        MTRAsyncWorkDuplicateCheckHandler duplicateCheckHandler = ^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
             for (NSArray * readItem in readRequests) {
                 if ([readItem isEqual:opaqueItemData]) {
                     MTR_LOG_DEFAULT("%@ duplicate check found %@ - report duplicate", logPrefix, readItem);
@@ -919,7 +919,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             }
             *stop = NO;
         };
-        MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
             MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, self->_asyncCallbackWorkQueue);
 
             // Sanity check
@@ -1000,14 +1000,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         expectedValueInterval:expectedValueInterval
               expectedValueID:&expectedValueID];
 
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.queue];
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
     // The write operation will install a duplicate check handler, to return NO for "isDuplicate". Since a write operation may
     // change values, only read requests after this should be considered for duplicate requests.
-    MTRAsyncCallbackDuplicateCheckHandler duplicateCheckHandler = ^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
+    MTRAsyncWorkDuplicateCheckHandler duplicateCheckHandler = ^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
         *isDuplicate = NO;
         *stop = YES;
     };
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, self->_asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [self newBaseDevice];
         [baseDevice
@@ -1060,14 +1060,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             [attributePaths addObject:expectedValue[MTRAttributePathKey]];
         }
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.queue];
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
     // The command operation will install a duplicate check handler, to return NO for "isDuplicate". Since a command operation may
     // change values, only read requests after this should be considered for duplicate requests.
-    MTRAsyncCallbackDuplicateCheckHandler duplicateCheckHandler = ^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
+    MTRAsyncWorkDuplicateCheckHandler duplicateCheckHandler = ^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
         *isDuplicate = NO;
         *stop = YES;
     };
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, self->_asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [self newBaseDevice];
         [baseDevice

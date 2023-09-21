@@ -27,3 +27,9 @@
 #else
 #define MTR_DIRECT_MEMBERS
 #endif
+
+#ifdef DEBUG
+#define MTR_TESTABLE MTR_EXPORT
+#else
+#define MTR_TESTABLE MTR_HIDDEN
+#endif

@@ -16,13 +16,14 @@
  */
 
 #import <Foundation/Foundation.h>
-
-#import "MTRBaseDevice.h"
-#import "MTRDevice.h"
+#import <Matter/MTRBaseDevice.h>
+#import <Matter/MTRDevice.h>
 
 #include <app/DeviceProxy.h>
 
 NS_ASSUME_NONNULL_BEGIN
+
+@class MTRAsyncWorkQueue;
 
 typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 
@@ -47,7 +48,7 @@ typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 // on work items should happen on this queue, so we don't block progress of the
 // asyncCallbackWorkQueue on any client code.
 @property (nonatomic) dispatch_queue_t queue;
-@property (nonatomic, readonly) MTRAsyncCallbackWorkQueue * asyncCallbackWorkQueue;
+@property (nonatomic, readonly) MTRAsyncWorkQueue * asyncCallbackWorkQueue;
 
 @end
 
