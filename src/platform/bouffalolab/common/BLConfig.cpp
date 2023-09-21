@@ -24,18 +24,20 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-void BLConfig::Init(void) 
+void BLConfig::Init(void)
 {
     easyflash_init();
     ef_load_env_cache();
 
-    if (ef_get_env(kBLKey_factoryResetFlag)) {
+    if (ef_get_env(kBLKey_factoryResetFlag))
+    {
 
-        ef_print_env_cb([](env_node_obj_t env, void *arg1, void *arg2){ 
-
-            if (ENV_WRITE == env->status) {
+        ef_print_env_cb([](env_node_obj_t env, void * arg1, void * arg2) {
+            if (ENV_WRITE == env->status)
+            {
                 env->name[env->name_len] = '\0';
-                if (strncmp(kBLKey_factoryResetFlag, env->name, sizeof(env->name) - 1)) {
+                if (strncmp(kBLKey_factoryResetFlag, env->name, sizeof(env->name) - 1))
+                {
                     /** delete all key=value except factory reset flag */
                     ef_del_and_save_env(env->name);
                 }
