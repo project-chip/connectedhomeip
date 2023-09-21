@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,10 +29,11 @@ namespace bdx {
  * An abstract class with methods for handling BDX messages from an ExchangeContext and using an event driven
  * async approach to get the next action from the transfer session state machine.
  *
- * This class does not define any methods for beginning a transfer or initializing the underlying TransferSession object (see
- * Responder below. TODO: # 29334 - Add Initiator to AsyncFacilitator)
+ * This class does not define any methods for beginning a transfer or initializing the underlying TransferSession object.
+ * See AsyncResponder for a class that does.
+ * TODO: # 29334 - Add AsyncInitiator to handle the initiating side of a transfer.
  *
- * For each BDX transfer, we will have an instance of AsyncTransferFacilitator facilitating the transfer.
+ * An AsyncTransferFacilitator is associated with a specific BDX transfer.
  */
 class AsyncTransferFacilitator : public Messaging::ExchangeDelegate
 {
@@ -46,18 +46,20 @@ public:
      *
      * @param[in] event An OutputEvent that contains output from the TransferSession object.
      */
-    virtual void HandleAsyncTransferSessionOutput(TransferSession::OutputEvent & event) = 0;
+    virtual void HandleTransferSessionOutput(TransferSession::OutputEvent & event) = 0;
 
     /**
-     * This method returns the exchange context contained in the exchange holder member of this class.
+     * This method returns the exchange on which the BDX transfer is happening.
+     *
+     * May return null if there is no such exchange (e.g. it has been closed due to the transfer completing
+     * or some error condition).
      */
-    chip::Messaging::ExchangeContext * GetExchangeContext();
+    Messaging::ExchangeContext * GetExchangeContext();
 
-    // Inherited from ExchangeContext
-    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
-                                 chip::System::PacketBufferHandle && payload) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
-    void OnExchangeClosing(chip::Messaging::ExchangeContext * ec) override;
+    void OnExchangeClosing(Messaging::ExchangeContext * ec) override;
 
 protected:
     // The transfer session coresponding to this AsynTransferFacilitator object.
@@ -71,8 +73,9 @@ protected:
  * An AsyncTransferFacilitator that is initialized to respond to an incoming BDX transfer request.
  *
  * Provides a method for initializing the TransferSession member but still needs to be extended to implement
- * HandleAsyncTransferSessionOutput. It is intended that this class will be used as a delegate for handling an unsolicited BDX
- * message.
+ * HandleAsyncTransferSessionOutput. 
+ *
+ * This class, or a subclass of it, should be used as the exchange delegate for a BDX transfer.
  */
 class AsyncResponder : public AsyncTransferFacilitator
 {
@@ -80,10 +83,10 @@ public:
     /**
      * Initialize the TransferSession state machine to be ready for an incoming transfer request.
      *
-     * @param[in] exchangeCtx     The exchange context of the delegate
+     * @param[in] exchangeCtx     The exchange to use for the transfer.
      * @param[in] role            The role of the Responder: Sender or Receiver of BDX data
      * @param[in] xferControlOpts Supported transfer modes (see TransferControlFlags)
-     * @param[in] maxBlockSize    The supported maximum size of BDX Block data
+     * @param[in] maxBlockSize    The maximum supported size of BDX Block data
      * @param[in] timeout         The chosen timeout delay for the BDX transfer
      */
     CHIP_ERROR PrepareForTransfer(Messaging::ExchangeContext * exchangeCtx, TransferRole role,
@@ -97,9 +100,11 @@ public:
      * while handling the event. This is needed as the delegate calls async callbacks for handling the BDX messages and we need to
      * get the next action from the state machine based on how the delegate handled the message.
      *
-     * @param[in] error           The CHIP_ERROR if there were any errors in handling the event, otherwise CHIP_NO_ERROR is passed
+     * @param[in] eventHandlingResult  The result of handling the event.  CHIP_NO_ERROR if
+     *                                 it was handled successfully, otherwise the error that
+     *                                 was encountered.
      */
-    void NotifyEventHandledWithError(CHIP_ERROR error);
+    void NotifyEventHandled(CHIP_ERROR eventHandlingResult);
 
 private:
     bdx::StatusCode GetBdxStatusCodeFromChipError(CHIP_ERROR err);

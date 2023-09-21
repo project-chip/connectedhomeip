@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,9 +21,9 @@
 namespace chip {
 namespace bdx {
 
-CHIP_ERROR AsyncTransferFacilitator::OnMessageReceived(chip::Messaging::ExchangeContext * ec,
-                                                       const chip::PayloadHeader & payloadHeader,
-                                                       chip::System::PacketBufferHandle && payload)
+CHIP_ERROR AsyncTransferFacilitator::OnMessageReceived(Messaging::ExchangeContext * ec,
+                                                       const PayloadHeader & payloadHeader,
+                                                       System::PacketBufferHandle && payload)
 {
     VerifyOrReturnError(ec == mExchange.Get(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -64,29 +63,19 @@ CHIP_ERROR AsyncTransferFacilitator::OnMessageReceived(chip::Messaging::Exchange
 
 Messaging::ExchangeContext * AsyncTransferFacilitator::GetExchangeContext()
 {
-    if (mExchange)
-    {
-        return mExchange.Get();
-    }
-    return nullptr;
+    return mExchange.Get();
 }
 
 void AsyncTransferFacilitator::OnExchangeClosing(chip::Messaging::ExchangeContext * ec)
 {
     ChipLogDetail(BDX, "%s, ec: " ChipLogFormatExchange, __FUNCTION__, ChipLogValueExchange(ec));
-    if (mExchange)
-    {
-        mExchange.Release();
-    }
+    mExchange.Release();
 }
 
 void AsyncTransferFacilitator::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
     ChipLogDetail(BDX, "%s, ec: " ChipLogFormatExchange, __FUNCTION__, ChipLogValueExchange(ec));
-    if (mExchange)
-    {
-        mExchange.Release();
-    }
+    mExchange.Release();
 }
 
 CHIP_ERROR AsyncResponder::PrepareForTransfer(Messaging::ExchangeContext * exchangeCtx, TransferRole role,
