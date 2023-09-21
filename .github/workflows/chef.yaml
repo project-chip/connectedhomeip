@@ -96,7 +96,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:10
+            image: ghcr.io/project-chip/chip-build-telink:12
             options: --user root
 
         steps:
