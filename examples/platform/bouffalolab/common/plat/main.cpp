@@ -33,8 +33,7 @@ void appError(int err)
 {
     ChipLogProgress(NotSpecified, "!!!!!!!!!!!! App Critical Error: %d !!!!!!!!!!!", err);
     portDISABLE_INTERRUPTS();
-    while (true)
-        ;
+    while (true) ;
 }
 
 void appError(CHIP_ERROR error)
