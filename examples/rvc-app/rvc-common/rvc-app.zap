@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -33,10 +33,9 @@
   ],
   "endpointTypes": [
     {
-      "id": 12,
+      "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 177,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 177,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        177
       ],
       "deviceVersions": [
         1
@@ -5420,10 +5415,9 @@
       ]
     },
     {
-      "id": 11,
+      "id": 2,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
-        "id": 225,
         "code": 116,
         "profileId": 259,
         "label": "MA-robotic-vacuum-cleaner",
@@ -5431,15 +5425,11 @@
       },
       "deviceTypes": [
         {
-          "id": 225,
           "code": 116,
           "profileId": 259,
           "label": "MA-robotic-vacuum-cleaner",
           "name": "MA-robotic-vacuum-cleaner"
         }
-      ],
-      "deviceTypeRefs": [
-        225
       ],
       "deviceVersions": [
         1
@@ -7705,11 +7695,11 @@
               "mfgCode": null,
               "side": "server",
               "type": "int8u",
-              "included": 0,
+              "included": 1,
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
