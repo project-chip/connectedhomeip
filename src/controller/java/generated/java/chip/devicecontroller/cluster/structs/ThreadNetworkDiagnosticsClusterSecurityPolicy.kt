@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class ThreadNetworkDiagnosticsClusterSecurityPolicy(val rotationTime: Int, val flags: Int) {
+class ThreadNetworkDiagnosticsClusterSecurityPolicy(val rotationTime: UInt, val flags: UInt) {
   override fun toString(): String = buildString {
     append("ThreadNetworkDiagnosticsClusterSecurityPolicy {\n")
     append("\trotationTime : $rotationTime\n")
@@ -45,8 +45,8 @@ class ThreadNetworkDiagnosticsClusterSecurityPolicy(val rotationTime: Int, val f
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): ThreadNetworkDiagnosticsClusterSecurityPolicy {
       tlvReader.enterStructure(tag)
-      val rotationTime = tlvReader.getInt(ContextSpecificTag(TAG_ROTATION_TIME))
-      val flags = tlvReader.getInt(ContextSpecificTag(TAG_FLAGS))
+      val rotationTime = tlvReader.getUInt(ContextSpecificTag(TAG_ROTATION_TIME))
+      val flags = tlvReader.getUInt(ContextSpecificTag(TAG_FLAGS))
 
       tlvReader.exitContainer()
 

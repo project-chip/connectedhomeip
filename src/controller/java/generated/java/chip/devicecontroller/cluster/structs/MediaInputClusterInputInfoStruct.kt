@@ -23,8 +23,8 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class MediaInputClusterInputInfoStruct(
-  val index: Int,
-  val inputType: Int,
+  val index: UInt,
+  val inputType: UInt,
   val name: String,
   val description: String
 ) {
@@ -56,8 +56,8 @@ class MediaInputClusterInputInfoStruct(
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): MediaInputClusterInputInfoStruct {
       tlvReader.enterStructure(tag)
-      val index = tlvReader.getInt(ContextSpecificTag(TAG_INDEX))
-      val inputType = tlvReader.getInt(ContextSpecificTag(TAG_INPUT_TYPE))
+      val index = tlvReader.getUInt(ContextSpecificTag(TAG_INDEX))
+      val inputType = tlvReader.getUInt(ContextSpecificTag(TAG_INPUT_TYPE))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       val description = tlvReader.getString(ContextSpecificTag(TAG_DESCRIPTION))
 

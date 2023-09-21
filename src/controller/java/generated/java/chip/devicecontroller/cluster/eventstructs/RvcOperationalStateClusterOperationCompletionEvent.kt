@@ -24,9 +24,9 @@ import chip.tlv.TlvWriter
 import java.util.Optional
 
 class RvcOperationalStateClusterOperationCompletionEvent(
-  val completionErrorCode: Int,
-  val totalOperationalTime: Optional<Long>?,
-  val pausedTime: Optional<Long>?
+  val completionErrorCode: UInt,
+  val totalOperationalTime: Optional<ULong>?,
+  val pausedTime: Optional<ULong>?
 ) {
   override fun toString(): String = buildString {
     append("RvcOperationalStateClusterOperationCompletionEvent {\n")
@@ -70,11 +70,11 @@ class RvcOperationalStateClusterOperationCompletionEvent(
       tlvReader: TlvReader
     ): RvcOperationalStateClusterOperationCompletionEvent {
       tlvReader.enterStructure(tag)
-      val completionErrorCode = tlvReader.getInt(ContextSpecificTag(TAG_COMPLETION_ERROR_CODE))
+      val completionErrorCode = tlvReader.getUInt(ContextSpecificTag(TAG_COMPLETION_ERROR_CODE))
       val totalOperationalTime =
         if (!tlvReader.isNull()) {
           if (tlvReader.isNextTag(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))) {
-            Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME)))
+            Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME)))
           } else {
             Optional.empty()
           }
@@ -85,7 +85,7 @@ class RvcOperationalStateClusterOperationCompletionEvent(
       val pausedTime =
         if (!tlvReader.isNull()) {
           if (tlvReader.isNextTag(ContextSpecificTag(TAG_PAUSED_TIME))) {
-            Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_PAUSED_TIME)))
+            Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_PAUSED_TIME)))
           } else {
             Optional.empty()
           }

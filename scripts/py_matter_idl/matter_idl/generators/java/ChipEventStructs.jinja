@@ -26,11 +26,11 @@
       {{encode_tlv(encodable.without_optional(), tag, "opt" + name, depth + 1)}}
     }
   {%- elif encodable.is_list -%}
-      startList({{tag}})
+      startArray({{tag}})
       for (item in {{name}}.iterator()) {
         {{encode_tlv(encodable.without_list(), "AnonymousTag", "item", depth + 1)}}
       }
-      endList()
+      endArray()
   {%- elif encodable.is_struct -%}
       {{name}}.toTlv({{tag}}, this)
   {%- else -%}
@@ -55,7 +55,7 @@
   {%- elif encodable.is_list -%}
     {%- set encodablewithoutlist = encodable.without_list() -%}
     buildList <{{encode_value(source, encodablewithoutlist, depth + 1)}}> {
-      tlvReader.enterList({{tag}})
+      tlvReader.enterArray({{tag}})
       while(!tlvReader.isEndOfContainer()) {
         this.add({{decode_tlv(source, encodablewithoutlist, "AnonymousTag", depth + 1)}})
       }

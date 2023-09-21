@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class TargetNavigatorClusterTargetInfoStruct(val identifier: Int, val name: String) {
+class TargetNavigatorClusterTargetInfoStruct(val identifier: UInt, val name: String) {
   override fun toString(): String = buildString {
     append("TargetNavigatorClusterTargetInfoStruct {\n")
     append("\tidentifier : $identifier\n")
@@ -45,7 +45,7 @@ class TargetNavigatorClusterTargetInfoStruct(val identifier: Int, val name: Stri
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): TargetNavigatorClusterTargetInfoStruct {
       tlvReader.enterStructure(tag)
-      val identifier = tlvReader.getInt(ContextSpecificTag(TAG_IDENTIFIER))
+      val identifier = tlvReader.getUInt(ContextSpecificTag(TAG_IDENTIFIER))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
 
       tlvReader.exitContainer()

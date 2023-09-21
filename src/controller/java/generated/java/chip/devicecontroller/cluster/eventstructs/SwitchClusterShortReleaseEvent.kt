@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class SwitchClusterShortReleaseEvent(val previousPosition: Int) {
+class SwitchClusterShortReleaseEvent(val previousPosition: UInt) {
   override fun toString(): String = buildString {
     append("SwitchClusterShortReleaseEvent {\n")
     append("\tpreviousPosition : $previousPosition\n")
@@ -42,7 +42,7 @@ class SwitchClusterShortReleaseEvent(val previousPosition: Int) {
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): SwitchClusterShortReleaseEvent {
       tlvReader.enterStructure(tag)
-      val previousPosition = tlvReader.getInt(ContextSpecificTag(TAG_PREVIOUS_POSITION))
+      val previousPosition = tlvReader.getUInt(ContextSpecificTag(TAG_PREVIOUS_POSITION))
 
       tlvReader.exitContainer()
 

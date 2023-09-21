@@ -23,9 +23,9 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class AccessControlClusterAccessControlTargetStruct(
-  val cluster: Long?,
-  val endpoint: Int?,
-  val deviceType: Long?
+  val cluster: ULong?,
+  val endpoint: UInt?,
+  val deviceType: ULong?
 ) {
   override fun toString(): String = buildString {
     append("AccessControlClusterAccessControlTargetStruct {\n")
@@ -66,21 +66,21 @@ class AccessControlClusterAccessControlTargetStruct(
       tlvReader.enterStructure(tag)
       val cluster =
         if (!tlvReader.isNull()) {
-          tlvReader.getLong(ContextSpecificTag(TAG_CLUSTER))
+          tlvReader.getULong(ContextSpecificTag(TAG_CLUSTER))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_CLUSTER))
           null
         }
       val endpoint =
         if (!tlvReader.isNull()) {
-          tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT))
+          tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_ENDPOINT))
           null
         }
       val deviceType =
         if (!tlvReader.isNull()) {
-          tlvReader.getLong(ContextSpecificTag(TAG_DEVICE_TYPE))
+          tlvReader.getULong(ContextSpecificTag(TAG_DEVICE_TYPE))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_DEVICE_TYPE))
           null

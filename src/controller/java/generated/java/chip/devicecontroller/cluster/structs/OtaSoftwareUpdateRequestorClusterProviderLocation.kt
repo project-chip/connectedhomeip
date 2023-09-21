@@ -23,9 +23,9 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class OtaSoftwareUpdateRequestorClusterProviderLocation(
-  val providerNodeID: Long,
-  val endpoint: Int,
-  val fabricIndex: Int
+  val providerNodeID: ULong,
+  val endpoint: UInt,
+  val fabricIndex: UInt
 ) {
   override fun toString(): String = buildString {
     append("OtaSoftwareUpdateRequestorClusterProviderLocation {\n")
@@ -52,9 +52,9 @@ class OtaSoftwareUpdateRequestorClusterProviderLocation(
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): OtaSoftwareUpdateRequestorClusterProviderLocation {
       tlvReader.enterStructure(tag)
-      val providerNodeID = tlvReader.getLong(ContextSpecificTag(TAG_PROVIDER_NODE_I_D))
-      val endpoint = tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT))
-      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val providerNodeID = tlvReader.getULong(ContextSpecificTag(TAG_PROVIDER_NODE_I_D))
+      val endpoint = tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT))
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 

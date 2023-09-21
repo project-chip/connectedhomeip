@@ -23,8 +23,8 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class SwitchClusterMultiPressCompleteEvent(
-  val previousPosition: Int,
-  val totalNumberOfPressesCounted: Int
+  val previousPosition: UInt,
+  val totalNumberOfPressesCounted: UInt
 ) {
   override fun toString(): String = buildString {
     append("SwitchClusterMultiPressCompleteEvent {\n")
@@ -48,9 +48,9 @@ class SwitchClusterMultiPressCompleteEvent(
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): SwitchClusterMultiPressCompleteEvent {
       tlvReader.enterStructure(tag)
-      val previousPosition = tlvReader.getInt(ContextSpecificTag(TAG_PREVIOUS_POSITION))
+      val previousPosition = tlvReader.getUInt(ContextSpecificTag(TAG_PREVIOUS_POSITION))
       val totalNumberOfPressesCounted =
-        tlvReader.getInt(ContextSpecificTag(TAG_TOTAL_NUMBER_OF_PRESSES_COUNTED))
+        tlvReader.getUInt(ContextSpecificTag(TAG_TOTAL_NUMBER_OF_PRESSES_COUNTED))
 
       tlvReader.exitContainer()
 

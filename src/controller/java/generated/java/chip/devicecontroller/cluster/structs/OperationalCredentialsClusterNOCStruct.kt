@@ -25,7 +25,7 @@ import chip.tlv.TlvWriter
 class OperationalCredentialsClusterNOCStruct(
   val noc: ByteArray,
   val icac: ByteArray?,
-  val fabricIndex: Int
+  val fabricIndex: UInt
 ) {
   override fun toString(): String = buildString {
     append("OperationalCredentialsClusterNOCStruct {\n")
@@ -64,7 +64,7 @@ class OperationalCredentialsClusterNOCStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_ICAC))
           null
         }
-      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 

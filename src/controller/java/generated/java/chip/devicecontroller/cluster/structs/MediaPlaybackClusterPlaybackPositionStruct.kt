@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class MediaPlaybackClusterPlaybackPositionStruct(val updatedAt: Long, val position: Long?) {
+class MediaPlaybackClusterPlaybackPositionStruct(val updatedAt: ULong, val position: ULong?) {
   override fun toString(): String = buildString {
     append("MediaPlaybackClusterPlaybackPositionStruct {\n")
     append("\tupdatedAt : $updatedAt\n")
@@ -49,10 +49,10 @@ class MediaPlaybackClusterPlaybackPositionStruct(val updatedAt: Long, val positi
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): MediaPlaybackClusterPlaybackPositionStruct {
       tlvReader.enterStructure(tag)
-      val updatedAt = tlvReader.getLong(ContextSpecificTag(TAG_UPDATED_AT))
+      val updatedAt = tlvReader.getULong(ContextSpecificTag(TAG_UPDATED_AT))
       val position =
         if (!tlvReader.isNull()) {
-          tlvReader.getLong(ContextSpecificTag(TAG_POSITION))
+          tlvReader.getULong(ContextSpecificTag(TAG_POSITION))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_POSITION))
           null

@@ -23,7 +23,7 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class ThermostatClusterThermostatScheduleTransition(
-  val transitionTime: Int,
+  val transitionTime: UInt,
   val heatSetpoint: Int?,
   val coolSetpoint: Int?
 ) {
@@ -60,7 +60,7 @@ class ThermostatClusterThermostatScheduleTransition(
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): ThermostatClusterThermostatScheduleTransition {
       tlvReader.enterStructure(tag)
-      val transitionTime = tlvReader.getInt(ContextSpecificTag(TAG_TRANSITION_TIME))
+      val transitionTime = tlvReader.getUInt(ContextSpecificTag(TAG_TRANSITION_TIME))
       val heatSetpoint =
         if (!tlvReader.isNull()) {
           tlvReader.getInt(ContextSpecificTag(TAG_HEAT_SETPOINT))

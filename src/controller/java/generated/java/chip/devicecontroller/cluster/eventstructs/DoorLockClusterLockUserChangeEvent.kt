@@ -23,13 +23,13 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class DoorLockClusterLockUserChangeEvent(
-  val lockDataType: Int,
-  val dataOperationType: Int,
-  val operationSource: Int,
-  val userIndex: Int?,
-  val fabricIndex: Int?,
-  val sourceNode: Long?,
-  val dataIndex: Int?
+  val lockDataType: UInt,
+  val dataOperationType: UInt,
+  val operationSource: UInt,
+  val userIndex: UInt?,
+  val fabricIndex: UInt?,
+  val sourceNode: ULong?,
+  val dataIndex: UInt?
 ) {
   override fun toString(): String = buildString {
     append("DoorLockClusterLockUserChangeEvent {\n")
@@ -84,33 +84,33 @@ class DoorLockClusterLockUserChangeEvent(
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): DoorLockClusterLockUserChangeEvent {
       tlvReader.enterStructure(tag)
-      val lockDataType = tlvReader.getInt(ContextSpecificTag(TAG_LOCK_DATA_TYPE))
-      val dataOperationType = tlvReader.getInt(ContextSpecificTag(TAG_DATA_OPERATION_TYPE))
-      val operationSource = tlvReader.getInt(ContextSpecificTag(TAG_OPERATION_SOURCE))
+      val lockDataType = tlvReader.getUInt(ContextSpecificTag(TAG_LOCK_DATA_TYPE))
+      val dataOperationType = tlvReader.getUInt(ContextSpecificTag(TAG_DATA_OPERATION_TYPE))
+      val operationSource = tlvReader.getUInt(ContextSpecificTag(TAG_OPERATION_SOURCE))
       val userIndex =
         if (!tlvReader.isNull()) {
-          tlvReader.getInt(ContextSpecificTag(TAG_USER_INDEX))
+          tlvReader.getUInt(ContextSpecificTag(TAG_USER_INDEX))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_USER_INDEX))
           null
         }
       val fabricIndex =
         if (!tlvReader.isNull()) {
-          tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+          tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_FABRIC_INDEX))
           null
         }
       val sourceNode =
         if (!tlvReader.isNull()) {
-          tlvReader.getLong(ContextSpecificTag(TAG_SOURCE_NODE))
+          tlvReader.getULong(ContextSpecificTag(TAG_SOURCE_NODE))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_SOURCE_NODE))
           null
         }
       val dataIndex =
         if (!tlvReader.isNull()) {
-          tlvReader.getInt(ContextSpecificTag(TAG_DATA_INDEX))
+          tlvReader.getUInt(ContextSpecificTag(TAG_DATA_INDEX))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_DATA_INDEX))
           null

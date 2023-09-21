@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class SmokeCoAlarmClusterCOAlarmEvent(val alarmSeverityLevel: Int) {
+class SmokeCoAlarmClusterCOAlarmEvent(val alarmSeverityLevel: UInt) {
   override fun toString(): String = buildString {
     append("SmokeCoAlarmClusterCOAlarmEvent {\n")
     append("\talarmSeverityLevel : $alarmSeverityLevel\n")
@@ -42,7 +42,7 @@ class SmokeCoAlarmClusterCOAlarmEvent(val alarmSeverityLevel: Int) {
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): SmokeCoAlarmClusterCOAlarmEvent {
       tlvReader.enterStructure(tag)
-      val alarmSeverityLevel = tlvReader.getInt(ContextSpecificTag(TAG_ALARM_SEVERITY_LEVEL))
+      val alarmSeverityLevel = tlvReader.getUInt(ContextSpecificTag(TAG_ALARM_SEVERITY_LEVEL))
 
       tlvReader.exitContainer()
 

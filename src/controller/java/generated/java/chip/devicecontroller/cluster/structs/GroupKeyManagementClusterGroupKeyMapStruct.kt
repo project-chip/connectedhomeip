@@ -23,9 +23,9 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class GroupKeyManagementClusterGroupKeyMapStruct(
-  val groupId: Int,
-  val groupKeySetID: Int,
-  val fabricIndex: Int
+  val groupId: UInt,
+  val groupKeySetID: UInt,
+  val fabricIndex: UInt
 ) {
   override fun toString(): String = buildString {
     append("GroupKeyManagementClusterGroupKeyMapStruct {\n")
@@ -52,9 +52,9 @@ class GroupKeyManagementClusterGroupKeyMapStruct(
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): GroupKeyManagementClusterGroupKeyMapStruct {
       tlvReader.enterStructure(tag)
-      val groupId = tlvReader.getInt(ContextSpecificTag(TAG_GROUP_ID))
-      val groupKeySetID = tlvReader.getInt(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D))
-      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val groupId = tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_ID))
+      val groupKeySetID = tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D))
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 

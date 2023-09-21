@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class WiFiNetworkDiagnosticsClusterConnectionStatusEvent(val connectionStatus: Int) {
+class WiFiNetworkDiagnosticsClusterConnectionStatusEvent(val connectionStatus: UInt) {
   override fun toString(): String = buildString {
     append("WiFiNetworkDiagnosticsClusterConnectionStatusEvent {\n")
     append("\tconnectionStatus : $connectionStatus\n")
@@ -45,7 +45,7 @@ class WiFiNetworkDiagnosticsClusterConnectionStatusEvent(val connectionStatus: I
       tlvReader: TlvReader
     ): WiFiNetworkDiagnosticsClusterConnectionStatusEvent {
       tlvReader.enterStructure(tag)
-      val connectionStatus = tlvReader.getInt(ContextSpecificTag(TAG_CONNECTION_STATUS))
+      val connectionStatus = tlvReader.getUInt(ContextSpecificTag(TAG_CONNECTION_STATUS))
 
       tlvReader.exitContainer()
 

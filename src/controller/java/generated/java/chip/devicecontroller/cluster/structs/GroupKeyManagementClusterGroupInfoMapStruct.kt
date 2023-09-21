@@ -25,10 +25,10 @@ import chip.tlv.TlvWriter
 import java.util.Optional
 
 class GroupKeyManagementClusterGroupInfoMapStruct(
-  val groupId: Int,
-  val endpoints: List<Int>,
+  val groupId: UInt,
+  val endpoints: List<UInt>,
   val groupName: Optional<String>,
-  val fabricIndex: Int
+  val fabricIndex: UInt
 ) {
   override fun toString(): String = buildString {
     append("GroupKeyManagementClusterGroupInfoMapStruct {\n")
@@ -43,11 +43,11 @@ class GroupKeyManagementClusterGroupInfoMapStruct(
     tlvWriter.apply {
       startStructure(tag)
       put(ContextSpecificTag(TAG_GROUP_ID), groupId)
-      startList(ContextSpecificTag(TAG_ENDPOINTS))
+      startArray(ContextSpecificTag(TAG_ENDPOINTS))
       for (item in endpoints.iterator()) {
         put(AnonymousTag, item)
       }
-      endList()
+      endArray()
       if (groupName.isPresent) {
         val optgroupName = groupName.get()
         put(ContextSpecificTag(TAG_GROUP_NAME), optgroupName)
@@ -65,12 +65,12 @@ class GroupKeyManagementClusterGroupInfoMapStruct(
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): GroupKeyManagementClusterGroupInfoMapStruct {
       tlvReader.enterStructure(tag)
-      val groupId = tlvReader.getInt(ContextSpecificTag(TAG_GROUP_ID))
+      val groupId = tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_ID))
       val endpoints =
-        buildList<Int> {
-          tlvReader.enterList(ContextSpecificTag(TAG_ENDPOINTS))
+        buildList<UInt> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_ENDPOINTS))
           while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getInt(AnonymousTag))
+            add(tlvReader.getUInt(AnonymousTag))
           }
           tlvReader.exitContainer()
         }
@@ -80,7 +80,7 @@ class GroupKeyManagementClusterGroupInfoMapStruct(
         } else {
           Optional.empty()
         }
-      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 

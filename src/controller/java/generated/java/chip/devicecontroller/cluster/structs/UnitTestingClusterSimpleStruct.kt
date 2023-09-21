@@ -23,12 +23,12 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class UnitTestingClusterSimpleStruct(
-  val a: Int,
+  val a: UInt,
   val b: Boolean,
-  val c: Int,
+  val c: UInt,
   val d: ByteArray,
   val e: String,
-  val f: Int,
+  val f: UInt,
   val g: Float,
   val h: Double
 ) {
@@ -72,12 +72,12 @@ class UnitTestingClusterSimpleStruct(
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): UnitTestingClusterSimpleStruct {
       tlvReader.enterStructure(tag)
-      val a = tlvReader.getInt(ContextSpecificTag(TAG_A))
+      val a = tlvReader.getUInt(ContextSpecificTag(TAG_A))
       val b = tlvReader.getBoolean(ContextSpecificTag(TAG_B))
-      val c = tlvReader.getInt(ContextSpecificTag(TAG_C))
+      val c = tlvReader.getUInt(ContextSpecificTag(TAG_C))
       val d = tlvReader.getByteArray(ContextSpecificTag(TAG_D))
       val e = tlvReader.getString(ContextSpecificTag(TAG_E))
-      val f = tlvReader.getInt(ContextSpecificTag(TAG_F))
+      val f = tlvReader.getUInt(ContextSpecificTag(TAG_F))
       val g = tlvReader.getFloat(ContextSpecificTag(TAG_G))
       val h = tlvReader.getDouble(ContextSpecificTag(TAG_H))
 

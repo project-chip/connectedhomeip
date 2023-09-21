@@ -24,9 +24,9 @@ import chip.tlv.TlvWriter
 import java.util.Optional
 
 class DescriptorClusterSemanticTagStruct(
-  val mfgCode: Int?,
-  val namespaceID: Int,
-  val tag: Int,
+  val mfgCode: UInt?,
+  val namespaceID: UInt,
+  val tag: UInt,
   val label: Optional<String>?
 ) {
   override fun toString(): String = buildString {
@@ -70,13 +70,13 @@ class DescriptorClusterSemanticTagStruct(
       tlvReader.enterStructure(tag)
       val mfgCode =
         if (!tlvReader.isNull()) {
-          tlvReader.getInt(ContextSpecificTag(TAG_MFG_CODE))
+          tlvReader.getUInt(ContextSpecificTag(TAG_MFG_CODE))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_MFG_CODE))
           null
         }
-      val namespaceID = tlvReader.getInt(ContextSpecificTag(TAG_NAMESPACE_I_D))
-      val tag = tlvReader.getInt(ContextSpecificTag(TAG_TAG))
+      val namespaceID = tlvReader.getUInt(ContextSpecificTag(TAG_NAMESPACE_I_D))
+      val tag = tlvReader.getUInt(ContextSpecificTag(TAG_TAG))
       val label =
         if (!tlvReader.isNull()) {
           if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {

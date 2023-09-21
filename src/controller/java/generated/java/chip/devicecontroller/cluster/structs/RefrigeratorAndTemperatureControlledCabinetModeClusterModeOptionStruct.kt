@@ -25,7 +25,7 @@ import chip.tlv.TlvWriter
 
 class RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct(
   val label: String,
-  val mode: Int,
+  val mode: UInt,
   val modeTags: List<RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct>
 ) {
   override fun toString(): String = buildString {
@@ -41,11 +41,11 @@ class RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct(
       startStructure(tag)
       put(ContextSpecificTag(TAG_LABEL), label)
       put(ContextSpecificTag(TAG_MODE), mode)
-      startList(ContextSpecificTag(TAG_MODE_TAGS))
+      startArray(ContextSpecificTag(TAG_MODE_TAGS))
       for (item in modeTags.iterator()) {
         item.toTlv(AnonymousTag, this)
       }
-      endList()
+      endArray()
       endStructure()
     }
   }
@@ -61,10 +61,10 @@ class RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct(
     ): RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct {
       tlvReader.enterStructure(tag)
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
-      val mode = tlvReader.getInt(ContextSpecificTag(TAG_MODE))
+      val mode = tlvReader.getUInt(ContextSpecificTag(TAG_MODE))
       val modeTags =
         buildList<RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct> {
-          tlvReader.enterList(ContextSpecificTag(TAG_MODE_TAGS))
+          tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
           while (!tlvReader.isEndOfContainer()) {
             add(
               RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct.fromTlv(

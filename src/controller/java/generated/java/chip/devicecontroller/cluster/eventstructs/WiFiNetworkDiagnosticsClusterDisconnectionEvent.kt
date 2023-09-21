@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class WiFiNetworkDiagnosticsClusterDisconnectionEvent(val reasonCode: Int) {
+class WiFiNetworkDiagnosticsClusterDisconnectionEvent(val reasonCode: UInt) {
   override fun toString(): String = buildString {
     append("WiFiNetworkDiagnosticsClusterDisconnectionEvent {\n")
     append("\treasonCode : $reasonCode\n")
@@ -42,7 +42,7 @@ class WiFiNetworkDiagnosticsClusterDisconnectionEvent(val reasonCode: Int) {
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): WiFiNetworkDiagnosticsClusterDisconnectionEvent {
       tlvReader.enterStructure(tag)
-      val reasonCode = tlvReader.getInt(ContextSpecificTag(TAG_REASON_CODE))
+      val reasonCode = tlvReader.getUInt(ContextSpecificTag(TAG_REASON_CODE))
 
       tlvReader.exitContainer()
 

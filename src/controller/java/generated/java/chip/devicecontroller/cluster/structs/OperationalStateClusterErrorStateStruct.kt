@@ -24,7 +24,7 @@ import chip.tlv.TlvWriter
 import java.util.Optional
 
 class OperationalStateClusterErrorStateStruct(
-  val errorStateID: Int,
+  val errorStateID: UInt,
   val errorStateLabel: Optional<String>,
   val errorStateDetails: Optional<String>
 ) {
@@ -59,7 +59,7 @@ class OperationalStateClusterErrorStateStruct(
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): OperationalStateClusterErrorStateStruct {
       tlvReader.enterStructure(tag)
-      val errorStateID = tlvReader.getInt(ContextSpecificTag(TAG_ERROR_STATE_I_D))
+      val errorStateID = tlvReader.getUInt(ContextSpecificTag(TAG_ERROR_STATE_I_D))
       val errorStateLabel =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_STATE_LABEL))) {
           Optional.of(tlvReader.getString(ContextSpecificTag(TAG_ERROR_STATE_LABEL)))

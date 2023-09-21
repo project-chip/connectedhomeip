@@ -493,10 +493,16 @@ class EncodableValue:
                 raise Exception("Unknown fundamental type")
         elif isinstance(t, BasicInteger):
             # the >= 3 will include int24_t to be considered "long"
-            if t.byte_count >= 3:
-                return "Long"
+            if t.is_signed:
+                if t.byte_count >= 3:
+                    return "Long"
+                else:
+                    return "Int"
             else:
-                return "Int"
+                if t.byte_count >= 3:
+                    return "ULong"
+                else:
+                    return "UInt"
         elif isinstance(t, BasicString):
             if t.is_binary:
                 return "ByteArray"
@@ -504,14 +510,14 @@ class EncodableValue:
                 return "String"
         elif isinstance(t, IdlEnumType):
             if t.base_type.byte_count >= 3:
-                return "Long"
+                return "ULong"
             else:
-                return "Int"
+                return "UInt"
         elif isinstance(t, IdlBitmapType):
             if t.base_type.byte_count >= 3:
-                return "Long"
+                return "ULong"
             else:
-                return "Int"
+                return "UInt"
         else:
             return "Any"
 

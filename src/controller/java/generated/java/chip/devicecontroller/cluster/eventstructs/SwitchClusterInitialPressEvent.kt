@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class SwitchClusterInitialPressEvent(val newPosition: Int) {
+class SwitchClusterInitialPressEvent(val newPosition: UInt) {
   override fun toString(): String = buildString {
     append("SwitchClusterInitialPressEvent {\n")
     append("\tnewPosition : $newPosition\n")
@@ -42,7 +42,7 @@ class SwitchClusterInitialPressEvent(val newPosition: Int) {
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): SwitchClusterInitialPressEvent {
       tlvReader.enterStructure(tag)
-      val newPosition = tlvReader.getInt(ContextSpecificTag(TAG_NEW_POSITION))
+      val newPosition = tlvReader.getUInt(ContextSpecificTag(TAG_NEW_POSITION))
 
       tlvReader.exitContainer()
 

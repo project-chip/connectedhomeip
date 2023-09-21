@@ -24,10 +24,10 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class ActionsClusterEndpointListStruct(
-  val endpointListID: Int,
+  val endpointListID: UInt,
   val name: String,
-  val type: Int,
-  val endpoints: List<Int>
+  val type: UInt,
+  val endpoints: List<UInt>
 ) {
   override fun toString(): String = buildString {
     append("ActionsClusterEndpointListStruct {\n")
@@ -44,11 +44,11 @@ class ActionsClusterEndpointListStruct(
       put(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D), endpointListID)
       put(ContextSpecificTag(TAG_NAME), name)
       put(ContextSpecificTag(TAG_TYPE), type)
-      startList(ContextSpecificTag(TAG_ENDPOINTS))
+      startArray(ContextSpecificTag(TAG_ENDPOINTS))
       for (item in endpoints.iterator()) {
         put(AnonymousTag, item)
       }
-      endList()
+      endArray()
       endStructure()
     }
   }
@@ -61,14 +61,14 @@ class ActionsClusterEndpointListStruct(
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): ActionsClusterEndpointListStruct {
       tlvReader.enterStructure(tag)
-      val endpointListID = tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D))
+      val endpointListID = tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
-      val type = tlvReader.getInt(ContextSpecificTag(TAG_TYPE))
+      val type = tlvReader.getUInt(ContextSpecificTag(TAG_TYPE))
       val endpoints =
-        buildList<Int> {
-          tlvReader.enterList(ContextSpecificTag(TAG_ENDPOINTS))
+        buildList<UInt> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_ENDPOINTS))
           while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getInt(AnonymousTag))
+            add(tlvReader.getUInt(AnonymousTag))
           }
           tlvReader.exitContainer()
         }

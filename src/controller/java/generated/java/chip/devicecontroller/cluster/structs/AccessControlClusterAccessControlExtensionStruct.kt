@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class AccessControlClusterAccessControlExtensionStruct(val data: ByteArray, val fabricIndex: Int) {
+class AccessControlClusterAccessControlExtensionStruct(val data: ByteArray, val fabricIndex: UInt) {
   override fun toString(): String = buildString {
     append("AccessControlClusterAccessControlExtensionStruct {\n")
     append("\tdata : $data\n")
@@ -46,7 +46,7 @@ class AccessControlClusterAccessControlExtensionStruct(val data: ByteArray, val 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): AccessControlClusterAccessControlExtensionStruct {
       tlvReader.enterStructure(tag)
       val data = tlvReader.getByteArray(ContextSpecificTag(TAG_DATA))
-      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 

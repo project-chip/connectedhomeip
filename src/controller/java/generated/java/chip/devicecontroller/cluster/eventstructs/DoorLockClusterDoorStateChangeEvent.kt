@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class DoorLockClusterDoorStateChangeEvent(val doorState: Int) {
+class DoorLockClusterDoorStateChangeEvent(val doorState: UInt) {
   override fun toString(): String = buildString {
     append("DoorLockClusterDoorStateChangeEvent {\n")
     append("\tdoorState : $doorState\n")
@@ -42,7 +42,7 @@ class DoorLockClusterDoorStateChangeEvent(val doorState: Int) {
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): DoorLockClusterDoorStateChangeEvent {
       tlvReader.enterStructure(tag)
-      val doorState = tlvReader.getInt(ContextSpecificTag(TAG_DOOR_STATE))
+      val doorState = tlvReader.getUInt(ContextSpecificTag(TAG_DOOR_STATE))
 
       tlvReader.exitContainer()
 

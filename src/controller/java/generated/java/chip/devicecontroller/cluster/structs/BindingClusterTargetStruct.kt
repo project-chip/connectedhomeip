@@ -24,11 +24,11 @@ import chip.tlv.TlvWriter
 import java.util.Optional
 
 class BindingClusterTargetStruct(
-  val node: Optional<Long>,
-  val group: Optional<Int>,
-  val endpoint: Optional<Int>,
-  val cluster: Optional<Long>,
-  val fabricIndex: Int
+  val node: Optional<ULong>,
+  val group: Optional<UInt>,
+  val endpoint: Optional<UInt>,
+  val cluster: Optional<ULong>,
+  val fabricIndex: UInt
 ) {
   override fun toString(): String = buildString {
     append("BindingClusterTargetStruct {\n")
@@ -75,29 +75,29 @@ class BindingClusterTargetStruct(
       tlvReader.enterStructure(tag)
       val node =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_NODE))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_NODE)))
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_NODE)))
         } else {
           Optional.empty()
         }
       val group =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_GROUP))) {
-          Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_GROUP)))
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_GROUP)))
         } else {
           Optional.empty()
         }
       val endpoint =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENDPOINT))) {
-          Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT)))
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT)))
         } else {
           Optional.empty()
         }
       val cluster =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLUSTER))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_CLUSTER)))
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_CLUSTER)))
         } else {
           Optional.empty()
         }
-      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 

@@ -24,8 +24,8 @@ import chip.tlv.TlvWriter
 
 class TimeSynchronizationClusterDSTOffsetStruct(
   val offset: Long,
-  val validStarting: Long,
-  val validUntil: Long?
+  val validStarting: ULong,
+  val validUntil: ULong?
 ) {
   override fun toString(): String = buildString {
     append("TimeSynchronizationClusterDSTOffsetStruct {\n")
@@ -57,10 +57,10 @@ class TimeSynchronizationClusterDSTOffsetStruct(
     fun fromTlv(tag: Tag, tlvReader: TlvReader): TimeSynchronizationClusterDSTOffsetStruct {
       tlvReader.enterStructure(tag)
       val offset = tlvReader.getLong(ContextSpecificTag(TAG_OFFSET))
-      val validStarting = tlvReader.getLong(ContextSpecificTag(TAG_VALID_STARTING))
+      val validStarting = tlvReader.getULong(ContextSpecificTag(TAG_VALID_STARTING))
       val validUntil =
         if (!tlvReader.isNull()) {
-          tlvReader.getLong(ContextSpecificTag(TAG_VALID_UNTIL))
+          tlvReader.getULong(ContextSpecificTag(TAG_VALID_UNTIL))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_VALID_UNTIL))
           null

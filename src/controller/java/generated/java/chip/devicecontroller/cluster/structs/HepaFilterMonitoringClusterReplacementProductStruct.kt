@@ -23,7 +23,7 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class HepaFilterMonitoringClusterReplacementProductStruct(
-  val productIdentifierType: Int,
+  val productIdentifierType: UInt,
   val productIdentifierValue: String
 ) {
   override fun toString(): String = buildString {
@@ -51,7 +51,7 @@ class HepaFilterMonitoringClusterReplacementProductStruct(
       tlvReader: TlvReader
     ): HepaFilterMonitoringClusterReplacementProductStruct {
       tlvReader.enterStructure(tag)
-      val productIdentifierType = tlvReader.getInt(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_TYPE))
+      val productIdentifierType = tlvReader.getUInt(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_TYPE))
       val productIdentifierValue =
         tlvReader.getString(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_VALUE))
 

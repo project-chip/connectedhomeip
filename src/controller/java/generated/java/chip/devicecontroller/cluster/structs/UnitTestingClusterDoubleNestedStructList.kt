@@ -33,11 +33,11 @@ class UnitTestingClusterDoubleNestedStructList(val a: List<UnitTestingClusterNes
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tag)
-      startList(ContextSpecificTag(TAG_A))
+      startArray(ContextSpecificTag(TAG_A))
       for (item in a.iterator()) {
         item.toTlv(AnonymousTag, this)
       }
-      endList()
+      endArray()
       endStructure()
     }
   }
@@ -49,7 +49,7 @@ class UnitTestingClusterDoubleNestedStructList(val a: List<UnitTestingClusterNes
       tlvReader.enterStructure(tag)
       val a =
         buildList<UnitTestingClusterNestedStructList> {
-          tlvReader.enterList(ContextSpecificTag(TAG_A))
+          tlvReader.enterArray(ContextSpecificTag(TAG_A))
           while (!tlvReader.isEndOfContainer()) {
             add(UnitTestingClusterNestedStructList.fromTlv(AnonymousTag, tlvReader))
           }

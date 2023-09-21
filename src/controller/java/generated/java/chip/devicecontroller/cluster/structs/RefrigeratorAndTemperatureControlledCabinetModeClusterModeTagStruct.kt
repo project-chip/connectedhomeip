@@ -24,8 +24,8 @@ import chip.tlv.TlvWriter
 import java.util.Optional
 
 class RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct(
-  val mfgCode: Optional<Int>,
-  val value: Int
+  val mfgCode: Optional<UInt>,
+  val value: UInt
 ) {
   override fun toString(): String = buildString {
     append("RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct {\n")
@@ -57,11 +57,11 @@ class RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct(
       tlvReader.enterStructure(tag)
       val mfgCode =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_MFG_CODE))) {
-          Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_MFG_CODE)))
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MFG_CODE)))
         } else {
           Optional.empty()
         }
-      val value = tlvReader.getInt(ContextSpecificTag(TAG_VALUE))
+      val value = tlvReader.getUInt(ContextSpecificTag(TAG_VALUE))
 
       tlvReader.exitContainer()
 

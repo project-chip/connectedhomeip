@@ -23,8 +23,8 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class OtaSoftwareUpdateRequestorClusterVersionAppliedEvent(
-  val softwareVersion: Long,
-  val productID: Int
+  val softwareVersion: ULong,
+  val productID: UInt
 ) {
   override fun toString(): String = buildString {
     append("OtaSoftwareUpdateRequestorClusterVersionAppliedEvent {\n")
@@ -51,8 +51,8 @@ class OtaSoftwareUpdateRequestorClusterVersionAppliedEvent(
       tlvReader: TlvReader
     ): OtaSoftwareUpdateRequestorClusterVersionAppliedEvent {
       tlvReader.enterStructure(tag)
-      val softwareVersion = tlvReader.getLong(ContextSpecificTag(TAG_SOFTWARE_VERSION))
-      val productID = tlvReader.getInt(ContextSpecificTag(TAG_PRODUCT_I_D))
+      val softwareVersion = tlvReader.getULong(ContextSpecificTag(TAG_SOFTWARE_VERSION))
+      val productID = tlvReader.getUInt(ContextSpecificTag(TAG_PRODUCT_I_D))
 
       tlvReader.exitContainer()
 

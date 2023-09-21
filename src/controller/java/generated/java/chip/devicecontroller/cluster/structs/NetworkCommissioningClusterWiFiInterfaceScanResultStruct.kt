@@ -23,11 +23,11 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class NetworkCommissioningClusterWiFiInterfaceScanResultStruct(
-  val security: Int,
+  val security: UInt,
   val ssid: ByteArray,
   val bssid: ByteArray,
-  val channel: Int,
-  val wiFiBand: Int,
+  val channel: UInt,
+  val wiFiBand: UInt,
   val rssi: Int
 ) {
   override fun toString(): String = buildString {
@@ -67,11 +67,11 @@ class NetworkCommissioningClusterWiFiInterfaceScanResultStruct(
       tlvReader: TlvReader
     ): NetworkCommissioningClusterWiFiInterfaceScanResultStruct {
       tlvReader.enterStructure(tag)
-      val security = tlvReader.getInt(ContextSpecificTag(TAG_SECURITY))
+      val security = tlvReader.getUInt(ContextSpecificTag(TAG_SECURITY))
       val ssid = tlvReader.getByteArray(ContextSpecificTag(TAG_SSID))
       val bssid = tlvReader.getByteArray(ContextSpecificTag(TAG_BSSID))
-      val channel = tlvReader.getInt(ContextSpecificTag(TAG_CHANNEL))
-      val wiFiBand = tlvReader.getInt(ContextSpecificTag(TAG_WI_FI_BAND))
+      val channel = tlvReader.getUInt(ContextSpecificTag(TAG_CHANNEL))
+      val wiFiBand = tlvReader.getUInt(ContextSpecificTag(TAG_WI_FI_BAND))
       val rssi = tlvReader.getInt(ContextSpecificTag(TAG_RSSI))
 
       tlvReader.exitContainer()

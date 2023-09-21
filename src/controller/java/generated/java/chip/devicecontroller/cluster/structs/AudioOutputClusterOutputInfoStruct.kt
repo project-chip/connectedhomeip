@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class AudioOutputClusterOutputInfoStruct(val index: Int, val outputType: Int, val name: String) {
+class AudioOutputClusterOutputInfoStruct(val index: UInt, val outputType: UInt, val name: String) {
   override fun toString(): String = buildString {
     append("AudioOutputClusterOutputInfoStruct {\n")
     append("\tindex : $index\n")
@@ -48,8 +48,8 @@ class AudioOutputClusterOutputInfoStruct(val index: Int, val outputType: Int, va
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): AudioOutputClusterOutputInfoStruct {
       tlvReader.enterStructure(tag)
-      val index = tlvReader.getInt(ContextSpecificTag(TAG_INDEX))
-      val outputType = tlvReader.getInt(ContextSpecificTag(TAG_OUTPUT_TYPE))
+      val index = tlvReader.getUInt(ContextSpecificTag(TAG_INDEX))
+      val outputType = tlvReader.getUInt(ContextSpecificTag(TAG_OUTPUT_TYPE))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
 
       tlvReader.exitContainer()

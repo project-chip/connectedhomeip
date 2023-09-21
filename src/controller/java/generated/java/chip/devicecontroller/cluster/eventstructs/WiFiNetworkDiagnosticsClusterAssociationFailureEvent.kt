@@ -23,8 +23,8 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class WiFiNetworkDiagnosticsClusterAssociationFailureEvent(
-  val associationFailure: Int,
-  val status: Int
+  val associationFailure: UInt,
+  val status: UInt
 ) {
   override fun toString(): String = buildString {
     append("WiFiNetworkDiagnosticsClusterAssociationFailureEvent {\n")
@@ -51,8 +51,8 @@ class WiFiNetworkDiagnosticsClusterAssociationFailureEvent(
       tlvReader: TlvReader
     ): WiFiNetworkDiagnosticsClusterAssociationFailureEvent {
       tlvReader.enterStructure(tag)
-      val associationFailure = tlvReader.getInt(ContextSpecificTag(TAG_ASSOCIATION_FAILURE))
-      val status = tlvReader.getInt(ContextSpecificTag(TAG_STATUS))
+      val associationFailure = tlvReader.getUInt(ContextSpecificTag(TAG_ASSOCIATION_FAILURE))
+      val status = tlvReader.getUInt(ContextSpecificTag(TAG_STATUS))
 
       tlvReader.exitContainer()
 

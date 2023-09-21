@@ -23,7 +23,7 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class ApplicationBasicClusterApplicationStruct(
-  val catalogVendorID: Int,
+  val catalogVendorID: UInt,
   val applicationID: String
 ) {
   override fun toString(): String = buildString {
@@ -48,7 +48,7 @@ class ApplicationBasicClusterApplicationStruct(
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): ApplicationBasicClusterApplicationStruct {
       tlvReader.enterStructure(tag)
-      val catalogVendorID = tlvReader.getInt(ContextSpecificTag(TAG_CATALOG_VENDOR_I_D))
+      val catalogVendorID = tlvReader.getUInt(ContextSpecificTag(TAG_CATALOG_VENDOR_I_D))
       val applicationID = tlvReader.getString(ContextSpecificTag(TAG_APPLICATION_I_D))
 
       tlvReader.exitContainer()

@@ -23,8 +23,8 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct(
-  val nodeID: Long,
-  val endpoint: Int
+  val nodeID: ULong,
+  val endpoint: UInt
 ) {
   override fun toString(): String = buildString {
     append("TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct {\n")
@@ -51,8 +51,8 @@ class TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct(
       tlvReader: TlvReader
     ): TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct {
       tlvReader.enterStructure(tag)
-      val nodeID = tlvReader.getLong(ContextSpecificTag(TAG_NODE_I_D))
-      val endpoint = tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT))
+      val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_I_D))
+      val endpoint = tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT))
 
       tlvReader.exitContainer()
 

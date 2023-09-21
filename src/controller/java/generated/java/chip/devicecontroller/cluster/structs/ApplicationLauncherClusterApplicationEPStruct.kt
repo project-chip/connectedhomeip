@@ -25,7 +25,7 @@ import java.util.Optional
 
 class ApplicationLauncherClusterApplicationEPStruct(
   val application: ApplicationLauncherClusterApplicationStruct,
-  val endpoint: Optional<Int>
+  val endpoint: Optional<UInt>
 ) {
   override fun toString(): String = buildString {
     append("ApplicationLauncherClusterApplicationEPStruct {\n")
@@ -59,7 +59,7 @@ class ApplicationLauncherClusterApplicationEPStruct(
         )
       val endpoint =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENDPOINT))) {
-          Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT)))
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT)))
         } else {
           Optional.empty()
         }

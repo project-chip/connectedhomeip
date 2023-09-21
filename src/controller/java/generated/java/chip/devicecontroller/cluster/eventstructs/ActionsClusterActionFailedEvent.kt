@@ -23,10 +23,10 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class ActionsClusterActionFailedEvent(
-  val actionID: Int,
-  val invokeID: Long,
-  val newState: Int,
-  val error: Int
+  val actionID: UInt,
+  val invokeID: ULong,
+  val newState: UInt,
+  val error: UInt
 ) {
   override fun toString(): String = buildString {
     append("ActionsClusterActionFailedEvent {\n")
@@ -56,10 +56,10 @@ class ActionsClusterActionFailedEvent(
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): ActionsClusterActionFailedEvent {
       tlvReader.enterStructure(tag)
-      val actionID = tlvReader.getInt(ContextSpecificTag(TAG_ACTION_I_D))
-      val invokeID = tlvReader.getLong(ContextSpecificTag(TAG_INVOKE_I_D))
-      val newState = tlvReader.getInt(ContextSpecificTag(TAG_NEW_STATE))
-      val error = tlvReader.getInt(ContextSpecificTag(TAG_ERROR))
+      val actionID = tlvReader.getUInt(ContextSpecificTag(TAG_ACTION_I_D))
+      val invokeID = tlvReader.getULong(ContextSpecificTag(TAG_INVOKE_I_D))
+      val newState = tlvReader.getUInt(ContextSpecificTag(TAG_NEW_STATE))
+      val error = tlvReader.getUInt(ContextSpecificTag(TAG_ERROR))
 
       tlvReader.exitContainer()
 

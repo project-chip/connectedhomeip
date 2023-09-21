@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class ScenesClusterAttributeValuePair(val attributeID: Long, val attributeValue: Long) {
+class ScenesClusterAttributeValuePair(val attributeID: ULong, val attributeValue: ULong) {
   override fun toString(): String = buildString {
     append("ScenesClusterAttributeValuePair {\n")
     append("\tattributeID : $attributeID\n")
@@ -45,8 +45,8 @@ class ScenesClusterAttributeValuePair(val attributeID: Long, val attributeValue:
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): ScenesClusterAttributeValuePair {
       tlvReader.enterStructure(tag)
-      val attributeID = tlvReader.getLong(ContextSpecificTag(TAG_ATTRIBUTE_I_D))
-      val attributeValue = tlvReader.getLong(ContextSpecificTag(TAG_ATTRIBUTE_VALUE))
+      val attributeID = tlvReader.getULong(ContextSpecificTag(TAG_ATTRIBUTE_I_D))
+      val attributeValue = tlvReader.getULong(ContextSpecificTag(TAG_ATTRIBUTE_VALUE))
 
       tlvReader.exitContainer()
 

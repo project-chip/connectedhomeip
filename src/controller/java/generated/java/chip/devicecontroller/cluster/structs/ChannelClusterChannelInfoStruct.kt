@@ -24,8 +24,8 @@ import chip.tlv.TlvWriter
 import java.util.Optional
 
 class ChannelClusterChannelInfoStruct(
-  val majorNumber: Int,
-  val minorNumber: Int,
+  val majorNumber: UInt,
+  val minorNumber: UInt,
   val name: Optional<String>,
   val callSign: Optional<String>,
   val affiliateCallSign: Optional<String>
@@ -70,8 +70,8 @@ class ChannelClusterChannelInfoStruct(
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): ChannelClusterChannelInfoStruct {
       tlvReader.enterStructure(tag)
-      val majorNumber = tlvReader.getInt(ContextSpecificTag(TAG_MAJOR_NUMBER))
-      val minorNumber = tlvReader.getInt(ContextSpecificTag(TAG_MINOR_NUMBER))
+      val majorNumber = tlvReader.getUInt(ContextSpecificTag(TAG_MAJOR_NUMBER))
+      val minorNumber = tlvReader.getUInt(ContextSpecificTag(TAG_MINOR_NUMBER))
       val name =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
           Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))

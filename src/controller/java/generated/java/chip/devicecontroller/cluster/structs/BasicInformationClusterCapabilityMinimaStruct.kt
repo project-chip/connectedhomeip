@@ -23,8 +23,8 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class BasicInformationClusterCapabilityMinimaStruct(
-  val caseSessionsPerFabric: Int,
-  val subscriptionsPerFabric: Int
+  val caseSessionsPerFabric: UInt,
+  val subscriptionsPerFabric: UInt
 ) {
   override fun toString(): String = buildString {
     append("BasicInformationClusterCapabilityMinimaStruct {\n")
@@ -48,9 +48,10 @@ class BasicInformationClusterCapabilityMinimaStruct(
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): BasicInformationClusterCapabilityMinimaStruct {
       tlvReader.enterStructure(tag)
-      val caseSessionsPerFabric = tlvReader.getInt(ContextSpecificTag(TAG_CASE_SESSIONS_PER_FABRIC))
+      val caseSessionsPerFabric =
+        tlvReader.getUInt(ContextSpecificTag(TAG_CASE_SESSIONS_PER_FABRIC))
       val subscriptionsPerFabric =
-        tlvReader.getInt(ContextSpecificTag(TAG_SUBSCRIPTIONS_PER_FABRIC))
+        tlvReader.getUInt(ContextSpecificTag(TAG_SUBSCRIPTIONS_PER_FABRIC))
 
       tlvReader.exitContainer()
 

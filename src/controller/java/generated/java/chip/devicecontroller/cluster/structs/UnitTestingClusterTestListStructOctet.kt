@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class UnitTestingClusterTestListStructOctet(val member1: Long, val member2: ByteArray) {
+class UnitTestingClusterTestListStructOctet(val member1: ULong, val member2: ByteArray) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterTestListStructOctet {\n")
     append("\tmember1 : $member1\n")
@@ -45,7 +45,7 @@ class UnitTestingClusterTestListStructOctet(val member1: Long, val member2: Byte
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): UnitTestingClusterTestListStructOctet {
       tlvReader.enterStructure(tag)
-      val member1 = tlvReader.getLong(ContextSpecificTag(TAG_MEMBER1))
+      val member1 = tlvReader.getULong(ContextSpecificTag(TAG_MEMBER1))
       val member2 = tlvReader.getByteArray(ContextSpecificTag(TAG_MEMBER2))
 
       tlvReader.exitContainer()

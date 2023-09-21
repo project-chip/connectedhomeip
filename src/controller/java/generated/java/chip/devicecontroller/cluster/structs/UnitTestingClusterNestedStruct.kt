@@ -23,7 +23,7 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class UnitTestingClusterNestedStruct(
-  val a: Int,
+  val a: UInt,
   val b: Boolean,
   val c: UnitTestingClusterSimpleStruct
 ) {
@@ -52,7 +52,7 @@ class UnitTestingClusterNestedStruct(
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): UnitTestingClusterNestedStruct {
       tlvReader.enterStructure(tag)
-      val a = tlvReader.getInt(ContextSpecificTag(TAG_A))
+      val a = tlvReader.getUInt(ContextSpecificTag(TAG_A))
       val b = tlvReader.getBoolean(ContextSpecificTag(TAG_B))
       val c = UnitTestingClusterSimpleStruct.fromTlv(ContextSpecificTag(TAG_C), tlvReader)
 

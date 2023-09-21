@@ -23,9 +23,9 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class OtaSoftwareUpdateRequestorClusterDownloadErrorEvent(
-  val softwareVersion: Long,
-  val bytesDownloaded: Long,
-  val progressPercent: Int?,
+  val softwareVersion: ULong,
+  val bytesDownloaded: ULong,
+  val progressPercent: UInt?,
   val platformCode: Long?
 ) {
   override fun toString(): String = buildString {
@@ -67,11 +67,11 @@ class OtaSoftwareUpdateRequestorClusterDownloadErrorEvent(
       tlvReader: TlvReader
     ): OtaSoftwareUpdateRequestorClusterDownloadErrorEvent {
       tlvReader.enterStructure(tag)
-      val softwareVersion = tlvReader.getLong(ContextSpecificTag(TAG_SOFTWARE_VERSION))
-      val bytesDownloaded = tlvReader.getLong(ContextSpecificTag(TAG_BYTES_DOWNLOADED))
+      val softwareVersion = tlvReader.getULong(ContextSpecificTag(TAG_SOFTWARE_VERSION))
+      val bytesDownloaded = tlvReader.getULong(ContextSpecificTag(TAG_BYTES_DOWNLOADED))
       val progressPercent =
         if (!tlvReader.isNull()) {
-          tlvReader.getInt(ContextSpecificTag(TAG_PROGRESS_PERCENT))
+          tlvReader.getUInt(ContextSpecificTag(TAG_PROGRESS_PERCENT))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_PROGRESS_PERCENT))
           null

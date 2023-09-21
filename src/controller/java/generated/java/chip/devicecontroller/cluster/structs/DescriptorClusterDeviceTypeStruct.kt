@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class DescriptorClusterDeviceTypeStruct(val deviceType: Long, val revision: Int) {
+class DescriptorClusterDeviceTypeStruct(val deviceType: ULong, val revision: UInt) {
   override fun toString(): String = buildString {
     append("DescriptorClusterDeviceTypeStruct {\n")
     append("\tdeviceType : $deviceType\n")
@@ -45,8 +45,8 @@ class DescriptorClusterDeviceTypeStruct(val deviceType: Long, val revision: Int)
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): DescriptorClusterDeviceTypeStruct {
       tlvReader.enterStructure(tag)
-      val deviceType = tlvReader.getLong(ContextSpecificTag(TAG_DEVICE_TYPE))
-      val revision = tlvReader.getInt(ContextSpecificTag(TAG_REVISION))
+      val deviceType = tlvReader.getULong(ContextSpecificTag(TAG_DEVICE_TYPE))
+      val revision = tlvReader.getUInt(ContextSpecificTag(TAG_REVISION))
 
       tlvReader.exitContainer()
 

@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class UnitTestingClusterTestFabricScopedEventEvent(val fabricIndex: Int) {
+class UnitTestingClusterTestFabricScopedEventEvent(val fabricIndex: UInt) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterTestFabricScopedEventEvent {\n")
     append("\tfabricIndex : $fabricIndex\n")
@@ -42,7 +42,7 @@ class UnitTestingClusterTestFabricScopedEventEvent(val fabricIndex: Int) {
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): UnitTestingClusterTestFabricScopedEventEvent {
       tlvReader.enterStructure(tag)
-      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 

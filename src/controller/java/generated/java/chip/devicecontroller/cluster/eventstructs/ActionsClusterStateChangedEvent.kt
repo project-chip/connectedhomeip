@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class ActionsClusterStateChangedEvent(val actionID: Int, val invokeID: Long, val newState: Int) {
+class ActionsClusterStateChangedEvent(val actionID: UInt, val invokeID: ULong, val newState: UInt) {
   override fun toString(): String = buildString {
     append("ActionsClusterStateChangedEvent {\n")
     append("\tactionID : $actionID\n")
@@ -48,9 +48,9 @@ class ActionsClusterStateChangedEvent(val actionID: Int, val invokeID: Long, val
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): ActionsClusterStateChangedEvent {
       tlvReader.enterStructure(tag)
-      val actionID = tlvReader.getInt(ContextSpecificTag(TAG_ACTION_I_D))
-      val invokeID = tlvReader.getLong(ContextSpecificTag(TAG_INVOKE_I_D))
-      val newState = tlvReader.getInt(ContextSpecificTag(TAG_NEW_STATE))
+      val actionID = tlvReader.getUInt(ContextSpecificTag(TAG_ACTION_I_D))
+      val invokeID = tlvReader.getULong(ContextSpecificTag(TAG_INVOKE_I_D))
+      val newState = tlvReader.getUInt(ContextSpecificTag(TAG_NEW_STATE))
 
       tlvReader.exitContainer()
 

@@ -23,10 +23,10 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class DishwasherAlarmClusterNotifyEvent(
-  val active: Long,
-  val inactive: Long,
-  val state: Long,
-  val mask: Long
+  val active: ULong,
+  val inactive: ULong,
+  val state: ULong,
+  val mask: ULong
 ) {
   override fun toString(): String = buildString {
     append("DishwasherAlarmClusterNotifyEvent {\n")
@@ -56,10 +56,10 @@ class DishwasherAlarmClusterNotifyEvent(
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): DishwasherAlarmClusterNotifyEvent {
       tlvReader.enterStructure(tag)
-      val active = tlvReader.getLong(ContextSpecificTag(TAG_ACTIVE))
-      val inactive = tlvReader.getLong(ContextSpecificTag(TAG_INACTIVE))
-      val state = tlvReader.getLong(ContextSpecificTag(TAG_STATE))
-      val mask = tlvReader.getLong(ContextSpecificTag(TAG_MASK))
+      val active = tlvReader.getULong(ContextSpecificTag(TAG_ACTIVE))
+      val inactive = tlvReader.getULong(ContextSpecificTag(TAG_INACTIVE))
+      val state = tlvReader.getULong(ContextSpecificTag(TAG_STATE))
+      val mask = tlvReader.getULong(ContextSpecificTag(TAG_MASK))
 
       tlvReader.exitContainer()
 

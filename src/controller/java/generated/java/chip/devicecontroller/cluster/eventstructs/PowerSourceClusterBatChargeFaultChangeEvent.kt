@@ -23,7 +23,10 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class PowerSourceClusterBatChargeFaultChangeEvent(val current: List<Int>, val previous: List<Int>) {
+class PowerSourceClusterBatChargeFaultChangeEvent(
+  val current: List<UInt>,
+  val previous: List<UInt>
+) {
   override fun toString(): String = buildString {
     append("PowerSourceClusterBatChargeFaultChangeEvent {\n")
     append("\tcurrent : $current\n")
@@ -34,16 +37,16 @@ class PowerSourceClusterBatChargeFaultChangeEvent(val current: List<Int>, val pr
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tag)
-      startList(ContextSpecificTag(TAG_CURRENT))
+      startArray(ContextSpecificTag(TAG_CURRENT))
       for (item in current.iterator()) {
         put(AnonymousTag, item)
       }
-      endList()
-      startList(ContextSpecificTag(TAG_PREVIOUS))
+      endArray()
+      startArray(ContextSpecificTag(TAG_PREVIOUS))
       for (item in previous.iterator()) {
         put(AnonymousTag, item)
       }
-      endList()
+      endArray()
       endStructure()
     }
   }
@@ -55,18 +58,18 @@ class PowerSourceClusterBatChargeFaultChangeEvent(val current: List<Int>, val pr
     fun fromTlv(tag: Tag, tlvReader: TlvReader): PowerSourceClusterBatChargeFaultChangeEvent {
       tlvReader.enterStructure(tag)
       val current =
-        buildList<Int> {
-          tlvReader.enterList(ContextSpecificTag(TAG_CURRENT))
+        buildList<UInt> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT))
           while (!tlvReader.isEndOfContainer()) {
-            this.add(tlvReader.getInt(AnonymousTag))
+            this.add(tlvReader.getUInt(AnonymousTag))
           }
           tlvReader.exitContainer()
         }
       val previous =
-        buildList<Int> {
-          tlvReader.enterList(ContextSpecificTag(TAG_PREVIOUS))
+        buildList<UInt> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_PREVIOUS))
           while (!tlvReader.isEndOfContainer()) {
-            this.add(tlvReader.getInt(AnonymousTag))
+            this.add(tlvReader.getUInt(AnonymousTag))
           }
           tlvReader.exitContainer()
         }

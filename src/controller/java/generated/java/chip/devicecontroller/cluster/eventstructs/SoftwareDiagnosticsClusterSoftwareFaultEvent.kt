@@ -24,7 +24,7 @@ import chip.tlv.TlvWriter
 import java.util.Optional
 
 class SoftwareDiagnosticsClusterSoftwareFaultEvent(
-  val id: Long,
+  val id: ULong,
   val name: Optional<String>,
   val faultRecording: Optional<ByteArray>
 ) {
@@ -59,7 +59,7 @@ class SoftwareDiagnosticsClusterSoftwareFaultEvent(
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): SoftwareDiagnosticsClusterSoftwareFaultEvent {
       tlvReader.enterStructure(tag)
-      val id = tlvReader.getLong(ContextSpecificTag(TAG_ID))
+      val id = tlvReader.getULong(ContextSpecificTag(TAG_ID))
       val name =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
           Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))

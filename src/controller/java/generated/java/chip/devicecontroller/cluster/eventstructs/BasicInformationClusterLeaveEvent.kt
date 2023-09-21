@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class BasicInformationClusterLeaveEvent(val fabricIndex: Int) {
+class BasicInformationClusterLeaveEvent(val fabricIndex: UInt) {
   override fun toString(): String = buildString {
     append("BasicInformationClusterLeaveEvent {\n")
     append("\tfabricIndex : $fabricIndex\n")
@@ -42,7 +42,7 @@ class BasicInformationClusterLeaveEvent(val fabricIndex: Int) {
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): BasicInformationClusterLeaveEvent {
       tlvReader.enterStructure(tag)
-      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 

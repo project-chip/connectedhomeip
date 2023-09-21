@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class DoorLockClusterDoorLockAlarmEvent(val alarmCode: Int) {
+class DoorLockClusterDoorLockAlarmEvent(val alarmCode: UInt) {
   override fun toString(): String = buildString {
     append("DoorLockClusterDoorLockAlarmEvent {\n")
     append("\talarmCode : $alarmCode\n")
@@ -42,7 +42,7 @@ class DoorLockClusterDoorLockAlarmEvent(val alarmCode: Int) {
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): DoorLockClusterDoorLockAlarmEvent {
       tlvReader.enterStructure(tag)
-      val alarmCode = tlvReader.getInt(ContextSpecificTag(TAG_ALARM_CODE))
+      val alarmCode = tlvReader.getUInt(ContextSpecificTag(TAG_ALARM_CODE))
 
       tlvReader.exitContainer()
 

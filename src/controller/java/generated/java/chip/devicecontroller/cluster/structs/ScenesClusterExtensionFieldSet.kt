@@ -24,7 +24,7 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class ScenesClusterExtensionFieldSet(
-  val clusterID: Long,
+  val clusterID: ULong,
   val attributeValueList: List<ScenesClusterAttributeValuePair>
 ) {
   override fun toString(): String = buildString {
@@ -38,11 +38,11 @@ class ScenesClusterExtensionFieldSet(
     tlvWriter.apply {
       startStructure(tag)
       put(ContextSpecificTag(TAG_CLUSTER_I_D), clusterID)
-      startList(ContextSpecificTag(TAG_ATTRIBUTE_VALUE_LIST))
+      startArray(ContextSpecificTag(TAG_ATTRIBUTE_VALUE_LIST))
       for (item in attributeValueList.iterator()) {
         item.toTlv(AnonymousTag, this)
       }
-      endList()
+      endArray()
       endStructure()
     }
   }
@@ -53,10 +53,10 @@ class ScenesClusterExtensionFieldSet(
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): ScenesClusterExtensionFieldSet {
       tlvReader.enterStructure(tag)
-      val clusterID = tlvReader.getLong(ContextSpecificTag(TAG_CLUSTER_I_D))
+      val clusterID = tlvReader.getULong(ContextSpecificTag(TAG_CLUSTER_I_D))
       val attributeValueList =
         buildList<ScenesClusterAttributeValuePair> {
-          tlvReader.enterList(ContextSpecificTag(TAG_ATTRIBUTE_VALUE_LIST))
+          tlvReader.enterArray(ContextSpecificTag(TAG_ATTRIBUTE_VALUE_LIST))
           while (!tlvReader.isEndOfContainer()) {
             add(ScenesClusterAttributeValuePair.fromTlv(AnonymousTag, tlvReader))
           }

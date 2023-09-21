@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class ModeSelectClusterSemanticTagStruct(val mfgCode: Int, val value: Int) {
+class ModeSelectClusterSemanticTagStruct(val mfgCode: UInt, val value: UInt) {
   override fun toString(): String = buildString {
     append("ModeSelectClusterSemanticTagStruct {\n")
     append("\tmfgCode : $mfgCode\n")
@@ -45,8 +45,8 @@ class ModeSelectClusterSemanticTagStruct(val mfgCode: Int, val value: Int) {
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): ModeSelectClusterSemanticTagStruct {
       tlvReader.enterStructure(tag)
-      val mfgCode = tlvReader.getInt(ContextSpecificTag(TAG_MFG_CODE))
-      val value = tlvReader.getInt(ContextSpecificTag(TAG_VALUE))
+      val mfgCode = tlvReader.getUInt(ContextSpecificTag(TAG_MFG_CODE))
+      val value = tlvReader.getUInt(ContextSpecificTag(TAG_VALUE))
 
       tlvReader.exitContainer()
 

@@ -23,10 +23,10 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class OtaSoftwareUpdateRequestorClusterStateTransitionEvent(
-  val previousState: Int,
-  val newState: Int,
-  val reason: Int,
-  val targetSoftwareVersion: Long?
+  val previousState: UInt,
+  val newState: UInt,
+  val reason: UInt,
+  val targetSoftwareVersion: ULong?
 ) {
   override fun toString(): String = buildString {
     append("OtaSoftwareUpdateRequestorClusterStateTransitionEvent {\n")
@@ -63,12 +63,12 @@ class OtaSoftwareUpdateRequestorClusterStateTransitionEvent(
       tlvReader: TlvReader
     ): OtaSoftwareUpdateRequestorClusterStateTransitionEvent {
       tlvReader.enterStructure(tag)
-      val previousState = tlvReader.getInt(ContextSpecificTag(TAG_PREVIOUS_STATE))
-      val newState = tlvReader.getInt(ContextSpecificTag(TAG_NEW_STATE))
-      val reason = tlvReader.getInt(ContextSpecificTag(TAG_REASON))
+      val previousState = tlvReader.getUInt(ContextSpecificTag(TAG_PREVIOUS_STATE))
+      val newState = tlvReader.getUInt(ContextSpecificTag(TAG_NEW_STATE))
+      val reason = tlvReader.getUInt(ContextSpecificTag(TAG_REASON))
       val targetSoftwareVersion =
         if (!tlvReader.isNull()) {
-          tlvReader.getLong(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION))
+          tlvReader.getULong(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION))
           null

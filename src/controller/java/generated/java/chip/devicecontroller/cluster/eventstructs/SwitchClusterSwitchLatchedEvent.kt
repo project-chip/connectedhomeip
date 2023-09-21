@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class SwitchClusterSwitchLatchedEvent(val newPosition: Int) {
+class SwitchClusterSwitchLatchedEvent(val newPosition: UInt) {
   override fun toString(): String = buildString {
     append("SwitchClusterSwitchLatchedEvent {\n")
     append("\tnewPosition : $newPosition\n")
@@ -42,7 +42,7 @@ class SwitchClusterSwitchLatchedEvent(val newPosition: Int) {
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): SwitchClusterSwitchLatchedEvent {
       tlvReader.enterStructure(tag)
-      val newPosition = tlvReader.getInt(ContextSpecificTag(TAG_NEW_POSITION))
+      val newPosition = tlvReader.getUInt(ContextSpecificTag(TAG_NEW_POSITION))
 
       tlvReader.exitContainer()
 

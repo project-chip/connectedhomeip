@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class DoorLockClusterCredentialStruct(val credentialType: Int, val credentialIndex: Int) {
+class DoorLockClusterCredentialStruct(val credentialType: UInt, val credentialIndex: UInt) {
   override fun toString(): String = buildString {
     append("DoorLockClusterCredentialStruct {\n")
     append("\tcredentialType : $credentialType\n")
@@ -45,8 +45,8 @@ class DoorLockClusterCredentialStruct(val credentialType: Int, val credentialInd
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): DoorLockClusterCredentialStruct {
       tlvReader.enterStructure(tag)
-      val credentialType = tlvReader.getInt(ContextSpecificTag(TAG_CREDENTIAL_TYPE))
-      val credentialIndex = tlvReader.getInt(ContextSpecificTag(TAG_CREDENTIAL_INDEX))
+      val credentialType = tlvReader.getUInt(ContextSpecificTag(TAG_CREDENTIAL_TYPE))
+      val credentialIndex = tlvReader.getUInt(ContextSpecificTag(TAG_CREDENTIAL_INDEX))
 
       tlvReader.exitContainer()
 

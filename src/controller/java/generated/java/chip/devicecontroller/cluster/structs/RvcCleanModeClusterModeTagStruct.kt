@@ -23,7 +23,7 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 import java.util.Optional
 
-class RvcCleanModeClusterModeTagStruct(val mfgCode: Optional<Int>, val value: Int) {
+class RvcCleanModeClusterModeTagStruct(val mfgCode: Optional<UInt>, val value: UInt) {
   override fun toString(): String = buildString {
     append("RvcCleanModeClusterModeTagStruct {\n")
     append("\tmfgCode : $mfgCode\n")
@@ -51,11 +51,11 @@ class RvcCleanModeClusterModeTagStruct(val mfgCode: Optional<Int>, val value: In
       tlvReader.enterStructure(tag)
       val mfgCode =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_MFG_CODE))) {
-          Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_MFG_CODE)))
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MFG_CODE)))
         } else {
           Optional.empty()
         }
-      val value = tlvReader.getInt(ContextSpecificTag(TAG_VALUE))
+      val value = tlvReader.getUInt(ContextSpecificTag(TAG_VALUE))
 
       tlvReader.exitContainer()
 

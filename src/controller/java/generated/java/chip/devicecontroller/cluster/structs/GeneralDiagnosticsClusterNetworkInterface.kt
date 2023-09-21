@@ -31,7 +31,7 @@ class GeneralDiagnosticsClusterNetworkInterface(
   val hardwareAddress: ByteArray,
   val IPv4Addresses: List<ByteArray>,
   val IPv6Addresses: List<ByteArray>,
-  val type: Int
+  val type: UInt
 ) {
   override fun toString(): String = buildString {
     append("GeneralDiagnosticsClusterNetworkInterface {\n")
@@ -68,16 +68,16 @@ class GeneralDiagnosticsClusterNetworkInterface(
         putNull(ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV6))
       }
       put(ContextSpecificTag(TAG_HARDWARE_ADDRESS), hardwareAddress)
-      startList(ContextSpecificTag(TAG_I_PV4_ADDRESSES))
+      startArray(ContextSpecificTag(TAG_I_PV4_ADDRESSES))
       for (item in IPv4Addresses.iterator()) {
         put(AnonymousTag, item)
       }
-      endList()
-      startList(ContextSpecificTag(TAG_I_PV6_ADDRESSES))
+      endArray()
+      startArray(ContextSpecificTag(TAG_I_PV6_ADDRESSES))
       for (item in IPv6Addresses.iterator()) {
         put(AnonymousTag, item)
       }
-      endList()
+      endArray()
       put(ContextSpecificTag(TAG_TYPE), type)
       endStructure()
     }
@@ -114,7 +114,7 @@ class GeneralDiagnosticsClusterNetworkInterface(
       val hardwareAddress = tlvReader.getByteArray(ContextSpecificTag(TAG_HARDWARE_ADDRESS))
       val IPv4Addresses =
         buildList<ByteArray> {
-          tlvReader.enterList(ContextSpecificTag(TAG_I_PV4_ADDRESSES))
+          tlvReader.enterArray(ContextSpecificTag(TAG_I_PV4_ADDRESSES))
           while (!tlvReader.isEndOfContainer()) {
             add(tlvReader.getByteArray(AnonymousTag))
           }
@@ -122,13 +122,13 @@ class GeneralDiagnosticsClusterNetworkInterface(
         }
       val IPv6Addresses =
         buildList<ByteArray> {
-          tlvReader.enterList(ContextSpecificTag(TAG_I_PV6_ADDRESSES))
+          tlvReader.enterArray(ContextSpecificTag(TAG_I_PV6_ADDRESSES))
           while (!tlvReader.isEndOfContainer()) {
             add(tlvReader.getByteArray(AnonymousTag))
           }
           tlvReader.exitContainer()
         }
-      val type = tlvReader.getInt(ContextSpecificTag(TAG_TYPE))
+      val type = tlvReader.getUInt(ContextSpecificTag(TAG_TYPE))
 
       tlvReader.exitContainer()
 

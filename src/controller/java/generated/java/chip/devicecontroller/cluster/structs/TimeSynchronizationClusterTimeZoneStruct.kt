@@ -25,7 +25,7 @@ import java.util.Optional
 
 class TimeSynchronizationClusterTimeZoneStruct(
   val offset: Long,
-  val validAt: Long,
+  val validAt: ULong,
   val name: Optional<String>
 ) {
   override fun toString(): String = buildString {
@@ -57,7 +57,7 @@ class TimeSynchronizationClusterTimeZoneStruct(
     fun fromTlv(tag: Tag, tlvReader: TlvReader): TimeSynchronizationClusterTimeZoneStruct {
       tlvReader.enterStructure(tag)
       val offset = tlvReader.getLong(ContextSpecificTag(TAG_OFFSET))
-      val validAt = tlvReader.getLong(ContextSpecificTag(TAG_VALID_AT))
+      val validAt = tlvReader.getULong(ContextSpecificTag(TAG_VALID_AT))
       val name =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
           Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))

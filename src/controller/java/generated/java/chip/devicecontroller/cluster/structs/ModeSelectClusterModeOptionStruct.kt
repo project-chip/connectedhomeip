@@ -25,7 +25,7 @@ import chip.tlv.TlvWriter
 
 class ModeSelectClusterModeOptionStruct(
   val label: String,
-  val mode: Int,
+  val mode: UInt,
   val semanticTags: List<ModeSelectClusterSemanticTagStruct>
 ) {
   override fun toString(): String = buildString {
@@ -41,11 +41,11 @@ class ModeSelectClusterModeOptionStruct(
       startStructure(tag)
       put(ContextSpecificTag(TAG_LABEL), label)
       put(ContextSpecificTag(TAG_MODE), mode)
-      startList(ContextSpecificTag(TAG_SEMANTIC_TAGS))
+      startArray(ContextSpecificTag(TAG_SEMANTIC_TAGS))
       for (item in semanticTags.iterator()) {
         item.toTlv(AnonymousTag, this)
       }
-      endList()
+      endArray()
       endStructure()
     }
   }
@@ -58,10 +58,10 @@ class ModeSelectClusterModeOptionStruct(
     fun fromTlv(tag: Tag, tlvReader: TlvReader): ModeSelectClusterModeOptionStruct {
       tlvReader.enterStructure(tag)
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
-      val mode = tlvReader.getInt(ContextSpecificTag(TAG_MODE))
+      val mode = tlvReader.getUInt(ContextSpecificTag(TAG_MODE))
       val semanticTags =
         buildList<ModeSelectClusterSemanticTagStruct> {
-          tlvReader.enterList(ContextSpecificTag(TAG_SEMANTIC_TAGS))
+          tlvReader.enterArray(ContextSpecificTag(TAG_SEMANTIC_TAGS))
           while (!tlvReader.isEndOfContainer()) {
             add(ModeSelectClusterSemanticTagStruct.fromTlv(AnonymousTag, tlvReader))
           }

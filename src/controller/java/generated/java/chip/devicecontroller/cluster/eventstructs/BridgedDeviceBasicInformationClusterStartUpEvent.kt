@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class BridgedDeviceBasicInformationClusterStartUpEvent(val softwareVersion: Long) {
+class BridgedDeviceBasicInformationClusterStartUpEvent(val softwareVersion: ULong) {
   override fun toString(): String = buildString {
     append("BridgedDeviceBasicInformationClusterStartUpEvent {\n")
     append("\tsoftwareVersion : $softwareVersion\n")
@@ -42,7 +42,7 @@ class BridgedDeviceBasicInformationClusterStartUpEvent(val softwareVersion: Long
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): BridgedDeviceBasicInformationClusterStartUpEvent {
       tlvReader.enterStructure(tag)
-      val softwareVersion = tlvReader.getLong(ContextSpecificTag(TAG_SOFTWARE_VERSION))
+      val softwareVersion = tlvReader.getULong(ContextSpecificTag(TAG_SOFTWARE_VERSION))
 
       tlvReader.exitContainer()
 

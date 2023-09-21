@@ -24,11 +24,11 @@ import chip.tlv.TlvWriter
 
 class OperationalCredentialsClusterFabricDescriptorStruct(
   val rootPublicKey: ByteArray,
-  val vendorID: Int,
-  val fabricID: Long,
-  val nodeID: Long,
+  val vendorID: UInt,
+  val fabricID: ULong,
+  val nodeID: ULong,
   val label: String,
-  val fabricIndex: Int
+  val fabricIndex: UInt
 ) {
   override fun toString(): String = buildString {
     append("OperationalCredentialsClusterFabricDescriptorStruct {\n")
@@ -68,11 +68,11 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
     ): OperationalCredentialsClusterFabricDescriptorStruct {
       tlvReader.enterStructure(tag)
       val rootPublicKey = tlvReader.getByteArray(ContextSpecificTag(TAG_ROOT_PUBLIC_KEY))
-      val vendorID = tlvReader.getInt(ContextSpecificTag(TAG_VENDOR_I_D))
-      val fabricID = tlvReader.getLong(ContextSpecificTag(TAG_FABRIC_I_D))
-      val nodeID = tlvReader.getLong(ContextSpecificTag(TAG_NODE_I_D))
+      val vendorID = tlvReader.getUInt(ContextSpecificTag(TAG_VENDOR_I_D))
+      val fabricID = tlvReader.getULong(ContextSpecificTag(TAG_FABRIC_I_D))
+      val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_I_D))
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
-      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 

@@ -23,12 +23,12 @@ import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
 class ActionsClusterActionStruct(
-  val actionID: Int,
+  val actionID: UInt,
   val name: String,
-  val type: Int,
-  val endpointListID: Int,
-  val supportedCommands: Int,
-  val state: Int
+  val type: UInt,
+  val endpointListID: UInt,
+  val supportedCommands: UInt,
+  val state: UInt
 ) {
   override fun toString(): String = buildString {
     append("ActionsClusterActionStruct {\n")
@@ -64,12 +64,12 @@ class ActionsClusterActionStruct(
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader): ActionsClusterActionStruct {
       tlvReader.enterStructure(tag)
-      val actionID = tlvReader.getInt(ContextSpecificTag(TAG_ACTION_I_D))
+      val actionID = tlvReader.getUInt(ContextSpecificTag(TAG_ACTION_I_D))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
-      val type = tlvReader.getInt(ContextSpecificTag(TAG_TYPE))
-      val endpointListID = tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D))
-      val supportedCommands = tlvReader.getInt(ContextSpecificTag(TAG_SUPPORTED_COMMANDS))
-      val state = tlvReader.getInt(ContextSpecificTag(TAG_STATE))
+      val type = tlvReader.getUInt(ContextSpecificTag(TAG_TYPE))
+      val endpointListID = tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D))
+      val supportedCommands = tlvReader.getUInt(ContextSpecificTag(TAG_SUPPORTED_COMMANDS))
+      val state = tlvReader.getUInt(ContextSpecificTag(TAG_STATE))
 
       tlvReader.exitContainer()
 
