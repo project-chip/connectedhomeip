@@ -441,9 +441,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // For unit testing only
 #ifdef DEBUG
     id delegate = _weakDelegate.strongObject;
-    if (delegate && [delegate respondsToSelector:@selector(unitTestReportEndForDevice:)]) {
+    if (delegate) {
         dispatch_async(_delegateQueue, ^{
-            [delegate unitTestReportEndForDevice:self];
+            if ([delegate respondsToSelector:@selector(unitTestReportEndForDevice:)]) {
+                [delegate unitTestReportEndForDevice:self];
+            }
         });
     }
 #endif
