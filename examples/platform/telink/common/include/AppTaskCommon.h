@@ -94,8 +94,10 @@ protected:
     static void FactoryResetButtonEventHandler(void);
     static void FactoryResetHandler(AppEvent * aEvent);
 
+#if APP_USE_BLE_START_BUTTON
     static void StartBleAdvButtonEventHandler(void);
     static void StartBleAdvHandler(AppEvent * aEvent);
+#endif
 
 #if APP_USE_THREAD_START_BUTTON
     static void StartThreadButtonEventHandler(void);

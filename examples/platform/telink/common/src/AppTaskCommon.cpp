@@ -48,7 +48,9 @@ constexpr int kAppEventQueueSize       = 10;
 
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
 const struct gpio_dt_spec sFactoryResetButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_1), gpios);
-const struct gpio_dt_spec sBleStartButtonDt     = GPIO_DT_SPEC_GET(DT_NODELABEL(key_2), gpios);
+#if APP_USE_BLE_START_BUTTON
+const struct gpio_dt_spec sBleStartButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_2), gpios);
+#endif
 #if APP_USE_THREAD_START_BUTTON
 const struct gpio_dt_spec sThreadStartButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_3), gpios);
 #endif
@@ -85,7 +87,9 @@ LEDWidget sStatusLED;
 #endif
 
 Button sFactoryResetButton;
+#if APP_USE_BLE_START_BUTTON
 Button sBleAdvStartButton;
+#endif
 #if APP_USE_EXAMPLE_START_BUTTON
 Button sExampleActionButton;
 #endif
@@ -371,7 +375,9 @@ void AppTaskCommon::InitButtons(void)
 {
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
     sFactoryResetButton.Configure(&sFactoryResetButtonDt, FactoryResetButtonEventHandler);
+#if APP_USE_BLE_START_BUTTON
     sBleAdvStartButton.Configure(&sBleStartButtonDt, StartBleAdvButtonEventHandler);
+#endif
 #if APP_USE_EXAMPLE_START_BUTTON
     if (ExampleActionEventHandler)
     {
@@ -383,7 +389,9 @@ void AppTaskCommon::InitButtons(void)
 #endif
 #else
     sFactoryResetButton.Configure(&sButtonRow1Dt, &sButtonCol1Dt, FactoryResetButtonEventHandler);
+#if APP_USE_BLE_START_BUTTON
     sBleAdvStartButton.Configure(&sButtonRow2Dt, &sButtonCol2Dt, StartBleAdvButtonEventHandler);
+#endif
 #if APP_USE_EXAMPLE_START_BUTTON
     if (ExampleActionEventHandler)
     {
@@ -396,7 +404,9 @@ void AppTaskCommon::InitButtons(void)
 #endif
 
     ButtonManagerInst().AddButton(sFactoryResetButton);
+#if APP_USE_BLE_START_BUTTON
     ButtonManagerInst().AddButton(sBleAdvStartButton);
+#endif
 #if APP_USE_THREAD_START_BUTTON
     ButtonManagerInst().AddButton(sThreadStartButton);
 #endif
@@ -511,6 +521,7 @@ void AppTaskCommon::IdentifyEffectHandler(Clusters::Identify::EffectIdentifierEn
 }
 #endif
 
+#if APP_USE_BLE_START_BUTTON
 void AppTaskCommon::StartBleAdvButtonEventHandler(void)
 {
     AppEvent event;
@@ -543,6 +554,7 @@ void AppTaskCommon::StartBleAdvHandler(AppEvent * aEvent)
         LOG_ERR("OpenBasicCommissioningWindow fail");
     }
 }
+#endif
 
 void AppTaskCommon::FactoryResetButtonEventHandler(void)
 {

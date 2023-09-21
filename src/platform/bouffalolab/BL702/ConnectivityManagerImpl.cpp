@@ -128,7 +128,6 @@ extern "C" void network_netif_ext_callback(struct netif * nif, netif_nsc_reason_
 
     if ((LWIP_NSC_IPV6_ADDR_STATE_CHANGED & reason) && args)
     {
-
         if (args->ipv6_addr_state_changed.addr_index >= LWIP_IPV6_NUM_ADDRESSES ||
             ip6_addr_islinklocal(netif_ip6_addr(nif, args->ipv6_addr_state_changed.addr_index)))
         {
