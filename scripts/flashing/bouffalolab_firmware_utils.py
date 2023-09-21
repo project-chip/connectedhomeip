@@ -186,7 +186,9 @@ class Flasher(firmware_utils.Flasher):
             logging.error('source scripts/activate.sh -p bouffalolab')
             logging.error('Or')
             logging.error('source scripts/bootstrap.sh -p bouffalolab')
-            
+
+            logging.error('If upgrade bflb_iot_tool failed, try pip uninstall bflb_iot_tool first.')
+
             raise Exception(e)
 
         tool_path = os.path.dirname(bflb_iot_tool.__file__)

@@ -112,10 +112,10 @@ BL706 develop `XT-ZB6-DevKit` and `BL706DK` bl706 board, and `BL704LDK` BL704L b
 - `-mfd`, enable Matter factory data feature, which load factory data from `DTS` region and `MFD` partition
     - Please contact to `Bouffalo Lab` for Matter factory data support.
 - `-mfdtest`, enable Matter factory data module, but only load factory data from `FactoryDataProvider.cpp` file.
-- `-wifi`, to specifiy that connectivity Wi-Fi is enabled for Matter application.
-- `-ethernet`, to specifiy that connectivity Ethernet is enabled for Matter application.
-- `-thread`, to specifiy that connectivity Thread is enabled for Matter application.
-- `-fp`, to specifiy to enable frame pointer feature to print call stack when hit an exception for debug purpose.
+- `-wifi`, to specify that connectivity Wi-Fi is enabled for Matter application.
+- `-ethernet`, to specify that connectivity Ethernet is enabled for Matter application.
+- `-thread`, to specify that connectivity Thread is enabled for Matter application.
+- `-fp`, to specify to enable frame pointer feature to print call stack when hit an exception for debug purpose.
 
 ## Download image
 
