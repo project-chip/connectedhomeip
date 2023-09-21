@@ -144,9 +144,19 @@ private:
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
-    Attributes::UTCTime::TypeInfo::DecodableType mTrustedNodeUtcTime;
-    Attributes::Granularity::TypeInfo::DecodableType mTrustedNodeGranularity;
-    Platform::UniquePtr<app::ReadClient> mReadClient;
+    struct TimeReadInfo
+    {
+        TimeReadInfo(InteractionModelEngine * apImEngine, Messaging::ExchangeManager * apExchangeMgr,
+                     ReadClient::Callback & apCallback, ReadClient::InteractionType aInteractionType) :
+            readClient(apImEngine, apExchangeMgr, apCallback, aInteractionType)
+        {
+            utcTime.SetNull();
+        }
+        Attributes::UTCTime::TypeInfo::DecodableType utcTime;
+        Attributes::Granularity::TypeInfo::DecodableType granularity = GranularityEnum::kNoTimeGranularity;
+        app::ReadClient readClient;
+    };
+    Platform::UniquePtr<TimeReadInfo> mTimeReadInfo;
 #endif
     chip::Callback::Callback<OnTimeSyncCompletion> mOnTimeSyncCompletion;
     chip::Callback::Callback<OnFallbackNTPCompletion> mOnFallbackNTPCompletion;

@@ -309,23 +309,21 @@ void TimeSynchronizationServer::OnDeviceConnectedFn(Messaging::ExchangeManager &
     readParams.mpAttributePathParamsList    = readPaths;
     readParams.mAttributePathParamsListSize = 2;
 
-    mTrustedNodeUtcTime.SetNull();
-    mTrustedNodeGranularity = GranularityEnum::kNoTimeGranularity;
-    auto readClient         = Platform::MakeUnique<ReadClient>(engine, &exchangeMgr, *this, ReadClient::InteractionType::Read);
-    if (readClient == nullptr)
+    auto readInfo = Platform::MakeUnique<TimeReadInfo>(engine, &exchangeMgr, *this, ReadClient::InteractionType::Read);
+    if (readInfo == nullptr)
     {
         // This is unlikely to work if we don't have memory, but let's try
         OnDeviceConnectionFailureFn();
         return;
     }
-    CHIP_ERROR err = readClient->SendRequest(readParams);
+    CHIP_ERROR err = readInfo->readClient.SendRequest(readParams);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to read UTC time from trusted source");
         OnDeviceConnectionFailureFn();
         return;
     }
-    mReadClient = std::move(readClient);
+    mTimeReadInfo = std::move(readInfo);
 }
 
 void TimeSynchronizationServer::OnDeviceConnectionFailureFn()
@@ -344,15 +342,15 @@ void TimeSynchronizationServer::OnAttributeData(const ConcreteDataAttributePath 
     switch (aPath.mAttributeId)
     {
     case Attributes::UTCTime::Id:
-        if (DataModel::Decode(*apData, mTrustedNodeUtcTime) != CHIP_NO_ERROR)
+        if (DataModel::Decode(*apData, mTimeReadInfo->utcTime) != CHIP_NO_ERROR)
         {
-            mTrustedNodeUtcTime.SetNull();
+            mTimeReadInfo->utcTime.SetNull();
         }
         break;
     case Attributes::Granularity::Id:
-        if (DataModel::Decode(*apData, mTrustedNodeGranularity) != CHIP_NO_ERROR)
+        if (DataModel::Decode(*apData, mTimeReadInfo->granularity) != CHIP_NO_ERROR)
         {
-            mTrustedNodeGranularity = GranularityEnum::kNoTimeGranularity;
+            mTimeReadInfo->granularity = GranularityEnum::kNoTimeGranularity;
         }
         break;
     default:
@@ -362,11 +360,11 @@ void TimeSynchronizationServer::OnAttributeData(const ConcreteDataAttributePath 
 
 void TimeSynchronizationServer::OnDone(ReadClient * apReadClient)
 {
-    if (!mTrustedNodeUtcTime.IsNull() && mTrustedNodeGranularity != GranularityEnum::kNoTimeGranularity)
+    if (!mTimeReadInfo->utcTime.IsNull() && mTimeReadInfo->granularity != GranularityEnum::kNoTimeGranularity)
     {
         GranularityEnum ourGranularity;
         // Being conservative with granularity - nothing smaller than seconds because of network delay
-        switch (mTrustedNodeGranularity)
+        switch (mTimeReadInfo->granularity)
         {
         case GranularityEnum::kMinutesGranularity:
         case GranularityEnum::kSecondsGranularity:
@@ -377,7 +375,8 @@ void TimeSynchronizationServer::OnDone(ReadClient * apReadClient)
             break;
         }
 
-        CHIP_ERROR err = SetUTCTime(kRootEndpointId, mTrustedNodeUtcTime.Value(), ourGranularity, TimeSourceEnum::kNodeTimeCluster);
+        CHIP_ERROR err =
+            SetUTCTime(kRootEndpointId, mTimeReadInfo->utcTime.Value(), ourGranularity, TimeSourceEnum::kNodeTimeCluster);
         if (err == CHIP_NO_ERROR)
         {
             return;
@@ -387,7 +386,7 @@ void TimeSynchronizationServer::OnDone(ReadClient * apReadClient)
     // If we failed to set the UTC time, it doesn't hurt to try the backup - NTP system might have different permissions on the
     // system clock
     AttemptToGetFallbackNTPTimeFromDelegate();
-    mReadClient = nullptr;
+    mTimeReadInfo = nullptr;
 }
 #endif
 
