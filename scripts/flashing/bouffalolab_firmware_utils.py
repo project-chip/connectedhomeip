@@ -244,7 +244,7 @@ class Flasher(firmware_utils.Flasher):
                     arg = ("--{}={}".format(key, os.path.join(os.getcwd(), str(value)))).strip()
                 else:
                     arg = ("--{}={}".format(key, value)).strip()
-                    
+
                 arguments.append(arg)
 
             if key == "chipname":
