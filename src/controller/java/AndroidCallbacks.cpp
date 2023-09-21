@@ -829,7 +829,7 @@ void InvokeCallback::OnResponse(app::CommandSender * apCommandSender, const app:
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to create Java InvokeElement: %s", ErrorStr(err)));
     err = JniReferences::GetInstance().FindMethod(env, mJavaCallbackRef, "onResponse",
                                                   "(Lchip/devicecontroller/model/InvokeElement;J)V", &onResponseMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onError method: %s", ErrorStr(err)));
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onResponse method: %s", ErrorStr(err)));
 
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(mJavaCallbackRef, onResponseMethod, invokeElementObj, static_cast<jlong>(aStatusIB.mStatus));
