@@ -52,6 +52,8 @@ if (CONFIG_POSIX_API)
     matter_add_flags(-isystem${ZEPHYR_BASE}/include/zephyr/posix)
 endif()
 
+matter_add_flags(-DNL_ASSERT_USE_FLAGS_DEFAULT=1)
+
 zephyr_include_directories(${CHIP_ROOT}/src/platform/telink/)
 
 zephyr_get_compile_flags(ZEPHYR_CFLAGS_C C)
