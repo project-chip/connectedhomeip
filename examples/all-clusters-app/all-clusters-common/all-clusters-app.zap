@@ -23526,7 +23526,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "5",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -23542,7 +23542,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "0",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -23558,7 +23558,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "100",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -35392,5 +35392,6 @@
       "endpointId": 65534,
       "networkId": 0
     }
-  ]
+  ],
+  "log": []
 }
