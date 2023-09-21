@@ -108,8 +108,6 @@ protected:
     // be immediately followed by OnDone and we want to do the deletion there.
     void ReportError(CHIP_ERROR aError, bool aCancelSubscription = true);
 
-    void ReportCurrentData();
-
     // Called at attribute/event report time to queue a block to report on the Matter queue so that for multi-packet reports, this
     // block is run and reports in batch. No-op if the block is already queued.
     void QueueInterimReport();

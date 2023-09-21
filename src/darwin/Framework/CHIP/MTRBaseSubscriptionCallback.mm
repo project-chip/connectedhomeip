@@ -58,26 +58,15 @@ void MTRBaseSubscriptionCallback::QueueInterimReport()
         return;
     }
 
-    //    __block auto * myself = this;
     mInterimReportBlock = dispatch_block_create(DISPATCH_BLOCK_INHERIT_QOS_CLASS, ^{
         mInterimReportBlock = nil;
         ReportData();
         // Allocate reports arrays to continue accumulation
         mAttributeReports = [NSMutableArray new];
         mEventReports = [NSMutableArray new];
-        //            myself->ReportCurrentData();
     });
 
     dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), mInterimReportBlock);
-}
-
-void MTRBaseSubscriptionCallback::ReportCurrentData()
-{
-    mInterimReportBlock = nil;
-    ReportData();
-    // Allocate reports arrays to continue accumulation
-    mAttributeReports = [NSMutableArray new];
-    mEventReports = [NSMutableArray new];
 }
 
 void MTRBaseSubscriptionCallback::OnReportEnd()
