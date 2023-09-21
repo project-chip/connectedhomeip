@@ -11,6 +11,7 @@ struct Constants {
     static let timeoutInSeconds : UInt16 = 3
 }
 
+@available(macOS, introduced: 13.3)
 class MTRSwiftPairingTestControllerDelegate : NSObject, MTRDeviceControllerDelegate {
     let expectation: XCTestExpectation
 
@@ -18,12 +19,10 @@ class MTRSwiftPairingTestControllerDelegate : NSObject, MTRDeviceControllerDeleg
         expectation = providedExpectation
     }
 
-    @available(macOS, introduced: 13.3)
     func controller(_ controller: MTRDeviceController, statusUpdate status: MTRCommissioningStatus) {
         XCTAssertNotEqual(status, MTRCommissioningStatus.failed)
     }
 
-    @available(macOS, introduced: 13.3)
     func controller(_ controller: MTRDeviceController, commissioningSessionEstablishmentDone error: Error?) {
         XCTAssertNil(error)
 

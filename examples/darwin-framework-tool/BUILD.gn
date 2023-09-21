@@ -149,15 +149,15 @@ config("config") {
   defines = [
     "CONFIG_ENABLE_YAML_TESTS=${config_enable_yaml_tests}",
     "CONFIG_USE_INTERACTIVE_MODE=${config_use_interactive_mode}",
+
+    # Disable availability annotations in Matter.framework headers because we
+    # are not building against a system Matter.framework here anyway.
+    "MTR_SKIP_AVAILABILITY_ANNOTATIONS=1",
   ]
 
   cflags = [
     "-Wconversion",
     "-fobjc-arc",
-
-    # For now disable unguarded-availability-new warnings because we
-    # are not building against a system Matter.framework here anyway.
-    "-Wno-unguarded-availability-new",
   ]
 }
 
