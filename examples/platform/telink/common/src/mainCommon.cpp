@@ -149,7 +149,7 @@ int main(void)
 #elif defined(CONFIG_CHIP_THREAD_DEVICE_ROLE_SLEEPY_END_DEVICE)
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 #else
-    #error THREAD_DEVICE_ROLE not selected
+#error THREAD_DEVICE_ROLE not selected
 #endif
     if (err != CHIP_NO_ERROR)
     {

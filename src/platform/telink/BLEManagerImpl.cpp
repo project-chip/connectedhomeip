@@ -39,14 +39,14 @@
 
 #include <zephyr/bluetooth/addr.h>
 #include <zephyr/bluetooth/gatt.h>
+#include <zephyr/drivers/flash.h>
 #include <zephyr/random/rand32.h>
+#include <zephyr/storage/flash_map.h>
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
-#include <zephyr/storage/flash_map.h>
-#include <zephyr/drivers/flash.h>
 
 extern "C" {
-  #include <b9x_bt_flash.h>
+#include <b9x_bt_flash.h>
 }
 
 #if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
