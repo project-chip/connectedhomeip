@@ -30,11 +30,11 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.chip.chiptool.attestation.AttestationTestFragment
 import com.google.chip.chiptool.clusterclient.*
+import com.google.chip.chiptool.clusterclient.GroupSettingFragment
 import com.google.chip.chiptool.clusterclient.clusterinteraction.ClusterInteractionFragment
 import com.google.chip.chiptool.databinding.SelectActionFragmentBinding
 import com.google.chip.chiptool.provisioning.ProvisionNetworkType
 import com.google.chip.chiptool.provisioning.UnpairDeviceFragment
-import com.google.chip.chiptool.clusterclient.GroupSettingFragment
 import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
 import com.google.chip.chiptool.util.FragmentUtil
 

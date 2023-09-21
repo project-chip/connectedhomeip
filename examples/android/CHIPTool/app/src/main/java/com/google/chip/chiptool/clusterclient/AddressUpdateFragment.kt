@@ -53,14 +53,16 @@ class AddressUpdateFragment : Fragment() {
 
   fun updateDeviceIdSpinner() {
     val deviceIdList = DeviceIdUtil.getCommissionedNodeId(requireContext())
-    binding.deviceIdSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, deviceIdList)
-    binding.deviceIdSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-      override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        binding.deviceIdEd.setText(deviceIdList[position].toULong(16).toString())
-      }
+    binding.deviceIdSpinner.adapter =
+      ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, deviceIdList)
+    binding.deviceIdSpinner.onItemSelectedListener =
+      object : AdapterView.OnItemSelectedListener {
+        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+          binding.deviceIdEd.setText(deviceIdList[position].toULong(16).toString())
+        }
 
-      override fun onNothingSelected(parent: AdapterView<*>?) {}
-    }
+        override fun onNothingSelected(parent: AdapterView<*>?) {}
+      }
   }
 
   override fun onDestroyView() {
@@ -90,6 +92,5 @@ class AddressUpdateFragment : Fragment() {
     fun getNodeIdFromGroupId(groupId: UInt): ULong {
       return groupId.toULong() or MIN_GROUP_NODE_ID
     }
-
   }
 }
