@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022 - 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#import "MTROTAUnsolicitedBDXMessageHandler.h"
 #import <Matter/MTROTAProviderDelegate.h>
 
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
@@ -27,15 +28,7 @@ public:
     MTROTAProviderDelegateBridge();
     ~MTROTAProviderDelegateBridge();
 
-    CHIP_ERROR Init(chip::System::Layer * systemLayer, chip::Messaging::ExchangeManager * exchangeManager);
-
-    // Shutdown must be called after the event loop has been stopped, since it
-    // touches Matter objects.
-    void Shutdown();
-
-    // ControllerShuttingDown must be called on the Matter work queue, since it
-    // touches Matter objects.
-    void ControllerShuttingDown(MTRDeviceController * controller);
+    CHIP_ERROR Init(chip::Messaging::ExchangeManager * exchangeMgr);
 
     void HandleQueryImage(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -65,6 +58,9 @@ private:
     static void ConvertToNotifyUpdateAppliedParams(
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData,
         MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams * commandParams);
+
+protected:
+    MTROTAUnsolicitedBDXMessageHandler * sOtaUnsolicitedBDXMsgHandler = nullptr;
 };
 
 NS_ASSUME_NONNULL_END

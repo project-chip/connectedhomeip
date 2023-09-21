@@ -79,6 +79,11 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 @property (atomic, readonly) dispatch_queue_t chipWorkQueue;
 @property (readonly) DeviceControllerFactory * controllerFactory;
 @property (readonly) PersistentStorageDelegate * persistentStorageDelegate;
+
+// This is the OTA provider cluster delegate that would handle the requests to the OTA provider cluster
+//  itself like QueryImage, HandleUpdate and NotifyUpdateApplied. All BDX related handlers will be
+// not handled here since each BDX session will have its own delegate to handle all BDX messages
+// for that session.
 @property (readonly) MTROTAProviderDelegateBridge * otaProviderDelegateBridge;
 @property (readonly) Crypto::RawKeySessionKeystore * sessionKeystore;
 // We use TestPersistentStorageDelegate just to get an in-memory store to back
@@ -901,7 +906,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     __block CHIP_ERROR err;
     dispatch_sync(_chipWorkQueue, ^{
         auto systemState = _controllerFactory->GetSystemState();
-        err = _otaProviderDelegateBridge->Init(systemState->SystemLayer(), systemState->ExchangeMgr());
+        err = _otaProviderDelegateBridge->Init(systemState->ExchangeMgr());
     });
     if (CHIP_NO_ERROR != err) {
         MTR_LOG_ERROR("Failed to init provider delegate bridge: %" CHIP_ERROR_FORMAT, err.Format());
@@ -975,10 +980,6 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         // down most of the world.
         DeviceLayer::PlatformMgrImpl().StopEventLoopTask();
 
-        if (_otaProviderDelegateBridge) {
-            _otaProviderDelegateBridge->Shutdown();
-        }
-
         sharedCleanupBlock();
 
         // Now that our per-controller storage for the controller being shut
@@ -999,10 +1000,6 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     } else {
         // Do the controller shutdown on the Matter work queue.
         dispatch_sync(_chipWorkQueue, ^{
-            if (_otaProviderDelegateBridge) {
-                _otaProviderDelegateBridge->ControllerShuttingDown(controller);
-            }
-
             sharedCleanupBlock();
 
             // Now that our per-controller storage for the controller being shut

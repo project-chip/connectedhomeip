@@ -297,6 +297,10 @@
 		B4E2621B2AA0D02000DBA5BC /* SleepCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4E262192AA0D01D00DBA5BC /* SleepCommand.mm */; };
 		B4E2621E2AA0D02D00DBA5BC /* WaitForCommissioneeCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4E2621C2AA0D02A00DBA5BC /* WaitForCommissioneeCommand.mm */; };
 		BA09EB43247477BA00605257 /* libCHIP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BA09EB3F2474762900605257 /* libCHIP.a */; };
+		CF0F30852A97E128001F96C5 /* MTROTAUnsolicitedBDXMessageHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = CF0F30842A97E128001F96C5 /* MTROTAUnsolicitedBDXMessageHandler.h */; };
+		CF0F30872A97F5D5001F96C5 /* MTROTAUnsolicitedBDXMessageHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF0F30862A97F5D5001F96C5 /* MTROTAUnsolicitedBDXMessageHandler.mm */; };
+		CF2A42DC2AB11FD2009A1DB2 /* MTROTAImageTransferHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = CF2A42DA2AB11FD1009A1DB2 /* MTROTAImageTransferHandler.h */; };
+		CF2A42DD2AB11FD2009A1DB2 /* MTROTAImageTransferHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF2A42DB2AB11FD2009A1DB2 /* MTROTAImageTransferHandler.mm */; };
 		D4772A46285AE98400383630 /* MTRClusterConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = D4772A45285AE98300383630 /* MTRClusterConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
@@ -660,6 +664,10 @@
 		B4E2621C2AA0D02A00DBA5BC /* WaitForCommissioneeCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WaitForCommissioneeCommand.mm; sourceTree = "<group>"; };
 		BA09EB3F2474762900605257 /* libCHIP.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCHIP.a; path = lib/libCHIP.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA107AEE2470CFBB004287EB /* chip_xcode_build_connector.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = chip_xcode_build_connector.sh; sourceTree = "<group>"; };
+		CF0F30842A97E128001F96C5 /* MTROTAUnsolicitedBDXMessageHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTROTAUnsolicitedBDXMessageHandler.h; sourceTree = "<group>"; };
+		CF0F30862A97F5D5001F96C5 /* MTROTAUnsolicitedBDXMessageHandler.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTROTAUnsolicitedBDXMessageHandler.mm; sourceTree = "<group>"; };
+		CF2A42DA2AB11FD1009A1DB2 /* MTROTAImageTransferHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTROTAImageTransferHandler.h; sourceTree = "<group>"; };
+		CF2A42DB2AB11FD2009A1DB2 /* MTROTAImageTransferHandler.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTROTAImageTransferHandler.mm; sourceTree = "<group>"; };
 		D437613E285BDC0D0051FEA2 /* MTRErrorTestUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRErrorTestUtils.h; sourceTree = "<group>"; };
 		D437613F285BDC0D0051FEA2 /* MTRTestKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestKeys.h; sourceTree = "<group>"; };
 		D4376140285BDC0D0051FEA2 /* MTRTestStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestStorage.h; sourceTree = "<group>"; };
@@ -1086,6 +1094,10 @@
 		B202528F2459E34F00F97062 /* CHIP */ = {
 			isa = PBXGroup;
 			children = (
+				CF2A42DA2AB11FD1009A1DB2 /* MTROTAImageTransferHandler.h */,
+				CF2A42DB2AB11FD2009A1DB2 /* MTROTAImageTransferHandler.mm */,
+				CF0F30862A97F5D5001F96C5 /* MTROTAUnsolicitedBDXMessageHandler.mm */,
+				CF0F30842A97E128001F96C5 /* MTROTAUnsolicitedBDXMessageHandler.h */,
 				1E4D655129C30A8700BC3478 /* MTRCommissionableBrowser.mm */,
 				1E4D654C29C208DD00BC3478 /* MTRCommissionableBrowser.h */,
 				1E4D654D29C208DD00BC3478 /* MTRCommissionableBrowserDelegate.h */,
@@ -1389,6 +1401,7 @@
 				5A6FEC9927B5C88900F25F42 /* MTRDeviceOverXPC.h in Headers */,
 				51B22C222740CB1D008D5055 /* MTRCommandPayloadsObjc.h in Headers */,
 				51B22C1E2740CB0A008D5055 /* MTRStructsObjc.h in Headers */,
+				CF2A42DC2AB11FD2009A1DB2 /* MTROTAImageTransferHandler.h in Headers */,
 				2CB7163B252E8A7B0026E2BB /* MTRDeviceControllerDelegateBridge.h in Headers */,
 				75B765C12A1D71BC0014719B /* MTRAttributeSpecifiedCheck.h in Headers */,
 				5ACDDD7A27CD129700EFD68A /* MTRClusterStateCacheContainer.h in Headers */,
@@ -1408,6 +1421,7 @@
 				513DDB862761F69300DAA01A /* MTRAttributeTLVValueDecoder_Internal.h in Headers */,
 				2CB7163F252F731E0026E2BB /* MTRDeviceControllerDelegate.h in Headers */,
 				88EBF8CE27FABDD500686BC1 /* MTRDeviceAttestationDelegate.h in Headers */,
+				CF0F30852A97E128001F96C5 /* MTROTAUnsolicitedBDXMessageHandler.h in Headers */,
 				2C222AD0255C620600E446B9 /* MTRBaseDevice.h in Headers */,
 				7596A84F2877E6A9004DAE0E /* MTRCluster_Internal.h in Headers */,
 				3D843716294979230070D20A /* MTRCallbackBridge.h in Headers */,
@@ -1721,6 +1735,7 @@
 				51565CB22A7AD77600469F18 /* MTRDeviceControllerDataStore.mm in Sources */,
 				1ED276E226C5812A00547A89 /* MTRCluster.mm in Sources */,
 				B2E0D7B3245B0B5C003C5B48 /* MTRError.mm in Sources */,
+				CF0F30872A97F5D5001F96C5 /* MTROTAUnsolicitedBDXMessageHandler.mm in Sources */,
 				51E51FC1282AD37A00FC978D /* MTRDeviceControllerStartupParams.mm in Sources */,
 				51565CAE2A79D42100469F18 /* MTRConversion.mm in Sources */,
 				1ED276E026C57CF000547A89 /* MTRCallbackBridge.mm in Sources */,
@@ -1730,6 +1745,7 @@
 				510470FB2A2F7DF60053EA7E /* MTRBackwardsCompatShims.mm in Sources */,
 				5173A47629C0E2ED00F67F48 /* MTRFabricInfo.mm in Sources */,
 				5ACDDD7D27CD16D200EFD68A /* MTRClusterStateCacheContainer.mm in Sources */,
+				CF2A42DD2AB11FD2009A1DB2 /* MTROTAImageTransferHandler.mm in Sources */,
 				513DDB8A2761F6F900DAA01A /* MTRAttributeTLVValueDecoder.mm in Sources */,
 				5117DD3829A931AE00FFA1AA /* MTROperationalBrowser.mm in Sources */,
 				3D843757294AD25A0070D20A /* MTRCertificateInfo.mm in Sources */,
