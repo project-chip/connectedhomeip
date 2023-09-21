@@ -31,9 +31,9 @@ class RvcOperationalStateClusterOperationalErrorEvent(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       errorState.toTlv(ContextSpecificTag(TAG_ERROR_STATE), this)
       endStructure()
     }
@@ -42,8 +42,11 @@ class RvcOperationalStateClusterOperationalErrorEvent(
   companion object {
     private const val TAG_ERROR_STATE = 0
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): RvcOperationalStateClusterOperationalErrorEvent {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): RvcOperationalStateClusterOperationalErrorEvent {
+      tlvReader.enterStructure(tlvTag)
       val errorState =
         chip.devicecontroller.cluster.structs.RvcOperationalStateClusterErrorStateStruct.fromTlv(
           ContextSpecificTag(TAG_ERROR_STATE),
