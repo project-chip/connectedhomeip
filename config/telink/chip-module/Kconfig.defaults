@@ -57,7 +57,7 @@ config POSIX_MAX_FDS
 
 # Application stack size
 config MAIN_STACK_SIZE
-    default 2600 if PM
+    default 3240 if PM
     default 4096
 
 config INIT_STACKS
