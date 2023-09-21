@@ -163,7 +163,8 @@ void AppTask::AppTaskMain(void * pvParameter)
     ef_set_env_blob(APP_REBOOT_RESET_COUNT_KEY, &resetCnt, sizeof(resetCnt));
 #endif
 
-    GetAppTask().sTimer = xTimerCreate("lightTmr", pdMS_TO_TICKS(APP_TIMER_EVENT_DEFAULT_ITVL), false, NULL, AppTask::TimerCallback);
+    GetAppTask().sTimer =
+        xTimerCreate("lightTmr", pdMS_TO_TICKS(APP_TIMER_EVENT_DEFAULT_ITVL), false, NULL, AppTask::TimerCallback);
     if (GetAppTask().sTimer == NULL)
     {
         ChipLogError(NotSpecified, "Failed to create timer task");
@@ -340,7 +341,8 @@ void AppTask::TimerEventHandler(app_event_t event)
     {
         pressedTime = System::SystemClock().GetMonotonicMilliseconds64().count() - GetAppTask().mButtonPressedTime;
 #ifdef BOOT_PIN_RESET
-        if (ButtonPressed()) {
+        if (ButtonPressed())
+        {
             if (pressedTime > APP_BUTTON_PRESS_LONG)
             {
                 GetAppTask().PostEvent(APP_EVENT_BTN_LONG);
@@ -356,7 +358,8 @@ void AppTask::TimerEventHandler(app_event_t event)
 #endif
             }
         }
-        else {
+        else
+        {
             if (pressedTime >= APP_BUTTON_PRESS_LONG)
             {
                 GetAppTask().PostEvent(APP_EVENT_FACTORY_RESET);
@@ -365,7 +368,8 @@ void AppTask::TimerEventHandler(app_event_t event)
             {
                 GetAppTask().PostEvent(APP_EVENT_BTN_SHORT);
             }
-            else {
+            else
+            {
                 GetAppTask().PostEvent(APP_EVENT_LIGHTING_MASK);
             }
 
@@ -392,8 +396,10 @@ void AppTask::TimerEventHandler(app_event_t event)
 #endif
     }
 #ifdef BOOT_PIN_RESET
-    else {
-        if (ButtonPressed()) {
+    else
+    {
+        if (ButtonPressed())
+        {
             GetAppTask().mTimerIntvl        = APP_BUTTON_PRESSED_ITVL;
             GetAppTask().mButtonPressedTime = System::SystemClock().GetMonotonicMilliseconds64().count();
         }
@@ -462,9 +468,10 @@ bool AppTask::ButtonPressed(void)
     return val == 1;
 }
 
-void AppTask::ButtonEventHandler(void * arg) 
+void AppTask::ButtonEventHandler(void * arg)
 {
-    if (ButtonPressed()) {
+    if (ButtonPressed())
+    {
         GetAppTask().PostEvent(APP_EVENT_BTN_ISR);
     }
 }
