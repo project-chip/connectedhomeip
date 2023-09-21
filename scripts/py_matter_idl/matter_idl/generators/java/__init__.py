@@ -796,6 +796,15 @@ class JavaClassGenerator(__JavaCodeGenerator):
             }
         )
 
+        self.internal_render_one_output(
+            template_path="ChipStructFiles_gni.jinja",
+            output_file_name="java/chip/devicecontroller/cluster/files.gni",
+            vars={
+                'idl': self.idl,
+                'clientClusters': clientClusters,
+            }
+        )
+
         # Every cluster has its own impl, to avoid
         # very large compilations (running out of RAM)
         for cluster in self.idl.clusters:
