@@ -145,6 +145,10 @@ bouffalolab_executable("lighting_app") {
     defines += [ "BOOT_PIN_RESET=31" ]
   }
 
+  if (chip_enable_factory_data) {
+    defines += [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE" ]
+  }
+
   if ("XT-ZB6-DevKit" == board) {
     defines += [ "XT_ZB6_DevKit" ]
   } else if ("BL706-NIGHT-LIGHT" == board) {

@@ -77,6 +77,8 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602/evb/src/strntoumax.c",
     ]
     cflags_c = [ "-Wno-format-truncation" ]
+
+    configs += [ ":${sdk_target_name}_config", ":${sdk_target_name}_config_freertos" ]
   }
 
   config("${sdk_target_name}_config_BSP_Driver") {
@@ -274,6 +276,7 @@ template("bl_iot_sdk") {
       "-Wno-stringop-overflow",
       "-Wno-format-truncation",
       "-Wno-unused-variable",
+      "-Wno-array-bounds"
     ]
     configs += [
       ":${sdk_target_name}_config_wifi",
@@ -958,9 +961,11 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_factory_data") {
-    libs = [ "${bl_iot_sdk_root}/components/network/matter/matter_factory_data/lib/libmatter_factory_data.a" ]
-
-    configs += [ ":${sdk_target_name}_config" ]
+    sources = [
+      "${bl_iot_sdk_root}/components/network/matter/matter_factory_data/efuse_slot.c",
+      "${bl_iot_sdk_root}/components/network/matter/matter_factory_data/matter_factory_data.c",
+    ]
+    configs += [ ":${sdk_target_name}_config",  ":${sdk_target_name}_config_freertos", ":${sdk_target_name}_config_BSP_Driver", ":${sdk_target_name}_config_hosal"]
     public_configs = [ ":${sdk_target_name}_config_factory_data" ]
   }
 

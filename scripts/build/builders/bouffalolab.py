@@ -135,23 +135,23 @@ class BouffalolabBuilder(GnBuilder):
         if (enable_ethernet or enable_wifi) and enable_thread:
             raise Exception('Currently, Thread cannot be enabled with Wi-Fi or Ethernet')
 
+        if enable_thread:
+            chip_mdns="platform"
+        elif enable_ethernet or enable_wifi:
+            chip_mdns="minimal"
+
         # hardware connectivity support check
         if bouffalo_chip == "bl602":
-
             if enable_ethernet or enable_thread:
-                raise Exception('SoC %s doesn\'t support connectivity Ethernet/Thread.' % bouffalo_chip)
-
+                raise Exception('SoC %s doesn\'t support connectivity Ethernet/Thread.'.format(bouffalo_chip))
         elif bouffalo_chip == "bl702":
-
             self.argsOpt.append('module_type=\"{}\"'.format(module_type))
             if board != BouffalolabBoard.BL706DK:
                 if enable_ethernet or enable_wifi:
-                    raise Exception('Board %s doesn\'t support connectivity Ethernet/Wi-Fi.' % board)
-
+                    raise Exception('Board %s doesn\'t support connectivity Ethernet/Wi-Fi.'.format(board))
         elif bouffalo_chip == "bl702l":
-
             if enable_ethernet or enable_wifi:
-                raise Exception('SoC %s doesn\'t support connectivity Ethernet/Wi-Fi currently.' % bouffalo_chip)
+                raise Exception('SoC %s doesn\'t support connectivity Ethernet/Wi-Fi currently.'.format(bouffalo_chip))
 
         self.argsOpt.append('chip_enable_ethernet={}'.format(str(enable_ethernet).lower()))
         self.argsOpt.append('chip_enable_wifi={}'.format(str(enable_wifi).lower()))
@@ -160,13 +160,10 @@ class BouffalolabBuilder(GnBuilder):
         # for enable_ethernet, do not need ble for commissioning
         self.argsOpt.append('chip_config_network_layer_ble={}'.format(str(enable_wifi or enable_thread)).lower())
 
-        if enable_ethernet or enable_wifi:
-            self.argsOpt.append('chip_mdns="minimal"')
-            self.argsOpt.append('chip_inet_config_enable_ipv4=true')
+        self.argsOpt.append('chip_mdns="{}"'.format(chip_mdns))
+        self.argsOpt.append('chip_inet_config_enable_ipv4={}'.format(str(enable_ethernet or enable_wifi)).lower())
 
         if enable_thread:
-            self.argsOpt.append('chip_mdns="platform"')
-            self.argsOpt.append('chip_inet_config_enable_ipv4=false')
             self.argsOpt.append('openthread_project_core_config_file="{}-openthread-core-bl-config.h"'.format(bouffalo_chip))
 
         if enable_cdc:
@@ -190,18 +187,12 @@ class BouffalolabBuilder(GnBuilder):
             self.argsOpt.append('chip_enable_rotating_device_id=true')
 
         if BouffalolabMfd.MFD_DISABLE != function_mfd:
-            if bouffalo_chip != "bl602":
-                raise Exception('Only BL602 support matter factory data feature currently.')
-
             if BouffalolabMfd.MFD_RELEASE == function_mfd:
                 self.argsOpt.append("chip_enable_factory_data=true")
             elif BouffalolabMfd.MFD_TEST == function_mfd:
                 self.argsOpt.append("chip_enable_factory_data_test=true")
 
-        if enable_frame_ptr:
-            self.argsOpt.append("enable_debug_frame_ptr=true")
-        else:
-            self.argsOpt.append("enable_debug_frame_ptr=false")
+        self.argsOpt.append("enable_debug_frame_ptr={}".format(str(enable_frame_ptr).lower()))
 
         try:
             self.argsOpt.append('bouffalolab_sdk_root="%s"' % os.environ['BOUFFALOLAB_SDK_ROOT'])

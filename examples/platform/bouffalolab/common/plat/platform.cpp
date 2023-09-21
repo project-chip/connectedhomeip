@@ -168,6 +168,9 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 {
     chip::RendezvousInformationFlags rendezvousMode(chip::RendezvousInformationFlag::kOnNetwork);
+#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || defined(CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST)
+    CHIP_ERROR retFactoryData = sFactoryDataProvider.Init();
+#endif
 
 #if PW_RPC_ENABLED
     PigweedLogger::pw_init();
@@ -207,7 +210,7 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 
     // Initialize device attestation config
 #if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || defined(CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST)
-    if (CHIP_NO_ERROR == sFactoryDataProvider.Init())
+    if (CHIP_NO_ERROR == retFactoryData)
     {
         SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
         SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
