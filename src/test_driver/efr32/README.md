@@ -110,7 +110,7 @@ Then the python wheels need to installed using pip3.
     pip3 install out/debug/chip_nl_test_runner_wheels/*.whl
     ```
 
-Other python libraries may need to be installed such as 
+Other python libraries may need to be installed such as
 
     ```
     pip3 install pyserial
