@@ -348,7 +348,7 @@ class WildcardFragment : Fragment() {
 
     deviceController.write(
       writeAttributeCallback,
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      addressUpdateFragment.getDevicePointer(requireContext()),
       listOf(writeRequest),
       timedRequestTimeoutMs,
       imTimeoutMs
@@ -365,7 +365,7 @@ class WildcardFragment : Fragment() {
       InvokeElement.newInstance(endpointId, clusterId, commandId, null, jsonString)
     deviceController.invoke(
       invokeCallback,
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      addressUpdateFragment.getDevicePointer(requireContext()),
       invokeElement,
       timedRequestTimeoutMs,
       imTimeoutMs

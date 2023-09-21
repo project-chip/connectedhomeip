@@ -354,7 +354,7 @@ public class ChipDeviceController {
       this.id = id;
     }
 
-    int getID() {
+    public int getID() {
       return id;
     }
 
