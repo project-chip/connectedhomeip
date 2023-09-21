@@ -48,7 +48,7 @@ __LOG_LEVELS__ = {
 @click.option(
     '--log-level',
     default='INFO',
-    type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
+    type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
     help='Determines the verbosity of script output')
 @click.argument(
     'old_idl',
