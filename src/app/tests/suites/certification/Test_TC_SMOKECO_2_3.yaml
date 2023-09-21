@@ -104,7 +104,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read costate 1 1
+          ./chip-tool smokecoalarm read costate 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
           [TOO]   COState: 1
@@ -190,7 +190,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read costate 1 1
+          ./chip-tool smokecoalarm read costate 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
           [TOO]   COState: 2
@@ -241,7 +241,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read costate 1 1
+          ./chip-tool smokecoalarm read costate 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
           [TOO]   COState: 0

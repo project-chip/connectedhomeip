@@ -33,9 +33,9 @@ typedef uint16_t SceneIndex;
 typedef uint32_t TransitionTimeMs;
 typedef uint32_t SceneTransitionTime;
 
-constexpr GroupId kGlobalGroupSceneId     = 0x0000;
-constexpr SceneIndex kUndefinedSceneIndex = 0xffff;
-constexpr SceneId kUndefinedSceneId       = 0xff;
+inline constexpr GroupId kGlobalGroupSceneId     = 0x0000;
+inline constexpr SceneIndex kUndefinedSceneIndex = 0xffff;
+inline constexpr SceneId kUndefinedSceneId       = 0xff;
 
 static constexpr size_t kIteratorsMax                 = CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS;
 static constexpr size_t kSceneNameMaxLength           = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH;

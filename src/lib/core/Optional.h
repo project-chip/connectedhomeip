@@ -35,7 +35,7 @@ struct NullOptionalType
 {
     explicit NullOptionalType() = default;
 };
-constexpr NullOptionalType NullOptional{};
+inline constexpr NullOptionalType NullOptional{};
 
 /**
  * Pairs an object with a boolean value to determine if the object value

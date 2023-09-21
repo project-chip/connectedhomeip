@@ -16,6 +16,12 @@
  */
 #import <Matter/MTRDefines.h>
 
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+#import <Matter/MTRDeviceControllerParameters.h>
+#else
+#import "MTRDeviceControllerParameters_Wrapper.h"
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+
 #import "MTRDeviceController_Internal.h"
 
 #import "MTRAttestationTrustStoreBridge.h"
@@ -118,6 +124,20 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 @end
 
 @implementation MTRDeviceController
+
+- (nullable instancetype)initWithParameters:(MTRDeviceControllerParameters *)parameters error:(NSError * __autoreleasing *)error
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    if (!factory.isRunning) {
+        auto * params = [[MTRDeviceControllerFactoryParams alloc] initWithoutStorage];
+
+        if (![factory startControllerFactory:params error:error]) {
+            return nil;
+        }
+    }
+
+    return [factory initializeController:self withParameters:parameters error:error];
+}
 
 - (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
                           queue:(dispatch_queue_t)queue

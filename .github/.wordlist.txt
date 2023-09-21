@@ -849,6 +849,7 @@ MDNS
 MediaInput
 MediaPlayback
 MediaTek
+MEI
 mem
 memdf
 MemMonitoring
@@ -1276,6 +1277,9 @@ StatusCode
 stderr
 stdout
 sterm
+stmicroelectronics
+stm
+stlink
 storagepath
 str
 strcpy
@@ -1352,6 +1356,7 @@ ThreadNetworkDiagnostics
 threadOperationalDataset
 ThreadStackManager
 ThreadStackManagerImpl
+thread
 ths
 Thunderboard
 timedInteractionTimeoutMs
@@ -1425,6 +1430,7 @@ UnitLocalization
 unpair
 unprovisioned
 Unsecure
+Unselect
 untrusted
 updateAvailable
 updateNotAvailable
@@ -1556,3 +1562,5 @@ zhengyaohan
 Zigbee
 zigbeealliance
 zigbeethread
+PIXIT
+RVC

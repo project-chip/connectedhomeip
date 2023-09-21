@@ -42,7 +42,7 @@ extern "C" {
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 #include "wfx_sl_ble_init.h"
-#ifndef SIWX_917
+#if !(SIWX_917 | EXP_BOARD)
 #include <rsi_driver.h>
 #endif
 #include <rsi_utils.h>
@@ -130,6 +130,7 @@ void sl_ble_event_handling_task(void)
             // Requests the connection parameters change with the remote device
             rsi_ble_conn_params_update(event_msg.resp_enh_conn.dev_addr, BLE_MIN_CONNECTION_INTERVAL_MS,
                                        BLE_MAX_CONNECTION_INTERVAL_MS, BLE_SLAVE_LATENCY_MS, BLE_TIMEOUT_MS);
+            rsi_ble_set_data_len(event_msg.resp_enh_conn.dev_addr, RSI_BLE_TX_OCTETS, RSI_BLE_TX_TIME);
         }
         break;
         case RSI_BLE_DISCONN_EVENT: {

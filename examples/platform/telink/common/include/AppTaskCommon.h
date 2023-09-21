@@ -53,11 +53,11 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 namespace {
-constexpr EndpointId kExampleEndpointId = 1;
-constexpr uint8_t kDefaultMinLevel      = 0;
-constexpr uint8_t kDefaultMaxLevel      = 254;
-constexpr uint8_t kButtonPushEvent      = 1;
-constexpr uint8_t kButtonReleaseEvent   = 0;
+inline constexpr EndpointId kExampleEndpointId = 1;
+inline constexpr uint8_t kDefaultMinLevel      = 0;
+inline constexpr uint8_t kDefaultMaxLevel      = 254;
+inline constexpr uint8_t kButtonPushEvent      = 1;
+inline constexpr uint8_t kButtonReleaseEvent   = 0;
 } // namespace
 
 class AppTaskCommon

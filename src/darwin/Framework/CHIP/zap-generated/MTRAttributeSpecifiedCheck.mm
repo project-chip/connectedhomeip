@@ -1071,6 +1071,9 @@ static BOOL AttributeIsSpecifiedInGeneralDiagnosticsCluster(AttributeId aAttribu
     case Attributes::TestEventTriggersEnabled::Id: {
         return YES;
     }
+    case Attributes::AverageWearCount::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -5453,6 +5456,36 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL AttributeIsSpecifiedInSampleMEICluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::SampleMei;
+    switch (aAttributeId) {
+    case Attributes::FlipFlop::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 
 BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
 {
@@ -5735,6 +5768,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::UnitTesting::Id: {
         return AttributeIsSpecifiedInUnitTestingCluster(aAttributeId);
+    }
+    case Clusters::SampleMei::Id: {
+        return AttributeIsSpecifiedInSampleMEICluster(aAttributeId);
     }
     default: {
         return NO;

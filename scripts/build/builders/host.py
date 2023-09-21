@@ -70,6 +70,7 @@ class HostApp(Enum):
     CONTACT_SENSOR = auto()
     DISHWASHER = auto()
     REFRIGERATOR = auto()
+    RVC = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -118,6 +119,8 @@ class HostApp(Enum):
             return 'dishwasher-app/linux'
         elif self == HostApp.REFRIGERATOR:
             return 'refrigerator-app/linux'
+        elif self == HostApp.RVC:
+            return 'rvc-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -203,6 +206,9 @@ class HostApp(Enum):
         elif self == HostApp.REFRIGERATOR:
             yield 'refrigerator-app'
             yield 'refrigerator-app.map'
+        elif self == HostApp.RVC:
+            yield 'rvc-app'
+            yield 'rvc-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 

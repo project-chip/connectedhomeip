@@ -48,8 +48,7 @@ class QRCodeTest {
     generator.setAllowInvalidPayload(allowInvalidPayload)
     var result = generator.payloadBase38Representation()
 
-    var outPayload = OnboardingPayload()
-    QRCodeOnboardingPayloadParser(result).populatePayload(outPayload)
+    var outPayload = QRCodeOnboardingPayloadParser(result).populatePayload()
 
     return inPayload == outPayload
   }
@@ -223,10 +222,8 @@ class QRCodeTest {
     var invalidString = kDefaultPayloadQRCode
     invalidString = invalidString.dropLast(1) + " " // space is not contained in the base38 alphabet
 
-    var payload = OnboardingPayload()
-
     try {
-      QRCodeOnboardingPayloadParser(invalidString).populatePayload(payload)
+      QRCodeOnboardingPayloadParser(invalidString).populatePayload()
       assertThat(false)
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
@@ -241,10 +238,8 @@ class QRCodeTest {
     var invalidString = kDefaultPayloadQRCode
     invalidString = invalidString.dropLast(1)
 
-    var payload = OnboardingPayload()
-
     try {
-      QRCodeOnboardingPayloadParser(invalidString).populatePayload(payload)
+      QRCodeOnboardingPayloadParser(invalidString).populatePayload()
       assertThat(false)
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
@@ -284,8 +279,7 @@ class QRCodeTest {
     var generator = QRCodeOnboardingPayloadGenerator(payload)
     var base38Rep = generator.payloadBase38Representation()
 
-    var resultingPayload = OnboardingPayload()
-    QRCodeOnboardingPayloadParser(base38Rep).populatePayload(resultingPayload)
+    var resultingPayload = QRCodeOnboardingPayloadParser(base38Rep).populatePayload()
 
     assertEquals(true, resultingPayload.isValidQRCodePayload())
     assertEquals(true, payload == resultingPayload)
@@ -313,6 +307,60 @@ class QRCodeTest {
     assertEquals("", QRCodeOnboardingPayloadParser.extractPayload("A%"))
     assertEquals("", QRCodeOnboardingPayloadParser.extractPayload("MT:%"))
     assertEquals("ABC", QRCodeOnboardingPayloadParser.extractPayload("%MT:ABC"))
+  }
+
+  /*
+   * Test Parse QrCode to Expected Payload
+   */
+  @Test
+  fun testParseQrCodeToExpectedPayload() {
+    // Payload: MT:W0GU2OTB00KA0648G00
+    // Vendor Id: 9050 (0x235A)
+    // Product Id: 20043 (0x4E4B)
+    // Setup Pin Code: 20202021
+    // Setup Discriminator: 3840 (0xF00)
+
+    val parser = OnboardingPayloadParser()
+    assertThat(parser.parseQrCode("MT:W0GU2OTB00KA0648G00"))
+      .isEqualTo(
+        OnboardingPayload(
+          discriminator = 0xF00,
+          setupPinCode = 20202021,
+          version = 0,
+          vendorId = 0x235A,
+          productId = 0x4E4B,
+          commissioningFlow = CommissioningFlow.STANDARD.value,
+          discoveryCapabilities = mutableSetOf(DiscoveryCapability.BLE),
+        )
+      )
+  }
+
+  /*
+   * Test Generate QrCode from Expected Value
+   */
+  @Test
+  fun testGenerateQrCodeFromExpectedValue() {
+    // Payload: MT:W0GU2OTB00KA0648G00
+    // Vendor Id: 9050 (0x235A)
+    // Product Id: 20043 (0x4E4B)
+    // Setup Pin Code: 20202021
+    // Setup Discriminator: 3840 (0xF00)
+
+    val parser = OnboardingPayloadParser()
+    assertThat(
+        parser.getQrCodeFromPayload(
+          OnboardingPayload(
+            discriminator = 0xF00,
+            setupPinCode = 20202021,
+            version = 0,
+            vendorId = 0x235A,
+            productId = 0x4E4B,
+            commissioningFlow = CommissioningFlow.STANDARD.value,
+            discoveryCapabilities = mutableSetOf(DiscoveryCapability.BLE),
+          )
+        )
+      )
+      .isEqualTo("MT:W0GU2OTB00KA0648G00")
   }
 
   companion object {

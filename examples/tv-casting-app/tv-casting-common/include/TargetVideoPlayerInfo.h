@@ -25,7 +25,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
-constexpr size_t kMaxNumberOfEndpoints = 5;
+inline constexpr size_t kMaxNumberOfEndpoints = 5;
 
 class TargetVideoPlayerInfo;
 class VideoPlayerConnectionContext

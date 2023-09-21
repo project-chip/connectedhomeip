@@ -30,8 +30,9 @@ class ManualOnboardingPayloadParser(decimalRepresentation: String) {
     decimalStringRepresentation = decimalRepresentation.replace("-", "")
   }
 
-  fun populatePayload(outPayload: OnboardingPayload): Unit {
+  fun populatePayload(): OnboardingPayload {
     var representationWithoutCheckDigit: String
+    var outPayload: OnboardingPayload = OnboardingPayload()
 
     representationWithoutCheckDigit = checkDecimalStringValidity(decimalStringRepresentation)
 
@@ -125,6 +126,8 @@ class ManualOnboardingPayloadParser(decimalRepresentation: String) {
     require(kManualSetupDiscriminatorFieldLengthInBits <= 8) { "Won't fit in UInt8" }
     outPayload.discriminator = discriminator
     outPayload.hasShortDiscriminator = true
+
+    return outPayload
   }
 
   companion object {

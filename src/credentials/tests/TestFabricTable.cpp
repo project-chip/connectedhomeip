@@ -89,16 +89,17 @@ static CHIP_ERROR LoadTestFabric_Node01_01(nlTestSuite * inSuite, FabricTable & 
     static Crypto::P256Keypair opKey_Node01_01;
 
     FabricIndex fabricIndex;
-    memcpy(opKeysSerialized.Bytes(), TestCerts::sTestCert_Node01_01_PublicKey, TestCerts::sTestCert_Node01_01_PublicKey_Len);
-    memcpy(opKeysSerialized.Bytes() + TestCerts::sTestCert_Node01_01_PublicKey_Len, TestCerts::sTestCert_Node01_01_PrivateKey,
-           TestCerts::sTestCert_Node01_01_PrivateKey_Len);
+    memcpy(opKeysSerialized.Bytes(), TestCerts::sTestCert_Node01_01_PublicKey.data(),
+           TestCerts::sTestCert_Node01_01_PublicKey.size());
+    memcpy(opKeysSerialized.Bytes() + TestCerts::sTestCert_Node01_01_PublicKey.size(),
+           TestCerts::sTestCert_Node01_01_PrivateKey.data(), TestCerts::sTestCert_Node01_01_PrivateKey.size());
 
-    ByteSpan rcacSpan(TestCerts::sTestCert_Root01_Chip, TestCerts::sTestCert_Root01_Chip_Len);
-    ByteSpan icacSpan(TestCerts::sTestCert_ICA01_Chip, TestCerts::sTestCert_ICA01_Chip_Len);
-    ByteSpan nocSpan(TestCerts::sTestCert_Node01_01_Chip, TestCerts::sTestCert_Node01_01_Chip_Len);
+    ByteSpan rcacSpan(TestCerts::sTestCert_Root01_Chip);
+    ByteSpan icacSpan(TestCerts::sTestCert_ICA01_Chip);
+    ByteSpan nocSpan(TestCerts::sTestCert_Node01_01_Chip);
 
-    ReturnErrorOnFailure(
-        opKeysSerialized.SetLength(TestCerts::sTestCert_Node01_01_PublicKey_Len + TestCerts::sTestCert_Node01_01_PrivateKey_Len));
+    ReturnErrorOnFailure(opKeysSerialized.SetLength(TestCerts::sTestCert_Node01_01_PublicKey.size() +
+                                                    TestCerts::sTestCert_Node01_01_PrivateKey.size()));
     ReturnErrorOnFailure(opKey_Node01_01.Deserialize(opKeysSerialized));
     ReturnErrorOnFailure(fabricTable.AddNewPendingTrustedRootCert(rcacSpan));
 
@@ -119,15 +120,16 @@ static CHIP_ERROR LoadTestFabric_Node01_02(nlTestSuite * inSuite, FabricTable & 
     FabricIndex fabricIndex;
     static Crypto::P256Keypair opKey_Node01_02;
 
-    memcpy(opKeysSerialized.Bytes(), TestCerts::sTestCert_Node01_02_PublicKey, TestCerts::sTestCert_Node01_02_PublicKey_Len);
-    memcpy(opKeysSerialized.Bytes() + TestCerts::sTestCert_Node01_02_PublicKey_Len, TestCerts::sTestCert_Node01_02_PrivateKey,
-           TestCerts::sTestCert_Node01_02_PrivateKey_Len);
+    memcpy(opKeysSerialized.Bytes(), TestCerts::sTestCert_Node01_02_PublicKey.data(),
+           TestCerts::sTestCert_Node01_02_PublicKey.size());
+    memcpy(opKeysSerialized.Bytes() + TestCerts::sTestCert_Node01_02_PublicKey.size(),
+           TestCerts::sTestCert_Node01_02_PrivateKey.data(), TestCerts::sTestCert_Node01_02_PrivateKey.size());
 
-    ByteSpan rcacSpan(TestCerts::sTestCert_Root01_Chip, TestCerts::sTestCert_Root01_Chip_Len);
-    ByteSpan nocSpan(TestCerts::sTestCert_Node01_02_Chip, TestCerts::sTestCert_Node01_02_Chip_Len);
+    ByteSpan rcacSpan(TestCerts::sTestCert_Root01_Chip);
+    ByteSpan nocSpan(TestCerts::sTestCert_Node01_02_Chip);
 
-    ReturnErrorOnFailure(
-        opKeysSerialized.SetLength(TestCerts::sTestCert_Node01_02_PublicKey_Len + TestCerts::sTestCert_Node01_02_PrivateKey_Len));
+    ReturnErrorOnFailure(opKeysSerialized.SetLength(TestCerts::sTestCert_Node01_02_PublicKey.size() +
+                                                    TestCerts::sTestCert_Node01_02_PrivateKey.size()));
     ReturnErrorOnFailure(opKey_Node01_02.Deserialize(opKeysSerialized));
 
     ReturnErrorOnFailure(fabricTable.AddNewPendingTrustedRootCert(rcacSpan));
@@ -152,17 +154,18 @@ static CHIP_ERROR LoadTestFabric_Node02_01(nlTestSuite * inSuite, FabricTable & 
     FabricIndex fabricIndex;
     static Crypto::P256Keypair opKey_Node02_01;
 
-    memcpy(opKeysSerialized.Bytes(), TestCerts::sTestCert_Node02_01_PublicKey, TestCerts::sTestCert_Node02_01_PublicKey_Len);
-    memcpy(opKeysSerialized.Bytes() + TestCerts::sTestCert_Node02_01_PublicKey_Len, TestCerts::sTestCert_Node02_01_PrivateKey,
-           TestCerts::sTestCert_Node02_01_PrivateKey_Len);
+    memcpy(opKeysSerialized.Bytes(), TestCerts::sTestCert_Node02_01_PublicKey.data(),
+           TestCerts::sTestCert_Node02_01_PublicKey.size());
+    memcpy(opKeysSerialized.Bytes() + TestCerts::sTestCert_Node02_01_PublicKey.size(),
+           TestCerts::sTestCert_Node02_01_PrivateKey.data(), TestCerts::sTestCert_Node02_01_PrivateKey.size());
 
-    ByteSpan rcacSpan(TestCerts::sTestCert_Root02_Chip, TestCerts::sTestCert_Root02_Chip_Len);
-    ByteSpan icacSpan(TestCerts::sTestCert_ICA02_Chip, TestCerts::sTestCert_ICA02_Chip_Len);
-    ByteSpan nocSpan(TestCerts::sTestCert_Node02_01_Chip, TestCerts::sTestCert_Node02_01_Chip_Len);
+    ByteSpan rcacSpan(TestCerts::sTestCert_Root02_Chip);
+    ByteSpan icacSpan(TestCerts::sTestCert_ICA02_Chip);
+    ByteSpan nocSpan(TestCerts::sTestCert_Node02_01_Chip);
 
     NL_TEST_ASSERT(inSuite,
-                   opKeysSerialized.SetLength(TestCerts::sTestCert_Node02_01_PublicKey_Len +
-                                              TestCerts::sTestCert_Node02_01_PrivateKey_Len) == CHIP_NO_ERROR);
+                   opKeysSerialized.SetLength(TestCerts::sTestCert_Node02_01_PublicKey.size() +
+                                              TestCerts::sTestCert_Node02_01_PrivateKey.size()) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, opKey_Node02_01.Deserialize(opKeysSerialized) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcacSpan) == CHIP_NO_ERROR);
@@ -218,7 +221,7 @@ void TestCollidingFabrics(nlTestSuite * inSuite, void * inContext)
     fabricTable.PermitCollidingFabrics();
     NL_TEST_ASSERT(inSuite, LoadTestFabric_Node01_02(inSuite, fabricTable, /* doCommit = */ true) == CHIP_NO_ERROR);
 
-    ByteSpan rcacSpan(TestCerts::sTestCert_Root01_Chip, TestCerts::sTestCert_Root01_Chip_Len);
+    ByteSpan rcacSpan(TestCerts::sTestCert_Root01_Chip);
     Credentials::P256PublicKeySpan rootPublicKeySpan;
 
     NL_TEST_ASSERT(inSuite, Credentials::ExtractPublicKeyFromChipCert(rcacSpan, rootPublicKeySpan) == CHIP_NO_ERROR);
@@ -228,7 +231,7 @@ void TestCollidingFabrics(nlTestSuite * inSuite, void * inContext)
     //
     {
         chip::Platform::ScopedMemoryBuffer<uint8_t> nocBuf;
-        ByteSpan origNocSpan(TestCerts::sTestCert_Node01_01_Chip, TestCerts::sTestCert_Node01_01_Chip_Len);
+        ByteSpan origNocSpan(TestCerts::sTestCert_Node01_01_Chip);
         NodeId nodeId;
         FabricId fabricId;
 
@@ -238,7 +241,7 @@ void TestCollidingFabrics(nlTestSuite * inSuite, void * inContext)
 
     {
         chip::Platform::ScopedMemoryBuffer<uint8_t> nocBuf;
-        ByteSpan origNocSpan(TestCerts::sTestCert_Node01_02_Chip, TestCerts::sTestCert_Node01_02_Chip_Len);
+        ByteSpan origNocSpan(TestCerts::sTestCert_Node01_02_Chip);
         NodeId nodeId;
         FabricId fabricId;
 
@@ -2357,12 +2360,12 @@ void TestFabricLookup(nlTestSuite * inSuite, void * inContext)
     // Attempt lookup of the Root01 fabric.
     {
         Crypto::P256PublicKey key;
-        NL_TEST_ASSERT(inSuite, key.Length() >= TestCerts::sTestCert_Root01_PublicKey_Len);
-        if (key.Length() < TestCerts::sTestCert_Root01_PublicKey_Len)
+        NL_TEST_ASSERT(inSuite, key.Length() >= TestCerts::sTestCert_Root01_PublicKey.size());
+        if (key.Length() < TestCerts::sTestCert_Root01_PublicKey.size())
         {
             return;
         }
-        memcpy(key.Bytes(), TestCerts::sTestCert_Root01_PublicKey, TestCerts::sTestCert_Root01_PublicKey_Len);
+        memcpy(key.Bytes(), TestCerts::sTestCert_Root01_PublicKey.data(), TestCerts::sTestCert_Root01_PublicKey.size());
         auto fabricInfo = fabricTable.FindFabric(key, 0xFAB000000000001D);
         NL_TEST_ASSERT(inSuite, fabricInfo != nullptr);
         if (fabricInfo == nullptr)
@@ -2376,12 +2379,12 @@ void TestFabricLookup(nlTestSuite * inSuite, void * inContext)
     // Attempt lookup of the Root02 fabric.
     {
         Crypto::P256PublicKey key;
-        NL_TEST_ASSERT(inSuite, key.Length() >= TestCerts::sTestCert_Root02_PublicKey_Len);
-        if (key.Length() < TestCerts::sTestCert_Root02_PublicKey_Len)
+        NL_TEST_ASSERT(inSuite, key.Length() >= TestCerts::sTestCert_Root02_PublicKey.size());
+        if (key.Length() < TestCerts::sTestCert_Root02_PublicKey.size())
         {
             return;
         }
-        memcpy(key.Bytes(), TestCerts::sTestCert_Root02_PublicKey, TestCerts::sTestCert_Root02_PublicKey_Len);
+        memcpy(key.Bytes(), TestCerts::sTestCert_Root02_PublicKey.data(), TestCerts::sTestCert_Root02_PublicKey.size());
         auto fabricInfo = fabricTable.FindFabric(key, 0xFAB000000000001D);
         NL_TEST_ASSERT(inSuite, fabricInfo != nullptr);
         if (fabricInfo == nullptr)

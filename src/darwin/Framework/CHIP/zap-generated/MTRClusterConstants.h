@@ -317,6 +317,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeAccountLoginID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000050E,
     MTRClusterIDTypeElectricalMeasurementID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000B04,
     MTRClusterIDTypeUnitTestingID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0xFFF1FC05,
+    MTRClusterIDTypeSampleMEIID MTR_PROVISIONALLY_AVAILABLE = 0xFFF1FC20,
 };
 
 #pragma mark - Attributes IDs
@@ -915,7 +916,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = 0x00000002,
     MTRAttributeIDTypeClusterDescriptorAttributePartsListID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000003,
-    MTRAttributeIDTypeClusterDescriptorAttributeTagListID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterDescriptorAttributeTagListID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
     MTRAttributeIDTypeClusterDescriptorAttributeGeneratedCommandListID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
@@ -1791,7 +1792,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterPowerSourceAttributeActiveBatChargeFaultsID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x0000001E,
-    MTRAttributeIDTypeClusterPowerSourceAttributeEndpointListID MTR_NEWLY_AVAILABLE = 0x0000001F,
+    MTRAttributeIDTypeClusterPowerSourceAttributeEndpointListID MTR_PROVISIONALLY_AVAILABLE = 0x0000001F,
     MTRAttributeIDTypeClusterPowerSourceAttributeGeneratedCommandListID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
@@ -2102,6 +2103,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTestEventTriggersEnabledID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000008,
+    MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAverageWearCountID MTR_NEWLY_AVAILABLE = 0x00000009,
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeGeneratedCommandListID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
@@ -8636,6 +8638,21 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterUnitTestingAttributeClusterRevisionID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
+    // Cluster SampleMEI attributes
+    MTRAttributeIDTypeClusterSampleMEIAttributeFlipFlopID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterSampleMEIAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterSampleMEIAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterSampleMEIAttributeEventListID MTR_PROVISIONALLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeEventListID,
+    MTRAttributeIDTypeClusterSampleMEIAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterSampleMEIAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterSampleMEIAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
 };
 
 #pragma mark - Commands IDs
@@ -10295,6 +10312,11 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestFabricScopedEventRequestID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000015,
+
+    // Cluster SampleMEI commands
+    MTRCommandIDTypeClusterSampleMEICommandPingID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterSampleMEICommandAddArgumentsResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterSampleMEICommandAddArgumentsID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
 
 };
 

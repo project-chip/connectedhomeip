@@ -55,9 +55,18 @@ static void ot_task_worker(void * context)
     vTaskDelete(NULL);
 }
 
-void set_openthread_platform_config(esp_openthread_platform_config_t * config)
+esp_err_t set_openthread_platform_config(esp_openthread_platform_config_t * config)
 {
-    s_platform_config = config;
+    if (!s_platform_config)
+    {
+        s_platform_config = (esp_openthread_platform_config_t *) malloc(sizeof(esp_openthread_platform_config_t));
+        if (!s_platform_config)
+        {
+            return ESP_ERR_NO_MEM;
+        }
+    }
+    memcpy(s_platform_config, config, sizeof(esp_openthread_platform_config_t));
+    return ESP_OK;
 }
 
 esp_err_t openthread_init_stack(void)
@@ -77,6 +86,8 @@ esp_err_t openthread_init_stack(void)
     ESP_ERROR_CHECK(esp_openthread_init(s_platform_config));
     // Initialize the esp_netif bindings
     openthread_netif = init_openthread_netif(s_platform_config);
+    free(s_platform_config);
+    s_platform_config = NULL;
     return ESP_OK;
 }
 

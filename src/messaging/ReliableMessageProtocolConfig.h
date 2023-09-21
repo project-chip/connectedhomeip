@@ -167,7 +167,7 @@ namespace chip {
 #endif
 #endif // CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST
 
-constexpr System::Clock::Milliseconds32 kDefaultActiveTime = System::Clock::Milliseconds16(4000);
+inline constexpr System::Clock::Milliseconds32 kDefaultActiveTime = System::Clock::Milliseconds16(4000);
 
 /**
  *  @brief

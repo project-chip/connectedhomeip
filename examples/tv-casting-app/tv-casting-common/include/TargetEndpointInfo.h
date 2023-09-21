@@ -20,7 +20,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-constexpr size_t kMaxNumberOfClustersPerEndpoint = 10;
+inline constexpr size_t kMaxNumberOfClustersPerEndpoint = 10;
 
 class TargetEndpointInfo
 {
