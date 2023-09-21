@@ -150,6 +150,6 @@ class K32WBuilder(GnBuilder):
     def build_outputs(self):
         name = 'chip-%s-%s' % (self.board.Name(), self.app.NameSuffix())
         return {
-            '%s.elf' % name: os.path.join(self.output_dir, '%s.elf' % name),
+            '%s.elf' % name: os.path.join(self.output_dir, name),
             '%s.map' % name: os.path.join(self.output_dir, '%s.map' % name)
         }
