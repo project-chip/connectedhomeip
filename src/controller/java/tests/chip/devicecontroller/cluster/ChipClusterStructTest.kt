@@ -24,7 +24,7 @@ import chip.devicecontroller.cluster.structs.UnitTestingClusterTestFabricScoped
 import chip.devicecontroller.cluster.structs.UnitTestingClusterTestListStructOctet
 import chip.tlv.AnonymousTag
 import chip.tlv.TlvReader
-import chip.tlv.TlvWriter 
+import chip.tlv.TlvWriter
 import java.util.Optional
 import org.junit.Test
 import org.junit.runner.RunWith
