@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2023 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,17 +18,10 @@
 
 #pragma once
 
-#include <app/ReadHandler.h>
+// ---- Air Quality Example App Config ----
 
-class ICDUtil : public chip::app::ReadHandler::ApplicationCallback
-{
-    CHIP_ERROR OnSubscriptionRequested(chip::app::ReadHandler & aReadHandler,
-                                       chip::Transport::SecureSession & aSecureSession) override;
-    friend ICDUtil & GetICDUtil();
-    static ICDUtil sICDUtil;
-};
-
-inline ICDUtil & GetICDUtil()
-{
-    return ICDUtil::sICDUtil;
-}
+#define APP_USE_EXAMPLE_START_BUTTON 0
+#define APP_USE_THREAD_START_BUTTON 0
+#define APP_SET_DEVICE_INFO_PROVIDER 1
+#define APP_SET_NETWORK_COMM_ENDPOINT_SEC 0
+#define APP_USE_IDENTIFY_PWM 1

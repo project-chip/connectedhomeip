@@ -17,7 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "MTRAsyncCallbackWorkQueue.h"
+#import "MTRAsyncWorkQueue.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 //      - The "batching ID" is used for grouping mergeable work items with unique merging strategies. The ID value is opaque to this
 //        API, and the API client is responsible for assigning them.
 //      - Each work item will only be asked to batch before it's first dequeued to run readyHandler.
-// See the MTRAsyncCallbackBatchingHandler definition for more details.
+// See the MTRAsyncWorkBatchingHandler definition for more details.
 
 // The batching handler is called by the work queue when all of the following are true:
 //
@@ -47,14 +47,14 @@ NS_ASSUME_NONNULL_BEGIN
 //
 // If *fullyMerged is set to YES, this handler may be called again to possibly also batch the work item
 // after the one that was dropped.
-typedef void (^MTRAsyncCallbackBatchingHandler)(id opaqueDataCurrent, id opaqueDataNext, BOOL * fullyMerged);
+typedef void (^MTRAsyncWorkBatchingHandler)(id opaqueDataCurrent, id opaqueDataNext, BOOL * fullyMerged);
 
 // Optional feature: Duplicate Filtering
 //   This is a facility that enables the API client to check if a potential work item has already been enqueued. By providing a
 //   handler that can answer if a work item's relevant data is a duplicate, it can avoid redundant queuing of requests.
 //      - The "duplicate type ID" is used for grouping different types of work items for duplicate checking. The ID value is opaque
 //        to this API, and the API client is responsible for assigning them.
-// See the MTRAsyncCallbackDuplicateCheckHandler definition and the WorkQueue's -isDuplicateForTypeID:workItemData: method
+// See the MTRAsyncWorkDuplicateCheckHandler definition and the WorkQueue's -isDuplicateForTypeID:workItemData: method
 // descriptions for more details.
 
 // The duplicate check handler is called by the work queue when the client wishes to check whether a work item is a duplicate of an
@@ -68,9 +68,9 @@ typedef void (^MTRAsyncCallbackBatchingHandler)(id opaqueDataCurrent, id opaqueD
 //
 // If the handler is unable to determine if the data is duplicate work, it should set *stop to NO.
 // In this case, the value of *isDuplicate is not examined.
-typedef void (^MTRAsyncCallbackDuplicateCheckHandler)(id opaqueItemData, BOOL * isDuplicate, BOOL * stop);
+typedef void (^MTRAsyncWorkDuplicateCheckHandler)(id opaqueItemData, BOOL * isDuplicate, BOOL * stop);
 
-@interface MTRAsyncCallbackWorkQueue ()
+@interface MTRAsyncWorkQueue ()
 // The MTRDevice object is only held and passed back as a reference and is opaque to the queue
 - (instancetype)initWithContext:(id _Nullable)context queue:(dispatch_queue_t)queue;
 
@@ -82,21 +82,21 @@ typedef void (^MTRAsyncCallbackDuplicateCheckHandler)(id opaqueItemData, BOOL * 
 - (BOOL)isDuplicateForTypeID:(NSUInteger)opaqueDuplicateTypeID workItemData:(id)opaqueWorkItemData;
 @end
 
-@interface MTRAsyncCallbackQueueWorkItem ()
+@interface MTRAsyncWorkItem ()
 // Batching
 @property (nonatomic, readonly) BOOL batchable;
 @property (nonatomic, readonly) NSUInteger batchingID;
 @property (nonatomic, readonly) id batchableData;
-@property (nonatomic, readonly) MTRAsyncCallbackBatchingHandler batchingHandler;
+@property (nonatomic, readonly) MTRAsyncWorkBatchingHandler batchingHandler;
 - (void)setBatchingID:(NSUInteger)opaqueBatchingID
                  data:(id)opaqueBatchableData
-              handler:(MTRAsyncCallbackBatchingHandler)batchingHandler;
+              handler:(MTRAsyncWorkBatchingHandler)batchingHandler;
 
 // Duplicate check
 @property (nonatomic, readonly) BOOL supportsDuplicateCheck;
 @property (nonatomic, readonly) NSUInteger duplicateTypeID;
-@property (nonatomic, readonly) MTRAsyncCallbackDuplicateCheckHandler duplicateCheckHandler;
-- (void)setDuplicateTypeID:(NSUInteger)opaqueDuplicateTypeID handler:(MTRAsyncCallbackDuplicateCheckHandler)duplicateCheckHandler;
+@property (nonatomic, readonly) MTRAsyncWorkDuplicateCheckHandler duplicateCheckHandler;
+- (void)setDuplicateTypeID:(NSUInteger)opaqueDuplicateTypeID handler:(MTRAsyncWorkDuplicateCheckHandler)duplicateCheckHandler;
 @end
 
 NS_ASSUME_NONNULL_END
