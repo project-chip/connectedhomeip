@@ -55,7 +55,7 @@ jobs:
               # internally use APIs that we are annotating as only available on
               # new enough versions.  Maybe we should change out deployment
               # target versions instead?
-              run: xcodebuild -target "Matter" -sdk iphoneos OTHER_CFLAGS='${inherited} -Wno-unguarded-availability-new'
+              run: xcodebuild -target "Matter" -sdk iphoneos -configuration Debug OTHER_CFLAGS='${inherited} -Wno-unguarded-availability-new'
             - name: Run iOS Build Release
               working-directory: src/darwin/Framework
               # For now disable unguarded-availability-new warnings because we
