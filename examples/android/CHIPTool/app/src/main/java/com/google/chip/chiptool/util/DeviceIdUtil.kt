@@ -9,6 +9,7 @@ object DeviceIdUtil {
   private const val DEVICE_ID_PREFS_KEY = "device_id"
   private const val DEVICE_ID_LIST_PREFS_KEY = "device_id_list"
   private const val DEFAULT_DEVICE_ID = 1L
+  private const val HEX_RADIX = 16
 
   fun getNextAvailableId(context: Context): Long {
     val prefs = getPrefs(context)
@@ -26,7 +27,8 @@ object DeviceIdUtil {
 
   fun setCommissionedNodeId(context: Context, nodeId: Long) {
     val nodeList = getCommissionedNodeId(context)
-    nodeList.add(nodeId.toULong().toString(16))
+
+    nodeList.add(nodeId.toULong().toString(HEX_RADIX))
 
     getPrefs(context).edit().putStringSet(DEVICE_ID_LIST_PREFS_KEY, nodeList.toSet()).apply()
   }

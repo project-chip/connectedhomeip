@@ -2,6 +2,7 @@ package com.google.chip.chiptool.clusterclient
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -61,7 +62,9 @@ class AddressUpdateFragment : Fragment() {
           binding.deviceIdEd.setText(deviceIdList[position].toULong(16).toString())
         }
 
-        override fun onNothingSelected(parent: AdapterView<*>?) {}
+        override fun onNothingSelected(parent: AdapterView<*>?) {
+          Log.d(TAG, "onNothingSelected")
+        }
       }
   }
 
@@ -81,6 +84,7 @@ class AddressUpdateFragment : Fragment() {
   }
 
   companion object {
+    private const val TAG = "AddressUpdateFragment"
     // Refer from NodeId.h (src/lib/core/NodeId.h)
     private const val MIN_GROUP_NODE_ID = 0xFFFF_FFFF_FFFF_0000UL
     private const val MASK_GROUP_ID = 0x0000_0000_0000_FFFFUL

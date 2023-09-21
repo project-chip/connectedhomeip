@@ -18,6 +18,7 @@ import chip.devicecontroller.InvokeCallback
 import chip.devicecontroller.ReportCallback
 import chip.devicecontroller.WriteAttributesCallback
 import chip.devicecontroller.cluster.structs.AccessControlClusterAccessControlEntryStruct
+import chip.devicecontroller.cluster.structs.GroupKeyManagementClusterGroupKeySetStruct
 import chip.devicecontroller.model.AttributeWriteRequest
 import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipEventPath
@@ -258,20 +259,22 @@ class GroupSettingFragment : Fragment() {
     val dialog = AlertDialog.Builder(requireContext()).apply { setView(dialogView) }.create()
     dialogView.findViewById<Button>(R.id.addKeySetDialogBtn).setOnClickListener {
       scope.launch {
-        sendKeySetWrite(
-          keySetIdEd.text.toString().toUInt(),
-          ChipDeviceController.GroupKeySecurityPolicy.valueOf(
-              keySecurityPolicySp.selectedItem.toString()
-            )
-            .id
-            .toUInt(),
-          hexStringToByteArray(epochKey0Ed.text.toString()),
-          epochStartTime0Ed.text.toString().toUInt(),
-          hexStringToByteArray(epochKey1Ed.text.toString()),
-          epochStartTime1Ed.text.toString().toUInt(),
-          hexStringToByteArray(epochKey2Ed.text.toString()),
-          epochStartTime2Ed.text.toString().toUInt()
-        )
+        val keySetWritestruct =
+          GroupKeyManagementClusterGroupKeySetStruct(
+            keySetIdEd.text.toString().toUInt(),
+            ChipDeviceController.GroupKeySecurityPolicy.valueOf(
+                keySecurityPolicySp.selectedItem.toString()
+              )
+              .id
+              .toUInt(),
+            hexStringToByteArray(epochKey0Ed.text.toString()),
+            epochStartTime0Ed.text.toString().toULong(),
+            hexStringToByteArray(epochKey1Ed.text.toString()),
+            epochStartTime1Ed.text.toString().toULong(),
+            hexStringToByteArray(epochKey2Ed.text.toString()),
+            epochStartTime2Ed.text.toString().toULong()
+          )
+        sendKeySetWrite(keySetWritestruct)
         requireActivity().runOnUiThread { dialog.dismiss() }
       }
     }
@@ -279,34 +282,20 @@ class GroupSettingFragment : Fragment() {
   }
 
   private suspend fun sendKeySetWrite(
-    keySetId: UInt,
-    keyPolicy: UInt,
-    epochKey0: ByteArray,
-    epochStartTime0: UInt,
-    epochKey1: ByteArray,
-    epochStartTime1: UInt,
-    epochKey2: ByteArray,
-    epochStartTime2: UInt
+    groupKeySetStruct: GroupKeyManagementClusterGroupKeySetStruct
   ) {
     val tlvWriter =
-      TlvWriter().apply {
-        startStructure(AnonymousTag)
-        startStructure(
-          ContextSpecificTag(
-            ClusterIDMapping.GroupKeyManagement.KeySetWriteCommandField.GroupKeySet.id
+      TlvWriter()
+        .startStructure(AnonymousTag)
+        .apply {
+          groupKeySetStruct.toTlv(
+            ContextSpecificTag(
+              ClusterIDMapping.GroupKeyManagement.KeySetWriteCommandField.GroupKeySet.id
+            ),
+            this
           )
-        )
-        put(ContextSpecificTag(0), keySetId)
-        put(ContextSpecificTag(1), keyPolicy)
-        put(ContextSpecificTag(2), epochKey0)
-        put(ContextSpecificTag(3), epochStartTime0)
-        put(ContextSpecificTag(4), epochKey1)
-        put(ContextSpecificTag(5), epochStartTime1)
-        put(ContextSpecificTag(6), epochKey2)
-        put(ContextSpecificTag(7), epochStartTime2)
-        endStructure()
-        endStructure()
-      }
+        }
+        .endStructure()
 
     deviceController.invoke(
       object : InvokeCallback {
@@ -604,8 +593,6 @@ class GroupSettingFragment : Fragment() {
   }
 
   inner class ChipControllerCallback : GenericChipDeviceListener() {
-    override fun onConnectDeviceComplete() {}
-
     override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
       Log.d(TAG, "onCommissioningComplete for nodeId $nodeId: $errorCode")
     }
@@ -632,13 +619,17 @@ class GroupSettingFragment : Fragment() {
 
     fun newInstance(): GroupSettingFragment = GroupSettingFragment()
 
+    private const val HEX_RADIX = 16
+    private const val HEX_BIT_SHIFT = 4
+
     private fun hexStringToByteArray(hexString: String): ByteArray {
       val len = hexString.length
       val data = ByteArray(len / 2)
       var i = 0
       while (i < len) {
         data[i / 2] =
-          ((Character.digit(hexString[i], 16) shl 4) + Character.digit(hexString[i + 1], 16))
+          ((Character.digit(hexString[i], HEX_RADIX) shl HEX_BIT_SHIFT) +
+              Character.digit(hexString[i + 1], HEX_RADIX))
             .toByte()
         i += 2
       }
