@@ -33,7 +33,7 @@ config:
         defaultValue: "hex:17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003248656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E2E0018"
 
 tests:
-    - label: "Step 1: TH commissions DUT using admin node ID N1"
+    - label: "Step 1: TH1 commissions DUT using admin node ID N1"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -50,7 +50,7 @@ tests:
                 saveAs: CommissionerNodeId
 
     - label:
-          "Step 2: TH reads DUT Endpoint 0 OperationalCredentials cluster
+          "Step 2: TH1 reads DUT Endpoint 0 OperationalCredentials cluster
           CurrentFabricIndex attribute"
       command: "readAttribute"
       cluster: "Operational Credentials"
@@ -60,7 +60,7 @@ tests:
 
     #Issue: https://github.com/project-chip/connectedhomeip/issues/24081
     - label:
-          "Step 3: TH reads DUT Endpoint 0 AccessControl cluster
+          "Step 3: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlExtensionChanged event"
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
@@ -87,7 +87,7 @@ tests:
                 value: "y"
 
     - label:
-          "Step 4: TH writes DUT Endpoint 0 AccessControl cluster Extension
+          "Step 4: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
           attribute, value is list of AccessControlExtensionStruct containing 1
           element struct Data field: D_OK_EMPTY"
       PICS: ACL.S.A0001
@@ -97,7 +97,7 @@ tests:
           value: [{ Data: D_OK_EMPTY, FabricIndex: CurrentFabricIndexValue }]
 
     - label:
-          "Step 5: TH reads DUT Endpoint 0 AccessControl cluster
+          "Step 5: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlExtensionChanged event"
       PICS: ACL.S.E01
       command: "readEvent"
@@ -118,7 +118,7 @@ tests:
               }
 
     - label:
-          "Step 6: TH writes DUT Endpoint 0 AccessControl cluster Extension
+          "Step 6: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
           attribute, value is list of AccessControlExtensionStruct containing 1
           element struct Data field: D_OK_SINGLE"
       PICS: ACL.S.A0001
@@ -128,7 +128,7 @@ tests:
           value: [{ Data: D_OK_SINGLE, FabricIndex: CurrentFabricIndexValue }]
 
     - label:
-          "Step 7: TH reads DUT Endpoint 0 AccessControl cluster
+          "Step 7: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlExtensionChanged event"
       PICS: ACL.S.E01
       command: "readEvent"
@@ -163,7 +163,7 @@ tests:
                       }
 
     - label:
-          "Step 8: TH writes DUT Endpoint 0 AccessControl cluster Extension
+          "Step 8: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
           attribute, value is list of AccessControlExtensionStruct containing 1
           element struct Data field: D_BAD_LENGTH"
       PICS: ACL.S.A0001
@@ -175,7 +175,7 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Step 9: TH reads DUT Endpoint 0 AccessControl cluster
+          "Step 9: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlExtensionChanged event"
       PICS: ACL.S.E01
       command: "readEvent"
@@ -196,7 +196,7 @@ tests:
               }
 
     - label:
-          "Step 10: TH writes DUT Endpoint 0 AccessControl cluster Extension
+          "Step 10: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
           attribute, value is list of AccessControlExtensionStruct containing 2
           elements struct Data field: D_OK_EMPTY struct Data field: D_OK_SINGLE"
       PICS: ACL.S.A0001
@@ -212,7 +212,7 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Step 11: TH reads DUT Endpoint 0 AccessControl cluster
+          "Step 11: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlExtensionChanged event"
       PICS: ACL.S.E01
       command: "readEvent"
@@ -233,7 +233,7 @@ tests:
               }
 
     - label:
-          "Step 12: TH writes DUT Endpoint 0 AccessControl cluster Extension
+          "Step 12: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
           attribute, value is an empty list"
       PICS: ACL.S.A0001
       command: "writeAttribute"
@@ -242,7 +242,7 @@ tests:
           value: []
 
     - label:
-          "Step 13: TH reads DUT Endpoint 0 AccessControl cluster
+          "Step 13: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlExtensionChanged event"
       PICS: ACL.S.E01
       command: "readEvent"
