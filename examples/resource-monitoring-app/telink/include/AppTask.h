@@ -1,5 +1,7 @@
-/**
- *    Copyright (c) 2022 Project CHIP Authors
+/*
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,26 +15,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
 
-#import <Foundation/Foundation.h>
-#import <Matter/MTRDefines.h>
+#include "AppTaskCommon.h"
 
-NS_ASSUME_NONNULL_BEGIN
+class AppTask : public AppTaskCommon
+{
+private:
+    friend AppTask & GetAppTask(void);
+    friend class AppTaskCommon;
 
-MTR_HIDDEN
-@interface MTRControllerAccessControl : NSObject
+    CHIP_ERROR Init(void);
 
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-+ (instancetype)alloc NS_UNAVAILABLE;
+    static AppTask sAppTask;
+};
 
-/**
- * Initialize the access control module. Must be called on the Matter task
- * queue.
- */
-+ (void)init;
-
-@end
-
-NS_ASSUME_NONNULL_END
+inline AppTask & GetAppTask(void)
+{
+    return AppTask::sAppTask;
+}

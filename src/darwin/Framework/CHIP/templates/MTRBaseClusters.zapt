@@ -19,6 +19,10 @@ NS_ASSUME_NONNULL_BEGIN
 {{availability (asUpperCamelCase name preserveAcronyms=true)}}
 @interface MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}} : MTRCluster
 
+/**
+ * For all instance methods (reads, writes, commands) that take a completion,
+ * the completion will be called on the provided queue.
+ */
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER {{availability (asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};

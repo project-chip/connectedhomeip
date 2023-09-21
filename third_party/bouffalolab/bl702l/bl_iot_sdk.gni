@@ -188,6 +188,11 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_hosal") {
+    if (defined(invoker.chip_config_network_layer_ble) &&
+        invoker.chip_config_network_layer_ble) {
+      defines = [ "CFG_BLE_ENABLE" ]
+    }
+
     sources = [
       "${bl_iot_sdk_root}/components/platform/hosal/bl702l_hal/bl_adc.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702l_hal/bl_boot2.c",
@@ -258,6 +263,11 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_fs",
       ":${sdk_target_name}_config_utils",
     ]
+    if (defined(invoker.chip_config_network_layer_ble) &&
+        invoker.chip_config_network_layer_ble) {
+      configs += [ ":${sdk_target_name}_config_ble" ]
+    }
+
     public_configs = [
       ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_hosal",
@@ -690,7 +700,6 @@ template("bl_iot_sdk") {
   group(sdk_target_name) {
     public_deps = [
       ":${sdk_target_name}_bl702l_rom_a0",
-      ":${sdk_target_name}_ble",
       ":${sdk_target_name}_fs",
       ":${sdk_target_name}_hosal",
       ":${sdk_target_name}_libc",
@@ -701,6 +710,12 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_utils",
     ]
     public_configs = [ ":${sdk_target_name}_config_BSP_Driver" ]
+
+    if (defined(invoker.chip_config_network_layer_ble) &&
+        invoker.chip_config_network_layer_ble) {
+      public_deps += [ ":${sdk_target_name}_ble" ]
+    }
+
     if (defined(invoker.chip_enable_openthread) &&
         invoker.chip_enable_openthread) {
       public_deps += [ ":${sdk_target_name}_openthread_port" ]

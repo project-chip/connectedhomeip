@@ -50,7 +50,7 @@ CHIP_ERROR ASRFactoryDataProvider::Init()
     if (ret != 0)
     {
         err = CHIP_ERROR_INTERNAL;
-        ChipLogError(DeviceLayer, "The hash of factory bin is not correct.");
+        ChipLogError(DeviceLayer, "ASR factory data check failed.");
     }
 #endif
     return err;
