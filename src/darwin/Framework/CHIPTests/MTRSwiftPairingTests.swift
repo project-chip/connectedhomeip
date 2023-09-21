@@ -11,6 +11,9 @@ struct Constants {
     static let timeoutInSeconds : UInt16 = 3
 }
 
+// Because we are using things from Matter.framework that are flagged
+// as only being available starting with macOS 13.3, we need to flag our
+// code with the same availabiluty annotation.
 @available(macOS, introduced: 13.3)
 class MTRSwiftPairingTestControllerDelegate : NSObject, MTRDeviceControllerDelegate {
     let expectation: XCTestExpectation
@@ -43,6 +46,9 @@ class MTRSwiftPairingTestControllerDelegate : NSObject, MTRDeviceControllerDeleg
 }
 
 class MTRSwiftPairingTests : XCTestCase {
+    // Because we are using things from Matter.framework that are flagged
+    // as only being available starting with macOS 13.3, we need to flag our
+    // code with the same availabiluty annotation.
     @available(macOS, introduced: 13.3)
     func test001_BasicPairing() {
         let factory = MTRDeviceControllerFactory.sharedInstance()

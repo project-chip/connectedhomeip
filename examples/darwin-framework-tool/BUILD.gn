@@ -152,7 +152,7 @@ config("config") {
 
     # Disable availability annotations in Matter.framework headers because we
     # are not building against a system Matter.framework here anyway.
-    "MTR_SKIP_AVAILABILITY_ANNOTATIONS=1",
+    "MTR_NO_AVAILABILITY=1",
   ]
 
   cflags = [

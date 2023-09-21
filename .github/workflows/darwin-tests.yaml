@@ -72,7 +72,7 @@ jobs:
               #
               # Disable availability annotations, since we are not building against a system
               # Matter.framework.
-              run: xcodebuild -target "darwin-framework-tool" -sdk macosx -configuration Debug OTHER_CFLAGS='${inherited} -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_SKIP_AVAILABILITY_ANNOTATIONS=1'
+              run: xcodebuild -target "darwin-framework-tool" -sdk macosx -configuration Debug OTHER_CFLAGS='${inherited} -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true

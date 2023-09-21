@@ -96,7 +96,7 @@ def build_darwin_framework(args):
     for option in options:
         command += ["{}={}".format(option, "YES" if options[option] else "NO")]
 
-    defines = 'GCC_PREPROCESSOR_DEFINITIONS=${inherited} MTR_SKIP_AVAILABILITY_ANNOTATIONS=1'
+    defines = 'GCC_PREPROCESSOR_DEFINITIONS=${inherited} MTR_NO_AVAILABILITY=1'
     if args.enable_provisional_framework_features:
         defines += ' MTR_ENABLE_PROVISIONAL=1'
 
