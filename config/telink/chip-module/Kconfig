@@ -35,10 +35,10 @@ config CHIP_APP_LOG_LEVEL
 # See config/zephyr/Kconfig for full definition
 config CHIP_OTA_REQUESTOR
 	bool
-	imply BOOTLOADER_MCUBOOT
-	imply IMG_MANAGER
-	imply STREAM_FLASH
-	imply STREAM_FLASH_ERASE
+	select BOOTLOADER_MCUBOOT
+	select IMG_MANAGER
+	select STREAM_FLASH
+	select STREAM_FLASH_ERASE
 
 config CHIP_OTA_REQUESTOR_BUFFER_SIZE
 	int "OTA Requestor image buffer size"
