@@ -144,8 +144,11 @@ extern uint32_t SystemCoreClock;
 #else
 #define configUSE_TICKLESS_IDLE 0
 #endif // SL_CATALOG_POWER_MANAGER_PRESENT
-
-#define configTICK_RATE_HZ (1024)
+#ifdef SIWX_917
+#define configTICK_RATE_HZ ((TickType_t) 10000)
+#else
+#define configTICK_RATE_HZ ((TickType_t) 1024)
+#endif // SIWX_917
 /* Definition used by Keil to replace default system clock source. */
 #define configOVERRIDE_DEFAULT_TICK_CONFIGURATION 1
 
