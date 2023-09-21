@@ -25,6 +25,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
+#include <platform/LockTracker.h>
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #include "TraceDecoder.h"
@@ -222,17 +223,17 @@ CHIP_ERROR CHIPCommand::Run()
 
     CHIP_ERROR err = StartWaiting(GetWaitDuration());
 
-    bool deferCleanup = (IsInteractive() && DeferInteractiveCleanup());
-
-    Shutdown();
-
-    if (deferCleanup)
+    if (IsInteractive())
     {
-        sDeferredCleanups.insert(this);
+        bool timedOut;
+        // Give it 2 hours to run our cleanup; that should never get hit in practice.
+        CHIP_ERROR cleanupErr = RunOnMatterQueue(RunCommandCleanup, chip::System::Clock::Seconds16(7200), &timedOut);
+        VerifyOrDie(cleanupErr == CHIP_NO_ERROR);
+        VerifyOrDie(!timedOut);
     }
     else
     {
-        Cleanup();
+        CleanupAfterRun();
     }
 
     MaybeTearDownStack();
@@ -504,6 +505,56 @@ void CHIPCommand::RunQueuedCommand(intptr_t commandArg)
     }
 }
 
+void CHIPCommand::RunCommandCleanup(intptr_t commandArg)
+{
+    auto * command = reinterpret_cast<CHIPCommand *>(commandArg);
+    command->CleanupAfterRun();
+    command->StopWaiting();
+}
+
+void CHIPCommand::CleanupAfterRun()
+{
+    assertChipStackLockedByCurrentThread();
+    bool deferCleanup = (IsInteractive() && DeferInteractiveCleanup());
+
+    Shutdown();
+
+    if (deferCleanup)
+    {
+        sDeferredCleanups.insert(this);
+    }
+    else
+    {
+        Cleanup();
+    }
+}
+
+CHIP_ERROR CHIPCommand::RunOnMatterQueue(MatterWorkCallback callback, chip::System::Clock::Timeout timeout, bool * timedOut)
+{
+    {
+        std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
+        mWaitingForResponse = true;
+    }
+
+    auto err = chip::DeviceLayer::PlatformMgr().ScheduleWork(callback, reinterpret_cast<intptr_t>(this));
+    if (CHIP_NO_ERROR != err)
+    {
+        {
+            std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
+            mWaitingForResponse = false;
+        }
+        return err;
+    }
+
+    auto waitingUntil = std::chrono::system_clock::now() + std::chrono::duration_cast<std::chrono::seconds>(timeout);
+    {
+        std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);
+        *timedOut = !cvWaitingForResponse.wait_until(lk, waitingUntil, [this]() { return !this->mWaitingForResponse; });
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 #if !CONFIG_USE_SEPARATE_EVENTLOOP
 static void OnResponseTimeout(chip::System::Layer *, void * appState)
 {
@@ -526,28 +577,15 @@ CHIP_ERROR CHIPCommand::StartWaiting(chip::System::Clock::Timeout duration)
     }
     else
     {
-        {
-            std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
-            mWaitingForResponse = true;
-        }
-
-        auto err = chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
+        bool timedOut;
+        CHIP_ERROR err = RunOnMatterQueue(RunQueuedCommand, duration, &timedOut);
         if (CHIP_NO_ERROR != err)
         {
-            {
-                std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
-                mWaitingForResponse = false;
-            }
             return err;
         }
-
-        auto waitingUntil = std::chrono::system_clock::now() + std::chrono::duration_cast<std::chrono::seconds>(duration);
+        if (timedOut)
         {
-            std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);
-            if (!cvWaitingForResponse.wait_until(lk, waitingUntil, [this]() { return !this->mWaitingForResponse; }))
-            {
-                mCommandExitStatus = CHIP_ERROR_TIMEOUT;
-            }
+            mCommandExitStatus = CHIP_ERROR_TIMEOUT;
         }
     }
     if (!IsInteractive())

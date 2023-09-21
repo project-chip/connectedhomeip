@@ -25,7 +25,7 @@
 
 namespace chip {
 
-constexpr size_t kIcdMonitoringBufferSize = 40;
+inline constexpr size_t kIcdMonitoringBufferSize = 40;
 
 struct IcdMonitoringEntry : public PersistentData<kIcdMonitoringBufferSize>
 {

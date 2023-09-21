@@ -779,18 +779,69 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
     }
 }
 
+MdnsAvahi::ResolveContext * MdnsAvahi::AllocateResolveContext()
+{
+    ResolveContext * context = chip::Platform::New<ResolveContext>();
+    if (context == nullptr)
+    {
+        return nullptr;
+    }
+
+    context->mNumber = mResolveCount++;
+    mAllocatedResolves.push_back(context);
+
+    return context;
+}
+
+MdnsAvahi::ResolveContext * MdnsAvahi::ResolveContextForHandle(size_t handle)
+{
+    for (auto it : mAllocatedResolves)
+    {
+        if (it->mNumber == handle)
+        {
+            return it;
+        }
+    }
+    return nullptr;
+}
+
+void MdnsAvahi::FreeResolveContext(size_t handle)
+{
+    for (auto it = mAllocatedResolves.begin(); it != mAllocatedResolves.end(); it++)
+    {
+        if ((*it)->mNumber == handle)
+        {
+            chip::Platform::Delete(*it);
+            mAllocatedResolves.erase(it);
+            return;
+        }
+    }
+}
+
+void MdnsAvahi::StopResolve(const char * name)
+{
+    auto truncate_end = std::remove_if(mAllocatedResolves.begin(), mAllocatedResolves.end(),
+                                       [name](ResolveContext * ctx) { return strcmp(ctx->mName, name) == 0; });
+
+    for (auto it = truncate_end; it != mAllocatedResolves.end(); it++)
+    {
+        (*it)->mCallback((*it)->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_CANCELLED);
+        chip::Platform::Delete(*it);
+    }
+
+    mAllocatedResolves.erase(truncate_end, mAllocatedResolves.end());
+}
+
 CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdServiceProtocol protocol, Inet::IPAddressType addressType,
                               Inet::IPAddressType transportType, Inet::InterfaceId interface, DnssdResolveCallback callback,
                               void * context)
 {
-    AvahiServiceResolver * resolver;
     AvahiIfIndex avahiInterface     = static_cast<AvahiIfIndex>(interface.GetPlatformInterface());
-    ResolveContext * resolveContext = chip::Platform::New<ResolveContext>();
+    ResolveContext * resolveContext = AllocateResolveContext();
     CHIP_ERROR error                = CHIP_NO_ERROR;
-
-    resolveContext->mInstance = this;
-    resolveContext->mCallback = callback;
-    resolveContext->mContext  = context;
+    resolveContext->mInstance       = this;
+    resolveContext->mCallback       = callback;
+    resolveContext->mContext        = context;
 
     if (!interface.IsPresent())
     {
@@ -803,15 +854,17 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdService
     resolveContext->mAddressType = ToAvahiProtocol(addressType);
     resolveContext->mFullType    = GetFullType(type, protocol);
 
-    resolver = avahi_service_resolver_new(mClient, avahiInterface, resolveContext->mTransport, name,
-                                          resolveContext->mFullType.c_str(), nullptr, resolveContext->mAddressType,
-                                          static_cast<AvahiLookupFlags>(0), HandleResolve, resolveContext);
+    AvahiServiceResolver * resolver =
+        avahi_service_resolver_new(mClient, avahiInterface, resolveContext->mTransport, name, resolveContext->mFullType.c_str(),
+                                   nullptr, resolveContext->mAddressType, static_cast<AvahiLookupFlags>(0), HandleResolve,
+                                   reinterpret_cast<void *>(resolveContext->mNumber));
     // Otherwise the resolver will be freed in the callback
     if (resolver == nullptr)
     {
         error = CHIP_ERROR_INTERNAL;
         chip::Platform::Delete(resolveContext);
     }
+    resolveContext->mResolver = resolver;
 
     return error;
 }
@@ -821,8 +874,15 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
                               const char * host_name, const AvahiAddress * address, uint16_t port, AvahiStringList * txt,
                               AvahiLookupResultFlags flags, void * userdata)
 {
-    ResolveContext * context = reinterpret_cast<ResolveContext *>(userdata);
+    size_t handle            = reinterpret_cast<size_t>(userdata);
+    ResolveContext * context = sInstance.ResolveContextForHandle(handle);
     std::vector<TextEntry> textEntries;
+
+    if (context == nullptr)
+    {
+        ChipLogError(Discovery, "Invalid context for handling resolves: %ld", static_cast<long>(handle));
+        return;
+    }
 
     switch (event)
     {
@@ -831,14 +891,14 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         {
             ChipLogProgress(DeviceLayer, "Re-trying resolve");
             avahi_service_resolver_free(resolver);
-            resolver = avahi_service_resolver_new(context->mInstance->mClient, context->mInterface, context->mTransport,
-                                                  context->mName, context->mFullType.c_str(), nullptr, context->mAddressType,
-                                                  static_cast<AvahiLookupFlags>(0), HandleResolve, context);
-            if (resolver == nullptr)
+            context->mResolver = avahi_service_resolver_new(
+                context->mInstance->mClient, context->mInterface, context->mTransport, context->mName, context->mFullType.c_str(),
+                nullptr, context->mAddressType, static_cast<AvahiLookupFlags>(0), HandleResolve, context);
+            if (context->mResolver == nullptr)
             {
                 ChipLogError(DeviceLayer, "Avahi resolve failed on retry");
                 context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
-                chip::Platform::Delete(context);
+                sInstance.FreeResolveContext(handle);
             }
             return;
         }
@@ -930,8 +990,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         break;
     }
 
-    avahi_service_resolver_free(resolver);
-    chip::Platform::Delete(context);
+    sInstance.FreeResolveContext(handle);
 }
 
 CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
@@ -988,7 +1047,10 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId
                                             browseResult->mAddressType, Inet::IPAddressType::kAny, interface, callback, context);
 }
 
-void ChipDnssdResolveNoLongerNeeded(const char * instanceName) {}
+void ChipDnssdResolveNoLongerNeeded(const char * instanceName)
+{
+    MdnsAvahi::GetInstance().StopResolve(instanceName);
+}
 
 CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface)
 {

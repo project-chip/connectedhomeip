@@ -142,7 +142,7 @@ int main(void)
         goto exit;
     }
 
-#ifdef CONFIG_OPENTHREAD_MTD_SED
+#ifdef CONFIG_CHIP_ENABLE_ICD_SUPPORT
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 #elif CONFIG_OPENTHREAD_MTD
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);

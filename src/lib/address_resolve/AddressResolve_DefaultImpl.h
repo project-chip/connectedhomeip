@@ -26,7 +26,7 @@ namespace chip {
 namespace AddressResolve {
 namespace Impl {
 
-constexpr uint8_t kNodeLookupResultsLen = CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS;
+inline constexpr uint8_t kNodeLookupResultsLen = CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS;
 
 enum class NodeLookupResult
 {
