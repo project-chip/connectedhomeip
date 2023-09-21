@@ -187,7 +187,8 @@ tests:
     - label:
           "Step 2b: TH sends the Unlock with Timeout argument value as 60
           seconds"
-      PICS: " DRLK.S.F08 && DRLK.S.F00 && DRLK.S.C03.Rsp && PICS_SKIP_SAMPLE_APP "
+      PICS:
+          " DRLK.S.F08 && DRLK.S.F00 && DRLK.S.C03.Rsp && PICS_SKIP_SAMPLE_APP "
       command: "UnlockWithTimeout"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -200,7 +201,9 @@ tests:
     - label:
           "Step 2b: TH sends the Unlock with Timeout argument value as 60
           seconds"
-      PICS: " (!DRLK.S.F08 || !DRLK.S.F00) && DRLK.S.C03.Rsp && PICS_SKIP_SAMPLE_APP "
+      PICS:
+          " (!DRLK.S.F08 || !DRLK.S.F00) && DRLK.S.C03.Rsp &&
+          PICS_SKIP_SAMPLE_APP "
       command: "UnlockWithTimeout"
       timedInteractionTimeoutMs: 1000
       arguments:
