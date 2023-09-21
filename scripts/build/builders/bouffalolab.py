@@ -136,22 +136,22 @@ class BouffalolabBuilder(GnBuilder):
             raise Exception('Currently, Thread cannot be enabled with Wi-Fi or Ethernet')
 
         if enable_thread:
-            chip_mdns="platform"
+            chip_mdns = "platform"
         elif enable_ethernet or enable_wifi:
-            chip_mdns="minimal"
+            chip_mdns = "minimal"
 
         # hardware connectivity support check
         if bouffalo_chip == "bl602":
             if enable_ethernet or enable_thread:
-                raise Exception('SoC %s doesn\'t support connectivity Ethernet/Thread.'.format(bouffalo_chip))
+                raise Exception('SoC {} doesn\'t support connectivity Ethernet/Thread.'.format(bouffalo_chip))
         elif bouffalo_chip == "bl702":
             self.argsOpt.append('module_type=\"{}\"'.format(module_type))
             if board != BouffalolabBoard.BL706DK:
                 if enable_ethernet or enable_wifi:
-                    raise Exception('Board %s doesn\'t support connectivity Ethernet/Wi-Fi.'.format(board))
+                    raise Exception('Board {} doesn\'t support connectivity Ethernet/Wi-Fi.'.format(board))
         elif bouffalo_chip == "bl702l":
             if enable_ethernet or enable_wifi:
-                raise Exception('SoC %s doesn\'t support connectivity Ethernet/Wi-Fi currently.'.format(bouffalo_chip))
+                raise Exception('SoC {} doesn\'t support connectivity Ethernet/Wi-Fi currently.'.format(bouffalo_chip))
 
         self.argsOpt.append('chip_enable_ethernet={}'.format(str(enable_ethernet).lower()))
         self.argsOpt.append('chip_enable_wifi={}'.format(str(enable_wifi).lower()))
