@@ -20,6 +20,7 @@
 
 #include "rsi_ble_apis.h"
 #if (SIWX_917 | EXP_BOARD)
+#include "rsi_bt_common_apis.h"
 #include "rsi_user.h"
 #else
 #include <rsi_data_types.h>
