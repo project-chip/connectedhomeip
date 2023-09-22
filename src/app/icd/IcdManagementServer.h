@@ -59,7 +59,8 @@ private:
 
     static_assert((CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC) <= 64800,
                   "Spec requires the IdleModeInterval to be equal or inferior to 64800s.");
-    static_assert((CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC) >= 1, "Spec requires the IdleModeInterval to be equal or greater to 1s.");
+    static_assert((CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC) >= 1,
+                  "Spec requires the IdleModeInterval to be equal or greater to 1s.");
     uint32_t mIdleInterval_s = CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC; // in seconds.
 
     static_assert((CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS) <= (CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC * 1000),
