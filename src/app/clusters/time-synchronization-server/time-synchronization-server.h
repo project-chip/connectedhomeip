@@ -154,7 +154,7 @@ private:
         }
         Attributes::UTCTime::TypeInfo::DecodableType utcTime;
         Attributes::Granularity::TypeInfo::DecodableType granularity = GranularityEnum::kNoTimeGranularity;
-        app::ReadClient readClient;
+        ReadClient readClient;
     };
     Platform::UniquePtr<TimeReadInfo> mTimeReadInfo;
 #endif
