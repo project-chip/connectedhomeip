@@ -634,7 +634,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
  */
 EmberAfStatus OnOffServer::getOnOffValueForStartUp(chip::EndpointId endpoint, bool & onOffValueForStartUp)
 {
-    app::DataModel::Nullable<OnOff::OnOffStartUpOnOff> startUpOnOff;
+    app::DataModel::Nullable<OnOff::StartUpOnOffEnum> startUpOnOff;
     EmberAfStatus status = Attributes::StartUpOnOff::Get(endpoint, startUpOnOff);
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -647,13 +647,13 @@ EmberAfStatus OnOffServer::getOnOffValueForStartUp(chip::EndpointId endpoint, bo
             {
                 switch (startUpOnOff.Value())
                 {
-                case OnOff::OnOffStartUpOnOff::kOff:
+                case OnOff::StartUpOnOffEnum::kOff:
                     updatedOnOff = false; // Off
                     break;
-                case OnOff::OnOffStartUpOnOff::kOn:
+                case OnOff::StartUpOnOffEnum::kOn:
                     updatedOnOff = true; // On
                     break;
-                case OnOff::OnOffStartUpOnOff::kTogglePreviousOnOff:
+                case OnOff::StartUpOnOffEnum::kToggle:
                     updatedOnOff = !updatedOnOff;
                     break;
                 default:
@@ -811,14 +811,14 @@ uint32_t OnOffServer::calculateNextWaitTimeMS()
 bool OnOffServer::OnWithTimedOffCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                         const Commands::OnWithTimedOff::DecodableType & commandData)
 {
-    BitFlags<OnOffControl> onOffControl = commandData.onOffControl;
-    uint16_t onTime                     = commandData.onTime;
-    uint16_t offWaitTime                = commandData.offWaitTime;
-    Status status                       = Status::Success;
-    chip::EndpointId endpoint           = commandPath.mEndpointId;
-    bool isOn                           = false;
-    uint16_t currentOffWaitTime         = MAX_ON_OFF_TIME_VALUE;
-    uint16_t currentOnTime              = 0;
+    BitFlags<OnOffControlBitmap> onOffControl = commandData.onOffControl;
+    uint16_t onTime                           = commandData.onTime;
+    uint16_t offWaitTime                      = commandData.offWaitTime;
+    Status status                             = Status::Success;
+    chip::EndpointId endpoint                 = commandPath.mEndpointId;
+    bool isOn                                 = false;
+    uint16_t currentOffWaitTime               = MAX_ON_OFF_TIME_VALUE;
+    uint16_t currentOnTime                    = 0;
 
     EmberEventControl * event = configureEventControl(endpoint);
     VerifyOrExit(event != nullptr, status = Status::UnsupportedEndpoint);
@@ -827,7 +827,7 @@ bool OnOffServer::OnWithTimedOffCommand(app::CommandHandler * commandObj, const 
     OnOff::Attributes::OnOff::Get(endpoint, &isOn);
 
     // OnOff is off and the commands is only accepted if on
-    if (onOffControl.Has(OnOffControl::kAcceptOnlyWhenOn) && !isOn)
+    if (onOffControl.Has(OnOffControlBitmap::kAcceptOnlyWhenOn) && !isOn)
     {
         commandObj->AddStatus(commandPath, Status::Success);
         return true;
@@ -1024,7 +1024,7 @@ static inline void unreg(OnOffEffect * inst)
 }
 
 OnOffEffect::OnOffEffect(chip::EndpointId endpoint, OffWithEffectTriggerCommand offWithEffectTrigger,
-                         OnOffEffectIdentifier effectIdentifier, uint8_t effectVariant) :
+                         EffectIdentifierEnum effectIdentifier, uint8_t effectVariant) :
     mEndpoint(endpoint),
     mOffWithEffectTrigger(offWithEffectTrigger), mEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant)
 {

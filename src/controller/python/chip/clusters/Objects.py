@@ -1285,7 +1285,7 @@ class OnOff(Cluster):
                 ClusterObjectFieldDescriptor(Label="globalSceneControl", Tag=0x00004000, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="onTime", Tag=0x00004001, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="offWaitTime", Tag=0x00004002, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="startUpOnOff", Tag=0x00004003, Type=typing.Union[None, Nullable, OnOff.Enums.OnOffStartUpOnOff]),
+                ClusterObjectFieldDescriptor(Label="startUpOnOff", Tag=0x00004003, Type=typing.Union[None, Nullable, OnOff.Enums.StartUpOnOffEnum]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -1298,7 +1298,7 @@ class OnOff(Cluster):
     globalSceneControl: 'typing.Optional[bool]' = None
     onTime: 'typing.Optional[uint]' = None
     offWaitTime: 'typing.Optional[uint]' = None
-    startUpOnOff: 'typing.Union[None, Nullable, OnOff.Enums.OnOffStartUpOnOff]' = None
+    startUpOnOff: 'typing.Union[None, Nullable, OnOff.Enums.StartUpOnOffEnum]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -1307,25 +1307,25 @@ class OnOff(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class OnOffDelayedAllOffEffectVariant(MatterIntEnum):
-            kFadeToOffIn0p8Seconds = 0x00
+        class DelayedAllOffEffectVariantEnum(MatterIntEnum):
+            kDelayedOffFastFade = 0x00
             kNoFade = 0x01
-            k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 0x02
+            kDelayedOffSlowFade = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 3,
 
-        class OnOffDyingLightEffectVariant(MatterIntEnum):
-            k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0x00
+        class DyingLightEffectVariantEnum(MatterIntEnum):
+            kDyingLightFadeOff = 0x00
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 1,
 
-        class OnOffEffectIdentifier(MatterIntEnum):
+        class EffectIdentifierEnum(MatterIntEnum):
             kDelayedAllOff = 0x00
             kDyingLight = 0x01
             # All received enum values that are not listed above will be mapped
@@ -1334,10 +1334,10 @@ class OnOff(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
-        class OnOffStartUpOnOff(MatterIntEnum):
+        class StartUpOnOffEnum(MatterIntEnum):
             kOff = 0x00
             kOn = 0x01
-            kTogglePreviousOnOff = 0x02
+            kToggle = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
@@ -1347,9 +1347,9 @@ class OnOff(Cluster):
     class Bitmaps:
         class Feature(IntFlag):
             kLighting = 0x1
-            kDeadFront = 0x2
+            kDeadFrontBehavior = 0x2
 
-        class OnOffControl(IntFlag):
+        class OnOffControlBitmap(IntFlag):
             kAcceptOnlyWhenOn = 0x1
 
     class Commands:
@@ -1403,11 +1403,11 @@ class OnOff(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="effectIdentifier", Tag=0, Type=OnOff.Enums.OnOffEffectIdentifier),
+                        ClusterObjectFieldDescriptor(Label="effectIdentifier", Tag=0, Type=OnOff.Enums.EffectIdentifierEnum),
                         ClusterObjectFieldDescriptor(Label="effectVariant", Tag=1, Type=uint),
                     ])
 
-            effectIdentifier: 'OnOff.Enums.OnOffEffectIdentifier' = 0
+            effectIdentifier: 'OnOff.Enums.EffectIdentifierEnum' = 0
             effectVariant: 'uint' = 0
 
         @dataclass
@@ -1520,9 +1520,9 @@ class OnOff(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, OnOff.Enums.OnOffStartUpOnOff])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, OnOff.Enums.StartUpOnOffEnum])
 
-            value: 'typing.Union[None, Nullable, OnOff.Enums.OnOffStartUpOnOff]' = None
+            value: 'typing.Union[None, Nullable, OnOff.Enums.StartUpOnOffEnum]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

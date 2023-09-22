@@ -6424,7 +6424,7 @@
               "code": 16387,
               "mfgCode": null,
               "side": "server",
-              "type": "OnOffStartUpOnOff",
+              "type": "StartUpOnOffEnum",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,

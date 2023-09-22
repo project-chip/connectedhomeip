@@ -2772,6 +2772,7 @@ static id _Nullable DecodeAttributeValueForGeneralDiagnosticsCluster(
         value = [NSNumber numberWithBool:cppValue];
         return value;
     }
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::AverageWearCount::Id: {
         using TypeInfo = Attributes::AverageWearCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -2783,6 +2784,7 @@ static id _Nullable DecodeAttributeValueForGeneralDiagnosticsCluster(
         value = [NSNumber numberWithUnsignedInt:cppValue];
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }
