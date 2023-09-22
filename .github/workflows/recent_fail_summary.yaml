@@ -26,7 +26,7 @@ jobs:
     name: Summarize Recent Workflow Failures
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: pip install pandas python-slugify
       - name: Run Summarization Script
         run: python scripts/tools/summarize_fail.py
