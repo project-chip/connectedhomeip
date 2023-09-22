@@ -94,7 +94,7 @@ CHIP_ERROR ReadDerUnsignedIntegerIntoRaw(Reader & reader, MutableByteSpan raw_in
 CHIP_ERROR ConvertIntegerRawToDerInternal(const ByteSpan & raw_integer, MutableByteSpan & out_der_integer,
                                           bool include_tag_and_length)
 {
-    if (!IsSpanUsable(raw_integer) || !IsSpanUsable(out_der_integer))
+    if (raw_integer.empty() || out_der_integer.empty())
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -906,7 +906,7 @@ CHIP_ERROR DeriveGroupPrivacyKey(const ByteSpan & encryption_key, MutableByteSpa
     VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == encryption_key.size(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES <= out_key.size(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    const ByteSpan null_span = ByteSpan(nullptr, 0);
+    constexpr ByteSpan null_span = ByteSpan();
 
     Crypto::HKDF_sha crypto;
     return crypto.HKDF_SHA256(encryption_key.data(), encryption_key.size(), null_span.data(), null_span.size(), kGroupPrivacyInfo,
