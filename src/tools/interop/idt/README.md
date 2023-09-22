@@ -291,8 +291,8 @@ artifact dir.
 
 [TODO] dnssd per device log
 
-## Extending ecosystems
+## Extending functionality
 
-Ecosystems implementations are dynamically loaded from `/capture/ecosystem`.
+Ecosystem and Platform implementations are dynamically loaded.
 
-See the README in `/capture/ecosystem` for guidance on implementing an ecosystem.
+See the `README` in `/capture/ecosystem` and `/capture/platform` for guidance on implementing each. 
