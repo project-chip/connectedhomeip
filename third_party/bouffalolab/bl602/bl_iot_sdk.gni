@@ -843,7 +843,6 @@ template("bl_iot_sdk") {
 
   config("${sdk_target_name}_config_lwip") {
     include_dirs = [
-      "${bl_iot_sdk_root}/components/network/lwip/lwip-port/config",
       "${bl_iot_sdk_root}/components/network/lwip/src/include",
       "${bl_iot_sdk_root}/components/network/lwip/src/include/lwip/apps",
       "${bl_iot_sdk_root}/components/network/lwip/lwip-port",
@@ -852,19 +851,7 @@ template("bl_iot_sdk") {
     ]
 
     defines = [
-      "LWIP_IPV6=1",
-      "LWIP_IPV4=1",
-      "LWIP_IPV6_DHCP6=1",
-      "LWIP_IPV6_SCOPES=0",
-      "LWIP_AUTOIP=1",
-      "LWIP_IPV6_MLD=1",
-      "LWIP_ND6_RDNSS_MAX_DNS_SERVERS=1",
-      "MEMP_NUM_MLD6_GROUP=10",
-      "PBUF_POOL_SIZE=20",
-      "PBUF_POOL_BUFSIZE=1600",
-      "MEMP_NUM_UDP_PCB=8",
-      "LWIP_NETIF_EXT_STATUS_CALLBACK",
-      "LWIP_HOOK_FILENAME=\"bl_route_hook.h\"",
+      "LWIP_IPV6=1"
     ]
   }
 
