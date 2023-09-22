@@ -261,5 +261,5 @@ class BouffalolabBuilder(GnBuilder):
         os.system("cp " + ota_images_image + " " + ota_images_dev_image)
 
         logging.info("PostBuild:")
-        logging.info("Bouffalo Lab OTA format image without signature: " +
+        logging.info("Bouffalo Lab unsigned OTA image: " +
                      self.app.AppNamePrefix(self.chip_name) + ".bin.xz.hash is generated.")

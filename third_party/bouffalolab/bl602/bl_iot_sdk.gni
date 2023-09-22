@@ -957,7 +957,6 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_bl602_freertos",
       ":${sdk_target_name}_blcrypto_suite",
       ":${sdk_target_name}_ble",
-      ":${sdk_target_name}_factory_data",
       ":${sdk_target_name}_fs",
       ":${sdk_target_name}_hosal",
       ":${sdk_target_name}_libc",
@@ -969,5 +968,9 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_utils",
       ":${sdk_target_name}_wifi",
     ]
+
+    if (defined(invoker.chip_enable_factory_data) && invoker.chip_enable_factory_data) {
+        public_deps += [":${sdk_target_name}_factory_data"]
+    }
   }
 }
