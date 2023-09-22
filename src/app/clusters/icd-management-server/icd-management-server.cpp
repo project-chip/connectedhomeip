@@ -94,7 +94,7 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadIdleModeInterval(EndpointId endpoin
 
 CHIP_ERROR IcdManagementAttributeAccess::ReadActiveModeInterval(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
-    return encoder.Encode(IcdManagementServer::GetInstance().GetActiveModeInterval());
+    return encoder.Encode(IcdManagementServer::GetInstance().GetActiveModeIntervalMs());
 }
 
 CHIP_ERROR IcdManagementAttributeAccess::ReadActiveModeThreshold(EndpointId endpoint, AttributeValueEncoder & encoder)

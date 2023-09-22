@@ -30,11 +30,11 @@ using chip::Protocols::InteractionModel::Status;
 class IcdManagementServer
 {
 public:
-    uint32_t GetIdleModeInterval() { return mIdleInterval_s; }
+    uint32_t GetIdleModeIntervalSec() { return mIdleInterval_s; }
 
-    uint32_t GetActiveModeInterval() { return mActiveInterval_ms; }
+    uint32_t GetActiveModeIntervalMs() { return mActiveInterval_ms; }
 
-    uint16_t GetActiveModeThreshold() { return mActiveThreshold_ms; }
+    uint16_t GetActiveModeThresholdMs() { return mActiveThreshold_ms; }
 
     uint32_t GetICDCounter() { return mIcdCounter; }
 
@@ -61,17 +61,17 @@ private:
                   "Spec requires the IdleModeInterval to be equal or inferior to 64800s.");
     static_assert((CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC) >= 1,
                   "Spec requires the IdleModeInterval to be equal or greater to 1s.");
-    uint32_t mIdleInterval_s = CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC; // in seconds.
+    uint32_t mIdleInterval_s = CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC;
 
     static_assert((CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS) <= (CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC * 1000),
                   "Spec requires the IdleModeInterval be equal or greater to the ActiveModeInterval.");
     static_assert((CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS) >= 300,
                   "Spec requires the ActiveModeThreshold to be equal or greater to 300ms");
-    uint32_t mActiveInterval_ms = CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS; // in milliseconds
+    uint32_t mActiveInterval_ms = CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS;
 
     static_assert((CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS) >= 300,
                   "Spec requires the ActiveModeThreshold to be equal or greater to 300ms.");
-    uint16_t mActiveThreshold_ms = CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS; // in milliseconds
+    uint16_t mActiveThreshold_ms = CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS;
 
     uint32_t mIcdCounter = 0;
 
