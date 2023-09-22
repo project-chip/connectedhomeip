@@ -264,11 +264,11 @@ at the end of output.
 ```
 idt discover -h
 
-usage: idt discover [-h] --type {ble,b,mdns,m}
+usage: idt discover [-h] --type {ble,b,dnssd,d}
 
 options:
   -h, --help            show this help message and exit
-  --type {ble,b,mdns,m}, -t {ble,b,mdns,m}
+  --type {ble,b,dnssd,d}, -t {ble,b,dnssd,d}
                         Specify the type of discovery to execute
 ```
 
@@ -281,7 +281,7 @@ idt discover -t b
 #### mDNS
 
 ```
- idt discover -t m
+idt discover -t d
 ```
 
 #### Artifacts
@@ -289,11 +289,10 @@ idt discover -t b
 There is a per device log for ble scanning in `ble` subdirectory of the root
 artifact dir.
 
-[TODO] per device log
+[TODO] dnssd per device log
 
-## Contributing
+## Extending ecosystems
 
-See the README in `/capture/ecosystem` for guidance on adding new ecosystems.
+Ecosystems implementations are dynamically loaded from `/capture/ecosystem`.
 
-`/capture/ecosystem/play_services_user` contains a minimal example
-implementation.
+See the README in `/capture/ecosystem` for guidance on implementing an ecosystem.

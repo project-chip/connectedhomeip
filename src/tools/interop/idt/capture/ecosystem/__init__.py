@@ -15,10 +15,16 @@
 #    limitations under the License.
 #
 
-from .play_services import PlayServices
-from .play_services_user import PlayServicesUser
+from capture.base import EcosystemCapture
+from capture.loader import CaptureImplsLoader
 
-__all__ = [
-    'PlayServices',
-    'PlayServicesUser'
-]
+impl_loader = CaptureImplsLoader(
+    __path__[0],
+    "capture.ecosystem",
+    EcosystemCapture
+)
+
+for impl_name, impl in impl_loader.impls.items():
+    globals()[impl_name] = impl
+
+__all__ = impl_loader.impl_names

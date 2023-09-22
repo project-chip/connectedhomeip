@@ -3,14 +3,13 @@
 This directory contains the logging transport implementation for various
 platforms.
 
-## Adding new platforms
+## Extending platforms
 
-1. Add the platform package in this directory (`/platform`).
-1. Create a subclass of `capture.base.PlatformLogStreamer`.
-1. Add the new class to `__all__` in `/platform/__init__.py`.
+The platform loader functions the same as `capture/ecosystem`. See the `README` there for additional details.
 
-# Implementation requirements
+For each package in `capture/platform`, the platform loader expects a module name matching the package name.  
+This module must contain a single class which subclasses `capture.base.PlatformLogStreamer`.
 
-Captures should be run in separate processes and minimize blocking main.  
-Start should be able to be called repeatedly without restarting streaming.  
-Stop should not cause an error even if the stream is not running.
+Note the following runtime expectations of platforms:
+- Start should be able to be called repeatedly without restarting streaming.  
+- Stop should not cause an error even if the stream is not running.

@@ -3,12 +3,17 @@
 This directory contains the capture process and log analysis implementations for
 each ecosystem.
 
-## Adding new ecosystems
+## Extending ecosystems
 
-1. Add the ecosystem package in this directory (`/ecosystem`).
-1. Create a subclass of `capture.base.EcosystemCapture`.
-1. Add the new class to `__all__` in `/ecosystem/__init__.py`
+For each package in `capture/ecosystem`, the ecosystem loader expects a module name matching the package name.  
+This module must contain a single class which subclasses `capture.base.EcosystemCapture`.  
 
-### Notes
+`/capture/ecosystem/play_services_user` contains a minimal example implementation.
 
-Captures should be run in separate processes and minimize blocking main.
+As another example, symlink `/res/plugin_demo/ecosystem/demo_ext_ecosystem`.
+
+```
+$ idt_go && ln -s $PWD/idt/res/plugin_demo/ecosystem/demo_ext_ecosystem/ idt/capture/ecosystem
+$ idt capture -h
+usage: idt capture [-h] [--platform {Android}] [--ecosystem {DemoExtEcosystem...
+```

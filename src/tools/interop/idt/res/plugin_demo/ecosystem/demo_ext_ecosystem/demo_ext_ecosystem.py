@@ -15,12 +15,21 @@
 #    limitations under the License.
 #
 
-cd idt
-if [ -d venv ]; then
-  source venv/bin/activate
-else
-  python3 -m venv venv
-  source venv/bin/activate
-  pip install -r requirements.txt
-fi
-cd ..
+from capture.base import EcosystemCapture
+
+
+class DemoExtEcosystem(EcosystemCapture):
+
+    def __init__(self, platform, artifact_dir: str) -> None:
+        self.artifact_dir = artifact_dir
+        self.platform = platform
+        self.message = "in the demo external ecosystem"
+
+    def start_capture(self) -> None:
+        print("Start capture " + self.message)
+
+    def stop_capture(self) -> None:
+        print("Stop capture " + self.message)
+
+    def analyze_capture(self) -> None:
+        print("Analyze capture " + self.message)

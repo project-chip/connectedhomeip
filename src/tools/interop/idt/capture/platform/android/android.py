@@ -136,7 +136,6 @@ class Android(PlatformLogStreamer):
         return valid_ip_no_port or valid_ip_valid_port
 
     def _check_connect_wireless_adb(self, temp_device_id: str) -> None:
-        # TODO: Wireless debugging does not work from container
         if Android._is_connection_str(temp_device_id):
             connect_command = f"adb connect {temp_device_id}"
             print(

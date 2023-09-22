@@ -15,12 +15,8 @@
 #    limitations under the License.
 #
 
-cd idt
-if [ -d venv ]; then
-  source venv/bin/activate
-else
-  python3 -m venv venv
-  source venv/bin/activate
-  pip install -r requirements.txt
-fi
-cd ..
+from .demo_ext_ecosystem import DemoExtEcosystem
+
+__all__ = [
+    'DemoExtEcosystem'
+]

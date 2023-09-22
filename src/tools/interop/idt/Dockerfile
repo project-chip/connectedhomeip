@@ -16,46 +16,33 @@
 #
 
 FROM debian:bookworm
-# generic deps
-RUN apt-get update
-RUN apt-get install -y \
+RUN apt-get update && \
+    apt-get install -y \
+    adb \
+    aircrack-ng \
     apt-utils \
     git \
-    pkg-config \
-    wget
-# python
-RUN apt-get install -y python3.11
-RUN apt-get install -y \
-    python3-pip \
-    python3.11-venv
-# bt deps
-RUN apt-get install -y \
     glib-2.0 \
-    libglib2.0-dev
-RUN apt-get install -y \
+    kmod \
     libbluetooth-dev \
     libboost-python-dev \
-    libboost-thread-dev
-# adb
-RUN apt-get install -y \
-    adb \
-    usbutils
-RUN usermod -aG plugdev $(whoami)
-# pcaps / net tools
-RUN apt-get install -y \
-    aircrack-ng \
-    kmod \
+    libboost-thread-dev \
+    libglib2.0-dev \
     net-tools \
     pciutils \
-    tcpdump
-RUN echo "wireshark-common wireshark-common/install-setuid boolean true" | debconf-set-selections
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install wireshark
-# otbr
+    pkg-config \
+    python3-pip \
+    python3.11 \
+    python3.11-venv \
+    tcpdump \
+    usbutils \
+    wget && \
+    echo "wireshark-common wireshark-common/install-setuid boolean true" | debconf-set-selections && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y install wireshark && \
+    rm -rf /var/lib/apt/lists/*
+RUN usermod -aG plugdev $(whoami)
 RUN git clone https://github.com/openthread/ot-br-posix
-# python deps
-RUN python3 -m venv /env
 COPY requirements.txt /
-RUN /bin/bash -c "source /env/bin/activate && pip install -r requirements.txt"
-# env
+RUN /bin/bash -c "python3 -m venv /env && source /env/bin/activate && pip install -r requirements.txt"
 RUN echo "source /env/bin/activate; pip -V; source /idt/scripts/alias.sh;" >> /root/.bashrc
 ENTRYPOINT ["/bin/bash"]

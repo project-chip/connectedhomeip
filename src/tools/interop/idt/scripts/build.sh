@@ -15,4 +15,4 @@
 #    limitations under the License.
 #
 
-sudo docker build ~/idt -t idt
+sudo docker build idt -t idt

@@ -15,8 +15,16 @@
 #    limitations under the License.
 #
 
-from .android import Android
+from capture.base import PlatformLogStreamer
+from capture.loader import CaptureImplsLoader
 
-__all__ = [
-    'Android'
-]
+impl_loader = CaptureImplsLoader(
+    __path__[0],
+    "capture.platform",
+    PlatformLogStreamer
+)
+
+for impl_name, impl in impl_loader.impls.items():
+    globals()[impl_name] = impl
+
+__all__ = impl_loader.impl_names
