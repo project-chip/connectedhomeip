@@ -90,7 +90,7 @@ RUN set -x \
 
 # Required for the Bouffalolab platform
 RUN set -x \
-    && pip3 install bflb-iot-tool \
+    && pip3 install bflb-iot-tool==1.8.6 \
     && : # last line
 
 ENV PATH $PATH:/usr/lib/kotlinc/bin
