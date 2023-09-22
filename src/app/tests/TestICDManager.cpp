@@ -20,9 +20,9 @@
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <lib/support/TimeUtils.h>
 #include <nlunit-test.h>
 #include <system/SystemLayerImpl.h>
-
 #include <app/icd/ICDManager.h>
 #include <app/icd/ICDStateObserver.h>
 #include <app/icd/IcdManagementServer.h>
@@ -117,7 +117,7 @@ public:
         AdvanceClockAndRunEventLoop(ctx, IcdManagementServer::GetInstance().GetActiveModeIntervalMs() + 1);
         // Active mode interval expired, ICDManager transitioned to the IdleMode.
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
-        AdvanceClockAndRunEventLoop(ctx, (IcdManagementServer::GetInstance().GetIdleModeIntervalMs() * 1000) + 1);
+        AdvanceClockAndRunEventLoop(ctx, secondsToMilliseconds(IcdManagementServer::GetInstance().GetIdleModeIntervalSec()) + 1);
         // Idle mode interval expired, ICDManager transitioned to the ActiveMode.
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
@@ -166,7 +166,7 @@ public:
         ctx->mICDManager.SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kAwaitingMsgAck, true);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
         // advance time so the active mode interval expires.
-        AdvanceClockAndRunEventLoop(ctx, IcdManagementServer::GetInstance().GetActiveModeInterval() + 1);
+        AdvanceClockAndRunEventLoop(ctx, IcdManagementServer::GetInstance().GetActiveModeIntervalMs() + 1);
         // A requirement flag is still set. We stay in active mode.
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
