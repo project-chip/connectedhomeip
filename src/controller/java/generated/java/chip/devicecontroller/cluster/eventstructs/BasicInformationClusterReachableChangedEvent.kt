@@ -29,9 +29,9 @@ class BasicInformationClusterReachableChangedEvent(val reachableNewValue: Boolea
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_REACHABLE_NEW_VALUE), reachableNewValue)
       endStructure()
     }
@@ -40,8 +40,8 @@ class BasicInformationClusterReachableChangedEvent(val reachableNewValue: Boolea
   companion object {
     private const val TAG_REACHABLE_NEW_VALUE = 0
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): BasicInformationClusterReachableChangedEvent {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): BasicInformationClusterReachableChangedEvent {
+      tlvReader.enterStructure(tlvTag)
       val reachableNewValue = tlvReader.getBoolean(ContextSpecificTag(TAG_REACHABLE_NEW_VALUE))
 
       tlvReader.exitContainer()

@@ -109,6 +109,7 @@ client cluster SecureChannelProtocol = 0xFFFF0000 {
   readonly attribute CaseSigma3 case_sigma3 = 0x32;
   readonly attribute CaseSigma2Resume case_sigma2_resume = 0x33;
   readonly attribute protocol_binary_data status_report = 0x40;
+  readonly attribute protocol_binary_data icd_checkin = 0x50;
 }
 
 /// Fake cluster for defining structures for IM data encoding.

@@ -642,6 +642,7 @@ def BuildBouffalolabTarget():
     target.AppendModifier('wifi', enable_wifi=True)
     target.AppendModifier('thread', enable_thread=True)
     target.AppendModifier('fp', enable_frame_ptr=True)
+    target.AppendModifier('memmonitor', enable_heap_monitoring=True)
 
     return target
 
@@ -696,6 +697,7 @@ def BuildTelinkTarget():
         TargetPart('ota-requestor', app=TelinkApp.OTA_REQUESTOR),
         TargetPart('pump', app=TelinkApp.PUMP),
         TargetPart('pump-controller', app=TelinkApp.PUMP_CONTROLLER),
+        TargetPart('resource-monitoring', app=TelinkApp.RESOURCE_MONITORING),
         TargetPart('shell', app=TelinkApp.SHELL),
         TargetPart('smoke-co-alarm', app=TelinkApp.SMOKE_CO_ALARM),
         TargetPart('temperature-measurement',

@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/AppBuildConfig.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/DataVersionFilter.h>
 #include <app/util/basic-types.h>

@@ -974,7 +974,7 @@ CHIPOnOffStartUpOnOffAttributeCallback::~CHIPOnOffStartUpOnOffAttributeCallback(
 }
 
 void CHIPOnOffStartUpOnOffAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::StartUpOnOffEnum> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;

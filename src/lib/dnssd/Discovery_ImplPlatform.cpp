@@ -370,9 +370,7 @@ void DnssdService::ToDiscoveredNodeData(const Span<Inet::IPAddress> & addresses,
     }
 }
 
-DiscoveryImplPlatform DiscoveryImplPlatform::sManager;
-
-DiscoveryImplPlatform::DiscoveryImplPlatform() = default;
+Global<DiscoveryImplPlatform> DiscoveryImplPlatform::sManager;
 
 CHIP_ERROR DiscoveryImplPlatform::InitImpl()
 {
@@ -510,7 +508,11 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
                              ? MakeInstanceName(service.mName, sizeof(service.mName), peerId)
                              : GetCommissionableInstanceName(service.mName, sizeof(service.mName)));
     Platform::CopyString(service.mType, serviceType);
-    service.mAddressType   = Inet::IPAddressType::kAny;
+#if INET_CONFIG_ENABLE_IPV4
+    service.mAddressType = Inet::IPAddressType::kAny;
+#else
+    service.mAddressType = Inet::IPAddressType::kIPv6;
+#endif
     service.mInterface     = interfaceId;
     service.mProtocol      = protocol;
     service.mPort          = port;
@@ -681,7 +683,7 @@ CHIP_ERROR DiscoveryImplPlatform::ReconfirmRecord(const char * hostname, Inet::I
 
 DiscoveryImplPlatform & DiscoveryImplPlatform::GetInstance()
 {
-    return sManager;
+    return sManager.get();
 }
 
 ServiceAdvertiser & chip::Dnssd::ServiceAdvertiser::Instance()

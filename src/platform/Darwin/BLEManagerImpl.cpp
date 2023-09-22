@@ -24,12 +24,11 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <ble/CHIPBleServiceData.h>
+#include <lib/core/Global.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Darwin/BleApplicationDelegate.h>
 #include <platform/Darwin/BleConnectionDelegate.h>
 #include <platform/Darwin/BlePlatformDelegate.h>
-
-#include <new>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
@@ -40,7 +39,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-BLEManagerImpl BLEManagerImpl::sInstance;
+Global<BLEManagerImpl> BLEManagerImpl::sInstance;
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {

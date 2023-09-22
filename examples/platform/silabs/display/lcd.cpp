@@ -25,6 +25,10 @@
 #include "dmd.h"
 #include "glib.h"
 
+#if (SIWX_917)
+#include "rsi_chip.h"
+#endif
+
 #ifdef QR_CODE_ENABLED
 #include "qrcodegen.h"
 #endif // QR_CODE_ENABLED
@@ -38,6 +42,7 @@
 #define QR_CODE_VERSION 4
 #define QR_CODE_MODULE_SIZE 3
 #define QR_CODE_BORDER_SIZE 0
+#define SL_BOARD_ENABLE_DISPLAY_PIN 0
 
 #ifdef QR_CODE_ENABLED
 static uint8_t qrCode[qrcodegen_BUFFER_LEN_FOR_VERSION(QR_CODE_VERSION)];
@@ -64,12 +69,19 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
     }
 
     /* Enable the memory lcd */
+#if (SIWX_917)
+    RSI_NPSSGPIO_InputBufferEn(SL_BOARD_ENABLE_DISPLAY_PIN, 1U);
+    RSI_NPSSGPIO_SetPinMux(SL_BOARD_ENABLE_DISPLAY_PIN, 0);
+    RSI_NPSSGPIO_SetDir(SL_BOARD_ENABLE_DISPLAY_PIN, 0);
+    RSI_NPSSGPIO_SetPin(SL_BOARD_ENABLE_DISPLAY_PIN, 1U);
+#else
     status = sl_board_enable_display();
     if (status != SL_STATUS_OK)
     {
         SILABS_LOG("Board Display enable fail %d", status);
         err = CHIP_ERROR_INTERNAL;
     }
+#endif
 
     /* Initialize the DMD module for the DISPLAY device driver. */
     status = DMD_init(0);
@@ -212,9 +224,11 @@ void SilabsLCD::SetScreen(Screen_e screen)
     case StatusScreen:
         WriteStatus();
         break;
+#ifdef QR_CODE_ENABLED
     case QRCodeScreen:
         WriteQRCode();
         break;
+#endif
     default:
         break;
     }
@@ -224,7 +238,7 @@ void SilabsLCD::CycleScreens(void)
 {
 #ifdef QR_CODE_ENABLED
     if (mCurrentScreen < QRCodeScreen)
-#elif
+#else
     if (mCurrentScreen < StatusScreen)
 #endif
     {

@@ -87,6 +87,7 @@
 		/delete-node/ partition@88000;
 		/delete-node/ partition@f0000;
 		/delete-node/ partition@f4000;
+		/delete-node/ partition@fe000;
 		boot_partition: partition@0 {
 			label = "mcuboot";
 			reg = <0x00000000 0x19000>;
@@ -107,6 +108,9 @@
 			label = "image-1";
 			reg = <0x110000 0xee000>;
 		};
-		/* region <0x1fe000 0x2000> is reserved for Telink B91 SDK's data */
+		vendor_partition: partition@1fe000 {
+			label = "vendor-data";
+			reg = <0x1fe000 0x2000>;
+		};
 	};
 };

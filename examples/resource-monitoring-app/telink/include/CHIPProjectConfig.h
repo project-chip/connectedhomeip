@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2023 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,19 +16,17 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *          Example project configuration file for CHIP.
+ *
+ *          This is a place to put application or project-specific overrides
+ *          to the default configuration values for general CHIP features.
+ *
+ */
+
 #pragma once
 
-#include <app/ReadHandler.h>
-
-class ICDUtil : public chip::app::ReadHandler::ApplicationCallback
-{
-    CHIP_ERROR OnSubscriptionRequested(chip::app::ReadHandler & aReadHandler,
-                                       chip::Transport::SecureSession & aSecureSession) override;
-    friend ICDUtil & GetICDUtil();
-    static ICDUtil sICDUtil;
-};
-
-inline ICDUtil & GetICDUtil()
-{
-    return ICDUtil::sICDUtil;
-}
+// Use a default pairing code if one hasn't been provisioned in flash.
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00

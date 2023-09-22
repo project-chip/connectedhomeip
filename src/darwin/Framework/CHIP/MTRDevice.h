@@ -22,7 +22,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class MTRDeviceController;
-@class MTRAsyncCallbackWorkQueue;
 
 typedef NS_ENUM(NSUInteger, MTRDeviceState) {
     MTRDeviceStateUnknown = 0,

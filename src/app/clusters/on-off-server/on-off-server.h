@@ -101,30 +101,30 @@ private:
 struct OnOffEffect
 {
     using OffWithEffectTriggerCommand = void (*)(OnOffEffect *);
-    using EffectVariantType           = std::underlying_type_t<chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant>;
+    using EffectVariantType           = std::underlying_type_t<chip::app::Clusters::OnOff::DelayedAllOffEffectVariantEnum>;
     static_assert(
-        std::is_same<EffectVariantType, std::underlying_type_t<chip::app::Clusters::OnOff::OnOffDyingLightEffectVariant>>::value,
-        "chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant and "
-        "chip::app::Clusters::OnOff::OnOffDyingLightEffectVariant underlying types differ.");
+        std::is_same<EffectVariantType, std::underlying_type_t<chip::app::Clusters::OnOff::DyingLightEffectVariantEnum>>::value,
+        "chip::app::Clusters::OnOff::DelayedAllOffEffectVariantEnum and "
+        "chip::app::Clusters::OnOff::DyingLightEffectVariantEnum underlying types differ.");
 
     chip::EndpointId mEndpoint;
     OffWithEffectTriggerCommand mOffWithEffectTrigger = nullptr;
-    chip::app::Clusters::OnOff::OnOffEffectIdentifier mEffectIdentifier;
+    chip::app::Clusters::OnOff::EffectIdentifierEnum mEffectIdentifier;
     EffectVariantType mEffectVariant;
     OnOffEffect * nextEffect = nullptr;
 
-    OnOffEffect(chip::EndpointId endpoint, OffWithEffectTriggerCommand offWithEffectTrigger,
-                chip::app::Clusters::OnOff::OnOffEffectIdentifier effectIdentifier =
-                    chip::app::Clusters::OnOff::OnOffEffectIdentifier::kDelayedAllOff,
+    OnOffEffect(
+        chip::EndpointId endpoint, OffWithEffectTriggerCommand offWithEffectTrigger,
+        chip::app::Clusters::OnOff::EffectIdentifierEnum effectIdentifier =
+            chip::app::Clusters::OnOff::EffectIdentifierEnum::kDelayedAllOff,
 
-                /*
-                 * effectVariant's type depends on the effectIdentifier so we don't know the type at compile time.
-                 * The assertion at the beginning of this method ensures the effect variants share the same base type.
-                 * Casting to the common base type for more flexibility since the type can be OnOffDelayedAllOffEffectVariant or
-                 * OnOffDelayedAllOffEffectVariant
-                 */
-                EffectVariantType =
-                    chip::to_underlying(chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant::kFadeToOffIn0p8Seconds));
+        /*
+         * effectVariant's type depends on the effectIdentifier so we don't know the type at compile time.
+         * The assertion at the beginning of this method ensures the effect variants share the same base type.
+         * Casting to the common base type for more flexibility since the type can be DelayedAllOffEffectVariantEnum or
+         * DelayedAllOffEffectVariantEnum
+         */
+        EffectVariantType = chip::to_underlying(chip::app::Clusters::OnOff::DelayedAllOffEffectVariantEnum::kDelayedOffFastFade));
     ~OnOffEffect();
 
     bool hasNext() { return this->nextEffect != nullptr; }
