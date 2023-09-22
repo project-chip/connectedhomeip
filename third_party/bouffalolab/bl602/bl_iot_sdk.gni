@@ -850,9 +850,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/lwip/lwip-port/hook",
     ]
 
-    defines = [
-      "LWIP_IPV6=1"
-    ]
+    defines = [ "LWIP_IPV6=1" ]
   }
 
   source_set("${sdk_target_name}_lwip") {
@@ -969,8 +967,9 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_wifi",
     ]
 
-    if (defined(invoker.chip_enable_factory_data) && invoker.chip_enable_factory_data) {
-        public_deps += [":${sdk_target_name}_factory_data"]
+    if (defined(invoker.chip_enable_factory_data) &&
+        invoker.chip_enable_factory_data) {
+      public_deps += [ ":${sdk_target_name}_factory_data" ]
     }
   }
 }

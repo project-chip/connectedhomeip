@@ -835,9 +835,7 @@ template("bl_iot_sdk") {
   }
 
   config("${sdk_target_name}_config_lwip") {
-    include_dirs = [
-      "${bl_iot_sdk_root}/components/network/lwip/lwip-port",
-    ]
+    include_dirs = [ "${bl_iot_sdk_root}/components/network/lwip/lwip-port" ]
 
     include_dirs += [
       "${bl_iot_sdk_root}/components/network/lwip/src/include",
@@ -847,9 +845,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/lwip/lwip-port/hook",
     ]
 
-    defines = [
-      "LWIP_IPV6=1",
-    ]
+    defines = [ "LWIP_IPV6=1" ]
   }
 
   source_set("${sdk_target_name}_lwip") {

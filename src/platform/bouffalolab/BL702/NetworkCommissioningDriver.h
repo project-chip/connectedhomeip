@@ -19,7 +19,6 @@
 
 #include <pkg_protocol.h>
 #include <platform/NetworkCommissioning.h>
-#include <pkg_protocol.h>
 
 namespace chip {
 namespace DeviceLayer {

@@ -1,14 +1,13 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-#include <stdbool.h>
 
 #include <FreeRTOS.h>
-#include <task.h>
 #include <aos/yloop.h>
 #include <bl60x_wifi_driver/wifi_mgmr.h>
 #include <bl60x_wifi_driver/wifi_mgmr_api.h>
 #include <bl60x_wifi_driver/wifi_mgmr_profile.h>
+#include <task.h>
 
 #include <supplicant_api.h>
 
@@ -174,7 +173,7 @@ void wifi_start_firmware_task(void)
     netif_add_ext_callback(&netifExtCallback, network_netif_ext_callback);
 
     bl_pm_init();
-    xTaskCreateStatic(wifi_main, (char*)"fw", WIFI_STACK_SIZE, NULL, 30, wifi_fw_stack, &wifi_fw_task);
+    xTaskCreateStatic(wifi_main, (char *) "fw", WIFI_STACK_SIZE, NULL, 30, wifi_fw_stack, &wifi_fw_task);
 
     aos_post_event(EV_WIFI, CODE_WIFI_ON_INIT_DONE, 0);
 }
