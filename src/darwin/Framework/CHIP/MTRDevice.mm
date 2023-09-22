@@ -187,6 +187,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 @end
 
+// Declaring selector so compiler won't complain about testing and calling it in _handleReportEnd
+#ifdef DEBUG
+@protocol MTRDeviceUnitTestDelegate <MTRDeviceDelegate>
+- (void)unitTestReportEndForDevice:(MTRDevice *)device;
+@end
+#endif
+
 @implementation MTRDevice
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -402,9 +409,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self _changeState:MTRDeviceStateReachable];
 
     id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    if (delegate && [delegate respondsToSelector:@selector(deviceBecameActive:)]) {
+    if (delegate) {
         dispatch_async(_delegateQueue, ^{
-            [delegate deviceBecameActive:self];
+            if ([delegate respondsToSelector:@selector(deviceBecameActive:)]) {
+                [delegate deviceBecameActive:self];
+            }
         });
     }
 
@@ -429,6 +438,17 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_lock(&self->_lock);
     _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
+// For unit testing only
+#ifdef DEBUG
+    id delegate = _weakDelegate.strongObject;
+    if (delegate) {
+        dispatch_async(_delegateQueue, ^{
+            if ([delegate respondsToSelector:@selector(unitTestReportEndForDevice:)]) {
+                [delegate unitTestReportEndForDevice:self];
+            }
+        });
+    }
+#endif
     os_unfair_lock_unlock(&self->_lock);
 }
 
@@ -1546,6 +1566,8 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
             [mEventReports addObject:[MTRBaseDevice eventReportForHeader:aEventHeader andData:value]];
         }
     }
+
+    QueueInterimReport();
 }
 
 void SubscriptionCallback::OnAttributeData(
@@ -1582,5 +1604,7 @@ void SubscriptionCallback::OnAttributeData(
             [mAttributeReports addObject:@ { MTRAttributePathKey : attributePath, MTRDataKey : value }];
         }
     }
+
+    QueueInterimReport();
 }
 } // anonymous namespace
