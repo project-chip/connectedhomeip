@@ -16,16 +16,16 @@
  *    limitations under the License.
  */
 #include <app/EventManagement.h>
-#include <app/tests/AppTestContext.h>
-#include <lib/support/TestPersistentStorageDelegate.h>
-#include <lib/support/UnitTestContext.h>
-#include <lib/support/UnitTestRegistration.h>
-#include <lib/support/TimeUtils.h>
-#include <nlunit-test.h>
-#include <system/SystemLayerImpl.h>
 #include <app/icd/ICDManager.h>
 #include <app/icd/ICDStateObserver.h>
 #include <app/icd/IcdManagementServer.h>
+#include <app/tests/AppTestContext.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/TimeUtils.h>
+#include <lib/support/UnitTestContext.h>
+#include <lib/support/UnitTestRegistration.h>
+#include <nlunit-test.h>
+#include <system/SystemLayerImpl.h>
 
 using namespace chip;
 using namespace chip::app;
