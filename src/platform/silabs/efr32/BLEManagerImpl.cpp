@@ -1053,7 +1053,7 @@ extern "C" void sl_bt_on_event(sl_bt_msg_t * evt)
                 evt->data.evt_gatt_server_characteristic_status.connection);
         }
         else if ((evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_CHIPoBLEChar_Tx) &&
-                 (evt->data.evt_gatt_server_characteristic_status.status_flags == gatt_server_client_config))
+                 (evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config))
         {
             chip::DeviceLayer::Internal::BLEMgrImpl().HandleTXCharCCCDWrite(evt);
         }

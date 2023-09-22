@@ -483,7 +483,11 @@ template("efr32_sdk") {
       ]
 
       if (!chip_enable_ble_rs911x) {
-        libs += [ "${sdk_support_root}/protocol/bluetooth/lib/EFR32XG12/GCC/libbluetooth.a" ]
+        libs += [ 
+          "${sdk_support_root}/protocol/bluetooth/bgcommon/lib/libbgcommon_efr32xg12_gcc_release.a",
+          "${sdk_support_root}/protocol/bluetooth/bgstack/ll/lib/libbluetooth_controller_efr32xg12_gcc_release.a",
+          "${sdk_support_root}/protocol/bluetooth/lib/libbluetooth_host_efr32xg12_gcc_release.a", 
+        ]
       }
 
       defines += [ "EFR32MG12" ]
@@ -505,7 +509,11 @@ template("efr32_sdk") {
       ]
 
       if (!chip_enable_ble_rs911x) {
-        libs += [ "${sdk_support_root}/protocol/bluetooth/lib/EFR32XG24/GCC/libbluetooth.a" ]
+        libs += [ 
+          "${sdk_support_root}/protocol/bluetooth/bgcommon/lib/libbgcommon_efr32xg24_gcc_release.a",
+          "${sdk_support_root}/protocol/bluetooth/bgstack/ll/lib/libbluetooth_controller_efr32xg24_gcc_release.a",
+          "${sdk_support_root}/protocol/bluetooth/lib/libbluetooth_host_efr32xg24_gcc_release.a", 
+        ]
       }
 
       defines += [
@@ -526,7 +534,9 @@ template("efr32_sdk") {
       ]
 
       libs += [
-        "${sdk_support_root}/protocol/bluetooth/lib/EFR32XG24/GCC/libbluetooth.a",
+        "${sdk_support_root}/protocol/bluetooth/bgcommon/lib/libbgcommon_efr32xg24_gcc_release.a",
+        "${sdk_support_root}/protocol/bluetooth/bgstack/ll/lib/libbluetooth_controller_efr32xg24_gcc_release.a",
+        "${sdk_support_root}/protocol/bluetooth/lib/libbluetooth_host_efr32xg24_gcc_release.a", 
         "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_module_efr32xg24_gcc_release.a",
         "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
         "${sdk_support_root}/protocol/openthread/libs/libsl_openthread_efr32mg2x_gcc.a",
@@ -775,7 +785,6 @@ template("efr32_sdk") {
       }
     } else {
       sources += [
-        "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_mbedtls_context.c",
         "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_rtos_adaptation.c",
         "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_stack_init.c",
         "${efr32_sdk_root}/protocol/bluetooth/src/sli_bt_advertiser_config.c",
