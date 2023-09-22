@@ -50,5 +50,4 @@ source_set("esp32_trace_tracing") {
   public = [ "include/matter/tracing/macros_impl.h" ]
   public_configs = [ ":tracing" ]
   deps = [ ":backend" ]
-  
 }
