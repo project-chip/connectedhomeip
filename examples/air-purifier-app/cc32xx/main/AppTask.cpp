@@ -49,6 +49,7 @@
 #include <CC32XXConfig.h>
 /* syscfg */
 #include <ti_drivers_config.h>
+#include <third_party/ti_simplelink_sdk/repo_cc32xx/source/ti/drivers/net/wifi/fs.h>
 
 extern "C" {
 extern int WiFi_init();
@@ -284,6 +285,9 @@ void AppTask::PostEvent(const AppEvent * aEvent)
 //     app::Clusters::OnOff::Attributes::OnOff::Set(1, state);
 // }
 
+// need to define custom tokens to read/write files from the file system
+#define KVS_TOKEN 0x13578642
+
 void AppTask::DispatchEvent(AppEvent * aEvent)
 {
     switch (aEvent->Type)
@@ -295,9 +299,12 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         }
         if ( AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
         {
-            //this is just a workaround until TI fixes the syncing of KVS to NV after e.g. a unpair.
-            PLAT_LOG("DispatchEvent: kEventType_ButtonRight: LONG clicked - writing KVS to NV");
-            DeviceLayer::Internal::CC32XXConfig::WriteKVSToNV();
+            // delete the kvs.cfg file and reset the matter part of the device
+            PLAT_LOG("DispatchEvent: kEventType_ButtonRight: LONG clicked - clearing KVS");
+            
+            uint32_t token = KVS_TOKEN;
+            const unsigned char listName[] = "/sys/matter/kvs.cfg";
+            sl_FsDel(listName,token);
         }
         break;
     case AppEvent::kEventType_AppEvent:
