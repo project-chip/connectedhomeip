@@ -18,7 +18,8 @@
 
 #include <AppTask.h>
 
-#include <easyflash.h>
+#include <BLConfig.h>
+
 #include <plat.h>
 
 using namespace ::chip;
@@ -46,8 +47,7 @@ extern "C" int START_ENTRY(void)
 {
     platform_port_init();
 
-    easyflash_init();
-    ef_load_env_cache();
+    Internal::BLConfig::Init();
 
     ChipLogProgress(NotSpecified, "==================================================");
     ChipLogProgress(NotSpecified, "bouffalolab chip-lighting-example, built at " __DATE__ " " __TIME__);
