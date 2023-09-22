@@ -36,7 +36,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Setup Environment
               run: brew install python@3.9
             - name: Checkout submodules & Bootstrap
