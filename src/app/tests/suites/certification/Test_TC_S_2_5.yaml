@@ -15,12 +15,23 @@
 
 name: 132.2.5. [TC-S-2.5] RemainingCapacity functionality with DUT as Server
 
+PICS:
+    - S.S
+    - S.S.F03
+
 config:
     nodeId: 0x12344321
     cluster: "Basic Information"
     endpoint: 0
 
 tests:
+    - label: "Precondition"
+      verification: |
+          - Commission DUT to TH
+          - A given fabric SHALL NOT consume more than half (rounded down towards 0) of the Scene Table entries (as indicated in the SceneTableSize attribute).
+          - MaxRemainingCapacity is SceneTableSize/2.
+      disabled: true
+
     - label:
           "Step 0a: TH sends KeySetWrite command in the GroupKeyManagement
           cluster to DUT using a key that is pre-installed on the TH.
@@ -76,7 +87,7 @@ tests:
 
     - label:
           "Step 2: TH sends a AddGroup command to DUT with the GroupID field set
-          to 0x0001."
+          to G1."
       PICS: G.S.C00.Rsp
       verification: |
           ./chip-tool groups add-group 0x0001 grp1 1 1
@@ -90,7 +101,7 @@ tests:
 
     - label:
           "Step 3: TH sends a RemoveAllScenes command to DUT with the GroupID
-          field set to 0x0001."
+          field set to G1."
       PICS: S.S.C03.Rsp
       verification: |
           ./chip-tool scenes remove-all-scenes 0x0001 1 1
@@ -113,55 +124,11 @@ tests:
       disabled: true
 
     - label:
-          "Step 4b: TH sends a subscription request action for RemainingCapacity
+          "Step 4b: TH sends a subscription request action for FabricSceneInfo
           to the DUT."
       PICS: S.S.A0007
       verification: |
-          ./chip-tool interactive start
 
-          >> scenes subscribe remaining-capacity 10 100 1 1
-
-          [1688019515.541743][1731:1733] CHIP:DMG: ReportDataMessage =
-          [1688019515.541783][1731:1733] CHIP:DMG: {
-          [1688019515.541816][1731:1733] CHIP:DMG: 	SubscriptionId = 0x86424e60,
-          [1688019515.541848][1731:1733] CHIP:DMG: 	AttributeReportIBs =
-          [1688019515.541889][1731:1733] CHIP:DMG: 	[
-          [1688019515.541920][1731:1733] CHIP:DMG: 		AttributeReportIB =
-          [1688019515.541961][1731:1733] CHIP:DMG: 		{
-          [1688019515.541995][1731:1733] CHIP:DMG: 			AttributeDataIB =
-          [1688019515.542032][1731:1733] CHIP:DMG: 			{
-          [1688019515.542071][1731:1733] CHIP:DMG: 				DataVersion = 0x5c66a0ed,
-          [1688019515.542109][1731:1733] CHIP:DMG: 				AttributePathIB =
-          [1688019515.542149][1731:1733] CHIP:DMG: 				{
-          [1688019515.542189][1731:1733] CHIP:DMG: 					Endpoint = 0x1,
-          [1688019515.542230][1731:1733] CHIP:DMG: 					Cluster = 0x5,
-          [1688019515.542273][1731:1733] CHIP:DMG: 					Attribute = 0x0000_0007,
-          [1688019515.542313][1731:1733] CHIP:DMG: 				}
-          [1688019515.542355][1731:1733] CHIP:DMG:
-          [1688019515.542396][1731:1733] CHIP:DMG: 				Data = 0,
-          [1688019515.542433][1731:1733] CHIP:DMG: 			},
-          [1688019515.542474][1731:1733] CHIP:DMG:
-          [1688019515.542507][1731:1733] CHIP:DMG: 		},
-          [1688019515.542546][1731:1733] CHIP:DMG:
-          [1688019515.542575][1731:1733] CHIP:DMG: 	],
-          [1688019515.542614][1731:1733] CHIP:DMG:
-          [1688019515.542644][1731:1733] CHIP:DMG: 	InteractionModelRevision = 1
-          [1688019515.542673][1731:1733] CHIP:DMG: }
-          [1688019515.542841][1731:1733] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0007 DataVersion: 1550229741
-          [1688019515.542905][1731:1733] CHIP:TOO:   RemainingCapacity: 0
-          [1688019515.542968][1731:1733] CHIP:DMG: MoveToState ReadClient[0xffffac012a80]: Moving to [AwaitingSu]
-          [1688019515.543104][1731:1733] CHIP:EM: <<< [E:47710i S:27355 M:73821372 (Ack:265285849)] (S) Msg TX to 1:0000000000000001 [2867] --- Type 0001:01 (IM:StatusResponse)
-          [1688019515.543154][1731:1733] CHIP:IN: (S) Sending msg 73821372 on secure session with LSID: 27355
-          [1688019515.544315][1731:1733] CHIP:EM: >>> [E:47710i S:27355 M:265285850 (Ack:73821372)] (S) Msg RX from 1:0000000000000001 [2867] --- Type 0001:04 (IM:SubscribeResponse)
-          [1688019515.544359][1731:1733] CHIP:EM: Found matching exchange: 47710i, Delegate: 0xffffac012a90
-          [1688019515.544401][1731:1733] CHIP:EM: Rxd Ack; Removing MessageCounter:73821372 from Retrans Table on exchange 47710i
-          [1688019515.544478][1731:1733] CHIP:DMG: SubscribeResponse is received
-          [1688019515.544530][1731:1733] CHIP:DMG: SubscribeResponseMessage =
-          [1688019515.544562][1731:1733] CHIP:DMG: {
-          [1688019515.544592][1731:1733] CHIP:DMG: 	SubscriptionId = 0x86424e60,
-          [1688019515.544625][1731:1733] CHIP:DMG: 	MaxInterval = 0x64,
-          [1688019515.544657][1731:1733] CHIP:DMG: 	InteractionModelRevision = 1
-          [1688019515.544687][1731:1733] CHIP:DMG: }
       disabled: true
 
     - label:
@@ -173,8 +140,8 @@ tests:
 
     - label:
           "Step 5a: TH sends a AddScene command to DUT with the GroupID field
-          set to 0x0001, the SceneID field set to 0x01, the TransitionTime field
-          set to 0x0014 (20s) and no extension field sets."
+          set to G1, the SceneID field set to 0x01, the TransitionTime field set
+          to 0x0014 (20s) and no extension field sets."
       PICS: S.S.C00.Rsp
       verification: |
           ./chip-tool scenes add-scene 0x0001 0x1 0x0014 scene1 [] 1 1
@@ -194,8 +161,7 @@ tests:
           (MaxRemainingCapacity-1)."
       PICS: S.S.A0007
       verification: |
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0007 DataVersion: 2793536935
-          CHIP:TOO:   RemainingCapacity: 7
+
       disabled: true
 
     - label:
@@ -222,15 +188,14 @@ tests:
           (MaxRemainingCapacity-2)."
       PICS: S.S.A0007
       verification: |
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0007 DataVersion: 2793536935
-          CHIP:TOO:   RemainingCapacity: 6
+
       disabled: true
 
     - label:
           "Step 7a: If RemainingCapacity is greater than 0, TH sends a AddScene
-          command to DUT with the GroupID field set to 0x0001, the SceneID field
-          set to 0x03, the TransitionTime field set to 0x0014 (20s) and no
-          extension field sets. If RemainingCapacity is 0, continue to Step 8a."
+          command to DUT with the GroupID field set to G1, the SceneID field set
+          to 0x03, the TransitionTime field set to 0x0014 (20s) and no extension
+          field sets. If RemainingCapacity is 0, continue to Step 8a."
       PICS: S.S.C00.Rsp
       verification: |
           ./chip-tool scenes add-scene 0x0001 0x3 0x0014 scene3 [] 1 1
@@ -243,12 +208,12 @@ tests:
           (MaxRemainingCapacity-3)."
       PICS: S.S.A0007
       verification: |
-          ./chip-tool scenes add-scene 0x0001 0x3 0x0014 scene3 [] 1 1
+
       disabled: true
 
     - label:
           "Step 8a: TH sends a RemoveScene command to DUT with the GroupID field
-          set to 0x0001 and the SceneID field set to 0x01."
+          set to G1 and the SceneID field set to 0x01."
       PICS: S.S.C02.Rsp
       verification: |
           ./chip-tool scenes remove-scene 0x0001 0x1 1 1
@@ -268,13 +233,12 @@ tests:
           (MaxRemainingCapacity-2)."
       PICS: S.S.A0007
       verification: |
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0007 DataVersion: 2793536935
-          CHIP:TOO:   RemainingCapacity: 6
+
       disabled: true
 
     - label:
           "Step 9a: TH sends a RemoveAllScenes command to DUT with the GroupID
-          field set to 0x0001."
+          field set to G1."
       PICS: S.S.C03.Rsp
       verification: |
           ./chip-tool scenes remove-all-scenes 0x0001 1 1
@@ -293,8 +257,7 @@ tests:
           (MaxRemainingCapacity)."
       PICS: S.S.A0007
       verification: |
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0007 DataVersion: 2793536935
-          CHIP:TOO:   RemainingCapacity: 8
+
       disabled: true
 
     - label:

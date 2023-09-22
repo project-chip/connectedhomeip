@@ -22,7 +22,7 @@
 
 #import <Foundation/Foundation.h>
 #import <Matter/MTRCertificates.h>
-#import <Matter/MTRDeviceControllerStartupParameters.h>
+#import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -37,6 +37,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRDeviceControllerFactoryParams : NSObject
+
+- (instancetype)init NS_UNAVAILABLE;
+
 /*
  * Storage used to store persistent information for the fabrics the
  * controllers ends up interacting with.  This is only used if "initWithStorage"
@@ -93,12 +96,6 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  */
 - (instancetype)initWithStorage:(id<MTRStorage>)storage;
 
-/*
- * Initialize the device controller factory without storage.  In this mode,
- * device controllers will need to have per-controller storage provided to allow
- * storing controller-specific information.
- */
-- (instancetype)init MTR_NEWLY_AVAILABLE;
 @end
 
 API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -179,18 +176,6 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  */
 - (MTRDeviceController * _Nullable)createControllerOnNewFabric:(MTRDeviceControllerStartupParams *)startupParams
                                                          error:(NSError * __autoreleasing *)error;
-
-/**
- * Create an MTRDeviceController.  Returns nil on failure.
- *
- * This method will fail if there is already a controller running for the given
- * node identity.
- *
- * This method will fail if the controller factory was not initialized in
- * storage-per-controller mode.
- */
-- (MTRDeviceController * _Nullable)createController:(MTRDeviceControllerStartupParameters *)startupParameters
-                                              error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 @end
 

@@ -184,14 +184,20 @@ tests:
     - label:
           "Step 10: TH waits for a report of BatteryAlert attribute from DUT
           with a timeout of 300 seconds"
-      PICS: SMOKECO.S.A0003
-      command: "waitForReport"
-      attribute: "BatteryAlert"
-      timeout: 300
-      response:
-          value: 1
-          constraints:
-              type: enum8
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0003
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read battery-alert 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0003 DataVersion: 1795725838
+          [TOO]   BatteryAlert: 1
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Step 11a: TH subscribes to InterconnectSmokeAlarm attribute from DUT"
@@ -221,15 +227,20 @@ tests:
     - label:
           "Step 12: TH waits for a report of InterconnectSmokeAlarm attribute
           from DUT with a timeout of 300 seconds"
-      PICS: SMOKECO.S.A0008
-      command: "waitForReport"
-      attribute: "InterconnectSmokeAlarm"
-      timeout: 300
-      response:
-          constraints:
-              type: enum8
-              minValue: 1
-              maxValue: 2
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0008
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read interconnect-smoke-alarm 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0008 DataVersion: 1795725838
+          [TOO]   InterconnectSmokeAlarm: 1
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 13a: TH subscribes to InterconnectCOAlarm attribute from DUT"
       PICS: SMOKECO.S.A0009
@@ -257,15 +268,20 @@ tests:
     - label:
           "Step 14: TH waits for a report of InterconnectCOAlarm attribute from
           DUT with a timeout of 300 seconds"
-      PICS: SMOKECO.S.A0009
-      command: "waitForReport"
-      attribute: "InterconnectCOAlarm"
-      timeout: 300
-      response:
-          constraints:
-              type: enum8
-              minValue: 1
-              maxValue: 2
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0009
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read interconnect-coalarm 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0009 DataVersion: 1795725838
+          [TOO]   InterconnectCOAlarm: 1
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 15a: TH subscribes to COState attribute from DUT"
       PICS: SMOKECO.S.A0002
@@ -293,14 +309,20 @@ tests:
     - label:
           "Step 16: TH waits for a report of COState attribute from DUT with a
           timeout of 300 seconds"
-      PICS: SMOKECO.S.A0002
-      command: "waitForReport"
-      attribute: "COState"
-      timeout: 300
-      response:
-          value: 1
-          constraints:
-              type: enum8
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0002
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read costate 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
+          [TOO]   COState: 1
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 17a: TH subscribes to SmokeState attribute from DUT"
       PICS: SMOKECO.S.A0001
@@ -328,14 +350,20 @@ tests:
     - label:
           "Step 18: TH waits for a report of SmokeState attribute from DUT with
           a timeout of 300 seconds"
-      PICS: SMOKECO.S.A0001
-      command: "waitForReport"
-      attribute: "SmokeState"
-      timeout: 300
-      response:
-          value: 1
-          constraints:
-              type: enum8
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0001
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read smoke-state 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0001 DataVersion: 1795725838
+          [TOO]   SmokeState: 1
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 19: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
@@ -365,14 +393,20 @@ tests:
     - label:
           "Step 21: TH waits for a report of SmokeState attribute from DUT with
           a timeout of 300 seconds"
-      PICS: SMOKECO.S.A0001
-      command: "waitForReport"
-      attribute: "SmokeState"
-      timeout: 300
-      response:
-          value: 0
-          constraints:
-              type: enum8
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0001
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read smoke-state 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0001 DataVersion: 1795725838
+          [TOO]   SmokeState: 0
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 22: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
@@ -409,14 +443,20 @@ tests:
     - label:
           "Step 24: TH waits for a report of COState attribute from DUT with a
           timeout of 300 seconds"
-      PICS: SMOKECO.S.A0002
-      command: "waitForReport"
-      attribute: "COState"
-      timeout: 300
-      response:
-          value: 0
-          constraints:
-              type: enum8
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0002
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read costate 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
+          [TOO]   COState: 0
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 25: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
@@ -454,14 +494,20 @@ tests:
     - label:
           "Step 27: TH waits for a report of InterconnectCOAlarm attribute from
           DUT with a timeout of 300 seconds"
-      PICS: SMOKECO.S.A0009
-      command: "waitForReport"
-      attribute: "InterconnectCOAlarm"
-      timeout: 300
-      response:
-          value: 0
-          constraints:
-              type: enum8
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0009
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read interconnect-coalarm 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0009 DataVersion: 1795725838
+          [TOO]   InterconnectCOAlarm: 0
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 28: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
@@ -500,14 +546,20 @@ tests:
     - label:
           "Step 30: TH waits for a report of InterconnectSmokeAlarm attribute
           from DUT with a timeout of 300 seconds"
-      PICS: SMOKECO.S.A0008
-      command: "waitForReport"
-      attribute: "InterconnectSmokeAlarm"
-      timeout: 300
-      response:
-          value: 0
-          constraints:
-              type: enum8
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0008
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read interconnect-smoke-alarm 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0008 DataVersion: 1795725838
+          [TOO]   InterconnectSmokeAlarm: 0
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 31: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
@@ -544,14 +596,20 @@ tests:
     - label:
           "Step 33: TH waits for a report of BatteryAlert attribute from DUT
           with a timeout of 300 seconds"
-      PICS: SMOKECO.S.A0003
-      command: "waitForReport"
-      attribute: "BatteryAlert"
-      timeout: 300
-      response:
-          value: 0
-          constraints:
-              type: enum8
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0003
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read battery-alert 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0003 DataVersion: 1795725838
+          [TOO]   BatteryAlert: 0
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 34: TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000

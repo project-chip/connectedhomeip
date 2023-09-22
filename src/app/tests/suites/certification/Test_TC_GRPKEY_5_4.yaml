@@ -33,12 +33,12 @@ tests:
           fields to the corresponding values. Values given below are for
           reference purpose. groupKeySetID: 0x01a3 groupKeySecurityPolicy:
           CacheAndSync (1) epochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
-          epochStartTime0: 0 epochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          epochStartTime0: 1 epochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf
           epochStartTime1: 2220001 epochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
           epochStartTime2: 2220002"
       PICS: "!GRPKEY.S.F00 && GRPKEY.S.C00.Rsp "
       verification: |
-          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 42, "groupKeySecurityPolicy": 1, "epochKey0": "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 0, "epochKey1": "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2": "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0
+          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": "0x01a3", "groupKeySecurityPolicy": 1, "epochKey0": "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 1, "epochKey1": "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2": "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0
 
           Verify DUT sends INVALID_COMMAND response on  TH(chip-tool)  Logs:
 

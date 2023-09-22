@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -36,7 +36,6 @@
       "id": 1,
       "name": "MA-bridge",
       "deviceTypeRef": {
-        "id": 2,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 2,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        2
       ],
       "deviceVersions": [
         1
@@ -5047,7 +5042,6 @@
       "id": 2,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
-        "id": 6,
         "code": 14,
         "profileId": 259,
         "label": "MA-aggregator",
@@ -5055,15 +5049,11 @@
       },
       "deviceTypes": [
         {
-          "id": 6,
           "code": 14,
           "profileId": 259,
           "label": "MA-aggregator",
           "name": "MA-aggregator"
         }
-      ],
-      "deviceTypeRefs": [
-        6
       ],
       "deviceVersions": [
         1
@@ -5806,7 +5796,6 @@
       "id": 3,
       "name": "MA-dimmablelight",
       "deviceTypeRef": {
-        "id": 9,
         "code": 257,
         "profileId": 259,
         "label": "MA-dimmablelight",
@@ -5814,15 +5803,11 @@
       },
       "deviceTypes": [
         {
-          "id": 9,
           "code": 257,
           "profileId": 259,
           "label": "MA-dimmablelight",
           "name": "MA-dimmablelight"
         }
-      ],
-      "deviceTypeRefs": [
-        9
       ],
       "deviceVersions": [
         1
@@ -7697,6 +7682,5 @@
       "endpointId": 2,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

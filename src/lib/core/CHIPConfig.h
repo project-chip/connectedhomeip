@@ -42,8 +42,8 @@
 #include <ble/BleConfig.h>
 #include <system/SystemConfig.h>
 
-/* COMING SOON: making the INET Layer optional entails making this inclusion optional. */
-// #include "InetConfig.h"
+#include <inet/InetConfig.h>
+
 /*
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL <= 0
 #error "chip SDK requires INET_TCP_IDLE_CHECK_INTERVAL > 0"
@@ -162,6 +162,30 @@
 #ifndef CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 #define CHIP_CONFIG_MEMORY_DEBUG_DMALLOC 0
 #endif // CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
+
+/**
+ *  @def CHIP_CONFIG_GLOBALS_LAZY_INIT
+ *
+ *  @brief
+ *    Whether to perform chip::Global initialization lazily (1) or eagerly (0).
+ *
+ *    The default is standard (eager) C++ global initialization behavior.
+ */
+#ifndef CHIP_CONFIG_GLOBALS_LAZY_INIT
+#define CHIP_CONFIG_GLOBALS_LAZY_INIT 0
+#endif // CHIP_CONFIG_GLOBALS_LAZY_INIT
+
+/**
+ *  @def CHIP_CONFIG_GLOBALS_NO_DESTRUCT
+ *
+ *  @brief
+ *    Whether to omit calling destructors for chip::Global objects.
+ *
+ *    The default is to call destructors.
+ */
+#ifndef CHIP_CONFIG_GLOBALS_NO_DESTRUCT
+#define CHIP_CONFIG_GLOBALS_NO_DESTRUCT 0
+#endif // CHIP_CONFIG_GLOBALS_NO_DESTRUCT
 
 /**
  *  @def CHIP_CONFIG_SHA256_CONTEXT_SIZE
@@ -1474,36 +1498,36 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL
+ * @def CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC
  *
  * @brief Default value for the ICD Management cluster IdleModeInterval attribute, in seconds
  */
-#ifndef CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL
-#define CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL 2
+#ifndef CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC
+#define CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC 2
 #endif
 
 /**
- * @def CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL
+ * @def CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS
  *
  * @brief Default value for the ICD Management cluster ActiveModeInterval attribute, in milliseconds
  */
-#ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL
-#define CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL 300
+#ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS 300
 #endif
 
 /**
- * @def CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD
+ * @def CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS
  *
  * @brief Default value for the ICD Management cluster ActiveModeThreshold attribute, in milliseconds
  */
-#ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD
-#define CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD 300
+#ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS 300
 #endif
 
 /**
  * @def CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC
  *
- * @brief Default value for the ICD Management cluster ClientsSupportedPerFabric attribute, in milliseconds
+ * @brief Default value for the ICD Management cluster ClientsSupportedPerFabric attribute
  */
 #ifndef CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC
 #define CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC 2

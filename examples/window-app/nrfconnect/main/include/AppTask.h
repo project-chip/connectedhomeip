@@ -32,10 +32,6 @@
 #include "DFUOverSMP.h"
 #endif
 
-#ifdef CONFIG_CHIP_ICD_SUBSCRIPTION_HANDLING
-#include "ICDUtil.h"
-#endif
-
 struct k_timer;
 struct Identify;
 

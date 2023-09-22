@@ -307,7 +307,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
-    if (!IsSpanUsable(block))
+    if (block.empty())
     {
         ReleaseBlock();
         return CHIP_NO_ERROR;
@@ -366,7 +366,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
 CHIP_ERROR OTAImageProcessorImpl::InitEncryptedOTA(const CharSpan & key)
 {
     VerifyOrReturnError(mEncryptedOTAEnabled == false, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(IsSpanUsable(key), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!key.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
     mKey                 = key;
     mEncryptedOTAEnabled = true;

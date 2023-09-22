@@ -39,7 +39,7 @@ constexpr const char kLocalNodeIdKey[]      = "LocalNodeId";
 constexpr const char kCommissionerCATsKey[] = "CommissionerCATs";
 constexpr LogCategory kDefaultLoggingLevel  = kLogCategory_Automation;
 
-std::string GetFilename(const char * directory, const char * name)
+const char * GetUsedDirectory(const char * directory)
 {
     const char * dir = directory;
 
@@ -52,6 +52,13 @@ std::string GetFilename(const char * directory, const char * name)
     {
         dir = "/tmp";
     }
+
+    return dir;
+}
+
+std::string GetFilename(const char * directory, const char * name)
+{
+    const char * dir = GetUsedDirectory(directory);
 
     if (name == nullptr)
     {
@@ -180,6 +187,11 @@ CHIP_ERROR PersistentStorage::SyncClearAll()
     section.clear();
     mConfig.sections[kDefaultSectionName] = section;
     return CommitConfig(mDirectory, mName);
+}
+
+const char * PersistentStorage::GetDirectory() const
+{
+    return GetUsedDirectory(mDirectory);
 }
 
 CHIP_ERROR PersistentStorage::CommitConfig(const char * directory, const char * name)

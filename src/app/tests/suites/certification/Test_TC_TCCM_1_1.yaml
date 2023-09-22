@@ -14,6 +14,9 @@
 
 name: 219.1.1. [TC-TCCM-1.1] Global attributes with DUT as Server
 
+PICS:
+    - TCCM.S
+
 config:
     nodeId: 0x12344321
     cluster: "Refrigerator And Temperature Controlled Cabinet Mode"

@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -33,10 +33,9 @@
   ],
   "endpointTypes": [
     {
-      "id": 2,
+      "id": 1,
       "name": "MA-windowcovering",
       "deviceTypeRef": {
-        "id": 3,
         "code": 17,
         "profileId": 259,
         "label": "MA-powersource",
@@ -44,23 +43,17 @@
       },
       "deviceTypes": [
         {
-          "id": 3,
           "code": 17,
           "profileId": 259,
           "label": "MA-powersource",
           "name": "MA-powersource"
         },
         {
-          "id": 2,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        3,
-        2
       ],
       "deviceVersions": [
         1,
@@ -6989,10 +6982,9 @@
       ]
     },
     {
-      "id": 1,
+      "id": 2,
       "name": "MA-windowcovering",
       "deviceTypeRef": {
-        "id": 31,
         "code": 514,
         "profileId": 259,
         "label": "MA-windowcovering",
@@ -7000,15 +6992,11 @@
       },
       "deviceTypes": [
         {
-          "id": 31,
           "code": 514,
           "profileId": 259,
           "label": "MA-windowcovering",
           "name": "MA-windowcovering"
         }
-      ],
-      "deviceTypeRefs": [
-        31
       ],
       "deviceVersions": [
         2
@@ -8554,7 +8542,6 @@
       "id": 3,
       "name": "MA-windowcovering",
       "deviceTypeRef": {
-        "id": 31,
         "code": 514,
         "profileId": 259,
         "label": "MA-windowcovering",
@@ -8562,15 +8549,11 @@
       },
       "deviceTypes": [
         {
-          "id": 31,
           "code": 514,
           "profileId": 259,
           "label": "MA-windowcovering",
           "name": "MA-windowcovering"
         }
-      ],
-      "deviceTypeRefs": [
-        31
       ],
       "deviceVersions": [
         2
@@ -10135,6 +10118,5 @@
       "endpointId": 2,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

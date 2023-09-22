@@ -105,6 +105,7 @@
         "wifi-network-diagnostics-cluster.xml",
         "window-covering.xml",
         "matter-devices.xml",
+        "sample-mei-cluster.xml",
         "types/color-control.xml",
         "types/door-lock.xml",
         "types/occupancy-sensing.xml",
@@ -186,7 +187,8 @@
             "RebootCount",
             "UpTime",
             "TotalOperationalHours",
-            "BootReason"
+            "BootReason",
+            "AverageWearCount"
         ],
         "Group Key Management": [
             "ClusterRevision",

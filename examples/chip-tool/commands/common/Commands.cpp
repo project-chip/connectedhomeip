@@ -28,6 +28,8 @@
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/KeyValueStoreManager.h>
 
 #include "../clusters/JsonParser.h"
 
@@ -40,6 +42,35 @@ constexpr const char * kJsonClusterKey              = "cluster";
 constexpr const char * kJsonCommandKey              = "command";
 constexpr const char * kJsonCommandSpecifierKey     = "command_specifier";
 constexpr const char * kJsonArgumentsKey            = "arguments";
+
+#if !CHIP_DISABLE_PLATFORM_KVS
+template <typename T>
+struct HasInitWithString
+{
+    template <typename U>
+    static constexpr auto check(U *) -> typename std::is_same<decltype(std::declval<U>().Init("")), CHIP_ERROR>::type;
+
+    template <typename>
+    static constexpr std::false_type check(...);
+
+    typedef decltype(check<std::remove_reference_t<T>>(nullptr)) type;
+
+public:
+    static constexpr bool value = type::value;
+};
+
+// Template so we can do conditional enabling
+template <typename T, std::enable_if_t<HasInitWithString<T>::value, int> = 0>
+static void UseStorageDirectory(T & storageManagerImpl, const char * storageDirectory)
+{
+    std::string platformKVS = std::string(storageDirectory) + "/chip_tool_kvs";
+    storageManagerImpl.Init(platformKVS.c_str());
+}
+
+template <typename T, std::enable_if_t<!HasInitWithString<T>::value, int> = 0>
+static void UseStorageDirectory(T & storageManagerImpl, const char * storageDirectory)
+{}
+#endif // !CHIP_DISABLE_PLATFORM_KVS
 
 bool GetArgumentsFromJson(Command * command, Json::Value & value, bool optional, std::vector<std::string> & outArgs)
 {
@@ -290,6 +321,11 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive,
     }
 
     chip::Logging::SetLogFilter(mStorage.GetLoggingLevel());
+
+#if !CHIP_DISABLE_PLATFORM_KVS
+    UseStorageDirectory(chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl(), mStorage.GetDirectory());
+#endif // !CHIP_DISABLE_PLATFORM_KVS
+
 #endif // CONFIG_USE_LOCAL_STORAGE
 
     return command->Run();

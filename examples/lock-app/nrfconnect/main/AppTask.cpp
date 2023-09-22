@@ -45,10 +45,6 @@
 #include "OTAUtil.h"
 #endif
 
-#ifdef CONFIG_CHIP_ICD_SUBSCRIPTION_HANDLING
-#include <app/InteractionModelEngine.h>
-#endif
-
 #include <dk_buttons_and_leds.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
@@ -189,11 +185,7 @@ CHIP_ERROR AppTask::Init()
 
 #ifdef CONFIG_CHIP_OTA_REQUESTOR
     /* OTA image confirmation must be done before the factory data init. */
-    err = OtaConfirmNewImage();
-    if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
+    OtaConfirmNewImage();
 #endif
 
     // Initialize CHIP server
@@ -225,10 +217,6 @@ CHIP_ERROR AppTask::Init()
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
-
-#ifdef CONFIG_CHIP_ICD_SUBSCRIPTION_HANDLING
-    chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&GetICDUtil());
-#endif
 
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point to avoid data races

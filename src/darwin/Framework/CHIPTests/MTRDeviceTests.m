@@ -118,19 +118,20 @@ static MTRBaseDevice * GetConnectedDevice(void)
 typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *, id> *> *);
 
 @interface MTRDeviceTestDelegate : NSObject <MTRDeviceDelegate>
-@property (nonatomic) dispatch_block_t onSubscriptionEstablished;
+@property (nonatomic) dispatch_block_t onReachable;
+@property (nonatomic, nullable) dispatch_block_t onNotReachable;
 @property (nonatomic, nullable) MTRDeviceTestDelegateDataHandler onAttributeDataReceived;
 @property (nonatomic, nullable) MTRDeviceTestDelegateDataHandler onEventDataReceived;
-@property (nonatomic, nullable) dispatch_block_t onSubscriptionDropped;
+@property (nonatomic, nullable) dispatch_block_t onReportEnd;
 @end
 
 @implementation MTRDeviceTestDelegate
 - (void)device:(MTRDevice *)device stateChanged:(MTRDeviceState)state
 {
     if (state == MTRDeviceStateReachable) {
-        self.onSubscriptionEstablished();
-    } else if (state == MTRDeviceStateUnknown && self.onSubscriptionDropped != nil) {
-        self.onSubscriptionDropped();
+        self.onReachable();
+    } else if (state != MTRDeviceStateReachable && self.onNotReachable != nil) {
+        self.onNotReachable();
     }
 }
 
@@ -145,6 +146,13 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
 {
     if (self.onEventDataReceived != nil) {
         self.onEventDataReceived(eventReport);
+    }
+}
+
+- (void)unitTestReportEndForDevice:(MTRDevice *)device
+{
+    if (self.onReportEnd != nil) {
+        self.onReportEnd();
     }
 }
 
@@ -1423,10 +1431,12 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
     dispatch_queue_t queue = dispatch_get_main_queue();
 
+    // Given reachable state becomes true before underlying OnSubscriptionEstablished callback, this expectation is necessary but
+    // not sufficient as a mark to the end of reports
     XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
 
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
-    delegate.onSubscriptionEstablished = ^() {
+    delegate.onReachable = ^() {
         [subscriptionExpectation fulfill];
     };
 
@@ -1435,6 +1445,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         attributeReportsReceived += data.count;
     };
 
+    // This is dependent on current implementation that priming reports send attributes and events in that order, and also that
+    // events in this test would fit in one report. So receiving events would mean all attributes and events have been received, and
+    // can satisfy the test below.
+    XCTestExpectation * gotReportsExpectation = [self expectationWithDescription:@"Attribute and Event reports have been received"];
     __block unsigned eventReportsReceived = 0;
     delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * eventReport) {
         eventReportsReceived += eventReport.count;
@@ -1451,6 +1465,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 XCTAssertNotNil(eventDict[MTREventTimestampDateKey]);
             }
         }
+    };
+    delegate.onReportEnd = ^() {
+        [gotReportsExpectation fulfill];
     };
 
     [device setDelegate:delegate queue:queue];
@@ -1481,23 +1498,12 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
     [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
 
-    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+    [self waitForExpectations:@[ subscriptionExpectation, gotReportsExpectation ] timeout:60];
+
+    delegate.onReportEnd = nil;
 
     XCTAssertNotEqual(attributeReportsReceived, 0);
     XCTAssertNotEqual(eventReportsReceived, 0);
-
-    attributeReportsReceived = 0;
-    eventReportsReceived = 0;
-
-    XCTestExpectation * resubscriptionExpectation = [self expectationWithDescription:@"Resubscription has happened"];
-    delegate.onSubscriptionEstablished = ^() {
-        [resubscriptionExpectation fulfill];
-    };
-
-    XCTestExpectation * subscriptionDroppedExpectation = [self expectationWithDescription:@"Subscription has dropped"];
-    delegate.onSubscriptionDropped = ^() {
-        [subscriptionDroppedExpectation fulfill];
-    };
 
     // Before resubscribe, first test write failure and expected value effects
     NSNumber * testEndpointID = @(1);
@@ -1547,9 +1553,25 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [device readAttributeWithEndpointID:testEndpointID clusterID:testClusterID attributeID:testAttributeID params:nil];
     [self waitForExpectations:@[ attributeReportErrorExpectation ] timeout:10];
 
+    // Resubscription test setup
+    XCTestExpectation * subscriptionDroppedExpectation = [self expectationWithDescription:@"Subscription has dropped"];
+    delegate.onNotReachable = ^() {
+        [subscriptionDroppedExpectation fulfill];
+    };
+    XCTestExpectation * resubscriptionExpectation = [self expectationWithDescription:@"Resubscription has happened"];
+    delegate.onReachable = ^() {
+        [resubscriptionExpectation fulfill];
+    };
+
     // reset the onAttributeDataReceived to validate the following resubscribe test
+    attributeReportsReceived = 0;
+    eventReportsReceived = 0;
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
         attributeReportsReceived += data.count;
+    };
+
+    delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * eventReport) {
+        eventReportsReceived += eventReport.count;
     };
 
     // Now trigger another subscription which will cause ours to drop; we should re-subscribe after that.
@@ -1580,9 +1602,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Now make sure we ignore later tests.  Ideally we would just unsubscribe
     // or remove the delegate, but there's no good way to do that.
-    delegate.onSubscriptionEstablished = ^() {
+    delegate.onReachable = ^() {
     };
-    delegate.onSubscriptionDropped = nil;
+    delegate.onNotReachable = nil;
     delegate.onAttributeDataReceived = nil;
     delegate.onEventDataReceived = nil;
 

@@ -34,9 +34,9 @@
 
 #pragma once
 
-constexpr const char kIdentityAlpha[] = "alpha";
-constexpr const char kIdentityBeta[]  = "beta";
-constexpr const char kIdentityGamma[] = "gamma";
+inline constexpr const char kIdentityAlpha[] = "alpha";
+inline constexpr const char kIdentityBeta[]  = "beta";
+inline constexpr const char kIdentityGamma[] = "gamma";
 // The null fabric commissioner is a commissioner that isn't on a fabric.
 // This is a legal configuration in which the commissioner delegates
 // operational communication and invocation of the commssioning complete
@@ -46,7 +46,7 @@ constexpr const char kIdentityGamma[] = "gamma";
 // commissioner portion of such an architecture.  The null-fabric-commissioner
 // can carry a commissioning flow up until the point of operational channel
 // (CASE) communcation.
-constexpr const char kIdentityNull[] = "null-fabric-commissioner";
+inline constexpr const char kIdentityNull[] = "null-fabric-commissioner";
 
 class CHIPCommand : public Command
 {
@@ -220,6 +220,18 @@ private:
     static const chip::Credentials::AttestationTrustStore * sTrustStore;
 
     static void RunQueuedCommand(intptr_t commandArg);
+    typedef decltype(RunQueuedCommand) MatterWorkCallback;
+    static void RunCommandCleanup(intptr_t commandArg);
+
+    // Do cleanup after a commmand is done running.  Must happen with the
+    // Matter stack locked.
+    void CleanupAfterRun();
+
+    // Run the given callback on the Matter thread.  Return whether we managed
+    // to successfully dispatch it to the Matter thread.  If we did, *timedOut
+    // will be set to whether we timed out or whether our mWaitingForResponse
+    // got set to false by the callback itself.
+    CHIP_ERROR RunOnMatterQueue(MatterWorkCallback callback, chip::System::Clock::Timeout timeout, bool * timedOut);
 
     CHIP_ERROR mCommandExitStatus = CHIP_ERROR_INTERNAL;
 

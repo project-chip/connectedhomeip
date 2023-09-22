@@ -36,7 +36,7 @@ namespace Credentials {
  *        to refactors to use `OperationalCertificateStore` and exists as a baseline example
  *        of how to use the interface.
  */
-class PersistentStorageOpCertStore : public OperationalCertificateStore
+class PersistentStorageOpCertStore final : public OperationalCertificateStore
 {
 public:
     PersistentStorageOpCertStore() {}

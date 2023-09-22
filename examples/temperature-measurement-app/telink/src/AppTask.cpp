@@ -50,13 +50,6 @@ CHIP_ERROR AppTask::Init(void)
     app::Clusters::TemperatureMeasurement::Attributes::MaxMeasuredValue::Set(kExampleEndpointId, SensorMgr().GetMaxMeasuredValue());
     PlatformMgr().UnlockChipStack();
 
-    err = ConnectivityMgr().SetBLEDeviceName("TelinkTerm");
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("SetBLEDeviceName fail");
-        return err;
-    }
-
     return CHIP_NO_ERROR;
 }
 

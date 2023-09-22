@@ -43,6 +43,7 @@
     "DeviceManagement": [
         "TestIcdManagementCluster",
         "Test_TC_OPCREDS_1_2",
+        "Test_TC_OPCREDS_3_7",
         "Test_TC_BINFO_1_1",
         "Test_TC_BINFO_2_1",
         "Test_TC_BINFO_2_2",
@@ -108,6 +109,11 @@
         "Test_TC_ULABEL_2_4"
     ],
     "LaundryWasherMode": ["Test_TC_LWM_1_1", "Test_TC_LWM_2_1"],
+    "LaundryWasherControl": [
+        "Test_TC_WASHERCTRL_1_1",
+        "Test_TC_WASHERCTRL_2_1",
+        "Test_TC_WASHERCTRL_2_2"
+    ],
     "MediaControl": [
         "Test_TC_LOWPOWER_1_1",
         "Test_TC_KEYPADINPUT_1_2",
@@ -177,7 +183,6 @@
     "RelativeHumidityMeasurement": ["Test_TC_RH_1_1", "Test_TC_RH_2_1"],
     "RoboticVacuumCleaner": [
         "Test_TC_RVCCLEANM_1_1",
-        "Test_TC_RVCCLEANM_3_1",
         "Test_TC_RVCRUNM_1_1",
         "Test_TC_RVCOPSTATE_1_1"
     ],
@@ -192,8 +197,16 @@
         "Test_TC_SMOKECO_2_6"
     ],
     "Switch": ["Test_TC_SWTCH_1_1", "Test_TC_SWTCH_2_1"],
-    "TemperatureControlledCabinetMode": ["Test_TC_TCCM_1_1"],
-    "TemperatureControl": ["Test_TC_TCTL_1_1"],
+    "TemperatureControlledCabinetMode": [
+        "Test_TC_TCCM_1_1",
+        "Test_TC_TCCM_3_1"
+    ],
+    "TemperatureControl": [
+        "Test_TC_TCTL_1_1",
+        "Test_TC_TCTL_2_1",
+        "Test_TC_TCTL_2_2",
+        "Test_TC_TCTL_2_3"
+    ],
     "TemperatureMeasurement": ["Test_TC_TMP_1_1", "Test_TC_TMP_2_1"],
     "Thermostat": ["Test_TC_TSTAT_1_1", "Test_TC_TSTAT_2_1"],
     "ThermostatUserConfiguration": [
@@ -365,6 +378,7 @@
         "UnitLocalization",
         "TimeFormatLocalization",
         "LaundryWasherMode",
+        "LaundryWasherControl",
         "MediaControl",
         "ModeSelect",
         "MultipleFabrics",

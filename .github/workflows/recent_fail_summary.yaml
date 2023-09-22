@@ -26,7 +26,7 @@ jobs:
     name: Summarize Recent Workflow Failures
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: pip install pandas python-slugify
       - name: Run Summarization Script
         run: python scripts/tools/summarize_fail.py
@@ -40,6 +40,9 @@ jobs:
             run_list.json
             recent_fails.csv
             recent_fails_frequency.csv
+            failure_cause_summary.csv
+            workflow_fail_rate.csv
             recent_fails_logs
+            workflow_fail_rate
           retention-days: 5
         

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,8 +25,13 @@
 // Project-specific settings
 #include "openthread/platform/logging.h"
 
+/* Number of message buffers reduced to save RAM */
 #undef OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS
-#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS 64
+#if CONFIG_PM
+#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS 22
+#else
+#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS 44
+#endif
 
 #define OPENTHREAD_CONFIG_LOG_OUTPUT OPENTHREAD_CONFIG_LOG_OUTPUT_DEBUG_UART
 

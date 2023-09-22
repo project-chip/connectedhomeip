@@ -211,21 +211,6 @@ void HandleIncomingBleConnection(BLEEndPoint * bleEP)
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {
-#if CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    if (ConnectivityMgr().IsThreadProvisioned())
-    {
-        ESP_LOGI(TAG, "Thread credentials already provisioned, not initializing BLE");
-#else
-    if (ConnectivityMgr().IsWiFiStationProvisioned())
-    {
-        ESP_LOGI(TAG, "WiFi station already provisioned, not initializing BLE");
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
-        esp_bt_mem_release(ESP_BT_MODE_BTDM);
-        return CHIP_NO_ERROR;
-    }
-#endif /* CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING */
-
     CHIP_ERROR err;
 
     // Initialize the Chip BleLayer.
@@ -1014,7 +999,7 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::ConfigureScanResponseData(ByteSpan data)
 {
-    if (!IsSpanUsable(data) || data.size() > MAX_SCAN_RSP_DATA_LEN)
+    if (data.empty() || data.size() > MAX_SCAN_RSP_DATA_LEN)
     {
         ChipLogError(DeviceLayer, "scan response data is invalid");
         return CHIP_ERROR_INVALID_ARGUMENT;

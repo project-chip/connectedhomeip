@@ -62,7 +62,7 @@ enum class Feature : uint32_t
 {
     kCondition              = 0x1,
     kWarning                = 0x2,
-    kReplacementProductList = 0x3
+    kReplacementProductList = 0x4
 };
 
 // Enum for ProductIdentifierTypeEnum
@@ -127,7 +127,7 @@ public:
      */
     CHIP_ERROR SetProductIdentifierValue(chip::CharSpan aProductIdentifierValue)
     {
-        VerifyOrReturnError(IsSpanUsable(aProductIdentifierValue), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!aProductIdentifierValue.empty(), CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(aProductIdentifierValue.size() <= sizeof(productIdentifierValueBuffer), CHIP_ERROR_INVALID_ARGUMENT);
 
         memcpy(productIdentifierValueBuffer, aProductIdentifierValue.data(), aProductIdentifierValue.size());

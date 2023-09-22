@@ -113,7 +113,7 @@ void emberAf{{asUpperCamelCase label}}ClusterClientTickCallback(chip::EndpointId
 {{#zcl_clusters}}
 {{#zcl_commands}}
 {{#if (isClient source)}}
-{{#unless (isInConfigList (asUpperCamelCase parent.name) "CommandHandlerInterfaceOnlyClusters")}}
+{{#unless (isInConfigList parent.name "CommandHandlerInterfaceOnlyClusters")}}
 /**
  * @brief {{parent.name}} Cluster {{name}} Command callback (from {{source}})
  */

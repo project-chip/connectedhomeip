@@ -59,7 +59,7 @@ tests:
       cluster: "Operational Credentials"
       attribute: "CurrentFabricIndex"
       response:
-          saveAs: CurrentFabricIndex
+          saveAs: CurrentFabricIndexValue
 
     - label:
           "Step 3:TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute"
@@ -74,7 +74,7 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -98,7 +98,7 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 1,
@@ -106,7 +106,7 @@ tests:
                       Subjects: [111, 222, 333, 444],
                       Targets:
                           [{ Cluster: 11, Endpoint: 22, DeviceType: null }],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
@@ -114,7 +114,7 @@ tests:
                       Subjects: [555, 666, 777, 888],
                       Targets:
                           [{ Cluster: 55, Endpoint: 66, DeviceType: null }],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -131,7 +131,7 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 1,
@@ -139,7 +139,7 @@ tests:
                       Subjects: [111, 222, 333, 444],
                       Targets:
                           [{ Cluster: 11, Endpoint: 22, DeviceType: null }],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
@@ -147,7 +147,7 @@ tests:
                       Subjects: [555, 666, 777, 888],
                       Targets:
                           [{ Cluster: 55, Endpoint: 66, DeviceType: null }],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -171,7 +171,7 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 4,
@@ -179,7 +179,7 @@ tests:
                       Subjects: [444, 333, 222, 111],
                       Targets:
                           [{ Cluster: 44, Endpoint: 33, DeviceType: null }],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 5,
@@ -187,7 +187,7 @@ tests:
                       Subjects: [888, 777, 666, 555],
                       Targets:
                           [{ Cluster: 88, Endpoint: 77, DeviceType: null }],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -204,7 +204,7 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 4,
@@ -212,7 +212,7 @@ tests:
                       Subjects: [444, 333, 222, 111],
                       Targets:
                           [{ Cluster: 44, Endpoint: 33, DeviceType: null }],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 5,
@@ -220,7 +220,7 @@ tests:
                       Subjects: [888, 777, 666, 555],
                       Targets:
                           [{ Cluster: 88, Endpoint: 77, DeviceType: null }],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -245,7 +245,7 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 1,
@@ -256,7 +256,7 @@ tests:
                               { Cluster: 11, Endpoint: 22, DeviceType: null },
                               { Cluster: 33, Endpoint: null, DeviceType: 44 },
                           ],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
@@ -267,7 +267,7 @@ tests:
                               { Cluster: 55, Endpoint: 66, DeviceType: null },
                               { Cluster: 77, Endpoint: null, DeviceType: 88 },
                           ],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -283,7 +283,7 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 1,
@@ -294,7 +294,7 @@ tests:
                               { Cluster: 11, Endpoint: 22, DeviceType: null },
                               { Cluster: 33, Endpoint: null, DeviceType: 44 },
                           ],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
@@ -305,7 +305,7 @@ tests:
                               { Cluster: 55, Endpoint: 66, DeviceType: null },
                               { Cluster: 77, Endpoint: null, DeviceType: 88 },
                           ],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -330,7 +330,7 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 1,
@@ -341,7 +341,7 @@ tests:
                               { Cluster: 11, Endpoint: 22, DeviceType: null },
                               { Cluster: 33, Endpoint: null, DeviceType: 44 },
                           ],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
@@ -352,7 +352,7 @@ tests:
                               { Cluster: 55, Endpoint: 66, DeviceType: null },
                               { Cluster: 77, Endpoint: null, DeviceType: 88 },
                           ],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -368,7 +368,7 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 1,
@@ -379,7 +379,7 @@ tests:
                               { Cluster: 11, Endpoint: 22, DeviceType: null },
                               { Cluster: 33, Endpoint: null, DeviceType: 44 },
                           ],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
@@ -390,7 +390,7 @@ tests:
                               { Cluster: 55, Endpoint: 66, DeviceType: null },
                               { Cluster: 77, Endpoint: null, DeviceType: 88 },
                           ],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -414,21 +414,21 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 1,
                       AuthMode: 2,
                       Subjects: [111, 222, 333, 444],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
                       AuthMode: 3,
                       Subjects: [555, 666, 777, 888],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -444,21 +444,21 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 1,
                       AuthMode: 2,
                       Subjects: [111, 222, 333, 444],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
                       AuthMode: 3,
                       Subjects: [555, 666, 777, 888],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -480,14 +480,14 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
                       AuthMode: 3,
                       Subjects: null,
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -503,14 +503,14 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
                       AuthMode: 3,
                       Subjects: null,
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -532,14 +532,14 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 2,
                       AuthMode: 2,
                       Subjects: null,
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -555,14 +555,14 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 2,
                       AuthMode: 2,
                       Subjects: null,
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -719,14 +719,14 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
                       AuthMode: 2,
                       Subjects: [CAT1, CAT2, CAT3, CAT4],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -742,14 +742,14 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
                       AuthMode: 2,
                       Subjects: [CAT1, CAT2, CAT3, CAT4],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -760,7 +760,7 @@ tests:
       command: "readAttribute"
       attribute: "TargetsPerAccessControlEntry"
       response:
-          saveAs: TargetsPerAccessControlEntry
+          saveAs: TargetsPerAccessControlEntryValue
 
     #Need if support : https://github.com/project-chip/connectedhomeip/issues/16719
     - label:
@@ -926,21 +926,21 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
                       AuthMode: 2,
                       Subjects: null,
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
                       AuthMode: 2,
                       Subjects: null,
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -956,21 +956,21 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
                       AuthMode: 2,
                       Subjects: null,
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
                       AuthMode: 2,
                       Subjects: null,
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -992,14 +992,14 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
                       AuthMode: 1,
                       Subjects: null,
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
       response:
@@ -1017,7 +1017,7 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -1039,14 +1039,14 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 5,
                       AuthMode: 3,
                       Subjects: null,
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
       response:
@@ -1070,14 +1070,14 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: "6",
                       AuthMode: 3,
                       Subjects: null,
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
       response:
@@ -1097,14 +1097,14 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: "6",
                       AuthMode: "4",
                       Subjects: null,
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
       response:
@@ -1124,14 +1124,14 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
                       AuthMode: 2,
                       Subjects: [0],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
       response:
@@ -1155,14 +1155,14 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
                       AuthMode: 2,
                       Subjects: ["18446744073709551615"],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
       response:
@@ -1186,14 +1186,14 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
                       AuthMode: 2,
                       Subjects: ["18446744060824649728"],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
       response:
@@ -1217,14 +1217,14 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
                       AuthMode: 2,
                       Subjects: ["18446744073709486080"],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
       response:
@@ -1248,7 +1248,7 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
@@ -1256,7 +1256,7 @@ tests:
                       Subjects: null,
                       Targets:
                           [{ Cluster: null, Endpoint: null, DeviceType: null }],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
       response:
@@ -1280,7 +1280,7 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
@@ -1294,7 +1294,7 @@ tests:
                                   DeviceType: null,
                               },
                           ],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
       response:
@@ -1318,7 +1318,7 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
@@ -1332,7 +1332,7 @@ tests:
                                   DeviceType: null,
                               },
                           ],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
       response:
@@ -1356,7 +1356,7 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
@@ -1370,7 +1370,7 @@ tests:
                                   DeviceType: 4294967295,
                               },
                           ],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
       response:
@@ -1394,7 +1394,7 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
@@ -1402,7 +1402,7 @@ tests:
                       Subjects: null,
                       Targets:
                           [{ Cluster: null, Endpoint: 22, DeviceType: 33 }],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
       response:
@@ -1426,14 +1426,14 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
                       AuthMode: 2,
                       Subjects: null,
                       Targets: [{ Cluster: 11, Endpoint: 22, DeviceType: 33 }],
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
       response:

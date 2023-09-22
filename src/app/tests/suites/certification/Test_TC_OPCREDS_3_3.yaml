@@ -45,10 +45,13 @@ tests:
 
     - label: "Step 2: Start the commissioning process of TH with DUT"
       verification: |
-          ./chip-tool pairing ble-wifi 1 GRLPrivate_EXT matter123 20202021 3840 --trace_decode 1
+          On dut(chip-tool) side:
+           ./chip-tool pairing ble-wifi 1 GRLPrivate_EXT matter123 20202021 3840 --trace_decode 1
           [1641381202.376419][5628:5633] CHIP:CTL: Received success response 0x3df8
 
-          sudo ./all-clusters-app --wifi
+
+          On TH(all-clusters-app)
+          ./all-clusters-app --wifi
           [1641381202.306840][4431:4431] CHIP:DL: NVS set: chip-config/regulatory-location = 0 (0x0)
       disabled: true
 
@@ -742,7 +745,7 @@ tests:
     - label:
           "Step 10: Verify that the public Key extracted NOCValue of the AddNOC
           matches the Node Operational Public Key extracted from CSRResponse"
-      verifiaction: |
+      verification: |
           Not verifiable (out of scope)
       disabled: true
 

@@ -18,7 +18,7 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRBaseClusters.h>
 
-#import "MTRAsyncCallbackWorkQueue.h"
+#import "MTRAsyncWorkQueue.h"
 #import "MTRBaseClusterUtils.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCallbackBridge.h"
@@ -43,12 +43,12 @@ using chip::Messaging::ExchangeManager;
 using chip::System::Clock::Seconds16;
 using chip::System::Clock::Timeout;
 
-static void MTRClustersLogEnqueue(NSString * logPrefix, MTRAsyncCallbackWorkQueue * workQueue)
+static void MTRClustersLogEnqueue(NSString * logPrefix, MTRAsyncWorkQueue * workQueue)
 {
     MTR_LOG_DEFAULT("%@ enqueueWorkItem %@", logPrefix, workQueue);
 }
 
-static void MTRClustersLogDequeue(NSString * logPrefix, MTRAsyncCallbackWorkQueue * workQueue)
+static void MTRClustersLogDequeue(NSString * logPrefix, MTRAsyncWorkQueue * workQueue)
 {
     MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, workQueue);
 }
@@ -86,8 +86,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeIdentifyID, (unsigned int) MTRCommandIDTypeClusterIdentifyCommandIdentifyID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterIdentify alloc] initWithDevice:baseDevice
@@ -126,8 +126,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeIdentifyID, (unsigned int) MTRCommandIDTypeClusterIdentifyCommandTriggerEffectID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterIdentify alloc] initWithDevice:baseDevice
@@ -294,8 +294,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeGroupsID, (unsigned int) MTRCommandIDTypeClusterGroupsCommandAddGroupID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterGroups alloc] initWithDevice:baseDevice
@@ -335,8 +335,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeGroupsID, (unsigned int) MTRCommandIDTypeClusterGroupsCommandViewGroupID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterGroups alloc] initWithDevice:baseDevice
@@ -376,8 +376,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeGroupsID, (unsigned int) MTRCommandIDTypeClusterGroupsCommandGetGroupMembershipID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterGroups alloc] initWithDevice:baseDevice
@@ -418,8 +418,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeGroupsID, (unsigned int) MTRCommandIDTypeClusterGroupsCommandRemoveGroupID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterGroups alloc] initWithDevice:baseDevice
@@ -467,8 +467,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeGroupsID, (unsigned int) MTRCommandIDTypeClusterGroupsCommandRemoveAllGroupsID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterGroups alloc] initWithDevice:baseDevice
@@ -507,8 +507,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterGroupsCommandAddGroupIfIdentifyingID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterGroups alloc] initWithDevice:baseDevice
@@ -714,8 +714,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandAddSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterScenes alloc] initWithDevice:baseDevice
@@ -755,8 +755,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandViewSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterScenes alloc] initWithDevice:baseDevice
@@ -796,8 +796,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandRemoveSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterScenes alloc] initWithDevice:baseDevice
@@ -837,8 +837,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandRemoveAllScenesID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterScenes alloc] initWithDevice:baseDevice
@@ -879,8 +879,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandStoreSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterScenes alloc] initWithDevice:baseDevice
@@ -919,8 +919,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandRecallSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterScenes alloc] initWithDevice:baseDevice
@@ -960,8 +960,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandGetSceneMembershipID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterScenes alloc] initWithDevice:baseDevice
@@ -1002,8 +1002,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandEnhancedAddSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterScenes alloc] initWithDevice:baseDevice
@@ -1044,8 +1044,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandEnhancedViewSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterScenes alloc] initWithDevice:baseDevice
@@ -1086,8 +1086,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandCopySceneID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterScenes alloc] initWithDevice:baseDevice
@@ -1407,8 +1407,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeOnOffID, (unsigned int) MTRCommandIDTypeClusterOnOffCommandOffID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOnOff alloc] initWithDevice:baseDevice
@@ -1453,8 +1453,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeOnOffID, (unsigned int) MTRCommandIDTypeClusterOnOffCommandOnID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOnOff alloc] initWithDevice:baseDevice
@@ -1499,8 +1499,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeOnOffID, (unsigned int) MTRCommandIDTypeClusterOnOffCommandToggleID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOnOff alloc] initWithDevice:baseDevice
@@ -1539,8 +1539,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeOnOffID, (unsigned int) MTRCommandIDTypeClusterOnOffCommandOffWithEffectID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOnOff alloc] initWithDevice:baseDevice
@@ -1588,8 +1588,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterOnOffCommandOnWithRecallGlobalSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOnOff alloc] initWithDevice:baseDevice
@@ -1628,8 +1628,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeOnOffID, (unsigned int) MTRCommandIDTypeClusterOnOffCommandOnWithTimedOffID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOnOff alloc] initWithDevice:baseDevice
@@ -2044,8 +2044,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveToLevelID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterLevelControl alloc] initWithDevice:baseDevice
@@ -2084,8 +2084,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterLevelControl alloc] initWithDevice:baseDevice
@@ -2124,8 +2124,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandStepID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterLevelControl alloc] initWithDevice:baseDevice
@@ -2164,8 +2164,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandStopID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterLevelControl alloc] initWithDevice:baseDevice
@@ -2204,8 +2204,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveToLevelWithOnOffID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterLevelControl alloc] initWithDevice:baseDevice
@@ -2244,8 +2244,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveWithOnOffID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterLevelControl alloc] initWithDevice:baseDevice
@@ -2284,8 +2284,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterLevelControlCommandStepWithOnOffID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterLevelControl alloc] initWithDevice:baseDevice
@@ -2324,8 +2324,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterLevelControlCommandStopWithOnOffID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterLevelControl alloc] initWithDevice:baseDevice
@@ -2364,8 +2364,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveToClosestFrequencyID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterLevelControl alloc] initWithDevice:baseDevice
@@ -3520,8 +3520,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandInstantActionID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterActions alloc] initWithDevice:baseDevice
@@ -3560,8 +3560,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterActionsCommandInstantActionWithTransitionID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterActions alloc] initWithDevice:baseDevice
@@ -3600,8 +3600,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandStartActionID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterActions alloc] initWithDevice:baseDevice
@@ -3640,8 +3640,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterActionsCommandStartActionWithDurationID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterActions alloc] initWithDevice:baseDevice
@@ -3680,8 +3680,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandStopActionID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterActions alloc] initWithDevice:baseDevice
@@ -3720,8 +3720,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandPauseActionID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterActions alloc] initWithDevice:baseDevice
@@ -3760,8 +3760,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterActionsCommandPauseActionWithDurationID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterActions alloc] initWithDevice:baseDevice
@@ -3800,8 +3800,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandResumeActionID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterActions alloc] initWithDevice:baseDevice
@@ -3840,8 +3840,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandEnableActionID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterActions alloc] initWithDevice:baseDevice
@@ -3880,8 +3880,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterActionsCommandEnableActionWithDurationID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterActions alloc] initWithDevice:baseDevice
@@ -3920,8 +3920,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandDisableActionID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterActions alloc] initWithDevice:baseDevice
@@ -3960,8 +3960,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterActionsCommandDisableActionWithDurationID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterActions alloc] initWithDevice:baseDevice
@@ -4225,8 +4225,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      self.endpoint, (unsigned int) 0x00000028, (unsigned int) 0x10020000];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterBasic alloc] initWithDevice:baseDevice
@@ -4585,8 +4585,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandQueryImageID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOTASoftwareUpdateProvider alloc] initWithDevice:baseDevice
@@ -4627,8 +4627,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandApplyUpdateRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOTASoftwareUpdateProvider alloc] initWithDevice:baseDevice
@@ -4668,8 +4668,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandNotifyUpdateAppliedID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOTASoftwareUpdateProvider alloc] initWithDevice:baseDevice
@@ -4826,8 +4826,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterOTASoftwareUpdateRequestorCommandAnnounceOTAProviderID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOTASoftwareUpdateRequestor alloc] initWithDevice:baseDevice
@@ -5783,8 +5783,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterGeneralCommissioningCommandArmFailSafeID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterGeneralCommissioning alloc] initWithDevice:baseDevice
@@ -5825,8 +5825,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterGeneralCommissioningCommandSetRegulatoryConfigID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterGeneralCommissioning alloc] initWithDevice:baseDevice
@@ -5880,8 +5880,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterGeneralCommissioningCommandCommissioningCompleteID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterGeneralCommissioning alloc] initWithDevice:baseDevice
@@ -6117,8 +6117,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandScanNetworksID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterNetworkCommissioning alloc] initWithDevice:baseDevice
@@ -6159,8 +6159,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandAddOrUpdateWiFiNetworkID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterNetworkCommissioning alloc] initWithDevice:baseDevice
@@ -6201,8 +6201,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandAddOrUpdateThreadNetworkID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterNetworkCommissioning alloc] initWithDevice:baseDevice
@@ -6243,8 +6243,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandRemoveNetworkID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterNetworkCommissioning alloc] initWithDevice:baseDevice
@@ -6285,8 +6285,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandConnectNetworkID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterNetworkCommissioning alloc] initWithDevice:baseDevice
@@ -6327,8 +6327,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandReorderNetworkID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterNetworkCommissioning alloc] initWithDevice:baseDevice
@@ -6619,8 +6619,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterDiagnosticLogsCommandRetrieveLogsRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDiagnosticLogs alloc] initWithDevice:baseDevice
@@ -6748,8 +6748,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterGeneralDiagnosticsCommandTestEventTriggerID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterGeneralDiagnostics alloc] initWithDevice:baseDevice
@@ -6849,6 +6849,14 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                        clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
                                      attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTestEventTriggersEnabledID)
                                           params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageWearCountWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint)
+                                          clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAverageWearCountID)
+                                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -6957,8 +6965,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterSoftwareDiagnosticsCommandResetWatermarksID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterSoftwareDiagnostics alloc] initWithDevice:baseDevice
@@ -7131,8 +7139,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterThreadNetworkDiagnosticsCommandResetCountsID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterThreadNetworkDiagnostics alloc] initWithDevice:baseDevice
@@ -7802,8 +7810,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterWiFiNetworkDiagnosticsCommandResetCountsID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterWiFiNetworkDiagnostics alloc] initWithDevice:baseDevice
@@ -8060,8 +8068,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterEthernetNetworkDiagnosticsCommandResetCountsID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterEthernetNetworkDiagnostics alloc] initWithDevice:baseDevice
@@ -8266,8 +8274,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterTimeSynchronizationCommandSetUTCTimeID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterTimeSynchronization alloc] initWithDevice:baseDevice
@@ -8306,8 +8314,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterTimeSynchronizationCommandSetTrustedTimeSourceID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterTimeSynchronization alloc] initWithDevice:baseDevice
@@ -8347,8 +8355,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterTimeSynchronizationCommandSetTimeZoneID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterTimeSynchronization alloc] initWithDevice:baseDevice
@@ -8388,8 +8396,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterTimeSynchronizationCommandSetDSTOffsetID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterTimeSynchronization alloc] initWithDevice:baseDevice
@@ -8428,8 +8436,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterTimeSynchronizationCommandSetDefaultNTPID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterTimeSynchronization alloc] initWithDevice:baseDevice
@@ -8966,8 +8974,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRCommandIDTypeClusterAdministratorCommissioningCommandOpenCommissioningWindowID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterAdministratorCommissioning alloc] initWithDevice:baseDevice
@@ -9007,8 +9015,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRCommandIDTypeClusterAdministratorCommissioningCommandOpenBasicCommissioningWindowID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterAdministratorCommissioning alloc] initWithDevice:baseDevice
@@ -9056,8 +9064,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterAdministratorCommissioningCommandRevokeCommissioningID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterAdministratorCommissioning alloc] initWithDevice:baseDevice
@@ -9236,8 +9244,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:baseDevice
@@ -9278,8 +9286,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandCertificateChainRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:baseDevice
@@ -9321,8 +9329,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandCSRRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:baseDevice
@@ -9363,8 +9371,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandAddNOCID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:baseDevice
@@ -9405,8 +9413,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandUpdateNOCID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:baseDevice
@@ -9447,8 +9455,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandUpdateFabricLabelID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:baseDevice
@@ -9489,8 +9497,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandRemoveFabricID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:baseDevice
@@ -9531,8 +9539,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandAddTrustedRootCertificateID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:baseDevice
@@ -9808,8 +9816,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetWriteID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterGroupKeyManagement alloc] initWithDevice:baseDevice
@@ -9849,8 +9857,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterGroupKeyManagement alloc] initWithDevice:baseDevice
@@ -9890,8 +9898,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetRemoveID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterGroupKeyManagement alloc] initWithDevice:baseDevice
@@ -9942,8 +9950,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadAllIndicesID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterGroupKeyManagement alloc] initWithDevice:baseDevice
@@ -10420,8 +10428,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterICDManagementCommandRegisterClientID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterICDManagement alloc] initWithDevice:baseDevice
@@ -10461,8 +10469,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterICDManagementCommandUnregisterClientID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterICDManagement alloc] initWithDevice:baseDevice
@@ -10510,8 +10518,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterICDManagementCommandStayActiveRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterICDManagement alloc] initWithDevice:baseDevice
@@ -10662,8 +10670,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterModeSelectCommandChangeToModeID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterModeSelect alloc] initWithDevice:baseDevice
@@ -10872,8 +10880,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterLaundryWasherModeCommandChangeToModeID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterLaundryWasherMode alloc] initWithDevice:baseDevice
@@ -10997,8 +11005,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRCommandIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeCommandChangeToModeID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterRefrigeratorAndTemperatureControlledCabinetMode alloc] initWithDevice:baseDevice
@@ -11269,8 +11277,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterRVCRunModeCommandChangeToModeID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterRVCRunMode alloc] initWithDevice:baseDevice
@@ -11445,8 +11453,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterRVCCleanModeCommandChangeToModeID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterRVCCleanMode alloc] initWithDevice:baseDevice
@@ -11620,8 +11628,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterTemperatureControlCommandSetTemperatureID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterTemperatureControl alloc] initWithDevice:baseDevice
@@ -11863,8 +11871,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterDishwasherModeCommandChangeToModeID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDishwasherMode alloc] initWithDevice:baseDevice
@@ -12065,8 +12073,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterSmokeCOAlarmCommandSelfTestRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterSmokeCOAlarm alloc] initWithDevice:baseDevice
@@ -12294,8 +12302,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterDishwasherAlarmCommandResetID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDishwasherAlarm alloc] initWithDevice:baseDevice
@@ -12334,8 +12342,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterDishwasherAlarmCommandModifyEnabledAlarmsID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDishwasherAlarm alloc] initWithDevice:baseDevice
@@ -12478,8 +12486,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterOperationalStateCommandPauseID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOperationalState alloc] initWithDevice:baseDevice
@@ -12527,8 +12535,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterOperationalStateCommandStopID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOperationalState alloc] initWithDevice:baseDevice
@@ -12576,8 +12584,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterOperationalStateCommandStartID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOperationalState alloc] initWithDevice:baseDevice
@@ -12625,8 +12633,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterOperationalStateCommandResumeID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterOperationalState alloc] initWithDevice:baseDevice
@@ -12786,8 +12794,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterRVCOperationalStateCommandPauseID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterRVCOperationalState alloc] initWithDevice:baseDevice
@@ -12835,8 +12843,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterRVCOperationalStateCommandStopID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterRVCOperationalState alloc] initWithDevice:baseDevice
@@ -12884,8 +12892,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterRVCOperationalStateCommandStartID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterRVCOperationalState alloc] initWithDevice:baseDevice
@@ -12933,8 +12941,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterRVCOperationalStateCommandResumeID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterRVCOperationalState alloc] initWithDevice:baseDevice
@@ -13095,8 +13103,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterHEPAFilterMonitoringCommandResetConditionID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterHEPAFilterMonitoring alloc] initWithDevice:baseDevice
@@ -13276,8 +13284,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterActivatedCarbonFilterMonitoringCommandResetConditionID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterActivatedCarbonFilterMonitoring alloc] initWithDevice:baseDevice
@@ -13456,8 +13464,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandLockDoorID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDoorLock alloc] initWithDevice:baseDevice
@@ -13496,8 +13504,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandUnlockDoorID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDoorLock alloc] initWithDevice:baseDevice
@@ -13536,8 +13544,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandUnlockWithTimeoutID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDoorLock alloc] initWithDevice:baseDevice
@@ -13576,8 +13584,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetWeekDayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDoorLock alloc] initWithDevice:baseDevice
@@ -13617,8 +13625,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandGetWeekDayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDoorLock alloc] initWithDevice:baseDevice
@@ -13658,8 +13666,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandClearWeekDayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDoorLock alloc] initWithDevice:baseDevice
@@ -13698,8 +13706,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetYearDayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDoorLock alloc] initWithDevice:baseDevice
@@ -13739,8 +13747,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandGetYearDayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDoorLock alloc] initWithDevice:baseDevice
@@ -13780,8 +13788,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandClearYearDayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDoorLock alloc] initWithDevice:baseDevice
@@ -13820,8 +13828,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetHolidayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDoorLock alloc] initWithDevice:baseDevice
@@ -13861,8 +13869,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandGetHolidayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDoorLock alloc] initWithDevice:baseDevice
@@ -13902,8 +13910,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandClearHolidayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDoorLock alloc] initWithDevice:baseDevice
@@ -13942,8 +13950,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetUserID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDoorLock alloc] initWithDevice:baseDevice
@@ -13982,8 +13990,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandGetUserID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDoorLock alloc] initWithDevice:baseDevice
@@ -14022,8 +14030,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandClearUserID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDoorLock alloc] initWithDevice:baseDevice
@@ -14063,8 +14071,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetCredentialID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDoorLock alloc] initWithDevice:baseDevice
@@ -14105,8 +14113,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandGetCredentialStatusID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDoorLock alloc] initWithDevice:baseDevice
@@ -14146,8 +14154,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandClearCredentialID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDoorLock alloc] initWithDevice:baseDevice
@@ -14186,8 +14194,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandUnboltDoorID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterDoorLock alloc] initWithDevice:baseDevice
@@ -15160,8 +15168,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandUpOrOpenID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterWindowCovering alloc] initWithDevice:baseDevice
@@ -15209,8 +15217,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandDownOrCloseID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterWindowCovering alloc] initWithDevice:baseDevice
@@ -15258,8 +15266,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandStopMotionID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterWindowCovering alloc] initWithDevice:baseDevice
@@ -15298,8 +15306,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandGoToLiftValueID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterWindowCovering alloc] initWithDevice:baseDevice
@@ -15338,8 +15346,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandGoToLiftPercentageID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterWindowCovering alloc] initWithDevice:baseDevice
@@ -15378,8 +15386,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandGoToTiltValueID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterWindowCovering alloc] initWithDevice:baseDevice
@@ -15418,8 +15426,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandGoToTiltPercentageID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterWindowCovering alloc] initWithDevice:baseDevice
@@ -15829,8 +15837,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterBarrierControlCommandBarrierControlGoToPercentID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterBarrierControl alloc] initWithDevice:baseDevice
@@ -15878,8 +15886,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterBarrierControlCommandBarrierControlStopID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterBarrierControl alloc] initWithDevice:baseDevice
@@ -16565,8 +16573,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterThermostatCommandSetpointRaiseLowerID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterThermostat alloc] initWithDevice:baseDevice
@@ -16605,8 +16613,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterThermostatCommandSetWeeklyScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterThermostat alloc] initWithDevice:baseDevice
@@ -16646,8 +16654,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterThermostatCommandGetWeeklyScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterThermostat alloc] initWithDevice:baseDevice
@@ -16696,8 +16704,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterThermostatCommandClearWeeklyScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterThermostat alloc] initWithDevice:baseDevice
@@ -17789,8 +17797,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeFanControlID, (unsigned int) MTRCommandIDTypeClusterFanControlCommandStepID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterFanControl alloc] initWithDevice:baseDevice
@@ -18305,8 +18313,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToHueID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterColorControl alloc] initWithDevice:baseDevice
@@ -18345,8 +18353,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveHueID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterColorControl alloc] initWithDevice:baseDevice
@@ -18385,8 +18393,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterColorControlCommandStepHueID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterColorControl alloc] initWithDevice:baseDevice
@@ -18425,8 +18433,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToSaturationID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterColorControl alloc] initWithDevice:baseDevice
@@ -18465,8 +18473,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveSaturationID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterColorControl alloc] initWithDevice:baseDevice
@@ -18505,8 +18513,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterColorControlCommandStepSaturationID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterColorControl alloc] initWithDevice:baseDevice
@@ -18545,8 +18553,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToHueAndSaturationID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterColorControl alloc] initWithDevice:baseDevice
@@ -18585,8 +18593,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToColorID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterColorControl alloc] initWithDevice:baseDevice
@@ -18625,8 +18633,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveColorID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterColorControl alloc] initWithDevice:baseDevice
@@ -18665,8 +18673,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterColorControlCommandStepColorID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterColorControl alloc] initWithDevice:baseDevice
@@ -18705,8 +18713,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToColorTemperatureID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterColorControl alloc] initWithDevice:baseDevice
@@ -18745,8 +18753,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterColorControlCommandEnhancedMoveToHueID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterColorControl alloc] initWithDevice:baseDevice
@@ -18785,8 +18793,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterColorControlCommandEnhancedMoveHueID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterColorControl alloc] initWithDevice:baseDevice
@@ -18825,8 +18833,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterColorControlCommandEnhancedStepHueID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterColorControl alloc] initWithDevice:baseDevice
@@ -18865,8 +18873,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterColorControlCommandEnhancedMoveToHueAndSaturationID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterColorControl alloc] initWithDevice:baseDevice
@@ -18905,8 +18913,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterColorControlCommandColorLoopSetID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterColorControl alloc] initWithDevice:baseDevice
@@ -18945,8 +18953,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterColorControlCommandStopMoveStepID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterColorControl alloc] initWithDevice:baseDevice
@@ -18985,8 +18993,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveColorTemperatureID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterColorControl alloc] initWithDevice:baseDevice
@@ -19025,8 +19033,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterColorControlCommandStepColorTemperatureID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterColorControl alloc] initWithDevice:baseDevice
@@ -23182,8 +23190,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeChannelID, (unsigned int) MTRCommandIDTypeClusterChannelCommandChangeChannelID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterChannel alloc] initWithDevice:baseDevice
@@ -23223,8 +23231,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterChannelCommandChangeChannelByNumberID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterChannel alloc] initWithDevice:baseDevice
@@ -23263,8 +23271,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeChannelID, (unsigned int) MTRCommandIDTypeClusterChannelCommandSkipChannelID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterChannel alloc] initWithDevice:baseDevice
@@ -23435,8 +23443,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterTargetNavigatorCommandNavigateTargetID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterTargetNavigator alloc] initWithDevice:baseDevice
@@ -23588,8 +23596,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandPlayID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterMediaPlayback alloc] initWithDevice:baseDevice
@@ -23636,8 +23644,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandPauseID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterMediaPlayback alloc] initWithDevice:baseDevice
@@ -23684,8 +23692,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandStopID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterMediaPlayback alloc] initWithDevice:baseDevice
@@ -23735,8 +23743,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandStartOverID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterMediaPlayback alloc] initWithDevice:baseDevice
@@ -23783,8 +23791,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandPreviousID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterMediaPlayback alloc] initWithDevice:baseDevice
@@ -23831,8 +23839,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandNextID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterMediaPlayback alloc] initWithDevice:baseDevice
@@ -23879,8 +23887,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandRewindID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterMediaPlayback alloc] initWithDevice:baseDevice
@@ -23930,8 +23938,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandFastForwardID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterMediaPlayback alloc] initWithDevice:baseDevice
@@ -23972,8 +23980,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandSkipForwardID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterMediaPlayback alloc] initWithDevice:baseDevice
@@ -24014,8 +24022,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandSkipBackwardID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterMediaPlayback alloc] initWithDevice:baseDevice
@@ -24056,8 +24064,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandSeekID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterMediaPlayback alloc] initWithDevice:baseDevice
@@ -24459,8 +24467,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterMediaInputCommandSelectInputID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterMediaInput alloc] initWithDevice:baseDevice
@@ -24508,8 +24516,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterMediaInputCommandShowInputStatusID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterMediaInput alloc] initWithDevice:baseDevice
@@ -24557,8 +24565,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterMediaInputCommandHideInputStatusID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterMediaInput alloc] initWithDevice:baseDevice
@@ -24597,8 +24605,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterMediaInputCommandRenameInputID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterMediaInput alloc] initWithDevice:baseDevice
@@ -24790,8 +24798,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeLowPowerID, (unsigned int) MTRCommandIDTypeClusterLowPowerCommandSleepID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterLowPower alloc] initWithDevice:baseDevice
@@ -24923,8 +24931,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeKeypadInputID, (unsigned int) MTRCommandIDTypeClusterKeypadInputCommandSendKeyID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterKeypadInput alloc] initWithDevice:baseDevice
@@ -25051,8 +25059,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterContentLauncherCommandLaunchContentID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterContentLauncher alloc] initWithDevice:baseDevice
@@ -25093,8 +25101,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterContentLauncherCommandLaunchURLID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterContentLauncher alloc] initWithDevice:baseDevice
@@ -25273,8 +25281,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterAudioOutputCommandSelectOutputID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterAudioOutput alloc] initWithDevice:baseDevice
@@ -25313,8 +25321,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterAudioOutputCommandRenameOutputID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterAudioOutput alloc] initWithDevice:baseDevice
@@ -25463,8 +25471,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterApplicationLauncherCommandLaunchAppID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterApplicationLauncher alloc] initWithDevice:baseDevice
@@ -25505,8 +25513,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterApplicationLauncherCommandStopAppID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterApplicationLauncher alloc] initWithDevice:baseDevice
@@ -25547,8 +25555,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterApplicationLauncherCommandHideAppID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterApplicationLauncher alloc] initWithDevice:baseDevice
@@ -25876,8 +25884,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterAccountLoginCommandGetSetupPINID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterAccountLogin alloc] initWithDevice:baseDevice
@@ -25917,8 +25925,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeAccountLoginID, (unsigned int) MTRCommandIDTypeClusterAccountLoginCommandLoginID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterAccountLogin alloc] initWithDevice:baseDevice
@@ -25963,8 +25971,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeAccountLoginID, (unsigned int) MTRCommandIDTypeClusterAccountLoginCommandLogoutID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterAccountLogin alloc] initWithDevice:baseDevice
@@ -26128,8 +26136,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterElectricalMeasurementCommandGetProfileInfoCommandID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterElectricalMeasurement alloc] initWithDevice:baseDevice
@@ -26169,8 +26177,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRCommandIDTypeClusterElectricalMeasurementCommandGetMeasurementProfileCommandID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterElectricalMeasurement alloc] initWithDevice:baseDevice
@@ -27554,8 +27562,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -27603,8 +27611,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestNotHandledID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -27654,8 +27662,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestSpecificID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -27704,8 +27712,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestUnknownCommandID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -27745,8 +27753,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestAddArgumentsID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -27787,8 +27795,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestSimpleArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -27830,8 +27838,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestStructArrayArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -27873,8 +27881,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestStructArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -27915,8 +27923,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestNestedStructArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -27957,8 +27965,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestListStructArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -27999,8 +28007,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestListInt8UArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -28041,8 +28049,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestNestedStructListArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -28085,8 +28093,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestListNestedStructListArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -28127,8 +28135,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestListInt8UReverseRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -28169,8 +28177,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestEnumsRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -28211,8 +28219,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestNullableOptionalRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -28255,8 +28263,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestComplexNullableOptionalRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -28299,8 +28307,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandSimpleStructEchoRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -28349,8 +28357,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTimedInvokeRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -28389,8 +28397,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestSimpleOptionalArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -28430,8 +28438,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestEventRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -28476,8 +28484,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestFabricScopedEventRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:baseDevice
@@ -31177,6 +31185,185 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                                     error);
                                             }];
 }
+@end
+
+@implementation MTRClusterSampleMEI
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithEndpointID:endpointID queue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _device = device;
+    }
+    return self;
+}
+
+- (void)pingWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                    completion:(MTRStatusCompletion)completion
+{
+    [self pingWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)pingWithParams:(MTRSampleMEIClusterPingParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               completion:(MTRStatusCompletion)completion
+{
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint,
+                  (unsigned int) MTRClusterIDTypeSampleMEIID, (unsigned int) MTRCommandIDTypeClusterSampleMEICommandPingID];
+    // Make a copy of params before we go async.
+    params = [params copy];
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
+        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
+        auto * cluster = [[MTRBaseClusterSampleMEI alloc] initWithDevice:baseDevice
+                                                              endpointID:@(self.endpoint)
+                                                                   queue:self.device.queue];
+        [cluster pingWithParams:params
+                     completion:^(NSError * _Nullable error) {
+                         MTRClustersLogCompletion(logPrefix, nil, error);
+                         dispatch_async(self.callbackQueue, ^{
+                             completion(error);
+                         });
+                         [workItem endWork];
+                     }];
+    };
+    workItem.readyHandler = readyHandler;
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
+}
+
+- (void)addArgumentsWithParams:(MTRSampleMEIClusterAddArgumentsParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                    completion:(void (^)(MTRSampleMEIClusterAddArgumentsResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completion
+{
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint,
+                  (unsigned int) MTRClusterIDTypeSampleMEIID, (unsigned int) MTRCommandIDTypeClusterSampleMEICommandAddArgumentsID];
+    // Make a copy of params before we go async.
+    params = [params copy];
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
+        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
+        auto * cluster = [[MTRBaseClusterSampleMEI alloc] initWithDevice:baseDevice
+                                                              endpointID:@(self.endpoint)
+                                                                   queue:self.device.queue];
+        [cluster
+            addArgumentsWithParams:params
+                        completion:^(MTRSampleMEIClusterAddArgumentsResponseParams * _Nullable value, NSError * _Nullable error) {
+                            MTRClustersLogCompletion(logPrefix, value, error);
+                            dispatch_async(self.callbackQueue, ^{
+                                completion(value, error);
+                            });
+                            [workItem endWork];
+                        }];
+    };
+    workItem.readyHandler = readyHandler;
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFlipFlopWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint)
+                                          clusterID:@(MTRClusterIDTypeSampleMEIID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSampleMEIAttributeFlipFlopID)
+                                             params:params];
+}
+
+- (void)writeAttributeFlipFlopWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeFlipFlopWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeFlipFlopWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                 params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:@(self.endpoint)
+                                    clusterID:@(MTRClusterIDTypeSampleMEIID)
+                                  attributeID:@(MTRAttributeIDTypeClusterSampleMEIAttributeFlipFlopID)
+                                        value:dataValueDictionary
+                        expectedValueInterval:expectedValueIntervalMs
+                            timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint)
+                                          clusterID:@(MTRClusterIDTypeSampleMEIID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSampleMEIAttributeGeneratedCommandListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint)
+                                          clusterID:@(MTRClusterIDTypeSampleMEIID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSampleMEIAttributeAcceptedCommandListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint)
+                                          clusterID:@(MTRClusterIDTypeSampleMEIID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSampleMEIAttributeEventListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint)
+                                          clusterID:@(MTRClusterIDTypeSampleMEIID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSampleMEIAttributeAttributeListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint)
+                                          clusterID:@(MTRClusterIDTypeSampleMEIID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSampleMEIAttributeFeatureMapID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint)
+                                          clusterID:@(MTRClusterIDTypeSampleMEIID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSampleMEIAttributeClusterRevisionID)
+                                             params:params];
+}
+
 @end
 
 // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)

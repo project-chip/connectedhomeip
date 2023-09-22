@@ -74,10 +74,6 @@ public:
     using ThreadStackManager::InitThreadStack;
     CHIP_ERROR InitThreadStack(otInstance * otInst);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR _RequestSEDFastPollingMode(bool onOff);
-#endif
-
 private:
     // ===== Methods that implement the ThreadStackManager abstract interface.
 

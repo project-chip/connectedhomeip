@@ -273,33 +273,33 @@ server cluster Scenes = 5 {
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
 client cluster OnOff = 6 {
-  enum OnOffDelayedAllOffEffectVariant : ENUM8 {
-    kFadeToOffIn0p8Seconds = 0;
+  enum DelayedAllOffEffectVariantEnum : ENUM8 {
+    kDelayedOffFastFade = 0;
     kNoFade = 1;
-    k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
+    kDelayedOffSlowFade = 2;
   }
 
-  enum OnOffDyingLightEffectVariant : ENUM8 {
-    k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
+  enum DyingLightEffectVariantEnum : ENUM8 {
+    kDyingLightFadeOff = 0;
   }
 
-  enum OnOffEffectIdentifier : ENUM8 {
+  enum EffectIdentifierEnum : ENUM8 {
     kDelayedAllOff = 0;
     kDyingLight = 1;
   }
 
-  enum OnOffStartUpOnOff : ENUM8 {
+  enum StartUpOnOffEnum : ENUM8 {
     kOff = 0;
     kOn = 1;
-    kTogglePreviousOnOff = 2;
+    kToggle = 2;
   }
 
   bitmap Feature : BITMAP32 {
     kLighting = 0x1;
-    kDeadFront = 0x2;
+    kDeadFrontBehavior = 0x2;
   }
 
-  bitmap OnOffControl : BITMAP8 {
+  bitmap OnOffControlBitmap : BITMAP8 {
     kAcceptOnlyWhenOn = 0x1;
   }
 
@@ -307,7 +307,7 @@ client cluster OnOff = 6 {
   readonly attribute optional boolean globalSceneControl = 16384;
   attribute optional int16u onTime = 16385;
   attribute optional int16u offWaitTime = 16386;
-  attribute access(write: manage) optional nullable OnOffStartUpOnOff startUpOnOff = 16387;
+  attribute access(write: manage) optional nullable StartUpOnOffEnum startUpOnOff = 16387;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -316,12 +316,12 @@ client cluster OnOff = 6 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct OffWithEffectRequest {
-    OnOffEffectIdentifier effectIdentifier = 0;
+    EffectIdentifierEnum effectIdentifier = 0;
     int8u effectVariant = 1;
   }
 
   request struct OnWithTimedOffRequest {
-    OnOffControl onOffControl = 0;
+    OnOffControlBitmap onOffControl = 0;
     int16u onTime = 1;
     int16u offWaitTime = 2;
   }
@@ -342,33 +342,33 @@ client cluster OnOff = 6 {
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
 server cluster OnOff = 6 {
-  enum OnOffDelayedAllOffEffectVariant : ENUM8 {
-    kFadeToOffIn0p8Seconds = 0;
+  enum DelayedAllOffEffectVariantEnum : ENUM8 {
+    kDelayedOffFastFade = 0;
     kNoFade = 1;
-    k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
+    kDelayedOffSlowFade = 2;
   }
 
-  enum OnOffDyingLightEffectVariant : ENUM8 {
-    k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
+  enum DyingLightEffectVariantEnum : ENUM8 {
+    kDyingLightFadeOff = 0;
   }
 
-  enum OnOffEffectIdentifier : ENUM8 {
+  enum EffectIdentifierEnum : ENUM8 {
     kDelayedAllOff = 0;
     kDyingLight = 1;
   }
 
-  enum OnOffStartUpOnOff : ENUM8 {
+  enum StartUpOnOffEnum : ENUM8 {
     kOff = 0;
     kOn = 1;
-    kTogglePreviousOnOff = 2;
+    kToggle = 2;
   }
 
   bitmap Feature : BITMAP32 {
     kLighting = 0x1;
-    kDeadFront = 0x2;
+    kDeadFrontBehavior = 0x2;
   }
 
-  bitmap OnOffControl : BITMAP8 {
+  bitmap OnOffControlBitmap : BITMAP8 {
     kAcceptOnlyWhenOn = 0x1;
   }
 
@@ -376,7 +376,7 @@ server cluster OnOff = 6 {
   readonly attribute boolean globalSceneControl = 16384;
   attribute int16u onTime = 16385;
   attribute int16u offWaitTime = 16386;
-  attribute access(write: manage) nullable OnOffStartUpOnOff startUpOnOff = 16387;
+  attribute access(write: manage) nullable StartUpOnOffEnum startUpOnOff = 16387;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -385,12 +385,12 @@ server cluster OnOff = 6 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct OffWithEffectRequest {
-    OnOffEffectIdentifier effectIdentifier = 0;
+    EffectIdentifierEnum effectIdentifier = 0;
     int8u effectVariant = 1;
   }
 
   request struct OnWithTimedOffRequest {
-    OnOffControl onOffControl = 0;
+    OnOffControlBitmap onOffControl = 0;
     int16u onTime = 1;
     int16u offWaitTime = 2;
   }
@@ -2977,6 +2977,10 @@ server cluster DishwasherAlarm = 93 {
     kWaterLevelError = 0x20;
   }
 
+  bitmap Feature : BITMAP32 {
+    kReset = 0x1;
+  }
+
   info event Notify = 0 {
     AlarmMap active = 0;
     AlarmMap inactive = 1;
@@ -3152,7 +3156,7 @@ server cluster HepaFilterMonitoring = 113 {
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
-    kReplacementProductList = 0x3;
+    kReplacementProductList = 0x4;
   }
 
   struct ReplacementProductStruct {
@@ -3200,7 +3204,7 @@ server cluster ActivatedCarbonFilterMonitoring = 114 {
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
-    kReplacementProductList = 0x3;
+    kReplacementProductList = 0x4;
   }
 
   struct ReplacementProductStruct {
@@ -3915,6 +3919,17 @@ server cluster WindowCovering = 258 {
 
 /** This cluster provides control of a barrier (garage door). */
 server cluster BarrierControl = 259 {
+  bitmap BarrierControlCapabilities : BITMAP8 {
+    kPartialBarrier = 0x1;
+  }
+
+  bitmap BarrierControlSafetyStatus : BITMAP16 {
+    kRemoteLockout = 0x1;
+    kTemperDetected = 0x2;
+    kFailedCommunication = 0x4;
+    kPositionFailure = 0x8;
+  }
+
   readonly attribute enum8 barrierMovingState = 1;
   readonly attribute bitmap16 barrierSafetyStatus = 2;
   readonly attribute bitmap8 barrierCapabilities = 3;
@@ -6712,7 +6727,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
     ram      attribute manufacturerExtension default = 255;
   }
 
@@ -6810,7 +6825,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 15;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6898,7 +6913,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 3;
+    ram      attribute featureMap default = 7;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6912,7 +6927,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 3;
+    ram      attribute featureMap default = 7;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -7177,9 +7192,9 @@ endpoint 1 {
   }
 
   server cluster FlowMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
+    ram      attribute measuredValue default = 5;
+    ram      attribute minMeasuredValue default = 0;
+    ram      attribute maxMeasuredValue default = 100;
     ram      attribute tolerance default = 0;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
@@ -7217,7 +7232,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7236,7 +7251,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7255,7 +7270,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7274,7 +7289,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7293,7 +7308,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7312,7 +7327,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7331,7 +7346,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7350,7 +7365,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7369,7 +7384,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7388,7 +7403,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 

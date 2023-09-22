@@ -93,6 +93,7 @@ done
 declare -a args=(
     'default_configs_cosmetic=[]' # suppress colorization
     'chip_crypto="boringssl"'
+    'chip_build_controller_dynamic_server=true'
     'chip_build_tools=false'
     'chip_build_tests=false'
     'chip_enable_wifi=false'
@@ -107,7 +108,10 @@ declare -a args=(
     "mac_deployment_target=\"$LLVM_TARGET_TRIPLE_OS_VERSION$LLVM_TARGET_TRIPLE_SUFFIX\""
 )
 
-[[ $CONFIGURATION == Debug ]] && args+=('is_debug=true')
+case "$CONFIGURATION" in
+    Debug) args+=('is_debug=true') ;;
+    Release) args+=('is_debug=false') ;;
+esac
 
 [[ $PLATFORM_FAMILY_NAME != macOS ]] && {
     args+=(

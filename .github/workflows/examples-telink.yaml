@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Project CHIP Authors
+# Copyright (c) 2022-2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,13 +36,13 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:1
+            image: ghcr.io/project-chip/chip-build-telink:12
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -54,7 +54,7 @@ jobs:
               with:
                 gh-context: ${{ toJson(github) }}
 
-            - name: Build example Telink All Clusters App
+            - name: Build example Telink (B91) All Clusters App
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-all-clusters' build"
@@ -66,19 +66,19 @@ jobs:
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink All Clusters Minimal App
+            - name: Build example Telink (B92) All Clusters Minimal App
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-all-clusters-minimal' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-all-clusters-minimal' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9518adk80d all-clusters-minimal-app \
-                    out/telink-tlsr9518adk80d-all-clusters-minimal/zephyr/zephyr.elf \
+                    telink tlsr9528a all-clusters-minimal-app \
+                    out/telink-tlsr9528a-all-clusters-minimal/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink Bridge App
+            - name: Build example Telink (B91) Bridge App
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-bridge' build"
@@ -90,70 +90,53 @@ jobs:
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink Contact Sensor App
+            - name: Build example Telink (B92) Contact Sensor App
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-contact-sensor' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-contact-sensor' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9518adk80d contact-sensor-app \
-                    out/telink-tlsr9518adk80d-contact-sensor/zephyr/zephyr.elf \
+                    telink tlsr9528a contact-sensor-app \
+                    out/telink-tlsr9528a-contact-sensor/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink Lighting App
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-light' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9518adk80d lighting-app \
-                    out/telink-tlsr9518adk80d-light/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
-
-            - name: clean out build output
-              run: rm -rf ./out
-
-            - name: Build example Telink Lighting App with RPC
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-light-rpc' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9518adk80d lighting-app-rpc \
-                    out/telink-tlsr9518adk80d-light-rpc/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
-
-            - name: clean out build output
-              run: rm -rf ./out
-
-            - name: Build example Telink Lighting App with Shell
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-light-shell' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9518adk80d lighting-app-shell \
-                    out/telink-tlsr9518adk80d-light-shell/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
-
-            - name: clean out build output
-              run: rm -rf ./out
-
-            - name: Build example Telink Lighting App with Factory Data
+            - name: Build tools required for Factory Data
               run: |
                   ./scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
                   ./scripts/build/gn_gen.sh
                   ./scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE chip-cert chip-tool spake2p"
+                  mv ./out/$BUILD_TYPE/chip-cert ./out/$BUILD_TYPE/chip-tool ./out/$BUILD_TYPE/spake2p ./out
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
+            - name: Build example Telink (B91) Lighting App with RPC, Shell and Factory Data
+              run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-light-factory-data' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-light-rpc-shell-factory-data' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9518adk80d lighting-app-factory-data \
-                    out/telink-tlsr9518adk80d-light-factory-data/zephyr/zephyr.elf \
+                    telink tlsr9518adk80d lighting-app-rpc-shell-factory-data \
+                    out/telink-tlsr9518adk80d-light-rpc-shell-factory-data/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
+            - name: Build example Telink (B92) Lighting App with RPC, Shell and Factory Data
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-light-rpc-shell-factory-data' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9528a lighting-app-rpc-shell-factory-data \
+                    out/telink-tlsr9528a-light-rpc-shell-factory-data/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink Light Switch App
+            - name: Build example Telink (B91) Light Switch App
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-light-switch' build"
@@ -165,19 +148,19 @@ jobs:
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink Lock App
+            - name: Build example Telink (B92) Lock App
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-lock' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-lock' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9518adk80d lock-app \
-                    out/telink-tlsr9518adk80d-lock/zephyr/zephyr.elf \
+                    telink tlsr9528a lock-app \
+                    out/telink-tlsr9528a-lock/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink OTA Requestor App
+            - name: Build example Telink (B91) OTA Requestor App
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-ota-requestor' build"
@@ -189,19 +172,19 @@ jobs:
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink Pump App
+            - name: Build example Telink (B92) Pump App
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-pump' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-pump' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9518adk80d pump-app \
-                    out/telink-tlsr9518adk80d-pump/zephyr/zephyr.elf \
+                    telink tlsr9528a pump-app \
+                    out/telink-tlsr9528a-pump/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink Pump Controller App
+            - name: Build example Telink (B91) Pump Controller App
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-pump-controller' build"
@@ -213,7 +196,19 @@ jobs:
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink Shell App
+            - name: Build example Telink (B91) Resource Monitoring App
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-resource-monitoring' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9518adk80d resource-monitoring-app \
+                    out/telink-tlsr9518adk80d-resource-monitoring/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output
+              run: rm -rf ./out
+
+            - name: Build example Telink (B91) Shell App
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-shell' build"
@@ -225,31 +220,31 @@ jobs:
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink Smoke CO Alarm App
+            - name: Build example Telink (B92) Smoke CO Alarm App
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-smoke-co-alarm' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-smoke-co-alarm' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9518adk80d smoke_co_alarm-app \
-                    out/telink-tlsr9518adk80d-smoke-co-alarm/zephyr/zephyr.elf \
+                    telink tlsr9528a smoke_co_alarm-app \
+                    out/telink-tlsr9528a-smoke-co-alarm/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink Temperature Measurement App
+            - name: Build example Telink (B92) Temperature Measurement App
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-temperature-measurement' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-temperature-measurement' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9518adk80d temperature-measurement-app \
-                    out/telink-tlsr9518adk80d-temperature-measurement/zephyr/zephyr.elf \
+                    telink tlsr9528a temperature-measurement-app \
+                    out/telink-tlsr9528a-temperature-measurement/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink Thermostat App
+            - name: Build example Telink (B91) Thermostat App
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-thermostat' build"
@@ -261,7 +256,7 @@ jobs:
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink Window Covering App
+            - name: Build example Telink (B91) Window Covering App
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-window-covering' build"

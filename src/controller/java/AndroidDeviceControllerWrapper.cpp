@@ -403,8 +403,8 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyNetworkCredentials(chip::Control
         passwordStr = static_cast<jstring>(env->NewGlobalRef(env->CallObjectMethod(wifiCredentialsJava, getPassword)));
         VerifyOrReturnError(ssidStr != nullptr && !env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
-        ssid                 = env->GetStringUTFChars(ssidStr, 0);
-        password             = env->GetStringUTFChars(passwordStr, 0);
+        ssid                 = env->GetStringUTFChars(ssidStr, nullptr);
+        password             = env->GetStringUTFChars(passwordStr, nullptr);
         jsize ssidLength     = env->GetStringUTFLength(ssidStr);
         jsize passwordLength = env->GetStringUTFLength(passwordStr);
 
@@ -600,8 +600,8 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
     std::string NetworkingStatusClassName     = "java/lang/Integer";
     std::string NetworkingStatusCtorSignature = "(I)V";
     jint jniNetworkingStatus                  = static_cast<jint>(dataResponse.networkingStatus);
-    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-        NetworkingStatusClassName.c_str(), NetworkingStatusCtorSignature.c_str(), jniNetworkingStatus, NetworkingStatus);
+    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(NetworkingStatusClassName, NetworkingStatusCtorSignature,
+                                                               jniNetworkingStatus, NetworkingStatus);
     jobject DebugText;
     if (!dataResponse.debugText.HasValue())
     {
@@ -633,9 +633,8 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
             std::string newElement_securityClassName     = "java/lang/Integer";
             std::string newElement_securityCtorSignature = "(I)V";
             jint jniNewElementSecurity                   = static_cast<jint>(entry.security.Raw());
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_securityClassName.c_str(),
-                                                                       newElement_securityCtorSignature.c_str(),
-                                                                       jniNewElementSecurity, newElement_security);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                newElement_securityClassName, newElement_securityCtorSignature, jniNewElementSecurity, newElement_security);
             jobject newElement_ssid;
             jbyteArray newElement_ssidByteArray = env->NewByteArray(static_cast<jsize>(entry.ssid.size()));
             env->SetByteArrayRegion(newElement_ssidByteArray, 0, static_cast<jsize>(entry.ssid.size()),

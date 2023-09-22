@@ -27,6 +27,7 @@
 #include <app/server/Server.h>
 #include <platform/PlatformManager.h>
 
+#include <air-quality-instance.h>
 #include <dishwasher-mode.h>
 #include <laundry-washer-mode.h>
 #include <rvc-modes.h>
@@ -163,6 +164,19 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
             mode.SetNull();
         }
         self->OnModeChangeHandler(device, type, mode);
+    }
+    else if (name == "SetAirQuality")
+    {
+        Json::Value jsonAirQualityEnum = self->mJsonValue["NewValue"];
+
+        if (jsonAirQualityEnum.isNull())
+        {
+            ChipLogError(NotSpecified, "The SetAirQuality command requires the NewValue key.");
+        }
+        else
+        {
+            self->OnAirQualityChange(static_cast<uint32_t>(jsonAirQualityEnum.asUInt()));
+        }
     }
     else
     {
@@ -411,6 +425,18 @@ void AllClustersAppCommandHandler::OnModeChangeHandler(std::string device, std::
     {
         ChipLogDetail(NotSpecified, "Invalid mode type : %s", type.c_str());
         return;
+    }
+}
+
+void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aNewValue)
+{
+    AirQuality::Instance * airQualityInstance = AirQuality::GetInstance();
+    Protocols::InteractionModel::Status status =
+        airQualityInstance->UpdateAirQuality(static_cast<AirQuality::AirQualityEnum>(aNewValue));
+
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        ChipLogDetail(NotSpecified, "Invalid value: %u", aNewValue);
     }
 }
 

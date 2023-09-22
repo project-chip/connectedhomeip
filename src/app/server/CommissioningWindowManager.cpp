@@ -98,14 +98,6 @@ void CommissioningWindowManager::ResetState()
     mECMIterations    = 0;
     mECMSaltLength    = 0;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    if (mSEDActiveModeEnabled)
-    {
-        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(false);
-        mSEDActiveModeEnabled = false;
-    }
-#endif
-
     UpdateWindowStatus(CommissioningWindowStatusEnum::kWindowNotOpen);
 
     UpdateOpenerFabricIndex(NullNullable);
@@ -244,14 +236,6 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
     VerifyOrReturnError(mCommissioningTimeoutTimerArmed, CHIP_ERROR_INCORRECT_STATE);
 
     mPairingSession.Clear();
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    if (!mSEDActiveModeEnabled)
-    {
-        mSEDActiveModeEnabled = true;
-        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(true);
-    }
-#endif
 
     ReturnErrorOnFailure(mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
         Protocols::SecureChannel::MsgType::PBKDFParamRequest, this));

@@ -451,7 +451,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 6d: Verify SetupURL appended by '?/a='' and the decimal numeric
+          "Step 6d: Verify SetupURL appended by '?/a=' and the decimal numeric
           value of one of the exposed ActionIDs (see step 5a) points to a site
           providing information about the action"
       PICS: ACT.S.A0002 && ACT.S.M.SetupURLWithSuffix

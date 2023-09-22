@@ -7,6 +7,8 @@ namespace app {
 namespace Clusters {
 namespace AirQuality {
 
+Instance * GetInstance();
+
 void Shutdown();
 
 } // namespace AirQuality

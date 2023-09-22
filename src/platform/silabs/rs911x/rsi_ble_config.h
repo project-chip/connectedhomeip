@@ -19,7 +19,8 @@
 #define RSI_BLE_CONFIG_H
 
 #include "rsi_ble_apis.h"
-#ifdef SIWX_917
+#if (SIWX_917 | EXP_BOARD)
+#include "rsi_bt_common_apis.h"
 #include "rsi_user.h"
 #else
 #include <rsi_data_types.h>
@@ -60,6 +61,14 @@
 #define ADD_DEVICE_TO_WHITELIST (0x01)
 #define DELETE_DEVICE_FROM_WHITELIST (0x02)
 
+#define CLEAR_ACCEPTLIST (0x00)
+#define ADD_DEVICE_TO_ACCEPTLIST (0x01)
+#define DELETE_DEVICE_FROM_ACCEPTLIST (0x02)
+
+#define RSI_BLE_TX_OCTETS 251
+#define RSI_BLE_TX_TIME 2120 // microseconds
+#define RSI_BLE_CS_DATA_LENGTH 240
+
 #define ALL_PHYS (0x00)
 
 #define RSI_BLE_DEV_ADDR_RESOLUTION_ENABLE (0)
@@ -82,7 +91,7 @@
 #ifdef RSI_M4_INTERFACE
 #define RSI_BLE_MAX_NBR_ATT_REC (20)
 
-#ifdef SIWX_917
+#if (SIWX_917 | EXP_BOARD)
 #define RSI_BLE_MAX_NBR_PERIPHERALS (1)
 #else
 #define RSI_BLE_MAX_NBR_SLAVES (1)
@@ -92,7 +101,7 @@
 #else
 #define RSI_BLE_MAX_NBR_ATT_REC (80)
 
-#ifdef SIWX_917
+#if (SIWX_917 | EXP_BOARD)
 #define RSI_BLE_MAX_NBR_PERIPHERALS (3)
 #else
 #define RSI_BLE_MAX_NBR_SLAVES (3)
@@ -103,8 +112,9 @@
 
 #define RSI_BLE_MAX_NBR_ATT_SERV (10)
 
-#ifdef SIWX_917
+#if (SIWX_917 | EXP_BOARD)
 #define RSI_BLE_MAX_NBR_CENTRALS (1)
+#define FRONT_END_SWITCH_SEL2 BIT(30)
 #else
 #define RSI_BLE_MAX_NBR_MASTERS (1)
 #endif
@@ -255,15 +265,16 @@
 #define BLE_ATT_REC_SIZE (500)
 #define NO_OF_VAL_ATT (5) //! Attribute value count
 
-#ifdef SIWX_917
+#if (SIWX_917 | EXP_BOARD)
 #define RSI_FEATURE_BIT_MAP                                                                                                        \
     (SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE | SL_SI91X_FEAT_DEV_TO_HOST_ULP_GPIO_1) //! To set wlan feature select bit map
 #define RSI_TCP_IP_FEATURE_BIT_MAP                                                                                                 \
     (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT) //! TCP/IP feature select bitmap for selecting TCP/IP features
 #define RSI_CUSTOM_FEATURE_BIT_MAP SL_SI91X_FEAT_CUSTOM_FEAT_EXTENTION_VALID //! To set custom feature select bit map
-#ifdef CHIP_9117
+#ifdef CHIP_917
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP                                                                                             \
-    (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(1) | RAM_LEVEL_NWP_BASIC_MCU_ADV | FRONT_END_SWITCH_SEL2)
+    (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(1) | RAM_LEVEL_NWP_BASIC_MCU_ADV |                       \
+     SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0)
 #else
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(2))
 #endif

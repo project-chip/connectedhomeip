@@ -45,9 +45,6 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TimeUtils.h>
 #include <protocols/Protocols.h>
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
 
 namespace chip {
 namespace Credentials {
@@ -488,23 +485,17 @@ CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const Cer
     // Default error if we don't find any matching cert.
     err = (depth > 0) ? CHIP_ERROR_CA_CERT_NOT_FOUND : CHIP_ERROR_CERT_NOT_FOUND;
 
-    // Fail immediately if neither of the input criteria are specified.
-    if (subjectDN.IsEmpty() && subjectKeyId.empty())
-    {
-        ExitNow();
-    }
-
     // For each cert in the set...
     for (uint8_t i = 0; i < mCertCount; i++)
     {
         ChipCertificateData * candidateCert = &mCerts[i];
 
         // Skip the certificate if its subject DN and key id do not match the input criteria.
-        if (!subjectDN.IsEmpty() && !candidateCert->mSubjectDN.IsEqual(subjectDN))
+        if (!candidateCert->mSubjectDN.IsEqual(subjectDN))
         {
             continue;
         }
-        if (!subjectKeyId.empty() && !candidateCert->mSubjectKeyId.data_equal(subjectKeyId))
+        if (!candidateCert->mSubjectKeyId.data_equal(subjectKeyId))
         {
             continue;
         }
@@ -1208,12 +1199,11 @@ CHIP_ERROR ConvertIntegerDERToRaw(ByteSpan derInt, uint8_t * rawInt, const uint1
 
 CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, MutableByteSpan & derSig)
 {
+    VerifyOrReturnError(derSig.size() >= kMax_ECDSA_Signature_Length_Der, CHIP_ERROR_BUFFER_TOO_SMALL);
+
     ASN1Writer writer;
-
     writer.Init(derSig);
-
     ReturnErrorOnFailure(ConvertECDSASignatureRawToDER(rawSig, writer));
-
     derSig.reduce_size(writer.GetLengthWritten());
 
     return CHIP_NO_ERROR;
@@ -1223,8 +1213,6 @@ CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, ASN1Writ
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t derInt[kP256_FE_Length + kEmitDerIntegerWithoutTagOverhead];
-
-    VerifyOrReturnError(!rawSig.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Ecdsa-Sig-Value ::= SEQUENCE
     ASN1_START_SEQUENCE

@@ -66,20 +66,30 @@ void InitBasicOTARequestor()
     imageProcessor.TriggerFlashAction(ExternalFlashManager::Action::SLEEP);
 }
 
-CHIP_ERROR OtaConfirmNewImage()
+void OtaConfirmNewImage()
 {
-    CHIP_ERROR err                         = CHIP_NO_ERROR;
+#ifndef CONFIG_SOC_SERIES_NRF53X
+    /* Check if the image is run in the REVERT mode and eventually
+    confirm it to prevent reverting on the next boot.
+    On nRF53 target there is not way to verify current swap type
+    because we use permanent swap so we can skip it. */
+    VerifyOrReturn(mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT);
+#endif
+
     OTAImageProcessorImpl & imageProcessor = GetOTAImageProcessor();
-    if (imageProcessor.IsFirstImageRun())
+    if (!boot_is_img_confirmed())
     {
         CHIP_ERROR err = System::MapErrorZephyr(boot_write_img_confirmed());
         if (CHIP_NO_ERROR == err)
         {
             imageProcessor.SetImageConfirmed();
+            ChipLogProgress(SoftwareUpdate, "New firmware image confirmed");
+        }
+        else
+        {
+            ChipLogError(SoftwareUpdate, "Failed to confirm firmware image, it will be reverted on the next boot");
         }
     }
-    ChipLogError(SoftwareUpdate, "Failed to confirm firmware image, it will be reverted on the next boot");
-    return err;
 }
 
 #endif

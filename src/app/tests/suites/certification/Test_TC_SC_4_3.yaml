@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 15.4.3. [TC-SC-4.3] Discovery [DUT as Commissionee]
+name: 3.4.3.  [TC-SC-4.3] Discovery [DUT as Commissionee]
 
 PICS:
     - MCORE.ROLE.COMMISSIONEE
@@ -24,22 +24,27 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as controller test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
-          "DUT is commissioned to TH and DUT is instructed to advertise its
-          operational service (_matter._tcp)."
+          "Step 1: DUT is commissioned to TH and DUT is instructed to advertise
+          its operational service (_matter._tcp)."
       verification: |
           1. Provision the DUT by TH (Chip-tool)
       disabled: true
 
-    - label: "Scan for DNS-SD advertising"
+    - label: "Step 2: Scan for DNS-SD advertising"
       PICS:
-          MCORE.COM.WIFI && MCORE.COM.ETH && MCORE.COM.THR &&
+          MCORE.COM.WIFI && MCORE.COM.ETH && MCORE.COM.THR && MCORE.ICD &&
           MCORE.SC.SII_OP_DISCOVERY_KEY && MCORE.SC.SAI_OP_DISCOVERY_KEY &&
-          MCORE.SC.T_KEY
+          MCORE.SC.SAT_OP_DISCOVERY_KEY && MCORE.SC.T_KEY
       verification: |
           avahi-browse -rt _matter._tcp
 
-          Verify the advertisement on the TH Log:
+          Verify the device is advertising _matterc._udp service like below output in TH terminal Log: (Verify for the DUT's actual values (like vendor ID, PID ..etc) as mentioned in the expected outcome of the test plan, The below log contains the data from the reference raspi accessory)
 
           + veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
           = veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local

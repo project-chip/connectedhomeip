@@ -19,6 +19,17 @@ NS_ASSUME_NONNULL_BEGIN
 {{availability (asUpperCamelCase name preserveAcronyms=true)}}
 @interface MTRCluster{{asUpperCamelCase name preserveAcronyms=true}} : MTRCluster
 
+/**
+{{#zcl_commands}}
+{{#first}}
+ * For all instance methods that take a completion (i.e. command invocations),
+ * the completion will be called on the provided queue.
+{{/first}}
+{{else}}
+ * The queue is currently unused, but may be used in the future for calling completions
+ * for command invocations if commands are added to this cluster.
+{{/zcl_commands}}
+ */
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER {{availability (asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};

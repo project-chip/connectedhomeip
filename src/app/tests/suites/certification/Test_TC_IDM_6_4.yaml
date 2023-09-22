@@ -28,13 +28,19 @@ config:
 tests:
     - label: "Note"
       verification: |
-          Please use Interactive mode to Verify subscription test cases
-          Here the command to enter interactive mode:--   ./chip-tool interactive start
+          1. The Cluster and Commands should be based on the cluster implementation on the DUT.
+          2. The cluster used in the below test steps is an example, User can use any supported chip cluster/attribute/command.
       disabled: true
 
     - label: "Note"
       verification: |
           Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Precondition"
+      verification: |
+          1. Please use Interactive mode to Verify subscription test cases
+          2. Here the command to enter interactive mode:--   ./chip-tool interactive start
       disabled: true
 
     - label:
@@ -114,7 +120,7 @@ tests:
 
     - label:
           "Step 5: With an active Event subscription from DUT to TH, TH sends
-          Report Data message to DUT with an inactive SubscriptionId."
+          Report Data message to DUT with an invalid SubscriptionId."
       verification: |
           Mark this as not testable /NA. Out of Scope for V1.0
       disabled: true

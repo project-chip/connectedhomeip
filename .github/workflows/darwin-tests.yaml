@@ -45,7 +45,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install coreutils
@@ -73,7 +73,7 @@ jobs:
               # Disable -Wunguarded-availability-new because we internally use
               # APIs we added after our deployment target version.  Maybe we
               # should change the deployment target version instead?
-              run: xcodebuild -target "darwin-framework-tool" -sdk macosx OTHER_CFLAGS='${inherited} -Wconversion -Wno-unguarded-availability-new'
+              run: xcodebuild -target "darwin-framework-tool" -sdk macosx -configuration Debug OTHER_CFLAGS='${inherited} -Wconversion -Wno-unguarded-availability-new'
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true

@@ -6042,7 +6042,7 @@ tests:
           contains the state of the battery of the (supported) devices from the
           above list"
       verification: |
-          ./chip-tool powersource read bat-charge-level 1 9
+          ./chip-tool powersource read bat-charge-level 1 6
 
           Verify BatChargeLevel attribute response on TH(bridge-app) Log:
 
@@ -6063,7 +6063,7 @@ tests:
           [1663925822.845919][1588:1588] CHIP:DMG:                                         Attribute = 0x0000_000E,
           [1663925822.845946][1588:1588] CHIP:DMG:                                 }
           [1663925822.845978][1588:1588] CHIP:DMG:
-          [1663925822.846007][1588:1588] CHIP:DMG:                                 Data = 58,
+          [1663925822.846007][1588:1588] CHIP:DMG:                                 Data = 3,
           [1663925822.846035][1588:1588] CHIP:DMG:                         },
           [1663925822.846063][1588:1588] CHIP:DMG:
           [1663925822.846086][1588:1588] CHIP:DMG:                 },

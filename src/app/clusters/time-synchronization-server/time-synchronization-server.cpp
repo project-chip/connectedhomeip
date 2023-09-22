@@ -392,8 +392,9 @@ void TimeSynchronizationServer::OnTimeSyncCompletionFn(TimeSourceEnum timeSource
         }
         return;
     }
-    mGranularity = granularity;
-    if (EMBER_ZCL_STATUS_SUCCESS != TimeSource::Set(kRootEndpointId, timeSource))
+    mGranularity         = granularity;
+    EmberAfStatus status = TimeSource::Set(kRootEndpointId, timeSource);
+    if (!(status == EMBER_ZCL_STATUS_SUCCESS || status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE))
     {
         ChipLogError(Zcl, "Writing TimeSource failed.");
     }
@@ -405,7 +406,8 @@ void TimeSynchronizationServer::OnFallbackNTPCompletionFn(bool timeSyncSuccessfu
     {
         mGranularity = GranularityEnum::kMillisecondsGranularity;
         // Non-matter SNTP because we know it's external and there's only one source
-        if (EMBER_ZCL_STATUS_SUCCESS != TimeSource::Set(kRootEndpointId, TimeSourceEnum::kNonMatterSNTP))
+        EmberAfStatus status = TimeSource::Set(kRootEndpointId, TimeSourceEnum::kNonMatterSNTP);
+        if (!(status == EMBER_ZCL_STATUS_SUCCESS || status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE))
         {
             ChipLogError(Zcl, "Writing TimeSource failed.");
         }
@@ -789,8 +791,9 @@ CHIP_ERROR TimeSynchronizationServer::SetUTCTime(EndpointId ep, uint64_t utcTime
         ChipLogError(Zcl, "Error setting UTC time on the device");
         return err;
     }
-    mGranularity = granularity;
-    if (EMBER_ZCL_STATUS_SUCCESS != TimeSource::Set(ep, source))
+    mGranularity         = granularity;
+    EmberAfStatus status = TimeSource::Set(ep, source);
+    if (!(status == EMBER_ZCL_STATUS_SUCCESS || status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE))
     {
         ChipLogError(Zcl, "Writing TimeSource failed.");
         return CHIP_IM_GLOBAL_STATUS(Failure);

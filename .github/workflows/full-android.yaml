@@ -41,7 +41,7 @@ jobs:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
               name: Checkout
               with:
                 token: ${{ github.token }}
@@ -51,7 +51,7 @@ jobs:
             # Note you likely still need to have non submodules setup for the
             # local machine, like:
             #   git submodule deinit --all
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
               if: ${{ env.ACT }}
               name: Checkout (ACT for local build)
             - name: Checkout submodules & Bootstrap

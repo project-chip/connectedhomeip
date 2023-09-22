@@ -21,6 +21,7 @@ matter_idl_generator_templates = [
 
 matter_idl_generator_sources = [
   "${chip_root}/scripts/py_matter_idl/matter_idl/__init__.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/backwards_compatibility.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/__init__.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/cpp/__init__.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/cpp/application/__init__.py",
@@ -34,6 +35,7 @@ matter_idl_generator_sources = [
   "${chip_root}/scripts/py_matter_idl/matter_idl/lint/types.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/matter_idl_parser.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/matter_idl_types.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/test_backwards_compatibility.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/test_generators.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/test_matter_idl_parser.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/test_xml_parser.py",

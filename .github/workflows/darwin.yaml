@@ -36,7 +36,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Setup Environment
               run: brew install python@3.9
             - name: Checkout submodules & Bootstrap
@@ -55,7 +55,7 @@ jobs:
               # internally use APIs that we are annotating as only available on
               # new enough versions.  Maybe we should change out deployment
               # target versions instead?
-              run: xcodebuild -target "Matter" -sdk iphoneos OTHER_CFLAGS='${inherited} -Wno-unguarded-availability-new'
+              run: xcodebuild -target "Matter" -sdk iphoneos -configuration Debug OTHER_CFLAGS='${inherited} -Wno-unguarded-availability-new'
             - name: Run iOS Build Release
               working-directory: src/darwin/Framework
               # For now disable unguarded-availability-new warnings because we
@@ -116,6 +116,8 @@ jobs:
                   # -enableUndefinedBehaviorSanitizer instruments the code in Matter.framework,
                   # but to instrument the code in the underlying libCHIP we need to pass CHIP_IS_UBSAN=YES
                   TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new' CHIP_IS_UBSAN=YES CHIP_IS_BLE=NO > >(tee /tmp/darwin/framework-tests/darwin-tests-asan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-err.log >&2)
+                  # And the same thing, but with MTR_PER_CONTROLLER_STORAGE_ENABLED turned on.
+                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new' CHIP_IS_UBSAN=YES CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_PER_CONTROLLER_STORAGE_ENABLED=1' > >(tee /tmp/darwin/framework-tests/darwin-tests-asan-provisional.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-provisional-err.log >&2)
                   # -enableThreadSanitizer instruments the code in Matter.framework,
                   # but to instrument the code in the underlying libCHIP we need to pass CHIP_IS_TSAN=YES
                   xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableThreadSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new' CHIP_IS_TSAN=YES CHIP_IS_BLE=NO > >(tee /tmp/darwin/framework-tests/darwin-tests-tsan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-tsan-err.log >&2)

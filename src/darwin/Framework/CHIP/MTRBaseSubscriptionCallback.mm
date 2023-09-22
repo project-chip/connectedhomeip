@@ -27,6 +27,9 @@ void MTRBaseSubscriptionCallback::OnReportBegin()
 {
     mAttributeReports = [NSMutableArray new];
     mEventReports = [NSMutableArray new];
+    if (mReportBeginHandler) {
+        mReportBeginHandler();
+    }
 }
 
 // Reports attribute and event data if any exists
@@ -43,12 +46,40 @@ void MTRBaseSubscriptionCallback::ReportData()
     if (attributeCallback != nil && attributeReports.count) {
         attributeCallback(attributeReports);
     }
+
     if (eventCallback != nil && eventReports.count) {
         eventCallback(eventReports);
     }
 }
 
-void MTRBaseSubscriptionCallback::OnReportEnd() { ReportData(); }
+void MTRBaseSubscriptionCallback::QueueInterimReport()
+{
+    if (mInterimReportBlock) {
+        return;
+    }
+
+    mInterimReportBlock = dispatch_block_create(DISPATCH_BLOCK_INHERIT_QOS_CLASS, ^{
+        mInterimReportBlock = nil;
+        ReportData();
+        // Allocate reports arrays to continue accumulation
+        mAttributeReports = [NSMutableArray new];
+        mEventReports = [NSMutableArray new];
+    });
+
+    dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), mInterimReportBlock);
+}
+
+void MTRBaseSubscriptionCallback::OnReportEnd()
+{
+    if (mInterimReportBlock) {
+        dispatch_block_cancel(mInterimReportBlock);
+        mInterimReportBlock = nil;
+    }
+    ReportData();
+    if (mReportEndHandler) {
+        mReportEndHandler();
+    }
+}
 
 void MTRBaseSubscriptionCallback::OnError(CHIP_ERROR aError)
 {

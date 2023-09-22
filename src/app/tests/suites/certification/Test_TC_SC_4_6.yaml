@@ -13,12 +13,11 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name:
-    3.4.6. [TC-SC-4.6] Commissioner Discovery - Commissioner [DUT -
-    Commissioner]
+name: 3.4.6. [TC-SC-4.6]Commissioner Discovery [DUT as Commissioner]
 
 PICS:
     - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.COMM_DISCOVERY
 
 config:
     nodeId: 0x12344321
@@ -29,6 +28,12 @@ tests:
     - label: "Note"
       verification: |
           Chip-tool command used below are an example to verify the  DUT as commissioner test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Precondition"
+      verification: |
+          1. DUT is connected to the IP network or supports SoftAP
+          2. DUT and TH support Commissioner Discovery
       disabled: true
 
     - label:

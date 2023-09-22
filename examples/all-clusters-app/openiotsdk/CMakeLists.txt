@@ -54,6 +54,7 @@ target_sources(${APP_TARGET}
         main/main_ns.cpp
         ${ALL_CLUSTERS_COMMON}/src/smco-stub.cpp
         ${ALL_CLUSTERS_COMMON}/src/bridged-actions-stub.cpp
+        ${ALL_CLUSTERS_COMMON}/src/air-quality-instance.cpp
         ${ALL_CLUSTERS_COMMON}/src/concentration-measurement-instances.cpp
         ${ALL_CLUSTERS_COMMON}/src/fan-stub.cpp
         ${ALL_CLUSTERS_COMMON}/src/resource-monitoring-delegates.cpp

@@ -159,7 +159,7 @@ tests:
       verification: |
           On TH_CR3 send the below command
 
-           ./chip-tool pairing onnetwork 3 20202021  --commissioner-name gamma
+           ./chip-tool pairing code 3 34970112332  --commissioner-name gamma
 
           Verify you got below message  on TH_CR3(chip-tool) log
           Device commissioning completed with success
@@ -210,7 +210,7 @@ tests:
 
 
           On 2nd controller using chip tool connect to the accessory
-          ./chip-tool pairing onnetwork 2 20202021  --commissioner-name beta
+          ./chip-tool pairing code 2 34970112332   --commissioner-name beta
 
           Verify you got below message on TH_CR2(chip-tool) log
           Device commissioning completed with success
