@@ -45,11 +45,10 @@ static CHIP_ERROR OtcliHandler(int argc, char * argv[])
         strcat(cli_str.get(), " ");
     }
 
-    if (cli_transmit_task_post(cli_str) != CHIP_NO_ERROR)
+    if (cli_transmit_task_post(std::move(cli_str)) != CHIP_NO_ERROR)
     {
         return CHIP_ERROR_INTERNAL;
     }
-    cli_str.release();
     return CHIP_NO_ERROR;
 }
 

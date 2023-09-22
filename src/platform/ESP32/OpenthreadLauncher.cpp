@@ -39,12 +39,14 @@ static esp_openthread_platform_config_t * s_platform_config = NULL;
 static TaskHandle_t cli_transmit_task                       = NULL;
 static QueueHandle_t cli_transmit_task_queue                = NULL;
 
-CHIP_ERROR cli_transmit_task_post(std::unique_ptr<char[]> & cli_str)
+CHIP_ERROR cli_transmit_task_post(std::unique_ptr<char[]> && cli_str)
 {
-    if (!cli_transmit_task_queue || xQueueSend(cli_transmit_task_queue, &cli_str, portMAX_DELAY) != pdTRUE)
+    char * cmd = cli_str.get();
+    if (!cli_transmit_task_queue || xQueueSend(cli_transmit_task_queue, &cmd, portMAX_DELAY) != pdTRUE)
     {
         return CHIP_ERROR_INTERNAL;
     }
+    cli_str.release();
     return CHIP_NO_ERROR;
 }
 
@@ -71,7 +73,7 @@ static void esp_openthread_matter_cli_init(void)
 
 static void cli_transmit_worker(void * context)
 {
-    cli_transmit_task_queue = xQueueCreate(8, sizeof(std::unique_ptr<char[]>));
+    cli_transmit_task_queue = xQueueCreate(8, sizeof(char *));
     if (!cli_transmit_task_queue)
     {
         vTaskDelete(NULL);
@@ -80,12 +82,13 @@ static void cli_transmit_worker(void * context)
 
     while (true)
     {
-        std::unique_ptr<char[]> command_line(nullptr);
-        if (xQueueReceive(cli_transmit_task_queue, &command_line, portMAX_DELAY) == pdTRUE)
+        char * cmd = NULL;
+        if (xQueueReceive(cli_transmit_task_queue, &cmd, portMAX_DELAY) == pdTRUE)
         {
-            if (command_line)
+            if (cmd)
             {
-                esp_openthread_cli_input(command_line.get());
+                std::unique_ptr<char[]> cmd_ptr(cmd);
+                esp_openthread_cli_input(cmd_ptr.get());
             }
             else
             {
