@@ -89,7 +89,7 @@ CHIP_ERROR IcdManagementAttributeAccess::Read(const ConcreteReadAttributePath & 
 
 CHIP_ERROR IcdManagementAttributeAccess::ReadIdleModeInterval(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
-    return encoder.Encode(IcdManagementServer::GetInstance().GetIdleModeInterval());
+    return encoder.Encode(IcdManagementServer::GetInstance().GetIdleModeIntervalSec());
 }
 
 CHIP_ERROR IcdManagementAttributeAccess::ReadActiveModeInterval(EndpointId endpoint, AttributeValueEncoder & encoder)
@@ -99,7 +99,7 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadActiveModeInterval(EndpointId endpo
 
 CHIP_ERROR IcdManagementAttributeAccess::ReadActiveModeThreshold(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
-    return encoder.Encode(IcdManagementServer::GetInstance().GetActiveModeThreshold());
+    return encoder.Encode(IcdManagementServer::GetInstance().GetActiveModeThresholdMs());
 }
 
 CHIP_ERROR IcdManagementAttributeAccess::ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder)
