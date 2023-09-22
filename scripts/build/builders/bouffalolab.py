@@ -90,7 +90,8 @@ class BouffalolabBuilder(GnBuilder):
                  enable_ethernet: bool = False,
                  enable_wifi: bool = False,
                  enable_thread: bool = False,
-                 enable_frame_ptr: bool = False
+                 enable_frame_ptr: bool = False,
+                 enable_heap_monitoring: bool = False
                  ):
 
         if 'BL602' == module_type:
@@ -194,6 +195,8 @@ class BouffalolabBuilder(GnBuilder):
 
         self.argsOpt.append("enable_debug_frame_ptr={}".format(str(enable_frame_ptr).lower()))
 
+        self.argsOpt.append("enable_heap_monitoring={}".format(str(enable_heap_monitoring).lower()))
+
         try:
             self.argsOpt.append('bouffalolab_sdk_root="%s"' % os.environ['BOUFFALOLAB_SDK_ROOT'])
         except KeyError as err:
@@ -252,4 +255,5 @@ class BouffalolabBuilder(GnBuilder):
         os.system("cp " + ota_images_image + " " + ota_images_dev_image)
 
         logging.info("PostBuild:")
-        logging.info("Bouffalo Lab OTA format image: " + self.app.AppNamePrefix(self.chip_name) + ".bin.xz.hash is generated.")
+        logging.info("Bouffalo Lab unsigned OTA image: " +
+                     self.app.AppNamePrefix(self.chip_name) + ".bin.xz.hash is generated.")

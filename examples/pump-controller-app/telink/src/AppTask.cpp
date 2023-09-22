@@ -47,13 +47,6 @@ CHIP_ERROR AppTask::Init(void)
     PumpMgr().Init();
     PumpMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-    CHIP_ERROR err = ConnectivityMgr().SetBLEDeviceName("Telink Pump Controller");
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("SetBLEDeviceName fail");
-        return err;
-    }
-
     return CHIP_NO_ERROR;
 }
 

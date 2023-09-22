@@ -92,6 +92,10 @@ bl_iot_sdk("sdk") {
 
   defines += [ "CHIP_DEVICE_CONFIG_ENABLE_ETHERNET=${chip_enable_ethernet}" ]
 
+  if (chip_enable_wifi || chip_enable_ethernet) {
+    include_dirs += [ "${examples_plat_dir}/bl702/lwipopts" ]
+  }
+
   if (chip_enable_ethernet) {
     defines += [ "CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE=48" ]
   }
