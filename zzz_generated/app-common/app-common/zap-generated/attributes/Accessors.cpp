@@ -670,9 +670,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 
 namespace StartUpOnOff {
 
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> & value)
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::OnOff::StartUpOnOffEnum> & value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::OnOff::OnOffStartUpOnOff>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::OnOff::StartUpOnOffEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OnOff::Id, Id, readable, sizeof(temp));
@@ -687,9 +687,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::app::Clus
     }
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OnOff::OnOffStartUpOnOff value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OnOff::StartUpOnOffEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::OnOff::OnOffStartUpOnOff>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::OnOff::StartUpOnOffEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -702,7 +702,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OnOff::OnOffSt
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::OnOff::OnOffStartUpOnOff>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::OnOff::StartUpOnOffEnum>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
@@ -710,7 +710,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint,
-                  const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> & value)
+                  const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::StartUpOnOffEnum> & value)
 {
     if (value.IsNull())
     {
