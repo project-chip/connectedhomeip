@@ -47,9 +47,9 @@ void SynchronizedReportSchedulerImpl::OnReadHandlerDestroyed(ReadHandler * aRead
 void SynchronizedReportSchedulerImpl::OnTransitionToIdle()
 {
     Timestamp now               = mTimerDelegate->GetCurrentMonotonicTimestamp();
-    uint32_t targetIdleInterval = static_cast<uint32_t>(ICD_SLEEP_TIME_JITTER_MS);
-    VerifyOrReturn(now >= mTestNextReportTimestamp);
-    if (((mTestNextReportTimestamp - now) < Seconds16(targetIdleInterval)) && (now > mNextMinTimestamp))
+    uint32_t targetIdleInterval = static_cast<uint32_t>(ICD_REPORT_BEFORE_IDLE_THRESHOLD_MS);
+    VerifyOrReturn(now <= mTestNextReportTimestamp);
+    if (((mTestNextReportTimestamp - now) < Milliseconds32(targetIdleInterval)) && (now > mNextMinTimestamp))
     {
         // If the next report is due in less than the idle mode interval and we are past the min interval, we can just send it now
         CancelReport();
