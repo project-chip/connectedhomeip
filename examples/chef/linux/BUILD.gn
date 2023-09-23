@@ -43,6 +43,8 @@ chip_data_model("chef-data-model") {
 executable("${sample_name}") {
   sources = [
     "${project_dir}/common/chef-channel-manager.cpp",
+    "${project_dir}/common/chef-air-quality.cpp",
+    "${project_dir}/common/chef-concentration-measurement.cpp",
     "${project_dir}/common/stubs.cpp",
     "${project_dir}/linux/main.cpp",
   ]
