@@ -1011,12 +1011,15 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 
     auto * path = [MTRAttributePath attributePathWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID];
-
-    auto * report = [[MTRAttributeReport alloc] initWithResponseValue:@{
+    auto * responseValue = @{
         MTRAttributePathKey : path,
         MTRDataKey : value,
+    };
+
+    auto * report = [[MTRAttributeReport alloc] initWithResponseValue:responseValue error:error];
+    if (report == nil) {
+        return nil;
     }
-                                                                error:error];
 
     return report.value;
 }
