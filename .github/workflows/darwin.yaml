@@ -51,18 +51,14 @@ jobs:
               run: scripts/run_in_build_env.sh '(zap-cli --version && exit 1) || exit 0'
             - name: Run iOS Build Debug
               working-directory: src/darwin/Framework
-              # For now disable unguarded-availability-new warnings because we
-              # internally use APIs that we are annotating as only available on
-              # new enough versions.  Maybe we should change out deployment
-              # target versions instead?
-              run: xcodebuild -target "Matter" -sdk iphoneos -configuration Debug OTHER_CFLAGS='${inherited} -Wno-unguarded-availability-new'
+              # Disable availability annotations, since we are not building a system
+              # Matter.framework.
+              run: xcodebuild -target "Matter" -sdk iphoneos -configuration Debug GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
             - name: Run iOS Build Release
               working-directory: src/darwin/Framework
-              # For now disable unguarded-availability-new warnings because we
-              # internally use APIs that we are annotating as only available on
-              # new enough versions.  Maybe we should change out deployment
-              # target versions instead?
-              run: xcodebuild -target "Matter" -sdk iphoneos -configuration Release OTHER_CFLAGS='${inherited} -Wno-unguarded-availability-new'
+              # Disable availability annotations, since we are not building a system
+              # Matter.framework.
+              run: xcodebuild -target "Matter" -sdk iphoneos -configuration Release GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
             - name: Clean Build
               run: xcodebuild clean
               working-directory: src/darwin/Framework
@@ -77,10 +73,9 @@ jobs:
               # Enable -Wconversion by hand as well, because it seems to not be
               # enabled by default in the Xcode config.
               #
-              # Disable -Wunguarded-availability-new because we internally use
-              # APIs we added after our deployment target version.  Maybe we
-              # should change the deployment target version instead?
-              run: xcodebuild -target "Matter" -sdk macosx OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new'
+              # Disable availability annotations, since we are not building a system
+              # Matter.framework.
+              run: xcodebuild -target "Matter" -sdk macosx OTHER_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
               working-directory: src/darwin/Framework
             - name: Clean Build
               run: xcodebuild clean
@@ -115,12 +110,14 @@ jobs:
                   #
                   # -enableUndefinedBehaviorSanitizer instruments the code in Matter.framework,
                   # but to instrument the code in the underlying libCHIP we need to pass CHIP_IS_UBSAN=YES
-                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new' CHIP_IS_UBSAN=YES CHIP_IS_BLE=NO > >(tee /tmp/darwin/framework-tests/darwin-tests-asan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-err.log >&2)
+                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion' CHIP_IS_UBSAN=YES CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'> >(tee /tmp/darwin/framework-tests/darwin-tests-asan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-err.log >&2)
                   # And the same thing, but with MTR_PER_CONTROLLER_STORAGE_ENABLED turned on.
-                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new' CHIP_IS_UBSAN=YES CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_PER_CONTROLLER_STORAGE_ENABLED=1' > >(tee /tmp/darwin/framework-tests/darwin-tests-asan-provisional.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-provisional-err.log >&2)
+                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion' CHIP_IS_UBSAN=YES CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1 MTR_PER_CONTROLLER_STORAGE_ENABLED=1' > >(tee /tmp/darwin/framework-tests/darwin-tests-asan-provisional.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-provisional-err.log >&2)
+                  # And the same thing, but with MTR_NO_AVAILABILITY not turned on.  This requires -Wno-unguarded-availability-new to avoid availability errors.
+                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new' CHIP_IS_UBSAN=YES CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited}' > >(tee /tmp/darwin/framework-tests/darwin-tests-asan-with-availability-annotations.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-with-availability-annotations-err.log >&2)
                   # -enableThreadSanitizer instruments the code in Matter.framework,
                   # but to instrument the code in the underlying libCHIP we need to pass CHIP_IS_TSAN=YES
-                  xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableThreadSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new' CHIP_IS_TSAN=YES CHIP_IS_BLE=NO > >(tee /tmp/darwin/framework-tests/darwin-tests-tsan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-tsan-err.log >&2)
+                  xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableThreadSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion' CHIP_IS_TSAN=YES CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1' > >(tee /tmp/darwin/framework-tests/darwin-tests-tsan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-tsan-err.log >&2)
               working-directory: src/darwin/Framework
             - name: Build Matter TV Casting Bridge
               run: |

@@ -2032,8 +2032,6 @@
 					CHIP_HAVE_CONFIG_H,
 					"CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>",
 					"$(inherited)",
-					"MTR_NEWLY_AVAILABLE=",
-					"MTR_NEWLY_DEPRECATED(message)=",
 					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
 				);
 				HEADER_SEARCH_PATHS = (
@@ -2198,8 +2196,6 @@
 					CHIP_HAVE_CONFIG_H,
 					"CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>",
 					"$(inherited)",
-					"MTR_NEWLY_AVAILABLE=",
-					"MTR_NEWLY_DEPRECATED(message)=",
 					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
 				);
 				HEADER_SEARCH_PATHS = (
