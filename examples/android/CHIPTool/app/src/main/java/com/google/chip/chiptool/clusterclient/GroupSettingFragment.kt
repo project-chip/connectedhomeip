@@ -147,9 +147,7 @@ class GroupSettingFragment : Fragment() {
       val ret =
         deviceController.addKeySet(
           keySetIdEd.text.toString().toUInt().toInt(),
-          GroupKeySecurityPolicy.valueOf(
-            keySecurityPolicySp.selectedItem.toString()
-          ),
+          GroupKeySecurityPolicy.valueOf(keySecurityPolicySp.selectedItem.toString()),
           validityTimeEd.text.toString().toULong().toLong(),
           hexStringToByteArray(epochKeyEd.text.toString())
         )
@@ -263,11 +261,7 @@ class GroupSettingFragment : Fragment() {
         val keySetWritestruct =
           GroupKeyManagementClusterGroupKeySetStruct(
             keySetIdEd.text.toString().toUInt(),
-            GroupKeySecurityPolicy.valueOf(
-                keySecurityPolicySp.selectedItem.toString()
-              )
-              .id
-              .toUInt(),
+            GroupKeySecurityPolicy.valueOf(keySecurityPolicySp.selectedItem.toString()).id.toUInt(),
             hexStringToByteArray(epochKey0Ed.text.toString()),
             epochStartTime0Ed.text.toString().toULong(),
             hexStringToByteArray(epochKey1Ed.text.toString()),
