@@ -122,9 +122,9 @@ static bool writeExtFlashImgPages(NVS_Handle handle, ssize_t offset, MutableByte
             /* We have not downloaded past the Matter OTA header */
             return true;
         }
-
+        
         imageOffset = 0;
-        data = block.data();
+        data = block.data() + blockOffset;
         dataSize = block.size() - blockOffset;
     }
     else
@@ -156,11 +156,11 @@ static bool writeExtFlashImgPages(NVS_Handle handle, ssize_t offset, MutableByte
     }
     else
     {
+        uint8_t buf[1024] = {0};
+        status = NVS_read(handle, totalBytesWrittenNvs, buf, dataSize);
+        ChipLogProgress(SoftwareUpdate, "block read out of flash: %s", buf);
         totalBytesWrittenNvs += dataSize;
         ChipLogProgress(SoftwareUpdate, "Total written bytes: %d", (size_t) totalBytesWrittenNvs);
-        uint8_t buf[1024] = {0};
-        status = NVS_read(handle, imageOffset, buf, dataSize);
-        ChipLogProgress(SoftwareUpdate, "block read out of flash: %s", buf);
     }
     return true;
 }
