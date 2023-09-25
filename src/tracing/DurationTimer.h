@@ -1,7 +1,8 @@
 #pragma once
 
 #include <string>
-#include <time.h>
+//#include <time.h>
+#include <sys/time.h>
 #include <iostream>
 #include <stdio.h>
 
@@ -35,10 +36,10 @@ namespace chip{
         };
 
         //todo add description
-        class TimespecTimer : public DurationTimer<timespec>{
+        class TimespecTimer : public DurationTimer<timeval>{
                 
                 private:
-                    char* toTimeStr(timespec time);
+                    char* toTimeStr(timeval time);
 
                 public:
                     //constructors
@@ -50,7 +51,7 @@ namespace chip{
                     void stop();
                     double duration(); 
 
-                    double static duration_calc(timespec start, timespec stop) ;
+                    double static duration_calc(timeval start, timeval stop) ;
         };
 
     }
