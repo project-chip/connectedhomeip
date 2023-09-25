@@ -49,7 +49,7 @@ void emberAfCarbonDioxideConcentrationMeasurementClusterInitCallback(EndpointId 
 }
 #endif
 
-#ifdef EMBER_AF_PLUGIN_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_SERVER 
+#ifdef EMBER_AF_PLUGIN_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_SERVER
 static Instance gCarbonMonoxideConcentrationMeasurementInstance =
     CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
         EndpointId(1), CarbonMonoxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
