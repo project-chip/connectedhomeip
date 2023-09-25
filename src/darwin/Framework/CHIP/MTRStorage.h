@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Implementations of the storage methods must not call into any Matter
  * framework APIs.
  */
-API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @protocol MTRStorage <NSObject>
 @required
 

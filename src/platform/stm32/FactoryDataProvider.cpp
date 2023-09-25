@@ -25,7 +25,6 @@
 
 namespace chip {
 namespace {
-
 } // namespace
 
 namespace DeviceLayer {
@@ -80,8 +79,8 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
     ByteSpan kDacPrivateKey = ByteSpan(kDevelopmentDAC_PrivateKey_FFF1_8004);
     ByteSpan kDacPublicKey  = ByteSpan(kDevelopmentDAC_PublicKey_FFF1_8004);
 
-    VerifyOrReturnError(IsSpanUsable(outSignBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(messageToSign), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!outSignBuffer.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!messageToSign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // In a non-exemplary implementation, the public key is not needed here. It is used here merely because

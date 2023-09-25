@@ -27,6 +27,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ReliableMessageContext.h>
 
+#include <app/AppConfig.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Defer.h>
@@ -58,7 +59,7 @@ void ReliableMessageContext::SetMessageNotAcked(bool messageNotAcked)
 {
     mFlags.Set(Flags::kFlagMessageNotAcked, messageNotAcked);
 
-#if CONFIG_DEVICE_LAYER
+#if CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
     DeviceLayer::ChipDeviceEvent event;
     event.Type                = DeviceLayer::DeviceEventType::kICDMsgAckSyncEvent;
     event.AckSync.awaitingAck = messageNotAcked;

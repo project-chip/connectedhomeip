@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class MTRDeviceControllerStartupParams;
 @class MTRFabricInfo;
 
-API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRDeviceControllerFactoryParams : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -98,7 +98,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 
 @end
 
-API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRDeviceControllerFactory : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;

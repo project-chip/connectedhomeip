@@ -127,7 +127,7 @@ public:
      */
     CHIP_ERROR SetProductIdentifierValue(chip::CharSpan aProductIdentifierValue)
     {
-        VerifyOrReturnError(IsSpanUsable(aProductIdentifierValue), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!aProductIdentifierValue.empty(), CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(aProductIdentifierValue.size() <= sizeof(productIdentifierValueBuffer), CHIP_ERROR_INVALID_ARGUMENT);
 
         memcpy(productIdentifierValueBuffer, aProductIdentifierValue.data(), aProductIdentifierValue.size());
