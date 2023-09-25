@@ -1,41 +1,42 @@
 #include "DurationTimer.h"
 #include <stdint.h>
 //#include <time.h>
-#include <sys/time.h>
+//#include <sys/time.h>
 #include <string>
 #include <lib/support/logging/CHIPLogging.h>
+//#include <system/SystemClock.h>
+//#include <src/system/SystemClock.h>
+//#include <platform/CHIPDeviceLayer.h>
 
 using namespace std;
-
+using namespace chip;
 //todo add description
 namespace chip{
     namespace timing{
         /**   TimespecTimer implementations   */
 
                 //static function
-            double TimespecTimer::duration_calc(timeval start, timeval stop)
+            double TimespecTimer::duration_calc(uint64_t start, uint64_t stop)
         {
-            return (stop.tv_sec - start.tv_sec) + ((stop.tv_usec - start.tv_usec) * 1e-9);
+            //return (stop.tv_sec - start.tv_sec) + ((stop.tv_usec - start.tv_usec) * 1e-9);
+            //start.
+            return (stop - start);
         }
 
         // member functions
         void TimespecTimer::start()
         {
-            struct timeval now;
-            gettimeofday(&now, NULL);
-            t1 = now;
+            t1 = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
 
             // todo use logging instead of stdout
-            cout << "Timer " << label << " start " << toTimeStr(now) << '\n';
+            cout << "Timer " << label << " start " << chip::System::SystemClock().GetClock_RealTimeMS(t1) << '\n';
         }
 
         void TimespecTimer::stop()
         {
-            struct timeval now;
-            gettimeofday(&now, NULL);
-            t2 = now;
+            t2 = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
 
-            cout << "Timer " << label << " stop " << toTimeStr(now) << '\n';
+            cout << "Timer " << label << " stop " << chip::System::SystemClock().GetClock_RealTimeMS(t2) << '\n';
             duration();
         }
 
@@ -46,19 +47,6 @@ namespace chip{
             return dur;
         }
 
-        #define DATETIME_PATTERN  ("%Y-%m-%dT%H:%M:%SZ")
-        #define DATETIME_LEN (sizeof "1970-01-01T23:59:59.")
-        #define ISO8601_LEN (sizeof "1970-01-01T23:59:59.123456Z")
-
-        // utility method
-        char * TimespecTimer::toTimeStr(timeval time)
-        {
-            char buff[DATETIME_LEN];
-            strftime(buff, sizeof buff, DATETIME_PATTERN, gmtime(&time.tv_sec));
-            char * str = new char[sizeof buff + 1];
-            snprintf(str, ISO8601_LEN, " %s.%05ld", buff, time.tv_usec);
-            return str; // timeval_to_str( buff, 0, &time);
-        }
 
     }
 }

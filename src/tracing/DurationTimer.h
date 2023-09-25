@@ -2,11 +2,13 @@
 
 #include <string>
 //#include <time.h>
-#include <sys/time.h>
+//#include <sys/time.h>
 #include <iostream>
 #include <stdio.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace std;
+//using namespace chip::System;
 
 //todo add description
 namespace chip{
@@ -36,10 +38,10 @@ namespace chip{
         };
 
         //todo add description
-        class TimespecTimer : public DurationTimer<timeval>{
+        class TimespecTimer : public DurationTimer<uint64_t>{
                 
                 private:
-                    char* toTimeStr(timeval time);
+                    char* toTimeStr(uint64_t time);
 
                 public:
                     //constructors
@@ -51,7 +53,7 @@ namespace chip{
                     void stop();
                     double duration(); 
 
-                    double static duration_calc(timeval start, timeval stop) ;
+                    double static duration_calc(uint64_t start, uint64_t stop) ;
         };
 
     }
