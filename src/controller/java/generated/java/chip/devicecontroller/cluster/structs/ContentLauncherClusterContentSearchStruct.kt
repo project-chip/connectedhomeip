@@ -32,14 +32,14 @@ class ContentLauncherClusterContentSearchStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
-      startList(ContextSpecificTag(TAG_PARAMETER_LIST))
+      startStructure(tlvTag)
+      startArray(ContextSpecificTag(TAG_PARAMETER_LIST))
       for (item in parameterList.iterator()) {
         item.toTlv(AnonymousTag, this)
       }
-      endList()
+      endArray()
       endStructure()
     }
   }
@@ -47,11 +47,11 @@ class ContentLauncherClusterContentSearchStruct(
   companion object {
     private const val TAG_PARAMETER_LIST = 0
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ContentLauncherClusterContentSearchStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentLauncherClusterContentSearchStruct {
+      tlvReader.enterStructure(tlvTag)
       val parameterList =
         buildList<ContentLauncherClusterParameterStruct> {
-          tlvReader.enterList(ContextSpecificTag(TAG_PARAMETER_LIST))
+          tlvReader.enterArray(ContextSpecificTag(TAG_PARAMETER_LIST))
           while (!tlvReader.isEndOfContainer()) {
             add(ContentLauncherClusterParameterStruct.fromTlv(AnonymousTag, tlvReader))
           }

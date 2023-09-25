@@ -1,24 +1,24 @@
 
 server cluster OnOff = 6 {
-  enum OnOffDelayedAllOffEffectVariant : ENUM8 {
-    kFadeToOffIn0p8Seconds = 0;
+  enum DelayedAllOffEffectVariantEnum : ENUM8 {
+    kDelayedOffFastFade = 0;
     kNoFade = 1;
-    k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
+    kDelayedOffSlowFade = 2;
   }
 
-  enum OnOffDyingLightEffectVariant : ENUM8 {
-    k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
+  enum DyingLightEffectVariantEnum : ENUM8 {
+    kDyingLightFadeOff = 0;
   }
 
-  enum OnOffEffectIdentifier : ENUM8 {
+  enum EffectIdentifierEnum : ENUM8 {
     kDelayedAllOff = 0;
     kDyingLight = 1;
   }
 
-  enum OnOffStartUpOnOff : ENUM8 {
+  enum StartUpOnOffEnum : ENUM8 {
     kOff = 0;
     kOn = 1;
-    kTogglePreviousOnOff = 2;
+    kToggle = 2;
   }
 
   bitmap OnOffControl : BITMAP8 {

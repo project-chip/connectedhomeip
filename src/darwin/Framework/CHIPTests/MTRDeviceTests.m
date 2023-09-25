@@ -122,6 +122,7 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
 @property (nonatomic, nullable) dispatch_block_t onNotReachable;
 @property (nonatomic, nullable) MTRDeviceTestDelegateDataHandler onAttributeDataReceived;
 @property (nonatomic, nullable) MTRDeviceTestDelegateDataHandler onEventDataReceived;
+@property (nonatomic, nullable) dispatch_block_t onReportEnd;
 @end
 
 @implementation MTRDeviceTestDelegate
@@ -145,6 +146,13 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
 {
     if (self.onEventDataReceived != nil) {
         self.onEventDataReceived(eventReport);
+    }
+}
+
+- (void)unitTestReportEndForDevice:(MTRDevice *)device
+{
+    if (self.onReportEnd != nil) {
+        self.onReportEnd();
     }
 }
 
@@ -1457,6 +1465,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 XCTAssertNotNil(eventDict[MTREventTimestampDateKey]);
             }
         }
+    };
+    delegate.onReportEnd = ^() {
         [gotReportsExpectation fulfill];
     };
 
@@ -1490,11 +1500,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     [self waitForExpectations:@[ subscriptionExpectation, gotReportsExpectation ] timeout:60];
 
+    delegate.onReportEnd = nil;
+
     XCTAssertNotEqual(attributeReportsReceived, 0);
     XCTAssertNotEqual(eventReportsReceived, 0);
-
-    attributeReportsReceived = 0;
-    eventReportsReceived = 0;
 
     // Before resubscribe, first test write failure and expected value effects
     NSNumber * testEndpointID = @(1);
@@ -1555,6 +1564,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     };
 
     // reset the onAttributeDataReceived to validate the following resubscribe test
+    attributeReportsReceived = 0;
+    eventReportsReceived = 0;
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
         attributeReportsReceived += data.count;
     };

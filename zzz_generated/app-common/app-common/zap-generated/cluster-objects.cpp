@@ -6981,6 +6981,9 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::TestEventTriggersEnabled::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, testEventTriggersEnabled));
         break;
+    case Attributes::AverageWearCount::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageWearCount));
+        break;
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;

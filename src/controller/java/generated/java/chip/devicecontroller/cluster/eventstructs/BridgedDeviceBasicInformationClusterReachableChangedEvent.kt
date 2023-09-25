@@ -29,9 +29,9 @@ class BridgedDeviceBasicInformationClusterReachableChangedEvent(val reachableNew
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_REACHABLE_NEW_VALUE), reachableNewValue)
       endStructure()
     }
@@ -41,10 +41,10 @@ class BridgedDeviceBasicInformationClusterReachableChangedEvent(val reachableNew
     private const val TAG_REACHABLE_NEW_VALUE = 0
 
     fun fromTlv(
-      tag: Tag,
+      tlvTag: Tag,
       tlvReader: TlvReader
     ): BridgedDeviceBasicInformationClusterReachableChangedEvent {
-      tlvReader.enterStructure(tag)
+      tlvReader.enterStructure(tlvTag)
       val reachableNewValue = tlvReader.getBoolean(ContextSpecificTag(TAG_REACHABLE_NEW_VALUE))
 
       tlvReader.exitContainer()

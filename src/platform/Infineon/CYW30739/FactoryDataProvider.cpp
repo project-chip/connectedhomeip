@@ -64,8 +64,8 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;
 
-    VerifyOrReturnError(IsSpanUsable(out_signature_buffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(message_to_sign), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!out_signature_buffer.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!message_to_sign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_signature_buffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     uint8_t dac_key_buffer[128];

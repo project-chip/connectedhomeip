@@ -20743,15 +20743,15 @@ void MTRNullableIdentifyClusterIdentifyTypeEnumAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant value)
+void MTROnOffClusterDelayedAllOffEffectVariantEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OnOff::DelayedAllOffEffectVariantEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROnOffClusterDelayedAllOffEffectVariantEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20766,8 +20766,8 @@ void MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscription
     }
 }
 
-void MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant> & value)
+void MTRNullableOnOffClusterDelayedAllOffEffectVariantEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::DelayedAllOffEffectVariantEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20778,7 +20778,7 @@ void MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableOnOffClusterDelayedAllOffEffectVariantEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20793,15 +20793,15 @@ void MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubs
     }
 }
 
-void MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OnOff::OnOffDyingLightEffectVariant value)
+void MTROnOffClusterDyingLightEffectVariantEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OnOff::DyingLightEffectVariantEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROnOffClusterDyingLightEffectVariantEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20816,8 +20816,8 @@ void MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffDyingLightEffectVariant> & value)
+void MTRNullableOnOffClusterDyingLightEffectVariantEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::DyingLightEffectVariantEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20828,7 +20828,7 @@ void MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableOnOffClusterDyingLightEffectVariantEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20843,15 +20843,15 @@ void MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscri
     }
 }
 
-void MTROnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OnOff::OnOffEffectIdentifier value)
+void MTROnOffClusterEffectIdentifierEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OnOff::EffectIdentifierEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTROnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROnOffClusterEffectIdentifierEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20866,8 +20866,8 @@ void MTROnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffEffectIdentifier> & value)
+void MTRNullableOnOffClusterEffectIdentifierEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::EffectIdentifierEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20878,7 +20878,7 @@ void MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::OnSucc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableOnOffClusterEffectIdentifierEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20893,15 +20893,15 @@ void MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBr
     }
 }
 
-void MTROnOffClusterOnOffStartUpOnOffAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OnOff::OnOffStartUpOnOff value)
+void MTROnOffClusterStartUpOnOffEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OnOff::StartUpOnOffEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTROnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROnOffClusterStartUpOnOffEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20916,8 +20916,8 @@ void MTROnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> & value)
+void MTRNullableOnOffClusterStartUpOnOffEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::StartUpOnOffEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20928,7 +20928,7 @@ void MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableOnOffClusterStartUpOnOffEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

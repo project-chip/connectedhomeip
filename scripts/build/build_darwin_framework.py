@@ -96,14 +96,13 @@ def build_darwin_framework(args):
     for option in options:
         command += ["{}={}".format(option, "YES" if options[option] else "NO")]
 
+    defines = 'GCC_PREPROCESSOR_DEFINITIONS=${inherited} MTR_NO_AVAILABILITY=1'
     if args.enable_provisional_framework_features:
-        command += ['GCC_PREPROCESSOR_DEFINITIONS=${inherited} MTR_ENABLE_PROVISIONAL=1']
+        defines += ' MTR_ENABLE_PROVISIONAL=1'
 
-    # For now disable unguarded-availability-new warnings because we
-    # internally use APIs that we are annotating as only available on
-    # new enough versions.  Maybe we should change out deployment
-    # target versions instead?
-    cflags = ["${inherited}", "-Wno-unguarded-availability-new"]
+    command += [defines]
+
+    cflags = ["${inherited}"]
     ldflags = ["${inherited}"]
 
     if args.clang:

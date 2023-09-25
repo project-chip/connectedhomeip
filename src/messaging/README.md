@@ -16,7 +16,7 @@ will be expanded are denoted with `$` .
 Unless specified, numerical values are represented in decimal notation.
 
 ```
-<<< [E:$exchange_id S:$session_id M:$msg_id (Ack: $ack_msg_id)] ($msg_category) Msg TX to $fabric_index:$destination [$compressed_fabric_id] --- Type $protocol_id:$msg_type ($protocol_name:$msg_type_name)
+<<< [E:$exchange_id S:$session_id M:$msg_id (Ack: $ack_msg_id)] ($msg_category) Msg TX to $fabric_index:$destination [$compressed_fabric_id] [$peer_address] --- Type $protocol_id:$msg_type ($protocol_name:$msg_type_name)
 ```
 
 | Field                | Description                                                                                                                            |
@@ -29,6 +29,7 @@ Unless specified, numerical values are represented in decimal notation.
 | fabric_index         | Fabric index on the sending side                                                                                                       |
 | destination          | 64-bit Node Identifier that can represent both group, operational and temporary node identifiers depending on `$msg_category` (in hex) |
 | compressed_fabric_id | If present and valid, lower 16-bits of the compressed fabric ID (in hex). Otherwise, it will be set to 0000.                           |
+| peer_address         | The peer address (IP and port) for the session                                                                                         |
 | protocol_id          | 16-bit Protocol ID within the common vendor namespace (in hex)                                                                         |
 | msg_type             | 8-bit message type ID (in hex)                                                                                                         |
 | protocol_name        | If available, a logical name for the protocol                                                                                          |
