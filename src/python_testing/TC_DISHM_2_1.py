@@ -84,9 +84,6 @@ class TC_DISHM_2_1(MatterBaseTest):
             UNSUPPORTED_MODE = 0x01
             GENERIC_FAILURE = 0x02
 
-        DishwasherModeCodes = [code.value for code in Clusters.DishwasherMode.Enums.ModeTag
-                               if code is not Clusters.DishwasherMode.Enums.ModeTag.kUnknownEnumValue]
-
         self.print_step(4, "Send ChangeToMode command with NewMode set to %d" % (old_current_mode_dut))
 
         ret = await self.send_change_to_mode_cmd(newMode=old_current_mode_dut)

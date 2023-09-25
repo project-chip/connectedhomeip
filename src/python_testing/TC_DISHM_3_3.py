@@ -143,7 +143,7 @@ class TC_DISHM_3_3(MatterBaseTest):
         logging.info("OnMode: %s" % (new_on_mode_dut))
         # There is an issue with the test plan here as new_mode_th cannot be read if step 7 is not executed so I've changed
         # from comparing against new_mode_th to comparing against startup_mode_dut instead to ensure that it runs.
-        # Will make issue
+        # Issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3478
         asserts.assert_true(startup_mode_dut != new_on_mode_dut, "OnMode must match the mode written in previous step")
 
         self.print_step(9, "Write to the StartUpOnOff attribute of OnOff cluster with a value of 1")
