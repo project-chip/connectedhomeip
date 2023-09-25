@@ -29,7 +29,6 @@ using namespace chip;
 AirQualitySensorAppAttrUpdateDelegate::AirQualitySensorAppAttrUpdateDelegate(void)
 {
     char uartBuff[BUFFER_SIZE];
-    // char *json;
     int32_t jsonStructLen = 0;
 
     while (1)
@@ -38,10 +37,6 @@ AirQualitySensorAppAttrUpdateDelegate::AirQualitySensorAppAttrUpdateDelegate(voi
 
         if (jsonStructLen > 0)
         {
-            // json = Platform::MemoryAlloc((size_t)jsonStructLen);
-            // memcpy(json, uartBuff, jsonStructureLen);
-            // Assuming OnEventCommandReceived makes a copy of buffer
-            // Otherwise need to allocate memory and set up an event to free memory once schedulework is done
             OnEventCommandReceived(uartBuff);
         }
     }

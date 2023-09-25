@@ -138,68 +138,78 @@ void AirQualitySensorManager::Init()
 void AirQualitySensorManager::OnAirQualityChangeHandler(AirQualityEnum newValue)
 {
     Status status = mAirQualityInstance.UpdateAirQuality(static_cast<AirQualityEnum>(newValue));
-    VerifyOrReturn(Status::Success == status, ChipLogError(NotSpecified, "Failed to set AirQuality attribute"));
+    VerifyOrReturn(Status::Success == status,
+                    ChipLogError(NotSpecified, "AirQualitySensor App: Failed to set AirQuality attribute %x", (unsigned int)status));
 }
 
 void AirQualitySensorManager::OnCarbonDioxideMeasurementChangeHandler(float newValue)
 {
-    ChipError chipError = mCarbonDioxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    VerifyOrReturn(CHIP_NO_ERROR == chipError, ChipLogError(NotSpecified, "Failed to set CarbonDioxide MeasuredValue attribute"));
+    CHIP_ERROR chipError = mCarbonDioxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
+    VerifyOrReturn(CHIP_NO_ERROR == chipError,
+                    ChipLogError(NotSpecified, "AirQualitySensor App: Failed to set CarbonDioxide MeasuredValue attribute %s", chip::ErrorStr(chipError)));
 }
 
 void AirQualitySensorManager::OnCarbonMonoxideMeasurementChangeHandler(float newValue)
 {
-    ChipError chipError = mCarbonMonoxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    VerifyOrReturn(CHIP_NO_ERROR == chipError, ChipLogError(NotSpecified, "Failed to set CarbonMonoxide MeasuredValue attribute"));
+    CHIP_ERROR chipError = mCarbonMonoxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
+    VerifyOrReturn(CHIP_NO_ERROR == chipError,
+                    ChipLogError(NotSpecified, "AirQualitySensor App: Failed to set CarbonMonoxide MeasuredValue attribute %s", chip::ErrorStr(chipError)));
 }
 
 void AirQualitySensorManager::OnNitrogenDioxideMeasurementChangeHandler(float newValue)
 {
-    ChipError chipError = mNitrogenDioxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    VerifyOrReturn(CHIP_NO_ERROR == chipError, ChipLogError(NotSpecified, "Failed to set NitrogenDioxide MeasuredValue attribute"));
+    CHIP_ERROR chipError = mNitrogenDioxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
+    VerifyOrReturn(CHIP_NO_ERROR == chipError,
+                    ChipLogError(NotSpecified, "AirQualitySensor App: Failed to set NitrogenDioxide MeasuredValue attribute %s", chip::ErrorStr(chipError)));
 }
 
 void AirQualitySensorManager::OnPm1MeasurementChangeHandler(float newValue)
 {
-    ChipError chipError = mPm1ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    VerifyOrReturn(CHIP_NO_ERROR == chipError, ChipLogError(NotSpecified, "Failed to set Pm1 MeasuredValue attribute"));
+    CHIP_ERROR chipError = mPm1ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
+    VerifyOrReturn(CHIP_NO_ERROR == chipError,
+                    ChipLogError(NotSpecified, "AirQualitySensor App: Failed to set Pm1 MeasuredValue attribute %s", chip::ErrorStr(chipError)));
 }
 
 void AirQualitySensorManager::OnPm10MeasurementChangeHandler(float newValue)
 {
-    ChipError chipError = mPm10ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    VerifyOrReturn(CHIP_NO_ERROR == chipError, ChipLogError(NotSpecified, "Failed to set Pm10 MeasuredValue attribute"));
+    CHIP_ERROR chipError = mPm10ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
+    VerifyOrReturn(CHIP_NO_ERROR == chipError,
+                    ChipLogError(NotSpecified, "AirQualitySensor App: Failed to set Pm10 MeasuredValue attribute %s", chip::ErrorStr(chipError)));
 }
 
 void AirQualitySensorManager::OnPm25MeasurementChangeHandler(float newValue)
 {
-    ChipError chipError = mPm25ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    VerifyOrReturn(CHIP_NO_ERROR == chipError, ChipLogError(NotSpecified, "Failed to set Pm25 MeasuredValue attribute"));
+    CHIP_ERROR chipError = mPm25ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
+    VerifyOrReturn(CHIP_NO_ERROR == chipError,
+                    ChipLogError(NotSpecified, "AirQualitySensor App: Failed to set Pm25 MeasuredValue attribute %s", chip::ErrorStr(chipError)));
 }
 
 void AirQualitySensorManager::OnRadonMeasurementChangeHandler(float newValue)
 {
-    ChipError chipError = mRadonConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    VerifyOrReturn(CHIP_NO_ERROR == chipError, ChipLogError(NotSpecified, "Failed to set Radon MeasuredValue attribute"));
+    CHIP_ERROR chipError = mRadonConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
+    VerifyOrReturn(CHIP_NO_ERROR == chipError,
+                    ChipLogError(NotSpecified, "AirQualitySensor App: Failed to set Radon MeasuredValue attribute %s", chip::ErrorStr(chipError)));
 }
 
 void AirQualitySensorManager::OnTotalVolatileOrganicCompoundsMeasurementChangeHandler(float newValue)
 {
-    ChipError chipError = mTotalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
+    CHIP_ERROR chipError = mTotalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
     VerifyOrReturn(CHIP_NO_ERROR == chipError,
-                   ChipLogError(NotSpecified, "Failed to set TotalVolatileOrganicCompounds MeasuredValue attribute"));
+                   ChipLogError(NotSpecified, "AirQualitySensor App: Failed to set TotalVolatileOrganicCompounds MeasuredValue attribute %s", chip::ErrorStr(chipError)));
 }
 
 void AirQualitySensorManager::OnOzoneMeasurementChangeHandler(float newValue)
 {
-    ChipError chipError = mOzoneConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    VerifyOrReturn(CHIP_NO_ERROR == chipError, ChipLogError(NotSpecified, "Failed to set Ozone MeasuredValue attribute"));
+    CHIP_ERROR chipError = mOzoneConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
+    VerifyOrReturn(CHIP_NO_ERROR == chipError,
+                    ChipLogError(NotSpecified, "AirQualitySensor App: Failed to set Ozone MeasuredValue attribute %s", chip::ErrorStr(chipError)));
 }
 
 void AirQualitySensorManager::OnFormaldehydeMeasurementChangeHandler(float newValue)
 {
-    ChipError chipError = mFormaldehydeConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
-    VerifyOrReturn(CHIP_NO_ERROR == chipError, ChipLogError(NotSpecified, "Failed to set Formaldehyde MeasuredValue attribute"));
+    CHIP_ERROR chipError = mFormaldehydeConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(newValue));
+    VerifyOrReturn(CHIP_NO_ERROR == chipError,
+                    ChipLogError(NotSpecified, "AirQualitySensor App: Failed to set Formaldehyde MeasuredValue attribute %s", chip::ErrorStr(chipError)));
 }
 
 void AirQualitySensorManager::OnTemperatureMeasurementChangeHandler(int16_t newValue)

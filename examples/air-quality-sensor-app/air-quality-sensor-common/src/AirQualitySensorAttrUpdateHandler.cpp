@@ -34,19 +34,19 @@ AirQualitySensorAttrUpdateHandler * AirQualitySensorAttrUpdateHandler::FromJSON(
     if (!reader.parse(json, value))
     {
         ChipLogError(NotSpecified,
-                     "AllClusters App: Error parsing JSON with error %s:", reader.getFormattedErrorMessages().c_str());
+                     "AirQualitySensor App: Error parsing JSON with error %s:", reader.getFormattedErrorMessages().c_str());
         return nullptr;
     }
 
     if (value.empty() || !value.isObject())
     {
-        ChipLogError(NotSpecified, "AllClusters App: Invalid JSON command received");
+        ChipLogError(NotSpecified, "AirQualitySensor App: Invalid JSON command received");
         return nullptr;
     }
 
     if (!value.isMember("Name") || !value["Name"].isString())
     {
-        ChipLogError(NotSpecified, "AllClusters App: Invalid JSON command received: command name is missing");
+        ChipLogError(NotSpecified, "AirQualitySensor App: Invalid JSON command received: command name is missing");
         return nullptr;
     }
 
@@ -59,7 +59,7 @@ void AirQualitySensorAttrUpdateHandler::HandleCommand(intptr_t context)
     std::string clusterName = self->mJsonValue["Name"].asString();
 
     VerifyOrReturn(!self->mJsonValue.empty(), {
-        ChipLogError(NotSpecified, "Invalid JSON event command received");
+        ChipLogError(NotSpecified, "AirQualitySensor App: Invalid JSON event command received");
         Platform::Delete(self);
     });
 
@@ -131,7 +131,7 @@ void AirQualitySensorAttrUpdateHandler::HandleCommand(intptr_t context)
     }
     else
     {
-        ChipLogError(NotSpecified, "Invalid cluster name %s", clusterName.c_str());
+        ChipLogError(NotSpecified, "AirQualitySensor App: Invalid cluster name %s", clusterName.c_str());
     }
 
     // Delete AirQualitySensorAttrUpdateHandler

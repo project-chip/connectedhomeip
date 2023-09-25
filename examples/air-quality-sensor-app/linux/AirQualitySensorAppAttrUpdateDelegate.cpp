@@ -27,7 +27,7 @@ void AirQualitySensorAppAttrUpdateDelegate::OnEventCommandReceived(const char * 
     auto handler = AirQualitySensorAttrUpdateHandler::FromJSON(json);
     if (nullptr == handler)
     {
-        ChipLogError(NotSpecified, "AllClusters App: Unable to instantiate a command handler");
+        ChipLogError(NotSpecified, "AirQualitySensor App: Unable to instantiate a command handler");
         return;
     }
 

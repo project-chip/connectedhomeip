@@ -1,13 +1,12 @@
-# Matter `CC32XXSF` Lock Example Application
+# Matter `CC32XXSF` Air Quality Sensor Example Application
 
 An example application showing the use of [Matter][matter] on the Texas
 Instruments CC32XX family of Wireless MCUs.
 
 ---
 
--   [Matter CC32XX Lock Example Application](#matter-cc32xxsf-lock-example-application)
+-   [Matter CC32XX Air Quality Sensor Example Application](#matter-cc32xxsf-air-quality-sensor-example-application)
     -   [Introduction](#introduction)
-        -   [Device UI](#device-ui)
     -   [Building](#building)
         -   [Preparation](#preparation)
         -   [Compilation](#compilation)
@@ -22,27 +21,17 @@ Instruments CC32XX family of Wireless MCUs.
 
 ## Introduction
 
-The CC32XX lock example application provides a working demonstration of a
-connected door lock device. This uses the open-source CHIP implementation and
+The CC32XX air quality sensor example application provides a working demonstration 
+of an air quality sensor device. This uses the open-source CHIP implementation and
 the Texas Instruments SimpleLink™ Wi-Fi® CC32xx software development kit.
 
-By default this example targets the [CC3235SF_LAUNCHXL][cc3235sf_launchxl]
+By default this example targets the [CC3220SF_LAUNCHXL][cc3220sf_launchxl]
 LaunchPad, but the example application is enabled to build on the whole `CC32XX`
 family of MCUs.
 
-The lock example is intended to serve both as a means to explore the workings of
-CHIP, as well as a template for creating real products based on the Texas
+The air quality sensor example is intended to serve both as a means to explore the
+workings of CHIP, as well as a template for creating real products based on the Texas
 Instruments devices.
-
-## Device UI
-
-This example application has a simple User Interface to depict the state of the
-door lock and to control the state. The user LEDs on the LaunchPad are set on
-when the lock is locked, and are set off when unlocked. The LEDs will flash when
-in the transition state between locked and unlocked. The user buttons are used
-for requesting lock and unlock of the door lock. The left button (`BTN-1`) is
-used to enable provisioning (provisioning is enabled as "oneshot" by default.
-The right button (`BTN-2`) us used to toggle the "Lock" state.
 
 ## Building
 
@@ -91,7 +80,7 @@ Ninja to build the executable.
 
 
     ```
-    $ cd ~/connectedhomeip/examples/lock-app/cc32xx
+    $ cd ~/connectedhomeip/examples//air-quality-sensor-app/cc32xx
     $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.13.0\""
     $ ninja -C out/debug
     ```

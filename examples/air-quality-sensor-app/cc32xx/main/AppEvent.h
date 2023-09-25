@@ -27,27 +27,10 @@ struct AppEvent
     enum AppEventType
     {
         kEventType_None = 0,
-        kEventType_ButtonLeft,
-        kEventType_ButtonRight,
         kEventType_AppEvent,
     };
 
-    enum AppEventButtonType
-    {
-        kAppEventButtonType_None = 0,
-        kAppEventButtonType_Clicked,
-        kAppEventButtonType_LongClicked,
-    };
-
     enum AppEventType Type;
-
-    union
-    {
-        struct
-        {
-            enum AppEventButtonType Type;
-        } ButtonEvent;
-    };
 
     EventHandler Handler;
 };
