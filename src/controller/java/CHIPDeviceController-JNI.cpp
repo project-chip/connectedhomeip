@@ -2463,7 +2463,9 @@ JNI_METHOD(void, invoke)
     tlvBytesObj = static_cast<jbyteArray>(env->CallObjectMethod(invokeElement, getTlvByteArrayMethod));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
     {
-        GroupId groupId = device->GetSecureSession().Value()->IsGroupSession() ? device->GetSecureSession().Value()->AsOutgoingGroupSession()->GetGroupId() : chip::kUndefinedGroupId;
+        GroupId groupId = device->GetSecureSession().Value()->IsGroupSession()
+            ? device->GetSecureSession().Value()->AsOutgoingGroupSession()->GetGroupId()
+            : chip::kUndefinedGroupId;
         app::CommandPathParams path(static_cast<EndpointId>(endpointId), groupId, static_cast<ClusterId>(clusterId),
                                     static_cast<CommandId>(commandId), app::CommandPathFlags::kEndpointIdValid);
         if (tlvBytesObj != nullptr)

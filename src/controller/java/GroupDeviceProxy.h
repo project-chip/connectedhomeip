@@ -27,7 +27,7 @@ public:
 private:
     bool IsSecureConnected() const override { return static_cast<bool>(mSecureSession); }
 
-    GroupId mGroupId = chip::kUndefinedGroupId;
+    GroupId mGroupId                          = chip::kUndefinedGroupId;
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
     SessionHolder mSecureSession;
 };
