@@ -58,8 +58,8 @@ public:
     uint32_t deviceType;
 };
 /**
- * @brief CastingPlayer represent a Casting Server which can be connected to once discovered
- * through Matter Commissioner discovery over DNS-SD.
+ * @brief CastingPlayer represents a Matter commissioner that is able to play media to a physical
+ * output or to a display screen which is part of the device. 
  */
 class CastingPlayer : public std::enable_shared_from_this<CastingPlayer>
 {
