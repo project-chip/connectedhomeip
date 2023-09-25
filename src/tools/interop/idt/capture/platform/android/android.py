@@ -14,11 +14,12 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
+import asyncio
 import ipaddress
 import os
 import time
 import typing
+from asyncio import get_running_loop
 
 from capture.base import PlatformLogStreamer
 from capture.file_utils import create_standard_log_name
@@ -183,28 +184,32 @@ class Android(PlatformLogStreamer):
             self.check_screen_command, capture_output=True)
         return "true" in screen_cmd_output.get_captured_output()
 
-    def prepare_screen_recording(self) -> None:
+    async def prepare_screen_recording(self) -> None:
         if self.screen_proc.command_is_running():
             return True
-        screen_on = self.check_screen()
-        while not screen_on:
-            input(
-                "Please turn the screen on so screen recording can start, press enter once on!")
-            screen_on = self.check_screen()
-            if not screen_on:
-                print("Screen is still not on for recording!")
-        self.screen_recording_already_pulled = False
+        try:
+            async with asyncio.timeout_at(get_running_loop().time() + 30.0):
+                screen_on = self.check_screen()
+                print("Please turn the screen on so screen recording can start!")
+                while not screen_on:
+                    await asyncio.sleep(5)
+                    screen_on = self.check_screen()
+                    if not screen_on:
+                        print("Screen is still not on for recording!")
+                self.screen_recording_already_pulled = False
+        except TimeoutError:
+            print("WARNING screen recording timeout")
+            return
 
-    def start_streaming(self) -> None:
-        self.prepare_screen_recording()
+    async def start_streaming(self) -> None:
+        await self.prepare_screen_recording()
         self.screen_proc.start_command()
         self.logcat_proc.start_command()
-        print(f'logcat started {self.logcat_output_path}')
 
     def pull_screen_recording(self) -> None:
         self.run_adb_command(self.screen_pull_command)
 
-    def stop_streaming(self) -> None:
+    async def stop_streaming(self) -> None:
         self.screen_proc.stop_command()
         print("screen proc stopped")
         if not self.screen_recording_already_pulled:

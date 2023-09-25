@@ -15,21 +15,8 @@
 #    limitations under the License.
 #
 
-from capture.base import EcosystemCapture
+read -p "Enter RPi host name " pihost
+read -p "Enter RPi user name " piuser
 
-
-class DemoExtEcosystem(EcosystemCapture):
-
-    def __init__(self, platform, artifact_dir: str) -> None:
-        self.artifact_dir = artifact_dir
-        self.platform = platform
-        self.message = "in the demo external ecosystem"
-
-    async def start_capture(self) -> None:
-        print("Start capture " + self.message)
-
-    async def stop_capture(self) -> None:
-        print("Stop capture " + self.message)
-
-    async def analyze_capture(self) -> None:
-        print("Analyze capture " + self.message)
+echo "export PIHOST=\"$pihost\"" > $IDT_SRC_PARENT/idt/scripts/vars.sh
+echo "export PIUSER=\"$piuser\"" >> $IDT_SRC_PARENT/idt/scripts/vars.sh

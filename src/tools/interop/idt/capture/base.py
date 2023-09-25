@@ -31,7 +31,7 @@ class PlatformLogStreamer(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def start_streaming(self) -> None:
+    async def start_streaming(self) -> None:
         """
         Begin streaming logs
         Start should be able to be called repeatedly without restarting streaming
@@ -39,7 +39,7 @@ class PlatformLogStreamer(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def stop_streaming(self) -> None:
+    async def stop_streaming(self) -> None:
         """
         Stop streaming logs
         Stop should not cause an error even if the stream is not running
@@ -55,9 +55,6 @@ class UnsupportedCapturePlatformException(Exception):
 
 
 class EcosystemCapture(ABC):
-    """
-    The abstract base class for an ecosystem capture and analysis, subclassed by sub packages of ecosystem
-    """
 
     @abstractmethod
     def __init__(
@@ -71,21 +68,21 @@ class EcosystemCapture(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def start_capture(self) -> None:
+    async def start_capture(self) -> None:
         """
         Start the capture
         """
         raise NotImplementedError
 
     @abstractmethod
-    def stop_capture(self) -> None:
+    async def stop_capture(self) -> None:
         """
         Stop the capture
         """
         raise NotImplementedError
 
     @abstractmethod
-    def analyze_capture(self) -> None:
+    async def analyze_capture(self) -> None:
         """
         Parse the capture and create + display helpful analysis artifacts that are unique to the ecosystem
         Write analysis artifacts to artifact_dir

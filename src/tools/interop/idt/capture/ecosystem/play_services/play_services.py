@@ -48,16 +48,12 @@ class PlayServices(EcosystemCapture):
 
         self.analysis = PlayServicesAnalysis(self.platform, self.artifact_dir)
 
-        service_ids = ['336',  # Home
-                       '305',  # Thread
-                       '168',  # mDNS
-                       ]
-        for service_id in service_ids:
-            verbose_command = f"shell setprop log.tag.gms_svc_id:{service_id} VERBOSE"
-            self.platform.run_adb_command(verbose_command)
+        self.service_ids = ['336',  # Home
+                            '305',  # Thread
+                            '168',  # mDNS
+                            ]
 
     def _write_standard_info_file(self) -> None:
-        """Write env details to json file"""
         for k, v in self.standard_info_data.items():
             print(f"{k}: {v}")
         standard_info_data_json = json.dumps(self.standard_info_data, indent=2)
@@ -65,10 +61,10 @@ class PlayServices(EcosystemCapture):
             standard_info_file.write(standard_info_data_json)
 
     def _parse_get_prop(self) -> None:
-        prop_cmd = self.platform.run_adb_command("shell getprop",
-                                                 capture_output=True)
-        full_get_prop = prop_cmd.get_captured_output()
-        for output in full_get_prop.split("\n"):
+        get_prop = self.platform.run_adb_command(
+            "shell getprop",
+            capture_output=True).get_captured_output()
+        for output in get_prop.split("\n"):
             for prop in props:
                 if prop in output:
                     self.standard_info_data[prop] = output[output.rindex("["):]
@@ -76,24 +72,25 @@ class PlayServices(EcosystemCapture):
     def _parse_dumpsys(self) -> None:
         for attr_name, command in dumpsys.items():
             command = f"shell dumpsys {command}"
-            command_r = self.platform.run_adb_command(
+            command_output = self.platform.run_adb_command(
                 command,
-                capture_output=True)
-            command_output = command_r.get_captured_output()
+                capture_output=True).get_captured_output()
             self.standard_info_data[attr_name] = command_output
 
     def _get_standard_info(self) -> None:
-        """Fetch helpful env details"""
         self._parse_get_prop()
         self._parse_dumpsys()
         self._write_standard_info_file()
 
-    def start_capture(self) -> None:
+    async def start_capture(self) -> None:
+        for service_id in self.service_ids:
+            verbose_command = f"shell setprop log.tag.gms_svc_id:{service_id} VERBOSE"
+            self.platform.run_adb_command(verbose_command)
         self._get_standard_info()
-        self.platform.start_streaming()
+        await self.platform.start_streaming()
 
-    def stop_capture(self) -> None:
-        self.platform.stop_streaming()
+    async def stop_capture(self) -> None:
+        await self.platform.stop_streaming()
 
-    def analyze_capture(self) -> None:
+    async def analyze_capture(self) -> None:
         self.analysis.do_analysis()

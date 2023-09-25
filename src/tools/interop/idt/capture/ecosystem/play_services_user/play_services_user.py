@@ -40,13 +40,13 @@ class PlayServicesUser(EcosystemCapture):
                 'ecosystem=PlayServicesUser')
         self.platform = platform
 
-    def start_capture(self) -> None:
-        self.platform.start_streaming()
+    async def start_capture(self) -> None:
+        await self.platform.start_streaming()
 
-    def stop_capture(self) -> None:
-        self.platform.stop_streaming()
+    async def stop_capture(self) -> None:
+        await self.platform.stop_streaming()
 
-    def analyze_capture(self) -> None:
+    async def analyze_capture(self) -> None:
         """"Show the start and end times of commissioning boundaries"""
         analysis_file = open(self.analysis_file, mode='w+')
         with open(self.platform.logcat_output_path, mode='r') as logcat_file:

@@ -14,15 +14,18 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
+import asyncio
 import os
+import traceback
 import typing
+from asyncio import get_running_loop
 
 import capture
-from capture.base import EcosystemCapture, PlatformLogStreamer
-from capture.file_utils import safe_mkdir
+from capture.base import EcosystemCapture, PlatformLogStreamer, UnsupportedCapturePlatformException
+from capture.file_utils import safe_mkdir, border_print
 
 _PLATFORM_MAP: typing.Dict[str, PlatformLogStreamer] = {}
+_ECOSYSTEM_MAP: typing.Dict[str, PlatformLogStreamer] = {}
 
 
 class CapturePlatforms:
@@ -35,7 +38,6 @@ class CapturePlatforms:
     def get_platform_impl(
             platform: str,
             artifact_dir: str) -> PlatformLogStreamer:
-        """Fetches a singleton instance of the requested platform transport"""
         if platform in _PLATFORM_MAP:
             return _PLATFORM_MAP[platform]
         platform_class = getattr(capture.platform, platform)
@@ -53,13 +55,61 @@ class CaptureEcosystems:
         return capture.ecosystem.__all__
 
     @staticmethod
-    def get_ecosystem_impl(
+    async def get_ecosystem_impl(
             ecosystem: str,
             platform: str,
             artifact_dir: str) -> EcosystemCapture:
+        if ecosystem in _ECOSYSTEM_MAP:
+            return _ECOSYSTEM_MAP[ecosystem]
         ecosystem_class = getattr(capture.ecosystem, ecosystem)
         ecosystem_artifact_dir = os.path.join(artifact_dir, ecosystem)
         safe_mkdir(ecosystem_artifact_dir)
         platform_instance = CapturePlatforms.get_platform_impl(
             platform, artifact_dir)
-        return ecosystem_class(platform_instance, ecosystem_artifact_dir)
+        ecosystem_instance = ecosystem_class(platform_instance, ecosystem_artifact_dir)
+        _ECOSYSTEM_MAP[ecosystem] = ecosystem_instance
+        return ecosystem_instance
+
+
+async def init_ecosystems(platform, ecosystem, artifact_dir):
+    ecosystems_to_load = CaptureEcosystems.list_available_ecosystems() \
+        if ecosystem == 'ALL' \
+        else [ecosystem]
+    for ecosystem in ecosystems_to_load:
+        try:
+            async with asyncio.timeout(30):
+                await CaptureEcosystems.get_ecosystem_impl(
+                    ecosystem, platform, artifact_dir)
+        except UnsupportedCapturePlatformException:
+            print(f"ERROR unsupported platform {ecosystem} {platform}")
+        except TimeoutError:
+            print(f"ERROR timeout starting ecosystem {ecosystem} {platform}")
+        except Exception:
+            print("ERROR unknown error instantiating ecosystem")
+            print(traceback.format_exc())
+
+
+async def handle_capture(attr):
+    for ecosystem in _ECOSYSTEM_MAP:
+        try:
+            border_print(f"{attr} capture for {ecosystem}")
+            async with asyncio.timeout(get_running_loop().time() + 60):
+                await getattr(_ECOSYSTEM_MAP[ecosystem], attr)()
+        except TimeoutError:
+            print(f"ERROR timeout {attr} {ecosystem}")
+        except Exception:
+            print(f"ERROR unexpected error {attr} {ecosystem}")
+            print(traceback.format_exc())
+
+
+async def start_captures():
+    await handle_capture("start_capture")
+
+
+async def stop_captures():
+    await handle_capture("stop_capture")
+
+
+async def analyze_captures():
+    # TODO: Enable realtime but keep this post capture analysis step
+    await handle_capture("analyze_capture")

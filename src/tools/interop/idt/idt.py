@@ -16,6 +16,7 @@
 #
 
 import argparse
+import asyncio
 import logging
 import os
 import shutil
@@ -23,6 +24,7 @@ import sys
 from pathlib import Path
 
 from capture import CaptureEcosystems, CapturePlatforms, PacketCaptureRunner
+from capture.factory import init_ecosystems, start_captures, stop_captures, analyze_captures
 from capture.file_utils import border_print, create_file_timestamp, safe_mkdir
 from discovery.matter_ble import MatterBleScanner
 from discovery.matter_dnssd import MatterDnssdListener
@@ -69,27 +71,14 @@ class InteropDebuggingTool:
         self.available_ecosystems_default = 'ALL'
         self.available_ecosystems.append(self.available_ecosystems_default)
 
-        # TODO: Support loading net interfaces on more platforms
         net_interface_path = "/sys/class/net/"
-        if os.path.exists(net_interface_path):
-            self.available_net_interfaces = os.listdir(net_interface_path)
-        else:
-            self.available_net_interfaces = []
-        self.available_net_interfaces_default = "wlan0mon" if "wlan0mon" in self.available_net_interfaces else None
-        if self.available_net_interfaces_default is None:
-            saw_one_wl_prefix = False
-            only_one_wl_prefix = True
-            last_seen_wl_interface = ""
-            for interface in self.available_net_interfaces:
-                if interface.startswith("wl") and not saw_one_wl_prefix:
-                    last_seen_wl_interface = interface
-                    saw_one_wl_prefix = True
-                elif interface.startswith("wl"):
-                    only_one_wl_prefix = False
-            if saw_one_wl_prefix and only_one_wl_prefix:
-                self.available_net_interfaces_default = last_seen_wl_interface
-        self.net_interface_required = self.available_net_interfaces_default is None
+        self.available_net_interfaces = os.listdir(net_interface_path) \
+            if os.path.exists(net_interface_path) \
+            else []
+        self.available_net_interfaces.append("any")
+        self.available_net_interfaces_default = "any"
         self.pcap_artifact_dir = os.path.join(self.artifact_dir, "pcap")
+        self.net_interface_required = self.available_net_interfaces_default is None
 
         self.ble_artifact_dir = os.path.join(self.artifact_dir, "ble")
         self.dnssd_artifact_dir = os.path.join(self.artifact_dir, "dnssd")
@@ -147,7 +136,7 @@ class InteropDebuggingTool:
                                     choices=['t', 'f'],
                                     default='t')
 
-        interface_help = "Run packet capture against a specified interface"
+        interface_help = "Specify packet capture interface"
         if self.available_net_interfaces_default:
             interface_help += f" (default {self.available_net_interfaces_default})"
         capture_parser.add_argument(
@@ -183,18 +172,9 @@ class InteropDebuggingTool:
         print(f'Output zip: {output_zip}')
 
     def command_capture(self, args: argparse.Namespace) -> None:
-
-        # TODO: Add UnsupportedCapturePlatformException exception handling here
         self.available_ecosystems.remove('ALL')
-        ecosystems = {}
-        if args.ecosystem == 'ALL':
-            for ecosystem in self.available_ecosystems:
-                ecosystems[ecosystem] = CaptureEcosystems.get_ecosystem_impl(
-                    ecosystem, args.platform, self.artifact_dir)
-        else:
-            ecosystems[args.ecosystem] = CaptureEcosystems.get_ecosystem_impl(
-                args.ecosystem, args.platform, self.artifact_dir)
-
+        asyncio.run(init_ecosystems(args.platform, args.ecosystem, self.artifact_dir))
+        asyncio.run(start_captures())
         pcap = args.pcap == 't'
         pcap_runner = None if not pcap else PacketCaptureRunner(
             self.pcap_artifact_dir, args.interface)
@@ -203,24 +183,14 @@ class InteropDebuggingTool:
             safe_mkdir(self.pcap_artifact_dir)
             pcap_runner.start_pcap()
 
-        for ecosystem in ecosystems:
-            border_print(f"Starting capture for {ecosystem}")
-            ecosystems[ecosystem].start_capture()
-
+        # TODO: Non blocking e.g. select.select([sys.stdin], [], [], 5)
         border_print("Press enter to stop streaming", important=True)
         input("")
 
         if pcap:
             border_print("Stopping pcap")
             pcap_runner.stop_pcap()
-
-        for ecosystem in ecosystems:
-            border_print(f"Stopping capture for {ecosystem}")
-            ecosystems[ecosystem].stop_capture()
-
-        for ecosystem in ecosystems:
-            border_print(f"Analyze + collate capture for {ecosystem}")
-            ecosystems[ecosystem].analyze_capture()
-
-        border_print("Zipping artifacts, this may take a second!")
+        asyncio.run(stop_captures())
+        asyncio.run(analyze_captures())
+        border_print("Compressing artifacts, this may take some time!")
         self.zip_artifacts()
