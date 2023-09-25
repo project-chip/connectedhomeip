@@ -69,10 +69,12 @@ public:
         VerifyOrReturn(CHIP_NO_ERROR == err, command->SetCommandExitStatus(err));
         ChipLogProgress(chipTool, "RCAC: %s", rcacStr.c_str());
 
-        auto ipkValue = ipk.ValueOr(chip::Crypto::IdentityProtectionKeySpan());
         std::string ipkStr;
-        err = ToBase64(ipkValue, ipkStr);
-        VerifyOrReturn(CHIP_NO_ERROR == err, command->SetCommandExitStatus(err));
+        if (ipk.HasValue())
+        {
+            err = ToBase64(ipk.Value(), ipkStr);
+            VerifyOrReturn(CHIP_NO_ERROR == err, command->SetCommandExitStatus(err));
+        }
         ChipLogProgress(chipTool, "IPK: %s", ipkStr.c_str());
 
         err = RemoteDataModelLogger::LogIssueNOCChain(nocStr.c_str(), icacStr.c_str(), rcacStr.c_str(), ipkStr.c_str());

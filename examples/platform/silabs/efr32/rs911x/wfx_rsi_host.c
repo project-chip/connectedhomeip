@@ -203,11 +203,7 @@ sl_status_t wfx_connect_to_ap(void)
  ***********************************************************************/
 sl_status_t wfx_power_save()
 {
-    if (wfx_rsi_power_save() != RSI_ERROR_NONE)
-    {
-        return SL_STATUS_FAIL;
-    }
-    return SL_STATUS_OK;
+    return (wfx_rsi_power_save() ? SL_STATUS_FAIL : SL_STATUS_OK);
 }
 #endif /* SL_ICD_ENABLED */
 

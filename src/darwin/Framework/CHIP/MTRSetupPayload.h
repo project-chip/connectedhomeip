@@ -52,7 +52,7 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
  */
 @interface MTROptionalQRCodeInfo : NSObject
 
-@property (nonatomic, assign) MTROptionalQRCodeInfoType type API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@property (nonatomic, assign) MTROptionalQRCodeInfoType type MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The numeric value of the TLV tag for this information item.
@@ -87,7 +87,7 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
  * this will be set to MTRDiscoveryCapabilitiesUnknown.
  */
 @property (nonatomic, assign)
-    MTRDiscoveryCapabilities discoveryCapabilities API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTRDiscoveryCapabilities discoveryCapabilities MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 @property (nonatomic, copy) NSNumber * discriminator;
 
 /**
@@ -97,7 +97,7 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
  * discriminator can be anything in the range 0xA00 t0 0xAFF.
  */
 @property (nonatomic, assign) BOOL hasShortDiscriminator;
-@property (nonatomic, copy) NSNumber * setupPasscode API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@property (nonatomic, copy) NSNumber * setupPasscode MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 @property (nonatomic, copy, nullable) NSString * serialNumber;
 - (NSArray<MTROptionalQRCodeInfo *> * _Nullable)getAllOptionalVendorData:(NSError * __autoreleasing *)error;
@@ -110,7 +110,7 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
 /**
  * Generate a random Matter-valid setup passcode.
  */
-+ (NSNumber *)generateRandomSetupPasscode API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
++ (NSNumber *)generateRandomSetupPasscode MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 /**
  * Create an MTRSetupPayload with the given onboarding payload.
@@ -119,14 +119,14 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
  */
 + (MTRSetupPayload * _Nullable)setupPayloadWithOnboardingPayload:(NSString *)onboardingPayload
                                                            error:(NSError * __autoreleasing *)error
-    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+    MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 /**
  * Initialize an MTRSetupPayload with the given passcode and discriminator.
  * This will pre-set version, product id, and vendor id to 0.
  */
 - (instancetype)initWithSetupPasscode:(NSNumber *)setupPasscode
-                        discriminator:(NSNumber *)discriminator API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+                        discriminator:(NSNumber *)discriminator MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 /** Get 11 digit manual entry code from the setup payload. */
 - (NSString * _Nullable)manualEntryCode;
@@ -138,7 +138,7 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
  * information a QR code needs).
  */
 - (NSString * _Nullable)qrCodeString:(NSError * __autoreleasing *)error
-    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+    MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 @end
 

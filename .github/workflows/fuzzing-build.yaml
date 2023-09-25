@@ -39,7 +39,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - run: apt-get update
             - run: apt-get install --fix-missing llvm-10 clang-10
             - name: Try to ensure the objdir-clone dir exists
@@ -77,7 +77,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Setup Environment
               run: brew install llvm
             - name: Try to ensure the objdir-clone dir exists

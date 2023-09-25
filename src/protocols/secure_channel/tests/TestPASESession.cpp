@@ -161,8 +161,8 @@ void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
     loopback.Reset();
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.WaitForPairing(sessionManager, sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
-                                          ByteSpan(nullptr, 0), Optional<ReliableMessageProtocolConfig>::Missing(),
+                   pairing.WaitForPairing(sessionManager, sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount, ByteSpan(),
+                                          Optional<ReliableMessageProtocolConfig>::Missing(),
                                           &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
     ctx.DrainAndServiceIO();
 

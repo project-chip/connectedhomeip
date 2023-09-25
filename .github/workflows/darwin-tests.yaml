@@ -45,7 +45,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install coreutils
@@ -70,10 +70,9 @@ jobs:
               # Enable -Wconversion by hand as well, because it seems to not be
               # enabled by default in the Xcode config.
               #
-              # Disable -Wunguarded-availability-new because we internally use
-              # APIs we added after our deployment target version.  Maybe we
-              # should change the deployment target version instead?
-              run: xcodebuild -target "darwin-framework-tool" -sdk macosx OTHER_CFLAGS='${inherited} -Wconversion -Wno-unguarded-availability-new'
+              # Disable availability annotations, since we are not building against a system
+              # Matter.framework.
+              run: xcodebuild -target "darwin-framework-tool" -sdk macosx -configuration Debug OTHER_CFLAGS='${inherited} -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true

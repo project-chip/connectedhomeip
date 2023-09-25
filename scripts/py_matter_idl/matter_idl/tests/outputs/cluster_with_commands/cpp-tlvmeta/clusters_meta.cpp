@@ -16,25 +16,25 @@ const Entry<ItemInfo> _OnOff[] = {
   { { CommandTag(2), "Toggle", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::Toggle::()
 };
 
-const Entry<ItemInfo> _OnOff_OnOffDelayedAllOffEffectVariant[] = {
-  { { ConstantValueTag(0x0), "kFadeToOffIn0p8Seconds", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::OnOffDelayedAllOffEffectVariant::kFadeToOffIn0p8Seconds
-  { { ConstantValueTag(0x1), "kNoFade", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::OnOffDelayedAllOffEffectVariant::kNoFade
-  { { ConstantValueTag(0x2), "k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::OnOffDelayedAllOffEffectVariant::k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds
+const Entry<ItemInfo> _OnOff_DelayedAllOffEffectVariantEnum[] = {
+  { { ConstantValueTag(0x0), "kDelayedOffFastFade", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::DelayedAllOffEffectVariantEnum::kDelayedOffFastFade
+  { { ConstantValueTag(0x1), "kNoFade", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::DelayedAllOffEffectVariantEnum::kNoFade
+  { { ConstantValueTag(0x2), "kDelayedOffSlowFade", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::DelayedAllOffEffectVariantEnum::kDelayedOffSlowFade
 };
 
-const Entry<ItemInfo> _OnOff_OnOffDyingLightEffectVariant[] = {
-  { { ConstantValueTag(0x0), "k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::OnOffDyingLightEffectVariant::k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second
+const Entry<ItemInfo> _OnOff_DyingLightEffectVariantEnum[] = {
+  { { ConstantValueTag(0x0), "kDyingLightFadeOff", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::DyingLightEffectVariantEnum::kDyingLightFadeOff
 };
 
-const Entry<ItemInfo> _OnOff_OnOffEffectIdentifier[] = {
-  { { ConstantValueTag(0x0), "kDelayedAllOff", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::OnOffEffectIdentifier::kDelayedAllOff
-  { { ConstantValueTag(0x1), "kDyingLight", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::OnOffEffectIdentifier::kDyingLight
+const Entry<ItemInfo> _OnOff_EffectIdentifierEnum[] = {
+  { { ConstantValueTag(0x0), "kDelayedAllOff", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::EffectIdentifierEnum::kDelayedAllOff
+  { { ConstantValueTag(0x1), "kDyingLight", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::EffectIdentifierEnum::kDyingLight
 };
 
-const Entry<ItemInfo> _OnOff_OnOffStartUpOnOff[] = {
-  { { ConstantValueTag(0x0), "kOff", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::OnOffStartUpOnOff::kOff
-  { { ConstantValueTag(0x1), "kOn", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::OnOffStartUpOnOff::kOn
-  { { ConstantValueTag(0x2), "kTogglePreviousOnOff", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::OnOffStartUpOnOff::kTogglePreviousOnOff
+const Entry<ItemInfo> _OnOff_StartUpOnOffEnum[] = {
+  { { ConstantValueTag(0x0), "kOff", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::StartUpOnOffEnum::kOff
+  { { ConstantValueTag(0x1), "kOn", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::StartUpOnOffEnum::kOn
+  { { ConstantValueTag(0x2), "kToggle", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::StartUpOnOffEnum::kToggle
 };
 
 const Entry<ItemInfo> _OnOff_OnOffControl[] = {
@@ -66,10 +66,10 @@ const std::array<const Node<ItemInfo>, 8 + 2> clusters_meta = { {
   _ENTRY(_all_clusters), // 0
   _ENTRY(_primitive_type_list), // 1
   _ENTRY(_OnOff), // 2
-  _ENTRY(_OnOff_OnOffDelayedAllOffEffectVariant), // 3
-  _ENTRY(_OnOff_OnOffDyingLightEffectVariant), // 4
-  _ENTRY(_OnOff_OnOffEffectIdentifier), // 5
-  _ENTRY(_OnOff_OnOffStartUpOnOff), // 6
+  _ENTRY(_OnOff_DelayedAllOffEffectVariantEnum), // 3
+  _ENTRY(_OnOff_DyingLightEffectVariantEnum), // 4
+  _ENTRY(_OnOff_EffectIdentifierEnum), // 5
+  _ENTRY(_OnOff_StartUpOnOffEnum), // 6
   _ENTRY(_OnOff_OnOffControl), // 7
   _ENTRY(_OnOff_OnOffFeature), // 8
   _ENTRY(_OnOff_ScenesFeature), // 9
