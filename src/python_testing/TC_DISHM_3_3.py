@@ -167,7 +167,7 @@ class TC_DISHM_3_3(MatterBaseTest):
 
         logging.info("CurrentMode: %s" % (current_mode))
 
-        asserts.assert_true(new_on_mode_dut == current_mode, "CurrentMode must match OnMode after a power cycle")
+        asserts.assert_true(current_mode == new_on_mode_dut, "CurrentMode must match OnMode after a power cycle")
 
 
 if __name__ == "__main__":
