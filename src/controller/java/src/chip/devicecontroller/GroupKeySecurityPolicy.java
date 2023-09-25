@@ -19,25 +19,25 @@
 package chip.devicecontroller;
 
 public enum GroupKeySecurityPolicy {
-    TrustFirst(0),
-    CacheAndSync(1);
+  TrustFirst(0),
+  CacheAndSync(1);
 
-    private int id;
+  private int id;
 
-    GroupKeySecurityPolicy(int id) {
-        this.id = id;
+  GroupKeySecurityPolicy(int id) {
+    this.id = id;
+  }
+
+  public int getID() {
+    return id;
+  }
+
+  public static GroupKeySecurityPolicy value(int id) {
+    for (GroupKeySecurityPolicy policy : GroupKeySecurityPolicy.values()) {
+      if (policy.id == id) {
+        return policy;
+      }
     }
-
-    public int getID() {
-        return id;
-    }
-
-    public static GroupKeySecurityPolicy value(int id) {
-        for (GroupKeySecurityPolicy policy : GroupKeySecurityPolicy.values()) {
-            if (policy.id == id) {
-                return policy;
-            }
-        }
-        return null;
-    }
+    return null;
+  }
 }
