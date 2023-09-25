@@ -1,5 +1,5 @@
 {
-  "featureLevel": 97,
+  "featureLevel": 98,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -33,10 +33,9 @@
   ],
   "endpointTypes": [
     {
-      "id": 4,
+      "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "id": 2,
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
@@ -44,15 +43,11 @@
       },
       "deviceTypes": [
         {
-          "id": 2,
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice"
         }
-      ],
-      "deviceTypeRefs": [
-        2
       ],
       "deviceVersions": [
         1
@@ -5420,10 +5415,9 @@
       ]
     },
     {
-      "id": 3,
+      "id": 2,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
-        "id": 8,
         "code": 256,
         "profileId": 259,
         "label": "MA-onofflight",
@@ -5431,15 +5425,11 @@
       },
       "deviceTypes": [
         {
-          "id": 8,
           "code": 256,
           "profileId": 259,
           "label": "MA-onofflight",
           "name": "MA-onofflight"
         }
-      ],
-      "deviceTypeRefs": [
-        8
       ],
       "deviceVersions": [
         1
@@ -6338,7 +6328,7 @@
               "code": 16387,
               "mfgCode": null,
               "side": "server",
-              "type": "OnOffStartUpOnOff",
+              "type": "StartUpOnOffEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -7731,6 +7721,5 @@
       "endpointId": 1,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

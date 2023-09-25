@@ -22,7 +22,7 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class BasicInformationClusterProductAppearanceStruct(val finish: Int, val primaryColor: Int?) {
+class BasicInformationClusterProductAppearanceStruct(val finish: UInt, val primaryColor: UInt?) {
   override fun toString(): String = buildString {
     append("BasicInformationClusterProductAppearanceStruct {\n")
     append("\tfinish : $finish\n")
@@ -30,9 +30,9 @@ class BasicInformationClusterProductAppearanceStruct(val finish: Int, val primar
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_FINISH), finish)
       if (primaryColor != null) {
         put(ContextSpecificTag(TAG_PRIMARY_COLOR), primaryColor)
@@ -47,12 +47,12 @@ class BasicInformationClusterProductAppearanceStruct(val finish: Int, val primar
     private const val TAG_FINISH = 0
     private const val TAG_PRIMARY_COLOR = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): BasicInformationClusterProductAppearanceStruct {
-      tlvReader.enterStructure(tag)
-      val finish = tlvReader.getInt(ContextSpecificTag(TAG_FINISH))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): BasicInformationClusterProductAppearanceStruct {
+      tlvReader.enterStructure(tlvTag)
+      val finish = tlvReader.getUInt(ContextSpecificTag(TAG_FINISH))
       val primaryColor =
         if (!tlvReader.isNull()) {
-          tlvReader.getInt(ContextSpecificTag(TAG_PRIMARY_COLOR))
+          tlvReader.getUInt(ContextSpecificTag(TAG_PRIMARY_COLOR))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_PRIMARY_COLOR))
           null

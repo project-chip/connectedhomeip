@@ -62,10 +62,13 @@ if (chip_enable_wifi) {
   assert(use_rs9116 || use_wf200 || use_SiWx917)
   import("${chip_root}/src/platform/silabs/wifi_args.gni")
 
-  if (use_rs9116 || use_SiWx917) {
+  if (use_rs9116) {
     wiseconnect_sdk_root =
         "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
     import("rs911x/rs911x.gni")
+  } else if (use_SiWx917) {
+    wifi_sdk_root = "${chip_root}/third_party/silabs/wifi_sdk"
+    import("rs911x/rs9117.gni")
   }
   if (use_wf200) {
     import("wf200/wf200.gni")

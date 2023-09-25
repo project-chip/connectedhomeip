@@ -489,6 +489,8 @@ Usage:
 
 ```
 
+<hr>
+
 ### Getting the list of commands supported for a specific cluster
 
 To print the list of commands supported by a specific cluster, use the following
@@ -539,6 +541,8 @@ Usage:
 
 ```
 
+<hr>
+
 ### Getting the list of attributes supported for a specific cluster
 
 To get the list of attributes for a specific cluster, use the following command
@@ -582,6 +586,8 @@ Usage:
   +-------------------------------------------------------------------------------------+
 [1647417857.914110][404444:404444] CHIP:TOO: Run command failure: ../../examples/chip-tool/commands/common/Commands.cpp:120: Error 0x0000002F
 ```
+
+<hr>
 
 ### Getting the list of command options
 
@@ -668,6 +674,69 @@ The following flags are available:
     Here, _<onoff\>_ is a `[0/1]` flag, which when set to `1` prints the trace
     data with automation logs to the console.
 
+<hr>
+
+### Commissioner name and ID flags
+
+All CHIP Tool commands can be used together with the following
+commissioner-related flags:
+
+-   `--commissioner-name`
+-   `--commissioner-nodeid`
+
+These flags let you control which fabric and node ID are used for the CHIP Tool
+when interacting with devices. They are especially useful in scenarios where you
+are working with more than one fabric, but you can also use them with a single
+CHIP Tool node identity.
+
+#### `--commissioner-name` flag
+
+This flag lets you control which fabric is used by selecting a specific fabric
+commissioner.
+
+As per the CHIP Tool implementation, the commissioners are required to have the
+following names: `alpha` for the first one, `beta` for the second one, `gamma`
+for the third one, `4` for the fourth one, `5` for the fifth one, and so on.
+
+If you don't use this flag, the CHIP Tool assumes that the command is meant for
+the `alpha` commissioner and hence for the fabric associated with this
+commissioner.
+
+**Example of commands:**
+
+```
+$ ./chip-tool any subscribe-by-id '0x0028,0x0028,0x0101,0x0028,0x0028,0x0028' '5,6,0,1,2,4' 100 1000 1 '0,0,1,0,0,0' --keepSubscriptions true
+$ ./chip-tool any subscribe-by-id '0x0028,0x0028,0x0101,0x0028,0x0028,0x0028' '5,6,0,1,2,4' 100 1000 2 '0,0,1,0,0,0' --keepSubscriptions true --commissioner-name beta
+$ ./chip-tool any subscribe-by-id '0x0028,0x0028,0x0101,0x0028,0x0028,0x0028' '5,6,0,1,2,4' 100 1000 3 '0,0,1,0,0,0' --keepSubscriptions true --commissioner-name gamma
+```
+
+#### `--commissioner-nodeid` flag
+
+This flag lets you select the node ID to use on the fabric specified with the
+`--commissioner-name` flag.
+
+If you don't use this flag, the CHIP Tool assumes that the command is sent with
+the ID value that the CHIP Tool has in storage. If there's none, the CHIP Tool
+sends the command with the default fallback node ID `112233`.
+
+> **Note:** If the device has been already commissioned with a specific
+> `--commissioner-nodeid`, you must always provide the `--commissioner-nodeid`
+> flag with the CHIP Tool commands or update the Access Control List (ACL) on
+> the device. Otherwise, the default fallback node ID `112233` is used and the
+> communication will fail.
+
+**Example of commands:**
+
+```
+$ ./chip-tool pairing code-thread 1 hex:000030000150208562618342348532605109bd31cda6908667addca8789211addac0102c4a9 34970112332 --commissioner-name alpha --commissioner-nodeid 999999
+```
+
+```
+$ ./chip-tool basicinformation read vendor-id --commissioner-name alpha --commissioner-nodeid 999999
+```
+
+<hr>
+
 ### Running a test suite against a paired peer device
 
 The CHIP Tool allows to run a set of tests, already compiled in the tool,
@@ -692,6 +761,8 @@ against a paired Matter device.
 
 See the [Examples](#running-testclusters-test) section for an example of how to
 run a test from the test suite.
+
+<hr>
 
 ### Parsing the setup payload
 
@@ -722,17 +793,21 @@ Here, _<payload\>_ is the ID of the payload to be parsed.
     $ ./chip-tool payload parse-setup-payload 34970112332
     ```
 
+<hr>
+
 ### Parsing additional data payload
 
 To parse additional data payload, use the following command pattern:
 
 ```
-$ ./chip-tool parse-additional-data-payload <payload>
+$ ./chip-tool payload parse-additional-data-payload <payload>
 ```
 
 In this command:
 
 -   _<payload\>_ is the ID of the payload with additional data to be parsed.
+
+<hr>
 
 ### Discover actions
 
@@ -778,25 +853,111 @@ following command:
 $ ./chip-tool discover commissioners
 ```
 
+<hr>
+
 ### Pairing
 
-The `pairing` command supports different means regarding Matter device
-commissioning procedure.
+The `pairing` command supports different methods for Matter device commissioning
+procedure. The recommended methods are the following:
 
-Thread and Wi-Fi commissioning use cases are described in the
-[Using the CHIP Tool for Matter device testing](#using-chip-tool-for-matter-device-testing)
-section.
+-   `code-thread` - For Thread commissioning.
+-   `code-wifi` - For Wi-Fi commissioning.
+-   `code` - For commissioning the device when it is already present in an IP
+    network.
 
-To list all `pairing` sub-commands, run the following command:
+Alternatively, you can also use the following methods described in the
+[Using CHIP Tool for Matter device testing](#using-chip-tool-for-matter-device-testing)
+section:
+
+-   `ble-thread` - For Thread commissioning; described under
+    [Commissioning into a Thread network over Bluetooth LE](#commissioning-into-a-thread-network-over-bluetooth-le).
+-   `ble-wifi` - For Wi-Fi commissioning; described under
+    [Commissioning into a Wi-Fi network over Bluetooth LE](#commissioning-into-a-wi-fi-network-over-bluetooth-le)
+-   `onnetwork` - For commissioning the device when it is already present in an
+    IP network; described under
+    [Commissioning with setup PIN code](#commissioning-with-setup-pin-code)
+
+To list all `pairing` sub-commands and commissioning methods, run the following
+command:
 
 ```
 $ ./chip-tool pairing
 ```
 
+**Example of commands:**
+
+The following command commissions the Thread device with the node ID `1` to the
+Matter fabric. The `hex:...` parameter is the operational dataset that contains
+information about the Thread network to which the device is going to be
+commissioned. The onboarding dataset payload `34970112332` (short manual pairing
+code) is used to discover and commission the device.
+
+```
+$ ./chip-tool pairing code-thread 1 hex:000030000150208562618342348532605109bd31cda6908667addca8789211addac0102c4a9 34970112332
+```
+
+The following command commissions the Wi-Fi device with the node ID `1` to the
+Matter fabric The SSID `wifi_test` and the password `admin123` is the required
+information about the Wi-Fi network to which the device is going to be
+commissioned. The onboarding dataset payload `34970112332` (short manual pairing
+code) is used to discover and commission the device.
+
+```
+$ ./chip-tool pairing code-wifi 1 wifi_test admin123 34970112332
+```
+
+The following command commissions the device with the node ID `1` to the Matter
+fabric. The onboarding dataset payload `MT:8IXS142C00KA0648G00` (QR code
+payload) is used to discover and commission the device.
+
+```
+$ ./chip-tool pairing code 1 MT:8IXS142C00KA0648G00
+```
+
+#### Attestation-related flags
+
+The `pairing` commissioning command can be run with several flags that allow you
+to modify attestation-related settings:
+
+-   `--paa-trust-store-path` - Use to provide the path to the directory that
+    contains the information about Product Attestation Authority (PAA)
+    certificates. The path can be absolute or relative to the current working
+    directory. With this flag, the CHIP Tool looks for the PAA certificate that
+    matches the PAI and the DAC certificates programmed on the device. Without
+    this flag, the CHIP Tool uses the built-in test PAA certificate.
+
+-   `--cd-trust-store-path` - Use to provide the path to the directory
+    containing the key that is used to validate the device's Certification
+    Declaration. The path can be absolute or relative to the current working
+    directory. With this flag, the CHIP tool looks for additional public keys,
+    in addition to the well-known built-in public keys (built-in public keys
+    `src/credentials/attestation_verifier/DefaultDeviceAttestationVerifier.cpp`),
+    to be used to validate Certification Declaration signatures.
+
+*   `--only-allow-trusted-cd-keys` - Use to only allow the keys from
+    `--cd-trust-store-path` and not the built-in test key. If the flag is not
+    provided or it is provided with the value `false`, untrusted CD verifying
+    keys are allowed. If it is provided with the value `true`
+    (`--only-allow-trusted-cd-keys true`), test keys are disallowed and CD
+    signed with the test key will not be accepted.
+
+*   `--bypass-attestation-verifier` - Use to bypass the attestation verifier. If
+    the flag is not provided or it is provided with the value `false`, the
+    attestation verifier is not bypassed. If it is provided with the value
+    `true` (`--bypass-attestation-verifier true`), the commissioning will
+    continue in case of the attestation verification failure. The failure can be
+    caused by errors in Certification Declaration, PAA or PAI certificates, or
+    in the Device Attestation Certificate. This option can be helpful if you
+    want to quickly commission a device with PAI and DAC certificates based on
+    an unknown PAA and/or with a Certification Declaration signed by an unknown
+    key.
+
+<hr>
+
 ### Interacting with Data Model clusters
 
 As mentioned in the
-[Using the CHIP Tool for Matter device testing](#using-chip-tool-for-matter-device-testing)
+[Using CHIP Tool for Matter device testing](#using-chip-tool-for-matter-device-testing)
 section, executing the `chip-tool` command with a particular cluster name lists
 all operations supported for this cluster, as in the following command pattern:
 
@@ -845,9 +1006,9 @@ cases.
 
 ##### Writing ACL to the `accesscontrol` cluster
 
-The Access Control List (ACL) concept allows to govern all Data Model
-interactions (such as read attribute, write attribute, invoke command). For more
-information about ACL, see
+The Access Control List concept allows to govern all Data Model interactions
+(such as read attribute, write attribute, invoke command). For more information
+about ACL, see
 [Access Control Guide](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/access-control-guide.md).
 
 To write ACL to the `accesscontrol` cluster, use the following command pattern:
@@ -909,6 +1070,8 @@ Complete the following steps to
 
 Read the [CHIP Test Suits](../../src/app/tests/suites/README.md) page for more
 information about how the test suite is structured.
+
+<hr>
 
 ### Multi-admin scenario
 

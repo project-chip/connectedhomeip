@@ -71,9 +71,15 @@ class App:
         return False
 
     def factoryReset(self):
+        wasRunning = (not self.killed) and self.stop()
+
         for kvs in self.kvsPathSet:
             if os.path.exists(kvs):
                 os.unlink(kvs)
+
+        if wasRunning:
+            return self.start()
+
         return True
 
     def waitForAnyAdvertisement(self):

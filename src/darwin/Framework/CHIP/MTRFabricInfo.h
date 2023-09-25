@@ -25,7 +25,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5))
+MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5))
 @interface MTRFabricInfo : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;

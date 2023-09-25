@@ -162,6 +162,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
     FabricIndex fabricIndex;
 #endif // CHIP_PROGRESS_LOGGING
 
+    PeerAddress destination_address;
+
     switch (sessionHandle->GetSessionType())
     {
     case Transport::Session::SessionType::kGroupOutgoing: {
@@ -184,7 +186,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             return CHIP_ERROR_INTERNAL;
         }
 
-        PeerAddress destination_address = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
+        destination_address = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
 
         // Trace before any encryption
         MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kGroupMessage, &payloadHeader, &packetHeader,
@@ -224,7 +226,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             .SetSessionId(session->GetPeerSessionId()) //
             .SetSessionType(Header::SessionType::kUnicastSession);
 
-        PeerAddress destination_address = session->GetPeerAddress();
+        destination_address = session->GetPeerAddress();
 
         // Trace before any encryption
         MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kSecureSession, &payloadHeader, &packetHeader,
@@ -259,8 +261,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             break;
         }
 
-        auto unauthenticated            = sessionHandle->AsUnauthenticatedSession();
-        PeerAddress destination_address = unauthenticated->GetPeerAddress();
+        auto unauthenticated = sessionHandle->AsUnauthenticatedSession();
+        destination_address  = unauthenticated->GetPeerAddress();
 
         // Trace after all headers are settled.
         MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kUnauthenticated, &payloadHeader, &packetHeader,
@@ -304,16 +306,24 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         snprintf(ackBuf, sizeof(ackBuf), " (Ack:" ChipLogFormatMessageCounter ")", payloadHeader.GetAckMessageCounter().Value());
     }
 
+    char addressStr[Transport::PeerAddress::kMaxToStringSize] = { 0 };
+    destination_address.ToString(addressStr);
+
+    // Work around pigweed not allowing more than 14 format args in a log
+    // message when using tokenized logs.
+    char typeStr[4 + 1 + 2 + 1];
+    snprintf(typeStr, sizeof(typeStr), "%04X:%02X", payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType());
+
     //
     // Legend that can be used to decode this log line can be found in messaging/README.md
     //
     ChipLogProgress(ExchangeManager,
                     "<<< [E:" ChipLogFormatExchangeId " S:%u M:" ChipLogFormatMessageCounter
-                    "%s] (%s) Msg TX to %u:" ChipLogFormatX64 " [%04X] --- Type %04X:%02X (%s:%s)",
+                    "%s] (%s) Msg TX to %u:" ChipLogFormatX64 " [%04X] [%s] --- Type %s (%s:%s)",
                     ChipLogValueExchangeIdFromSentHeader(payloadHeader), sessionHandle->SessionIdForLogging(),
                     packetHeader.GetMessageCounter(), ackBuf, Transport::GetSessionTypeString(sessionHandle), fabricIndex,
-                    ChipLogValueX64(destination), static_cast<uint16_t>(compressedFabricId),
-                    payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType(), protocolName, msgTypeName);
+                    ChipLogValueX64(destination), static_cast<uint16_t>(compressedFabricId), addressStr, typeStr, protocolName,
+                    msgTypeName);
 #endif
 
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
@@ -341,11 +351,6 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
         multicastAddress = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
         destination      = &multicastAddress;
-        char addressStr[Transport::PeerAddress::kMaxToStringSize];
-        multicastAddress.ToString(addressStr, Transport::PeerAddress::kMaxToStringSize);
-
-        ChipLogProgress(Inet, "(G) Sending msg " ChipLogFormatMessageCounter " to Multicast IPV6 address '%s'",
-                        preparedMessage.GetMessageCounter(), addressStr);
     }
     break;
     case Transport::Session::SessionType::kSecure: {
@@ -356,23 +361,12 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
         secure->MarkActive();
 
         destination = &secure->GetPeerAddress();
-
-        ChipLogProgress(Inet, "(S) Sending msg " ChipLogFormatMessageCounter " on secure session with LSID: %u",
-                        preparedMessage.GetMessageCounter(), secure->GetLocalSessionId());
     }
     break;
     case Transport::Session::SessionType::kUnauthenticated: {
         auto unauthenticated = sessionHandle->AsUnauthenticatedSession();
         unauthenticated->MarkActive();
         destination = &unauthenticated->GetPeerAddress();
-
-#if CHIP_PROGRESS_LOGGING
-        char addressStr[Transport::PeerAddress::kMaxToStringSize];
-        destination->ToString(addressStr);
-
-        ChipLogProgress(Inet, "(U) Sending msg " ChipLogFormatMessageCounter " to IP address '%s'",
-                        preparedMessage.GetMessageCounter(), addressStr);
-#endif
     }
     break;
     default:
@@ -533,7 +527,7 @@ CHIP_ERROR SessionManager::InjectPaseSessionWithTestKey(SessionHolder & sessionH
     size_t secretLen = CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH;
     ByteSpan secret(reinterpret_cast<const uint8_t *>(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE), secretLen);
     ReturnErrorOnFailure(secureSession->GetCryptoContext().InitFromSecret(
-        *mSessionKeystore, secret, ByteSpan(nullptr, 0), CryptoContext::SessionInfoType::kSessionEstablishment, role));
+        *mSessionKeystore, secret, ByteSpan(), CryptoContext::SessionInfoType::kSessionEstablishment, role));
     secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(Transport::PeerMessageCounter::kInitialSyncValue);
     sessionHolder.Grab(session.Value());
     return CHIP_NO_ERROR;
@@ -554,7 +548,7 @@ CHIP_ERROR SessionManager::InjectCaseSessionWithTestKey(SessionHolder & sessionH
     size_t secretLen = CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH;
     ByteSpan secret(reinterpret_cast<const uint8_t *>(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE), secretLen);
     ReturnErrorOnFailure(secureSession->GetCryptoContext().InitFromSecret(
-        *mSessionKeystore, secret, ByteSpan(nullptr, 0), CryptoContext::SessionInfoType::kSessionEstablishment, role));
+        *mSessionKeystore, secret, ByteSpan(), CryptoContext::SessionInfoType::kSessionEstablishment, role));
     secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(Transport::PeerMessageCounter::kInitialSyncValue);
     sessionHolder.Grab(session.Value());
     return CHIP_NO_ERROR;

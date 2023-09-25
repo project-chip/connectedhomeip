@@ -413,13 +413,6 @@ CHIP_ERROR AppTask::Init(void)
 #endif
     InitCommonParts();
 
-    err = ConnectivityMgr().SetBLEDeviceName("TelinkLight");
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("SetBLEDeviceName fail");
-        return err;
-    }
-
     memset(gDevices, 0, sizeof(gDevices));
 
     gLight1.SetReachable(true);

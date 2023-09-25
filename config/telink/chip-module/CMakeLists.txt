@@ -52,6 +52,8 @@ if (CONFIG_POSIX_API)
     matter_add_flags(-isystem${ZEPHYR_BASE}/include/zephyr/posix)
 endif()
 
+matter_add_flags(-DNL_ASSERT_USE_FLAGS_DEFAULT=1)
+
 zephyr_include_directories(${CHIP_ROOT}/src/platform/telink/)
 
 zephyr_get_compile_flags(ZEPHYR_CFLAGS_C C)
@@ -60,6 +62,8 @@ zephyr_get_compile_flags(ZEPHYR_CFLAGS_CC CXX)
 matter_add_cxxflags("${ZEPHYR_CFLAGS_CC}")
 zephyr_get_gnu_cpp_standard(ZEPHYR_GNU_CPP_STD)
 matter_add_cxxflags(${ZEPHYR_GNU_CPP_STD})
+
+matter_add_flags(-DMBEDTLS_USER_CONFIG_FILE=<telink-mbedtls-config.h>)
 
 # Set up custom OpenThread configuration
 
