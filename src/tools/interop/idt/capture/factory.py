@@ -22,7 +22,7 @@ from asyncio import get_running_loop
 
 import capture
 from capture.base import EcosystemCapture, PlatformLogStreamer, UnsupportedCapturePlatformException
-from capture.file_utils import safe_mkdir, border_print
+from capture.file_utils import border_print, safe_mkdir
 
 _PLATFORM_MAP: typing.Dict[str, PlatformLogStreamer] = {}
 _ECOSYSTEM_MAP: typing.Dict[str, PlatformLogStreamer] = {}

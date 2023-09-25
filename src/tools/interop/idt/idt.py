@@ -24,7 +24,7 @@ import sys
 from pathlib import Path
 
 from capture import CaptureEcosystems, CapturePlatforms, PacketCaptureRunner
-from capture.factory import init_ecosystems, start_captures, stop_captures, analyze_captures
+from capture.factory import analyze_captures, init_ecosystems, start_captures, stop_captures
 from capture.file_utils import border_print, create_file_timestamp, safe_mkdir
 from discovery.matter_ble import MatterBleScanner
 from discovery.matter_dnssd import MatterDnssdListener
