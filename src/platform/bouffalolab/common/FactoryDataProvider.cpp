@@ -682,28 +682,5 @@ CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & un
 #endif
 }
 
-extern "C" bool spake2pUtils_test(uint32_t aIt, uint8_t * aSalt, uint32_t aSaltLen, uint8_t * aSaltVerifier,
-                                  uint32_t * pSaltVerifierLen, uint32_t pincode)
-{
-    chip::Crypto::Spake2pVerifier verifier;
-    ByteSpan salt(aSalt, aSaltLen);
-    chip::MutableByteSpan serializedVerifierSpan(aSaltVerifier, *pSaltVerifierLen);
-
-    VerifyOrReturnValue(aIt >= chip::Crypto::kSpake2p_Min_PBKDF_Iterations && aIt <= chip::Crypto::kSpake2p_Max_PBKDF_Iterations,
-                        false);
-    VerifyOrReturnValue(aSalt && aSaltLen >= chip::Crypto::kSpake2p_Min_PBKDF_Salt_Length &&
-                            aSaltLen <= chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length,
-                        false);
-    VerifyOrReturnValue(aSaltVerifier && *pSaltVerifierLen >= chip::Crypto::kSpake2p_VerifierSerialized_Length, false);
-
-    VerifyOrReturnValue(CHIP_NO_ERROR == verifier.Generate(aIt, salt, pincode), false);
-
-    VerifyOrReturnValue(CHIP_NO_ERROR == verifier.Serialize(serializedVerifierSpan), false);
-
-    *pSaltVerifierLen = serializedVerifierSpan.size();
-
-    return true;
-}
-
 } // namespace DeviceLayer
 } // namespace chip

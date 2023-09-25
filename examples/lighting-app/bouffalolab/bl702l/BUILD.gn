@@ -20,6 +20,7 @@ import("${bouffalolab_iot_sdk_build_root}/bl702l/bl_iot_sdk.gni")
 import("${bouffalolab_iot_sdk_build_root}/common/bouffalolab_executable.gni")
 import("${build_root}/config/defaults.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/src/platform/bouffalolab/common/args.gni")
 import("${chip_root}/src/platform/device.gni")
 
 import("${chip_root}/src/app/chip_data_model.gni")
@@ -124,6 +125,14 @@ bouffalolab_executable("lighting_app") {
 
   if (false == enable_reset_counter) {
     defines += [ "BOOT_PIN_RESET=16" ]
+  }
+
+  if (chip_enable_factory_data) {
+    defines += [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=1" ]
+  }
+
+  if (chip_enable_factory_data_test) {
+    defines += [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST=1" ]
   }
 
   if ("BL704LDK" == board) {

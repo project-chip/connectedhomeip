@@ -1,16 +1,16 @@
 [pt_table]
 #partition table is 4K in size
-address0 = 0x1000
-address1 = 0x2000
+address0 = 0xE000
+address1 = 0xF000
 
 [[pt_entry]]
 type = 0
 name = "FW"
 device = 0
-address0 = 0x3000
-size0 = 0x134000
-address1 = 0x137000
-size1 = 0xBB000
+address0 = 0x10000
+size0 = 0x12A000
+address1 = 0x13A000
+size1 = 0xB8000
 # compressed image must set len,normal image can left it to 0
 len = 0
 activeindex = 0
@@ -20,8 +20,8 @@ age = 0
 type = 1
 name = "mfg"
 device = 0
-address0 = 0x137000
-size0 = 0xBB000
+address0 = 0x13A000
+size0 = 0xB8000
 address1 = 0
 size1 = 0
 # compressed image must set len,normal image can left it to 0

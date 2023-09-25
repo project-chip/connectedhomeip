@@ -931,11 +931,30 @@ template("bl_iot_sdk") {
     ]
   }
 
+  config("${sdk_target_name}_config_factory_data") {
+    include_dirs = [ "${bl_iot_sdk_root}/components/network/matter/matter_factory_data/include" ]
+  }
+
+  source_set("${sdk_target_name}_factory_data") {
+    sources = [
+      "${bl_iot_sdk_root}/components/network/matter/matter_factory_data/efuse_slot.c",
+      "${bl_iot_sdk_root}/components/network/matter/matter_factory_data/matter_factory_data.c",
+    ]
+    configs += [
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_freertos",
+      ":${sdk_target_name}_config_BSP_Driver",
+      ":${sdk_target_name}_config_hosal",
+    ]
+    public_configs = [ ":${sdk_target_name}_config_factory_data" ]
+  }
+
   group(sdk_target_name) {
     public_deps = [
       ":${sdk_target_name}_BSP_Driver",
       ":${sdk_target_name}_bl702_freertos",
       ":${sdk_target_name}_ble",
+      ":${sdk_target_name}_factory_data",
       ":${sdk_target_name}_fs",
       ":${sdk_target_name}_hosal",
       ":${sdk_target_name}_libc",

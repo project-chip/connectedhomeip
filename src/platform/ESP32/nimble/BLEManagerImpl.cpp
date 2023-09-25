@@ -1006,7 +1006,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureScanResponseData(ByteSpan data)
     }
     memcpy(scanResponseBuffer, data.data(), data.size());
     ByteSpan scanResponseSpan(scanResponseBuffer);
-    mScanResponse = chip::Optional(scanResponseSpan);
+    mScanResponse = chip::Optional<ByteSpan>(scanResponseSpan);
     return CHIP_NO_ERROR;
 }
 
