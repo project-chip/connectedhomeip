@@ -1880,6 +1880,9 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
     case CommissioningStage::kCheckForMatchingFabric:
         ParseFabrics();
         break;
+    case CommissioningStage::kIcdDiscovery:
+        ParseIcdInfo();
+        break;
     default:
         // We're not trying to read anything here, just exit
         break;
@@ -2173,6 +2176,43 @@ void DeviceCommissioner::ParseFabrics()
     CommissioningDelegate::CommissioningReport report;
     report.Set<MatchingFabricInfo>(info);
     CommissioningStageComplete(return_err, report);
+}
+
+void DeviceCommissioner::ParseIcdInfo()
+{
+    CHIP_ERROR err;
+    IcdInfo info;
+    IcdManagement::Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
+
+    err = mAttributeCache->Get<IcdManagement::Attributes::FeatureMap::TypeInfo>(kRootEndpointId, featureMap);
+    if (err == CHIP_NO_ERROR)
+    {
+        info.isIcd                  = true;
+        info.checkInProtocolSupport = !!(featureMap & 0x1);
+    }
+    else if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
+    {
+        app::StatusIB statusIB;
+        err = mAttributeCache->GetStatus(
+            app::ConcreteAttributePath(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::FeatureMap::Id), statusIB);
+        if (err != CHIP_NO_ERROR)
+        {
+            CommissioningStageComplete(err);
+            return;
+        }
+        if (statusIB.mStatus == Protocols::InteractionModel::Status::UnsupportedCluster)
+        {
+            info.isIcd = false;
+        }
+        else
+        {
+            err = statusIB.ToChipError();
+        }
+    }
+
+    CommissioningDelegate::CommissioningReport report;
+    report.Set<IcdInfo>(info);
+    CommissioningStageComplete(err, report);
 }
 
 void DeviceCommissioner::OnArmFailSafe(void * context,
@@ -2780,6 +2820,14 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                                                                /* attemptCount = */ 3, &mOnDeviceConnectionRetryCallback
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
         );
+    }
+    break;
+    case CommissioningStage::kIcdDiscovery: {
+        app::AttributePathParams readPaths[1];
+        // Read all the feature maps for all the networking clusters on any endpoint to determine what is supported
+        readPaths[0] =
+            app::AttributePathParams(app::Clusters::IcdManagement::Id, app::Clusters::IcdManagement::Attributes::FeatureMap::Id);
+        SendCommissioningReadRequest(proxy, timeout, readPaths, 1);
     }
     break;
     case CommissioningStage::kSendComplete: {

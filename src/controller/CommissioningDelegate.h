@@ -59,8 +59,12 @@ enum CommissioningStage : uint8_t
     kWiFiNetworkEnable,          ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
     kThreadNetworkEnable,        ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
     kFindOperational,            ///< Perform operational discovery and establish a CASE session with the device
-    kSendComplete,               ///< Send CommissioningComplete (0x30:4) command to the device
-    kCleanup,                    ///< Call delegates with status, free memory, clear timers and state
+    /// Optional steps for ICD
+    kIcdDiscovery, ///< Check whether the device is an ICD
+    /// TODO(#29384): Finish ICD registration implementation in commissioner
+    /// End of optional steps for ICD
+    kSendComplete, ///< Send CommissioningComplete (0x30:4) command to the device
+    kCleanup,      ///< Call delegates with status, free memory, clear timers and state
     /// Send ScanNetworks (0x31:0) command to the device.
     /// ScanNetworks can happen anytime after kArmFailsafe.
     /// However, the cirque tests fail if it is earlier in the list
@@ -69,6 +73,13 @@ enum CommissioningStage : uint8_t
     /// Call CHIPDeviceController::NetworkCredentialsReady() when CommissioningParameters is populated with
     /// network credentials to use in kWiFiNetworkSetup or kThreadNetworkSetup steps.
     kNeedsNetworkCreds,
+};
+
+enum IcdRegistrationStrategy
+{
+    kIgnore,         ///< Do not check whether the device is an ICD during commissioning
+    kBeforeComplete, ///< Do commissioner self-registration or external controller registration,
+                     ///< Controller should provide a ICDKey manager for generating symmetric key
 };
 
 const char * StageToString(CommissioningStage stage);
@@ -493,6 +504,13 @@ public:
         return *this;
     }
 
+    IcdRegistrationStrategy GetIcdRegistrationStrategy() const { return mIcdRegistrationStrategy; }
+    CommissioningParameters & SetIcdRegistrationStrategy(IcdRegistrationStrategy icdRegistrationStrategy)
+    {
+        mIcdRegistrationStrategy = icdRegistrationStrategy;
+        return *this;
+    }
+
     // Clear all members that depend on some sort of external buffer.  Can be
     // used to make sure that we are not holding any dangling pointers.
     void ClearExternalBufferDependentValues()
@@ -550,7 +568,8 @@ private:
     Optional<bool> mAttemptWiFiNetworkScan;
     Optional<bool> mAttemptThreadNetworkScan; // This automatically gets set to false when a ThreadOperationalDataset is set
     Optional<bool> mSkipCommissioningComplete;
-    bool mCheckForMatchingFabric = false;
+    IcdRegistrationStrategy mIcdRegistrationStrategy = IcdRegistrationStrategy::kIgnore;
+    bool mCheckForMatchingFabric                     = false;
 };
 
 struct RequestedCertificate
@@ -632,6 +651,13 @@ struct ReadCommissioningInfo
     uint8_t maxTimeZoneSize        = 1;
     uint8_t maxDSTSize             = 1;
 };
+
+struct IcdInfo
+{
+    bool isIcd                  = false;
+    bool checkInProtocolSupport = false;
+};
+
 struct MatchingFabricInfo
 {
     NodeId nodeId = kUndefinedNodeId;
@@ -694,7 +720,7 @@ public:
      */
     struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData,
                                          ReadCommissioningInfo, AttestationErrorInfo, CommissioningErrorInfo,
-                                         NetworkCommissioningStatusInfo, MatchingFabricInfo, TimeZoneResponseInfo>
+                                         NetworkCommissioningStatusInfo, MatchingFabricInfo, TimeZoneResponseInfo, IcdInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

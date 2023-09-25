@@ -392,6 +392,13 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         }
         return CommissioningStage::kFindOperational;
     case CommissioningStage::kFindOperational:
+        if (mParams.GetIcdRegistrationStrategy() != IcdRegistrationStrategy::kIgnore)
+        {
+            return CommissioningStage::kIcdDiscovery;
+        }
+        return CommissioningStage::kSendComplete;
+    case CommissioningStage::kIcdDiscovery:
+        // TODO(#29385): Register to the ICD.
         return CommissioningStage::kSendComplete;
     case CommissioningStage::kSendComplete:
         return CommissioningStage::kCleanup;
@@ -705,6 +712,15 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         case CommissioningStage::kFindOperational:
             mOperationalDeviceProxy = report.Get<OperationalNodeFoundData>().operationalProxy;
             break;
+        case CommissioningStage::kIcdDiscovery: {
+            IcdInfo icdInfo = report.Get<IcdInfo>();
+            if (icdInfo.isIcd)
+            {
+                mNeedIcdRegistraion = true;
+                ChipLogDetail(Controller, "AutoCommissioner: Device is ICD");
+            }
+            break;
+        }
         case CommissioningStage::kCleanup:
             ReleasePAI();
             ReleaseDAC();
