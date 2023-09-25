@@ -509,14 +509,14 @@ static void backport_if_freenameindex(struct if_nameindex *);
 
 static void backport_if_freenameindex(struct if_nameindex * inArray)
 {
-    if (inArray == NULL)
+    if (inArray == nullptr)
     {
         return;
     }
 
     for (size_t i = 0; inArray[i].if_index != 0; i++)
     {
-        if (inArray[i].if_name != NULL)
+        if (inArray[i].if_name != nullptr)
         {
             Platform::MemoryFree(inArray[i].if_name);
         }
@@ -533,17 +533,17 @@ static struct if_nameindex * backport_if_nameindex(void)
     size_t maxIntfNum            = 0;
     size_t numIntf               = 0;
     size_t numAddrs              = 0;
-    struct if_nameindex * retval = NULL;
-    struct if_nameindex * tmpval = NULL;
-    struct ifaddrs * addrList    = NULL;
-    struct ifaddrs * addrIter    = NULL;
+    struct if_nameindex * retval = nullptr;
+    struct if_nameindex * tmpval = nullptr;
+    struct ifaddrs * addrList    = nullptr;
+    struct ifaddrs * addrIter    = nullptr;
     const char * lastIntfName    = "";
 
     err = getifaddrs(&addrList);
     VerifyOrExit(err >= 0, );
 
     // coalesce on consecutive interface names
-    for (addrIter = addrList; addrIter != NULL; addrIter = addrIter->ifa_next)
+    for (addrIter = addrList; addrIter != nullptr; addrIter = addrIter->ifa_next)
     {
         numAddrs++;
         if (strcmp(addrIter->ifa_name, lastIntfName) == 0)
@@ -555,11 +555,11 @@ static struct if_nameindex * backport_if_nameindex(void)
     }
 
     tmpval = (struct if_nameindex *) Platform::MemoryAlloc((numIntf + 1) * sizeof(struct if_nameindex));
-    VerifyOrExit(tmpval != NULL, );
+    VerifyOrExit(tmpval != nullptr, );
     memset(tmpval, 0, (numIntf + 1) * sizeof(struct if_nameindex));
 
     lastIntfName = "";
-    for (addrIter = addrList; addrIter != NULL; addrIter = addrIter->ifa_next)
+    for (addrIter = addrList; addrIter != nullptr; addrIter = addrIter->ifa_next)
     {
         if (strcmp(addrIter->ifa_name, lastIntfName) == 0)
         {
@@ -587,7 +587,7 @@ static struct if_nameindex * backport_if_nameindex(void)
     }
 
     retval = (struct if_nameindex *) Platform::MemoryAlloc((maxIntfNum + 1) * sizeof(struct if_nameindex));
-    VerifyOrExit(retval != NULL, );
+    VerifyOrExit(retval != nullptr, );
     memset(retval, 0, (maxIntfNum + 1) * sizeof(struct if_nameindex));
 
     for (size_t i = 0; tmpval[i].if_index != 0; i++)
@@ -620,16 +620,16 @@ static struct if_nameindex * backport_if_nameindex(void)
     for (size_t i = intfIter; i < maxIntfNum; i++)
     {
         retval[i].if_index = 0;
-        retval[i].if_name  = NULL;
+        retval[i].if_name  = nullptr;
     }
 
 exit:
-    if (tmpval != NULL)
+    if (tmpval != nullptr)
     {
         Platform::MemoryFree(tmpval);
     }
 
-    if (addrList != NULL)
+    if (addrList != nullptr)
     {
         freeifaddrs(addrList);
     }

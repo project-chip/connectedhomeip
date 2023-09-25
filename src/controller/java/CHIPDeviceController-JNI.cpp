@@ -1287,8 +1287,19 @@ JNI_METHOD(jlong, getGroupDevicePointer)(JNIEnv * env, jobject self, jlong handl
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
+    VerifyOrReturnValue(wrapper != nullptr, JNI_FALSE, ChipLogError(Controller, "wrapper is null"));
+
     GroupDeviceProxy * device = new GroupDeviceProxy(static_cast<GroupId>(groupId), wrapper->Controller()->GetFabricIndex(),
                                                      wrapper->Controller()->ExchangeMgr());
+
+    if (device == nullptr)
+    {
+        CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
+        ChipLogError(Controller, "GroupDeviceProxy handle is nullptr: %s", ErrorStr(err));
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        return 0;
+    }
+
     return reinterpret_cast<jlong>(device);
 }
 
@@ -1306,6 +1317,8 @@ JNI_METHOD(jobject, getAvailableGroupIds)(JNIEnv * env, jobject self, jlong hand
 {
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrReturnValue(wrapper != nullptr, JNI_FALSE, ChipLogError(Controller, "wrapper is null"));
 
     CHIP_ERROR err                                           = CHIP_NO_ERROR;
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
@@ -1335,6 +1348,8 @@ JNI_METHOD(jstring, getGroupName)(JNIEnv * env, jobject self, jlong handle, jint
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
+    VerifyOrReturnValue(wrapper != nullptr, JNI_FALSE, ChipLogError(Controller, "wrapper is null"));
+
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
     auto it = groupDataProvider->IterateGroupInfo(wrapper->Controller()->GetFabricIndex());
 
@@ -1359,6 +1374,8 @@ JNI_METHOD(jobject, findKeySetId)(JNIEnv * env, jobject self, jlong handle, jint
 {
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrReturnValue(wrapper != nullptr, JNI_FALSE, ChipLogError(Controller, "wrapper is null"));
 
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
     auto iter = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
@@ -1391,6 +1408,8 @@ JNI_METHOD(jboolean, addGroup)(JNIEnv * env, jobject self, jlong handle, jint jG
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
+    VerifyOrReturnValue(wrapper != nullptr, JNI_FALSE, ChipLogError(Controller, "wrapper is null"));
+
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
     chip::Credentials::GroupDataProvider::GroupInfo group;
 
@@ -1408,6 +1427,8 @@ JNI_METHOD(jboolean, removeGroup)(JNIEnv * env, jobject self, jlong handle, jint
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
+    VerifyOrReturnValue(wrapper != nullptr, JNI_FALSE, ChipLogError(Controller, "wrapper is null"));
+
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
     CHIP_ERROR err = groupDataProvider->RemoveGroupInfo(wrapper->Controller()->GetFabricIndex(), static_cast<GroupId>(jGroupId));
 
@@ -1418,6 +1439,8 @@ JNI_METHOD(jobject, getKeySetIds)(JNIEnv * env, jobject self, jlong handle)
 {
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrReturnValue(wrapper != nullptr, JNI_FALSE, ChipLogError(Controller, "wrapper is null"));
 
     CHIP_ERROR err                                           = CHIP_NO_ERROR;
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
@@ -1447,6 +1470,8 @@ JNI_METHOD(jobject, getKeySecurityPolicy)(JNIEnv * env, jobject self, jlong hand
 {
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrReturnValue(wrapper != nullptr, JNI_FALSE, ChipLogError(Controller, "wrapper is null"));
 
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
     auto it = groupDataProvider->IterateKeySets(wrapper->Controller()->GetFabricIndex());
@@ -1481,6 +1506,8 @@ JNI_METHOD(jboolean, bindKeySet)(JNIEnv * env, jobject self, jlong handle, jint 
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
+    VerifyOrReturnValue(wrapper != nullptr, JNI_FALSE, ChipLogError(Controller, "wrapper is null"));
+
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
     auto iter            = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
     size_t current_count = iter->Count();
@@ -1496,6 +1523,8 @@ JNI_METHOD(jboolean, unbindKeySet)(JNIEnv * env, jobject self, jlong handle, jin
 {
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrReturnValue(wrapper != nullptr, JNI_FALSE, ChipLogError(Controller, "wrapper is null"));
 
     size_t index                                             = 0;
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
@@ -1531,6 +1560,8 @@ JNI_METHOD(jboolean, addKeySet)
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
+    VerifyOrReturnValue(wrapper != nullptr, JNI_FALSE, ChipLogError(Controller, "wrapper is null"));
+
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
     uint8_t compressed_fabric_id[sizeof(chip::FabricId)];
     chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
@@ -1564,6 +1595,8 @@ JNI_METHOD(jboolean, removeKeySet)(JNIEnv * env, jobject self, jlong handle, jin
 {
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrReturnValue(wrapper != nullptr, JNI_FALSE, ChipLogError(Controller, "wrapper is null"));
 
     CHIP_ERROR err                                           = CHIP_NO_ERROR;
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
@@ -2430,7 +2463,8 @@ JNI_METHOD(void, invoke)
     tlvBytesObj = static_cast<jbyteArray>(env->CallObjectMethod(invokeElement, getTlvByteArrayMethod));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
     {
-        app::CommandPathParams path(static_cast<EndpointId>(endpointId), /* group id */ 0, static_cast<ClusterId>(clusterId),
+        GroupId groupId = device->GetSecureSession().Value()->IsGroupSession() ? device->GetSecureSession().Value()->AsOutgoingGroupSession()->GetGroupId() : chip::kUndefinedGroupId;
+        app::CommandPathParams path(static_cast<EndpointId>(endpointId), groupId, static_cast<ClusterId>(clusterId),
                                     static_cast<CommandId>(commandId), app::CommandPathFlags::kEndpointIdValid);
         if (tlvBytesObj != nullptr)
         {

@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.ClusterIDMapping
+import chip.devicecontroller.GroupKeySecurityPolicy
 import chip.devicecontroller.InvokeCallback
 import chip.devicecontroller.ReportCallback
 import chip.devicecontroller.WriteAttributesCallback
@@ -136,7 +137,7 @@ class GroupSettingFragment : Fragment() {
       ArrayAdapter(
         requireContext(),
         android.R.layout.simple_spinner_dropdown_item,
-        ChipDeviceController.GroupKeySecurityPolicy.values()
+        GroupKeySecurityPolicy.values()
       )
     val validityTimeEd = dialogView.findViewById<EditText>(R.id.validityTimeEd)
     val epochKeyEd = dialogView.findViewById<EditText>(R.id.epochKeyEd)
@@ -146,7 +147,7 @@ class GroupSettingFragment : Fragment() {
       val ret =
         deviceController.addKeySet(
           keySetIdEd.text.toString().toUInt().toInt(),
-          ChipDeviceController.GroupKeySecurityPolicy.valueOf(
+          GroupKeySecurityPolicy.valueOf(
             keySecurityPolicySp.selectedItem.toString()
           ),
           validityTimeEd.text.toString().toULong().toLong(),
@@ -247,7 +248,7 @@ class GroupSettingFragment : Fragment() {
       ArrayAdapter(
         requireContext(),
         android.R.layout.simple_spinner_dropdown_item,
-        ChipDeviceController.GroupKeySecurityPolicy.values()
+        GroupKeySecurityPolicy.values()
       )
     val epochKey0Ed = dialogView.findViewById<EditText>(R.id.epochKey0Ed)
     val epochStartTime0Ed = dialogView.findViewById<EditText>(R.id.epochStartTime0Ed)
@@ -262,7 +263,7 @@ class GroupSettingFragment : Fragment() {
         val keySetWritestruct =
           GroupKeyManagementClusterGroupKeySetStruct(
             keySetIdEd.text.toString().toUInt(),
-            ChipDeviceController.GroupKeySecurityPolicy.valueOf(
+            GroupKeySecurityPolicy.valueOf(
                 keySecurityPolicySp.selectedItem.toString()
               )
               .id

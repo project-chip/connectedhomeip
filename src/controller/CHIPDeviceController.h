@@ -193,7 +193,7 @@ public:
 
     Messaging::ExchangeManager * ExchangeMgr()
     {
-        if (mSystemState)
+        if (mSystemState != nullptr)
         {
             return mSystemState->ExchangeMgr();
         }

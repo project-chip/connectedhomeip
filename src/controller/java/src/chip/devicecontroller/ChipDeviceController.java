@@ -344,30 +344,6 @@ public class ChipDeviceController {
     releaseOperationalDevicePointer(devicePtr);
   }
 
-  public enum GroupKeySecurityPolicy {
-    TrustFirst(0),
-    CacheAndSync(1);
-
-    private int id;
-
-    GroupKeySecurityPolicy(int id) {
-      this.id = id;
-    }
-
-    public int getID() {
-      return id;
-    }
-
-    public static GroupKeySecurityPolicy value(int id) {
-      for (GroupKeySecurityPolicy policy : GroupKeySecurityPolicy.values()) {
-        if (policy.id == id) {
-          return policy;
-        }
-      }
-      return null;
-    }
-  }
-
   public long getGroupDevicePointer(int groupId) {
     return getGroupDevicePointer(deviceControllerPtr, groupId);
   }
