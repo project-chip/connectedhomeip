@@ -115,7 +115,7 @@ class TC_DISHM_3_3(MatterBaseTest):
 
         logging.info("OnMode: %s" % (old_on_mode_dut))
 
-        #asserts.assert_true(type_matches(old_on_mode_dut, uint) , "On mode value should be an integer value")
+        # asserts.assert_true(type_matches(old_on_mode_dut, uint) , "On mode value should be an integer value")
 
         if old_on_mode_dut == startup_mode_dut:
 
@@ -153,14 +153,14 @@ class TC_DISHM_3_3(MatterBaseTest):
         self.print_step(10, "Physically power cycle the device")
         input("Press Enter when done.\n")
 
-        self.print_step(11, "Read StartUpMode attribute")
+        self.print_step(11, "Read StartUpMode attribute from the DUT")
 
         startup_mode_dut = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.StartUpMode)
 
         logging.info("StartUpMode: %s" % (startup_mode_dut))
 
-        asserts.assert_true(type_matches(startup_mode_dut, uint) or startup_mode_dut ==
-                            new_start_up_mode_th, "Startup mode value should be an integer value or null")
+        asserts.assert_true(type_matches(startup_mode_dut, uint) and startup_mode_dut ==
+                            new_start_up_mode_th, "Startup mode value should be an integer value and match the StartUpMode value saved in step 3")
 
         self.print_step(12, "Read CurrentMode attribute")
         current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)

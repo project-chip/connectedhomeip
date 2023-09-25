@@ -116,7 +116,7 @@ class TC_DISHM_3_1(MatterBaseTest):
 
         logging.info("OnMode: %s" % (on_mode_dut))
 
-        #asserts.assert_false(on_mode_dut == NullValue, "On mode value should be an integer value")
+        # asserts.assert_false(on_mode_dut == NullValue, "On mode value should be an integer value")
 
         self.print_step(3, "Read CurrentMode attribute")
 

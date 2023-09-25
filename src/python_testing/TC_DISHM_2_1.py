@@ -106,7 +106,7 @@ class TC_DISHM_2_1(MatterBaseTest):
             ret = await self.send_change_to_mode_cmd(newMode=self.modeFail)
             st = ret.status
             is_mfg_code = st in range(0x80, 0xC0)
-            is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st in DishwasherModeCodes) or is_mfg_code
+            is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or is_mfg_code
             asserts.assert_true(
                 is_err_code, "Changing to mode %d must fail due to the current state of the device" % (self.modeFail))
             # Status text is an optional string which may not always be included
