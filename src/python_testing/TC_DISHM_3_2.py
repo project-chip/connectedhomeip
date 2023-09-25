@@ -121,7 +121,7 @@ class TC_DISHM_3_2(MatterBaseTest):
             self.print_step(4, "Write to the StartUpMode Attribute")
 
             ret = await self.write_start_up_mode(newMode=new_start_up_mode_th)
-            # There is no recorded response returned from StartUpMode when writing to StartUpMode.
+            # There is no recorded response returned when writing to StartUpMode.
             logging.info("Write StartUpMode Return: %s" % ret)
 
         else:
