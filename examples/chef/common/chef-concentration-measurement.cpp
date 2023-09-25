@@ -14,9 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app-common/zap-generated/callback.h>
 #include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
 
@@ -24,16 +24,16 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-#if defined(EMBER_AF_PLUGIN_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_SERVER) || \
-	defined(EMBER_AF_PLUGIN_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) || \
-	defined(EMBER_AF_PLUGIN_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) || \
-	defined(EMBER_AF_PLUGIN_OZONE_CONCENTRATION_MEASUREMENT_SERVER) || \
-	defined(EMBER_AF_PLUGIN_PM2__5_CONCENTRATION_MEASUREMENT_SERVER) || \
-	defined(EMBER_AF_PLUGIN_FORMALDEHYDE_CONCENTRATION_MEASUREMENT_SERVER) || \
-	defined(EMBER_AF_PLUGIN_PM1_CONCENTRATION_MEASUREMENT_SERVER) || \
-	defined(EMBER_AF_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER) || \
-	defined(EMBER_AF_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER) || \
-	defined(EMBER_AF_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER)
+#if defined(EMBER_AF_PLUGIN_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                   \
+    defined(EMBER_AF_PLUGIN_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                    \
+    defined(EMBER_AF_PLUGIN_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                  \
+    defined(EMBER_AF_PLUGIN_OZONE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                             \
+    defined(EMBER_AF_PLUGIN_PM2__5_CONCENTRATION_MEASUREMENT_SERVER) ||                                                            \
+    defined(EMBER_AF_PLUGIN_FORMALDEHYDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                      \
+    defined(EMBER_AF_PLUGIN_PM1_CONCENTRATION_MEASUREMENT_SERVER) ||                                                               \
+    defined(EMBER_AF_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER) ||                                                              \
+    defined(EMBER_AF_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER) ||                                  \
+    defined(EMBER_AF_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER)
 #include <app/clusters/concentration-measurement-server/concentration-measurement-server.h>
 using namespace chip::app::Clusters::ConcentrationMeasurement;
 #endif

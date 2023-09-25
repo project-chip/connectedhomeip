@@ -14,9 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app-common/zap-generated/callback.h>
 #include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
 
@@ -29,7 +29,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AirQuality;
 
 static chip::BitMask<Feature, uint32_t> airQualityFeatures(Feature::kFair, Feature::kModerate, Feature::kVeryPoor,
-                                                        Feature::kExtremelyPoor);
+                                                           Feature::kExtremelyPoor);
 static Instance gAirQualityClusterInstance = Instance(1, airQualityFeatures);
 
 void emberAfAirQualityClusterInitCallback(chip::EndpointId endpointId)
