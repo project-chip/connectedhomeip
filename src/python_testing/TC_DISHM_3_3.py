@@ -57,7 +57,7 @@ class TC_DISHM_3_3(MatterBaseTest):
         asserts.assert_true(self.check_pics("DISHM.S.C01.Tx"), "DISHM.S.C01.Tx must be supported")
 
         if not self.check_pics("DISHM.S.A0002"):
-            logging.info("Test skipped because PICS DISHM.S.A0002 (StartupMode)")
+            logging.info("Test skipped because PICS DISHM.S.A0002 (StartupMode) is not set")
             return
 
         if not self.check_pics("DISHM.S.A0003"):
