@@ -18,5 +18,5 @@
 read -p "Enter RPi host name " pihost
 read -p "Enter RPi user name " piuser
 
-echo "export PIHOST=\"$pihost\"" > $IDT_SRC_PARENT/idt/scripts/vars.sh
-echo "export PIUSER=\"$piuser\"" >> $IDT_SRC_PARENT/idt/scripts/vars.sh
+echo "export PIHOST=\"$pihost\"" > "$IDT_SRC_PARENT"/idt/scripts/vars.sh
+echo "export PIUSER=\"$piuser\"" >> "$IDT_SRC_PARENT"/idt/scripts/vars.sh
