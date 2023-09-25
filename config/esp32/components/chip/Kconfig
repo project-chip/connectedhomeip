@@ -310,7 +310,7 @@ menu "CHIP Device Layer"
             help
                 Enables or Disables ICD server
 
-        config ICD_SLOW_POLL_INTERVAL
+        config ICD_SLOW_POLL_INTERVAL_MS
             int "ICD Slow Polling Interval(ms)"
             depends on ENABLE_ICD_SERVER
             default 5000
@@ -319,7 +319,7 @@ menu "CHIP Device Layer"
                 messages in Idle Mode. The Slow Polling interval MAY be the same as the Idle Mode
                 Interval.
 
-        config ICD_FAST_POLL_INTERVAL
+        config ICD_FAST_POLL_INTERVAL_MS
             int "ICD Fast Polling Interval(ms)"
             depends on ENABLE_ICD_SERVER
             default 200
@@ -328,15 +328,15 @@ menu "CHIP Device Layer"
                 in Active Mode. The Fast Polling interval SHALL be smaller than the Active Mode
                 Interval.
 
-        config ICD_IDLE_MODE_INTERVAL
-            int "ICD Idle Mode Interval(s)"
+        config ICD_IDLE_MODE_INTERVAL_SEC
+            int "ICD Idle Mode Interval(sec)"
             depends on ENABLE_ICD_SERVER
             default 2
             help
                 This value indicates the maximum interval in seconds the server can stay in idle
                 mode.
 
-        config ICD_ACTIVE_MODE_INTERVAL
+        config ICD_ACTIVE_MODE_INTERVAL_MS
             int "ICD Active Mode Interval(ms)"
             depends on ENABLE_ICD_SERVER
             default 300
@@ -344,7 +344,7 @@ menu "CHIP Device Layer"
                 This value indicates the minimum interval in milliseconds the server can stay in
                 active mode.
 
-        config ICD_ACTIVE_MODE_THRESHOLD
+        config ICD_ACTIVE_MODE_THRESHOLD_MS
             int "ICD Active Mode Threshold(ms)"
             depends on ENABLE_ICD_SERVER
             default 300
