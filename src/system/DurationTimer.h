@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <chrono>
 #include <ctime>
+#include <system/SystemClock.h>
 
 using namespace std;
 
@@ -22,8 +23,8 @@ namespace chip{
                 private:
                     //char* toTimeStr(std::chrono::time_point time);
                 protected:
-                    std::chrono::time_point<std::chrono::system_clock> t1;
-                    std::chrono::time_point<std::chrono::system_clock> t2;
+                    chip::System::Clock::Timestamp t1;
+                    chip::System::Clock::Timestamp t2;
                     string * label;
                 public:
                     //constructors
@@ -33,13 +34,13 @@ namespace chip{
                     }
                     ~TimespecTimer(){
                         delete label;
-                        //t1=0;
-                        //t2=0;
+                        t1=1;
+                        t2=1;
                     }
                     //member functions
                     void start();
                     void stop();
-                    double duration(); 
+                    long long int duration(); 
 
         };
 

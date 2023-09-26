@@ -22,7 +22,7 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <transport/SessionManager.h>
-#include <tracing/DurationTimer.h>
+#include <system/DurationTimer.h>
 
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
