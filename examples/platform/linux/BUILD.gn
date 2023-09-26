@@ -1,4 +1,5 @@
 # Copyright (c) 2020 Project CHIP Authors
+# Copyright 2025 NXP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -98,8 +99,8 @@ source_set("app-main") {
 
   if (chip_with_trusty_os) {
     sources += [
-      "DeviceAttestationCreds.cpp",
-      "DeviceAttestationCreds.h",
+      "DeviceAttestationCredsTrusty.cpp",
+      "DeviceAttestationCredsTrusty.h",
       "PersistentStorageOperationalKeystoreTrusty.cpp",
       "PersistentStorageOperationalKeystoreTrusty.h",
     ]
@@ -107,6 +108,9 @@ source_set("app-main") {
 
   if (chip_with_imx_ele) {
     sources += [
+      #TODO enable this when official tool ready
+      #     "DeviceAttestationCredsEle.cpp",
+      #     "DeviceAttestationCredsEle.h",
       "PersistentStorageOperationalKeystoreEle.cpp",
       "PersistentStorageOperationalKeystoreEle.h",
     ]
@@ -161,8 +165,11 @@ source_set("app-main") {
 
   if (chip_with_imx_ele) {
     defines += [ "CHIP_OP_KEYSTORE_ELE=1" ]
+    #TODO enable this when official tool ready
+    #   defines += [ "CHIP_ATTESTATION_ELE=1" ]
   } else {
     defines += [ "CHIP_OP_KEYSTORE_ELE=0" ]
+    defines += [ "CHIP_ATTESTATION_ELE=0" ]
   }
 
   if (chip_enable_pw_rpc) {
