@@ -207,7 +207,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             = dispatch_queue_create("org.csa-iot.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _readCache = [NSMutableDictionary dictionary];
         _expectedValueCache = [NSMutableDictionary dictionary];
-        _asyncCallbackWorkQueue = [[MTRAsyncWorkQueue alloc] initWithContext:self queue:_queue];
+        _asyncWorkQueue = [[MTRAsyncWorkQueue alloc] initWithContext:self];
         _state = MTRDeviceStateUnknown;
         MTR_LOG_INFO("%@ init with hex nodeID 0x%016llX", self, _nodeID.unsignedLongLongValue);
     }
@@ -381,7 +381,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 
     MTR_LOG_DEFAULT("%@ scheduling to reattempt subscription in %u seconds", self, _lastSubscriptionAttemptWait);
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_lastSubscriptionAttemptWait * NSEC_PER_SEC)), self.queue, ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (_lastSubscriptionAttemptWait * NSEC_PER_SEC)), self.queue, ^{
         os_unfair_lock_lock(&self->_lock);
         [self _reattemptSubscriptionNowIfNeeded];
         os_unfair_lock_unlock(&self->_lock);
@@ -882,7 +882,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         NSArray * readRequestData = @[ readRequestPath, params ?: [NSNull null] ];
 
         // But first, check if a duplicate read request is already queued and return
-        if ([_asyncCallbackWorkQueue isDuplicateForTypeID:MTRDeviceWorkItemDuplicateReadTypeID workItemData:readRequestData]) {
+        if ([_asyncWorkQueue isDuplicateForTypeID:MTRDeviceWorkItemDuplicateReadTypeID workItemData:readRequestData]) {
             return attributeValueToReturn;
         }
 
@@ -890,7 +890,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
         // Create work item, set ready handler to perform task, then enqueue the work
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
-        MTRAsyncWorkBatchingHandler batchingHandler = ^(id opaqueDataCurrent, id opaqueDataNext, BOOL * fullyMerged) {
+        [workItem setBatchingID:MTRDeviceWorkItemBatchingReadID data:readRequests handler:^(id opaqueDataCurrent, id opaqueDataNext, BOOL * fullyMerged) {
             NSMutableArray<NSArray *> * readRequestsCurrent = opaqueDataCurrent;
             NSMutableArray<NSArray *> * readRequestsNext = opaqueDataNext;
 
@@ -927,8 +927,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 MTR_LOG_DEFAULT("%@ batching - fully merged next item", logPrefix);
                 *fullyMerged = YES;
             }
-        };
-        MTRAsyncWorkDuplicateCheckHandler duplicateCheckHandler = ^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
+        }];
+        [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
             for (NSArray * readItem in readRequests) {
                 if ([readItem isEqual:opaqueItemData]) {
                     MTR_LOG_DEFAULT("%@ duplicate check found %@ - report duplicate", logPrefix, readItem);
@@ -938,14 +938,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 }
             }
             *stop = NO;
-        };
-        MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-            MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, self->_asyncCallbackWorkQueue);
+        }];
+        [workItem setReadyHandler:^(MTRDevice * device, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+            MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, self->_asyncWorkQueue);
 
             // Sanity check
             if (readRequests.count == 0) {
                 MTR_LOG_ERROR("%@ dequeueWorkItem no read requests", logPrefix);
-                [workItem endWork];
+                completion(MTRAsyncWorkComplete);
                 return;
             }
 
@@ -955,7 +955,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 // Sanity check
                 if (readItem.count < 2) {
                     MTR_LOG_ERROR("%@ dequeueWorkItem read item missing info %@", logPrefix, readItem);
-                    [workItem endWork];
+                    completion(MTRAsyncWorkComplete);
                     return;
                 }
                 [attributePaths addObject:readItem[MTRDeviceReadRequestFieldPathIndex]];
@@ -981,18 +981,15 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                             // TODO: better retry logic
                             if (error && (retryCount < 2)) {
                                 MTR_LOG_ERROR("%@ completion error %@ retryWork %lu", logPrefix, error, (unsigned long) retryCount);
-                                [workItem retryWork];
+                                completion(MTRAsyncWorkNeedsRetry);
                             } else {
                                 MTR_LOG_DEFAULT("%@ completion error %@ endWork", logPrefix, error);
-                                [workItem endWork];
+                                completion(MTRAsyncWorkComplete);
                             }
                         }];
-        };
-        workItem.readyHandler = readyHandler;
-        [workItem setBatchingID:MTRDeviceWorkItemBatchingReadID data:readRequests handler:batchingHandler];
-        [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:duplicateCheckHandler];
-        MTR_LOG_DEFAULT("%@ enqueueWorkItem %@", logPrefix, _asyncCallbackWorkQueue);
-        [_asyncCallbackWorkQueue enqueueWorkItem:workItem];
+        }];
+        MTR_LOG_DEFAULT("%@ enqueueWorkItem %@", logPrefix, _asyncWorkQueue);
+        [_asyncWorkQueue enqueueWorkItem:workItem];
     }
 
     return attributeValueToReturn;
@@ -1023,12 +1020,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
     // The write operation will install a duplicate check handler, to return NO for "isDuplicate". Since a write operation may
     // change values, only read requests after this should be considered for duplicate requests.
-    MTRAsyncWorkDuplicateCheckHandler duplicateCheckHandler = ^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
+    [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
         *isDuplicate = NO;
         *stop = YES;
-    };
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, self->_asyncCallbackWorkQueue);
+    }];
+    [workItem setReadyHandler:^(MTRDevice * device, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, self->_asyncWorkQueue);
         MTRBaseDevice * baseDevice = [self newBaseDevice];
         [baseDevice
             writeAttributeWithEndpointID:endpointID
@@ -1039,16 +1036,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                                    queue:self.queue
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                   MTR_LOG_DEFAULT("%@ completion error %@ endWork", logPrefix, error);
-                                  [workItem endWork];
                                   if (error) {
                                       [self removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
                                   }
+                                  completion(MTRAsyncWorkComplete);
                               }];
-    };
-    workItem.readyHandler = readyHandler;
-    [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:duplicateCheckHandler];
-    MTR_LOG_DEFAULT("%@ enqueueWorkItem %@", logPrefix, _asyncCallbackWorkQueue);
-    [_asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    }];
+    MTR_LOG_DEFAULT("%@ enqueueWorkItem %@", logPrefix, _asyncWorkQueue);
+    [_asyncWorkQueue enqueueWorkItem:workItem];
 }
 
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
@@ -1083,12 +1078,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
     // The command operation will install a duplicate check handler, to return NO for "isDuplicate". Since a command operation may
     // change values, only read requests after this should be considered for duplicate requests.
-    MTRAsyncWorkDuplicateCheckHandler duplicateCheckHandler = ^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
+    [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
         *isDuplicate = NO;
         *stop = YES;
-    };
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, self->_asyncCallbackWorkQueue);
+    }];
+    [workItem setReadyHandler:^(MTRDevice * device, NSInteger retryCount, MTRAsyncWorkCompletionBlock workCompletion) {
+        MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, self->_asyncWorkQueue);
         MTRBaseDevice * baseDevice = [self newBaseDevice];
         [baseDevice
             invokeCommandWithEndpointID:endpointID
@@ -1101,20 +1096,18 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                                  // Log the data at the INFO level (not usually persisted permanently),
                                  // but make sure we log the work completion at the DEFAULT level.
                                  MTR_LOG_INFO("%@ received response: %@ error: %@", logPrefix, values, error);
-                                 MTR_LOG_DEFAULT("%@ endWork", logPrefix);
                                  dispatch_async(queue, ^{
                                      completion(values, error);
                                  });
-                                 [workItem endWork];
                                  if (error && expectedValues) {
                                      [self removeExpectedValuesForAttributePaths:attributePaths expectedValueID:expectedValueID];
                                  }
+                                 MTR_LOG_DEFAULT("%@ endWork", logPrefix);
+                                 workCompletion(MTRAsyncWorkComplete);
                              }];
-    };
-    workItem.readyHandler = readyHandler;
-    [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:duplicateCheckHandler];
-    MTR_LOG_DEFAULT("%@ enqueueWorkItem %@", logPrefix, _asyncCallbackWorkQueue);
-    [_asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    }];
+    MTR_LOG_DEFAULT("%@ enqueueWorkItem %@", logPrefix, _asyncWorkQueue);
+    [_asyncWorkQueue enqueueWorkItem:workItem];
 }
 
 - (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
@@ -1198,7 +1191,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             waitTime = MTR_DEVICE_EXPIRATION_CHECK_TIMER_MINIMUM_WAIT_TIME;
         }
         MTRWeakReference<MTRDevice *> * weakSelf = [MTRWeakReference weakReferenceWithObject:self];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(waitTime * NSEC_PER_SEC)), self.queue, ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (waitTime * NSEC_PER_SEC)), self.queue, ^{
             MTRDevice * strongSelf = weakSelf.strongObject;
             [strongSelf _performScheduledExpirationCheck];
         });

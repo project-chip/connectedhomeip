@@ -19,6 +19,8 @@
 #import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRDevice.h>
 
+#import "MTRAsyncWorkQueue.h"
+
 #include <app/DeviceProxy.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -44,11 +46,9 @@ typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 
 @property (nonatomic, readonly) MTRDeviceController * deviceController;
 @property (nonatomic, readonly, copy) NSNumber * nodeID;
-// Queue used for various internal bookkeeping work.  In general endWork calls
-// on work items should happen on this queue, so we don't block progress of the
-// asyncCallbackWorkQueue on any client code.
+// Queue used for various internal bookkeeping work.
 @property (nonatomic) dispatch_queue_t queue;
-@property (nonatomic, readonly) MTRAsyncWorkQueue * asyncCallbackWorkQueue;
+@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
 
 @end
 

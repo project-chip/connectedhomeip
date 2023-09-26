@@ -19,66 +19,89 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class MTRAsyncWorkItem;
+typedef NS_ENUM(NSInteger, MTRAsyncWorkOutcome) {
+    MTRAsyncWorkComplete,
+    MTRAsyncWorkNeedsRetry,
+};
 
-typedef void (^MTRAsyncWorkReadyHandler)(id context, NSUInteger retryCount);
+/// The type of completion handler passed to `MTRAsyncWorkItem`.
+/// Return YES if the completion call was valid, or NO if the
+/// work item was already completed previously (e.g. due to
+/// being cancelled).
+typedef BOOL (^MTRAsyncWorkCompletionBlock)(MTRAsyncWorkOutcome outcome);
 
-// MTRAsyncWorkQueue high level description
-//   The MTRAsyncWorkQueue was made to call one readyHandler
-//   block at a time asynchronously, and the readyHandler is
-//   expected to start/schedule a task. When the task finishes
-//   asynchronously in the future (at any time, from any queue
-//   or thread), it is expected to ask the workItem object to
-//   either endWork or retryWork.
-
-// Sequence of steps when queuing a work item:
-//   - Create MTRAsyncWorkItem object
-//   - Create ready handler block (MTRAsyncWorkReadyHandler)
-//      - block is called when it's the WorkItem's turn to do work
-//      - its body is to perform a task that is expected to end asynchronously in the future
-//      - at the end of work, call on the work item object:
-//         - endWork for success or failure
-//         - retryWork for temporary failures
-//   - Set the readyHandler block on the WorkItem object
-//   - Call enqueueWorkItem on a MTRAsyncWorkQueue
-
-// A serial one-at-a-time queue for performing work items
+/// A unit of work that can be run on a `MTRAsyncWorkQueue`.
+///
+/// A work item can be configured with a number of hander blocks called by the
+/// async work queue in various situations. Generally work items will have at
+/// least a `readyHandler` (though it is technically optional).
+///
+/// This class is not thread-safe, and once a work item has be submitted to the
+/// queue via `enqueueWorkItem` ownership of the work item passes to the queue.
+/// No further modifications may be made to it after that point.
+///
+/// @see -[MTRAsyncWorkQueue enqueueWorkItem:]
 MTR_TESTABLE
-@interface MTRAsyncWorkQueue : NSObject
+@interface MTRAsyncWorkItem<__contravariant ContextType> : NSObject
+
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
-// The context object is only held and passed back as a reference and is opaque to the work queue
-- (instancetype)initWithContext:(id _Nullable)context queue:(dispatch_queue_t)queue;
+/// Creates a work item that will run on the specified dispatch queue.
+- (instancetype)initWithQueue:(dispatch_queue_t)queue;
 
-// Called by the work queue owner to clean up and cancel work items
-- (void)invalidate;
+/// Called by the work queue to start this work item
+///
+/// This handler block must, synchronously or asynchronously from any thread,
+/// call the provided completion block exactly once. Passing an outcome of
+/// MTRAsyncWorkComplete removes it from the queue and allows the queue to move
+/// on to the next work item (if any).
+///
+/// Passing an outcome of MTRAsyncWorkNeedsRetry causes the queue to start the
+/// work item again with an incremented retryCount. The retryCount is 0 when a
+/// work item is executed for the first time.
+@property (nonatomic, strong, nullable) void (^readyHandler)
+    (ContextType context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion);
 
-// Work items may be enqueued from any queue or thread
-// Note: Once a work item is enqueued, its handlers cannot be modified
-- (void)enqueueWorkItem:(MTRAsyncWorkItem *)item;
+/// Called by the work queue to cancel the work item. The work item may or may
+/// not have been started already.
+@property (nonatomic, strong, nullable) void (^cancelHandler)(void);
+
 @end
 
-// An item in the work queue
+/// A serial one-at-a-time queue for performing asynchronous work items.
+///
+/// Units of work are represented by MTRAsyncWorkItem objects that are
+/// configured with one or more handler blocks before being passed to
+/// `enqueueWorkItem:`.
+///
+/// MTRAsyncWorkQueue is thread-safe.
 MTR_TESTABLE
-@interface MTRAsyncWorkItem : NSObject
+@interface MTRAsyncWorkQueue<ContextType> : NSObject
+
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
-// Both readyHandler and cancelHander will be called on the queue given to initWithQueue
-- (instancetype)initWithQueue:(dispatch_queue_t)queue;
-@property (nonatomic, strong) MTRAsyncWorkReadyHandler readyHandler;
-@property (nonatomic, strong) dispatch_block_t cancelHandler;
+/// Creates a work queue with the given context object.
+///
+/// The context object is weakly held and passed to the readyHandler of work
+/// items. This avoids work item blocks accidentally creating a retain cycle
+/// by strongly closing over the context object themselves (since the context
+/// object will generally be holding a strong reference to the work queue
+/// itself). The owner of the queue is responsible for keeping the context
+/// object alive; no further work items will be executed if the context object
+/// is lost.
+- (instancetype)initWithContext:(ContextType)context;
 
-// Called by the creater of the work item when async work is done and should
-// be removed from the queue. The work queue will run the next work item.
-// Note: This must only be called from within the readyHandler
-- (void)endWork;
+/// Enqueues the specified work item, making it eligible for execution.
+///
+/// Once a work item is enqueued, ownership of it passes to the queue and
+/// no further modifications may be made to it. Work item objects cannot be
+/// re-used.
+- (void)enqueueWorkItem:(MTRAsyncWorkItem<ContextType> *)item;
 
-// Called by the creater of the work item when async work should be retried.
-// The work queue will call this workItem's readyHandler again.
-// Note: This must only be called from within the readyHandler
-- (void)retryWork;
+/// Cancels and removes all work items.
+- (void)invalidate;
 @end
 
 NS_ASSUME_NONNULL_END
